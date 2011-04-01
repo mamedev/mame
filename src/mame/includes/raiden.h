@@ -4,16 +4,16 @@ public:
 	raiden_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *shared_ram;
-	UINT16 *back_data;
-	UINT16 *fore_data;
-	UINT16 *scroll_ram;
-	tilemap_t *bg_layer;
-	tilemap_t *fg_layer;
-	tilemap_t *tx_layer;
-	int flipscreen;
-	int alternate;
+	UINT16 *m_videoram;
+	UINT16 *m_shared_ram;
+	UINT16 *m_back_data;
+	UINT16 *m_fore_data;
+	UINT16 *m_scroll_ram;
+	tilemap_t *m_bg_layer;
+	tilemap_t *m_fg_layer;
+	tilemap_t *m_tx_layer;
+	int m_flipscreen;
+	int m_alternate;
 };
 
 

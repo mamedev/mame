@@ -10,16 +10,17 @@ public:
 	battlex_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 in0_b4;
+	UINT8 m_in0_b4;
 
 	/* memory pointers */
-	UINT8 * videoram;
-	UINT8 * spriteram;
+	UINT8 * m_videoram;
+	UINT8 * m_spriteram;
 
 	/* video-related */
-	tilemap_t *bg_tilemap;
-	UINT8 scroll_lsb, scroll_msb;
-	UINT8 starfield_enabled;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_scroll_lsb;
+	UINT8 m_scroll_msb;
+	UINT8 m_starfield_enabled;
 };
 
 

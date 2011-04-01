@@ -68,25 +68,25 @@ TODO:
 static READ8_HANDLER( sraider_sound_low_r )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	return state->sound_low;
+	return state->m_sound_low;
 }
 
 static READ8_HANDLER( sraider_sound_high_r )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	return state->sound_high;
+	return state->m_sound_high;
 }
 
 static WRITE8_HANDLER( sraider_sound_low_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->sound_low = data;
+	state->m_sound_low = data;
 }
 
 static WRITE8_HANDLER( sraider_sound_high_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->sound_high = data;
+	state->m_sound_high = data;
 }
 
 /* Protection? */
@@ -113,15 +113,15 @@ static WRITE8_HANDLER( sraider_misc_w )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			state->weird_value[offset & 7] = data & 1;
+			state->m_weird_value[offset & 7] = data & 1;
 			break;
 		/* These 6 bits are stored in the latch at N7 */
 		case 0x08:
-			state->sraider_0x30 = data&0x3f;
+			state->m_sraider_0x30 = data&0x3f;
 			break;
 		/* These 6 bits are stored in the latch at N8 */
 		case 0x10:
-			state->sraider_0x38 = data&0x3f;
+			state->m_sraider_0x38 = data&0x3f;
 			break;
 		default:
 			mame_printf_debug("(%04X) write to %02X\n", cpu_get_pc(&space->device()), offset);
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( sraider_misc_w )
 static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8000, 0x8fff) AM_READNOP
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
 	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP  //unknown 0x10 when in attract, 0x20 when coined/playing
 ADDRESS_MAP_END
 
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
 	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_MEMBER(ladybug_state, grid_data)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_MEMBER(ladybug_state, m_grid_data)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
 ADDRESS_MAP_END
 
@@ -192,7 +192,7 @@ static INPUT_CHANGED( coin1_inserted )
 	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
@@ -201,7 +201,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		device_set_input_line(state->maincpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
 
@@ -725,29 +725,29 @@ GFXDECODE_END
 static MACHINE_START( ladybug )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 }
 
 static MACHINE_START( sraider )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->grid_color));
-	state->save_item(NAME(state->sound_low));
-	state->save_item(NAME(state->sound_high));
-	state->save_item(NAME(state->sraider_0x30));
-	state->save_item(NAME(state->sraider_0x38));
-	state->save_item(NAME(state->weird_value));
+	state->save_item(NAME(state->m_grid_color));
+	state->save_item(NAME(state->m_sound_low));
+	state->save_item(NAME(state->m_sound_high));
+	state->save_item(NAME(state->m_sraider_0x30));
+	state->save_item(NAME(state->m_sraider_0x38));
+	state->save_item(NAME(state->m_weird_value));
 
 	/* for stars */
-	state->save_item(NAME(state->star_speed));
-	state->save_item(NAME(state->stars_enable));
-	state->save_item(NAME(state->stars_speed));
-	state->save_item(NAME(state->stars_state));
-	state->save_item(NAME(state->stars_offset));
-	state->save_item(NAME(state->stars_count));
+	state->save_item(NAME(state->m_star_speed));
+	state->save_item(NAME(state->m_stars_enable));
+	state->save_item(NAME(state->m_stars_speed));
+	state->save_item(NAME(state->m_stars_state));
+	state->save_item(NAME(state->m_stars_offset));
+	state->save_item(NAME(state->m_stars_count));
 }
 
 static MACHINE_RESET( sraider )
@@ -755,22 +755,22 @@ static MACHINE_RESET( sraider )
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 	int i;
 
-	state->grid_color = 0;
-	state->sound_low = 0;
-	state->sound_high = 0;
-	state->sraider_0x30 = 0;
-	state->sraider_0x38 = 0;
+	state->m_grid_color = 0;
+	state->m_sound_low = 0;
+	state->m_sound_high = 0;
+	state->m_sraider_0x30 = 0;
+	state->m_sraider_0x38 = 0;
 
 	/* for stars */
-	state->star_speed = 0;
-	state->stars_enable = 0;
-	state->stars_speed = 0;
-	state->stars_state = 0;
-	state->stars_offset = 0;
-	state->stars_count = 0;
+	state->m_star_speed = 0;
+	state->m_stars_enable = 0;
+	state->m_stars_speed = 0;
+	state->m_stars_state = 0;
+	state->m_stars_offset = 0;
+	state->m_stars_count = 0;
 
 	for (i = 0; i < 8; i++)
-		state->weird_value[i] = 0;
+		state->m_weird_value[i] = 0;
 }
 
 static MACHINE_CONFIG_START( ladybug, ladybug_state )

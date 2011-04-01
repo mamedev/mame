@@ -44,14 +44,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *   spriteram;
-	UINT16 *   paletteram;
-	size_t     spriteram_size;
+	UINT16 *   m_spriteram;
+	UINT16 *   m_paletteram;
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	bitmap_t * bitmap;
-	UINT16     screen_enable;
-	UINT16     draw_sprites;
+	bitmap_t * m_bitmap;
+	UINT16     m_screen_enable;
+	UINT16     m_draw_sprites;
 };
 
 /***************************************************************************
@@ -62,11 +62,11 @@ static VIDEO_START( astrocorp )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
 
-	state->bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->save_item(NAME(*state->bitmap));
-	state->save_item       (NAME(state->screen_enable));
-	state->save_item       (NAME(state->draw_sprites));
+	state->save_item(NAME(*state->m_bitmap));
+	state->save_item       (NAME(state->m_screen_enable));
+	state->save_item       (NAME(state->m_draw_sprites));
 }
 
 /***************************************************************************
@@ -94,8 +94,8 @@ static VIDEO_START( astrocorp )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	astrocorp_state *state = machine.driver_data<astrocorp_state>();
-	UINT16 *source = state->spriteram;
-	UINT16 *finish = state->spriteram + state->spriteram_size / 2;
+	UINT16 *source = state->m_spriteram;
+	UINT16 *finish = state->m_spriteram + state->m_spriteram_size / 2;
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
@@ -143,8 +143,8 @@ static SCREEN_UPDATE(astrocorp)
 {
 	astrocorp_state *state = screen->machine().driver_data<astrocorp_state>();
 
-	if (state->screen_enable & 1)
-		copybitmap(bitmap, state->bitmap, 0,0,0,0, cliprect);
+	if (state->m_screen_enable & 1)
+		copybitmap(bitmap, state->m_bitmap, 0,0,0,0, cliprect);
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
@@ -160,11 +160,11 @@ static WRITE16_HANDLER( astrocorp_draw_sprites_w )
 {
 	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
 
-	UINT16 old = state->draw_sprites;
-	UINT16 now = COMBINE_DATA(&state->draw_sprites);
+	UINT16 old = state->m_draw_sprites;
+	UINT16 now = COMBINE_DATA(&state->m_draw_sprites);
 
 	if (!old && now)
-		draw_sprites(space->machine(), state->bitmap, &space->machine().primary_screen->visible_area());
+		draw_sprites(space->machine(), state->m_bitmap, &space->machine().primary_screen->visible_area());
 }
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
@@ -260,10 +260,10 @@ static WRITE16_HANDLER( skilldrp_outputs_w )
 static WRITE16_HANDLER( astrocorp_screen_enable_w )
 {
 	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
-	COMBINE_DATA(&state->screen_enable);
+	COMBINE_DATA(&state->m_screen_enable);
 //  popmessage("%04X",data);
-	if (state->screen_enable & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(&space->device()), state->screen_enable);
+	if (state->m_screen_enable & (~1))
+		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(&space->device()), state->m_screen_enable);
 }
 
 static READ16_HANDLER( astrocorp_unk_r )
@@ -275,23 +275,23 @@ static READ16_HANDLER( astrocorp_unk_r )
 static WRITE16_HANDLER( astrocorp_palette_w )
 {
 	astrocorp_state *state = space->machine().driver_data<astrocorp_state>();
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 	palette_set_color_rgb(space->machine(), offset,
-		pal5bit((state->paletteram[offset] >>  0) & 0x1f),
-		pal6bit((state->paletteram[offset] >>  5) & 0x3f),
-		pal5bit((state->paletteram[offset] >> 11) & 0x1f)
+		pal5bit((state->m_paletteram[offset] >>  0) & 0x1f),
+		pal6bit((state->m_paletteram[offset] >>  5) & 0x3f),
+		pal5bit((state->m_paletteram[offset] >> 11) & 0x1f)
 	);
 }
 
 static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, spriteram, spriteram_size)
+	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, m_paletteram)
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
@@ -300,9 +300,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, m_paletteram)
 	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
-	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, spriteram, spriteram_size)
+	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
@@ -315,13 +315,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, spriteram, spriteram_size)
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x202000, 0x202001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x204000, 0x204001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x208000, 0x208001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x20a000, 0x20a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
+	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, m_paletteram)
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE("oki", skilldrp_sound_bank_w)
@@ -331,13 +331,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram")	// battery
-	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, spriteram, spriteram_size)
+	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x382000, 0x382001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x384000, 0x384001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x388000, 0x388001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x38a000, 0x38a001 ) AM_WRITE(skilldrp_outputs_w)
 	AM_RANGE( 0x38e000, 0x38e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
+	AM_RANGE( 0x480000, 0x4801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, m_paletteram)
 	AM_RANGE( 0x500000, 0x500001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE("oki", skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)

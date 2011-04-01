@@ -12,7 +12,7 @@ public:
 	xybots_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16			h256;
+	UINT16			m_h256;
 };
 
 

@@ -125,7 +125,7 @@ static READ8_HANDLER( boggy84_custom_io_r )
 static MACHINE_START( imago )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	gfx_element_set_source(machine.gfx[1], state->imago_sprites);
+	gfx_element_set_source(machine.gfx[1], state->m_imago_sprites);
 }
 
 static WRITE8_HANDLER( imago_dma_irq_w )
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( imago_dma_irq_w )
 static WRITE8_HANDLER( imago_sprites_bank_w )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	state->imago_sprites_bank = (data & 2) >> 1;
+	state->m_imago_sprites_bank = (data & 2) >> 1;
 }
 
 static WRITE8_HANDLER( imago_sprites_dma_w )
@@ -145,14 +145,14 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 	UINT8 *rom = (UINT8 *)space->machine().region("gfx2")->base();
 	UINT8 sprites_data;
 
-	sprites_data = rom[state->imago_sprites_address + 0x2000*0 + state->imago_sprites_bank * 0x1000];
-	state->imago_sprites[offset + 0x800*0] = sprites_data;
+	sprites_data = rom[state->m_imago_sprites_address + 0x2000*0 + state->m_imago_sprites_bank * 0x1000];
+	state->m_imago_sprites[offset + 0x800*0] = sprites_data;
 
-	sprites_data = rom[state->imago_sprites_address + 0x2000*1 + state->imago_sprites_bank * 0x1000];
-	state->imago_sprites[offset + 0x800*1] = sprites_data;
+	sprites_data = rom[state->m_imago_sprites_address + 0x2000*1 + state->m_imago_sprites_bank * 0x1000];
+	state->m_imago_sprites[offset + 0x800*1] = sprites_data;
 
-	sprites_data = rom[state->imago_sprites_address + 0x2000*2 + state->imago_sprites_bank * 0x1000];
-	state->imago_sprites[offset + 0x800*2] = sprites_data;
+	sprites_data = rom[state->m_imago_sprites_address + 0x2000*2 + state->m_imago_sprites_bank * 0x1000];
+	state->m_imago_sprites[offset + 0x800*2] = sprites_data;
 
 	gfx_element_mark_dirty(space->machine().gfx[1], offset/32);
 }
@@ -160,18 +160,18 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 static READ8_HANDLER( imago_sprites_offset_r )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	state->imago_sprites_address = offset;
+	state->m_imago_sprites_address = offset;
 	return 0xff; //not really used
 }
 
 static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, spriteram) AM_SIZE_MEMBER(fastfred_state, spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
 	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, background_color)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
@@ -190,11 +190,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, attributesram)
-	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE_MEMBER(fastfred_state, spriteram) AM_SIZE_MEMBER(fastfred_state, spriteram_size)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
+	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
 	AM_RANGE(0xd060, 0xd3ff) AM_RAM
-	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, videoram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, background_color)
+	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
@@ -221,10 +221,10 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM // same fg videoram (which one of the 2 is really used?)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(imago_sprites_dma_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_BASE_MEMBER(fastfred_state, imago_fg_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, spriteram) AM_SIZE_MEMBER(fastfred_state, spriteram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_BASE_MEMBER(fastfred_state, m_imago_fg_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
 	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
@@ -981,13 +981,13 @@ static DRIVER_INIT( flyboy )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc085, 0xc099, FUNC(flyboy_custom1_io_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc8fb, 0xc900, FUNC(flyboy_custom2_io_r));
-	state->hardware_type = 1;
+	state->m_hardware_type = 1;
 }
 
 static DRIVER_INIT( flyboyb )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->hardware_type = 1;
+	state->m_hardware_type = 1;
 }
 
 static DRIVER_INIT( fastfred )
@@ -995,7 +995,7 @@ static DRIVER_INIT( fastfred )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(fastfred_custom_io_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->hardware_type = 1;
+	state->m_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
@@ -1003,7 +1003,7 @@ static DRIVER_INIT( jumpcoas )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->hardware_type = 0;
+	state->m_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84b )
@@ -1011,7 +1011,7 @@ static DRIVER_INIT( boggy84b )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->hardware_type = 2;
+	state->m_hardware_type = 2;
 }
 
 static DRIVER_INIT( boggy84 )
@@ -1019,14 +1019,14 @@ static DRIVER_INIT( boggy84 )
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(boggy84_custom_io_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
-	state->hardware_type = 2;
+	state->m_hardware_type = 2;
 }
 
 
 static DRIVER_INIT( imago )
 {
 	fastfred_state *state = machine.driver_data<fastfred_state>();
-	state->hardware_type = 3;
+	state->m_hardware_type = 3;
 }
 
 GAME( 1982, flyboy,   0,        fastfred, flyboy,   flyboy,   ROT90, "Kaneko", "Fly-Boy", 0 )

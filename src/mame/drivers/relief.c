@@ -34,7 +34,7 @@
 static void update_interrupts(running_machine &machine)
 {
 	relief_state *state = machine.driver_data<relief_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -76,12 +76,12 @@ static MACHINE_RESET( relief )
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 2);
+	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 2);
 
 	machine.device<okim6295_device>("oki")->set_bank_base(0);
-	state->ym2413_volume = 15;
-	state->overall_volume = 127;
-	state->adpcm_bank_base = 0;
+	state->m_ym2413_volume = 15;
+	state->m_overall_volume = 127;
+	state->m_adpcm_bank_base = 0;
 }
 
 
@@ -96,7 +96,7 @@ static READ16_HANDLER( special_port2_r )
 {
 	relief_state *state = space->machine().driver_data<relief_state>();
 	int result = input_port_read(space->machine(), "260010");
-	if (state->cpu_to_sound_ready) result ^= 0x0020;
+	if (state->m_cpu_to_sound_ready) result ^= 0x0020;
 	if (!(result & 0x0080) || atarigen_get_hblank(*space->machine().primary_screen)) result ^= 0x0001;
 	return result;
 }
@@ -114,15 +114,15 @@ static WRITE16_HANDLER( audio_control_w )
 	relief_state *state = space->machine().driver_data<relief_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol(space->machine(), (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
-		state->adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (state->adpcm_bank_base & 0x100000);
+		state->m_ym2413_volume = (data >> 1) & 15;
+		atarigen_set_ym2413_vol(space->machine(), (state->m_ym2413_volume * state->m_overall_volume * 100) / (127 * 15));
+		state->m_adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (state->m_adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_BITS_8_15)
-		state->adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (state->adpcm_bank_base & 0x0c0000);
+		state->m_adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (state->m_adpcm_bank_base & 0x0c0000);
 
 	okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-	oki->set_bank_base(state->adpcm_bank_base);
+	oki->set_bank_base(state->m_adpcm_bank_base);
 }
 
 
@@ -131,9 +131,9 @@ static WRITE16_HANDLER( audio_volume_w )
 	relief_state *state = space->machine().driver_data<relief_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->overall_volume = data & 127;
-		atarigen_set_ym2413_vol(space->machine(), (state->ym2413_volume * state->overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(space->machine(), state->overall_volume * 100 / 127);
+		state->m_overall_volume = data & 127;
+		atarigen_set_ym2413_vol(space->machine(), (state->m_ym2413_volume * state->m_overall_volume * 100) / (127 * 15));
+		atarigen_set_oki6295_vol(space->machine(), state->m_overall_volume * 100 / 127);
 	}
 }
 
@@ -161,13 +161,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260012, 0x260013) AM_READ_PORT("260012")
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_BASE_MEMBER(relief_state, atarivc_data)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(relief_state, playfield2)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(relief_state, playfield)
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(relief_state, playfield_upper)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_BASE_MEMBER(relief_state, m_atarivc_data)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(relief_state, m_playfield2)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(relief_state, m_playfield)
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(relief_state, m_playfield_upper)
 	AM_RANGE(0x3f6000, 0x3f67ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3f6800, 0x3f8eff) AM_RAM
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_BASE_MEMBER(relief_state, atarivc_eof_data)
+	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_BASE_MEMBER(relief_state, m_atarivc_eof_data)
 	AM_RANGE(0x3f8f80, 0x3f8fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END

@@ -56,21 +56,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *      map1ram;
-	UINT16 *      map2ram;
-	UINT16 *      map3ram;
-	UINT16 *      map4ram;
-	UINT16 *      charram;
-	UINT16 *      textram;
-	UINT16 *      unkram;
-//  UINT16 *      paletteram;   // currently this uses generic palette handling
-	UINT16 *      iodata;
+	UINT16 *      m_map1ram;
+	UINT16 *      m_map2ram;
+	UINT16 *      m_map3ram;
+	UINT16 *      m_map4ram;
+	UINT16 *      m_charram;
+	UINT16 *      m_textram;
+	UINT16 *      m_unkram;
+//  UINT16 *      m_paletteram;   // currently this uses generic palette handling
+	UINT16 *      m_iodata;
 
 	/* input-related */
-	UINT16        defender_sensor, shutter_sensor;
+	UINT16        m_defender_sensor;
+	UINT16		  m_shutter_sensor;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 
@@ -86,8 +87,8 @@ public:
 							cliprect,screen->machine().gfx[0], data1, \
 							data0 & 0xff, \
 							data0 & 0x4000, data0 & 0x8000, \
-							x * 16 - 512 /*+(((INT16)(state->unkram[0x60000 / 2 + num])) / 32)*/, \
-							y * 16 /*+(((INT16)(state->unkram[0x60008 / 2 + num])) / 32)*/,0); \
+							x * 16 - 512 /*+(((INT16)(state->m_unkram[0x60000 / 2 + num])) / 32)*/, \
+							y * 16 /*+(((INT16)(state->m_unkram[0x60008 / 2 + num])) / 32)*/,0); \
 					}	\
 			}
 
@@ -96,10 +97,10 @@ static SCREEN_UPDATE( drill )
 	_2mindril_state *state = screen->machine().driver_data<_2mindril_state>();
 	bitmap_fill(bitmap, NULL, 0);
 
-	DRAW_MAP(state->map1ram, 0)
-	DRAW_MAP(state->map2ram, 1)
-	DRAW_MAP(state->map3ram, 2)
-	DRAW_MAP(state->map4ram, 3)
+	DRAW_MAP(state->m_map1ram, 0)
+	DRAW_MAP(state->m_map2ram, 1)
+	DRAW_MAP(state->m_map3ram, 2)
+	DRAW_MAP(state->m_map4ram, 3)
 
 	{
 		int x, y;
@@ -109,14 +110,14 @@ static SCREEN_UPDATE( drill )
 				drawgfx_transpen(	bitmap,
 						cliprect,
 						screen->machine().gfx[1],
-						state->textram[y * 64 + x] & 0xff, //1ff ??
-						((state->textram[y * 64 + x] >> 9) & 0xf),
+						state->m_textram[y * 64 + x] & 0xff, //1ff ??
+						((state->m_textram[y * 64 + x] >> 9) & 0xf),
 						0, 0,
 						x*8,y*8,0);
 			}
 	}
-	/*printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", state->unkram[0x60000 / 2], state->unkram[0x60000 / 2 + 1], state->unkram[0x60000 / 2 + 2],
-                                    state->unkram[0x60000 / 2 + 3], state->unkram[0x60000 / 2 + 4], state->unkram[0x60000 / 2 + 5]);*/
+	/*printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", state->m_unkram[0x60000 / 2], state->m_unkram[0x60000 / 2 + 1], state->m_unkram[0x60000 / 2 + 2],
+                                    state->m_unkram[0x60000 / 2 + 3], state->m_unkram[0x60000 / 2 + 4], state->m_unkram[0x60000 / 2 + 5]);*/
 	return 0;
 }
 
@@ -125,7 +126,7 @@ static VIDEO_START( drill )
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
 	machine.gfx[0]->color_granularity = 16;
-	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->charram);
+	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_charram);
 }
 
 static READ16_HANDLER( drill_io_r )
@@ -133,8 +134,8 @@ static READ16_HANDLER( drill_io_r )
 	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
 
 //  if (offset * 2 == 0x4)
-	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space->device()), state->iodata[0/2], state->iodata[2/2], state->iodata[4/2], state->iodata[6/2],
-                                        state->iodata[8/2], state->iodata[0xa/2], state->iodata[0xc/2], state->iodata[0xe/2]);*/
+	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(&space->device()), state->m_iodata[0/2], state->m_iodata[2/2], state->m_iodata[4/2], state->m_iodata[6/2],
+                                        state->m_iodata[8/2], state->m_iodata[0xa/2], state->m_iodata[0xc/2], state->m_iodata[0xe/2]);*/
 
 	switch(offset)
 	{
@@ -150,9 +151,9 @@ static READ16_HANDLER( drill_io_r )
 			if(arm_pwr > 0x40) return ~0x1000;
 			else return ~0x0000;
 		}
-		case 0x4/2: return (state->defender_sensor) | (state->shutter_sensor);
+		case 0x4/2: return (state->m_defender_sensor) | (state->m_shutter_sensor);
 		case 0xe/2: return input_port_read(space->machine(), "IN2");//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space->device()), offset * 2, state->iodata[offset]);
+//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(&space->device()), offset * 2, state->m_iodata[offset]);
 	}
 
 	return 0xffff;
@@ -161,15 +162,15 @@ static READ16_HANDLER( drill_io_r )
 static WRITE16_HANDLER( drill_io_w )
 {
 	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
-	COMBINE_DATA(&state->iodata[offset]);
+	COMBINE_DATA(&state->m_iodata[offset]);
 
 	switch(offset)
 	{
 		case 0x8/2:
-			coin_counter_w(space->machine(), 0, state->iodata[offset] & 0x0400);
-			coin_counter_w(space->machine(), 1, state->iodata[offset] & 0x0800);
-			coin_lockout_w(space->machine(), 0, ~state->iodata[offset] & 0x0100);
-			coin_lockout_w(space->machine(), 1, ~state->iodata[offset] & 0x0200);
+			coin_counter_w(space->machine(), 0, state->m_iodata[offset] & 0x0400);
+			coin_counter_w(space->machine(), 1, state->m_iodata[offset] & 0x0800);
+			coin_lockout_w(space->machine(), 0, ~state->m_iodata[offset] & 0x0100);
+			coin_lockout_w(space->machine(), 1, ~state->m_iodata[offset] & 0x0200);
 			break;
 	}
 
@@ -195,13 +196,13 @@ static WRITE16_HANDLER( drill_io_w )
 static TIMER_CALLBACK( shutter_req )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
-	state->shutter_sensor = param;
+	state->m_shutter_sensor = param;
 }
 
 static TIMER_CALLBACK( defender_req )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
-	state->defender_sensor = param;
+	state->m_defender_sensor = param;
 }
 #endif
 
@@ -214,23 +215,23 @@ static WRITE16_HANDLER( sensors_w )
 	if (data & 1)
 	{
 		//space->machine().scheduler().timer_set(attotime::from_seconds(2), FUNC(shutter_req ), 0x100);
-		state->shutter_sensor = 0x100;
+		state->m_shutter_sensor = 0x100;
 	}
 	else if (data & 2)
 	{
 		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(shutter_req ), 0x200);
-		state->shutter_sensor = 0x200;
+		state->m_shutter_sensor = 0x200;
 	}
 
 	if (data & 0x1000 || data & 0x4000)
 	{
 		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x800);
-		state->defender_sensor = 0x800;
+		state->m_defender_sensor = 0x800;
 	}
 	else if (data & 0x2000 || data & 0x8000)
 	{
 		//space->machine().scheduler().timer_set( attotime::from_seconds(2), FUNC(defender_req ), 0x400);
-		state->defender_sensor = 0x400;
+		state->m_defender_sensor = 0x400;
 	}
 }
 
@@ -238,7 +239,7 @@ static WRITE16_HANDLER( charram_w )
 {
 	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
 
-	COMBINE_DATA(&state->charram[offset]);
+	COMBINE_DATA(&state->m_charram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[1], offset / 16);
 }
 
@@ -246,19 +247,19 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM
-	AM_RANGE(0x410000, 0x411fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map1ram)
-	AM_RANGE(0x412000, 0x413fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map2ram)
-	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map3ram)
-	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map4ram)
-	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE_MEMBER(_2mindril_state, textram)
-	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(_2mindril_state, charram)
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(_2mindril_state, unkram)// video stuff, 460000 - video regs ?
+	AM_RANGE(0x410000, 0x411fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map1ram)
+	AM_RANGE(0x412000, 0x413fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map2ram)
+	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map3ram)
+	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map4ram)
+	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_textram)
+	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(_2mindril_state, m_charram)
+	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_r, ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_RAM
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, iodata) // i/o
+	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, m_iodata) // i/o
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
 
@@ -415,7 +416,7 @@ static INTERRUPT_GEN( drill_interrupt )
 static void irqhandler(device_t *device, int irq)
 {
 //  _2mindril_state *state = machine.driver_data<_2mindril_state>();
-//  device_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(state->m_maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -428,18 +429,18 @@ static MACHINE_START( drill )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->defender_sensor));
-	state->save_item(NAME(state->shutter_sensor));
+	state->save_item(NAME(state->m_defender_sensor));
+	state->save_item(NAME(state->m_shutter_sensor));
 }
 
 static MACHINE_RESET( drill )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
-	state->defender_sensor = 0;
-	state->shutter_sensor = 0;
+	state->m_defender_sensor = 0;
+	state->m_shutter_sensor = 0;
 }
 
 static MACHINE_CONFIG_START( drill, _2mindril_state )

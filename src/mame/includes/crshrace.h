@@ -6,22 +6,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  videoram1;
-	UINT16 *  videoram2;
-//  UINT16 *  spriteram1;   // currently this uses generic buffered spriteram
-//  UINT16 *  spriteram2;   // currently this uses generic buffered spriteram
-//      UINT16 *  paletteram;   // currently this uses generic palette handling
+	UINT16 *  m_videoram1;
+	UINT16 *  m_videoram2;
+//  UINT16 *  m_spriteram1;   // currently this uses generic buffered spriteram
+//  UINT16 *  m_spriteram2;   // currently this uses generic buffered spriteram
+//      UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t   *tilemap1, *tilemap2;
-	int       roz_bank, gfxctrl, flipscreen;
+	tilemap_t   *m_tilemap1;
+	tilemap_t   *m_tilemap2;
+	int       m_roz_bank;
+	int       m_gfxctrl;
+	int       m_flipscreen;
 
 	/* misc */
-	int pending_command;
+	int m_pending_command;
 
 	/* devices */
-	device_t *audiocpu;
-	device_t *k053936;
+	device_t *m_audiocpu;
+	device_t *m_k053936;
 };
 
 /*----------- defined in video/crshrace.c -----------*/

@@ -104,7 +104,7 @@ Dip Locations and factory settings verified with manual
 static TIMER_CALLBACK( soundlatch_callback )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
-	state->latch = param;
+	state->m_latch = param;
 }
 
 static WRITE8_HANDLER( bombjack_soundlatch_w )
@@ -118,8 +118,8 @@ static READ8_HANDLER( bombjack_soundlatch_r )
 	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 	int res;
 
-	res = state->latch;
-	state->latch = 0;
+	res = state->m_latch;
+	state->m_latch = 0;
 	return res;
 }
 
@@ -133,9 +133,9 @@ static READ8_HANDLER( bombjack_soundlatch_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE_MEMBER(bombjack_state, videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE_MEMBER(bombjack_state, colorram)
-	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bombjack_state, spriteram, spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE_MEMBER(bombjack_state, m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE_MEMBER(bombjack_state, m_colorram)
+	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bombjack_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
@@ -330,8 +330,8 @@ static MACHINE_START( bombjack )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
 
-	state->save_item(NAME(state->latch));
-	state->save_item(NAME(state->background_image));
+	state->save_item(NAME(state->m_latch));
+	state->save_item(NAME(state->m_background_image));
 }
 
 
@@ -339,8 +339,8 @@ static MACHINE_RESET( bombjack )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
 
-	state->latch = 0;
-	state->background_image = 0;
+	state->m_latch = 0;
+	state->m_background_image = 0;
 }
 
 

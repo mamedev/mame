@@ -9,36 +9,36 @@ public:
 	senjyo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int int_delay_kludge;
-	UINT8 sound_cmd;
-	INT16 *single_data;
-	int single_rate;
-	int single_volume;
+	int m_int_delay_kludge;
+	UINT8 m_sound_cmd;
+	INT16 *m_single_data;
+	int m_single_rate;
+	int m_single_volume;
 
-	size_t spriteram_size;
-	UINT8 *spriteram;
-	UINT8 *fgscroll;
-	UINT8 *scrollx1;
-	UINT8 *scrolly1;
-	UINT8 *scrollx2;
-	UINT8 *scrolly2;
-	UINT8 *scrollx3;
-	UINT8 *scrolly3;
-	UINT8 *fgvideoram;
-	UINT8 *fgcolorram;
-	UINT8 *bg1videoram;
-	UINT8 *bg2videoram;
-	UINT8 *bg3videoram;
-	UINT8 *radarram;
-	UINT8 *bgstripesram;
-	int is_senjyo;
-	int scrollhack;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg1_tilemap;
-	tilemap_t *bg2_tilemap;
-	tilemap_t *bg3_tilemap;
+	size_t m_spriteram_size;
+	UINT8 *m_spriteram;
+	UINT8 *m_fgscroll;
+	UINT8 *m_scrollx1;
+	UINT8 *m_scrolly1;
+	UINT8 *m_scrollx2;
+	UINT8 *m_scrolly2;
+	UINT8 *m_scrollx3;
+	UINT8 *m_scrolly3;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_fgcolorram;
+	UINT8 *m_bg1videoram;
+	UINT8 *m_bg2videoram;
+	UINT8 *m_bg3videoram;
+	UINT8 *m_radarram;
+	UINT8 *m_bgstripesram;
+	int m_is_senjyo;
+	int m_scrollhack;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg1_tilemap;
+	tilemap_t *m_bg2_tilemap;
+	tilemap_t *m_bg3_tilemap;
 
-	int bgstripes;
+	int m_bgstripes;
 };
 
 

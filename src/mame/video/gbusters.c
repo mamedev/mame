@@ -14,7 +14,7 @@ void gbusters_tile_callback( running_machine &machine, int layer, int bank, int 
 	gbusters_state *state = machine.driver_data<gbusters_state>();
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);
-	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -27,7 +27,7 @@ void gbusters_sprite_callback( running_machine &machine, int *code, int *color, 
 {
 	gbusters_state *state = machine.driver_data<gbusters_state>();
 	*priority = (*color & 0x30) >> 4;
-	*color = state->sprite_colorbase + (*color & 0x0f);
+	*color = state->m_sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -40,10 +40,10 @@ void gbusters_sprite_callback( running_machine &machine, int *code, int *color, 
 VIDEO_START( gbusters )
 {
 	gbusters_state *state = machine.driver_data<gbusters_state>();
-	state->layer_colorbase[0] = 48;
-	state->layer_colorbase[1] = 0;
-	state->layer_colorbase[2] = 16;
-	state->sprite_colorbase = 32;
+	state->m_layer_colorbase[0] = 48;
+	state->m_layer_colorbase[1] = 0;
+	state->m_layer_colorbase[2] = 16;
+	state->m_sprite_colorbase = 32;
 }
 
 
@@ -51,26 +51,26 @@ SCREEN_UPDATE( gbusters )
 {
 	gbusters_state *state = screen->machine().driver_data<gbusters_state>();
 
-	k052109_tilemap_update(state->k052109);
+	k052109_tilemap_update(state->m_k052109);
 
 	/* sprite priority 3 = disable */
-	if (state->priority)
+	if (state->m_priority)
 	{
-//      k051960_sprites_draw(state->k051960, bitmap, cliprect, 1, 1);  /* are these used? */
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);
-		k051960_sprites_draw(state->k051960, bitmap, cliprect, 2, 2);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, 0, 0);
-		k051960_sprites_draw(state->k051960, bitmap, cliprect, 0, 0);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 0, 0, 0);
+//      k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 1, 1);  /* are these used? */
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);
+		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 2, 2);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 0);
+		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
 	}
 	else
 	{
-//      k051960_sprites_draw(state->k051960, bitmap, cliprect, 1, 1);  /* are these used? */
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
-		k051960_sprites_draw(state->k051960, bitmap, cliprect, 2, 2);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, 0, 0);
-		k051960_sprites_draw(state->k051960, bitmap, cliprect, 0, 0);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 0, 0, 0);
+//      k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 1, 1);  /* are these used? */
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 2, 2);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 0);
+		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, 0);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
 	}
 	return 0;
 }

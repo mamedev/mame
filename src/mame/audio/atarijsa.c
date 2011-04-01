@@ -229,8 +229,8 @@ static READ8_HANDLER( jsa1_io_r )
             */
 			result = input_port_read(space->machine(), "JSAI");
 			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x80;
-			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			if ((tms5220 != NULL) && (tms5220_readyq_r(tms5220) == 0))
 				result |= 0x10;
 			else
@@ -362,8 +362,8 @@ static READ8_HANDLER( jsa2_io_r )
             */
 			result = input_port_read(space->machine(), "JSAII");
 			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x80;
-			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -485,8 +485,8 @@ static READ8_HANDLER( jsa3_io_r )
             */
 			result = input_port_read(space->machine(), "JSAIII");
 			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x90;
-			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -619,8 +619,8 @@ static READ8_HANDLER( jsa3s_io_r )
             */
 			result = input_port_read(space->machine(), "JSAIII");
 			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x90;
-			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */

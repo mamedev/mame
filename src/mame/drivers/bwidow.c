@@ -230,7 +230,7 @@ public:
 	bwidow_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int lastdata;
+	int m_lastdata;
 };
 
 
@@ -336,12 +336,12 @@ static WRITE8_HANDLER( bwidow_misc_w )
         0x02 = coin counter 2
     */
 
-	if (data == state->lastdata) return;
+	if (data == state->m_lastdata) return;
 	set_led_status(space->machine(), 0,~data & 0x10);
 	set_led_status(space->machine(), 1,~data & 0x20);
 	coin_counter_w(space->machine(), 0, data & 0x01);
 	coin_counter_w(space->machine(), 1, data & 0x02);
-	state->lastdata = data;
+	state->m_lastdata = data;
 }
 
 /*************************************

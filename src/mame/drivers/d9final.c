@@ -30,10 +30,10 @@ public:
 	d9final_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *lo_vram;
-	UINT8 *hi_vram;
-	UINT8 *cram;
-	tilemap_t *sc0_tilemap;
+	UINT8 *m_lo_vram;
+	UINT8 *m_hi_vram;
+	UINT8 *m_cram;
+	tilemap_t *m_sc0_tilemap;
 };
 
 
@@ -41,8 +41,8 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	d9final_state *state = machine.driver_data<d9final_state>();
-	int tile = ((state->hi_vram[tile_index] & 0x3f)<<8) | state->lo_vram[tile_index];
-	int color = state->cram[tile_index] & 0x3f;
+	int tile = ((state->m_hi_vram[tile_index] & 0x3f)<<8) | state->m_lo_vram[tile_index];
+	int color = state->m_cram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(
 			0,
@@ -54,35 +54,35 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static VIDEO_START(d9final)
 {
 	d9final_state *state = machine.driver_data<d9final_state>();
-	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 static SCREEN_UPDATE(d9final)
 {
 	d9final_state *state = screen->machine().driver_data<d9final_state>();
-	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;
 }
 
 static WRITE8_HANDLER( sc0_lovram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->lo_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	state->m_lo_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_hivram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->hi_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	state->m_hi_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_cram )
 {
 	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->cram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	state->m_cram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( d9final_bank_w )
@@ -109,9 +109,9 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE_MEMBER(d9final_state, lo_vram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE_MEMBER(d9final_state, hi_vram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE_MEMBER(d9final_state, cram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE_MEMBER(d9final_state, m_lo_vram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE_MEMBER(d9final_state, m_hi_vram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE_MEMBER(d9final_state, m_cram)
 	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
 ADDRESS_MAP_END
 

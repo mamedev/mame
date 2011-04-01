@@ -11,39 +11,48 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  bg_videoram;
-	UINT8  *  fg_videoram;	// 8bits
-	UINT16 *  spriteram;
-	UINT16 *  spriteram_2;
-	UINT16 *  workram;
-	UINT8  *  mcu_ram;	// 8bits
-//  UINT16 *  nvram;    // currently this uses generic nvram handling
+	UINT16 *  m_bg_videoram;
+	UINT8  *  m_fg_videoram;	// 8bits
+	UINT16 *  m_spriteram;
+	UINT16 *  m_spriteram_2;
+	UINT16 *  m_workram;
+	UINT8  *  m_mcu_ram;	// 8bits
+//  UINT16 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap_t   *fg_tilemap, *bg_tilemap;
-	int       fg_char_bank;
-	UINT8     bgcolor;
-	UINT16    splndrbt_bg_scrollx, splndrbt_bg_scrolly;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	int       m_fg_char_bank;
+	UINT8     m_bgcolor;
+	UINT16    m_splndrbt_bg_scrollx;
+	UINT16	  m_splndrbt_bg_scrolly;
 
 	/* misc */
-	int       sound_prom_address;
-	UINT8     dac_latch;
-	UINT8     eq8155_port_b;
-	UINT8     eq8155_port_a,eq8155_port_c,ay_port_a,ay_port_b,eq_cymbal_ctrl;
-	emu_timer *nmi_timer, *adjuster_timer;
-	float     cymvol,hihatvol;
-	int       timer_count;
-	int       unknown_bit;	// Gekisou special handling
+	int       m_sound_prom_address;
+	UINT8     m_dac_latch;
+	UINT8     m_eq8155_port_b;
+	UINT8     m_eq8155_port_a;
+	UINT8     m_eq8155_port_c;
+	UINT8     m_ay_port_a;
+	UINT8     m_ay_port_b;
+	UINT8     m_eq_cymbal_ctrl;
+	emu_timer *m_nmi_timer;
+	emu_timer *m_adjuster_timer;
+	float     m_cymvol;
+	float     m_hihatvol;
+	int       m_timer_count;
+	int       m_unknown_bit;	// Gekisou special handling
 #if POPDRUMKIT
-	int       hihat,cymbal;
+	int       m_hihat;
+	int       m_cymbal;
 #endif
 
 	/* devices */
-	device_t *mcu;
-	device_t *audio_cpu;
-	msm5232_device *msm;
-	device_t *dac_1;
-	device_t *dac_2;
+	device_t *m_mcu;
+	device_t *m_audio_cpu;
+	msm5232_device *m_msm;
+	device_t *m_dac_1;
+	device_t *m_dac_2;
 };
 
 

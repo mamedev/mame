@@ -70,8 +70,8 @@ public:
 	feversoc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 x;
-	UINT32 *spriteram;
+	UINT16 m_x;
+	UINT32 *m_spriteram;
 };
 
 
@@ -85,7 +85,7 @@ static VIDEO_START( feversoc )
 static SCREEN_UPDATE( feversoc )
 {
 	feversoc_state *state = screen->machine().driver_data<feversoc_state>();
-	UINT32 *spriteram32 = state->spriteram;
+	UINT32 *spriteram32 = state->m_spriteram;
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]); //black pen
@@ -134,8 +134,8 @@ static READ32_HANDLER( in0_r )
 {
 	feversoc_state *state = space->machine().driver_data<feversoc_state>();
 
-	state->x^=0x40; //vblank? eeprom read bit?
-	return (input_port_read(space->machine(), "IN0") | state->x) | (input_port_read(space->machine(), "IN1")<<16);
+	state->m_x^=0x40; //vblank? eeprom read bit?
+	return (input_port_read(space->machine(), "IN0") | state->m_x) | (input_port_read(space->machine(), "IN1")<<16);
 }
 
 static WRITE32_HANDLER( output_w )
@@ -163,7 +163,7 @@ static WRITE32_HANDLER( output_w )
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_MEMBER(feversoc_state, spriteram)
+	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_MEMBER(feversoc_state, m_spriteram)
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)

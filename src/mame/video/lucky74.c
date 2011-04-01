@@ -101,29 +101,29 @@
 WRITE8_HANDLER( lucky74_fg_videoram_w )
 {
 	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_fg_colorram_w )
 {
 	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->fg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_fg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_bg_videoram_w )
 {
 	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lucky74_bg_colorram_w )
 {
 	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->bg_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_bg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -208,8 +208,8 @@ static TILE_GET_INFO( get_fg_tile_info )
     xxxx ----   tiles page offset.
 */
 	int bank = 0;
-	int attr = state->fg_colorram[tile_index];
-	int code = state->fg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = state->m_fg_colorram[tile_index];
+	int code = state->m_fg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -224,8 +224,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xxxx ----   tiles page offset.
 */
 	int bank = 1;
-	int attr = state->bg_colorram[tile_index];
-	int code = state->bg_videoram[tile_index] + ((attr & 0xf0) << 4);
+	int attr = state->m_bg_colorram[tile_index];
+	int code = state->m_bg_videoram[tile_index] + ((attr & 0xf0) << 4);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -235,17 +235,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( lucky74 )
 {
 	lucky74_state *state = machine.driver_data<lucky74_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
 SCREEN_UPDATE( lucky74 )
 {
 	lucky74_state *state = screen->machine().driver_data<lucky74_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 

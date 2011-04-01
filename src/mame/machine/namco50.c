@@ -138,10 +138,10 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 typedef struct _namco_50xx_state namco_50xx_state;
 struct _namco_50xx_state
 {
-	device_t *	cpu;
-	UINT8					latched_cmd;
-	UINT8					latched_rw;
-	UINT8					portO;
+	device_t *	m_cpu;
+	UINT8					m_latched_cmd;
+	UINT8					m_latched_rw;
+	UINT8					m_portO;
 };
 
 INLINE namco_50xx_state *get_safe_token(device_t *device)
@@ -157,34 +157,34 @@ INLINE namco_50xx_state *get_safe_token(device_t *device)
 static TIMER_CALLBACK( namco_50xx_latch_callback )
 {
 	namco_50xx_state *state = get_safe_token((device_t *)ptr);
-	state->latched_cmd = param;
-	state->latched_rw = 0;
+	state->m_latched_cmd = param;
+	state->m_latched_rw = 0;
 }
 
 
 static TIMER_CALLBACK( namco_50xx_readrequest_callback )
 {
 	namco_50xx_state *state = get_safe_token((device_t *)ptr);
-	state->latched_rw = 1;
+	state->m_latched_rw = 1;
 }
 
 
 static READ8_HANDLER( namco_50xx_K_r )
 {
 	namco_50xx_state *state = get_safe_token(space->device().owner());
-	return state->latched_cmd >> 4;
+	return state->m_latched_cmd >> 4;
 }
 
 static READ8_HANDLER( namco_50xx_R0_r )
 {
 	namco_50xx_state *state = get_safe_token(space->device().owner());
-	return state->latched_cmd & 0x0f;
+	return state->m_latched_cmd & 0x0f;
 }
 
 static READ8_HANDLER( namco_50xx_R2_r )
 {
 	namco_50xx_state *state = get_safe_token(space->device().owner());
-	return state->latched_rw & 1;
+	return state->m_latched_rw & 1;
 }
 
 
@@ -194,9 +194,9 @@ static WRITE8_HANDLER( namco_50xx_O_w )
 	namco_50xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		state->portO = (state->portO & 0x0f) | (out << 4);
+		state->m_portO = (state->m_portO & 0x0f) | (out << 4);
 	else
-		state->portO = (state->portO & 0xf0) | (out);
+		state->m_portO = (state->m_portO & 0xf0) | (out);
 }
 
 
@@ -205,14 +205,14 @@ static WRITE8_HANDLER( namco_50xx_O_w )
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
 	namco_50xx_state *state = get_safe_token((device_t *)ptr);
-	device_set_input_line(state->cpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_cpu, 0, CLEAR_LINE);
 }
 
 static void namco_50xx_irq_set(device_t *device)
 {
 	namco_50xx_state *state = get_safe_token(device);
 
-	device_set_input_line(state->cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_cpu, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
@@ -241,7 +241,7 @@ void namco_50xx_read_request(device_t *device)
 READ8_DEVICE_HANDLER( namco_50xx_read )
 {
 	namco_50xx_state *state = get_safe_token(device);
-	UINT8 res = state->portO;
+	UINT8 res = state->m_portO;
 
 	namco_50xx_read_request(device);
 
@@ -283,12 +283,12 @@ static DEVICE_START( namco_50xx )
 	astring tempstring;
 
 	/* find our CPU */
-	state->cpu = device->subdevice("mcu");
-	assert(state->cpu != NULL);
+	state->m_cpu = device->subdevice("mcu");
+	assert(state->m_cpu != NULL);
 
-	device->save_item(NAME(state->latched_cmd));
-	device->save_item(NAME(state->latched_rw));
-	device->save_item(NAME(state->portO));
+	device->save_item(NAME(state->m_latched_cmd));
+	device->save_item(NAME(state->m_latched_rw));
+	device->save_item(NAME(state->m_portO));
 }
 
 

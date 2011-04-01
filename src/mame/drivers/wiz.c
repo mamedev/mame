@@ -184,14 +184,14 @@ static WRITE8_HANDLER( sound_command_w )
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(discrete, STINGER_BOOM_EN1, state->dsc1);
-			discrete_sound_w(discrete, STINGER_BOOM_EN2, state->dsc1^=1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN1, state->m_dsc1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN2, state->m_dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(discrete, STINGER_SHOT_EN1, state->dsc0);
-			discrete_sound_w(discrete, STINGER_SHOT_EN2, state->dsc0^=1);
+			discrete_sound_w(discrete, STINGER_SHOT_EN1, state->m_dsc0);
+			discrete_sound_w(discrete, STINGER_SHOT_EN2, state->m_dsc0^=1);
 		break;
 	}
 }
@@ -199,14 +199,14 @@ static WRITE8_HANDLER( sound_command_w )
 static READ8_HANDLER( wiz_protection_r )
 {
 	wiz_state *state = space->machine().driver_data<wiz_state>();
-	switch (state->colorram2[0])
+	switch (state->m_colorram2[0])
 	{
 	case 0x35: return 0x25;	/* FIX: sudden player death + free play afterwards   */
 	case 0x8f: return 0x1f;	/* FIX: early boss appearance with corrupt graphics  */
 	case 0xa0: return 0x00;	/* FIX: executing junk code after defeating the boss */
 	}
 
-	return state->colorram2[0];
+	return state->m_colorram2[0];
 }
 
 static WRITE8_HANDLER( wiz_coin_counter_w )
@@ -218,18 +218,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_BASE_MEMBER(wiz_state, videoram2)					/* Fallthrough */
-	AM_RANGE(0xd400, 0xd7ff) AM_BASE_MEMBER(wiz_state, colorram2)
-	AM_RANGE(0xd800, 0xd83f) AM_BASE_MEMBER(wiz_state, attributesram2)
-	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, spriteram2) AM_SIZE_MEMBER(wiz_state, spriteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_BASE_MEMBER(wiz_state, m_videoram2)					/* Fallthrough */
+	AM_RANGE(0xd400, 0xd7ff) AM_BASE_MEMBER(wiz_state, m_colorram2)
+	AM_RANGE(0xd800, 0xd83f) AM_BASE_MEMBER(wiz_state, m_attributesram2)
+	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, m_spriteram2) AM_SIZE_MEMBER(wiz_state, m_spriteram)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, videoram)	/* Fallthrough */
+	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, m_videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe83f) AM_BASE_MEMBER(wiz_state, attributesram)
-	AM_RANGE(0xe840, 0xe85f) AM_BASE_MEMBER(wiz_state, spriteram)
+	AM_RANGE(0xe800, 0xe83f) AM_BASE_MEMBER(wiz_state, m_attributesram)
+	AM_RANGE(0xe840, 0xe85f) AM_BASE_MEMBER(wiz_state, m_spriteram)
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE_MEMBER(wiz_state, sprite_bank)
+	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE_MEMBER(wiz_state, m_sprite_bank)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palettebank_w)
 	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_select_w)
@@ -678,7 +678,7 @@ DISCRETE_SOUND_END
 static MACHINE_RESET( wiz )
 {
 	wiz_state *state = machine.driver_data<wiz_state>();
-	state->dsc0 = state->dsc1 = 1;
+	state->m_dsc0 = state->m_dsc1 = 1;
 }
 
 static MACHINE_CONFIG_START( wiz, wiz_state )

@@ -11,23 +11,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    colorram;
-	UINT8 *    spriteram;
+	UINT8 *    m_videoram;
+	UINT8 *    m_colorram;
+	UINT8 *    m_spriteram;
 
 	/* video-related */
-	tilemap_t     *layer0;
-	int         flipscreen;
+	tilemap_t     *m_layer0;
+	int         m_flipscreen;
 
-	int irq_enable_a, irq_enable_b;
-	int firq_old_data_a, firq_old_data_b;
-	int i8039_status;
+	int m_irq_enable_a;
+	int m_irq_enable_b;
+	int m_firq_old_data_a;
+	int m_firq_old_data_b;
+	int m_i8039_status;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *subcpu;
-	cpu_device *audiocpu;
-	cpu_device *mcu;
+	cpu_device *m_maincpu;
+	cpu_device *m_subcpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_mcu;
 };
 
 

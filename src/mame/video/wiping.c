@@ -82,14 +82,14 @@ PALETTE_INIT( wiping )
 WRITE8_HANDLER( wiping_flipscreen_w )
 {
 	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->flipscreen = (data & 1);
+	state->m_flipscreen = (data & 1);
 }
 
 
 SCREEN_UPDATE( wiping )
 {
 	wiping_state *state = screen->machine().driver_data<wiping_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	for (offs = 0x3ff; offs > 0; offs--)
@@ -115,16 +115,16 @@ SCREEN_UPDATE( wiping )
 			sy = my - 2;
 		}
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sx = 35 - sx;
 			sy = 27 - sy;
 		}
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
-				state->videoram[offs],
-				state->colorram[offs] & 0x3f,
-				state->flipscreen,state->flipscreen,
+				state->m_videoram[offs],
+				state->m_colorram[offs] & 0x3f,
+				state->m_flipscreen,state->m_flipscreen,
 				sx*8,sy*8);
 	}
 
@@ -142,7 +142,7 @@ SCREEN_UPDATE( wiping )
 		flipy = spriteram[offs] & 0x40;
 		flipx = spriteram[offs] & 0x80;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sy = 208 - sy;
 			flipx = !flipx;
@@ -160,7 +160,7 @@ SCREEN_UPDATE( wiping )
 	/* redraw high priority chars */
 	for (offs = 0x3ff; offs > 0; offs--)
 	{
-		if (state->colorram[offs] & 0x80)
+		if (state->m_colorram[offs] & 0x80)
 		{
 			int mx,my,sx,sy;
 
@@ -183,16 +183,16 @@ SCREEN_UPDATE( wiping )
 				sy = my - 2;
 			}
 
-			if (state->flipscreen)
+			if (state->m_flipscreen)
 			{
 				sx = 35 - sx;
 				sy = 27 - sy;
 			}
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
-					state->videoram[offs],
-					state->colorram[offs] & 0x3f,
-					state->flipscreen,state->flipscreen,
+					state->m_videoram[offs],
+					state->m_colorram[offs] & 0x3f,
+					state->m_flipscreen,state->m_flipscreen,
 					sx*8,sy*8);
         	}
 	}
@@ -207,7 +207,7 @@ SCREEN_UPDATE( wiping )
 		for (j = 0;j < 8;j++)
 		{
 			char buf[40];
-			sprintf(buf,"%01x",state->soundregs[i*8+j]&0xf);
+			sprintf(buf,"%01x",state->m_soundregs[i*8+j]&0xf);
 			ui_draw_text(buf,j*10,i*8);
 		}
 	}
@@ -217,7 +217,7 @@ SCREEN_UPDATE( wiping )
 		for (j = 0;j < 8;j++)
 		{
 			char buf[40];
-			sprintf(buf,"%01x",state->soundregs[0x2000+i*8+j]>>4);
+			sprintf(buf,"%01x",state->m_soundregs[0x2000+i*8+j]>>4);
 			ui_draw_text(buf,j*10,80+i*8);
 		}
 	}

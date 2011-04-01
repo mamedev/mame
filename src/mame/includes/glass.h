@@ -11,18 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    videoram;
-	UINT16 *    vregs;
-	UINT16 *    spriteram;
-//      UINT16 *    paletteram;    // currently this uses generic palette handling
+	UINT16 *    m_videoram;
+	UINT16 *    m_vregs;
+	UINT16 *    m_spriteram;
+//      UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t     *pant[2];
-	bitmap_t    *screen_bitmap;
+	tilemap_t     *m_pant[2];
+	bitmap_t    *m_screen_bitmap;
 
 	/* misc */
-	int         current_bit, current_command, cause_interrupt;
-	int         blitter_serial_buffer[5];
+	int         m_current_bit;
+	int         m_current_command;
+	int         m_cause_interrupt;
+	int         m_blitter_serial_buffer[5];
 };
 
 

@@ -11,17 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * videoram;
-	UINT8 * colorram;
-	UINT8 * spriteram;
-	UINT8 * scrollx;
-	UINT8 * scrolly;
-	UINT8 * bgscrollx;
-	size_t  spriteram_size;
+	UINT8 * m_videoram;
+	UINT8 * m_colorram;
+	UINT8 * m_spriteram;
+	UINT8 * m_scrollx;
+	UINT8 * m_scrolly;
+	UINT8 * m_bgscrollx;
+	size_t  m_spriteram_size;
 
 	/* video-related */
-	tilemap_t *fg_tilemap, *bg_tilemap, *bg2_tilemap;
-	int     char_on, obj_on, bg1_on, bg2_on;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg2_tilemap;
+	int     m_char_on;
+	int     m_obj_on;
+	int     m_bg1_on;
+	int     m_bg2_on;
 };
 
 

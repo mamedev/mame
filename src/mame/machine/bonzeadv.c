@@ -309,10 +309,10 @@ static void WriteLevelData( running_machine &machine )
 
 	for (i = 0; i < 13; i++)
 	{
-		UINT16 v = CLEV[state->current_round][i];
+		UINT16 v = CLEV[state->m_current_round][i];
 
-		state->cval[2 * i + 0] = v & 0xff;
-		state->cval[2 * i + 1] = v >> 8;
+		state->m_cval[2 * i + 0] = v & 0xff;
+		state->m_cval[2 * i + 1] = v >> 8;
 	}
 }
 
@@ -330,8 +330,8 @@ static void WriteRestartPos( running_machine &machine, int level )
     */
 
 	asuka_state *state = machine.driver_data<asuka_state>();
-	int x = state->cval[0] + 256 * state->cval[1] + state->cval[4] + 256 * state->cval[5];
-	int y = state->cval[2] + 256 * state->cval[3] + state->cval[6] + 256 * state->cval[7];
+	int x = state->m_cval[0] + 256 * state->m_cval[1] + state->m_cval[4] + 256 * state->m_cval[5];
+	int y = state->m_cval[2] + 256 * state->m_cval[3] + state->m_cval[6] + 256 * state->m_cval[7];
 
 	const struct cchip_mapping* thisLevel = levelData[level];
 
@@ -340,17 +340,17 @@ static void WriteRestartPos( running_machine &machine, int level )
 		if (x >= thisLevel->xmin && x < thisLevel->xmax &&
 		    y >= thisLevel->ymin && y < thisLevel->ymax)
 		{
-			state->cval[0] = thisLevel->sx & 0xff;
-			state->cval[1] = thisLevel->sx >> 8;
-			state->cval[2] = thisLevel->sy & 0xff;
-			state->cval[3] = thisLevel->sy >> 8;
-			state->cval[4] = thisLevel->px & 0xff;
-			state->cval[5] = thisLevel->px >> 8;
-			state->cval[6] = thisLevel->py & 0xff;
-			state->cval[7] = thisLevel->py >> 8;
+			state->m_cval[0] = thisLevel->sx & 0xff;
+			state->m_cval[1] = thisLevel->sx >> 8;
+			state->m_cval[2] = thisLevel->sy & 0xff;
+			state->m_cval[3] = thisLevel->sy >> 8;
+			state->m_cval[4] = thisLevel->px & 0xff;
+			state->m_cval[5] = thisLevel->px >> 8;
+			state->m_cval[6] = thisLevel->py & 0xff;
+			state->m_cval[7] = thisLevel->py >> 8;
 
 			// Restart position found ok
-			state->restart_status = 0;
+			state->m_restart_status = 0;
 
 			return;
 		}
@@ -359,7 +359,7 @@ static void WriteRestartPos( running_machine &machine, int level )
 	}
 
 	// No restart position found for this position (cval0-7 confirmed unchanged in this case)
-	state->restart_status = 0xff;
+	state->m_restart_status = 0xff;
 }
 
 
@@ -377,7 +377,7 @@ WRITE16_HANDLER( bonzeadv_cchip_ctrl_w )
 WRITE16_HANDLER( bonzeadv_cchip_bank_w )
 {
 	asuka_state *state = space->machine().driver_data<asuka_state>();
-	state->current_bank = data & 7;
+	state->m_current_bank = data & 7;
 }
 
 WRITE16_HANDLER( bonzeadv_cchip_ram_w )
@@ -387,11 +387,11 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 //  if (cpu_get_pc(&space->device())!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(&space->device()), offset, data);
 
-	if (state->current_bank == 0)
+	if (state->m_current_bank == 0)
 	{
 		if (offset == 0x08)
 		{
-			state->cc_port = data;
+			state->m_cc_port = data;
 
 			coin_lockout_w(space->machine(), 1, data & 0x80);
 			coin_lockout_w(space->machine(), 0, data & 0x40);
@@ -401,7 +401,7 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 
 		if (offset == 0x0e && data != 0x00)
 		{
-			WriteRestartPos(space->machine(), state->current_round);
+			WriteRestartPos(space->machine(), state->m_current_round);
 		}
 
 		if (offset == 0x0f && data != 0x00)
@@ -411,12 +411,12 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 
 		if (offset == 0x10)
 		{
-			state->current_round = data;
+			state->m_current_round = data;
 		}
 
 		if (offset >= 0x11 && offset <= 0x2a)
 		{
-			state->cval[offset - 0x11] = data;
+			state->m_cval[offset - 0x11] = data;
 		}
 	}
 }
@@ -442,7 +442,7 @@ READ16_HANDLER( bonzeadv_cchip_ram_r )
 
 //  logerror("%08x:  read %04x cchip\n", cpu_get_pc(&space->device()), offset);
 
-	if (state->current_bank == 0)
+	if (state->m_current_bank == 0)
 	{
 		switch (offset)
 		{
@@ -450,17 +450,17 @@ READ16_HANDLER( bonzeadv_cchip_ram_r )
 		case 0x04: return input_port_read(space->machine(), "800009");    /* COINn */
 		case 0x05: return input_port_read(space->machine(), "80000B");    /* Player controls + TILT */
 		case 0x06: return input_port_read(space->machine(), "80000D");    /* Player controls (cocktail) */
-		case 0x08: return state->cc_port;
+		case 0x08: return state->m_cc_port;
 		}
 
 		if (offset == 0x0e)
 		{
-			return state->restart_status; /* 0xff signals error, 0 signals ok */
+			return state->m_restart_status; /* 0xff signals error, 0 signals ok */
 		}
 
 		if (offset >= 0x11 && offset <= 0x2a)
 		{
-			return state->cval[offset - 0x11];
+			return state->m_cval[offset - 0x11];
 		}
 	}
 

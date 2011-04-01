@@ -6,36 +6,47 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      sharedram;
-	UINT8 *      scrlram;
-	UINT8 *      videoram;
-	UINT8 *      spriteram;
-	size_t       videoram_size;
+	UINT8 *      m_sharedram;
+	UINT8 *      m_scrlram;
+	UINT8 *      m_videoram;
+	UINT8 *      m_spriteram;
+	size_t       m_videoram_size;
 
 	/* video-related */
-	tilemap_t *bg_tilemap;
-	int char_bank, palette_bank, gfxctrl;
+	tilemap_t *m_bg_tilemap;
+	int m_char_bank;
+	int m_palette_bank;
+	int m_gfxctrl;
 
 	/* mcu */
-	UINT8 from_main, from_mcu;
-	int mcu_sent, main_sent;
-	UINT8 port_a_in, port_a_out, ddr_a;
-	UINT8 port_b_in, port_b_out, ddr_b;
-	UINT8 port_c_in, port_c_out, ddr_c;
+	UINT8 m_from_main;
+	UINT8 m_from_mcu;
+	int m_mcu_sent;
+	int m_main_sent;
+	UINT8 m_port_a_in;
+	UINT8 m_port_a_out;
+	UINT8 m_ddr_a;
+	UINT8 m_port_b_in;
+	UINT8 m_port_b_out;
+	UINT8 m_ddr_b;
+	UINT8 m_port_c_in;
+	UINT8 m_port_c_out;
+	UINT8 m_ddr_c;
 
 	/* misc */
-	int generic_control_reg;
-	int sound_nmi_enable, pending_nmi;
-	UINT8 snd_data;
-	int vol_ctrl[16];
-	int  gametype;
-	int mask;
+	int m_generic_control_reg;
+	int m_sound_nmi_enable;
+	int m_pending_nmi;
+	UINT8 m_snd_data;
+	int m_vol_ctrl[16];
+	int  m_gametype;
+	int m_mask;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *mcu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_mcu;
 };
 
 

@@ -4,14 +4,14 @@ public:
 	wiping_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *sharedram1;
-	UINT8 *sharedram2;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	int flipscreen;
-	UINT8 *soundregs;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_sharedram1;
+	UINT8 *m_sharedram2;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	int m_flipscreen;
+	UINT8 *m_soundregs;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

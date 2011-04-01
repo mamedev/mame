@@ -12,13 +12,13 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 *videoram;
-	UINT8 *slapstic_source;
-	UINT8 *slapstic_base;
-	UINT8 current_bank;
-	UINT8 nvram_write_enable;
-	emu_timer *interrupt_timer;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_slapstic_source;
+	UINT8 *m_slapstic_base;
+	UINT8 m_current_bank;
+	UINT8 m_nvram_write_enable;
+	emu_timer *m_interrupt_timer;
+	tilemap_t *m_bg_tilemap;
 };
 
 /*----------- defined in video/atetris.c -----------*/

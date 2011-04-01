@@ -161,13 +161,13 @@ TODO:
 static READ8_HANDLER( gaplus_spriteram_r )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	return state->spriteram[offset];
+	return state->m_spriteram[offset];
 }
 
 static WRITE8_HANDLER( gaplus_spriteram_w )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	state->spriteram[offset] = data;
+	state->m_spriteram[offset] = data;
 }
 
 static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
@@ -270,12 +270,12 @@ static INTERRUPT_GEN( gaplus_interrupt_1 )
 
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, videoram)		/* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, m_videoram)		/* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)										/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE_MEMBER(gaplus_state, customio_3)	/* custom I/O chip #3 interface */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE_MEMBER(gaplus_state, m_customio_3)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
@@ -285,12 +285,12 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gaplusa_cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, videoram)		/* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, m_videoram)		/* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)													/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
-	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE_MEMBER(gaplus_state, customio_3)	/* custom I/O chip #3 interface */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE_MEMBER(gaplus_state, m_customio_3)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */

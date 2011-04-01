@@ -31,7 +31,7 @@ static WRITE16_HANDLER( madmotor_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1a0010, 0x1a0017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE_MEMBER(madmotor_state, spriteram, spriteram_size)
+	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE_MEMBER(madmotor_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
@@ -223,7 +223,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	madmotor_state *driver_state = device->machine().driver_data<madmotor_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -235,17 +235,17 @@ static MACHINE_START( madmotor )
 {
 	madmotor_state *state = machine.driver_data<madmotor_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_RESET( madmotor )
 {
 	madmotor_state *state = machine.driver_data<madmotor_state>();
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( madmotor, madmotor_state )

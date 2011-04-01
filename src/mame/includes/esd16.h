@@ -11,25 +11,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *       vram_0;
-	UINT16 *       vram_1;
-	UINT16 *       scroll_0;
-	UINT16 *       scroll_1;
-	UINT16 *       spriteram;
-	UINT16 *       head_layersize;
-	UINT16 *       headpanic_platform_x;
-	UINT16 *       headpanic_platform_y;
-//  UINT16 *       paletteram;  // currently this uses generic palette handling
-	size_t         spriteram_size;
+	UINT16 *       m_vram_0;
+	UINT16 *       m_vram_1;
+	UINT16 *       m_scroll_0;
+	UINT16 *       m_scroll_1;
+	UINT16 *       m_spriteram;
+	UINT16 *       m_head_layersize;
+	UINT16 *       m_headpanic_platform_x;
+	UINT16 *       m_headpanic_platform_y;
+//  UINT16 *       m_paletteram;  // currently this uses generic palette handling
+	size_t         m_spriteram_size;
 
 	/* video-related */
-	tilemap_t       *tilemap_0_16x16, *tilemap_1_16x16;
-	tilemap_t       *tilemap_0, *tilemap_1;
-	int           tilemap0_color;
+	tilemap_t       *m_tilemap_0_16x16;
+	tilemap_t       *m_tilemap_1_16x16;
+	tilemap_t       *m_tilemap_0;
+	tilemap_t       *m_tilemap_1;
+	int           m_tilemap0_color;
 
 	/* devices */
-	device_t *audio_cpu;
-	device_t *eeprom;
+	device_t *m_audio_cpu;
+	device_t *m_eeprom;
 };
 
 

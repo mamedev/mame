@@ -12,14 +12,14 @@ public:
 	cchasm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int sound_flags;
-	int coin_flag;
-	device_t *ctc;
-	int channel_active[2];
-	int output[2];
-	UINT16 *ram;
-	int xcenter;
-	int ycenter;
+	int m_sound_flags;
+	int m_coin_flag;
+	device_t *m_ctc;
+	int m_channel_active[2];
+	int m_output[2];
+	UINT16 *m_ram;
+	int m_xcenter;
+	int m_ycenter;
 };
 
 

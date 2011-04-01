@@ -195,22 +195,22 @@ public:
 	aristmk4_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int rtc_address_strobe;
-	int rtc_data_strobe;
-	device_t *samples;
-	UINT8 *shapeRomPtr;
-	UINT8 shapeRom[0xc000];
-	UINT8 *mkiv_vram;
-	UINT8 *nvram;
-	UINT8 psg_data;
-	int ay8910_1;
-	int ay8910_2;
-	int u3_p0_w;
-	UINT8 cgdrsw;
-	UINT8 ripple;
-	int hopper_motor;
-	int inscrd;
-	int cashcade_c;
+	int m_rtc_address_strobe;
+	int m_rtc_data_strobe;
+	device_t *m_samples;
+	UINT8 *m_shapeRomPtr;
+	UINT8 m_shapeRom[0xc000];
+	UINT8 *m_mkiv_vram;
+	UINT8 *m_nvram;
+	UINT8 m_psg_data;
+	int m_ay8910_1;
+	int m_ay8910_2;
+	int m_u3_p0_w;
+	UINT8 m_cgdrsw;
+	UINT8 m_ripple;
+	int m_hopper_motor;
+	int m_inscrd;
+	int m_cashcade_c;
 };
 
 
@@ -243,23 +243,23 @@ INLINE void uBackgroundColour(running_machine &machine)
 	{
         case 0x00:
              // restore defaults
-             memcpy(state->shapeRomPtr,state->shapeRom, sizeof(state->shapeRom)); // restore defaults, both switches off
+             memcpy(state->m_shapeRomPtr,state->m_shapeRom, sizeof(state->m_shapeRom)); // restore defaults, both switches off
                                                              // OE enabled on both shapes
              break;
         case 0x01:
              // unselect U22 via SW7. OE on U22 is low.
-             memset(&state->shapeRomPtr[0x4000],0xff,0x2000);               // fill unused space with 0xff
-             memcpy(&state->shapeRomPtr[0xa000],&state->shapeRom[0xa000], 0x2000); // restore defaults here
+             memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);               // fill unused space with 0xff
+             memcpy(&state->m_shapeRomPtr[0xa000],&state->m_shapeRom[0xa000], 0x2000); // restore defaults here
              break;
         case 0x02:
              // unselect U47 via SW7. OE on U47 is low.
-             memcpy(&state->shapeRomPtr[0x4000],&state->shapeRom[0x4000], 0x2000);
-             memset(&state->shapeRomPtr[0xa000],0xff,0x2000);
+             memcpy(&state->m_shapeRomPtr[0x4000],&state->m_shapeRom[0x4000], 0x2000);
+             memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
              break;
         case 0x03:
              // unselect U47 & U22 via SW7. Both output enable low.
-             memset(&state->shapeRomPtr[0x4000],0xff,0x2000);
-             memset(&state->shapeRomPtr[0xa000],0xff,0x2000);
+             memset(&state->m_shapeRomPtr[0x4000],0xff,0x2000);
+             memset(&state->m_shapeRomPtr[0xa000],0xff,0x2000);
              break;
     }
 }
@@ -280,14 +280,14 @@ static SCREEN_UPDATE(aristmk4)
 	{
 		for (x=38;x--;)
 		{
-            color = ((state->mkiv_vram[count]) & 0xe0) >> 5;
-			tile = (state->mkiv_vram[count+1]|state->mkiv_vram[count]<<8) & 0x3ff;
-			bgtile = (state->mkiv_vram[count+1]|state->mkiv_vram[count]<<8) & 0xff; // first 256 tiles
+            color = ((state->m_mkiv_vram[count]) & 0xe0) >> 5;
+			tile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0x3ff;
+			bgtile = (state->m_mkiv_vram[count+1]|state->m_mkiv_vram[count]<<8) & 0xff; // first 256 tiles
 			uBackgroundColour(screen->machine()); // read sw7
 			gfx_element_decode(gfx, bgtile);    // force the machine to update only the first 256 tiles.
 			                                    // as we only update the background, not the entire display.
-			flipx = ((state->mkiv_vram[count]) & 0x04);
-			flipy = ((state->mkiv_vram[count]) & 0x08);
+			flipx = ((state->m_mkiv_vram[count]) & 0x04);
+			flipy = ((state->m_mkiv_vram[count]) & 0x08);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,flipx,flipy,(38-x-1)<<3,(27-y-1)<<3);
 			count+=2;
 		}
@@ -304,16 +304,16 @@ static READ8_HANDLER(ldsw)
    {
         return 0;
    }
-   return state->cgdrsw = input_port_read(space->machine(), "CGDRSW");
+   return state->m_cgdrsw = input_port_read(space->machine(), "CGDRSW");
 }
 
 static READ8_HANDLER(cgdrr)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-   if(state->cgdrsw) // is the LC closed
+   if(state->m_cgdrsw) // is the LC closed
    {
-        return state->ripple; // return a positive value from the ripple counter
+        return state->m_ripple; // return a positive value from the ripple counter
    }
    return 0x0; // otherwise the counter outputs are set low.
 }
@@ -322,7 +322,7 @@ static WRITE8_HANDLER(cgdrw)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-    state->ripple = data;
+    state->m_ripple = data;
 
 }
 
@@ -330,8 +330,8 @@ static WRITE8_HANDLER(u3_p0)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	state->u3_p0_w = data;
-	//logerror("u3_p0_w: %02X\n",state->u3_p0_w);
+	state->m_u3_p0_w = data;
+	//logerror("u3_p0_w: %02X\n",state->m_u3_p0_w);
 
 }
 
@@ -345,18 +345,18 @@ static READ8_HANDLER(u3_p2)
     output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
     output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
 
-    if (state->u3_p0_w&0x20) // DOPTE on
+    if (state->m_u3_p0_w&0x20) // DOPTE on
     {
         if (u3_p3_ret&0x02) // door closed
 			u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
 	}
 
-    if (state->inscrd==0)
+    if (state->m_inscrd==0)
     {
-		state->inscrd=input_port_read(space->machine(), "insertcoin");
+		state->m_inscrd=input_port_read(space->machine(), "insertcoin");
 	}
 
-    if (state->inscrd==1)
+    if (state->m_inscrd==1)
 		u3_p2_ret=u3_p2_ret^0x02;
 
     return u3_p2_ret;
@@ -401,7 +401,7 @@ static WRITE8_HANDLER(mkiv_pia_outa)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 	mc146818_device *mc = space->machine().device<mc146818_device>("rtc");
-    if(state->rtc_data_strobe)
+    if(state->m_rtc_data_strobe)
     {
         mc->write(*space,1,data);
         //logerror("rtc protocol write data: %02X\n",data);
@@ -420,7 +420,7 @@ static WRITE8_HANDLER(mkiv_pia_outa)
 static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-     state->rtc_address_strobe = data;
+     state->m_rtc_address_strobe = data;
     // logerror("address strobe %02X\n", address_strobe);
 }
 
@@ -429,7 +429,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_ca2)
 static WRITE8_DEVICE_HANDLER(mkiv_pia_cb2)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-     state->rtc_data_strobe = data;
+     state->m_rtc_data_strobe = data;
      //logerror("data strobe: %02X\n", data);
 }
 
@@ -457,7 +457,7 @@ static WRITE8_DEVICE_HANDLER(mkiv_pia_outb)
             if(emet[i])
             {
                 //logerror("Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
-                sample_start(state->samples,i,0, FALSE); // pulse sound for mechanical meters
+                sample_start(state->m_samples,i,0, FALSE); // pulse sound for mechanical meters
             }
      }
 
@@ -491,7 +491,7 @@ static TIMER_CALLBACK(coin_input_reset)
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->inscrd=0; //reset credit input after 150msec
+	state->m_inscrd=0; //reset credit input after 150msec
 
 }
 
@@ -499,7 +499,7 @@ static TIMER_CALLBACK(hopper_reset)
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->hopper_motor=0x01;
+	state->m_hopper_motor=0x01;
 
 }
 
@@ -511,13 +511,13 @@ static READ8_DEVICE_HANDLER(via_a_r)
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
 	int psg_ret=0;
 
-    if (state->ay8910_1&0x03) // SW1 read.
+    if (state->m_ay8910_1&0x03) // SW1 read.
     {
     	psg_ret = ay8910_r(device->machine().device("ay1"), 0);
     	//logerror("PSG porta ay1 returned %02X\n",psg_ret);
     }
 
-	else if (state->ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
+	else if (state->m_ay8910_2&0x03) //i don't think we read anything from Port A on ay2, Can be removed once game works ok.
 	{
 		psg_ret = ay8910_r(device->machine().device("ay2"), 0);
 		//logerror("PSG porta ay2 returned %02X\n",psg_ret);
@@ -542,7 +542,7 @@ static READ8_DEVICE_HANDLER(via_b_r)
 /* Coin input... CBOPT2 goes LOW, then the optic detectors OPTA1 / OPTB1 detect the coin passing */
 /* The timer causes one credit, per 150ms or so... */
 
-    switch(state->inscrd)
+    switch(state->m_inscrd)
 	{
 
 		case 0x00:
@@ -550,12 +550,12 @@ static READ8_DEVICE_HANDLER(via_b_r)
 
 		case 0x01:
 			ret=ret^0x10;
-			state->inscrd++;
+			state->m_inscrd++;
 			break;
 
 		case 0x02:
 			ret=ret^0x20;
-			state->inscrd++;
+			state->m_inscrd++;
 			device->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(coin_input_reset));
 			break;
 
@@ -566,12 +566,12 @@ static READ8_DEVICE_HANDLER(via_b_r)
 
 // if user presses collect.. send coins to hopper.
 
-    switch(state->hopper_motor)
+    switch(state->m_hopper_motor)
 	{
 		case 0x00:
 			ret=ret^0x40;
 			device->machine().scheduler().timer_set(attotime::from_msec(175), FUNC(hopper_reset));
-			state->hopper_motor=0x02;
+			state->m_hopper_motor=0x02;
 			break;
 		case 0x01:
 			break; //default
@@ -590,35 +590,35 @@ static WRITE8_DEVICE_HANDLER(via_a_w)
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();   //via_b_w will handle sending the data to the ay8910, so just write the data for it to use later
 
 	//logerror("VIA port A write %02X\n",data);
-	state->psg_data = data;
+	state->m_psg_data = data;
 
 }
 
 static WRITE8_DEVICE_HANDLER(via_b_w)
 {
 	aristmk4_state *state = device->machine().driver_data<aristmk4_state>();
-	state->ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
+	state->m_ay8910_1 = ( data & 0x0F ) ; //only need first 4 bits per schematics
                                  //NOTE: when bit 4 is off, we write to AY1, when bit 4 is on, we write to AY2
-	state->ay8910_2 = state->ay8910_1;
+	state->m_ay8910_2 = state->m_ay8910_1;
 
-	if ( state->ay8910_2 & 0x08 ) // is bit 4 on ?
+	if ( state->m_ay8910_2 & 0x08 ) // is bit 4 on ?
 	{
-        state->ay8910_2  = (state->ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
-        state->ay8910_1  = 0x00; // write only to ay2
+        state->m_ay8910_2  = (state->m_ay8910_2 | 0x02) ; // bit 2 is turned on as bit 4 hooks to bit 2 in the schematics
+        state->m_ay8910_1  = 0x00; // write only to ay2
 	}
 	else
 	{
-		state->ay8910_2 = 0x00; // write only to ay1
+		state->m_ay8910_2 = 0x00; // write only to ay1
 	}
 
 	//only need bc1/bc2 and bdir so drop bit 4.
 
-	state->ay8910_1 = (state->ay8910_1 & 0x07);
-	state->ay8910_2 = (state->ay8910_2 & 0x07);
+	state->m_ay8910_1 = (state->m_ay8910_1 & 0x07);
+	state->m_ay8910_2 = (state->m_ay8910_2 & 0x07);
 
 	//PSG ay1
 
-	switch(state->ay8910_1)
+	switch(state->m_ay8910_1)
 	{
 
 		case 0x00:	//INACT -Nothing to do here. Inactive PSG
@@ -629,26 +629,26 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( device->machine().device("ay1"), 0 , state->psg_data );
-        	//logerror("VIA Port A write data ay1: %02X\n",state->psg_data);
+        	ay8910_data_w( device->machine().device("ay1"), 0 , state->m_psg_data );
+        	//logerror("VIA Port A write data ay1: %02X\n",state->m_psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-        	ay8910_address_w( device->machine().device("ay1"), 0 , state->psg_data );
-        	//logerror("VIA Port B write register ay1: %02X\n",state->psg_data);
+        	ay8910_address_w( device->machine().device("ay1"), 0 , state->m_psg_data );
+        	//logerror("VIA Port B write register ay1: %02X\n",state->m_psg_data);
         	break;
         }
 
 		default:
-			//logerror("Unknown PSG state on ay1: %02X\n",state->ay8910_1);
+			//logerror("Unknown PSG state on ay1: %02X\n",state->m_ay8910_1);
 			break;
 	}
 
 	//PSG ay2
 
-	switch(state->ay8910_2)
+	switch(state->m_ay8910_2)
 	{
 
 		case 0x00:	//INACT - Nothing to do here. Inactive PSG
@@ -662,20 +662,20 @@ static WRITE8_DEVICE_HANDLER(via_b_w)
 
 		case 0x06:  //WRITE
         {
-        	ay8910_data_w( device->machine().device("ay2"), 0 , state->psg_data );
-        	//logerror("VIA Port A write data ay2: %02X\n",state->psg_data);
+        	ay8910_data_w( device->machine().device("ay2"), 0 , state->m_psg_data );
+        	//logerror("VIA Port A write data ay2: %02X\n",state->m_psg_data);
         	break;
         }
 
 		case 0x07:  //LATCH Address (set register)
         {
-            ay8910_address_w( device->machine().device("ay2"), 0 , state->psg_data );
-            //logerror("VIA Port B write register ay2: %02X\n",state->psg_data);
+            ay8910_address_w( device->machine().device("ay2"), 0 , state->m_psg_data );
+            //logerror("VIA Port B write register ay2: %02X\n",state->m_psg_data);
             break;
         }
 
 		default:
-			//logerror("Unknown PSG state on ay2: %02X\n",state->ay8910_2);
+			//logerror("Unknown PSG state on ay2: %02X\n",state->m_ay8910_2);
 			break;
 
 	}
@@ -715,9 +715,9 @@ static WRITE8_DEVICE_HANDLER(via_cb2_w)
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
 	if (data==0x01)
-		state->hopper_motor=data;
-	else if (state->hopper_motor<0x02)
-		state->hopper_motor=data;
+		state->m_hopper_motor=data;
+	else if (state->m_hopper_motor<0x02)
+		state->m_hopper_motor=data;
 }
 
 
@@ -773,7 +773,7 @@ static READ8_HANDLER(cashcade_r)
 {
 	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 	/* work around for cashcade games */
-	return cashcade_p[(state->cashcade_c++)%15];
+	return cashcade_p[(state->m_cashcade_c++)%15];
 }
 
 static WRITE8_HANDLER(mk4_printer_w)
@@ -787,7 +787,7 @@ static READ8_HANDLER(mk4_printer_r)
 }
 
 static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -827,7 +827,7 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 
 
 static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -1435,17 +1435,17 @@ static PALETTE_INIT( aristmk4 )
 static DRIVER_INIT( aristmk4 )
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
-	state->shapeRomPtr = (UINT8 *)machine.region("tile_gfx")->base();
-    memcpy(state->shapeRom,state->shapeRomPtr,sizeof(state->shapeRom)); // back up
-	state->nvram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_shapeRomPtr = (UINT8 *)machine.region("tile_gfx")->base();
+    memcpy(state->m_shapeRom,state->m_shapeRomPtr,sizeof(state->m_shapeRom)); // back up
+	state->m_nvram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 static MACHINE_START( aristmk4 )
 {
 	aristmk4_state *state = machine.driver_data<aristmk4_state>();
 
-	state->samples = machine.device("samples");
-    state_save_register_global_pointer(machine, state->nvram, 0x1000); // state->nvram
+	state->m_samples = machine.device("samples");
+    state_save_register_global_pointer(machine, state->m_nvram, 0x1000); // state->m_nvram
 }
 
 

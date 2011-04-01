@@ -42,7 +42,7 @@ static INTERRUPT_GEN( bladestl_interrupt )
 
 	if (cpu_getiloops(device) == 0)
 	{
-		if (k007342_is_int_enabled(state->k007342))
+		if (k007342_is_int_enabled(state->m_k007342))
 			device_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
@@ -64,8 +64,8 @@ static READ8_HANDLER( trackball_r )
 	int curr, delta;
 
 	curr = input_port_read(space->machine(), port[offset]);
-	delta = (curr - state->last_track[offset]) & 0xff;
-	state->last_track[offset] = curr;
+	delta = (curr - state->m_last_track[offset]) & 0xff;
+	state->m_last_track[offset] = curr;
 
 	return (delta & 0x80) | (curr >> 1);
 }
@@ -88,7 +88,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", (data & 0x60) >> 5);
 
 	/* bit 7 = select sprite bank */
-	state->spritebank = (data & 0x80) << 3;
+	state->m_spritebank = (data & 0x80) << 3;
 
 }
 
@@ -97,7 +97,7 @@ static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)	/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE_MEMBER(bladestl_state, paletteram)		/* palette */
+	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE_MEMBER(bladestl_state, m_paletteram)		/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")				/* DIPSW #3, coinsw, startsw */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")					/* 1P controls */
@@ -311,13 +311,13 @@ static MACHINE_START( bladestl )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k007342 = machine.device("k007342");
-	state->k007420 = machine.device("k007420");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k007342 = machine.device("k007342");
+	state->m_k007420 = machine.device("k007420");
 
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->layer_colorbase));
-	state->save_item(NAME(state->last_track));
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_layer_colorbase));
+	state->save_item(NAME(state->m_last_track));
 }
 
 static MACHINE_RESET( bladestl )
@@ -325,12 +325,12 @@ static MACHINE_RESET( bladestl )
 	bladestl_state *state = machine.driver_data<bladestl_state>();
 	int i;
 
-	state->layer_colorbase[0] = 0;
-	state->layer_colorbase[1] = 1;
-	state->spritebank = 0;
+	state->m_layer_colorbase[0] = 0;
+	state->m_layer_colorbase[1] = 1;
+	state->m_spritebank = 0;
 
 	for (i = 0; i < 4 ; i++)
-		state->last_track[i] = 0;
+		state->m_last_track[i] = 0;
 }
 
 static MACHINE_CONFIG_START( bladestl, bladestl_state )

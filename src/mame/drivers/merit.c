@@ -61,29 +61,29 @@ public:
 		: driver_device(machine, config) { }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
-	pen_t pens[NUM_PENS];
-	UINT8 *ram_attr;
-	UINT8 *ram_video;
-	UINT8 *ram_palette;
-	UINT8 lscnblk;
-	int extra_video_bank_bit;
-	int question_address;
-	int decryption_key;
-	UINT8 *backup_ram;
+	pen_t m_pens[NUM_PENS];
+	UINT8 *m_ram_attr;
+	UINT8 *m_ram_video;
+	UINT8 *m_ram_palette;
+	UINT8 m_lscnblk;
+	int m_extra_video_bank_bit;
+	int m_question_address;
+	int m_decryption_key;
+	UINT8 *m_backup_ram;
 };
 
 
 static MACHINE_START(merit)
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->question_address = 0;
-	state->ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
+	state->m_question_address = 0;
+	state->m_ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
 
-	state_save_register_global_pointer(machine, state->ram_palette, RAM_PALETTE_SIZE);
-	state_save_register_global(machine, state->lscnblk);
-	state_save_register_global(machine, state->extra_video_bank_bit);
-	state_save_register_global(machine, state->question_address);
-	state_save_register_global(machine, state->decryption_key);
+	state_save_register_global_pointer(machine, state->m_ram_palette, RAM_PALETTE_SIZE);
+	state_save_register_global(machine, state->m_lscnblk);
+	state_save_register_global(machine, state->m_extra_video_bank_bit);
+	state_save_register_global(machine, state->m_question_address);
+	state_save_register_global(machine, state->m_decryption_key);
 }
 
 
@@ -93,7 +93,7 @@ static READ8_HANDLER( questions_r )
 	UINT8 *questions = space->machine().region("user1")->base();
 	int address;
 
-	switch(state->question_address >> 16)
+	switch(state->m_question_address >> 16)
 	{
 		case 0x30: address = 0x00000;
 			break;
@@ -131,11 +131,11 @@ static READ8_HANDLER( questions_r )
  *          break;
  */
 
-		default: logerror("read unknown question rom: %02X\n",state->question_address >> 16);
+		default: logerror("read unknown question rom: %02X\n",state->m_question_address >> 16);
 			return 0xff;
 	}
 
-	address |= state->question_address & 0xffff;
+	address |= state->m_question_address & 0xffff;
 
 	return questions[address];
 }
@@ -143,24 +143,24 @@ static READ8_HANDLER( questions_r )
 static WRITE8_HANDLER( low_offset_w )
 {
 	merit_state *state = space->machine().driver_data<merit_state>();
-	offset = (offset & 0xf0) | ((offset - state->decryption_key) & 0x0f);
+	offset = (offset & 0xf0) | ((offset - state->m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->question_address = (state->question_address & 0xffff00) | offset;
+	state->m_question_address = (state->m_question_address & 0xffff00) | offset;
 }
 
 static WRITE8_HANDLER( med_offset_w )
 {
 	merit_state *state = space->machine().driver_data<merit_state>();
-	offset = (offset & 0xf0) | ((offset - state->decryption_key) & 0x0f);
+	offset = (offset & 0xf0) | ((offset - state->m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->question_address = (state->question_address & 0xff00ff) | (offset << 8);
+	state->m_question_address = (state->m_question_address & 0xff00ff) | (offset << 8);
 }
 
 static WRITE8_HANDLER( high_offset_w )
 {
 	merit_state *state = space->machine().driver_data<merit_state>();
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->question_address = (state->question_address & 0x00ffff) | (offset << 16);
+	state->m_question_address = (state->m_question_address & 0x00ffff) | (offset << 16);
 }
 
 static READ8_HANDLER( palette_r )
@@ -168,8 +168,8 @@ static READ8_HANDLER( palette_r )
 	merit_state *state = space->machine().driver_data<merit_state>();
 	int co;
 
-	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	return state->ram_palette[co];
+	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	return state->m_ram_palette[co];
 }
 
 static WRITE8_HANDLER( palette_w )
@@ -180,8 +180,8 @@ static WRITE8_HANDLER( palette_w )
 	space->machine().primary_screen->update_now();
 	data &= 0x0f;
 
-	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	state->ram_palette[co] = data;
+	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	state->m_ram_palette[co] = data;
 
 }
 
@@ -198,10 +198,10 @@ static MC6845_BEGIN_UPDATE( begin_update )
 		bit0 = BIT(i,0);
 		bit1 = BIT(i,1);
 		bit2 = BIT(i,2);
-		state->pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
+		state->m_pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
 	}
 
-	return state->pens;
+	return state->m_pens;
 }
 
 
@@ -223,9 +223,9 @@ static MC6845_UPDATE_ROW( update_row )
 	for (cx = 0; cx < x_count; cx++)
 	{
 		int i;
-		int attr = state->ram_attr[ma & 0x7ff];
+		int attr = state->m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
-		int addr = ((state->ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (state->m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
 		UINT8	*data;
 
@@ -245,8 +245,8 @@ static MC6845_UPDATE_ROW( update_row )
 			else
 				col |= 0x03;
 
-			col = state->ram_palette[col & 0x3ff];
-			*BITMAP_ADDR32(bitmap, y, x) = pens[col ? col : (state->lscnblk ? 8 : 0)];
+			col = state->m_ram_palette[col & 0x3ff];
+			*BITMAP_ADDR32(bitmap, y, x) = pens[col ? col : (state->m_lscnblk ? 8 : 0)];
 
 			x++;
 		}
@@ -307,8 +307,8 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 {
 	merit_state *state = device->machine().driver_data<merit_state>();
 	flip_screen_set(device->machine(), ~data & 0x10);
-	state->extra_video_bank_bit = (data & 2) << 8;
-	state->lscnblk = (data >> 3) & 1;
+	state->m_extra_video_bank_bit = (data & 2) << 8;
+	state->m_lscnblk = (data >> 3) & 1;
 
 	/* other bits unknown */
 }
@@ -317,13 +317,13 @@ static WRITE8_DEVICE_HANDLER( misc_couple_w )
 {
 	merit_state *state = device->machine().driver_data<merit_state>();
 	flip_screen_set(device->machine(), ~data & 0x10);
-	state->extra_video_bank_bit = (data & 2) << 8;
-	state->lscnblk = (data >> 3) & 1;
+	state->m_extra_video_bank_bit = (data & 2) << 8;
+	state->m_lscnblk = (data >> 3) & 1;
 
 	/* other bits unknown */
 
 	/*kludge to avoid jumps on ram area in The Couples*/
-	state->backup_ram[0x1011] = 0xc9; //ret
+	state->m_backup_ram[0x1011] = 0xc9; //ret
 }
 
 static WRITE8_HANDLER(casino5_bank_w)
@@ -356,8 +356,8 @@ static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -372,8 +372,8 @@ static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -384,8 +384,8 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -396,8 +396,8 @@ static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -416,8 +416,8 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -437,8 +437,8 @@ static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -458,8 +458,8 @@ static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( trvwhziv_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -495,21 +495,21 @@ static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( couple_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(merit_state, backup_ram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(merit_state, m_backup_ram)
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(merit_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -1996,31 +1996,31 @@ ROM_END
 static DRIVER_INIT( key_0 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->decryption_key = 0;
+	state->m_decryption_key = 0;
 }
 
 static DRIVER_INIT( key_2 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->decryption_key = 2;
+	state->m_decryption_key = 2;
 }
 
 static DRIVER_INIT( key_4 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->decryption_key = 4;
+	state->m_decryption_key = 4;
 }
 
 static DRIVER_INIT( key_5 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->decryption_key = 5;
+	state->m_decryption_key = 5;
 }
 
 static DRIVER_INIT( key_7 )
 {
 	merit_state *state = machine.driver_data<merit_state>();
-	state->decryption_key = 7;
+	state->m_decryption_key = 7;
 }
 
 static DRIVER_INIT( couple )
@@ -2074,7 +2074,7 @@ static DRIVER_INIT( dtrvwz5 )
 	ROM[0xb00c] = 0x5f; /* ld   e,a */
 	ROM[0xb00a] = 0xc9; /* ret */
 
-	state->decryption_key = 6;
+	state->m_decryption_key = 6;
 }
 
 GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

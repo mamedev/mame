@@ -22,31 +22,32 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *   spriteram;
-	size_t     spriteram_size;
+	UINT16 *   m_spriteram;
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	struct othunder_tempsprite *spritelist;
+	struct othunder_tempsprite *m_spritelist;
 
 	/* misc */
-	int        vblank_irq, ad_irq;
-	INT32      banknum;
-	int        pan[4];
+	int        m_vblank_irq;
+	int        m_ad_irq;
+	INT32      m_banknum;
+	int        m_pan[4];
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *eeprom;
-	device_t *tc0220ioc;
-	device_t *tc0100scn;
-	device_t *tc0110pcr;
-	device_t *tc0140syt;
-	device_t *_2610_0l;
-	device_t *_2610_0r;
-	device_t *_2610_1l;
-	device_t *_2610_1r;
-	device_t *_2610_2l;
-	device_t *_2610_2r;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_eeprom;
+	device_t *m_tc0220ioc;
+	device_t *m_tc0100scn;
+	device_t *m_tc0110pcr;
+	device_t *m_tc0140syt;
+	device_t *m_2610_0l;
+	device_t *m_2610_0r;
+	device_t *m_2610_1l;
+	device_t *m_2610_1r;
+	device_t *m_2610_2l;
+	device_t *m_2610_2r;
 };
 
 

@@ -19,7 +19,7 @@
 static TILE_GET_INFO( get_playfield_tile_info )
 {
 	blstroid_state *state = machine.driver_data<blstroid_state>();
-	UINT16 data = state->playfield[tile_index];
+	UINT16 data = state->m_playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO(0, code, color, 0);
@@ -74,7 +74,7 @@ VIDEO_START( blstroid )
 	blstroid_state *state = machine.driver_data<blstroid_state>();
 
 	/* initialize the playfield */
-	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -112,7 +112,7 @@ void blstroid_scanline_update(screen_device &screen, int scanline)
 
 	/* check for interrupts */
 	if (offset < 0x1000)
-		if (state->playfield[offset] & 0x8000)
+		if (state->m_playfield[offset] & 0x8000)
 		{
 			int width, vpos;
 			attotime period_on;
@@ -151,7 +151,7 @@ SCREEN_UPDATE( blstroid )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -168,7 +168,7 @@ SCREEN_UPDATE( blstroid )
                         priority address = HPPPMMMM
                     */
 					int priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
-					if (state->priorityram[priaddr] & 1)
+					if (state->m_priorityram[priaddr] & 1)
 						pf[x] = mo[x];
 
 					/* erase behind ourselves */

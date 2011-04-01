@@ -627,56 +627,56 @@ static INTERRUPT_GEN( cps2_interrupt )
 	cps_state *state = device->machine().driver_data<cps_state>();
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
-	if (state->scancount >= 258)
+	if (state->m_scancount >= 258)
 	{
-		state->scancount = -1;
-		state->scancalls = 0;
+		state->m_scancount = -1;
+		state->m_scancalls = 0;
 	}
-	state->scancount++;
+	state->m_scancount++;
 
-	if (state->cps_b_regs[0x10 / 2] & 0x8000)
-		state->cps_b_regs[0x10 / 2] &= 0x1ff;
+	if (state->m_cps_b_regs[0x10 / 2] & 0x8000)
+		state->m_cps_b_regs[0x10 / 2] &= 0x1ff;
 
-	if (state->cps_b_regs[0x12 / 2] & 0x8000)
-		state->cps_b_regs[0x12 / 2] &= 0x1ff;
+	if (state->m_cps_b_regs[0x12 / 2] & 0x8000)
+		state->m_cps_b_regs[0x12 / 2] &= 0x1ff;
 
-//  popmessage("%04x %04x - %04x %04x",state->scanline1,state->scanline2,state->cps_b_regs[0x10/2],state->cps_b_regs[0x12/2]);
+//  popmessage("%04x %04x - %04x %04x",state->m_scanline1,state->m_scanline2,state->m_cps_b_regs[0x10/2],state->m_cps_b_regs[0x12/2]);
 
 	/* raster effects */
-	if (state->scanline1 == state->scancount || (state->scanline1 < state->scancount && !state->scancalls))
+	if (state->m_scanline1 == state->m_scancount || (state->m_scanline1 < state->m_scancount && !state->m_scancalls))
 	{
-		state->cps_b_regs[0x10/2] = 0;
+		state->m_cps_b_regs[0x10/2] = 0;
 		device_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine());
-		device->machine().primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
-		state->scancalls++;
-//          popmessage("IRQ4 scancounter = %04i", state->scancount);
+		device->machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		state->m_scancalls++;
+//          popmessage("IRQ4 scancounter = %04i", state->m_scancount);
 	}
 
 	/* raster effects */
-	if(state->scanline2 == state->scancount || (state->scanline2 < state->scancount && !state->scancalls))
+	if(state->m_scanline2 == state->m_scancount || (state->m_scanline2 < state->m_scancount && !state->m_scancalls))
 	{
-		state->cps_b_regs[0x12 / 2] = 0;
+		state->m_cps_b_regs[0x12 / 2] = 0;
 		device_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine());
-		device->machine().primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
-		state->scancalls++;
+		device->machine().primary_screen->update_partial(16 - 10 + state->m_scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		state->m_scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
 
-	if (state->scancount == 240)  /* VBlank */
+	if (state->m_scancount == 240)  /* VBlank */
 	{
-		state->cps_b_regs[0x10 / 2] = state->scanline1;
-		state->cps_b_regs[0x12 / 2] = state->scanline2;
+		state->m_cps_b_regs[0x10 / 2] = state->m_scanline1;
+		state->m_cps_b_regs[0x12 / 2] = state->m_scanline2;
 		device_set_input_line(device, 2, HOLD_LINE);
-		if(state->scancalls)
+		if(state->m_scancalls)
 		{
 			cps2_set_sprite_priorities(device->machine());
 			device->machine().primary_screen->update_partial(256);
 		}
 		cps2_objram_latch(device->machine());
 	}
-	//popmessage("Raster calls = %i", state->scancalls);
+	//popmessage("Raster calls = %i", state->m_scancalls);
 }
 
 
@@ -726,15 +726,15 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 	        /* Z80 Reset */
-		if (state->audiocpu != NULL)
-			device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		if (state->m_audiocpu != NULL)
+			device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 		coin_counter_w(space->machine(), 0, data & 0x0001);
 		if ((strncmp(space->machine().system().name, "pzloop2", 8) == 0) ||
 		    (strncmp(space->machine().system().name, "pzloop2j", 8) == 0))
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
-			state->readpaddle = data & 0x0002;
+			state->m_readpaddle = data & 0x0002;
 		}
 		else
 		{
@@ -779,7 +779,7 @@ static READ16_HANDLER( cps2_qsound_volume_r )
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
 	/* Only game known to use both these so far is SSF2TB */
 
-	if (state->cps2networkpresent)
+	if (state->m_cps2networkpresent)
 		return 0x2021;
 	else
 		return 0xe021;
@@ -801,7 +801,7 @@ static READ16_HANDLER( joy_or_paddle_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
 
-	if (state->readpaddle != 0)
+	if (state->m_readpaddle != 0)
 		return (input_port_read(space->machine(), "IN0"));
 	else
 		return (input_port_read(space->machine(), "PADDLE1") & 0xff) | (input_port_read(space->machine(), "PADDLE2") << 8);
@@ -816,20 +816,20 @@ static READ16_HANDLER( joy_or_paddle_r )
 
 static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, output, output_size)						/* CPS2 object output */
+	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, objram1)    							/* Object RAM, no game seems to use it directly */
-	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)								/* mirror (sfa) */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, cps_b_regs) 			/* mirror (sfa) */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, m_objram1)    							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* Object RAM */
+	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* mirror (sfa) */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs) 			/* mirror (sfa) */
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
@@ -838,29 +838,29 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
 	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)													/* bit 0 = Object ram bank swap */
-	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)							/* CPS-A custom */
+	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)							/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)           							/* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)	/* Video RAM */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* Video RAM */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM																			/* RAM */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, output, output_size)						/* CPS2 object output */
+	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, objram1)    							/* Object RAM, no game seems to use it directly */
-	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, objram2)			/* mirror */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)								/* mirror (sfa) */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, cps_b_regs) 			/* mirror (sfa) */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, m_objram1)    							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* Object RAM */
+	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* mirror (sfa) */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs) 			/* mirror (sfa) */
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
@@ -869,11 +869,11 @@ static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
 	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)													/* bit 0 = Object ram bank swap */
-	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)								/* CPS-A custom */
+	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)           							/* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)	/* Video RAM */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* Video RAM */
 	AM_RANGE(0xff0000, 0xffffef) AM_RAM																			/* RAM */
-	AM_RANGE(0xfffff0, 0xfffffb) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, output, output_size)						/* CPS2 output */
+	AM_RANGE(0xfffff0, 0xfffffb) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 output */
 ADDRESS_MAP_END
 
 
@@ -1203,12 +1203,12 @@ static MACHINE_START( cps2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->scancount));
+	state->save_item(NAME(state->m_scancount));
 
-	if (state->audiocpu != NULL)	// gigamn2 has no audiocpu
+	if (state->m_audiocpu != NULL)	// gigamn2 has no audiocpu
 		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -7982,8 +7982,8 @@ static DRIVER_INIT( cps2 )
 	/* Initialize some video elements */
 	DRIVER_INIT_CALL(cps2_video);
 
-	state->scancount = 0;
-	state->cps2networkpresent = 0;
+	state->m_scancount = 0;
+	state->m_cps2networkpresent = 0;
 
 	machine.device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
@@ -7994,11 +7994,11 @@ static DRIVER_INIT( ssf2tb )
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->cps2networkpresent = 0;
+	state->m_cps2networkpresent = 0;
 
 	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
        attempt to boot in tournament mode and fail */
-	//state->cps2networkpresent = 1;
+	//state->m_cps2networkpresent = 1;
 
 }
 
@@ -8008,9 +8008,9 @@ static DRIVER_INIT ( pzloop2 )
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->readpaddle = 0;
+	state->m_readpaddle = 0;
 
-	state->save_item(NAME(state->readpaddle));
+	state->save_item(NAME(state->m_readpaddle));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
@@ -8018,13 +8018,13 @@ static DRIVER_INIT ( pzloop2 )
 static READ16_HANDLER( gigamn2_dummyqsound_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return state->gigamn2_dummyqsound_ram[offset];
+	return state->m_gigamn2_dummyqsound_ram[offset];
 };
 
 static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->gigamn2_dummyqsound_ram[offset] = data;
+	state->m_gigamn2_dummyqsound_ram[offset] = data;
 };
 
 static DRIVER_INIT( gigamn2 )
@@ -8036,8 +8036,8 @@ static DRIVER_INIT( gigamn2 )
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
-	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
+	state->m_gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
+	state->save_pointer(NAME(state->m_gigamn2_dummyqsound_ram), 0x20000 / 2);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigamn2_dummyqsound_r), FUNC(gigamn2_dummyqsound_w)); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);

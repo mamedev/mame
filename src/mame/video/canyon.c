@@ -11,15 +11,15 @@ Atari Canyon Bomber video emulation
 WRITE8_HANDLER( canyon_videoram_w )
 {
 	canyon_state *state = space->machine().driver_data<canyon_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	canyon_state *state = machine.driver_data<canyon_state>();
-	UINT8 code = state->videoram[tile_index];
+	UINT8 code = state->m_videoram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
 }
@@ -29,7 +29,7 @@ VIDEO_START( canyon )
 {
 	canyon_state *state = machine.driver_data<canyon_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -40,9 +40,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (i = 0; i < 2; i++)
 	{
-		int x = state->videoram[0x3d0 + 2 * i + 0x1];
-		int y = state->videoram[0x3d0 + 2 * i + 0x8];
-		int c = state->videoram[0x3d0 + 2 * i + 0x9];
+		int x = state->m_videoram[0x3d0 + 2 * i + 0x1];
+		int y = state->m_videoram[0x3d0 + 2 * i + 0x8];
+		int c = state->m_videoram[0x3d0 + 2 * i + 0x9];
 
 		drawgfx_transpen(bitmap, cliprect,
 			machine.gfx[1],
@@ -62,8 +62,8 @@ static void draw_bombs( running_machine &machine, bitmap_t *bitmap, const rectan
 
 	for (i = 0; i < 2; i++)
 	{
-		int sx = 254 - state->videoram[0x3d0 + 2 * i + 0x5];
-		int sy = 246 - state->videoram[0x3d0 + 2 * i + 0xc];
+		int sx = 254 - state->m_videoram[0x3d0 + 2 * i + 0x5];
+		int sy = 246 - state->m_videoram[0x3d0 + 2 * i + 0xc];
 
 		rectangle rect;
 
@@ -86,7 +86,7 @@ SCREEN_UPDATE( canyon )
 {
 	canyon_state *state = screen->machine().driver_data<canyon_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 

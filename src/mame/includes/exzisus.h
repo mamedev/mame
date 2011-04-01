@@ -4,16 +4,16 @@ public:
 	exzisus_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *sharedram_ab;
-	UINT8 *sharedram_ac;
-	int cpua_bank;
-	int cpub_bank;
-	UINT8 *videoram0;
-	UINT8 *videoram1;
-	UINT8 *objectram0;
-	UINT8 *objectram1;
-	size_t objectram_size0;
-	size_t objectram_size1;
+	UINT8 *m_sharedram_ab;
+	UINT8 *m_sharedram_ac;
+	int m_cpua_bank;
+	int m_cpub_bank;
+	UINT8 *m_videoram0;
+	UINT8 *m_videoram1;
+	UINT8 *m_objectram0;
+	UINT8 *m_objectram1;
+	size_t m_objectram_size0;
+	size_t m_objectram_size1;
 };
 
 

@@ -11,27 +11,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *   videoram;
-	UINT8 *   colorram;
-	UINT8 *   paletteram;
+	UINT8 *   m_videoram;
+	UINT8 *   m_colorram;
+	UINT8 *   m_paletteram;
 
 	/* video-related */
-	tilemap_t  *tilemap;
-	bitmap_t   *tmpbitmap;
-	int       gfxreg;
-	int       flipscreen, flipscreen_old;
-	int       scrollx, scrolly;
-	int       screen_refresh;
+	tilemap_t  *m_tilemap;
+	bitmap_t   *m_tmpbitmap;
+	int       m_gfxreg;
+	int       m_flipscreen;
+	int       m_flipscreen_old;
+	int       m_scrollx;
+	int       m_scrolly;
+	int       m_screen_refresh;
 
 	/* misc */
-	int       portselect;
-	int       adpcm_reset;
-	int       adpcm_data;
-	int       vclk_left;
+	int       m_portselect;
+	int       m_adpcm_reset;
+	int       m_adpcm_data;
+	int       m_vclk_left;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *msm;
+	device_t *m_maincpu;
+	device_t *m_msm;
 };
 
 

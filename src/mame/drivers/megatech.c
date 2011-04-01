@@ -210,7 +210,7 @@ INPUT_PORTS_END
 static READ8_HANDLER( megatech_cart_select_r )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	return state->mt_cart_select_reg;
+	return state->m_mt_cart_select_reg;
 }
 
 
@@ -226,10 +226,10 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 
 	memcpy(machine.region("maincpu")->base(), game_region, 0x400000);
 
-	if (!state->cart_is_genesis[param])
+	if (!state->m_cart_is_genesis[param])
 	{
 		printf("enabling SMS Z80\n");
-		state->current_game_is_sms = 1;
+		state->m_current_game_is_sms = 1;
 		megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 		//cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 		cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
@@ -237,7 +237,7 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 	else
 	{
 		printf("disabling SMS Z80\n");
-		state->current_game_is_sms = 0;
+		state->m_current_game_is_sms = 0;
 		megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 		//cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
@@ -293,9 +293,9 @@ static WRITE8_HANDLER( megatech_cart_select_w )
       because it always seems to show the
       same instructions ... */
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	state->mt_cart_select_reg = data;
+	state->m_mt_cart_select_reg = data;
 
-	megatech_select_game(space->machine(), state->mt_cart_select_reg);
+	megatech_select_game(space->machine(), state->m_mt_cart_select_reg);
 }
 
 
@@ -306,9 +306,9 @@ static READ8_HANDLER( bios_ctrl_r )
 	if (offset == 0)
 		return 0;
 	if (offset == 2)
-		return state->bios_ctrl[offset] & 0xfe;
+		return state->m_bios_ctrl[offset] & 0xfe;
 
-	return state->bios_ctrl[offset];
+	return state->m_bios_ctrl[offset];
 }
 
 static WRITE8_HANDLER( bios_ctrl_w )
@@ -316,9 +316,9 @@ static WRITE8_HANDLER( bios_ctrl_w )
 	mtech_state *state = space->machine().driver_data<mtech_state>();
 	if (offset == 1)
 	{
-		state->bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
+		state->m_bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
-	state->bios_ctrl[offset] = data;
+	state->m_bios_ctrl[offset] = data;
 }
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
@@ -328,7 +328,7 @@ static READ8_HANDLER( megatech_z80_read_68k_banked_data )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
 	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
-	UINT8 ret = space68k->read_byte(state->mt_bank_addr + offset);
+	UINT8 ret = space68k->read_byte(state->m_mt_bank_addr + offset);
 	return ret;
 }
 
@@ -336,13 +336,13 @@ static WRITE8_HANDLER( megatech_z80_write_68k_banked_data )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
 	address_space *space68k = space->machine().device<legacy_cpu_device>("maincpu")->space();
-	space68k->write_byte(state->mt_bank_addr + offset,data);
+	space68k->write_byte(state->m_mt_bank_addr + offset,data);
 }
 
 static void megatech_z80_bank_w(running_machine &machine, UINT16 data)
 {
 	mtech_state *state = machine.driver_data<mtech_state>();
-	state->mt_bank_addr = ((state->mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
+	state->m_mt_bank_addr = ((state->m_mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
 static WRITE8_HANDLER( mt_z80_bank_w )
@@ -353,13 +353,13 @@ static WRITE8_HANDLER( mt_z80_bank_w )
 static READ8_HANDLER( megatech_banked_ram_r )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	return state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)];
+	return state->m_megatech_banked_ram[offset + 0x1000 * (state->m_mt_cart_select_reg & 0x07)];
 }
 
 static WRITE8_HANDLER( megatech_banked_ram_w )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	state->megatech_banked_ram[offset + 0x1000 * (state->mt_cart_select_reg & 0x07)] = data;
+	state->m_megatech_banked_ram[offset + 0x1000 * (state->m_mt_cart_select_reg & 0x07)] = data;
 }
 
 
@@ -385,13 +385,13 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( megatech_bios_port_ctrl_w )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	state->bios_port_ctrl = data;
+	state->m_bios_port_ctrl = data;
 }
 
 static READ8_HANDLER( megatech_bios_joypad_r )
 {
 	mtech_state *state = space->machine().driver_data<mtech_state>();
-	return megatech_bios_port_cc_dc_r(space->machine(), offset, state->bios_port_ctrl);
+	return megatech_bios_port_cc_dc_r(space->machine(), offset, state->m_bios_port_ctrl);
 }
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)
@@ -417,13 +417,13 @@ ADDRESS_MAP_END
 static DRIVER_INIT(mt_slot)
 {
 	mtech_state *state = machine.driver_data<mtech_state>();
-	state->megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
+	state->m_megatech_banked_ram = auto_alloc_array(machine, UINT8, 0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(megatech_bios);
 
 	// this gets set in DEVICE_IMAGE_LOAD
-	memset(state->cart_is_genesis, 0, ARRAY_LENGTH(state->cart_is_genesis));
+	memset(state->m_cart_is_genesis, 0, ARRAY_LENGTH(state->m_cart_is_genesis));
 }
 
 static DRIVER_INIT(mt_crt)
@@ -432,7 +432,7 @@ static DRIVER_INIT(mt_crt)
 	UINT8* pin = machine.region("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
-	state->cart_is_genesis[0] = !pin[0] ? 1 : 0;;
+	state->m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
 static VIDEO_START(mtnew)
@@ -451,7 +451,7 @@ static SCREEN_UPDATE(mtnew)
 	if (screen == megadriv_screen)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!state->current_game_is_sms)
+		if (!state->m_current_game_is_sms)
 			SCREEN_UPDATE_CALL(megadriv);
 		else
 			SCREEN_UPDATE_CALL(megatech_md_sms);
@@ -464,7 +464,7 @@ static SCREEN_UPDATE(mtnew)
 static SCREEN_EOF(mtnew)
 {
 	mtech_state *state = machine.driver_data<mtech_state>();
-	if (!state->current_game_is_sms)
+	if (!state->m_current_game_is_sms)
 		SCREEN_EOF_CALL(megadriv);
 	else
 		SCREEN_EOF_CALL(megatech_md_sms);
@@ -475,7 +475,7 @@ static SCREEN_EOF(mtnew)
 static MACHINE_RESET(mtnew)
 {
 	mtech_state *state = machine.driver_data<mtech_state>();
-	state->mt_bank_addr = 0;
+	state->m_mt_bank_addr = 0;
 
 	MACHINE_RESET_CALL(megadriv);
 	MACHINE_RESET_CALL(megatech_bios);
@@ -571,12 +571,12 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 		if (!mame_stricmp("genesis", pcb_name))
 		{
 			printf("%s is genesis\n", mt_cart->tag);
-			state->cart_is_genesis[this_cart->slot] = 1;
+			state->m_cart_is_genesis[this_cart->slot] = 1;
 		}
 		else if (!mame_stricmp("sms", pcb_name))
 		{
 			printf("%s is sms\n", mt_cart->tag);
-			state->cart_is_genesis[this_cart->slot] = 0;
+			state->m_cart_is_genesis[this_cart->slot] = 0;
 		}
 		else
 		{

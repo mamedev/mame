@@ -53,15 +53,15 @@ public:
 	cb2001_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vram_fg;
-	UINT16* vram_bg;
-	int videobank;
-	int videomode;
-	tilemap_t *reel1_tilemap;
-	tilemap_t *reel2_tilemap;
-	tilemap_t *reel3_tilemap;
-	int other1;
-	int other2;
+	UINT16 *m_vram_fg;
+	UINT16* m_vram_bg;
+	int m_videobank;
+	int m_videomode;
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
+	int m_other1;
+	int m_other2;
 };
 
 
@@ -336,9 +336,9 @@ static SCREEN_UPDATE(cb2001)
 	count = 0x0000;
 
 	// render bg as 8x8 tilemaps
-	if (state->other1 & 0x02)
+	if (state->m_other1 & 0x02)
 	{
-		if (!(state->other1 & 0x04))
+		if (!(state->m_other1 & 0x04))
 		{
 			for (y=0;y<32;y++)
 			{
@@ -347,9 +347,9 @@ static SCREEN_UPDATE(cb2001)
 					int tile;
 					int colour;
 
-					tile = (state->vram_bg[count] & 0x0fff);
-					colour = (state->vram_bg[count] & 0xf000)>>12;
-					tile += state->videobank*0x2000;
+					tile = (state->m_vram_bg[count] & 0x0fff);
+					colour = (state->m_vram_bg[count] & 0xf000)>>12;
+					tile += state->m_videobank*0x2000;
 
 
 					drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,colour,0,0,x*8,y*8);
@@ -366,32 +366,32 @@ static SCREEN_UPDATE(cb2001)
 			{
 				UINT16 scroll;
 
-				scroll = state->vram_bg[0xa00/2 + i/2];
+				scroll = state->m_vram_bg[0xa00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->reel2_tilemap, i, scroll);
+				tilemap_set_scrolly(state->m_reel2_tilemap, i, scroll);
 
-				scroll = state->vram_bg[0x800/2 + i/2];
+				scroll = state->m_vram_bg[0x800/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->reel1_tilemap, i, scroll);
+				tilemap_set_scrolly(state->m_reel1_tilemap, i, scroll);
 
-				scroll = state->vram_bg[0xc00/2 + i/2];
+				scroll = state->m_vram_bg[0xc00/2 + i/2];
 				if (i&1)
 					scroll >>=8;
 				scroll &=0xff;
 
-				tilemap_set_scrolly(state->reel3_tilemap, i, scroll);
+				tilemap_set_scrolly(state->m_reel3_tilemap, i, scroll);
 
 			}
 
-			tilemap_draw(bitmap, &visible1, state->reel1_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible2, state->reel2_tilemap, 0, 0);
-			tilemap_draw(bitmap, &visible3, state->reel3_tilemap, 0, 0);
+			tilemap_draw(bitmap, &visible1, state->m_reel1_tilemap, 0, 0);
+			tilemap_draw(bitmap, &visible2, state->m_reel2_tilemap, 0, 0);
+			tilemap_draw(bitmap, &visible3, state->m_reel3_tilemap, 0, 0);
 		}
 	}
 
@@ -404,11 +404,11 @@ static SCREEN_UPDATE(cb2001)
 			int tile;
 			int colour;
 
-			tile = (state->vram_fg[count] & 0x0fff);
-			colour = (state->vram_fg[count] & 0xf000)>>12;
-			tile += state->videobank*0x2000;
+			tile = (state->m_vram_fg[count] & 0x0fff);
+			colour = (state->m_vram_fg[count] & 0xf000)>>12;
+			tile += state->m_videobank*0x2000;
 
-			if (state->other2 & 0x4)
+			if (state->m_other2 & 0x4)
 			{
 				tile += 0x1000;
 			}
@@ -418,7 +418,7 @@ static SCREEN_UPDATE(cb2001)
 		}
 	}
 
-	popmessage("%02x %02x %02x %02x\n",state->videobank,state->videomode, state->other1, state->other2);
+	popmessage("%02x %02x %02x %02x\n",state->m_videobank,state->m_videomode, state->m_other1, state->m_other2);
 
 	return 0;
 }
@@ -433,10 +433,10 @@ WRITE16_HANDLER( cb2001_vidctrl_w )
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
-		state->videobank = (data & 0x0800)>>11;
+		state->m_videobank = (data & 0x0800)>>11;
 	}
 	else // something else
-		state->other1 = data & 0x00ff;
+		state->m_other1 = data & 0x00ff;
 }
 
 WRITE16_HANDLER( cb2001_vidctrl2_w )
@@ -445,10 +445,10 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
-		state->videomode = (data>>8) & 0x03; // which bit??
+		state->m_videomode = (data>>8) & 0x03; // which bit??
 	}
 	else // something else
-		state->other2 = data & 0x00ff;
+		state->m_other2 = data & 0x00ff;
 
 //      printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
 }
@@ -457,7 +457,7 @@ WRITE16_HANDLER( cb2001_vidctrl2_w )
 static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->vram_bg[(0x0000/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0000/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -476,7 +476,7 @@ static TILE_GET_INFO( get_cb2001_reel1_tile_info )
 static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->vram_bg[(0x0200/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0200/2) + tile_index/2];
 
 	if (tile_index&1)
 		code >>=8;
@@ -496,7 +496,7 @@ static TILE_GET_INFO( get_cb2001_reel2_tile_info )
 static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	int code = state->vram_bg[(0x0400/2) + tile_index/2];
+	int code = state->m_vram_bg[(0x0400/2) + tile_index/2];
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
 
 	if (tile_index&1)
@@ -515,50 +515,50 @@ static TILE_GET_INFO( get_cb2001_reel3_tile_info )
 static VIDEO_START(cb2001)
 {
 	cb2001_state *state = machine.driver_data<cb2001_state>();
-	state->reel1_tilemap = tilemap_create(machine,get_cb2001_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
-	state->reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	state->m_reel1_tilemap = tilemap_create(machine,get_cb2001_reel1_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	state->m_reel2_tilemap = tilemap_create(machine,get_cb2001_reel2_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
+	state->m_reel3_tilemap = tilemap_create(machine,get_cb2001_reel3_tile_info,tilemap_scan_rows, 8, 32, 64, 8);
 
-	tilemap_set_scroll_cols(state->reel1_tilemap, 64);
-	tilemap_set_scroll_cols(state->reel2_tilemap, 64);
-	tilemap_set_scroll_cols(state->reel3_tilemap, 64);
+	tilemap_set_scroll_cols(state->m_reel1_tilemap, 64);
+	tilemap_set_scroll_cols(state->m_reel2_tilemap, 64);
+	tilemap_set_scroll_cols(state->m_reel3_tilemap, 64);
 }
 
 WRITE16_HANDLER( cb2001_bg_w )
 {
 	cb2001_state *state = space->machine().driver_data<cb2001_state>();
-	COMBINE_DATA(&state->vram_bg[offset]);
+	COMBINE_DATA(&state->m_vram_bg[offset]);
 
 	// also used for the reel tilemaps in a different mode
 /*
     if (offset<0x200/2)
     {
-        tilemap_mark_tile_dirty(state->reel1_tilemap,(offset&0xff)/2);
+        tilemap_mark_tile_dirty(state->m_reel1_tilemap,(offset&0xff)/2);
     }
     else if (offset<0x400/2)
     {
-        tilemap_mark_tile_dirty(state->reel2_tilemap,(offset&0xff)/2);
+        tilemap_mark_tile_dirty(state->m_reel2_tilemap,(offset&0xff)/2);
     }
     else if (offset<0x600/2)
     {
-        tilemap_mark_tile_dirty(state->reel3_tilemap,(offset&0xff)/2);
+        tilemap_mark_tile_dirty(state->m_reel3_tilemap,(offset&0xff)/2);
     }
     else if (offset<0x800/2)
     {
     //  tilemap_mark_tile_dirty(reel4_tilemap,(offset&0xff)/2);
     }
 */
-	tilemap_mark_all_tiles_dirty (state->reel1_tilemap);
-	tilemap_mark_all_tiles_dirty (state->reel2_tilemap);
-	tilemap_mark_all_tiles_dirty (state->reel3_tilemap);
+	tilemap_mark_all_tiles_dirty (state->m_reel1_tilemap);
+	tilemap_mark_all_tiles_dirty (state->m_reel2_tilemap);
+	tilemap_mark_all_tiles_dirty (state->m_reel3_tilemap);
 
 
 }
 
 static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE_MEMBER(cb2001_state, vram_fg)
-	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(&cb2001_bg_w) AM_BASE_MEMBER(cb2001_state, vram_bg)
+	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE_MEMBER(cb2001_state, m_vram_fg)
+	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(&cb2001_bg_w) AM_BASE_MEMBER(cb2001_state, m_vram_bg)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 

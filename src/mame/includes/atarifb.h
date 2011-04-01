@@ -22,30 +22,38 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	UINT8 *  alphap1_videoram;
-	UINT8 *  alphap2_videoram;
-	UINT8 *  field_videoram;
-	UINT8 *  spriteram;
-	UINT8 *  scroll_register;
-	size_t   spriteram_size;
+	UINT8 *  m_alphap1_videoram;
+	UINT8 *  m_alphap2_videoram;
+	UINT8 *  m_field_videoram;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_scroll_register;
+	size_t   m_spriteram_size;
 
-	tilemap_t  *alpha1_tilemap;
-	tilemap_t  *alpha2_tilemap;
-	tilemap_t  *field_tilemap;
+	tilemap_t  *m_alpha1_tilemap;
+	tilemap_t  *m_alpha2_tilemap;
+	tilemap_t  *m_field_tilemap;
 
 	/* sound-related */
-	int CTRLD;
-	int sign_x_1, sign_y_1;
-	int sign_x_2, sign_y_2;
-	int sign_x_3, sign_y_3;
-	int sign_x_4, sign_y_4;
-	int counter_x_in0, counter_y_in0;
-	int counter_x_in0b, counter_y_in0b;
-	int counter_x_in2, counter_y_in2;
-	int counter_x_in2b, counter_y_in2b;
+	int m_CTRLD;
+	int m_sign_x_1;
+	int m_sign_y_1;
+	int m_sign_x_2;
+	int m_sign_y_2;
+	int m_sign_x_3;
+	int m_sign_y_3;
+	int m_sign_x_4;
+	int m_sign_y_4;
+	int m_counter_x_in0;
+	int m_counter_y_in0;
+	int m_counter_x_in0b;
+	int m_counter_y_in0b;
+	int m_counter_x_in2;
+	int m_counter_y_in2;
+	int m_counter_x_in2b;
+	int m_counter_y_in2b;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 

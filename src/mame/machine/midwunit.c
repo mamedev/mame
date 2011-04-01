@@ -27,11 +27,11 @@ static READ16_HANDLER( midwunit_sound_state_r );
 static void register_state_saving(running_machine &machine)
 {
 	midwunit_state *state = machine.driver_data<midwunit_state>();
-	state_save_register_global(machine, state->cmos_write_enable);
-	state_save_register_global_array(machine, state->iodata);
-	state_save_register_global_array(machine, state->ioshuffle);
-	state_save_register_global_array(machine, state->uart);
-	state_save_register_global(machine, state->security_bits);
+	state_save_register_global(machine, state->m_cmos_write_enable);
+	state_save_register_global_array(machine, state->m_iodata);
+	state_save_register_global_array(machine, state->m_ioshuffle);
+	state_save_register_global_array(machine, state->m_uart);
+	state_save_register_global(machine, state->m_security_bits);
 }
 
 
@@ -45,18 +45,18 @@ static void register_state_saving(running_machine &machine)
 WRITE16_HANDLER( midwunit_cmos_enable_w )
 {
 	midwunit_state *state = space->machine().driver_data<midwunit_state>();
-	state->cmos_write_enable = 1;
+	state->m_cmos_write_enable = 1;
 }
 
 
 WRITE16_HANDLER( midwunit_cmos_w )
 {
 	midwunit_state *state = space->machine().driver_data<midwunit_state>();
-	if (state->cmos_write_enable)
+	if (state->m_cmos_write_enable)
 	{
 		midwunit_state *state = space->machine().driver_data<midwunit_state>();
 		COMBINE_DATA(state->m_nvram+offset);
-		state->cmos_write_enable = 0;
+		state->m_cmos_write_enable = 0;
 	}
 	else
 	{
@@ -87,7 +87,7 @@ WRITE16_HANDLER( midwunit_io_w )
 	int oldword, newword;
 
 	offset %= 8;
-	oldword = state->iodata[offset];
+	oldword = state->m_iodata[offset];
 	newword = oldword;
 	COMBINE_DATA(&newword);
 
@@ -113,7 +113,7 @@ WRITE16_HANDLER( midwunit_io_w )
 			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(&space->device()), offset, data);
 			break;
 	}
-	state->iodata[offset] = newword;
+	state->m_iodata[offset] = newword;
 }
 
 
@@ -130,7 +130,7 @@ READ16_HANDLER( midwunit_io_r )
 	static const char *const portnames[] = { "IN0", "IN1", "DSW", "IN2" };
 
 	/* apply I/O shuffling */
-	offset = state->ioshuffle[offset % 16];
+	offset = state->m_ioshuffle[offset % 16];
 
 	switch (offset)
 	{
@@ -172,13 +172,13 @@ static void init_wunit_generic(running_machine &machine)
 	len = machine.region("gfx1")->bytes();
 	for (i = 0; i < len / 0x400000; i++)
 	{
-		memcpy(state->decode_memory, base, 0x400000);
+		memcpy(state->m_decode_memory, base, 0x400000);
 		for (j = 0; j < 0x100000; j++)
 		{
-			*base++ = state->decode_memory[0x000000 + j];
-			*base++ = state->decode_memory[0x100000 + j];
-			*base++ = state->decode_memory[0x200000 + j];
-			*base++ = state->decode_memory[0x300000 + j];
+			*base++ = state->m_decode_memory[0x000000 + j];
+			*base++ = state->m_decode_memory[0x100000 + j];
+			*base++ = state->m_decode_memory[0x200000 + j];
+			*base++ = state->m_decode_memory[0x300000 + j];
 		}
 	}
 
@@ -221,9 +221,9 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         Although not realistic, this is sufficient to reduce the frequency of incorrect colors
         without significantly impacting the rest of the system.
     */
-	COMBINE_DATA(&state->umk3_palette[offset]);
+	COMBINE_DATA(&state->m_umk3_palette[offset]);
 	device_adjust_icount(&space->device(), -100);
-/*  printf("in=%04X%04X  out=%04X%04X\n", state->umk3_palette[3], state->umk3_palette[2], state->umk3_palette[1], state->umk3_palette[0]); */
+/*  printf("in=%04X%04X  out=%04X%04X\n", state->m_umk3_palette[3], state->m_umk3_palette[2], state->m_umk3_palette[1], state->m_umk3_palette[0]); */
 }
 
 static void init_mk3_common(running_machine &machine)
@@ -254,14 +254,14 @@ DRIVER_INIT( umk3 )
 {
 	midwunit_state *state = machine.driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
+	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
 }
 
 DRIVER_INIT( umk3r11 )
 {
 	midwunit_state *state = machine.driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
+	state->m_umk3_palette = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0106a060, 0x0106a09f, FUNC(umk3_palette_hack_w));
 }
 
 
@@ -298,7 +298,7 @@ static WRITE16_HANDLER( wwfmania_io_0_w )
 
 	/* start with the originals */
 	for (i = 0; i < 16; i++)
-		state->ioshuffle[i] = i % 8;
+		state->m_ioshuffle[i] = i % 8;
 
 	/* based on the data written, shuffle */
 	switch (data)
@@ -307,35 +307,35 @@ static WRITE16_HANDLER( wwfmania_io_0_w )
 			break;
 
 		case 1:
-			state->ioshuffle[4] = 0;
-			state->ioshuffle[8] = 1;
-			state->ioshuffle[1] = 2;
-			state->ioshuffle[9] = 3;
-			state->ioshuffle[2] = 4;
+			state->m_ioshuffle[4] = 0;
+			state->m_ioshuffle[8] = 1;
+			state->m_ioshuffle[1] = 2;
+			state->m_ioshuffle[9] = 3;
+			state->m_ioshuffle[2] = 4;
 			break;
 
 		case 2:
-			state->ioshuffle[8] = 0;
-			state->ioshuffle[2] = 1;
-			state->ioshuffle[4] = 2;
-			state->ioshuffle[6] = 3;
-			state->ioshuffle[1] = 4;
+			state->m_ioshuffle[8] = 0;
+			state->m_ioshuffle[2] = 1;
+			state->m_ioshuffle[4] = 2;
+			state->m_ioshuffle[6] = 3;
+			state->m_ioshuffle[1] = 4;
 			break;
 
 		case 3:
-			state->ioshuffle[1] = 0;
-			state->ioshuffle[8] = 1;
-			state->ioshuffle[2] = 2;
-			state->ioshuffle[10] = 3;
-			state->ioshuffle[5] = 4;
+			state->m_ioshuffle[1] = 0;
+			state->m_ioshuffle[8] = 1;
+			state->m_ioshuffle[2] = 2;
+			state->m_ioshuffle[10] = 3;
+			state->m_ioshuffle[5] = 4;
 			break;
 
 		case 4:
-			state->ioshuffle[2] = 0;
-			state->ioshuffle[4] = 1;
-			state->ioshuffle[1] = 2;
-			state->ioshuffle[7] = 3;
-			state->ioshuffle[8] = 4;
+			state->m_ioshuffle[2] = 0;
+			state->m_ioshuffle[4] = 1;
+			state->m_ioshuffle[1] = 2;
+			state->m_ioshuffle[7] = 3;
+			state->m_ioshuffle[8] = 4;
 			break;
 	}
 	logerror("Changed I/O swiching to %d\n", data);
@@ -383,7 +383,7 @@ MACHINE_RESET( midwunit )
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
-		state->ioshuffle[i] = i % 8;
+		state->m_ioshuffle[i] = i % 8;
 }
 
 

@@ -23,7 +23,7 @@ Notes:
 static READ16_HANDLER( pip )
 {
 	othldrby_state *state = space->machine().driver_data<othldrby_state>();
-	return state->toggle ^= 1;
+	return state->m_toggle ^= 1;
 }
 
 static READ16_HANDLER( pap )
@@ -220,21 +220,21 @@ static MACHINE_START( othldrby )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->save_item(NAME(state->toggle));
-	state->save_item(NAME(state->vram_addr));
-	state->save_item(NAME(state->vreg_addr));
-	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->m_toggle));
+	state->save_item(NAME(state->m_vram_addr));
+	state->save_item(NAME(state->m_vreg_addr));
+	state->save_item(NAME(state->m_vreg));
 }
 
 static MACHINE_RESET( othldrby )
 {
 	othldrby_state *state = machine.driver_data<othldrby_state>();
 
-	state->toggle = 0xff;
-	state->vram_addr = 0;
-	state->vreg_addr = 0;
+	state->m_toggle = 0xff;
+	state->m_vram_addr = 0;
+	state->m_vreg_addr = 0;
 
-	memset(state->vreg, 0, ARRAY_LENGTH(state->vreg));
+	memset(state->m_vreg, 0, ARRAY_LENGTH(state->m_vreg));
 }
 
 static MACHINE_CONFIG_START( othldrby, othldrby_state )

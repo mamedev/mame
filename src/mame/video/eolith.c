@@ -5,7 +5,7 @@
 WRITE32_HANDLER( eolith_vram_w )
 {
 	eolith_state *state = space->machine().driver_data<eolith_state>();
-	UINT32 *dest = &state->vram[offset+(0x40000/4)*state->buffer];
+	UINT32 *dest = &state->m_vram[offset+(0x40000/4)*state->m_buffer];
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -24,13 +24,13 @@ WRITE32_HANDLER( eolith_vram_w )
 READ32_HANDLER( eolith_vram_r )
 {
 	eolith_state *state = space->machine().driver_data<eolith_state>();
-	return state->vram[offset+(0x40000/4)*state->buffer];
+	return state->m_vram[offset+(0x40000/4)*state->m_buffer];
 }
 
 VIDEO_START( eolith )
 {
 	eolith_state *state = machine.driver_data<eolith_state>();
-	state->vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
+	state->m_vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
 SCREEN_UPDATE( eolith )
@@ -41,7 +41,7 @@ SCREEN_UPDATE( eolith )
 	for (y = 0; y < 240; y++)
 	{
 		int x;
-		UINT32 *src = &state->vram[(state->buffer ? 0 : 0x10000) | (y * (336 / 2))];
+		UINT32 *src = &state->m_vram[(state->m_buffer ? 0 : 0x10000) | (y * (336 / 2))];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = 0; x < 320; x += 2)

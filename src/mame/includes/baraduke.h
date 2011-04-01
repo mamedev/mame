@@ -4,16 +4,16 @@ public:
 	baraduke_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int inputport_selected;
-	int counter;
-	UINT8 *textram;
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	tilemap_t *tx_tilemap;
-	tilemap_t *bg_tilemap[2];
-	int xscroll[2];
-	int yscroll[2];
-	int copy_sprites;
+	int m_inputport_selected;
+	int m_counter;
+	UINT8 *m_textram;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap[2];
+	int m_xscroll[2];
+	int m_yscroll[2];
+	int m_copy_sprites;
 };
 
 

@@ -15,10 +15,10 @@ public:
 	cd32_state(running_machine &machine, const driver_device_config_base &config)
 		: amiga_state(machine, config) { }
 
-	UINT16 potgo_value;
-	int cd32_shifter[2];
-	void (*input_hack)(running_machine &machine);
-	int oldstate[2];
+	UINT16 m_potgo_value;
+	int m_cd32_shifter[2];
+	void (*m_input_hack)(running_machine &machine);
+	int m_oldstate[2];
 };
 
 /*----------- defined in machine/cd32.c -----------*/

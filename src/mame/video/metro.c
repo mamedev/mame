@@ -58,7 +58,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	int code = state->k053936_ram[tile_index];
+	int code = state->m_k053936_ram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -70,7 +70,7 @@ static TILE_GET_INFO( metro_k053936_get_tile_info )
 static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	int code = state->k053936_ram[tile_index];
+	int code = state->m_k053936_ram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -82,8 +82,8 @@ static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 WRITE16_HANDLER( metro_k053936_w )
 {
 	metro_state *state = space->machine().driver_data<metro_state>();
-	COMBINE_DATA(&state->k053936_ram[offset]);
-	tilemap_mark_tile_dirty(state->k053936_tilemap, offset);
+	COMBINE_DATA(&state->m_k053936_ram[offset]);
+	tilemap_mark_tile_dirty(state->m_k053936_tilemap, offset);
 }
 
 static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
@@ -150,7 +150,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 
 	/* Use code as an index into the tiles set table */
 	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (state->tiletable[table_index + 0] << 16) + state->tiletable[table_index + 1];
+	tile = (state->m_tiletable[table_index + 0] << 16) + state->m_tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
@@ -162,7 +162,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 			return 0;
 
 	}
-	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->support_8bpp)) /* draw tile as 8bpp */
+	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->m_support_8bpp)) /* draw tile as 8bpp */
 	{
 		const gfx_element *gfx1 = machine.gfx[big?3:1];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
@@ -250,9 +250,9 @@ INLINE void metro_vram_w( running_machine &machine, offs_t offset, UINT16 data, 
 	COMBINE_DATA(&vram[offset]);
 }
 
-WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 0, state->vram_0); }
-WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 1, state->vram_1); }
-WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 2, state->vram_2); }
+WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 0, state->m_vram_0); }
+WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 1, state->m_vram_1); }
+WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 2, state->m_vram_2); }
 
 
 
@@ -260,7 +260,7 @@ WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine().driver
 WRITE16_HANDLER( metro_window_w )
 {
 	metro_state *state = space->machine().driver_data<metro_state>();
-	COMBINE_DATA(&state->window[offset]);
+	COMBINE_DATA(&state->m_window[offset]);
 
 }
 
@@ -288,63 +288,63 @@ VIDEO_START( metro_14100 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	state->support_8bpp = 0;
-	state->support_16x16 = 0;
-	state->has_zoom = 0;
+	state->m_support_8bpp = 0;
+	state->m_support_16x16 = 0;
+	state->m_has_zoom = 0;
 
-	state->bg_tilemap_enable[0] = 1;
-	state->bg_tilemap_enable[1] = 1;
-	state->bg_tilemap_enable[2] = 1;
+	state->m_bg_tilemap_enable[0] = 1;
+	state->m_bg_tilemap_enable[1] = 1;
+	state->m_bg_tilemap_enable[2] = 1;
 
-	state->bg_tilemap_enable16[0] = 0;
-	state->bg_tilemap_enable16[1] = 0;
-	state->bg_tilemap_enable16[2] = 0;
+	state->m_bg_tilemap_enable16[0] = 0;
+	state->m_bg_tilemap_enable16[1] = 0;
+	state->m_bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap_scrolldx[0] = 0;
-	state->bg_tilemap_scrolldx[1] = 0;
-	state->bg_tilemap_scrolldx[2] = 0;
+	state->m_bg_tilemap_scrolldx[0] = 0;
+	state->m_bg_tilemap_scrolldx[1] = 0;
+	state->m_bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( metro_14220 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	state->support_8bpp = 1;
-	state->support_16x16 = 0;
-	state->has_zoom = 0;
+	state->m_support_8bpp = 1;
+	state->m_support_16x16 = 0;
+	state->m_has_zoom = 0;
 
-	state->bg_tilemap_enable[0] = 1;
-	state->bg_tilemap_enable[1] = 1;
-	state->bg_tilemap_enable[2] = 1;
+	state->m_bg_tilemap_enable[0] = 1;
+	state->m_bg_tilemap_enable[1] = 1;
+	state->m_bg_tilemap_enable[2] = 1;
 
-	state->bg_tilemap_enable16[0] = 0;
-	state->bg_tilemap_enable16[1] = 0;
-	state->bg_tilemap_enable16[2] = 0;
+	state->m_bg_tilemap_enable16[0] = 0;
+	state->m_bg_tilemap_enable16[1] = 0;
+	state->m_bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap_scrolldx[0] = -2;
-	state->bg_tilemap_scrolldx[1] = -2;
-	state->bg_tilemap_scrolldx[2] = -2;
+	state->m_bg_tilemap_scrolldx[0] = -2;
+	state->m_bg_tilemap_scrolldx[1] = -2;
+	state->m_bg_tilemap_scrolldx[2] = -2;
 }
 
 VIDEO_START( metro_14300 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	state->support_8bpp = 1;
-	state->support_16x16 = 1;
-	state->has_zoom = 0;
+	state->m_support_8bpp = 1;
+	state->m_support_16x16 = 1;
+	state->m_has_zoom = 0;
 
-	state->bg_tilemap_enable[0] = 1;
-	state->bg_tilemap_enable[1] = 1;
-	state->bg_tilemap_enable[2] = 1;
+	state->m_bg_tilemap_enable[0] = 1;
+	state->m_bg_tilemap_enable[1] = 1;
+	state->m_bg_tilemap_enable[2] = 1;
 
-	state->bg_tilemap_enable16[0] = 0;
-	state->bg_tilemap_enable16[1] = 0;
-	state->bg_tilemap_enable16[2] = 0;
+	state->m_bg_tilemap_enable16[0] = 0;
+	state->m_bg_tilemap_enable16[1] = 0;
+	state->m_bg_tilemap_enable16[2] = 0;
 
-	state->bg_tilemap_scrolldx[0] = 0;
-	state->bg_tilemap_scrolldx[1] = 0;
-	state->bg_tilemap_scrolldx[2] = 0;
+	state->m_bg_tilemap_scrolldx[0] = 0;
+	state->m_bg_tilemap_scrolldx[1] = 0;
+	state->m_bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( blzntrnd )
@@ -353,13 +353,13 @@ VIDEO_START( blzntrnd )
 
 	VIDEO_START_CALL(metro_14220);
 
-	state->has_zoom = 1;
+	state->m_has_zoom = 1;
 
-	state->k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
+	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
 
-	state->bg_tilemap_scrolldx[0] = 8;
-	state->bg_tilemap_scrolldx[1] = 8;
-	state->bg_tilemap_scrolldx[2] = 8;
+	state->m_bg_tilemap_scrolldx[0] = 8;
+	state->m_bg_tilemap_scrolldx[1] = 8;
+	state->m_bg_tilemap_scrolldx[2] = 8;
 }
 
 VIDEO_START( gstrik2 )
@@ -368,13 +368,13 @@ VIDEO_START( gstrik2 )
 
 	VIDEO_START_CALL(metro_14220);
 
-	state->has_zoom = 1;
+	state->m_has_zoom = 1;
 
-	state->k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
+	state->m_k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
 
-	state->bg_tilemap_scrolldx[0] = 8;
-	state->bg_tilemap_scrolldx[1] = 0;
-	state->bg_tilemap_scrolldx[2] = 8;
+	state->m_bg_tilemap_scrolldx[0] = 8;
+	state->m_bg_tilemap_scrolldx[1] = 0;
+	state->m_bg_tilemap_scrolldx[2] = 8;
 }
 
 /***************************************************************************
@@ -448,10 +448,10 @@ void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const recta
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	int max_sprites = state->spriteram_size / 8;
-	int sprites     = state->videoregs[0x00/2] % max_sprites;
+	int max_sprites = state->m_spriteram_size / 8;
+	int sprites     = state->m_videoregs[0x00/2] % max_sprites;
 
-	int color_start = ((state->videoregs[0x08/2] & 0x0f) << 4) + 0x100;
+	int color_start = ((state->m_videoregs[0x08/2] & 0x0f) << 4) + 0x100;
 
 	int i, j, pri;
 	static const int primask[4] = { 0x0000, 0xff00, 0xff00 | 0xf0f0, 0xff00 | 0xf0f0 | 0xcccc };
@@ -466,12 +466,12 @@ void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const recta
 	{
 		gfx_element gfx;
 
-		if (!(state->videoregs[0x02/2] & 0x8000))
+		if (!(state->m_videoregs[0x02/2] & 0x8000))
 		{
-			src = state->spriteram + (sprites - 1) * (8 / 2);
+			src = state->m_spriteram + (sprites - 1) * (8 / 2);
 			inc = -(8 / 2);
 		} else {
-			src = state->spriteram;
+			src = state->m_spriteram;
 			inc = (8 / 2);
 		}
 
@@ -500,12 +500,12 @@ void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const recta
 				continue;
 			}
 
-			pri = (state->videoregs[0x02/2] & 0x0300) >> 8;
+			pri = (state->m_videoregs[0x02/2] & 0x0300) >> 8;
 
-			if (!(state->videoregs[0x02/2] & 0x8000))
+			if (!(state->m_videoregs[0x02/2] & 0x8000))
 			{
-				if (curr_pri > (state->videoregs[0x02/2] & 0x1f))
-					pri = (state->videoregs[0x02/2] & 0x0c00) >> 10;
+				if (curr_pri > (state->m_videoregs[0x02/2] & 0x1f))
+					pri = (state->m_videoregs[0x02/2] & 0x0c00) >> 10;
 			}
 
 			y     = src[1];
@@ -518,21 +518,21 @@ void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const recta
 
 			zoom = zoomtable[(y & 0xfc00) >> 10] << (16 - 8);
 
-			x = (x & 0x07ff) - state->sprite_xoffs;
-			y = (y & 0x03ff) - state->sprite_yoffs;
+			x = (x & 0x07ff) - state->m_sprite_xoffs;
+			y = (y & 0x03ff) - state->m_sprite_yoffs;
 
 			width  = (((attr >> 11) & 0x7) + 1) * 8;
 			height = (((attr >>  8) & 0x7) + 1) * 8;
 
 			gfxdata = base_gfx + (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (state->flip_screen)
+			if (state->m_flip_screen)
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
 			}
 
-			if (state->support_8bpp && color == 0xf)	/* 8bpp */
+			if (state->m_support_8bpp && color == 0xf)	/* 8bpp */
 			{
 				/* Bounds checking */
 				if ((gfxdata + width * height - 1) >= gfx_max)
@@ -608,21 +608,21 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 
 	if (!big)
 	{
-		if (!state->bg_tilemap_enable[layer]) return;
+		if (!state->m_bg_tilemap_enable[layer]) return;
 	}
 	else
 	{
-		if (!state->bg_tilemap_enable16[layer]) return;
+		if (!state->m_bg_tilemap_enable16[layer]) return;
 	}
 
 
-	if (!state->flip_screen)
+	if (!state->m_flip_screen)
 	{
-		sx -= state->bg_tilemap_scrolldx[layer];
+		sx -= state->m_bg_tilemap_scrolldx[layer];
 	}
 	else
 	{
-		sx += state->bg_tilemap_scrolldx[layer];
+		sx += state->m_bg_tilemap_scrolldx[layer];
 	}
 
 	for (y=0;y<scrheight;y++)
@@ -634,7 +634,7 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 		int srcline = (wy+scrolly)&(height-1);
 		int srctilerow = srcline >> (big ? 4 : 3);
 
-		if (!state->flip_screen)
+		if (!state->m_flip_screen)
 		{
 			dst = BITMAP_ADDR16(bitmap, y, 0);
 			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, y, 0);
@@ -689,7 +689,7 @@ static void draw_tilemap( running_machine &machine, bitmap_t *bitmap, const rect
 static void draw_layers( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl )
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	UINT16 layers_pri = state->videoregs[0x10 / 2];
+	UINT16 layers_pri = state->m_videoregs[0x10 / 2];
 	int layer;
 
 	/* Draw all the layers with priority == pri */
@@ -698,20 +698,20 @@ static void draw_layers( running_machine &machine, bitmap_t *bitmap, const recta
 		if (pri == ((layers_pri >> (layer * 2)) & 3))
 		{
 			/* Scroll and Window values */
-			UINT16 sy = state->scroll[layer * 2 + 0];	UINT16 sx = state->scroll[layer * 2 + 1];
-			UINT16 wy = state->window[layer * 2 + 0];	UINT16 wx = state->window[layer * 2 + 1];
+			UINT16 sy = state->m_scroll[layer * 2 + 0];	UINT16 sx = state->m_scroll[layer * 2 + 1];
+			UINT16 wy = state->m_window[layer * 2 + 0];	UINT16 wx = state->m_window[layer * 2 + 1];
 
 			if (BIT(layers_ctrl, layer))	// for debug
 			{
 				UINT16* tilemapram = 0;
 
-				if (layer==0) tilemapram = state->vram_0;
-				else if (layer==1) tilemapram = state->vram_1;
-				else if (layer==2) tilemapram = state->vram_2;
+				if (layer==0) tilemapram = state->m_vram_0;
+				else if (layer==1) tilemapram = state->m_vram_1;
+				else if (layer==2) tilemapram = state->m_vram_2;
 
 				draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 0, tilemapram, layer);
 
-				if (state->support_16x16)
+				if (state->m_support_16x16)
 					draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 1, tilemapram, layer);
 			}
 		}
@@ -724,14 +724,14 @@ SCREEN_UPDATE( metro )
 {
 	metro_state *state = screen->machine().driver_data<metro_state>();
 	int pri, layers_ctrl = -1;
-	UINT16 screenctrl = *state->screenctrl;
+	UINT16 screenctrl = *state->m_screenctrl;
 
-	state->sprite_xoffs = state->videoregs[0x06 / 2] - screen->width()  / 2;
-	state->sprite_yoffs = state->videoregs[0x04 / 2] - screen->height() / 2;
+	state->m_sprite_xoffs = state->m_videoregs[0x06 / 2] - screen->width()  / 2;
+	state->m_sprite_yoffs = state->m_videoregs[0x04 / 2] - screen->height() / 2;
 
 	/* The background color is selected by a register */
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
-	bitmap_fill(bitmap, cliprect, ((state->videoregs[0x12/2] & 0x0fff)) + 0x1000);
+	bitmap_fill(bitmap, cliprect, ((state->m_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
 
@@ -748,12 +748,12 @@ SCREEN_UPDATE( metro )
 		return 0;
 
 	//flip_screen_set(screen->machine(), screenctrl & 1);
-	state->flip_screen = screenctrl & 1;
+	state->m_flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the
        16x16 and 8x8 tilemaps of a given layer are not simultaneously
        enabled! */
-	if (state->support_16x16)
+	if (state->m_support_16x16)
 	{
 		int layer;
 
@@ -761,8 +761,8 @@ SCREEN_UPDATE( metro )
 		{
 			int big = screenctrl & (0x0020 << layer);
 
-			state->bg_tilemap_enable[layer] = !big;
-			state->bg_tilemap_enable16[layer] = big;
+			state->m_bg_tilemap_enable[layer] = !big;
+			state->m_bg_tilemap_enable16[layer] = big;
 		}
 	}
 
@@ -782,14 +782,14 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	}
 
 	popmessage("l %x-%x-%x r %04x %04x %04x",
-				(state->videoregs[0x10/2] & 0x30) >> 4, (state->videoregs[0x10/2] & 0xc) >> 2, state->videoregs[0x10/2] & 3,
-				state->videoregs[0x02/2], state->videoregs[0x12/2],
-				*state->screenctrl);
+				(state->m_videoregs[0x10/2] & 0x30) >> 4, (state->m_videoregs[0x10/2] & 0xc) >> 2, state->m_videoregs[0x10/2] & 3,
+				state->m_videoregs[0x02/2], state->m_videoregs[0x12/2],
+				*state->m_screenctrl);
 }
 #endif
 
-	if (state->has_zoom)
-		k053936_zoom_draw(state->k053936, bitmap, cliprect, state->k053936_tilemap, 0, 0, 1);
+	if (state->m_has_zoom)
+		k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
 		draw_layers(screen->machine(), bitmap, cliprect, pri, layers_ctrl);

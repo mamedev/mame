@@ -30,7 +30,7 @@ WRITE16_HANDLER( toki_control_w )
 {
 	toki_state *state = space->machine().driver_data<toki_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
-	COMBINE_DATA(&state->scrollram16[offset]);
+	COMBINE_DATA(&state->m_scrollram16[offset]);
 }
 
 SCREEN_EOF( toki )
@@ -46,7 +46,7 @@ SCREEN_EOF( tokib )
 static TILE_GET_INFO( get_text_tile_info )
 {
 	toki_state *state = machine.driver_data<toki_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	int tile = videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
 
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_text_tile_info )
 static TILE_GET_INFO( get_back_tile_info )
 {
 	toki_state *state = machine.driver_data<toki_state>();
-	int tile = state->background1_videoram16[tile_index];
+	int tile = state->m_background1_videoram16[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
@@ -77,7 +77,7 @@ static TILE_GET_INFO( get_back_tile_info )
 static TILE_GET_INFO( get_fore_tile_info )
 {
 	toki_state *state = machine.driver_data<toki_state>();
-	int tile = state->background2_videoram16[tile_index];
+	int tile = state->m_background2_videoram16[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
@@ -99,13 +99,13 @@ static TILE_GET_INFO( get_fore_tile_info )
 VIDEO_START( toki )
 {
 	toki_state *state = machine.driver_data<toki_state>();
-	state->text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,32,32);
-	state->background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,32,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 
-	tilemap_set_transparent_pen(state->text_layer,15);
-	tilemap_set_transparent_pen(state->background_layer,15);
-	tilemap_set_transparent_pen(state->foreground_layer,15);
+	tilemap_set_transparent_pen(state->m_text_layer,15);
+	tilemap_set_transparent_pen(state->m_background_layer,15);
+	tilemap_set_transparent_pen(state->m_foreground_layer,15);
 }
 
 /*************************************/
@@ -113,23 +113,23 @@ VIDEO_START( toki )
 WRITE16_HANDLER( toki_foreground_videoram16_w )
 {
 	toki_state *state = space->machine().driver_data<toki_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->text_layer,offset);
+	tilemap_mark_tile_dirty(state->m_text_layer,offset);
 }
 
 WRITE16_HANDLER( toki_background1_videoram16_w )
 {
 	toki_state *state = space->machine().driver_data<toki_state>();
-	COMBINE_DATA(&state->background1_videoram16[offset]);
-	tilemap_mark_tile_dirty(state->background_layer,offset);
+	COMBINE_DATA(&state->m_background1_videoram16[offset]);
+	tilemap_mark_tile_dirty(state->m_background_layer,offset);
 }
 
 WRITE16_HANDLER( toki_background2_videoram16_w )
 {
 	toki_state *state = space->machine().driver_data<toki_state>();
-	COMBINE_DATA(&state->background2_videoram16[offset]);
-	tilemap_mark_tile_dirty(state->foreground_layer,offset);
+	COMBINE_DATA(&state->m_background2_videoram16[offset]);
+	tilemap_mark_tile_dirty(state->m_foreground_layer,offset);
 }
 
 /***************************************************************************
@@ -272,55 +272,55 @@ SCREEN_UPDATE( toki )
 	toki_state *state = screen->machine().driver_data<toki_state>();
 	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
-	background_x_scroll=((state->scrollram16[0x06] &0x7f) << 1)
-								 |((state->scrollram16[0x06] &0x80) >> 7)
-								 |((state->scrollram16[0x05] &0x10) << 4);
-	background_y_scroll=((state->scrollram16[0x0d]&0x10)<<4)+((state->scrollram16[0x0e]&0x7f)<<1)+((state->scrollram16[0x0e]&0x80)>>7);
+	background_x_scroll=((state->m_scrollram16[0x06] &0x7f) << 1)
+								 |((state->m_scrollram16[0x06] &0x80) >> 7)
+								 |((state->m_scrollram16[0x05] &0x10) << 4);
+	background_y_scroll=((state->m_scrollram16[0x0d]&0x10)<<4)+((state->m_scrollram16[0x0e]&0x7f)<<1)+((state->m_scrollram16[0x0e]&0x80)>>7);
 
-	tilemap_set_scrollx( state->background_layer, 0, background_x_scroll );
-	tilemap_set_scrolly( state->background_layer, 0, background_y_scroll );
+	tilemap_set_scrollx( state->m_background_layer, 0, background_x_scroll );
+	tilemap_set_scrolly( state->m_background_layer, 0, background_y_scroll );
 
-	foreground_x_scroll= ((state->scrollram16[0x16] &0x7f) << 1)
-								 |((state->scrollram16[0x16] &0x80) >> 7)
-								 |((state->scrollram16[0x15] &0x10) << 4);
-	foreground_y_scroll=((state->scrollram16[0x1d]&0x10)<<4)+((state->scrollram16[0x1e]&0x7f)<<1)+((state->scrollram16[0x1e]&0x80)>>7);
+	foreground_x_scroll= ((state->m_scrollram16[0x16] &0x7f) << 1)
+								 |((state->m_scrollram16[0x16] &0x80) >> 7)
+								 |((state->m_scrollram16[0x15] &0x10) << 4);
+	foreground_y_scroll=((state->m_scrollram16[0x1d]&0x10)<<4)+((state->m_scrollram16[0x1e]&0x7f)<<1)+((state->m_scrollram16[0x1e]&0x80)>>7);
 
-	tilemap_set_scrollx( state->foreground_layer, 0, foreground_x_scroll );
-	tilemap_set_scrolly( state->foreground_layer, 0, foreground_y_scroll );
+	tilemap_set_scrollx( state->m_foreground_layer, 0, foreground_x_scroll );
+	tilemap_set_scrolly( state->m_foreground_layer, 0, foreground_y_scroll );
 
-	flip_screen_set(screen->machine(), (state->scrollram16[0x28]&0x8000)==0);
+	flip_screen_set(screen->machine(), (state->m_scrollram16[0x28]&0x8000)==0);
 
-	if (state->scrollram16[0x28]&0x100) {
-		tilemap_draw(bitmap,cliprect,state->background_layer,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->foreground_layer,0,0);
+	if (state->m_scrollram16[0x28]&0x100) {
+		tilemap_draw(bitmap,cliprect,state->m_background_layer,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,0);
 	} else {
-		tilemap_draw(bitmap,cliprect,state->foreground_layer,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->background_layer,0,0);
+		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	}
 	toki_draw_sprites(screen->machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->text_layer,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,0);
 	return 0;
 }
 
 SCREEN_UPDATE( tokib )
 {
 	toki_state *state = screen->machine().driver_data<toki_state>();
-	tilemap_set_scroll_rows(state->foreground_layer,1);
-	tilemap_set_scroll_rows(state->background_layer,1);
-	tilemap_set_scrolly( state->background_layer, 0, state->scrollram16[0]+1 );
-	tilemap_set_scrollx( state->background_layer, 0, state->scrollram16[1]-0x103 );
-	tilemap_set_scrolly( state->foreground_layer, 0, state->scrollram16[2]+1 );
-	tilemap_set_scrollx( state->foreground_layer, 0, state->scrollram16[3]-0x101 );
+	tilemap_set_scroll_rows(state->m_foreground_layer,1);
+	tilemap_set_scroll_rows(state->m_background_layer,1);
+	tilemap_set_scrolly( state->m_background_layer, 0, state->m_scrollram16[0]+1 );
+	tilemap_set_scrollx( state->m_background_layer, 0, state->m_scrollram16[1]-0x103 );
+	tilemap_set_scrolly( state->m_foreground_layer, 0, state->m_scrollram16[2]+1 );
+	tilemap_set_scrollx( state->m_foreground_layer, 0, state->m_scrollram16[3]-0x101 );
 
-	if (state->scrollram16[3]&0x2000) {
-		tilemap_draw(bitmap,cliprect,state->background_layer,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->foreground_layer,0,0);
+	if (state->m_scrollram16[3]&0x2000) {
+		tilemap_draw(bitmap,cliprect,state->m_background_layer,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,0);
 	} else {
-		tilemap_draw(bitmap,cliprect,state->foreground_layer,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,state->background_layer,0,0);
+		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
 	}
 
 	tokib_draw_sprites(screen->machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->text_layer,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_text_layer,0,0);
 	return 0;
 }

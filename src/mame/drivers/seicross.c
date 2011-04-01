@@ -52,8 +52,8 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 static NVRAM_HANDLER( seicross )
 {
 	seicross_state *state = machine.driver_data<seicross_state>();
-	UINT8 *nvram = state->nvram;
-	size_t nvram_size = state->nvram_size;
+	UINT8 *nvram = state->m_nvram;
+	size_t nvram_size = state->m_nvram_size;
 
 	if (read_or_write)
 		file->write(nvram,nvram_size);
@@ -85,7 +85,7 @@ static READ8_DEVICE_HANDLER( friskyt_portB_r )
 {
 	seicross_state *state = device->machine().driver_data<seicross_state>();
 
-	return (state->portb & 0x9f) | (input_port_read_safe(device->machine(), "DEBUG", 0) & 0x60);
+	return (state->m_portb & 0x9f) | (input_port_read_safe(device->machine(), "DEBUG", 0) & 0x60);
 }
 
 static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
@@ -99,7 +99,7 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 	/* bit 1 flips screen */
 
 	/* bit 2 resets the microcontroller */
-	if (((state->portb & 4) == 0) && (data & 4))
+	if (((state->m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
 		cputag_set_input_line(device->machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
@@ -107,18 +107,18 @@ static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 	}
 
 	/* other bits unknown */
-	state->portb = data;
+	state->m_portb = data;
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8820, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(seicross_state, spriteram, spriteram_size)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(seicross_videoram_w) AM_BASE_MEMBER(seicross_state, videoram)	/* video RAM */
-	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(seicross_state, row_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(seicross_state, spriteram2, spriteram2_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(seicross_colorram_w) AM_BASE_MEMBER(seicross_state, colorram)
+	AM_RANGE(0x8820, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(seicross_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(seicross_videoram_w) AM_BASE_MEMBER(seicross_state, m_videoram)	/* video RAM */
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(seicross_state, m_row_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(seicross_state, m_spriteram2, m_spriteram2_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(seicross_colorram_w) AM_BASE_MEMBER(seicross_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("TEST")		/* test */
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(seicross_state, nvram, nvram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(seicross_state, m_nvram, m_nvram_size)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")

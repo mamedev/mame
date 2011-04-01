@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->bgvideoram16[tile_index+state->bg_ram_bank];
+	code = state->m_bgvideoram16[tile_index+state->m_bg_ram_bank];
 	tile_number = code & 0x0fff;
 	color = (code & 0xf000) >> 12;
 	SET_TILE_INFO(
@@ -60,8 +60,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->fgvideoram16[tile_index];
-	tile_number = (code & 0x0fff) | state->fg_rom_bank;
+	code = state->m_fgvideoram16[tile_index];
+	tile_number = (code & 0x0fff) | state->m_fg_rom_bank;
 	color = (code & 0xf000) >> 12;
 	SET_TILE_INFO(
 			1,
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int code, tile_number, color;
 
-	code = state->txvideoram16[tile_index];
+	code = state->m_txvideoram16[tile_index];
 	tile_number = code & 0x07ff;
 	color = (code & 0xf800) >> 11;
 	SET_TILE_INFO(
@@ -93,12 +93,12 @@ static void twincobr_create_tilemaps(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
-	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap,0);
-	tilemap_set_transparent_pen(state->tx_tilemap,0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
+	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
 }
 
 VIDEO_START( toaplan0 )
@@ -106,38 +106,38 @@ VIDEO_START( toaplan0 )
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	/* the video RAM is accessed via ports, it's not memory mapped */
-	state->txvideoram_size = 0x0800;
-	state->bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
-	state->fgvideoram_size = 0x1000;
+	state->m_txvideoram_size = 0x0800;
+	state->m_bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
+	state->m_fgvideoram_size = 0x1000;
 
 	twincobr_create_tilemaps(machine);
 
-	state->txvideoram16 = auto_alloc_array_clear(machine, UINT16, state->txvideoram_size);
-	state->fgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->fgvideoram_size);
-	state->bgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->bgvideoram_size);
+	state->m_txvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_txvideoram_size);
+	state->m_fgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_fgvideoram_size);
+	state->m_bgvideoram16 = auto_alloc_array_clear(machine, UINT16, state->m_bgvideoram_size);
 
-	state->display_on = 0;
-	twincobr_display(machine, state->display_on);
+	state->m_display_on = 0;
+	twincobr_display(machine, state->m_display_on);
 
-	state_save_register_global_pointer(machine, state->txvideoram16, state->txvideoram_size);
-	state_save_register_global_pointer(machine, state->fgvideoram16, state->fgvideoram_size);
-	state_save_register_global_pointer(machine, state->bgvideoram16, state->bgvideoram_size);
-	state_save_register_global(machine, state->txoffs);
-	state_save_register_global(machine, state->fgoffs);
-	state_save_register_global(machine, state->bgoffs);
-	state_save_register_global(machine, state->scroll_x);
-	state_save_register_global(machine, state->scroll_y);
-	state_save_register_global(machine, state->txscrollx);
-	state_save_register_global(machine, state->fgscrollx);
-	state_save_register_global(machine, state->bgscrollx);
-	state_save_register_global(machine, state->txscrolly);
-	state_save_register_global(machine, state->fgscrolly);
-	state_save_register_global(machine, state->bgscrolly);
-	state_save_register_global(machine, state->display_on);
-	state_save_register_global(machine, state->fg_rom_bank);
-	state_save_register_global(machine, state->bg_ram_bank);
-	state_save_register_global(machine, state->flip_screen);
-	state_save_register_global(machine, state->wardner_sprite_hack);
+	state_save_register_global_pointer(machine, state->m_txvideoram16, state->m_txvideoram_size);
+	state_save_register_global_pointer(machine, state->m_fgvideoram16, state->m_fgvideoram_size);
+	state_save_register_global_pointer(machine, state->m_bgvideoram16, state->m_bgvideoram_size);
+	state_save_register_global(machine, state->m_txoffs);
+	state_save_register_global(machine, state->m_fgoffs);
+	state_save_register_global(machine, state->m_bgoffs);
+	state_save_register_global(machine, state->m_scroll_x);
+	state_save_register_global(machine, state->m_scroll_y);
+	state_save_register_global(machine, state->m_txscrollx);
+	state_save_register_global(machine, state->m_fgscrollx);
+	state_save_register_global(machine, state->m_bgscrollx);
+	state_save_register_global(machine, state->m_txscrolly);
+	state_save_register_global(machine, state->m_fgscrolly);
+	state_save_register_global(machine, state->m_bgscrolly);
+	state_save_register_global(machine, state->m_display_on);
+	state_save_register_global(machine, state->m_fg_rom_bank);
+	state_save_register_global(machine, state->m_bg_ram_bank);
+	state_save_register_global(machine, state->m_flip_screen);
+	state_save_register_global(machine, state->m_wardner_sprite_hack);
 	machine.state().register_postload(twincobr_restore_screen, NULL);
 }
 
@@ -145,8 +145,8 @@ static STATE_POSTLOAD( twincobr_restore_screen )
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	twincobr_display(machine, state->display_on);
-	twincobr_flipscreen(machine, state->flip_screen);
+	twincobr_display(machine, state->m_display_on);
+	twincobr_flipscreen(machine, state->m_flip_screen);
 }
 
 
@@ -158,10 +158,10 @@ void twincobr_display(running_machine &machine, int enable)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	state->display_on = enable;
-	tilemap_set_enable(state->bg_tilemap, enable);
-	tilemap_set_enable(state->fg_tilemap, enable);
-	tilemap_set_enable(state->tx_tilemap, enable);
+	state->m_display_on = enable;
+	tilemap_set_enable(state->m_bg_tilemap, enable);
+	tilemap_set_enable(state->m_fg_tilemap, enable);
+	tilemap_set_enable(state->m_tx_tilemap, enable);
 }
 
 void twincobr_flipscreen(running_machine &machine, int flip)
@@ -169,14 +169,14 @@ void twincobr_flipscreen(running_machine &machine, int flip)
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
 	tilemap_set_flip_all(machine, (flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
-	state->flip_screen = flip;
+	state->m_flip_screen = flip;
 	if (flip) {
-		state->scroll_x = 0x008;
-		state->scroll_y = 0x0c5;
+		state->m_scroll_x = 0x008;
+		state->m_scroll_y = 0x0c5;
 	}
 	else {
-		state->scroll_x = 0x037;
-		state->scroll_y = 0x01e;
+		state->m_scroll_x = 0x037;
+		state->m_scroll_y = 0x01e;
 	}
 }
 
@@ -185,63 +185,63 @@ WRITE16_HANDLER( twincobr_txoffs_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->txoffs);
-	state->txoffs %= state->txvideoram_size;
+	COMBINE_DATA(&state->m_txoffs);
+	state->m_txoffs %= state->m_txvideoram_size;
 }
 READ16_HANDLER( twincobr_txram_r )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	return state->txvideoram16[state->txoffs];
+	return state->m_txvideoram16[state->m_txoffs];
 }
 WRITE16_HANDLER( twincobr_txram_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->txvideoram16[state->txoffs]);
-	tilemap_mark_tile_dirty(state->tx_tilemap,state->txoffs);
+	COMBINE_DATA(&state->m_txvideoram16[state->m_txoffs]);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap,state->m_txoffs);
 }
 
 WRITE16_HANDLER( twincobr_bgoffs_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->bgoffs);
-	state->bgoffs %= (state->bgvideoram_size >> 1);
+	COMBINE_DATA(&state->m_bgoffs);
+	state->m_bgoffs %= (state->m_bgvideoram_size >> 1);
 }
 READ16_HANDLER( twincobr_bgram_r )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	return state->bgvideoram16[state->bgoffs+state->bg_ram_bank];
+	return state->m_bgvideoram16[state->m_bgoffs+state->m_bg_ram_bank];
 }
 WRITE16_HANDLER( twincobr_bgram_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->bgvideoram16[state->bgoffs+state->bg_ram_bank]);
-	tilemap_mark_tile_dirty(state->bg_tilemap,(state->bgoffs+state->bg_ram_bank));
+	COMBINE_DATA(&state->m_bgvideoram16[state->m_bgoffs+state->m_bg_ram_bank]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,(state->m_bgoffs+state->m_bg_ram_bank));
 }
 
 WRITE16_HANDLER( twincobr_fgoffs_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->fgoffs);
-	state->fgoffs %= state->fgvideoram_size;
+	COMBINE_DATA(&state->m_fgoffs);
+	state->m_fgoffs %= state->m_fgvideoram_size;
 }
 READ16_HANDLER( twincobr_fgram_r )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	return state->fgvideoram16[state->fgoffs];
+	return state->m_fgvideoram16[state->m_fgoffs];
 }
 WRITE16_HANDLER( twincobr_fgram_w )
 {
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
-	COMBINE_DATA(&state->fgvideoram16[state->fgoffs]);
-	tilemap_mark_tile_dirty(state->fg_tilemap,state->fgoffs);
+	COMBINE_DATA(&state->m_fgvideoram16[state->m_fgoffs]);
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,state->m_fgoffs);
 }
 
 
@@ -250,12 +250,12 @@ WRITE16_HANDLER( twincobr_txscroll_w )
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
-		COMBINE_DATA(&state->txscrollx);
-		tilemap_set_scrollx(state->tx_tilemap,0,(state->txscrollx+state->scroll_x) & 0x1ff);
+		COMBINE_DATA(&state->m_txscrollx);
+		tilemap_set_scrollx(state->m_tx_tilemap,0,(state->m_txscrollx+state->m_scroll_x) & 0x1ff);
 	}
 	else {
-		COMBINE_DATA(&state->txscrolly);
-		tilemap_set_scrolly(state->tx_tilemap,0,(state->txscrolly+state->scroll_y) & 0x1ff);
+		COMBINE_DATA(&state->m_txscrolly);
+		tilemap_set_scrolly(state->m_tx_tilemap,0,(state->m_txscrolly+state->m_scroll_y) & 0x1ff);
 	}
 }
 
@@ -264,12 +264,12 @@ WRITE16_HANDLER( twincobr_bgscroll_w )
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
-		COMBINE_DATA(&state->bgscrollx);
-		tilemap_set_scrollx(state->bg_tilemap,0,(state->bgscrollx+state->scroll_x) & 0x1ff);
+		COMBINE_DATA(&state->m_bgscrollx);
+		tilemap_set_scrollx(state->m_bg_tilemap,0,(state->m_bgscrollx+state->m_scroll_x) & 0x1ff);
 	}
 	else {
-		COMBINE_DATA(&state->bgscrolly);
-		tilemap_set_scrolly(state->bg_tilemap,0,(state->bgscrolly+state->scroll_y) & 0x1ff);
+		COMBINE_DATA(&state->m_bgscrolly);
+		tilemap_set_scrolly(state->m_bg_tilemap,0,(state->m_bgscrolly+state->m_scroll_y) & 0x1ff);
 	}
 }
 
@@ -278,12 +278,12 @@ WRITE16_HANDLER( twincobr_fgscroll_w )
 	twincobr_state *state = space->machine().driver_data<twincobr_state>();
 
 	if (offset == 0) {
-		COMBINE_DATA(&state->fgscrollx);
-		tilemap_set_scrollx(state->fg_tilemap,0,(state->fgscrollx+state->scroll_x) & 0x1ff);
+		COMBINE_DATA(&state->m_fgscrollx);
+		tilemap_set_scrollx(state->m_fg_tilemap,0,(state->m_fgscrollx+state->m_scroll_x) & 0x1ff);
 	}
 	else {
-		COMBINE_DATA(&state->fgscrolly);
-		tilemap_set_scrolly(state->fg_tilemap,0,(state->fgscrolly+state->scroll_y) & 0x1ff);
+		COMBINE_DATA(&state->m_fgscrolly);
+		tilemap_set_scrolly(state->m_fg_tilemap,0,(state->m_fgscrolly+state->m_scroll_y) & 0x1ff);
 	}
 }
 
@@ -387,9 +387,9 @@ static void wardner_sprite_priority_hack(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	if (state->fgscrollx != state->bgscrollx) {
+	if (state->m_fgscrollx != state->m_bgscrollx) {
 		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
-		if ((state->fgscrollx==0x1c9) || (state->flip_screen && (state->fgscrollx==0x17a))) {	/* in the shop ? */
+		if ((state->m_fgscrollx==0x1c9) || (state->m_flip_screen && (state->m_fgscrollx==0x17a))) {	/* in the shop ? */
 			int wardner_hack = buffered_spriteram16[0x0b04/2];
 		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
 		/* sprite position 0x3900 to 0x5e00 -- hero on shop keeper (flip) */
@@ -424,28 +424,28 @@ static void twincobr_log_vram(running_machine &machine)
 		int tcode[4];
 		while (input_code_pressed(machine, KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
-		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",state->bgscrollx,state->bgscrolly,state->fgscrollx,state->fgscrolly,state->txscrollx,state->txscrolly);
-		for ( tile_voffs = 0; tile_voffs < (state->txvideoram_size/2); tile_voffs++ )
+		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",state->m_bgscrollx,state->m_bgscrolly,state->m_fgscrollx,state->m_fgscrolly,state->m_txscrollx,state->m_txscrolly);
+		for ( tile_voffs = 0; tile_voffs < (state->m_txvideoram_size/2); tile_voffs++ )
 		{
-			tcode[1] = state->bgvideoram16[tile_voffs];
-			tcode[2] = state->fgvideoram16[tile_voffs];
-			tcode[3] = state->txvideoram16[tile_voffs];
+			tcode[1] = state->m_bgvideoram16[tile_voffs];
+			tcode[2] = state->m_fgvideoram16[tile_voffs];
+			tcode[3] = state->m_txvideoram16[tile_voffs];
 			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x  TX1:%02x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff,
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff,
 							tcode[3] & 0xf800 >> 11, tcode[3] & 0x07ff);
 		}
-		for ( tile_voffs = (state->txvideoram_size/2); tile_voffs < (state->fgvideoram_size/2); tile_voffs++ )
+		for ( tile_voffs = (state->m_txvideoram_size/2); tile_voffs < (state->m_fgvideoram_size/2); tile_voffs++ )
 		{
-			tcode[1] = state->bgvideoram16[tile_voffs];
-			tcode[2] = state->fgvideoram16[tile_voffs];
+			tcode[1] = state->m_bgvideoram16[tile_voffs];
+			tcode[2] = state->m_fgvideoram16[tile_voffs];
 			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x  FG1:%01x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff,
 							tcode[2] & 0xf000 >> 12, tcode[2] & 0x0fff);
 		}
-		for ( tile_voffs = (state->fgvideoram_size/2); tile_voffs < (state->bgvideoram_size/2); tile_voffs++ )
+		for ( tile_voffs = (state->m_fgvideoram_size/2); tile_voffs < (state->m_bgvideoram_size/2); tile_voffs++ )
 		{
-			tcode[1] = state->bgvideoram16[tile_voffs];
+			tcode[1] = state->m_bgvideoram16[tile_voffs];
 			logerror("$(%04x)  (Col-Tile) BG1:%01x-%03x\n", tile_voffs,
 							tcode[1] & 0xf000 >> 12, tcode[1] & 0x0fff);
 		}
@@ -463,7 +463,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	int offs;
 
-	if (state->display_on)
+	if (state->m_display_on)
 	{
 		UINT16 *buffered_spriteram16 = machine.generic.buffered_spriteram.u16;
 		for (offs = 0;offs < machine.generic.spriteram_size/2;offs += 4)
@@ -502,15 +502,15 @@ SCREEN_UPDATE( toaplan0 )
 	twincobr_state *state = screen->machine().driver_data<twincobr_state>();
 	twincobr_log_vram(screen->machine());
 
-	if (state->wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine());
+	if (state->m_wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine());
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen->machine(), bitmap,cliprect,0x0400);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	draw_sprites(screen->machine(), bitmap,cliprect,0x0800);
-	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	draw_sprites(screen->machine(), bitmap,cliprect,0x0c00);
 	return 0;
 }

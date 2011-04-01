@@ -169,9 +169,9 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -214,9 +214,9 @@ static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -377,9 +377,9 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, videoram, videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, spriteram, spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r)	/* COIN + 68705 status */
@@ -541,7 +541,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lsasquad_state *state = device->machine().driver_data<lsasquad_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( unk )
@@ -571,48 +571,48 @@ static MACHINE_START( lsasquad )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->mcu = machine.device("mcu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_mcu = machine.device("mcu");
 
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
-	state->save_item(NAME(state->port_b_in));
-	state->save_item(NAME(state->port_b_out));
-	state->save_item(NAME(state->ddr_b));
-	state->save_item(NAME(state->mcu_sent));
-	state->save_item(NAME(state->main_sent));
-	state->save_item(NAME(state->from_main));
-	state->save_item(NAME(state->from_mcu));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
+	state->save_item(NAME(state->m_port_b_in));
+	state->save_item(NAME(state->m_port_b_out));
+	state->save_item(NAME(state->m_ddr_b));
+	state->save_item(NAME(state->m_mcu_sent));
+	state->save_item(NAME(state->m_main_sent));
+	state->save_item(NAME(state->m_from_main));
+	state->save_item(NAME(state->m_from_mcu));
 
-	state->save_item(NAME(state->sound_pending));
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->sound_cmd));
-	state->save_item(NAME(state->sound_result));
+	state->save_item(NAME(state->m_sound_pending));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_sound_cmd));
+	state->save_item(NAME(state->m_sound_result));
 }
 
 static MACHINE_RESET( lsasquad )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
 
-	state->sound_pending = 0;
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->sound_cmd = 0;
-	state->sound_result = 0;
+	state->m_sound_pending = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_sound_cmd = 0;
+	state->m_sound_result = 0;
 
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_mcu_sent = 0;
+	state->m_main_sent = 0;
+	state->m_from_main = 0;
+	state->m_from_mcu = 0;
 }
 
 /* Note: lsasquad clock values are not verified */

@@ -143,12 +143,12 @@ static WRITE8_HANDLER( sound_bank_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = BIT(data, 1);
 	bank_B = BIT(data, 0);
-	k007232_set_bank(state->k007232_1, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(state->k007232_2, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
 }
 
 static void volume_callback0(device_t *device, int v)

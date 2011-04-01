@@ -70,16 +70,16 @@ public:
 	darkhors_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *tmap;
-	tilemap_t *tmap2;
-	UINT32 *tmapram;
-	UINT32 *tmapscroll;
-	UINT32 *tmapram2;
-	UINT32 *tmapscroll2;
-	UINT32 input_sel;
-	UINT32* jclub2_tileram;
-	int jclub2_gfx_index;
-	UINT32 *spriteram;
+	tilemap_t *m_tmap;
+	tilemap_t *m_tmap2;
+	UINT32 *m_tmapram;
+	UINT32 *m_tmapscroll;
+	UINT32 *m_tmapram2;
+	UINT32 *m_tmapscroll2;
+	UINT32 m_input_sel;
+	UINT32* m_jclub2_tileram;
+	int m_jclub2_gfx_index;
+	UINT32 *m_spriteram;
 };
 
 
@@ -100,37 +100,37 @@ static SCREEN_UPDATE( darkhors );
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT16 tile		=	state->tmapram[tile_index] >> 16;
-	UINT16 color	=	state->tmapram[tile_index] & 0xffff;
+	UINT16 tile		=	state->m_tmapram[tile_index] >> 16;
+	UINT16 color	=	state->m_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT16 tile		=	state->tmapram2[tile_index] >> 16;
-	UINT16 color	=	state->tmapram2[tile_index] & 0xffff;
+	UINT16 tile		=	state->m_tmapram2[tile_index] >> 16;
+	UINT16 color	=	state->m_tmapram2[tile_index] & 0xffff;
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 static WRITE32_HANDLER( darkhors_tmapram_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
-	COMBINE_DATA(&state->tmapram[offset]);
-	tilemap_mark_tile_dirty(state->tmap, offset);
+	COMBINE_DATA(&state->m_tmapram[offset]);
+	tilemap_mark_tile_dirty(state->m_tmap, offset);
 }
 static WRITE32_HANDLER( darkhors_tmapram2_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
-	COMBINE_DATA(&state->tmapram2[offset]);
-	tilemap_mark_tile_dirty(state->tmap2, offset);
+	COMBINE_DATA(&state->m_tmapram2[offset]);
+	tilemap_mark_tile_dirty(state->m_tmap2, offset);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT32 *s		=	state->spriteram;
-	UINT32 *end		=	state->spriteram + 0x02000/4;
+	UINT32 *s		=	state->m_spriteram;
+	UINT32 *end		=	state->m_spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
@@ -164,14 +164,14 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static VIDEO_START( darkhors )
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
-	state->tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
-	state->tmap2			=	tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tmap2			=	tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 												16,16, 0x40,0x40	);
 
-	tilemap_set_transparent_pen(state->tmap, 0);
-	tilemap_set_transparent_pen(state->tmap2, 0);
+	tilemap_set_transparent_pen(state->m_tmap, 0);
+	tilemap_set_transparent_pen(state->m_tmap2, 0);
 
 	machine.gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
@@ -194,25 +194,25 @@ static SCREEN_UPDATE( darkhors )
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
-	tilemap_set_scrollx(state->tmap,0, (state->tmapscroll[0] >> 16) - 5);
-	tilemap_set_scrolly(state->tmap,0, (state->tmapscroll[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->tmap, TILEMAP_DRAW_OPAQUE, 0);
+	tilemap_set_scrollx(state->m_tmap,0, (state->m_tmapscroll[0] >> 16) - 5);
+	tilemap_set_scrolly(state->m_tmap,0, (state->m_tmapscroll[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, state->m_tmap, TILEMAP_DRAW_OPAQUE, 0);
 
-	tilemap_set_scrollx(state->tmap2,0, (state->tmapscroll2[0] >> 16) - 5);
-	tilemap_set_scrolly(state->tmap2,0, (state->tmapscroll2[0] & 0xffff) - 0xff );
-	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->tmap2, 0, 0);
+	tilemap_set_scrollx(state->m_tmap2,0, (state->m_tmapscroll2[0] >> 16) - 5);
+	tilemap_set_scrolly(state->m_tmap2,0, (state->m_tmapscroll2[0] & 0xffff) - 0xff );
+	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, state->m_tmap2, 0, 0);
 
 	if (layers_ctrl & 4)	draw_sprites(screen->machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0
 	popmessage("%04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X",
-		state->tmapscroll[0] >> 16, state->tmapscroll[0] & 0xffff,
-		state->tmapscroll[1] >> 16, state->tmapscroll[1] & 0xffff,
-		state->tmapscroll[2] >> 16, state->tmapscroll[2] & 0xffff,
-		state->tmapscroll[3] >> 16, state->tmapscroll[3] & 0xffff,
-		state->tmapscroll[4] >> 16, state->tmapscroll[4] & 0xffff,
-		state->tmapscroll[5] >> 16, state->tmapscroll[5] & 0xffff
+		state->m_tmapscroll[0] >> 16, state->m_tmapscroll[0] & 0xffff,
+		state->m_tmapscroll[1] >> 16, state->m_tmapscroll[1] & 0xffff,
+		state->m_tmapscroll[2] >> 16, state->m_tmapscroll[2] & 0xffff,
+		state->m_tmapscroll[3] >> 16, state->m_tmapscroll[3] & 0xffff,
+		state->m_tmapscroll[4] >> 16, state->m_tmapscroll[4] & 0xffff,
+		state->m_tmapscroll[5] >> 16, state->m_tmapscroll[5] & 0xffff
 	);
 #endif
 #endif
@@ -268,7 +268,7 @@ static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 static WRITE32_HANDLER( darkhors_input_sel_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
-	COMBINE_DATA(&state->input_sel);
+	COMBINE_DATA(&state->m_input_sel);
 //  if (ACCESSING_BITS_16_31)    popmessage("%04X",data >> 16);
 }
 
@@ -292,8 +292,8 @@ static READ32_HANDLER( darkhors_input_sel_r )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
 	// from bit mask to bit number
-	int bit_p1 = mask_to_bit((state->input_sel & 0x00ff0000) >> 16);
-	int bit_p2 = mask_to_bit((state->input_sel & 0xff000000) >> 24);
+	int bit_p1 = mask_to_bit((state->m_input_sel & 0x00ff0000) >> 16);
+	int bit_p2 = mask_to_bit((state->m_input_sel & 0xff000000) >> 24);
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	return	(input_port_read(space->machine(), portnames[bit_p1]) & 0x00ffffff) |
@@ -323,22 +323,22 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
 	AM_RANGE(0x800000, 0x86bfff) AM_RAM
-	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(darkhors_tmapram_w) AM_BASE_MEMBER(darkhors_state, tmapram)
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE_MEMBER(darkhors_state, tmapram2)
+	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(darkhors_tmapram_w) AM_BASE_MEMBER(darkhors_state, m_tmapram)
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE_MEMBER(darkhors_state, m_tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, spriteram)
+	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, m_spriteram)
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
-	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, tmapscroll)
-	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, tmapscroll2)
+	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, m_tmapscroll)
+	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, m_tmapscroll2)
 ADDRESS_MAP_END
 
 
 static WRITE32_HANDLER( jclub2_tileram_w )
 {
 	darkhors_state *state = space->machine().driver_data<darkhors_state>();
-	COMBINE_DATA(&state->jclub2_tileram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[state->jclub2_gfx_index], offset/(256/4));
+	COMBINE_DATA(&state->m_jclub2_tileram[offset]);
+	gfx_element_mark_dirty(space->machine().gfx[state->m_jclub2_gfx_index], offset/(256/4));
 
 }
 
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, spriteram)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, m_spriteram)
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_BASE_MEMBER(darkhors_state, jclub2_tileram) // tile data gets decompressed here by main cpu?
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_BASE_MEMBER(darkhors_state, m_jclub2_tileram) // tile data gets decompressed here by main cpu?
 ADDRESS_MAP_END
 
 
@@ -679,14 +679,14 @@ static VIDEO_START(jclub2)
 {
 	darkhors_state *state = machine.driver_data<darkhors_state>();
 	/* find first empty slot to decode gfx */
-	for (state->jclub2_gfx_index = 0; state->jclub2_gfx_index < MAX_GFX_ELEMENTS; state->jclub2_gfx_index++)
-		if (machine.gfx[state->jclub2_gfx_index] == 0)
+	for (state->m_jclub2_gfx_index = 0; state->m_jclub2_gfx_index < MAX_GFX_ELEMENTS; state->m_jclub2_gfx_index++)
+		if (machine.gfx[state->m_jclub2_gfx_index] == 0)
 			break;
 
-	assert(state->jclub2_gfx_index != MAX_GFX_ELEMENTS);
+	assert(state->m_jclub2_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)state->jclub2_tileram, machine.total_colors() / 16, 0);
+	machine.gfx[state->m_jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, (UINT8 *)state->m_jclub2_tileram, machine.total_colors() / 16, 0);
 
 
 }

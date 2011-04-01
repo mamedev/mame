@@ -29,15 +29,15 @@ public:
 	bestleag_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *txram;
-	UINT16 *bgram;
-	UINT16 *fgram;
-	UINT16 *vregs;
-	tilemap_t *tx_tilemap;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_txram;
+	UINT16 *m_bgram;
+	UINT16 *m_fgram;
+	UINT16 *m_vregs;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 
@@ -47,7 +47,7 @@ public:
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->txram[tile_index];
+	int code = state->m_txram[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -59,7 +59,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->bgram[tile_index];
+	int code = state->m_bgram[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	int code = state->fgram[tile_index];
+	int code = state->m_fgram[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -94,12 +94,12 @@ static TILEMAP_MAPPER( bsb_bg_scan )
 static VIDEO_START(bestleag)
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,256, 32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,bsb_bg_scan,16,16,128, 64);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,bsb_bg_scan,16,16,128, 64);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,256, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,bsb_bg_scan,16,16,128, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,bsb_bg_scan,16,16,128, 64);
 
-	tilemap_set_transparent_pen(state->tx_tilemap,15);
-	tilemap_set_transparent_pen(state->fg_tilemap,15);
+	tilemap_set_transparent_pen(state->m_tx_tilemap,15);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,15);
 }
 
 /*
@@ -110,7 +110,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	bestleag_state *state = machine.driver_data<bestleag_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 
 	/*
 
@@ -120,7 +120,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 	int offs;
 
-	for (offs = 0x16/2;offs < state->spriteram_size/2;offs += 4)
+	for (offs = 0x16/2;offs < state->m_spriteram_size/2;offs += 4)
 	{
 		int code = spriteram16[offs+3] & 0xfff;
 		int color = (spriteram16[offs+2] & 0xf000) >> 12;
@@ -133,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			return;
 
 		/* it can change sprites color mask like the original set */
-		if(state->vregs[0x00/2] & 0x1000)
+		if(state->m_vregs[0x00/2] & 0x1000)
 			color &= 7;
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
@@ -166,56 +166,56 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static SCREEN_UPDATE(bestleag)
 {
 	bestleag_state *state = screen->machine().driver_data<bestleag_state>();
-	tilemap_set_scrollx(state->bg_tilemap,0,(state->vregs[0x00/2] & 0xfff) + (state->vregs[0x08/2] & 0x7) - 3);
-	tilemap_set_scrolly(state->bg_tilemap,0,state->vregs[0x02/2]);
-	tilemap_set_scrollx(state->tx_tilemap,0,state->vregs[0x04/2]);
-	tilemap_set_scrolly(state->tx_tilemap,0,state->vregs[0x06/2]);
-	tilemap_set_scrollx(state->fg_tilemap,0,state->vregs[0x08/2] & 0xfff8);
-	tilemap_set_scrolly(state->fg_tilemap,0,state->vregs[0x0a/2]);
+	tilemap_set_scrollx(state->m_bg_tilemap,0,(state->m_vregs[0x00/2] & 0xfff) + (state->m_vregs[0x08/2] & 0x7) - 3);
+	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_vregs[0x02/2]);
+	tilemap_set_scrollx(state->m_tx_tilemap,0,state->m_vregs[0x04/2]);
+	tilemap_set_scrolly(state->m_tx_tilemap,0,state->m_vregs[0x06/2]);
+	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_vregs[0x08/2] & 0xfff8);
+	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_vregs[0x0a/2]);
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	draw_sprites(screen->machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
 }
 
 static SCREEN_UPDATE(bestleaw)
 {
 	bestleag_state *state = screen->machine().driver_data<bestleag_state>();
-	tilemap_set_scrollx(state->bg_tilemap,0,state->vregs[0x08/2]);
-	tilemap_set_scrolly(state->bg_tilemap,0,state->vregs[0x0a/2]);
-	tilemap_set_scrollx(state->tx_tilemap,0,state->vregs[0x00/2]);
-	tilemap_set_scrolly(state->tx_tilemap,0,state->vregs[0x02/2]);
-	tilemap_set_scrollx(state->fg_tilemap,0,state->vregs[0x04/2]);
-	tilemap_set_scrolly(state->fg_tilemap,0,state->vregs[0x06/2]);
+	tilemap_set_scrollx(state->m_bg_tilemap,0,state->m_vregs[0x08/2]);
+	tilemap_set_scrolly(state->m_bg_tilemap,0,state->m_vregs[0x0a/2]);
+	tilemap_set_scrollx(state->m_tx_tilemap,0,state->m_vregs[0x00/2]);
+	tilemap_set_scrolly(state->m_tx_tilemap,0,state->m_vregs[0x02/2]);
+	tilemap_set_scrollx(state->m_fg_tilemap,0,state->m_vregs[0x04/2]);
+	tilemap_set_scrolly(state->m_fg_tilemap,0,state->m_vregs[0x06/2]);
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	draw_sprites(screen->machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 	return 0;
 }
 
 static WRITE16_HANDLER( bestleag_txram_w )
 {
 	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->txram[offset] = data;
-	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
+	state->m_txram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER( bestleag_bgram_w )
 {
 	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
+	state->m_bgram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( bestleag_fgram_w )
 {
 	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fgram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
@@ -230,12 +230,12 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_BASE_MEMBER(bestleag_state, bgram)
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_BASE_MEMBER(bestleag_state, fgram)
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_BASE_MEMBER(bestleag_state, txram)
-	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE_MEMBER(bestleag_state, vregs)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_BASE_MEMBER(bestleag_state, m_bgram)
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_BASE_MEMBER(bestleag_state, m_fgram)
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_BASE_MEMBER(bestleag_state, m_txram)
+	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE_MEMBER(bestleag_state, m_vregs)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(bestleag_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(bestleag_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")

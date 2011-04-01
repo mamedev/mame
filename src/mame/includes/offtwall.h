@@ -12,12 +12,12 @@ public:
 	offtwall_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16 *bankswitch_base;
-	UINT16 *bankrom_base;
-	UINT32 bank_offset;
+	UINT16 *m_bankswitch_base;
+	UINT16 *m_bankrom_base;
+	UINT32 m_bank_offset;
 
-	UINT16 *spritecache_count;
-	UINT16 *unknown_verify_base;
+	UINT16 *m_spritecache_count;
+	UINT16 *m_unknown_verify_base;
 };
 
 

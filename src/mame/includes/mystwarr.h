@@ -4,21 +4,21 @@ public:
 	mystwarr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *gx_workram;
-	UINT8 mw_irq_control;
-	int cur_sound_region;
-	int layer_colorbase[6];
-	int oinprion;
-	int cbparam;
-	int sprite_colorbase;
-	int sub1_colorbase;
-	int last_psac_colorbase;
-	int gametype;
-	int roz_enable;
-	int roz_rombank;
-	tilemap_t *ult_936_tilemap;
-	UINT16 clip;
-	UINT16 *spriteram;
+	UINT16 *m_gx_workram;
+	UINT8 m_mw_irq_control;
+	int m_cur_sound_region;
+	int m_layer_colorbase[6];
+	int m_oinprion;
+	int m_cbparam;
+	int m_sprite_colorbase;
+	int m_sub1_colorbase;
+	int m_last_psac_colorbase;
+	int m_gametype;
+	int m_roz_enable;
+	int m_roz_rombank;
+	tilemap_t *m_ult_936_tilemap;
+	UINT16 m_clip;
+	UINT16 *m_spriteram;
 };
 
 

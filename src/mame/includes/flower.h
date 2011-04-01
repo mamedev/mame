@@ -6,18 +6,18 @@ public:
 	flower_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *spriteram;
-	UINT8 *sn_irq_enable;
-	UINT8 *sn_nmi_enable;
-	UINT8 *textram;
-	UINT8 *bg0ram;
-	UINT8 *bg1ram;
-	UINT8 *bg0_scroll;
-	UINT8 *bg1_scroll;
-	tilemap_t *bg0_tilemap;
-	tilemap_t *bg1_tilemap;
-	tilemap_t *text_tilemap;
-	tilemap_t *text_right_tilemap;
+	UINT8 *m_spriteram;
+	UINT8 *m_sn_irq_enable;
+	UINT8 *m_sn_nmi_enable;
+	UINT8 *m_textram;
+	UINT8 *m_bg0ram;
+	UINT8 *m_bg1ram;
+	UINT8 *m_bg0_scroll;
+	UINT8 *m_bg1_scroll;
+	tilemap_t *m_bg0_tilemap;
+	tilemap_t *m_bg1_tilemap;
+	tilemap_t *m_text_tilemap;
+	tilemap_t *m_text_right_tilemap;
 };
 
 

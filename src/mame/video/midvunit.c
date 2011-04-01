@@ -48,7 +48,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	if (scanline != -1)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-		state->scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline + 1), scanline);
+		state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline + 1), scanline);
 		machine.scheduler().timer_set(attotime::from_hz(25000000), FUNC(scanline_timer_cb), -1);
 	}
 	else
@@ -59,22 +59,22 @@ static TIMER_CALLBACK( scanline_timer_cb )
 static void midvunit_exit(running_machine &machine)
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
-	poly_free(state->poly);
+	poly_free(state->m_poly);
 }
 
 
 VIDEO_START( midvunit )
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
-	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
-	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
+	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, midvunit_exit);
 
-	state_save_register_global_array(machine, state->video_regs);
-	state_save_register_global_array(machine, state->dma_data);
-	state_save_register_global(machine, state->dma_data_index);
-	state_save_register_global(machine, state->page_control);
-	state_save_register_global(machine, state->video_changed);
+	state_save_register_global_array(machine, state->m_video_regs);
+	state_save_register_global_array(machine, state->m_dma_data);
+	state_save_register_global(machine, state->m_dma_data_index);
+	state_save_register_global(machine, state->m_page_control);
+	state_save_register_global(machine, state->m_video_changed);
 }
 
 
@@ -293,25 +293,25 @@ static void make_vertices_inclusive(poly_vertex *vert)
 static void process_dma_queue(running_machine &machine)
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->poly);
-	UINT16 *dest = &state->videoram[(state->page_control & 4) ? 0x40000 : 0x00000];
-	int textured = ((state->dma_data[0] & 0x300) == 0x100);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+	UINT16 *dest = &state->m_videoram[(state->m_page_control & 4) ? 0x40000 : 0x00000];
+	int textured = ((state->m_dma_data[0] & 0x300) == 0x100);
 	poly_draw_scanline_func callback;
 	poly_vertex vert[4];
 
 	/* if we're rendering to the same page we're viewing, it has changed */
-	if ((((state->page_control >> 2) ^ state->page_control) & 1) == 0 || WATCH_RENDER)
-		state->video_changed = TRUE;
+	if ((((state->m_page_control >> 2) ^ state->m_page_control) & 1) == 0 || WATCH_RENDER)
+		state->m_video_changed = TRUE;
 
 	/* fill in the vertex data */
-	vert[0].x = (float)(INT16)state->dma_data[2] + 0.5f;
-	vert[0].y = (float)(INT16)state->dma_data[3] + 0.5f;
-	vert[1].x = (float)(INT16)state->dma_data[4] + 0.5f;
-	vert[1].y = (float)(INT16)state->dma_data[5] + 0.5f;
-	vert[2].x = (float)(INT16)state->dma_data[6] + 0.5f;
-	vert[2].y = (float)(INT16)state->dma_data[7] + 0.5f;
-	vert[3].x = (float)(INT16)state->dma_data[8] + 0.5f;
-	vert[3].y = (float)(INT16)state->dma_data[9] + 0.5f;
+	vert[0].x = (float)(INT16)state->m_dma_data[2] + 0.5f;
+	vert[0].y = (float)(INT16)state->m_dma_data[3] + 0.5f;
+	vert[1].x = (float)(INT16)state->m_dma_data[4] + 0.5f;
+	vert[1].y = (float)(INT16)state->m_dma_data[5] + 0.5f;
+	vert[2].x = (float)(INT16)state->m_dma_data[6] + 0.5f;
+	vert[2].y = (float)(INT16)state->m_dma_data[7] + 0.5f;
+	vert[3].x = (float)(INT16)state->m_dma_data[8] + 0.5f;
+	vert[3].y = (float)(INT16)state->m_dma_data[9] + 0.5f;
 
 	/* make the vertices inclusive of right/bottom points */
 	make_vertices_inclusive(vert);
@@ -324,25 +324,25 @@ static void process_dma_queue(running_machine &machine)
 	else
 	{
 		/* if textured, add the texture info */
-		vert[0].p[0] = (float)(state->dma_data[10] & 0xff) * 65536.0f + 32768.0f;
-		vert[0].p[1] = (float)(state->dma_data[10] >> 8) * 65536.0f + 32768.0f;
-		vert[1].p[0] = (float)(state->dma_data[11] & 0xff) * 65536.0f + 32768.0f;
-		vert[1].p[1] = (float)(state->dma_data[11] >> 8) * 65536.0f + 32768.0f;
-		vert[2].p[0] = (float)(state->dma_data[12] & 0xff) * 65536.0f + 32768.0f;
-		vert[2].p[1] = (float)(state->dma_data[12] >> 8) * 65536.0f + 32768.0f;
-		vert[3].p[0] = (float)(state->dma_data[13] & 0xff) * 65536.0f + 32768.0f;
-		vert[3].p[1] = (float)(state->dma_data[13] >> 8) * 65536.0f + 32768.0f;
+		vert[0].p[0] = (float)(state->m_dma_data[10] & 0xff) * 65536.0f + 32768.0f;
+		vert[0].p[1] = (float)(state->m_dma_data[10] >> 8) * 65536.0f + 32768.0f;
+		vert[1].p[0] = (float)(state->m_dma_data[11] & 0xff) * 65536.0f + 32768.0f;
+		vert[1].p[1] = (float)(state->m_dma_data[11] >> 8) * 65536.0f + 32768.0f;
+		vert[2].p[0] = (float)(state->m_dma_data[12] & 0xff) * 65536.0f + 32768.0f;
+		vert[2].p[1] = (float)(state->m_dma_data[12] >> 8) * 65536.0f + 32768.0f;
+		vert[3].p[0] = (float)(state->m_dma_data[13] & 0xff) * 65536.0f + 32768.0f;
+		vert[3].p[1] = (float)(state->m_dma_data[13] >> 8) * 65536.0f + 32768.0f;
 
 		/* handle non-masked, non-transparent quads */
-		if ((state->dma_data[0] & 0xc00) == 0x000)
+		if ((state->m_dma_data[0] & 0xc00) == 0x000)
 			callback = render_tex;
 
 		/* handle non-masked, transparent quads */
-		else if ((state->dma_data[0] & 0xc00) == 0x800)
+		else if ((state->m_dma_data[0] & 0xc00) == 0x800)
 			callback = render_textrans;
 
 		/* handle masked, transparent quads */
-		else if ((state->dma_data[0] & 0xc00) == 0xc00)
+		else if ((state->m_dma_data[0] & 0xc00) == 0xc00)
 			callback = render_textransmask;
 
 		/* handle masked, non-transparent quads */
@@ -351,12 +351,12 @@ static void process_dma_queue(running_machine &machine)
 	}
 
 	/* set up the extra data for this triangle */
-	extra->texbase = (UINT8 *)state->textureram + (state->dma_data[14] * 256);
-	extra->pixdata = state->dma_data[1] | (state->dma_data[0] & 0x00ff);
-	extra->dither = ((state->dma_data[0] & 0x2000) != 0);
+	extra->texbase = (UINT8 *)state->m_textureram + (state->m_dma_data[14] * 256);
+	extra->pixdata = state->m_dma_data[1] | (state->m_dma_data[0] & 0x00ff);
+	extra->dither = ((state->m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	poly_render_quad(state->poly, dest, &machine.primary_screen->visible_area(), callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
+	poly_render_quad(state->m_poly, dest, &machine.primary_screen->visible_area(), callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
 }
 
 
@@ -371,9 +371,9 @@ WRITE32_HANDLER( midvunit_dma_queue_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space->device()), state->dma_data_index, data);
-	if (state->dma_data_index < 16)
-		state->dma_data[state->dma_data_index++] = data;
+		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space->device()), state->m_dma_data_index, data);
+	if (state->m_dma_data_index < 16)
+		state->m_dma_data[state->m_dma_data_index++] = data;
 }
 
 
@@ -392,7 +392,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 		if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
 			logerror("%06X:trigger\n", cpu_get_pc(&space->device()));
 		process_dma_queue(space->machine());
-		state->dma_data_index = 0;
+		state->m_dma_data_index = 0;
 	}
 	return 0;
 }
@@ -409,21 +409,21 @@ WRITE32_HANDLER( midvunit_page_control_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	/* watch for the display page to change */
-	if ((state->page_control ^ data) & 1)
+	if ((state->m_page_control ^ data) & 1)
 	{
-		state->video_changed = TRUE;
+		state->m_video_changed = TRUE;
 		if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
 			logerror("##########################################################\n");
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
 	}
-	state->page_control = data;
+	state->m_page_control = data;
 }
 
 
 READ32_HANDLER( midvunit_page_control_r )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	return state->page_control;
+	return state->m_page_control;
 }
 
 
@@ -437,26 +437,26 @@ READ32_HANDLER( midvunit_page_control_r )
 WRITE32_HANDLER( midvunit_video_control_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT16 old = state->video_regs[offset];
+	UINT16 old = state->m_video_regs[offset];
 
 	/* update the data */
-	COMBINE_DATA(&state->video_regs[offset]);
+	COMBINE_DATA(&state->m_video_regs[offset]);
 
 	/* update the scanline timer */
 	if (offset == 0)
-		state->scanline_timer->adjust(space->machine().primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
+		state->m_scanline_timer->adjust(space->machine().primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
-	if (old != state->video_regs[offset] && state->video_regs[6] != 0 && state->video_regs[11] != 0)
+	if (old != state->m_video_regs[offset] && state->m_video_regs[6] != 0 && state->m_video_regs[11] != 0)
 	{
 		rectangle visarea;
 
 		/* derive visible area from blanking */
 		visarea.min_x = 0;
-		visarea.max_x = (state->video_regs[6] + state->video_regs[2] - state->video_regs[5]) % state->video_regs[6];
+		visarea.max_x = (state->m_video_regs[6] + state->m_video_regs[2] - state->m_video_regs[5]) % state->m_video_regs[6];
 		visarea.min_y = 0;
-		visarea.max_y = (state->video_regs[11] + state->video_regs[7] - state->video_regs[10]) % state->video_regs[11];
-		space->machine().primary_screen->configure(state->video_regs[6], state->video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * state->video_regs[6] * state->video_regs[11]);
+		visarea.max_y = (state->m_video_regs[11] + state->m_video_regs[7] - state->m_video_regs[10]) % state->m_video_regs[11];
+		space->machine().primary_screen->configure(state->m_video_regs[6], state->m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * state->m_video_regs[6] * state->m_video_regs[11]);
 	}
 }
 
@@ -477,22 +477,22 @@ READ32_HANDLER( midvunit_scanline_r )
 WRITE32_HANDLER( midvunit_videoram_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	poly_wait(state->poly, "Video RAM write");
-	if (!state->video_changed)
+	poly_wait(state->m_poly, "Video RAM write");
+	if (!state->m_video_changed)
 	{
-		int visbase = (state->page_control & 1) ? 0x40000 : 0x00000;
+		int visbase = (state->m_page_control & 1) ? 0x40000 : 0x00000;
 		if ((offset & 0x40000) == visbase)
-			state->video_changed = TRUE;
+			state->m_video_changed = TRUE;
 	}
-	COMBINE_DATA(&state->videoram[offset]);
+	COMBINE_DATA(&state->m_videoram[offset]);
 }
 
 
 READ32_HANDLER( midvunit_videoram_r )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	poly_wait(state->poly, "Video RAM read");
-	return state->videoram[offset];
+	poly_wait(state->m_poly, "Video RAM read");
+	return state->m_videoram[offset];
 }
 
 
@@ -523,8 +523,8 @@ WRITE32_HANDLER( midvunit_paletteram_w )
 WRITE32_HANDLER( midvunit_textureram_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT8 *base = (UINT8 *)state->textureram;
-	poly_wait(state->poly, "Texture RAM write");
+	UINT8 *base = (UINT8 *)state->m_textureram;
+	poly_wait(state->m_poly, "Texture RAM write");
 	base[offset * 2] = data;
 	base[offset * 2 + 1] = data >> 8;
 }
@@ -533,7 +533,7 @@ WRITE32_HANDLER( midvunit_textureram_w )
 READ32_HANDLER( midvunit_textureram_r )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	UINT8 *base = (UINT8 *)state->textureram;
+	UINT8 *base = (UINT8 *)state->m_textureram;
 	return (base[offset * 2 + 1] << 8) | base[offset * 2];
 }
 
@@ -552,18 +552,18 @@ SCREEN_UPDATE( midvunit )
 	int x, y, width, xoffs;
 	UINT32 offset;
 
-	poly_wait(state->poly, "Refresh Time");
+	poly_wait(state->m_poly, "Refresh Time");
 
 	/* if the video didn't change, indicate as much */
-	if (!state->video_changed)
+	if (!state->m_video_changed)
 		return UPDATE_HAS_NOT_CHANGED;
-	state->video_changed = FALSE;
+	state->m_video_changed = FALSE;
 
 	/* determine the base of the videoram */
 #if WATCH_RENDER
-	offset = (state->page_control & 4) ? 0x40000 : 0x00000;
+	offset = (state->m_page_control & 4) ? 0x40000 : 0x00000;
 #else
-	offset = (state->page_control & 1) ? 0x40000 : 0x00000;
+	offset = (state->m_page_control & 1) ? 0x40000 : 0x00000;
 #endif
 
 	/* determine how many pixels to copy */
@@ -579,7 +579,7 @@ SCREEN_UPDATE( midvunit )
 	{
 		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels + cliprect->min_x;
 		for (x = 0; x < width; x++)
-			*dest++ = state->videoram[offset + x] & 0x7fff;
+			*dest++ = state->m_videoram[offset + x] & 0x7fff;
 		offset += 512;
 	}
 	return 0;

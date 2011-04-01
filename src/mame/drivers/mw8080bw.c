@@ -168,7 +168,7 @@
 static READ8_HANDLER( mw8080bw_shift_result_rev_r )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 ret = mb14241_shift_result_r(state->mb14241, 0);
+	UINT8 ret = mb14241_shift_result_r(state->m_mb14241, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
 }
@@ -179,13 +179,13 @@ static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 	UINT8 ret;
 
-	if (state->rev_shift_res)
+	if (state->m_rev_shift_res)
 	{
 		ret = mw8080bw_shift_result_rev_r(space, 0);
 	}
 	else
 	{
-		ret = mb14241_shift_result_r(state->mb14241, 0);
+		ret = mb14241_shift_result_r(state->m_mb14241, 0);
 	}
 
 	return ret;
@@ -194,9 +194,9 @@ static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	mb14241_shift_count_w(state->mb14241, offset, data);
+	mb14241_shift_count_w(state->m_mb14241, offset, data);
 
-	state->rev_shift_res = data & 0x08;
+	state->m_rev_shift_res = data & 0x08;
 }
 
 
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_SIZE_MEMBER(mw8080bw_state, main_ram, main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_SIZE_MEMBER(mw8080bw_state, m_main_ram, m_main_ram_size)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -429,10 +429,10 @@ static WRITE8_HANDLER( gunfight_io_w )
 		gunfight_audio_w(space, 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(state->mb14241, 0, data);
+		mb14241_shift_count_w(state->m_mb14241, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(state->mb14241, 0, data);
+		mb14241_shift_data_w(state->m_mb14241, 0, data);
 
 }
 
@@ -626,10 +626,10 @@ static WRITE8_HANDLER( tornbase_io_w )
 		tornbase_audio_w(space->machine().device("discrete"), 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(state->mb14241, 0, data);
+		mb14241_shift_count_w(state->m_mb14241, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(state->mb14241, 0, data);
+		mb14241_shift_data_w(state->m_mb14241, 0, data);
 }
 
 
@@ -874,15 +874,15 @@ MACHINE_CONFIG_END
 static STATE_POSTLOAD( maze_update_discrete )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	maze_write_discrete(machine.device("discrete"), state->maze_tone_timing_state);
+	maze_write_discrete(machine.device("discrete"), state->m_maze_tone_timing_state);
 }
 
 
 static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	state->maze_tone_timing_state = !state->maze_tone_timing_state;
-	maze_write_discrete(state->discrete, state->maze_tone_timing_state);
+	state->m_maze_tone_timing_state = !state->m_maze_tone_timing_state;
+	maze_write_discrete(state->m_discrete, state->m_maze_tone_timing_state);
 }
 
 
@@ -894,10 +894,10 @@ static MACHINE_START( maze )
 	machine.scheduler().timer_pulse(MAZE_555_B1_PERIOD, FUNC(maze_tone_timing_timer_callback));
 
 	/* initialize state of Tone Timing FF, IC C1 */
-	state->maze_tone_timing_state = 0;
+	state->m_maze_tone_timing_state = 0;
 
 	/* setup for save states */
-	state->save_item(NAME(state->maze_tone_timing_state));
+	state->save_item(NAME(state->m_maze_tone_timing_state));
 	machine.state().register_postload(maze_update_discrete, NULL);
 
 	MACHINE_START_CALL(mw8080bw);
@@ -984,7 +984,7 @@ static MACHINE_START( boothill )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->rev_shift_res));
+	state->save_item(NAME(state->m_rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1078,7 +1078,7 @@ static WRITE8_HANDLER( checkmat_io_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
-	if (offset & 0x01)  checkmat_audio_w(state->discrete, 0, data);
+	if (offset & 0x01)  checkmat_audio_w(state->m_discrete, 0, data);
 
 	if (offset & 0x02)  watchdog_reset_w(space, 0, data);
 }
@@ -1186,7 +1186,7 @@ static MACHINE_START( desertgu )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->desertgun_controller_select));
+	state->save_item(NAME(state->m_desertgun_controller_select));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1197,7 +1197,7 @@ static CUSTOM_INPUT( desertgu_gun_input_r )
 	mw8080bw_state *state = field->port->machine().driver_data<mw8080bw_state>();
 	UINT32 ret;
 
-	if (state->desertgun_controller_select)
+	if (state->m_desertgun_controller_select)
 		ret = input_port_read(field->port->machine(), DESERTGU_GUN_X_PORT_TAG);
 	else
 		ret = input_port_read(field->port->machine(), DESERTGU_GUN_Y_PORT_TAG);
@@ -1211,7 +1211,7 @@ static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 	mw8080bw_state *state = field->port->machine().driver_data<mw8080bw_state>();
 	UINT32 ret;
 
-	if (state->desertgun_controller_select)
+	if (state->m_desertgun_controller_select)
 		ret = input_port_read(field->port->machine(), DESERTGU_DIP_SW_0_1_SET_2_TAG);
 	else
 		ret = input_port_read(field->port->machine(), DESERTGU_DIP_SW_0_1_SET_1_TAG);
@@ -1514,7 +1514,7 @@ static MACHINE_START( gmissile )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->rev_shift_res));
+	state->save_item(NAME(state->m_rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1610,7 +1610,7 @@ static MACHINE_START( m4 )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->rev_shift_res));
+	state->save_item(NAME(state->m_rev_shift_res));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1708,7 +1708,7 @@ static MACHINE_START( clowns )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->clowns_controller_select));
+	state->save_item(NAME(state->m_clowns_controller_select));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1719,7 +1719,7 @@ static CUSTOM_INPUT( clowns_controller_r )
 	mw8080bw_state *state = field->port->machine().driver_data<mw8080bw_state>();
 	UINT32 ret;
 
-	if (state->clowns_controller_select)
+	if (state->m_clowns_controller_select)
 	{
 		ret = input_port_read(field->port->machine(), CLOWNS_CONTROLLER_P2_TAG);
 	}
@@ -2137,7 +2137,7 @@ MACHINE_CONFIG_END
 static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
 {
 	mw8080bw_state *state = timer.machine().driver_data<mw8080bw_state>();
-	output_set_value("STROBE", param && state->spcenctr_strobe_state);
+	output_set_value("STROBE", param && state->m_spcenctr_strobe_state);
 }
 
 
@@ -2146,10 +2146,10 @@ static MACHINE_START( spcenctr )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->spcenctr_strobe_state));
-	state->save_item(NAME(state->spcenctr_trench_width));
-	state->save_item(NAME(state->spcenctr_trench_center));
-	state->save_item(NAME(state->spcenctr_trench_slope));
+	state->save_item(NAME(state->m_spcenctr_strobe_state));
+	state->save_item(NAME(state->m_spcenctr_trench_width));
+	state->save_item(NAME(state->m_spcenctr_trench_center));
+	state->save_item(NAME(state->m_spcenctr_trench_slope));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -2158,21 +2158,21 @@ static MACHINE_START( spcenctr )
 UINT8 spcenctr_get_trench_width( *running_machine &machine )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->spcenctr_trench_width;
+	return state->m_spcenctr_trench_width;
 }
 
 
 UINT8 spcenctr_get_trench_center( *running_machine &machine )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->spcenctr_trench_center;
+	return state->m_spcenctr_trench_center;
 }
 
 
 UINT8 spcenctr_get_trench_slope( *running_machine &machine , UINT8 addr )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->spcenctr_trench_slope[addr & 0x0f];
+	return state->m_spcenctr_trench_slope[addr & 0x0f];
 }
 #endif
 
@@ -2184,24 +2184,24 @@ static WRITE8_HANDLER( spcenctr_io_w )
 		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(state->discrete, 0, data);	/*  -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(state->m_discrete, 0, data);	/*  -  0  -  0  0  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(state->discrete, 0, data);	/*  -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(state->m_discrete, 0, data);	/*  -  0  -  0  1  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(state->discrete, 0, data);	/*  -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(state->m_discrete, 0, data);	/*  -  0  -  1  0  0  0  1 */
 
 	else if ((offset & 0x07) == 0x03)
 	{											/*  -  -  -  -  -  0  1  1 */
 		UINT8 addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
-		state->spcenctr_trench_slope[addr] = data;
+		state->m_spcenctr_trench_slope[addr] = data;
 	}
 	else if ((offset & 0x07) == 0x04)
-		state->spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
+		state->m_spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
 
 	else if ((offset & 0x07) == 0x07)
-		state->spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
+		state->m_spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
 
 	else
 		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", cpu_get_pc(&space->device()), offset, data);
@@ -2309,7 +2309,7 @@ static MACHINE_START( phantom2 )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->phantom2_cloud_counter));
+	state->save_item(NAME(state->m_phantom2_cloud_counter));
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -2402,7 +2402,7 @@ static READ8_HANDLER( bowler_shift_result_r )
        the bits to flip */
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
-	return ~mb14241_shift_result_r(state->mb14241, 0);
+	return ~mb14241_shift_result_r(state->m_mb14241, 0);
 }
 
 static WRITE8_HANDLER( bowler_lights_1_w )
@@ -2539,7 +2539,7 @@ static MACHINE_START( invaders )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->invaders_flip_screen));
+	state->save_item(NAME(state->m_invaders_flip_screen));
 
 	MACHINE_START_CALL(mw8080bw);
 }

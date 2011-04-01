@@ -81,17 +81,17 @@ WRITE8_HANDLER( mario_videoram_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mario_gfxbank_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->gfx_bank != (data & 0x01))
+	if (state->m_gfx_bank != (data & 0x01))
 	{
-		state->gfx_bank = data & 0x01;
+		state->m_gfx_bank = data & 0x01;
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
@@ -100,9 +100,9 @@ WRITE8_HANDLER( mario_palettebank_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->palette_bank != (data & 0x01))
+	if (state->m_palette_bank != (data & 0x01))
 	{
-		state->palette_bank = data & 0x01;
+		state->m_palette_bank = data & 0x01;
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
@@ -111,17 +111,17 @@ WRITE8_HANDLER( mario_scroll_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	state->gfx_scroll = data + 17;
+	state->m_gfx_scroll = data + 17;
 }
 
 WRITE8_HANDLER( mario_flip_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->flip != (data & 0x01))
+	if (state->m_flip != (data & 0x01))
 	{
-		state->flip = data & 0x01;
-		if (state->flip)
+		state->m_flip = data & 0x01;
+		if (state->m_flip)
 			tilemap_set_flip_all(space->machine(), TILEMAP_FLIPX | TILEMAP_FLIPY);
 		else
 			tilemap_set_flip_all(space->machine(), 0);
@@ -132,10 +132,10 @@ WRITE8_HANDLER( mario_flip_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	mario_state	*state = machine.driver_data<mario_state>();
-	int code = state->videoram[tile_index] + 256 * state->gfx_bank;
+	int code = state->m_videoram[tile_index] + 256 * state->m_gfx_bank;
 	int color;
 
-	color =  ((state->videoram[tile_index] >> 2) & 0x38) | 0x40 | (state->palette_bank<<7) | (state->monitor<<8);
+	color =  ((state->m_videoram[tile_index] >> 2) & 0x38) | 0x40 | (state->m_palette_bank<<7) | (state->m_monitor<<8);
 	color = color >> 2;
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -144,16 +144,16 @@ VIDEO_START( mario )
 {
 	mario_state	*state = machine.driver_data<mario_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	state->gfx_bank = 0;
-	state->palette_bank = 0;
-	state->gfx_scroll = 0;
-	state->save_item(NAME(state->gfx_bank));
-	state->save_item(NAME(state->palette_bank));
-	state->save_item(NAME(state->gfx_scroll));
-	state->save_item(NAME(state->flip));
+	state->m_gfx_bank = 0;
+	state->m_palette_bank = 0;
+	state->m_gfx_scroll = 0;
+	state->save_item(NAME(state->m_gfx_bank));
+	state->save_item(NAME(state->m_palette_bank));
+	state->save_item(NAME(state->m_gfx_scroll));
+	state->save_item(NAME(state->m_flip));
 }
 
 /*
@@ -169,29 +169,29 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	mario_state	*state = machine.driver_data<mario_state>();
 	int offs;
 
-	for (offs = 0;offs < state->spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
 	{
-		if (state->spriteram[offs])
+		if (state->m_spriteram[offs])
 		{
 			int x, y;
 
 			// from schematics ....
-			y = (state->spriteram[offs] + (state->flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-			x = state->spriteram[offs+3];
+			y = (state->m_spriteram[offs] + (state->m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+			x = state->m_spriteram[offs+3];
 			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
 			y = 240 - y; /* logical screen position */
 
-			y = y ^ (state->flip ? 0xFF : 0x00); /* physical screen location */
-			x = x ^ (state->flip ? 0xFF : 0x00); /* physical screen location */
+			y = y ^ (state->m_flip ? 0xFF : 0x00); /* physical screen location */
+			x = x ^ (state->m_flip ? 0xFF : 0x00); /* physical screen location */
 
-			if (state->flip)
+			if (state->m_flip)
 			{
 				y -= 14;
 				x -= 7;
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-						state->spriteram[offs + 2],
-						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
-						!(state->spriteram[offs + 1] & 0x80),!(state->spriteram[offs + 1] & 0x40),
+						state->m_spriteram[offs + 2],
+						(state->m_spriteram[offs + 1] & 0x0f) + 16 * state->m_palette_bank + 32 * state->m_monitor,
+						!(state->m_spriteram[offs + 1] & 0x80),!(state->m_spriteram[offs + 1] & 0x40),
 						x, y,0);
 			}
 			else
@@ -199,9 +199,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				y += 1;
 				x -= 8;
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-						state->spriteram[offs + 2],
-						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
-						(state->spriteram[offs + 1] & 0x80),(state->spriteram[offs + 1] & 0x40),
+						state->m_spriteram[offs + 2],
+						(state->m_spriteram[offs + 1] & 0x0f) + 16 * state->m_palette_bank + 32 * state->m_monitor,
+						(state->m_spriteram[offs + 1] & 0x80),(state->m_spriteram[offs + 1] & 0x40),
 						x, y,0);
 			}
 		}
@@ -214,16 +214,16 @@ SCREEN_UPDATE( mario )
 	int t;
 
 	t = input_port_read(screen->machine(), "MONITOR");
-	if (t != state->monitor)
+	if (t != state->m_monitor)
 	{
-		state->monitor = t;
+		state->m_monitor = t;
 		tilemap_mark_all_tiles_dirty_all(screen->machine());
 	}
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ? (HTOTAL-HBSTART) : 0);
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->gfx_scroll - (state->flip ? 8 : 0));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_flip ? (HTOTAL-HBSTART) : 0);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_gfx_scroll - (state->m_flip ? 8 : 0));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;

@@ -46,7 +46,7 @@ static void set_pens( running_machine &machine )
 
 	for (i = 0; i < 0x400; i += 2)
 	{
-		UINT16 data = state->paletteram[i] | (state->paletteram[i | 1] << 8);
+		UINT16 data = state->m_paletteram[i] | (state->m_paletteram[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
@@ -58,7 +58,7 @@ static void set_pens( running_machine &machine )
 void jackal_mark_tile_dirty( running_machine &machine, int offset )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -76,7 +76,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( jackal )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -85,34 +85,34 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 	UINT8 *RAM = machine.region("master")->base();
 	int i;
 
-	state->scrollram = &RAM[0x0020];
+	state->m_scrollram = &RAM[0x0020];
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 1);
-	tilemap_set_scroll_cols(state->bg_tilemap, 1);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 1);
+	tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
 
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->videoctrl[0]);
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->videoctrl[1]);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_videoctrl[0]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_videoctrl[1]);
 
-	if (state->videoctrl[2] & 0x02)
+	if (state->m_videoctrl[2] & 0x02)
 	{
-		if (state->videoctrl[2] & 0x08)
+		if (state->m_videoctrl[2] & 0x08)
 		{
-			tilemap_set_scroll_rows(state->bg_tilemap, 32);
+			tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 
 			for (i = 0; i < 32; i++)
-				tilemap_set_scrollx(state->bg_tilemap, i, state->scrollram[i]);
+				tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_scrollram[i]);
 		}
 
-		if (state->videoctrl[2] & 0x04)
+		if (state->m_videoctrl[2] & 0x04)
 		{
-			tilemap_set_scroll_cols(state->bg_tilemap, 32);
+			tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
 
 			for (i = 0; i < 32; i++)
-				tilemap_set_scrolly(state->bg_tilemap, i, state->scrollram[i]);
+				tilemap_set_scrolly(state->m_bg_tilemap, i, state->m_scrollram[i]);
 		}
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 }
 
 #define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
@@ -207,7 +207,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	UINT8 *RAM = machine.region("master")->base();
 	UINT8 *sr, *ss;
 
-	if (state->videoctrl[0x03] & 0x08)
+	if (state->m_videoctrl[0x03] & 0x08)
 	{
 		sr = &RAM[0x03800];	// Sprite 2
 		ss = &RAM[0x13800];	// Additional Sprite 2

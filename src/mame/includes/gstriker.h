@@ -48,19 +48,19 @@ public:
 	gstriker_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 dmmy_8f_ret;
-	int pending_command;
-	UINT16 *work_ram;
-	int gametype;
-	UINT16 mcu_data;
-	UINT16 prot_reg[2];
-	UINT16 *lineram;
-	sVS920A VS920A[MAX_VS920A];
-	tMB60553 MB60553[MAX_MB60553];
-	tCG10103 CG10103[MAX_CG10103];
-	sVS920A* VS920A_cur_chip;
-	tMB60553 *MB60553_cur_chip;
-	tCG10103* CG10103_cur_chip;
+	UINT16 m_dmmy_8f_ret;
+	int m_pending_command;
+	UINT16 *m_work_ram;
+	int m_gametype;
+	UINT16 m_mcu_data;
+	UINT16 m_prot_reg[2];
+	UINT16 *m_lineram;
+	sVS920A m_VS920A[MAX_VS920A];
+	tMB60553 m_MB60553[MAX_MB60553];
+	tCG10103 m_CG10103[MAX_CG10103];
+	sVS920A* m_VS920A_cur_chip;
+	tMB60553 *m_MB60553_cur_chip;
+	tCG10103* m_CG10103_cur_chip;
 };
 
 

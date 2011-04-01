@@ -32,10 +32,10 @@ confirmed for m107 games as well.
 #include "sound/iremga20.h"
 
 
-#define M107_IRQ_0 ((state->irq_vectorbase+0)/4) /* VBL interrupt*/
-#define M107_IRQ_1 ((state->irq_vectorbase+4)/4) /* ??? */
-#define M107_IRQ_2 ((state->irq_vectorbase+8)/4) /* Raster interrupt */
-#define M107_IRQ_3 ((state->irq_vectorbase+12)/4) /* ??? */
+#define M107_IRQ_0 ((state->m_irq_vectorbase+0)/4) /* VBL interrupt*/
+#define M107_IRQ_1 ((state->m_irq_vectorbase+4)/4) /* ??? */
+#define M107_IRQ_2 ((state->m_irq_vectorbase+8)/4) /* Raster interrupt */
+#define M107_IRQ_3 ((state->m_irq_vectorbase+12)/4) /* ??? */
 
 
 
@@ -56,13 +56,13 @@ static WRITE16_HANDLER( bankswitch_w )
 static MACHINE_START( m107 )
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(m107_scanline_interrupt));
+	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(m107_scanline_interrupt));
 }
 
 static MACHINE_RESET( m107 )
 {
 	m107_state *state = machine.driver_data<m107_state>();
-	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 /*****************************************************************************/
@@ -73,7 +73,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	int scanline = param;
 
 	/* raster interrupt */
-	if (scanline == state->raster_irq_position)
+	if (scanline == state->m_raster_irq_position)
 	{
 		machine.primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M107_IRQ_2);
@@ -89,7 +89,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine.primary_screen->height())
 		scanline = 0;
-	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -112,19 +112,19 @@ static TIMER_CALLBACK( setvector_callback )
 
 	switch(param)
 	{
-		case VECTOR_INIT:	state->irqvector = 0;		break;
-		case YM2151_ASSERT:	state->irqvector |= 0x2;	break;
-		case YM2151_CLEAR:	state->irqvector &= ~0x2;	break;
-		case V30_ASSERT:	state->irqvector |= 0x1;	break;
-		case V30_CLEAR:		state->irqvector &= ~0x1;	break;
+		case VECTOR_INIT:	state->m_irqvector = 0;		break;
+		case YM2151_ASSERT:	state->m_irqvector |= 0x2;	break;
+		case YM2151_CLEAR:	state->m_irqvector &= ~0x2;	break;
+		case V30_ASSERT:	state->m_irqvector |= 0x1;	break;
+		case V30_CLEAR:		state->m_irqvector &= ~0x1;	break;
 	}
 
-	if (state->irqvector & 0x2)		/* YM2151 has precedence */
+	if (state->m_irqvector & 0x2)		/* YM2151 has precedence */
 		device_set_input_line_vector(machine.device("soundcpu"), 0, 0x18);
-	else if (state->irqvector & 0x1)	/* V30 */
+	else if (state->m_irqvector & 0x1)	/* V30 */
 		device_set_input_line_vector(machine.device("soundcpu"), 0, 0x19);
 
-	if (state->irqvector == 0)	/* no IRQs pending */
+	if (state->m_irqvector == 0)	/* no IRQs pending */
 		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 	else	/* IRQ pending */
 		cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
@@ -141,7 +141,7 @@ static WRITE16_HANDLER( m107_soundlatch_w )
 static READ16_HANDLER( m107_sound_status_r )
 {
 	m107_state *state = space->machine().driver_data<m107_state>();
-	return state->sound_status;
+	return state->m_sound_status;
 }
 
 static READ16_HANDLER( m107_soundlatch_r )
@@ -157,7 +157,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	m107_state *state = space->machine().driver_data<m107_state>();
-	COMBINE_DATA(&state->sound_status);
+	COMBINE_DATA(&state->m_sound_status);
 	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, M107_IRQ_3);
 }
 
@@ -171,9 +171,9 @@ static WRITE16_HANDLER( m107_sound_reset_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE_MEMBER(m107_state, vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE_MEMBER(m107_state, m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE_MEMBER(m107_state, spriteram)
+	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE_MEMBER(m107_state, m_spriteram)
 	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -1023,8 +1023,8 @@ static DRIVER_INIT( firebarr )
 	RAM = machine.region("soundcpu")->base();
 	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	state->irq_vectorbase = 0x20;
-	state->spritesystem = 1;
+	state->m_irq_vectorbase = 0x20;
+	state->m_spritesystem = 1;
 }
 
 static DRIVER_INIT( dsoccr94 )
@@ -1038,8 +1038,8 @@ static DRIVER_INIT( dsoccr94 )
 	RAM = machine.region("soundcpu")->base();
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	state->irq_vectorbase = 0x80;
-	state->spritesystem = 0;
+	state->m_irq_vectorbase = 0x80;
+	state->m_spritesystem = 0;
 }
 
 static DRIVER_INIT( wpksoc )
@@ -1054,8 +1054,8 @@ static DRIVER_INIT( wpksoc )
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
 
-	state->irq_vectorbase = 0x80;
-	state->spritesystem = 0;
+	state->m_irq_vectorbase = 0x80;
+	state->m_spritesystem = 0;
 }
 
 /***************************************************************************/

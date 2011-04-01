@@ -29,8 +29,8 @@ static void draw_layer( running_machine &machine, bitmap_t *bitmap, const rectan
 				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = state->videoram[base + 2 * y + 1];
-			code = state->videoram[base + 2 * y] + ((attr & 0x0f) << 8);
+			attr = state->m_videoram[base + 2 * y + 1];
+			code = state->m_videoram[base + 2 * y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
@@ -57,30 +57,30 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_t *bitmap, cons
 	initoffs = offs;
 	globalscrollx = 0;
 
-	id = state->scrollram[offs + 2];
+	id = state->m_scrollram[offs + 2];
 
 	for( ; offs < 0x400; offs += 4)
 	{
 		int base, y, sx, sy, code, color;
 
 		 //id change
-		if (id != state->scrollram[offs + 2])
+		if (id != state->m_scrollram[offs + 2])
 		{
 			*previd = id;
 			return offs;
 		}
 		else
 		{
-			id = state->scrollram[offs + 2];
+			id = state->m_scrollram[offs + 2];
 		}
 
 		//skip empty (??) column, potential probs with 1st column in scrollram (scroll 0, tile 0, id 0)
-		if ((state->scrollram[offs + 0] | state->scrollram[offs + 1] | state->scrollram[offs + 2] | state->scrollram[offs + 3]) == 0)
+		if ((state->m_scrollram[offs + 0] | state->m_scrollram[offs + 1] | state->m_scrollram[offs + 2] | state->m_scrollram[offs + 3]) == 0)
 			continue;
 
 		//local scroll x/y
-		scrolly = -state->scrollram[offs + 0];
-		scrollx =  state->scrollram[offs + 3];
+		scrolly = -state->m_scrollram[offs + 0];
+		scrollx =  state->m_scrollram[offs + 3];
 
 		//check for global x scroll used in bg layer in game (starts at offset 0 in scrollram
 		// and game name/logo on title screen (starts in the middle of scrollram, but with different
@@ -99,7 +99,7 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_t *bitmap, cons
 			}
 		}
 
-		base = 64 * state->scrollram[offs + 1];
+		base = 64 * state->m_scrollram[offs + 1];
 		sx = scrollx + stepx;
 
 		if (flip_screen_get(machine))
@@ -115,8 +115,8 @@ static int draw_layer_daikaiju( running_machine &machine, bitmap_t *bitmap, cons
 				sy = 248 - sy;
 			sy &= 0xff;
 
-			attr = state->videoram[base + 2 * y + 1];
-			code = state->videoram[base + 2 * y] + ((attr & 0x0f) << 8);
+			attr = state->m_videoram[base + 2 * y + 1];
+			code = state->m_videoram[base + 2 * y] + ((attr & 0x0f) << 8);
 			color = attr >> 4;
 
 			if ((type == 0 && color != 0x0d) || (type != 0 && color == 0x0d))
@@ -146,13 +146,13 @@ static void drawbg( running_machine &machine, bitmap_t *bitmap, const rectangle 
 
 	while (i < 0x400)
 	{
-		if (!(state->scrollram[i + 2] & 1))
+		if (!(state->m_scrollram[i + 2] & 1))
 		{
 			i = draw_layer_daikaiju(machine, bitmap, cliprect, i, &id, type);
 		}
 		else
 		{
-			id = state->scrollram[i + 2];
+			id = state->m_scrollram[i + 2];
 			i += 4;
 		}
 	}
@@ -161,10 +161,10 @@ static void drawbg( running_machine &machine, bitmap_t *bitmap, const rectangle 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, attr, code, color, flipx, flipy;
 
@@ -203,10 +203,10 @@ SCREEN_UPDATE( lsasquad )
 	lsasquad_state *state = screen->machine().driver_data<lsasquad_state>();
 	bitmap_fill(bitmap, cliprect, 511);
 
-	draw_layer(screen->machine(), bitmap, cliprect, state->scrollram + 0x000);
-	draw_layer(screen->machine(), bitmap, cliprect, state->scrollram + 0x080);
+	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x000);
+	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x080);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	draw_layer(screen->machine(), bitmap, cliprect, state->scrollram + 0x100);
+	draw_layer(screen->machine(), bitmap, cliprect, state->m_scrollram + 0x100);
 	return 0;
 }
 

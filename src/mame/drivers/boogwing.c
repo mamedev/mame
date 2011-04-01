@@ -109,14 +109,14 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf1_rowscroll)
-	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf2_rowscroll)
+	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf1_rowscroll)
+	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf2_rowscroll)
 
 	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf1_data_w)
 	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf2_data_w)
-	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf3_rowscroll)
-	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf4_rowscroll)
+	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf3_rowscroll)
+	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf4_rowscroll)
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
@@ -277,14 +277,14 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	boogwing_state *driver_state = device->machine().driver_data<boogwing_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	boogwing_state *state = device->machine().driver_data<boogwing_state>();
-	state->oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
-	state->oki1->set_bank_base((data & 1) * 0x40000);
+	state->m_oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
+	state->m_oki1->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

@@ -21,7 +21,7 @@ public:
 	intrscti_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
+	UINT8 *m_ram;
 };
 
 
@@ -33,7 +33,7 @@ static READ8_HANDLER( unk_r )
 static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(intrscti_state, ram) // video ram
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(intrscti_state, m_ram) // video ram
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -80,7 +80,7 @@ static SCREEN_UPDATE(intrscti)
 		for (x=0;x<32;x++)
 		{
 			int dat;
-			dat = state->ram[count];
+			dat = state->m_ram[count];
 			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}

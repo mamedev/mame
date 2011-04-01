@@ -4,22 +4,22 @@ public:
 	popeye_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 prot0;
-	UINT8 prot1;
-	UINT8 prot_shift;
-	int dswbit;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *background_pos;
-	UINT8 *palettebank;
-	UINT8 *bitmapram;
-	bitmap_t *tmpbitmap2;
-	UINT8 invertmask;
-	UINT8 bitmap_type;
-	tilemap_t *fg_tilemap;
-	UINT8 lastflip;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 m_prot0;
+	UINT8 m_prot1;
+	UINT8 m_prot_shift;
+	int m_dswbit;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_background_pos;
+	UINT8 *m_palettebank;
+	UINT8 *m_bitmapram;
+	bitmap_t *m_tmpbitmap2;
+	UINT8 m_invertmask;
+	UINT8 m_bitmap_type;
+	tilemap_t *m_fg_tilemap;
+	UINT8 m_lastflip;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

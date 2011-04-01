@@ -25,26 +25,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  main_ram;
-	UINT8 *  videoram;
-	UINT8 *  spriteram;
-	size_t   videoram_size;
-	size_t   spriteram_size;
+	UINT8 *  m_main_ram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_spriteram;
+	size_t   m_videoram_size;
+	size_t   m_spriteram_size;
 
 	/* video-related */
-	UINT8    cocktail_flip;
-	UINT8    char_palette, sprite_palette;
-	UINT8    char_bank;
-	UINT16   *background_gfx[4];
-	UINT8    *background_mixer;
-	UINT8    background_latches[13];
+	UINT8    m_cocktail_flip;
+	UINT8    m_char_palette;
+	UINT8    m_sprite_palette;
+	UINT8    m_char_bank;
+	UINT16   *m_background_gfx[4];
+	UINT8    *m_background_mixer;
+	UINT8    m_background_latches[13];
 
 	/* protection? */
-	UINT8 porta;
-	UINT8 portb;
+	UINT8 m_porta;
+	UINT8 m_portb;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 

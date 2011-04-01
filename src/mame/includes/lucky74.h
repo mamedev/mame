@@ -4,20 +4,20 @@ public:
 	lucky74_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 ym2149_portb;
-	UINT8 usart_8251;
-	UINT8 copro_sm7831;
-	int adpcm_pos;
-	int adpcm_end;
-	int adpcm_data;
-	UINT8 adpcm_reg[6];
-	UINT8 adpcm_busy_line;
-	UINT8 *fg_videoram;
-	UINT8 *fg_colorram;
-	UINT8 *bg_videoram;
-	UINT8 *bg_colorram;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
+	UINT8 m_ym2149_portb;
+	UINT8 m_usart_8251;
+	UINT8 m_copro_sm7831;
+	int m_adpcm_pos;
+	int m_adpcm_end;
+	int m_adpcm_data;
+	UINT8 m_adpcm_reg[6];
+	UINT8 m_adpcm_busy_line;
+	UINT8 *m_fg_videoram;
+	UINT8 *m_fg_colorram;
+	UINT8 *m_bg_videoram;
+	UINT8 *m_bg_colorram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
 };
 
 

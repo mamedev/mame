@@ -39,17 +39,17 @@ static UINT8 amspdwy_wheel_r( running_machine &machine, int index )
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
 	UINT8 wheel = input_port_read(machine, portnames[2 + index]);
-	if (wheel != state->wheel_old[index])
+	if (wheel != state->m_wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
-		if (wheel > state->wheel_old[index])
-		state->wheel_return[index] = ((+wheel) & 0xf) | 0x00;
+		if (wheel > state->m_wheel_old[index])
+		state->m_wheel_return[index] = ((+wheel) & 0xf) | 0x00;
 		else
-		state->wheel_return[index] = ((-wheel) & 0xf) | 0x10;
+		state->m_wheel_return[index] = ((-wheel) & 0xf) | 0x10;
 
-	state->wheel_old[index] = wheel;
+	state->m_wheel_old[index] = wheel;
 	}
-	return state->wheel_return[index] | input_port_read(machine, portnames[index]);
+	return state->m_wheel_return[index] | input_port_read(machine, portnames[index]);
 }
 
 static READ8_HANDLER( amspdwy_wheel_0_r )
@@ -71,14 +71,14 @@ static WRITE8_HANDLER( amspdwy_sound_w )
 {
 	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												// ROM
 	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_BASE_GENERIC(paletteram)// Palette
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_MEMBER(amspdwy_state, videoram)	// Layer, mirrored?
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE_MEMBER(amspdwy_state, colorram)	// Layer
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_MEMBER(amspdwy_state, m_videoram)	// Layer, mirrored?
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE_MEMBER(amspdwy_state, m_colorram)	// Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM												// Unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
 	AM_RANGE(0xb400, 0xb400) AM_DEVREAD("ymsnd", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_MEMBER(amspdwy_state, spriteram, spriteram_size)// Sprites
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_MEMBER(amspdwy_state, m_spriteram, m_spriteram_size)// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END
 
@@ -242,7 +242,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	amspdwy_state *state = device->machine().driver_data<amspdwy_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =
@@ -254,21 +254,21 @@ static MACHINE_START( amspdwy )
 {
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->wheel_old));
-	state->save_item(NAME(state->wheel_return));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_wheel_old));
+	state->save_item(NAME(state->m_wheel_return));
 }
 
 static MACHINE_RESET( amspdwy )
 {
 	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	state->flipscreen = 0;
-	state->wheel_old[0] = 0;
-	state->wheel_old[1] = 0;
-	state->wheel_return[0] = 0;
-	state->wheel_return[1] = 0;
+	state->m_flipscreen = 0;
+	state->m_wheel_old[0] = 0;
+	state->m_wheel_old[1] = 0;
+	state->m_wheel_return[0] = 0;
+	state->m_wheel_return[1] = 0;
 }
 
 static MACHINE_CONFIG_START( amspdwy, amspdwy_state )

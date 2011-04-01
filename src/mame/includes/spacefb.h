@@ -30,16 +30,16 @@ public:
 	spacefb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 sound_latch;
-	emu_timer *interrupt_timer;
-	UINT8 *videoram;
-	size_t videoram_size;
-	UINT8 *object_present_map;
-	UINT8 port_0;
-	UINT8 port_2;
-	UINT32 star_shift_reg;
-	double color_weights_rg[3];
-	double color_weights_b[2];
+	UINT8 m_sound_latch;
+	emu_timer *m_interrupt_timer;
+	UINT8 *m_videoram;
+	size_t m_videoram_size;
+	UINT8 *m_object_present_map;
+	UINT8 m_port_0;
+	UINT8 m_port_2;
+	UINT32 m_star_shift_reg;
+	double m_color_weights_rg[3];
+	double m_color_weights_b[2];
 };
 
 

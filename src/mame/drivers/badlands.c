@@ -179,8 +179,8 @@ Measurements -
 static void update_interrupts(running_machine &machine)
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -202,7 +202,7 @@ static MACHINE_START( badlands )
 
 	atarigen_init(machine);
 
-	state->save_item(NAME(state->pedal_value));
+	state->save_item(NAME(state->m_pedal_value));
 }
 
 
@@ -210,14 +210,14 @@ static MACHINE_RESET( badlands )
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
 
-	state->pedal_value[0] = state->pedal_value[1] = 0x80;
+	state->m_pedal_value[0] = state->m_pedal_value[1] = 0x80;
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
 	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 32);
 
 	atarigen_sound_io_reset(machine.device("audiocpu"));
-	memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
+	memcpy(state->m_bank_base, &state->m_bank_source_data[0x0000], 0x1000);
 }
 
 
@@ -237,9 +237,9 @@ static INTERRUPT_GEN( vblank_int )
 	/* update the pedals once per frame */
 	for (i = 0; i < 2; i++)
 	{
-		state->pedal_value[i]--;
+		state->m_pedal_value[i]--;
 		if (pedal_state & (1 << i))
-			state->pedal_value[i]++;
+			state->m_pedal_value[i]++;
 	}
 
 	atarigen_video_int_gen(device);
@@ -257,7 +257,7 @@ static READ16_HANDLER( sound_busy_r )
 {
 	badlands_state *state = space->machine().driver_data<badlands_state>();
 	int temp = 0xfeff;
-	if (state->cpu_to_sound_ready) temp ^= 0x0100;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x0100;
 	return temp;
 }
 
@@ -265,14 +265,14 @@ static READ16_HANDLER( sound_busy_r )
 static READ16_HANDLER( pedal_0_r )
 {
 	badlands_state *state = space->machine().driver_data<badlands_state>();
-	return state->pedal_value[0];
+	return state->m_pedal_value[0];
 }
 
 
 static READ16_HANDLER( pedal_1_r )
 {
 	badlands_state *state = space->machine().driver_data<badlands_state>();
-	return state->pedal_value[1];
+	return state->m_pedal_value[1];
 }
 
 
@@ -311,8 +311,8 @@ static READ8_HANDLER( audio_io_r )
             */
 			result = input_port_read(space->machine(), "AUDIO");
 			if (!(input_port_read(space->machine(), "FE4000") & 0x0080)) result ^= 0x90;
-			if (state->cpu_to_sound_ready) result ^= 0x40;
-			if (state->sound_to_cpu_ready) result ^= 0x20;
+			if (state->m_cpu_to_sound_ready) result ^= 0x40;
+			if (state->m_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
 			break;
 
@@ -368,7 +368,7 @@ static WRITE8_HANDLER( audio_io_w )
             */
 
 			/* update the bank */
-			memcpy(state->bank_base, &state->bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
+			memcpy(state->m_bank_base, &state->m_bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
 			break;
 	}
 }
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(badlands_state, playfield)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(badlands_state, m_playfield)
 	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM_WRITE(atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -591,8 +591,8 @@ static DRIVER_INIT( badlands )
 	badlands_state *state = machine.driver_data<badlands_state>();
 
 	/* initialize the audio system */
-	state->bank_base = &machine.region("audiocpu")->base()[0x03000];
-	state->bank_source_data = &machine.region("audiocpu")->base()[0x10000];
+	state->m_bank_base = &machine.region("audiocpu")->base()[0x03000];
+	state->m_bank_source_data = &machine.region("audiocpu")->base()[0x10000];
 }
 
 
@@ -659,7 +659,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(badlands_state, playfield)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(badlands_state, m_playfield)
 	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM_WRITE(atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -684,7 +684,7 @@ GFXDECODE_END
 static void update_interrupts_bootleg(running_machine &machine)
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -702,14 +702,14 @@ static void scanline_update_bootleg(screen_device &screen, int scanline)
 static MACHINE_RESET( badlandsb )
 {
 	badlands_state *state = machine.driver_data<badlands_state>();
-//  state->pedal_value[0] = state->pedal_value[1] = 0x80;
+//  state->m_pedal_value[0] = state->m_pedal_value[1] = 0x80;
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts_bootleg);
 	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update_bootleg, 32);
 
 //  atarigen_sound_io_reset(machine.device("audiocpu"));
-//  memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
+//  memcpy(state->m_bank_base, &state->m_bank_source_data[0x0000], 0x1000);
 }
 
 static MACHINE_CONFIG_START( badlandsb, badlands_state )

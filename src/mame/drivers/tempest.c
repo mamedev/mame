@@ -292,7 +292,7 @@ public:
 	tempest_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 player_select;
+	UINT8 m_player_select;
 };
 
 
@@ -309,7 +309,7 @@ public:
 static MACHINE_START( tempest )
 {
 	tempest_state *state = machine.driver_data<tempest_state>();
-	state->save_item(NAME(state->player_select));
+	state->save_item(NAME(state->m_player_select));
 }
 
 /*************************************
@@ -333,14 +333,14 @@ static WRITE8_HANDLER( wdclr_w )
 static CUSTOM_INPUT( tempest_knob_r )
 {
 	tempest_state *state = field->port->machine().driver_data<tempest_state>();
-	return input_port_read(field->port->machine(), (state->player_select == 0) ?
+	return input_port_read(field->port->machine(), (state->m_player_select == 0) ?
 										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
 static CUSTOM_INPUT( tempest_buttons_r )
 {
 	tempest_state *state = field->port->machine().driver_data<tempest_state>();
-	return input_port_read(field->port->machine(), (state->player_select == 0) ?
+	return input_port_read(field->port->machine(), (state->m_player_select == 0) ?
 										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 
@@ -377,7 +377,7 @@ static WRITE8_HANDLER( tempest_led_w )
 	set_led_status(space->machine(), 0, ~data & 0x02);
 	set_led_status(space->machine(), 1, ~data & 0x01);
 	/* FLIP is bit 0x04 */
-	state->player_select = data & 0x04;
+	state->m_player_select = data & 0x04;
 }
 
 

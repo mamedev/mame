@@ -4,17 +4,17 @@ public:
 	snk68_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int invert_controls;
-	int sound_status;
+	int m_invert_controls;
+	int m_sound_status;
 
-	UINT16* pow_fg_videoram;
+	UINT16* m_pow_fg_videoram;
 
-	UINT16 *spriteram;
-	UINT16 *paletteram;
-	int sprite_flip_axis;
-	tilemap_t *fg_tilemap;
-	int flipscreen;
-	UINT32 fg_tile_offset;
+	UINT16 *m_spriteram;
+	UINT16 *m_paletteram;
+	int m_sprite_flip_axis;
+	tilemap_t *m_fg_tilemap;
+	int m_flipscreen;
+	UINT32 m_fg_tile_offset;
 };
 
 

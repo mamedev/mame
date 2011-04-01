@@ -4,18 +4,18 @@ public:
 	sspeedr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 led_TIME[2];
-	UINT8 led_SCORE[24];
-	int toggle;
-	unsigned driver_horz;
-	unsigned driver_vert;
-	unsigned driver_pic;
-	unsigned drones_horz;
-	unsigned drones_vert[3];
-	unsigned drones_mask;
-	unsigned track_horz;
-	unsigned track_vert[2];
-	unsigned track_ice;
+	UINT8 m_led_TIME[2];
+	UINT8 m_led_SCORE[24];
+	int m_toggle;
+	unsigned m_driver_horz;
+	unsigned m_driver_vert;
+	unsigned m_driver_pic;
+	unsigned m_drones_horz;
+	unsigned m_drones_vert[3];
+	unsigned m_drones_mask;
+	unsigned m_track_horz;
+	unsigned m_track_vert[2];
+	unsigned m_track_ice;
 };
 
 

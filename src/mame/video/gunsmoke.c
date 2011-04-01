@@ -61,15 +61,15 @@ PALETTE_INIT( gunsmoke )
 WRITE8_HANDLER( gunsmoke_videoram_w )
 {
 	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gunsmoke_colorram_w )
 {
 	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gunsmoke_c804_w )
@@ -89,7 +89,7 @@ WRITE8_HANDLER( gunsmoke_c804_w )
 	flip_screen_set(space->machine(), data & 0x40);
 
 	/* bit 7 enables characters? */
-	state->chon = data & 0x80;
+	state->m_chon = data & 0x80;
 }
 
 WRITE8_HANDLER( gunsmoke_d806_w )
@@ -97,13 +97,13 @@ WRITE8_HANDLER( gunsmoke_d806_w )
 	gunsmoke_state *state = space->machine().driver_data<gunsmoke_state>();
 
 	/* bits 0-2 select the sprite 3 bank */
-	state->sprite3bank = data & 0x07;
+	state->m_sprite3bank = data & 0x07;
 
 	/* bit 4 enables bg 1? */
-	state->bgon = data & 0x10;
+	state->m_bgon = data & 0x10;
 
 	/* bit 5 enables sprites? */
-	state->objon = data & 0x20;
+	state->m_objon = data & 0x20;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -122,8 +122,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + ((attr & 0xe0) << 2);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0xe0) << 2);
 	int color = attr & 0x1f;
 
 	tileinfo->group = color;
@@ -134,19 +134,19 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( gunsmoke )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 0x4f);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x4f);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32)
+	for (offs = state->m_spriteram_size - 32; offs >= 0; offs -= 32)
 	{
 		int attr = spriteram[offs + 1];
 		int bank = (attr & 0xc0) >> 6;
@@ -158,7 +158,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		int sy = spriteram[offs + 2];
 
 		if (bank == 3)
-			bank += state->sprite3bank;
+			bank += state->m_sprite3bank;
 
 		code += 256 * bank;
 
@@ -177,19 +177,19 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( gunsmoke )
 {
 	gunsmoke_state *state = screen->machine().driver_data<gunsmoke_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0]);
 
-	if (state->bgon)
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	if (state->m_bgon)
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	if (state->objon)
+	if (state->m_objon)
 		draw_sprites(screen->machine(), bitmap, cliprect);
 
-	if (state->chon)
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	if (state->m_chon)
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }

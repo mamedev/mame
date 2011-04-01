@@ -78,40 +78,40 @@ public:
 	multigam_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* nt_ram;
-	UINT8* vram;
-	UINT8* nt_page[4];
-	UINT32 in_0;
-	UINT32 in_1;
-	UINT32 in_0_shift;
-	UINT32 in_1_shift;
-	UINT32 in_dsw;
-	UINT32 in_dsw_shift;
-	int game_gfx_bank;
-	int multigam3_mmc3_scanline_counter;
-	int multigam3_mmc3_scanline_latch;
-	int multigam3_mmc3_banks[2];
-	int multigam3_mmc3_4screen;
-	int multigam3_mmc3_last_bank;
-	UINT8* multigmc_mmc3_6000_ram;
-	UINT8* multigam3_mmc3_prg_base;
-	int multigam3_mmc3_prg_size;
-	int multigam3_mmc3_chr_bank_base;
-	int multigam3_mmc3_command;
-	UINT8* mapper02_prg_base;
-	int mapper02_prg_size;
-	int mmc1_shiftreg;
-	int mmc1_shiftcount;
-	int mmc1_rom_mask;
-	UINT8* mmc1_prg_base;
-	int mmc1_prg_size;
-	int mmc1_chr_bank_base;
-	int mmc1_reg_write_enable;
-	int size16k;
-	int switchlow;
-	int vrom4k;
-	UINT8 supergm3_prg_bank;
-	UINT8 supergm3_chr_bank;
+	UINT8* m_nt_ram;
+	UINT8* m_vram;
+	UINT8* m_nt_page[4];
+	UINT32 m_in_0;
+	UINT32 m_in_1;
+	UINT32 m_in_0_shift;
+	UINT32 m_in_1_shift;
+	UINT32 m_in_dsw;
+	UINT32 m_in_dsw_shift;
+	int m_game_gfx_bank;
+	int m_multigam3_mmc3_scanline_counter;
+	int m_multigam3_mmc3_scanline_latch;
+	int m_multigam3_mmc3_banks[2];
+	int m_multigam3_mmc3_4screen;
+	int m_multigam3_mmc3_last_bank;
+	UINT8* m_multigmc_mmc3_6000_ram;
+	UINT8* m_multigam3_mmc3_prg_base;
+	int m_multigam3_mmc3_prg_size;
+	int m_multigam3_mmc3_chr_bank_base;
+	int m_multigam3_mmc3_command;
+	UINT8* m_mapper02_prg_base;
+	int m_mapper02_prg_size;
+	int m_mmc1_shiftreg;
+	int m_mmc1_shiftcount;
+	int m_mmc1_rom_mask;
+	UINT8* m_mmc1_prg_base;
+	int m_mmc1_prg_size;
+	int m_mmc1_chr_bank_base;
+	int m_mmc1_reg_write_enable;
+	int m_size16k;
+	int m_switchlow;
+	int m_vrom4k;
+	UINT8 m_supergm3_prg_bank;
+	UINT8 m_supergm3_chr_bank;
 };
 
 
@@ -127,29 +127,29 @@ static void set_mirroring(multigam_state *state, int mirroring)
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram;
+		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram;
 		break;
 	case PPU_MIRROR_HIGH:
-		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram;
-		state->nt_page[2] = state->nt_ram + 0x400;
-		state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram;
+		state->m_nt_page[2] = state->m_nt_ram + 0x400;
+		state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram + 0x400;
-		state->nt_page[2] = state->nt_ram;
-		state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram + 0x400;
+		state->m_nt_page[2] = state->m_nt_ram;
+		state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram + 0x400;
-		state->nt_page[2] = state->nt_ram + 0x800;
-		state->nt_page[3] = state->nt_ram + 0xc00;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram + 0x400;
+		state->m_nt_page[2] = state->m_nt_ram + 0x800;
+		state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 		break;
 	}
 }
@@ -158,7 +158,7 @@ static WRITE8_HANDLER (multigam_nt_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	int page = ((offset & 0xc00) >> 10);
-	state->nt_page[page][offset & 0x3ff] = data;
+	state->m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
@@ -166,7 +166,7 @@ static READ8_HANDLER (multigam_nt_r)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	int page = ((offset & 0xc00) >> 10);
-	return state->nt_page[page][offset & 0x3ff];
+	return state->m_nt_page[page][offset & 0x3ff];
 }
 
 static const char * const banknames[] = { "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8", "bank9" };
@@ -192,7 +192,7 @@ static void set_videoram_bank(running_machine& machine, int start, int count, in
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		memory_set_bankptr(machine, banknames[i + start], state->vram + offset);
+		memory_set_bankptr(machine, banknames[i + start], state->m_vram + offset);
 	}
 }
 
@@ -233,7 +233,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static READ8_HANDLER( multigam_IN0_r )
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	return ((state->in_0 >> state->in_0_shift++) & 0x01) | 0x40;
+	return ((state->m_in_0 >> state->m_in_0_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( multigam_IN0_w )
@@ -244,20 +244,20 @@ static WRITE8_HANDLER( multigam_IN0_w )
 		return;
 	}
 
-	state->in_0_shift = 0;
-	state->in_1_shift = 0;
+	state->m_in_0_shift = 0;
+	state->m_in_1_shift = 0;
 
-	state->in_0 = input_port_read(space->machine(), "P1");
-	state->in_1 = input_port_read(space->machine(), "P2");
+	state->m_in_0 = input_port_read(space->machine(), "P1");
+	state->m_in_1 = input_port_read(space->machine(), "P2");
 
-	state->in_dsw_shift = 0;
-	state->in_dsw = input_port_read_safe(space->machine(), "DSW", 0);
+	state->m_in_dsw_shift = 0;
+	state->m_in_dsw = input_port_read_safe(space->machine(), "DSW", 0);
 }
 
 static READ8_HANDLER( multigam_IN1_r )
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	return ((state->in_1 >> state->in_1_shift++) & 0x01) | 0x40;
+	return ((state->m_in_1 >> state->m_in_1_shift++) & 0x01) | 0x40;
 }
 
 static CUSTOM_INPUT( multigam_inputs_r )
@@ -265,7 +265,7 @@ static CUSTOM_INPUT( multigam_inputs_r )
 	multigam_state *state = field->port->machine().driver_data<multigam_state>();
 	/* bit 0: serial input (dsw)
        bit 1: coin */
-	return (state->in_dsw >> state->in_dsw_shift++) & 0x01;
+	return (state->m_in_dsw >> state->m_in_dsw_shift++) & 0x01;
 }
 
 
@@ -302,16 +302,16 @@ static WRITE8_HANDLER(multigam_switch_gfx_rom)
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	memory_set_bankptr(space->machine(), "bank1", space->machine().region("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(state, data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	state->game_gfx_bank = data;
+	state->m_game_gfx_bank = data;
 };
 
 
 static WRITE8_HANDLER(multigam_mapper2_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	if (state->game_gfx_bank & 0x80)
+	if (state->m_game_gfx_bank & 0x80)
 	{
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("gfx1")->base() + (0x2000 * ((data & 0x3) + (state->game_gfx_bank & 0x3c))));
+		memory_set_bankptr(space->machine(), "bank1", space->machine().region("gfx1")->base() + (0x2000 * ((data & 0x3) + (state->m_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -373,9 +373,9 @@ static void multigam3_mmc3_scanline_cb( device_t *device, int scanline, int vbla
 	multigam_state *state = device->machine().driver_data<multigam_state>();
 	if (!vblank && !blanked)
 	{
-		if (--state->multigam3_mmc3_scanline_counter == -1)
+		if (--state->m_multigam3_mmc3_scanline_counter == -1)
 		{
-			state->multigam3_mmc3_scanline_counter = state->multigam3_mmc3_scanline_latch;
+			state->m_multigam3_mmc3_scanline_counter = state->m_multigam3_mmc3_scanline_latch;
 			generic_pulse_irq_line(device->machine().device("maincpu"), 0);
 		}
 	}
@@ -387,48 +387,48 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 	device_t *ppu = space->machine().device("ppu");
 
 	/* basically, a MMC3 mapper from the nes */
-	int bankmask = state->multigam3_mmc3_prg_size == 0x40000 ? 0x1f : 0x0f;
+	int bankmask = state->m_multigam3_mmc3_prg_size == 0x40000 ? 0x1f : 0x0f;
 
 	switch(offset & 0x7001)
 	{
 		case 0x0000:
-			state->multigam3_mmc3_command = data;
+			state->m_multigam3_mmc3_command = data;
 
-			if (state->multigam3_mmc3_last_bank != (data & 0xc0))
+			if (state->m_multigam3_mmc3_last_bank != (data & 0xc0))
 			{
 				int bank;
 				UINT8 *prg = space->machine().region("maincpu")->base();
 
 				/* reset the banks */
-				if (state->multigam3_mmc3_command & 0x40)
+				if (state->m_multigam3_mmc3_command & 0x40)
 				{
 					/* high bank */
-					bank = (state->multigam3_mmc3_banks[0] & bankmask) * 0x2000;
+					bank = (state->m_multigam3_mmc3_banks[0] & bankmask) * 0x2000;
 
-					memcpy(&prg[0x0c000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
-					memcpy(&prg[0x08000], &state->multigam3_mmc3_prg_base[state->multigam3_mmc3_prg_size - 0x4000], 0x2000);
+					memcpy(&prg[0x0c000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
+					memcpy(&prg[0x08000], &state->m_multigam3_mmc3_prg_base[state->m_multigam3_mmc3_prg_size - 0x4000], 0x2000);
 				}
 				else
 				{
 					/* low bank */
-					bank = (state->multigam3_mmc3_banks[0] & bankmask) * 0x2000;
+					bank = (state->m_multigam3_mmc3_banks[0] & bankmask) * 0x2000;
 
-					memcpy(&prg[0x08000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
-					memcpy(&prg[0x0c000], &state->multigam3_mmc3_prg_base[state->multigam3_mmc3_prg_size - 0x4000], 0x2000);
+					memcpy(&prg[0x08000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
+					memcpy(&prg[0x0c000], &state->m_multigam3_mmc3_prg_base[state->m_multigam3_mmc3_prg_size - 0x4000], 0x2000);
 				}
 
 				/* mid bank */
-				bank = (state->multigam3_mmc3_banks[1] & bankmask) * 0x2000;
-				memcpy(&prg[0x0a000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
+				bank = (state->m_multigam3_mmc3_banks[1] & bankmask) * 0x2000;
+				memcpy(&prg[0x0a000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
 
-				state->multigam3_mmc3_last_bank = data & 0xc0;
+				state->m_multigam3_mmc3_last_bank = data & 0xc0;
 			}
 		break;
 
 		case 0x0001:
 			{
-				UINT8 cmd = state->multigam3_mmc3_command & 0x07;
-				int page = (state->multigam3_mmc3_command & 0x80) >> 5;
+				UINT8 cmd = state->m_multigam3_mmc3_command & 0x07;
+				int page = (state->m_multigam3_mmc3_command & 0x80) >> 5;
 				int bank;
 
 				switch (cmd)
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= (cmd << 1);
-						set_videorom_bank(space->machine(), page, 2, state->multigam3_mmc3_chr_bank_base + data, 1);
+						set_videorom_bank(space->machine(), page, 2, state->m_multigam3_mmc3_chr_bank_base + data, 1);
 					break;
 
 					case 2: /* char banking */
@@ -445,29 +445,29 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						set_videorom_bank(space->machine(), page, 1, state->multigam3_mmc3_chr_bank_base + data, 1);
+						set_videorom_bank(space->machine(), page, 1, state->m_multigam3_mmc3_chr_bank_base + data, 1);
 					break;
 
 					case 6: /* program banking */
 					{
 						UINT8 *prg = space->machine().region("maincpu")->base();
-						if (state->multigam3_mmc3_command & 0x40)
+						if (state->m_multigam3_mmc3_command & 0x40)
 						{
 							/* high bank */
-							state->multigam3_mmc3_banks[0] = data & bankmask;
-							bank = (state->multigam3_mmc3_banks[0]) * 0x2000;
+							state->m_multigam3_mmc3_banks[0] = data & bankmask;
+							bank = (state->m_multigam3_mmc3_banks[0]) * 0x2000;
 
-							memcpy(&prg[0x0c000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
-							memcpy(&prg[0x08000], &state->multigam3_mmc3_prg_base[state->multigam3_mmc3_prg_size - 0x4000], 0x2000);
+							memcpy(&prg[0x0c000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
+							memcpy(&prg[0x08000], &state->m_multigam3_mmc3_prg_base[state->m_multigam3_mmc3_prg_size - 0x4000], 0x2000);
 						}
 						else
 						{
 							/* low bank */
-							state->multigam3_mmc3_banks[0] = data & bankmask;
-							bank = (state->multigam3_mmc3_banks[0]) * 0x2000;
+							state->m_multigam3_mmc3_banks[0] = data & bankmask;
+							bank = (state->m_multigam3_mmc3_banks[0]) * 0x2000;
 
-							memcpy(&prg[0x08000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
-							memcpy(&prg[0x0c000], &state->multigam3_mmc3_prg_base[state->multigam3_mmc3_prg_size - 0x4000], 0x2000);
+							memcpy(&prg[0x08000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
+							memcpy(&prg[0x0c000], &state->m_multigam3_mmc3_prg_base[state->m_multigam3_mmc3_prg_size - 0x4000], 0x2000);
 						}
 					}
 					break;
@@ -477,10 +477,10 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 							/* mid bank */
 							UINT8 *prg = space->machine().region("maincpu")->base();
 
-							state->multigam3_mmc3_banks[1] = data & bankmask;
-							bank = state->multigam3_mmc3_banks[1] * 0x2000;
+							state->m_multigam3_mmc3_banks[1] = data & bankmask;
+							bank = state->m_multigam3_mmc3_banks[1] * 0x2000;
 
-							memcpy(&prg[0x0a000], &state->multigam3_mmc3_prg_base[bank], 0x2000);
+							memcpy(&prg[0x0a000], &state->m_multigam3_mmc3_prg_base[bank], 0x2000);
 						}
 					break;
 				}
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x2000: /* mirroring */
-			if (!state->multigam3_mmc3_4screen)
+			if (!state->m_multigam3_mmc3_4screen)
 			{
 				if (data & 0x40)
 					set_mirroring(state, PPU_MIRROR_HIGH);
@@ -500,7 +500,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		case 0x2001: /* enable ram at $6000 */
 			if (data & 0x80)
 			{
-				memory_set_bankptr(space->machine(), "bank10", state->multigmc_mmc3_6000_ram);
+				memory_set_bankptr(space->machine(), "bank10", state->m_multigmc_mmc3_6000_ram);
 			}
 			else
 			{
@@ -513,11 +513,11 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x4000: /* scanline counter */
-			state->multigam3_mmc3_scanline_counter = data;
+			state->m_multigam3_mmc3_scanline_counter = data;
 		break;
 
 		case 0x4001: /* scanline latch */
-			state->multigam3_mmc3_scanline_latch = data;
+			state->m_multigam3_mmc3_scanline_latch = data;
 		break;
 
 		case 0x6000: /* disable irqs */
@@ -537,30 +537,30 @@ static void multigam_init_mmc3(running_machine &machine, UINT8 *prg_base, int pr
 
 	// Tom & Jerry in Super Game III enables 6000 ram, but does not read/write it
 	// however, it expects ROM from 6000 there (code jumps to $6xxx)
-	memcpy(state->multigmc_mmc3_6000_ram, dst + 0x6000, 0x2000);
+	memcpy(state->m_multigmc_mmc3_6000_ram, dst + 0x6000, 0x2000);
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigam3_mmc3_rom_switch_w) );
 
-	state->multigam3_mmc3_banks[0] = 0x1e;
-	state->multigam3_mmc3_banks[1] = 0x1f;
-	state->multigam3_mmc3_scanline_counter = 0;
-	state->multigam3_mmc3_scanline_latch = 0;
-	state->multigam3_mmc3_4screen = 0;
-	state->multigam3_mmc3_last_bank = 0xff;
-	state->multigam3_mmc3_prg_base = prg_base;
-	state->multigam3_mmc3_chr_bank_base = chr_bank_base;
-	state->multigam3_mmc3_prg_size = prg_size;
+	state->m_multigam3_mmc3_banks[0] = 0x1e;
+	state->m_multigam3_mmc3_banks[1] = 0x1f;
+	state->m_multigam3_mmc3_scanline_counter = 0;
+	state->m_multigam3_mmc3_scanline_latch = 0;
+	state->m_multigam3_mmc3_4screen = 0;
+	state->m_multigam3_mmc3_last_bank = 0xff;
+	state->m_multigam3_mmc3_prg_base = prg_base;
+	state->m_multigam3_mmc3_chr_bank_base = chr_bank_base;
+	state->m_multigam3_mmc3_prg_size = prg_size;
 };
 
 static WRITE8_HANDLER(multigm3_mapper2_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	if (state->game_gfx_bank & 0x80)
+	if (state->m_game_gfx_bank & 0x80)
 	{
-		set_videorom_bank(space->machine(), 0, 8, (state->game_gfx_bank & 0x3c)  + (data & 0x3), 8);
+		set_videorom_bank(space->machine(), 0, 8, (state->m_game_gfx_bank & 0x3c)  + (data & 0x3), 8);
 	}
 	else
 	{
@@ -573,7 +573,7 @@ static WRITE8_HANDLER(multigm3_switch_gfx_rom)
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	set_videorom_bank(space->machine(), 0, 8, data & 0x3f, 8);
 	set_mirroring(state, data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	state->game_gfx_bank = data;
+	state->m_game_gfx_bank = data;
 };
 
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
@@ -644,8 +644,8 @@ static WRITE8_HANDLER(multigam3_mapper02_rom_switch_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	UINT8* mem = space->machine().region("maincpu")->base();
-	int bankmask = (state->mapper02_prg_size/0x4000) - 1;
-	memcpy(mem + 0x8000, state->mapper02_prg_base + 0x4000*(data & bankmask), 0x4000);
+	int bankmask = (state->m_mapper02_prg_size/0x4000) - 1;
+	memcpy(mem + 0x8000, state->m_mapper02_prg_base + 0x4000*(data & bankmask), 0x4000);
 }
 
 static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, int prg_size)
@@ -655,8 +655,8 @@ static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, in
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigam3_mapper02_rom_switch_w) );
 
-	state->mapper02_prg_base = prg_base;
-	state->mapper02_prg_size = prg_size;
+	state->m_mapper02_prg_base = prg_base;
+	state->m_mapper02_prg_size = prg_size;
 
 	ppu2c0x_set_scanline_callback(machine.device("ppu"), 0);
 }
@@ -671,7 +671,7 @@ static void multigam_init_mapper02(running_machine &machine, UINT8* prg_base, in
 static TIMER_CALLBACK( mmc1_resync_callback )
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	state->mmc1_reg_write_enable = 1;
+	state->m_mmc1_reg_write_enable = 1;
 }
 
 static WRITE8_HANDLER( mmc1_rom_switch_w )
@@ -679,13 +679,13 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 	multigam_state *state = space->machine().driver_data<multigam_state>();
 	/* basically, a MMC1 mapper from the nes */
 
-	if ( state->mmc1_reg_write_enable == 0 )
+	if ( state->m_mmc1_reg_write_enable == 0 )
 	{
 		return;
 	}
 	else
 	{
-		state->mmc1_reg_write_enable = 0;
+		state->m_mmc1_reg_write_enable = 0;
 		space->machine().scheduler().synchronize(FUNC(mmc1_resync_callback));
 	}
 
@@ -694,28 +694,28 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 	/* reset mapper */
 	if (data & 0x80)
 	{
-		state->mmc1_shiftreg = state->mmc1_shiftcount = 0;
+		state->m_mmc1_shiftreg = state->m_mmc1_shiftcount = 0;
 
-		state->size16k = 1;
-		state->switchlow = 1;
-		state->vrom4k = 0;
+		state->m_size16k = 1;
+		state->m_switchlow = 1;
+		state->m_vrom4k = 0;
 
 		return;
 	}
 
 	/* see if we need to clock in data */
-	if (state->mmc1_shiftcount < 5)
+	if (state->m_mmc1_shiftcount < 5)
 	{
-		state->mmc1_shiftreg >>= 1;
-		state->mmc1_shiftreg |= (data & 1) << 4;
-		state->mmc1_shiftcount++;
+		state->m_mmc1_shiftreg >>= 1;
+		state->m_mmc1_shiftreg |= (data & 1) << 4;
+		state->m_mmc1_shiftcount++;
 	}
 
 	/* are we done shifting? */
-	if (state->mmc1_shiftcount == 5)
+	if (state->m_mmc1_shiftcount == 5)
 	{
 		/* reset count */
-		state->mmc1_shiftcount = 0;
+		state->m_mmc1_shiftcount = 0;
 
 		/* apply data to registers */
 		switch (reg)
@@ -724,11 +724,11 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 				{
 					int _mirroring;
 
-					state->vrom4k = state->mmc1_shiftreg & 0x10;
-					state->size16k = state->mmc1_shiftreg & 0x08;
-					state->switchlow = state->mmc1_shiftreg & 0x04;
+					state->m_vrom4k = state->m_mmc1_shiftreg & 0x10;
+					state->m_size16k = state->m_mmc1_shiftreg & 0x08;
+					state->m_switchlow = state->m_mmc1_shiftreg & 0x04;
 
-					switch (state->mmc1_shiftreg & 3)
+					switch (state->m_mmc1_shiftreg & 3)
 					{
 						case 0:
 							_mirroring = PPU_MIRROR_LOW;
@@ -754,47 +754,47 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 			break;
 
 			case 1:	/* video rom banking - bank 0 - 4k or 8k */
-				if (state->mmc1_chr_bank_base == 0)
-					set_videoram_bank(space->machine(), 0, (state->vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
+				if (state->m_mmc1_chr_bank_base == 0)
+					set_videoram_bank(space->machine(), 0, (state->m_vrom4k) ? 4 : 8, (state->m_mmc1_shiftreg & 0x1f), 4);
 				else
-					set_videorom_bank(space->machine(), 0, (state->vrom4k) ? 4 : 8, state->mmc1_chr_bank_base + (state->mmc1_shiftreg & 0x1f), 4);
+					set_videorom_bank(space->machine(), 0, (state->m_vrom4k) ? 4 : 8, state->m_mmc1_chr_bank_base + (state->m_mmc1_shiftreg & 0x1f), 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
-				if (state->vrom4k)
+				if (state->m_vrom4k)
 				{
-					if (state->mmc1_chr_bank_base == 0)
-						set_videoram_bank(space->machine(), 0, (state->vrom4k) ? 4 : 8, (state->mmc1_shiftreg & 0x1f), 4);
+					if (state->m_mmc1_chr_bank_base == 0)
+						set_videoram_bank(space->machine(), 0, (state->m_vrom4k) ? 4 : 8, (state->m_mmc1_shiftreg & 0x1f), 4);
 					else
-						set_videorom_bank(space->machine(), 4, 4, state->mmc1_chr_bank_base + (state->mmc1_shiftreg & 0x1f), 4);
+						set_videorom_bank(space->machine(), 4, 4, state->m_mmc1_chr_bank_base + (state->m_mmc1_shiftreg & 0x1f), 4);
 				}
 			break;
 
 			case 3:	/* program banking */
 				{
-					int bank = (state->mmc1_shiftreg & state->mmc1_rom_mask) * 0x4000;
+					int bank = (state->m_mmc1_shiftreg & state->m_mmc1_rom_mask) * 0x4000;
 					UINT8 *prg = space->machine().region("maincpu")->base();
 
-					if (!state->size16k)
+					if (!state->m_size16k)
 					{
-						bank = ((state->mmc1_shiftreg >> 1) & state->mmc1_rom_mask) * 0x4000;
+						bank = ((state->m_mmc1_shiftreg >> 1) & state->m_mmc1_rom_mask) * 0x4000;
 						/* switch 32k */
-						memcpy(&prg[0x08000], state->mmc1_prg_base + bank, 0x8000);
+						memcpy(&prg[0x08000], state->m_mmc1_prg_base + bank, 0x8000);
 					}
 					else
 					{
 						/* switch 16k */
-						if (state->switchlow)
+						if (state->m_switchlow)
 						{
 							/* low */
-							memcpy(&prg[0x08000], state->mmc1_prg_base + bank, 0x4000);
-							memcpy(&prg[0x0c000], state->mmc1_prg_base + (0x0f & state->mmc1_rom_mask) * 0x4000, 0x4000);
+							memcpy(&prg[0x08000], state->m_mmc1_prg_base + bank, 0x4000);
+							memcpy(&prg[0x0c000], state->m_mmc1_prg_base + (0x0f & state->m_mmc1_rom_mask) * 0x4000, 0x4000);
 						}
 						else
 						{
 							/* high */
-							memcpy(&prg[0x08000], state->mmc1_prg_base + (0x00 & state->mmc1_rom_mask) * 0x4000, 0x4000);
-							memcpy(&prg[0x0c000], state->mmc1_prg_base + bank, 0x4000);
+							memcpy(&prg[0x08000], state->m_mmc1_prg_base + (0x00 & state->m_mmc1_rom_mask) * 0x4000, 0x4000);
+							memcpy(&prg[0x0c000], state->m_mmc1_prg_base + bank, 0x4000);
 						}
 					}
 				}
@@ -812,11 +812,11 @@ static void multigam_init_mmc1(running_machine &machine, UINT8 *prg_base, int pr
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
-	state->mmc1_reg_write_enable = 1;
-	state->mmc1_rom_mask = (prg_size / 0x4000) - 1;
-	state->mmc1_prg_base = prg_base;
-	state->mmc1_prg_size = prg_size;
-	state->mmc1_chr_bank_base = chr_bank_base;
+	state->m_mmc1_reg_write_enable = 1;
+	state->m_mmc1_rom_mask = (prg_size / 0x4000) - 1;
+	state->m_mmc1_prg_base = prg_base;
+	state->m_mmc1_prg_size = prg_size;
+	state->m_mmc1_chr_bank_base = chr_bank_base;
 
 	ppu2c0x_set_scanline_callback(machine.device("ppu"), 0);
 
@@ -852,15 +852,15 @@ static void supergm3_set_bank(running_machine &machine)
 	UINT8* mem = machine.region("maincpu")->base();
 
 	// video bank
-	if (state->supergm3_chr_bank == 0x10 ||
-		state->supergm3_chr_bank == 0x40 )
+	if (state->m_supergm3_chr_bank == 0x10 ||
+		state->m_supergm3_chr_bank == 0x40 )
 	{
 		// VRAM
 		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
 		ppu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
-		memory_set_bankptr(machine, "bank1", state->vram);
+		memory_set_bankptr(machine, "bank1", state->m_vram);
 
-		if (state->supergm3_chr_bank == 0x40)
+		if (state->m_supergm3_chr_bank == 0x40)
 			set_mirroring(state, PPU_MIRROR_VERT);
 	}
 	else
@@ -879,48 +879,48 @@ static void supergm3_set_bank(running_machine &machine)
 	}
 
 	// prg bank
-	if ((state->supergm3_prg_bank & 0x80) == 0)
+	if ((state->m_supergm3_prg_bank & 0x80) == 0)
 	{
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		memory_set_bankptr(machine, "bank10", mem + 0x6000);
 		ppu2c0x_set_scanline_callback(ppu, 0);
 	}
-	else if ((state->supergm3_prg_bank & 0x40) == 0)
+	else if ((state->m_supergm3_prg_bank & 0x40) == 0)
 	{
 		// mapper 02
 		multigam_init_mapper02(machine,
-			machine.region("user1")->base() + (state->supergm3_prg_bank & 0x1f)*0x20000,
+			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
 			0x20000);
 	}
-	else if (state->supergm3_chr_bank & 0x10)
+	else if (state->m_supergm3_chr_bank & 0x10)
 	{
 		// MMC3
 		multigam_init_mmc3(machine,
-			machine.region("user1")->base() + (state->supergm3_prg_bank & 0x1f)*0x20000,
-			(state->supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000,
-			(state->supergm3_chr_bank & 0x0f)*0x80);
+			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
+			(state->m_supergm3_prg_bank & 0x20) ? 0x20000 : 0x40000,
+			(state->m_supergm3_chr_bank & 0x0f)*0x80);
 	}
 	else
 	{
 		//MMC1
 		multigam_init_mmc1(machine,
-			machine.region("user1")->base() + (state->supergm3_prg_bank & 0x1f)*0x20000,
+			machine.region("user1")->base() + (state->m_supergm3_prg_bank & 0x1f)*0x20000,
 			0x20000,
-			(state->supergm3_chr_bank & 0x0f)*0x80/4 );
+			(state->m_supergm3_chr_bank & 0x0f)*0x80/4 );
 	}
 }
 
 static WRITE8_HANDLER(supergm3_prg_bank_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	state->supergm3_prg_bank = data;
+	state->m_supergm3_prg_bank = data;
 }
 
 static WRITE8_HANDLER(supergm3_chr_bank_w)
 {
 	multigam_state *state = space->machine().driver_data<multigam_state>();
-	state->supergm3_chr_bank = data;
+	state->m_supergm3_chr_bank = data;
 	supergm3_set_bank(space->machine());
 }
 
@@ -1121,11 +1121,11 @@ static MACHINE_RESET( multigm3 )
 static MACHINE_START( multigam )
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->nt_page[0] = state->nt_ram;
-	state->nt_page[1] = state->nt_ram + 0x400;
-	state->nt_page[2] = state->nt_ram + 0x800;
-	state->nt_page[3] = state->nt_ram + 0xc00;
+	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_nt_page[0] = state->m_nt_ram;
+	state->m_nt_page[1] = state->m_nt_ram + 0x400;
+	state->m_nt_page[2] = state->m_nt_ram + 0x800;
+	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
@@ -1135,11 +1135,11 @@ static MACHINE_START( multigam )
 static MACHINE_START( multigm3 )
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->nt_page[0] = state->nt_ram;
-	state->nt_page[1] = state->nt_ram + 0x400;
-	state->nt_page[2] = state->nt_ram + 0x800;
-	state->nt_page[3] = state->nt_ram + 0xc00;
+	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_nt_page[0] = state->m_nt_ram;
+	state->m_nt_page[1] = state->m_nt_ram + 0x400;
+	state->m_nt_page[2] = state->m_nt_ram + 0x800;
+	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
 
@@ -1158,16 +1158,16 @@ static MACHINE_START( multigm3 )
 static MACHINE_START( supergm3 )
 {
 	multigam_state *state = machine.driver_data<multigam_state>();
-	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->nt_page[0] = state->nt_ram;
-	state->nt_page[1] = state->nt_ram + 0x400;
-	state->nt_page[2] = state->nt_ram + 0x800;
-	state->nt_page[3] = state->nt_ram + 0xc00;
+	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_nt_page[0] = state->m_nt_ram;
+	state->m_nt_page[1] = state->m_nt_ram + 0x400;
+	state->m_nt_page[2] = state->m_nt_ram + 0x800;
+	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
 
-	state->vram = auto_alloc_array(machine, UINT8, 0x2000);
-	state->multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_vram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
 static MACHINE_CONFIG_START( multigam, multigam_state )
@@ -1366,7 +1366,7 @@ static DRIVER_INIT(multigm3)
 	multigm3_decrypt(machine.region("maincpu")->base(), machine.region("maincpu")->bytes(), decode );
 	multigm3_decrypt(machine.region("user1")->base(), machine.region("user1")->bytes(), decode );
 
-	state->multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }

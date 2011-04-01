@@ -50,11 +50,11 @@ public:
 	dlair_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	laserdisc_device *laserdisc;
-	UINT8 last_misc;
-	UINT8 laserdisc_type;
-	UINT8 laserdisc_data;
+	UINT8 *m_videoram;
+	laserdisc_device *m_laserdisc;
+	UINT8 m_last_misc;
+	UINT8 m_laserdisc_type;
+	UINT8 m_laserdisc_data;
 };
 
 
@@ -102,7 +102,7 @@ static void dleuro_interrupt(device_t *device, int state)
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
-	laserdisc_data_w(state->laserdisc, data);
+	laserdisc_data_w(state->m_laserdisc, data);
 }
 
 
@@ -110,8 +110,8 @@ static int serial_receive(device_t *device, int channel)
 {
 	dlair_state *state = device->machine().driver_data<dlair_state>();
 	/* if we still have data to send, do it now */
-	if (channel == 0 && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		return laserdisc_data_r(state->laserdisc);
+	if (channel == 0 && laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+		return laserdisc_data_r(state->m_laserdisc);
 
 	return -1;
 }
@@ -175,7 +175,7 @@ static PALETTE_INIT( dleuro )
 static SCREEN_UPDATE( dleuro )
 {
 	dlair_state *state = screen->machine().driver_data<dlair_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int x, y;
 
 	/* redraw the overlay */
@@ -200,7 +200,7 @@ static SCREEN_UPDATE( dleuro )
 static MACHINE_START( dlair )
 {
 	dlair_state *state = machine.driver_data<dlair_state>();
-	state->laserdisc = machine.device<laserdisc_device>("laserdisc");
+	state->m_laserdisc = machine.device<laserdisc_device>("laserdisc");
 }
 
 
@@ -208,10 +208,10 @@ static MACHINE_RESET( dlair )
 {
 	dlair_state *state = machine.driver_data<dlair_state>();
 	/* determine the laserdisc player from the DIP switches */
-	if (state->laserdisc_type == LASERDISC_TYPE_VARIABLE)
+	if (state->m_laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
 		int newtype = (input_port_read(machine, "DSW2") & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-		laserdisc_set_type(state->laserdisc, newtype);
+		laserdisc_set_type(state->m_laserdisc, newtype);
 	}
 }
 
@@ -253,17 +253,17 @@ static WRITE8_HANDLER( misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->last_misc;
-	state->last_misc = data;
+	UINT8 diff = data ^ state->m_last_misc;
+	state->m_last_misc = data;
 
 	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(state->laserdisc, state->laserdisc_data);
+		laserdisc_data_w(state->m_laserdisc, state->m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -280,18 +280,18 @@ static WRITE8_HANDLER( dleuro_misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->last_misc;
-	state->last_misc = data;
+	UINT8 diff = data ^ state->m_last_misc;
+	state->m_last_misc = data;
 
 	coin_counter_w(space->machine(), 1, (~data >> 3) & 1);
 	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		laserdisc_data_w(state->laserdisc, state->laserdisc_data);
+		laserdisc_data_w(state->m_laserdisc, state->m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_ENTER, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -317,13 +317,13 @@ static WRITE8_HANDLER( led_den2_w )
 static CUSTOM_INPUT( laserdisc_status_r )
 {
 	dlair_state *state = field->port->machine().driver_data<dlair_state>();
-	switch (laserdisc_get_type(state->laserdisc))
+	switch (laserdisc_get_type(state->m_laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return 0;
 
 		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PHILLIPS_22VP932:
 			return 0;
@@ -335,13 +335,13 @@ static CUSTOM_INPUT( laserdisc_status_r )
 static CUSTOM_INPUT( laserdisc_command_r )
 {
 	dlair_state *state = field->port->machine().driver_data<dlair_state>();
-	switch (laserdisc_get_type(state->laserdisc))
+	switch (laserdisc_get_type(state->m_laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
-			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PIONEER_LDV1000:
-			return (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
+			return (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_COMMAND) == ASSERT_LINE) ? 0 : 1;
 
 		case LASERDISC_TYPE_PHILLIPS_22VP932:
 			return 0;
@@ -353,7 +353,7 @@ static CUSTOM_INPUT( laserdisc_command_r )
 static READ8_HANDLER( laserdisc_r )
 {
 	dlair_state *state = space->machine().driver_data<dlair_state>();
-	UINT8 result = laserdisc_data_r(state->laserdisc);
+	UINT8 result = laserdisc_data_r(state->m_laserdisc);
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
@@ -362,7 +362,7 @@ static READ8_HANDLER( laserdisc_r )
 static WRITE8_HANDLER( laserdisc_w )
 {
 	dlair_state *state = space->machine().driver_data<dlair_state>();
-	state->laserdisc_data = data;
+	state->m_laserdisc_data = data;
 }
 
 
@@ -401,7 +401,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(dlair_state, videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(dlair_state, m_videoram)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1
@@ -950,14 +950,14 @@ ROM_END
 static DRIVER_INIT( fixed )
 {
 	dlair_state *state = machine.driver_data<dlair_state>();
-	state->laserdisc_type = LASERDISC_TYPE_FIXED;
+	state->m_laserdisc_type = LASERDISC_TYPE_FIXED;
 }
 
 
 static DRIVER_INIT( variable )
 {
 	dlair_state *state = machine.driver_data<dlair_state>();
-	state->laserdisc_type = LASERDISC_TYPE_VARIABLE;
+	state->m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
 

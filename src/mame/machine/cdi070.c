@@ -73,7 +73,7 @@ void scc68070_set_quizard_mcu_value(running_machine &machine, UINT16 value)
 TIMER_CALLBACK( scc68070_timer0_callback )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
     scc68070->timers.timer0 = scc68070->timers.reload_register;
     scc68070->timers.timer_status_register |= TSR_OV0;
@@ -88,7 +88,7 @@ TIMER_CALLBACK( scc68070_timer0_callback )
 		}
     }
 
-    scc68070_set_timer_callback(&state->scc68070_regs, 0);
+    scc68070_set_timer_callback(&state->m_scc68070_regs, 0);
 }
 
 static void scc68070_uart_rx_check(running_machine &machine, scc68070_regs_t *scc68070)
@@ -148,7 +148,7 @@ void scc68070_uart_tx(running_machine &machine, scc68070_regs_t *scc68070, UINT8
 TIMER_CALLBACK( scc68070_rx_callback )
 {
 	cdi_state *state = machine.driver_data<cdi_state>();
-	scc68070_regs_t *scc68070 = &state->scc68070_regs;
+	scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
 	if((scc68070->uart.command_register & 3) == 1)
 	{
@@ -255,7 +255,7 @@ static void quizard_calculate_state(running_machine &machine, scc68070_regs_t *s
 INTERRUPT_GEN( scc68070_mcu_frame )
 {
     cdi_state *state = device->machine().driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
 	if(0)//mcu_active)
 	{
@@ -365,7 +365,7 @@ static void quizard_handle_byte_tx(running_machine &machine, scc68070_regs_t *sc
 TIMER_CALLBACK( scc68070_tx_callback )
 {
 	cdi_state *state = machine.driver_data<cdi_state>();
-	scc68070_regs_t *scc68070 = &state->scc68070_regs;
+	scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
 	if(((scc68070->uart.command_register >> 2) & 3) == 1)
 	{
@@ -407,7 +407,7 @@ TIMER_CALLBACK( scc68070_tx_callback )
 READ16_HANDLER( scc68070_periphs_r )
 {
     cdi_state *state = space->machine().driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
     switch(offset)
     {
@@ -699,7 +699,7 @@ READ16_HANDLER( scc68070_periphs_r )
 WRITE16_HANDLER( scc68070_periphs_w )
 {
     cdi_state *state = space->machine().driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 
     switch(offset)
     {
@@ -842,7 +842,7 @@ WRITE16_HANDLER( scc68070_periphs_w )
         case 0x2024/2:
             verboselog(space->machine(), 2, "scc68070_periphs_w: Timer 0: %04x & %04x\n", data, mem_mask);
             COMBINE_DATA(&scc68070->timers.timer0);
-            scc68070_set_timer_callback(&state->scc68070_regs, 0);
+            scc68070_set_timer_callback(&state->m_scc68070_regs, 0);
             break;
         case 0x2026/2:
             verboselog(space->machine(), 2, "scc68070_periphs_w: Timer 1: %04x & %04x\n", data, mem_mask);

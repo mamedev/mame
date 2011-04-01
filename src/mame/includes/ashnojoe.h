@@ -11,27 +11,33 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    tileram;
-	UINT16 *    tileram_1;
-	UINT16 *    tileram_2;
-	UINT16 *    tileram_3;
-	UINT16 *    tileram_4;
-	UINT16 *    tileram_5;
-	UINT16 *    tileram_6;
-	UINT16 *    tileram_7;
-	UINT16 *    tilemap_reg;
-//  UINT16 *    paletteram; // currently this uses generic palette handling
+	UINT16 *    m_tileram;
+	UINT16 *    m_tileram_1;
+	UINT16 *    m_tileram_2;
+	UINT16 *    m_tileram_3;
+	UINT16 *    m_tileram_4;
+	UINT16 *    m_tileram_5;
+	UINT16 *    m_tileram_6;
+	UINT16 *    m_tileram_7;
+	UINT16 *    m_tilemap_reg;
+//  UINT16 *    m_paletteram; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t     *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilemap5, *joetilemap6, *joetilemap7;
+	tilemap_t     *m_joetilemap;
+	tilemap_t     *m_joetilemap2;
+	tilemap_t     *m_joetilemap3;
+	tilemap_t     *m_joetilemap4;
+	tilemap_t     *m_joetilemap5;
+	tilemap_t     *m_joetilemap6;
+	tilemap_t     *m_joetilemap7;
 
 	/* sound-related */
-	UINT8       adpcm_byte;
-	int         soundlatch_status;
-	int         msm5205_vclk_toggle;
+	UINT8       m_adpcm_byte;
+	int         m_soundlatch_status;
+	int         m_msm5205_vclk_toggle;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

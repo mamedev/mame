@@ -34,7 +34,7 @@ static WRITE8_HANDLER( crimfght_sh_irqtrigger_w )
 {
 	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
@@ -46,24 +46,24 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 	int bank_A = BIT(data, 1);
 	int bank_B = BIT(data, 0);
 
-	k007232_set_bank(state->k007232, bank_A, bank_B );
+	k007232_set_bank(state->m_k007232, bank_A, bank_B );
 }
 
 static READ8_HANDLER( k052109_051960_r )
 {
 	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
-	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->k051960, offset - 0x3800);
+			return k051937_r(state->m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->k052109, offset);
+			return k052109_r(state->m_k052109, offset);
 		else
-			return k051960_r(state->k051960, offset - 0x3c00);
+			return k051960_r(state->m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->k052109, offset);
+		return k052109_r(state->m_k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
@@ -71,11 +71,11 @@ static WRITE8_HANDLER( k052109_051960_w )
 	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->k051960, offset - 0x3800, data);
+		k051937_w(state->m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->k052109, offset, data);
+		k052109_w(state->m_k052109, offset, data);
 	else
-		k051960_w(state->k051960, offset - 0x3c00, data);
+		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
 /********************************************/
@@ -263,11 +263,11 @@ static MACHINE_START( crimfght )
 	memory_configure_bank(machine, "bank2", 0, 12, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank2", 0);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k052109 = machine.device("k052109");
-	state->k051960 = machine.device("k051960");
-	state->k007232 = machine.device("k007232");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k052109 = machine.device("k052109");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k007232 = machine.device("k007232");
 }
 
 static MACHINE_RESET( crimfght )
@@ -418,7 +418,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 		device->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->m_k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	memory_set_bank(device->machine(), "bank2", lines & 0x0f);
 }

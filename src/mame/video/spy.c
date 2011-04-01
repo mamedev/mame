@@ -14,7 +14,7 @@ void spy_tile_callback( running_machine &machine, int layer, int bank, int *code
 	spy_state *state = machine.driver_data<spy_state>();
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -34,7 +34,7 @@ void spy_sprite_callback( running_machine &machine, int *code, int *color, int *
 	if ( *color & 0x10) *priority_mask |= 0xa;
 	if (~*color & 0x20) *priority_mask |= 0xc;
 
-	*color = state->sprite_colorbase + (*color & 0x0f);
+	*color = state->m_sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -48,10 +48,10 @@ VIDEO_START( spy )
 {
 	spy_state *state = machine.driver_data<spy_state>();
 
-	state->layer_colorbase[0] = 48;
-	state->layer_colorbase[1] = 0;
-	state->layer_colorbase[2] = 16;
-	state->sprite_colorbase = 32;
+	state->m_layer_colorbase[0] = 48;
+	state->m_layer_colorbase[1] = 0;
+	state->m_layer_colorbase[2] = 16;
+	state->m_sprite_colorbase = 32;
 }
 
 
@@ -66,18 +66,18 @@ SCREEN_UPDATE( spy )
 {
 	spy_state *state = screen->machine().driver_data<spy_state>();
 
-	k052109_tilemap_update(state->k052109);
+	k052109_tilemap_update(state->m_k052109);
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	if (!state->video_enable)
-		bitmap_fill(bitmap, cliprect, 16 * state->layer_colorbase[0]);
+	if (!state->m_video_enable)
+		bitmap_fill(bitmap, cliprect, 16 * state->m_layer_colorbase[0]);
 	else
 	{
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, 0, 2);
-		k051960_sprites_draw(state->k051960, bitmap, cliprect, -1, -1);
-		k052109_tilemap_draw(state->k052109, bitmap, cliprect, 0, 0, 0);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, 0, 2);
+		k051960_sprites_draw(state->m_k051960, bitmap, cliprect, -1, -1);
+		k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 0);
 	}
 
 	return 0;

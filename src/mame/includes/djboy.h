@@ -13,33 +13,35 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8		*videoram;
-	UINT8		*paletteram;
+	UINT8		*m_videoram;
+	UINT8		*m_paletteram;
 
 	/* ROM banking */
-	UINT8		bankxor;
+	UINT8		m_bankxor;
 
 	/* video-related */
-	tilemap_t	*background;
-	UINT8		videoreg, scrollx, scrolly;
+	tilemap_t	*m_background;
+	UINT8		m_videoreg;
+	UINT8       m_scrollx;
+	UINT8       m_scrolly;
 
 	/* Kaneko BEAST state */
-	UINT8		data_to_beast;
-	UINT8		data_to_z80;
-	UINT8		beast_to_z80_full;
-	UINT8		z80_to_beast_full;
-	UINT8		beast_int0_l;
-	UINT8		beast_p0;
-	UINT8		beast_p1;
-	UINT8		beast_p2;
-	UINT8		beast_p3;
+	UINT8		m_data_to_beast;
+	UINT8		m_data_to_z80;
+	UINT8		m_beast_to_z80_full;
+	UINT8		m_z80_to_beast_full;
+	UINT8		m_beast_int0_l;
+	UINT8		m_beast_p0;
+	UINT8		m_beast_p1;
+	UINT8		m_beast_p2;
+	UINT8		m_beast_p3;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *cpu1;
-	device_t *cpu2;
-	device_t *pandora;
-	device_t *beast;
+	device_t *m_maincpu;
+	device_t *m_cpu1;
+	device_t *m_cpu2;
+	device_t *m_pandora;
+	device_t *m_beast;
 };
 
 

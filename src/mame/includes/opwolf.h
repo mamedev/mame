@@ -11,40 +11,44 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      cchip_ram;
+	UINT8 *      m_cchip_ram;
 
 	/* video-related */
-	UINT16       sprite_ctrl;
-	UINT16       sprites_flipscreen;
+	UINT16       m_sprite_ctrl;
+	UINT16       m_sprites_flipscreen;
 
 	/* misc */
-	UINT8        adpcm_b[0x08];
-	UINT8        adpcm_c[0x08];
-	UINT32       adpcm_pos[2], adpcm_end[2];
-	int          adpcm_data[2];
+	UINT8        m_adpcm_b[0x08];
+	UINT8        m_adpcm_c[0x08];
+	UINT32       m_adpcm_pos[2];
+	UINT32       m_adpcm_end[2];
+	int          m_adpcm_data[2];
 
-	int          opwolf_gun_xoffs, opwolf_gun_yoffs;
+	int          m_opwolf_gun_xoffs;
+	int          m_opwolf_gun_yoffs;
 
 	/* c-chip */
-	int          opwolf_region;
+	int          m_opwolf_region;
 
-	UINT8        current_bank;
-	UINT8        current_cmd;
-	UINT8        cchip_last_7a;
-	UINT8        cchip_last_04;
-	UINT8        cchip_last_05;
-	UINT8        cchip_coins_for_credit[2];
-	UINT8        cchip_credits_for_coin[2];
-	UINT8        cchip_coins[2];
-	UINT8        c588, c589, c58a; // These variables derived from the bootleg
+	UINT8        m_current_bank;
+	UINT8        m_current_cmd;
+	UINT8        m_cchip_last_7a;
+	UINT8        m_cchip_last_04;
+	UINT8        m_cchip_last_05;
+	UINT8        m_cchip_coins_for_credit[2];
+	UINT8        m_cchip_credits_for_coin[2];
+	UINT8        m_cchip_coins[2];
+	UINT8        m_c588;
+	UINT8        m_c589;
+	UINT8        m_c58a; // These variables derived from the bootleg
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	device_t *pc080sn;
-	device_t *pc090oj;
-	device_t *msm1;
-	device_t *msm2;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	device_t *m_pc080sn;
+	device_t *m_pc090oj;
+	device_t *m_msm1;
+	device_t *m_msm2;
 };
 
 

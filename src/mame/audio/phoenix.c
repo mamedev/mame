@@ -63,14 +63,14 @@ struct n_state
 typedef struct _phoenix_sound_state phoenix_sound_state;
 struct _phoenix_sound_state
 {
-	struct c_state		c24_state;
-	struct c_state		c25_state;
-	struct n_state		noise_state;
-	UINT8				sound_latch_a;
-	sound_stream *		channel;
-	UINT32 *				poly18;
-	device_t *discrete;
-	device_t *tms;
+	struct c_state		m_c24_state;
+	struct c_state		m_c25_state;
+	struct n_state		m_noise_state;
+	UINT8				m_sound_latch_a;
+	sound_stream *		m_channel;
+	UINT32 *				m_poly18;
+	device_t *m_discrete;
+	device_t *m_tms;
 };
 
 INLINE phoenix_sound_state *get_safe_token( device_t *device )
@@ -94,9 +94,9 @@ INLINE int update_c24(phoenix_sound_state *state, int samplerate)
 	#define R51 330
 	#define R52 20000
 
-	c_state *c24_state = &state->c24_state;
+	c_state *c24_state = &state->m_c24_state;
 
-	if( state->sound_latch_a & 0x40 )
+	if( state->m_sound_latch_a & 0x40 )
 	{
 		if (c24_state->level > VMIN)
 		{
@@ -139,9 +139,9 @@ INLINE int update_c25(phoenix_sound_state *state, int samplerate)
 	#define R53 330
 	#define R54 47000
 
-	c_state *c25_state = &state->c25_state;
+	c_state *c25_state = &state->m_c25_state;
 
-	if( state->sound_latch_a & 0x80 )
+	if( state->m_sound_latch_a & 0x80 )
 	{
 		if (c25_state->level < VMAX)
 		{
@@ -178,7 +178,7 @@ INLINE int noise(phoenix_sound_state *state, int samplerate)
 	int vc24 = update_c24(state, samplerate);
 	int vc25 = update_c25(state, samplerate);
 	int sum = 0, level, frequency;
-	n_state *noise_state = &state->noise_state;
+	n_state *noise_state = &state->m_noise_state;
 
 	/*
      * The voltage levels are added and control I(CE) of transistor TR1
@@ -204,7 +204,7 @@ INLINE int noise(phoenix_sound_state *state, int samplerate)
 		int n = (-noise_state->counter / samplerate) + 1;
 		noise_state->counter += n * samplerate;
 		noise_state->polyoffs = (noise_state->polyoffs + n) & 0x3ffff;
-		noise_state->polybit = (state->poly18[noise_state->polyoffs>>5] >> (noise_state->polyoffs & 31)) & 1;
+		noise_state->polybit = (state->m_poly18[noise_state->polyoffs>>5] >> (noise_state->polyoffs & 31)) & 1;
 	}
 	if (!noise_state->polybit)
 		sum += vc24;
@@ -495,44 +495,44 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 {
 	phoenix_sound_state *state = get_safe_token(device);
 
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_3_EN  , data & 0x40);
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_4_EN  , data & 0x80);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_3_EN  , data & 0x40);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
-	state->channel->update();
-	state->sound_latch_a = data;
+	state->m_channel->update();
+	state->m_sound_latch_a = data;
 }
 
 static void register_state(device_t *device)
 {
 	phoenix_sound_state *state = get_safe_token(device);
 
-	device->save_item(NAME(state->sound_latch_a));
-	device->save_item(NAME(state->c24_state.counter));
-	device->save_item(NAME(state->c24_state.level));
-	device->save_item(NAME(state->c25_state.counter));
-	device->save_item(NAME(state->c25_state.level));
-	device->save_item(NAME(state->noise_state.counter));
-	device->save_item(NAME(state->noise_state.polybit));
-	device->save_item(NAME(state->noise_state.polyoffs));
-	device->save_item(NAME(state->noise_state.lowpass_counter));
-	device->save_item(NAME(state->noise_state.lowpass_polybit));
-	device->save_pointer(NAME(state->poly18), (1ul << (18-5)));
+	device->save_item(NAME(state->m_sound_latch_a));
+	device->save_item(NAME(state->m_c24_state.counter));
+	device->save_item(NAME(state->m_c24_state.level));
+	device->save_item(NAME(state->m_c25_state.counter));
+	device->save_item(NAME(state->m_c25_state.level));
+	device->save_item(NAME(state->m_noise_state.counter));
+	device->save_item(NAME(state->m_noise_state.polybit));
+	device->save_item(NAME(state->m_noise_state.polyoffs));
+	device->save_item(NAME(state->m_noise_state.lowpass_counter));
+	device->save_item(NAME(state->m_noise_state.lowpass_polybit));
+	device->save_pointer(NAME(state->m_poly18), (1ul << (18-5)));
 }
 
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w )
 {
 	phoenix_sound_state *state = get_safe_token(device);
 
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_FILT, data & 0x20);
+	discrete_sound_w(state->m_discrete, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
-	mm6221aa_tune_w(state->tms, data >> 6);
+	mm6221aa_tune_w(state->m_tms, data >> 6);
 }
 
 static DEVICE_START( phoenix_sound )
@@ -541,15 +541,15 @@ static DEVICE_START( phoenix_sound )
 	int i, j;
 	UINT32 shiftreg;
 
-	state->sound_latch_a = 0;
-	memset(&state->c24_state, 0, sizeof(state->c24_state));
-	memset(&state->c25_state, 0, sizeof(state->c25_state));
-	memset(&state->noise_state, 0, sizeof(state->noise_state));
+	state->m_sound_latch_a = 0;
+	memset(&state->m_c24_state, 0, sizeof(state->m_c24_state));
+	memset(&state->m_c25_state, 0, sizeof(state->m_c25_state));
+	memset(&state->m_noise_state, 0, sizeof(state->m_noise_state));
 
-	state->discrete = device->machine().device("discrete");
-	state->tms = device->machine().device("tms");
+	state->m_discrete = device->machine().device("discrete");
+	state->m_tms = device->machine().device("tms");
 
-	state->poly18 = auto_alloc_array(device->machine(), UINT32, 1ul << (18-5));
+	state->m_poly18 = auto_alloc_array(device->machine(), UINT32, 1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
@@ -563,10 +563,10 @@ static DEVICE_START( phoenix_sound )
 			else
 				shiftreg <<= 1;
 		}
-		state->poly18[i] = bits;
+		state->m_poly18[i] = bits;
 	}
 
-	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, phoenix_sound_update);
+	state->m_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), 0, phoenix_sound_update);
 
 	register_state(device);
 }

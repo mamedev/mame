@@ -11,20 +11,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        sprite_colorbase, zoom_colorbase;
+	int        m_sprite_colorbase;
+	int        m_zoom_colorbase;
 
 	/* misc */
-	int        readzoomroms;
+	int        m_readzoomroms;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k053260;
-	device_t *k053244;
-	device_t *k051316;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k053260;
+	device_t *m_k053244;
+	device_t *m_k051316;
 };
 
 /*----------- defined in video/rollerg.c -----------*/

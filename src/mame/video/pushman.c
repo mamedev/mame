@@ -30,7 +30,7 @@ static TILE_GET_INFO( get_text_tile_info )
 {
 	pushman_state *state = machine.driver_data<pushman_state>();
 
-	int tile = state->videoram[tile_index];
+	int tile = state->m_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
 			(tile & 0xff) | ((tile & 0xc000) >> 6) | ((tile & 0x2000) >> 3),
@@ -50,10 +50,10 @@ VIDEO_START( pushman )
 {
 	pushman_state *state = machine.driver_data<pushman_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_back_tile_info, background_scan_rows, 32, 32, 128, 64);
-	state->tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_back_tile_info, background_scan_rows, 32, 32, 128, 64);
+	state->m_tx_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->tx_tilemap, 3);
+	tilemap_set_transparent_pen(state->m_tx_tilemap, 3);
 }
 
 
@@ -67,14 +67,14 @@ VIDEO_START( pushman )
 WRITE16_HANDLER( pushman_scroll_w )
 {
 	pushman_state *state = space->machine().driver_data<pushman_state>();
-	COMBINE_DATA(&state->control[offset]);
+	COMBINE_DATA(&state->m_control[offset]);
 }
 
 WRITE16_HANDLER( pushman_videoram_w )
 {
 	pushman_state *state = space->machine().driver_data<pushman_state>();
-	COMBINE_DATA(&state->videoram[offset]);
-	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
+	COMBINE_DATA(&state->m_videoram[offset]);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
 }
 
 
@@ -88,7 +88,7 @@ WRITE16_HANDLER( pushman_videoram_w )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	pushman_state *state = machine.driver_data<pushman_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs, x, y, color, sprite, flipx, flipy;
 
 	for (offs = 0x0800 - 4; offs >=0; offs -= 4)
@@ -125,11 +125,11 @@ SCREEN_UPDATE( pushman )
 	pushman_state *state = screen->machine().driver_data<pushman_state>();
 
 	/* Setup the tilemaps */
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->control[0]);
-	tilemap_set_scrolly(state->bg_tilemap, 0, 0xf00 - state->control[1]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_control[0]);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0xf00 - state->m_control[1]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;
 }

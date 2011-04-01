@@ -3,24 +3,24 @@ class bbusters_state : public driver_device
 public:
 	bbusters_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  eprom_data(*this, "eeprom") { }
+		  m_eprom_data(*this, "eeprom") { }
 
-	UINT16 *videoram;
-	UINT16 *ram;
-	optional_shared_ptr<UINT16> eprom_data;
-	int sound_status;
-	int gun_select;
+	UINT16 *m_videoram;
+	UINT16 *m_ram;
+	optional_shared_ptr<UINT16> m_eprom_data;
+	int m_sound_status;
+	int m_gun_select;
 
-	tilemap_t *fix_tilemap;
-	tilemap_t *pf1_tilemap;
-	tilemap_t *pf2_tilemap;
-	const UINT8 *scale_table_ptr;
-	UINT8 scale_line_count;
+	tilemap_t *m_fix_tilemap;
+	tilemap_t *m_pf1_tilemap;
+	tilemap_t *m_pf2_tilemap;
+	const UINT8 *m_scale_table_ptr;
+	UINT8 m_scale_line_count;
 
-	UINT16 *pf1_data;
-	UINT16 *pf2_data;
-	UINT16 *pf1_scroll_data;
-	UINT16 *pf2_scroll_data;
+	UINT16 *m_pf1_data;
+	UINT16 *m_pf2_data;
+	UINT16 *m_pf1_scroll_data;
+	UINT16 *m_pf2_scroll_data;
 };
 
 

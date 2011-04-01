@@ -104,8 +104,8 @@
 static void update_irqs(running_machine &machine)
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	cputag_set_input_line(machine, "maincpu", 2, state->tms_irq ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, state->duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, state->m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -118,28 +118,28 @@ static void update_irqs(running_machine &machine)
 static MACHINE_START( jpmimpct )
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	state_save_register_global(machine, state->tms_irq);
-	state_save_register_global(machine, state->duart_1_irq);
-	state_save_register_global(machine, state->touch_cnt);
-	state_save_register_global_array(machine, state->touch_data);
+	state_save_register_global(machine, state->m_tms_irq);
+	state_save_register_global(machine, state->m_duart_1_irq);
+	state_save_register_global(machine, state->m_touch_cnt);
+	state_save_register_global_array(machine, state->m_touch_data);
 
 	/* TODO! */
-	state_save_register_global(machine, state->duart_1.ISR);
-	state_save_register_global(machine, state->duart_1.IMR);
-	state_save_register_global(machine, state->duart_1.CT);
+	state_save_register_global(machine, state->m_duart_1.ISR);
+	state_save_register_global(machine, state->m_duart_1.IMR);
+	state_save_register_global(machine, state->m_duart_1.CT);
 }
 
 
 static MACHINE_RESET( jpmimpct )
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->duart_1, 0, sizeof(state->duart_1));
+	memset(&state->m_duart_1, 0, sizeof(state->m_duart_1));
 
 	/* Reset states */
-	state->duart_1_irq = state->tms_irq = 0;
-	state->touch_cnt = 0;
+	state->m_duart_1_irq = state->m_tms_irq = 0;
+	state->m_touch_cnt = 0;
 
-//  state->duart_1.IVR=0x0f;
+//  state->m_duart_1.IVR=0x0f;
 }
 
 
@@ -191,17 +191,17 @@ static READ16_HANDLER( m68k_tms_r )
 static TIMER_DEVICE_CALLBACK( duart_1_timer_event )
 {
 	jpmimpct_state *state = timer.machine().driver_data<jpmimpct_state>();
-	state->duart_1.tc = 0;
-	state->duart_1.ISR |= 0x08;
+	state->m_duart_1.tc = 0;
+	state->m_duart_1.ISR |= 0x08;
 
-	state->duart_1_irq = 1;
+	state->m_duart_1_irq = 1;
 	update_irqs(timer.machine());
 }
 
 static READ16_HANDLER( duart_1_r )
 {
 	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	struct duart_t &duart_1 = state->duart_1;
+	struct duart_t &duart_1 = state->m_duart_1;
 	UINT16 val = 0xffff;
 	switch (offset)
 	{
@@ -254,7 +254,7 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xf:
 		{
-			state->duart_1_irq = 0;
+			state->m_duart_1_irq = 0;
 			update_irqs(space->machine());
 			duart_1.ISR |= ~0x8;
 			break;
@@ -267,7 +267,7 @@ static READ16_HANDLER( duart_1_r )
 static WRITE16_HANDLER( duart_1_w )
 {
 	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	struct duart_t &duart_1 = state->duart_1;
+	struct duart_t &duart_1 = state->m_duart_1;
 	//int old_val;
 	switch (offset)
 	{
@@ -358,13 +358,13 @@ static READ16_HANDLER( duart_2_r )
 	{
 		case 0x9:
 		{
-			if (state->touch_cnt == 0)
+			if (state->m_touch_cnt == 0)
 			{
 				if ( input_port_read(space->machine(), "TOUCH") & 0x1 )
 				{
-					state->touch_data[0] = 0x2a;
-					state->touch_data[1] = 0x7 - (input_port_read(space->machine(), "TOUCH_Y") >> 5) + 0x30;
-					state->touch_data[2] = (input_port_read(space->machine(), "TOUCH_X") >> 5) + 0x30;
+					state->m_touch_data[0] = 0x2a;
+					state->m_touch_data[1] = 0x7 - (input_port_read(space->machine(), "TOUCH_Y") >> 5) + 0x30;
+					state->m_touch_data[2] = (input_port_read(space->machine(), "TOUCH_X") >> 5) + 0x30;
 
 					/* Return RXRDY */
 					return 0x1;
@@ -378,10 +378,10 @@ static READ16_HANDLER( duart_2_r )
 		}
 		case 0xb:
 		{
-			UINT16 val = state->touch_data[state->touch_cnt];
+			UINT16 val = state->m_touch_data[state->m_touch_cnt];
 
-			if (state->touch_cnt++ == 3)
-				state->touch_cnt = 0;
+			if (state->m_touch_cnt++ == 3)
+				state->m_touch_cnt = 0;
 
 			return val;
 		}
@@ -506,8 +506,8 @@ static void jpm_draw_lamps(jpmimpct_state *state, int data, int lamp_strobe)
 	int i;
 	for (i=0; i<16; i++)
 	{
-		state->Lamps[16*(state->lamp_strobe+i)] = data & 1;
-		output_set_lamp_value((16*lamp_strobe)+i, (state->Lamps[(16*lamp_strobe)+i]));
+		state->m_Lamps[16*(state->m_lamp_strobe+i)] = data & 1;
+		output_set_lamp_value((16*lamp_strobe)+i, (state->m_Lamps[(16*lamp_strobe)+i]));
 		data = data >> 1;
 	}
 }
@@ -548,26 +548,26 @@ static WRITE16_HANDLER( jpmio_w )
 			else
 //          slide = 0;
 			MechMtr_update(0, data >> 10);
-			state->duart_1.IP &= ~0x10;
+			state->m_duart_1.IP &= ~0x10;
 			break;
 		}
 
 		case 0x08:
 		{
-			jpm_draw_lamps(state, data, state->lamp_strobe);
+			jpm_draw_lamps(state, data, state->m_lamp_strobe);
 			break;
 		}
 
 		case 0x0b:
 		{
-			output_set_digit_value(state->lamp_strobe,data);
+			output_set_digit_value(state->m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
 		{
 			if (data & 0x10)
 			{
-				state->lamp_strobe = (data +1) & 0x0f;
+				state->m_lamp_strobe = (data +1) & 0x0f;
 			}
 			break;
 		}
@@ -611,7 +611,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_BASE_MEMBER(jpmimpct_state, vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_BASE_MEMBER(jpmimpct_state, m_vram)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
 	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
@@ -782,7 +782,7 @@ INPUT_PORTS_END
 static void jpmimpct_tms_irq(device_t *device, int state)
 {
 	jpmimpct_state *drvstate = device->machine().driver_data<jpmimpct_state>();
-	drvstate->tms_irq = state;
+	drvstate->m_tms_irq = state;
 	update_irqs(device->machine());
 }
 
@@ -1062,9 +1062,9 @@ static WRITE8_DEVICE_HANDLER( payen_a_w )
 	if ( data )
 	{
 		if ( data & 0x10 )
-		state->payen = 1;
+		state->m_payen = 1;
 		else
-		state->payen = 0;
+		state->m_payen = 0;
     }
 }
 
@@ -1088,14 +1088,14 @@ static const ppi8255_interface ppi8255_intf[1] =
 static MACHINE_START( impctawp )
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	state_save_register_global(machine, state->duart_1_irq);
-	state_save_register_global(machine, state->touch_cnt);
-	state_save_register_global_array(machine, state->touch_data);
+	state_save_register_global(machine, state->m_duart_1_irq);
+	state_save_register_global(machine, state->m_touch_cnt);
+	state_save_register_global_array(machine, state->m_touch_data);
 
 	/* TODO! */
-	state_save_register_global(machine, state->duart_1.ISR);
-	state_save_register_global(machine, state->duart_1.IMR);
-	state_save_register_global(machine, state->duart_1.CT);
+	state_save_register_global(machine, state->m_duart_1.ISR);
+	state_save_register_global(machine, state->m_duart_1.IMR);
+	state_save_register_global(machine, state->m_duart_1.CT);
 
 	stepper_config(machine, 0, &starpoint_interface_48step);
 	stepper_config(machine, 1, &starpoint_interface_48step);
@@ -1109,10 +1109,10 @@ static MACHINE_START( impctawp )
 static MACHINE_RESET( impctawp )
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->duart_1, 0, sizeof(state->duart_1));
+	memset(&state->m_duart_1, 0, sizeof(state->m_duart_1));
 
 	/* Reset states */
-	state->duart_1_irq = 0;
+	state->m_duart_1_irq = 0;
 
 	ROC10937_init(0, MSC1937,0);
 	ROC10937_reset(0);	/* reset display1 */
@@ -1145,10 +1145,10 @@ static READ16_HANDLER( optos_r )
 
 	for (i=0; i<6; i++)
 	{
-		if ( stepper_optic_state(i) ) state->optic_pattern |= (1 << i);
-		else                          state->optic_pattern &= ~(1 << i);
+		if ( stepper_optic_state(i) ) state->m_optic_pattern |= (1 << i);
+		else                          state->m_optic_pattern &= ~(1 << i);
 	}
-	return state->optic_pattern;
+	return state->m_optic_pattern;
 }
 
 /*************************************
@@ -1205,31 +1205,31 @@ static WRITE16_HANDLER( jpmioawp_w )
 			MechMtr_update(0, data >> 10);
 			if ( data )
 			{
-				state->duart_1.IP &= ~0x10;
+				state->m_duart_1.IP &= ~0x10;
 			}
 			else
 			{
-				state->duart_1.IP |= 0x10;
+				state->m_duart_1.IP |= 0x10;
 			}
 			break;
 		}
 
 		case 0x08:
 		{
-			jpm_draw_lamps(state, data, state->lamp_strobe);
+			jpm_draw_lamps(state, data, state->m_lamp_strobe);
 			break;
 		}
 
 		case 0x0b:
 		{
-			output_set_digit_value(state->lamp_strobe,data);
+			output_set_digit_value(state->m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
 		{
 			if (data & 0x10)
 			{
-				state->lamp_strobe = (data & 0x0f);
+				state->m_lamp_strobe = (data & 0x0f);
 			}
 			break;
 		}

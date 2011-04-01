@@ -53,9 +53,9 @@ public:
 	caswin_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *sc0_vram;
-	UINT8 *sc0_attr;
-	tilemap_t *sc0_tilemap;
+	UINT8 *m_sc0_vram;
+	UINT8 *m_sc0_attr;
+	tilemap_t *m_sc0_tilemap;
 };
 
 
@@ -63,8 +63,8 @@ public:
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	caswin_state *state = machine.driver_data<caswin_state>();
-	int tile = (state->sc0_vram[tile_index] | ((state->sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
-	int colour = state->sc0_attr[tile_index] & 0xf;
+	int tile = (state->m_sc0_vram[tile_index] | ((state->m_sc0_attr[tile_index] & 0x70)<<4)) & 0x7ff;
+	int colour = state->m_sc0_attr[tile_index] & 0xf;
 
 	SET_TILE_INFO(
 			0,
@@ -76,28 +76,28 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static VIDEO_START(vvillage)
 {
 	caswin_state *state = machine.driver_data<caswin_state>();
-	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 static SCREEN_UPDATE(vvillage)
 {
 	caswin_state *state = screen->machine().driver_data<caswin_state>();
-	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;
 }
 
 static WRITE8_HANDLER( sc0_vram_w )
 {
 	caswin_state *state = space->machine().driver_data<caswin_state>();
-	state->sc0_vram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	state->m_sc0_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
 	caswin_state *state = space->machine().driver_data<caswin_state>();
-	state->sc0_attr[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	state->m_sc0_attr[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset);
 }
 
 /*These two are tested during the two cherry sub-games.I really don't know what is supposed to do...*/
@@ -153,8 +153,8 @@ static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(caswin_state, sc0_vram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(caswin_state, sc0_attr)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(caswin_state, m_sc0_vram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(caswin_state, m_sc0_attr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vvillage_io, AS_IO, 8 )

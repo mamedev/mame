@@ -91,8 +91,8 @@ static WRITE8_HANDLER( funkybee_coin_counter_w )
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_BASE_MEMBER(funkybee_state, videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_BASE_MEMBER(funkybee_state, colorram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_BASE_MEMBER(funkybee_state, m_videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_BASE_MEMBER(funkybee_state, m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(funkybee_flipscreen_w)
 	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
@@ -282,14 +282,14 @@ static MACHINE_START( funkybee )
 {
 	funkybee_state *state = machine.driver_data<funkybee_state>();
 
-	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->m_gfx_bank));
 }
 
 static MACHINE_RESET( funkybee )
 {
 	funkybee_state *state = machine.driver_data<funkybee_state>();
 
-	state->gfx_bank = 0;
+	state->m_gfx_bank = 0;
 }
 
 static MACHINE_CONFIG_START( funkybee, funkybee_state )

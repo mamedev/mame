@@ -20,15 +20,15 @@
 WRITE8_HANDLER( calomega_videoram_w )
 {
 	calomega_state *state = space->machine().driver_data<calomega_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( calomega_colorram_w )
 {
 	calomega_state *state = space->machine().driver_data<calomega_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -40,8 +40,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color */
 
@@ -60,13 +60,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( calomega )
 {
 	calomega_state *state = machine.driver_data<calomega_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
 SCREEN_UPDATE( calomega )
 {
 	calomega_state *state = screen->machine().driver_data<calomega_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 

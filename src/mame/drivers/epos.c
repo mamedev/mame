@@ -39,13 +39,13 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 	epos_state *state = space->machine().driver_data<epos_state>();
 
 	if (offset & 0x04)
-		state->counter = (state->counter + 1) & 0x03;
+		state->m_counter = (state->m_counter + 1) & 0x03;
 	else
-		state->counter = (state->counter - 1) & 0x03;
+		state->m_counter = (state->m_counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(&space->device()), state->counter);
+//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(&space->device()), state->m_counter);
 
-	memory_set_bank(space->machine(), "bank1", state->counter);
+	memory_set_bank(space->machine(), "bank1", state->m_counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -60,7 +60,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(epos_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(epos_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( dealer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(epos_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(epos_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 /*************************************
@@ -367,16 +367,16 @@ static MACHINE_START( epos )
 {
 	epos_state *state = machine.driver_data<epos_state>();
 
-	state->save_item(NAME(state->palette));
-	state->save_item(NAME(state->counter));
+	state->save_item(NAME(state->m_palette));
+	state->save_item(NAME(state->m_counter));
 }
 
 static MACHINE_RESET( epos )
 {
 	epos_state *state = machine.driver_data<epos_state>();
 
-	state->palette = 0;
-	state->counter = 0;
+	state->m_palette = 0;
+	state->m_counter = 0;
 }
 
 

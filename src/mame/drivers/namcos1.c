@@ -384,16 +384,16 @@ static WRITE8_HANDLER( namcos1_coin_w )
 static void namcos1_update_DACs(running_machine &machine)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
-	dac_signed_data_16_w(machine.device("dac"),0x8000 + (state->dac0_value * state->dac0_gain) + (state->dac1_value * state->dac1_gain));
+	dac_signed_data_16_w(machine.device("dac"),0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
 }
 
 void namcos1_init_DACs(running_machine &machine)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
-	state->dac0_value = 0;
-	state->dac1_value = 0;
-	state->dac0_gain=0x80;
-	state->dac1_gain=0x80;
+	state->m_dac0_value = 0;
+	state->m_dac1_value = 0;
+	state->m_dac0_gain=0x80;
+	state->m_dac1_gain=0x80;
 }
 
 static WRITE8_HANDLER( namcos1_dac_gain_w )
@@ -403,11 +403,11 @@ static WRITE8_HANDLER( namcos1_dac_gain_w )
 
 	/* DAC0 (bits 0,2) */
 	value = (data & 1) | ((data >> 1) & 2); /* GAIN0,GAIN1 */
-	state->dac0_gain = 0x20 * (value+1);
+	state->m_dac0_gain = 0x20 * (value+1);
 
 	/* DAC1 (bits 3,4) */
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
-	state->dac1_gain = 0x20 * (value+1);
+	state->m_dac1_gain = 0x20 * (value+1);
 
 	namcos1_update_DACs(space->machine());
 }
@@ -415,14 +415,14 @@ static WRITE8_HANDLER( namcos1_dac_gain_w )
 static WRITE8_HANDLER( namcos1_dac0_w )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->dac0_value = data - 0x80; /* shift zero point */
+	state->m_dac0_value = data - 0x80; /* shift zero point */
 	namcos1_update_DACs(space->machine());
 }
 
 static WRITE8_HANDLER( namcos1_dac1_w )
 {
 	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->dac1_value = data - 0x80; /* shift zero point */
+	state->m_dac1_value = data - 0x80; /* shift zero point */
 	namcos1_update_DACs(space->machine());
 }
 

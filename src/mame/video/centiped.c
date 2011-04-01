@@ -17,7 +17,7 @@
 static TILE_GET_INFO( centiped_get_tile_info )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 
 	int data = videoram[tile_index];
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
@@ -27,9 +27,9 @@ static TILE_GET_INFO( centiped_get_tile_info )
 static TILE_GET_INFO( warlords_get_tile_info )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
-	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (state->flipscreen >> 5);
+	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (state->m_flipscreen >> 5);
 
 	SET_TILE_INFO(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
 }
@@ -38,12 +38,12 @@ static TILE_GET_INFO( warlords_get_tile_info )
 static TILE_GET_INFO( milliped_get_tile_info )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
 	int bank = (data >> 6) & 1;
 	int color = (data >> 6) & 3;
 	/* Flip both x and y if flipscreen is non-zero */
-	int flip_tiles = (state->flipscreen) ? 0x03 : 0;
+	int flip_tiles = (state->m_flipscreen) ? 0x03 : 0;
 
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
 }
@@ -52,9 +52,9 @@ static TILE_GET_INFO( milliped_get_tile_info )
 static TILE_GET_INFO( bullsdrt_get_tile_info )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
-	int bank = state->bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
+	int bank = state->m_bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
 }
@@ -78,7 +78,7 @@ static void init_penmask(running_machine &machine)
 		if (((i >> 0) & 3) == 0) mask |= 2;
 		if (((i >> 2) & 3) == 0) mask |= 4;
 		if (((i >> 4) & 3) == 0) mask |= 8;
-		state->penmask[i] = mask;
+		state->m_penmask[i] = mask;
 	}
 }
 
@@ -93,14 +93,14 @@ static void init_penmask(running_machine &machine)
 VIDEO_START( centiped )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
-	state->bg_tilemap = tilemap_create(machine, centiped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, centiped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask(machine);
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->bullsdrt_sprites_bank));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_bullsdrt_sprites_bank));
 }
 
 
@@ -108,9 +108,9 @@ VIDEO_START( warlords )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
 
-	state->bg_tilemap = tilemap_create(machine, warlords_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, warlords_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 
@@ -118,13 +118,13 @@ VIDEO_START( milliped )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
 
-	state->bg_tilemap = tilemap_create(machine, milliped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, milliped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask(machine);
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 
@@ -132,11 +132,11 @@ VIDEO_START( bullsdrt )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
 
-	state->bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask(machine);
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 
@@ -150,10 +150,10 @@ VIDEO_START( bullsdrt )
 WRITE8_HANDLER( centiped_videoram_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -168,7 +168,7 @@ WRITE8_HANDLER( centiped_flip_screen_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->flipscreen = data >> 7;
+	state->m_flipscreen = data >> 7;
 }
 
 
@@ -183,8 +183,8 @@ WRITE8_HANDLER( bullsdrt_tilesbank_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->bullsdrt_tiles_bankram[offset] = data;
-	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	state->m_bullsdrt_tiles_bankram[offset] = data;
+	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 }
 
 
@@ -199,7 +199,7 @@ WRITE8_HANDLER( bullsdrt_sprites_bank_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->bullsdrt_sprites_bank = data;
+	state->m_bullsdrt_sprites_bank = data;
 }
 
 
@@ -432,15 +432,15 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
 SCREEN_UPDATE( centiped )
 {
 	centiped_state *state = screen->machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	rectangle spriteclip = *cliprect;
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -455,7 +455,7 @@ SCREEN_UPDATE( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx_transmask(bitmap, &spriteclip, screen->machine().gfx[1], code, color, flipx, flipy, x, y, state->penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, &spriteclip, screen->machine().gfx[1], code, color, flipx, flipy, x, y, state->m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -464,20 +464,20 @@ SCREEN_UPDATE( centiped )
 SCREEN_UPDATE( warlords )
 {
 	centiped_state *state = screen->machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int upright_mode = input_port_read(screen->machine(), "IN0") & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */
-	if (state->flipscreen != upright_mode)
+	if (state->m_flipscreen != upright_mode)
 	{
-		state->flipscreen = upright_mode;
-		tilemap_set_flip(state->bg_tilemap, upright_mode ? TILEMAP_FLIPX : 0);
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_flipscreen = upright_mode;
+		tilemap_set_flip(state->m_bg_tilemap, upright_mode ? TILEMAP_FLIPX : 0);
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
@@ -510,16 +510,16 @@ SCREEN_UPDATE( warlords )
 SCREEN_UPDATE( bullsdrt )
 {
 	centiped_state *state = screen->machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	rectangle spriteclip = *cliprect;
 
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -527,7 +527,7 @@ SCREEN_UPDATE( bullsdrt )
 	/* draw the sprites */
 	for (offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (state->bullsdrt_sprites_bank * 0x20);
+		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (state->m_bullsdrt_sprites_bank * 0x20);
 		int color = spriteram[offs + 0x30];
 		int flipy = (spriteram[offs] >> 7) & 1;
 		int x = spriteram[offs + 0x20];
@@ -545,15 +545,15 @@ SCREEN_UPDATE( bullsdrt )
 SCREEN_UPDATE( milliped )
 {
 	centiped_state *state = screen->machine().driver_data<centiped_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	rectangle spriteclip = *cliprect;
 	int offs;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* apply the sprite clip */
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 		spriteclip.min_x += 8;
 	else
 		spriteclip.max_x -= 8;
@@ -563,7 +563,7 @@ SCREEN_UPDATE( milliped )
 	{
 		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6);
 		int color = spriteram[offs + 0x30];
-		int flipx = state->flipscreen;
+		int flipx = state->m_flipscreen;
 		int flipy = (spriteram[offs] & 0x80);
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
@@ -571,7 +571,7 @@ SCREEN_UPDATE( milliped )
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, &spriteclip, screen->machine().gfx[1], code, color, flipx, flipy, x, y, state->penmask[color & 0x3f]);
+		drawgfx_transmask(bitmap, &spriteclip, screen->machine().gfx[1], code, color, flipx, flipy, x, y, state->m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

@@ -4,12 +4,12 @@ public:
 	nova2001_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 ninjakun_io_a002_ctrl;
-	UINT8 *fg_videoram;
-	UINT8 *bg_videoram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT8 *spriteram;
+	UINT8 m_ninjakun_io_a002_ctrl;
+	UINT8 *m_fg_videoram;
+	UINT8 *m_bg_videoram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 *m_spriteram;
 };
 
 

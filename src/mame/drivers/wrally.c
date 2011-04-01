@@ -103,11 +103,11 @@ produces a high clock frequency, slow movements a low freq.
 
 static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE_MEMBER(wrally_state, videoram)	/* encrypted Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE_MEMBER(wrally_state, vregs)									/* Video Registers */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE_MEMBER(wrally_state, m_videoram)	/* encrypted Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE_MEMBER(wrally_state, m_vregs)									/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP												/* CLR INT Video */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(wrally_state, spriteram)								/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(wrally_state, m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("WHEEL")
@@ -119,13 +119,13 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP												/* Sound muting */
 	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITENOP												/* ??? */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE_MEMBER(wrally_state, shareram)										/* Work RAM (shared with DS5002FP) */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE_MEMBER(wrally_state, m_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
 static READ8_HANDLER( dallas_share_r )
 {
 	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->shareram;
+	UINT8 *shareram = (UINT8 *)state->m_shareram;
 
 	return shareram[BYTE_XOR_LE(offset) ^ 1];
 }
@@ -133,7 +133,7 @@ static READ8_HANDLER( dallas_share_r )
 static WRITE8_HANDLER( dallas_share_w )
 {
 	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->shareram;
+	UINT8 *shareram = (UINT8 *)state->m_shareram;
 
 	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
 }

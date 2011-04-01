@@ -76,10 +76,10 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pf1_rowscroll)
-	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pf2_rowscroll)
+	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pf1_rowscroll)
+	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pf2_rowscroll)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(pktgaldx_state, spriteram, spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(pktgaldx_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
@@ -122,9 +122,9 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 
 static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pktgaldb_fgram) // fgram on original?
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pktgaldb_fgram) // fgram on original?
 	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, pktgaldb_sprites)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pktgaldb_sprites)
 
 	AM_RANGE(0x130000, 0x130fff) AM_RAM // palette on original?
 
@@ -321,8 +321,8 @@ static MACHINE_START( pktgaldx )
 {
 	pktgaldx_state *state = machine.driver_data<pktgaldx_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )

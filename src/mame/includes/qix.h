@@ -26,21 +26,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* machine state */
-	UINT8 *_68705_port_out;
-	UINT8 *_68705_ddr;
-	UINT8  _68705_port_in[3];
-	UINT8  coinctrl;
+	UINT8 *m_68705_port_out;
+	UINT8 *m_68705_ddr;
+	UINT8  m_68705_port_in[3];
+	UINT8  m_coinctrl;
 
 	/* video state */
-	UINT8 *videoram;
-	UINT8 *videoram_address;
-	UINT8 *videoram_mask;
-	UINT8 *paletteram;
-	UINT8  flip;
-	UINT8  palette_bank;
-	UINT8  leds;
-	UINT8 *scanline_latch;
-	pen_t pens[NUM_PENS];
+	UINT8 *m_videoram;
+	UINT8 *m_videoram_address;
+	UINT8 *m_videoram_mask;
+	UINT8 *m_paletteram;
+	UINT8  m_flip;
+	UINT8  m_palette_bank;
+	UINT8  m_leds;
+	UINT8 *m_scanline_latch;
+	pen_t m_pens[NUM_PENS];
 };
 
 

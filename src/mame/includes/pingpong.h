@@ -4,13 +4,13 @@ public:
 	pingpong_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int intenable;
-	int question_addr_high;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	int m_intenable;
+	int m_question_addr_high;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

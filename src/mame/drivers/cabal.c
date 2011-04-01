@@ -55,7 +55,7 @@ Dip locations verified with Fabtek manual for the trackball version
 static MACHINE_RESET( cabalbl )
 {
 	cabal_state *state = machine.driver_data<cabal_state>();
-	state->sound_command1 = state->sound_command2 = 0xff;
+	state->m_sound_command1 = state->m_sound_command2 = 0xff;
 }
 
 
@@ -68,11 +68,11 @@ static WRITE16_HANDLER( cabalbl_sndcmd_w )
 	switch (offset)
 	{
 		case 0x0:
-			state->sound_command1 = data;
+			state->m_sound_command1 = data;
 			break;
 
 		case 0x1: /* ?? */
-			state->sound_command2 = data & 0xff;
+			state->m_sound_command2 = data & 0xff;
 			break;
 	}
 }
@@ -86,7 +86,7 @@ static WRITE16_HANDLER( track_reset_w )
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
-		state->last[i] = input_port_read(space->machine(), track_names[i]);
+		state->m_last[i] = input_port_read(space->machine(), track_names[i]);
 }
 
 static READ16_HANDLER( track_r )
@@ -96,10 +96,10 @@ static READ16_HANDLER( track_r )
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(space->machine(), "IN0") - state->last[0]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN2") - state->last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(space->machine(), "IN0") - state->last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN2") - state->last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(space->machine(), "IN1") - state->last[1]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN3") - state->last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(space->machine(), "IN1") - state->last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN3") - state->last[3]) & 0xff00);			/* Y hi */
+		case 0:	return (( input_port_read(space->machine(), "IN0") - state->m_last[0]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN2") - state->m_last[2]) & 0x00ff) << 8);	/* X lo */
+		case 1:	return (((input_port_read(space->machine(), "IN0") - state->m_last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN2") - state->m_last[2]) & 0xff00);			/* X hi */
+		case 2:	return (( input_port_read(space->machine(), "IN1") - state->m_last[1]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN3") - state->m_last[3]) & 0x00ff) << 8);	/* Y lo */
+		case 3:	return (((input_port_read(space->machine(), "IN1") - state->m_last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN3") - state->m_last[3]) & 0xff00);			/* Y hi */
 	}
 }
 
@@ -122,10 +122,10 @@ static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, spriteram, spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, m_colorram)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, m_videoram)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
@@ -141,10 +141,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, spriteram, spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, m_colorram)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, m_videoram)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
@@ -164,14 +164,14 @@ static READ8_HANDLER( cabalbl_snd2_r )
 {
 	cabal_state *state = space->machine().driver_data<cabal_state>();
 
-	return BITSWAP8(state->sound_command2, 7,2,4,5,3,6,1,0);
+	return BITSWAP8(state->m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 static READ8_HANDLER( cabalbl_snd1_r )
 {
 	cabal_state *state = space->machine().driver_data<cabal_state>();
 
-	return BITSWAP8(state->sound_command1, 7,2,4,5,3,6,1,0);
+	return BITSWAP8(state->m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
 static WRITE8_HANDLER( cabalbl_coin_w )

@@ -45,26 +45,26 @@ class mirage_state : public driver_device
 public:
 	mirage_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  deco_tilegen1(*this, "tilegen1"),
-		  oki_sfx(*this, "oki_sfx"),
-		  oki_bgm(*this, "oki_bgm") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_deco_tilegen1(*this, "tilegen1"),
+		  m_oki_sfx(*this, "oki_sfx"),
+		  m_oki_bgm(*this, "oki_bgm") { }
 
 	/* memory pointers */
-	UINT16 *  pf1_rowscroll;
-	UINT16 *  pf2_rowscroll;
-//  UINT16 *  spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
-//  size_t    spriteram_size;
+	UINT16 *  m_pf1_rowscroll;
+	UINT16 *  m_pf2_rowscroll;
+//  UINT16 *  m_spriteram;
+//  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
+//  size_t    m_spriteram_size;
 
 	/* misc */
-	UINT8 mux_data;
+	UINT8 m_mux_data;
 
 	/* devices */
-	required_device<m68000_device> maincpu;
-	required_device<deco16ic_device> deco_tilegen1;
-	required_device<okim6295_device> oki_sfx;
-	required_device<okim6295_device> oki_bgm;
+	required_device<m68000_device> m_maincpu;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<okim6295_device> m_oki_sfx;
+	required_device<okim6295_device> m_oki_bgm;
 };
 
 static VIDEO_START( mirage )
@@ -75,19 +75,19 @@ static VIDEO_START( mirage )
 static SCREEN_UPDATE( mirage )
 {
 	mirage_state *state = screen->machine().driver_data<mirage_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
 	flip_screen_set(screen->machine(), BIT(flip, 7));
 
 	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 0x400); 
 
-	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256); /* not verified */
 
-	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	screen->machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine(), bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
@@ -103,13 +103,13 @@ static SCREEN_EOF( mirage )
 static WRITE16_HANDLER( mirage_mux_w )
 {
 	mirage_state *state = space->machine().driver_data<mirage_state>();
-	state->mux_data = data & 0x1f;
+	state->m_mux_data = data & 0x1f;
 }
 
 static READ16_HANDLER( mirage_input_r )
 {
 	mirage_state *state = space->machine().driver_data<mirage_state>();
-	switch (state->mux_data & 0x1f)
+	switch (state->m_mux_data & 0x1f)
 	{
 		case 0x01: return input_port_read(space->machine(), "KEY0");
 		case 0x02: return input_port_read(space->machine(), "KEY1");
@@ -124,7 +124,7 @@ static READ16_HANDLER( mirage_input_r )
 static WRITE16_HANDLER( okim1_rombank_w )
 {
 	mirage_state *state = space->machine().driver_data<mirage_state>();
-	state->oki_sfx->set_bank_base(0x40000 * (data & 0x3));
+	state->m_oki_sfx->set_bank_base(0x40000 * (data & 0x3));
 }
 
 static WRITE16_HANDLER( okim0_rombank_w )
@@ -132,7 +132,7 @@ static WRITE16_HANDLER( okim0_rombank_w )
 	mirage_state *state = space->machine().driver_data<mirage_state>();
 
 	/*bits 4-6 used on POST? */
-	state->oki_bgm->set_bank_base(0x40000 * (data & 0x7));
+	state->m_oki_bgm->set_bank_base(0x40000 * (data & 0x7));
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16 )
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested
 	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w) // 0x102000 - 0x102fff tested
 	/* linescroll */
-	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf1_rowscroll)
-	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf2_rowscroll)
+	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, m_pf1_rowscroll)
+	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, m_pf2_rowscroll)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8_MODERN("oki_sfx", okim6295_device, read, write, 0x00ff)
@@ -304,14 +304,14 @@ static MACHINE_START( mirage )
 {
 	mirage_state *state = machine.driver_data<mirage_state>();
 
-	state->save_item(NAME(state->mux_data));
+	state->save_item(NAME(state->m_mux_data));
 }
 
 static MACHINE_RESET( mirage )
 {
 	mirage_state *state = machine.driver_data<mirage_state>();
 
-	state->mux_data = 0;
+	state->m_mux_data = 0;
 }
 
 static MACHINE_CONFIG_START( mirage, mirage_state )

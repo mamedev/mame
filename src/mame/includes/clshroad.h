@@ -4,14 +4,14 @@ public:
 	clshroad_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram_0;
-	UINT8 *vram_1;
-	UINT8 *vregs;
-	tilemap_t *tilemap_0a;
-	tilemap_t *tilemap_0b;
-	tilemap_t *tilemap_1;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_vram_0;
+	UINT8 *m_vram_1;
+	UINT8 *m_vregs;
+	tilemap_t *m_tilemap_0a;
+	tilemap_t *m_tilemap_0b;
+	tilemap_t *m_tilemap_1;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

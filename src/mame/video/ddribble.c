@@ -36,7 +36,7 @@ static void set_pens( running_machine &machine )
 
 	for (i = 0x00; i < 0x80; i += 2)
 	{
-		UINT16 data = state->paletteram[i | 1] | (state->paletteram[i] << 8);
+		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 		colortable_palette_set_color(machine.colortable, i >> 1, color);
@@ -50,17 +50,17 @@ WRITE8_HANDLER( K005885_0_w )
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 1 */
-			if ((data & 0x03) != state->charbank[0])
+			if ((data & 0x03) != state->m_charbank[0])
 			{
-				state->charbank[0] = data & 0x03;
-				tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+				state->m_charbank[0] = data & 0x03;
+				tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
 			}
 			break;
 		case 0x04:	/* IRQ control, flipscreen */
-			state->int_enable_0 = data & 0x02;
+			state->m_int_enable_0 = data & 0x02;
 			break;
 	}
-	state->vregs[0][offset] = data;
+	state->m_vregs[0][offset] = data;
 }
 
 WRITE8_HANDLER( K005885_1_w )
@@ -69,17 +69,17 @@ WRITE8_HANDLER( K005885_1_w )
 	switch (offset)
 	{
 		case 0x03:	/* char bank selection for set 2 */
-			if ((data & 0x03) != state->charbank[1])
+			if ((data & 0x03) != state->m_charbank[1])
 			{
-				state->charbank[1] = data & 0x03;
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+				state->m_charbank[1] = data & 0x03;
+				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 			}
 			break;
 		case 0x04:	/* IRQ control, flipscreen */
-			state->int_enable_1 = data & 0x02;
+			state->m_int_enable_1 = data & 0x02;
 			break;
 	}
-	state->vregs[1][offset] = data;
+	state->m_vregs[1][offset] = data;
 }
 
 /***************************************************************************
@@ -97,8 +97,8 @@ static TILEMAP_MAPPER( tilemap_scan )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	ddribble_state *state = machine.driver_data<ddribble_state>();
-	UINT8 attr = state->fg_videoram[tile_index];
-	int num = state->fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((state->charbank[0] & 2) << 10);
+	UINT8 attr = state->m_fg_videoram[tile_index];
+	int num = state->m_fg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((state->m_charbank[0] & 2) << 10);
 	SET_TILE_INFO(
 			0,
 			num,
@@ -109,8 +109,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	ddribble_state *state = machine.driver_data<ddribble_state>();
-	UINT8 attr = state->bg_videoram[tile_index];
-	int num = state->bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (state->charbank[1] << 11);
+	UINT8 attr = state->m_bg_videoram[tile_index];
+	int num = state->m_bg_videoram[tile_index + 0x400] + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (state->m_charbank[1] << 11);
 	SET_TILE_INFO(
 			1,
 			num,
@@ -128,10 +128,10 @@ VIDEO_START( ddribble )
 {
 	ddribble_state *state = machine.driver_data<ddribble_state>();
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan, 8, 8, 64, 32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan, 8, 8, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
 /***************************************************************************
@@ -143,15 +143,15 @@ VIDEO_START( ddribble )
 WRITE8_HANDLER( ddribble_fg_videoram_w )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0xbff);
+	state->m_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0xbff);
 }
 
 WRITE8_HANDLER( ddribble_bg_videoram_w )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0xbff);
+	state->m_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0xbff);
 }
 
 /***************************************************************************
@@ -255,18 +255,18 @@ SCREEN_UPDATE( ddribble )
 	ddribble_state *state = screen->machine().driver_data<ddribble_state>();
 	set_pens(screen->machine());
 
-	tilemap_set_flip(state->fg_tilemap, (state->vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	tilemap_set_flip(state->bg_tilemap, (state->vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip(state->m_fg_tilemap, (state->m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	tilemap_set_flip(state->m_bg_tilemap, (state->m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* set scroll registers */
-	tilemap_set_scrollx(state->fg_tilemap, 0, state->vregs[0][1] | ((state->vregs[0][2] & 0x01) << 8));
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->vregs[1][1] | ((state->vregs[1][2] & 0x01) << 8));
-	tilemap_set_scrolly(state->fg_tilemap, 0, state->vregs[0][0]);
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->vregs[1][0]);
+	tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_vregs[0][1] | ((state->m_vregs[0][2] & 0x01) << 8));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_vregs[1][1] | ((state->m_vregs[1][2] & 0x01) << 8));
+	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_vregs[0][0]);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_vregs[1][0]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_1, 0x07d, 2, state->vregs[0][4] & 0x08);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram_2, 0x140, 3, state->vregs[1][4] & 0x08);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram_1, 0x07d, 2, state->m_vregs[0][4] & 0x08);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram_2, 0x140, 3, state->m_vregs[1][4] & 0x08);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

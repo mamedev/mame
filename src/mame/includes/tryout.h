@@ -4,15 +4,15 @@ public:
 	tryout_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *gfx_control;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 vram_bank;
-	UINT8 *vram;
-	UINT8 *vram_gfx;
-	UINT8 *spriteram;
-	UINT8 *spriteram2;
+	UINT8 *m_videoram;
+	UINT8 *m_gfx_control;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_vram_bank;
+	UINT8 *m_vram;
+	UINT8 *m_vram_gfx;
+	UINT8 *m_spriteram;
+	UINT8 *m_spriteram2;
 };
 
 

@@ -4,12 +4,12 @@ public:
 	shootout_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *background;
-	tilemap_t *foreground;
-	UINT8 *spriteram;
-	UINT8 *videoram;
-	UINT8 *textram;
-	int bFlicker;
+	tilemap_t *m_background;
+	tilemap_t *m_foreground;
+	UINT8 *m_spriteram;
+	UINT8 *m_videoram;
+	UINT8 *m_textram;
+	int m_bFlicker;
 };
 
 

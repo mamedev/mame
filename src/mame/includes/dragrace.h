@@ -29,18 +29,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  playfield_ram;
-	UINT8 *  position_ram;
+	UINT8 *  m_playfield_ram;
+	UINT8 *  m_position_ram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	unsigned  misc_flags;
-	int       gear[2];
+	unsigned  m_misc_flags;
+	int       m_gear[2];
 
 	/* devices */
-	device_t *discrete;
+	device_t *m_discrete;
 };
 
 

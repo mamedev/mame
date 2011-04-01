@@ -12,21 +12,21 @@ public:
 	atarigx2_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16			playfield_base;
+	UINT16			m_playfield_base;
 
-	UINT32 *		mo_command;
-	UINT32 *		protection_base;
+	UINT32 *		m_mo_command;
+	UINT32 *		m_protection_base;
 
-	UINT16			current_control;
-	UINT8			playfield_tile_bank;
-	UINT8			playfield_color_bank;
-	UINT16			playfield_xscroll;
-	UINT16			playfield_yscroll;
+	UINT16			m_current_control;
+	UINT8			m_playfield_tile_bank;
+	UINT8			m_playfield_color_bank;
+	UINT16			m_playfield_xscroll;
+	UINT16			m_playfield_yscroll;
 
-	UINT16			last_write;
-	UINT16			last_write_offset;
+	UINT16			m_last_write;
+	UINT16			m_last_write_offset;
 
-	device_t *		rle;
+	device_t *		m_rle;
 };
 
 

@@ -159,22 +159,22 @@ static void update_interrupts(running_machine &machine)
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
-	if (state->video_int_state)
+	if (state->m_video_int_state)
 		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
 
-	if (state->scanline_int_state)
+	if (state->m_scanline_int_state)
 		cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
 
-	if (state->p2portwr_state)
+	if (state->m_p2portwr_state)
 		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
 
-	if (state->p2portrd_state)
+	if (state->m_p2portrd_state)
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -195,7 +195,7 @@ static void scanline_update(screen_device &screen, int scanline)
 	{
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
-			if (state->interrupt_enable & 4)
+			if (state->m_interrupt_enable & 4)
 				atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 	}
 }
@@ -214,7 +214,7 @@ DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 	if (address >= 0x8000 && address < 0x8200)
 	{
 		atarisy2_state *state = machine->driver_data<atarisy2_state>();
-		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, (UINT8 *)state->slapstic_base);
+		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, (UINT8 *)state->m_slapstic_base);
 		return ~0;
 	}
 	return address;
@@ -226,12 +226,12 @@ static MACHINE_START( atarisy2 )
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 	atarigen_init(machine);
 
-	state->save_item(NAME(state->interrupt_enable));
-	state->save_item(NAME(state->which_adc));
-	state->save_item(NAME(state->p2portwr_state));
-	state->save_item(NAME(state->p2portrd_state));
+	state->save_item(NAME(state->m_interrupt_enable));
+	state->save_item(NAME(state->m_which_adc));
+	state->save_item(NAME(state->m_p2portwr_state));
+	state->save_item(NAME(state->m_p2portrd_state));
 	machine.state().register_postload(bankselect_postload, NULL);
-	state->save_item(NAME(state->sound_reset_state));
+	state->save_item(NAME(state->m_sound_reset_state));
 }
 
 
@@ -248,10 +248,10 @@ static MACHINE_RESET( atarisy2 )
 	address_space *main = machine.device<t11_device>("maincpu")->space(AS_PROGRAM);
 	main->set_direct_update_handler(direct_update_delegate_create_static(atarisy2_direct_handler, machine));
 
-	state->p2portwr_state = 0;
-	state->p2portrd_state = 0;
+	state->m_p2portwr_state = 0;
+	state->m_p2portrd_state = 0;
 
-	state->which_adc = 0;
+	state->m_which_adc = 0;
 }
 
 
@@ -267,7 +267,7 @@ static INTERRUPT_GEN( vblank_int )
 	atarisy2_state *state = device->machine().driver_data<atarisy2_state>();
 
 	/* clock the VBLANK through */
-	if (state->interrupt_enable & 8)
+	if (state->m_interrupt_enable & 8)
 		atarigen_video_int_gen(device);
 }
 
@@ -276,7 +276,7 @@ static WRITE16_HANDLER( int0_ack_w )
 {
 	/* reset sound IRQ */
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	state->p2portrd_state = 0;
+	state->m_p2portrd_state = 0;
 	atarigen_update_interrupts(space->machine());
 }
 
@@ -292,7 +292,7 @@ static WRITE16_HANDLER( int1_ack_w )
 static TIMER_CALLBACK( delayed_int_enable_w )
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	state->interrupt_enable = param;
+	state->m_interrupt_enable = param;
 }
 
 
@@ -333,14 +333,14 @@ static WRITE16_HANDLER( bankselect_w )
 	};
 
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	int newword = state->bankselect[offset];
+	int newword = state->m_bankselect[offset];
 	UINT8 *base;
 
 	COMBINE_DATA(&newword);
-	state->bankselect[offset] = newword;
+	state->m_bankselect[offset] = newword;
 
 	base = &space->machine().region("maincpu")->base()[bankoffset[(newword >> 10) & 0x3f]];
-	memcpy(offset ? state->rombank2 : state->rombank1, base, 0x2000);
+	memcpy(offset ? state->m_rombank2 : state->m_rombank1, base, 0x2000);
 }
 
 
@@ -349,8 +349,8 @@ static STATE_POSTLOAD( bankselect_postload )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
-	bankselect_w(space, 0, state->bankselect[0], 0xffff);
-	bankselect_w(space, 1, state->bankselect[1], 0xffff);
+	bankselect_w(space, 0, state->m_bankselect[0], 0xffff);
+	bankselect_w(space, 1, state->m_bankselect[1], 0xffff);
 }
 
 
@@ -366,8 +366,8 @@ static READ16_HANDLER( switch_r )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 	int result = input_port_read(space->machine(), "1800") | (input_port_read(space->machine(), "1801") << 8);
 
-	if (state->cpu_to_sound_ready) result ^= 0x20;
-	if (state->sound_to_cpu_ready) result ^= 0x10;
+	if (state->m_cpu_to_sound_ready) result ^= 0x20;
+	if (state->m_sound_to_cpu_ready) result ^= 0x10;
 
 	return result;
 }
@@ -378,9 +378,9 @@ static READ8_HANDLER( switch_6502_r )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 	int result = input_port_read(space->machine(), "1840");
 
-	if (state->cpu_to_sound_ready) result |= 0x01;
-	if (state->sound_to_cpu_ready) result |= 0x02;
-	if ((state->has_tms5220) && (tms5220_readyq_r(space->machine().device("tms")) == 0))
+	if (state->m_cpu_to_sound_ready) result |= 0x01;
+	if (state->m_sound_to_cpu_ready) result |= 0x02;
+	if ((state->m_has_tms5220) && (tms5220_readyq_r(space->machine().device("tms")) == 0))
 		result &= ~0x04;
 	if (!(input_port_read(space->machine(), "1801") & 0x80)) result |= 0x10;
 
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( switch_6502_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
-	if (state->has_tms5220)
+	if (state->m_has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
 		tms5220_set_frequency(space->machine().device("tms"), MASTER_CLOCK/4 / (16 - data) / 2);
@@ -410,7 +410,7 @@ static WRITE8_HANDLER( switch_6502_w )
 static WRITE16_HANDLER( adc_strobe_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	state->which_adc = offset & 3;
+	state->m_which_adc = offset & 3;
 }
 
 
@@ -419,10 +419,10 @@ static READ16_HANDLER( adc_r )
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
-	if (state->which_adc < state->pedal_count)
-		return ~input_port_read(space->machine(), adcnames[state->which_adc]);
+	if (state->m_which_adc < state->m_pedal_count)
+		return ~input_port_read(space->machine(), adcnames[state->m_which_adc]);
 
-	return input_port_read(space->machine(), adcnames[state->which_adc]) | 0xff00;
+	return input_port_read(space->machine(), adcnames[state->m_which_adc]) | 0xff00;
 }
 
 
@@ -431,7 +431,7 @@ static READ8_HANDLER( leta_r )
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
-    if (offset <= 1 && state->pedal_count == -1)   /* 720 */
+    if (offset <= 1 && state->m_pedal_count == -1)   /* 720 */
 	{
 		switch (input_port_read(space->machine(), "SELECT"))
 		{
@@ -446,16 +446,16 @@ static READ8_HANDLER( leta_r )
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
-				angle = state->joy_last_angle;
+				angle = state->m_joy_last_angle;
 				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
 					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
 
 				/* detect when we pass the 0 point in either direction */
-				if (state->joy_last_angle < -90 && angle > 90)
-					state->joy_rotations--;
-				else if (state->joy_last_angle > 90 && angle < -90)
-					state->joy_rotations++;
-				state->joy_last_angle = angle;
+				if (state->m_joy_last_angle < -90 && angle > 90)
+					state->m_joy_rotations--;
+				else if (state->m_joy_last_angle > 90 && angle < -90)
+					state->m_joy_rotations++;
+				state->m_joy_last_angle = angle;
 
 				/* make offset 0 return 0xff when the controller blocks one of two gaps */
 				/* this is not accurate, as a counter should count up/down 2 counts as it passes through each gap */
@@ -473,7 +473,7 @@ static READ8_HANDLER( leta_r )
 				else
 				{
 					/* take the rotations * 144 plus the current angle */
-					return (state->joy_rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
+					return (state->m_joy_rotations * 144 + (int)(angle * 144.0 / 360.0)) & 0xff;
 				}
 			}
 
@@ -486,26 +486,26 @@ static READ8_HANDLER( leta_r )
                  * we use it to generate the LETA0 Center encoder count
                  */
 
-				if (rotate_count != state->spin_last_rotate_count)
+				if (rotate_count != state->m_spin_last_rotate_count)
 				{
 					/* see if count rolled between 0xffff and 0x0000 */
-					if ((state->spin_last_rotate_count > 0xc000) && (rotate_count < 0x03ff))
+					if ((state->m_spin_last_rotate_count > 0xc000) && (rotate_count < 0x03ff))
 					{
-						temp = 0xffff - state->spin_last_rotate_count;
+						temp = 0xffff - state->m_spin_last_rotate_count;
 						diff = rotate_count + temp + 1;
 					}
-					else if ((rotate_count > 0xc000) && (state->spin_last_rotate_count < 0x03ff))
+					else if ((rotate_count > 0xc000) && (state->m_spin_last_rotate_count < 0x03ff))
 					{
 						temp = 0xffff - rotate_count;
-						diff = state->spin_last_rotate_count - temp - 1;
+						diff = state->m_spin_last_rotate_count - temp - 1;
 					}
 					else
 					{
-						temp = rotate_count - state->spin_last_rotate_count;
+						temp = rotate_count - state->m_spin_last_rotate_count;
 						diff = temp;
 					}
 
-					state->spin_last_rotate_count = rotate_count;
+					state->m_spin_last_rotate_count = rotate_count;
 
 					/* you may not like this, but it is the easiest way to accurately fake the center count */
 					/* diff is never a big number anyways */
@@ -513,17 +513,17 @@ static READ8_HANDLER( leta_r )
 					{
 						for (int i = 0; i > diff; i--)
 						{
-							state->spin_pos--;
-							if (state->spin_pos < 0)
-								state->spin_pos = 143;
+							state->m_spin_pos--;
+							if (state->m_spin_pos < 0)
+								state->m_spin_pos = 143;
 							else
-								switch (state->spin_pos)
+								switch (state->m_spin_pos)
 								{
 									case 2:
 									case 3:
 									case 141:
 									case 142:
-										state->spin_center_count--;
+										state->m_spin_center_count--;
 								}
 						}
 					}
@@ -531,24 +531,24 @@ static READ8_HANDLER( leta_r )
 					{
 						for (int i = 0; i < diff; i++)
 						{
-							state->spin_pos++;
-							if (state->spin_pos > 143)
-								state->spin_pos = 0;
+							state->m_spin_pos++;
+							if (state->m_spin_pos > 143)
+								state->m_spin_pos = 0;
 							else
-								switch (state->spin_pos)
+								switch (state->m_spin_pos)
 								{
 									case 2:
 									case 3:
 									case 141:
 									case 142:
-										state->spin_center_count++;
+										state->m_spin_center_count++;
 								}
 						}
 					}
 				}
 
 				if (offset == 0)
-					return state->spin_center_count & 0xff;
+					return state->m_spin_center_count & 0xff;
 				else
 					/* offset == 1 */
 					return rotate_count & 0xff;
@@ -695,18 +695,18 @@ static WRITE8_HANDLER( sound_reset_w )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
 	/* if no change, do nothing */
-	if ((data & 1) == state->sound_reset_state)
+	if ((data & 1) == state->m_sound_reset_state)
 		return;
-	state->sound_reset_state = data & 1;
+	state->m_sound_reset_state = data & 1;
 
 	/* only track the 0 -> 1 transition */
-	if (state->sound_reset_state == 0)
+	if (state->m_sound_reset_state == 0)
 		return;
 
 	/* a large number of signals are reset when this happens */
 	atarigen_sound_io_reset(space->machine().device("soundcpu"));
 	devtag_reset(space->machine(), "ymsnd");
-	if (state->has_tms5220)
+	if (state->m_has_tms5220)
 	{
 		devtag_reset(space->machine(), "tms"); // technically what happens is the tms5220 gets a long stream of 0xFF written to it when sound_reset_state is 0 which halts the chip after a few frames, but this works just as well, even if it isn't exactly true to hardware... The hardware may not have worked either, the resistors to pull input to 0xFF are fighting against the ls263 gate holding the latched value to be sent to the chip.
 	}
@@ -719,7 +719,7 @@ static READ16_HANDLER( sound_r )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
 	/* clear the p2portwr state on a p1portrd */
-	state->p2portwr_state = 0;
+	state->m_p2portwr_state = 0;
 	atarigen_update_interrupts(space->machine());
 
 	/* handle it normally otherwise */
@@ -732,7 +732,7 @@ static WRITE8_HANDLER( sound_6502_w )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
 	/* clock the state through */
-	state->p2portwr_state = (state->interrupt_enable & 2) != 0;
+	state->m_p2portwr_state = (state->m_interrupt_enable & 2) != 0;
 	atarigen_update_interrupts(space->machine());
 
 	/* handle it normally otherwise */
@@ -745,7 +745,7 @@ static READ8_HANDLER( sound_6502_r )
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
 
 	/* clock the state through */
-	state->p2portrd_state = (state->interrupt_enable & 1) != 0;
+	state->m_p2portrd_state = (state->m_interrupt_enable & 1) != 0;
 	atarigen_update_interrupts(space->machine());
 
 	/* handle it normally otherwise */
@@ -763,7 +763,7 @@ static READ8_HANDLER( sound_6502_r )
 static WRITE8_HANDLER( tms5220_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	if (state->has_tms5220)
+	if (state->m_has_tms5220)
 	{
 		tms5220_data_w(space->machine().device("tms"), 0, data);
 	}
@@ -772,7 +772,7 @@ static WRITE8_HANDLER( tms5220_w )
 static WRITE8_HANDLER( tms5220_strobe_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	if (state->has_tms5220)
+	if (state->m_has_tms5220)
 	{
 		tms5220_wsq_w(space->machine().device("tms"), 1-(offset & 1));
 	}
@@ -802,7 +802,7 @@ static WRITE8_HANDLER( coincount_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_WRITE(atarisy2_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w) AM_BASE_MEMBER(atarisy2_state, bankselect)
+	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w) AM_BASE_MEMBER(atarisy2_state, m_bankselect)
 	AM_RANGE(0x1480, 0x1487) AM_MIRROR(0x0078) AM_WRITE(adc_strobe_w)
 	AM_RANGE(0x1580, 0x1581) AM_MIRROR(0x001e) AM_WRITE(int0_ack_w)
 	AM_RANGE(0x15a0, 0x15a1) AM_MIRROR(0x001e) AM_WRITE(int1_ack_w)
@@ -810,14 +810,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x15e0, 0x15e1) AM_MIRROR(0x001e) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x007e) AM_WRITE(int_enable_w)
 	AM_RANGE(0x1680, 0x1681) AM_MIRROR(0x007e) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(atarisy2_xscroll_w) AM_BASE_MEMBER(atarisy2_state, xscroll)
-	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(atarisy2_yscroll_w) AM_BASE_MEMBER(atarisy2_state, yscroll)
+	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(atarisy2_xscroll_w) AM_BASE_MEMBER(atarisy2_state, m_xscroll)
+	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(atarisy2_yscroll_w) AM_BASE_MEMBER(atarisy2_state, m_yscroll)
 	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READWRITE(switch_r, watchdog_reset16_w)
 	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x03fe) AM_READ(sound_r)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(atarisy2_videoram_r, atarisy2_videoram_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_BASE_MEMBER(atarisy2_state, rombank1)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_BASE_MEMBER(atarisy2_state, rombank2)
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(atarisy2_slapstic_r, atarisy2_slapstic_w) AM_BASE_MEMBER(atarisy2_state, slapstic_base)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_BASE_MEMBER(atarisy2_state, m_rombank1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_BASE_MEMBER(atarisy2_state, m_rombank2)
+	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(atarisy2_slapstic_r, atarisy2_slapstic_w) AM_BASE_MEMBER(atarisy2_state, m_slapstic_base)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -3208,8 +3208,8 @@ static DRIVER_INIT( paperboy )
 		memcpy(&cpu1[i + 0x18000], &cpu1[i], 0x8000);
 	}
 
-	state->pedal_count = 0;
-	state->has_tms5220 = 1;
+	state->m_pedal_count = 0;
+	state->m_has_tms5220 = 1;
 	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
@@ -3222,8 +3222,8 @@ static DRIVER_INIT( 720 )
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 	slapstic_init(machine, 107);
 
-	state->pedal_count = -1;
-	state->has_tms5220 = 1;
+	state->m_pedal_count = -1;
+	state->m_has_tms5220 = 1;
 	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
 }
 
@@ -3240,8 +3240,8 @@ static DRIVER_INIT( ssprint )
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
-	state->pedal_count = 3;
-	state->has_tms5220 = 0;
+	state->m_pedal_count = 3;
+	state->m_has_tms5220 = 0;
 }
 
 
@@ -3257,8 +3257,8 @@ static DRIVER_INIT( csprint )
 	for (i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
-	state->pedal_count = 2;
-	state->has_tms5220 = 0;
+	state->m_pedal_count = 2;
+	state->m_has_tms5220 = 0;
 }
 
 
@@ -3268,8 +3268,8 @@ static DRIVER_INIT( apb )
 
 	slapstic_init(machine, 110);
 
-	state->pedal_count = 2;
-	state->has_tms5220 = 1;
+	state->m_pedal_count = 2;
+	state->m_has_tms5220 = 1;
 	tms5220_rsq_w(machine.device("tms"),  1); // /RS is tied high on sys2 hw
 }
 

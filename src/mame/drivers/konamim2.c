@@ -206,26 +206,26 @@ public:
 	konamim2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT64 *main_ram;
-	UINT32 vdl0_address;
-	UINT32 vdl1_address;
-	UINT32 irq_enable;
-	UINT32 irq_active;
-	UINT64 unk3;
-	UINT32 unk20004;
-	int counter1;
-	int cde_num_status_bytes;
-	UINT32 cde_status_bytes[16];
-	int cde_status_byte_ptr;
-	UINT32 cde_command_bytes[16];
-	int cde_command_byte_ptr;
-	int cde_response;
-	int cde_drive_state;
-	int cde_enable_qchannel_reports;
-	int cde_enable_seek_reports;
-	int cde_qchannel_offset;
-	cdrom_toc cde_toc;
-	CDE_DMA cde_dma[2];
+	UINT64 *m_main_ram;
+	UINT32 m_vdl0_address;
+	UINT32 m_vdl1_address;
+	UINT32 m_irq_enable;
+	UINT32 m_irq_active;
+	UINT64 m_unk3;
+	UINT32 m_unk20004;
+	int m_counter1;
+	int m_cde_num_status_bytes;
+	UINT32 m_cde_status_bytes[16];
+	int m_cde_status_byte_ptr;
+	UINT32 m_cde_command_bytes[16];
+	int m_cde_command_byte_ptr;
+	int m_cde_response;
+	int m_cde_drive_state;
+	int m_cde_enable_qchannel_reports;
+	int m_cde_enable_seek_reports;
+	int m_cde_qchannel_offset;
+	cdrom_toc m_cde_toc;
+	CDE_DMA m_cde_dma[2];
 };
 
 
@@ -239,14 +239,14 @@ static SCREEN_UPDATE( m2 )
 	int i, j;
 
 	UINT32 fb_start = 0xffffffff;
-	if (state->vdl0_address != 0)
+	if (state->m_vdl0_address != 0)
 	{
-		fb_start = *(UINT32*)&state->main_ram[(state->vdl0_address - 0x40000000) / 8] - 0x40000000;
+		fb_start = *(UINT32*)&state->m_main_ram[(state->m_vdl0_address - 0x40000000) / 8] - 0x40000000;
 	}
 
 	if (fb_start <= 0x800000)
 	{
-		UINT16 *frame = (UINT16*)&state->main_ram[fb_start/8];
+		UINT16 *frame = (UINT16*)&state->m_main_ram[fb_start/8];
 		for (j=0; j < 384; j++)
 		{
 			UINT16 *fb = &frame[(j*512)];
@@ -271,7 +271,7 @@ static READ64_HANDLER(irq_enable_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(state->irq_enable) << 32;
+		r |= (UINT64)(state->m_irq_enable) << 32;
 	}
 
 	return r;
@@ -282,7 +282,7 @@ static WRITE64_HANDLER(irq_enable_w)
 	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		state->irq_enable |= (UINT32)(data >> 32);
+		state->m_irq_enable |= (UINT32)(data >> 32);
 	}
 }
 
@@ -293,7 +293,7 @@ static READ64_HANDLER(irq_active_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(state->irq_active) << 32;
+		r |= (UINT64)(state->m_irq_active) << 32;
 	}
 
 	return r;
@@ -322,7 +322,7 @@ static READ64_HANDLER(unk3_r)
 {
 	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	//return U64(0xffffffffffffffff);
-	return state->unk3;
+	return state->m_unk3;
 }
 
 static READ64_HANDLER(unk4_r)
@@ -338,7 +338,7 @@ static READ64_HANDLER(unk4_r)
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		r |= state->unk20004 & ~0x800000;
+		r |= state->m_unk20004 & ~0x800000;
 	}
 	return r;
 }
@@ -357,7 +357,7 @@ static WRITE64_HANDLER(unk4_w)
 			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
-		state->unk20004 = (UINT32)(data);
+		state->m_unk20004 = (UINT32)(data);
 		return;
 	}
 }
@@ -365,8 +365,8 @@ static WRITE64_HANDLER(unk4_w)
 static READ64_HANDLER(unk30000_r)
 {
 	konamim2_state *state = space->machine().driver_data<konamim2_state>();
-	state->counter1++;
-	return (UINT64)(state->counter1 & 0x7f) << 32;
+	state->m_counter1++;
+	return (UINT64)(state->m_counter1 & 0x7f) << 32;
 }
 
 static READ64_HANDLER(unk30030_r)
@@ -383,11 +383,11 @@ static WRITE64_HANDLER(video_w)
 	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		state->vdl0_address = (UINT32)(data >> 32);
+		state->m_vdl0_address = (UINT32)(data >> 32);
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		state->vdl1_address = (UINT32)(data);
+		state->m_vdl1_address = (UINT32)(data);
 	}
 }
 
@@ -398,7 +398,7 @@ static WRITE64_HANDLER(video_irq_ack_w)
 	{
 		if ((data >> 32) & 0x8000)
 		{
-			state->irq_active &= ~0x800000;
+			state->m_irq_active &= ~0x800000;
 		}
 	}
 }
@@ -453,7 +453,7 @@ static WRITE64_HANDLER(reset_w)
 		if (data & U64(0x100000000))
 		{
 			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-			state->unk3 = 0;
+			state->m_unk3 = 0;
 		}
 	}
 }
@@ -481,7 +481,7 @@ static void cde_init(running_machine &machine)
 
 	if (cd)
 	{
-		memcpy(&state->cde_toc, toc, sizeof(cdrom_toc));
+		memcpy(&state->m_cde_toc, toc, sizeof(cdrom_toc));
 	}
 
 	/*
@@ -499,190 +499,190 @@ static void cde_init(running_machine &machine)
 		cdrom_close(cd);
 	}
 
-	state->cde_drive_state = CDE_DRIVE_STATE_PAUSED;
+	state->m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
 
-	state->cde_num_status_bytes = 0;
-	state->cde_status_byte_ptr = 0;
-	state->cde_command_byte_ptr = 0;
+	state->m_cde_num_status_bytes = 0;
+	state->m_cde_status_byte_ptr = 0;
+	state->m_cde_command_byte_ptr = 0;
 
-	state->cde_response = 0;
+	state->m_cde_response = 0;
 
-	state->cde_enable_qchannel_reports = 0;
-	state->cde_enable_seek_reports = 0;
+	state->m_cde_enable_qchannel_reports = 0;
+	state->m_cde_enable_seek_reports = 0;
 
-	state->cde_qchannel_offset = 0;
+	state->m_cde_qchannel_offset = 0;
 }
 
 static void cde_handle_command(running_machine &machine)
 {
 	konamim2_state *state = machine.driver_data<konamim2_state>();
-	switch (state->cde_command_bytes[0])
+	switch (state->m_cde_command_bytes[0])
 	{
 		case 0x04:		// Set Speed
 		{
-			state->cde_num_status_bytes = 1;
+			state->m_cde_num_status_bytes = 1;
 
-			state->cde_status_bytes[0] = 0x04;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x04;
+			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: SET SPEED %02X, %02X\n", state->cde_command_bytes[1], state->cde_command_bytes[2]);
+//			mame_printf_debug("CDE: SET SPEED %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2]);
 			break;
 		}
 		case 0x06:		// Audio Format / Data Format
 		{
-			state->cde_num_status_bytes = 1;
+			state->m_cde_num_status_bytes = 1;
 
-			state->cde_status_bytes[0] = 0x06;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x06;
+			state->m_cde_status_byte_ptr = 0;
 
-			if (state->cde_command_bytes[1] == 0x00)		// Audio Format
+			if (state->m_cde_command_bytes[1] == 0x00)		// Audio Format
 			{
 //				mame_printf_debug("CDE: AUDIO FORMAT\n");
 			}
-			else if (state->cde_command_bytes[1] == 0x78)	// Data Format
+			else if (state->m_cde_command_bytes[1] == 0x78)	// Data Format
 			{
 //				mame_printf_debug("CDE: DATA FORMAT\n");
 			}
 			else
 			{
-				fatalerror("CDE: unknown command %02X, %02X\n", state->cde_command_bytes[0], state->cde_command_bytes[1]);
+				fatalerror("CDE: unknown command %02X, %02X\n", state->m_cde_command_bytes[0], state->m_cde_command_bytes[1]);
 			}
 			break;
 		}
 		case 0x08:		// Pause / Eject / Play
 		{
-			state->cde_num_status_bytes = 1;
+			state->m_cde_num_status_bytes = 1;
 
-			state->cde_status_bytes[0] = 0x08;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x08;
+			state->m_cde_status_byte_ptr = 0;
 
-			if (state->cde_command_bytes[1] == 0x00)		// Eject
+			if (state->m_cde_command_bytes[1] == 0x00)		// Eject
 			{
 //				mame_printf_debug("CDE: EJECT command\n");
 			}
-			else if (state->cde_command_bytes[1] == 0x02)	// Pause
+			else if (state->m_cde_command_bytes[1] == 0x02)	// Pause
 			{
 //				mame_printf_debug("CDE: PAUSE command\n");
-				state->cde_drive_state = CDE_DRIVE_STATE_PAUSED;
+				state->m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
 			}
-			else if (state->cde_command_bytes[1] == 0x03)	// Play
+			else if (state->m_cde_command_bytes[1] == 0x03)	// Play
 			{
 //				mame_printf_debug("CDE: PLAY command\n");
 			}
 			else
 			{
-				fatalerror("CDE: unknown command %02X, %02X\n", state->cde_command_bytes[0], state->cde_command_bytes[1]);
+				fatalerror("CDE: unknown command %02X, %02X\n", state->m_cde_command_bytes[0], state->m_cde_command_bytes[1]);
 			}
 			break;
 		}
 		case 0x09:		// Seek
 		{
-			state->cde_num_status_bytes = 1;
+			state->m_cde_num_status_bytes = 1;
 
-			state->cde_status_bytes[0] = 0x1b;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x1b;
+			state->m_cde_status_byte_ptr = 0;
 
-			state->cde_drive_state = CDE_DRIVE_STATE_SEEK_DONE;
+			state->m_cde_drive_state = CDE_DRIVE_STATE_SEEK_DONE;
 
-//			mame_printf_debug("CDE: SEEK %08X\n", (state->cde_command_bytes[1] << 16) | (state->cde_command_bytes[2] << 8) | (state->cde_command_bytes[3]));
+//			mame_printf_debug("CDE: SEEK %08X\n", (state->m_cde_command_bytes[1] << 16) | (state->m_cde_command_bytes[2] << 8) | (state->m_cde_command_bytes[3]));
 			break;
 		}
 		case 0x0b:		// Get Drive State
 		{
-			state->cde_num_status_bytes = 0x3;
+			state->m_cde_num_status_bytes = 0x3;
 
-			state->cde_status_bytes[0] = 0x0b;
-			state->cde_status_bytes[1] = 0x1b;
-			state->cde_status_bytes[2] = state->cde_drive_state;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x0b;
+			state->m_cde_status_bytes[1] = 0x1b;
+			state->m_cde_status_bytes[2] = state->m_cde_drive_state;
+			state->m_cde_status_byte_ptr = 0;
 
-			if (state->cde_command_bytes[1] & 0x02)
+			if (state->m_cde_command_bytes[1] & 0x02)
 			{
-				state->cde_enable_seek_reports = 1;
+				state->m_cde_enable_seek_reports = 1;
 			}
 			else
 			{
-				state->cde_enable_seek_reports = 0;
+				state->m_cde_enable_seek_reports = 0;
 			}
 
-//			mame_printf_debug("CDE: GET DRIVE STATE %02X\n", state->cde_command_bytes[1]);
+//			mame_printf_debug("CDE: GET DRIVE STATE %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x0c:		// ?
 		{
-			state->cde_num_status_bytes = 1;
+			state->m_cde_num_status_bytes = 1;
 
-			state->cde_status_bytes[0] = 0x0c;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x0c;
+			state->m_cde_status_byte_ptr = 0;
 
-			if (state->cde_command_bytes[1] == 0x02)
+			if (state->m_cde_command_bytes[1] == 0x02)
 			{
-				state->cde_enable_qchannel_reports = 1;
-				state->cde_drive_state = CDE_DRIVE_STATE_PAUSED;
+				state->m_cde_enable_qchannel_reports = 1;
+				state->m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
 			}
-			else if (state->cde_command_bytes[0] == 0x00)
+			else if (state->m_cde_command_bytes[0] == 0x00)
 			{
-				state->cde_enable_qchannel_reports = 0;
+				state->m_cde_enable_qchannel_reports = 0;
 			}
 
-//			mame_printf_debug("CDE: UNKNOWN CMD 0x0c %02X\n", state->cde_command_bytes[1]);
+//			mame_printf_debug("CDE: UNKNOWN CMD 0x0c %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x0d:		// Get Switch State
 		{
-			state->cde_num_status_bytes = 0x4;
+			state->m_cde_num_status_bytes = 0x4;
 
-			state->cde_status_bytes[0] = 0x0d;
-			state->cde_status_bytes[1] = 0x1d;
-			state->cde_status_bytes[2] = 0x02;
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_bytes[0] = 0x0d;
+			state->m_cde_status_bytes[1] = 0x1d;
+			state->m_cde_status_bytes[2] = 0x02;
+			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: GET SWITCH STATE %02X\n", state->cde_command_bytes[1]);
+//			mame_printf_debug("CDE: GET SWITCH STATE %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x21:		// Mech type
 		{
-			state->cde_num_status_bytes = 0x8;
+			state->m_cde_num_status_bytes = 0x8;
 
-			state->cde_status_bytes[0] = 0x21;
-			state->cde_status_bytes[1] = 0xff;
-			state->cde_status_bytes[2] = 0x08;		// Max Speed
-			state->cde_status_bytes[3] = 0xff;
-			state->cde_status_bytes[4] = 0xff;
-			state->cde_status_bytes[5] = 0xff;
-			state->cde_status_bytes[6] = 0xff;
-			state->cde_status_bytes[7] = 0xff;
+			state->m_cde_status_bytes[0] = 0x21;
+			state->m_cde_status_bytes[1] = 0xff;
+			state->m_cde_status_bytes[2] = 0x08;		// Max Speed
+			state->m_cde_status_bytes[3] = 0xff;
+			state->m_cde_status_bytes[4] = 0xff;
+			state->m_cde_status_bytes[5] = 0xff;
+			state->m_cde_status_bytes[6] = 0xff;
+			state->m_cde_status_bytes[7] = 0xff;
 
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: MECH TYPE %02X, %02X, %02X\n", state->cde_command_bytes[1], state->cde_command_bytes[2], state->cde_command_bytes[3]);
+//			mame_printf_debug("CDE: MECH TYPE %02X, %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2], state->m_cde_command_bytes[3]);
 			break;
 		}
 		case 0x83:		// Read ID
 		{
-			state->cde_num_status_bytes = 0xc;
+			state->m_cde_num_status_bytes = 0xc;
 
-			state->cde_status_bytes[0] = 0x03;
-			state->cde_status_bytes[1] = 0xff;
-			state->cde_status_bytes[2] = 0xff;
-			state->cde_status_bytes[3] = 0xff;
-			state->cde_status_bytes[4] = 0xff;
-			state->cde_status_bytes[5] = 0xff;
-			state->cde_status_bytes[6] = 0xff;
-			state->cde_status_bytes[7] = 0xff;
-			state->cde_status_bytes[8] = 0xff;
-			state->cde_status_bytes[9] = 0xff;
-			state->cde_status_bytes[10] = 0xff;
-			state->cde_status_bytes[11] = 0xff;
+			state->m_cde_status_bytes[0] = 0x03;
+			state->m_cde_status_bytes[1] = 0xff;
+			state->m_cde_status_bytes[2] = 0xff;
+			state->m_cde_status_bytes[3] = 0xff;
+			state->m_cde_status_bytes[4] = 0xff;
+			state->m_cde_status_bytes[5] = 0xff;
+			state->m_cde_status_bytes[6] = 0xff;
+			state->m_cde_status_bytes[7] = 0xff;
+			state->m_cde_status_bytes[8] = 0xff;
+			state->m_cde_status_bytes[9] = 0xff;
+			state->m_cde_status_bytes[10] = 0xff;
+			state->m_cde_status_bytes[11] = 0xff;
 
-			state->cde_status_byte_ptr = 0;
+			state->m_cde_status_byte_ptr = 0;
 
 //			mame_printf_debug("CDE: READ ID\n");
 			break;
 		}
 		default:
 		{
-			fatalerror("CDE: unknown command %08X\n", state->cde_command_bytes[0]);
+			fatalerror("CDE: unknown command %08X\n", state->m_cde_command_bytes[0]);
 			break;
 		}
 	}
@@ -691,18 +691,18 @@ static void cde_handle_command(running_machine &machine)
 static void cde_handle_reports(running_machine &machine)
 {
 	konamim2_state *state = machine.driver_data<konamim2_state>();
-	switch (state->cde_command_bytes[0])
+	switch (state->m_cde_command_bytes[0])
 	{
 		case 0x09:
 		{
-			if (state->cde_enable_seek_reports)
+			if (state->m_cde_enable_seek_reports)
 			{
-				state->cde_num_status_bytes = 0x2;
-				state->cde_status_bytes[0] = 0x02;
+				state->m_cde_num_status_bytes = 0x2;
+				state->m_cde_status_bytes[0] = 0x02;
 
-				state->cde_status_byte_ptr = 0;
+				state->m_cde_status_byte_ptr = 0;
 
-				state->cde_command_bytes[0] = 0x0c;
+				state->m_cde_command_bytes[0] = 0x0c;
 
 //				mame_printf_debug("CDE: SEEK REPORT\n");
 			}
@@ -711,94 +711,94 @@ static void cde_handle_reports(running_machine &machine)
 
 		case 0x0b:
 		{
-			if (state->cde_enable_qchannel_reports)
+			if (state->m_cde_enable_qchannel_reports)
 			{
 				int track, num_tracks;
 
-				num_tracks = state->cde_toc.numtrks;
-				track = state->cde_qchannel_offset % (num_tracks+3);
+				num_tracks = state->m_cde_toc.numtrks;
+				track = state->m_cde_qchannel_offset % (num_tracks+3);
 
-				state->cde_num_status_bytes = 0xb;
-				state->cde_status_bytes[0] = 0x1c;
+				state->m_cde_num_status_bytes = 0xb;
+				state->m_cde_status_bytes[0] = 0x1c;
 
 				/*
-                state->cde_status_bytes[1] = 0x0;      // q-Mode
-                state->cde_status_bytes[2] = 0x0;      // TNO
-                state->cde_status_bytes[3] = 0x0;      // Index / Pointer
-                state->cde_status_bytes[4] = 0x0;      // Min
-                state->cde_status_bytes[5] = 0x0;      // Sec
-                state->cde_status_bytes[6] = 0x0;      // Frac
-                state->cde_status_bytes[7] = 0x0;      // Zero
-                state->cde_status_bytes[8] = 0x0;      // A-Min
-                state->cde_status_bytes[9] = 0x0;      // A-Sec
-                state->cde_status_bytes[10] = 0x0;     // A-Frac
+                state->m_cde_status_bytes[1] = 0x0;      // q-Mode
+                state->m_cde_status_bytes[2] = 0x0;      // TNO
+                state->m_cde_status_bytes[3] = 0x0;      // Index / Pointer
+                state->m_cde_status_bytes[4] = 0x0;      // Min
+                state->m_cde_status_bytes[5] = 0x0;      // Sec
+                state->m_cde_status_bytes[6] = 0x0;      // Frac
+                state->m_cde_status_bytes[7] = 0x0;      // Zero
+                state->m_cde_status_bytes[8] = 0x0;      // A-Min
+                state->m_cde_status_bytes[9] = 0x0;      // A-Sec
+                state->m_cde_status_bytes[10] = 0x0;     // A-Frac
                 */
 
 				if (track < num_tracks)
 				{
-					int time = lba_to_msf(state->cde_toc.tracks[track].physframeofs);
+					int time = lba_to_msf(state->m_cde_toc.tracks[track].physframeofs);
 
-					state->cde_status_bytes[1] = 0x41;					// q-Mode
-					state->cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
-					state->cde_status_bytes[3] = track+1;				// Pointer
-					state->cde_status_bytes[4] = 0x0;					// Min
-					state->cde_status_bytes[5] = 0x0;					// Sec
-					state->cde_status_bytes[6] = 0x0;					// Frac
-					state->cde_status_bytes[7] = 0x0;					// Zero
-					state->cde_status_bytes[8] = (time >> 16) & 0xff;	// P-Min
-					state->cde_status_bytes[9] = (time >>  8) & 0xff;	// P-Sec
-					state->cde_status_bytes[10] = time & 0xff;			// P-Frac
+					state->m_cde_status_bytes[1] = 0x41;					// q-Mode
+					state->m_cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
+					state->m_cde_status_bytes[3] = track+1;				// Pointer
+					state->m_cde_status_bytes[4] = 0x0;					// Min
+					state->m_cde_status_bytes[5] = 0x0;					// Sec
+					state->m_cde_status_bytes[6] = 0x0;					// Frac
+					state->m_cde_status_bytes[7] = 0x0;					// Zero
+					state->m_cde_status_bytes[8] = (time >> 16) & 0xff;	// P-Min
+					state->m_cde_status_bytes[9] = (time >>  8) & 0xff;	// P-Sec
+					state->m_cde_status_bytes[10] = time & 0xff;			// P-Frac
 				}
 				else
 				{
 					if (track == num_tracks+0)
 					{
-						state->cde_status_bytes[1] = 0x41;					// q-Mode / Control
-						state->cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
-						state->cde_status_bytes[3] = 0xa0;					// Pointer
-						state->cde_status_bytes[4] = 0x0;					// Min
-						state->cde_status_bytes[5] = 0x0;					// Sec
-						state->cde_status_bytes[6] = 0x0;					// Frac
-						state->cde_status_bytes[7] = 0x0;					// Zero
-						state->cde_status_bytes[8] = 1;					// P-Min
-						state->cde_status_bytes[9] = 0x0;					// P-Sec
-						state->cde_status_bytes[10] = 0x0;					// P-Frac
+						state->m_cde_status_bytes[1] = 0x41;					// q-Mode / Control
+						state->m_cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
+						state->m_cde_status_bytes[3] = 0xa0;					// Pointer
+						state->m_cde_status_bytes[4] = 0x0;					// Min
+						state->m_cde_status_bytes[5] = 0x0;					// Sec
+						state->m_cde_status_bytes[6] = 0x0;					// Frac
+						state->m_cde_status_bytes[7] = 0x0;					// Zero
+						state->m_cde_status_bytes[8] = 1;					// P-Min
+						state->m_cde_status_bytes[9] = 0x0;					// P-Sec
+						state->m_cde_status_bytes[10] = 0x0;					// P-Frac
 					}
 					else if (track == num_tracks+1)
 					{
-						state->cde_status_bytes[1] = 0x41;					// q-Mode / Control
-						state->cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
-						state->cde_status_bytes[3] = 0xa1;					// Pointer
-						state->cde_status_bytes[4] = 0x0;					// Min
-						state->cde_status_bytes[5] = 0x0;					// Sec
-						state->cde_status_bytes[6] = 0x0;					// Frac
-						state->cde_status_bytes[7] = 0x0;					// Zero
-						state->cde_status_bytes[8] = num_tracks;			// P-Min
-						state->cde_status_bytes[9] = 0x0;					// P-Sec
-						state->cde_status_bytes[10] = 0x0;					// P-Frac
+						state->m_cde_status_bytes[1] = 0x41;					// q-Mode / Control
+						state->m_cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
+						state->m_cde_status_bytes[3] = 0xa1;					// Pointer
+						state->m_cde_status_bytes[4] = 0x0;					// Min
+						state->m_cde_status_bytes[5] = 0x0;					// Sec
+						state->m_cde_status_bytes[6] = 0x0;					// Frac
+						state->m_cde_status_bytes[7] = 0x0;					// Zero
+						state->m_cde_status_bytes[8] = num_tracks;			// P-Min
+						state->m_cde_status_bytes[9] = 0x0;					// P-Sec
+						state->m_cde_status_bytes[10] = 0x0;					// P-Frac
 					}
 					else
 					{
-						int leadout_lba = state->cde_toc.tracks[num_tracks-1].physframeofs + state->cde_toc.tracks[num_tracks-1].frames;
+						int leadout_lba = state->m_cde_toc.tracks[num_tracks-1].physframeofs + state->m_cde_toc.tracks[num_tracks-1].frames;
 						int leadout_time = lba_to_msf(leadout_lba);
 
-						state->cde_status_bytes[1] = 0x41;					// q-Mode / Control
-						state->cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
-						state->cde_status_bytes[3] = 0xa2;					// Pointer
-						state->cde_status_bytes[4] = 0x0;					// Min
-						state->cde_status_bytes[5] = 0x0;					// Sec
-						state->cde_status_bytes[6] = 0x0;					// Frac
-						state->cde_status_bytes[7] = 0x0;					// Zero
-						state->cde_status_bytes[8] = (leadout_time >> 16) & 0xff;	// P-Min
-						state->cde_status_bytes[9] = (leadout_time >>  8) & 0xff;	// P-Sec
-						state->cde_status_bytes[10] = leadout_time & 0xff;			// P-Frac
+						state->m_cde_status_bytes[1] = 0x41;					// q-Mode / Control
+						state->m_cde_status_bytes[2] = 0x0;					// TNO (Lead-in track)
+						state->m_cde_status_bytes[3] = 0xa2;					// Pointer
+						state->m_cde_status_bytes[4] = 0x0;					// Min
+						state->m_cde_status_bytes[5] = 0x0;					// Sec
+						state->m_cde_status_bytes[6] = 0x0;					// Frac
+						state->m_cde_status_bytes[7] = 0x0;					// Zero
+						state->m_cde_status_bytes[8] = (leadout_time >> 16) & 0xff;	// P-Min
+						state->m_cde_status_bytes[9] = (leadout_time >>  8) & 0xff;	// P-Sec
+						state->m_cde_status_bytes[10] = leadout_time & 0xff;			// P-Frac
 					}
 				}
 
-				state->cde_qchannel_offset++;
+				state->m_cde_qchannel_offset++;
 
-				state->cde_status_byte_ptr = 0;
-				state->cde_command_bytes[0] = 0x0c;
+				state->m_cde_status_byte_ptr = 0;
+				state->m_cde_command_bytes[0] = 0x0c;
 
 //				mame_printf_debug("CDE: QCHANNEL REPORT\n");
 				break;
@@ -816,16 +816,16 @@ static void cde_dma_transfer(address_space *space, int channel, int next)
 
 	if (next)
 	{
-		address = state->cde_dma[channel].next_dst_addr;
-		//length = state->cde_dma[channel].next_length;
+		address = state->m_cde_dma[channel].next_dst_addr;
+		//length = state->m_cde_dma[channel].next_length;
 	}
 	else
 	{
-		address = state->cde_dma[channel].dst_addr;
-		//length = state->cde_dma[channel].length;
+		address = state->m_cde_dma[channel].dst_addr;
+		//length = state->m_cde_dma[channel].length;
 	}
 
-	for (i=0; i < state->cde_dma[channel].next_length; i++)
+	for (i=0; i < state->m_cde_dma[channel].next_length; i++)
 	{
 		space->write_byte(address, 0xff);		// TODO: do the real transfer...
 		address++;
@@ -852,36 +852,36 @@ static READ64_HANDLER(cde_r)
 		{
 			r = 0x100038;
 
-			r |= state->cde_dma[0].dma_done ? 0x400 : 0;
-			r |= state->cde_dma[1].dma_done ? 0x800 : 0;
+			r |= state->m_cde_dma[0].dma_done ? 0x400 : 0;
+			r |= state->m_cde_dma[1].dma_done ? 0x800 : 0;
 			break;
 		}
 		case 0x02c/4:
 		{
-			r = state->cde_status_bytes[state->cde_status_byte_ptr++];
+			r = state->m_cde_status_bytes[state->m_cde_status_byte_ptr++];
 
-			if (state->cde_status_byte_ptr <= state->cde_num_status_bytes)
+			if (state->m_cde_status_byte_ptr <= state->m_cde_num_status_bytes)
 			{
 				r |= 0x100;
 			}
 			else
 			{
 				//if (cde_enable_reports &&
-				//  !state->cde_response &&
-				//  state->cde_command_bytes[0] != ((cde_report_type >> 8) & 0xff))
+				//  !state->m_cde_response &&
+				//  state->m_cde_command_bytes[0] != ((cde_report_type >> 8) & 0xff))
 
-				if (!state->cde_response)
+				if (!state->m_cde_response)
 				{
 					cde_handle_reports(space->machine());
 
-			//      state->cde_command_byte_ptr = 0;
-			//      state->cde_command_bytes[state->cde_command_byte_ptr++] = 0x1c;
+			//      state->m_cde_command_byte_ptr = 0;
+			//      state->m_cde_command_bytes[state->m_cde_command_byte_ptr++] = 0x1c;
 
-			//      state->cde_response = 1;
+			//      state->m_cde_response = 1;
 				}
 			}
 
-	//      printf("status byte %d\n", state->cde_status_byte_ptr);
+	//      printf("status byte %d\n", state->m_cde_status_byte_ptr);
 			break;
 		}
 
@@ -932,28 +932,28 @@ static WRITE64_HANDLER(cde_w)
 
 			if (d == 0x0180)
 			{
-				if (state->cde_response)
+				if (state->m_cde_response)
 				{
 					cde_handle_command(space->machine());
 
-					state->cde_response = 0;
+					state->m_cde_response = 0;
 				}
 
-				state->cde_command_byte_ptr = 0;
+				state->m_cde_command_byte_ptr = 0;
 			}
-			else if (state->cde_command_byte_ptr == 0)
+			else if (state->m_cde_command_byte_ptr == 0)
 			{
-				state->cde_num_status_bytes = 1;
+				state->m_cde_num_status_bytes = 1;
 
-				state->cde_status_bytes[0] = d & 0xff;
-				state->cde_status_byte_ptr = 0;
+				state->m_cde_status_bytes[0] = d & 0xff;
+				state->m_cde_status_byte_ptr = 0;
 
-				state->cde_response = 1;
+				state->m_cde_response = 1;
 			}
 
 			if (d != 0x180)
 			{
-				state->cde_command_bytes[state->cde_command_byte_ptr++] = d;
+				state->m_cde_command_bytes[state->m_cde_command_byte_ptr++] = d;
 			}
 
 			break;
@@ -965,13 +965,13 @@ static WRITE64_HANDLER(cde_w)
 
 			if (d & 0x20)
 			{
-				state->cde_dma[0].dma_done = 1;
+				state->m_cde_dma[0].dma_done = 1;
 
 				cde_dma_transfer(space, 0, 0);
 			}
 			if (d & 0x40)
 			{
-				state->cde_dma[0].dma_done = 1;
+				state->m_cde_dma[0].dma_done = 1;
 
 				cde_dma_transfer(space, 0, 1);
 			}
@@ -981,28 +981,28 @@ static WRITE64_HANDLER(cde_w)
 		{
 //			mame_printf_debug("CDE: DMA0 dst addr %08X\n", d);
 
-			state->cde_dma[0].dst_addr = d;
+			state->m_cde_dma[0].dst_addr = d;
 			break;
 		}
 		case 0x30c/4:		// DMA Channel 0 length?
 		{
 //			mame_printf_debug("CDE: DMA0 length %08X\n", d);
 
-			state->cde_dma[0].length = d;
+			state->m_cde_dma[0].length = d;
 			break;
 		}
 		case 0x318/4:		// DMA Channel 0 next destination address
 		{
 //			mame_printf_debug("CDE: DMA0 next dst addr %08X\n", d);
 
-			state->cde_dma[0].next_dst_addr = d;
+			state->m_cde_dma[0].next_dst_addr = d;
 			break;
 		}
 		case 0x31c/4:		// DMA Channel 0 next length?
 		{
 //			mame_printf_debug("CDE: DMA0 next length %08X\n", d);
 
-			state->cde_dma[0].next_length = d;
+			state->m_cde_dma[0].next_length = d;
 			break;
 		}
 
@@ -1015,28 +1015,28 @@ static WRITE64_HANDLER(cde_w)
 		{
 //			mame_printf_debug("CDE: DMA1 dst addr %08X\n", d);
 
-			state->cde_dma[1].dst_addr = d;
+			state->m_cde_dma[1].dst_addr = d;
 			break;
 		}
 		case 0x32c/4:		// DMA Channel 1 length?
 		{
 //			mame_printf_debug("CDE: DMA1 length %08X\n", d);
 
-			state->cde_dma[1].length = d;
+			state->m_cde_dma[1].length = d;
 			break;
 		}
 		case 0x338/4:		// DMA Channel 1 next destination address
 		{
 //			mame_printf_debug("CDE: DMA1 next dst addr %08X\n", d);
 
-			state->cde_dma[1].next_dst_addr = d;
+			state->m_cde_dma[1].next_dst_addr = d;
 			break;
 		}
 		case 0x33c/4:		// DMA Channel 1 next length?
 		{
 //			mame_printf_debug("CDE: DMA1 next length %08X\n", d);
 
-			state->cde_dma[1].next_length = d;
+			state->m_cde_dma[1].next_length = d;
 			break;
 		}
 
@@ -1044,12 +1044,12 @@ static WRITE64_HANDLER(cde_w)
 		{
 			if (d & 0x80000000)
 			{
-				state->irq_active &= ~0x8;
+				state->m_irq_active &= ~0x8;
 			}
 			if (d & 0x60000000)
 			{
-				state->cde_dma[0].dma_done = 0;
-				state->cde_dma[1].dma_done = 0;
+				state->m_cde_dma[0].dma_done = 0;
+				state->m_cde_dma[1].dma_done = 0;
 			}
 			break;
 		}
@@ -1126,7 +1126,7 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64 )
 	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP		// ???
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(konamim2_state, main_ram)
+	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(konamim2_state, m_main_ram)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
 ADDRESS_MAP_END
 
@@ -1142,14 +1142,14 @@ static const powerpc_config ppc602_config =
 static INTERRUPT_GEN(m2)
 {
 	konamim2_state *state = device->machine().driver_data<konamim2_state>();
-	if (state->irq_enable & 0x800000)
+	if (state->m_irq_enable & 0x800000)
 	{
-		state->irq_active |= 0x800000;
+		state->m_irq_active |= 0x800000;
 	}
 
-	/*if (state->irq_enable & 0x8)
+	/*if (state->m_irq_enable & 0x8)
     {
-        state->irq_active |= 0x8;
+        state->m_irq_active |= 0x8;
     }*/
 
 	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -1283,8 +1283,8 @@ ROM_END
 static DRIVER_INIT( m2 )
 {
 	konamim2_state *state = machine.driver_data<konamim2_state>();
-	state->unk3 = U64(0xffffffffffffffff);
-	state->unk20004 = 0;
+	state->m_unk3 = U64(0xffffffffffffffff);
+	state->m_unk20004 = 0;
 	cde_init(machine);
 }
 

@@ -179,10 +179,10 @@ public:
 	spaceg_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  io9400;
-	UINT8 *  io9401;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_io9400;
+	UINT8 *  m_io9401;
 };
 
 /*************************************
@@ -221,16 +221,16 @@ static PALETTE_INIT( spaceg )
 static WRITE8_HANDLER( zvideoram_w )
 {
 	spaceg_state *state = space->machine().driver_data<spaceg_state>();
-	int col = state->colorram[0x400];
-	int xoff = *state->io9400 >> 5 & 7;
+	int col = state->m_colorram[0x400];
+	int xoff = *state->m_io9400 >> 5 & 7;
 	UINT16 offset2 = (offset + 0x100) & 0x1fff;
 	UINT16 sdata = data << (8 - xoff);
-	UINT16 vram_data = state->videoram[offset] << 8 | (state->videoram[offset2]);
+	UINT16 vram_data = state->m_videoram[offset] << 8 | (state->m_videoram[offset2]);
 
 	if (col > 0x0f) popmessage("color > 0x0f = %2d", col);
 	col &= 0x0f;
 
-	switch (*state->io9401)
+	switch (*state->m_io9401)
 	{
 		// draw
 		case 0:
@@ -240,8 +240,8 @@ static WRITE8_HANDLER( zvideoram_w )
 			vram_data |= sdata;
 
 			// update colorram
-			if (sdata&0xff00) state->colorram[offset] = col;
-			if (sdata&0x00ff) state->colorram[offset2] = col;
+			if (sdata&0xff00) state->m_colorram[offset] = col;
+			if (sdata&0x00ff) state->m_colorram[offset2] = col;
 			break;
 
 		// erase
@@ -250,13 +250,13 @@ static WRITE8_HANDLER( zvideoram_w )
 			break;
 
 		default:
-			logerror("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(&space->device()));
-			popmessage("mode = %02x pc = %04x\n", *state->io9401, cpu_get_pc(&space->device()));
+			logerror("mode = %02x pc = %04x\n", *state->m_io9401, cpu_get_pc(&space->device()));
+			popmessage("mode = %02x pc = %04x\n", *state->m_io9401, cpu_get_pc(&space->device()));
 			return;
 	}
 
-	state->videoram[offset]=vram_data>>8;
-	state->videoram[offset2]=vram_data&0xff;
+	state->m_videoram[offset]=vram_data>>8;
+	state->m_videoram[offset2]=vram_data&0xff;
 }
 
 
@@ -267,7 +267,7 @@ static READ8_HANDLER(spaceg_colorram_r)
 
 	if (offset < 0x400)
 	{
-		rgbcolor = (state->colorram[offset] << 1) | ((offset &0x100) >> 8);
+		rgbcolor = (state->m_colorram[offset] << 1) | ((offset &0x100) >> 8);
 
 		if ((offset >= 0x200) && (offset < 0x220)) /* 0xa200- 0xa21f */
 		{
@@ -285,10 +285,10 @@ static READ8_HANDLER(spaceg_colorram_r)
 			logerror("palette? read from colorram offset = %04x\n",offset);
 	}
 
-	if (*state->io9401 != 0x40)
-		logerror("colorram read in mode: 9401 = %02x (offset = %04x)\n", *state->io9401, offset);
+	if (*state->m_io9401 != 0x40)
+		logerror("colorram read in mode: 9401 = %02x (offset = %04x)\n", *state->m_io9401, offset);
 
-	return state->colorram[offset];
+	return state->m_colorram[offset];
 }
 
 
@@ -300,13 +300,13 @@ static SCREEN_UPDATE( spaceg )
 	for (offs = 0; offs < 0x2000; offs++)
 	{
 		int i;
-		UINT8 data = state->videoram[offs];
+		UINT8 data = state->m_videoram[offs];
 		int y = offs & 0xff;
 		int x = (offs >> 8) << 3;
 
 		for (i = 0; i < 8; i++)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = (data & 0x80) ? state->colorram[offs] : 0;
+			*BITMAP_ADDR16(bitmap, y, x) = (data & 0x80) ? state->m_colorram[offs] : 0;
 
 			x++;
 			data <<= 1;
@@ -328,11 +328,11 @@ static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_BASE_MEMBER(spaceg_state, colorram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE_MEMBER(spaceg_state, videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_BASE_MEMBER(spaceg_state, m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE_MEMBER(spaceg_state, m_videoram)
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, io9400) /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, io9401) /* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, m_io9400) /* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, m_io9401) /* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 2 - unknown -

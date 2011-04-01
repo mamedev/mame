@@ -74,12 +74,12 @@ static TIMER_CALLBACK( interrupt_callback )
 	int scanline;
 	int coin = (input_port_read(machine, "IN1") & 2);
 
-	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 
-	if (!coin && state->prev_coin)
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	if (!coin && state->m_prev_coin)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
-	state->prev_coin = coin;
+	state->m_prev_coin = coin;
 
 	scanline = machine.primary_screen->vpos() + 128;
 
@@ -93,14 +93,14 @@ static TIMER_CALLBACK( interrupt_callback )
 static unsigned video_ram_address( running_machine &machine )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
-	return 0x4000 | (state->row << 5) | (state->col >> 3);
+	return 0x4000 | (state->m_row << 5) | (state->m_col >> 3);
 }
 
 
 static READ8_HANDLER( fgoal_analog_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return input_port_read(space->machine(), state->fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	return input_port_read(space->machine(), state->m_fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
 }
 
 
@@ -114,7 +114,7 @@ static CUSTOM_INPUT( fgoal_80_r )
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -123,7 +123,7 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -132,7 +132,7 @@ static READ8_HANDLER( fgoal_irq_reset_r )
 static READ8_HANDLER( fgoal_row_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return state->row;
+	return state->m_row;
 }
 
 
@@ -140,16 +140,16 @@ static WRITE8_HANDLER( fgoal_row_w )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->row = data;
-	mb14241_shift_data_w(state->mb14241, 0, 0);
+	state->m_row = data;
+	mb14241_shift_data_w(state->m_mb14241, 0, 0);
 }
 
 static WRITE8_HANDLER( fgoal_col_w )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->col = data;
-	mb14241_shift_count_w(state->mb14241, 0, data);
+	state->m_col = data;
+	mb14241_shift_count_w(state->m_mb14241, 0, data);
 }
 
 static READ8_HANDLER( fgoal_address_hi_r )
@@ -165,7 +165,7 @@ static READ8_HANDLER( fgoal_address_lo_r )
 static READ8_HANDLER( fgoal_shifter_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
@@ -173,7 +173,7 @@ static READ8_HANDLER( fgoal_shifter_r )
 static READ8_HANDLER( fgoal_shifter_reverse_r )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -201,7 +201,7 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->fgoal_player = data & 1;
+	state->m_fgoal_player = data & 1;
 }
 
 
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(fgoal_state, video_ram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(fgoal_state, m_video_ram)
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)
@@ -340,16 +340,16 @@ static MACHINE_START( fgoal )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->mb14241 = machine.device("mb14241");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_mb14241 = machine.device("mb14241");
 
-	state->save_item(NAME(state->xpos));
-	state->save_item(NAME(state->ypos));
-	state->save_item(NAME(state->current_color));
-	state->save_item(NAME(state->fgoal_player));
-	state->save_item(NAME(state->row));
-	state->save_item(NAME(state->col));
-	state->save_item(NAME(state->prev_coin));
+	state->save_item(NAME(state->m_xpos));
+	state->save_item(NAME(state->m_ypos));
+	state->save_item(NAME(state->m_current_color));
+	state->save_item(NAME(state->m_fgoal_player));
+	state->save_item(NAME(state->m_row));
+	state->save_item(NAME(state->m_col));
+	state->save_item(NAME(state->m_prev_coin));
 }
 
 static MACHINE_RESET( fgoal )
@@ -358,13 +358,13 @@ static MACHINE_RESET( fgoal )
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(interrupt_callback));
 
-	state->xpos = 0;
-	state->ypos = 0;
-	state->current_color = 0;
-	state->fgoal_player = 0;
-	state->row = 0;
-	state->col = 0;
-	state->prev_coin = 0;
+	state->m_xpos = 0;
+	state->m_ypos = 0;
+	state->m_current_color = 0;
+	state->m_fgoal_player = 0;
+	state->m_row = 0;
+	state->m_col = 0;
+	state->m_prev_coin = 0;
 }
 
 static MACHINE_CONFIG_START( fgoal, fgoal_state )

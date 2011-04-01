@@ -33,8 +33,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	vindictr_state *state = machine.driver_data<vindictr_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -66,8 +66,8 @@ static READ16_HANDLER( port1_r )
 {
 	vindictr_state *state = space->machine().driver_data<vindictr_state>();
 	int result = input_port_read(space->machine(), "260010");
-	if (state->sound_to_cpu_ready) result ^= 0x0004;
-	if (state->cpu_to_sound_ready) result ^= 0x0008;
+	if (state->m_sound_to_cpu_ready) result ^= 0x0004;
+	if (state->m_cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;
 	return result;
 }
@@ -96,9 +96,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(vindictr_state, playfield)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(vindictr_state, m_playfield)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(vindictr_state, alpha)
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(vindictr_state, m_alpha)
 	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f5000, 0x3f7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END

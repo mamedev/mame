@@ -17,14 +17,14 @@ MACHINE_START( extra_8080bw_vh )
 {
 	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 
-	state->save_item(NAME(state->c8080bw_flip_screen));
-	state->save_item(NAME(state->color_map));
-	state->save_item(NAME(state->screen_red));
+	state->save_item(NAME(state->m_c8080bw_flip_screen));
+	state->save_item(NAME(state->m_color_map));
+	state->save_item(NAME(state->m_screen_red));
 
 	// These two only belong to schaser, but for simplicity's sake let's waste
 	// two bytes in other drivers' .sta files.
-	state->save_item(NAME(state->schaser_background_disable));
-	state->save_item(NAME(state->schaser_background_select));
+	state->save_item(NAME(state->m_schaser_background_disable));
+	state->save_item(NAME(state->m_schaser_background_select));
 }
 
 
@@ -69,7 +69,7 @@ INLINE void set_pixel( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT
 
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
-		if (state->c8080bw_flip_screen)
+		if (state->m_c8080bw_flip_screen)
 			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
 			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
@@ -103,7 +103,7 @@ static void clear_extra_columns( running_machine &machine, bitmap_t *bitmap, pen
 
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
-			if (state->c8080bw_flip_screen)
+			if (state->m_c8080bw_flip_screen)
 				*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
 				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
@@ -123,17 +123,17 @@ SCREEN_UPDATE( invadpt2 )
 	invadpt2_get_pens(pens);
 
 	prom = screen->machine().region("proms")->base();
-	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->screen_red ? 1 : color_map_base[color_address] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
@@ -155,17 +155,17 @@ SCREEN_UPDATE( ballbomb )
 	invadpt2_get_pens(pens);
 
 	prom = screen->machine().region("proms")->base();
-	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->screen_red ? 1 : color_map_base[color_address] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_screen_red ? 1 : color_map_base[color_address] & 0x07;
 
 		/* blue background */
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 2);
@@ -188,17 +188,17 @@ SCREEN_UPDATE( schaser )
 
 	background_map_base = screen->machine().region("proms")->base();
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 back_color = 0;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_colorram[offs & 0x1f9f] & 0x07;
 
-		if (!state->schaser_background_disable)
+		if (!state->m_schaser_background_disable)
 		{
 			offs_t back_address = (offs >> 8 << 5) | (offs & 0x1f);
 
@@ -206,13 +206,13 @@ SCREEN_UPDATE( schaser )
 
 			/* the equations derived from the schematics don't appear to produce
                the right colors, but this one does, at least for this PROM */
-			back_color = (((back_data & 0x0c) == 0x0c) && state->schaser_background_select) ? 4 : 2;
+			back_color = (((back_data & 0x0c) == 0x0c) && state->m_schaser_background_select) ? 4 : 2;
 		}
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, back_color);
 	}
 
-	clear_extra_columns(screen->machine(), bitmap, pens, state->schaser_background_disable ? 0 : 2);
+	clear_extra_columns(screen->machine(), bitmap, pens, state->m_schaser_background_disable ? 0 : 2);
 
 	return 0;
 }
@@ -226,13 +226,13 @@ SCREEN_UPDATE( schasercv )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_colorram[offs & 0x1f9f] & 0x07;
 
 		/* blue background */
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 2);
@@ -252,13 +252,13 @@ SCREEN_UPDATE( rollingc )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->colorram[offs & 0x1f1f] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_colorram[offs & 0x1f1f] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
@@ -282,12 +282,12 @@ SCREEN_UPDATE( polaris )
 	color_map_base = screen->machine().region("proms")->base();
 	cloud_gfx = screen->machine().region("user1")->base();
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
+		UINT8 data = state->m_main_ram[offs];
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
@@ -298,9 +298,9 @@ SCREEN_UPDATE( polaris )
            bits 1 and 2 are marked 'not use' (sic) */
 
 		UINT8 back_color = (color_map_base[color_address] & 0x01) ? 6 : 2;
-		UINT8 fore_color = ~state->colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = ~state->m_colorram[offs & 0x1f9f] & 0x07;
 
-		UINT8 cloud_y = y - state->polaris_cloud_pos;
+		UINT8 cloud_y = y - state->m_polaris_cloud_pos;
 
 		if ((color_map_base[color_address] & 0x08) || (cloud_y >= 64))
 		{
@@ -349,13 +349,13 @@ SCREEN_UPDATE( lupin3 )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = ~state->colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = ~state->m_colorram[offs & 0x1f9f] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
@@ -374,15 +374,15 @@ SCREEN_UPDATE( cosmo )
 
 	cosmo_get_pens(pens);
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->colorram[color_address] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_colorram[color_address] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}
@@ -404,16 +404,16 @@ SCREEN_UPDATE( indianbt )
 	cosmo_get_pens(pens);
 
 	prom = screen->machine().region("proms")->base();
-	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->main_ram[offs];
+		UINT8 data = state->m_main_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
@@ -431,14 +431,14 @@ SCREEN_UPDATE( shuttlei )
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
+		UINT8 data = state->m_main_ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -464,13 +464,13 @@ SCREEN_UPDATE( sflush )
 
 	sflush_get_pens(pens);
 
-	for (offs = 0; offs < state->main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = state->main_ram[offs];
-		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->m_main_ram[offs];
+		UINT8 fore_color = state->m_colorram[offs & 0x1f9f] & 0x07;
 
 		set_8_pixels(screen->machine(), bitmap, y, x, data, pens, fore_color, 0);
 	}

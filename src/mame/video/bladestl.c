@@ -30,7 +30,7 @@ static void set_pens( running_machine &machine )
 
 	for (i = 0x00; i < 0x60; i += 2)
 	{
-		UINT16 data = state->paletteram[i | 1] | (state->paletteram[i] << 8);
+		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
@@ -51,7 +51,7 @@ void bladestl_tile_callback( running_machine &machine, int layer, int bank, int 
 	bladestl_state *state = machine.driver_data<bladestl_state>();
 
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = state->layer_colorbase[layer];
+	*color = state->m_layer_colorbase[layer];
 }
 
 /***************************************************************************
@@ -64,7 +64,7 @@ void bladestl_sprite_callback( running_machine &machine, int *code,int *color )
 {
 	bladestl_state *state = machine.driver_data<bladestl_state>();
 
-	*code |= ((*color & 0xc0) << 2) + state->spritebank;
+	*code |= ((*color & 0xc0) << 2) + state->m_spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
 	*color = 0 + (*color & 0x0f);
 }
@@ -81,12 +81,12 @@ SCREEN_UPDATE( bladestl )
 	bladestl_state *state = screen->machine().driver_data<bladestl_state>();
 	set_pens(screen->machine());
 
-	k007342_tilemap_update(state->k007342);
+	k007342_tilemap_update(state->m_k007342);
 
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
-	k007420_sprites_draw(state->k007420, bitmap, cliprect, screen->machine().gfx[1]);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, 0 ,0);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, 1 ,0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
+	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen->machine().gfx[1]);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 0 ,0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 1 ,0);
 	return 0;
 }

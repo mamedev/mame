@@ -70,9 +70,9 @@ public:
 	aristmk5_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *mk5_2KHz_timer;
-	UINT8 ext_latch;
-	UINT8 flyback;
+	emu_timer *m_mk5_2KHz_timer;
+	UINT8 m_ext_latch;
+	UINT8 m_flyback;
 };
 
 
@@ -81,7 +81,7 @@ static WRITE32_HANDLER( mk5_ext_latch_w )
 {
 	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	/* this banks "something" */
-	state->ext_latch = data & 1;
+	state->m_ext_latch = data & 1;
 }
 
 static READ32_HANDLER( ext_timer_latch_r )
@@ -89,7 +89,7 @@ static READ32_HANDLER( ext_timer_latch_r )
 	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	/* reset 2KHz timer */
 	ioc_regs[IRQ_STATUS_A] &= 0xfe;
-	state->mk5_2KHz_timer->adjust(attotime::from_hz(2000));
+	state->m_mk5_2KHz_timer->adjust(attotime::from_hz(2000));
 
 	return 0xffffffff; //value doesn't matter apparently
 }
@@ -109,11 +109,11 @@ static READ32_HANDLER( mk5_ioc_r )
 		int vert_pos;
 
 		vert_pos = space->machine().primary_screen->vpos();
-		state->flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
+		state->m_flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 		//i2c_data = (i2cmem_sda_read(space->machine().device("i2cmem")) & 1);
 
-		return (state->flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
+		return (state->m_flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
 	}
 
 	return archimedes_ioc_r(space,offset,mem_mask);
@@ -128,7 +128,7 @@ static WRITE32_HANDLER( mk5_ioc_w )
 	ioc_addr >>= 16;
 	ioc_addr &= 0x37;
 
-	if(!state->ext_latch)
+	if(!state->m_ext_latch)
 	{
 		if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
 		{
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( mk5_2KHz_callback )
 	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	ioc_regs[IRQ_STATUS_A] |= 1;
 
-	state->mk5_2KHz_timer->adjust(attotime::never);
+	state->m_mk5_2KHz_timer->adjust(attotime::never);
 }
 
 static MACHINE_START( aristmk5 )
@@ -247,14 +247,14 @@ static MACHINE_START( aristmk5 )
 	// reset the DAC to centerline
 	//dac_signed_data_w(machine.device("dac"), 0x80);
 
-	state->mk5_2KHz_timer = machine.scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
+	state->m_mk5_2KHz_timer = machine.scheduler().timer_alloc(FUNC(mk5_2KHz_callback));
 }
 
 static MACHINE_RESET( aristmk5 )
 {
 	aristmk5_state *state = machine.driver_data<aristmk5_state>();
 	archimedes_reset(machine);
-	state->mk5_2KHz_timer->adjust(attotime::from_hz(2000));
+	state->m_mk5_2KHz_timer->adjust(attotime::from_hz(2000));
 
 	ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 

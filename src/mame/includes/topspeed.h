@@ -11,30 +11,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *   spritemap;
-	UINT16 *   raster_ctrl;
-	UINT16 *   spriteram;
-	UINT16 *   sharedram;
+	UINT16 *   m_spritemap;
+	UINT16 *   m_raster_ctrl;
+	UINT16 *   m_spriteram;
+	UINT16 *   m_sharedram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
-	size_t     spriteram_size;
-	size_t     sharedram_size;
+	size_t     m_spriteram_size;
+	size_t     m_sharedram_size;
 
 	/* misc */
-	UINT16     cpua_ctrl;
-	INT32      ioc220_port;
-	INT32      banknum;
-	int        adpcm_pos;
-	int        adpcm_data;
+	UINT16     m_cpua_ctrl;
+	INT32      m_ioc220_port;
+	INT32      m_banknum;
+	int        m_adpcm_pos;
+	int        m_adpcm_data;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *pc080sn_1;
-	device_t *pc080sn_2;
-	device_t *tc0220ioc;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_pc080sn_1;
+	device_t *m_pc080sn_2;
+	device_t *m_tc0220ioc;
 
-	UINT8 dislayer[5];
+	UINT8 m_dislayer[5];
 };
 
 

@@ -26,10 +26,10 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 		UINT8 *rom = space->machine().region("oki")->base();
 
 		/* ADPCM bank switch */
-		if (state->sndbank != ((data >> state->adpcm_bank_shift) & 0x0f))
+		if (state->m_sndbank != ((data >> state->m_adpcm_bank_shift) & 0x0f))
 		{
-			state->sndbank = (data >> state->adpcm_bank_shift) & 0x0f;
-			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->sndbank, 0x20000);
+			state->m_sndbank = (data >> state->m_adpcm_bank_shift) & 0x0f;
+			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);
 		}
 	}
 	if (ACCESSING_BITS_8_15)
@@ -42,12 +42,12 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE_MEMBER(ohmygod_state, videoram)
+	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE_MEMBER(ohmygod_state, m_videoram)
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE_MEMBER(ohmygod_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE_MEMBER(ohmygod_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM 	/* Work RAM */
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
@@ -298,10 +298,10 @@ static MACHINE_START( ohmygod )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->sndbank));
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_sndbank));
 }
 
 static MACHINE_RESET( ohmygod )
@@ -309,12 +309,12 @@ static MACHINE_RESET( ohmygod )
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
 	UINT8 *rom = machine.region("oki")->base();
 
-	state->sndbank = 0;
-	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->sndbank, 0x20000);
+	state->m_sndbank = 0;
+	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);
 
-	state->spritebank = 0;
-	state->scrollx = 0;
-	state->scrolly = 0;
+	state->m_spritebank = 0;
+	state->m_scrollx = 0;
+	state->m_scrolly = 0;
 }
 
 static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
@@ -394,13 +394,13 @@ ROM_END
 static DRIVER_INIT( ohmygod )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->adpcm_bank_shift = 4;
+	state->m_adpcm_bank_shift = 4;
 }
 
 static DRIVER_INIT( naname )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	state->adpcm_bank_shift = 0;
+	state->m_adpcm_bank_shift = 0;
 }
 
 

@@ -19,20 +19,20 @@ public:
 	m92_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 irqvector;
-	UINT16 sound_status;
-	UINT32 bankaddress;
-	emu_timer *scanline_timer;
-	UINT8 irq_vectorbase;
-	UINT32 raster_irq_position;
-	UINT16 *vram_data;
-	UINT16 *spritecontrol;
-	UINT8 sprite_buffer_busy;
-	UINT8 game_kludge;
-	pf_layer_info pf_layer[3];
-	UINT16 pf_master_control[4];
-	INT32 sprite_list;
-	int palette_bank;
+	UINT8 m_irqvector;
+	UINT16 m_sound_status;
+	UINT32 m_bankaddress;
+	emu_timer *m_scanline_timer;
+	UINT8 m_irq_vectorbase;
+	UINT32 m_raster_irq_position;
+	UINT16 *m_vram_data;
+	UINT16 *m_spritecontrol;
+	UINT8 m_sprite_buffer_busy;
+	UINT8 m_game_kludge;
+	pf_layer_info m_pf_layer[3];
+	UINT16 m_pf_master_control[4];
+	INT32 m_sprite_list;
+	int m_palette_bank;
 };
 
 

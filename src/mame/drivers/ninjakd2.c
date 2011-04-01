@@ -218,7 +218,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 	for (i = 0; i < length; ++i)
 		sampledata[i] = rom[i] << 7;
 
-	state->sampledata = sampledata;
+	state->m_sampledata = sampledata;
 }
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 			++end;
 
 		if (end - start)
-			sample_start_raw(samples, 0, &state->sampledata[start], end - start, NE555_FREQUENCY, 0);
+			sample_start_raw(samples, 0, &state->m_sampledata[start], end - start, NE555_FREQUENCY, 0);
 		else
 			sample_stop(samples, 0);
 	}
@@ -260,11 +260,11 @@ static void omegaf_io_protection_reset(running_machine &machine)
 {
 	ninjakd2_state *state = machine.driver_data<ninjakd2_state>();
 	// make sure protection starts in a known state
-	state->omegaf_io_protection[0] = 0;
-	state->omegaf_io_protection[1] = 0;
-	state->omegaf_io_protection[2] = 0;
-	state->omegaf_io_protection_input = 0;
-	state->omegaf_io_protection_tic = 0;
+	state->m_omegaf_io_protection[0] = 0;
+	state->m_omegaf_io_protection[1] = 0;
+	state->m_omegaf_io_protection[2] = 0;
+	state->m_omegaf_io_protection_input = 0;
+	state->m_omegaf_io_protection_tic = 0;
 }
 
 static READ8_HANDLER( omegaf_io_protection_r )
@@ -272,22 +272,22 @@ static READ8_HANDLER( omegaf_io_protection_r )
 	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
 	UINT8 result = 0xff;
 
-	switch (state->omegaf_io_protection[1] & 3)
+	switch (state->m_omegaf_io_protection[1] & 3)
 	{
 		case 0:
 			switch (offset)
 			{
 				case 1:
-					switch (state->omegaf_io_protection[0] & 0xe0)
+					switch (state->m_omegaf_io_protection[0] & 0xe0)
 					{
 						case 0x00:
-							if (++state->omegaf_io_protection_tic & 1)
+							if (++state->m_omegaf_io_protection_tic & 1)
 							{
 								result = 0x00;
 							}
 							else
 							{
-								switch (state->omegaf_io_protection_input)
+								switch (state->m_omegaf_io_protection_input)
 								{
 									// first interrogation
 									// this happens just after setting mode 0.
@@ -318,11 +318,11 @@ static READ8_HANDLER( omegaf_io_protection_r )
 							break;
 
 						case 0x80:
-							result = 0x20 | (state->omegaf_io_protection_input & 0x1f);
+							result = 0x20 | (state->m_omegaf_io_protection_input & 0x1f);
 							break;
 
 						case 0xc0:
-							result = 0x60 | (state->omegaf_io_protection_input & 0x1f);
+							result = 0x60 | (state->m_omegaf_io_protection_input & 0x1f);
 							break;
 					}
 					break;
@@ -355,13 +355,13 @@ static WRITE8_HANDLER( omegaf_io_protection_w )
 {
 	ninjakd2_state *state = space->machine().driver_data<ninjakd2_state>();
 	// load parameter on c006 bit 0 rise transition
-	if (offset == 2 && (data & 1) && !(state->omegaf_io_protection[2] & 1))
+	if (offset == 2 && (data & 1) && !(state->m_omegaf_io_protection[2] & 1))
 	{
-		logerror("loading protection input %02x\n", state->omegaf_io_protection[0]);
-		state->omegaf_io_protection_input = state->omegaf_io_protection[0];
+		logerror("loading protection input %02x\n", state->m_omegaf_io_protection[0]);
+		state->m_omegaf_io_protection_input = state->m_omegaf_io_protection[0];
 	}
 
-	state->omegaf_io_protection[offset] = data;
+	state->m_omegaf_io_protection[offset] = data;
 }
 
 
@@ -386,10 +386,10 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
 	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)	// scroll + enable
 	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_bg_videoram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -397,9 +397,9 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xd9ff) AM_RAM
-	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, bg_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, fg_videoram)
+	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, fg_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
 	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
 	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xdf00, 0xdf04) AM_WRITE(robokid_bg2_ctrl_w)	// scroll + enable
 	AM_RANGE(0xdf05, 0xdf05) AM_WRITE(robokid_bg2_bank_w)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -462,10 +462,10 @@ static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, fg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
 ADDRESS_MAP_END
 
 

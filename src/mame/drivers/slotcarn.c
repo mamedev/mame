@@ -36,11 +36,11 @@ public:
 	slotcarn_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	pen_t pens[NUM_PENS];
-	UINT8 *ram_attr;
-	UINT8 *ram_video;
-	UINT8 *ram_palette;
-	UINT8 *backup_ram;
+	pen_t m_pens[NUM_PENS];
+	UINT8 *m_ram_attr;
+	UINT8 *m_ram_video;
+	UINT8 *m_ram_palette;
+	UINT8 *m_backup_ram;
 };
 
 
@@ -59,8 +59,8 @@ static READ8_HANDLER( palette_r )
 	slotcarn_state *state = space->machine().driver_data<slotcarn_state>();
 	int co;
 
-	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	return state->ram_palette[co];
+	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	return state->m_ram_palette[co];
 }
 
 static WRITE8_HANDLER( palette_w )
@@ -71,8 +71,8 @@ static WRITE8_HANDLER( palette_w )
 	space->machine().primary_screen->update_now();
 	data &= 0x0f;
 
-	co = ((state->ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	state->ram_palette[co] = data;
+	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	state->m_ram_palette[co] = data;
 
 }
 
@@ -89,10 +89,10 @@ static MC6845_BEGIN_UPDATE( begin_update )
 		bit0 = BIT(i,0);
 		bit1 = BIT(i,1);
 		bit2 = BIT(i,2);
-		state->pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
+		state->m_pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
 	}
 
-	return state->pens;
+	return state->m_pens;
 }
 
 
@@ -117,9 +117,9 @@ static MC6845_UPDATE_ROW( update_row )
 	for (cx = 0; cx < x_count; cx++)
 	{
 		int i;
-		int attr = state->ram_attr[ma & 0x7ff];
+		int attr = state->m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
-		int addr = ((state->ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((state->m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
 		UINT8	*data;
 
@@ -139,7 +139,7 @@ static MC6845_UPDATE_ROW( update_row )
 			else
 				col |= 0x03;
 
-			col = state->ram_palette[col & 0x3ff];
+			col = state->m_ram_palette[col & 0x3ff];
 			*BITMAP_ADDR32(bitmap, y, x) = pens[col ? col : (lscnblk ? 8 : 0)];
 
 			x++;
@@ -181,7 +181,7 @@ static const mc6845_interface mc6845_intf =
 
 static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(slotcarn_state, backup_ram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(slotcarn_state, m_backup_ram)
 	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
 	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
 
@@ -201,8 +201,8 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(slotcarn_state, ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(slotcarn_state, ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(slotcarn_state, m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(slotcarn_state, m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
@@ -547,8 +547,8 @@ static SCREEN_UPDATE( slotcarn )
 static MACHINE_START(merit)
 {
 	slotcarn_state *state = machine.driver_data<slotcarn_state>();
-	state->ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
-	state_save_register_global_pointer(machine, state->ram_palette, RAM_PALETTE_SIZE);
+	state->m_ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
+	state_save_register_global_pointer(machine, state->m_ram_palette, RAM_PALETTE_SIZE);
 }
 
 

@@ -92,28 +92,28 @@ struct sh6840_timer_channel
 typedef struct _beezer_sound_state beezer_sound_state;
 struct _beezer_sound_state
 {
-	device_t *maincpu;
+	device_t *m_maincpu;
 
 	/* IRQ variable */
-	UINT8 ptm_irq_state;
+	UINT8 m_ptm_irq_state;
 
-	struct sh6840_timer_channel sh6840_timer[3];
-	UINT8 sh6840_volume[4];
-	UINT8 sh6840_MSB_latch;
-	UINT8 sh6840_LSB_latch;
-	UINT32 sh6840_LFSR;
-	UINT32 sh6840_LFSR_clocks;
-	UINT32 sh6840_clocks_per_sample;
-	UINT32 sh6840_clock_count;
+	struct sh6840_timer_channel m_sh6840_timer[3];
+	UINT8 m_sh6840_volume[4];
+	UINT8 m_sh6840_MSB_latch;
+	UINT8 m_sh6840_LSB_latch;
+	UINT32 m_sh6840_LFSR;
+	UINT32 m_sh6840_LFSR_clocks;
+	UINT32 m_sh6840_clocks_per_sample;
+	UINT32 m_sh6840_clock_count;
 
-	UINT32 sh6840_latchwrite;
-	UINT32 sh6840_latchwriteold;
-	UINT32 sh6840_noiselatch1;
-	UINT32 sh6840_noiselatch3;
+	UINT32 m_sh6840_latchwrite;
+	UINT32 m_sh6840_latchwriteold;
+	UINT32 m_sh6840_noiselatch1;
+	UINT32 m_sh6840_noiselatch3;
 
 	/* sound streaming variables */
-	sound_stream *stream;
-	double freq_to_step;
+	sound_stream *m_stream;
+	double m_freq_to_step;
 
 };
 
@@ -210,18 +210,18 @@ INLINE int sh6840_update_noise(beezer_sound_state *state, int clocks)
 	/* loop over clocks */
 	for (i = 0; i < clocks; i++)
 	{
-		state->sh6840_LFSR_clocks++;
-		if (state->sh6840_LFSR_clocks >= 10) // about 10 clocks per 6840 clock
+		state->m_sh6840_LFSR_clocks++;
+		if (state->m_sh6840_LFSR_clocks >= 10) // about 10 clocks per 6840 clock
 		{
-			state->sh6840_LFSR_clocks = 0;
+			state->m_sh6840_LFSR_clocks = 0;
 			/* shift the LFSR. finally or in the result and see if we've
             * had a 0->1 transition */
-			newxor = (((state->sh6840_LFSR&0x10000)?1:0) ^ ((state->sh6840_LFSR&0x2000)?1:0))?1:0;
-			state->sh6840_LFSR <<= 1;
-			state->sh6840_LFSR |= newxor;
+			newxor = (((state->m_sh6840_LFSR&0x10000)?1:0) ^ ((state->m_sh6840_LFSR&0x2000)?1:0))?1:0;
+			state->m_sh6840_LFSR <<= 1;
+			state->m_sh6840_LFSR |= newxor;
 			/*printf("LFSR: %4x, %4x, %4x, %4x\n", sh6840_LFSR_3, sh6840_LFSR_2, sh6840_LFSR_1, sh6840_LFSR_0);*/
 			/* if we clocked 0->1, that will serve as an external clock */
-			if ((state->sh6840_LFSR & 0x01) == 0x01) /* tap is at bit 0, GUESSED */
+			if ((state->m_sh6840_LFSR & 0x01) == 0x01) /* tap is at bit 0, GUESSED */
 			{
 				noise_clocks++;
 			}
@@ -242,34 +242,34 @@ static void sh6840_register_state_globals(device_t *device)
 {
 	beezer_sound_state *state = get_safe_token(device);
 
-	device->save_item(NAME(state->sh6840_volume));
-	device->save_item(NAME(state->sh6840_MSB_latch));
-	device->save_item(NAME(state->sh6840_LSB_latch));
-	device->save_item(NAME(state->sh6840_LFSR));
-	device->save_item(NAME(state->sh6840_LFSR_clocks));
-	device->save_item(NAME(state->sh6840_clock_count));
-	device->save_item(NAME(state->sh6840_latchwrite));
-	device->save_item(NAME(state->sh6840_latchwriteold));
-	device->save_item(NAME(state->sh6840_noiselatch1));
-	device->save_item(NAME(state->sh6840_noiselatch3));
-	device->save_item(NAME(state->sh6840_timer[0].cr));
-	device->save_item(NAME(state->sh6840_timer[0].state));
-	device->save_item(NAME(state->sh6840_timer[0].leftovers));
-	device->save_item(NAME(state->sh6840_timer[0].timer));
-	device->save_item(NAME(state->sh6840_timer[0].clocks));
-	device->save_item(NAME(state->sh6840_timer[0].counter.w));
-	device->save_item(NAME(state->sh6840_timer[1].cr));
-	device->save_item(NAME(state->sh6840_timer[1].state));
-	device->save_item(NAME(state->sh6840_timer[1].leftovers));
-	device->save_item(NAME(state->sh6840_timer[1].timer));
-	device->save_item(NAME(state->sh6840_timer[1].clocks));
-	device->save_item(NAME(state->sh6840_timer[1].counter.w));
-	device->save_item(NAME(state->sh6840_timer[2].cr));
-	device->save_item(NAME(state->sh6840_timer[2].state));
-	device->save_item(NAME(state->sh6840_timer[2].leftovers));
-	device->save_item(NAME(state->sh6840_timer[2].timer));
-	device->save_item(NAME(state->sh6840_timer[2].clocks));
-	device->save_item(NAME(state->sh6840_timer[2].counter.w));
+	device->save_item(NAME(state->m_sh6840_volume));
+	device->save_item(NAME(state->m_sh6840_MSB_latch));
+	device->save_item(NAME(state->m_sh6840_LSB_latch));
+	device->save_item(NAME(state->m_sh6840_LFSR));
+	device->save_item(NAME(state->m_sh6840_LFSR_clocks));
+	device->save_item(NAME(state->m_sh6840_clock_count));
+	device->save_item(NAME(state->m_sh6840_latchwrite));
+	device->save_item(NAME(state->m_sh6840_latchwriteold));
+	device->save_item(NAME(state->m_sh6840_noiselatch1));
+	device->save_item(NAME(state->m_sh6840_noiselatch3));
+	device->save_item(NAME(state->m_sh6840_timer[0].cr));
+	device->save_item(NAME(state->m_sh6840_timer[0].state));
+	device->save_item(NAME(state->m_sh6840_timer[0].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[0].timer));
+	device->save_item(NAME(state->m_sh6840_timer[0].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[0].counter.w));
+	device->save_item(NAME(state->m_sh6840_timer[1].cr));
+	device->save_item(NAME(state->m_sh6840_timer[1].state));
+	device->save_item(NAME(state->m_sh6840_timer[1].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[1].timer));
+	device->save_item(NAME(state->m_sh6840_timer[1].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[1].counter.w));
+	device->save_item(NAME(state->m_sh6840_timer[2].cr));
+	device->save_item(NAME(state->m_sh6840_timer[2].state));
+	device->save_item(NAME(state->m_sh6840_timer[2].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[2].timer));
+	device->save_item(NAME(state->m_sh6840_timer[2].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[2].counter.w));
 }
 
 
@@ -283,7 +283,7 @@ static void sh6840_register_state_globals(device_t *device)
 static STREAM_UPDATE( beezer_stream_update )
 {
 	beezer_sound_state *state = get_safe_token(device);
-	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
+	struct sh6840_timer_channel *sh6840_timer = state->m_sh6840_timer;
 
 	/* hack to skip the expensive lfsr noise generation unless at least one of the 2 channels which actually depend on it are set to use it as a source */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[2].cr & 0x02) == 0);
@@ -300,9 +300,9 @@ static STREAM_UPDATE( beezer_stream_update )
 		sample1 = sample2 = sample3 = sample0 = 0;
 
 		/* determine how many 6840 clocks this sample */
-		state->sh6840_clock_count += state->sh6840_clocks_per_sample;
-		clocks_this_sample = state->sh6840_clock_count >> 24;
-		state->sh6840_clock_count &= (1 << 24) - 1;
+		state->m_sh6840_clock_count += state->m_sh6840_clocks_per_sample;
+		clocks_this_sample = state->m_sh6840_clock_count >> 24;
+		state->m_sh6840_clock_count &= (1 << 24) - 1;
 
 		/* skip if nothing enabled */
 		if ((sh6840_timer[0].cr & 0x01) == 0) // if we're not in reset...
@@ -316,7 +316,7 @@ static STREAM_UPDATE( beezer_stream_update )
 
 			/* handle timer 0 if enabled */
 			t = &sh6840_timer[0];
-			clocks = (t->cr & 0x02) ? clocks_this_sample : state->sh6840_noiselatch1;
+			clocks = (t->cr & 0x02) ? clocks_this_sample : state->m_sh6840_noiselatch1;
 			sh6840_apply_clock(t, clocks);
 			sample1 = (t->state && (t->cr & 0x80))?1:0;
 
@@ -331,12 +331,12 @@ static STREAM_UPDATE( beezer_stream_update )
 			if (noisy != 0)
 			{
 				noise_clocks_this_sample = sh6840_update_noise(state, t->clocks - chan1_clocks);
-				if (clocks) state->sh6840_noiselatch3 = (state->sh6840_LFSR&0x1);
+				if (clocks) state->m_sh6840_noiselatch3 = (state->m_sh6840_LFSR&0x1);
 			}
 
 			/* handle timer 2 if enabled */
 			t = &sh6840_timer[2];
-			clocks = (t->cr & 0x02) ? clocks_this_sample : state->sh6840_noiselatch3;
+			clocks = (t->cr & 0x02) ? clocks_this_sample : state->m_sh6840_noiselatch3;
 			/* prescale */
 			if (t->cr & 0x01)
 			{
@@ -347,19 +347,19 @@ static STREAM_UPDATE( beezer_stream_update )
 			sh6840_apply_clock(t, clocks);
 			sample3 = (t->state && (t->cr & 0x80))?1:0;
 		}
-		sample0 = state->sh6840_latchwrite?1:0;
+		sample0 = state->m_sh6840_latchwrite?1:0;
 
 		/* stash */
 		/* each sample feeds an xor bit on the sign bit of a sign-magnitude (NOT 2'S COMPLEMENT)
          * DAC. This requires some rather convoluted processing:
          * samplex*0x80 brings the sample to the sign bit
-         * state->sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
-         * state->sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
+         * state->m_sh6840_volume[x]&0x80 pulls the sign bit from the dac sample
+         * state->m_sh6840_volume[x]&0x7F pulls the magnitude from the dac sample
          */
-		sample += (((sample0*0x80)^(state->sh6840_volume[0]&0x80))?-1:1)*(state->sh6840_volume[0]&0x7F);
-		sample += (((sample1*0x80)^(state->sh6840_volume[1]&0x80))?-1:1)*(state->sh6840_volume[1]&0x7F);
-		sample += (((sample2*0x80)^(state->sh6840_volume[2]&0x80))?-1:1)*(state->sh6840_volume[2]&0x7F);
-		sample += (((sample3*0x80)^(state->sh6840_volume[3]&0x80))?-1:1)*(state->sh6840_volume[3]&0x7F);
+		sample += (((sample0*0x80)^(state->m_sh6840_volume[0]&0x80))?-1:1)*(state->m_sh6840_volume[0]&0x7F);
+		sample += (((sample1*0x80)^(state->m_sh6840_volume[1]&0x80))?-1:1)*(state->m_sh6840_volume[1]&0x7F);
+		sample += (((sample2*0x80)^(state->m_sh6840_volume[2]&0x80))?-1:1)*(state->m_sh6840_volume[2]&0x7F);
+		sample += (((sample3*0x80)^(state->m_sh6840_volume[3]&0x80))?-1:1)*(state->m_sh6840_volume[3]&0x7F);
 		*buffer++ = sample*64; // adding 3 numbers ranging from -128 to 127 yields a range of -512 to 508; to scale that to '-32768 to 32767' we multiply by 64
 	}
 }
@@ -377,11 +377,11 @@ static DEVICE_START( common_sh_start )
 	beezer_sound_state *state = get_safe_token(device);
 	int sample_rate = MULTIPLEX_FREQ;
 
-	state->sh6840_clocks_per_sample = (int)(((double)SH6840_CLOCK / (double)sample_rate) * (double)(1 << 24));
+	state->m_sh6840_clocks_per_sample = (int)(((double)SH6840_CLOCK / (double)sample_rate) * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
-	state->maincpu = device->machine().device("maincpu");
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, beezer_stream_update);
+	state->m_maincpu = device->machine().device("maincpu");
 
 	sh6840_register_state_globals(device);
 }
@@ -405,22 +405,22 @@ static DEVICE_RESET( common_sh_reset )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* 6840 */
-	memset(state->sh6840_timer, 0, sizeof(state->sh6840_timer));
-	state->sh6840_MSB_latch = 0;
-	state->sh6840_LSB_latch = 0;
-	state->sh6840_volume[0] = 0;
-	state->sh6840_volume[1] = 0;
-	state->sh6840_volume[2] = 0;
-	state->sh6840_volume[3] = 0;
-	state->sh6840_clock_count = 0;
-	state->sh6840_latchwrite = 0;
-	state->sh6840_latchwriteold = 0;
-	state->sh6840_noiselatch1 = 0;
-	state->sh6840_noiselatch3 = 0;
+	memset(state->m_sh6840_timer, 0, sizeof(state->m_sh6840_timer));
+	state->m_sh6840_MSB_latch = 0;
+	state->m_sh6840_LSB_latch = 0;
+	state->m_sh6840_volume[0] = 0;
+	state->m_sh6840_volume[1] = 0;
+	state->m_sh6840_volume[2] = 0;
+	state->m_sh6840_volume[3] = 0;
+	state->m_sh6840_clock_count = 0;
+	state->m_sh6840_latchwrite = 0;
+	state->m_sh6840_latchwriteold = 0;
+	state->m_sh6840_noiselatch1 = 0;
+	state->m_sh6840_noiselatch3 = 0;
 
 	/* LFSR */
-	state->sh6840_LFSR = 0xffffffff;
-	state->sh6840_LFSR_clocks = 0;
+	state->m_sh6840_LFSR = 0xffffffff;
+	state->m_sh6840_LFSR_clocks = 0;
 }
 
 static DEVICE_RESET( beezer_sound )
@@ -457,7 +457,7 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
@@ -466,15 +466,15 @@ READ8_DEVICE_HANDLER( beezer_sh6840_r )
 		return 0;
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(state->maincpu));
+		logerror("%04X:beezer_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(state->m_maincpu));
 		return 0;
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:
-		state->sh6840_LSB_latch = state->sh6840_timer[((offset<<1)-1)].counter.b.l;
-		return state->sh6840_timer[((offset<<1)-1)].counter.b.h;
+		state->m_sh6840_LSB_latch = state->m_sh6840_timer[((offset<<1)-1)].counter.b.l;
+		return state->m_sh6840_timer[((offset<<1)-1)].counter.b.h;
 		/* offsets 3,5,7 read the LSB latch*/
 		default: /* case 3,5,7 */
-		return state->sh6840_LSB_latch;
+		return state->m_sh6840_LSB_latch;
 	}
 }
 
@@ -483,12 +483,12 @@ WRITE8_DEVICE_HANDLER( beezer_timer1_w )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	state->stream->update();
-	state->sh6840_latchwriteold = state->sh6840_latchwrite;
-	state->sh6840_latchwrite = data&0x80;
-	if ((!state->sh6840_latchwriteold) && (state->sh6840_latchwrite)) // rising edge
+	state->m_stream->update();
+	state->m_sh6840_latchwriteold = state->m_sh6840_latchwrite;
+	state->m_sh6840_latchwrite = data&0x80;
+	if ((!state->m_sh6840_latchwriteold) && (state->m_sh6840_latchwrite)) // rising edge
 	{
-		state->sh6840_noiselatch1 = (state->sh6840_LFSR&0x1);
+		state->m_sh6840_noiselatch1 = (state->m_sh6840_LFSR&0x1);
 	}
 }
 
@@ -497,17 +497,17 @@ READ8_DEVICE_HANDLER( beezer_noise_r )
 	beezer_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	state->stream->update();
-	return (state->sh6840_LFSR&0x1);
+	state->m_stream->update();
+	return (state->m_sh6840_LFSR&0x1);
 }
 
 WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 {
 	beezer_sound_state *state = get_safe_token(device);
-	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
+	struct sh6840_timer_channel *sh6840_timer = state->m_sh6840_timer;
 
 	/* force an update of the stream */
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
@@ -536,7 +536,7 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 		case 2:
 		case 4:
 		case 6:
-			state->sh6840_MSB_latch = data;
+			state->m_sh6840_MSB_latch = data;
 			break;
 
 		/* offsets 3/5/7 write to the LSB controls */
@@ -546,7 +546,7 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 		{
 			/* latch the timer value */
 			int ch = (offset - 3) / 2;
-			sh6840_timer[ch].timer = (state->sh6840_MSB_latch << 8) | (data & 0xff);
+			sh6840_timer[ch].timer = (state->m_sh6840_MSB_latch << 8) | (data & 0xff);
 
 			/* if CR4 is clear, the value is loaded immediately */
 			if (!(sh6840_timer[ch].cr & 0x10))
@@ -567,7 +567,7 @@ WRITE8_DEVICE_HANDLER( beezer_sh6840_w )
 WRITE8_DEVICE_HANDLER( beezer_sfxctrl_w )
 {
 	beezer_sound_state *state = get_safe_token(device);
-	state->stream->update();
-	state->sh6840_volume[offset] = data;
+	state->m_stream->update();
+	state->m_sh6840_volume[offset] = data;
 }
 

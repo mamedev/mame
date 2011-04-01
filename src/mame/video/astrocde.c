@@ -304,7 +304,7 @@ static void init_savestate(running_machine &machine)
 SCREEN_UPDATE( astrocde )
 {
 	astrocde_state *state = screen->machine().driver_data<astrocde_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	UINT32 sparklebase = 0;
 	const int colormask = (astrocade_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
 	int xystep = 2 - video_mode;

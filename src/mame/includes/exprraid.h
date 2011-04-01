@@ -12,22 +12,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        main_ram;
-	UINT8 *        videoram;
-	UINT8 *        colorram;
-	UINT8 *        spriteram;
-	size_t         spriteram_size;
+	UINT8 *        m_main_ram;
+	UINT8 *        m_videoram;
+	UINT8 *        m_colorram;
+	UINT8 *        m_spriteram;
+	size_t         m_spriteram_size;
 
 	/* video-related */
-	tilemap_t        *bg_tilemap, *fg_tilemap;
-	int            bg_index[4];
+	tilemap_t        *m_bg_tilemap;
+	tilemap_t        *m_fg_tilemap;
+	int            m_bg_index[4];
 
 	/* misc */
-	//int          coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
+	//int          m_coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
-	device_t *maincpu;
-	device_t *slave;
+	device_t *m_maincpu;
+	device_t *m_slave;
 };
 
 

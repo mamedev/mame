@@ -25,10 +25,10 @@ TO DO:
 static TIMER_CALLBACK( nmi_callback )
 {
 	msisaac_state *state = machine.driver_data<msisaac_state>();
-	if (state->sound_nmi_enable)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_sound_nmi_enable)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->pending_nmi = 1;
+		state->m_pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -40,17 +40,17 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( nmi_disable_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->sound_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->sound_nmi_enable = 1;
-	if (state->pending_nmi)
+	state->m_sound_nmi_enable = 1;
+	if (state->m_pending_nmi)
 	{
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->pending_nmi = 0;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_pending_nmi = 0;
 	}
 }
 
@@ -94,10 +94,10 @@ MCU simulation TODO:
 */
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 
-	switch (state->mcu_val)
+	switch (state->m_mcu_val)
 	{
 		/*Start-up check*/
-		case 0x5f:  return (state->mcu_val + 0x6b);
+		case 0x5f:  return (state->m_mcu_val + 0x6b);
 		/*These interferes with RAM operations(setting them to non-zero you  *
          * will have unexpected results,such as infinite lives or score not  *
          * incremented properly).*/
@@ -138,9 +138,9 @@ MCU simulation TODO:
 			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
 			if (table[val] >= 0)
-				state->direction = table[val];
+				state->m_direction = table[val];
 
-			return state->direction;
+			return state->m_direction;
 		}
 
 		/*This controls the arms when they return to the player.            */
@@ -148,8 +148,8 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space->device()), state->mcu_val);
-			return state->mcu_val;
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space->device()), state->m_mcu_val);
+			return state->m_mcu_val;
 	}
 #endif
 }
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
 	//  popmessage("PC = %04x %02x", cpu_get_pc(&space->device()), data);
-	state->mcu_val = data;
+	state->m_mcu_val = data;
 #endif
 }
 
@@ -205,10 +205,10 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(msisaac_state, spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram3)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram2)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(msisaac_state, m_spriteram)	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram3)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram2)
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
@@ -225,8 +225,8 @@ static MACHINE_RESET( ta7630 )
 	for (i=0; i<16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		state->vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, state->vol_ctrl[15 - i], db);*/
+		state->m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, state->m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -243,25 +243,25 @@ static MACHINE_RESET( ta7630 )
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
 	msisaac_state *state = device->machine().driver_data<msisaac_state>();
-	state->snd_ctrl0 = data & 0xff;
-	//popmessage("SND0 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
+	state->m_snd_ctrl0 = data & 0xff;
+	//popmessage("SND0 0=%2x 1=%2x", state->m_snd_ctrl0, state->m_snd_ctrl1);
 
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(1, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(2, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(3, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(4, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(5, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(6, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(7, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(0, state->m_vol_ctrl[state->m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(1, state->m_vol_ctrl[state->m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(2, state->m_vol_ctrl[state->m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(3, state->m_vol_ctrl[state->m_snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(4, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(5, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(6, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(7, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {
 	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->snd_ctrl1 = data & 0xff;
-	//popmessage("SND1 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
+	state->m_snd_ctrl1 = data & 0xff;
+	//popmessage("SND1 0=%2x 1=%2x", state->m_snd_ctrl0, state->m_snd_ctrl1);
 }
 
 static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8 )
@@ -440,21 +440,21 @@ static MACHINE_START( msisaac )
 {
 	msisaac_state *state = machine.driver_data<msisaac_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
 	/* video */
-	state->save_item(NAME(state->bg2_textbank));
+	state->save_item(NAME(state->m_bg2_textbank));
 	/* sound */
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->vol_ctrl));
-	state->save_item(NAME(state->snd_ctrl0));
-	state->save_item(NAME(state->snd_ctrl1));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_vol_ctrl));
+	state->save_item(NAME(state->m_snd_ctrl0));
+	state->save_item(NAME(state->m_snd_ctrl1));
 
 #ifdef USE_MCU
 #else
-	state->save_item(NAME(state->mcu_val));
-	state->save_item(NAME(state->direction));
+	state->save_item(NAME(state->m_mcu_val));
+	state->save_item(NAME(state->m_direction));
 #endif
 }
 
@@ -465,18 +465,18 @@ static MACHINE_RESET( msisaac )
 	MACHINE_RESET_CALL(ta7630);
 
 	/* video */
-	state->bg2_textbank = 0;
+	state->m_bg2_textbank = 0;
 	/* sound */
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->snd_ctrl0 = 0;
-	state->snd_ctrl1 = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_snd_ctrl0 = 0;
+	state->m_snd_ctrl1 = 0;
 
 #ifdef USE_MCU
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 #else
-	state->mcu_val = 0;
-	state->direction = 0;
+	state->m_mcu_val = 0;
+	state->m_direction = 0;
 #endif
 }
 

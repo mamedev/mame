@@ -4,23 +4,23 @@ public:
 	tsamurai_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int nmi_enabled;
-	int sound_command1;
-	int sound_command2;
-	int sound_command3;
-	int vsgongf_sound_nmi_enabled;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *bg_videoram;
-	int bgcolor;
-	int textbank1;
-	int textbank2;
-	tilemap_t *background;
-	tilemap_t *foreground;
-	int flicker;
-	int vsgongf_color;
-	int key_count;
-	UINT8 *spriteram;
+	int m_nmi_enabled;
+	int m_sound_command1;
+	int m_sound_command2;
+	int m_sound_command3;
+	int m_vsgongf_sound_nmi_enabled;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_bg_videoram;
+	int m_bgcolor;
+	int m_textbank1;
+	int m_textbank2;
+	tilemap_t *m_background;
+	tilemap_t *m_foreground;
+	int m_flicker;
+	int m_vsgongf_color;
+	int m_key_count;
+	UINT8 *m_spriteram;
 };
 
 

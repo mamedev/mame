@@ -15,7 +15,7 @@ SCREEN_UPDATE( copsnrob )
 
 	/* redrawing the entire display is faster in this case */
 
-	for (offs = state->videoram_size; offs >= 0; offs--)
+	for (offs = state->m_videoram_size; offs >= 0; offs--)
 	{
 		int sx,sy;
 
@@ -23,36 +23,36 @@ SCREEN_UPDATE( copsnrob )
 		sy = offs / 32;
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
-				state->videoram[offs] & 0x3f,0,
+				state->m_videoram[offs] & 0x3f,0,
 				0,0,
 				8*sx,8*sy);
 	}
 
 
 	/* Draw the cars. Positioning was based on a screen shot */
-	if (state->cary[0])
+	if (state->m_cary[0])
 		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
-				state->carimage[0],0,
+				state->m_carimage[0],0,
 				1,0,
-				0xe4,256 - state->cary[0],0);
+				0xe4,256 - state->m_cary[0],0);
 
-	if (state->cary[1])
+	if (state->m_cary[1])
 		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
-				state->carimage[1],0,
+				state->m_carimage[1],0,
 				1,0,
-				0xc4,256 - state->cary[1],0);
+				0xc4,256 - state->m_cary[1],0);
 
-	if (state->cary[2])
+	if (state->m_cary[2])
 		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
-				state->carimage[2],0,
+				state->m_carimage[2],0,
 				0,0,
-				0x24,256 - state->cary[2],0);
+				0x24,256 - state->m_cary[2],0);
 
-	if (state->cary[3])
+	if (state->m_cary[3])
 		drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[1],
-				state->carimage[3],0,
+				state->m_carimage[3],0,
 				0,0,
-				0x04,256 - state->cary[3],0);
+				0x04,256 - state->m_cary[3],0);
 
 
 	/* Draw the beer truck. Positioning was based on a screen shot.
@@ -70,11 +70,11 @@ SCREEN_UPDATE( copsnrob )
 		/* y is going up the screen, but the truck window RAM locations
         go down the screen. */
 
-		if (state->truckram[255 - y])
+		if (state->m_truckram[255 - y])
 		{
 			/* The hardware only uses the low 5 bits of the truck image line
             sync register. */
-			if ((state->trucky[0] & 0x1f) == ((y + 31) & 0x1f))
+			if ((state->m_trucky[0] & 0x1f) == ((y + 31) & 0x1f))
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
                    end may be off the top of the screen, but we don't care. */
@@ -86,7 +86,7 @@ SCREEN_UPDATE( copsnrob )
                 truck twice. */
 				y += 31;
 			}
-			else if ((state->trucky[0] & 0x1f) == (y & 0x1f))
+			else if ((state->m_trucky[0] & 0x1f) == (y & 0x1f))
 			{
 				/* We missed a truck's back end (it was off the bottom of the
                    screen) but have hit its front end, so draw the truck. */
@@ -107,7 +107,7 @@ SCREEN_UPDATE( copsnrob )
 	{
 		int bullet, mask1, mask2, val;
 
-		val = state->bulletsram[x];
+		val = state->m_bulletsram[x];
 
 		// Check for the most common case
 		if (!(val & 0x0f))
@@ -122,7 +122,7 @@ SCREEN_UPDATE( copsnrob )
 			if (val & mask1)
 			{
 				for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-					if (state->bulletsram[y] & mask2)
+					if (state->m_bulletsram[y] & mask2)
 						*BITMAP_ADDR16(bitmap, y, 256 - x) = 1;
 			}
 

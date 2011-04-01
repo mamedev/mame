@@ -11,11 +11,11 @@ public:
 	ultratnk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int da_latch;
-	int collision[4];
-	tilemap_t* playfield;
-	bitmap_t* helper;
+	UINT8 *m_videoram;
+	int m_da_latch;
+	int m_collision[4];
+	tilemap_t* m_playfield;
+	bitmap_t* m_helper;
 };
 
 

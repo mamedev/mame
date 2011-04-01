@@ -11,16 +11,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *        spriteram;
-//  UINT16 *        paletteram;     // this currently uses generic palette handlers
-	size_t          spriteram_size;
+	UINT16 *        m_spriteram;
+//  UINT16 *        m_paletteram;     // this currently uses generic palette handlers
+	size_t          m_spriteram_size;
 
 	/* video-related */
-	int             flipscreen;
+	int             m_flipscreen;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

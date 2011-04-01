@@ -187,14 +187,14 @@ void micro3d_noise_sh_w(running_machine &machine, UINT8 data)
 		device_t *device = machine.device(data & 4 ? "noise_2" : "noise_1");
 		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
-		if (state->dac_data != nstate->dac[data & 3])
+		if (state->m_dac_data != nstate->dac[data & 3])
 		{
 			double q;
 			double fc;
 
 			nstate->stream->update();
 
-			nstate->dac[data & 3] = state->dac_data;
+			nstate->dac[data & 3] = state->m_dac_data;
 
 			if (nstate->vca == 255)
 				nstate->gain = 0;
@@ -373,7 +373,7 @@ DEVICE_GET_INFO( micro3d_sound )
 WRITE8_HANDLER( micro3d_snd_dac_a )
 {
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
-	state->dac_data = data;
+	state->m_dac_data = data;
 }
 
 WRITE8_HANDLER( micro3d_snd_dac_b )
@@ -385,7 +385,7 @@ WRITE8_HANDLER( micro3d_sound_io_w )
 {
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->sound_port_latch[offset] = data;
+	state->m_sound_port_latch[offset] = data;
 
 	switch (offset)
 	{
@@ -410,8 +410,8 @@ READ8_HANDLER( micro3d_sound_io_r )
 
 	switch (offset)
 	{
-		case 0x01:	return (state->sound_port_latch[offset] & 0x7f) | input_port_read(space->machine(), "SOUND_SW");
-		case 0x03:	return (state->sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine().device("upd7759")) ? 0x08 : 0);
+		case 0x01:	return (state->m_sound_port_latch[offset] & 0x7f) | input_port_read(space->machine(), "SOUND_SW");
+		case 0x03:	return (state->m_sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(space->machine().device("upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }

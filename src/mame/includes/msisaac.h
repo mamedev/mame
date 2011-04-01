@@ -8,34 +8,40 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     videoram;
-	UINT8 *     videoram2;
-	UINT8 *     videoram3;
-	UINT8 *     spriteram;
-	size_t      videoram_size;
-	size_t      spriteram_size;
-	size_t      spriteram2_size;
+	UINT8 *     m_videoram;
+	UINT8 *     m_videoram2;
+	UINT8 *     m_videoram3;
+	UINT8 *     m_spriteram;
+	size_t      m_videoram_size;
+	size_t      m_spriteram_size;
+	size_t      m_spriteram2_size;
 
 	/* video-related */
-	bitmap_t    *tmp_bitmap1, *tmp_bitmap2;
-	tilemap_t     *bg_tilemap;
-	tilemap_t     *fg_tilemap, *bg2_tilemap;
-	int         bg2_textbank;
+	bitmap_t    *m_tmp_bitmap1;
+	bitmap_t    *m_tmp_bitmap2;
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_bg2_tilemap;
+	int         m_bg2_textbank;
 
 	/* sound-related */
-	int         sound_nmi_enable, pending_nmi;
+	int         m_sound_nmi_enable;
+	int         m_pending_nmi;
 
 	/* fake mcu (in msisaac.c) */
 #ifndef USE_MCU
-	UINT8       mcu_val;
-	UINT8       direction;
+	UINT8       m_mcu_val;
+	UINT8       m_direction;
 #endif
 
-	int         vol_ctrl[16];
-	UINT8       snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3;
+	int         m_vol_ctrl[16];
+	UINT8       m_snd_ctrl0;
+	UINT8       m_snd_ctrl1;
+	UINT8       m_snd_ctrl2;
+	UINT8       m_snd_ctrl3;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

@@ -13,14 +13,14 @@ public:
 	redalert_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 ay8910_latch_1;
-	UINT8 ay8910_latch_2;
-	UINT8 *bitmap_videoram;
-	UINT8 *bitmap_color;
-	UINT8 *charmap_videoram;
-	UINT8 *video_control;
-	UINT8 *bitmap_colorram;
-	UINT8 control_xor;
+	UINT8 m_ay8910_latch_1;
+	UINT8 m_ay8910_latch_2;
+	UINT8 *m_bitmap_videoram;
+	UINT8 *m_bitmap_color;
+	UINT8 *m_charmap_videoram;
+	UINT8 *m_video_control;
+	UINT8 *m_bitmap_colorram;
+	UINT8 m_control_xor;
 };
 
 

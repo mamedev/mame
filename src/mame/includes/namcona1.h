@@ -22,32 +22,32 @@ public:
 	namcona1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *spriteram;
-	UINT16 *mpBank0;
-	UINT16 *mpBank1;
-	int mEnableInterrupts;
-	int gametype;
-	UINT8 nvmem[NA1_NVRAM_SIZE];
-	UINT16 count;
-	UINT32 keyval;
-	UINT16 mcu_mailbox[8];
-	UINT8 mcu_port4;
-	UINT8 mcu_port5;
-	UINT8 mcu_port6;
-	UINT8 mcu_port8;
-	UINT16 *workram;
-	UINT16 *vreg;
-	UINT16 *scroll;
-	UINT16 *shaperam;
-	UINT16 *cgram;
-	tilemap_t *roz_tilemap;
-	int roz_palette;
-	tilemap_t *bg_tilemap[NAMCONA1_NUM_TILEMAPS];
-	int tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
-	int palette_is_dirty;
-	UINT8 mask_data[8];
-	UINT8 conv_data[9];
+	UINT16 *m_videoram;
+	UINT16 *m_spriteram;
+	UINT16 *m_mpBank0;
+	UINT16 *m_mpBank1;
+	int m_mEnableInterrupts;
+	int m_gametype;
+	UINT8 m_nvmem[NA1_NVRAM_SIZE];
+	UINT16 m_count;
+	UINT32 m_keyval;
+	UINT16 m_mcu_mailbox[8];
+	UINT8 m_mcu_port4;
+	UINT8 m_mcu_port5;
+	UINT8 m_mcu_port6;
+	UINT8 m_mcu_port8;
+	UINT16 *m_workram;
+	UINT16 *m_vreg;
+	UINT16 *m_scroll;
+	UINT16 *m_shaperam;
+	UINT16 *m_cgram;
+	tilemap_t *m_roz_tilemap;
+	int m_roz_palette;
+	tilemap_t *m_bg_tilemap[NAMCONA1_NUM_TILEMAPS];
+	int m_tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
+	int m_palette_is_dirty;
+	UINT8 m_mask_data[8];
+	UINT8 m_conv_data[9];
 };
 
 

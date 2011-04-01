@@ -4,10 +4,10 @@ public:
 	stadhero_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *pf1_data;
-	tilemap_t *pf1_tilemap;
-	int flipscreen;
-	UINT16 *spriteram;
+	UINT16 *m_pf1_data;
+	tilemap_t *m_pf1_tilemap;
+	int m_flipscreen;
+	UINT16 *m_spriteram;
 };
 
 

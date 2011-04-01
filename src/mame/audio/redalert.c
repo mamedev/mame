@@ -86,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			state->ay8910_latch_1 = ay8910_r(device, 0);
+			state->m_ay8910_latch_1 = ay8910_r(device, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910_data_address_w(device, data, state->ay8910_latch_2);
+			ay8910_data_address_w(device, data, state->m_ay8910_latch_2);
 			break;
 	}
 }
@@ -103,14 +103,14 @@ static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 static READ8_HANDLER( redalert_ay8910_latch_1_r )
 {
 	redalert_state *state = space->machine().driver_data<redalert_state>();
-	return state->ay8910_latch_1;
+	return state->m_ay8910_latch_1;
 }
 
 
 static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 {
 	redalert_state *state = space->machine().driver_data<redalert_state>();
-	state->ay8910_latch_2 = data;
+	state->m_ay8910_latch_2 = data;
 }
 
 
@@ -143,8 +143,8 @@ ADDRESS_MAP_END
 static SOUND_START( redalert_audio )
 {
 	redalert_state *state = machine.driver_data<redalert_state>();
-	state->save_item(NAME(state->ay8910_latch_1));
-	state->save_item(NAME(state->ay8910_latch_2));
+	state->save_item(NAME(state->m_ay8910_latch_1));
+	state->save_item(NAME(state->m_ay8910_latch_2));
 }
 
 
@@ -291,14 +291,14 @@ WRITE8_HANDLER( demoneye_audio_command_w )
 static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
 {
 	redalert_state *state = device->machine().driver_data<redalert_state>();
-	state->ay8910_latch_1 = data;
+	state->m_ay8910_latch_1 = data;
 }
 
 
 static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 {
 	redalert_state *state = device->machine().driver_data<redalert_state>();
-	return state->ay8910_latch_2;
+	return state->m_ay8910_latch_2;
 }
 
 
@@ -308,37 +308,37 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 	device_t *ay1 = device->machine().device("ay1");
 	device_t *ay2 = device->machine().device("ay2");
 
-	switch (state->ay8910_latch_1 & 0x03)
+	switch (state->m_ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
-			if (state->ay8910_latch_1 & 0x10)
+			if (state->m_ay8910_latch_1 & 0x10)
 				ay8910_data_w(ay1, 0, data);
 
-			if (state->ay8910_latch_1 & 0x20)
+			if (state->m_ay8910_latch_1 & 0x20)
 				ay8910_data_w(ay2, 0, data);
 
 			break;
 
 		case 0x01:
-			if (state->ay8910_latch_1 & 0x10)
-				state->ay8910_latch_2 = ay8910_r(ay1, 0);
+			if (state->m_ay8910_latch_1 & 0x10)
+				state->m_ay8910_latch_2 = ay8910_r(ay1, 0);
 
-			if (state->ay8910_latch_1 & 0x20)
-				state->ay8910_latch_2 = ay8910_r(ay2, 0);
+			if (state->m_ay8910_latch_1 & 0x20)
+				state->m_ay8910_latch_2 = ay8910_r(ay2, 0);
 
 			break;
 
 		case 0x03:
-			if (state->ay8910_latch_1 & 0x10)
+			if (state->m_ay8910_latch_1 & 0x10)
 				ay8910_address_w(ay1, 0, data);
 
-			if (state->ay8910_latch_1 & 0x20)
+			if (state->m_ay8910_latch_1 & 0x20)
 				ay8910_address_w(ay2, 0, data);
 
 			break;
 
 		default:
-			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", state->ay8910_latch_1, data);
+			logerror("demoneye_ay8910_data_w called with latch %02X  data %02X\n", state->m_ay8910_latch_1, data);
 			break;
 	}
 }
@@ -390,8 +390,8 @@ static const pia6821_interface demoneye_pia_intf =
 static SOUND_START( demoneye )
 {
 	redalert_state *state = machine.driver_data<redalert_state>();
-	state->save_item(NAME(state->ay8910_latch_1));
-	state->save_item(NAME(state->ay8910_latch_2));
+	state->save_item(NAME(state->m_ay8910_latch_1));
+	state->save_item(NAME(state->m_ay8910_latch_2));
 }
 
 

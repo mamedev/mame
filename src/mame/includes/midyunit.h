@@ -33,27 +33,27 @@ public:
 	midyunit_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *cmos_ram;
-	UINT32 cmos_page;
-	UINT8 *	gfx_rom;
-	size_t gfx_rom_size;
-	UINT16 prot_result;
-	UINT16 prot_sequence[3];
-	UINT8 prot_index;
-	UINT8 term2_analog_select;
-	const struct protection_data *prot_data;
-	UINT8 cmos_w_enable;
-	UINT8 chip_type;
-	UINT16 *t2_hack_mem;
-	UINT8 *cvsd_protection_base;
-	UINT8 autoerase_enable;
-	UINT32 palette_mask;
-	pen_t *	pen_map;
-	UINT16 *	local_videoram;
-	UINT8 videobank_select;
-	UINT8 yawdim_dma;
-	UINT16 dma_register[16];
-	dma_state_t dma_state;
+	UINT16 *m_cmos_ram;
+	UINT32 m_cmos_page;
+	UINT8 *	m_gfx_rom;
+	size_t m_gfx_rom_size;
+	UINT16 m_prot_result;
+	UINT16 m_prot_sequence[3];
+	UINT8 m_prot_index;
+	UINT8 m_term2_analog_select;
+	const struct protection_data *m_prot_data;
+	UINT8 m_cmos_w_enable;
+	UINT8 m_chip_type;
+	UINT16 *m_t2_hack_mem;
+	UINT8 *m_cvsd_protection_base;
+	UINT8 m_autoerase_enable;
+	UINT32 m_palette_mask;
+	pen_t *	m_pen_map;
+	UINT16 *	m_local_videoram;
+	UINT8 m_videobank_select;
+	UINT8 m_yawdim_dma;
+	UINT16 m_dma_register[16];
+	dma_state_t m_dma_state;
 };
 
 

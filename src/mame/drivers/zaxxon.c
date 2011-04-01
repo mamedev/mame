@@ -301,7 +301,7 @@ static INTERRUPT_GEN( vblank_int )
 {
 	zaxxon_state *state = device->machine().driver_data<zaxxon_state>();
 
-	if (state->int_enabled)
+	if (state->m_int_enabled)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -310,8 +310,8 @@ static WRITE8_HANDLER( int_enable_w )
 {
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->int_enabled = data & 1;
-	if (!state->int_enabled)
+	state->m_int_enabled = data & 1;
+	if (!state->m_int_enabled)
 		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
@@ -328,9 +328,9 @@ static MACHINE_START( zaxxon )
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* register for save states */
-	state->save_item(NAME(state->int_enabled));
-	state->save_item(NAME(state->coin_status));
-	state->save_item(NAME(state->coin_enable));
+	state->save_item(NAME(state->m_int_enabled));
+	state->save_item(NAME(state->m_coin_status));
+	state->save_item(NAME(state->m_coin_enable));
 }
 
 
@@ -356,7 +356,7 @@ static READ8_HANDLER( razmataz_counter_r )
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
 	/* or else the sound will mess up */
-	return state->razmataz_counter++ >> 8;
+	return state->m_razmataz_counter++ >> 8;
 }
 
 
@@ -372,14 +372,14 @@ static CUSTOM_INPUT( razmataz_dial_r )
 	if (delta < 0x80)
 	{
 		// right
-		state->razmataz_dial_pos[num] -= delta;
-		res = (state->razmataz_dial_pos[num] << 1) | 1;
+		state->m_razmataz_dial_pos[num] -= delta;
+		res = (state->m_razmataz_dial_pos[num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		state->razmataz_dial_pos[num] += delta;
-		res = (state->razmataz_dial_pos[num] << 1);
+		state->m_razmataz_dial_pos[num] += delta;
+		res = (state->m_razmataz_dial_pos[num] << 1);
 	}
 
 	return res;
@@ -405,9 +405,9 @@ static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->coin_enable[offset] = data & 1;
-	if (!state->coin_enable[offset])
-		state->coin_status[offset] = 0;
+	state->m_coin_enable[offset] = data & 1;
+	if (!state->m_coin_enable[offset])
+		state->m_coin_status[offset] = 0;
 }
 
 
@@ -417,7 +417,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 	{
 		zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
 
-		state->coin_status[(int)(FPTR)param] = state->coin_enable[(int)(FPTR)param];
+		state->m_coin_status[(int)(FPTR)param] = state->m_coin_enable[(int)(FPTR)param];
 	}
 }
 
@@ -426,7 +426,7 @@ static CUSTOM_INPUT( zaxxon_coin_r )
 {
 	zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
 
-	return state->coin_status[(int)(FPTR)param];
+	return state->m_coin_status[(int)(FPTR)param];
 }
 
 
@@ -441,8 +441,8 @@ static CUSTOM_INPUT( zaxxon_coin_r )
 static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_MEMBER(zaxxon_state,spriteram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,m_videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_MEMBER(zaxxon_state,m_spriteram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
@@ -464,8 +464,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_MEMBER(zaxxon_state,colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,m_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_MEMBER(zaxxon_state,m_colorram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
@@ -1523,8 +1523,8 @@ static DRIVER_INIT( razmataz )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 
 	/* additional state saving */
-	state->save_item(NAME(state->razmataz_dial_pos));
-	state->save_item(NAME(state->razmataz_counter));
+	state->save_item(NAME(state->m_razmataz_dial_pos));
+	state->save_item(NAME(state->m_razmataz_counter));
 }
 
 

@@ -270,14 +270,14 @@ static INPUT_CHANGED( coin_inserted )
 static CUSTOM_INPUT( firq_beam_r )
 {
 	exidy440_state *state = field->port->machine().driver_data<exidy440_state>();
-	return state->firq_beam;
+	return state->m_firq_beam;
 }
 
 
 static CUSTOM_INPUT( firq_vblank_r )
 {
 	exidy440_state *state = field->port->machine().driver_data<exidy440_state>();
-	return state->firq_vblank;
+	return state->m_firq_vblank;
 }
 
 
@@ -300,17 +300,17 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 {
 	exidy440_state *state = machine.driver_data<exidy440_state>();
 	/* for the showdown case, bank 0 is a PLD */
-	if (state->showdown_bank_data[0] != NULL)
+	if (state->m_showdown_bank_data[0] != NULL)
 	{
-		if (bank == 0 && state->bank != 0)
+		if (bank == 0 && state->m_bank != 0)
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x7fff, FUNC(showdown_bank0_r));
-		else if (bank != 0 && state->bank == 0)
+		else if (bank != 0 && state->m_bank == 0)
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank1");
 	}
 
 	/* select the bank and update the bank pointer */
-	state->bank = bank;
-	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + state->bank * 0x4000]);
+	state->m_bank = bank;
+	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
 }
 
 
@@ -318,7 +318,7 @@ static WRITE8_HANDLER( bankram_w )
 {
 	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* EEROM lives in the upper 8k of bank 15 */
-	if (state->bank == 15 && offset >= 0x2000)
+	if (state->m_bank == 15 && offset >= 0x2000)
 	{
 		space->machine().region("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
@@ -397,22 +397,22 @@ static READ8_HANDLER( showdown_bank0_r )
 	UINT8 result = 0xff;
 
 	/* fetch the special data if a bank is selected */
-	if (state->showdown_bank_select >= 0)
+	if (state->m_showdown_bank_select >= 0)
 	{
-		result = state->showdown_bank_data[state->showdown_bank_select][state->showdown_bank_offset++];
+		result = state->m_showdown_bank_data[state->m_showdown_bank_select][state->m_showdown_bank_offset++];
 
 		/* after 24 bytes, stop and revert back to the beginning */
-		if (state->showdown_bank_offset == 0x18)
-			state->showdown_bank_offset = 0;
+		if (state->m_showdown_bank_offset == 0x18)
+			state->m_showdown_bank_offset = 0;
 	}
 
 	/* look for special offsets to adjust our behavior */
 	if (offset == 0x0055)
-		state->showdown_bank_select = -1;
-	else if (state->showdown_bank_select == -1)
+		state->m_showdown_bank_select = -1;
+	else if (state->m_showdown_bank_select == -1)
 	{
-		state->showdown_bank_select = (offset == 0x00ed) ? 0 : (offset == 0x1243) ? 1 : 0;
-		state->showdown_bank_offset = 0;
+		state->m_showdown_bank_select = (offset == 0x00ed) ? 0 : (offset == 0x1243) ? 1 : 0;
+		state->m_showdown_bank_offset = 0;
 	}
 
 	return result;
@@ -434,7 +434,7 @@ static READ8_HANDLER( topsecex_input_port_5_r )
 static WRITE8_HANDLER( topsecex_yscroll_w )
 {
 	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	*state->topsecex_yscroll = data;
+	*state->m_topsecex_yscroll = data;
 }
 
 
@@ -455,7 +455,7 @@ static MACHINE_START( exidy440 )
 static MACHINE_RESET( exidy440 )
 {
 	exidy440_state *state = machine.driver_data<exidy440_state>();
-	state->bank = 0xff;
+	state->m_bank = 0xff;
 	exidy440_bank_select(machine, 0);
 }
 
@@ -468,13 +468,13 @@ static MACHINE_RESET( exidy440 )
  *************************************/
 
 static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(exidy440_state, imageram)
-	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_BASE_MEMBER(exidy440_state, spriteram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(exidy440_state, m_imageram)
+	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_BASE_MEMBER(exidy440_state, m_spriteram)
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM
 	AM_RANGE(0x2a00, 0x2aff) AM_READWRITE(exidy440_videoram_r, exidy440_videoram_w)
 	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
 	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
-	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE_MEMBER(exidy440_state, scanline)
+	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE_MEMBER(exidy440_state, m_scanline)
 	AM_RANGE(0x2b03, 0x2b03) AM_READ_PORT("IN0") AM_WRITE(exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
 	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
@@ -1930,7 +1930,7 @@ ROM_END
 static DRIVER_INIT( exidy440 )
 {
 	exidy440_state *state = machine.driver_data<exidy440_state>();
-	state->showdown_bank_data[0] = state->showdown_bank_data[1] = NULL;
+	state->m_showdown_bank_data[0] = state->m_showdown_bank_data[1] = NULL;
 }
 
 
@@ -1952,7 +1952,7 @@ static DRIVER_INIT( topsecex )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	state->topsecex_yscroll = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ec1, 0x2ec1, FUNC(topsecex_yscroll_w));
+	state->m_topsecex_yscroll = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ec1, 0x2ec1, FUNC(topsecex_yscroll_w));
 }
 
 
@@ -1975,8 +1975,8 @@ static DRIVER_INIT( showdown )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
-	state->showdown_bank_data[0] = bankdata0;
-	state->showdown_bank_data[1] = bankdata1;
+	state->m_showdown_bank_data[0] = bankdata0;
+	state->m_showdown_bank_data[1] = bankdata1;
 }
 
 
@@ -1999,8 +1999,8 @@ static DRIVER_INIT( yukon )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
-	state->showdown_bank_data[0] = bankdata0;
-	state->showdown_bank_data[1] = bankdata1;
+	state->m_showdown_bank_data[0] = bankdata0;
+	state->m_showdown_bank_data[1] = bankdata1;
 }
 
 

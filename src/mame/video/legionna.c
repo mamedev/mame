@@ -13,59 +13,59 @@
 void heatbrl_setgfxbank(running_machine &machine, UINT16 data)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->back_gfx_bank = (data &0x4000) >> 2;
+	state->m_back_gfx_bank = (data &0x4000) >> 2;
 }
 
 /*xxx- --- ---- ---- banking*/
 void denjinmk_setgfxbank(running_machine &machine, UINT16 data)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->fore_gfx_bank = (data &0x2000) >> 1;//???
-	state->back_gfx_bank = (data &0x4000) >> 2;
-	state->mid_gfx_bank  = (data &0x8000) >> 3;//???
+	state->m_fore_gfx_bank = (data &0x2000) >> 1;//???
+	state->m_back_gfx_bank = (data &0x4000) >> 2;
+	state->m_mid_gfx_bank  = (data &0x8000) >> 3;//???
 
-	tilemap_mark_all_tiles_dirty (state->background_layer);
-	tilemap_mark_all_tiles_dirty (state->foreground_layer);
-	tilemap_mark_all_tiles_dirty (state->midground_layer);
-	tilemap_mark_all_tiles_dirty (state->text_layer);
+	tilemap_mark_all_tiles_dirty (state->m_background_layer);
+	tilemap_mark_all_tiles_dirty (state->m_foreground_layer);
+	tilemap_mark_all_tiles_dirty (state->m_midground_layer);
+	tilemap_mark_all_tiles_dirty (state->m_text_layer);
 }
 
 WRITE16_HANDLER( legionna_background_w )
 {
 	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->back_data[offset]);
-	tilemap_mark_tile_dirty(state->background_layer,offset);
+	COMBINE_DATA(&state->m_back_data[offset]);
+	tilemap_mark_tile_dirty(state->m_background_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_midground_w )
 {
 	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->mid_data[offset]);
-	tilemap_mark_tile_dirty(state->midground_layer,offset);
+	COMBINE_DATA(&state->m_mid_data[offset]);
+	tilemap_mark_tile_dirty(state->m_midground_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_foreground_w )
 {
 	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->fore_data[offset]);
-	tilemap_mark_tile_dirty(state->foreground_layer,offset);
+	COMBINE_DATA(&state->m_fore_data[offset]);
+	tilemap_mark_tile_dirty(state->m_foreground_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_text_w )
 {
 	legionna_state *state = space->machine().driver_data<legionna_state>();
-	COMBINE_DATA(&state->textram[offset]);
-	tilemap_mark_tile_dirty(state->text_layer,offset);
+	COMBINE_DATA(&state->m_textram[offset]);
+	tilemap_mark_tile_dirty(state->m_text_layer,offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->back_data[tile_index];
+	int tile=state->m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
-	tile |= state->back_gfx_bank;		/* Heatbrl uses banking */
+	tile |= state->m_back_gfx_bank;		/* Heatbrl uses banking */
 
 	SET_TILE_INFO(1,tile,color,0);
 }
@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_back_tile_info )
 static TILE_GET_INFO( get_mid_tile_info )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->mid_data[tile_index];
+	int tile=state->m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -84,11 +84,11 @@ static TILE_GET_INFO( get_mid_tile_info )
 static TILE_GET_INFO( get_mid_tile_info_denji )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->mid_data[tile_index];
+	int tile=state->m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
-	tile |= state->mid_gfx_bank;
+	tile |= state->m_mid_gfx_bank;
 
 	SET_TILE_INFO(5,tile,color,0);
 }
@@ -96,7 +96,7 @@ static TILE_GET_INFO( get_mid_tile_info_denji )
 static TILE_GET_INFO( get_mid_tile_info_cupsoc )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->mid_data[tile_index];
+	int tile=state->m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -110,7 +110,7 @@ static TILE_GET_INFO( get_mid_tile_info_cupsoc )
 static TILE_GET_INFO( get_fore_tile_info )	/* this is giving bad tiles... */
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->fore_data[tile_index];
+	int tile=state->m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	// legionnaire tile numbers / gfx set wrong, see screen after coin insertion
@@ -122,11 +122,11 @@ static TILE_GET_INFO( get_fore_tile_info )	/* this is giving bad tiles... */
 static TILE_GET_INFO( get_fore_tile_info_denji )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile=state->fore_data[tile_index];
+	int tile=state->m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
-	tile |= state->fore_gfx_bank;
+	tile |= state->m_fore_gfx_bank;
 
 	SET_TILE_INFO(4,tile,color,0);
 }
@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_fore_tile_info_denji )
 static TILE_GET_INFO( get_text_tile_info )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	int tile = state->textram[tile_index];
+	int tile = state->m_textram[tile_index];
 	int color=(tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -145,74 +145,74 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START( legionna )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
-	state->text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	state->scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->sprite_xoffs = 0;
-	state->sprite_yoffs = 0;
+	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
+	state->m_sprite_xoffs = 0;
+	state->m_sprite_yoffs = 0;
 
-	state->has_extended_banking = 0;
-	state->has_extended_priority = 0;
+	state->m_has_extended_banking = 0;
+	state->m_has_extended_priority = 0;
 
-	tilemap_set_transparent_pen(state->background_layer,15);
-	tilemap_set_transparent_pen(state->midground_layer,15);
-	tilemap_set_transparent_pen(state->foreground_layer,15);
-	tilemap_set_transparent_pen(state->text_layer,15);
+	tilemap_set_transparent_pen(state->m_background_layer,15);
+	tilemap_set_transparent_pen(state->m_midground_layer,15);
+	tilemap_set_transparent_pen(state->m_foreground_layer,15);
+	tilemap_set_transparent_pen(state->m_text_layer,15);
 }
 
 VIDEO_START( denjinmk )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
-	state->midground_layer =  tilemap_create(machine, get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
-	state->text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	state->scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->sprite_xoffs = 0;
-	state->sprite_yoffs = 0;
+	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
+	state->m_sprite_xoffs = 0;
+	state->m_sprite_yoffs = 0;
 
-	state->has_extended_banking = 1;
-	state->has_extended_priority = 0;
+	state->m_has_extended_banking = 1;
+	state->m_has_extended_priority = 0;
 
-	tilemap_set_transparent_pen(state->background_layer,15);
-	tilemap_set_transparent_pen(state->midground_layer,15);
-	tilemap_set_transparent_pen(state->foreground_layer,15);
-	tilemap_set_transparent_pen(state->text_layer,7);//?
+	tilemap_set_transparent_pen(state->m_background_layer,15);
+	tilemap_set_transparent_pen(state->m_midground_layer,15);
+	tilemap_set_transparent_pen(state->m_foreground_layer,15);
+	tilemap_set_transparent_pen(state->m_text_layer,7);//?
 }
 
 VIDEO_START( cupsoc )
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
-	state->background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->midground_layer =  tilemap_create(machine, get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
-	state->text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	state->m_background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_midground_layer =  tilemap_create(machine, get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
+	state->m_text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	state->scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
-	state->sprite_xoffs = 0;
-	state->sprite_yoffs = 0;
+	state->m_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
+	state->m_sprite_xoffs = 0;
+	state->m_sprite_yoffs = 0;
 
-	state->has_extended_banking = 0;
-	state->has_extended_priority = 1;
+	state->m_has_extended_banking = 0;
+	state->m_has_extended_priority = 1;
 
-	tilemap_set_transparent_pen(state->background_layer,15);
-	tilemap_set_transparent_pen(state->midground_layer,15);
-	tilemap_set_transparent_pen(state->foreground_layer,15);
-	tilemap_set_transparent_pen(state->text_layer,15);
+	tilemap_set_transparent_pen(state->m_background_layer,15);
+	tilemap_set_transparent_pen(state->m_midground_layer,15);
+	tilemap_set_transparent_pen(state->m_foreground_layer,15);
+	tilemap_set_transparent_pen(state->m_text_layer,15);
 }
 
 VIDEO_START(grainbow)
 {
 	legionna_state *state = machine.driver_data<legionna_state>();
 	VIDEO_START_CALL(legionna);
-	state->sprite_xoffs = state->sprite_yoffs = 16;
+	state->m_sprite_xoffs = state->m_sprite_yoffs = 16;
 
-	state->has_extended_banking = 0;
-	state->has_extended_priority = 1;
+	state->m_has_extended_banking = 0;
+	state->m_has_extended_priority = 1;
 }
 
 VIDEO_START(godzilla)
@@ -220,8 +220,8 @@ VIDEO_START(godzilla)
 	legionna_state *state = machine.driver_data<legionna_state>();
 	VIDEO_START_CALL(legionna);
 
-	state->has_extended_banking = 1;
-	state->has_extended_priority = 0;
+	state->m_has_extended_banking = 1;
+	state->m_has_extended_priority = 0;
 
 }
 
@@ -266,7 +266,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 		pri_mask = 0;
 
-		if (state->has_extended_priority)
+		if (state->m_has_extended_priority)
 		{
 
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
@@ -317,7 +317,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 
 		sprite &= 0x3fff;
 
-		if (state->has_extended_banking)
+		if (state->m_has_extended_banking)
 		{
 			if(data & 0x0040)
 			{
@@ -369,7 +369,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+state->sprite_xoffs,y+ay*16+state->sprite_yoffs,
+						color,fx,fy,(x+ax*16)+state->m_sprite_xoffs,y+ay*16+state->m_sprite_yoffs,
 						machine.priority_bitmap,pri_mask, 15);
 					}
 			}
@@ -380,7 +380,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+state->sprite_xoffs,y+(dy-ay-1)*16+state->sprite_yoffs,
+						color,fx,fy,(x+ax*16)+state->m_sprite_xoffs,y+(dy-ay-1)*16+state->m_sprite_yoffs,
 						machine.priority_bitmap,pri_mask,15);
 					}
 			}
@@ -394,7 +394,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+state->sprite_xoffs,y+ay*16+state->sprite_yoffs,
+						color,fx,fy,(x+(dx-ax-1)*16)+state->m_sprite_xoffs,y+ay*16+state->m_sprite_yoffs,
 						machine.priority_bitmap,pri_mask,15);
 					}
 			}
@@ -405,7 +405,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 					{
 						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+state->sprite_xoffs,y+(dy-ay-1)*16+state->sprite_yoffs,
+						color,fx,fy,(x+(dx-ax-1)*16)+state->m_sprite_xoffs,y+(dy-ay-1)*16+state->m_sprite_yoffs,
 						machine.priority_bitmap,pri_mask, 15);
 					}
 			}
@@ -419,24 +419,24 @@ SCREEN_UPDATE( legionna )
 {
 	legionna_state *state = screen->machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */
-	tilemap_set_scrollx( state->background_layer, 0, state->scrollram16[0] );
-	tilemap_set_scrolly( state->background_layer, 0, state->scrollram16[1] );
-	tilemap_set_scrollx( state->midground_layer,  0, state->scrollram16[2] );
-	tilemap_set_scrolly( state->midground_layer,  0, state->scrollram16[3] );
-	tilemap_set_scrollx( state->foreground_layer, 0, state->scrollram16[4] );
-	tilemap_set_scrolly( state->foreground_layer, 0, state->scrollram16[5] );
-	tilemap_set_scrollx( state->text_layer, 0,  0/*state->scrollram16[6]*/ );
-	tilemap_set_scrolly( state->text_layer, 0,  0/*state->scrollram16[7]*/ );
+	tilemap_set_scrollx( state->m_background_layer, 0, state->m_scrollram16[0] );
+	tilemap_set_scrolly( state->m_background_layer, 0, state->m_scrollram16[1] );
+	tilemap_set_scrollx( state->m_midground_layer,  0, state->m_scrollram16[2] );
+	tilemap_set_scrolly( state->m_midground_layer,  0, state->m_scrollram16[3] );
+	tilemap_set_scrollx( state->m_foreground_layer, 0, state->m_scrollram16[4] );
+	tilemap_set_scrolly( state->m_foreground_layer, 0, state->m_scrollram16[5] );
+	tilemap_set_scrollx( state->m_text_layer, 0,  0/*state->m_scrollram16[6]*/ );
+	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
 	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));	/* wrong color? */
 
-	/* state->layer_disable is a guess based on 'stage 1' screen in heatbrl  */
+	/* state->m_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
-	if (!(state->layer_disable&0x0020)) tilemap_draw(bitmap,cliprect,state->foreground_layer,0, 0);
-	if (!(state->layer_disable&0x0010)) tilemap_draw(bitmap,cliprect,state->midground_layer,0, 0);
-	if (!(state->layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,state->background_layer,0, 1);
-	if (!(state->layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,state->text_layer,0, 2);
+	if (!(state->m_layer_disable&0x0020)) tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0, 0);
+	if (!(state->m_layer_disable&0x0010)) tilemap_draw(bitmap,cliprect,state->m_midground_layer,0, 0);
+	if (!(state->m_layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,state->m_background_layer,0, 1);
+	if (!(state->m_layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,state->m_text_layer,0, 2);
 
 	draw_sprites(screen->machine(),bitmap,cliprect);
 
@@ -448,26 +448,26 @@ SCREEN_UPDATE( legionna )
 SCREEN_UPDATE( godzilla )
 {
 	legionna_state *state = screen->machine().driver_data<legionna_state>();
-//  tilemap_set_scrollx( state->text_layer, 0, 0 );
-//  tilemap_set_scrolly( state->text_layer, 0, 112 );
+//  tilemap_set_scrollx( state->m_text_layer, 0, 0 );
+//  tilemap_set_scrolly( state->m_text_layer, 0, 112 );
 	/* Setup the tilemaps */
-	tilemap_set_scrollx( state->background_layer, 0, state->scrollram16[0] );
-	tilemap_set_scrolly( state->background_layer, 0, state->scrollram16[1] );
-	tilemap_set_scrollx( state->midground_layer,  0, state->scrollram16[2] );
-	tilemap_set_scrolly( state->midground_layer,  0, state->scrollram16[3] );
-	tilemap_set_scrollx( state->foreground_layer, 0, state->scrollram16[4] );
-	tilemap_set_scrolly( state->foreground_layer, 0, state->scrollram16[5] );
-	tilemap_set_scrollx( state->text_layer, 0,  0/*state->scrollram16[6]*/ );
-	tilemap_set_scrolly( state->text_layer, 0,  0/*state->scrollram16[7]*/ );
+	tilemap_set_scrollx( state->m_background_layer, 0, state->m_scrollram16[0] );
+	tilemap_set_scrolly( state->m_background_layer, 0, state->m_scrollram16[1] );
+	tilemap_set_scrollx( state->m_midground_layer,  0, state->m_scrollram16[2] );
+	tilemap_set_scrolly( state->m_midground_layer,  0, state->m_scrollram16[3] );
+	tilemap_set_scrollx( state->m_foreground_layer, 0, state->m_scrollram16[4] );
+	tilemap_set_scrolly( state->m_foreground_layer, 0, state->m_scrollram16[5] );
+	tilemap_set_scrollx( state->m_text_layer, 0,  0/*state->m_scrollram16[6]*/ );
+	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
 
 	bitmap_fill(bitmap,cliprect,0x0200);
 	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
-	if (!(state->layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,state->background_layer,0,0);
-	if (!(state->layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,state->midground_layer,0,0);
-	if (!(state->layer_disable&0x0004)) tilemap_draw(bitmap,cliprect,state->foreground_layer,0,1);
-	if (!(state->layer_disable&0x0008)) tilemap_draw(bitmap,cliprect,state->text_layer,0,2);
+	if (!(state->m_layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,state->m_background_layer,0,0);
+	if (!(state->m_layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,0);
+	if (!(state->m_layer_disable&0x0004)) tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,1);
+	if (!(state->m_layer_disable&0x0008)) tilemap_draw(bitmap,cliprect,state->m_text_layer,0,2);
 
 	draw_sprites(screen->machine(),bitmap,cliprect);
 
@@ -478,29 +478,29 @@ SCREEN_UPDATE( grainbow )
 {
 	legionna_state *state = screen->machine().driver_data<legionna_state>();
 	/* Setup the tilemaps */
-	tilemap_set_scrollx( state->background_layer, 0, state->scrollram16[0] );
-	tilemap_set_scrolly( state->background_layer, 0, state->scrollram16[1] );
-	tilemap_set_scrollx( state->midground_layer,  0, state->scrollram16[2] );
-	tilemap_set_scrolly( state->midground_layer,  0, state->scrollram16[3] );
-	tilemap_set_scrollx( state->foreground_layer, 0, state->scrollram16[4] );
-	tilemap_set_scrolly( state->foreground_layer, 0, state->scrollram16[5] );
-	tilemap_set_scrollx( state->text_layer, 0,  0/*state->scrollram16[6]*/ );
-	tilemap_set_scrolly( state->text_layer, 0,  0/*state->scrollram16[7]*/ );
+	tilemap_set_scrollx( state->m_background_layer, 0, state->m_scrollram16[0] );
+	tilemap_set_scrolly( state->m_background_layer, 0, state->m_scrollram16[1] );
+	tilemap_set_scrollx( state->m_midground_layer,  0, state->m_scrollram16[2] );
+	tilemap_set_scrolly( state->m_midground_layer,  0, state->m_scrollram16[3] );
+	tilemap_set_scrollx( state->m_foreground_layer, 0, state->m_scrollram16[4] );
+	tilemap_set_scrolly( state->m_foreground_layer, 0, state->m_scrollram16[5] );
+	tilemap_set_scrollx( state->m_text_layer, 0,  0/*state->m_scrollram16[6]*/ );
+	tilemap_set_scrolly( state->m_text_layer, 0,  0/*state->m_scrollram16[7]*/ );
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
-	if(!(state->layer_disable & 1))
-		tilemap_draw(bitmap,cliprect,state->background_layer,0,1);
+	if(!(state->m_layer_disable & 1))
+		tilemap_draw(bitmap,cliprect,state->m_background_layer,0,1);
 
-	if(!(state->layer_disable & 2))
-		tilemap_draw(bitmap,cliprect,state->midground_layer,0,2);
+	if(!(state->m_layer_disable & 2))
+		tilemap_draw(bitmap,cliprect,state->m_midground_layer,0,2);
 
-	if(!(state->layer_disable & 4))
-		tilemap_draw(bitmap,cliprect,state->foreground_layer,0,4);
+	if(!(state->m_layer_disable & 4))
+		tilemap_draw(bitmap,cliprect,state->m_foreground_layer,0,4);
 
-	if(!(state->layer_disable & 8))
-		tilemap_draw(bitmap,cliprect,state->text_layer,0,8);
+	if(!(state->m_layer_disable & 8))
+		tilemap_draw(bitmap,cliprect,state->m_text_layer,0,8);
 
 	draw_sprites(screen->machine(),bitmap,cliprect);
 

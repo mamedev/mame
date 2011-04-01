@@ -11,24 +11,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    video_ram;
-	UINT8  *    cchip_ram;
+	UINT16 *    m_video_ram;
+	UINT8  *    m_cchip_ram;
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
-	UINT16      video_ctrl;
-	UINT16      video_mask;
+	UINT16      m_video_ctrl;
+	UINT16      m_video_mask;
 
 	/* c-chip */
-	UINT8       current_bank;
-	UINT8       current_flag;
-	UINT8       cc_port;
-	UINT8       current_cmd;
+	UINT8       m_current_bank;
+	UINT8       m_current_flag;
+	UINT8       m_cc_port;
+	UINT8       m_current_cmd;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *pc090oj;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_pc090oj;
 };
 
 

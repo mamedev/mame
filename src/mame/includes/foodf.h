@@ -16,13 +16,13 @@ public:
 
 	required_device<x2212_device> m_nvram;
 
-	double			rweights[3];
-	double			gweights[3];
-	double			bweights[2];
-	UINT8			playfield_flip;
+	double			m_rweights[3];
+	double			m_gweights[3];
+	double			m_bweights[2];
+	UINT8			m_playfield_flip;
 
-	UINT8			whichport;
-	UINT16 *spriteram;
+	UINT8			m_whichport;
+	UINT16 *m_spriteram;
 };
 
 

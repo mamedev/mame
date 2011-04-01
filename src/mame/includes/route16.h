@@ -4,15 +4,15 @@ public:
 	route16_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *sharedram;
-	UINT8 ttmahjng_port_select;
-	int speakres_vrx;
-	UINT8 *videoram1;
-	UINT8 *videoram2;
-	size_t videoram_size;
-	UINT8 flipscreen;
-	UINT8 palette_1;
-	UINT8 palette_2;
+	UINT8 *m_sharedram;
+	UINT8 m_ttmahjng_port_select;
+	int m_speakres_vrx;
+	UINT8 *m_videoram1;
+	UINT8 *m_videoram2;
+	size_t m_videoram_size;
+	UINT8 m_flipscreen;
+	UINT8 m_palette_1;
+	UINT8 m_palette_2;
 };
 
 

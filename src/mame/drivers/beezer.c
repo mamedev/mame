@@ -14,7 +14,7 @@
 #include "includes/beezer.h"
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, m_videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_WRITE(beezer_bankswitch_w) // ROM at G1, bankswitch
 	AM_RANGE(0xe000, 0xffff) AM_ROM // ROMS at G3, G5

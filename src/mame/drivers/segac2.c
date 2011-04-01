@@ -101,9 +101,9 @@ static MACHINE_START( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
 
-	state_save_register_global_array(machine, state->misc_io_data);
-	state_save_register_global(machine, state->prot_write_buf);
-	state_save_register_global(machine, state->prot_read_buf);
+	state_save_register_global_array(machine, state->m_misc_io_data);
+	state_save_register_global(machine, state->m_prot_write_buf);
+	state_save_register_global(machine, state->m_prot_read_buf);
 }
 
 
@@ -116,18 +116,18 @@ static MACHINE_RESET( segac2 )
 	MACHINE_RESET_CALL(megadriv);
 
 	/* determine how many sound banks */
-	state->sound_banks = 0;
+	state->m_sound_banks = 0;
 	if (machine.region("upd")->base())
-		state->sound_banks = machine.region("upd")->bytes() / 0x20000;
+		state->m_sound_banks = machine.region("upd")->bytes() / 0x20000;
 
 	/* reset the protection */
-	state->prot_write_buf = 0;
-	state->prot_read_buf = 0;
-	state->segac2_alt_palette_mode = 0;
+	state->m_prot_write_buf = 0;
+	state->m_prot_read_buf = 0;
+	state->m_segac2_alt_palette_mode = 0;
 
-	state->palbank = 0;
-	state->bg_palbase = 0;
-	state->sp_palbase = 0;
+	state->m_palbank = 0;
+	state->m_bg_palbase = 0;
+	state->m_sp_palbase = 0;
 
 	recompute_palette_tables(machine);
 
@@ -153,7 +153,7 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 	segac2_state *state = device->machine().driver_data<segac2_state>();
 
 	/* make sure we have a UPD chip */
-	if (!state->sound_banks)
+	if (!state->m_sound_banks)
 		return;
 
 	/* only works if we're accessing the low byte */
@@ -188,10 +188,10 @@ static READ16_HANDLER( palette_r )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
 	offset &= 0x1ff;
-	if (state->segac2_alt_palette_mode)
+	if (state->m_segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
 
-	return state->paletteram[offset + state->palbank * 0x200];
+	return state->m_paletteram[offset + state->m_palbank * 0x200];
 }
 
 /* handle writes to the paletteram */
@@ -203,13 +203,13 @@ static WRITE16_HANDLER( palette_w )
 
 	/* adjust for the palette bank */
 	offset &= 0x1ff;
-	if (state->segac2_alt_palette_mode)
+	if (state->m_segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	offset += state->palbank * 0x200;
+	offset += state->m_palbank * 0x200;
 
 	/* combine data */
-	COMBINE_DATA(&state->paletteram[offset]);
-	newword = state->paletteram[offset];
+	COMBINE_DATA(&state->m_paletteram[offset]);
+	newword = state->m_paletteram[offset];
 
 	/* up to 8 bits */
 	r = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
@@ -272,18 +272,18 @@ static void recompute_palette_tables( running_machine &machine )
 
 	for (i = 0; i < 4; i++)
 	{
-		int bgpal = 0x000 + state->bg_palbase * 0x40 + i * 0x10;
-		int sppal = 0x100 + state->sp_palbase * 0x40 + i * 0x10;
+		int bgpal = 0x000 + state->m_bg_palbase * 0x40 + i * 0x10;
+		int sppal = 0x100 + state->m_sp_palbase * 0x40 + i * 0x10;
 
-		if (!state->segac2_alt_palette_mode)
+		if (!state->m_segac2_alt_palette_mode)
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * state->palbank + bgpal;
-			segac2_sp_pal_lookup[i] = 0x200 * state->palbank + sppal;
+			segac2_bg_pal_lookup[i] = 0x200 * state->m_palbank + bgpal;
+			segac2_sp_pal_lookup[i] = 0x200 * state->m_palbank + sppal;
 		}
 		else
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * state->palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
-			segac2_sp_pal_lookup[i] = 0x200 * state->palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
+			segac2_bg_pal_lookup[i] = 0x200 * state->m_palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
+			segac2_sp_pal_lookup[i] = 0x200 * state->m_palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
 
@@ -320,11 +320,11 @@ static READ16_HANDLER( io_chip_r )
 		case 0x0c/2:
 		case 0x0e/2:
 			/* if the port is configured as an output, return the last thing written */
-			if (state->misc_io_data[0x1e/2] & (1 << offset))
-				return state->misc_io_data[offset];
+			if (state->m_misc_io_data[0x1e/2] & (1 << offset))
+				return state->m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			if (offset == 0x04/2 && state->sound_banks)
+			if (offset == 0x04/2 && state->m_sound_banks)
 				return (input_port_read(space->machine(), portnames[offset]) & 0xbf) | (upd7759_busy_r(space->machine().device("upd")) << 6);
 			return input_port_read(space->machine(), portnames[offset]);
 
@@ -341,12 +341,12 @@ static READ16_HANDLER( io_chip_r )
 		/* CNT register & mirror */
 		case 0x18/2:
 		case 0x1c/2:
-			return state->misc_io_data[0x1c/2];
+			return state->m_misc_io_data[0x1c/2];
 
 		/* port direction register & mirror */
 		case 0x1a/2:
 		case 0x1e/2:
-			return state->misc_io_data[0x1e/2];
+			return state->m_misc_io_data[0x1e/2];
 	}
 	return 0xffff;
 }
@@ -360,8 +360,8 @@ static WRITE16_HANDLER( io_chip_w )
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-	old = state->misc_io_data[offset];
-	state->misc_io_data[offset] = data;
+	old = state->m_misc_io_data[offset];
+	state->m_misc_io_data[offset] = data;
 
 	switch (offset)
 	{
@@ -405,23 +405,23 @@ static WRITE16_HANDLER( io_chip_w )
              D0 : To A9 of color RAM
             */
 			newbank = data & 3;
-			if (newbank != state->palbank)
+			if (newbank != state->m_palbank)
 			{
 				//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
-				state->palbank = newbank;
+				state->m_palbank = newbank;
 				recompute_palette_tables(space->machine());
 			}
-			if (state->sound_banks > 1)
+			if (state->m_sound_banks > 1)
 			{
 				device_t *upd = space->machine().device("upd");
-				newbank = (data >> 2) & (state->sound_banks - 1);
+				newbank = (data >> 2) & (state->m_sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
 			break;
 
 		/* CNT register */
 		case 0x1c/2:
-			if (state->sound_banks > 1)
+			if (state->m_sound_banks > 1)
 			{
 				device_t *upd = space->machine().device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
@@ -451,14 +451,14 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 0 controls display enable */
 	//segac2_enable_display(space->machine(), ~data & 1);
-	state->segac2_enable_display = ~data & 1;
+	state->m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))
-		state->prot_write_buf = state->prot_read_buf = 0;
+		state->m_prot_write_buf = state->m_prot_read_buf = 0;
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
-	state->segac2_alt_palette_mode = ((~data & 4) >> 2);
+	state->m_segac2_alt_palette_mode = ((~data & 4) >> 2);
 	recompute_palette_tables(space->machine());
 }
 
@@ -480,8 +480,8 @@ static WRITE16_HANDLER( control_w )
 static READ16_HANDLER( prot_r )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(&space->device()), state->prot_func ? state->prot_read_buf : 0xff);
-	return state->prot_read_buf | 0xf0;
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(&space->device()), state->m_prot_func ? state->m_prot_read_buf : 0xff);
+	return state->m_prot_read_buf | 0xf0;
 }
 
 
@@ -498,24 +498,24 @@ static WRITE16_HANDLER( prot_w )
 		return;
 
 	/* compute the table index */
-	table_index = (state->prot_write_buf << 4) | state->prot_read_buf;
+	table_index = (state->m_prot_write_buf << 4) | state->m_prot_read_buf;
 
 	/* keep track of the last write for the next table lookup */
-	state->prot_write_buf = data & 0x0f;
+	state->m_prot_write_buf = data & 0x0f;
 
 	/* determine the value to return, should a read occur */
-	if (state->prot_func)
-		state->prot_read_buf = state->prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(&space->device()), data & 0x0f, state->prot_read_buf);
+	if (state->m_prot_func)
+		state->m_prot_read_buf = state->m_prot_func(table_index);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(&space->device()), data & 0x0f, state->m_prot_read_buf);
 
 	/* if the palette changed, force an update */
-	if (new_sp_palbase != state->sp_palbase || new_bg_palbase != state->bg_palbase)
+	if (new_sp_palbase != state->m_sp_palbase || new_bg_palbase != state->m_bg_palbase)
 	{
 		//space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() + 1);
-		state->sp_palbase = new_sp_palbase;
-		state->bg_palbase = new_bg_palbase;
+		state->m_sp_palbase = new_sp_palbase;
+		state->m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables(space->machine());
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->bg_palbase, state->sp_palbase, space->machine().primary_screen->vpos());
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->m_bg_palbase, state->m_sp_palbase, space->machine().primary_screen->vpos());
 	}
 }
 
@@ -582,13 +582,13 @@ static WRITE16_HANDLER( counter_timer_w )
 static READ16_HANDLER( printer_r )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
-	return state->cam_data;
+	return state->m_cam_data;
 }
 
 static WRITE16_HANDLER( print_club_camera_w )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
-	state->cam_data = data;
+	state->m_cam_data = data;
 }
 
 
@@ -609,7 +609,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_MEMBER(segac2_state, paletteram)
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_MEMBER(segac2_state, m_paletteram)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -1329,7 +1329,7 @@ static VIDEO_START(segac2_new)
 static SCREEN_UPDATE(segac2_new)
 {
 	segac2_state *state = screen->machine().driver_data<segac2_state>();
-	if (!state->segac2_enable_display)
+	if (!state->m_segac2_enable_display)
 	{
 		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine()));
 		return 0;
@@ -1823,7 +1823,7 @@ static void segac2_common_init(running_machine& machine, int (*func)(int in))
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 
-	state->prot_func = func;
+	state->m_prot_func = func;
 
 	genvdp_use_cram = 0;
 	genesis_always_irq6 = 1;

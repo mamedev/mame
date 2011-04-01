@@ -13,20 +13,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  blitter;
-	UINT8 *  custom_cpu_ram;
+	UINT8 *  m_blitter;
+	UINT8 *  m_custom_cpu_ram;
 
-	UINT8 *  main_bitmap;
-	UINT8 *  converted_gfx;
+	UINT8 *  m_main_bitmap;
+	UINT8 *  m_converted_gfx;
 
 	/* video-related */
-	UINT8    video_control;
-	UINT8    flip_screen;
+	UINT8    m_video_control;
+	UINT8    m_flip_screen;
 
 	/* MCU */
-	UINT8    mcu_port_o;
-	UINT8    mcu_port_p;
-	UINT8    mcu_port_r[4];
+	UINT8    m_mcu_port_o;
+	UINT8    m_mcu_port_p;
+	UINT8    m_mcu_port_r[4];
 };
 
 

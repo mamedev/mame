@@ -19,7 +19,7 @@
 static TILE_GET_INFO( get_alpha_tile_info )
 {
 	xybots_state *state = machine.driver_data<xybots_state>();
-	UINT16 data = state->alpha[tile_index];
+	UINT16 data = state->m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 7;
 	int opaque = data & 0x8000;
@@ -30,7 +30,7 @@ static TILE_GET_INFO( get_alpha_tile_info )
 static TILE_GET_INFO( get_playfield_tile_info )
 {
 	xybots_state *state = machine.driver_data<xybots_state>();
-	UINT16 data = state->playfield[tile_index];
+	UINT16 data = state->m_playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
@@ -85,14 +85,14 @@ VIDEO_START( xybots )
 	xybots_state *state = machine.driver_data<xybots_state>();
 
 	/* initialize the playfield */
-	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 }
 
 
@@ -111,7 +111,7 @@ SCREEN_UPDATE( xybots )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -165,6 +165,6 @@ SCREEN_UPDATE( xybots )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
 	return 0;
 }

@@ -4,19 +4,19 @@ public:
 	welltris_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int pending_command;
+	int m_pending_command;
 
-	UINT16 *spriteram;
-	UINT16 *pixelram;
-	UINT16 *charvideoram;
+	UINT16 *m_spriteram;
+	UINT16 *m_pixelram;
+	UINT16 *m_charvideoram;
 
-	tilemap_t *char_tilemap;
-	UINT8 gfxbank[8];
-	UINT16 charpalettebank;
-	UINT16 spritepalettebank;
-	UINT16 pixelpalettebank;
-	int scrollx;
-	int scrolly;
+	tilemap_t *m_char_tilemap;
+	UINT8 m_gfxbank[8];
+	UINT16 m_charpalettebank;
+	UINT16 m_spritepalettebank;
+	UINT16 m_pixelpalettebank;
+	int m_scrollx;
+	int m_scrolly;
 };
 
 

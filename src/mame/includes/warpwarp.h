@@ -6,17 +6,17 @@ public:
 	warpwarp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *geebee_videoram;
-	UINT8 *videoram;
-	int geebee_bgw;
-	int ball_on;
-	int ball_h;
-	int ball_v;
-	int ball_pen;
-	int ball_sizex;
-	int ball_sizey;
-	int handle_joystick;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_geebee_videoram;
+	UINT8 *m_videoram;
+	int m_geebee_bgw;
+	int m_ball_on;
+	int m_ball_h;
+	int m_ball_v;
+	int m_ball_pen;
+	int m_ball_sizex;
+	int m_ball_sizey;
+	int m_handle_joystick;
+	tilemap_t *m_bg_tilemap;
 };
 
 

@@ -15,8 +15,8 @@ public:
 	bzone_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 analog_data;
-	UINT8 rb_input_select;
+	UINT8 m_analog_data;
+	UINT8 m_rb_input_select;
 };
 
 

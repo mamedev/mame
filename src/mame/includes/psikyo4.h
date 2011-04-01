@@ -14,23 +14,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *       vidregs;
-	UINT32 *       paletteram;
-	UINT32 *       ram;
-	UINT32 *       io_select;
-	UINT32 *       bgpen_1;
-	UINT32 *       bgpen_2;
-	UINT32 *       spriteram;
-	size_t         spriteram_size;
+	UINT32 *       m_vidregs;
+	UINT32 *       m_paletteram;
+	UINT32 *       m_ram;
+	UINT32 *       m_io_select;
+	UINT32 *       m_bgpen_1;
+	UINT32 *       m_bgpen_2;
+	UINT32 *       m_spriteram;
+	size_t         m_spriteram_size;
 
 	/* video-related */
-	double         oldbrt1, oldbrt2;
+	double         m_oldbrt1;
+	double         m_oldbrt2;
 
 	/* misc */
-	UINT32         sample_offs;	// only used if ROMTEST = 1
+	UINT32         m_sample_offs;	// only used if ROMTEST = 1
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 

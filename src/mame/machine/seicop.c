@@ -1535,13 +1535,13 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 	switch(offset)
 	{
 		case (0x01a/2): { flip_screen_set(space->machine(), seibu_vregs[offset] & 0x01); break; }
-		case (0x01c/2): { state->layer_disable =  seibu_vregs[offset]; break; }
-		case (0x020/2): { state->scrollram16[0] = seibu_vregs[offset]; break; }
-		case (0x022/2): { state->scrollram16[1] = seibu_vregs[offset]; break; }
-		case (0x024/2): { state->scrollram16[2] = seibu_vregs[offset]; break; }
-		case (0x026/2): { state->scrollram16[3] = seibu_vregs[offset]; break; }
-		case (0x028/2): { state->scrollram16[4] = seibu_vregs[offset]; break; }
-		case (0x02a/2): { state->scrollram16[5] = seibu_vregs[offset]; break; }
+		case (0x01c/2): { state->m_layer_disable =  seibu_vregs[offset]; break; }
+		case (0x020/2): { state->m_scrollram16[0] = seibu_vregs[offset]; break; }
+		case (0x022/2): { state->m_scrollram16[1] = seibu_vregs[offset]; break; }
+		case (0x024/2): { state->m_scrollram16[2] = seibu_vregs[offset]; break; }
+		case (0x026/2): { state->m_scrollram16[3] = seibu_vregs[offset]; break; }
+		case (0x028/2): { state->m_scrollram16[4] = seibu_vregs[offset]; break; }
+		case (0x02a/2): { state->m_scrollram16[5] = seibu_vregs[offset]; break; }
 		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset,data); break; }
 	}
 }
@@ -1702,14 +1702,14 @@ WRITE16_HANDLER( copdxbl_0_w )
 		}
 
 		/*TODO: kludge on x-axis.*/
-		case (0x660/2): { state->scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x662/2): { state->scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x664/2): { state->scrollram16[2] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x666/2): { state->scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x668/2): { state->scrollram16[4] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66a/2): { state->scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x66c/2): { state->scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66e/2): { state->scrollram16[7] = cop_mcu_ram[offset]; break; }
+		case (0x660/2): { state->m_scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x662/2): { state->m_scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x664/2): { state->m_scrollram16[2] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x666/2): { state->m_scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x668/2): { state->m_scrollram16[4] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66a/2): { state->m_scrollram16[5] = cop_mcu_ram[offset]; break; }
+		case (0x66c/2): { state->m_scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66e/2): { state->m_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x740/2):
 		{

@@ -21,20 +21,20 @@ public:
 	mhavoc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *zram0;
-	UINT8 *zram1;
-	UINT8 alpha_data;
-	UINT8 alpha_rcvd;
-	UINT8 alpha_xmtd;
-	UINT8 gamma_data;
-	UINT8 gamma_rcvd;
-	UINT8 gamma_xmtd;
-	UINT8 player_1;
-	UINT8 alpha_irq_clock;
-	UINT8 alpha_irq_clock_enable;
-	UINT8 gamma_irq_clock;
-	UINT8 has_gamma_cpu;
-	UINT8 speech_write_buffer;
+	UINT8 *m_zram0;
+	UINT8 *m_zram1;
+	UINT8 m_alpha_data;
+	UINT8 m_alpha_rcvd;
+	UINT8 m_alpha_xmtd;
+	UINT8 m_gamma_data;
+	UINT8 m_gamma_rcvd;
+	UINT8 m_gamma_xmtd;
+	UINT8 m_player_1;
+	UINT8 m_alpha_irq_clock;
+	UINT8 m_alpha_irq_clock_enable;
+	UINT8 m_gamma_irq_clock;
+	UINT8 m_has_gamma_cpu;
+	UINT8 m_speech_write_buffer;
 };
 
 

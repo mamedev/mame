@@ -97,15 +97,15 @@ PALETTE_INIT( sonson )
 WRITE8_HANDLER( sonson_videoram_w )
 {
 	sonson_state *state = space->machine().driver_data<sonson_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sonson_colorram_w )
 {
 	sonson_state *state = space->machine().driver_data<sonson_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sonson_scrollx_w )
@@ -114,7 +114,7 @@ WRITE8_HANDLER( sonson_scrollx_w )
 	int row;
 
 	for (row = 5; row < 32; row++)
-		tilemap_set_scrollx(state->bg_tilemap, row, data);
+		tilemap_set_scrollx(state->m_bg_tilemap, row, data);
 }
 
 WRITE8_HANDLER( sonson_flipscreen_w )
@@ -125,8 +125,8 @@ WRITE8_HANDLER( sonson_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	sonson_state *state = machine.driver_data<sonson_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + 256 * (attr & 0x03);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -136,17 +136,17 @@ VIDEO_START( sonson )
 {
 	sonson_state *state = machine.driver_data<sonson_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	sonson_state *state = machine.driver_data<sonson_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs + 2] + ((spriteram[offs + 1] & 0x20) << 3);
 		int color = spriteram[offs + 1] & 0x1f;
@@ -178,7 +178,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( sonson )
 {
 	sonson_state *state = screen->machine().driver_data<sonson_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

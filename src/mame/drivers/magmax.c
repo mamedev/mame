@@ -35,7 +35,7 @@ static WRITE16_HANDLER( magmax_sound_w )
 	magmax_state *state = space->machine().driver_data<magmax_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->sound_latch = (data & 0xff) << 1;
+		state->m_sound_latch = (data & 0xff) << 1;
 		cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 	}
 }
@@ -49,16 +49,16 @@ static READ8_HANDLER( magmax_sound_irq_ack )
 static READ8_HANDLER( magmax_sound_r )
 {
 	magmax_state *state = space->machine().driver_data<magmax_state>();
-	return (state->sound_latch | state->LS74_q);
+	return (state->m_sound_latch | state->m_LS74_q);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
 {
 	magmax_state *state = device->machine().driver_data<magmax_state>();
 	/*bit 0 is input to CLR line of the LS74*/
-	state->LS74_clr = data & 1;
-	if (state->LS74_clr == 0)
-		state->LS74_q = 0;
+	state->m_LS74_clr = data & 1;
+	if (state->m_LS74_clr == 0)
+		state->m_LS74_q = 0;
 }
 
 static TIMER_CALLBACK( scanline_callback )
@@ -68,32 +68,32 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* bit 0 goes hi whenever line V6 from video part goes lo->hi */
 	/* that is when scanline is 64 and 192 accordingly */
-	if (state->LS74_clr != 0)
-		state->LS74_q = 1;
+	if (state->m_LS74_clr != 0)
+		state->m_LS74_q = 1;
 
 	scanline += 128;
 	scanline &= 255;
 
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( magmax )
 {
 	magmax_state *state = machine.driver_data<magmax_state>();
 	/* Create interrupt timer */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 
 	/* Set up save state */
-	state_save_register_global(machine, state->sound_latch);
-	state_save_register_global(machine, state->LS74_clr);
-	state_save_register_global(machine, state->LS74_q);
-	state_save_register_global(machine, state->gain_control);
+	state_save_register_global(machine, state->m_sound_latch);
+	state_save_register_global(machine, state->m_LS74_clr);
+	state_save_register_global(machine, state->m_LS74_q);
+	state_save_register_global(machine, state->m_gain_control);
 }
 
 static MACHINE_RESET( magmax )
 {
 	magmax_state *state = machine.driver_data<magmax_state>();
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(64), 64);
 
 #if 0
 	{
@@ -158,18 +158,18 @@ bit3 - SOUND Chan#7 name=AY-3-8910 #2 Ch B
 bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 */
 
-	if (state->gain_control == (data & 0x0f))
+	if (state->m_gain_control == (data & 0x0f))
 		return;
 
-	state->gain_control = data & 0x0f;
+	state->m_gain_control = data & 0x0f;
 
 	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
 
-	percent = (state->gain_control & 1) ? 1.0 : 0.50;
+	percent = (state->m_gain_control & 1) ? 1.0 : 0.50;
 	ay1->set_output_gain(0, percent);
 //fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
 
-	percent = (state->gain_control & 2) ? 0.45 : 0.23;
+	percent = (state->m_gain_control & 2) ? 0.45 : 0.23;
 	ay1->set_output_gain(1, percent);
 	ay1->set_output_gain(2, percent);
 	ay2->set_output_gain(0, percent);
@@ -179,11 +179,11 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 //fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 
-	percent = (state->gain_control & 4) ? 0.45 : 0.23;
+	percent = (state->m_gain_control & 4) ? 0.45 : 0.23;
 	ay2->set_output_gain(2, percent);
 	ay3->set_output_gain(0, percent);
 
-	percent = (state->gain_control & 8) ? 0.45 : 0.23;
+	percent = (state->m_gain_control & 8) ? 0.45 : 0.23;
 	ay3->set_output_gain(1, percent);
 	ay3->set_output_gain(2, percent);
 }
@@ -199,7 +199,7 @@ static WRITE16_HANDLER( magmax_vreg_w )
 	/* bit4 - sprite bank LSB (DP0) */
 	/* bit5 - sprite bank MSB (DP1) */
 	/* bit6 - BG display enable (BE)*/
-	COMBINE_DATA(state->vreg);
+	COMBINE_DATA(state->m_vreg);
 }
 
 
@@ -207,15 +207,15 @@ static WRITE16_HANDLER( magmax_vreg_w )
 static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x018fff) AM_RAM
-	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_MEMBER(magmax_state, videoram)
-	AM_RANGE(0x028000, 0x0281ff) AM_RAM AM_BASE_SIZE_MEMBER(magmax_state, spriteram, spriteram_size)
+	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_MEMBER(magmax_state, m_videoram)
+	AM_RANGE(0x028000, 0x0281ff) AM_RAM AM_BASE_SIZE_MEMBER(magmax_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x030000, 0x030001) AM_READ_PORT("P1")
 	AM_RANGE(0x030002, 0x030003) AM_READ_PORT("P2")
 	AM_RANGE(0x030004, 0x030005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x030006, 0x030007) AM_READ_PORT("DSW")
-	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w) AM_BASE_MEMBER(magmax_state, vreg)
-	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, scroll_x)
-	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, scroll_y)
+	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w) AM_BASE_MEMBER(magmax_state, m_vreg)
+	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, m_scroll_x)
+	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, m_scroll_y)
 	AM_RANGE(0x03001c, 0x03001d) AM_WRITE(magmax_sound_w)
 	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP	/* IRQ ack */
 ADDRESS_MAP_END

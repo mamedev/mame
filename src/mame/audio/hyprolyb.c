@@ -6,11 +6,11 @@
 typedef struct _hyprolyb_adpcm_state hyprolyb_adpcm_state;
 struct _hyprolyb_adpcm_state
 {
-	device_t *msm;
-	address_space *space;
-	UINT8    adpcm_ready;	// only bootlegs
-	UINT8    adpcm_busy;
-	UINT8    vck_ready;
+	device_t *m_msm;
+	address_space *m_space;
+	UINT8    m_adpcm_ready;	// only bootlegs
+	UINT8    m_adpcm_busy;
+	UINT8    m_vck_ready;
 };
 
 INLINE hyprolyb_adpcm_state *get_safe_token( device_t *device )
@@ -25,11 +25,11 @@ static DEVICE_START( hyprolyb_adpcm )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
-	state->msm = device->machine().device("msm");
-	device->save_item(NAME(state->adpcm_ready));	// only bootlegs
-	device->save_item(NAME(state->adpcm_busy));
-	device->save_item(NAME(state->vck_ready));
+	state->m_space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	state->m_msm = device->machine().device("msm");
+	device->save_item(NAME(state->m_adpcm_ready));	// only bootlegs
+	device->save_item(NAME(state->m_adpcm_busy));
+	device->save_item(NAME(state->m_vck_ready));
 }
 
 
@@ -37,40 +37,40 @@ static DEVICE_RESET( hyprolyb_adpcm )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->adpcm_ready = 0;
-	state->adpcm_busy = 0;
-	state->vck_ready = 0;
+	state->m_adpcm_ready = 0;
+	state->m_adpcm_busy = 0;
+	state->m_vck_ready = 0;
 }
 
 WRITE8_DEVICE_HANDLER( hyprolyb_adpcm_w )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	soundlatch2_w(state->space, offset, data);
-	state->adpcm_ready = 0x80;
+	soundlatch2_w(state->m_space, offset, data);
+	state->m_adpcm_ready = 0x80;
 }
 
 READ8_DEVICE_HANDLER( hyprolyb_adpcm_busy_r )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	return state->adpcm_busy ? 0x10 : 0x00;
+	return state->m_adpcm_busy ? 0x10 : 0x00;
 }
 
 static WRITE8_DEVICE_HANDLER( hyprolyb_msm_data_w )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	msm5205_data_w(state->msm, data);
-	state->adpcm_busy = ~data & 0x80;
+	msm5205_data_w(state->m_msm, data);
+	state->m_adpcm_busy = ~data & 0x80;
 }
 
 static READ8_DEVICE_HANDLER( hyprolyb_msm_vck_r )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	UINT8 old = state->vck_ready;
-	state->vck_ready = 0x00;
+	UINT8 old = state->m_vck_ready;
+	state->m_vck_ready = 0x00;
 	return old;
 }
 
@@ -78,15 +78,15 @@ static READ8_DEVICE_HANDLER( hyprolyb_adpcm_ready_r )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	return state->adpcm_ready;
+	return state->m_adpcm_ready;
 }
 
 static READ8_DEVICE_HANDLER( hyprolyb_adpcm_data_r )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->adpcm_ready = 0x00;
-	return soundlatch2_r(state->space, offset);
+	state->m_adpcm_ready = 0x00;
+	return soundlatch2_r(state->m_space, offset);
 }
 
 static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8 )
@@ -116,7 +116,7 @@ static void adpcm_vck_callback( device_t *device )
 	device_t *adpcm = device->machine().device("hyprolyb_adpcm");
 	hyprolyb_adpcm_state *state = get_safe_token(adpcm);
 
-	state->vck_ready = 0x80;
+	state->m_vck_ready = 0x80;
 }
 
 static const msm5205_interface hyprolyb_msm5205_config =

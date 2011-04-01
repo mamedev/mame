@@ -53,7 +53,7 @@ static void update_irq_state( device_t *cpu )
 
 	int i;
 	for (i = 1; i < 5; i++)
-		device_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(cpu, i, state->m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -62,7 +62,7 @@ static IRQ_CALLBACK( irq_callback )
 	dcheese_state *state = device->machine().driver_data<dcheese_state>();
 
 	/* auto-ack the IRQ */
-	state->irq_state[irqline] = 0;
+	state->m_irq_state[irqline] = 0;
 	update_irq_state(device);
 
 	/* vector is 0x40 + index */
@@ -74,8 +74,8 @@ void dcheese_signal_irq( running_machine &machine, int which )
 {
 	dcheese_state *state = machine.driver_data<dcheese_state>();
 
-	state->irq_state[which] = 1;
-	update_irq_state(state->maincpu);
+	state->m_irq_state[which] = 1;
+	update_irq_state(state->m_maincpu);
 }
 
 
@@ -97,16 +97,16 @@ static MACHINE_START( dcheese )
 {
 	dcheese_state *state = machine.driver_data<dcheese_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->bsmt = machine.device("bsmt");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_bsmt = machine.device("bsmt");
 
-	device_set_irq_callback(state->maincpu, irq_callback);
+	device_set_irq_callback(state->m_maincpu, irq_callback);
 
-	state->save_item(NAME(state->irq_state));
-	state->save_item(NAME(state->soundlatch_full));
-	state->save_item(NAME(state->sound_control));
-	state->save_item(NAME(state->sound_msb_latch));
+	state->save_item(NAME(state->m_irq_state));
+	state->save_item(NAME(state->m_soundlatch_full));
+	state->save_item(NAME(state->m_sound_control));
+	state->save_item(NAME(state->m_sound_msb_latch));
 }
 
 
@@ -120,7 +120,7 @@ static MACHINE_START( dcheese )
 static CUSTOM_INPUT( sound_latch_state_r )
 {
 	dcheese_state *state = field->port->machine().driver_data<dcheese_state>();
-	return state->soundlatch_full;
+	return state->m_soundlatch_full;
 }
 
 
@@ -143,8 +143,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
-		state->soundlatch_full = 1;
-		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		state->m_soundlatch_full = 1;
+		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -162,8 +162,8 @@ static READ8_HANDLER( sound_command_r )
 	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	/* read the latch and clear the IRQ */
-	state->soundlatch_full = 0;
-	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	state->m_soundlatch_full = 0;
+	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -179,13 +179,13 @@ static READ8_HANDLER( sound_status_r )
 static WRITE8_HANDLER( sound_control_w )
 {
 	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	UINT8 diff = data ^ state->sound_control;
-	state->sound_control = data;
+	UINT8 diff = data ^ state->m_sound_control;
+	state->m_sound_control = data;
 
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		state->bsmt->reset();
+		state->m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
 		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(&space->device()), data);
 }
@@ -200,10 +200,10 @@ static WRITE8_HANDLER( bsmt_data_w )
 	if (offset % 2 == 0)
 	{
 		bsmt->write_reg(offset / 2);
-		state->sound_msb_latch = data;
+		state->m_sound_msb_latch = data;
 	}
 	else
-		bsmt->write_data((state->sound_msb_latch << 8) | data);
+		bsmt->write_data((state->m_sound_msb_latch << 8) | data);
 }
 
 

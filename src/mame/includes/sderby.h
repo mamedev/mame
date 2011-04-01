@@ -4,18 +4,18 @@ public:
 	sderby_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 
-	UINT16 *videoram;
-	UINT16 *md_videoram;
-	UINT16 *fg_videoram;
+	UINT16 *m_videoram;
+	UINT16 *m_md_videoram;
+	UINT16 *m_fg_videoram;
 
-	tilemap_t *tilemap;
-	tilemap_t *md_tilemap;
-	tilemap_t *fg_tilemap;
+	tilemap_t *m_tilemap;
+	tilemap_t *m_md_tilemap;
+	tilemap_t *m_fg_tilemap;
 
-	UINT16 scroll[6];
+	UINT16 m_scroll[6];
 };
 
 

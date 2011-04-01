@@ -7,40 +7,46 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *     bgvideoram;
-	UINT16 *     videoram1;
-	UINT16 *     videoram2;
-	UINT16 *     videoram3;
-	UINT16 *     rowscroll;
-	UINT16 *     spriteram;
-//      UINT16 *     paletteram;    // currently this uses generic palette handling
-	size_t       spriteram_size;
+	UINT16 *     m_bgvideoram;
+	UINT16 *     m_videoram1;
+	UINT16 *     m_videoram2;
+	UINT16 *     m_videoram3;
+	UINT16 *     m_rowscroll;
+	UINT16 *     m_spriteram;
+//      UINT16 *     m_paletteram;    // currently this uses generic palette handling
+	size_t       m_spriteram_size;
 
 	/* video-related */
-	tilemap_t   *tx_tilemap, *fg_tilemap, *bg_tilemap;
-	int         bgscrollx, bgscrolly, bg_enable, bg_full_size;
-	int         fgscrollx, fg_rowscroll_enable;
+	tilemap_t   *m_tx_tilemap;
+	tilemap_t   *m_fg_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	int         m_bgscrollx;
+	int         m_bgscrolly;
+	int         m_bg_enable;
+	int         m_bg_full_size;
+	int         m_fgscrollx;
+	int         m_fg_rowscroll_enable;
 
-	int         xoffset;
-	int         yoffset;
-	int         txt_tile_offset;
-	int         pri_masks[3];
-	UINT16      scroll[7];
+	int         m_xoffset;
+	int         m_yoffset;
+	int         m_txt_tile_offset;
+	int         m_pri_masks[3];
+	UINT16      m_scroll[7];
 
 	/* powerbal-specific */
-	int         tilebank;
-	int         bg_yoffset;
+	int         m_tilebank;
+	int         m_bg_yoffset;
 
 	/* misc */
-	UINT16      snd_command;
-	UINT16      snd_flag;
-	UINT8       oki_control;
-	UINT8       oki_command;
-	int         old_oki_bank;
+	UINT16      m_snd_command;
+	UINT16      m_snd_flag;
+	UINT8       m_oki_control;
+	UINT8       m_oki_command;
+	int         m_old_oki_bank;
 
 	/* devices */
-	okim6295_device *oki;
-	device_t *eeprom;
+	okim6295_device *m_oki;
+	device_t *m_eeprom;
 };
 
 /*----------- defined in video/playmark.c -----------*/

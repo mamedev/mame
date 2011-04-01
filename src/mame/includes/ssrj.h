@@ -4,13 +4,15 @@ public:
 	ssrj_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int oldport;
-	tilemap_t *tilemap1,*tilemap2,*tilemap4;
-	UINT8 *vram1;
-	UINT8 *vram2;
-	UINT8 *vram3;
-	UINT8 *vram4;
-	UINT8 *scrollram;
+	int m_oldport;
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
+	tilemap_t *m_tilemap4;
+	UINT8 *m_vram1;
+	UINT8 *m_vram2;
+	UINT8 *m_vram3;
+	UINT8 *m_vram4;
+	UINT8 *m_scrollram;
 };
 
 

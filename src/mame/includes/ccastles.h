@@ -12,36 +12,38 @@ class ccastles_state : public driver_device
 public:
 	ccastles_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  nvram_4b(*this, "nvram_4b"),
-		  nvram_4a(*this, "nvram_4a") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_nvram_4b(*this, "nvram_4b"),
+		  m_nvram_4a(*this, "nvram_4a") { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  spriteram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_spriteram;
 
 	/* video-related */
-	const UINT8 *syncprom;
-	const UINT8 *wpprom;
-	const UINT8 *priprom;
-	bitmap_t *spritebitmap;
-	double rweights[3], gweights[3], bweights[3];
-	UINT8 video_control[8];
-	UINT8 bitmode_addr[2];
-	UINT8 hscroll;
-	UINT8 vscroll;
+	const UINT8 *m_syncprom;
+	const UINT8 *m_wpprom;
+	const UINT8 *m_priprom;
+	bitmap_t *m_spritebitmap;
+	double m_rweights[3];
+	double m_gweights[3];
+	double m_bweights[3];
+	UINT8 m_video_control[8];
+	UINT8 m_bitmode_addr[2];
+	UINT8 m_hscroll;
+	UINT8 m_vscroll;
 
 	/* misc */
-	int      vblank_start;
-	int      vblank_end;
-	emu_timer *irq_timer;
-	UINT8    irq_state;
-	UINT8    nvram_store[2];
+	int      m_vblank_start;
+	int      m_vblank_end;
+	emu_timer *m_irq_timer;
+	UINT8    m_irq_state;
+	UINT8    m_nvram_store[2];
 
 	/* devices */
-	required_device<m6502_device> maincpu;
-	required_device<x2212_device> nvram_4b;
-	required_device<x2212_device> nvram_4a;
+	required_device<m6502_device> m_maincpu;
+	required_device<x2212_device> m_nvram_4b;
+	required_device<x2212_device> m_nvram_4a;
 };
 
 

@@ -11,21 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[4], sprite_colorbase;
+	int        m_layer_colorbase[4];
+	int        m_sprite_colorbase;
 
 	/* misc */
-	UINT8      cur_control2;
+	UINT8      m_cur_control2;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k054539;
-	device_t *k056832;
-	device_t *k053244;
-	device_t *k054000;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k054539;
+	device_t *m_k056832;
+	device_t *m_k053244;
+	device_t *m_k054000;
 };
 
 /*----------- defined in video/lethal.c -----------*/

@@ -9,22 +9,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  text_videoram;
-	UINT16 *  bg_videoram;
-	UINT16 *  fg_videoram;
-	UINT16 *  legion_cmd;	// legion only!
-//  UINT16 *  spriteram;    // currently this uses generic buffered_spriteram
-//  UINT16 *  paletteram;   // currently this uses generic palette handling
+	UINT16 *  m_text_videoram;
+	UINT16 *  m_bg_videoram;
+	UINT16 *  m_fg_videoram;
+	UINT16 *  m_legion_cmd;	// legion only!
+//  UINT16 *  m_spriteram;    // currently this uses generic buffered_spriteram
+//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*fg_tilemap, *tx_tilemap;
-	UINT16   scroll_msb;
-	UINT16   vreg;
-	UINT16   fg_scrollx, fg_scrolly;
-	UINT16   bg_scrollx, bg_scrolly;
-	int      scroll_type, sprite_offy, mcu_mode, old_mcu_mode;
-	int      waiting_msb;
-	int      oldmode;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_tx_tilemap;
+	UINT16   m_scroll_msb;
+	UINT16   m_vreg;
+	UINT16   m_fg_scrollx;
+	UINT16   m_fg_scrolly;
+	UINT16   m_bg_scrollx;
+	UINT16   m_bg_scrolly;
+	int      m_scroll_type;
+	int      m_sprite_offy;
+	int      m_mcu_mode;
+	int      m_old_mcu_mode;
+	int      m_waiting_msb;
+	int      m_oldmode;
 };
 
 

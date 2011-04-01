@@ -91,25 +91,25 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->soundlatch_status = 1;
+		state->m_soundlatch_status = 1;
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
 static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE_MEMBER(ashnojoe_state, tileram_3)
-	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE_MEMBER(ashnojoe_state, tileram_4)
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_BASE_MEMBER(ashnojoe_state, tileram_5)
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_BASE_MEMBER(ashnojoe_state, tileram_2)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE_MEMBER(ashnojoe_state, tileram_6)
-	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE_MEMBER(ashnojoe_state, tileram_7)
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE_MEMBER(ashnojoe_state, tileram)
+	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_3)
+	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_4)
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_5)
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_2)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_6)
+	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_7)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram)
 	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE_MEMBER(ashnojoe_state, tilemap_reg)
+	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE_MEMBER(ashnojoe_state, m_tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
@@ -122,20 +122,20 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( adpcm_w )
 {
 	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	state->adpcm_byte = data;
+	state->m_adpcm_byte = data;
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
 	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	state->soundlatch_status = 0;
+	state->m_soundlatch_status = 0;
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( sound_latch_status_r )
 {
 	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	return state->soundlatch_status;
+	return state->m_soundlatch_status;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -277,7 +277,7 @@ GFXDECODE_END
 static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_a )
@@ -310,17 +310,17 @@ static const ym2203_interface ym2203_config =
 static void ashnojoe_vclk_cb( device_t *device )
 {
 	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
-	if (state->msm5205_vclk_toggle == 0)
+	if (state->m_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(device, state->adpcm_byte >> 4);
+		msm5205_data_w(device, state->m_adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	state->msm5205_vclk_toggle ^= 1;
+	state->m_msm5205_vclk_toggle ^= 1;
 }
 
 static const msm5205_interface msm5205_config =
@@ -334,20 +334,20 @@ static MACHINE_START( ashnojoe )
 {
 	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->adpcm_byte));
-	state->save_item(NAME(state->soundlatch_status));
-	state->save_item(NAME(state->msm5205_vclk_toggle));
+	state->save_item(NAME(state->m_adpcm_byte));
+	state->save_item(NAME(state->m_soundlatch_status));
+	state->save_item(NAME(state->m_msm5205_vclk_toggle));
 }
 
 static MACHINE_RESET( ashnojoe )
 {
 	ashnojoe_state *state = machine.driver_data<ashnojoe_state>();
 
-	state->adpcm_byte = 0;
-	state->soundlatch_status = 0;
-	state->msm5205_vclk_toggle = 0;
+	state->m_adpcm_byte = 0;
+	state->m_soundlatch_status = 0;
+	state->m_msm5205_vclk_toggle = 0;
 }
 
 

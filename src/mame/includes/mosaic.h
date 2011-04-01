@@ -11,15 +11,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        fgvideoram;
-	UINT8 *        bgvideoram;
-//      UINT8 *        paletteram;    // currently this uses generic palette handling
+	UINT8 *        m_fgvideoram;
+	UINT8 *        m_bgvideoram;
+//      UINT8 *        m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t      *bg_tilemap,*fg_tilemap;
+	tilemap_t      *m_bg_tilemap;
+	tilemap_t      *m_fg_tilemap;
 
 	/* misc */
-	int            prot_val;
+	int            m_prot_val;
 };
 
 

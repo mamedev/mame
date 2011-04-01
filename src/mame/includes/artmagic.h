@@ -10,26 +10,26 @@ public:
 	artmagic_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *control;
-	UINT8 tms_irq;
-	UINT8 hack_irq;
-	UINT8 prot_input[16];
-	UINT8 prot_input_index;
-	UINT8 prot_output[16];
-	UINT8 prot_output_index;
-	UINT8 prot_output_bit;
-	UINT8 prot_bit_index;
-	UINT16 prot_save;
-	void (*protection_handler)(running_machine &);
-	UINT16 *vram0;
-	UINT16 *vram1;
-	int _xor[16];
-	int is_stoneball;
-	UINT16 *blitter_base;
-	UINT32 blitter_mask;
-	UINT16 blitter_data[8];
-	UINT8 blitter_page;
-	attotime blitter_busy_until;
+	UINT16 *m_control;
+	UINT8 m_tms_irq;
+	UINT8 m_hack_irq;
+	UINT8 m_prot_input[16];
+	UINT8 m_prot_input_index;
+	UINT8 m_prot_output[16];
+	UINT8 m_prot_output_index;
+	UINT8 m_prot_output_bit;
+	UINT8 m_prot_bit_index;
+	UINT16 m_prot_save;
+	void (*m_protection_handler)(running_machine &);
+	UINT16 *m_vram0;
+	UINT16 *m_vram1;
+	int m_xor[16];
+	int m_is_stoneball;
+	UINT16 *m_blitter_base;
+	UINT32 m_blitter_mask;
+	UINT16 m_blitter_data[8];
+	UINT8 m_blitter_page;
+	attotime m_blitter_busy_until;
 };
 
 

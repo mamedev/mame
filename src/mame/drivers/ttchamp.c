@@ -51,8 +51,8 @@ public:
 	ttchamp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *peno_vram;
-	UINT16 paloff;
+	UINT16 *m_peno_vram;
+	UINT16 m_paloff;
 };
 
 
@@ -85,7 +85,7 @@ static SCREEN_UPDATE(ttchamp)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)state->peno_vram)[BYTE_XOR_LE(count)]+0x300;
+			/*if(hotblock_port0&0x40)*/*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)state->m_peno_vram)[BYTE_XOR_LE(count)]+0x300;
             count++;
         }
     }
@@ -96,7 +96,7 @@ static SCREEN_UPDATE(ttchamp)
 static WRITE16_HANDLER( paloff_w )
 {
 	ttchamp_state *state = space->machine().driver_data<ttchamp_state>();
-    COMBINE_DATA(&state->paloff);
+    COMBINE_DATA(&state->m_paloff);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -116,7 +116,7 @@ static WRITE16_HANDLER( pcup_prgbank_w )
 static WRITE16_HANDLER( paldat_w )
 {
 	ttchamp_state *state = space->machine().driver_data<ttchamp_state>();
-    palette_set_color_rgb(space->machine(),state->paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+    palette_set_color_rgb(space->machine(),state->m_paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )
@@ -133,7 +133,7 @@ static READ16_HANDLER( peno_rand2 )
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16 )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(ttchamp_state, peno_vram)
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(ttchamp_state, m_peno_vram)
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END

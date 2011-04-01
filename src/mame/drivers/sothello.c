@@ -49,9 +49,9 @@ public:
 	sothello_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int subcpu_status;
-	int soundcpu_busy;
-	int msm_data;
+	int m_subcpu_status;
+	int m_soundcpu_busy;
+	int m_msm_data;
 };
 
 
@@ -95,7 +95,7 @@ static READ8_HANDLER( subcpu_halt_set )
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
     space->machine().scheduler().synchronize(FUNC(subcpu_suspend));
-    state->subcpu_status|=2;
+    state->m_subcpu_status|=2;
     return 0;
 }
 
@@ -103,21 +103,21 @@ static READ8_HANDLER( subcpu_halt_clear )
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
     space->machine().scheduler().synchronize(FUNC(subcpu_resume));
-    state->subcpu_status&=~1;
-    state->subcpu_status&=~2;
+    state->m_subcpu_status&=~1;
+    state->m_subcpu_status&=~2;
     return 0;
 }
 
 static READ8_HANDLER(subcpu_comm_status )
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
-    return state->subcpu_status;
+    return state->m_subcpu_status;
 }
 
 static READ8_HANDLER( soundcpu_status_r )
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
-    return state->soundcpu_busy;
+    return state->m_soundcpu_busy;
 }
 
 static ADDRESS_MAP_START( maincpu_mem_map, AS_PROGRAM, 8 )
@@ -163,20 +163,20 @@ static WRITE8_DEVICE_HANDLER(msm_cfg_w)
 static WRITE8_HANDLER( msm_data_w )
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
-    state->msm_data = data;
+    state->m_msm_data = data;
 
 }
 
 static WRITE8_HANDLER(soundcpu_busyflag_set_w)
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
-    state->soundcpu_busy=1;
+    state->m_soundcpu_busy=1;
 }
 
 static WRITE8_HANDLER(soundcpu_busyflag_reset_w)
 {
 	sothello_state *state = space->machine().driver_data<sothello_state>();
-    state->soundcpu_busy=0;
+    state->m_soundcpu_busy=0;
 }
 
 static WRITE8_HANDLER(soundcpu_int_clear_w)
@@ -206,7 +206,7 @@ static void unlock_shared_ram(address_space *space)
 	sothello_state *state = space->machine().driver_data<sothello_state>();
     if(!space->machine().device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
     {
-        state->subcpu_status|=1;
+        state->m_subcpu_status|=1;
     }
     else
     {
@@ -326,7 +326,7 @@ static void adpcm_int(device_t *device)
 {
 	sothello_state *state = device->machine().driver_data<sothello_state>();
     /* only 4 bits are used */
-    msm5205_data_w( device, state->msm_data & 0x0f );
+    msm5205_data_w( device, state->m_msm_data & 0x0f );
     cputag_set_input_line(device->machine(), "soundcpu", 0, ASSERT_LINE );
 }
 

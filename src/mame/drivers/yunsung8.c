@@ -48,7 +48,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
 	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
-	state->layers_ctrl = data & 0x30;	// Layers enable
+	state->m_layers_ctrl = data & 0x30;	// Layers enable
 
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
 	/* Swap the nibbles */
-	state->adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
+	state->m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
 
@@ -450,12 +450,12 @@ static void yunsung8_adpcm_int( device_t *device )
 {
 	yunsung8_state *state = device->machine().driver_data<yunsung8_state>();
 
-	msm5205_data_w(device, state->adpcm >> 4);
-	state->adpcm <<= 4;
+	msm5205_data_w(device, state->m_adpcm >> 4);
+	state->m_adpcm <<= 4;
 
-	state->toggle ^= 1;
-	if (state->toggle)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_toggle ^= 1;
+	if (state->m_toggle)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =
@@ -471,31 +471,31 @@ static MACHINE_START( yunsung8 )
 	UINT8 *MAIN = machine.region("maincpu")->base();
 	UINT8 *AUDIO = machine.region("audiocpu")->base();
 
-	state->videoram_0 = state->videoram + 0x0000;	// Ram is banked
-	state->videoram_1 = state->videoram + 0x2000;
+	state->m_videoram_0 = state->m_videoram + 0x0000;	// Ram is banked
+	state->m_videoram_1 = state->m_videoram + 0x2000;
 
 	memory_configure_bank(machine, "bank1", 0, 3, &MAIN[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 3, 5, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank2", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->videoram));
-	state->save_item(NAME(state->layers_ctrl));
-	state->save_item(NAME(state->videobank));
-	state->save_item(NAME(state->adpcm));
-	state->save_item(NAME(state->toggle));
+	state->save_item(NAME(state->m_videoram));
+	state->save_item(NAME(state->m_layers_ctrl));
+	state->save_item(NAME(state->m_videobank));
+	state->save_item(NAME(state->m_adpcm));
+	state->save_item(NAME(state->m_toggle));
 }
 
 static MACHINE_RESET( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
-	state->videobank = 0;
-	state->layers_ctrl = 0;
-	state->adpcm = 0;
-	state->toggle = 0;
+	state->m_videobank = 0;
+	state->m_layers_ctrl = 0;
+	state->m_adpcm = 0;
+	state->m_toggle = 0;
 }
 
 

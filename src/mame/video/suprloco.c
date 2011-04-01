@@ -77,10 +77,10 @@ PALETTE_INIT( suprloco )
 static TILE_GET_INFO( get_tile_info )
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
-	UINT8 attr = state->videoram[2*tile_index+1];
+	UINT8 attr = state->m_videoram[2*tile_index+1];
 	SET_TILE_INFO(
 			0,
-			state->videoram[2*tile_index] | ((attr & 0x03) << 8),
+			state->m_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0);
 	tileinfo->category = (attr & 0x20) >> 5;
@@ -97,9 +97,9 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( suprloco )
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
-	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_scroll_rows(state->bg_tilemap,32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap,32);
 }
 
 
@@ -113,8 +113,8 @@ VIDEO_START( suprloco )
 WRITE8_HANDLER( suprloco_videoram_w )
 {
 	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( suprloco_scrollram_w )
@@ -122,8 +122,8 @@ WRITE8_HANDLER( suprloco_scrollram_w )
 	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	int adj = flip_screen_get(space->machine()) ? -8 : 8;
 
-	state->scrollram[offset] = data;
-	tilemap_set_scrollx(state->bg_tilemap,offset, data - adj);
+	state->m_scrollram[offset] = data;
+	tilemap_set_scrollx(state->m_bg_tilemap,offset, data - adj);
 }
 
 WRITE8_HANDLER( suprloco_control_w )
@@ -139,7 +139,7 @@ WRITE8_HANDLER( suprloco_control_w )
 	/* Bit 6   - probably unused */
 	/* Bit 7   - flip screen */
 
-	if ((state->control & 0x10) != (data & 0x10))
+	if ((state->m_control & 0x10) != (data & 0x10))
 	{
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
@@ -149,14 +149,14 @@ WRITE8_HANDLER( suprloco_control_w )
 
 	flip_screen_set(space->machine(), data & 0x80);
 
-	state->control = data;
+	state->m_control = data;
 }
 
 
 READ8_HANDLER( suprloco_control_r )
 {
 	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	return state->control;
+	return state->m_control;
 }
 
 
@@ -190,13 +190,13 @@ static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectang
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
 
-	spr_reg	= state->spriteram + 0x10 * spr_number;
+	spr_reg	= state->m_spriteram + 0x10 * spr_number;
 
 	src = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
 	height		= spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
-	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((state->control & 0x20)?0x100:0);
+	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((state->m_control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
@@ -261,9 +261,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (state->spriteram_size >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (state->m_spriteram_size >> 4);spr_number++)
 	{
-		spr_reg = state->spriteram + 0x10 * spr_number;
+		spr_reg = state->m_spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
 			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}
@@ -272,8 +272,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( suprloco )
 {
 	suprloco_state *state = screen->machine().driver_data<suprloco_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen->machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
 	return 0;
 }

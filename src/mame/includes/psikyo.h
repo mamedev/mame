@@ -11,36 +11,51 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *       vram_0;
-	UINT32 *       vram_1;
-	UINT32 *       vregs;
-	UINT32 *       spritebuf1;
-	UINT32 *       spritebuf2;
-	UINT32 *       bootleg_spritebuffer;
-//      UINT32 *       paletteram;  // currently this uses generic palette handling
-//  UINT32 *       spriteram;   // currently this uses generic buffered spriteram
-//  size_t         spriteram_size;
+	UINT32 *       m_vram_0;
+	UINT32 *       m_vram_1;
+	UINT32 *       m_vregs;
+	UINT32 *       m_spritebuf1;
+	UINT32 *       m_spritebuf2;
+	UINT32 *       m_bootleg_spritebuffer;
+//      UINT32 *       m_paletteram;  // currently this uses generic palette handling
+//  UINT32 *       m_spriteram;   // currently this uses generic buffered spriteram
+//  size_t         m_spriteram_size;
 
 	/* video-related */
-	tilemap_t        *tilemap_0_size0, *tilemap_0_size1, *tilemap_0_size2, *tilemap_0_size3;
-	tilemap_t        *tilemap_1_size0, *tilemap_1_size1, *tilemap_1_size2, *tilemap_1_size3;
-	int            tilemap_0_bank, tilemap_1_bank;
-	int            ka302c_banking;
-	UINT32 *spriteram;
-	size_t spriteram_size;
+	tilemap_t        *m_tilemap_0_size0;
+	tilemap_t        *m_tilemap_0_size1;
+	tilemap_t        *m_tilemap_0_size2;
+	tilemap_t        *m_tilemap_0_size3;
+	tilemap_t        *m_tilemap_1_size0;
+	tilemap_t        *m_tilemap_1_size1;
+	tilemap_t        *m_tilemap_1_size2;
+	tilemap_t        *m_tilemap_1_size3;
+	int            m_tilemap_0_bank;
+	int            m_tilemap_1_bank;
+	int            m_ka302c_banking;
+	UINT32 *m_spriteram;
+	size_t m_spriteram_size;
 
 	/* misc */
-	UINT8          soundlatch;
-	int            z80_nmi, mcu_status;
+	UINT8          m_soundlatch;
+	int            m_z80_nmi;
+	int            m_mcu_status;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 
 	/* game-specific */
 	// 1945 MCU
-	UINT8          s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, s1945_mcu_inlatch, s1945_mcu_index;
-	UINT8          s1945_mcu_latching, s1945_mcu_mode, s1945_mcu_control, s1945_mcu_bctrl;
-	const UINT8    *s1945_mcu_table;
+	UINT8          m_s1945_mcu_direction;
+	UINT8          m_s1945_mcu_latch1;
+	UINT8          m_s1945_mcu_latch2;
+	UINT8          m_s1945_mcu_inlatch;
+	UINT8          m_s1945_mcu_index;
+	UINT8          m_s1945_mcu_latching;
+	UINT8          m_s1945_mcu_mode;
+	UINT8          m_s1945_mcu_control;
+	UINT8          m_s1945_mcu_bctrl;
+	const UINT8    *m_s1945_mcu_table;
 };
 
 

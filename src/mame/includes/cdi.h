@@ -18,17 +18,17 @@ public:
     cdi_state(running_machine &machine, const driver_device_config_base &config)
         : driver_device(machine, config) { }
 
-    UINT16 *planea;
-    UINT16 *planeb;
+    UINT16 *m_planea;
+    UINT16 *m_planeb;
 
-    dmadac_sound_device *dmadac[2];
+    dmadac_sound_device *m_dmadac[2];
 
-    UINT8 timer_set;
-    emu_timer *test_timer;
-    bitmap_t* lcdbitmap;
-    scc68070_regs_t scc68070_regs;
-    mcd212_regs_t mcd212_regs;
-    mcd212_ab_t mcd212_ab;
+    UINT8 m_timer_set;
+    emu_timer *m_test_timer;
+    bitmap_t* m_lcdbitmap;
+    scc68070_regs_t m_scc68070_regs;
+    mcd212_regs_t m_mcd212_regs;
+    mcd212_ab_t m_mcd212_ab;
 };
 
 /*----------- debug defines -----------*/

@@ -40,7 +40,7 @@ public:
 	_86lions_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *lions_vram;
+	UINT8 *m_lions_vram;
 };
 
 
@@ -61,7 +61,7 @@ static SCREEN_UPDATE(lions)
 	{
 		for (x=0;x<38;x++)
 		{
-			int tile = state->lions_vram[count+1]|state->lions_vram[count]<<8;
+			int tile = state->m_lions_vram[count+1]|state->m_lions_vram[count]<<8;
 			tile&=0x1ff;
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
@@ -86,7 +86,7 @@ static READ8_HANDLER( test_r )
 
 
 static ADDRESS_MAP_START( lions_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(_86lions_state, lions_vram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(_86lions_state, m_lions_vram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)

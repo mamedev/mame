@@ -21,15 +21,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-//  UINT8 *    nvram;       // this currently uses generic nvram handlers
+	UINT8 *    m_videoram;
+//  UINT8 *    m_nvram;       // this currently uses generic nvram handlers
 
 	/* video-related */
-	tilemap_t *tilemap;
+	tilemap_t *m_tilemap;
 
 	/* misc */
-	int int_enable;
-	int input_sel;
+	int m_int_enable;
+	int m_input_sel;
 };
 
 
@@ -42,8 +42,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	int code = state->videoram[tile_index] + (state->videoram[tile_index + 0x800] & 0x1f) * 0x100;
-	int col = (state->videoram[tile_index + 0x1000] >> 3) & 0x1f;
+	int code = state->m_videoram[tile_index] + (state->m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
+	int col = (state->m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, col, 0);
 }
@@ -51,20 +51,20 @@ static TILE_GET_INFO( get_tile_info )
 static VIDEO_START( mayumi )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
-	state->tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static WRITE8_HANDLER( mayumi_videoram_w )
 {
 	mayumi_state *state = space->machine().driver_data<mayumi_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap, offset & 0x7ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x7ff);
 }
 
 static SCREEN_UPDATE( mayumi )
 {
 	mayumi_state *state = screen->machine().driver_data<mayumi_state>();
-	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;
 }
 
@@ -78,7 +78,7 @@ static INTERRUPT_GEN( mayumi_interrupt )
 {
 	mayumi_state *state = device->machine().driver_data<mayumi_state>();
 
-	if (state->int_enable)
+	if (state->m_int_enable)
 		 device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( bank_sel_w )
 
 	memory_set_bank(space->machine(), "bank1", bank);
 
-	state->int_enable = data & 1;
+	state->m_int_enable = data & 1;
 
 	flip_screen_set(space->machine(), data & 2);
 }
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( bank_sel_w )
 static WRITE8_HANDLER( input_sel_w )
 {
 	mayumi_state *state = space->machine().driver_data<mayumi_state>();
-	state->input_sel = data;
+	state->m_input_sel = data;
 }
 
 static READ8_HANDLER( key_matrix_r )
@@ -118,7 +118,7 @@ static READ8_HANDLER( key_matrix_r )
 
 	ret = 0xff;
 
-	p = ~state->input_sel & 0x1f;
+	p = ~state->m_input_sel & 0x1f;
 
 	for (i = 0; i < 5; i++)
 	{
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE_MEMBER(mayumi_state, videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE_MEMBER(mayumi_state, m_videoram)
 ADDRESS_MAP_END
 
 
@@ -355,16 +355,16 @@ static MACHINE_START( mayumi )
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->save_item(NAME(state->int_enable));
-	state->save_item(NAME(state->input_sel));
+	state->save_item(NAME(state->m_int_enable));
+	state->save_item(NAME(state->m_input_sel));
 }
 
 static MACHINE_RESET( mayumi )
 {
 	mayumi_state *state = machine.driver_data<mayumi_state>();
 
-	state->int_enable = 0;
-	state->input_sel = 0;
+	state->m_int_enable = 0;
+	state->m_input_sel = 0;
 }
 
 static MACHINE_CONFIG_START( mayumi, mayumi_state )

@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( threeds_inputport1_r )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 0x01: return input_port_read(space->machine(),"KEY0_PL1");
 		case 0x02: return input_port_read(space->machine(),"KEY1_PL1");
@@ -96,7 +96,7 @@ static READ8_HANDLER( threeds_inputport1_r )
 static READ8_HANDLER( threeds_inputport2_r )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 0x01: return input_port_read(space->machine(),"KEY0_PL2");
 		case 0x02: return input_port_read(space->machine(),"KEY1_PL2");
@@ -111,7 +111,7 @@ static READ8_HANDLER( threeds_inputport2_r )
 static WRITE8_HANDLER( threeds_inputportsel_w )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	state->mux_data = ~data;
+	state->m_mux_data = ~data;
 }
 
 static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8 )

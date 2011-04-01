@@ -17,21 +17,21 @@ public:
 		: mw8080bw_state(machine, config) { }
 
 	/* misc game specific */
-	emu_timer   *schaser_effect_555_timer;
-	attotime    schaser_effect_555_time_remain;
-	INT32       schaser_effect_555_time_remain_savable;
-	int         schaser_effect_555_is_low;
-	int         schaser_explosion;
-	int         schaser_last_effect;
-	UINT8       polaris_cloud_speed;
-	UINT8       polaris_cloud_pos;
-	UINT8       schaser_background_disable;
-	UINT8       schaser_background_select;
-	UINT8       c8080bw_flip_screen;
-	UINT8       color_map;
-	UINT8       screen_red;
+	emu_timer   *m_schaser_effect_555_timer;
+	attotime    m_schaser_effect_555_time_remain;
+	INT32       m_schaser_effect_555_time_remain_savable;
+	int         m_schaser_effect_555_is_low;
+	int         m_schaser_explosion;
+	int         m_schaser_last_effect;
+	UINT8       m_polaris_cloud_speed;
+	UINT8       m_polaris_cloud_pos;
+	UINT8       m_schaser_background_disable;
+	UINT8       m_schaser_background_select;
+	UINT8       m_c8080bw_flip_screen;
+	UINT8       m_color_map;
+	UINT8       m_screen_red;
 
-	device_t *speaker;
+	device_t *m_speaker;
 };
 
 

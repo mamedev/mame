@@ -19,8 +19,8 @@
 static TILE_GET_INFO( get_alpha_tile_info )
 {
 	thunderj_state *state = machine.driver_data<thunderj_state>();
-	UINT16 data = state->alpha[tile_index];
-	int code = ((data & 0x200) ? (state->alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
+	UINT16 data = state->m_alpha[tile_index];
+	int code = ((data & 0x200) ? (state->m_alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
 	SET_TILE_INFO(2, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
@@ -30,8 +30,8 @@ static TILE_GET_INFO( get_alpha_tile_info )
 static TILE_GET_INFO( get_playfield_tile_info )
 {
 	thunderj_state *state = machine.driver_data<thunderj_state>();
-	UINT16 data1 = state->playfield[tile_index];
-	UINT16 data2 = state->playfield_upper[tile_index] & 0xff;
+	UINT16 data1 = state->m_playfield[tile_index];
+	UINT16 data2 = state->m_playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -42,8 +42,8 @@ static TILE_GET_INFO( get_playfield_tile_info )
 static TILE_GET_INFO( get_playfield2_tile_info )
 {
 	thunderj_state *state = machine.driver_data<thunderj_state>();
-	UINT16 data1 = state->playfield2[tile_index];
-	UINT16 data2 = state->playfield_upper[tile_index] >> 8;
+	UINT16 data1 = state->m_playfield2[tile_index];
+	UINT16 data2 = state->m_playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -99,18 +99,18 @@ VIDEO_START( thunderj )
 	thunderj_state *state = machine.driver_data<thunderj_state>();
 
 	/* initialize the playfield */
-	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the second playfield */
-	state->playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
-	tilemap_set_transparent_pen(state->playfield2_tilemap, 0);
+	state->m_playfield2_tilemap = tilemap_create(machine, get_playfield2_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	tilemap_set_transparent_pen(state->m_playfield2_tilemap, 0);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 }
 
 
@@ -131,14 +131,14 @@ SCREEN_UPDATE( thunderj )
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0x00);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 1, 0x01);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 2, 0x02);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 3, 0x03);
-	tilemap_draw(bitmap, cliprect, state->playfield2_tilemap, 0, 0x80);
-	tilemap_draw(bitmap, cliprect, state->playfield2_tilemap, 1, 0x84);
-	tilemap_draw(bitmap, cliprect, state->playfield2_tilemap, 2, 0x88);
-	tilemap_draw(bitmap, cliprect, state->playfield2_tilemap, 3, 0x8c);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0x00);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 0x01);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 0x02);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 3, 0x03);
+	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 0, 0x80);
+	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 1, 0x84);
+	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 2, 0x88);
+	tilemap_draw(bitmap, cliprect, state->m_playfield2_tilemap, 3, 0x8c);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -237,7 +237,7 @@ SCREEN_UPDATE( thunderj )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

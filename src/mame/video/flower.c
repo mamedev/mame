@@ -29,7 +29,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 {
 	flower_state *state = machine.driver_data<flower_state>();
 	const gfx_element *gfx = machine.gfx[1];
-	UINT8 *source = state->spriteram + 0x200;
+	UINT8 *source = state->m_spriteram + 0x200;
 	UINT8 *finish = source - 0x200;
 
 	source -= 8;
@@ -120,8 +120,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static TILE_GET_INFO( get_bg0_tile_info )
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	int code = state->bg0ram[tile_index];
-	int color = state->bg0ram[tile_index+0x100];
+	int code = state->m_bg0ram[tile_index];
+	int color = state->m_bg0ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
 	SET_TILE_INFO(2, code, color>>4, 0);
@@ -130,8 +130,8 @@ static TILE_GET_INFO( get_bg0_tile_info )
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	int code = state->bg1ram[tile_index];
-	int color = state->bg1ram[tile_index+0x100];
+	int code = state->m_bg1ram[tile_index];
+	int color = state->m_bg1ram[tile_index+0x100];
 	/* Todo - may be tile flip bits? */
 
 	SET_TILE_INFO(2, code, color>>4, 0);
@@ -140,8 +140,8 @@ static TILE_GET_INFO( get_bg1_tile_info )
 static TILE_GET_INFO( get_text_tile_info )
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	int code = state->textram[tile_index];
-	int color = state->textram[tile_index+0x400];
+	int code = state->m_textram[tile_index];
+	int color = state->m_textram[tile_index+0x400];
 	/* Todo - may be tile flip bits? */
 
 	SET_TILE_INFO(0, code, color>>2, 0);
@@ -150,17 +150,17 @@ static TILE_GET_INFO( get_text_tile_info )
 VIDEO_START(flower)
 {
 	flower_state *state = machine.driver_data<flower_state>();
-	state->bg0_tilemap        = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_rows,     16,16,16,16);
-	state->bg1_tilemap        = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,16,16,16,16);
-	state->text_tilemap       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	state->text_right_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_cols, 8, 8, 2,32);
+	state->m_bg0_tilemap        = tilemap_create(machine, get_bg0_tile_info, tilemap_scan_rows,     16,16,16,16);
+	state->m_bg1_tilemap        = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,16,16,16,16);
+	state->m_text_tilemap       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_text_right_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_cols, 8, 8, 2,32);
 
-	tilemap_set_transparent_pen(state->bg1_tilemap,15);
-	tilemap_set_transparent_pen(state->text_tilemap,3);
-	tilemap_set_transparent_pen(state->text_right_tilemap,3);
+	tilemap_set_transparent_pen(state->m_bg1_tilemap,15);
+	tilemap_set_transparent_pen(state->m_text_tilemap,3);
+	tilemap_set_transparent_pen(state->m_text_right_tilemap,3);
 
-	tilemap_set_scrolly(state->text_tilemap, 0, 16);
-	tilemap_set_scrolly(state->text_right_tilemap, 0, 16);
+	tilemap_set_scrolly(state->m_text_tilemap, 0, 16);
+	tilemap_set_scrolly(state->m_text_right_tilemap, 0, 16);
 }
 
 SCREEN_UPDATE( flower )
@@ -168,11 +168,11 @@ SCREEN_UPDATE( flower )
 	flower_state *state = screen->machine().driver_data<flower_state>();
 	rectangle myclip = *cliprect;
 
-	tilemap_set_scrolly(state->bg0_tilemap,0, state->bg0_scroll[0]+16);
-	tilemap_set_scrolly(state->bg1_tilemap,0, state->bg1_scroll[0]+16);
+	tilemap_set_scrolly(state->m_bg0_tilemap,0, state->m_bg0_scroll[0]+16);
+	tilemap_set_scrolly(state->m_bg1_tilemap,0, state->m_bg1_scroll[0]+16);
 
-	tilemap_draw(bitmap,cliprect,state->bg0_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->bg1_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg1_tilemap,0,0);
 
 	draw_sprites(screen->machine(),bitmap,cliprect);
 
@@ -187,31 +187,31 @@ SCREEN_UPDATE( flower )
 		myclip.max_x = cliprect->max_x;
 	}
 
-	tilemap_draw(bitmap,cliprect,state->text_tilemap,0,0);
-	tilemap_draw(bitmap,&myclip,state->text_right_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_text_tilemap,0,0);
+	tilemap_draw(bitmap,&myclip,state->m_text_right_tilemap,0,0);
 	return 0;
 }
 
 WRITE8_HANDLER( flower_textram_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
-	state->textram[offset] = data;
-	tilemap_mark_tile_dirty(state->text_tilemap, offset);
-	tilemap_mark_all_tiles_dirty(state->text_right_tilemap);
+	state->m_textram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_text_tilemap, offset);
+	tilemap_mark_all_tiles_dirty(state->m_text_right_tilemap);
 }
 
 WRITE8_HANDLER( flower_bg0ram_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
-	state->bg0ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg0_tilemap, offset & 0x1ff);
+	state->m_bg0ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg0_tilemap, offset & 0x1ff);
 }
 
 WRITE8_HANDLER( flower_bg1ram_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
-	state->bg1ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x1ff);
+	state->m_bg1ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset & 0x1ff);
 }
 
 WRITE8_HANDLER( flower_flipscreen_w )

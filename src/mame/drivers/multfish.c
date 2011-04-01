@@ -182,28 +182,28 @@ public:
 
 	/* Video related */
 
-	int disp_enable;
-	int xor_paltype;
-	int xor_palette;
+	int m_disp_enable;
+	int m_xor_paltype;
+	int m_xor_palette;
 
-	tilemap_t *tilemap;
-	tilemap_t *reel_tilemap;
+	tilemap_t *m_tilemap;
+	tilemap_t *m_reel_tilemap;
 
 	/* Misc related */
 
-	UINT8 rambk;
+	UINT8 m_rambk;
 
-	UINT8 hopper_motor;
-	UINT8 hopper;
+	UINT8 m_hopper_motor;
+	UINT8 m_hopper;
 
-	UINT8 vid[multfish_VIDRAM_SIZE];
+	UINT8 m_vid[multfish_VIDRAM_SIZE];
 };
 
 static TILE_GET_INFO( get_multfish_tile_info )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
-	int code = state->vid[tile_index*2+0x0000] | (state->vid[tile_index*2+0x0001] << 8);
-	int attr = state->vid[tile_index*2+0x1000] | (state->vid[tile_index*2+0x1001] << 8);
+	int code = state->m_vid[tile_index*2+0x0000] | (state->m_vid[tile_index*2+0x0001] << 8);
+	int attr = state->m_vid[tile_index*2+0x1000] | (state->m_vid[tile_index*2+0x1001] << 8);
 
 	tileinfo->category = (attr&0x100)>>8;
 
@@ -217,7 +217,7 @@ static TILE_GET_INFO( get_multfish_tile_info )
 static TILE_GET_INFO( get_multfish_reel_tile_info )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
-	int code = state->vid[tile_index*2+0x2000] | (state->vid[tile_index*2+0x2001] << 8);
+	int code = state->m_vid[tile_index*2+0x2000] | (state->m_vid[tile_index*2+0x2001] << 8);
 
 	SET_TILE_INFO(
 			0,
@@ -230,15 +230,15 @@ static VIDEO_START(multfish)
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-	memset(state->vid,0x00,sizeof(state->vid));
-	state->save_item(NAME(state->vid));
+	memset(state->m_vid,0x00,sizeof(state->m_vid));
+	state->save_item(NAME(state->m_vid));
 
-	state->tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
-	tilemap_set_transparent_pen(state->tilemap,255);
+	state->m_tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
+	tilemap_set_transparent_pen(state->m_tilemap,255);
 
-	state->reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
-	tilemap_set_transparent_pen(state->reel_tilemap,255);
-	tilemap_set_scroll_cols(state->reel_tilemap, 64);
+	state->m_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
+	tilemap_set_transparent_pen(state->m_reel_tilemap,255);
+	tilemap_set_scroll_cols(state->m_reel_tilemap, 64);
 }
 
 static SCREEN_UPDATE(multfish)
@@ -248,21 +248,21 @@ static SCREEN_UPDATE(multfish)
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	if (!state->disp_enable) return 0;
+	if (!state->m_disp_enable) return 0;
 
 	/* Draw lower part of static tilemap (low pri tiles) */
-	tilemap_draw(bitmap,cliprect,state->tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+	tilemap_draw(bitmap,cliprect,state->m_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
 
 	/* Setup the column scroll and draw the reels */
 	for (i=0;i<64;i++)
 	{
-		int colscroll = (state->vid[i*2] | state->vid[i*2+1] << 8);
-		tilemap_set_scrolly(state->reel_tilemap, i, colscroll );
+		int colscroll = (state->m_vid[i*2] | state->m_vid[i*2+1] << 8);
+		tilemap_set_scrolly(state->m_reel_tilemap, i, colscroll );
 	}
-	tilemap_draw(bitmap,cliprect,state->reel_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_reel_tilemap,0,0);
 
 	/* Draw upper part of static tilemap (high pri tiles) */
-	tilemap_draw(bitmap,cliprect,state->tilemap,TILEMAP_DRAW_CATEGORY(0),0);
+	tilemap_draw(bitmap,cliprect,state->m_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
 
 	return 0;
 }
@@ -271,35 +271,35 @@ static WRITE8_HANDLER( multfish_vid_w )
 {
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->vid[offset]=data;
+	state->m_vid[offset]=data;
 
 	// 0x0000 - 0x1fff is normal tilemap
 	if (offset < 0x2000)
 	{
-		tilemap_mark_tile_dirty(state->tilemap,(offset&0xfff)/2);
+		tilemap_mark_tile_dirty(state->m_tilemap,(offset&0xfff)/2);
 
 	}
 	// 0x2000 - 0x2fff is for the reels
 	else if (offset < 0x4000)
 	{
-		tilemap_mark_tile_dirty(state->reel_tilemap,(offset&0x1fff)/2);
+		tilemap_mark_tile_dirty(state->m_reel_tilemap,(offset&0x1fff)/2);
 	}
 	else if (offset < 0x6000)
 	{
 		int r,g,b;
 		int coldat;
 
-		coldat = state->vid[(offset&0xfffe)] | (state->vid[(offset&0xfffe)^1] << 8);
+		coldat = state->m_vid[(offset&0xfffe)] | (state->m_vid[(offset&0xfffe)^1] << 8);
 
 		/* xor and bitswap palette */
-		switch (state->xor_paltype) {
+		switch (state->m_xor_paltype) {
 			case 1:
-				coldat ^= state->xor_palette;
+				coldat ^= state->m_xor_palette;
 				coldat ^= ((coldat&0x2) >>1) | ((coldat&0x80) >>3) ;
 				coldat = BITSWAP16(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
 				break;
 			case 2:
-	                        coldat ^= state->xor_palette;
+	                        coldat ^= state->m_xor_palette;
         	                coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
                 	        coldat = BITSWAP16(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
@@ -336,13 +336,13 @@ static READ8_HANDLER( bankedram_r )
 {
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	if ((state->rambk & 0x80) == 0x00)
+	if ((state->m_rambk & 0x80) == 0x00)
 	{
-		return timekeeper_r(space->machine().device("m48t35"), offset + 0x2000*(state->rambk & 0x03));
+		return timekeeper_r(space->machine().device("m48t35"), offset + 0x2000*(state->m_rambk & 0x03));
 	}
 	else
 	{
-		return state->vid[offset+0x2000*(state->rambk & 0x03)];
+		return state->m_vid[offset+0x2000*(state->m_rambk & 0x03)];
 	}
 
 }
@@ -351,13 +351,13 @@ static WRITE8_HANDLER( bankedram_w )
 {
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	if ((state->rambk & 0x80) == 0x00)
+	if ((state->m_rambk & 0x80) == 0x00)
 	{
-		timekeeper_w(space->machine().device("m48t35"), offset + 0x2000*(state->rambk & 0x03), data);
+		timekeeper_w(space->machine().device("m48t35"), offset + 0x2000*(state->m_rambk & 0x03), data);
 	}
 	else
 	{
-		multfish_vid_w(space, offset+0x2000*(state->rambk & 0x03), data);
+		multfish_vid_w(space, offset+0x2000*(state->m_rambk & 0x03), data);
 	}
 }
 
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( multfish_rambank_w )
 {
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->rambk = data;
+	state->m_rambk = data;
 }
 
 
@@ -380,10 +380,10 @@ static CUSTOM_INPUT( multfish_hopper_r )
 {
 	multfish_state *state = field->port->machine().driver_data<multfish_state>();
 
-	if ( state->hopper_motor != 0 )
+	if ( state->m_hopper_motor != 0 )
 	{
-			state->hopper++;
-			return state->hopper>>4;
+			state->m_hopper++;
+			return state->m_hopper>>4;
 	}
 	else
 	{
@@ -402,7 +402,7 @@ static WRITE8_HANDLER( multfish_hopper_w )
 */
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->hopper_motor = data & 0x10;
+	state->m_hopper_motor = data & 0x10;
         coin_lockout_w(space->machine(), 0, data & 0x01);
         coin_lockout_w(space->machine(), 1, data & 0x01);
         coin_lockout_w(space->machine(), 2, data & 0x01);
@@ -420,7 +420,7 @@ static WRITE8_HANDLER( rollfr_hopper_w )
 */
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->hopper_motor = data & 0x10;
+	state->m_hopper_motor = data & 0x10;
         coin_lockout_w(space->machine(), 0, !data & 0x01);
         coin_lockout_w(space->machine(), 1, !data & 0x01);
         coin_lockout_w(space->machine(), 2, !data & 0x01);
@@ -594,77 +594,77 @@ DRIVER_INIT( island2l )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x8bf7;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0x8bf7;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0xff, 0x11, 0x77, 0xee, 0x44c40);
 }
 DRIVER_INIT( keksl )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x41f3;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0x41f3;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
 }
 DRIVER_INIT( pirate2l )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x8bfb;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0x8bfb;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0xaa, 0x11, 0x22, 0xee, 0x48480);
 }
 DRIVER_INIT( fcockt2l )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0xedfb;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0xedfb;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0x55, 0x11, 0xff, 0xee, 0x78780);
 }
 DRIVER_INIT( sweetl2l )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x4bf7;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0x4bf7;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0xdd, 0x33, 0x33, 0x77, 0x00800);
 }
 DRIVER_INIT( gnomel )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x49ff;
-        state->xor_paltype = 1;
+        state->m_xor_palette = 0x49ff;
+        state->m_xor_paltype = 1;
 	lottery_decode(machine, 0xcc, 0x22, 0x33, 0x66, 0x14940);
 }
 DRIVER_INIT( crzmonent )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x1cdb;
-        state->xor_paltype = 2;
+        state->m_xor_palette = 0x1cdb;
+        state->m_xor_paltype = 2;
 }
 DRIVER_INIT( resdntent )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x6edb;
-        state->xor_paltype = 2;
+        state->m_xor_palette = 0x6edb;
+        state->m_xor_paltype = 2;
 }
 DRIVER_INIT( gnomeent )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x9edb;
-        state->xor_paltype = 2;
+        state->m_xor_palette = 0x9edb;
+        state->m_xor_paltype = 2;
 }
 DRIVER_INIT( lhauntent )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-        state->xor_palette = 0x1adb;
-        state->xor_paltype = 2;
+        state->m_xor_palette = 0x1adb;
+        state->m_xor_paltype = 2;
 	ent_decode(machine, 0x22, 0x44, 0x44, 0xbb, 0x24240);
 }
 
@@ -899,7 +899,7 @@ static WRITE8_HANDLER( multfish_dispenable_w )
 {
 	multfish_state *state = space->machine().driver_data<multfish_state>();
 	//popmessage("multfish_f4_w %02x",data); // display enable?
-	state->disp_enable = data;
+	state->m_disp_enable = data;
 }
 
 static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8 )
@@ -989,10 +989,10 @@ static MACHINE_START( multfish )
 {
 	multfish_state *state = machine.driver_data<multfish_state>();
 
-	state->save_item(NAME(state->disp_enable));
-	state->save_item(NAME(state->rambk));
-	state->save_item(NAME(state->hopper_motor));
-	state->save_item(NAME(state->hopper));
+	state->save_item(NAME(state->m_disp_enable));
+	state->save_item(NAME(state->m_rambk));
+	state->save_item(NAME(state->m_hopper_motor));
+	state->save_item(NAME(state->m_hopper));
 }
 
 static MACHINE_RESET( multfish )
@@ -1002,10 +1002,10 @@ static MACHINE_RESET( multfish )
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base(), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->disp_enable = 0;
-	state->rambk = 0;
-	state->hopper_motor = 0;
-	state->hopper = 0;
+	state->m_disp_enable = 0;
+	state->m_rambk = 0;
+	state->m_hopper_motor = 0;
+	state->m_hopper = 0;
 }
 
 static const ay8910_interface ay8910_config =

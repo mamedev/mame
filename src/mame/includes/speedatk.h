@@ -4,15 +4,16 @@ public:
 	speedatk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 crtc_vreg[0x100],crtc_index;
-	UINT8 flip_scr;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 m_crtc_vreg[0x100];
+	UINT8 m_crtc_index;
+	UINT8 m_flip_scr;
 
-	UINT8 mux_data;
-	UINT8 km_status;
-	UINT8 coin_settings;
-	UINT8 coin_impulse;
+	UINT8 m_mux_data;
+	UINT8 m_km_status;
+	UINT8 m_coin_settings;
+	UINT8 m_coin_impulse;
 };
 
 

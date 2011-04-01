@@ -22,10 +22,10 @@ WRITE8_HANDLER( crgolf_videoram_w )
 {
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	if (*state->screen_select & 1)
-		state->videoram_b[offset] = data;
+	if (*state->m_screen_select & 1)
+		state->m_videoram_b[offset] = data;
 	else
-		state->videoram_a[offset] = data;
+		state->m_videoram_a[offset] = data;
 }
 
 
@@ -34,10 +34,10 @@ READ8_HANDLER( crgolf_videoram_r )
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 	UINT8 ret;
 
-	if (*state->screen_select & 1)
-		ret = state->videoram_b[offset];
+	if (*state->m_screen_select & 1)
+		ret = state->m_videoram_b[offset];
 	else
-		ret = state->videoram_a[offset];
+		ret = state->m_videoram_a[offset];
 
 	return ret;
 }
@@ -95,12 +95,12 @@ static VIDEO_START( crgolf )
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
 	/* allocate memory for the two bitmaps */
-	state->videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
-	state->videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	state->m_videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	state->m_videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
 
 	/* register for save states */
-	state->save_pointer(NAME(state->videoram_a), VIDEORAM_SIZE);
-	state->save_pointer(NAME(state->videoram_b), VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->m_videoram_a), VIDEORAM_SIZE);
+	state->save_pointer(NAME(state->m_videoram_b), VIDEORAM_SIZE);
 }
 
 
@@ -114,7 +114,7 @@ static VIDEO_START( crgolf )
 static SCREEN_UPDATE( crgolf )
 {
 	crgolf_state *state = screen->machine().driver_data<crgolf_state>();
-	int flip = *state->screen_flip & 1;
+	int flip = *state->m_screen_flip & 1;
 
 	offs_t offs;
 	pen_t pens[NUM_PENS];
@@ -129,12 +129,12 @@ static SCREEN_UPDATE( crgolf )
 		UINT8 y = (offs & 0x1fe0) >> 5;
 		UINT8 x = (offs & 0x001f) << 3;
 
-		UINT8 data_a0 = state->videoram_a[0x2000 | offs];
-		UINT8 data_a1 = state->videoram_a[0x0000 | offs];
-		UINT8 data_a2 = state->videoram_a[0x4000 | offs];
-		UINT8 data_b0 = state->videoram_b[0x2000 | offs];
-		UINT8 data_b1 = state->videoram_b[0x0000 | offs];
-		UINT8 data_b2 = state->videoram_b[0x4000 | offs];
+		UINT8 data_a0 = state->m_videoram_a[0x2000 | offs];
+		UINT8 data_a1 = state->m_videoram_a[0x0000 | offs];
+		UINT8 data_a2 = state->m_videoram_a[0x4000 | offs];
+		UINT8 data_b0 = state->m_videoram_b[0x2000 | offs];
+		UINT8 data_b1 = state->m_videoram_b[0x0000 | offs];
+		UINT8 data_b2 = state->m_videoram_b[0x4000 | offs];
 
 		if (flip)
 		{
@@ -149,10 +149,10 @@ static SCREEN_UPDATE( crgolf )
 			UINT8 data_b = 0;
 			UINT8 data_a = 0;
 
-			if (~*state->screena_enable & 1)
+			if (~*state->m_screena_enable & 1)
 				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
 
-			if (~*state->screenb_enable & 1)
+			if (~*state->m_screenb_enable & 1)
 				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
 
 			/* screen A has priority over B */
@@ -162,7 +162,7 @@ static SCREEN_UPDATE( crgolf )
 				color = data_b | 0x08;
 
 			/* add HI bit if enabled */
-			if (*state->color_select)
+			if (*state->m_color_select)
 				color = color | 0x10;
 
 			*BITMAP_ADDR32(bitmap, y, x) = pens[color];

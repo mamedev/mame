@@ -16,159 +16,159 @@ class harddriv_state : public atarigen_state
 public:
 	harddriv_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config),
-		  maincpu(*this, "maincpu"),
-		  gsp(*this, "gsp"),
-		  msp(*this, "msp"),
-		  adsp(*this, "adsp"),
-		  soundcpu(*this, "soundcpu"),
-		  sounddsp(*this, "sounddsp"),
-		  jsacpu(*this, "jsacpu"),
-		  dsp32(*this, "dsp32"),
-		  ds4cpu1(*this, "ds4cpu1"),
-		  ds4cpu2(*this, "ds4cpu2"),
-		  duart_timer(*this, "duart_timer") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_gsp(*this, "gsp"),
+		  m_msp(*this, "msp"),
+		  m_adsp(*this, "adsp"),
+		  m_soundcpu(*this, "soundcpu"),
+		  m_sounddsp(*this, "sounddsp"),
+		  m_jsacpu(*this, "jsacpu"),
+		  m_dsp32(*this, "dsp32"),
+		  m_ds4cpu1(*this, "ds4cpu1"),
+		  m_ds4cpu2(*this, "ds4cpu2"),
+		  m_duart_timer(*this, "duart_timer") { }
 
-	required_device<cpu_device> maincpu;
-	required_device<tms34010_device> gsp;
-	optional_device<cpu_device> msp;
-	required_device<adsp21xx_device> adsp;
-	optional_device<cpu_device> soundcpu;
-	optional_device<cpu_device> sounddsp;
-	optional_device<cpu_device> jsacpu;
-	optional_device<dsp32c_device> dsp32;
-	optional_device<adsp2105_device> ds4cpu1;
-	optional_device<adsp2105_device> ds4cpu2;
+	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_gsp;
+	optional_device<cpu_device> m_msp;
+	required_device<adsp21xx_device> m_adsp;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_sounddsp;
+	optional_device<cpu_device> m_jsacpu;
+	optional_device<dsp32c_device> m_dsp32;
+	optional_device<adsp2105_device> m_ds4cpu1;
+	optional_device<adsp2105_device> m_ds4cpu2;
 
-	UINT8					hd34010_host_access;
-	UINT8					dsk_pio_access;
+	UINT8					m_hd34010_host_access;
+	UINT8					m_dsk_pio_access;
 
-	UINT16 *				msp_ram;
-	UINT16 *				dsk_ram;
-	UINT16 *				dsk_rom;
-	UINT16 *				dsk_zram;
-	UINT16 *				m68k_slapstic_base;
-	UINT16 *				m68k_sloop_alt_base;
+	UINT16 *				m_msp_ram;
+	UINT16 *				m_dsk_ram;
+	UINT16 *				m_dsk_rom;
+	UINT16 *				m_dsk_zram;
+	UINT16 *				m_m68k_slapstic_base;
+	UINT16 *				m_m68k_sloop_alt_base;
 
-	UINT16 *				adsp_data_memory;
-	UINT32 *				adsp_pgm_memory;
+	UINT16 *				m_adsp_data_memory;
+	UINT32 *				m_adsp_pgm_memory;
 
-	UINT16 *				gsp_protection;
-	UINT16 *				stmsp_sync[3];
+	UINT16 *				m_gsp_protection;
+	UINT16 *				m_stmsp_sync[3];
 
-	UINT16 *				gsp_speedup_addr[2];
-	offs_t					gsp_speedup_pc;
+	UINT16 *				m_gsp_speedup_addr[2];
+	offs_t					m_gsp_speedup_pc;
 
-	UINT16 *				msp_speedup_addr;
-	offs_t					msp_speedup_pc;
+	UINT16 *				m_msp_speedup_addr;
+	offs_t					m_msp_speedup_pc;
 
-	UINT16 *				ds3_speedup_addr;
-	offs_t					ds3_speedup_pc;
-	offs_t					ds3_transfer_pc;
+	UINT16 *				m_ds3_speedup_addr;
+	offs_t					m_ds3_speedup_pc;
+	offs_t					m_ds3_transfer_pc;
 
-	UINT32 *				rddsp32_sync[2];
+	UINT32 *				m_rddsp32_sync[2];
 
-	UINT32					gsp_speedup_count[4];
-	UINT32					msp_speedup_count[4];
-	UINT32					adsp_speedup_count[4];
+	UINT32					m_gsp_speedup_count[4];
+	UINT32					m_msp_speedup_count[4];
+	UINT32					m_adsp_speedup_count[4];
 
-	UINT16 *				sounddsp_ram;
+	UINT16 *				m_sounddsp_ram;
 
-	UINT8					gsp_multisync;
-	UINT8 *					gsp_vram;
-	UINT16 *				gsp_control_lo;
-	UINT16 *				gsp_control_hi;
-	UINT16 *				gsp_paletteram_lo;
-	UINT16 *				gsp_paletteram_hi;
-	size_t					gsp_vram_size;
+	UINT8					m_gsp_multisync;
+	UINT8 *					m_gsp_vram;
+	UINT16 *				m_gsp_control_lo;
+	UINT16 *				m_gsp_control_hi;
+	UINT16 *				m_gsp_paletteram_lo;
+	UINT16 *				m_gsp_paletteram_hi;
+	size_t					m_gsp_vram_size;
 
 	/* machine state */
-	UINT8					irq_state;
-	UINT8					gsp_irq_state;
-	UINT8					msp_irq_state;
-	UINT8					adsp_irq_state;
-	UINT8					duart_irq_state;
+	UINT8					m_irq_state;
+	UINT8					m_gsp_irq_state;
+	UINT8					m_msp_irq_state;
+	UINT8					m_adsp_irq_state;
+	UINT8					m_duart_irq_state;
 
-	UINT8					duart_read_data[16];
-	UINT8					duart_write_data[16];
-	UINT8					duart_output_port;
-	optional_device<timer_device> duart_timer;
+	UINT8					m_duart_read_data[16];
+	UINT8					m_duart_write_data[16];
+	UINT8					m_duart_output_port;
+	optional_device<timer_device> m_duart_timer;
 
-	UINT8					last_gsp_shiftreg;
+	UINT8					m_last_gsp_shiftreg;
 
-	UINT8					m68k_zp1;
-	UINT8					m68k_zp2;
-	UINT8					m68k_adsp_buffer_bank;
+	UINT8					m_m68k_zp1;
+	UINT8					m_m68k_zp2;
+	UINT8					m_m68k_adsp_buffer_bank;
 
-	UINT8					adsp_halt;
-	UINT8					adsp_br;
-	UINT8					adsp_xflag;
-	UINT16					adsp_sim_address;
-	UINT16					adsp_som_address;
-	UINT32					adsp_eprom_base;
+	UINT8					m_adsp_halt;
+	UINT8					m_adsp_br;
+	UINT8					m_adsp_xflag;
+	UINT16					m_adsp_sim_address;
+	UINT16					m_adsp_som_address;
+	UINT32					m_adsp_eprom_base;
 
-	UINT16 *				sim_memory;
-	UINT32					sim_memory_size;
-	UINT16					som_memory[0x8000/2];
-	UINT16 *				adsp_pgm_memory_word;
+	UINT16 *				m_sim_memory;
+	UINT32					m_sim_memory_size;
+	UINT16					m_som_memory[0x8000/2];
+	UINT16 *				m_adsp_pgm_memory_word;
 
-	UINT8					ds3_gcmd;
-	UINT8					ds3_gflag;
-	UINT8					ds3_g68irqs;
-	UINT8					ds3_gfirqs;
-	UINT8					ds3_g68flag;
-	UINT8					ds3_send;
-	UINT8					ds3_reset;
-	UINT16					ds3_gdata;
-	UINT16					ds3_g68data;
-	UINT32					ds3_sim_address;
+	UINT8					m_ds3_gcmd;
+	UINT8					m_ds3_gflag;
+	UINT8					m_ds3_g68irqs;
+	UINT8					m_ds3_gfirqs;
+	UINT8					m_ds3_g68flag;
+	UINT8					m_ds3_send;
+	UINT8					m_ds3_reset;
+	UINT16					m_ds3_gdata;
+	UINT16					m_ds3_g68data;
+	UINT32					m_ds3_sim_address;
 
-	UINT16					adc_control;
-	UINT8					adc8_select;
-	UINT8					adc8_data;
-	UINT8					adc12_select;
-	UINT8					adc12_byte;
-	UINT16					adc12_data;
+	UINT16					m_adc_control;
+	UINT8					m_adc8_select;
+	UINT8					m_adc8_data;
+	UINT8					m_adc12_select;
+	UINT8					m_adc12_byte;
+	UINT16					m_adc12_data;
 
-	UINT16					hdc68k_last_wheel;
-	UINT16					hdc68k_last_port1;
-	UINT8					hdc68k_wheel_edge;
-	UINT8					hdc68k_shifter_state;
+	UINT16					m_hdc68k_last_wheel;
+	UINT16					m_hdc68k_last_port1;
+	UINT8					m_hdc68k_wheel_edge;
+	UINT8					m_hdc68k_shifter_state;
 
-	UINT8					st68k_sloop_bank;
-	offs_t					st68k_last_alt_sloop_offset;
+	UINT8					m_st68k_sloop_bank;
+	offs_t					m_st68k_last_alt_sloop_offset;
 
 	#define MAX_MSP_SYNC	16
-	UINT32 *				dataptr[MAX_MSP_SYNC];
-	UINT32					dataval[MAX_MSP_SYNC];
-	int 					next_msp_sync;
+	UINT32 *				m_dataptr[MAX_MSP_SYNC];
+	UINT32					m_dataval[MAX_MSP_SYNC];
+	int 					m_next_msp_sync;
 
 	/* audio state */
-	UINT8					soundflag;
-	UINT8					mainflag;
-	UINT16					sounddata;
-	UINT16					maindata;
+	UINT8					m_soundflag;
+	UINT8					m_mainflag;
+	UINT16					m_sounddata;
+	UINT16					m_maindata;
 
-	UINT8					dacmute;
-	UINT8					cramen;
-	UINT8					irq68k;
+	UINT8					m_dacmute;
+	UINT8					m_cramen;
+	UINT8					m_irq68k;
 
-	offs_t					sound_rom_offs;
+	offs_t					m_sound_rom_offs;
 
-	UINT8 *					rombase;
-	UINT32					romsize;
-	UINT16					comram[0x400/2];
-	UINT64					last_bio_cycles;
+	UINT8 *					m_rombase;
+	UINT32					m_romsize;
+	UINT16					m_comram[0x400/2];
+	UINT64					m_last_bio_cycles;
 
 	/* video state */
-	offs_t					vram_mask;
+	offs_t					m_vram_mask;
 
-	UINT8					shiftreg_enable;
+	UINT8					m_shiftreg_enable;
 
-	UINT32					mask_table[65536 * 4];
-	UINT8 *					gsp_shiftreg_source;
+	UINT32					m_mask_table[65536 * 4];
+	UINT8 *					m_gsp_shiftreg_source;
 
-	INT8					gfx_finescroll;
-	UINT8					gfx_palettebank;
+	INT8					m_gfx_finescroll;
+	UINT8					m_gfx_palettebank;
 };
 
 

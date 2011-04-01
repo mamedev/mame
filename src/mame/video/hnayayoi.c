@@ -17,16 +17,16 @@ static void common_vh_start( running_machine &machine, int num_pixmaps )
 	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	int i;
 
-	state->total_pixmaps = num_pixmaps;
+	state->m_total_pixmaps = num_pixmaps;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (i < state->total_pixmaps)
+		if (i < state->m_total_pixmaps)
 		{
-			state->pixmap[i] = auto_alloc_array(machine, UINT8, 256 * 256);
+			state->m_pixmap[i] = auto_alloc_array(machine, UINT8, 256 * 256);
 		}
 		else
-			state->pixmap[i] = NULL;
+			state->m_pixmap[i] = NULL;
 	}
 }
 
@@ -35,10 +35,10 @@ VIDEO_START( hnayayoi )
 	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	common_vh_start(machine, 4);	/* 4 bitmaps -> 2 layers */
 
-	state->save_pointer(NAME(state->pixmap[0]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[1]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[2]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[3]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[0]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[1]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[2]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[3]), 256 * 256);
 }
 
 VIDEO_START( untoucha )
@@ -46,14 +46,14 @@ VIDEO_START( untoucha )
 	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	common_vh_start(machine, 8);	/* 8 bitmaps -> 4 layers */
 
-	state->save_pointer(NAME(state->pixmap[0]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[1]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[2]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[3]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[4]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[5]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[6]), 256 * 256);
-	state->save_pointer(NAME(state->pixmap[7]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[0]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[1]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[2]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[3]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[4]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[5]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[6]), 256 * 256);
+	state->save_pointer(NAME(state->m_pixmap[7]), 256 * 256);
 }
 
 
@@ -105,12 +105,12 @@ WRITE8_HANDLER( dynax_blitter_rev1_param_w )
 	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	switch (offset)
 	{
-		case 0: state->blit_dest = (state->blit_dest & 0xff00) | (data << 0); break;
-		case 1: state->blit_dest = (state->blit_dest & 0x00ff) | (data << 8); break;
-		case 2: state->blit_layer = data; break;
-		case 3: state->blit_src = (state->blit_src & 0xffff00) | (data << 0); break;
-		case 4: state->blit_src = (state->blit_src & 0xff00ff) | (data << 8); break;
-		case 5: state->blit_src = (state->blit_src & 0x00ffff) | (data <<16); break;
+		case 0: state->m_blit_dest = (state->m_blit_dest & 0xff00) | (data << 0); break;
+		case 1: state->m_blit_dest = (state->m_blit_dest & 0x00ff) | (data << 8); break;
+		case 2: state->m_blit_layer = data; break;
+		case 3: state->m_blit_src = (state->m_blit_src & 0xffff00) | (data << 0); break;
+		case 4: state->m_blit_src = (state->m_blit_src & 0xff00ff) | (data << 8); break;
+		case 5: state->m_blit_src = (state->m_blit_src & 0x00ffff) | (data <<16); break;
 	}
 }
 
@@ -123,8 +123,8 @@ static void copy_pixel( running_machine &machine, int x, int y, int pen )
 
 		for (i = 0; i < 8; i++)
 		{
-			if ((~state->blit_layer & (1 << i)) && (state->pixmap[i]))
-				state->pixmap[i][256 * y + x] = pen;
+			if ((~state->m_blit_layer & (1 << i)) && (state->m_pixmap[i]))
+				state->m_pixmap[i][256 * y + x] = pen;
 		}
 	}
 }
@@ -134,18 +134,18 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	UINT8 *rom = space->machine().region("gfx1")->base();
 	int romlen = space->machine().region("gfx1")->bytes();
-	int sx = state->blit_dest & 0xff;
-	int sy = state->blit_dest >> 8;
+	int sx = state->m_blit_dest & 0xff;
+	int sy = state->m_blit_dest >> 8;
 	int x, y;
 
 	x = sx;
 	y = sy;
-	while (state->blit_src < romlen)
+	while (state->m_blit_src < romlen)
 	{
-		int cmd = rom[state->blit_src] & 0x0f;
-		int pen = rom[state->blit_src] >> 4;
+		int cmd = rom[state->m_blit_src] & 0x0f;
+		int pen = rom[state->m_blit_src] >> 4;
 
-		state->blit_src++;
+		state->m_blit_src++;
 
 		switch (cmd)
 		{
@@ -155,31 +155,31 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 				break;
 
 			case 0xe:
-				if (state->blit_src >= romlen)
+				if (state->m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->blit_src);
+					popmessage("GFXROM OVER %06x", state->m_blit_src);
 					return;
 				}
 				x = sx;
-				state->blit_layer = rom[state->blit_src++];
+				state->m_blit_layer = rom[state->m_blit_src++];
 				break;
 
 			case 0xd:
-				if (state->blit_src >= romlen)
+				if (state->m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->blit_src);
+					popmessage("GFXROM OVER %06x", state->m_blit_src);
 					return;
 				}
-				x = sx + rom[state->blit_src++];
+				x = sx + rom[state->m_blit_src++];
 				/* fall through into next case */
 
 			case 0xc:
-				if (state->blit_src >= romlen)
+				if (state->m_blit_src >= romlen)
 				{
-					popmessage("GFXROM OVER %06x", state->blit_src);
+					popmessage("GFXROM OVER %06x", state->m_blit_src);
 					return;
 				}
-				cmd = rom[state->blit_src++];
+				cmd = rom[state->m_blit_src++];
 				/* fall through into next case */
 
 			case 0xb:
@@ -202,7 +202,7 @@ WRITE8_HANDLER( dynax_blitter_rev1_start_w )
 		}
 	}
 
-	popmessage("GFXROM OVER %06x", state->blit_src);
+	popmessage("GFXROM OVER %06x", state->m_blit_src);
 }
 
 WRITE8_HANDLER( dynax_blitter_rev1_clear_w )
@@ -213,8 +213,8 @@ WRITE8_HANDLER( dynax_blitter_rev1_clear_w )
 
 	for (i = 0; i < 8; i++)
 	{
-		if ((~state->blit_layer & (1 << i)) && (state->pixmap[i]))
-			memset(state->pixmap[i] + state->blit_dest, pen, 0x10000 - state->blit_dest);
+		if ((~state->m_blit_layer & (1 << i)) && (state->m_pixmap[i]))
+			memset(state->m_pixmap[i] + state->m_blit_dest, pen, 0x10000 - state->m_blit_dest);
 	}
 }
 
@@ -223,7 +223,7 @@ WRITE8_HANDLER( hnayayoi_palbank_w )
 {
 	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	offset *= 8;
-	state->palbank = (state->palbank & (0xff00 >> offset)) | (data << offset);
+	state->m_palbank = (state->m_palbank & (0xff00 >> offset)) | (data << offset);
 }
 
 
@@ -231,8 +231,8 @@ static void draw_layer_interleaved( running_machine &machine, bitmap_t *bitmap, 
 {
 	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	int county, countx, pen;
-	UINT8 *src1 = state->pixmap[left_pixmap];
-	UINT8 *src2 = state->pixmap[right_pixmap];
+	UINT8 *src1 = state->m_pixmap[left_pixmap];
+	UINT8 *src2 = state->m_pixmap[right_pixmap];
 	UINT16 *dstbase = (UINT16 *)bitmap->base;
 
 	palbase *= 16;
@@ -266,12 +266,12 @@ static void draw_layer_interleaved( running_machine &machine, bitmap_t *bitmap, 
 SCREEN_UPDATE( hnayayoi )
 {
 	hnayayoi_state *state = screen->machine().driver_data<hnayayoi_state>();
-	int col0 = (state->palbank >>  0) & 0x0f;
-	int col1 = (state->palbank >>  4) & 0x0f;
-	int col2 = (state->palbank >>  8) & 0x0f;
-	int col3 = (state->palbank >> 12) & 0x0f;
+	int col0 = (state->m_palbank >>  0) & 0x0f;
+	int col1 = (state->m_palbank >>  4) & 0x0f;
+	int col2 = (state->m_palbank >>  8) & 0x0f;
+	int col3 = (state->m_palbank >> 12) & 0x0f;
 
-	if (state->total_pixmaps == 4)
+	if (state->m_total_pixmaps == 4)
 	{
 		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 3, 2, col1, 0);
 		draw_layer_interleaved(screen->machine(), bitmap, cliprect, 1, 0, col0, 1);

@@ -21,7 +21,7 @@ Atari Ultra Tank driver
 static CUSTOM_INPUT( get_collision )
 {
 	ultratnk_state *state = field->port->machine().driver_data<ultratnk_state>();
-	return state->collision[(FPTR) param];
+	return state->m_collision[(FPTR) param];
 }
 
 
@@ -32,7 +32,7 @@ static CUSTOM_INPUT( get_joystick )
 
 	if (joy == 1)
 	{
-		return (state->da_latch < 8) ? 1 : 0;
+		return (state->m_da_latch < 8) ? 1 : 0;
 	}
 	if (joy == 2)
 	{
@@ -70,7 +70,7 @@ static MACHINE_RESET( ultratnk )
 static READ8_HANDLER( ultratnk_wram_r )
 {
 	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	return videoram[0x380 + offset];
 }
 
@@ -98,7 +98,7 @@ static READ8_HANDLER( ultratnk_options_r )
 static WRITE8_HANDLER( ultratnk_wram_w )
 {
 	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
@@ -106,14 +106,14 @@ static WRITE8_HANDLER( ultratnk_wram_w )
 static WRITE8_HANDLER( ultratnk_collision_reset_w )
 {
 	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	state->collision[(offset >> 1) & 3] = 0;
+	state->m_collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( ultratnk_da_latch_w )
 {
 	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	state->da_latch = data & 15;
+	state->m_da_latch = data & 15;
 }
 
 
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE_MEMBER(ultratnk_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE_MEMBER(ultratnk_state, m_videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")

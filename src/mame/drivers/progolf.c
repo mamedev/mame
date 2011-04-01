@@ -62,15 +62,15 @@ public:
 	progolf_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 char_pen;
-	UINT8 char_pen_vreg;
-	UINT8 *fg_fb;
-	UINT8 *fbram;
-	UINT8 scrollx_hi;
-	UINT8 scrollx_lo;
-	UINT8 gfx_switch;
-	UINT8 sound_cmd;
+	UINT8 *m_videoram;
+	UINT8 m_char_pen;
+	UINT8 m_char_pen_vreg;
+	UINT8 *m_fg_fb;
+	UINT8 *m_fbram;
+	UINT8 m_scrollx_hi;
+	UINT8 m_scrollx_lo;
+	UINT8 m_gfx_switch;
+	UINT8 m_sound_cmd;
 };
 
 
@@ -79,22 +79,22 @@ public:
 static VIDEO_START( progolf )
 {
 	progolf_state *state = machine.driver_data<progolf_state>();
-	state->scrollx_hi = 0;
-	state->scrollx_lo = 0;
+	state->m_scrollx_hi = 0;
+	state->m_scrollx_lo = 0;
 
-	state->fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
-	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
+	state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 
 static SCREEN_UPDATE( progolf )
 {
 	progolf_state *state = screen->machine().driver_data<progolf_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int count,color,x,y,xi,yi;
 
 	{
-		int scroll = (state->scrollx_lo | ((state->scrollx_hi & 0x03) << 8));
+		int scroll = (state->m_scrollx_lo | ((state->m_scrollx_hi & 0x03) << 8));
 
 		count = 0;
 
@@ -125,7 +125,7 @@ static SCREEN_UPDATE( progolf )
 				{
 					for (xi=0;xi<8;xi++)
 					{
-						color = state->fg_fb[(xi+yi*8)+count*0x40];
+						color = state->m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if((x+yi) <= cliprect->max_x && (256-y+xi) <= cliprect->max_y && color != 0)
 							*BITMAP_ADDR16(bitmap, x+yi, 256-y+xi) = screen->machine().pens[(color & 0x7)];
@@ -144,21 +144,21 @@ static WRITE8_HANDLER( progolf_charram_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
 	int i;
-	state->fbram[offset] = data;
+	state->m_fbram[offset] = data;
 
-	if(state->char_pen == 7)
+	if(state->m_char_pen == 7)
 	{
 		for(i=0;i<8;i++)
-			state->fg_fb[offset*8+i] = 0;
+			state->m_fg_fb[offset*8+i] = 0;
 	}
 	else
 	{
 		for(i=0;i<8;i++)
 		{
-			if(state->fg_fb[offset*8+i] == state->char_pen)
-				state->fg_fb[offset*8+i] = data & (1<<(7-i)) ? state->char_pen : 0;
+			if(state->m_fg_fb[offset*8+i] == state->m_char_pen)
+				state->m_fg_fb[offset*8+i] = data & (1<<(7-i)) ? state->m_char_pen : 0;
 			else
-				state->fg_fb[offset*8+i] = data & (1<<(7-i)) ? state->fg_fb[offset*8+i]|state->char_pen : state->fg_fb[offset*8+i];
+				state->m_fg_fb[offset*8+i] = data & (1<<(7-i)) ? state->m_fg_fb[offset*8+i]|state->m_char_pen : state->m_fg_fb[offset*8+i];
 		}
 	}
 }
@@ -166,21 +166,21 @@ static WRITE8_HANDLER( progolf_charram_w )
 static WRITE8_HANDLER( progolf_char_vregs_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	state->char_pen = data & 0x07;
-	state->gfx_switch = data & 0xf0;
-	state->char_pen_vreg = data & 0x30;
+	state->m_char_pen = data & 0x07;
+	state->m_gfx_switch = data & 0xf0;
+	state->m_char_pen_vreg = data & 0x30;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_lo_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	state->scrollx_lo = data;
+	state->m_scrollx_lo = data;
 }
 
 static WRITE8_HANDLER( progolf_scrollx_hi_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	state->scrollx_hi = data;
+	state->m_scrollx_hi = data;
 }
 
 static WRITE8_HANDLER( progolf_flip_screen_w )
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( progolf_flip_screen_w )
 static WRITE8_HANDLER( audio_command_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	state->sound_cmd = data;
+	state->m_sound_cmd = data;
 	cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
 }
 
@@ -201,31 +201,31 @@ static READ8_HANDLER( audio_command_r )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
 	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
-	return state->sound_cmd;
+	return state->m_sound_cmd;
 }
 
 static READ8_HANDLER( progolf_videoram_r )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	UINT8 *gfx_rom = space->machine().region("gfx1")->base();
 
 	if (offset >= 0x0800)
 	{
-		if      (state->gfx_switch == 0x50)
+		if      (state->m_gfx_switch == 0x50)
 			return gfx_rom[offset];
-		else if (state->gfx_switch == 0x60)
+		else if (state->m_gfx_switch == 0x60)
 			return gfx_rom[offset + 0x1000];
-		else if (state->gfx_switch == 0x70)
+		else if (state->m_gfx_switch == 0x70)
 			return gfx_rom[offset + 0x2000];
 		else
 			return videoram[offset];
 	} else {
-		if      (state->gfx_switch == 0x10)
+		if      (state->m_gfx_switch == 0x10)
 			return gfx_rom[offset];
-		else if (state->gfx_switch == 0x20)
+		else if (state->m_gfx_switch == 0x20)
 			return gfx_rom[offset + 0x1000];
-		else if (state->gfx_switch == 0x30)
+		else if (state->m_gfx_switch == 0x30)
 			return gfx_rom[offset + 0x2000];
 		else
 			return videoram[offset];
@@ -235,14 +235,14 @@ static READ8_HANDLER( progolf_videoram_r )
 static WRITE8_HANDLER( progolf_videoram_w )
 {
 	progolf_state *state = space->machine().driver_data<progolf_state>();
-	UINT8 *videoram = state->videoram;
-	//if(state->gfx_switch & 0x40)
+	UINT8 *videoram = state->m_videoram;
+	//if(state->m_gfx_switch & 0x40)
 	videoram[offset] = data;
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE_MEMBER(progolf_state, fbram)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE_MEMBER(progolf_state, m_fbram)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(progolf_videoram_r,progolf_videoram_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(progolf_char_vregs_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(progolf_scrollx_hi_w) //p1 inputs

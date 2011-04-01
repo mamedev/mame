@@ -47,7 +47,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -55,8 +55,8 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
 
-	state->msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
-	state->msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
+	state->m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
+	state->m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
@@ -65,33 +65,33 @@ static void m5205_int1( device_t *device )
 {
 	cps_state *state = device->machine().driver_data<cps_state>();
 
-	msm5205_data_w(device, state->sample_buffer1 & 0x0f);
-	state->sample_buffer1 >>= 4;
-	state->sample_select1 ^= 1;
-	if (state->sample_select1 == 0)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	msm5205_data_w(device, state->m_sample_buffer1 & 0x0f);
+	state->m_sample_buffer1 >>= 4;
+	state->m_sample_select1 ^= 1;
+	if (state->m_sample_select1 == 0)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2( device_t *device )
 {
 	cps_state *state = device->machine().driver_data<cps_state>();
 
-	msm5205_data_w(device, state->sample_buffer2 & 0x0f);
-	state->sample_buffer2 >>= 4;
-	state->sample_select2 ^= 1;
+	msm5205_data_w(device, state->m_sample_buffer2 & 0x0f);
+	state->m_sample_buffer2 >>= 4;
+	state->m_sample_select2 ^= 1;
 }
 
 
 static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->sample_buffer1 = data;
+	state->m_sample_buffer1 = data;
 }
 
 static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->sample_buffer2 = data;
+	state->m_sample_buffer2 = data;
 }
 
 
@@ -116,13 +116,13 @@ static void fcrash_update_transmasks( running_machine &machine )
 
 		/* Get transparency registers */
 		if (priority[i])
-			mask = state->cps_b_regs[priority[i] / 2] ^ 0xffff;
+			mask = state->m_cps_b_regs[priority[i] / 2] ^ 0xffff;
 		else
 			mask = 0xffff;	/* completely transparent if priority masks not defined (mercs, qad) */
 
-		tilemap_set_transmask(state->bg_tilemap[0], i, mask, 0x8000);
-		tilemap_set_transmask(state->bg_tilemap[1], i, mask, 0x8000);
-		tilemap_set_transmask(state->bg_tilemap[2], i, mask, 0x8000);
+		tilemap_set_transmask(state->m_bg_tilemap[0], i, mask, 0x8000);
+		tilemap_set_transmask(state->m_bg_tilemap[1], i, mask, 0x8000);
+		tilemap_set_transmask(state->m_bg_tilemap[2], i, mask, 0x8000);
 	}
 }
 
@@ -134,8 +134,8 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
 	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
-//  if (state->cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
-//  printf("cps1_cps_a_regs %04x\n", state->cps_a_regs[0]);
+//  if (state->m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
+//  printf("cps1_cps_a_regs %04x\n", state->m_cps_a_regs[0]);
 
 	for (pos = 0x1ffc; pos >= 0x0000; pos -= 4)
 	{
@@ -145,12 +145,12 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_t *bitmap, c
 		int flipx, flipy;
 		int colour;
 
-		tileno = state->gfxram[base +pos];
-		xpos   = state->gfxram[base +pos + 2];
-		ypos   = state->gfxram[base +pos - 1] & 0xff;
-		flipx  = state->gfxram[base +pos + 1] & 0x20;
-		flipy  = state->gfxram[base +pos + 1] & 0x40;
-		colour = state->gfxram[base +pos + 1] & 0x1f;
+		tileno = state->m_gfxram[base +pos];
+		xpos   = state->m_gfxram[base +pos + 2];
+		ypos   = state->m_gfxram[base +pos - 1] & 0xff;
+		flipx  = state->m_gfxram[base +pos + 1] & 0x20;
+		flipy  = state->m_gfxram[base +pos + 1] & 0x40;
+		colour = state->m_gfxram[base +pos + 1] & 0x1f;
 		ypos = 256 - ypos;
 
 		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine.priority_bitmap, 0x02, 15);
@@ -171,7 +171,7 @@ static void fcrash_render_layer( running_machine &machine, bitmap_t *bitmap, con
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(bitmap, cliprect, state->bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER1, primask);
+			tilemap_draw(bitmap, cliprect, state->m_bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER1, primask);
 			break;
 	}
 }
@@ -188,7 +188,7 @@ static void fcrash_render_high_layer( running_machine &machine, bitmap_t *bitmap
 		case 1:
 		case 2:
 		case 3:
-			tilemap_draw(NULL, cliprect, state->bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER0, 1);
+			tilemap_draw(NULL, cliprect, state->m_bg_tilemap[layer - 1], TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -200,7 +200,7 @@ static void fcrash_build_palette( running_machine &machine )
 
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
 	{
-		int palette = state->gfxram[0x14000 / 2 + offset];
+		int palette = state->m_gfxram[0x14000 / 2 + offset];
 		int r, g, b, bright;
 
 		// from my understanding of the schematics, when the 'brightness'
@@ -220,12 +220,12 @@ static SCREEN_UPDATE( fcrash )
 {
 	cps_state *state = screen->machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
-	int videocontrol = state->cps_a_regs[0x22 / 2];
+	int videocontrol = state->m_cps_a_regs[0x22 / 2];
 
 
 	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
-	layercontrol = state->cps_b_regs[0x20 / 2];
+	layercontrol = state->m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen->machine());
@@ -235,37 +235,37 @@ static SCREEN_UPDATE( fcrash )
 
 	fcrash_update_transmasks(screen->machine());
 
-	tilemap_set_scrollx(state->bg_tilemap[0], 0, state->scroll1x - 62);
-	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->scroll1y);
+	tilemap_set_scrollx(state->m_bg_tilemap[0], 0, state->m_scroll1x - 62);
+	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, state->m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly = -state->scroll2y;
+		int scrly = -state->m_scroll2y;
 		int i;
 		int otheroffs;
 
-		tilemap_set_scroll_rows(state->bg_tilemap[1], 1024);
+		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1024);
 
-		otheroffs = state->cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->bg_tilemap[1], (i - scrly) & 0x3ff, state->scroll2x + state->other[(i + otheroffs) & 0x3ff]);
+			tilemap_set_scrollx(state->m_bg_tilemap[1], (i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->bg_tilemap[1], 1);
-		tilemap_set_scrollx(state->bg_tilemap[1], 0, state->scroll2x - 60);
+		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1);
+		tilemap_set_scrollx(state->m_bg_tilemap[1], 0, state->m_scroll2x - 60);
 	}
-	tilemap_set_scrolly(state->bg_tilemap[1], 0, state->scroll2y);
-	tilemap_set_scrollx(state->bg_tilemap[2], 0, state->scroll3x - 64);
-	tilemap_set_scrolly(state->bg_tilemap[2], 0, state->scroll3y);
+	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, state->m_scroll2y);
+	tilemap_set_scrollx(state->m_bg_tilemap[2], 0, state->m_scroll3x - 64);
+	tilemap_set_scrolly(state->m_bg_tilemap[2], 0, state->m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	tilemap_set_enable(state->bg_tilemap[0], 1);
-	tilemap_set_enable(state->bg_tilemap[1], 1);
-	tilemap_set_enable(state->bg_tilemap[2], 1);
+	tilemap_set_enable(state->m_bg_tilemap[0], 1);
+	tilemap_set_enable(state->m_bg_tilemap[1], 1);
+	tilemap_set_enable(state->m_bg_tilemap[2], 1);
 
 	/* Blank screen */
 	bitmap_fill(bitmap, cliprect, 0xbff);
@@ -301,11 +301,11 @@ static SCREEN_UPDATE( kodb )
 {
 	cps_state *state = screen->machine().driver_data<cps_state>();
 	int layercontrol, l0, l1, l2, l3;
-	int videocontrol = state->cps_a_regs[0x22 / 2];
+	int videocontrol = state->m_cps_a_regs[0x22 / 2];
 
 	flip_screen_set(screen->machine(), videocontrol & 0x8000);
 
-	layercontrol = state->cps_b_regs[0x20 / 2];
+	layercontrol = state->m_cps_b_regs[0x20 / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(screen->machine());
@@ -315,38 +315,38 @@ static SCREEN_UPDATE( kodb )
 
 	fcrash_update_transmasks(screen->machine());
 
-	tilemap_set_scrollx(state->bg_tilemap[0], 0, state->scroll1x);
-	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->scroll1y);
+	tilemap_set_scrollx(state->m_bg_tilemap[0], 0, state->m_scroll1x);
+	tilemap_set_scrolly(state->m_bg_tilemap[0], 0, state->m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
 	{
-		int scrly= -state->scroll2y;
+		int scrly= -state->m_scroll2y;
 		int i;
 		int otheroffs;
 
-		tilemap_set_scroll_rows(state->bg_tilemap[1], 1024);
+		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1024);
 
-		otheroffs = state->cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		otheroffs = state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0; i < 256; i++)
-			tilemap_set_scrollx(state->bg_tilemap[1], (i - scrly) & 0x3ff, state->scroll2x + state->other[(i + otheroffs) & 0x3ff]);
+			tilemap_set_scrollx(state->m_bg_tilemap[1], (i - scrly) & 0x3ff, state->m_scroll2x + state->m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->bg_tilemap[1], 1);
-		tilemap_set_scrollx(state->bg_tilemap[1], 0, state->scroll2x);
+		tilemap_set_scroll_rows(state->m_bg_tilemap[1], 1);
+		tilemap_set_scrollx(state->m_bg_tilemap[1], 0, state->m_scroll2x);
 	}
 
-	tilemap_set_scrolly(state->bg_tilemap[1], 0, state->scroll2y);
-	tilemap_set_scrollx(state->bg_tilemap[2], 0, state->scroll3x);
-	tilemap_set_scrolly(state->bg_tilemap[2], 0, state->scroll3y);
+	tilemap_set_scrolly(state->m_bg_tilemap[1], 0, state->m_scroll2y);
+	tilemap_set_scrollx(state->m_bg_tilemap[2], 0, state->m_scroll3x);
+	tilemap_set_scrolly(state->m_bg_tilemap[2], 0, state->m_scroll3y);
 
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
-	tilemap_set_enable(state->bg_tilemap[0], 1);
-	tilemap_set_enable(state->bg_tilemap[1], 1);
-	tilemap_set_enable(state->bg_tilemap[2], 1);
+	tilemap_set_enable(state->m_bg_tilemap[0], 1);
+	tilemap_set_enable(state->m_bg_tilemap[1], 1);
+	tilemap_set_enable(state->m_bg_tilemap[2], 1);
 
 	/* Blank screen */
 	bitmap_fill(bitmap, cliprect, 0xbff);
@@ -381,13 +381,13 @@ static SCREEN_UPDATE( kodb )
 static ADDRESS_MAP_START( fcrash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
-	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_BASE_MEMBER(cps_state, cps_a_regs)	/* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_BASE_MEMBER(cps_state, cps_b_regs)	/* CPS-B custom */
+	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_BASE_MEMBER(cps_state, m_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_BASE_MEMBER(cps_state, m_cps_b_regs)	/* CPS-B custom */
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("IN1")				/* Player input ports */
 	AM_RANGE(0x880006, 0x880007) AM_WRITE(fcrash_soundlatch_w)		/* Sound command */
 	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)				/* System input ports / Dip Switches */
 	AM_RANGE(0x890000, 0x890001) AM_WRITENOP	// palette related?
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -412,12 +412,12 @@ static ADDRESS_MAP_START( kodb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800020, 0x800021) AM_READNOP						/* ? Used by Rockman ? not mapped according to PAL */
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)	/* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, cps_b_regs)	/* CPS-B custom */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs)	/* CPS-B custom */
 //  AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)    /* Sound command */
 //  AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
 	AM_RANGE(0x8001c0, 0x8001ff) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)	/* mirror (SF2 revision "E" US 910228) */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -696,33 +696,33 @@ static MACHINE_START( fcrash )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("soundcpu");
-	state->msm_1 = machine.device<msm5205_device>("msm1");
-	state->msm_2 = machine.device<msm5205_device>("msm2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("soundcpu");
+	state->m_msm_1 = machine.device<msm5205_device>("msm1");
+	state->m_msm_2 = machine.device<msm5205_device>("msm2");
 
-	state->save_item(NAME(state->sample_buffer1));
-	state->save_item(NAME(state->sample_buffer2));
-	state->save_item(NAME(state->sample_select1));
-	state->save_item(NAME(state->sample_select2));
+	state->save_item(NAME(state->m_sample_buffer1));
+	state->save_item(NAME(state->m_sample_buffer2));
+	state->save_item(NAME(state->m_sample_select1));
+	state->save_item(NAME(state->m_sample_select2));
 }
 
 static MACHINE_START( kodb )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("soundcpu");
 }
 
 static MACHINE_RESET( fcrash )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
-	state->sample_buffer1 = 0;
-	state->sample_buffer2 = 0;
-	state->sample_select1 = 0;
-	state->sample_select2 = 0;
+	state->m_sample_buffer1 = 0;
+	state->m_sample_buffer2 = 0;
+	state->m_sample_select1 = 0;
+	state->m_sample_select2 = 0;
 }
 
 static MACHINE_CONFIG_START( fcrash, cps_state )

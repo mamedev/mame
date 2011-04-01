@@ -14,15 +14,15 @@
 WRITE8_HANDLER( bagman_videoram_w )
 {
 	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bagman_colorram_w )
 {
 	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 /***************************************************************************
@@ -87,16 +87,16 @@ WRITE8_HANDLER( bagman_flipscreen_w )
 	if ((flip_screen_get(space->machine()) ^ data) & 1)
 	{
 		flip_screen_set(space->machine(), data & 0x01);
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bagman_state *state = machine.driver_data<bagman_state>();
-	int gfxbank = (machine.gfx[2] && (state->colorram[tile_index] & 0x10)) ? 2 : 0;
-	int code = state->videoram[tile_index] + 8 * (state->colorram[tile_index] & 0x20);
-	int color = state->colorram[tile_index] & 0x0f;
+	int gfxbank = (machine.gfx[2] && (state->m_colorram[tile_index] & 0x10)) ? 2 : 0;
+	int code = state->m_videoram[tile_index] + 8 * (state->m_colorram[tile_index] & 0x20);
+	int color = state->m_colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }
@@ -104,20 +104,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( bagman )
 {
 	bagman_state *state = machine.driver_data<bagman_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scrolldy(state->bg_tilemap, -1, -1);
+	tilemap_set_scrolldy(state->m_bg_tilemap, -1, -1);
 }
 
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	bagman_state *state = machine.driver_data<bagman_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
@@ -150,10 +150,10 @@ SCREEN_UPDATE( bagman )
 {
 	bagman_state *state = screen->machine().driver_data<bagman_state>();
 	bitmap_fill(bitmap,cliprect,0);
-	if (*state->video_enable == 0)
+	if (*state->m_video_enable == 0)
 		return 0;
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

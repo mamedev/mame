@@ -362,14 +362,14 @@ static READ16_HANDLER( cameltry_paddle_r )
 	{
 		case 0x00:
 			curr = input_port_read(space->machine(), "PADDLE1");
-			res = curr - state->last[0];
-			state->last[0] = curr;
+			res = curr - state->m_last[0];
+			state->m_last[0] = curr;
 			return res;
 
 		case 0x02:
 			curr = input_port_read(space->machine(), "PADDLE2");
-			res = curr - state->last[1];
-			state->last[1] = curr;
+			res = curr - state->m_last[1];
+			state->m_last[1] = curr;
 			return res;
 	}
 
@@ -401,7 +401,7 @@ static READ16_HANDLER( mjnquest_dsw_r )
 static READ16_HANDLER( mjnquest_input_r )
 {
 	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	switch (state->mjnquest_input)
+	switch (state->m_mjnquest_input)
 	{
 		case 0x01:
 			  return input_port_read(space->machine(), "IN0");
@@ -420,7 +420,7 @@ static READ16_HANDLER( mjnquest_input_r )
 
 	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(&space->device()), state->mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(&space->device()), state->m_mjnquest_input);
 
 	return 0xff;
 }
@@ -428,7 +428,7 @@ static READ16_HANDLER( mjnquest_input_r )
 static WRITE16_HANDLER( mjnquest_inputselect_w )
 {
 	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	state->mjnquest_input = (data >> 6);
+	state->m_mjnquest_input = (data >> 6);
 }
 
 /******************************************************************
@@ -578,7 +578,7 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	device_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
@@ -607,24 +607,24 @@ static READ8_HANDLER( driveout_sound_command_r)
 {
 	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
-	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
-//  logerror("sound IRQ OFF (sound command=%02x)\n", state->driveout_sound_latch);
-	return state->driveout_sound_latch;
+	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
+//  logerror("sound IRQ OFF (sound command=%02x)\n", state->m_driveout_sound_latch);
+	return state->m_driveout_sound_latch;
 }
 
 
 static void reset_driveout_sound_region( running_machine &machine )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	state->oki->set_bank_base(state->oki_bank * 0x40000);
+	state->m_oki->set_bank_base(state->m_oki_bank * 0x40000);
 }
 
 static WRITE8_HANDLER( oki_bank_w )
 {
 	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	if ((data & 4) && (state->oki_bank != (data & 3)) )
+	if ((data & 4) && (state->m_oki_bank != (data & 3)) )
 	{
-		state->oki_bank = (data & 3);
+		state->m_oki_bank = (data & 3);
 	}
 
 	reset_driveout_sound_region(space->machine());
@@ -639,18 +639,18 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 		data >>= 8;
 		if (offset == 0)
 		{
-			state->nibble = data & 1;
+			state->m_nibble = data & 1;
 		}
 		else
 		{
-			if (state->nibble == 0)
+			if (state->m_nibble == 0)
 			{
-				state->driveout_sound_latch = (data & 0x0f) | (state->driveout_sound_latch & 0xf0);
+				state->m_driveout_sound_latch = (data & 0x0f) | (state->m_driveout_sound_latch & 0xf0);
 			}
 			else
 			{
-				state->driveout_sound_latch = ((data << 4) & 0xf0) | (state->driveout_sound_latch & 0x0f);
-				device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+				state->m_driveout_sound_latch = ((data << 4) & 0xf0) | (state->m_driveout_sound_latch & 0x0f);
+				device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
 			}
 		}
 	}
@@ -672,7 +672,7 @@ static WRITE16_HANDLER( cchip2_word_w )
 
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(&space->device()), offset, data);
 
-	COMBINE_DATA(&state->cchip2_ram[offset]);
+	COMBINE_DATA(&state->m_cchip2_ram[offset]);
 }
 
 static READ16_HANDLER( cchip2_word_r )
@@ -685,7 +685,7 @@ static READ16_HANDLER( cchip2_word_r )
 
 	logerror("cchip2_r offset: %04x\n", offset);
 
-	return state->cchip2_ram[offset];
+	return state->m_cchip2_ram[offset];
 }
 
 
@@ -703,7 +703,7 @@ static ADDRESS_MAP_START( finalb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in game init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb00002, 0xb00003) AM_WRITENOP   /* ?? */
 ADDRESS_MAP_END
 
@@ -716,7 +716,7 @@ static ADDRESS_MAP_START( dondokod_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE("tc0280grd", tc0280grd_ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
@@ -727,14 +727,14 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE_MEMBER(taitof2_state, cchip2_ram)
+	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE_MEMBER(taitof2_state, m_cchip2_ram)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM   /* unused? */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16 )
@@ -748,7 +748,7 @@ static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x80001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 ADDRESS_MAP_END
 
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tc0280grd", tc0280grd_word_r, tc0280grd_word_w)	/* ROZ tilemap */
 	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE("tc0280grd", tc0280grd_ctrl_word_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
@@ -777,7 +777,7 @@ static ADDRESS_MAP_START( qtorimon_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x910000, 0x9120ff) AM_WRITENOP   /* error in init code ? */
 ADDRESS_MAP_END
 
@@ -790,7 +790,7 @@ static ADDRESS_MAP_START( liquidk_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -812,7 +812,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x810000, 0x81ffff) AM_WRITENOP   /* error in init code ? */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16 )
@@ -825,7 +825,7 @@ static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ?? */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps (not used) */
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)   /* sprite ram */
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)   /* sprite ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16 )
@@ -837,7 +837,7 @@ static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 //  AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP   /* ?? */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
@@ -861,7 +861,7 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x50c000, 0x50c00f) AM_READ_PORT("IN4")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -880,13 +880,13 @@ static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("tc0100scn", tc0100scn_gfxbank_w)	/* scr gfx bank select */
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x420000, 0x42000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)	/* updated at $a6e, off irq5 */
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
@@ -914,7 +914,7 @@ static ADDRESS_MAP_START( koshien_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa20000, 0xa20001) AM_WRITE(koshien_spritebank_w)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 ADDRESS_MAP_END
@@ -926,10 +926,10 @@ static ADDRESS_MAP_START( yuyugogo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb10fff) AM_RAM   /* deliberate writes to $b10xxx, I think */
-	AM_RANGE(0xc00000, 0xc01fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0xc00000, 0xc01fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 	AM_RANGE(0xd00000, 0xdfffff) AM_ROM AM_REGION("extra", 0)
 ADDRESS_MAP_END
 
@@ -945,7 +945,7 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(taitof2_spritebank_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* b00002 written like a watchdog?! */
 ADDRESS_MAP_END
 
@@ -966,7 +966,7 @@ static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x504000, 0x504001) AM_WRITENOP	/* unknown... various values */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 ADDRESS_MAP_END
 
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -990,11 +990,11 @@ static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0430grw_ctrl_word_w)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
@@ -1002,7 +1002,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( metalb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 //  AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 	AM_RANGE(0x530000, 0x53002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
@@ -1021,7 +1021,7 @@ static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x720000, 0x72000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -1029,7 +1029,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
@@ -1048,7 +1048,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(taitof2_spritebank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	 /* tilemaps */
 //    AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
@@ -1069,11 +1069,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dinorex_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
-	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM
 	AM_RANGE(0x700000, 0x70001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -1087,11 +1087,11 @@ static ADDRESS_MAP_START( qjinsei_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* watchdog ? */
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 ADDRESS_MAP_END
@@ -1103,9 +1103,9 @@ static ADDRESS_MAP_START( qcrayon_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
@@ -1116,7 +1116,7 @@ static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("extra", 0)   /* extra data rom */
@@ -1124,7 +1124,7 @@ static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x90001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
-	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, sprite_extension, spriteext_size)
+	AM_RANGE(0xb00000, 0xb017ff) AM_WRITE(taitof2_sprite_extension_w) AM_BASE_SIZE_MEMBER(taitof2_state, m_sprite_extension, m_spriteext_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16 )
@@ -1137,7 +1137,7 @@ static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
@@ -1154,7 +1154,7 @@ static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, spriteram, spriteram_size)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_SIZE_MEMBER(taitof2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa00000, 0xa0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_w, 0xff00)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 	AM_RANGE(0xb00018, 0xb00019) AM_READ_PORT("PADDLE1")
@@ -3216,7 +3216,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	taitof2_state *state = device->machine().driver_data<taitof2_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3425,15 +3425,15 @@ static MACHINE_START( common )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");;
-	state->tc0100scn = machine.device("tc0100scn");;
-	state->tc0100scn_1 = machine.device("tc0100scn_1");;
-	state->tc0100scn_2 = machine.device("tc0100scn_2");;
-	state->tc0360pri = machine.device("tc0360pri");;
-	state->tc0280grd = machine.device("tc0280grd");;
-	state->tc0430grw = machine.device("tc0430grw");;
-	state->tc0480scp = machine.device("tc0480scp");;
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");;
+	state->m_tc0100scn = machine.device("tc0100scn");;
+	state->m_tc0100scn_1 = machine.device("tc0100scn_1");;
+	state->m_tc0100scn_2 = machine.device("tc0100scn_2");;
+	state->m_tc0360pri = machine.device("tc0360pri");;
+	state->m_tc0280grd = machine.device("tc0280grd");;
+	state->m_tc0430grw = machine.device("tc0430grw");;
+	state->m_tc0480scp = machine.device("tc0480scp");;
 }
 
 static MACHINE_START( f2 )
@@ -5729,10 +5729,10 @@ static DRIVER_INIT( cameltry )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->last[0] = 0;
-	state->last[1] = 0;
+	state->m_last[0] = 0;
+	state->m_last[1] = 0;
 
-	state->save_item(NAME(state->last));
+	state->save_item(NAME(state->m_last));
 }
 
 
@@ -5753,9 +5753,9 @@ static DRIVER_INIT( mjnquest )
 		gfx[i + 1] = (t >> 4) | (t << 4);
 	}
 
-	state->mjnquest_input = 0;
+	state->m_mjnquest_input = 0;
 
-	state->save_item(NAME(state->mjnquest_input));
+	state->save_item(NAME(state->m_mjnquest_input));
 }
 
 static STATE_POSTLOAD( driveout_postload )
@@ -5767,13 +5767,13 @@ static DRIVER_INIT( driveout )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->driveout_sound_latch = 0;
-	state->oki_bank = 0;
-	state->nibble = 0;
+	state->m_driveout_sound_latch = 0;
+	state->m_oki_bank = 0;
+	state->m_nibble = 0;
 
-	state->save_item(NAME(state->driveout_sound_latch));
-	state->save_item(NAME(state->oki_bank));
-	state->save_item(NAME(state->nibble));
+	state->save_item(NAME(state->m_driveout_sound_latch));
+	state->save_item(NAME(state->m_oki_bank));
+	state->save_item(NAME(state->m_nibble));
 	machine.state().register_postload(driveout_postload, NULL);
 }
 

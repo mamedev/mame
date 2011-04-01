@@ -34,7 +34,7 @@ static void set_pens( running_machine &machine )
 
 	for (i = 0x00; i < 0x80; i += 2)
 	{
-		UINT16 data = state->paletteram[i] | (state->paletteram[i | 1] << 8);
+		UINT16 data = state->m_paletteram[i] | (state->m_paletteram[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
@@ -56,8 +56,8 @@ void rockrage_tile_callback( running_machine &machine, int layer, int bank, int 
 	if (layer == 1)
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x01) << 9);
 	else
-		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((state->vreg & 0x04) << 7) | ((state->vreg & 0x08) << 9);
-	*color = state->layer_colorbase[layer] + (*color & 0x0f);
+		*code |= ((*color & 0x40) << 2) | ((bank & 0x03) << 10) | ((state->m_vreg & 0x04) << 7) | ((state->m_vreg & 0x08) << 9);
+	*color = state->m_layer_colorbase[layer] + (*color & 0x0f);
 }
 
 /***************************************************************************
@@ -70,7 +70,7 @@ void rockrage_sprite_callback( running_machine &machine, int *code, int *color )
 {
 	rockrage_state *state = machine.driver_data<rockrage_state>();
 
-	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((state->vreg & 0x03) << 1);
+	*code |= ((*color & 0x40) << 2) | ((*color & 0x80) << 1) * ((state->m_vreg & 0x03) << 1);
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
 	*color = 0;
 }
@@ -84,10 +84,10 @@ WRITE8_HANDLER( rockrage_vreg_w )
 	/* bits 0-1: sprite bank select */
 	rockrage_state *state = space->machine().driver_data<rockrage_state>();
 
-	if ((data & 0x0c) != (state->vreg & 0x0c))
+	if ((data & 0x0c) != (state->m_vreg & 0x0c))
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 
-	state->vreg = data;
+	state->m_vreg = data;
 }
 
 /***************************************************************************
@@ -102,12 +102,12 @@ SCREEN_UPDATE( rockrage )
 
 	set_pens(screen->machine());
 
-	k007342_tilemap_update(state->k007342);
+	k007342_tilemap_update(state->m_k007342);
 
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	k007420_sprites_draw(state->k007420, bitmap, cliprect, screen->machine().gfx[1]);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE, 0);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, 0, 0);
-	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, 1, 0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+	k007420_sprites_draw(state->m_k007420, bitmap, cliprect, screen->machine().gfx[1]);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE, 0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, 0, 0);
+	k007342_tilemap_draw(state->m_k007342, bitmap, cliprect, 1, 1, 0);
 	return 0;
 }

@@ -41,9 +41,9 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		state->scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(64), 64);
+		state->m_scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(64), 64);
 	else
-		state->scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(param + 64), param + 64);
+		state->m_scanline_timer->adjust(timer.machine().primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cputag_set_input_line(timer.machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
@@ -52,25 +52,25 @@ TIMER_DEVICE_CALLBACK( balsente_interrupt_timer )
 	timer.machine().scheduler().timer_set(timer.machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), FUNC(irq_off));
 
 	/* if this is Grudge Match, update the steering */
-	if (state->grudge_steering_result & 0x80)
+	if (state->m_grudge_steering_result & 0x80)
 		update_grudge_steering(timer.machine());
 
 	/* if we're a shooter, we do a little more work */
-	if (state->shooter)
+	if (state->m_shooter)
 	{
 		UINT8 tempx, tempy;
 
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
 		{
-			state->shooter_x = input_port_read(timer.machine(), "FAKEX");
-			state->shooter_y = input_port_read(timer.machine(), "FAKEY");
+			state->m_shooter_x = input_port_read(timer.machine(), "FAKEX");
+			state->m_shooter_y = input_port_read(timer.machine(), "FAKEY");
 		}
 
 		/* which bits get returned depends on which scanline we're at */
-		tempx = state->shooter_x << ((param - 64) / 64);
-		tempy = state->shooter_y << ((param - 64) / 64);
-		state->nstocker_bits = ((tempx >> 4) & 0x08) | ((tempx >> 1) & 0x04) |
+		tempx = state->m_shooter_x << ((param - 64) / 64);
+		tempy = state->m_shooter_y << ((param - 64) / 64);
+		state->m_nstocker_bits = ((tempx >> 4) & 0x08) | ((tempx >> 1) & 0x04) |
 								((tempy >> 6) & 0x02) | ((tempy >> 3) & 0x01);
 	}
 }
@@ -81,12 +81,12 @@ MACHINE_START( balsente )
 	balsente_state *state = machine.driver_data<balsente_state>();
 	int i;
 
-	state->cem_device[0] = state->m_cem1;
-	state->cem_device[1] = state->m_cem2;
-	state->cem_device[2] = state->m_cem3;
-	state->cem_device[3] = state->m_cem4;
-	state->cem_device[4] = state->m_cem5;
-	state->cem_device[5] = state->m_cem6;
+	state->m_cem_device[0] = state->m_cem1;
+	state->m_cem_device[1] = state->m_cem2;
+	state->m_cem_device[2] = state->m_cem3;
+	state->m_cem_device[3] = state->m_cem4;
+	state->m_cem_device[4] = state->m_cem5;
+	state->m_cem_device[5] = state->m_cem6;
 
 	/* create the polynomial tables */
 	poly17_init(machine);
@@ -94,46 +94,46 @@ MACHINE_START( balsente )
 	/* register for saving */
 	for (i = 0; i < 3; i++)
 	{
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].timer_active);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].initial);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].count);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].gate);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].out);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].mode);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].readbyte);
-		state_save_register_item(machine, "8253counter", NULL, i, state->counter[i].writebyte);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].timer_active);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].initial);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].count);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].gate);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].out);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].mode);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].readbyte);
+		state_save_register_item(machine, "8253counter", NULL, i, state->m_counter[i].writebyte);
 	}
 
-	state->save_item(NAME(state->counter_control));
-	state->save_item(NAME(state->counter_0_ff));
-	state->save_item(NAME(state->counter_0_timer_active));
+	state->save_item(NAME(state->m_counter_control));
+	state->save_item(NAME(state->m_counter_0_ff));
+	state->save_item(NAME(state->m_counter_0_timer_active));
 
-	state->save_item(NAME(state->analog_input_data));
-	state->save_item(NAME(state->adc_value));
+	state->save_item(NAME(state->m_analog_input_data));
+	state->save_item(NAME(state->m_adc_value));
 
-	state->save_item(NAME(state->dac_value));
-	state->save_item(NAME(state->dac_register));
-	state->save_item(NAME(state->chip_select));
+	state->save_item(NAME(state->m_dac_value));
+	state->save_item(NAME(state->m_dac_register));
+	state->save_item(NAME(state->m_chip_select));
 
-	state->save_item(NAME(state->m6850_status));
-	state->save_item(NAME(state->m6850_control));
-	state->save_item(NAME(state->m6850_input));
-	state->save_item(NAME(state->m6850_output));
-	state->save_item(NAME(state->m6850_data_ready));
+	state->save_item(NAME(state->m_m6850_status));
+	state->save_item(NAME(state->m_m6850_control));
+	state->save_item(NAME(state->m_m6850_input));
+	state->save_item(NAME(state->m_m6850_output));
+	state->save_item(NAME(state->m_m6850_data_ready));
 
-	state->save_item(NAME(state->m6850_sound_status));
-	state->save_item(NAME(state->m6850_sound_control));
-	state->save_item(NAME(state->m6850_sound_input));
-	state->save_item(NAME(state->m6850_sound_output));
+	state->save_item(NAME(state->m_m6850_sound_status));
+	state->save_item(NAME(state->m_m6850_sound_control));
+	state->save_item(NAME(state->m_m6850_sound_input));
+	state->save_item(NAME(state->m_m6850_sound_output));
 
-	state->save_item(NAME(state->noise_position));
+	state->save_item(NAME(state->m_noise_position));
 
-	state->save_item(NAME(state->nstocker_bits));
-	state->save_item(NAME(state->spiker_expand_color));
-	state->save_item(NAME(state->spiker_expand_bgcolor));
-	state->save_item(NAME(state->spiker_expand_bits));
-	state->save_item(NAME(state->grudge_steering_result));
-	state->save_item(NAME(state->grudge_last_steering));
+	state->save_item(NAME(state->m_nstocker_bits));
+	state->save_item(NAME(state->m_spiker_expand_color));
+	state->save_item(NAME(state->m_spiker_expand_bgcolor));
+	state->save_item(NAME(state->m_spiker_expand_bits));
+	state->save_item(NAME(state->m_grudge_steering_result));
+	state->save_item(NAME(state->m_grudge_last_steering));
 }
 
 
@@ -144,33 +144,33 @@ MACHINE_RESET( balsente )
 	int numbanks;
 
 	/* reset counters; counter 2's gate is tied high */
-	memset(state->counter, 0, sizeof(state->counter));
-	state->counter[1].timer = machine.device<timer_device>("8253_1_timer");
-	state->counter[2].timer = machine.device<timer_device>("8253_2_timer");
-	state->counter[2].gate = 1;
+	memset(state->m_counter, 0, sizeof(state->m_counter));
+	state->m_counter[1].timer = machine.device<timer_device>("8253_1_timer");
+	state->m_counter[2].timer = machine.device<timer_device>("8253_2_timer");
+	state->m_counter[2].gate = 1;
 
 	/* reset the manual counter 0 clock */
-	state->counter_control = 0x00;
-	state->counter_0_ff = 0;
-	state->counter_0_timer_active = 0;
+	state->m_counter_control = 0x00;
+	state->m_counter_0_ff = 0;
+	state->m_counter_0_timer_active = 0;
 
 	/* reset the ADC states */
-	state->adc_value = 0;
+	state->m_adc_value = 0;
 
 	/* reset the CEM3394 I/O states */
-	state->dac_value = 0;
-	state->dac_register = 0;
-	state->chip_select = 0x3f;
+	state->m_dac_value = 0;
+	state->m_dac_register = 0;
+	state->m_chip_select = 0x3f;
 
 	/* reset game-specific states */
-	state->grudge_steering_result = 0;
+	state->m_grudge_steering_result = 0;
 
 	/* reset the 6850 chips */
 	balsente_m6850_w(space, 0, 3);
 	balsente_m6850_sound_w(space, 0, 3);
 
 	/* reset the noise generator */
-	memset(state->noise_position, 0, sizeof(state->noise_position));
+	memset(state->m_noise_position, 0, sizeof(state->m_noise_position));
 
 	/* point the banks to bank 0 */
 	numbanks = (machine.region("maincpu")->bytes() > 0x40000) ? 16 : 8;
@@ -181,7 +181,7 @@ MACHINE_RESET( balsente )
 	machine.device("maincpu")->reset();
 
 	/* start a timer to generate interrupts */
-	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
@@ -202,8 +202,8 @@ static void poly17_init(running_machine &machine)
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = state->poly17;
-	r = state->rand17;
+	p = state->m_poly17;
+	r = state->m_rand17;
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)
@@ -225,23 +225,23 @@ void balsente_noise_gen(device_t *device, int count, short *buffer)
 	UINT32 step, noise_counter;
 
 	/* find the chip we are referring to */
-	for (chip = 0; chip < ARRAY_LENGTH(state->cem_device); chip++)
-		if (device == state->cem_device[chip])
+	for (chip = 0; chip < ARRAY_LENGTH(state->m_cem_device); chip++)
+		if (device == state->m_cem_device[chip])
 			break;
-	assert(chip < ARRAY_LENGTH(state->cem_device));
+	assert(chip < ARRAY_LENGTH(state->m_cem_device));
 
 	/* noise generator runs at 100kHz */
 	step = (100000 << 14) / CEM3394_SAMPLE_RATE;
-	noise_counter = state->noise_position[chip];
+	noise_counter = state->m_noise_position[chip];
 
 	while (count--)
 	{
-		*buffer++ = state->poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
+		*buffer++ = state->m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
 		noise_counter += step;
 	}
 
 	/* remember the noise position */
-	state->noise_position[chip] = noise_counter;
+	state->m_noise_position[chip] = noise_counter;
 }
 
 
@@ -268,7 +268,7 @@ READ8_HANDLER( balsente_random_num_r )
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);
-	return state->rand17[cc & POLY17_SIZE];
+	return state->m_rand17[cc & POLY17_SIZE];
 }
 
 
@@ -349,82 +349,82 @@ static void m6850_update_io(running_machine &machine)
 	UINT8 new_state;
 
 	/* sound -> main CPU communications */
-	if (!(state->m6850_sound_status & 0x02))
+	if (!(state->m_m6850_sound_status & 0x02))
 	{
 		/* set the overrun bit if the data in the destination hasn't been read yet */
-		if (state->m6850_status & 0x01)
-			state->m6850_status |= 0x20;
+		if (state->m_m6850_status & 0x01)
+			state->m_m6850_status |= 0x20;
 
 		/* copy the sound's output to our input */
-		state->m6850_input = state->m6850_sound_output;
+		state->m_m6850_input = state->m_m6850_sound_output;
 
 		/* set the receive register full bit */
-		state->m6850_status |= 0x01;
+		state->m_m6850_status |= 0x01;
 
 		/* set the sound's trasmitter register empty bit */
-		state->m6850_sound_status |= 0x02;
+		state->m_m6850_sound_status |= 0x02;
 	}
 
 	/* main -> sound CPU communications */
-	if (state->m6850_data_ready)
+	if (state->m_m6850_data_ready)
 	{
 		/* set the overrun bit if the data in the destination hasn't been read yet */
-		if (state->m6850_sound_status & 0x01)
-			state->m6850_sound_status |= 0x20;
+		if (state->m_m6850_sound_status & 0x01)
+			state->m_m6850_sound_status |= 0x20;
 
 		/* copy the main CPU's output to our input */
-		state->m6850_sound_input = state->m6850_output;
+		state->m_m6850_sound_input = state->m_m6850_output;
 
 		/* set the receive register full bit */
-		state->m6850_sound_status |= 0x01;
+		state->m_m6850_sound_status |= 0x01;
 
 		/* set the main CPU's trasmitter register empty bit */
-		state->m6850_status |= 0x02;
-		state->m6850_data_ready = 0;
+		state->m_m6850_status |= 0x02;
+		state->m_m6850_data_ready = 0;
 	}
 
 	/* check for reset states */
-	if ((state->m6850_control & 3) == 3)
+	if ((state->m_m6850_control & 3) == 3)
 	{
-		state->m6850_status = 0x02;
-		state->m6850_data_ready = 0;
+		state->m_m6850_status = 0x02;
+		state->m_m6850_data_ready = 0;
 	}
-	if ((state->m6850_sound_control & 3) == 3)
-		state->m6850_sound_status = 0x02;
+	if ((state->m_m6850_sound_control & 3) == 3)
+		state->m_m6850_sound_status = 0x02;
 
 	/* check for transmit/receive IRQs on the main CPU */
 	new_state = 0;
-	if ((state->m6850_control & 0x80) && (state->m6850_status & 0x21)) new_state = 1;
-	if ((state->m6850_control & 0x60) == 0x20 && (state->m6850_status & 0x02)) new_state = 1;
+	if ((state->m_m6850_control & 0x80) && (state->m_m6850_status & 0x21)) new_state = 1;
+	if ((state->m_m6850_control & 0x60) == 0x20 && (state->m_m6850_status & 0x02)) new_state = 1;
 
 	/* apply the change */
-	if (new_state && !(state->m6850_status & 0x80))
+	if (new_state && !(state->m_m6850_status & 0x80))
 	{
 		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
-		state->m6850_status |= 0x80;
+		state->m_m6850_status |= 0x80;
 	}
-	else if (!new_state && (state->m6850_status & 0x80))
+	else if (!new_state && (state->m_m6850_status & 0x80))
 	{
 		cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
-		state->m6850_status &= ~0x80;
+		state->m_m6850_status &= ~0x80;
 	}
 
 	/* check for transmit/receive IRQs on the sound CPU */
 	new_state = 0;
-	if ((state->m6850_sound_control & 0x80) && (state->m6850_sound_status & 0x21)) new_state = 1;
-	if ((state->m6850_sound_control & 0x60) == 0x20 && (state->m6850_sound_status & 0x02)) new_state = 1;
-	if (!(state->counter_control & 0x20)) new_state = 0;
+	if ((state->m_m6850_sound_control & 0x80) && (state->m_m6850_sound_status & 0x21)) new_state = 1;
+	if ((state->m_m6850_sound_control & 0x60) == 0x20 && (state->m_m6850_sound_status & 0x02)) new_state = 1;
+	if (!(state->m_counter_control & 0x20)) new_state = 0;
 
 	/* apply the change */
-	if (new_state && !(state->m6850_sound_status & 0x80))
+	if (new_state && !(state->m_m6850_sound_status & 0x80))
 	{
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
-		state->m6850_sound_status |= 0x80;
+		state->m_m6850_sound_status |= 0x80;
 	}
-	else if (!new_state && (state->m6850_sound_status & 0x80))
+	else if (!new_state && (state->m_m6850_sound_status & 0x80))
 	{
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-		state->m6850_sound_status &= ~0x80;
+		state->m_m6850_sound_status &= ~0x80;
 	}
 }
 
@@ -444,16 +444,16 @@ READ8_HANDLER( balsente_m6850_r )
 	/* status register is at offset 0 */
 	if (offset == 0)
 	{
-		result = state->m6850_status;
+		result = state->m_m6850_status;
 	}
 
 	/* input register is at offset 1 */
 	else
 	{
-		result = state->m6850_input;
+		result = state->m_m6850_input;
 
 		/* clear the overrun and receive buffer full bits */
-		state->m6850_status &= ~0x21;
+		state->m_m6850_status &= ~0x21;
 		m6850_update_io(space->machine());
 	}
 
@@ -466,8 +466,8 @@ static TIMER_CALLBACK( m6850_data_ready_callback )
 	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* set the output data byte and indicate that we're ready to go */
-	state->m6850_output = param;
-	state->m6850_data_ready = 1;
+	state->m_m6850_output = param;
+	state->m_m6850_data_ready = 1;
 	m6850_update_io(machine);
 }
 
@@ -477,7 +477,7 @@ static TIMER_CALLBACK( m6850_w_callback )
 	balsente_state *state = machine.driver_data<balsente_state>();
 
 	/* indicate that the transmit buffer is no longer empty and update the I/O state */
-	state->m6850_status &= ~0x02;
+	state->m_m6850_status &= ~0x02;
 	m6850_update_io(machine);
 
 	/* set a timer for 500usec later to actually transmit the data */
@@ -493,7 +493,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 	/* control register is at offset 0 */
 	if (offset == 0)
 	{
-		state->m6850_control = data;
+		state->m_m6850_control = data;
 
 		/* re-update since interrupt enables could have been modified */
 		m6850_update_io(space->machine());
@@ -520,16 +520,16 @@ READ8_HANDLER( balsente_m6850_sound_r )
 	/* status register is at offset 0 */
 	if (offset == 0)
 	{
-		result = state->m6850_sound_status;
+		result = state->m_m6850_sound_status;
 	}
 
 	/* input register is at offset 1 */
 	else
 	{
-		result = state->m6850_sound_input;
+		result = state->m_m6850_sound_input;
 
 		/* clear the overrun and receive buffer full bits */
-		state->m6850_sound_status &= ~0x21;
+		state->m_m6850_sound_status &= ~0x21;
 		m6850_update_io(space->machine());
 	}
 
@@ -543,13 +543,13 @@ WRITE8_HANDLER( balsente_m6850_sound_w )
 
 	/* control register is at offset 0 */
 	if (offset == 0)
-		state->m6850_sound_control = data;
+		state->m_m6850_sound_control = data;
 
 	/* output register is at offset 1 */
 	else
 	{
-		state->m6850_sound_output = data;
-		state->m6850_sound_status &= ~0x02;
+		state->m_m6850_sound_output = data;
+		state->m_m6850_sound_status &= ~0x02;
 	}
 
 	/* re-update since interrupt enables could have been modified */
@@ -575,7 +575,7 @@ INTERRUPT_GEN( balsente_update_analog_inputs )
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		state->analog_input_data[i] = input_port_read(device->machine(), analog[i]);
+		state->m_analog_input_data[i] = input_port_read(device->machine(), analog[i]);
 }
 
 
@@ -586,12 +586,12 @@ static TIMER_CALLBACK( adc_finished )
 
 	/* analog controls are read in two pieces; the lower port returns the sign */
 	/* and the upper port returns the absolute value of the magnitude */
-	int val = state->analog_input_data[which / 2] << state->adc_shift;
+	int val = state->m_analog_input_data[which / 2] << state->m_adc_shift;
 
 	/* special case for Stompin'/Shrike Avenger */
-	if (state->adc_shift == 32)
+	if (state->m_adc_shift == 32)
 	{
-		state->adc_value = state->analog_input_data[which];
+		state->m_adc_value = state->m_analog_input_data[which];
 		return;
 	}
 
@@ -606,11 +606,11 @@ static TIMER_CALLBACK( adc_finished )
 
 	/* return the sign */
 	if (!(which & 1))
-		state->adc_value = (val < 0) ? 0xff : 0x00;
+		state->m_adc_value = (val < 0) ? 0xff : 0x00;
 
 	/* return the magnitude */
 	else
-		state->adc_value = (val < 0) ? -val : val;
+		state->m_adc_value = (val < 0) ? -val : val;
 }
 
 
@@ -619,7 +619,7 @@ READ8_HANDLER( balsente_adc_data_r )
 	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* just return the last value read */
-	return state->adc_value;
+	return state->m_adc_value;
 }
 
 
@@ -647,10 +647,10 @@ INLINE void counter_start(balsente_state *state, int which)
 	if (which != 0)
 	{
 		/* only start a timer if we're gated and there is none already */
-		if (state->counter[which].gate && !state->counter[which].timer_active)
+		if (state->m_counter[which].gate && !state->m_counter[which].timer_active)
 		{
-			state->counter[which].timer_active = 1;
-			state->counter[which].timer->adjust(attotime::from_hz(2000000) * state->counter[which].count, which);
+			state->m_counter[which].timer_active = 1;
+			state->m_counter[which].timer->adjust(attotime::from_hz(2000000) * state->m_counter[which].count, which);
 		}
 	}
 }
@@ -659,20 +659,20 @@ INLINE void counter_start(balsente_state *state, int which)
 INLINE void counter_stop(balsente_state *state, int which)
 {
 	/* only stop the timer if it exists */
-	if (state->counter[which].timer_active)
-		state->counter[which].timer->reset();
-	state->counter[which].timer_active = 0;
+	if (state->m_counter[which].timer_active)
+		state->m_counter[which].timer->reset();
+	state->m_counter[which].timer_active = 0;
 }
 
 
 INLINE void counter_update_count(balsente_state *state, int which)
 {
 	/* only update if the timer is running */
-	if (state->counter[which].timer_active)
+	if (state->m_counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = (state->counter[which].timer->time_left() * 2000000).as_double();
-		state->counter[which].count = (count < 0) ? 0 : count;
+		int count = (state->m_counter[which].timer->time_left() * 2000000).as_double();
+		state->m_counter[which].count = (count < 0) ? 0 : count;
 	}
 }
 
@@ -689,10 +689,10 @@ INLINE void counter_update_count(balsente_state *state, int which)
 static void counter_set_gate(running_machine &machine, int which, int gate)
 {
 	balsente_state *state = machine.driver_data<balsente_state>();
-	int oldgate = state->counter[which].gate;
+	int oldgate = state->m_counter[which].gate;
 
 	/* remember the gate state */
-	state->counter[which].gate = gate;
+	state->m_counter[which].gate = gate;
 
 	/* if the counter is being halted, update the count and remove the system timer */
 	if (!gate && oldgate)
@@ -705,13 +705,13 @@ static void counter_set_gate(running_machine &machine, int which, int gate)
 	else if (gate && !oldgate)
 	{
 		/* mode 1 waits for the gate to trigger the counter */
-		if (state->counter[which].mode == 1)
+		if (state->m_counter[which].mode == 1)
 		{
 			counter_set_out(machine, which, 0);
 
 			/* add one to the count; technically, OUT goes low on the next clock pulse */
 			/* and then starts counting down; it's important that we don't count the first one */
-			state->counter[which].count = state->counter[which].initial + 1;
+			state->m_counter[which].count = state->m_counter[which].initial + 1;
 		}
 
 		/* start the counter */
@@ -733,7 +733,7 @@ static void counter_set_out(running_machine &machine, int which, int out)
 		counter_set_gate(machine, 1, !out);
 
 	/* remember the out state */
-	state->counter[which].out = out;
+	state->m_counter[which].out = out;
 }
 
 
@@ -742,12 +742,12 @@ TIMER_DEVICE_CALLBACK( balsente_counter_callback )
 	balsente_state *state = timer.machine().driver_data<balsente_state>();
 
 	/* reset the counter and the count */
-	state->counter[param].timer_active = 0;
-	state->counter[param].count = 0;
+	state->m_counter[param].timer_active = 0;
+	state->m_counter[param].count = 0;
 
 	/* set the state of the OUT line */
 	/* mode 0 and 1: when firing, transition OUT to high */
-	if (state->counter[param].mode == 0 || state->counter[param].mode == 1)
+	if (state->m_counter[param].mode == 0 || state->m_counter[param].mode == 1)
 		counter_set_out(timer.machine(), param, 1);
 
 	/* no other modes handled currently */
@@ -780,17 +780,17 @@ READ8_HANDLER( balsente_counter_8253_r )
 			counter_update_count(state, which);
 
 			/* return the LSB */
-			if (state->counter[which].readbyte == 0)
+			if (state->m_counter[which].readbyte == 0)
 			{
-				state->counter[which].readbyte = 1;
-				return state->counter[which].count & 0xff;
+				state->m_counter[which].readbyte = 1;
+				return state->m_counter[which].count & 0xff;
 			}
 
 			/* write the MSB and reset the counter */
 			else
 			{
-				state->counter[which].readbyte = 0;
-				return (state->counter[which].count >> 8) & 0xff;
+				state->m_counter[which].readbyte = 0;
+				return (state->m_counter[which].count >> 8) & 0xff;
 			}
 			break;
 	}
@@ -812,36 +812,36 @@ WRITE8_HANDLER( balsente_counter_8253_w )
 			which = offset & 3;
 
 			/* if the counter is in mode 0, a write here will reset the OUT state */
-			if (state->counter[which].mode == 0)
+			if (state->m_counter[which].mode == 0)
 				counter_set_out(space->machine(), which, 0);
 
 			/* write the LSB */
-			if (state->counter[which].writebyte == 0)
+			if (state->m_counter[which].writebyte == 0)
 			{
-				state->counter[which].count = (state->counter[which].count & 0xff00) | (data & 0x00ff);
-				state->counter[which].initial = (state->counter[which].initial & 0xff00) | (data & 0x00ff);
-				state->counter[which].writebyte = 1;
+				state->m_counter[which].count = (state->m_counter[which].count & 0xff00) | (data & 0x00ff);
+				state->m_counter[which].initial = (state->m_counter[which].initial & 0xff00) | (data & 0x00ff);
+				state->m_counter[which].writebyte = 1;
 			}
 
 			/* write the MSB and reset the counter */
 			else
 			{
-				state->counter[which].count = (state->counter[which].count & 0x00ff) | ((data << 8) & 0xff00);
-				state->counter[which].initial = (state->counter[which].initial & 0x00ff) | ((data << 8) & 0xff00);
-				state->counter[which].writebyte = 0;
+				state->m_counter[which].count = (state->m_counter[which].count & 0x00ff) | ((data << 8) & 0xff00);
+				state->m_counter[which].initial = (state->m_counter[which].initial & 0x00ff) | ((data << 8) & 0xff00);
+				state->m_counter[which].writebyte = 0;
 
 				/* treat 0 as $10000 */
-				if (state->counter[which].count == 0) state->counter[which].count = state->counter[which].initial = 0x10000;
+				if (state->m_counter[which].count == 0) state->m_counter[which].count = state->m_counter[which].initial = 0x10000;
 
 				/* remove any old timer and set a new one */
 				counter_stop(state, which);
 
 				/* note that in mode 1, we have to wait for a rising edge of a gate */
-				if (state->counter[which].mode == 0)
+				if (state->m_counter[which].mode == 0)
 					counter_start(state, which);
 
 				/* if the counter is in mode 1, a write here will set the OUT state */
-				if (state->counter[which].mode == 1)
+				if (state->m_counter[which].mode == 1)
 					counter_set_out(space->machine(), which, 1);
 			}
 			break;
@@ -852,14 +852,14 @@ WRITE8_HANDLER( balsente_counter_8253_w )
 			if (which == 3) break;
 
 			/* if the counter was in mode 0, a write here will reset the OUT state */
-			if (((state->counter[which].mode >> 1) & 7) == 0)
+			if (((state->m_counter[which].mode >> 1) & 7) == 0)
 				counter_set_out(space->machine(), which, 0);
 
 			/* set the mode */
-			state->counter[which].mode = (data >> 1) & 7;
+			state->m_counter[which].mode = (data >> 1) & 7;
 
 			/* if the counter is in mode 0, a write here will reset the OUT state */
-			if (state->counter[which].mode == 0)
+			if (state->m_counter[which].mode == 0)
 				counter_set_out(space->machine(), which, 0);
 			break;
 	}
@@ -878,19 +878,19 @@ static void set_counter_0_ff(timer_device &timer, int newstate)
 	balsente_state *state = timer.machine().driver_data<balsente_state>();
 
 	/* the flip/flop output is inverted, so if we went high to low, that's a clock */
-	if (state->counter_0_ff && !newstate)
+	if (state->m_counter_0_ff && !newstate)
 	{
 		/* only count if gated and non-zero */
-		if (state->counter[0].count > 0 && state->counter[0].gate)
+		if (state->m_counter[0].count > 0 && state->m_counter[0].gate)
 		{
-			state->counter[0].count--;
-			if (state->counter[0].count == 0)
+			state->m_counter[0].count--;
+			if (state->m_counter[0].count == 0)
 				balsente_counter_callback(timer, NULL, 0);
 		}
 	}
 
 	/* remember the new state */
-	state->counter_0_ff = newstate;
+	state->m_counter_0_ff = newstate;
 }
 
 
@@ -899,7 +899,7 @@ TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff )
 	balsente_state *state = timer.machine().driver_data<balsente_state>();
 
 	/* clock the D value through the flip-flop */
-	set_counter_0_ff(timer, (state->counter_control >> 3) & 1);
+	set_counter_0_ff(timer, (state->m_counter_control >> 3) & 1);
 }
 
 
@@ -909,24 +909,24 @@ static void update_counter_0_timer(balsente_state *state)
 	int i;
 
 	/* if there's already a timer, remove it */
-	if (state->counter_0_timer_active)
-		state->counter_0_timer->reset();
-	state->counter_0_timer_active = 0;
+	if (state->m_counter_0_timer_active)
+		state->m_counter_0_timer->reset();
+	state->m_counter_0_timer_active = 0;
 
 	/* find the counter with the maximum frequency */
 	/* this is used to calibrate the timers at startup */
 	for (i = 0; i < 6; i++)
-		if (cem3394_get_parameter(state->cem_device[i], CEM3394_FINAL_GAIN) < 10.0)
+		if (cem3394_get_parameter(state->m_cem_device[i], CEM3394_FINAL_GAIN) < 10.0)
 		{
 			double tempfreq;
 
 			/* if the filter resonance is high, then they're calibrating the filter frequency */
-			if (cem3394_get_parameter(state->cem_device[i], CEM3394_FILTER_RESONANCE) > 0.9)
-				tempfreq = cem3394_get_parameter(state->cem_device[i], CEM3394_FILTER_FREQENCY);
+			if (cem3394_get_parameter(state->m_cem_device[i], CEM3394_FILTER_RESONANCE) > 0.9)
+				tempfreq = cem3394_get_parameter(state->m_cem_device[i], CEM3394_FILTER_FREQENCY);
 
 			/* otherwise, they're calibrating the VCO frequency */
 			else
-				tempfreq = cem3394_get_parameter(state->cem_device[i], CEM3394_VCO_FREQUENCY);
+				tempfreq = cem3394_get_parameter(state->m_cem_device[i], CEM3394_VCO_FREQUENCY);
 
 			if (tempfreq > maxfreq) maxfreq = tempfreq;
 		}
@@ -934,8 +934,8 @@ static void update_counter_0_timer(balsente_state *state)
 	/* reprime the timer */
 	if (maxfreq > 0.0)
 	{
-		state->counter_0_timer_active = 1;
-		state->counter_0_timer->adjust(attotime::from_hz(maxfreq), 0, attotime::from_hz(maxfreq));
+		state->m_counter_0_timer_active = 1;
+		state->m_counter_0_timer->adjust(attotime::from_hz(maxfreq), 0, attotime::from_hz(maxfreq));
 	}
 }
 
@@ -952,10 +952,10 @@ READ8_HANDLER( balsente_counter_state_r )
 	balsente_state *state = space->machine().driver_data<balsente_state>();
 
 	/* bit D0 is the inverse of the flip-flop state */
-	int result = !state->counter_0_ff;
+	int result = !state->m_counter_0_ff;
 
 	/* bit D1 is the OUT value from counter 0 */
-	if (state->counter[0].out) result |= 0x02;
+	if (state->m_counter[0].out) result |= 0x02;
 
 	return result;
 }
@@ -964,39 +964,39 @@ READ8_HANDLER( balsente_counter_state_r )
 WRITE8_HANDLER( balsente_counter_control_w )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
-	UINT8 diff_counter_control = state->counter_control ^ data;
+	UINT8 diff_counter_control = state->m_counter_control ^ data;
 
 	/* set the new global value */
-	state->counter_control = data;
+	state->m_counter_control = data;
 
 	/* bit D0 enables/disables audio */
 	if (diff_counter_control & 0x01)
 	{
 		int ch;
 		for (ch = 0; ch < 6; ch++)
-			state->cem_device[ch]->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
+			state->m_cem_device[ch]->set_output_gain(0, (data & 0x01) ? 1.0 : 0);
 	}
 
 	/* bit D1 is hooked to counter 0's gate */
 	/* if we gate on, start a pulsing timer to clock it */
-	if (!state->counter[0].gate && (data & 0x02) && !state->counter_0_timer_active)
+	if (!state->m_counter[0].gate && (data & 0x02) && !state->m_counter_0_timer_active)
 	{
 		update_counter_0_timer(state);
 	}
 
 	/* if we gate off, remove the timer */
-	else if (state->counter[0].gate && !(data & 0x02) && state->counter_0_timer_active)
+	else if (state->m_counter[0].gate && !(data & 0x02) && state->m_counter_0_timer_active)
 	{
-		state->counter_0_timer->reset();
-		state->counter_0_timer_active = 0;
+		state->m_counter_0_timer->reset();
+		state->m_counter_0_timer_active = 0;
 	}
 
 	/* set the actual gate afterwards, since we need to know the old value above */
 	counter_set_gate(space->machine(), 0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(*state->counter_0_timer, 1);
-	if (!(data & 0x10)) set_counter_0_ff(*state->counter_0_timer, 0);
+	if (!(data & 0x04)) set_counter_0_ff(*state->m_counter_0_timer, 1);
+	if (!(data & 0x10)) set_counter_0_ff(*state->m_counter_0_timer, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
 	m6850_update_io(space->machine());
@@ -1025,12 +1025,12 @@ WRITE8_HANDLER( balsente_chip_select_w )
 	};
 
 	balsente_state *state = space->machine().driver_data<balsente_state>();
-	double voltage = (double)state->dac_value * (8.0 / 4096.0) - 4.0;
-	int diffchip = data ^ state->chip_select, i;
-	int reg = register_map[state->dac_register];
+	double voltage = (double)state->m_dac_value * (8.0 / 4096.0) - 4.0;
+	int diffchip = data ^ state->m_chip_select, i;
+	int reg = register_map[state->m_dac_register];
 
 	/* remember the new select value */
-	state->chip_select = data;
+	state->m_chip_select = data;
 
 	/* check all six chip enables */
 	for (i = 0; i < 6; i++)
@@ -1042,14 +1042,14 @@ WRITE8_HANDLER( balsente_chip_select_w )
 			/* remember the previous value */
 			temp =
 #endif
-				cem3394_get_parameter(state->cem_device[i], reg);
+				cem3394_get_parameter(state->m_cem_device[i], reg);
 
 			/* set the voltage */
-			cem3394_set_voltage(state->cem_device[i], reg, voltage);
+			cem3394_set_voltage(state->m_cem_device[i], reg, voltage);
 
 			/* only log changes */
 #if LOG_CEM_WRITES
-			if (temp != cem3394_get_parameter(state->cem_device[i], reg))
+			if (temp != cem3394_get_parameter(state->m_cem_device[i], reg))
 			{
 				static const char *const names[] =
 				{
@@ -1062,13 +1062,13 @@ WRITE8_HANDLER( balsente_chip_select_w )
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(&space->device()), i, names[state->dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(&space->device()), i, names[state->m_dac_register], voltage);
 			}
 #endif
 		}
 
 	/* if a timer for counter 0 is running, recompute */
-	if (state->counter_0_timer_active)
+	if (state->m_counter_0_timer_active)
 		update_counter_0_timer(state);
 }
 
@@ -1080,14 +1080,14 @@ WRITE8_HANDLER( balsente_dac_data_w )
 
 	/* LSB or MSB? */
 	if (offset & 1)
-		state->dac_value = (state->dac_value & 0xfc0) | ((data >> 2) & 0x03f);
+		state->m_dac_value = (state->m_dac_value & 0xfc0) | ((data >> 2) & 0x03f);
 	else
-		state->dac_value = (state->dac_value & 0x03f) | ((data << 6) & 0xfc0);
+		state->m_dac_value = (state->m_dac_value & 0x03f) | ((data << 6) & 0xfc0);
 
 	/* if there are open channels, force the values in */
-	if ((state->chip_select & 0x3f) != 0x3f)
+	if ((state->m_chip_select & 0x3f) != 0x3f)
 	{
-		UINT8 temp = state->chip_select;
+		UINT8 temp = state->m_chip_select;
 		balsente_chip_select_w(space, 0, 0x3f);
 		balsente_chip_select_w(space, 0, temp);
 	}
@@ -1097,7 +1097,7 @@ WRITE8_HANDLER( balsente_dac_data_w )
 WRITE8_HANDLER( balsente_register_addr_w )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
-	state->dac_register = data & 7;
+	state->m_dac_register = data & 7;
 }
 
 
@@ -1111,7 +1111,7 @@ WRITE8_HANDLER( balsente_register_addr_w )
 CUSTOM_INPUT( nstocker_bits_r )
 {
 	balsente_state *state = field->port->machine().driver_data<balsente_state>();
-	return state->nstocker_bits;
+	return state->m_nstocker_bits;
 }
 
 
@@ -1121,15 +1121,15 @@ WRITE8_HANDLER( spiker_expand_w )
 
 	/* offset 0 is the bit pattern */
 	if (offset == 0)
-		state->spiker_expand_bits = data;
+		state->m_spiker_expand_bits = data;
 
 	/* offset 1 is the background color (cleared on each read) */
 	else if (offset == 1)
-		state->spiker_expand_bgcolor = data;
+		state->m_spiker_expand_bgcolor = data;
 
 	/* offset 2 is the color */
 	else if (offset == 2)
-		state->spiker_expand_color = data;
+		state->m_spiker_expand_color = data;
 }
 
 
@@ -1139,14 +1139,14 @@ READ8_HANDLER( spiker_expand_r )
 	UINT8 left, right;
 
 	/* first rotate each nibble */
-	state->spiker_expand_bits = ((state->spiker_expand_bits << 1) & 0xee) | ((state->spiker_expand_bits >> 3) & 0x11);
+	state->m_spiker_expand_bits = ((state->m_spiker_expand_bits << 1) & 0xee) | ((state->m_spiker_expand_bits >> 3) & 0x11);
 
 	/* compute left and right pixels */
-	left  = (state->spiker_expand_bits & 0x10) ? state->spiker_expand_color : state->spiker_expand_bgcolor;
-	right = (state->spiker_expand_bits & 0x01) ? state->spiker_expand_color : state->spiker_expand_bgcolor;
+	left  = (state->m_spiker_expand_bits & 0x10) ? state->m_spiker_expand_color : state->m_spiker_expand_bgcolor;
+	right = (state->m_spiker_expand_bits & 0x01) ? state->m_spiker_expand_color : state->m_spiker_expand_bgcolor;
 
 	/* reset the background color */
-	state->spiker_expand_bgcolor = 0;
+	state->m_spiker_expand_bgcolor = 0;
 
 	/* return the combined result */
 	return (left & 0xf0) | (right & 0x0f);
@@ -1165,31 +1165,31 @@ static void update_grudge_steering(running_machine &machine)
 	wheel[2] = input_port_read(machine, "AN2");
 
 	/* diff the values */
-	diff[0] = wheel[0] - state->grudge_last_steering[0];
-	diff[1] = wheel[1] - state->grudge_last_steering[1];
-	diff[2] = wheel[2] - state->grudge_last_steering[2];
+	diff[0] = wheel[0] - state->m_grudge_last_steering[0];
+	diff[1] = wheel[1] - state->m_grudge_last_steering[1];
+	diff[2] = wheel[2] - state->m_grudge_last_steering[2];
 
 	/* update the last values */
-	state->grudge_last_steering[0] += diff[0];
-	state->grudge_last_steering[1] += diff[1];
-	state->grudge_last_steering[2] += diff[2];
+	state->m_grudge_last_steering[0] += diff[0];
+	state->m_grudge_last_steering[1] += diff[1];
+	state->m_grudge_last_steering[2] += diff[2];
 
 	/* compute the result */
-	state->grudge_steering_result = 0xff;
+	state->m_grudge_steering_result = 0xff;
 	if (diff[0])
 	{
-		state->grudge_steering_result ^= 0x01;
-		if (diff[0] > 0) state->grudge_steering_result ^= 0x02;
+		state->m_grudge_steering_result ^= 0x01;
+		if (diff[0] > 0) state->m_grudge_steering_result ^= 0x02;
 	}
 	if (diff[1])
 	{
-		state->grudge_steering_result ^= 0x04;
-		if (diff[1] > 0) state->grudge_steering_result ^= 0x08;
+		state->m_grudge_steering_result ^= 0x04;
+		if (diff[1] > 0) state->m_grudge_steering_result ^= 0x08;
 	}
 	if (diff[2])
 	{
-		state->grudge_steering_result ^= 0x10;
-		if (diff[2] > 0) state->grudge_steering_result ^= 0x20;
+		state->m_grudge_steering_result ^= 0x10;
+		if (diff[2] > 0) state->m_grudge_steering_result ^= 0x20;
 	}
 	logerror("Recomputed steering\n");
 }
@@ -1199,8 +1199,8 @@ READ8_HANDLER( grudge_steering_r )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
 	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(&space->device()), space->machine().primary_screen->vpos());
-	state->grudge_steering_result |= 0x80;
-	return state->grudge_steering_result;
+	state->m_grudge_steering_result |= 0x80;
+	return state->m_grudge_steering_result;
 }
 
 
@@ -1221,7 +1221,7 @@ READ8_HANDLER( shrike_shared_6809_r )
 		case 6: // return OK for 68k status register until motors hooked up
 			return 0;
 		default:
-			return ( state->shrike_shared[offset >> 1] & ~mem_mask ) >> ( mem_mask & 8 );
+			return ( state->m_shrike_shared[offset >> 1] & ~mem_mask ) >> ( mem_mask & 8 );
 	}
 }
 
@@ -1230,7 +1230,7 @@ WRITE8_HANDLER( shrike_shared_6809_w )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
 	UINT16 mem_mask = offset & 1 ? 0xff00 : 0x00ff;
-	state->shrike_shared[offset >> 1] = ( state->shrike_shared[offset >> 1] & mem_mask ) | ( data << ( mem_mask & 0x8 ) );
+	state->m_shrike_shared[offset >> 1] = ( state->m_shrike_shared[offset >> 1] & mem_mask ) | ( data << ( mem_mask & 0x8 ) );
 }
 
 // uses movep, so writes even 8 bit addresses to odd 16 bit addresses, reads as 16 bit from odd addresses
@@ -1238,12 +1238,12 @@ WRITE8_HANDLER( shrike_shared_6809_w )
 WRITE16_HANDLER( shrike_io_68k_w )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
-	COMBINE_DATA( &state->shrike_io[offset] );
+	COMBINE_DATA( &state->m_shrike_io[offset] );
 }
 
 READ16_HANDLER( shrike_io_68k_r )
 {
 	balsente_state *state = space->machine().driver_data<balsente_state>();
-	return ( state->shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
+	return ( state->m_shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }
 

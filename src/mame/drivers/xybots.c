@@ -34,8 +34,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	xybots_state *state = machine.driver_data<xybots_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -68,8 +68,8 @@ static READ16_HANDLER( special_port1_r )
 	xybots_state *state = space->machine().driver_data<xybots_state>();
 	int result = input_port_read(space->machine(), "FFE200");
 
-	if (state->cpu_to_sound_ready) result ^= 0x0200;
-	result ^= state->h256 ^= 0x0400;
+	if (state->m_cpu_to_sound_ready) result ^= 0x0200;
+	result ^= state->m_h256 ^= 0x0400;
 	return result;
 }
 
@@ -87,10 +87,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM	/* slapstic maps here */
 	AM_RANGE(0x010000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
-	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(xybots_state, alpha)
+	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(xybots_state, m_alpha)
 	AM_RANGE(0xff9000, 0xffadff) AM_MIRROR(0x7f8000) AM_RAM
 	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(xybots_state, playfield)
+	AM_RANGE(0xffb000, 0xffbfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(xybots_state, m_playfield)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x7f8800) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffe000, 0xffe0ff) AM_MIRROR(0x7f8000) AM_READ(atarigen_sound_r)
@@ -393,7 +393,7 @@ ROM_END
 static DRIVER_INIT( xybots )
 {
 	xybots_state *state = machine.driver_data<xybots_state>();
-	state->h256 = 0x0400;
+	state->m_h256 = 0x0400;
 	atarigen_slapstic_init(machine.device("maincpu"), 0x008000, 0, 107);
 	atarijsa_init(machine, "FFE200", 0x0100);
 }

@@ -97,18 +97,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *  bg_videoram;
-	UINT32 *  bg2_videoram;
-	UINT32 *  bg_scroll;
-	UINT32 *  paletteram;
-	UINT32 *  spriteram;
+	UINT32 *  m_bg_videoram;
+	UINT32 *  m_bg2_videoram;
+	UINT32 *  m_bg_scroll;
+	UINT32 *  m_paletteram;
+	UINT32 *  m_spriteram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*bg2_tilemap;
-	int      tilebank[2], tilebankold[2];
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg2_tilemap;
+	int      m_tilebank[2];
+	int      m_tilebankold[2];
 
 	/* misc */
-	int      protindex;
+	int      m_protindex;
 };
 
 
@@ -117,8 +119,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	UINT32 *source = state->spriteram;
-	UINT32 *finish = state->spriteram + 0x1000 / 4;
+	UINT32 *source = state->m_spriteram;
+	UINT32 *finish = state->m_spriteram + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)machine.region("gfx3")->base();
 
 	while (source < finish)
@@ -172,75 +174,75 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 {
 	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
-	COMBINE_DATA(&state->bg_videoram[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2 + 1);
+	COMBINE_DATA(&state->m_bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset * 2);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	int tileno, colour;
-	tileno = (tile_index & 1) ? (state->bg_videoram[tile_index >> 1] & 0xffff) : ((state->bg_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO(1, tileno + state->tilebank[0] * 0x2000, 0x80 + colour, 0);
+	SET_TILE_INFO(1, tileno + state->m_tilebank[0] * 0x2000, 0x80 + colour, 0);
 }
 
 
 static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 {
 	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
-	COMBINE_DATA(&state->bg2_videoram[offset]);
-	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2);
-	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2 + 1);
+	COMBINE_DATA(&state->m_bg2_videoram[offset]);
+	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset * 2);
+	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 	UINT16 tileno, colour;
-	tileno = (tile_index & 1) ? (state->bg2_videoram[tile_index >> 1] & 0xffff) : ((state->bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
+	tileno = (tile_index & 1) ? (state->m_bg2_videoram[tile_index >> 1] & 0xffff) : ((state->m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
 	tileno &= 0x1fff;
-	SET_TILE_INFO(1, tileno + state->tilebank[1] * 0x2000, 0xc0 + colour, 0);
+	SET_TILE_INFO(1, tileno + state->m_tilebank[1] * 0x2000, 0xc0 + colour, 0);
 }
 
 static VIDEO_START( dreamwld )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	state->bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	tilemap_set_transparent_pen(state->bg2_tilemap,0);
+	state->m_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
+	tilemap_set_transparent_pen(state->m_bg2_tilemap,0);
 }
 
 static SCREEN_UPDATE( dreamwld )
 {
 	dreamwld_state *state = screen->machine().driver_data<dreamwld_state>();
 
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scroll[(0x400 / 4)] + 32);
-	tilemap_set_scrolly(state->bg2_tilemap, 0, state->bg_scroll[(0x400 / 4) + 2] + 32);
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scroll[(0x400 / 4) + 1] + 3);
-	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bg_scroll[(0x400 / 4) + 3] + 5);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scroll[(0x400 / 4)] + 32);
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg_scroll[(0x400 / 4) + 2] + 32);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bg_scroll[(0x400 / 4) + 1] + 3);
+	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg_scroll[(0x400 / 4) + 3] + 5);
 
-	state->tilebank[0] = (state->bg_scroll[(0x400 / 4) + 4] >> 6) & 1;
-	state->tilebank[1] = (state->bg_scroll[(0x400 / 4) + 5] >> 6) & 1;
+	state->m_tilebank[0] = (state->m_bg_scroll[(0x400 / 4) + 4] >> 6) & 1;
+	state->m_tilebank[1] = (state->m_bg_scroll[(0x400 / 4) + 5] >> 6) & 1;
 
-	if (state->tilebank[0] != state->tilebankold[0])
+	if (state->m_tilebank[0] != state->m_tilebankold[0])
 	{
-		state->tilebankold[0] = state->tilebank[0];
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_tilebankold[0] = state->m_tilebank[0];
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 
-	if (state->tilebank[1] != state->tilebankold[1])
+	if (state->m_tilebank[1] != state->m_tilebankold[1])
 	{
-		state->tilebankold[1] = state->tilebank[1];
-		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
+		state->m_tilebankold[1] = state->m_tilebank[1];
+		tilemap_mark_all_tiles_dirty(state->m_bg2_tilemap);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
@@ -254,7 +256,7 @@ static READ32_HANDLER( dreamwld_protdata_r )
 
 	UINT8 *protdata = space->machine().region("user1")->base();
 	size_t protsize = space->machine().region("user1")->bytes();
-	UINT8 dat = protdata[(state->protindex++) % protsize];
+	UINT8 dat = protdata[(state->m_protindex++) % protsize];
 	return dat << 24;
 }
 
@@ -265,13 +267,13 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 	UINT16 dat;
 	int color;
 
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 	color = offset * 2;
 
-	dat = state->paletteram[offset] & 0x7fff;
+	dat = state->m_paletteram[offset] & 0x7fff;
 	palette_set_color_rgb(space->machine(), color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (state->paletteram[offset] >> 16) & 0x7fff;
+	dat = (state->m_paletteram[offset] >> 16) & 0x7fff;
 	palette_set_color_rgb(space->machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
@@ -304,11 +306,11 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, paletteram)  // real palette?
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, bg_videoram)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, bg2_videoram)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, bg_scroll)  // scroll regs etc.
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_spriteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, m_paletteram)  // real palette?
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg_videoram)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg2_videoram)
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_bg_scroll)  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
@@ -404,18 +406,18 @@ static MACHINE_START( dreamwld )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->save_item(NAME(state->protindex));
-	state->save_item(NAME(state->tilebank));
-	state->save_item(NAME(state->tilebankold));
+	state->save_item(NAME(state->m_protindex));
+	state->save_item(NAME(state->m_tilebank));
+	state->save_item(NAME(state->m_tilebankold));
 }
 
 static MACHINE_RESET( dreamwld )
 {
 	dreamwld_state *state = machine.driver_data<dreamwld_state>();
 
-	state->tilebankold[0] = state->tilebankold[1] = -1;
-	state->tilebank[0] = state->tilebank[1] = 0;
-	state->protindex = 0;
+	state->m_tilebankold[0] = state->m_tilebankold[1] = -1;
+	state->m_tilebank[0] = state->m_tilebank[1] = 0;
+	state->m_protindex = 0;
 }
 
 static MACHINE_CONFIG_START( dreamwld, dreamwld_state )

@@ -10,24 +10,24 @@ public:
 	pacman_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 cannonb_bit_to_read;
-	int mystery;
-	UINT8 counter;
-	int bigbucks_bank;
-	UINT8 *rocktrv2_prot_data;
-	UINT8 rocktrv2_question_bank;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *s2650games_spriteram;
-	UINT8 *s2650games_tileram;
-	tilemap_t *bg_tilemap;
-	UINT8 charbank;
-	UINT8 spritebank;
-	UINT8 palettebank;
-	UINT8 colortablebank;
-	UINT8 flipscreen;
-	UINT8 bgpriority;
-	int xoffsethack;
+	UINT8 m_cannonb_bit_to_read;
+	int m_mystery;
+	UINT8 m_counter;
+	int m_bigbucks_bank;
+	UINT8 *m_rocktrv2_prot_data;
+	UINT8 m_rocktrv2_question_bank;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_s2650games_spriteram;
+	UINT8 *m_s2650games_tileram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_charbank;
+	UINT8 m_spritebank;
+	UINT8 m_palettebank;
+	UINT8 m_colortablebank;
+	UINT8 m_flipscreen;
+	UINT8 m_bgpriority;
+	int m_xoffsethack;
 };
 
 

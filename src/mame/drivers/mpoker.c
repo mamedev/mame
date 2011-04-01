@@ -180,9 +180,9 @@ public:
 	mpoker_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 output[8];
-	UINT8* video;
-	int mixdata;
+	UINT8 m_output[8];
+	UINT8* m_video;
+	int m_mixdata;
 };
 
 
@@ -203,8 +203,8 @@ static SCREEN_UPDATE(mpoker)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = state->video[count];
-			UINT16 col = state->video[count+0x400] & 0x7f;
+			UINT16 dat = state->m_video[count];
+			UINT16 col = state->m_video[count+0x400] & 0x7f;
 			drawgfx_opaque(bitmap,cliprect,gfx,dat,col,0,0,x*16,y*16);
 			count++;
 		}
@@ -247,9 +247,9 @@ static READ8_HANDLER( mixport_r )
     If you change the status *every* read, the HW stucks.
 */
 
-	state->mixdata = (input_port_read(space->machine(), "SW2") & 0xfd) | (space->machine().rand() & 0x02);
+	state->m_mixdata = (input_port_read(space->machine(), "SW2") & 0xfd) | (space->machine().rand() & 0x02);
 
-	return state->mixdata;
+	return state->m_mixdata;
 }
 
 /***** Port 0158 *****
@@ -287,8 +287,8 @@ static WRITE8_HANDLER( outport0_w )
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - BET */
 	output_set_lamp_value(5, (data >> 1) & 1);		/* Lamp 5 - HOLD 1 */
 
-	state->output[0] = data;
-	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[0] = data;
+	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8001 *****
@@ -309,8 +309,8 @@ static WRITE8_HANDLER( outport1_w )
 	output_set_lamp_value(2, (data & 1));			/* Lamp 2 - DEAL */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* Lamp 6 - HOLD 2 */
 
-	state->output[1] = data;
-	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[1] = data;
+	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8002 *****
@@ -331,8 +331,8 @@ static WRITE8_HANDLER( outport2_w )
 	output_set_lamp_value(3, (data & 1));			/* Lamp 3 - CANCEL */
 	output_set_lamp_value(7, (data >> 1) & 1);		/* Lamp 7 - HOLD 3 */
 
-	state->output[2] = data;
-	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[2] = data;
+	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8003 *****
@@ -353,8 +353,8 @@ static WRITE8_HANDLER( outport3_w )
 	output_set_lamp_value(4, (data & 1));			/* Lamp 4 - STAND */
 	output_set_lamp_value(8, (data >> 1) & 1);		/* Lamp 8 - HOLD 4 */
 
-	state->output[3] = data;
-	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[3] = data;
+	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8004 *****
@@ -374,8 +374,8 @@ static WRITE8_HANDLER( outport4_w )
 	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Lamp 9 - HOLD 5 */
 
-	state->output[4] = data;
-	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[4] = data;
+	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8005 *****
@@ -393,8 +393,8 @@ static WRITE8_HANDLER( outport4_w )
 static WRITE8_HANDLER( outport5_w )
 {
 	mpoker_state *state = space->machine().driver_data<mpoker_state>();
-	state->output[5] = data;
-	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[5] = data;
+	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8006 *****
@@ -414,8 +414,8 @@ static WRITE8_HANDLER( outport6_w )
 	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	coin_counter_w(space->machine(), 1, data & 0x02);	/* Payout pulse */
 
-	state->output[6] = data;
-	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[6] = data;
+	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 /***** Port 8007 *****
@@ -435,8 +435,8 @@ static WRITE8_HANDLER( outport7_w )
 	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	coin_counter_w(space->machine(), 0, data & 0x02);	/* Coin pulse */
 
-	state->output[7] = data;
-	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", state->output[0], state->output[1], state->output[2], state->output[3], state->output[4], state->output[5], state->output[6], state->output[7]);
+	state->m_output[7] = data;
+	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
 }
 
 
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")	/* NVRAM = 2x SCM5101E */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(mpoker_state, video)	/* 4x MM2114N-3 */
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(mpoker_state, m_video)	/* 4x MM2114N-3 */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ (mixport_r) /* DIP switch bank 2 + a sort of watchdog */
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")

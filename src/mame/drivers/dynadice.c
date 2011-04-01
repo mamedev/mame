@@ -45,30 +45,31 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-//  UINT8 *  nvram;     // currently this uses generic nvram handling
-//  UINT8 *  paletteram;    // currently this uses generic palette handling
+	UINT8 *  m_videoram;
+//  UINT8 *  m_nvram;     // currently this uses generic nvram handling
+//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*top_tilemap;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_top_tilemap;
 
 	/* misc */
-	int      ay_data;
+	int      m_ay_data;
 };
 
 
 static WRITE8_HANDLER( dynadice_videoram_w )
 {
 	dynadice_state *state = space->machine().driver_data<dynadice_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
-	tilemap_mark_all_tiles_dirty(state->top_tilemap);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	tilemap_mark_all_tiles_dirty(state->m_top_tilemap);
 }
 
 static WRITE8_HANDLER( sound_data_w )
 {
 	dynadice_state *state = space->machine().driver_data<dynadice_state>();
-	state->ay_data = data;
+	state->m_ay_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
@@ -84,16 +85,16 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 */
 	if ((data & 7) == 7)
-		ay8910_address_w(device, 0, state->ay_data);
+		ay8910_address_w(device, 0, state->m_ay_data);
 
 	if ((data & 7) == 6)
-		ay8910_data_w(device, 0, state->ay_data);
+		ay8910_data_w(device, 0, state->m_ay_data);
 }
 
 
 static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE_MEMBER(dynadice_state, videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE_MEMBER(dynadice_state, m_videoram)
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -191,7 +192,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info )
 {
 	dynadice_state *state = machine.driver_data<dynadice_state>();
-	int code = state->videoram[tile_index];
+	int code = state->m_videoram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
@@ -200,9 +201,9 @@ static VIDEO_START( dynadice )
 	dynadice_state *state = machine.driver_data<dynadice_state>();
 
 	/* pacman - style videoram layout */
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->top_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 2, 32);
-	tilemap_set_scrollx(state->bg_tilemap, 0, -16);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_top_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols, 8, 8, 2, 32);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, -16);
 }
 
 static SCREEN_UPDATE( dynadice )
@@ -210,8 +211,8 @@ static SCREEN_UPDATE( dynadice )
 	dynadice_state *state = screen->machine().driver_data<dynadice_state>();
 	rectangle myclip = *cliprect;
 	myclip.max_x = 15;
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &myclip, state->top_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &myclip, state->m_top_tilemap, 0, 0);
 	return 0;
 }
 
@@ -225,13 +226,13 @@ static PALETTE_INIT( dynadice )
 static MACHINE_START( dynadice )
 {
 	dynadice_state *state = machine.driver_data<dynadice_state>();
-	state->save_item(NAME(state->ay_data));
+	state->save_item(NAME(state->m_ay_data));
 }
 
 static MACHINE_RESET( dynadice )
 {
 	dynadice_state *state = machine.driver_data<dynadice_state>();
-	state->ay_data = 0;
+	state->m_ay_data = 0;
 }
 
 static MACHINE_CONFIG_START( dynadice, dynadice_state )

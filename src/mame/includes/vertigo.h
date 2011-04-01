@@ -83,16 +83,16 @@ public:
 	vertigo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vectorram;
-	device_t *ttl74148;
-	attotime irq4_time;
-	UINT8 irq_state;
-	UINT8 adc_result;
-	vproc vs;
-	am2901 bsp;
-	vector_generator vgen;
-	UINT16 *vectorrom;
-	microcode mc[MC_LENGTH];
+	UINT16 *m_vectorram;
+	device_t *m_ttl74148;
+	attotime m_irq4_time;
+	UINT8 m_irq_state;
+	UINT8 m_adc_result;
+	vproc m_vs;
+	am2901 m_bsp;
+	vector_generator m_vgen;
+	UINT16 *m_vectorrom;
+	microcode m_mc[MC_LENGTH];
 };
 
 

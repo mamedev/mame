@@ -15,10 +15,10 @@ WRITE8_HANDLER ( funybubl_paldatawrite )
 	int colchanged ;
 	UINT32 coldat;
 
-	state->paletteram[offset] = data;
+	state->m_paletteram[offset] = data;
 	colchanged = offset >> 2;
-	coldat = state->paletteram[colchanged * 4] | (state->paletteram[colchanged * 4 + 1] << 8) |
-			(state->paletteram[colchanged * 4 + 2] << 16) | (state->paletteram[colchanged * 4 + 3] << 24);
+	coldat = state->m_paletteram[colchanged * 4] | (state->m_paletteram[colchanged * 4 + 1] << 8) |
+			(state->m_paletteram[colchanged * 4 + 2] << 16) | (state->m_paletteram[colchanged * 4 + 3] << 24);
 
 	palette_set_color_rgb(space->machine(), colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
 }
@@ -31,7 +31,7 @@ VIDEO_START(funybubl)
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	funybubl_state *state = machine.driver_data<funybubl_state>();
-	UINT8 *source = &state->banked_vram[0x2000 - 0x20];
+	UINT8 *source = &state->m_banked_vram[0x2000 - 0x20];
 	UINT8 *finish = source - 0x1000;
 
 	while (source > finish)
@@ -88,7 +88,7 @@ SCREEN_UPDATE(funybubl)
 		{
 			int data;
 
-			data = state->banked_vram[offs] | (state->banked_vram[offs + 1] << 8);
+			data = state->m_banked_vram[offs] | (state->m_banked_vram[offs + 1] << 8);
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], data & 0x7fff, (data & 0x8000) ? 2 : 1, 0, 0, x*8, y*8, 0);
 			offs += 2;
 		}
@@ -104,7 +104,7 @@ SCREEN_UPDATE(funybubl)
 		fp = fopen("funnybubsprites", "w+b");
 		if (fp)
 		{
-			fwrite(&state->banked_vram[0x1000], 0x1000, 1, fp);
+			fwrite(&state->m_banked_vram[0x1000], 0x1000, 1, fp);
 			fclose(fp);
 		}
 	}

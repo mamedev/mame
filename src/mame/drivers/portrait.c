@@ -109,20 +109,20 @@ static WRITE8_HANDLER( portrait_ctrl_w )
 static WRITE8_HANDLER( portrait_positive_scroll_w )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->scroll = data;
+	state->m_scroll = data;
 }
 
 static WRITE8_HANDLER( portrait_negative_scroll_w )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->scroll = - (data ^ 0xff);
+	state->m_scroll = - (data ^ 0xff);
 }
 
 static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE_MEMBER(portrait_state, bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE_MEMBER(portrait_state, fgvideoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE_MEMBER(portrait_state, spriteram, spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE_MEMBER(portrait_state, m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE_MEMBER(portrait_state, m_fgvideoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE_MEMBER(portrait_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?

@@ -159,14 +159,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* misc */
-	UINT8 mux_data;
-	UINT8 register_active;
-	struct { int r,g,b,offs,offs_internal; } pal;
+	UINT8 m_mux_data;
+	UINT8 m_register_active;
+	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *duart;
-	device_t *hd63484;
+	device_t *m_maincpu;
+	device_t *m_duart;
+	device_t *m_hd63484;
 };
 
 
@@ -179,7 +179,7 @@ public:
 static void duart_irq_handler( device_t *device, UINT8 vector )
 {
 	adp_state *state = device->machine().driver_data<adp_state>();
-	device_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
+	device_set_input_line_and_vector(state->m_maincpu, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx( device_t *device, int channel, UINT8 data )
@@ -193,7 +193,7 @@ static void duart_tx( device_t *device, int channel, UINT8 data )
 static void microtouch_tx( running_machine &machine, UINT8 data )
 {
 	adp_state *state = machine.driver_data<adp_state>();
-	duart68681_rx_data(state->duart, 0, data);
+	duart68681_rx_data(state->m_duart, 0, data);
 }
 
 static UINT8 duart_input( device_t *device )
@@ -206,12 +206,12 @@ static MACHINE_START( skattv )
 	adp_state *state = machine.driver_data<adp_state>();
 	microtouch_init(machine, microtouch_tx, 0);
 
-	state->maincpu = machine.device("maincpu");
-	state->duart = machine.device("duart68681");
-	state->hd63484 = machine.device("hd63484");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_duart = machine.device("duart68681");
+	state->m_hd63484 = machine.device("hd63484");
 
-	state->save_item(NAME(state->mux_data));
-	state->save_item(NAME(state->register_active));
+	state->save_item(NAME(state->m_mux_data));
+	state->save_item(NAME(state->m_register_active));
 
 	/*
         ACRTC memory:
@@ -243,8 +243,8 @@ static MACHINE_RESET( skattv )
 {
 	adp_state *state = machine.driver_data<adp_state>();
 
-	state->mux_data = 0;
-	state->register_active = 0;
+	state->m_mux_data = 0;
+	state->m_register_active = 0;
 }
 
 static const duart68681_config skattv_duart68681_config =
@@ -294,7 +294,7 @@ static SCREEN_UPDATE( adp )
 	adp_state *state = screen->machine().driver_data<adp_state>();
 	int x, y, b, src;
 
-	b = ((hd63484_regs_r(state->hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xce/2, 0xffff);
+	b = ((hd63484_regs_r(state->m_hd63484, 0xcc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xce/2, 0xffff);
 #if 1
 	if (input_code_pressed(screen->machine(), KEYCODE_M)) b = 0;
 	if (input_code_pressed(screen->machine(), KEYCODE_Q)) b += 0x2000 * 1;
@@ -322,10 +322,10 @@ static SCREEN_UPDATE( adp )
 #endif
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x < (hd63484_regs_r(state->hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+		for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE - 1);
-			src = hd63484_ram_r(state->hd63484, b, 0xffff);
+			src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
 			*BITMAP_ADDR16(bitmap, y, x    ) = ((src & 0x000f) >>  0) << 0;
 			*BITMAP_ADDR16(bitmap, y, x + 1) = ((src & 0x00f0) >>  4) << 0;
 			*BITMAP_ADDR16(bitmap, y, x + 2) = ((src & 0x0f00) >>  8) << 0;
@@ -334,24 +334,24 @@ static SCREEN_UPDATE( adp )
 		}
 	}
 if (!input_code_pressed(screen->machine(), KEYCODE_O)) // debug: toggle window
-	if ((hd63484_regs_r(state->hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
+	if ((hd63484_regs_r(state->m_hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
-		int sy = (hd63484_regs_r(state->hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->hd63484, 0x88/2, 0xffff) >> 8);
-		int h = hd63484_regs_r(state->hd63484, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((hd63484_regs_r(state->hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(state->hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
-		int w = (hd63484_regs_r(state->hd63484, 0x92/2, 0xffff) & 0xff) * 2;
+		int sy = (hd63484_regs_r(state->m_hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(state->m_hd63484, 0x88/2, 0xffff) >> 8);
+		int h = hd63484_regs_r(state->m_hd63484, 0x96/2, 0xffff) & 0x0fff;
+		int sx = ((hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) >> 8) - (hd63484_regs_r(state->m_hd63484, 0x84/2, 0xffff) >> 8)) * 2 * 2;
+		int w = (hd63484_regs_r(state->m_hd63484, 0x92/2, 0xffff) & 0xff) * 2;
 		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
 
-		b = (((hd63484_regs_r(state->hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->hd63484, 0xde/2, 0xffff));
+		b = (((hd63484_regs_r(state->m_hd63484, 0xdc/2, 0xffff) & 0x000f) << 16) + hd63484_regs_r(state->m_hd63484, 0xde/2, 0xffff));
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (hd63484_regs_r(state->hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
+			for (x = 0 ; x < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4 ; x += 4)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				src = hd63484_ram_r(state->hd63484, b, 0xffff);
+				src = hd63484_ram_r(state->m_hd63484, b, 0xffff);
 
-				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(state->hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
+				if (x <= w && x + sx >= 0 && x + sx < (hd63484_regs_r(state->m_hd63484, 0xca/2, 0xffff) & 0x0fff) * 4)
 				{
 					*BITMAP_ADDR16(bitmap, y, x + sx    ) = ((src & 0x000f) >>  0) << 0;
 					*BITMAP_ADDR16(bitmap, y, x + sx + 1) = ((src & 0x00f0) >>  4) << 0;
@@ -371,7 +371,7 @@ static READ16_HANDLER( test_r )
 	adp_state *state = space->machine().driver_data<adp_state>();
 	int value = 0xffff;
 
-	switch (state->mux_data)
+	switch (state->m_mux_data)
 	{
 		case 0x00: value = input_port_read(space->machine(), "x0"); break;
 		case 0x01: value = input_port_read(space->machine(), "x1"); break;
@@ -391,8 +391,8 @@ static READ16_HANDLER( test_r )
 		case 0x0f: value = input_port_read(space->machine(), "1P_COIN"); break;
 	}
 
-	state->mux_data++;
-	state->mux_data &= 0xf;
+	state->m_mux_data++;
+	state->m_mux_data &= 0xf;
 /*
     switch (space->machine().rand() & 3)
     {
@@ -411,7 +411,7 @@ static READ16_HANDLER( test_r )
 static WRITE16_HANDLER(wh2_w)
 {
 	adp_state *state = space->machine().driver_data<adp_state>();
-	state->register_active = data;
+	state->m_register_active = data;
 }
 
 static READ8_DEVICE_HANDLER(t2_r)
@@ -469,29 +469,29 @@ static WRITE8_HANDLER( ramdac_io_w )
 	switch(offset)
 	{
 		case 0:
-			state->pal.offs = data;
-			state->pal.offs_internal = 0;
+			state->m_pal.offs = data;
+			state->m_pal.offs_internal = 0;
 			break;
 		case 2:
 			//mask pen reg
 			break;
 		case 1:
-			switch(state->pal.offs_internal)
+			switch(state->m_pal.offs_internal)
 			{
 				case 0:
-					state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->pal.offs_internal++;
+					state->m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
 					break;
 				case 1:
-					state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->pal.offs_internal++;
+					state->m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
 					break;
 				case 2:
-					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
-					state->pal.offs_internal = 0;
-					state->pal.offs++;
-					state->pal.offs&=0xff;
+					state->m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine(), state->m_pal.offs, MAKE_RGB(state->m_pal.r, state->m_pal.g, state->m_pal.b));
+					state->m_pal.offs_internal = 0;
+					state->m_pal.offs++;
+					state->m_pal.offs&=0xff;
 					break;
 			}
 

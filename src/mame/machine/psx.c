@@ -157,7 +157,7 @@ INLINE UINT16 psxreadword( UINT32 *p_n_psxram, UINT32 n_address )
 
 WRITE32_HANDLER( psx_com_delay_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	COMBINE_DATA( &p_psx->n_com_delay );
 	verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
@@ -165,7 +165,7 @@ WRITE32_HANDLER( psx_com_delay_w )
 
 READ32_HANDLER( psx_com_delay_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return p_psx->n_com_delay;
@@ -189,7 +189,7 @@ static void psx_irq_update( psx_machine *p_psx )
 
 WRITE32_HANDLER( psx_irq_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	switch( offset )
 	{
@@ -215,7 +215,7 @@ WRITE32_HANDLER( psx_irq_w )
 
 READ32_HANDLER( psx_irq_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	switch( offset )
 	{
@@ -234,7 +234,7 @@ READ32_HANDLER( psx_irq_r )
 
 void psx_irq_set( running_machine &machine, UINT32 data )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
 	verboselog( p_psx, 2, "psx_irq_set %08x\n", data );
 	p_psx->n_irqdata |= data;
@@ -359,28 +359,28 @@ static void dma_finished(psx_machine *p_psx, int n_channel)
 
 static TIMER_CALLBACK( dma_finished_callback )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
 	dma_finished(p_psx, param);
 }
 
 void psx_dma_install_read_handler( running_machine &machine, int n_channel, psx_dma_read_handler p_fn_dma_read )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
 	p_psx->channel[ n_channel ].fn_read = p_fn_dma_read;
 }
 
 void psx_dma_install_write_handler( running_machine &machine, int n_channel, psx_dma_read_handler p_fn_dma_write )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
 	p_psx->channel[ n_channel ].fn_write = p_fn_dma_write;
 }
 
 WRITE32_HANDLER( psx_dma_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
 	int n_channel = offset / 4;
 	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
@@ -553,7 +553,7 @@ WRITE32_HANDLER( psx_dma_w )
 
 READ32_HANDLER( psx_dma_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	int n_channel = offset / 4;
 	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
 
@@ -683,7 +683,7 @@ static void root_timer_adjust( psx_machine *p_psx, int n_counter )
 
 static TIMER_CALLBACK( root_finished )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	int n_counter = param;
 	psx_root *root = &p_psx->root[ n_counter ];
 
@@ -707,7 +707,7 @@ static TIMER_CALLBACK( root_finished )
 
 WRITE32_HANDLER( psx_counter_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	int n_counter = offset / 4;
 	psx_root *root = &p_psx->root[ n_counter ];
 
@@ -753,7 +753,7 @@ WRITE32_HANDLER( psx_counter_w )
 
 READ32_HANDLER( psx_counter_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	int n_counter = offset / 4;
 	psx_root *root = &p_psx->root[ n_counter ];
 	UINT32 data;
@@ -841,7 +841,7 @@ static void sio_timer_adjust( psx_machine *p_psx, int n_port )
 
 static TIMER_CALLBACK( sio_clock )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	int n_port = param;
 	psx_sio *sio = &p_psx->sio[ n_port ];
 	verboselog( p_psx, 2, "sio tick\n" );
@@ -913,7 +913,7 @@ static TIMER_CALLBACK( sio_clock )
 
 void psx_sio_input( running_machine &machine, int n_port, int n_mask, int n_data )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	psx_sio *sio = &p_psx->sio[ n_port ];
 	verboselog( p_psx, 1, "psx_sio_input( %d, %02x, %02x )\n", n_port, n_mask, n_data );
 	sio->n_rx = ( sio->n_rx & ~n_mask ) | ( n_data & n_mask );
@@ -936,7 +936,7 @@ void psx_sio_input( running_machine &machine, int n_port, int n_mask, int n_data
 
 WRITE32_HANDLER( psx_sio_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	int n_port = offset / 4;
 	psx_sio *sio = &p_psx->sio[ n_port ];
 
@@ -1014,7 +1014,7 @@ WRITE32_HANDLER( psx_sio_w )
 
 READ32_HANDLER( psx_sio_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 	int n_port = offset / 4;
 	psx_sio *sio = &p_psx->sio[ n_port ];
 	UINT32 data;
@@ -1070,7 +1070,7 @@ READ32_HANDLER( psx_sio_r )
 
 void psx_sio_install_handler( running_machine &machine, int n_port, psx_sio_handler p_f_sio_handler )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
 	p_psx->sio[ n_port ].fn_handler = p_f_sio_handler;
 }
@@ -1419,7 +1419,7 @@ static void mdec_yuv2_to_rgb24( psx_machine *p_psx )
 
 static void mdec0_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
 	int n_index;
 
@@ -1477,7 +1477,7 @@ static void mdec0_write( running_machine &machine, UINT32 n_address, INT32 n_siz
 
 static void mdec1_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
 	UINT32 n_this;
 	UINT32 n_nextaddress;
@@ -1538,7 +1538,7 @@ static void mdec1_read( running_machine &machine, UINT32 n_address, INT32 n_size
 
 WRITE32_HANDLER( psx_mdec_w )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	switch( offset )
 	{
@@ -1555,7 +1555,7 @@ WRITE32_HANDLER( psx_mdec_w )
 
 READ32_HANDLER( psx_mdec_r )
 {
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
 
 	switch( offset )
 	{
@@ -1571,7 +1571,7 @@ READ32_HANDLER( psx_mdec_r )
 
 static void gpu_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
 
 	psx_gpu_read( machine, &p_n_psxram[ n_address / 4 ], n_size );
@@ -1579,7 +1579,7 @@ static void gpu_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 
 static void gpu_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
 
 	psx_gpu_write( machine, &p_n_psxram[ n_address / 4 ], n_size );
@@ -1587,7 +1587,7 @@ static void gpu_write( running_machine &machine, UINT32 n_address, INT32 n_size 
 
 void psx_machine_init( running_machine &machine )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	int n;
 
 	/* irq */
@@ -1632,7 +1632,7 @@ void psx_machine_init( running_machine &machine )
 
 static STATE_POSTLOAD( psx_postload )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->p_psx;
+	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	int n;
 
 	psx_irq_update(p_psx);
@@ -1661,12 +1661,12 @@ void psx_driver_init( running_machine &machine )
 	psx_machine *p_psx = auto_alloc_clear(machine, psx_machine);
 	int n;
 
-	state->p_psx = p_psx;
-	state->p_n_psxram = (UINT32 *)memory_get_shared(machine, "share1", state->n_psxramsize);
+	state->m_p_psx = p_psx;
+	state->m_p_n_psxram = (UINT32 *)memory_get_shared(machine, "share1", state->m_n_psxramsize);
 
 	p_psx->m_machine = &machine;
-	p_psx->p_n_psxram = state->p_n_psxram;
-	p_psx->n_psxramsize = state->n_psxramsize;
+	p_psx->p_n_psxram = state->m_p_n_psxram;
+	p_psx->n_psxramsize = state->m_n_psxramsize;
 
 	for( n = 0; n < 7; n++ )
 	{

@@ -24,27 +24,27 @@ Main CPU:
 static WRITE8_HANDLER( video_interrupt_w )
 {
 	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->video_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_video_cpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w )
 {
 	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->sprite_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_sprite_cpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w )
 {
 	kingofb_state *state = space->machine().driver_data<kingofb_state>();
 	sprite_interrupt_w(space, offset, data);
-	*state->scroll_y = data;
+	*state->m_scroll_y = data;
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	kingofb_state *state = space->machine().driver_data<kingofb_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line_and_vector(state->audio_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audio_cpu, 0, HOLD_LINE, 0xff);
 }
 
 
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(kingofb_f800_w)	/* NMI enable, palette bank */
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* ???? */
-	AM_RANGE(0xf802, 0xf802) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, scroll_y)
+	AM_RANGE(0xf802, 0xf802) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, m_scroll_y)
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(scroll_interrupt_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(video_interrupt_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(sound_command_w) /* sound latch */
@@ -72,17 +72,17 @@ static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1") /* shared with main */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, videoram) /* background vram */
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, colorram) /* background colorram */
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, videoram2) /* foreground vram */
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, colorram2) /* foreground colorram */
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, m_videoram) /* background vram */
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, m_colorram) /* background colorram */
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, m_videoram2) /* foreground vram */
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share2") /* shared with main */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, spriteram, spriteram_size) /* sprite ram */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, m_spriteram, m_spriteram_size) /* sprite ram */
 	AM_RANGE(0xc400, 0xc43f) AM_RAM  /* something related to scroll? */
 ADDRESS_MAP_END
 
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, scroll_y)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, m_scroll_y)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 ADDRESS_MAP_END
 
@@ -123,17 +123,17 @@ static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1") /* shared with main */
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, videoram) /* background vram */
-	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, colorram) /* background colorram */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, videoram2) /* foreground vram */
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, colorram2) /* foreground colorram */
+	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, m_videoram) /* background vram */
+	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, m_colorram) /* background colorram */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, m_videoram2) /* foreground vram */
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with main */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, spriteram, spriteram_size) /* sprite ram */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, m_spriteram, m_spriteram_size) /* sprite ram */
 	AM_RANGE(0xa400, 0xa43f) AM_RAM /* something related to scroll? */
 ADDRESS_MAP_END
 
@@ -450,7 +450,7 @@ static INTERRUPT_GEN( kingofb_interrupt )
 {
 	kingofb_state *state = device->machine().driver_data<kingofb_state>();
 
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -458,20 +458,20 @@ static MACHINE_START( kingofb )
 {
 	kingofb_state *state = machine.driver_data<kingofb_state>();
 
-	state->video_cpu = machine.device("video");
-	state->sprite_cpu = machine.device("sprite");
-	state->audio_cpu = machine.device("audiocpu");
+	state->m_video_cpu = machine.device("video");
+	state->m_sprite_cpu = machine.device("sprite");
+	state->m_audio_cpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->palette_bank));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_palette_bank));
 }
 
 static MACHINE_RESET( kingofb )
 {
 	kingofb_state *state = machine.driver_data<kingofb_state>();
 
-	state->nmi_enable = 0;
-	state->palette_bank = 0;
+	state->m_nmi_enable = 0;
+	state->m_palette_bank = 0;
 }
 
 static MACHINE_CONFIG_START( kingofb, kingofb_state )

@@ -4,16 +4,16 @@ public:
 	scotrsht_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int irq_enable;
-	UINT8 *scroll;
+	int m_irq_enable;
+	UINT8 *m_scroll;
 
-	size_t spriteram_size;
-	UINT8 *spriteram;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
-	int charbank;
-	int palette_bank;
+	size_t m_spriteram_size;
+	UINT8 *m_spriteram;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
+	int m_charbank;
+	int m_palette_bank;
 };
 
 

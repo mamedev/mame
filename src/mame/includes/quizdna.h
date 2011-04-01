@@ -4,15 +4,15 @@ public:
 	quizdna_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *bg_ram;
-	UINT8 *fg_ram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT8 bg_xscroll[2];
-	int flipscreen;
-	int video_enable;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_bg_ram;
+	UINT8 *m_fg_ram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 m_bg_xscroll[2];
+	int m_flipscreen;
+	int m_video_enable;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

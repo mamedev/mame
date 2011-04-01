@@ -286,12 +286,12 @@ GFX:                Custom 145     ( 80 pin PQFP)
 static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	if(state->pos_irq_active || !(state->namconb_cpureg[0x02] & 0xf0))
+	if(state->m_pos_irq_active || !(state->m_namconb_cpureg[0x02] & 0xf0))
 		return;
 
 	machine.primary_screen->update_partial(param);
-	state->pos_irq_active = 1;
-	cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
+	state->m_pos_irq_active = 1;
+	cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb1_interrupt )
@@ -333,9 +333,9 @@ static INTERRUPT_GEN( namconb1_interrupt )
      */
 	int scanline = (device->machine().generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
-	if((!state->vblank_irq_active) && (state->namconb_cpureg[0x04] & 0xf0)) {
-		device_set_input_line(device, state->namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
-		state->vblank_irq_active = 1;
+	if((!state->m_vblank_irq_active) && (state->m_namconb_cpureg[0x04] & 0xf0)) {
+		device_set_input_line(device, state->m_namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
+		state->m_vblank_irq_active = 1;
 	}
 
 	if( scanline<0 )
@@ -368,8 +368,8 @@ static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
 	machine.primary_screen->update_partial(param);
-	state->pos_irq_active = 1;
-	cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x02], ASSERT_LINE);
+	state->m_pos_irq_active = 1;
+	cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x02], ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( namconb2_interrupt )
@@ -406,9 +406,9 @@ static INTERRUPT_GEN( namconb2_interrupt )
      */
 	int scanline = (device->machine().generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
-	if((!state->vblank_irq_active) && state->namconb_cpureg[0x00]) {
-		device_set_input_line(device, state->namconb_cpureg[0x00], ASSERT_LINE);
-		state->vblank_irq_active = 1;
+	if((!state->m_vblank_irq_active) && state->m_namconb_cpureg[0x00]) {
+		device_set_input_line(device, state->m_namconb_cpureg[0x00], ASSERT_LINE);
+		state->m_vblank_irq_active = 1;
 	}
 
 	if( scanline<0 )
@@ -421,40 +421,40 @@ static INTERRUPT_GEN( namconb2_interrupt )
 static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	UINT8 prev = state->namconb_cpureg[reg];
-	state->namconb_cpureg[reg] = data;
+	UINT8 prev = state->m_namconb_cpureg[reg];
+	state->m_namconb_cpureg[reg] = data;
 	switch(reg) {
 	case 0x02: // POS IRQ level/enable
-		if(state->pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
+		if(state->m_pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
 			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
 				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
-				state->pos_irq_active = 0;
+				state->m_pos_irq_active = 0;
 		}
 		break;
 
 	case 0x04: // VBLANK IRQ level/enable
-		if(state->vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
+		if(state->m_vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
 			cputag_set_input_line(machine, "maincpu", prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
 				cputag_set_input_line(machine, "maincpu", data & 0xf, ASSERT_LINE);
 			else
-				state->vblank_irq_active = 0;
+				state->m_vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x07: // POS ack
-		if(state->pos_irq_active) {
-			cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
-			state->pos_irq_active = 0;
+		if(state->m_pos_irq_active) {
+			cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
+			state->m_pos_irq_active = 0;
 		}
 		break;
 
 	case 0x09: // VBLANK ack
-		if(state->vblank_irq_active) {
-			cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
-			state->vblank_irq_active = 0;
+		if(state->m_vblank_irq_active) {
+			cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
+			state->m_vblank_irq_active = 0;
 		}
 		break;
 
@@ -488,40 +488,40 @@ static WRITE32_HANDLER( namconb1_cpureg_w )
 static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	UINT8 prev = state->namconb_cpureg[reg];
-	state->namconb_cpureg[reg] = data;
+	UINT8 prev = state->m_namconb_cpureg[reg];
+	state->m_namconb_cpureg[reg] = data;
 	switch(reg) {
 	case 0x00: // VBLANK IRQ level
-		if(state->vblank_irq_active && (prev != data)) {
+		if(state->m_vblank_irq_active && (prev != data)) {
 			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
 				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
-				state->vblank_irq_active = 0;
+				state->m_vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x02: // POS IRQ level
-		if(state->pos_irq_active && (prev != data)) {
+		if(state->m_pos_irq_active && (prev != data)) {
 			cputag_set_input_line(machine, "maincpu", prev, CLEAR_LINE);
 			if(data)
 				cputag_set_input_line(machine, "maincpu", data, ASSERT_LINE);
 			else
-				state->pos_irq_active = 0;
+				state->m_pos_irq_active = 0;
 		}
 		break;
 
 	case 0x04: // VBLANK ack
-		if(state->vblank_irq_active) {
-			cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x00], CLEAR_LINE);
-			state->vblank_irq_active = 0;
+		if(state->m_vblank_irq_active) {
+			cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x00], CLEAR_LINE);
+			state->m_vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x06: // POS ack
-		if(state->pos_irq_active) {
-			cputag_set_input_line(machine, "maincpu", state->namconb_cpureg[0x02], CLEAR_LINE);
-			state->pos_irq_active = 0;
+		if(state->m_pos_irq_active) {
+			cputag_set_input_line(machine, "maincpu", state->m_namconb_cpureg[0x02], CLEAR_LINE);
+			state->m_pos_irq_active = 0;
 		}
 		break;
 
@@ -555,8 +555,8 @@ static WRITE32_HANDLER( namconb2_cpureg_w )
 static READ32_HANDLER(namconb_cpureg_r)
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return (state->namconb_cpureg[offset*4] << 24) | (state->namconb_cpureg[offset*4+1] << 16)
-		| (state->namconb_cpureg[offset*4+2] << 8) | state->namconb_cpureg[offset*4+3];
+	return (state->m_namconb_cpureg[offset*4] << 24) | (state->m_namconb_cpureg[offset*4+1] << 16)
+		| (state->m_namconb_cpureg[offset*4+2] << 8) | state->m_namconb_cpureg[offset*4+3];
 }
 
 
@@ -571,7 +571,7 @@ static NVRAM_HANDLER( namconb1 )
 	{
 		for( i=0; i<NB1_NVMEM_SIZE/4; i++ )
 		{
-			UINT32 dword = state->nvmem32[i];
+			UINT32 dword = state->m_nvmem32[i];
 			data[0] = dword>>24;
 			data[1] = (dword&0x00ff0000)>>16;
 			data[2] = (dword&0x0000ff00)>>8;
@@ -586,15 +586,15 @@ static NVRAM_HANDLER( namconb1 )
 			for( i=0; i<NB1_NVMEM_SIZE/4; i++ )
 			{
 				file->read( data, 4 );
-				state->nvmem32[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
+				state->m_nvmem32[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
 			}
 		}
 		else
 		{
-			memset( state->nvmem32, 0x00, NB1_NVMEM_SIZE );
+			memset( state->m_nvmem32, 0x00, NB1_NVMEM_SIZE );
 			if( namcos2_gametype == NAMCONB1_GUNBULET )
 			{
-				state->nvmem32[0] = 0x0f260f26; /* default gun calibration */
+				state->m_nvmem32[0] = 0x0f260f26; /* default gun calibration */
 			}
 		}
 	}
@@ -603,9 +603,9 @@ static NVRAM_HANDLER( namconb1 )
 static MACHINE_START(namconb)
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	state->vblank_irq_active = 0;
-	state->pos_irq_active = 0;
-	memset(state->namconb_cpureg, 0, sizeof(state->namconb_cpureg));
+	state->m_vblank_irq_active = 0;
+	state->m_pos_irq_active = 0;
+	memset(state->m_namconb_cpureg, 0, sizeof(state->m_namconb_cpureg));
 }
 
 static DRIVER_INIT( nebulray )
@@ -665,12 +665,12 @@ static DRIVER_INIT( outfxies )
 static READ32_HANDLER( custom_key_r )
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	UINT16 old_count = state->count;
+	UINT16 old_count = state->m_count;
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
-		state->count = space->machine().rand();
-	} while( state->count==old_count );
+		state->m_count = space->machine().rand();
+	} while( state->m_count==old_count );
 
 	switch( namcos2_gametype )
 	{
@@ -681,7 +681,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0189;
-		case 1: return  state->count<<16;
+		case 1: return  state->m_count<<16;
 		}
 		break;
 
@@ -689,7 +689,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x01aa<<16;
-		case 4: return state->count<<16;
+		case 4: return state->m_count<<16;
 		}
 		break;
 
@@ -697,7 +697,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 2: return 0x1b2<<16;
-		case 5: return state->count<<16;
+		case 5: return state->m_count<<16;
 		}
 		break;
 
@@ -705,7 +705,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0167;
-		case 1: return state->count<<16;
+		case 1: return state->m_count<<16;
 		}
 		break;
 
@@ -713,7 +713,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 1: return 0;
-		case 3: return (0x0171<<16) | state->count;
+		case 3: return (0x0171<<16) | state->m_count;
 		}
 		break;
 
@@ -721,14 +721,14 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 1: return 0x016e;
-		case 3: return state->count;
+		case 3: return state->m_count;
 		}
 		break;
 
 	case NAMCONB1_VSHOOT:
 		switch( offset )
 		{
-		case 2: return state->count<<16;
+		case 2: return state->m_count<<16;
 		case 3: return 0x0170<<16;
 		}
 		break;
@@ -737,7 +737,7 @@ static READ32_HANDLER( custom_key_r )
 		switch( offset )
 		{
 		case 0: return 0x0186;
-		case 1: return state->count<<16;
+		case 1: return state->m_count<<16;
 		}
 		break;
 
@@ -842,16 +842,16 @@ WRITE32_HANDLER( srand_w )
 static READ32_HANDLER(namconb_share_r)
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return (state->namconb_shareram[offset*2] << 16) | state->namconb_shareram[offset*2+1];
+	return (state->m_namconb_shareram[offset*2] << 16) | state->m_namconb_shareram[offset*2+1];
 }
 
 static WRITE32_HANDLER(namconb_share_w)
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	COMBINE_DATA(state->namconb_shareram+offset*2+1);
+	COMBINE_DATA(state->m_namconb_shareram+offset*2+1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->namconb_shareram+offset*2);
+	COMBINE_DATA(state->m_namconb_shareram+offset*2);
 }
 
 static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32 )
@@ -862,12 +862,12 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE_MEMBER(namconb1_state, nvmem32)
+	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE_MEMBER(namconb1_state, m_nvmem32)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
-	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE_MEMBER(namconb1_state, spritebank32)
+	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_spritebank32)
 	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -887,10 +887,10 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(namco_rozvideoram32_r,namco_rozvideoram32_w)
 	AM_RANGE(0x740000, 0x74001f) AM_READWRITE(namco_rozcontrol32_r,namco_rozcontrol32_w)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE_MEMBER(namconb1_state, spritebank32)
-	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE_MEMBER(namconb1_state, tilebank32)
+	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_spritebank32)
+	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_tilebank32)
 	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)
-	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE_MEMBER(namconb1_state, nvmem32)
+	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE_MEMBER(namconb1_state, m_nvmem32)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END
@@ -908,7 +908,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	}
 #endif
 
-	COMBINE_DATA(&state->namconb_shareram[offset]);
+	COMBINE_DATA(&state->m_namconb_shareram[offset]);
 
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
@@ -919,7 +919,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE_MEMBER(namconb1_state, namconb_shareram)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE_MEMBER(namconb1_state, m_namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
@@ -928,19 +928,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER( port6_r )
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	return state->nbx_port6;
+	return state->m_nbx_port6;
 }
 
 static WRITE8_HANDLER( port6_w )
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	state->nbx_port6 = data;
+	state->m_nbx_port6 = data;
 }
 
 static READ8_HANDLER( port7_r )
 {
 	namconb1_state *state = space->machine().driver_data<namconb1_state>();
-	switch (state->nbx_port6 & 0xf0)
+	switch (state->m_nbx_port6 & 0xf0)
 	{
 		case 0x00:
 			return input_port_read_safe(space->machine(), "P4", 0xff);

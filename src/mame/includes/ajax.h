@@ -6,24 +6,26 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase, zoom_colorbase;
-	UINT8      priority;
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
+	int        m_zoom_colorbase;
+	UINT8      m_priority;
 
 	/* misc */
-	int        firq_enable;
+	int        m_firq_enable;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *k007232_1;
-	device_t *k007232_2;
-	device_t *k052109;
-	device_t *k051960;
-	device_t *k051316;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_k007232_1;
+	device_t *m_k007232_2;
+	device_t *m_k052109;
+	device_t *m_k051960;
+	device_t *m_k051316;
 };
 
 

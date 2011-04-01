@@ -50,15 +50,15 @@ public:
 	gpworld_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 nmi_enable;
-	UINT8 start_lamp;
-	UINT8 ldp_read_latch;
-	UINT8 ldp_write_latch;
-	UINT8 brake_gas;
-	UINT8* tile_RAM;
-	UINT8* sprite_RAM;
-	UINT8* palette_RAM;
-	device_t *laserdisc;
+	UINT8 m_nmi_enable;
+	UINT8 m_start_lamp;
+	UINT8 m_ldp_read_latch;
+	UINT8 m_ldp_write_latch;
+	UINT8 m_brake_gas;
+	UINT8* m_tile_RAM;
+	UINT8* m_sprite_RAM;
+	UINT8* m_palette_RAM;
+	device_t *m_laserdisc;
 };
 
 
@@ -82,7 +82,7 @@ static void gpworld_draw_tiles(running_machine &machine, bitmap_t *bitmap,const 
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->tile_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_RAM[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -125,7 +125,7 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
 	{
-		UINT8 *spr_reg = state->sprite_RAM + i;
+		UINT8 *spr_reg = state->m_sprite_RAM + i;
 
 		if (spr_reg[SPR_Y_BOTTOM] && spr_reg[SPR_X_LO] != 0xff)
 		{
@@ -230,7 +230,7 @@ static SCREEN_UPDATE( gpworld )
 static MACHINE_START( gpworld )
 {
 	gpworld_state *state = machine.driver_data<gpworld_state>();
-	state->laserdisc = machine.device("laserdisc");
+	state->m_laserdisc = machine.device("laserdisc");
 }
 
 
@@ -239,13 +239,13 @@ static MACHINE_START( gpworld )
 static READ8_HANDLER( ldp_read )
 {
 	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	return state->ldp_read_latch;
+	return state->m_ldp_read_latch;
 }
 
 static READ8_HANDLER( pedal_in )
 {
 	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	if (state->brake_gas)
+	if (state->m_brake_gas)
 		return	input_port_read(space->machine(), "INACCEL");
 
 	return	input_port_read(space->machine(), "INBRAKE");
@@ -256,23 +256,23 @@ static READ8_HANDLER( pedal_in )
 static WRITE8_HANDLER( ldp_write )
 {
 	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->ldp_write_latch = data;
+	state->m_ldp_write_latch = data;
 }
 
 static WRITE8_HANDLER( misc_io_write )
 {
 	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->start_lamp = (data & 0x04) >> 1;
-	state->nmi_enable = (data & 0x40) >> 6;
+	state->m_start_lamp = (data & 0x04) >> 1;
+	state->m_nmi_enable = (data & 0x40) >> 6;
 	/*  dunno      = (data & 0x80) >> 7; */ //coin counter???
 
-	logerror("NMI : %x (0x%x)\n", state->nmi_enable, data);
+	logerror("NMI : %x (0x%x)\n", state->m_nmi_enable, data);
 }
 
 static WRITE8_HANDLER( brake_gas_write )
 {
 	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->brake_gas = data & 0x01;
+	state->m_brake_gas = data & 0x01;
 }
 
 static WRITE8_HANDLER( palette_write )
@@ -281,15 +281,15 @@ static WRITE8_HANDLER( palette_write )
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
 
-	state->palette_RAM[offset] = data;
+	state->m_palette_RAM[offset] = data;
 
 	/* "Round down" to the nearest palette entry */
 	pal_index = offset & 0xffe;
 
-	g = (state->palette_RAM[pal_index]   & 0xf0) << 0;
-	b = (state->palette_RAM[pal_index]   & 0x0f) << 4;
-	r = (state->palette_RAM[pal_index+1] & 0x0f) << 4;
-	a = (state->palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
+	g = (state->m_palette_RAM[pal_index]   & 0xf0) << 0;
+	b = (state->m_palette_RAM[pal_index]   & 0x0f) << 4;
+	r = (state->m_palette_RAM[pal_index+1] & 0x0f) << 4;
+	a = (state->m_palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
@@ -299,9 +299,9 @@ static WRITE8_HANDLER( palette_write )
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE_MEMBER(gpworld_state, palette_RAM)	/* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, tile_RAM)
+	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, m_sprite_RAM)
+	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE_MEMBER(gpworld_state, m_palette_RAM)	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, m_tile_RAM)
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....
@@ -433,10 +433,10 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 {
 	gpworld_state *state = device->machine().driver_data<gpworld_state>();
 	/* Do an NMI if the enabled bit is set */
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 	{
-		laserdisc_data_w(state->laserdisc,state->ldp_write_latch);
-		state->ldp_read_latch  = laserdisc_data_r(state->laserdisc);
+		laserdisc_data_w(state->m_laserdisc,state->m_ldp_write_latch);
+		state->m_ldp_read_latch  = laserdisc_data_r(state->m_laserdisc);
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
@@ -528,10 +528,10 @@ ROM_END
 static DRIVER_INIT( gpworld )
 {
 	gpworld_state *state = machine.driver_data<gpworld_state>();
-	state->nmi_enable = 0;
-	state->start_lamp = 0;
-	state->brake_gas = 0;
-	state->ldp_write_latch = state->ldp_read_latch = 0;
+	state->m_nmi_enable = 0;
+	state->m_start_lamp = 0;
+	state->m_brake_gas = 0;
+	state->m_ldp_write_latch = state->m_ldp_read_latch = 0;
 }
 
 

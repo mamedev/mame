@@ -61,19 +61,19 @@ static MACHINE_START( circusc )
 {
 	circusc_state *state = machine.driver_data<circusc_state>();
 
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
-	state->sn1 = machine.device("sn1");
-	state->sn2 = machine.device("sn2");
-	state->dac = machine.device("dac");
-	state->discrete = machine.device("fltdisc");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_sn1 = machine.device("sn1");
+	state->m_sn2 = machine.device("sn2");
+	state->m_dac = machine.device("dac");
+	state->m_discrete = machine.device("fltdisc");
 
-	state->save_item(NAME(state->sn_latch));
+	state->save_item(NAME(state->m_sn_latch));
 }
 
 static MACHINE_RESET( circusc )
 {
 	circusc_state *state = machine.driver_data<circusc_state>();
-	state->sn_latch = 0;
+	state->m_sn_latch = 0;
 }
 
 static READ8_HANDLER( circusc_sh_timer_r )
@@ -84,7 +84,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
      * to D1-D4.
      *
      * The following:
-     * clock = state->audiocpu->total_cycles() >> 10;
+     * clock = state->m_audiocpu->total_cycles() >> 10;
      * return (clock & 0x0f) << 1;
      * Can be shortened to:
      */
@@ -92,7 +92,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
 	circusc_state *state = space->machine().driver_data<circusc_state>();
 	int clock;
 
-	clock = state->audiocpu->total_cycles() >> 9;
+	clock = state->m_audiocpu->total_cycles() >> 9;
 
 	return clock & 0x1e;
 }
@@ -100,7 +100,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
 	circusc_state *state = space->machine().driver_data<circusc_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )
@@ -116,29 +116,29 @@ static WRITE8_HANDLER(circusc_sound_w)
 	{
 		/* CS2 */
 		case 0:
-			state->sn_latch = data;
+			state->m_sn_latch = data;
 			break;
 
 		/* CS3 */
 		case 1:
-			sn76496_w(state->sn1, 0, state->sn_latch);
+			sn76496_w(state->m_sn1, 0, state->m_sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			sn76496_w(state->sn2, 0, state->sn_latch);
+			sn76496_w(state->m_sn2, 0, state->m_sn_latch);
 			break;
 
 		/* CS5 */
 		case 3:
-			dac_w(state->dac, 0, data);
+			dac_w(state->m_dac, 0, data);
 			break;
 
 		/* CS6 */
 		case 4:
-			discrete_sound_w(state->discrete, NODE_05, (offset & 0x20) >> 5);
-			discrete_sound_w(state->discrete, NODE_06, (offset & 0x18) >> 3);
-			discrete_sound_w(state->discrete, NODE_07, (offset & 0x40) >> 6);
+			discrete_sound_w(state->m_discrete, NODE_05, (offset & 0x20) >> 5);
+			discrete_sound_w(state->m_discrete, NODE_06, (offset & 0x18) >> 3);
+			discrete_sound_w(state->m_discrete, NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(interrupt_enable_w)			/* INTST */
 //  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
 	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)		/* COIN1, COIN2 */
-	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, spritebank) /* OBJ CHENG */
+	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, m_spritebank) /* OBJ CHENG */
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)			/* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_w)				/* SOUND DATA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)	/* SOUND-ON causes interrupt on audio CPU */
@@ -160,12 +160,12 @@ static ADDRESS_MAP_START( circusc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x03fc) AM_READNOP              /* unpopulated DIPSW 3*/
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, scroll) /* VGAP */
+	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, m_scroll) /* VGAP */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE_MEMBER(circusc_state, colorram) /* colorram */
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE_MEMBER(circusc_state, videoram) /* videoram */
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram_2) /* spriteram2 */
-	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(circusc_state, spriteram, spriteram_size) /* spriteram */
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE_MEMBER(circusc_state, m_colorram) /* colorram */
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE_MEMBER(circusc_state, m_videoram) /* videoram */
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_MEMBER(circusc_state, m_spriteram_2) /* spriteram2 */
+	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(circusc_state, m_spriteram, m_spriteram_size) /* spriteram */
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

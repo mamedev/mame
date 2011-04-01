@@ -87,7 +87,7 @@ static const UINT16 cdi220_lcd_char[20*22] =
 static void cdi220_draw_lcd(running_machine &machine, int y)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    bitmap_t *bitmap = state->lcdbitmap;
+    bitmap_t *bitmap = state->m_lcdbitmap;
     UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
     int x = 0;
     int lcd = 0;
@@ -352,7 +352,7 @@ static void mcd212_set_vsr(mcd212_regs_t *mcd212, int channel, UINT32 value)
 static void mcd212_set_register(running_machine &machine, int channel, UINT8 reg, UINT32 value)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    mcd212_regs_t *mcd212 = &state->mcd212_regs;
+    mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
 
     switch(reg)
     {
@@ -537,7 +537,7 @@ static void mcd212_set_display_parameters(mcd212_regs_t *mcd212, int channel, UI
 static void mcd212_update_visible_area(running_machine &machine)
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    mcd212_regs_t *mcd212 = &state->mcd212_regs;
+    mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
     const rectangle &visarea = machine.primary_screen->visible_area();
     rectangle visarea1;
     attoseconds_t period = machine.primary_screen->frame_period().attoseconds;
@@ -573,7 +573,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 {
     running_machine &machine = mcd212->machine();
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT16 *ica = channel ? state->planeb : state->planea;
+    UINT16 *ica = channel ? state->m_planeb : state->m_planea;
     UINT32 addr = 0x000400/2;
     UINT32 cmd = 0;
     while(1)
@@ -620,7 +620,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
                 mcd212->channel[1].csrr |= 1 << (2 - channel);
                 if(mcd212->channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
                 {
-                    UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
+                    UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
                         device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -630,7 +630,7 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 #if 0
                 if(mcd212->channel[1].csrr & MCD212_CSR2R_IT2)
                 {
-                    UINT8 interrupt = state->scc68070_regs.lir & 7;
+                    UINT8 interrupt = state->m_scc68070_regs.lir & 7;
                     if(interrupt)
                     {
                         device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
@@ -658,7 +658,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
 {
     running_machine &machine = mcd212->machine();
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT16 *dca = channel ? state->planeb : state->planea;
+    UINT16 *dca = channel ? state->m_planeb : state->m_planea;
     UINT32 addr = (mcd212->channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(mcd212, channel) & 0x0007ffff) / 2; // mcd212->channel[channel].dca / 2;
     UINT32 cmd = 0;
     UINT32 count = 0;
@@ -689,7 +689,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
             case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
             case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
                 verboselog(machine, 11, "%08x: %08x: DCA %d: RELOAD DCP and STOP\n", addr * 2 + channel * 0x200000, cmd, channel );
-                mcd212_set_dcp(&state->mcd212_regs, channel, cmd & 0x001fffff);
+                mcd212_set_dcp(&state->m_mcd212_regs, channel, cmd & 0x001fffff);
                 addr = (cmd & 0x0007ffff) / 2;
                 addr_changed = 1;
                 stop = 1;
@@ -697,12 +697,12 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
             case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR
             case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
                 verboselog(machine, 11, "%08x: %08x: DCA %d: RELOAD VSR\n", addr * 2 + channel * 0x200000, cmd, channel );
-                mcd212_set_vsr(&state->mcd212_regs, channel, cmd & 0x001fffff);
+                mcd212_set_vsr(&state->m_mcd212_regs, channel, cmd & 0x001fffff);
                 break;
             case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
             case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
                 verboselog(machine, 11, "%08x: %08x: DCA %d: RELOAD VSR and STOP\n", addr * 2 + channel * 0x200000, cmd, channel );
-                mcd212_set_vsr(&state->mcd212_regs, channel, cmd & 0x001fffff);
+                mcd212_set_vsr(&state->m_mcd212_regs, channel, cmd & 0x001fffff);
                 stop = 1;
                 break;
             case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
@@ -711,7 +711,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                 mcd212->channel[1].csrr |= 1 << (2 - channel);
                 if(mcd212->channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
                 {
-                    UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
+                    UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
                     if(interrupt)
                     {
                         device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -721,7 +721,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
 #if 0
                 if(mcd212->channel[1].csrr & MCD212_CSR2R_IT2)
                 {
-                    UINT8 interrupt = state->scc68070_regs.lir & 7;
+                    UINT8 interrupt = state->m_scc68070_regs.lir & 7;
                     if(interrupt)
                     {
                         device_set_input_line_vector(machine.device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
@@ -732,7 +732,7 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
                 break;
             case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
                 verboselog(machine, 6, "%08x: %08x: DCA %d: RELOAD DISPLAY PARAMETERS\n", addr * 2 + channel * 0x200000, cmd, channel );
-                mcd212_set_display_parameters(&state->mcd212_regs, channel, cmd & 0x1f);
+                mcd212_set_display_parameters(&state->m_mcd212_regs, channel, cmd & 0x1f);
                 break;
             default:
                 mcd212_set_register(machine, channel, cmd >> 24, cmd & 0x00ffffff);
@@ -806,7 +806,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
 {
     running_machine &machine = mcd212->machine();
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT8 *data = channel ? (UINT8*)state->planeb : (UINT8*)state->planea;
+    UINT8 *data = channel ? (UINT8*)state->m_planeb : (UINT8*)state->m_planea;
     UINT32 vsr = mcd212_get_vsr(mcd212, channel) & 0x0007ffff;
     UINT8 done = 0;
     UINT32 x = 0;
@@ -873,12 +873,12 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                         for(; x < width; x += 2)
                         {
                             BYTE68K b0 = byte;
-                            BYTE68K bU1 = bU + state->mcd212_ab.deltaUV[b0];
-                            BYTE68K bY0 = bY + state->mcd212_ab.deltaY[b0];
+                            BYTE68K bU1 = bU + state->m_mcd212_ab.deltaUV[b0];
+                            BYTE68K bY0 = bY + state->m_mcd212_ab.deltaY[b0];
 
                             BYTE68K b1 = data[(vsr & 0x0007ffff) ^ 1];
-                            BYTE68K bV1 = bV + state->mcd212_ab.deltaUV[b1];
-                            BYTE68K bY1 = bY0 + state->mcd212_ab.deltaY[b1];
+                            BYTE68K bV1 = bV + state->m_mcd212_ab.deltaUV[b1];
+                            BYTE68K bY1 = bY0 + state->m_mcd212_ab.deltaY[b1];
 
                             BYTE68K bU0 = (bU + bU1) >> 1;
                             BYTE68K bV0 = (bV + bV1) >> 1;
@@ -891,11 +891,11 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                             bU = bU0;
                             bV = bV0;
 
-                            pbLimit = state->mcd212_ab.limit + bY + BYTE68K_MAX;
+                            pbLimit = state->m_mcd212_ab.limit + bY + BYTE68K_MAX;
 
-                            pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[state->mcd212_ab.matrixVR[bV]];
-                            pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[state->mcd212_ab.matrixUG[bU] + state->mcd212_ab.matrixVG[bV]];
-                            pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[state->mcd212_ab.matrixUB[bU]];
+                            pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[state->m_mcd212_ab.matrixVR[bV]];
+                            pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[state->m_mcd212_ab.matrixUG[bU] + state->m_mcd212_ab.matrixVG[bV]];
+                            pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[state->m_mcd212_ab.matrixUB[bU]];
 
                             if(mosaic_enable)
                             {
@@ -919,11 +919,11 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                             bU = bU1;
                             bV = bV1;
 
-                            pbLimit = state->mcd212_ab.limit + bY + BYTE68K_MAX;
+                            pbLimit = state->m_mcd212_ab.limit + bY + BYTE68K_MAX;
 
-                            pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[state->mcd212_ab.matrixVR[bV]];
-                            pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[state->mcd212_ab.matrixUG[bU] + state->mcd212_ab.matrixVG[bV]];
-                            pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[state->mcd212_ab.matrixUB[bU]];
+                            pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[state->m_mcd212_ab.matrixVR[bV]];
+                            pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[state->m_mcd212_ab.matrixUG[bU] + state->m_mcd212_ab.matrixVG[bV]];
+                            pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[state->m_mcd212_ab.matrixUB[bU]];
 
                             if(mosaic_enable)
                             {
@@ -943,7 +943,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
 
                             vsr++;
                         }
-                        mcd212_set_vsr(&state->mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
+                        mcd212_set_vsr(&state->m_mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
                     }
                     else if(icm == 1 || icm == 3 || icm == 4)
                     {
@@ -972,7 +972,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                             byte = data[(vsr & 0x0007ffff) ^ 1];
                             vsr++;
                         }
-                        mcd212_set_vsr(&state->mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
+                        mcd212_set_vsr(&state->m_mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
                     }
                     else if(icm == 11)
                     {
@@ -1008,7 +1008,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                             byte = data[(vsr & 0x0007ffff) ^ 1];
                             vsr++;
                         }
-                        mcd212_set_vsr(&state->mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
+                        mcd212_set_vsr(&state->m_mcd212_regs, channel, (vsr - 1) & 0x0007ffff);
                     }
                     else
                     {
@@ -1052,7 +1052,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                                 pixels_b[x] = b;
                             }
                             done = 1;
-                            mcd212_set_vsr(&state->mcd212_regs, channel, vsr);
+                            mcd212_set_vsr(&state->m_mcd212_regs, channel, vsr);
                         }
                         else
                         {
@@ -1074,7 +1074,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                             if(x >= width)
                             {
                                 done = 1;
-                                mcd212_set_vsr(&state->mcd212_regs, channel, vsr);
+                                mcd212_set_vsr(&state->m_mcd212_regs, channel, vsr);
                             }
                         }
                     }
@@ -1093,7 +1093,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
                         if(x >= width)
                         {
                             done = 1;
-                            mcd212_set_vsr(&state->mcd212_regs, channel, vsr);
+                            mcd212_set_vsr(&state->m_mcd212_regs, channel, vsr);
                         }
                     }
                 }
@@ -1102,7 +1102,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
     }
 
     //printf( ": vsr after: %08x\n", vsr);
-    //mcd212_set_vsr(&state->mcd212_regs, channel, vsr);
+    //mcd212_set_vsr(&state->m_mcd212_regs, channel, vsr);
 }
 
 static const UINT32 mcd212_4bpp_color[16] =
@@ -1355,7 +1355,7 @@ static void mcd212_draw_scanline(mcd212_regs_t *mcd212, int y)
 READ16_HANDLER( mcd212_r )
 {
     cdi_state *state = space->machine().driver_data<cdi_state>();
-    mcd212_regs_t *mcd212 = &state->mcd212_regs;
+    mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
     UINT8 channel = 1 - (offset / 8);
 
     switch(offset)
@@ -1372,8 +1372,8 @@ READ16_HANDLER( mcd212_r )
                 else
                 {
                     UINT8 old_csr = mcd212->channel[1].csrr;
-                    UINT8 interrupt1 = (state->scc68070_regs.lir >> 4) & 7;
-                    //UINT8 interrupt2 = state->scc68070_regs.lir & 7;
+                    UINT8 interrupt1 = (state->m_scc68070_regs.lir >> 4) & 7;
+                    //UINT8 interrupt2 = state->m_scc68070_regs.lir & 7;
                     mcd212->channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
                     if(interrupt1)
                     {
@@ -1418,7 +1418,7 @@ READ16_HANDLER( mcd212_r )
 WRITE16_HANDLER( mcd212_w )
 {
     cdi_state *state = space->machine().driver_data<cdi_state>();
-    mcd212_regs_t *mcd212 = &state->mcd212_regs;
+    mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
 
     switch(offset)
     {
@@ -1458,7 +1458,7 @@ WRITE16_HANDLER( mcd212_w )
 TIMER_CALLBACK( mcd212_perform_scan )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    mcd212_regs_t *mcd212 = &state->mcd212_regs;
+    mcd212_regs_t *mcd212 = &state->m_mcd212_regs;
     int scanline = machine.primary_screen->vpos();
 
     if(/*mcd212->channel[0].dcr & MCD212_DCR_DE*/1)
@@ -1653,12 +1653,12 @@ VIDEO_START( cdimono1 )
     cdi_state *state = machine.driver_data<cdi_state>();
 
     VIDEO_START_CALL(generic_bitmapped);
-    mcd212_ab_init(&state->mcd212_ab);
-    mcd212_init(machine, &state->mcd212_regs);
-    state->mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
-    state->mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
+    mcd212_ab_init(&state->m_mcd212_ab);
+    mcd212_init(machine, &state->m_mcd212_regs);
+    state->m_mcd212_regs.scan_timer = machine.scheduler().timer_alloc(FUNC(mcd212_perform_scan));
+    state->m_mcd212_regs.scan_timer->adjust(machine.primary_screen->time_until_pos(0, 0));
 
-    state->lcdbitmap = downcast<screen_device *>(machine.device("lcd"))->alloc_compatible_bitmap();
+    state->m_lcdbitmap = downcast<screen_device *>(machine.device("lcd"))->alloc_compatible_bitmap();
 }
 
 SCREEN_UPDATE( cdimono1 )
@@ -1670,6 +1670,6 @@ SCREEN_UPDATE( cdimono1 )
 SCREEN_UPDATE( cdimono1_lcd )
 {
     cdi_state *state = screen->machine().driver_data<cdi_state>();
-    copybitmap(bitmap, state->lcdbitmap, 0, 0, 0, 0, cliprect);
+    copybitmap(bitmap, state->m_lcdbitmap, 0, 0, 0, 0, cliprect);
     return 0;
 }

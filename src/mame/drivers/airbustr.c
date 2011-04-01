@@ -244,7 +244,7 @@ static READ8_HANDLER( devram_r )
 		case 0xff2:
 		case 0xff3:
 		{
-			int	x = (state->devram[0xff0] + state->devram[0xff1] * 256) * (state->devram[0xff2] + state->devram[0xff3] * 256);
+			int	x = (state->m_devram[0xff0] + state->m_devram[0xff1] * 256) * (state->m_devram[0xff2] + state->m_devram[0xff3] * 256);
 			if (offset == 0xff2)
 				return (x & 0x00ff) >> 0;
 			else
@@ -257,14 +257,14 @@ static READ8_HANDLER( devram_r )
 			return space->machine().rand();
 
 		default:
-			return state->devram[offset];
+			return state->m_devram[offset];
 	}
 }
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( master_bankswitch_w )
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 	flip_screen_set(space->machine(), data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	pandora_set_clear_bitmap(state->pandora, data & 0x20);
+	pandora_set_clear_bitmap(state->m_pandora, data & 0x20);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -294,20 +294,20 @@ static READ8_HANDLER( soundcommand_status_r )
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 + state->soundlatch_status * 2 + (1 - state->soundlatch2_status);
+	return 4 + state->m_soundlatch_status * 2 + (1 - state->m_soundlatch2_status);
 }
 
 static READ8_HANDLER( soundcommand_r )
 {
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->soundlatch_status = 0;	// soundlatch has been read
+	state->m_soundlatch_status = 0;	// soundlatch has been read
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( soundcommand2_r )
 {
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->soundlatch2_status = 0;	// soundlatch2 has been read
+	state->m_soundlatch2_status = 0;	// soundlatch2 has been read
 	return soundlatch2_r(space, 0);
 }
 
@@ -315,15 +315,15 @@ static WRITE8_HANDLER( soundcommand_w )
 {
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	soundlatch_w(space, 0, data);
-	state->soundlatch_status = 1;	// soundlatch has been written
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	state->m_soundlatch_status = 1;	// soundlatch has been written
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
 {
 	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	soundlatch2_w(space, 0, data);
-	state->soundlatch2_status = 1;	// soundlatch2 has been written
+	state->m_soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
 static WRITE8_HANDLER( airbustr_paletteram_w )
@@ -335,8 +335,8 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	/*  xGGG GGRR   RRRB BBBB   */
 	/*  x432 1043   2104 3210   */
 
-	state->paletteram[offset] = data;
-	val = (state->paletteram[offset | 1] << 8) | state->paletteram[offset & ~1];
+	state->m_paletteram[offset] = data;
+	val = (state->m_paletteram[offset | 1] << 8) | state->m_paletteram[offset & ~1];
 
 	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(airbustr_state, devram) // shared with protection device
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(airbustr_state, m_devram) // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -369,11 +369,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE_MEMBER(airbustr_state, videoram2)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE_MEMBER(airbustr_state, colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_MEMBER(airbustr_state, videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE_MEMBER(airbustr_state, colorram)
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_MEMBER(airbustr_state, paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE_MEMBER(airbustr_state, m_videoram2)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE_MEMBER(airbustr_state, m_colorram2)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_MEMBER(airbustr_state, m_videoram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE_MEMBER(airbustr_state, m_colorram)
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_MEMBER(airbustr_state, m_paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -560,15 +560,15 @@ static const ym2203_interface ym2203_config =
 static INTERRUPT_GEN( master_interrupt )
 {
 	airbustr_state *state = device->machine().driver_data<airbustr_state>();
-	state->master_addr ^= 0x02;
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->master_addr);
+	state->m_master_addr ^= 0x02;
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
 	airbustr_state *state = device->machine().driver_data<airbustr_state>();
-	state->slave_addr ^= 0x02;
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->slave_addr);
+	state->m_slave_addr ^= 0x02;
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_slave_addr);
 }
 
 /* Machine Initialization */
@@ -587,34 +587,34 @@ static MACHINE_START( airbustr )
 	memory_configure_bank(machine, "bank3", 0, 3, &AUDIO[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank3", 3, 5, &AUDIO[0x10000], 0x4000);
 
-	state->master = machine.device("master");
-	state->slave = machine.device("slave");
-	state->audiocpu = machine.device("audiocpu");
-	state->pandora = machine.device("pandora");
+	state->m_master = machine.device("master");
+	state->m_slave = machine.device("slave");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_pandora = machine.device("pandora");
 
-	state->save_item(NAME(state->soundlatch_status));
-	state->save_item(NAME(state->soundlatch2_status));
-	state->save_item(NAME(state->master_addr));
-	state->save_item(NAME(state->slave_addr));
-	state->save_item(NAME(state->bg_scrollx));
-	state->save_item(NAME(state->bg_scrolly));
-	state->save_item(NAME(state->fg_scrollx));
-	state->save_item(NAME(state->fg_scrolly));
-	state->save_item(NAME(state->highbits));
+	state->save_item(NAME(state->m_soundlatch_status));
+	state->save_item(NAME(state->m_soundlatch2_status));
+	state->save_item(NAME(state->m_master_addr));
+	state->save_item(NAME(state->m_slave_addr));
+	state->save_item(NAME(state->m_bg_scrollx));
+	state->save_item(NAME(state->m_bg_scrolly));
+	state->save_item(NAME(state->m_fg_scrollx));
+	state->save_item(NAME(state->m_fg_scrolly));
+	state->save_item(NAME(state->m_highbits));
 }
 
 static MACHINE_RESET( airbustr )
 {
 	airbustr_state *state = machine.driver_data<airbustr_state>();
 
-	state->soundlatch_status = state->soundlatch2_status = 0;
-	state->master_addr = 0xff;
-	state->slave_addr = 0xfd;
-	state->bg_scrollx = 0;
-	state->bg_scrolly = 0;
-	state->fg_scrollx = 0;
-	state->fg_scrolly = 0;
-	state->highbits = 0;
+	state->m_soundlatch_status = state->m_soundlatch2_status = 0;
+	state->m_master_addr = 0xff;
+	state->m_slave_addr = 0xfd;
+	state->m_bg_scrollx = 0;
+	state->m_bg_scrolly = 0;
+	state->m_fg_scrollx = 0;
+	state->m_fg_scrolly = 0;
+	state->m_highbits = 0;
 
 	memory_set_bank(machine, "bank1", 0x02);
 	memory_set_bank(machine, "bank2", 0x02);

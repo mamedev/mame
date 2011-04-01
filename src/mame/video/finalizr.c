@@ -46,8 +46,8 @@ PALETTE_INIT( finalizr )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	finalizr_state *state = machine.driver_data<finalizr_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2) + (state->charbank << 10);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0xc0) << 2) + (state->m_charbank << 10);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -57,8 +57,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	finalizr_state *state = machine.driver_data<finalizr_state>();
-	int attr = state->colorram2[tile_index];
-	int code = state->videoram2[tile_index] + ((attr & 0xc0) << 2);
+	int attr = state->m_colorram2[tile_index];
+	int code = state->m_videoram2[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -69,8 +69,8 @@ VIDEO_START( finalizr )
 {
 	finalizr_state *state = machine.driver_data<finalizr_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -78,8 +78,8 @@ VIDEO_START( finalizr )
 WRITE8_HANDLER( finalizr_videoctrl_w )
 {
 	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	state->charbank = data & 3;
-	state->spriterambank = data & 8;
+	state->m_charbank = data & 3;
+	state->m_spriterambank = data & 8;
 	/* other bits unknown */
 }
 
@@ -90,21 +90,21 @@ SCREEN_UPDATE( finalizr )
 	finalizr_state *state = screen->machine().driver_data<finalizr_state>();
 	int offs;
 
-	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
-	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll - 32);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_scroll - 32);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* Draw the sprites. */
 	{
 		const gfx_element *gfx1 = screen->machine().gfx[1];
 		const gfx_element *gfx2 = screen->machine().gfx[2];
 
-		UINT8 *sr = state->spriterambank ? state->spriteram_2 : state->spriteram;
+		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
 
 
-		for (offs = 0; offs <= state->spriteram_size - 5; offs += 5)
+		for (offs = 0; offs <= state->m_spriteram_size - 5; offs += 5)
 		{
 			int sx, sy, flipx, flipy, code, color, size;
 
@@ -219,8 +219,8 @@ SCREEN_UPDATE( finalizr )
 		/* draw top status region */
 		clip.min_x = visarea.min_x;
 		clip.max_x = visarea.min_x + 31;
-		tilemap_set_scrolldx(state->fg_tilemap,  0,-32);
-		tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
+		tilemap_set_scrolldx(state->m_fg_tilemap,  0,-32);
+		tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
 	}
 	return 0;
 }

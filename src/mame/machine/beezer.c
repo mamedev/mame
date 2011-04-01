@@ -89,13 +89,13 @@ static READ_LINE_DEVICE_HANDLER( b_via_0_ca2_r )
 static READ8_DEVICE_HANDLER( b_via_0_pa_r )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
-	return (state->banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
+	return (state->m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
 static READ8_DEVICE_HANDLER( b_via_0_pb_r )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
-	return state->pbus;
+	return state->m_pbus;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
@@ -111,16 +111,16 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 		switch (data & 0x03)
 		{
 		case 0:
-			state->pbus = input_port_read(device->machine(), "IN0");
+			state->m_pbus = input_port_read(device->machine(), "IN0");
 			break;
 		case 1:
-			state->pbus = input_port_read(device->machine(), "IN1") | (input_port_read(device->machine(), "IN2") << 4);
+			state->m_pbus = input_port_read(device->machine(), "IN1") | (input_port_read(device->machine(), "IN2") << 4);
 			break;
 		case 2:
-			state->pbus = input_port_read(device->machine(), "DSWB");
+			state->m_pbus = input_port_read(device->machine(), "DSWB");
 			break;
 		case 3:
-			state->pbus = input_port_read(device->machine(), "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
+			state->m_pbus = input_port_read(device->machine(), "DSWA"); // Technically DSWA isn't populated on the board and is pulled to 0xFF with resistor pack, but there IS a DSWA port in the driver so we may as well use it.
 			break;
 		}
 	}
@@ -129,13 +129,13 @@ static WRITE8_DEVICE_HANDLER( b_via_0_pa_w )
 static WRITE8_DEVICE_HANDLER( b_via_0_pb_w )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
-	state->pbus = data;
+	state->m_pbus = data;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pa_r )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
-	return state->pbus;
+	return state->m_pbus;
 }
 
 static READ8_DEVICE_HANDLER( b_via_1_pb_r )
@@ -146,7 +146,7 @@ static READ8_DEVICE_HANDLER( b_via_1_pb_r )
 static WRITE8_DEVICE_HANDLER( b_via_1_pa_w )
 {
 	beezer_state *state = device->machine().driver_data<beezer_state>();
-	state->pbus = data;
+	state->m_pbus = data;
 }
 
 static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
@@ -159,14 +159,14 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w )
 DRIVER_INIT( beezer )
 {
 	beezer_state *state = machine.driver_data<beezer_state>();
-	state->pbus = 0;
-	state->banklatch = 0;
+	state->m_pbus = 0;
+	state->m_banklatch = 0;
 }
 
 WRITE8_HANDLER( beezer_bankswitch_w )
 {
 	beezer_state *state = space->machine().driver_data<beezer_state>();
-	state->banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
+	state->m_banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
 	if ((data & 0x07) == 0)
 	{
 		via6522_device *via_0 = space->machine().device<via6522_device>("via6522_0");

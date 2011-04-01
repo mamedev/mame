@@ -47,21 +47,21 @@ public:
 	astinvad_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *    colorram;
-	UINT8 *    videoram;
-	size_t     videoram_size;
+	UINT8 *    m_colorram;
+	UINT8 *    m_videoram;
+	size_t     m_videoram_size;
 
-	emu_timer  *int_timer;
-	UINT8      sound_state[2];
-	UINT8      screen_flip;
-	UINT8      screen_red;
-	UINT8      flip_yoffs;
-	UINT8      color_latch;
+	emu_timer  *m_int_timer;
+	UINT8      m_sound_state[2];
+	UINT8      m_screen_flip;
+	UINT8      m_screen_red;
+	UINT8      m_flip_yoffs;
+	UINT8      m_color_latch;
 
-	device_t *maincpu;
-	device_t *ppi8255_0;
-	device_t *ppi8255_1;
-	device_t *samples;
+	device_t *m_maincpu;
+	device_t *m_ppi8255_0;
+	device_t *m_ppi8255_1;
+	device_t *m_samples;
 };
 
 
@@ -105,25 +105,25 @@ static const ppi8255_interface ppi8255_intf[2] =
 static VIDEO_START( spaceint )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
-	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size);
+	state->m_colorram = auto_alloc_array(machine, UINT8, state->m_videoram_size);
 
-	state->save_item(NAME(state->color_latch));
-	state->save_pointer(NAME(state->colorram), state->videoram_size);
+	state->save_item(NAME(state->m_color_latch));
+	state->save_pointer(NAME(state->m_colorram), state->m_videoram_size);
 }
 
 
 static WRITE8_HANDLER( color_latch_w )
 {
 	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	state->color_latch = data & 0x0f;
+	state->m_color_latch = data & 0x0f;
 }
 
 
 static WRITE8_HANDLER( spaceint_videoram_w )
 {
 	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	state->videoram[offset] = data;
-	state->colorram[offset] = state->color_latch;
+	state->m_videoram[offset] = data;
+	state->m_colorram[offset] = state->m_color_latch;
 }
 
 
@@ -138,7 +138,7 @@ static void plot_byte( running_machine &machine, bitmap_t *bitmap, UINT8 y, UINT
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
-	UINT8 flip_xor = state->screen_flip & 7;
+	UINT8 flip_xor = state->m_screen_flip & 7;
 
 	*BITMAP_ADDR32(bitmap, y, x + (0 ^ flip_xor)) = (data & 0x01) ? fore_pen : RGB_BLACK;
 	*BITMAP_ADDR32(bitmap, y, x + (1 ^ flip_xor)) = (data & 0x02) ? fore_pen : RGB_BLACK;
@@ -155,16 +155,16 @@ static SCREEN_UPDATE( astinvad )
 {
 	astinvad_state *state = screen->machine().driver_data<astinvad_state>();
 	const UINT8 *color_prom = screen->machine().region("proms")->base();
-	UINT8 yoffs = state->flip_yoffs & state->screen_flip;
+	UINT8 yoffs = state->m_flip_yoffs & state->m_screen_flip;
 	int x, y;
 
 	/* render the visible pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for (x = cliprect->min_x & ~7; x <= cliprect->max_x; x += 8)
 		{
-			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->screen_flip ? 0 : 4);
-			UINT8 data = state->videoram[(((y ^ state->screen_flip) + yoffs) << 5) | ((x ^ state->screen_flip) >> 3)];
-			plot_byte(screen->machine(), bitmap, y, x, data, state->screen_red ? 1 : color);
+			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (state->m_screen_flip ? 0 : 4);
+			UINT8 data = state->m_videoram[(((y ^ state->m_screen_flip) + yoffs) << 5) | ((x ^ state->m_screen_flip) >> 3)];
+			plot_byte(screen->machine(), bitmap, y, x, data, state->m_screen_red ? 1 : color);
 		}
 
 	return 0;
@@ -177,10 +177,10 @@ static SCREEN_UPDATE( spaceint )
 	const UINT8 *color_prom = screen->machine().region("proms")->base();
 	int offs;
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
-		UINT8 data = state->videoram[offs];
-		UINT8 color = state->colorram[offs];
+		UINT8 data = state->m_videoram[offs];
+		UINT8 color = state->m_colorram[offs];
 
 		UINT8 y = ~offs;
 		UINT8 x = offs >> 8 << 3;
@@ -206,7 +206,7 @@ static SCREEN_UPDATE( spaceint )
 static TIMER_CALLBACK( kamikaze_int_off )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -214,9 +214,9 @@ static TIMER_CALLBACK( kamizake_int_gen )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 	/* interrupts are asserted on every state change of the 128V line */
-	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 	param ^= 128;
-	state->int_timer->adjust(machine.primary_screen->time_until_pos(param), param);
+	state->m_int_timer->adjust(machine.primary_screen->time_until_pos(param), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
 	machine.scheduler().timer_set(attotime::from_double(300 * 0.1e-6), FUNC(kamikaze_int_off));
@@ -227,27 +227,27 @@ static MACHINE_START( kamikaze )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->ppi8255_0 = machine.device("ppi8255_0");
-	state->ppi8255_1 = machine.device("ppi8255_1");
-	state->samples = machine.device("samples");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_ppi8255_0 = machine.device("ppi8255_0");
+	state->m_ppi8255_1 = machine.device("ppi8255_1");
+	state->m_samples = machine.device("samples");
 
-	state->int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
-	state->int_timer->adjust(machine.primary_screen->time_until_pos(128), 128);
+	state->m_int_timer = machine.scheduler().timer_alloc(FUNC(kamizake_int_gen));
+	state->m_int_timer->adjust(machine.primary_screen->time_until_pos(128), 128);
 
-	state->save_item(NAME(state->screen_flip));
-	state->save_item(NAME(state->screen_red));
-	state->save_item(NAME(state->sound_state));
+	state->save_item(NAME(state->m_screen_flip));
+	state->save_item(NAME(state->m_screen_red));
+	state->save_item(NAME(state->m_sound_state));
 }
 
 static MACHINE_RESET( kamikaze )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->screen_flip = 0;
-	state->screen_red = 0;
-	state->sound_state[0] = 0;
-	state->sound_state[1] = 0;
+	state->m_screen_flip = 0;
+	state->m_screen_red = 0;
+	state->m_sound_state[0] = 0;
+	state->m_sound_state[1] = 0;
 }
 
 
@@ -255,21 +255,21 @@ static MACHINE_START( spaceint )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->samples = machine.device("samples");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_samples = machine.device("samples");
 
-	state->save_item(NAME(state->screen_flip));
-	state->save_item(NAME(state->sound_state));
+	state->save_item(NAME(state->m_screen_flip));
+	state->save_item(NAME(state->m_sound_state));
 }
 
 static MACHINE_RESET( spaceint )
 {
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
-	state->screen_flip = 0;
-	state->sound_state[0] = 0;
-	state->sound_state[1] = 0;
-	state->color_latch = 0;
+	state->m_screen_flip = 0;
+	state->m_sound_state[0] = 0;
+	state->m_sound_state[1] = 0;
+	state->m_color_latch = 0;
 }
 
 
@@ -277,7 +277,7 @@ static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	astinvad_state *state = field->port->machine().driver_data<astinvad_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -295,9 +295,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(state->ppi8255_0, offset);
+		result &= ppi8255_r(state->m_ppi8255_0, offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(state->ppi8255_1, offset);
+		result &= ppi8255_r(state->m_ppi8255_1, offset);
 	return result;
 }
 
@@ -308,9 +308,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(state->ppi8255_0, offset, data);
+		ppi8255_w(state->m_ppi8255_0, offset, data);
 	if (!(offset & 8))
-		ppi8255_w(state->ppi8255_1, offset, data);
+		ppi8255_w(state->m_ppi8255_1, offset, data);
 }
 
 
@@ -324,66 +324,66 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 {
 	astinvad_state *state = device->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->sound_state[0];
-	state->sound_state[0] = data;
+	int bits_gone_hi = data & ~state->m_sound_state[0];
+	state->m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->samples, 0, SND_UFO, 1);
-	if (!(data & 0x01))      sample_stop(state->samples, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->samples, 1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->samples, 2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->samples, 3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 0, SND_UFO, 1);
+	if (!(data & 0x01))      sample_stop(state->m_samples, 0);
+	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 3, SND_INVADERHIT, 0);
 
 	device->machine().sound().system_enable(data & 0x20);
-	state->screen_red = data & 0x04;
+	state->m_screen_red = data & 0x04;
 }
 
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 {
 	astinvad_state *state = device->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->sound_state[1];
-	state->sound_state[1] = data;
+	int bits_gone_hi = data & ~state->m_sound_state[1];
+	state->m_sound_state[1] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->samples, 5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->samples, 5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->samples, 5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->samples, 5, SND_FLEET4, 0);
-	if (bits_gone_hi & 0x10) sample_start(state->samples, 4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) sample_start(state->m_samples, 4, SND_UFOHIT, 0);
 
-	state->screen_flip = (input_port_read(device->machine(), "CABINET") & data & 0x20) ? 0xff : 0x00;
+	state->m_screen_flip = (input_port_read(device->machine(), "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
 
 
 static WRITE8_HANDLER( spaceint_sound1_w )
 {
 	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->sound_state[0];
-	state->sound_state[0] = data;
+	int bits_gone_hi = data & ~state->m_sound_state[0];
+	state->m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(state->samples, 1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x02) sample_start(state->samples, 2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x04) sample_start(state->samples, 4, SND_UFOHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(state->samples, 0, SND_UFO, 1);
-	if (!(data & 0x08))      sample_stop(state->samples, 0);
+	if (bits_gone_hi & 0x01) sample_start(state->m_samples, 1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x02) sample_start(state->m_samples, 2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(state->m_samples, 0, SND_UFO, 1);
+	if (!(data & 0x08))      sample_stop(state->m_samples, 0);
 
-	if (bits_gone_hi & 0x10) sample_start(state->samples, 5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x20) sample_start(state->samples, 5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x40) sample_start(state->samples, 5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x80) sample_start(state->samples, 5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) sample_start(state->m_samples, 5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x20) sample_start(state->m_samples, 5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x40) sample_start(state->m_samples, 5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x80) sample_start(state->m_samples, 5, SND_FLEET4, 0);
 }
 
 
 static WRITE8_HANDLER( spaceint_sound2_w )
 {
 	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->sound_state[1];
-	state->sound_state[1] = data;
+	int bits_gone_hi = data & ~state->m_sound_state[1];
+	state->m_sound_state[1] = data;
 
 	space->machine().sound().system_enable(data & 0x02);
 
-	if (bits_gone_hi & 0x04) sample_start(state->samples, 3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x04) sample_start(state->m_samples, 3, SND_INVADERHIT, 0);
 
-	state->screen_flip = (input_port_read(space->machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
+	state->m_screen_flip = (input_port_read(space->machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -398,14 +398,14 @@ static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(astinvad_state, videoram, videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(astinvad_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_SIZE_MEMBER(astinvad_state, videoram, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_SIZE_MEMBER(astinvad_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -746,7 +746,7 @@ static DRIVER_INIT( kamikaze )
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* the flip screen logic adds 32 to the Y after flipping */
-	state->flip_yoffs = 32;
+	state->m_flip_yoffs = 32;
 }
 
 
@@ -755,7 +755,7 @@ static DRIVER_INIT( spcking2 )
 	astinvad_state *state = machine.driver_data<astinvad_state>();
 
 	/* don't have the schematics, but the blanking must center the screen here */
-	state->flip_yoffs = 0;
+	state->m_flip_yoffs = 0;
 }
 
 

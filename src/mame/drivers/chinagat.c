@@ -122,11 +122,11 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
@@ -141,23 +141,23 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	{
 		case 0: /* 3e00 - SND irq */
 			soundlatch_w(space, 0, data);
-			device_set_input_line(state->snd_cpu, state->sound_irq, (state->sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			device_set_input_line(state->m_snd_cpu, state->m_sound_irq, (state->m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
-			device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 2: /* 3e02 - FIRQ ack */
-			device_set_input_line(state->maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 3e03 - IRQ ack */
-			device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			device_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			device_set_input_line(state->m_sub_cpu, state->m_sprite_irq, (state->m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 	}
 }
@@ -172,8 +172,8 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
     ****************************/
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 
-	state->scrolly_hi = ((data & 0x02) >> 1);
-	state->scrollx_hi = data & 0x01;
+	state->m_scrolly_hi = ((data & 0x02) >> 1);
+	state->m_scrollx_hi = data & 0x01;
 
 	flip_screen_set(space->machine(), ~data & 0x04);
 }
@@ -192,18 +192,18 @@ static READ8_HANDLER( saiyugoub1_mcu_command_r )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 #if 0
-	if (state->mcu_command == 0x78)
+	if (state->m_mcu_command == 0x78)
 	{
 		space->machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
-	return state->mcu_command;
+	return state->m_mcu_command;
 }
 
 static WRITE8_HANDLER( saiyugoub1_mcu_command_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	state->mcu_command = data;
+	state->m_mcu_command = data;
 #if 0
 	if (data != 0x78)
 	{
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( saiyugoub1_adpcm_rom_addr_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
 	/* i8748 Port 1 write */
-	state->i8748_P1 = data;
+	state->m_i8748_P1 = data;
 }
 
 static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
@@ -229,42 +229,42 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_adpcm_control_w )
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
 		logerror("ADPCM output disabled\n");
-		state->pcm_nibble = 0x0f;
+		state->m_pcm_nibble = 0x0f;
 		msm5205_reset_w(device, 1);
 	}
 	else
 	{
-		if ((state->i8748_P2 & 0xc) != (data & 0xc))
+		if ((state->m_i8748_P2 & 0xc) != (data & 0xc))
 		{
-			if ((state->i8748_P2 & 0xc) == 0)	/* Latch MSB Address */
+			if ((state->m_i8748_P2 & 0xc) == 0)	/* Latch MSB Address */
 			{
 ///             logerror("Latching MSB\n");
-				state->adpcm_addr = (state->adpcm_addr & 0x3807f) | (state->i8748_P1 << 7);
+				state->m_adpcm_addr = (state->m_adpcm_addr & 0x3807f) | (state->m_i8748_P1 << 7);
 			}
-			if ((state->i8748_P2 & 0xc) == 4)	/* Latch LSB Address */
+			if ((state->m_i8748_P2 & 0xc) == 4)	/* Latch LSB Address */
 			{
 ///             logerror("Latching LSB\n");
-				state->adpcm_addr = (state->adpcm_addr & 0x3ff80) | (state->i8748_P1 >> 1);
-				state->pcm_shift = (state->i8748_P1 & 1) * 4;
+				state->m_adpcm_addr = (state->m_adpcm_addr & 0x3ff80) | (state->m_i8748_P1 >> 1);
+				state->m_pcm_shift = (state->m_i8748_P1 & 1) * 4;
 			}
 		}
 
-		state->adpcm_addr = ((state->adpcm_addr & 0x07fff) | (data & 0x70 << 11));
+		state->m_adpcm_addr = ((state->m_adpcm_addr & 0x07fff) | (data & 0x70 << 11));
 
-		state->pcm_nibble = saiyugoub1_adpcm_rom[state->adpcm_addr & 0x3ffff];
+		state->m_pcm_nibble = saiyugoub1_adpcm_rom[state->m_adpcm_addr & 0x3ffff];
 
-		state->pcm_nibble = (state->pcm_nibble >> state->pcm_shift) & 0x0f;
+		state->m_pcm_nibble = (state->m_pcm_nibble >> state->m_pcm_shift) & 0x0f;
 
-///     logerror("Writing %02x to m5205. $ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%08x\n", state->pcm_nibble, state->adpcm_addr, state->i8748_P1, data, state->i8748_P2, state->pcm_shift);
+///     logerror("Writing %02x to m5205. $ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%08x\n", state->m_pcm_nibble, state->m_adpcm_addr, state->m_i8748_P1, data, state->m_i8748_P2, state->m_pcm_shift);
 
-		if (((state->i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
+		if (((state->m_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4))
 		{
-			msm5205_data_w (device, state->pcm_nibble);
-			logerror("Writing %02x to m5205\n", state->pcm_nibble);
+			msm5205_data_w (device, state->m_pcm_nibble);
+			logerror("Writing %02x to m5205\n", state->m_pcm_nibble);
 		}
-		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", state->adpcm_addr, state->i8748_P1, data, state->i8748_P2, state->pcm_shift, state->pcm_nibble);
+		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n", state->m_adpcm_addr, state->m_i8748_P1, data, state->m_i8748_P2, state->m_pcm_shift, state->m_pcm_nibble);
 	}
-	state->i8748_P2 = data;
+	state->m_i8748_P2 = data;
 }
 
 static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
@@ -277,11 +277,11 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 #if 0
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
 
-	state->m5205_clk++;
-	if (state->m5205_clk == 8)
+	state->m_m5205_clk++;
+	if (state->m_m5205_clk == 8)
 	{
 		msm5205_vclk_w(device, 1);		/* ??? */
-		state->m5205_clk = 0;
+		state->m_m5205_clk = 0;
 	}
 	else
 		msm5205_vclk_w(device, 0);		/* ??? */
@@ -291,9 +291,9 @@ static WRITE8_DEVICE_HANDLER( saiyugoub1_m5205_clk_w )
 static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	if (state->adpcm_sound_irq)
+	if (state->m_adpcm_sound_irq)
 	{
-		state->adpcm_sound_irq = 0;
+		state->m_adpcm_sound_irq = 0;
 		return 1;
 	}
 	return 0;
@@ -302,19 +302,19 @@ static READ8_HANDLER( saiyugoub1_m5205_irq_r )
 static void saiyugoub1_m5205_irq_w( device_t *device )
 {
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
-	state->adpcm_sound_irq = 1;
+	state->m_adpcm_sound_irq = 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_BASE_MEMBER(ddragon_state, fgvideoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE_MEMBER(ddragon_state, bgvideoram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_BASE_MEMBER(ddragon_state, m_fgvideoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE_MEMBER(ddragon_state, m_bgvideoram)
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
+	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_BASE_SIZE_MEMBER(ddragon_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
-	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrolly_lo)
-	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrollx_lo)
+	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, m_scrolly_lo)
+	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, m_scrollx_lo)
 	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
 	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(chinagat_bankswitch_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("SYSTEM")
@@ -495,7 +495,7 @@ GFXDECODE_END
 static void chinagat_irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine().driver_data<ddragon_state>();
-	device_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(state->m_snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -526,25 +526,25 @@ static MACHINE_START( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->sub_cpu = machine.device("sub");
-	state->snd_cpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_sub_cpu = machine.device("sub");
+	state->m_snd_cpu = machine.device("audiocpu");
 
 	/* configure banks */
 	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* register for save states */
-	state->save_item(NAME(state->scrollx_hi));
-	state->save_item(NAME(state->scrolly_hi));
-	state->save_item(NAME(state->adpcm_sound_irq));
-	state->save_item(NAME(state->adpcm_addr));
-	state->save_item(NAME(state->pcm_shift));
-	state->save_item(NAME(state->pcm_nibble));
-	state->save_item(NAME(state->i8748_P1));
-	state->save_item(NAME(state->i8748_P2));
-	state->save_item(NAME(state->mcu_command));
+	state->save_item(NAME(state->m_scrollx_hi));
+	state->save_item(NAME(state->m_scrolly_hi));
+	state->save_item(NAME(state->m_adpcm_sound_irq));
+	state->save_item(NAME(state->m_adpcm_addr));
+	state->save_item(NAME(state->m_pcm_shift));
+	state->save_item(NAME(state->m_pcm_nibble));
+	state->save_item(NAME(state->m_i8748_P1));
+	state->save_item(NAME(state->m_i8748_P2));
+	state->save_item(NAME(state->m_mcu_command));
 #if 0
-	state->save_item(NAME(state->m5205_clk));
+	state->save_item(NAME(state->m_m5205_clk));
 #endif
 }
 
@@ -553,17 +553,17 @@ static MACHINE_RESET( chinagat )
 {
 	ddragon_state *state = machine.driver_data<ddragon_state>();
 
-	state->scrollx_hi = 0;
-	state->scrolly_hi = 0;
-	state->adpcm_sound_irq = 0;
-	state->adpcm_addr = 0;
-	state->pcm_shift = 0;
-	state->pcm_nibble = 0;
-	state->i8748_P1 = 0;
-	state->i8748_P2 = 0;
-	state->mcu_command = 0;
+	state->m_scrollx_hi = 0;
+	state->m_scrolly_hi = 0;
+	state->m_adpcm_sound_irq = 0;
+	state->m_adpcm_addr = 0;
+	state->m_pcm_shift = 0;
+	state->m_pcm_nibble = 0;
+	state->m_i8748_P1 = 0;
+	state->m_i8748_P2 = 0;
+	state->m_mcu_command = 0;
 #if 0
-	state->m5205_clk = 0;
+	state->m_m5205_clk = 0;
 #endif
 }
 
@@ -918,9 +918,9 @@ static DRIVER_INIT( chinagat )
 	UINT8 *MAIN = machine.region("maincpu")->base();
 	UINT8 *SUB = machine.region("sub")->base();
 
-	state->technos_video_hw = 1;
-	state->sprite_irq = M6809_IRQ_LINE;
-	state->sound_irq = INPUT_LINE_NMI;
+	state->m_technos_video_hw = 1;
+	state->m_sprite_irq = M6809_IRQ_LINE;
+	state->m_sound_irq = INPUT_LINE_NMI;
 
 	memory_configure_bank(machine, "bank1", 0, 6, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank4", 0, 6, &SUB[0x10000], 0x4000);

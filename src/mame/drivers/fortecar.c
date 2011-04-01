@@ -38,8 +38,8 @@ public:
 	fortecar_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	int bank;
+	UINT8 *m_ram;
+	int m_bank;
 };
 
 
@@ -59,8 +59,8 @@ static SCREEN_UPDATE(fortecar)
 		{
 			int tile,color;
 
-			tile = (state->ram[(count*4)+1] | (state->ram[(count*4)+2]<<8)) & 0xfff;
-			color = state->ram[(count*4)+3] & 3;
+			tile = (state->m_ram[(count*4)+1] | (state->m_ram[(count*4)+2]<<8)) & 0xfff;
+			color = state->m_ram[(count*4)+3] & 3;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,color,0,0,x*8,y*8);
 			count++;
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, ram)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, m_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
@@ -255,7 +255,7 @@ GFXDECODE_END
 static MACHINE_RESET(fortecar)
 {
 	fortecar_state *state = machine.driver_data<fortecar_state>();
-	state->bank = -1;
+	state->m_bank = -1;
 }
 
 /* WRONG, just to see something */

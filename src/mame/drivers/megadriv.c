@@ -252,15 +252,15 @@ a tilemap-like structure, from which data is copied)
 static TIMER_CALLBACK( mess_io_timeout_timer_callback )
 {
 	md_cons_state *state = machine.driver_data<md_cons_state>();
-	state->mess_io_stage[(int)(FPTR)ptr] = -1;
+	state->m_mess_io_stage[(int)(FPTR)ptr] = -1;
 }
 
 /* J-Cart controller port */
 WRITE16_HANDLER( jcart_ctrl_w )
 {
 	md_cons_state *state = space->machine().driver_data<md_cons_state>();
-	state->jcart_io_data[0] = (data & 1) << 6;
-	state->jcart_io_data[1] = (data & 1) << 6;
+	state->m_jcart_io_data[0] = (data & 1) << 6;
+	state->m_jcart_io_data[1] = (data & 1) << 6;
 }
 
 READ16_HANDLER( jcart_ctrl_r )
@@ -269,11 +269,11 @@ READ16_HANDLER( jcart_ctrl_r )
 	UINT16 retdata = 0;
 	UINT8 joy[2];
 
-	if (state->jcart_io_data[0] & 0x40)
+	if (state->m_jcart_io_data[0] & 0x40)
 	{
 		joy[0] = input_port_read_safe(space->machine(), "JCART3_3B", 0);
 		joy[1] = input_port_read_safe(space->machine(), "JCART4_3B", 0);
-		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+		retdata = (state->m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	else
 	{
@@ -281,7 +281,7 @@ READ16_HANDLER( jcart_ctrl_r )
 		  (input_port_read_safe(space->machine(), "JCART3_3B", 0) & 0x03);
 		joy[1] = ((input_port_read_safe(space->machine(), "JCART4_3B", 0) & 0xc0) >> 2) |
 		  (input_port_read_safe(space->machine(), "JCART4_3B", 0) & 0x03);
-		retdata = (state->jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
+		retdata = (state->m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 	}
 	return retdata;
 }
@@ -293,8 +293,8 @@ static void mess_init_6buttons_pad(running_machine &machine)
 
 	for (i = 0; i < 3; i++)
 	{
-		state->mess_io_timeout[i] = machine.scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
-		state->mess_io_stage[i] = -1;
+		state->m_mess_io_timeout[i] = machine.scheduler().timer_alloc(FUNC(mess_io_timeout_timer_callback), (void*)(FPTR)i);
+		state->m_mess_io_stage[i] = -1;
 	}
 }
 
@@ -334,7 +334,7 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 	{
 		if (megadrive_io_data_regs[portnum] & 0x40)
 		{
-			if (state->mess_io_stage[portnum] == 2)
+			if (state->m_mess_io_stage[portnum] == 2)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
@@ -350,13 +350,13 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 		}
 		else
 		{
-			if (state->mess_io_stage[portnum] == 1)
+			if (state->m_mess_io_stage[portnum] == 1)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
 							(((input_port_read_safe(machine, pad6names[0][portnum], 0) & 0xc0) >> 2) & ~helper_6b);
 			}
-			else if (state->mess_io_stage[portnum]==2)
+			else if (state->m_mess_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
@@ -423,8 +423,8 @@ static void mess_md_io_write_data_port(running_machine &machine, int portnum, UI
 		{
 			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
-				state->mess_io_stage[portnum]++;
-				state->mess_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+				state->m_mess_io_stage[portnum]++;
+				state->m_mess_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 			}
 
 		}
@@ -959,14 +959,14 @@ static READ16_HANDLER( pico_68k_io_read )
         */
 			{
 				UINT8 tmp = input_port_read_safe(space->machine(), "PAGE", 0);
-				if (tmp == 2 && state->page_register != 0x3f)
+				if (tmp == 2 && state->m_page_register != 0x3f)
 				{
-					state->page_register <<= 1;
-					state->page_register |= 1;
+					state->m_page_register <<= 1;
+					state->m_page_register |= 1;
 				}
-				if (tmp == 1 && state->page_register != 0x00)
-					state->page_register >>= 1;
-				retdata = state->page_register;
+				if (tmp == 1 && state->m_page_register != 0x00)
+					state->m_page_register >>= 1;
+				retdata = state->m_page_register;
 				break;
 			}
 		case 7:

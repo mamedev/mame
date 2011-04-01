@@ -118,7 +118,7 @@ INLINE void schedule_next_irq(running_machine &machine, int curscanline)
 	curscanline = (curscanline + 64) & 255;
 
 	/* next one at the start of this scanline */
-	state->irq_timer->adjust(machine.primary_screen->time_until_pos(curscanline), curscanline);
+	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 
@@ -126,10 +126,10 @@ static TIMER_CALLBACK( clock_irq )
 {
 	cloud9_state *state = machine.driver_data<cloud9_state>();
 	/* assert the IRQ if not already asserted */
-	if (!state->irq_state)
+	if (!state->m_irq_state)
 	{
-		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
-		state->irq_state = 1;
+		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		state->m_irq_state = 1;
 	}
 
 	/* force an update now */
@@ -144,7 +144,7 @@ static CUSTOM_INPUT( get_vblank )
 {
 	cloud9_state *state = field->port->machine().driver_data<cloud9_state>();
 	int scanline = field->port->machine().primary_screen->vpos();
-	return (~state->syncprom[scanline & 0xff] >> 1) & 1;
+	return (~state->m_syncprom[scanline & 0xff] >> 1) & 1;
 }
 
 
@@ -161,37 +161,37 @@ static MACHINE_START( cloud9 )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->syncprom = machine.region("proms")->base() + 0x000;
+	state->m_syncprom = machine.region("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
-	for (state->vblank_start = 0; state->vblank_start < 256; state->vblank_start++)
-		if ((state->syncprom[(state->vblank_start - 1) & 0xff] & 2) != 0 && (state->syncprom[state->vblank_start] & 2) == 0)
+	for (state->m_vblank_start = 0; state->m_vblank_start < 256; state->m_vblank_start++)
+		if ((state->m_syncprom[(state->m_vblank_start - 1) & 0xff] & 2) != 0 && (state->m_syncprom[state->m_vblank_start] & 2) == 0)
 			break;
-	if (state->vblank_start == 0)
-		state->vblank_start = 256;
+	if (state->m_vblank_start == 0)
+		state->m_vblank_start = 256;
 
 	/* find the end of VBLANK in the SYNC PROM */
-	for (state->vblank_end = 0; state->vblank_end < 256; state->vblank_end++)
-		if ((state->syncprom[(state->vblank_end - 1) & 0xff] & 2) == 0 && (state->syncprom[state->vblank_end] & 2) != 0)
+	for (state->m_vblank_end = 0; state->m_vblank_end < 256; state->m_vblank_end++)
+		if ((state->m_syncprom[(state->m_vblank_end - 1) & 0xff] & 2) == 0 && (state->m_syncprom[state->m_vblank_end] & 2) != 0)
 			break;
 
 	/* can't handle the wrapping case */
-	assert(state->vblank_end < state->vblank_start);
+	assert(state->m_vblank_end < state->m_vblank_start);
 
 	/* reconfigure the visible area to match */
 	visarea.min_x = 0;
 	visarea.max_x = 255;
-	visarea.min_y = state->vblank_end + 1;
-	visarea.max_y = state->vblank_start;
+	visarea.min_y = state->m_vblank_end + 1;
+	visarea.max_y = state->m_vblank_start;
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	state->irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
-	state->irq_state = 0;
+	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
+	state->m_irq_state = 0;
 	schedule_next_irq(machine, 0-64);
 
 	/* setup for save states */
-	state->save_item(NAME(state->irq_state));
+	state->save_item(NAME(state->m_irq_state));
 }
 
 
@@ -199,7 +199,7 @@ static MACHINE_RESET( cloud9 )
 {
 	cloud9_state *state = machine.driver_data<cloud9_state>();
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	state->irq_state = 0;
+	state->m_irq_state = 0;
 }
 
 
@@ -213,10 +213,10 @@ static MACHINE_RESET( cloud9 )
 static WRITE8_HANDLER( irq_ack_w )
 {
 	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	if (state->irq_state)
+	if (state->m_irq_state)
 	{
-		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
-		state->irq_state = 0;
+		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+		state->m_irq_state = 0;
 	}
 }
 
@@ -249,18 +249,18 @@ static READ8_HANDLER( leta_r )
 static WRITE8_HANDLER( nvram_recall_w )
 {
 	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	state->nvram->recall(0);
-	state->nvram->recall(1);
-	state->nvram->recall(0);
+	state->m_nvram->recall(0);
+	state->m_nvram->recall(1);
+	state->m_nvram->recall(0);
 }
 
 
 static WRITE8_HANDLER( nvram_store_w )
 {
 	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	state->nvram->store(0);
-	state->nvram->store(1);
-	state->nvram->store(0);
+	state->m_nvram->store(0);
+	state->m_nvram->store(1);
+	state->m_nvram->store(0);
 }
 
 
@@ -275,10 +275,10 @@ static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
 	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(cloud9_state, spriteram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(cloud9_state, m_spriteram)
 	AM_RANGE(0x5400, 0x547f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x5500, 0x557f) AM_RAM_WRITE(cloud9_paletteram_w) AM_BASE_MEMBER(cloud9_state, paletteram)
+	AM_RANGE(0x5500, 0x557f) AM_RAM_WRITE(cloud9_paletteram_w) AM_BASE_MEMBER(cloud9_state, m_paletteram)
 	AM_RANGE(0x5580, 0x5587) AM_MIRROR(0x0078) AM_WRITE(cloud9_video_control_w)
 	AM_RANGE(0x5600, 0x5601) AM_MIRROR(0x0078) AM_WRITE(cloud9_coin_counter_w)
 	AM_RANGE(0x5602, 0x5603) AM_MIRROR(0x0078) AM_WRITE(cloud9_led_w)

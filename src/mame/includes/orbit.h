@@ -22,19 +22,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    playfield_ram;
-	UINT8 *    sprite_ram;
+	UINT8 *    m_playfield_ram;
+	UINT8 *    m_sprite_ram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
-	int        flip_screen;
+	tilemap_t  *m_bg_tilemap;
+	int        m_flip_screen;
 
 	/* misc */
-	UINT8      misc_flags;
+	UINT8      m_misc_flags;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *discrete;
+	device_t *m_maincpu;
+	device_t *m_discrete;
 };
 
 

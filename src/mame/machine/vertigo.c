@@ -69,21 +69,21 @@ const struct pit8253_config vertigo_pit8254_config =
 void vertigo_update_irq(device_t *device)
 {
 	vertigo_state *state = device->machine().driver_data<vertigo_state>();
-	if (state->irq_state < 7)
-		cputag_set_input_line(device->machine(), "maincpu", state->irq_state ^ 7, CLEAR_LINE);
+	if (state->m_irq_state < 7)
+		cputag_set_input_line(device->machine(), "maincpu", state->m_irq_state ^ 7, CLEAR_LINE);
 
-	state->irq_state = ttl74148_output_r(device);
+	state->m_irq_state = ttl74148_output_r(device);
 
-	if (state->irq_state < 7)
-		cputag_set_input_line(device->machine(), "maincpu", state->irq_state ^ 7, ASSERT_LINE);
+	if (state->m_irq_state < 7)
+		cputag_set_input_line(device->machine(), "maincpu", state->m_irq_state ^ 7, ASSERT_LINE);
 }
 
 
 static void update_irq_encoder(running_machine &machine, int line, int state)
 {
 	vertigo_state *drvstate = machine.driver_data<vertigo_state>();
-	ttl74148_input_line_w(drvstate->ttl74148, line, !state);
-	ttl74148_update(drvstate->ttl74148);
+	ttl74148_input_line_w(drvstate->m_ttl74148, line, !state);
+	ttl74148_update(drvstate->m_ttl74148);
 }
 
 
@@ -91,8 +91,8 @@ static WRITE_LINE_DEVICE_HANDLER( v_irq4_w )
 {
 	vertigo_state *drvstate = device->machine().driver_data<vertigo_state>();
 	update_irq_encoder(device->machine(), INPUT_LINE_IRQ4, state);
-	vertigo_vproc(device->machine(), device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(device->machine().time() - drvstate->irq4_time), state);
-	drvstate->irq4_time = device->machine().time();
+	vertigo_vproc(device->machine(), device->machine().device<cpu_device>("maincpu")->attotime_to_cycles(device->machine().time() - drvstate->m_irq4_time), state);
+	drvstate->m_irq4_time = device->machine().time();
 }
 
 
@@ -118,9 +118,9 @@ READ16_HANDLER( vertigo_io_convert )
 	static const char *const adcnames[] = { "P1X", "P1Y", "PADDLE" };
 
 	if (offset > 2)
-		state->adc_result = 0;
+		state->m_adc_result = 0;
 	else
-		state->adc_result = input_port_read(space->machine(), adcnames[offset]);
+		state->m_adc_result = input_port_read(space->machine(), adcnames[offset]);
 
 	update_irq_encoder(space->machine(), INPUT_LINE_IRQ2, ASSERT_LINE);
 	return 0;
@@ -131,7 +131,7 @@ READ16_HANDLER( vertigo_io_adc )
 {
 	vertigo_state *state = space->machine().driver_data<vertigo_state>();
 	update_irq_encoder(space->machine(), INPUT_LINE_IRQ2, CLEAR_LINE);
-	return state->adc_result;
+	return state->m_adc_result;
 }
 
 
@@ -202,9 +202,9 @@ READ16_HANDLER( vertigo_sio_r )
 MACHINE_START( vertigo )
 {
 	vertigo_state *state = machine.driver_data<vertigo_state>();
-	state_save_register_global(machine, state->irq_state);
-	state_save_register_global(machine, state->adc_result);
-	state_save_register_global(machine, state->irq4_time);
+	state_save_register_global(machine, state->m_irq_state);
+	state_save_register_global(machine, state->m_adc_result);
+	state_save_register_global(machine, state->m_irq4_time);
 
 	vertigo_vproc_init(machine);
 }
@@ -214,17 +214,17 @@ MACHINE_RESET( vertigo )
 	vertigo_state *state = machine.driver_data<vertigo_state>();
 	int i;
 
-	state->ttl74148 = machine.device("74148");
-	ttl74148_enable_input_w(state->ttl74148, 0);
+	state->m_ttl74148 = machine.device("74148");
+	ttl74148_enable_input_w(state->m_ttl74148, 0);
 
 	for (i = 0; i < 8; i++)
-		ttl74148_input_line_w(state->ttl74148, i, 1);
+		ttl74148_input_line_w(state->m_ttl74148, i, 1);
 
-	ttl74148_update(state->ttl74148);
+	ttl74148_update(state->m_ttl74148);
 	vertigo_vproc_reset(machine);
 
-	state->irq4_time = machine.time();
-	state->irq_state = 7;
+	state->m_irq4_time = machine.time();
+	state->m_irq_state = 7;
 }
 
 

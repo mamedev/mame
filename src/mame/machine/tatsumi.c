@@ -9,14 +9,14 @@
 void tatsumi_reset(running_machine &machine)
 {
 	tatsumi_state *state = machine.driver_data<tatsumi_state>();
-	state->last_control = 0;
-	state->control_word = 0;
-	state->apache3_adc = 0;
-	state->apache3_rot_idx = 0;
+	state->m_last_control = 0;
+	state->m_control_word = 0;
+	state->m_apache3_adc = 0;
+	state->m_apache3_rot_idx = 0;
 
-	state_save_register_global(machine, state->last_control);
-	state_save_register_global(machine, state->control_word);
-	state_save_register_global(machine, state->apache3_adc);
+	state_save_register_global(machine, state->m_last_control);
+	state_save_register_global(machine, state->m_control_word);
+	state_save_register_global(machine, state->m_apache3_adc);
 }
 
 /******************************************************************************/
@@ -24,7 +24,7 @@ void tatsumi_reset(running_machine &machine)
 READ16_HANDLER( apache3_bank_r )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	return state->control_word;
+	return state->m_control_word;
 }
 
 WRITE16_HANDLER( apache3_bank_w )
@@ -38,25 +38,25 @@ WRITE16_HANDLER( apache3_bank_w )
         0x000f  - OBJ bank to access from main cpu (0x8 = RAM, 0x0 to 0x7 = ROM)
     */
 
-	COMBINE_DATA(&state->control_word);
+	COMBINE_DATA(&state->m_control_word);
 
-	if (state->control_word & 0x7f00)
+	if (state->m_control_word & 0x7f00)
 	{
-		logerror("Unknown control Word: %04x\n",state->control_word);
+		logerror("Unknown control Word: %04x\n",state->m_control_word);
 		cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_HALT, CLEAR_LINE); // ?
 	}
 
-	if (state->control_word & 0x10)
+	if (state->m_control_word & 0x10)
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	else
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
 
-	if (state->control_word & 0x80)
+	if (state->m_control_word & 0x80)
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	else
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
 
-	state->last_control=state->control_word;
+	state->m_last_control=state->m_control_word;
 }
 
 // D1 = /ZBREQ  - Z80 bus request
@@ -72,11 +72,11 @@ READ16_HANDLER( apache3_v30_v20_r )
 	address_space *targetspace = space->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* Each V20 byte maps to a V30 word */
-	if ((state->control_word & 0xe0) == 0xe0)
+	if ((state->m_control_word & 0xe0) == 0xe0)
 		offset += 0xf8000; /* Upper half */
-	else if ((state->control_word & 0xe0) == 0xc0)
+	else if ((state->m_control_word & 0xe0) == 0xc0)
 		offset += 0xf0000;
-	else if ((state->control_word & 0xe0) == 0x80)
+	else if ((state->m_control_word & 0xe0) == 0x80)
 		offset += 0x00000; // main ram
 	else
 		logerror("%08x: unmapped read z80 rom %08x\n", cpu_get_pc(&space->device()), offset);
@@ -88,7 +88,7 @@ WRITE16_HANDLER( apache3_v30_v20_w )
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	address_space *targetspace = space->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
-	if ((state->control_word & 0xe0) != 0x80)
+	if ((state->m_control_word & 0xe0) != 0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n", cpu_get_pc(&space->device()), offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
@@ -101,19 +101,19 @@ WRITE16_HANDLER( apache3_v30_v20_w )
 READ16_HANDLER( apache3_z80_r )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	return state->apache3_z80_ram[offset];
+	return state->m_apache3_z80_ram[offset];
 }
 
 WRITE16_HANDLER( apache3_z80_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	state->apache3_z80_ram[offset] = data & 0xff;
+	state->m_apache3_z80_ram[offset] = data & 0xff;
 }
 
 READ8_HANDLER( apache3_adc_r )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	switch (state->apache3_adc)
+	switch (state->m_apache3_adc)
 	{
 		case 0: return input_port_read(space->machine(), "STICK_X");
 		case 1: return input_port_read(space->machine(), "STICK_Y");
@@ -131,7 +131,7 @@ READ8_HANDLER( apache3_adc_r )
 WRITE8_HANDLER( apache3_adc_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	state->apache3_adc = offset;
+	state->m_apache3_adc = offset;
 }
 
 /* Ground/sky rotation control
@@ -143,8 +143,8 @@ WRITE8_HANDLER( apache3_adc_w )
 WRITE16_HANDLER( apache3_rotate_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	state->apache3_rotate_ctrl[state->apache3_rot_idx] = data;
-	state->apache3_rot_idx = (state->apache3_rot_idx + 1) % 12;
+	state->m_apache3_rotate_ctrl[state->m_apache3_rot_idx] = data;
+	state->m_apache3_rot_idx = (state->m_apache3_rot_idx + 1) % 12;
 }
 
 /******************************************************************************/
@@ -155,7 +155,7 @@ READ16_HANDLER( roundup_v30_z80_r )
 	address_space *targetspace = space->machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* Each Z80 byte maps to a V30 word */
-	if (state->control_word & 0x20)
+	if (state->m_control_word & 0x20)
 		offset += 0x8000; /* Upper half */
 
 	return 0xff00 | targetspace->read_byte(offset);
@@ -169,7 +169,7 @@ WRITE16_HANDLER( roundup_v30_z80_w )
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->control_word & 0x20)
+		if (state->m_control_word & 0x20)
 			offset += 0x8000; /* Upper half of Z80 address space */
 
 		targetspace->write_byte(offset, data & 0xff);
@@ -180,14 +180,14 @@ WRITE16_HANDLER( roundup_v30_z80_w )
 WRITE16_HANDLER( roundup5_control_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->control_word);
+	COMBINE_DATA(&state->m_control_word);
 
-	if (state->control_word & 0x10)
+	if (state->m_control_word & 0x10)
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	else
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
 
-	if (state->control_word & 0x4)
+	if (state->m_control_word & 0x4)
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	else
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_HALT, CLEAR_LINE);
@@ -215,7 +215,7 @@ WRITE16_HANDLER( roundup5_control_w )
         Changed bank to 0060 (0)
     */
 
-	if ((state->control_word & 0x8) == 0 && !(state->last_control & 0x8))
+	if ((state->m_control_word & 0x8) == 0 && !(state->m_last_control & 0x8))
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ4, ASSERT_LINE);
 //  if (tatsumi_control_w&0x200)
 //      cpu_set_reset_line(1, CLEAR_LINE);
@@ -227,19 +227,19 @@ WRITE16_HANDLER( roundup5_control_w )
 //  if ((tatsumi_control_w&0x200)==0 && (last_bank&0x200)==0x200)
 //      logerror("68k reset\n");
 
-	if (state->control_word == 0x3a00)
+	if (state->m_control_word == 0x3a00)
 	{
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //      logerror("68k on\n");
 	}
 
-	state->last_control = state->control_word;
+	state->m_last_control = state->m_control_word;
 }
 
 WRITE16_HANDLER( roundup5_d0000_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->roundup5_d0000_ram[offset]);
+	COMBINE_DATA(&state->m_roundup5_d0000_ram[offset]);
 //  logerror("d_68k_d0000_w %06x %04x\n", cpu_get_pc(&space->device()), data);
 }
 
@@ -250,7 +250,7 @@ WRITE16_HANDLER( roundup5_e0000_w )
         Bit 0x100 is used, but unknown
     */
 
-	COMBINE_DATA(&state->roundup5_e0000_ram[offset]);
+	COMBINE_DATA(&state->m_roundup5_e0000_ram[offset]);
 	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
 //  logerror("d_68k_e0000_w %06x %04x\n", cpu_get_pc(&space->device()), data);
@@ -262,15 +262,15 @@ READ16_HANDLER(cyclwarr_control_r)
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 //  logerror("%08x:  control_r\n", cpu_get_pc(&space->device()));
-	return state->control_word;
+	return state->m_control_word;
 }
 
 WRITE16_HANDLER(cyclwarr_control_w)
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->control_word);
+	COMBINE_DATA(&state->m_control_word);
 
-//  if ((state->control_word&0xfe) != (state->last_control&0xfe))
+//  if ((state->m_control_word&0xfe) != (state->m_last_control&0xfe))
 //      logerror("%08x:  control_w %04x\n", cpu_get_pc(&space->device()), data);
 
 /*
@@ -282,13 +282,13 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 */
 
-	if ((state->control_word & 4) == 4 && (state->last_control & 4) == 0)
+	if ((state->m_control_word & 4) == 4 && (state->m_last_control & 4) == 0)
 	{
 //      logerror("68k 2 halt\n");
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
-	if ((state->control_word & 4) == 0 && (state->last_control & 4) == 4)
+	if ((state->m_control_word & 4) == 0 && (state->m_last_control & 4) == 4)
 	{
 //      logerror("68k 2 irq go\n");
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_HALT, CLEAR_LINE);
@@ -302,7 +302,7 @@ WRITE16_HANDLER(cyclwarr_control_w)
 //      logerror("hack 68k2 on\n");
 	}
 
-	state->last_control = state->control_word;
+	state->m_last_control = state->m_control_word;
 }
 
 /******************************************************************************/
@@ -312,9 +312,9 @@ READ16_HANDLER( tatsumi_v30_68000_r )
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
 	const UINT16* rom=(UINT16*)space->machine().region("sub")->base();
 
-logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space->device()), offset*2, state->control_word);
+logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space->device()), offset*2, state->m_control_word);
 	/* Read from 68k RAM */
-	if ((state->control_word&0x1f)==0x18)
+	if ((state->m_control_word&0x1f)==0x18)
 	{
 		// hack to make roundup 5 boot
 		if (cpu_get_pc(&space->device())==0xec575)
@@ -331,11 +331,11 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space->device()), offset*2,
 			dst[BYTE_XOR_LE(0xfc525)]=0x46;
 		}
 
-		return state->_68k_ram[offset & 0x1fff];
+		return state->m_68k_ram[offset & 0x1fff];
 	}
 
 	/* Read from 68k ROM */
-	offset+=(state->control_word&0x7)*0x8000;
+	offset+=(state->m_control_word&0x7)*0x8000;
 
 	return rom[offset];
 }
@@ -343,10 +343,10 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(&space->device()), offset*2,
 WRITE16_HANDLER( tatsumi_v30_68000_w )
 {
 	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	if ((state->control_word&0x1f)!=0x18)
-		logerror("68k write in bank %05x\n",state->control_word);
+	if ((state->m_control_word&0x1f)!=0x18)
+		logerror("68k write in bank %05x\n",state->m_control_word);
 
-	COMBINE_DATA(&state->_68k_ram[offset]);
+	COMBINE_DATA(&state->m_68k_ram[offset]);
 }
 
 /***********************************************************************************/

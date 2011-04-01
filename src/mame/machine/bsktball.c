@@ -13,7 +13,7 @@
 WRITE8_HANDLER( bsktball_nmion_w )
 {
 	bsktball_state *state = space->machine().driver_data<bsktball_state>();
-	state->nmi_on = offset & 0x01;
+	state->m_nmi_on = offset & 0x01;
 }
 
 /***************************************************************************
@@ -25,11 +25,11 @@ INTERRUPT_GEN( bsktball_interrupt )
 	bsktball_state *state = device->machine().driver_data<bsktball_state>();
 
 	/* We mod by 8 because we're interrupting 8x per frame, 1 per 32V */
-	state->i256v = (state->i256v + 1) % 8;
+	state->m_i256v = (state->m_i256v + 1) % 8;
 
-	if (state->i256v == 0)
+	if (state->m_i256v == 0)
 		device_set_input_line(device, 0, HOLD_LINE);
-	else if (state->nmi_on)
+	else if (state->m_nmi_on)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -40,13 +40,13 @@ INTERRUPT_GEN( bsktball_interrupt )
 WRITE8_HANDLER( bsktball_ld1_w )
 {
 	bsktball_state *state = space->machine().driver_data<bsktball_state>();
-	state->ld1 = (offset & 0x01);
+	state->m_ld1 = (offset & 0x01);
 }
 
 WRITE8_HANDLER( bsktball_ld2_w )
 {
 	bsktball_state *state = space->machine().driver_data<bsktball_state>();
-	state->ld2 = (offset & 0x01);
+	state->m_ld2 = (offset & 0x01);
 }
 
 
@@ -71,81 +71,81 @@ READ8_HANDLER( bsktball_in0_r )
 	/* Set direction bits */
 
 	/* P1 H DIR */
-	if (p1_horiz > state->last_p1_horiz)
+	if (p1_horiz > state->m_last_p1_horiz)
 	{
-		if ((p1_horiz - state->last_p1_horiz) > 128)
-			state->dir2 = 0x40;
+		if ((p1_horiz - state->m_last_p1_horiz) > 128)
+			state->m_dir2 = 0x40;
 		else
-			state->dir2 = 0;
+			state->m_dir2 = 0;
 	}
-	else if (p1_horiz < state->last_p1_horiz)
+	else if (p1_horiz < state->m_last_p1_horiz)
 	{
-		if ((state->last_p1_horiz - p1_horiz) > 128)
-			state->dir2 = 0;
+		if ((state->m_last_p1_horiz - p1_horiz) > 128)
+			state->m_dir2 = 0;
 		else
-			state->dir2 = 0x40;
+			state->m_dir2 = 0x40;
 	}
 
 	/* P1 V DIR */
-	if (p1_vert > state->last_p1_vert)
+	if (p1_vert > state->m_last_p1_vert)
 	{
-		if ((p1_vert - state->last_p1_vert) > 128)
-			state->dir3 = 0;
+		if ((p1_vert - state->m_last_p1_vert) > 128)
+			state->m_dir3 = 0;
 		else
-			state->dir3 = 0x80;
+			state->m_dir3 = 0x80;
 	}
-	else if (p1_vert < state->last_p1_vert)
+	else if (p1_vert < state->m_last_p1_vert)
 	{
-		if ((state->last_p1_vert - p1_vert) > 128)
-			state->dir3 = 0x80;
+		if ((state->m_last_p1_vert - p1_vert) > 128)
+			state->m_dir3 = 0x80;
 		else
-			state->dir3 = 0;
+			state->m_dir3 = 0;
 	}
 
 	/* P2 H DIR */
-	if (p2_horiz > state->last_p2_horiz)
+	if (p2_horiz > state->m_last_p2_horiz)
 	{
-		if ((p2_horiz - state->last_p2_horiz) > 128)
-			state->dir0 = 0x10;
+		if ((p2_horiz - state->m_last_p2_horiz) > 128)
+			state->m_dir0 = 0x10;
 		else
-			state->dir0 = 0;
+			state->m_dir0 = 0;
 	}
-	else if (p2_horiz < state->last_p2_horiz)
+	else if (p2_horiz < state->m_last_p2_horiz)
 	{
-		if ((state->last_p2_horiz - p2_horiz) > 128)
-			state->dir0 = 0;
+		if ((state->m_last_p2_horiz - p2_horiz) > 128)
+			state->m_dir0 = 0;
 		else
-			state->dir0 = 0x10;
+			state->m_dir0 = 0x10;
 	}
 
 	/* P2 V DIR */
-	if (p2_vert > state->last_p2_vert)
+	if (p2_vert > state->m_last_p2_vert)
 	{
-		if ((p2_vert - state->last_p2_vert) > 128)
-			state->dir1 = 0;
+		if ((p2_vert - state->m_last_p2_vert) > 128)
+			state->m_dir1 = 0;
 		else
-			state->dir1 = 0x20;
+			state->m_dir1 = 0x20;
 	}
-	else if (p2_vert < state->last_p2_vert)
+	else if (p2_vert < state->m_last_p2_vert)
 	{
-		if ((state->last_p2_vert - p2_vert) > 128)
-			state->dir1 = 0x20;
+		if ((state->m_last_p2_vert - p2_vert) > 128)
+			state->m_dir1 = 0x20;
 		else
-			state->dir1 = 0;
+			state->m_dir1 = 0;
 	}
 
-	state->last_p1_horiz = p1_horiz;
-	state->last_p1_vert  = p1_vert;
-	state->last_p2_horiz = p2_horiz;
-	state->last_p2_vert  = p2_vert;
+	state->m_last_p1_horiz = p1_horiz;
+	state->m_last_p1_vert  = p1_vert;
+	state->m_last_p2_horiz = p2_horiz;
+	state->m_last_p2_vert  = p2_vert;
 
 	/* D0-D3 = Plyr 1 Horiz, D4-D7 = Plyr 1 Vert */
-	if ((state->ld1) & (state->ld2))
+	if ((state->m_ld1) & (state->m_ld2))
 	{
 		return ((p1_horiz & 0x0f) | ((p1_vert << 4) & 0xf0));
 	}
 	/* D0-D3 = Plyr 2 Horiz, D4-D7 = Plyr 2 Vert */
-	else if (state->ld2)
+	else if (state->m_ld2)
 	{
 		return ((p2_horiz & 0x0f) | ((p2_vert << 4) & 0xf0));
 	}
@@ -153,7 +153,7 @@ READ8_HANDLER( bsktball_in0_r )
 	{
 		temp = input_port_read(space->machine(), "IN0") & 0x0f;
 
-		return (temp | state->dir0 | state->dir1 | state->dir2 | state->dir3);
+		return (temp | state->m_dir0 | state->m_dir1 | state->m_dir2 | state->m_dir3);
 	}
 }
 

@@ -43,14 +43,14 @@ public:
 	kungfur_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 led[0x10];
-	UINT8 mux_data;
-	UINT32 adpcm_pos[2];
-	UINT8 adpcm_idle[2];
-	UINT8 trigger1;
-	UINT8 adpcm_data1;
-	UINT8 trigger2;
-	UINT8 adpcm_data2;
+	UINT8 m_led[0x10];
+	UINT8 m_mux_data;
+	UINT32 m_adpcm_pos[2];
+	UINT8 m_adpcm_idle[2];
+	UINT8 m_trigger1;
+	UINT8 m_adpcm_data1;
+	UINT8 m_trigger2;
+	UINT8 m_adpcm_data2;
 };
 
 
@@ -125,7 +125,7 @@ static SCREEN_UPDATE( kungfur )
 	int i;
 
 	for(i=0;i<16;i++)
-		draw_led(bitmap,  (i*8)+2, 100, state->led[i]);
+		draw_led(bitmap,  (i*8)+2, 100, state->m_led[i]);
 
 	return 0;
 }
@@ -133,9 +133,9 @@ static SCREEN_UPDATE( kungfur )
 static WRITE8_DEVICE_HANDLER( test0_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->mux_data = data & 7;	/* multiplexer selector? (00-06) */
+	state->m_mux_data = data & 7;	/* multiplexer selector? (00-06) */
 
-	state->mux_data|= (data & 0x10)>>1;
+	state->m_mux_data|= (data & 0x10)>>1;
 //  printf("%02x MUX W\n",data);
 }
 
@@ -149,7 +149,7 @@ static WRITE8_DEVICE_HANDLER( test2_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 //  io_data[2] = data;  /* lower nibble should be NULL */
-	state->led[state->mux_data] = data;
+	state->m_led[state->m_mux_data] = data;
 //  printf("%02x Unk 2 W\n",data);
 }
 
@@ -164,7 +164,7 @@ static WRITE8_DEVICE_HANDLER( test4_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 //  io_data[4] = data;
-	state->led[state->mux_data] = data;
+	state->m_led[state->m_mux_data] = data;
 }
 
 /* this looks like lamps. */
@@ -178,16 +178,16 @@ static WRITE8_DEVICE_HANDLER( test5_w )
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm1_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->adpcm_pos[0] = 0x40000+(data & 0xff) * 0x100;
-	state->adpcm_idle[0] = 0;
+	state->m_adpcm_pos[0] = 0x40000+(data & 0xff) * 0x100;
+	state->m_adpcm_idle[0] = 0;
 	msm5205_reset_w(device->machine().device("adpcm1"),0);
 }
 
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	state->adpcm_pos[1] = (data & 0xff) * 0x400;
-	state->adpcm_idle[1] = 0;
+	state->m_adpcm_pos[1] = (data & 0xff) * 0x400;
+	state->m_adpcm_idle[1] = 0;
 	msm5205_reset_w(device->machine().device("adpcm2"),0);
 }
 
@@ -281,23 +281,23 @@ static void kfr_adpcm1_int(device_t *device)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
-	if (state->adpcm_pos[0] >= 0x40000 || state->adpcm_idle[0])
+	if (state->m_adpcm_pos[0] >= 0x40000 || state->m_adpcm_idle[0])
 	{
 		msm5205_reset_w(device->machine().device("adpcm1"),1);
-		state->trigger1 = 0;
+		state->m_trigger1 = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("adpcm1")->base();
 
-		state->adpcm_data1 = ((state->trigger1 ? (ROM[state->adpcm_pos[0]] & 0x0f) : (ROM[state->adpcm_pos[0]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine().device("adpcm1"), state->adpcm_data1 & 0xf);
-		state->trigger1 ^= 1;
-		if(state->trigger1 == 0)
+		state->m_adpcm_data1 = ((state->m_trigger1 ? (ROM[state->m_adpcm_pos[0]] & 0x0f) : (ROM[state->m_adpcm_pos[0]] & 0xf0)>>4) );
+		msm5205_data_w(device->machine().device("adpcm1"), state->m_adpcm_data1 & 0xf);
+		state->m_trigger1 ^= 1;
+		if(state->m_trigger1 == 0)
 		{
-			state->adpcm_pos[0]++;
-			if((ROM[state->adpcm_pos[0]] & 0xff) == 0xff)
-				state->adpcm_idle[0] = 1;
+			state->m_adpcm_pos[0]++;
+			if((ROM[state->m_adpcm_pos[0]] & 0xff) == 0xff)
+				state->m_adpcm_idle[0] = 1;
 		}
 	}
 }
@@ -307,23 +307,23 @@ static void kfr_adpcm2_int(device_t *device)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 
-	if (state->adpcm_pos[1] >= 0x10000 || state->adpcm_idle[1])
+	if (state->m_adpcm_pos[1] >= 0x10000 || state->m_adpcm_idle[1])
 	{
 		msm5205_reset_w(device->machine().device("adpcm2"),1);
-		state->trigger2 = 0;
+		state->m_trigger2 = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("adpcm2")->base();
 
-		state->adpcm_data2 = ((state->trigger2 ? (ROM[state->adpcm_pos[1]] & 0x0f) : (ROM[state->adpcm_pos[1]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine().device("adpcm2"), state->adpcm_data2 & 0xf);
-		state->trigger2 ^= 1;
-		if(state->trigger2 == 0)
+		state->m_adpcm_data2 = ((state->m_trigger2 ? (ROM[state->m_adpcm_pos[1]] & 0x0f) : (ROM[state->m_adpcm_pos[1]] & 0xf0)>>4) );
+		msm5205_data_w(device->machine().device("adpcm2"), state->m_adpcm_data2 & 0xf);
+		state->m_trigger2 ^= 1;
+		if(state->m_trigger2 == 0)
 		{
-			state->adpcm_pos[1]++;
-			if((ROM[state->adpcm_pos[1]] & 0xff) == 0xff)
-				state->adpcm_idle[1] = 1;
+			state->m_adpcm_pos[1]++;
+			if((ROM[state->m_adpcm_pos[1]] & 0xff) == 0xff)
+				state->m_adpcm_idle[1] = 1;
 		}
 	}
 }
@@ -343,8 +343,8 @@ static const msm5205_interface msm5205_config_2 =
 static MACHINE_RESET( kungfur )
 {
 	kungfur_state *state = machine.driver_data<kungfur_state>();
-	state->adpcm_pos[0] =	state->adpcm_pos[1] = 0;
-	state->adpcm_idle[0] = state->adpcm_idle[1] = 1;
+	state->m_adpcm_pos[0] =	state->m_adpcm_pos[1] = 0;
+	state->m_adpcm_idle[0] = state->m_adpcm_idle[1] = 1;
 }
 
 static INTERRUPT_GEN( kungfur_irq )

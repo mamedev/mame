@@ -24,8 +24,8 @@ READ8_HANDLER( flstory_68705_port_a_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space->device()), state->port_a_in);
-	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
+	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(&space->device()), state->m_port_a_in);
+	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
 }
 
 WRITE8_HANDLER( flstory_68705_port_a_w )
@@ -33,13 +33,13 @@ WRITE8_HANDLER( flstory_68705_port_a_w )
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 
 	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(&space->device()), data);
-	state->port_a_out = data;
+	state->m_port_a_out = data;
 }
 
 WRITE8_HANDLER( flstory_68705_ddr_a_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->ddr_a = data;
+	state->m_ddr_a = data;
 }
 
 
@@ -56,7 +56,7 @@ WRITE8_HANDLER( flstory_68705_ddr_a_w )
 READ8_HANDLER( flstory_68705_port_b_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
+	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
 }
 
 WRITE8_HANDLER( flstory_68705_port_b_w )
@@ -64,28 +64,28 @@ WRITE8_HANDLER( flstory_68705_port_b_w )
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 	//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(&space->device()),data);
 
-	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
+	if ((state->m_ddr_b & 0x02) && (~data & 0x02) && (state->m_port_b_out & 0x02))
 	{
-		state->port_a_in = state->from_main;
-		if (state->main_sent)
-			device_set_input_line(state->mcu, 0, CLEAR_LINE);
-		state->main_sent = 0;
-		logerror("read command %02x from main cpu\n", state->port_a_in);
+		state->m_port_a_in = state->m_from_main;
+		if (state->m_main_sent)
+			device_set_input_line(state->m_mcu, 0, CLEAR_LINE);
+		state->m_main_sent = 0;
+		logerror("read command %02x from main cpu\n", state->m_port_a_in);
 	}
-	if ((state->ddr_b & 0x04) && (data & 0x04) && (~state->port_b_out & 0x04))
+	if ((state->m_ddr_b & 0x04) && (data & 0x04) && (~state->m_port_b_out & 0x04))
 	{
-		logerror("send command %02x to main cpu\n", state->port_a_out);
-		state->from_mcu = state->port_a_out;
-		state->mcu_sent = 1;
+		logerror("send command %02x to main cpu\n", state->m_port_a_out);
+		state->m_from_mcu = state->m_port_a_out;
+		state->m_mcu_sent = 1;
 	}
 
-	state->port_b_out = data;
+	state->m_port_b_out = data;
 }
 
 WRITE8_HANDLER( flstory_68705_ddr_b_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->ddr_b = data;
+	state->m_ddr_b = data;
 }
 
 
@@ -93,28 +93,28 @@ READ8_HANDLER( flstory_68705_port_c_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 
-	state->port_c_in = 0;
-	if (state->main_sent)
-		state->port_c_in |= 0x01;
+	state->m_port_c_in = 0;
+	if (state->m_main_sent)
+		state->m_port_c_in |= 0x01;
 
-	if (!state->mcu_sent)
-		state->port_c_in |= 0x02;
+	if (!state->m_mcu_sent)
+		state->m_port_c_in |= 0x02;
 
 	//logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(&space->device()), port_c_in);
-	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
+	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
 }
 
 WRITE8_HANDLER( flstory_68705_port_c_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(&space->device()), data);
-	state->port_c_out = data;
+	state->m_port_c_out = data;
 }
 
 WRITE8_HANDLER( flstory_68705_ddr_c_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->ddr_c = data;
+	state->m_ddr_c = data;
 }
 
 WRITE8_HANDLER( flstory_mcu_w )
@@ -122,18 +122,18 @@ WRITE8_HANDLER( flstory_mcu_w )
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 
 	logerror("%04x: mcu_w %02x\n", cpu_get_pc(&space->device()), data);
-	state->from_main = data;
-	state->main_sent = 1;
-	device_set_input_line(state->mcu, 0, ASSERT_LINE);
+	state->m_from_main = data;
+	state->m_main_sent = 1;
+	device_set_input_line(state->m_mcu, 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( flstory_mcu_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 
-	logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()), state->from_mcu);
-	state->mcu_sent = 0;
-	return state->from_mcu;
+	logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()), state->m_from_mcu);
+	state->m_mcu_sent = 0;
+	return state->m_from_mcu;
 }
 
 READ8_HANDLER( flstory_mcu_status_r )
@@ -144,9 +144,9 @@ READ8_HANDLER( flstory_mcu_status_r )
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
 	//logerror("%04x: mcu_status_r\n", cpu_get_pc(&space->device()));
-	if (!state->main_sent)
+	if (!state->m_main_sent)
 		res |= 0x01;
-	if (state->mcu_sent)
+	if (state->m_mcu_sent)
 		res |= 0x02;
 
 	return res;
@@ -155,37 +155,37 @@ READ8_HANDLER( flstory_mcu_status_r )
 WRITE8_HANDLER( onna34ro_mcu_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	UINT16 score_adr = state->workram[0x29e] * 0x100 + state->workram[0x29d];
+	UINT16 score_adr = state->m_workram[0x29e] * 0x100 + state->m_workram[0x29d];
 
 	switch (data)
 	{
 		case 0x0e:
-			state->from_mcu = 0xff;
+			state->m_from_mcu = 0xff;
 			break;
 		case 0x01:
-			state->from_mcu = 0x6a;
+			state->m_from_mcu = 0x6a;
 			break;
 		case 0x40:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				state->from_mcu = state->workram[score_adr - 0xe000];			/* score l*/
+				state->m_from_mcu = state->m_workram[score_adr - 0xe000];			/* score l*/
 			break;
 		case 0x41:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				state->from_mcu = state->workram[(score_adr + 1) - 0xe000];		/* score m*/
+				state->m_from_mcu = state->m_workram[(score_adr + 1) - 0xe000];		/* score m*/
 			break;
 		case 0x42:
 			if(score_adr >= 0xe000 && score_adr < 0xe800)
-				state->from_mcu = state->workram[(score_adr + 2) - 0xe000] & 0x0f;	/* score h*/
+				state->m_from_mcu = state->m_workram[(score_adr + 2) - 0xe000] & 0x0f;	/* score h*/
 			break;
 		default:
-			state->from_mcu = 0x80;
+			state->m_from_mcu = 0x80;
 	}
 }
 
 READ8_HANDLER( onna34ro_mcu_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return state->from_mcu;
+	return state->m_from_mcu;
 }
 
 READ8_HANDLER( onna34ro_mcu_status_r )
@@ -196,7 +196,7 @@ READ8_HANDLER( onna34ro_mcu_status_r )
 }
 
 
-#define VICTNINE_MCU_SEED	(state->workram[0x685])
+#define VICTNINE_MCU_SEED	(state->m_workram[0x685])
 
 static const UINT8 victnine_mcu_data[0x100] =
 {
@@ -241,7 +241,7 @@ WRITE8_HANDLER( victnine_mcu_w )
 
 	if (!seed && (data & 0x37) == 0x37)
 	{
-		state->from_mcu = 0xa6;
+		state->m_from_mcu = 0xa6;
 		logerror("mcu initialize (%02x)\n", data);
 	}
 	else
@@ -250,19 +250,19 @@ WRITE8_HANDLER( victnine_mcu_w )
 
 		if ((data & ~0x1f) == 0xa0)
 		{
-			state->mcu_select = data & 0x1f;
-			//logerror("mcu select: 0x%02x\n", state->mcu_select);
+			state->m_mcu_select = data & 0x1f;
+			//logerror("mcu select: 0x%02x\n", state->m_mcu_select);
 		}
 		else if (data < 0x20)
 		{
-			int offset = state->mcu_select * 8 + data;
+			int offset = state->m_mcu_select * 8 + data;
 
 			//logerror("mcu fetch: 0x%02x\n", offset);
-			state->from_mcu = victnine_mcu_data[offset];
+			state->m_from_mcu = victnine_mcu_data[offset];
 		}
 		else if (data >= 0x38 && data <= 0x3a)
 		{
-			state->from_mcu = state->workram[0x691 - 0x38 + data];
+			state->m_from_mcu = state->m_workram[0x691 - 0x38 + data];
 		}
 		else
 		{
@@ -274,9 +274,9 @@ WRITE8_HANDLER( victnine_mcu_w )
 READ8_HANDLER( victnine_mcu_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(&space->device()), state->from_mcu);
+	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(&space->device()), state->m_from_mcu);
 
-	return state->from_mcu - VICTNINE_MCU_SEED;
+	return state->m_from_mcu - VICTNINE_MCU_SEED;
 }
 
 READ8_HANDLER( victnine_mcu_status_r )

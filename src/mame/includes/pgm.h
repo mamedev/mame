@@ -6,68 +6,83 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT16 *      mainram;  // currently this is also used by nvram handler
-	UINT16 *      bg_videoram;
-	UINT16 *      tx_videoram;
-	UINT16 *      videoregs;
-	UINT16 *      rowscrollram;
-	UINT16 *      videoram;
-	UINT8  *      z80_mainram;
-	UINT32 *      arm7_shareram;
-	UINT32 *      svg_shareram[2];	//for 5585G MACHINE
-	UINT16 *      sharedprotram;		// killbld & olds
-	UINT8  *      sprite_a_region;
-	size_t        sprite_a_region_size;
-	UINT16 *      spritebufferram; // buffered spriteram
-//  UINT16 *      paletteram;    // currently this uses generic palette handling
+//  UINT16 *      m_mainram;  // currently this is also used by nvram handler
+	UINT16 *      m_bg_videoram;
+	UINT16 *      m_tx_videoram;
+	UINT16 *      m_videoregs;
+	UINT16 *      m_rowscrollram;
+	UINT16 *      m_videoram;
+	UINT8  *      m_z80_mainram;
+	UINT32 *      m_arm7_shareram;
+	UINT32 *      m_svg_shareram[2];	//for 5585G MACHINE
+	UINT16 *      m_sharedprotram;		// killbld & olds
+	UINT8  *      m_sprite_a_region;
+	size_t        m_sprite_a_region_size;
+	UINT16 *      m_spritebufferram; // buffered spriteram
+//  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t       *bg_tilemap, *tx_tilemap;
-	UINT16        *sprite_temp_render;
-	bitmap_t      *tmppgmbitmap;
+	tilemap_t       *m_bg_tilemap;
+	tilemap_t     *m_tx_tilemap;
+	UINT16        *m_sprite_temp_render;
+	bitmap_t      *m_tmppgmbitmap;
 
 	/* misc */
 	// kov2
-	UINT32        kov2_latchdata_68k_w;
-	UINT32        kov2_latchdata_arm_w;
+	UINT32        m_kov2_latchdata_68k_w;
+	UINT32        m_kov2_latchdata_arm_w;
 	// kovsh
-	UINT16        kovsh_highlatch_arm_w, kovsh_lowlatch_arm_w;
-	UINT16        kovsh_highlatch_68k_w, kovsh_lowlatch_68k_w;
-	UINT32        kovsh_counter;
+	UINT16        m_kovsh_highlatch_arm_w;
+	UINT16        m_kovsh_lowlatch_arm_w;
+	UINT16        m_kovsh_highlatch_68k_w;
+	UINT16        m_kovsh_lowlatch_68k_w;
+	UINT32        m_kovsh_counter;
 	// svg
-	int           svg_ram_sel;
+	int           m_svg_ram_sel;
 	// killbld & olds
-	int           kb_cmd;
-	int           kb_reg;
-	int           kb_ptr;
-	int			  kb_region_sequence_position;
-	UINT32        kb_regs[0x10];
-	UINT16        olds_bs, olds_cmd3;
+	int           m_kb_cmd;
+	int           m_kb_reg;
+	int           m_kb_ptr;
+	int			  m_kb_region_sequence_position;
+	UINT32        m_kb_regs[0x10];
+	UINT16        m_olds_bs;
+	UINT16        m_olds_cmd3;
 	// pstars
-	UINT16        pstars_key;
-	UINT16        pstars_int[2];
-	UINT32        pstars_regs[16];
-	UINT32        pstars_val;
-	UINT16        pstar_e7, pstar_b1, pstar_ce;
-	UINT16        pstar_ram[3];
+	UINT16        m_pstars_key;
+	UINT16        m_pstars_int[2];
+	UINT32        m_pstars_regs[16];
+	UINT32        m_pstars_val;
+	UINT16        m_pstar_e7;
+	UINT16        m_pstar_b1;
+	UINT16        m_pstar_ce;
+	UINT16        m_pstar_ram[3];
 	// ASIC 3 (oriental legends protection)
-	UINT8         asic3_reg, asic3_latch[3], asic3_x, asic3_y, asic3_z, asic3_h1, asic3_h2;
-	UINT16        asic3_hold;
+	UINT8         m_asic3_reg;
+	UINT8         m_asic3_latch[3];
+	UINT8         m_asic3_x;
+	UINT8         m_asic3_y;
+	UINT8         m_asic3_z;
+	UINT8         m_asic3_h1;
+	UINT8         m_asic3_h2;
+	UINT16        m_asic3_hold;
 	// ASIC28
-	UINT16        asic28_key;
-	UINT16        asic28_regs[10];
-	UINT16        asic_params[256];
-	UINT16        asic28_rcnt;
-	UINT32        eoregs[16];
+	UINT16        m_asic28_key;
+	UINT16        m_asic28_regs[10];
+	UINT16        m_asic_params[256];
+	UINT16        m_asic28_rcnt;
+	UINT32        m_eoregs[16];
 
 	/* calendar */
-	UINT8        cal_val, cal_mask, cal_com, cal_cnt;
-	system_time  systime;
+	UINT8        m_cal_val;
+	UINT8        m_cal_mask;
+	UINT8        m_cal_com;
+	UINT8        m_cal_cnt;
+	system_time  m_systime;
 
 	/* devices */
-	cpu_device *soundcpu;
-	cpu_device *prot;
-	device_t *ics;
+	cpu_device *m_soundcpu;
+	cpu_device *m_prot;
+	device_t *m_ics;
 };
 
 extern UINT16 *pgm_mainram;	// used by nvram handler, we cannot move it to driver data struct

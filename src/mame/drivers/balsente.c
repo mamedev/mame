@@ -243,8 +243,8 @@ DIP locations verified for:
  *************************************/
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(balsente_state, spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE_MEMBER(balsente_state, videoram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(balsente_state, m_spriteram)
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE_MEMBER(balsente_state, m_videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
@@ -301,8 +301,8 @@ ADDRESS_MAP_END
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
-	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_BASE_MEMBER(balsente_state, shrike_io)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_BASE_MEMBER(balsente_state, shrike_shared)
+	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_io)
+	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_shared)
 ADDRESS_MAP_END
 
 
@@ -2107,8 +2107,8 @@ static void expand_roms(running_machine &machine, UINT8 cd_rom_mask)
 INLINE void config_shooter_adc(running_machine &machine, UINT8 shooter, UINT8 adc_shift)
 {
 	balsente_state *state = machine.driver_data<balsente_state>();
-	state->shooter = shooter;
-	state->adc_shift = adc_shift;
+	state->m_shooter = shooter;
+	state->m_adc_shift = adc_shift;
 }
 
 static DRIVER_INIT( sentetst ) { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }

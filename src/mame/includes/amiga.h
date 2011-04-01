@@ -27,9 +27,9 @@ Ernesto Corvi & Mariusz Wojcieszek
 /* read them on both big-endian and little-endian systems, we store the custom */
 /* registers in 32-bit natural order. This means we need to XOR the register */
 /* address with 1 on little-endian systems. */
-#define CUSTOM_REG(x)			(state->custom_regs[BYTE_XOR_BE(x)])
+#define CUSTOM_REG(x)			(state->m_custom_regs[BYTE_XOR_BE(x)])
 #define CUSTOM_REG_SIGNED(x)	((INT16)CUSTOM_REG(x))
-#define CUSTOM_REG_LONG(x)		(*(UINT32 *)&state->custom_regs[x])
+#define CUSTOM_REG_LONG(x)		(*(UINT32 *)&state->m_custom_regs[x])
 
 /*
     A = Angus
@@ -378,57 +378,57 @@ public:
 	amiga_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *chip_ram;
-	size_t chip_ram_size;
-	UINT16 (*chip_ram_r)(amiga_state *state, offs_t offset);
-	void (*chip_ram_w)(amiga_state *state, offs_t offset, UINT16 data);
-	UINT16 *custom_regs;
+	UINT16 *m_chip_ram;
+	size_t m_chip_ram_size;
+	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
+	void (*m_chip_ram_w)(amiga_state *state, offs_t offset, UINT16 data);
+	UINT16 *m_custom_regs;
 
-	const amiga_machine_interface *intf;
-	autoconfig_device *autoconfig_list;
-	autoconfig_device *cur_autoconfig;
-	emu_timer * irq_timer;
-	emu_timer * blitter_timer;
-	device_t *sound_device;
+	const amiga_machine_interface *m_intf;
+	autoconfig_device *m_autoconfig_list;
+	autoconfig_device *m_cur_autoconfig;
+	emu_timer * m_irq_timer;
+	emu_timer * m_blitter_timer;
+	device_t *m_sound_device;
 
 	/* sprite states */
-	UINT8 sprite_comparitor_enable_mask;
-	UINT8 sprite_dma_reload_mask;
-	UINT8 sprite_dma_live_mask;
-	UINT8 sprite_ctl_written;
-	UINT32 sprite_shiftreg[8];
-	UINT8 sprite_remain[8];
+	UINT8 m_sprite_comparitor_enable_mask;
+	UINT8 m_sprite_dma_reload_mask;
+	UINT8 m_sprite_dma_live_mask;
+	UINT8 m_sprite_ctl_written;
+	UINT32 m_sprite_shiftreg[8];
+	UINT8 m_sprite_remain[8];
 
 	/* copper states */
-	UINT32 copper_pc;
-	UINT8 copper_waiting;
-	UINT8 copper_waitblit;
-	UINT16 copper_waitval;
-	UINT16 copper_waitmask;
-	UINT16 copper_pending_offset;
-	UINT16 copper_pending_data;
+	UINT32 m_copper_pc;
+	UINT8 m_copper_waiting;
+	UINT8 m_copper_waitblit;
+	UINT16 m_copper_waitval;
+	UINT16 m_copper_waitmask;
+	UINT16 m_copper_pending_offset;
+	UINT16 m_copper_pending_data;
 #if GUESS_COPPER_OFFSET
-	int wait_offset;
+	int m_wait_offset;
 #endif
 
 	/* playfield states */
-	int last_scanline;
-	int ham_color;
+	int m_last_scanline;
+	int m_ham_color;
 
 	/* misc states */
-	UINT16 genlock_color;
+	UINT16 m_genlock_color;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	UINT8 separate_bitplanes[2][64];
+	UINT8 m_separate_bitplanes[2][64];
 
 	/* aga */
-	int aga_diwhigh_written;
-	pen_t aga_palette[256];
-	UINT64 aga_bpldat[8];
-	UINT16 aga_sprdata[8][4];
-	UINT16 aga_sprdatb[8][4];
-	int aga_sprite_fetched_words;
-	int aga_sprite_dma_used_words[8];
+	int m_aga_diwhigh_written;
+	pen_t m_aga_palette[256];
+	UINT64 m_aga_bpldat[8];
+	UINT16 m_aga_sprdata[8][4];
+	UINT16 m_aga_sprdatb[8][4];
+	int m_aga_sprite_fetched_words;
+	int m_aga_sprite_dma_used_words[8];
 };
 
 

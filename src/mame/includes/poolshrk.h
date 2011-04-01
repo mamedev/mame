@@ -14,11 +14,11 @@ public:
 	poolshrk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int da_latch;
-	UINT8* playfield_ram;
-	UINT8* hpos_ram;
-	UINT8* vpos_ram;
-	tilemap_t* bg_tilemap;
+	int m_da_latch;
+	UINT8* m_playfield_ram;
+	UINT8* m_hpos_ram;
+	UINT8* m_vpos_ram;
+	tilemap_t* m_bg_tilemap;
 };
 
 

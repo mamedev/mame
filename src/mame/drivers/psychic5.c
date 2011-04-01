@@ -319,7 +319,7 @@ The first sprite data is located at f20b,then f21b and so on.
 static MACHINE_RESET( psychic5 )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
-	state->bank_latch = 0xff;
+	state->m_bank_latch = 0xff;
 	flip_screen_set(machine, 0);
 }
 
@@ -347,7 +347,7 @@ static INTERRUPT_GEN( psychic5_interrupt )
 static READ8_HANDLER( psychic5_bankselect_r )
 {
 	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	return state->bank_latch;
+	return state->m_bank_latch;
 }
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
@@ -356,9 +356,9 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
-	if (state->bank_latch != data)
+	if (state->m_bank_latch != data)
 	{
-		state->bank_latch = data;
+		state->m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
 		memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
@@ -370,9 +370,9 @@ static WRITE8_HANDLER( bombsa_bankselect_w )
 	UINT8 *RAM = space->machine().region("maincpu")->base();
 	int bankaddress;
 
-	if (state->bank_latch != data)
+	if (state->m_bank_latch != data)
 	{
-		state->bank_latch = data;
+		state->m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
 		memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, spriteram, spriteram_size)
+	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
 
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, spriteram, spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(psychic5_paged_ram_r, bombsa_paged_ram_w)

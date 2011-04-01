@@ -183,8 +183,8 @@ Frequencies: 68k is XTAL_32MHZ/2
 static READ16_HANDLER(dmmy_8f)
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	state->dmmy_8f_ret = ~state->dmmy_8f_ret;
-	return state->dmmy_8f_ret;
+	state->m_dmmy_8f_ret = ~state->m_dmmy_8f_ret;
+	return state->m_dmmy_8f_ret;
 }
 
 /*** SOUND RELATED ***********************************************************/
@@ -195,7 +195,7 @@ static WRITE16_HANDLER( sound_command_w )
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->pending_command = 1;
+		state->m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -205,14 +205,14 @@ static WRITE16_HANDLER( sound_command_w )
 static READ16_HANDLER( pending_command_r )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	return state->pending_command;
+	return state->m_pending_command;
 }
 #endif
 
 static WRITE8_HANDLER( gs_sh_pending_command_clear_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	state->pending_command = 0;
+	state->m_pending_command = 0;
 }
 
 static WRITE8_HANDLER( gs_sh_bankswitch_w )
@@ -282,10 +282,10 @@ static const ym2610_interface ym2610_config =
 
 static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, MB60553[0].vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, CG10103[0].vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, VS920A[0].vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, m_MB60553[0].vram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_CG10103[0].vram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, m_VS920A[0].vram)
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_lineram)
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_work_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -319,10 +319,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, MB60553[0].vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, CG10103[0].vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, VS920A[0].vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, m_MB60553[0].vram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_CG10103[0].vram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, m_VS920A[0].vram)
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_lineram)
 	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
 	AM_RANGE(0x200040, 0x20005f) AM_RAM //AM_BASE(&gs_mixer_regs)
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( vgoal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, m_work_ram)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
@@ -827,34 +827,34 @@ the zooming.To use it,you should use Player 2 Start button to show the test scre
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-state->work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-state->work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+state->m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
+state->m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
 static WRITE16_HANDLER( twrldc94_mcu_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	state->mcu_data = data;
+	state->m_mcu_data = data;
 }
 
 static READ16_HANDLER( twrldc94_mcu_r )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	return state->mcu_data;
+	return state->m_mcu_data;
 }
 
 static WRITE16_HANDLER( twrldc94_prot_reg_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	state->prot_reg[1] = state->prot_reg[0];
-	state->prot_reg[0] = data;
+	state->m_prot_reg[1] = state->m_prot_reg[0];
+	state->m_prot_reg[0] = data;
 
-	if( ((state->prot_reg[1] & 2) == 2) && ((state->prot_reg[0] & 2) == 0) )
+	if( ((state->m_prot_reg[1] & 2) == 2) && ((state->m_prot_reg[0] & 2) == 0) )
 	{
-		switch( state->gametype )
+		switch( state->m_gametype )
 		{
 			case 1:
-				switch(state->mcu_data)
+				switch(state->m_mcu_data)
 				{
 					#define NULL_SUB 0x0000828E
 					case 0x53: PC(0x0000a4c); break; // boot -> main loop
@@ -914,19 +914,19 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						popmessage("Unknown MCU CMD %04x",state->mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->m_mcu_data);
 						PC(NULL_SUB);
 						break;
 				}
 				break;
 
 			case 2:
-				switch(state->mcu_data)
+				switch(state->m_mcu_data)
 				{
 					case 0x53: PC(0x00000a5c); break; // POST
 
 					default:
-						popmessage("Unknown MCU CMD %04x",state->mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->m_mcu_data);
 						PC(NULL_SUB);
 						break;
 				}
@@ -934,7 +934,7 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 
 
 			case 3:
-				switch(state->mcu_data)
+				switch(state->m_mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
 					case 0x3d: PC(0x0006275C); break; // after sprite ram init, team select
@@ -947,7 +947,7 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x79: PC(0x0006072E); break; // after select, start match
 
 					default:
-						popmessage("Unknown MCU CMD %04x",state->mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->m_mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -963,7 +963,7 @@ static READ16_HANDLER( twrldc94_prot_reg_r )
 	// Setting it results in a hang with a digit displayed on screen
 	// For twrldc94, it just disables sound.
 
-	return state->prot_reg[0];
+	return state->m_prot_reg[0];
 }
 
 /*
@@ -977,15 +977,15 @@ static READ16_HANDLER( twrldc94_prot_reg_r )
 
     The tick count is usually set to 0x3c => it's driven off vblank?
 */
-//state->work_ram[ (0xffe900 - 0xffc00) ]
-#define COUNTER1_ENABLE state->work_ram[0x2900/2] >> 8
-#define COUNTER2_ENABLE (state->work_ram[0x2900/2] & 0xff)
-#define TICK_1 state->work_ram[0x2908/2]
-#define TICKCOUNT_1 state->work_ram[0x290a/2]
-#define TICK_2 state->work_ram[0x290c/2]
-#define TICKCOUNT_3 state->work_ram[0x290e/2]
-#define COUNTER_1 state->work_ram[0x2928/2]
-#define COUNTER_2 state->work_ram[0x292a/2]
+//state->m_work_ram[ (0xffe900 - 0xffc00) ]
+#define COUNTER1_ENABLE state->m_work_ram[0x2900/2] >> 8
+#define COUNTER2_ENABLE (state->m_work_ram[0x2900/2] & 0xff)
+#define TICK_1 state->m_work_ram[0x2908/2]
+#define TICKCOUNT_1 state->m_work_ram[0x290a/2]
+#define TICK_2 state->m_work_ram[0x290c/2]
+#define TICKCOUNT_3 state->m_work_ram[0x290e/2]
+#define COUNTER_1 state->m_work_ram[0x2928/2]
+#define COUNTER_2 state->m_work_ram[0x292a/2]
 static READ16_HANDLER( vbl_toggle_r )
 {
 	return 0xff;
@@ -1018,9 +1018,9 @@ static WRITE16_HANDLER( vbl_toggle_w )
 static void mcu_init( running_machine &machine )
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
-	state->dmmy_8f_ret = 0xFFFF;
-	state->pending_command = 0;
-	state->mcu_data = 0;
+	state->m_dmmy_8f_ret = 0xFFFF;
+	state->m_pending_command = 0;
+	state->m_mcu_data = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_r));
@@ -1032,21 +1032,21 @@ static void mcu_init( running_machine &machine )
 static DRIVER_INIT( twrldc94 )
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
-	state->gametype = 1;
+	state->m_gametype = 1;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( twrldc94a )
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
-	state->gametype = 2;
+	state->m_gametype = 2;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( vgoalsoc )
 {
 	gstriker_state *state = machine.driver_data<gstriker_state>();
-	state->gametype = 3;
+	state->m_gametype = 3;
 	mcu_init( machine );
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x200090, 0x200091, FUNC(vbl_toggle_w)); // vblank toggle

@@ -92,15 +92,15 @@ PALETTE_INIT( hyperspt )
 WRITE8_HANDLER( hyperspt_videoram_w )
 {
 	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hyperspt_colorram_w )
 {
 	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hyperspt_flipscreen_w )
@@ -115,9 +115,9 @@ WRITE8_HANDLER( hyperspt_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1) + ((state->colorram[tile_index] & 0x40) << 3);
-	int color = state->colorram[tile_index] & 0x0f;
-	int flags = ((state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x80) << 1) + ((state->m_colorram[tile_index] & 0x40) << 3);
+	int color = state->m_colorram[tile_index] & 0x0f;
+	int flags = ((state->m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((state->m_colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(1, code, color, flags);
 }
@@ -126,17 +126,17 @@ VIDEO_START( hyperspt )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs + 1];
@@ -181,12 +181,12 @@ SCREEN_UPDATE( hyperspt )
 
 	for (row = 0; row < 32; row++)
 	{
-		int scrollx = state->scroll[row * 2] + (state->scroll[(row * 2) + 1] & 0x01) * 256;
+		int scrollx = state->m_scroll[row * 2] + (state->m_scroll[(row * 2) + 1] & 0x01) * 256;
 		if (flip_screen_get(screen->machine())) scrollx = -scrollx;
-		tilemap_set_scrollx(state->bg_tilemap, row, scrollx);
+		tilemap_set_scrollx(state->m_bg_tilemap, row, scrollx);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
@@ -195,9 +195,9 @@ SCREEN_UPDATE( hyperspt )
 static TILE_GET_INFO( roadf_get_bg_tile_info )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1) + ((state->colorram[tile_index] & 0x60) << 4);
-	int color = state->colorram[tile_index] & 0x0f;
-	int flags = (state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x80) << 1) + ((state->m_colorram[tile_index] & 0x60) << 4);
+	int color = state->m_colorram[tile_index] & 0x0f;
+	int flags = (state->m_colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
 }
@@ -206,6 +206,6 @@ VIDEO_START( roadf )
 {
 	hyperspt_state *state = machine.driver_data<hyperspt_state>();
 
-	state->bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	state->m_bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }

@@ -30,60 +30,60 @@ public:
 	seta_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *sharedram;
-	UINT16 *workram;
-	UINT16 *vregs;
-	UINT16 *vram_0;
-	UINT16 *vctrl_0;
-	UINT16 *vram_2;
-	UINT16 *vctrl_2;
-	UINT16 *spriteram;
-	UINT16 *spriteram2;
-	UINT16 *paletteram;
-	size_t paletteram_size;
-	UINT16 *paletteram2;
-	size_t paletteram2_size;
+	UINT8 *m_sharedram;
+	UINT16 *m_workram;
+	UINT16 *m_vregs;
+	UINT16 *m_vram_0;
+	UINT16 *m_vctrl_0;
+	UINT16 *m_vram_2;
+	UINT16 *m_vctrl_2;
+	UINT16 *m_spriteram;
+	UINT16 *m_spriteram2;
+	UINT16 *m_paletteram;
+	size_t m_paletteram_size;
+	UINT16 *m_paletteram2;
+	size_t m_paletteram2_size;
 
-	int tiles_offset;
-	tilemap_t *tilemap_0;
-	tilemap_t *tilemap_1;	// Layer 0
-	tilemap_t *tilemap_2;
-	tilemap_t *tilemap_3;	// Layer 1
-	int tilemaps_flip;
-	int samples_bank;
-	int color_mode_shift;
-	int current_tilemap_mode[2];
+	int m_tiles_offset;
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;	// Layer 0
+	tilemap_t *m_tilemap_2;
+	tilemap_t *m_tilemap_3;	// Layer 1
+	int m_tilemaps_flip;
+	int m_samples_bank;
+	int m_color_mode_shift;
+	int m_current_tilemap_mode[2];
 
-	uPD71054_state uPD71054;
-	const game_offset *global_offsets;
+	uPD71054_state m_uPD71054;
+	const game_offset *m_global_offsets;
 
-	bool coin_lockout_initialized;
-	int coin_lockout;
+	bool m_coin_lockout_initialized;
+	int m_coin_lockout;
 
-	int sub_ctrl_data;
+	int m_sub_ctrl_data;
 
-	int gun_input_bit;
-	int gun_input_src;
-	int gun_bit_count;
-	int gun_old_clock;
+	int m_gun_input_bit;
+	int m_gun_input_src;
+	int m_gun_bit_count;
+	int m_gun_old_clock;
 
-	UINT8 usclssic_port_select;
-	int keroppi_prize_hop;
-	int keroppi_protection_count;
-	UINT16 *kiwame_nvram;
+	UINT8 m_usclssic_port_select;
+	int m_keroppi_prize_hop;
+	int m_keroppi_protection_count;
+	UINT16 *m_kiwame_nvram;
 
-	int wiggie_soundlatch;
+	int m_wiggie_soundlatch;
 
-	UINT16 *inttoote_key_select;
-	UINT16 *inttoote_700000;
-	UINT8 jockeyc_key_select;
+	UINT16 *m_inttoote_key_select;
+	UINT16 *m_inttoote_700000;
+	UINT8 m_jockeyc_key_select;
 
-	UINT8 twineagl_xram[8];
-	int twineagl_tilebank[4];
+	UINT8 m_twineagl_xram[8];
+	int m_twineagl_tilebank[4];
 
-	UINT16 pairslove_protram[0x200];
-	UINT16 pairslove_protram_old[0x200];
-	UINT16 downtown_protection[0x200/2];
+	UINT16 m_pairslove_protram[0x200];
+	UINT16 m_pairslove_protram_old[0x200];
+	UINT16 m_downtown_protection[0x200/2];
 };
 
 /*----------- defined in video/seta.c -----------*/

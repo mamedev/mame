@@ -28,8 +28,8 @@ static WRITE8_HANDLER( hyperspt_coin_counter_w )
 
 
 static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, m_scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -41,16 +41,16 @@ static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, videoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, colorram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, m_colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, m_scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, videoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, colorram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, m_colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM

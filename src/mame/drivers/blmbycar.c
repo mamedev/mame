@@ -63,7 +63,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->pot_wheel = ~input_port_read(space->machine(), "WHEEL") & 0xff;
+		state->m_pot_wheel = ~input_port_read(space->machine(), "WHEEL") & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
@@ -72,16 +72,16 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if ( ((state->old_val & 0xff) == 0xff) && ((data & 0xff) == 0) )
-			state->pot_wheel <<= 1;
-		state->old_val = data;
+		if ( ((state->m_old_val & 0xff) == 0xff) && ((data & 0xff) == 0) )
+			state->m_pot_wheel <<= 1;
+		state->m_old_val = data;
 	}
 }
 
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
 	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
-	return ((state->pot_wheel & 0x80) ? 0x04 : 0) | (space->machine().rand() & 0x08);
+	return ((state->m_pot_wheel & 0x80) ? 0x04 : 0) | (space->machine().rand() & 0x08);
 }
 
 
@@ -105,17 +105,17 @@ static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, vram_1)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, vram_0)	// Layer 0
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, m_vram_1)	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, m_vram_0)	// Layer 0
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_1)				// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)				// Scroll 0
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, m_scroll_1)				// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, m_scroll_0)				// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, m_paletteram)	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(blmbycar_state, spriteram, spriteram_size)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(blmbycar_state, m_spriteram, m_spriteram_size)// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)								// Wheel (optical)
@@ -132,25 +132,25 @@ static READ16_HANDLER( waterball_unk_r )
 {
 	blmbycar_state *state = space->machine().driver_data<blmbycar_state>();
 
-	state->retvalue ^= 0x0008; // must toggle.. but not vblank?
-	return state->retvalue;
+	state->m_retvalue ^= 0x0008; // must toggle.. but not vblank?
+	return state->m_retvalue;
 }
 
 static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
-	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, vram_1)	// Layer 1
-	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, vram_0)	// Layer 0
+	AM_RANGE(0x104000, 0x105fff) AM_RAM_WRITE(blmbycar_vram_1_w) AM_BASE_MEMBER(blmbycar_state, m_vram_1)	// Layer 1
+	AM_RANGE(0x106000, 0x107fff) AM_RAM_WRITE(blmbycar_vram_0_w) AM_BASE_MEMBER(blmbycar_state, m_vram_0)	// Layer 0
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY												// ???
-	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_1)					// Scroll 1
-	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)					// Scroll 0
+	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, m_scroll_1)					// Scroll 1
+	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, m_scroll_0)					// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, m_paletteram)	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(blmbycar_state, spriteram, spriteram_size)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(blmbycar_state, m_spriteram, m_spriteram_size)// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700006, 0x700007) AM_READNOP													// read
@@ -343,16 +343,16 @@ static MACHINE_START( blmbycar )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->save_item(NAME(state->pot_wheel));
-	state->save_item(NAME(state->old_val));
+	state->save_item(NAME(state->m_pot_wheel));
+	state->save_item(NAME(state->m_old_val));
 }
 
 static MACHINE_RESET( blmbycar )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->pot_wheel = 0;
-	state->old_val = 0;
+	state->m_pot_wheel = 0;
+	state->m_old_val = 0;
 }
 
 
@@ -393,14 +393,14 @@ static MACHINE_START( watrball )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->save_item(NAME(state->retvalue));
+	state->save_item(NAME(state->m_retvalue));
 }
 
 static MACHINE_RESET( watrball )
 {
 	blmbycar_state *state = machine.driver_data<blmbycar_state>();
 
-	state->retvalue = 0;
+	state->m_retvalue = 0;
 }
 
 static MACHINE_CONFIG_START( watrball, blmbycar_state )

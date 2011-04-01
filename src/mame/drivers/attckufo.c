@@ -51,16 +51,16 @@ class attckufo_state : public driver_device
 public:
 	attckufo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  mos6560(*this, "mos6560") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_mos6560(*this, "mos6560") { }
 
 	/* memory pointers */
-	UINT8 *      mainram;
-	UINT8 *      tileram;
+	UINT8 *      m_mainram;
+	UINT8 *      m_tileram;
 
 	/* devices */
-	required_device<cpu_device> maincpu;
-	required_device<mos6560_device> mos6560;
+	required_device<cpu_device> m_maincpu;
+	required_device<mos6560_device> m_mos6560;
 };
 
 
@@ -119,10 +119,10 @@ static WRITE8_HANDLER(attckufo_io_w)
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(attckufo_state, mainram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(attckufo_state, m_mainram)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_port_r, mos6560_port_w)
 	AM_RANGE(0x1400, 0x1403) AM_READWRITE(attckufo_io_r, attckufo_io_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(attckufo_state, tileram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(attckufo_state, m_tileram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -157,26 +157,26 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( attckufo_raster_interrupt )
 {
 	attckufo_state *state = device->machine().driver_data<attckufo_state>();
-	mos6560_raster_interrupt_gen(state->mos6560);
+	mos6560_raster_interrupt_gen(state->m_mos6560);
 }
 
 static SCREEN_UPDATE( attckufo )
 {
 	attckufo_state *state = screen->machine().driver_data<attckufo_state>();
-	mos6560_video_update(state->mos6560, bitmap, cliprect);
+	mos6560_video_update(state->m_mos6560, bitmap, cliprect);
 	return 0;
 }
 
 static int attckufo_dma_read( running_machine &machine, int offset )
 {
 	attckufo_state *state = machine.driver_data<attckufo_state>();
-	return state->maincpu->space(AS_PROGRAM)->read_byte(offset);
+	return state->m_maincpu->space(AS_PROGRAM)->read_byte(offset);
 }
 
 static int attckufo_dma_read_color( running_machine &machine, int offset )
 {
 	attckufo_state *state = machine.driver_data<attckufo_state>();
-	return state->maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
+	return state->m_maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
 }
 
 static const mos6560_interface attckufo_6560_intf =

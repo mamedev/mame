@@ -24,12 +24,12 @@ static INTERRUPT_GEN( fastlane_interrupt )
 
 	if (cpu_getiloops(device) == 0)
 	{
-		if (k007121_ctrlram_r(state->k007121, 7) & 0x02)
+		if (k007121_ctrlram_r(state->m_k007121, 7) & 0x02)
 			device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (k007121_ctrlram_r(state->k007121, 7) & 0x01)
+		if (k007121_ctrlram_r(state->m_k007121, 7) & 0x01)
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -39,9 +39,9 @@ static WRITE8_HANDLER( k007121_registers_w )
 	fastlane_state *state = space->machine().driver_data<fastlane_state>();
 
 	if (offset < 8)
-		k007121_ctrl_w(state->k007121, offset, data);
+		k007121_ctrl_w(state->m_k007121, offset, data);
 	else	/* scroll registers */
-		state->k007121_regs[offset] = data;
+		state->m_k007121_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( fastlane_bankswitch_w )
@@ -56,7 +56,7 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", (data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(state->konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
+	k007232_set_bank(state->m_konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -76,7 +76,7 @@ static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
 
 
 static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE_MEMBER(fastlane_state, k007121_regs)	/* 007121 registers */
+	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE_MEMBER(fastlane_state, m_k007121_regs)	/* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("P1")
@@ -88,11 +88,11 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_r, k051733_w)									/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(fastlane_state, paletteram)										/* Palette RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(fastlane_state, m_paletteram)										/* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM																/* Work RAM */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE_MEMBER(fastlane_state, videoram1)		/* Video RAM (chip 1) */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_BASE_MEMBER(fastlane_state, videoram2)		/* Video RAM (chip 2) */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(fastlane_state, spriteram)											/* Sprite RAM */
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE_MEMBER(fastlane_state, m_videoram1)		/* Video RAM (chip 1) */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_BASE_MEMBER(fastlane_state, m_videoram2)		/* Video RAM (chip 2) */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(fastlane_state, m_spriteram)											/* Sprite RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")														/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END
@@ -206,8 +206,8 @@ static MACHINE_START( fastlane )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->konami2 = machine.device("konami2");
-	state->k007121 = machine.device("k007121");
+	state->m_konami2 = machine.device("konami2");
+	state->m_k007121 = machine.device("k007121");
 }
 
 static MACHINE_CONFIG_START( fastlane, fastlane_state )

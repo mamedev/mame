@@ -71,8 +71,8 @@ static ADDRESS_MAP_START( mrjong_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE_MEMBER(mrjong_state, videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE_MEMBER(mrjong_state, colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE_MEMBER(mrjong_state, m_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE_MEMBER(mrjong_state, m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrjong_io_map, AS_IO, 8 )

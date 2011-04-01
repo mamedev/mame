@@ -57,7 +57,7 @@ NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 	{
 		/*  00010203 04050607 00010203 04050607 (normal) */
 		/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
-		int bank = nth_byte32( state->tilebank32, (code>>13)+8 );
+		int bank = nth_byte32( state->m_tilebank32, (code>>13)+8 );
 		mangle = (code&0x1fff) + bank*0x2000;
 		*tile = mangle;
 		*mask = mangle;
@@ -160,7 +160,7 @@ static int
 NB1objcode2tile( running_machine &machine, int code )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int bank = nth_word32( state->spritebank32, code>>11 );
+	int bank = nth_word32( state->m_spritebank32, code>>11 );
 	return (code&0x7ff) + bank*0x800;
 }
 
@@ -192,10 +192,10 @@ SCREEN_UPDATE( namconb2 )
 
 	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine()));
 
-	if( memcmp(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank))!=0 )
+	if( memcmp(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
-		memcpy(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank));
+		memcpy(state->m_tilemap_tile_bank,state->m_tilebank32,sizeof(state->m_tilemap_tile_bank));
 	}
 	video_update_common( screen->machine(), bitmap, &clip, 1 );
 	return 0;
@@ -205,7 +205,7 @@ static int
 NB2objcode2tile( running_machine &machine, int code )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int bank = nth_byte32( state->spritebank32, (code>>11)&0xf );
+	int bank = nth_byte32( state->m_spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{

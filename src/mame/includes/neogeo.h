@@ -39,75 +39,75 @@ public:
 //  UINT16     *save_ram;       // this currently uses generic handlers
 
 	/* video-related */
-	UINT8      *sprite_gfx;
-	UINT32     sprite_gfx_address_mask;
-	UINT16     *videoram;
-	UINT16     *palettes[2]; /* 0x100*16 2 byte palette entries */
-	pen_t      *pens;
-	UINT8      palette_bank;
-	UINT8      screen_dark;
-	UINT16     videoram_read_buffer;
-	UINT16     videoram_modulo;
-	UINT16     videoram_offset;
+	UINT8      *m_sprite_gfx;
+	UINT32     m_sprite_gfx_address_mask;
+	UINT16     *m_videoram;
+	UINT16     *m_palettes[2]; /* 0x100*16 2 byte palette entries */
+	pen_t      *m_pens;
+	UINT8      m_palette_bank;
+	UINT8      m_screen_dark;
+	UINT16     m_videoram_read_buffer;
+	UINT16     m_videoram_modulo;
+	UINT16     m_videoram_offset;
 
-	UINT8      fixed_layer_source;
+	UINT8      m_fixed_layer_source;
 
-	UINT8      auto_animation_speed;
-	UINT8      auto_animation_disabled;
-	UINT8      auto_animation_counter;
-	UINT8      auto_animation_frame_counter;
+	UINT8      m_auto_animation_speed;
+	UINT8      m_auto_animation_disabled;
+	UINT8      m_auto_animation_counter;
+	UINT8      m_auto_animation_frame_counter;
 
-	const UINT8 *region_zoomy;
+	const UINT8 *m_region_zoomy;
 
 
 	/* palette */
-	double     rgb_weights_normal[5];
-	double     rgb_weights_normal_bit15[5];
-	double     rgb_weights_dark[5];
-	double     rgb_weights_dark_bit15[5];
+	double     m_rgb_weights_normal[5];
+	double     m_rgb_weights_normal_bit15[5];
+	double     m_rgb_weights_dark[5];
+	double     m_rgb_weights_dark_bit15[5];
 
 	/* timers */
-	emu_timer  *display_position_interrupt_timer;
-	emu_timer  *display_position_vblank_timer;
-	emu_timer  *vblank_interrupt_timer;
-	emu_timer  *auto_animation_timer;
-	emu_timer  *sprite_line_timer;
-	UINT8      display_position_interrupt_control;
-	UINT32     display_counter;
-	UINT32     vblank_interrupt_pending;
-	UINT32     display_position_interrupt_pending;
-	UINT32     irq3_pending;
+	emu_timer  *m_display_position_interrupt_timer;
+	emu_timer  *m_display_position_vblank_timer;
+	emu_timer  *m_vblank_interrupt_timer;
+	emu_timer  *m_auto_animation_timer;
+	emu_timer  *m_sprite_line_timer;
+	UINT8      m_display_position_interrupt_control;
+	UINT32     m_display_counter;
+	UINT32     m_vblank_interrupt_pending;
+	UINT32     m_display_position_interrupt_pending;
+	UINT32     m_irq3_pending;
 
 	/* misc */
-	UINT8      controller_select;
+	UINT8      m_controller_select;
 
-	UINT32     main_cpu_bank_address;
-	UINT8      main_cpu_vector_table_source;
+	UINT32     m_main_cpu_bank_address;
+	UINT8      m_main_cpu_vector_table_source;
 
-	UINT8      audio_result;
-	UINT8      audio_cpu_banks[4];
-	UINT8      audio_cpu_rom_source;
-	UINT8      audio_cpu_rom_source_last;
+	UINT8      m_audio_result;
+	UINT8      m_audio_cpu_banks[4];
+	UINT8      m_audio_cpu_rom_source;
+	UINT8      m_audio_cpu_rom_source_last;
 
-	UINT8      save_ram_unlocked;
+	UINT8      m_save_ram_unlocked;
 
-	UINT8      output_data;
-	UINT8      output_latch;
-	UINT8      el_value;
-	UINT8      led1_value;
-	UINT8      led2_value;
-	UINT8      recurse;
+	UINT8      m_output_data;
+	UINT8      m_output_latch;
+	UINT8      m_el_value;
+	UINT8      m_led1_value;
+	UINT8      m_led2_value;
+	UINT8      m_recurse;
 
 	/* protection */
-	UINT32     fatfury2_prot_data;
-	UINT16     neogeo_rng;
-	UINT16     *pvc_cartridge_ram;
-	int        fixed_layer_bank_type;
+	UINT32     m_fatfury2_prot_data;
+	UINT16     m_neogeo_rng;
+	UINT16     *m_pvc_cartridge_ram;
+	int        m_fixed_layer_bank_type;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *upd4990a;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_upd4990a;
 };
 
 

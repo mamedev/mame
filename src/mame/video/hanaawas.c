@@ -65,18 +65,18 @@ PALETTE_INIT( hanaawas )
 WRITE8_HANDLER( hanaawas_videoram_w )
 {
 	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hanaawas_colorram_w )
 {
 	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->colorram[offset] = data;
+	state->m_colorram[offset] = data;
 
 	/* dirty both current and next offsets */
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->bg_tilemap, (offset + (flip_screen_get(space->machine()) ? -1 : 1)) & 0x03ff);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, (offset + (flip_screen_get(space->machine()) ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
@@ -94,10 +94,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 	hanaawas_state *state = machine.driver_data<hanaawas_state>();
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
 	int offset = (tile_index + (flip_screen_get(machine) ? 1 : -1)) & 0x3ff;
-	int attr = state->colorram[offset];
+	int attr = state->m_colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
-	int code = state->videoram[tile_index] + ((attr & 0x20) << 3);
-	int color = state->colorram[tile_index] & 0x1f;
+	int code = state->m_videoram[tile_index] + ((attr & 0x20) << 3);
+	int color = state->m_colorram[tile_index] & 0x1f;
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }
@@ -105,12 +105,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( hanaawas )
 {
 	hanaawas_state *state = machine.driver_data<hanaawas_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE( hanaawas )
 {
 	hanaawas_state *state = screen->machine().driver_data<hanaawas_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

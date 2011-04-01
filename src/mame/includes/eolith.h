@@ -4,9 +4,9 @@ public:
 	eolith_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int coin_counter_bit;
-	int buffer;
-	UINT32 *vram;
+	int m_coin_counter_bit;
+	int m_buffer;
+	UINT32 *m_vram;
 };
 
 

@@ -4,13 +4,13 @@ public:
 	shangkid_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	UINT8 bbx_sound_enable;
-	UINT8 sound_latch;
-	UINT8 *videoreg;
-	int gfx_type;
-	tilemap_t *background;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	UINT8 m_bbx_sound_enable;
+	UINT8 m_sound_latch;
+	UINT8 *m_videoreg;
+	int m_gfx_type;
+	tilemap_t *m_background;
 };
 
 

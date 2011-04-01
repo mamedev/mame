@@ -32,7 +32,7 @@ public:
 	kingpin_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *code_base;
+	UINT8 *m_code_base;
 };
 
 
@@ -189,8 +189,8 @@ static DRIVER_INIT( kingpin )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
-	state->code_base = machine.region("maincpu")->base();
-	state->code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
+	state->m_code_base = machine.region("maincpu")->base();
+	state->m_code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 
 ROM_START( kingpin )

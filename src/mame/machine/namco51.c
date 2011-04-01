@@ -63,23 +63,26 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-#define READ_PORT(st,num)			devcb_call_read8(&(st)->in[num], 0)
-#define WRITE_PORT(st,num,data) 	devcb_call_write8(&(st)->out[num], 0, data)
+#define READ_PORT(st,num)			devcb_call_read8(&(st)->m_in[num], 0)
+#define WRITE_PORT(st,num,data) 	devcb_call_write8(&(st)->m_out[num], 0, data)
 
 
 typedef struct _namco_51xx_state namco_51xx_state;
 struct _namco_51xx_state
 {
-	device_t *	cpu;
-	devcb_resolved_read8 in[4];
-	devcb_resolved_write8 out[2];
-	INT32 lastcoins,lastbuttons;
-	INT32 credits;
-	INT32 coins[2];
-	INT32 coins_per_cred[2];
-	INT32 creds_per_coin[2];
-	INT32 in_count;
-	INT32 mode,coincred_mode,remap_joy;
+	device_t *	m_cpu;
+	devcb_resolved_read8 m_in[4];
+	devcb_resolved_write8 m_out[2];
+	INT32 m_lastcoins;
+	INT32 m_lastbuttons;
+	INT32 m_credits;
+	INT32 m_coins[2];
+	INT32 m_coins_per_cred[2];
+	INT32 m_creds_per_coin[2];
+	INT32 m_in_count;
+	INT32 m_mode;
+	INT32 m_coincred_mode;
+	INT32 m_remap_joy;
 };
 
 INLINE namco_51xx_state *get_safe_token(device_t *device)
@@ -100,14 +103,14 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 
 	LOG(("%s: custom 51XX write %02x\n",device->machine().describe_context(),data));
 
-	if (state->coincred_mode)
+	if (state->m_coincred_mode)
 	{
-		switch (state->coincred_mode--)
+		switch (state->m_coincred_mode--)
 		{
-			case 4: state->coins_per_cred[0] = data; break;
-			case 3: state->creds_per_coin[0] = data; break;
-			case 2: state->coins_per_cred[1] = data; break;
-			case 1: state->creds_per_coin[1] = data; break;
+			case 4: state->m_coins_per_cred[0] = data; break;
+			case 3: state->m_creds_per_coin[0] = data; break;
+			case 2: state->m_coins_per_cred[1] = data; break;
+			case 1: state->m_creds_per_coin[1] = data; break;
 		}
 	}
 	else
@@ -118,9 +121,9 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 				break;
 
 			case 1:	// set coinage
-				state->coincred_mode = 4;
+				state->m_coincred_mode = 4;
 				/* this is a good time to reset the credits counter */
-				state->credits = 0;
+				state->m_credits = 0;
 
 				{
 					/* kludge for a possible bug in Xevious */
@@ -140,28 +143,28 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 
 					if (namcoio_51XX_kludge)
 					{
-						state->coincred_mode = 6;
-						state->remap_joy = 1;
+						state->m_coincred_mode = 6;
+						state->m_remap_joy = 1;
 					}
 				}
 				break;
 
 			case 2:	// go in "credits" mode and enable start buttons
-				state->mode = 1;
-				state->in_count = 0;
+				state->m_mode = 1;
+				state->m_in_count = 0;
 				break;
 
 			case 3:	// disable joystick remapping
-				state->remap_joy = 0;
+				state->m_remap_joy = 0;
 				break;
 
 			case 4:	// enable joystick remapping
-				state->remap_joy = 1;
+				state->m_remap_joy = 1;
 				break;
 
 			case 5:	// go in "switch" mode
-				state->mode = 0;
-				state->in_count = 0;
+				state->m_mode = 0;
+				state->m_in_count = 0;
 				break;
 
 			default:
@@ -198,9 +201,9 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 
 	LOG(("%s: custom 51XX read\n",device->machine().describe_context()));
 
-	if (state->mode == 0)	/* switch mode */
+	if (state->m_mode == 0)	/* switch mode */
 	{
-		switch ((state->in_count++) % 3)
+		switch ((state->m_in_count++) % 3)
 		{
 			default:
 			case 0: return READ_PORT(state,0) | (READ_PORT(state,1) << 4);
@@ -210,7 +213,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 	}
 	else	/* credits mode */
 	{
-		switch ((state->in_count++) % 3)
+		switch ((state->m_in_count++) % 3)
 		{
 			default:
 			case 0:	// number of credits in BCD format
@@ -218,12 +221,12 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 					int in,toggle;
 
 					in = ~(READ_PORT(state,0) | (READ_PORT(state,1) << 4));
-					toggle = in ^ state->lastcoins;
-					state->lastcoins = in;
+					toggle = in ^ state->m_lastcoins;
+					state->m_lastcoins = in;
 
-					if (state->coins_per_cred[0] > 0)
+					if (state->m_coins_per_cred[0] > 0)
 					{
-						if (state->credits >= 99)
+						if (state->m_credits >= 99)
 						{
 							WRITE_PORT(state,1,1);	// coin lockout
 						}
@@ -233,41 +236,41 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 							/* check if the user inserted a coin */
 							if (toggle & in & 0x10)
 							{
-								state->coins[0]++;
+								state->m_coins[0]++;
 								WRITE_PORT(state,0,0x04);	// coin counter
 								WRITE_PORT(state,0,0x0c);
-								if (state->coins[0] >= state->coins_per_cred[0])
+								if (state->m_coins[0] >= state->m_coins_per_cred[0])
 								{
-									state->credits += state->creds_per_coin[0];
-									state->coins[0] -= state->coins_per_cred[0];
+									state->m_credits += state->m_creds_per_coin[0];
+									state->m_coins[0] -= state->m_coins_per_cred[0];
 								}
 							}
 							if (toggle & in & 0x20)
 							{
-								state->coins[1]++;
+								state->m_coins[1]++;
 								WRITE_PORT(state,0,0x08);	// coin counter
 								WRITE_PORT(state,0,0x0c);
-								if (state->coins[1] >= state->coins_per_cred[1])
+								if (state->m_coins[1] >= state->m_coins_per_cred[1])
 								{
-									state->credits += state->creds_per_coin[1];
-									state->coins[1] -= state->coins_per_cred[1];
+									state->m_credits += state->m_creds_per_coin[1];
+									state->m_coins[1] -= state->m_coins_per_cred[1];
 								}
 							}
 							if (toggle & in & 0x40)
 							{
-								state->credits++;
+								state->m_credits++;
 							}
 						}
 					}
-					else state->credits = 100;	// free play
+					else state->m_credits = 100;	// free play
 
-					if (state->mode == 1)
+					if (state->m_mode == 1)
 					{
 						int on = (device->machine().primary_screen->frame_number() & 0x10) >> 4;
 
-						if (state->credits >= 2)
+						if (state->m_credits >= 2)
 							WRITE_PORT(state,0,0x0c | 3*on);	// lamps
-						else if (state->credits >= 1)
+						else if (state->m_credits >= 1)
 							WRITE_PORT(state,0,0x0c | 2*on);	// lamps
 						else
 							WRITE_PORT(state,0,0x0c);	// lamps off
@@ -275,20 +278,20 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 						/* check for 1 player start button */
 						if (toggle & in & 0x04)
 						{
-							if (state->credits >= 1)
+							if (state->m_credits >= 1)
 							{
-								state->credits--;
-								state->mode = 2;
+								state->m_credits--;
+								state->m_mode = 2;
 								WRITE_PORT(state,0,0x0c);	// lamps off
 							}
 						}
 						/* check for 2 players start button */
 						else if (toggle & in & 0x08)
 						{
-							if (state->credits >= 2)
+							if (state->m_credits >= 2)
 							{
-								state->credits -= 2;
-								state->mode = 2;
+								state->m_credits -= 2;
+								state->m_mode = 2;
 								WRITE_PORT(state, 0,0x0c);	// lamps off
 							}
 						}
@@ -298,7 +301,7 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 				if (~READ_PORT(state, 1) & 0x08)	/* check test mode switch */
 					return 0xbb;
 
-				return (state->credits / 10) * 16 + state->credits % 10;
+				return (state->m_credits / 10) * 16 + state->m_credits % 10;
 
 			case 1:
 				{
@@ -306,11 +309,11 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 					int in,toggle;
 
 					in = ~READ_PORT(state,0);
-					toggle = in ^ state->lastbuttons;
-					state->lastbuttons = (state->lastbuttons & 2) | (in & 1);
+					toggle = in ^ state->m_lastbuttons;
+					state->m_lastbuttons = (state->m_lastbuttons & 2) | (in & 1);
 
 					/* remap joystick */
-					if (state->remap_joy) joy = joy_map[joy];
+					if (state->m_remap_joy) joy = joy_map[joy];
 
 					/* fire */
 					joy |= ((toggle & in & 0x01)^1) << 4;
@@ -325,11 +328,11 @@ READ8_DEVICE_HANDLER( namco_51xx_read )
 					int in,toggle;
 
 					in = ~READ_PORT(state,0);
-					toggle = in ^ state->lastbuttons;
-					state->lastbuttons = (state->lastbuttons & 1) | (in & 2);
+					toggle = in ^ state->m_lastbuttons;
+					state->m_lastbuttons = (state->m_lastbuttons & 1) | (in & 2);
 
 					/* remap joystick */
-					if (state->remap_joy) joy = joy_map[joy];
+					if (state->m_remap_joy) joy = joy_map[joy];
 
 					/* fire */
 					joy |= ((toggle & in & 0x02)^2) << 3;
@@ -383,18 +386,18 @@ static DEVICE_START( namco_51xx )
 	assert(config != NULL);
 
 	/* find our CPU */
-	state->cpu = device->subdevice("mcu");
-	assert(state->cpu != NULL);
+	state->m_cpu = device->subdevice("mcu");
+	assert(state->m_cpu != NULL);
 
 	/* resolve our read callbacks */
-	devcb_resolve_read8(&state->in[0], &config->in[0], device);
-	devcb_resolve_read8(&state->in[1], &config->in[1], device);
-	devcb_resolve_read8(&state->in[2], &config->in[2], device);
-	devcb_resolve_read8(&state->in[3], &config->in[3], device);
+	devcb_resolve_read8(&state->m_in[0], &config->in[0], device);
+	devcb_resolve_read8(&state->m_in[1], &config->in[1], device);
+	devcb_resolve_read8(&state->m_in[2], &config->in[2], device);
+	devcb_resolve_read8(&state->m_in[3], &config->in[3], device);
 
 	/* resolve our write callbacks */
-	devcb_resolve_write8(&state->out[0], &config->out[0], device);
-	devcb_resolve_write8(&state->out[1], &config->out[1], device);
+	devcb_resolve_write8(&state->m_out[0], &config->out[0], device);
+	devcb_resolve_write8(&state->m_out[1], &config->out[1], device);
 #if 0
 	INT32 lastcoins,lastbuttons;
 	INT32 credits;
@@ -404,16 +407,16 @@ static DEVICE_START( namco_51xx )
 	INT32 in_count;
 	INT32 mode,coincred_mode,remap_joy;
 #endif
-	device->save_item(NAME(state->lastcoins));
-	device->save_item(NAME(state->lastbuttons));
-	device->save_item(NAME(state->credits));
-	device->save_item(NAME(state->coins));
-	device->save_item(NAME(state->coins_per_cred));
-	device->save_item(NAME(state->creds_per_coin));
-	device->save_item(NAME(state->in_count));
-	device->save_item(NAME(state->mode));
-	device->save_item(NAME(state->coincred_mode));
-	device->save_item(NAME(state->remap_joy));
+	device->save_item(NAME(state->m_lastcoins));
+	device->save_item(NAME(state->m_lastbuttons));
+	device->save_item(NAME(state->m_credits));
+	device->save_item(NAME(state->m_coins));
+	device->save_item(NAME(state->m_coins_per_cred));
+	device->save_item(NAME(state->m_creds_per_coin));
+	device->save_item(NAME(state->m_in_count));
+	device->save_item(NAME(state->m_mode));
+	device->save_item(NAME(state->m_coincred_mode));
+	device->save_item(NAME(state->m_remap_joy));
 }
 
 
@@ -426,14 +429,14 @@ static DEVICE_RESET( namco_51xx )
 	namco_51xx_state *state = get_safe_token(device);
 
 	/* reset internal registers */
-	state->credits = 0;
-	state->coins[0] = 0;
-	state->coins_per_cred[0] = 1;
-	state->creds_per_coin[0] = 1;
-	state->coins[1] = 0;
-	state->coins_per_cred[1] = 1;
-	state->creds_per_coin[1] = 1;
-	state->in_count = 0;
+	state->m_credits = 0;
+	state->m_coins[0] = 0;
+	state->m_coins_per_cred[0] = 1;
+	state->m_creds_per_coin[0] = 1;
+	state->m_coins[1] = 0;
+	state->m_coins_per_cred[1] = 1;
+	state->m_creds_per_coin[1] = 1;
+	state->m_in_count = 0;
 }
 
 

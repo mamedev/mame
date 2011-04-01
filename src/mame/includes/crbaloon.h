@@ -14,13 +14,13 @@ public:
 	crbaloon_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *pc3092_data;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *spriteram;
-	UINT16 collision_address;
-	UINT8 collision_address_clear;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_pc3092_data;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_spriteram;
+	UINT16 m_collision_address;
+	UINT8 m_collision_address_clear;
+	tilemap_t *m_bg_tilemap;
 };
 
 

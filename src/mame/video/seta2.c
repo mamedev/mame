@@ -125,10 +125,10 @@ WRITE16_HANDLER( seta2_vregs_w )
     */
 
 	seta2_state *state = space->machine().driver_data<seta2_state>();
-	UINT16 olddata = state->vregs[offset];
+	UINT16 olddata = state->m_vregs[offset];
 
-	COMBINE_DATA(&state->vregs[offset]);
-	if ( state->vregs[offset] != olddata )
+	COMBINE_DATA(&state->m_vregs[offset]);
+	if ( state->m_vregs[offset] != olddata )
 		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
 
 	switch( offset*2 )
@@ -217,10 +217,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 	// Sprites list
 
 	seta2_state *state = machine.driver_data<seta2_state>();
-	// When debugging, use state->spriteram here, and run mame -update_in_pause
-	UINT16 *buffered_spriteram16 = state->buffered_spriteram;
+	// When debugging, use state->m_spriteram here, and run mame -update_in_pause
+	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[state->spriteram_size/2];
+	UINT16 *end = &buffered_spriteram16[state->m_spriteram_size/2];
 
 	for ( ; s1 < end; s1+=4 )
 	{
@@ -318,7 +318,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				sx &= 0x3ff;
 				sy &= 0x1ff;
 
-				scrollx += state->xoffset;
+				scrollx += state->m_xoffset;
 				scrollx &= 0x3ff;
 				scrolly &= 0x1ff;
 
@@ -333,7 +333,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				if (clip.max_x > cliprect->max_x)	clip.max_x = cliprect->max_x;
 
 				// sprite clipping region (y)
-				clip.min_y = ((sy + yoffs) & 0x1ff) - state->yoffset;
+				clip.min_y = ((sy + yoffs) & 0x1ff) - state->m_yoffset;
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
 				if (clip.min_y > cliprect->max_y)	continue;
@@ -346,7 +346,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				// Draw the rows
 				for (y = 0; y < (0x40 >> tilesize); y++)
 				{
-					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - state->yoffset;
+					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - state->m_yoffset;
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -410,7 +410,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				sx = (sx & 0x1ff) - (sx & 0x200);
 
 				sy &= 0x1ff;
-				sy -= state->yoffset;
+				sy -= state->m_yoffset;
 
 				code &= ~((sizex+1) * (sizey+1) - 1);	// see myangel, myangel2 and grdians
 
@@ -451,12 +451,12 @@ VIDEO_START( seta2 )
 	machine.gfx[4]->color_granularity = 16;
 	machine.gfx[5]->color_granularity = 16;
 
-	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
 
-	state->xoffset = 0;
-	state->yoffset = 0;
+	state->m_xoffset = 0;
+	state->m_yoffset = 0;
 
-    state_save_register_global_pointer(machine, state->vregs, 0x40);
+    state_save_register_global_pointer(machine, state->m_vregs, 0x40);
 }
 
 VIDEO_START( seta2_xoffset )
@@ -465,7 +465,7 @@ VIDEO_START( seta2_xoffset )
 
 	VIDEO_START_CALL(seta2);
 
-	state->xoffset = 0x200;
+	state->m_xoffset = 0x200;
 }
 
 VIDEO_START( seta2_yoffset )
@@ -474,7 +474,7 @@ VIDEO_START( seta2_yoffset )
 
 	VIDEO_START_CALL(seta2);
 
-	state->yoffset = 0x10;
+	state->m_yoffset = 0x10;
 }
 
 SCREEN_UPDATE( seta2 )
@@ -484,7 +484,7 @@ SCREEN_UPDATE( seta2 )
 	// Black or pen 0?
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
-	if ( (state->vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
+	if ( (state->m_vregs[0x30/2] & 1) == 0 )	// 1 = BLANK SCREEN
 		draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;
@@ -495,5 +495,5 @@ SCREEN_EOF( seta2 )
 	seta2_state *state = machine.driver_data<seta2_state>();
 
 	// Buffer sprites by 1 frame
-	memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);
+	memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
 }

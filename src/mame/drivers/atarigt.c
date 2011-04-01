@@ -50,9 +50,9 @@ static void cage_irq_callback(running_machine &machine, int reason);
 static void update_interrupts(running_machine &machine)
 {
 	atarigt_state *state = machine.driver_data<atarigt_state>();
-	cputag_set_input_line(machine, "maincpu", 3, state->sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, state->m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -110,8 +110,8 @@ static READ32_HANDLER( special_port3_r )
 {
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
 	int temp = input_port_read(space->machine(), "COIN");
-	if (state->video_int_state) temp ^= 0x0001;
-	if (state->scanline_int_state) temp ^= 0x0002;
+	if (state->m_video_int_state) temp ^= 0x0001;
+	if (state->m_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
 }
 
@@ -199,7 +199,7 @@ static WRITE32_HANDLER( latch_w )
 		atarigt_state *state = space->machine().driver_data<atarigt_state>();
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(state->rle, (data >> 27) & 7);
+		atarirle_control_w(state->m_rle, (data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -214,9 +214,9 @@ static WRITE32_HANDLER( latch_w )
 static WRITE32_HANDLER( mo_command_w )
 {
 	atarigt_state *state = space->machine().driver_data<atarigt_state>();
-	COMBINE_DATA(state->mo_command);
+	COMBINE_DATA(state->m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(state->m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -269,8 +269,8 @@ static void tmek_update_mode(atarigt_state *state, offs_t offset)
 
 	/* pop us into the readseq */
 	for (i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		state->protaddr[i] = state->protaddr[i + 1];
-	state->protaddr[ADDRSEQ_COUNT - 1] = offset;
+		state->m_protaddr[i] = state->m_protaddr[i + 1];
+	state->m_protaddr[ADDRSEQ_COUNT - 1] = offset;
 
 }
 
@@ -294,7 +294,7 @@ static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 	switch (offset)
 	{
 		case 0xdb0000:
-			state->ignore_writes = (data == 0x18);
+			state->m_ignore_writes = (data == 0x18);
 			break;
 	}
 }
@@ -313,7 +313,7 @@ static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 		/* status register; the code spins on this waiting for the high bit to be set */
 		case 0xdb8700:
 		case 0xdb87c0:
-//          if (state->protmode != 0)
+//          if (state->m_protmode != 0)
 			{
 				*data = -1;//0x8000;
 			}
@@ -335,31 +335,31 @@ static void primage_update_mode(atarigt_state *state, offs_t offset)
 
 	/* pop us into the readseq */
 	for (i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		state->protaddr[i] = state->protaddr[i + 1];
-	state->protaddr[ADDRSEQ_COUNT - 1] = offset;
+		state->m_protaddr[i] = state->m_protaddr[i + 1];
+	state->m_protaddr[ADDRSEQ_COUNT - 1] = offset;
 
 	/* check for particular sequences */
-	if (!state->protmode)
+	if (!state->m_protmode)
 	{
 		/* this is from the code at $20f90 */
-		if (state->protaddr[1] == 0xdcc7c4 && state->protaddr[2] == 0xdcc7c4 && state->protaddr[3] == 0xdc4010)
+		if (state->m_protaddr[1] == 0xdcc7c4 && state->m_protaddr[2] == 0xdcc7c4 && state->m_protaddr[3] == 0xdc4010)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 1\n");
-			state->protmode = 1;
+			state->m_protmode = 1;
 		}
 
 		/* this is from the code at $27592 */
-		if (state->protaddr[0] == 0xdcc7ca && state->protaddr[1] == 0xdcc7ca && state->protaddr[2] == 0xdcc7c6 && state->protaddr[3] == 0xdc4022)
+		if (state->m_protaddr[0] == 0xdcc7ca && state->m_protaddr[1] == 0xdcc7ca && state->m_protaddr[2] == 0xdcc7c6 && state->m_protaddr[3] == 0xdc4022)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 2\n");
-			state->protmode = 2;
+			state->m_protmode = 2;
 		}
 
 		/* this is from the code at $3d8dc */
-		if (state->protaddr[0] == 0xdcc7c0 && state->protaddr[1] == 0xdcc7c0 && state->protaddr[2] == 0xdc80f2 && state->protaddr[3] == 0xdc7af2)
+		if (state->m_protaddr[0] == 0xdcc7c0 && state->m_protaddr[1] == 0xdcc7c0 && state->m_protaddr[2] == 0xdc80f2 && state->m_protaddr[3] == 0xdc7af2)
 		{
 			if (LOG_PROTECTION) logerror("prot:Entering mode 3\n");
-			state->protmode = 3;
+			state->m_protmode = 3;
 		}
 	}
 }
@@ -415,22 +415,22 @@ static void primrage_protection_w(address_space *space, offs_t offset, UINT16 da
 	primage_update_mode(state, offset);
 
 	/* check for certain read sequences */
-	if (state->protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(state->protdata) * 2)
-		state->protdata[(offset - 0xdc7800) / 2] = data;
+	if (state->m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(state->m_protdata) * 2)
+		state->m_protdata[(offset - 0xdc7800) / 2] = data;
 
-	if (state->protmode == 2)
+	if (state->m_protmode == 2)
 	{
 		int temp = (offset - 0xdc7800) / 2;
 		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
-		state->protresult = temp * 0x6915 + 0x6915;
+		state->m_protresult = temp * 0x6915 + 0x6915;
 	}
 
-	if (state->protmode == 3)
+	if (state->m_protmode == 3)
 	{
 		if (offset == 0xdc4700)
 		{
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 3\n");
-			state->protmode = 0;
+			state->m_protmode = 0;
 		}
 	}
 }
@@ -518,7 +518,7 @@ if (LOG_PROTECTION)
 	{
 		/* status register; the code spins on this waiting for the high bit to be set */
 		case 0xdc4700:
-//          if (state->protmode != 0)
+//          if (state->m_protmode != 0)
 			{
 				*data = 0x8000;
 			}
@@ -526,18 +526,18 @@ if (LOG_PROTECTION)
 
 		/* some kind of result register */
 		case 0xdcc7c2:
-			if (state->protmode == 2)
+			if (state->m_protmode == 2)
 			{
-				*data = state->protresult;
-				state->protmode = 0;
+				*data = state->m_protresult;
+				state->m_protmode = 0;
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 2\n");
 			}
 			break;
 
 		case 0xdcc7c4:
-			if (state->protmode == 1)
+			if (state->m_protmode == 1)
 			{
-				state->protmode = 0;
+				state->m_protmode = 0;
 			if (LOG_PROTECTION) logerror("prot:Clearing mode 1\n");
 			}
 			break;
@@ -562,13 +562,13 @@ static READ32_HANDLER( colorram_protection_r )
 	if (ACCESSING_BITS_16_31)
 	{
 		result = atarigt_colorram_r(state, address);
-		(*state->protection_r)(space, address, &result);
+		(*state->m_protection_r)(space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		result = atarigt_colorram_r(state, address + 2);
-		(*state->protection_r)(space, address + 2, &result);
+		(*state->m_protection_r)(space, address + 2, &result);
 		result32 |= result;
 	}
 
@@ -583,15 +583,15 @@ static WRITE32_HANDLER( colorram_protection_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		if (!state->ignore_writes)
+		if (!state->m_ignore_writes)
 			atarigt_colorram_w(state, address, data >> 16, mem_mask >> 16);
-		(*state->protection_w)(space, address, data >> 16);
+		(*state->m_protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		if (!state->ignore_writes)
+		if (!state->m_ignore_writes)
 			atarigt_colorram_w(state, address + 2, data, mem_mask);
-		(*state->protection_w)(space, address + 2, data);
+		(*state->m_protection_w)(space, address + 2, data);
 	}
 }
 
@@ -610,12 +610,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd4ffff) AM_WRITE(atarigen_eeprom_enable32_w)
-	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigt_state, playfield32)
-	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigt_state, alpha32)
+	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigt_state, m_playfield32)
+	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigt_state, m_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigt_state, mo_command)
+	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigt_state, m_mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
-	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_BASE_MEMBER(atarigt_state, colorram)
+	AM_RANGE(0xd80000, 0xdfffff) AM_READWRITE(colorram_protection_r, colorram_protection_w) AM_BASE_MEMBER(atarigt_state, m_colorram)
 	AM_RANGE(0xe04000, 0xe04003) AM_WRITE(led_w)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0a000, 0xe0a003) AM_WRITE(atarigen_scanline_int_ack32_w)
@@ -1271,15 +1271,15 @@ static DRIVER_INIT( tmek )
 {
 	atarigt_state *state = machine.driver_data<atarigt_state>();
 
-	state->eeprom_default = NULL;
-	state->is_primrage = 0;
+	state->m_eeprom_default = NULL;
+	state->m_is_primrage = 0;
 
 	cage_init(machine, 0x4fad);
 	cage_set_irq_handler(cage_irq_callback);
 
 	/* setup protection */
-	state->protection_r = tmek_protection_r;
-	state->protection_w = tmek_protection_w;
+	state->m_protection_r = tmek_protection_r;
+	state->m_protection_w = tmek_protection_w;
 
 	/* temp hack */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd72000, 0xd75fff, FUNC(tmek_pf_w));
@@ -1290,15 +1290,15 @@ static void primrage_init_common(running_machine &machine, offs_t cage_speedup)
 {
 	atarigt_state *state = machine.driver_data<atarigt_state>();
 
-	state->eeprom_default = NULL;
-	state->is_primrage = 1;
+	state->m_eeprom_default = NULL;
+	state->m_is_primrage = 1;
 
 	cage_init(machine, cage_speedup);
 	cage_set_irq_handler(cage_irq_callback);
 
 	/* install protection */
-	state->protection_r = primrage_protection_r;
-	state->protection_w = primrage_protection_w;
+	state->m_protection_r = primrage_protection_r;
+	state->m_protection_w = primrage_protection_w;
 }
 
 static DRIVER_INIT( primrage ) { primrage_init_common(machine, 0x42f2); }

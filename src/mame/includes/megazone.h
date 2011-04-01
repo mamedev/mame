@@ -11,28 +11,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *       scrollx;
-	UINT8 *       scrolly;
-	UINT8 *       videoram;
-	UINT8 *       colorram;
-	UINT8 *       videoram2;
-	UINT8 *       colorram2;
-	UINT8 *       spriteram;
-	size_t        spriteram_size;
-	size_t        videoram_size;
-	size_t        videoram2_size;
+	UINT8 *       m_scrollx;
+	UINT8 *       m_scrolly;
+	UINT8 *       m_videoram;
+	UINT8 *       m_colorram;
+	UINT8 *       m_videoram2;
+	UINT8 *       m_colorram2;
+	UINT8 *       m_spriteram;
+	size_t        m_spriteram_size;
+	size_t        m_videoram_size;
+	size_t        m_videoram2_size;
 
 	/* video-related */
-	bitmap_t      *tmpbitmap;
-	int           flipscreen;
+	bitmap_t      *m_tmpbitmap;
+	int           m_flipscreen;
 
 	/* misc */
-	int           i8039_status;
+	int           m_i8039_status;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	cpu_device *daccpu;
+	cpu_device *m_maincpu;
+	cpu_device *m_audiocpu;
+	cpu_device *m_daccpu;
 };
 
 

@@ -51,9 +51,9 @@ PALETTE_INIT( xorworld )
 WRITE16_HANDLER( xorworld_videoram16_w )
 {
 	xorworld_state *state = space->machine().driver_data<xorworld_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 /*
@@ -69,7 +69,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	xorworld_state *state = machine.driver_data<xorworld_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
 	int code = data & 0x0fff;
 
@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( xorworld )
 {
 	xorworld_state *state = machine.driver_data<xorworld_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
@@ -99,7 +99,7 @@ VIDEO_START( xorworld )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	xorworld_state *state = machine.driver_data<xorworld_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int i;
 
 	for (i = 0; i < 0x40; i += 2)
@@ -116,7 +116,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( xorworld )
 {
 	xorworld_state *state = screen->machine().driver_data<xorworld_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

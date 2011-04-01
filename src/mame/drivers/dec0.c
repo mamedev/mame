@@ -307,14 +307,14 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)									/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)								/* Sprites */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)									/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)								/* Sprites */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM									/* Main ram */
-	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(dec0_state, robocop_shared_ram)	/* Shared ram */
+	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_robocop_shared_ram)	/* Shared ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
@@ -402,7 +402,7 @@ static WRITE16_HANDLER( unmapped_w )
 {
 	// fall through for unmapped protection areas
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->slyspy_state);
+	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->m_slyspy_state);
 }
 
 void slyspy_set_protection_map(running_machine& machine, int type);
@@ -410,16 +410,16 @@ void slyspy_set_protection_map(running_machine& machine, int type);
 WRITE16_HANDLER( slyspy_state_w )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->slyspy_state=0;
-	slyspy_set_protection_map(space->machine(), state->slyspy_state);
+	state->m_slyspy_state=0;
+	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
 }
 
 READ16_HANDLER( slyspy_state_r )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->slyspy_state++;
-	state->slyspy_state=state->slyspy_state%4;
-	slyspy_set_protection_map(space->machine(), state->slyspy_state);
+	state->m_slyspy_state++;
+	state->m_slyspy_state=state->m_slyspy_state%4;
+	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
@@ -507,8 +507,8 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)	/* Sly spy main ram */
-	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)	/* Sprites */
+	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)	/* Sly spy main ram */
+	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
@@ -518,8 +518,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
@@ -607,9 +607,9 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram) /* Sly spy main ram */
+	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram) /* Sly spy main ram */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram) /* Sprites */
+	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram) /* Sprites */
 ADDRESS_MAP_END
 
 
@@ -641,14 +641,14 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)				/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)			/* Sprites */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)				/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)			/* Sprites */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( automat_adpcm_w )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->automat_adpcm_byte = data;
+	state->m_automat_adpcm_byte = data;
 }
 
 static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8 )
@@ -1285,17 +1285,17 @@ static const ym3812_interface ym3812b_interface =
 static void automat_vclk_cb(device_t *device)
 {
 	dec0_state *state = device->machine().driver_data<dec0_state>();
-	if (state->automat_msm5205_vclk_toggle == 0)
+	if (state->m_automat_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(device, state->automat_adpcm_byte & 0xf);
+		msm5205_data_w(device, state->m_automat_adpcm_byte & 0xf);
 	}
 	else
 	{
-		msm5205_data_w(device, state->automat_adpcm_byte >> 4);
+		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	state->automat_msm5205_vclk_toggle ^= 1;
+	state->m_automat_msm5205_vclk_toggle ^= 1;
 }
 
 static const msm5205_interface msm5205_config =

@@ -96,18 +96,18 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-----xx- unused
 	//-------x nmi enable
 
-	if((state->s_port3^data)&0x08)
+	if((state->m_s_port3^data)&0x08)
 		memory_set_bankptr(space->machine(), "bank2",&RAM[0x10000+((data&0x08)<<10)]);
 
-	state->s_port3 = data;
+	state->m_s_port3 = data;
 }
 
 static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE_MEMBER(sprcros2_state, fgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_fgvideoram)
 	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(sprcros2_state, spriteram, spriteram_size)
+	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(sprcros2_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE_MEMBER(sprcros2_state, bgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_bgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
@@ -251,7 +251,7 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 {
 	sprcros2_state *state = device->machine().driver_data<sprcros2_state>();
 
-	if(state->s_port3&0x01)
+	if(state->m_s_port3&0x01)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -260,7 +260,7 @@ static MACHINE_START( sprcros2 )
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
 	state->save_item(NAME(state->m_port7));
-	state->save_item(NAME(state->s_port3));
+	state->save_item(NAME(state->m_s_port3));
 }
 
 static MACHINE_CONFIG_START( sprcros2, sprcros2_state )

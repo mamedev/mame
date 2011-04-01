@@ -9,9 +9,9 @@ INTERRUPT_GEN( beezer_interrupt )
 	beezer_state *state = device->machine().driver_data<beezer_state>();
 	via6522_device *via_0 = device->machine().device<via6522_device>("via6522_0");
 
-	state->scanline = (state->scanline + 1) % 0x80;
-	via_0->write_ca2((state->scanline & 0x10) ? 1 : 0);
-	if ((state->scanline & 0x78) == 0x78)
+	state->m_scanline = (state->m_scanline + 1) % 0x80;
+	via_0->write_ca2((state->m_scanline & 0x10) ? 1 : 0);
+	if ((state->m_scanline & 0x78) == 0x78)
 		device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		device_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
@@ -20,7 +20,7 @@ INTERRUPT_GEN( beezer_interrupt )
 SCREEN_UPDATE( beezer )
 {
 	beezer_state *state = screen->machine().driver_data<beezer_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int x,y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y+=2)
@@ -69,6 +69,6 @@ WRITE8_HANDLER( beezer_map_w )
 READ8_HANDLER( beezer_line_r )
 {
 	beezer_state *state = space->machine().driver_data<beezer_state>();
-	return (state->scanline & 0xfe) << 1;
+	return (state->m_scanline & 0xfe) << 1;
 }
 

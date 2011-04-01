@@ -5,7 +5,7 @@ struct counter_state
 	UINT8			control;
 	UINT16			latch;
 	UINT16			count;
-	emu_timer *	timer;
+	emu_timer *		timer;
 	UINT8			timer_active;
 	attotime		period;
 };
@@ -16,29 +16,29 @@ public:
 	mcr68_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 control_word;
-	UINT8 protection_data[5];
-	attotime timing_factor;
-	UINT8 sprite_clip;
-	INT8 sprite_xoffset;
-	UINT8 m6840_status;
-	UINT8 m6840_status_read_since_int;
-	UINT8 m6840_msb_buffer;
-	UINT8 m6840_lsb_buffer;
-	UINT8 m6840_irq_state;
-	UINT8 m6840_irq_vector;
-	struct counter_state m6840_state[3];
-	UINT8 v493_irq_state;
-	UINT8 v493_irq_vector;
-	timer_expired_func v493_callback;
-	UINT8 zwackery_sound_data;
-	attotime m6840_counter_periods[3];
-	attotime m6840_internal_counter_period;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_videoram;
+	UINT16 m_control_word;
+	UINT8 m_protection_data[5];
+	attotime m_timing_factor;
+	UINT8 m_sprite_clip;
+	INT8 m_sprite_xoffset;
+	UINT8 m_m6840_status;
+	UINT8 m_m6840_status_read_since_int;
+	UINT8 m_m6840_msb_buffer;
+	UINT8 m_m6840_lsb_buffer;
+	UINT8 m_m6840_irq_state;
+	UINT8 m_m6840_irq_vector;
+	struct counter_state m_m6840_state[3];
+	UINT8 m_v493_irq_state;
+	UINT8 m_v493_irq_vector;
+	timer_expired_func m_v493_callback;
+	UINT8 m_zwackery_sound_data;
+	attotime m_m6840_counter_periods[3];
+	attotime m_m6840_internal_counter_period;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

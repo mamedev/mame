@@ -4,23 +4,23 @@ public:
 	stlforce_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *bg_tilemap;
-	tilemap_t *mlow_tilemap;
-	tilemap_t *mhigh_tilemap;
-	tilemap_t *tx_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_mlow_tilemap;
+	tilemap_t *m_mhigh_tilemap;
+	tilemap_t *m_tx_tilemap;
 
-	UINT16 *bg_videoram;
-	UINT16 *mlow_videoram;
-	UINT16 *mhigh_videoram;
-	UINT16 *tx_videoram;
-	UINT16 *bg_scrollram;
-	UINT16 *mlow_scrollram;
-	UINT16 *mhigh_scrollram;
-	UINT16 *vidattrram;
+	UINT16 *m_bg_videoram;
+	UINT16 *m_mlow_videoram;
+	UINT16 *m_mhigh_videoram;
+	UINT16 *m_tx_videoram;
+	UINT16 *m_bg_scrollram;
+	UINT16 *m_mlow_scrollram;
+	UINT16 *m_mhigh_scrollram;
+	UINT16 *m_vidattrram;
 
-	UINT16 *spriteram;
+	UINT16 *m_spriteram;
 
-	int sprxoffs;
+	int m_sprxoffs;
 };
 
 

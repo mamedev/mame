@@ -4,11 +4,11 @@ public:
 	tigeroad_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *ram16;
-	int bgcharbank;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	UINT16 *m_videoram;
+	UINT16 *m_ram16;
+	int m_bgcharbank;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
 

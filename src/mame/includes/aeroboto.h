@@ -11,30 +11,33 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * mainram;
-	UINT8 * spriteram;
-	UINT8 * videoram;
-	UINT8 * hscroll;
-	UINT8 * vscroll;
-	UINT8 * tilecolor;
-	UINT8 * starx;
-	UINT8 * stary;
-	UINT8 * bgcolor;
-	size_t  spriteram_size;
+	UINT8 * m_mainram;
+	UINT8 * m_spriteram;
+	UINT8 * m_videoram;
+	UINT8 * m_hscroll;
+	UINT8 * m_vscroll;
+	UINT8 * m_tilecolor;
+	UINT8 * m_starx;
+	UINT8 * m_stary;
+	UINT8 * m_bgcolor;
+	size_t  m_spriteram_size;
 
 	/* stars layout */
-	UINT8 * stars_rom;
-	int     stars_length;
+	UINT8 * m_stars_rom;
+	int     m_stars_length;
 
 	/* video-related */
-	tilemap_t *bg_tilemap;
-	int     charbank, starsoff;
-	int     sx, sy;
-	UINT8   ox, oy;
+	tilemap_t *m_bg_tilemap;
+	int     m_charbank;
+	int     m_starsoff;
+	int     m_sx;
+	int     m_sy;
+	UINT8   m_ox;
+	UINT8   m_oy;
 
 	/* misc */
-	int count;
-	int disable_irq;
+	int m_count;
+	int m_disable_irq;
 };
 
 

@@ -32,25 +32,25 @@ PALETTE_INIT( polyplay )
 WRITE8_HANDLER( polyplay_characterram_w )
 {
 	polyplay_state *state = space->machine().driver_data<polyplay_state>();
-	if (state->characterram[offset] != data)
+	if (state->m_characterram[offset] != data)
 	{
 		gfx_element_mark_dirty(space->machine().gfx[1], (offset >> 3) & 0x7f);
 
-		state->characterram[offset] = data;
+		state->m_characterram[offset] = data;
 	}
 }
 
 VIDEO_START( polyplay )
 {
 	polyplay_state *state = machine.driver_data<polyplay_state>();
-	gfx_element_set_source(machine.gfx[1], state->characterram);
+	gfx_element_set_source(machine.gfx[1], state->m_characterram);
 }
 
 
 SCREEN_UPDATE( polyplay )
 {
 	polyplay_state *state = screen->machine().driver_data<polyplay_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	offs_t offs;
 
 

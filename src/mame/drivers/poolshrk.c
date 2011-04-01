@@ -48,7 +48,7 @@ static DRIVER_INIT( poolshrk )
 static WRITE8_HANDLER( poolshrk_da_latch_w )
 {
 	poolshrk_state *state = space->machine().driver_data<poolshrk_state>();
-	state->da_latch = data & 15;
+	state->m_da_latch = data & 15;
 }
 
 
@@ -79,8 +79,8 @@ static READ8_HANDLER( poolshrk_input_r )
 	int x = input_port_read(space->machine(), (offset & 1) ? "AN1" : "AN0");
 	int y = input_port_read(space->machine(), (offset & 1) ? "AN3" : "AN2");
 
-	if (x >= state->da_latch) val |= 8;
-	if (y >= state->da_latch) val |= 4;
+	if (x >= state->m_da_latch) val |= 8;
+	if (y >= state->m_da_latch) val |= 4;
 
 	if ((offset & 3) == 3)
 	{
@@ -102,9 +102,9 @@ static READ8_HANDLER( poolshrk_irq_reset_r )
 static ADDRESS_MAP_START( poolshrk_cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x2300) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, playfield_ram)
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, hpos_ram)
-	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, vpos_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, m_playfield_ram)
+	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, m_hpos_ram)
+	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE_MEMBER(poolshrk_state, m_vpos_ram)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(poolshrk_input_r, poolshrk_watchdog_w)
 	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_DEVWRITE("discrete", poolshrk_scratch_sound_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_DEVWRITE("discrete", poolshrk_score_sound_w)

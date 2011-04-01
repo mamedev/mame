@@ -21,7 +21,7 @@ static INTERRUPT_GEN( shaolins_interrupt )
 	if (cpu_getiloops(device) == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (state->nmi_enable & 0x02) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_nmi_enable & 0x02) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -46,9 +46,9 @@ static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(shaolins_scroll_w)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM							/* RAM BANK 2 */
 	AM_RANGE(0x3000, 0x30ff) AM_RAM							/* RAM BANK 1 */
-	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_BASE_SIZE_MEMBER(shaolins_state, spriteram, spriteram_size)
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_BASE_MEMBER(shaolins_state, colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_BASE_MEMBER(shaolins_state, videoram)
+	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_BASE_SIZE_MEMBER(shaolins_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_BASE_MEMBER(shaolins_state, m_colorram)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_BASE_MEMBER(shaolins_state, m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM 						/* Machine checks for extra rom */
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

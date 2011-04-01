@@ -68,20 +68,20 @@ static void nbmj9195_outcoin_flag_w(address_space *space, int data)
 	// bit2: hopper
 	// bit3: coin lockout
 
-	if (data & 0x04) state->outcoin_flag ^= 1;
-	else state->outcoin_flag = 1;
+	if (data & 0x04) state->m_outcoin_flag ^= 1;
+	else state->m_outcoin_flag = 1;
 }
 
 static WRITE8_HANDLER( nbmj9195_inputportsel_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->inputport = (data ^ 0xff);
+	state->m_inputport = (data ^ 0xff);
 }
 
 static int nbmj9195_dipsw_r(running_machine &machine)
 {
 	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	return ((((input_port_read(machine, "DSWA") & 0xff) | ((input_port_read(machine, "DSWB") & 0xff) << 8)) >> state->dipswbitsel) & 0x01);
+	return ((((input_port_read(machine, "DSWA") & 0xff) | ((input_port_read(machine, "DSWB") & 0xff) << 8)) >> state->m_dipswbitsel) & 0x01);
 }
 
 static void nbmj9195_dipswbitsel_w(address_space *space, int data)
@@ -90,14 +90,14 @@ static void nbmj9195_dipswbitsel_w(address_space *space, int data)
 	switch (data & 0xc0)
 	{
 		case 0x00:
-			state->dipswbitsel = 0;
+			state->m_dipswbitsel = 0;
 			break;
 		case 0x40:
 			break;
 		case 0x80:
 			break;
 		case 0xc0:
-			state->dipswbitsel = ((state->dipswbitsel + 1) & 0x0f);
+			state->m_dipswbitsel = ((state->m_dipswbitsel + 1) & 0x0f);
 			break;
 		default:
 			break;
@@ -107,7 +107,7 @@ static void nbmj9195_dipswbitsel_w(address_space *space, int data)
 static void mscoutm_inputportsel_w(address_space *space, int data)
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->mscoutm_inputport = (data ^ 0xff);
+	state->m_mscoutm_inputport = (data ^ 0xff);
 }
 
 static READ8_HANDLER( mscoutm_dipsw_0_r )
@@ -150,7 +150,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
-				switch (state->mscoutm_inputport)
+				switch (state->m_mscoutm_inputport)
 				{
 					case 0x01:
 						portdata = input_port_read(space->machine(), "KEY0");
@@ -175,7 +175,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 				break;
 			case 2:			/* PC_0 */
 				// PLAYER2 KEY
-				switch (state->mscoutm_inputport)
+				switch (state->m_mscoutm_inputport)
 				{
 					case 0x01:
 						portdata = input_port_read(space->machine(), "KEY5");
@@ -233,11 +233,11 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = ((input_port_read(space->machine(), "SYSTEM") & 0xfe) | state->outcoin_flag);
+				portdata = ((input_port_read(space->machine(), "SYSTEM") & 0xfe) | state->m_outcoin_flag);
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
-				switch (state->inputport)
+				switch (state->m_inputport)
 				{
 					case 0x01:
 						portdata = input_port_read(space->machine(), "KEY0");
@@ -261,7 +261,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 				break;
 			case 2:			/* PC_0 */
 				// PLAYER2 KEY
-				switch (state->inputport)
+				switch (state->m_inputport)
 				{
 					case 0x01:
 						portdata = input_port_read(space->machine(), "KEY5");
@@ -405,239 +405,239 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 /* device 0 */
 static READ8_HANDLER( tmpz84c011_0_pa_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,0) & ~state->pio_dir[0]) | (state->pio_latch[0] & state->pio_dir[0]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,0) & ~state->m_pio_dir[0]) | (state->m_pio_latch[0] & state->m_pio_dir[0]);
 }
 static READ8_HANDLER( tmpz84c011_0_pb_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,1) & ~state->pio_dir[1]) | (state->pio_latch[1] & state->pio_dir[1]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,1) & ~state->m_pio_dir[1]) | (state->m_pio_latch[1] & state->m_pio_dir[1]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pc_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,2) & ~state->pio_dir[2]) | (state->pio_latch[2] & state->pio_dir[2]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,2) & ~state->m_pio_dir[2]) | (state->m_pio_latch[2] & state->m_pio_dir[2]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pd_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,3) & ~state->pio_dir[3]) | (state->pio_latch[3] & state->pio_dir[3]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,3) & ~state->m_pio_dir[3]) | (state->m_pio_latch[3] & state->m_pio_dir[3]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pe_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,4) & ~state->pio_dir[4]) | (state->pio_latch[4] & state->pio_dir[4]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,4) & ~state->m_pio_dir[4]) | (state->m_pio_latch[4] & state->m_pio_dir[4]);
 }
 
 
 static WRITE8_HANDLER( tmpz84c011_0_pa_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[0] = data;
+	state->m_pio_latch[0] = data;
 	tmpz84c011_pio_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pb_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[1] = data;
+	state->m_pio_latch[1] = data;
 	tmpz84c011_pio_w(space, 1, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pc_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[2] = data;
+	state->m_pio_latch[2] = data;
 	tmpz84c011_pio_w(space, 2, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pd_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[3] = data;
+	state->m_pio_latch[3] = data;
 	tmpz84c011_pio_w(space, 3, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pe_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[4] = data;
+	state->m_pio_latch[4] = data;
 	tmpz84c011_pio_w(space, 4, data);
 }
 
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[0];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[0];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[1];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[1];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pc_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[2];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[2];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pd_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[3];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[3];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pe_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[4];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[4];
 }
 
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pa_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[0] = data;
+	state->m_pio_dir[0] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pb_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[1] = data;
+	state->m_pio_dir[1] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pc_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[2] = data;
+	state->m_pio_dir[2] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[3] = data;
+	state->m_pio_dir[3] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[4] = data;
+	state->m_pio_dir[4] = data;
 }
 
 
 /* device 1 */
 static READ8_HANDLER( tmpz84c011_1_pa_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,5) & ~state->pio_dir[5]) | (state->pio_latch[5] & state->pio_dir[5]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,5) & ~state->m_pio_dir[5]) | (state->m_pio_latch[5] & state->m_pio_dir[5]);
 }
 
 static READ8_HANDLER( tmpz84c011_1_pb_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,6) & ~state->pio_dir[6]) | (state->pio_latch[6] & state->pio_dir[6]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,6) & ~state->m_pio_dir[6]) | (state->m_pio_latch[6] & state->m_pio_dir[6]);
 }
 
 static READ8_HANDLER( tmpz84c011_1_pc_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,7) & ~state->pio_dir[7]) | (state->pio_latch[7] & state->pio_dir[7]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,7) & ~state->m_pio_dir[7]) | (state->m_pio_latch[7] & state->m_pio_dir[7]);
 }
 
 static READ8_HANDLER( tmpz84c011_1_pd_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,8) & ~state->pio_dir[8]) | (state->pio_latch[8] & state->pio_dir[8]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,8) & ~state->m_pio_dir[8]) | (state->m_pio_latch[8] & state->m_pio_dir[8]);
 }
 
 static READ8_HANDLER( tmpz84c011_1_pe_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,9) & ~state->pio_dir[9]) | (state->pio_latch[9] & state->pio_dir[9]);
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return (tmpz84c011_pio_r(space,9) & ~state->m_pio_dir[9]) | (state->m_pio_latch[9] & state->m_pio_dir[9]);
 }
 
 
 static WRITE8_HANDLER( tmpz84c011_1_pa_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[5] = data;
+	state->m_pio_latch[5] = data;
 	tmpz84c011_pio_w(space, 5, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_pb_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[6] = data;
+	state->m_pio_latch[6] = data;
 	tmpz84c011_pio_w(space, 6, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_pc_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[7] = data;
+	state->m_pio_latch[7] = data;
 	tmpz84c011_pio_w(space, 7, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_pd_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[8] = data;
+	state->m_pio_latch[8] = data;
 	tmpz84c011_pio_w(space, 8, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_pe_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_latch[9] = data;
+	state->m_pio_latch[9] = data;
 	tmpz84c011_pio_w(space, 9, data);
 }
 
 
 static READ8_HANDLER( tmpz84c011_1_dir_pa_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[5];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[5];
 }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pb_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[6];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[6];
 }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pc_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[7];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[7];
 }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pd_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[8];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[8];
 }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pe_r )
 {
-	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->pio_dir[9];
+	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>(); return state->m_pio_dir[9];
 }
 
 
 static WRITE8_HANDLER( tmpz84c011_1_dir_pa_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[5] = data;
+	state->m_pio_dir[5] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_dir_pb_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[6] = data;
+	state->m_pio_dir[6] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_dir_pc_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[7] = data;
+	state->m_pio_dir[7] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_dir_pd_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[8] = data;
+	state->m_pio_dir[8] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )
 {
 	nbmj9195_state *state = space->machine().driver_data<nbmj9195_state>();
-	state->pio_dir[9] = data;
+	state->m_pio_dir[9] = data;
 }
 
 /* CTC of main cpu, ch0 trigger is vblank */
@@ -675,7 +675,7 @@ static MACHINE_RESET( sailorws )
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < (5 * 2); i++)
 	{
-		state->pio_dir[i] = state->pio_latch[i] = 0;
+		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
 		tmpz84c011_pio_w(space, i, 0);
 	}
 }

@@ -6,26 +6,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  bg_videoram;
-	UINT16 *  bg_rasterram;
-	UINT16 *  tx_videoram;
-	UINT16 *  spriteram1;
-	UINT16 *  spriteram2;
-//      UINT16 *  paletteram;    // currently this uses generic palette handling
-	size_t    spriteram1_size;
+	UINT16 *  m_bg_videoram;
+	UINT16 *  m_bg_rasterram;
+	UINT16 *  m_tx_videoram;
+	UINT16 *  m_spriteram1;
+	UINT16 *  m_spriteram2;
+//      UINT16 *  m_paletteram;    // currently this uses generic palette handling
+	size_t    m_spriteram1_size;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*tx_tilemap;
-	int       bg_scrollx, bg_scrolly;
-	int       tx_scrollx, tx_scrolly;
-	int       bg_raster;
-	int       bg_palettebank, tx_palettebank;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_tx_tilemap;
+	int       m_bg_scrollx;
+	int       m_bg_scrolly;
+	int       m_tx_scrollx;
+	int       m_tx_scrolly;
+	int       m_bg_raster;
+	int       m_bg_palettebank;
+	int       m_tx_palettebank;
 
 	/* misc */
-	UINT16    pending_command;
+	UINT16    m_pending_command;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

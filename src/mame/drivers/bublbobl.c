@@ -288,15 +288,15 @@ TODO:
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w)
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE_MEMBER(bublbobl_state, mcu_sharedram)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE_MEMBER(bublbobl_state, m_mcu_sharedram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
@@ -344,8 +344,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
@@ -368,8 +368,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(watchdog_reset_w)
@@ -700,7 +700,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	bublbobl_state *state = device->machine().driver_data<bublbobl_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -725,24 +725,24 @@ static MACHINE_START( common )
 {
 	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->mcu = machine.device("mcu");
-	state->audiocpu = machine.device("audiocpu");
-	state->slave = machine.device("slave");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_mcu = machine.device("mcu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_slave = machine.device("slave");
 
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->sound_status));
-	state->save_item(NAME(state->video_enable));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_sound_status));
+	state->save_item(NAME(state->m_video_enable));
 }
 
 static MACHINE_RESET( common )
 {
 	bublbobl_state *state = machine.driver_data<bublbobl_state>();
 
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->sound_status = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_sound_status = 0;
 }
 
 
@@ -752,7 +752,7 @@ static MACHINE_START( tokio )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->tokio_prot_count));
+	state->save_item(NAME(state->m_tokio_prot_count));
 }
 
 static MACHINE_RESET( tokio )
@@ -761,7 +761,7 @@ static MACHINE_RESET( tokio )
 
 	MACHINE_RESET_CALL(common);
 
-	state->tokio_prot_count = 0;
+	state->m_tokio_prot_count = 0;
 }
 
 static MACHINE_CONFIG_START( tokio, bublbobl_state )
@@ -810,18 +810,18 @@ static MACHINE_START( bublbobl )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->ddr1));
-	state->save_item(NAME(state->ddr2));
-	state->save_item(NAME(state->ddr3));
-	state->save_item(NAME(state->ddr4));
-	state->save_item(NAME(state->port1_in));
-	state->save_item(NAME(state->port2_in));
-	state->save_item(NAME(state->port3_in));
-	state->save_item(NAME(state->port4_in));
-	state->save_item(NAME(state->port1_out));
-	state->save_item(NAME(state->port2_out));
-	state->save_item(NAME(state->port3_out));
-	state->save_item(NAME(state->port4_out));
+	state->save_item(NAME(state->m_ddr1));
+	state->save_item(NAME(state->m_ddr2));
+	state->save_item(NAME(state->m_ddr3));
+	state->save_item(NAME(state->m_ddr4));
+	state->save_item(NAME(state->m_port1_in));
+	state->save_item(NAME(state->m_port2_in));
+	state->save_item(NAME(state->m_port3_in));
+	state->save_item(NAME(state->m_port4_in));
+	state->save_item(NAME(state->m_port1_out));
+	state->save_item(NAME(state->m_port2_out));
+	state->save_item(NAME(state->m_port3_out));
+	state->save_item(NAME(state->m_port4_out));
 }
 
 static MACHINE_RESET( bublbobl )
@@ -830,18 +830,18 @@ static MACHINE_RESET( bublbobl )
 
 	MACHINE_RESET_CALL(common);
 
-	state->ddr1 = 0;
-	state->ddr2 = 0;
-	state->ddr3 = 0;
-	state->ddr4 = 0;
-	state->port1_in = 0;
-	state->port2_in = 0;
-	state->port3_in = 0;
-	state->port4_in = 0;
-	state->port1_out = 0;
-	state->port2_out = 0;
-	state->port3_out = 0;
-	state->port4_out = 0;
+	state->m_ddr1 = 0;
+	state->m_ddr2 = 0;
+	state->m_ddr3 = 0;
+	state->m_ddr4 = 0;
+	state->m_port1_in = 0;
+	state->m_port2_in = 0;
+	state->m_port3_in = 0;
+	state->m_port4_in = 0;
+	state->m_port1_out = 0;
+	state->m_port2_out = 0;
+	state->m_port3_out = 0;
+	state->m_port4_out = 0;
 }
 
 static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
@@ -894,8 +894,8 @@ static MACHINE_START( boblbobl )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->ic43_a));
-	state->save_item(NAME(state->ic43_b));
+	state->save_item(NAME(state->m_ic43_a));
+	state->save_item(NAME(state->m_ic43_b));
 }
 
 static MACHINE_RESET( boblbobl )
@@ -904,8 +904,8 @@ static MACHINE_RESET( boblbobl )
 
 	MACHINE_RESET_CALL(common);
 
-	state->ic43_a = 0;
-	state->ic43_b = 0;
+	state->m_ic43_a = 0;
+	state->m_ic43_b = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
@@ -927,14 +927,14 @@ static MACHINE_START( bub68705 )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
-	state->save_item(NAME(state->port_b_in));
-	state->save_item(NAME(state->port_b_out));
-	state->save_item(NAME(state->ddr_b));
-	state->save_item(NAME(state->address));
-	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
+	state->save_item(NAME(state->m_port_b_in));
+	state->save_item(NAME(state->m_port_b_out));
+	state->save_item(NAME(state->m_ddr_b));
+	state->save_item(NAME(state->m_address));
+	state->save_item(NAME(state->m_latch));
 }
 
 static MACHINE_RESET( bub68705 )
@@ -943,14 +943,14 @@ static MACHINE_RESET( bub68705 )
 
 	MACHINE_RESET_CALL(common);
 
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->address = 0;
-	state->latch = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_address = 0;
+	state->m_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
@@ -1538,7 +1538,7 @@ static DRIVER_INIT( bublbobl )
 	configure_banks(machine);
 
 	/* we init this here, so that it does not conflict with tokio init, below */
-	state->video_enable = 0;
+	state->m_video_enable = 0;
 }
 
 static DRIVER_INIT( tokio )
@@ -1548,7 +1548,7 @@ static DRIVER_INIT( tokio )
 
 	/* preemptively enable video, the bit is not mapped for this game and */
 	/* I don't know if it even has it. */
-	state->video_enable = 1;
+	state->m_video_enable = 1;
 }
 
 static DRIVER_INIT( tokiob )

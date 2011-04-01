@@ -14,14 +14,14 @@
 typedef struct _geebee_sound_state geebee_sound_state;
 struct _geebee_sound_state
 {
-	emu_timer *volume_timer;
-	UINT16 *decay;
-	sound_stream *channel;
-	int sound_latch;
-	int sound_signal;
-	int volume;
-	int noise;
-	int vcount;
+	emu_timer *m_volume_timer;
+	UINT16 *m_decay;
+	sound_stream *m_channel;
+	int m_sound_latch;
+	int m_sound_signal;
+	int m_volume;
+	int m_noise;
+	int m_vcount;
 };
 
 INLINE geebee_sound_state *get_safe_token(device_t *device)
@@ -35,20 +35,20 @@ INLINE geebee_sound_state *get_safe_token(device_t *device)
 static TIMER_CALLBACK( volume_decay )
 {
 	geebee_sound_state *state = (geebee_sound_state *)ptr;
-	if( --state->volume < 0 )
-		state->volume = 0;
+	if( --state->m_volume < 0 )
+		state->m_volume = 0;
 }
 
 WRITE8_DEVICE_HANDLER( geebee_sound_w )
 {
 	geebee_sound_state *state = get_safe_token(device);
 
-	state->channel->update();
-	state->sound_latch = data;
-	state->volume = 0x7fff; /* set volume */
-	state->noise = 0x0000;  /* reset noise shifter */
+	state->m_channel->update();
+	state->m_sound_latch = data;
+	state->m_volume = 0x7fff; /* set volume */
+	state->m_noise = 0x0000;  /* reset noise shifter */
 	/* faster decay enabled? */
-	if( state->sound_latch & 8 )
+	if( state->m_sound_latch & 8 )
 	{
 		/*
          * R24 is 10k, Rb is 0, C57 is 1uF
@@ -59,7 +59,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * discharge C33 (1uF) through R50 (22k) -> 0.14058s
          */
 		attotime period = attotime::from_hz(32768) * 14058 / 100000;
-		state->volume_timer->adjust(period, 0, period);
+		state->m_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -71,7 +71,7 @@ WRITE8_DEVICE_HANDLER( geebee_sound_w )
          * maybe half as fast?
          */
 		attotime period = attotime::from_hz(32768) * 29060 / 100000;
-		state->volume_timer->adjust(period, 0, period);
+		state->m_volume_timer->adjust(period, 0, period);
     }
 }
 
@@ -82,45 +82,45 @@ static STREAM_UPDATE( geebee_sound_update )
 
 	while (samples--)
 	{
-		*buffer++ = state->sound_signal;
+		*buffer++ = state->m_sound_signal;
 		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
 		{
-			state->vcount++;
+			state->m_vcount++;
 			/* noise clocked with raising edge of 2V */
-			if ((state->vcount & 3) == 2)
+			if ((state->m_vcount & 3) == 2)
 			{
 				/* bit0 = bit0 ^ !bit10 */
-				if ((state->noise & 1) == ((state->noise >> 10) & 1))
-					state->noise = ((state->noise << 1) & 0xfffe) | 1;
+				if ((state->m_noise & 1) == ((state->m_noise >> 10) & 1))
+					state->m_noise = ((state->m_noise << 1) & 0xfffe) | 1;
 				else
-					state->noise = (state->noise << 1) & 0xfffe;
+					state->m_noise = (state->m_noise << 1) & 0xfffe;
 			}
-			switch (state->sound_latch & 7)
+			switch (state->m_sound_latch & 7)
 			{
 			case 0: /* 4V */
-				state->sound_signal = (state->vcount & 0x04) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x04) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 1: /* 8V */
-				state->sound_signal = (state->vcount & 0x08) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x08) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 2: /* 16V */
-				state->sound_signal = (state->vcount & 0x10) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x10) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 3: /* 32V */
-				state->sound_signal = (state->vcount & 0x20) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x20) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 4: /* TONE1 */
-				state->sound_signal = !(state->vcount & 0x01) && !(state->vcount & 0x10) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x01) && !(state->m_vcount & 0x10) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 5: /* TONE2 */
-				state->sound_signal = !(state->vcount & 0x02) && !(state->vcount & 0x20) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x02) && !(state->m_vcount & 0x20) ? state->m_decay[state->m_volume] : 0;
 				break;
 			case 6: /* TONE3 */
-				state->sound_signal = !(state->vcount & 0x04) && !(state->vcount & 0x40) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x04) && !(state->m_vcount & 0x40) ? state->m_decay[state->m_volume] : 0;
 				break;
 			default: /* NOISE */
 				/* QH of 74164 #4V */
-				state->sound_signal = (state->noise & 0x8000) ? state->decay[state->volume] : 0;
+				state->m_sound_signal = (state->m_noise & 0x8000) ? state->m_decay[state->m_volume] : 0;
 			}
 		}
 	}
@@ -132,16 +132,16 @@ static DEVICE_START( geebee_sound )
 	running_machine &machine = device->machine();
 	int i;
 
-	state->decay = auto_alloc_array(machine, UINT16, 32768);
+	state->m_decay = auto_alloc_array(machine, UINT16, 32768);
 
 	for( i = 0; i < 0x8000; i++ )
-		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
+		state->m_decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
 	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
-	state->vcount = 0;
+	state->m_channel = device->machine().sound().stream_alloc(*device, 0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
+	state->m_vcount = 0;
 
-	state->volume_timer = machine.scheduler().timer_alloc(FUNC(volume_decay), state);
+	state->m_volume_timer = machine.scheduler().timer_alloc(FUNC(volume_decay), state);
 }
 
 DEVICE_GET_INFO( geebee_sound )

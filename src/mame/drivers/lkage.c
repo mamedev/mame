@@ -98,10 +98,10 @@ TODO:
 static TIMER_CALLBACK( nmi_callback )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
-	if (state->sound_nmi_enable)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_sound_nmi_enable)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->pending_nmi = 1;
+		state->m_pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( lkage_sound_command_w )
@@ -113,19 +113,19 @@ static WRITE8_HANDLER( lkage_sound_command_w )
 static WRITE8_HANDLER( lkage_sh_nmi_disable_w )
 {
 	lkage_state *state = space->machine().driver_data<lkage_state>();
-	state->sound_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 {
 	lkage_state *state = space->machine().driver_data<lkage_state>();
 
-	state->sound_nmi_enable = 1;
-	if (state->pending_nmi)
+	state->m_sound_nmi_enable = 1;
+	if (state->m_pending_nmi)
 	{
 		/* probably wrong but commands may go lost otherwise */
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->pending_nmi = 0;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_pending_nmi = 0;
 	}
 }
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE_MEMBER(lkage_state, vreg) /* video registers */
+	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE_MEMBER(lkage_state, m_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
@@ -151,11 +151,11 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
 	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE_MEMBER(lkage_state, scroll)
+	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE_MEMBER(lkage_state, m_scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_MEMBER(lkage_state, spriteram)
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_MEMBER(lkage_state, m_spriteram)
 	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_MEMBER(lkage_state, videoram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_MEMBER(lkage_state, m_videoram)
 ADDRESS_MAP_END
 
 
@@ -481,7 +481,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lkage_state *state = device->machine().driver_data<lkage_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -498,60 +498,60 @@ static MACHINE_START( lkage )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->mcu = machine.device("mcu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_mcu = machine.device("mcu");
 
-	state->save_item(NAME(state->bg_tile_bank));
-	state->save_item(NAME(state->fg_tile_bank));
-	state->save_item(NAME(state->tx_tile_bank));
+	state->save_item(NAME(state->m_bg_tile_bank));
+	state->save_item(NAME(state->m_fg_tile_bank));
+	state->save_item(NAME(state->m_tx_tile_bank));
 
-	state->save_item(NAME(state->sprite_dx));
+	state->save_item(NAME(state->m_sprite_dx));
 
-	state->save_item(NAME(state->mcu_ready));
-	state->save_item(NAME(state->mcu_val));
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
+	state->save_item(NAME(state->m_mcu_ready));
+	state->save_item(NAME(state->m_mcu_val));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
 
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
-	state->save_item(NAME(state->port_b_in));
-	state->save_item(NAME(state->port_b_out));
-	state->save_item(NAME(state->ddr_b));
-	state->save_item(NAME(state->port_c_in));
-	state->save_item(NAME(state->port_c_out));
-	state->save_item(NAME(state->ddr_c));
-	state->save_item(NAME(state->mcu_sent));
-	state->save_item(NAME(state->main_sent));
-	state->save_item(NAME(state->from_main));
-	state->save_item(NAME(state->from_mcu));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
+	state->save_item(NAME(state->m_port_b_in));
+	state->save_item(NAME(state->m_port_b_out));
+	state->save_item(NAME(state->m_ddr_b));
+	state->save_item(NAME(state->m_port_c_in));
+	state->save_item(NAME(state->m_port_c_out));
+	state->save_item(NAME(state->m_ddr_c));
+	state->save_item(NAME(state->m_mcu_sent));
+	state->save_item(NAME(state->m_main_sent));
+	state->save_item(NAME(state->m_from_main));
+	state->save_item(NAME(state->m_from_mcu));
 }
 
 static MACHINE_RESET( lkage )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
 
-	state->bg_tile_bank = state->fg_tile_bank = state->tx_tile_bank =0;
+	state->m_bg_tile_bank = state->m_fg_tile_bank = state->m_tx_tile_bank =0;
 
-	state->mcu_ready = 3;
-	state->mcu_val = 0;
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
+	state->m_mcu_ready = 3;
+	state->m_mcu_val = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
 
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_port_c_in = 0;
+	state->m_port_c_out = 0;
+	state->m_ddr_c = 0;
+	state->m_mcu_sent = 0;
+	state->m_main_sent = 0;
+	state->m_from_main = 0;
+	state->m_from_mcu = 0;
 }
 
 static MACHINE_CONFIG_START( lkage, lkage_state )
@@ -925,32 +925,32 @@ static READ8_HANDLER( fake_mcu_r )
 	lkage_state *state = space->machine().driver_data<lkage_state>();
 	int result = 0;
 
-	switch (state->mcu_val)
+	switch (state->m_mcu_val)
 	{
 		/*These are for the attract mode*/
 		case 0x01:
-			result = state->mcu_val - 1;
+			result = state->m_mcu_val - 1;
 			break;
 
 		case 0x90:
-			result = state->mcu_val + 0x43;
+			result = state->m_mcu_val + 0x43;
 			break;
 
 		/*Gameplay Protection,checked in this order at a start of a play*/
 		case 0xa6:
-			result = state->mcu_val + 0x27;
+			result = state->m_mcu_val + 0x27;
 			break;
 
 		case 0x34:
-			result = state->mcu_val + 0x7f;
+			result = state->m_mcu_val + 0x7f;
 			break;
 
 		case 0x48:
-			result = state->mcu_val + 0xb7;
+			result = state->m_mcu_val + 0xb7;
 			break;
 
 		default:
-			result = state->mcu_val;
+			result = state->m_mcu_val;
 			break;
 	}
 	return result;
@@ -959,19 +959,19 @@ static READ8_HANDLER( fake_mcu_r )
 static WRITE8_HANDLER( fake_mcu_w )
 {
 	lkage_state *state = space->machine().driver_data<lkage_state>();
-	state->mcu_val = data;
+	state->m_mcu_val = data;
 }
 
 static READ8_HANDLER( fake_status_r )
 {
 	lkage_state *state = space->machine().driver_data<lkage_state>();
-	return state->mcu_ready;
+	return state->m_mcu_ready;
 }
 
 static DRIVER_INIT( lkage )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
-	state->sprite_dx=0;
+	state->m_sprite_dx=0;
 }
 
 static DRIVER_INIT( lkageb )
@@ -980,13 +980,13 @@ static DRIVER_INIT( lkageb )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf062, 0xf062, FUNC(fake_mcu_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf087, 0xf087, FUNC(fake_status_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf062, 0xf062, FUNC(fake_mcu_w) );
-	state->sprite_dx=0;
+	state->m_sprite_dx=0;
 }
 
 static DRIVER_INIT( bygone )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
-	state->sprite_dx=1;
+	state->m_sprite_dx=1;
 }
 
 GAME( 1984, lkage,    0,        lkage,    lkage,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

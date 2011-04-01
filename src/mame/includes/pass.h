@@ -4,11 +4,11 @@ public:
 	pass_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 
-	UINT16 *bg_videoram;
-	UINT16 *fg_videoram;
+	UINT16 *m_bg_videoram;
+	UINT16 *m_fg_videoram;
 };
 
 

@@ -242,14 +242,14 @@ public:
 	twinkle_state(running_machine &machine, const driver_device_config_base &config)
 		: psx_state(machine, config) { }
 
-	UINT16 spu_ctrl;		// SPU board control register
-	UINT8 spu_shared[0x400];	// SPU/PSX shared dual-ported RAM
-	UINT32 unknown;
+	UINT16 m_spu_ctrl;		// SPU board control register
+	UINT8 m_spu_shared[0x400];	// SPU/PSX shared dual-ported RAM
+	UINT32 m_unknown;
 
-	int io_offset;
-	int output_last[ 0x100 ];
-	int last_io_offset;
-	UINT8 sector_buffer[ 4096 ];
+	int m_io_offset;
+	int m_output_last[ 0x100 ];
+	int m_last_io_offset;
+	UINT8 m_sector_buffer[ 4096 ];
 };
 
 /* RTC */
@@ -260,13 +260,13 @@ static WRITE32_HANDLER( twinkle_unknown_w )
 
 /*  printf( "set unknown data=%08x\n", data ); */
 
-	state->unknown = data;
+	state->m_unknown = data;
 }
 
 static READ32_HANDLER( twinkle_unknown_r )
 {
 	twinkle_state *state = space->machine().driver_data<twinkle_state>();
-	UINT32 data = state->unknown;
+	UINT32 data = state->m_unknown;
 
 /*  printf( "get unknown data=%08x\n", data ); */
 
@@ -439,15 +439,15 @@ static WRITE32_HANDLER( twinkle_io_w )
 
 	if( ACCESSING_BITS_16_23 )
 	{
-		state->io_offset = ( data >> 16 ) & 0xff;
+		state->m_io_offset = ( data >> 16 ) & 0xff;
 	}
 	if( ACCESSING_BITS_0_7 )
 	{
-		if( state->output_last[ state->io_offset ] != ( data & 0xff ) )
+		if( state->m_output_last[ state->m_io_offset ] != ( data & 0xff ) )
 		{
-			state->output_last[ state->io_offset ] = ( data & 0xff );
+			state->m_output_last[ state->m_io_offset ] = ( data & 0xff );
 
-			switch( state->io_offset )
+			switch( state->m_io_offset )
 			{
 				/* ? */
 			case 0x07:
@@ -468,7 +468,7 @@ static WRITE32_HANDLER( twinkle_io_w )
 			case 0x6f:
 			case 0x77:
 			case 0x7f:
-				output_set_indexed_value( "led", ( state->io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				output_set_indexed_value( "led", ( state->m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
 				break;
 
 			case 0x87:
@@ -487,12 +487,12 @@ static WRITE32_HANDLER( twinkle_io_w )
 
 				if( ( data & 0xfe ) != 0xfe )
 				{
-					printf("%02x = %02x\n", state->io_offset, data & 0xff );
+					printf("%02x = %02x\n", state->m_io_offset, data & 0xff );
 				}
 				break;
 
 			default:
-				printf( "unknown io %02x = %02x\n", state->io_offset, data & 0xff );
+				printf( "unknown io %02x = %02x\n", state->m_io_offset, data & 0xff );
 				break;
 			}
 		}
@@ -506,7 +506,7 @@ static READ32_HANDLER(twinkle_io_r)
 
 	if( ACCESSING_BITS_0_7 )
 	{
-		switch( state->io_offset )
+		switch( state->m_io_offset )
 		{
 			case 0x07:
 				data |= input_port_read( space->machine(), "IN0" );
@@ -533,9 +533,9 @@ static READ32_HANDLER(twinkle_io_r)
 				break;
 
 			default:
-				if( state->last_io_offset != state->io_offset )
+				if( state->m_last_io_offset != state->m_io_offset )
 				{
-					state->last_io_offset = state->io_offset;
+					state->m_last_io_offset = state->m_io_offset;
 				}
 
 				break;
@@ -597,12 +597,12 @@ static WRITE32_HANDLER(shared_psx_w)
 
 	if (mem_mask == 0xff)
 	{
-		state->spu_shared[offset*2] = data;
+		state->m_spu_shared[offset*2] = data;
 //      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(&space->device()));
 	}
 	else if (mem_mask == 0xff0000)
 	{
-		state->spu_shared[(offset*2)+1] = data;
+		state->m_spu_shared[(offset*2)+1] = data;
 //      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(&space->device()));
 	}
 	else
@@ -616,7 +616,7 @@ static READ32_HANDLER(shared_psx_r)
 	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 	UINT32 result;
 
-	result = state->spu_shared[offset*2] | state->spu_shared[(offset*2)+1]<<16;
+	result = state->m_spu_shared[offset*2] | state->m_spu_shared[(offset*2)+1]<<16;
 
 //  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(&space->device()));
 
@@ -676,7 +676,7 @@ static void ide_interrupt(device_t *device, int state_)
 {
 	twinkle_state *state = device->machine().driver_data<twinkle_state>();
 
-	if ((state_) && (state->spu_ctrl & 0x0400))
+	if ((state_) && (state->m_spu_ctrl & 0x0400))
 	{
 		cputag_set_input_line(device->machine(), "audiocpu", M68K_IRQ_6, ASSERT_LINE);
 	}
@@ -714,24 +714,24 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 {
 	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
-	if ((!(data & 0x0080)) && (state->spu_ctrl & 0x0080))
+	if ((!(data & 0x0080)) && (state->m_spu_ctrl & 0x0080))
 	{
 		device_set_input_line(&space->device(), M68K_IRQ_1, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0100)) && (state->spu_ctrl & 0x0100))
+	else if ((!(data & 0x0100)) && (state->m_spu_ctrl & 0x0100))
 	{
 		device_set_input_line(&space->device(), M68K_IRQ_2, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0200)) && (state->spu_ctrl & 0x0200))
+	else if ((!(data & 0x0200)) && (state->m_spu_ctrl & 0x0200))
 	{
 		device_set_input_line(&space->device(), M68K_IRQ_4, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0400)) && (state->spu_ctrl & 0x0400))
+	else if ((!(data & 0x0400)) && (state->m_spu_ctrl & 0x0400))
 	{
 		device_set_input_line(&space->device(), M68K_IRQ_6, CLEAR_LINE);
 	}
 
-	state->spu_ctrl = data;
+	state->m_spu_ctrl = data;
 }
 
 static READ16_HANDLER( twinkle_waveram_r )
@@ -754,7 +754,7 @@ static READ16_HANDLER( shared_68k_r )
 
 //  printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
 
-	return state->spu_shared[offset];
+	return state->m_spu_shared[offset];
 }
 
 static WRITE16_HANDLER( shared_68k_w )
@@ -763,7 +763,7 @@ static WRITE16_HANDLER( shared_68k_w )
 
 //  printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
 
-	state->spu_shared[offset] = data & 0xff;
+	state->m_spu_shared[offset] = data & 0xff;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
@@ -786,15 +786,15 @@ ADDRESS_MAP_END
 static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
 	twinkle_state *state = machine.driver_data<twinkle_state>();
-	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->sector_buffer ) / 4 )
+		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->sector_buffer ) / 4;
+			n_this = sizeof( state->m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -803,12 +803,12 @@ static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_s
 		if( n_this < 2048 / 4 )
 		{
 			/* non-READ commands */
-			am53cf96_read_data( n_this * 4, state->sector_buffer );
+			am53cf96_read_data( n_this * 4, state->m_sector_buffer );
 		}
 		else
 		{
 			/* assume normal 2048 byte data for now */
-			am53cf96_read_data( 2048, state->sector_buffer );
+			am53cf96_read_data( 2048, state->m_sector_buffer );
 			n_this = 2048 / 4;
 		}
 		n_size -= n_this;
@@ -817,10 +817,10 @@ static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_s
 		while( n_this > 0 )
 		{
 			p_n_psxram[ n_address / 4 ] =
-				( state->sector_buffer[ i + 0 ] << 0 ) |
-				( state->sector_buffer[ i + 1 ] << 8 ) |
-				( state->sector_buffer[ i + 2 ] << 16 ) |
-				( state->sector_buffer[ i + 3 ] << 24 );
+				( state->m_sector_buffer[ i + 0 ] << 0 ) |
+				( state->m_sector_buffer[ i + 1 ] << 8 ) |
+				( state->m_sector_buffer[ i + 2 ] << 16 ) |
+				( state->m_sector_buffer[ i + 3 ] << 24 );
 			n_address += 4;
 			i += 4;
 			n_this--;
@@ -831,15 +831,15 @@ static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_s
 static void scsi_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
 {
 	twinkle_state *state = machine.driver_data<twinkle_state>();
-	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->sector_buffer ) / 4 )
+		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->sector_buffer ) / 4;
+			n_this = sizeof( state->m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -850,16 +850,16 @@ static void scsi_dma_write( running_machine &machine, UINT32 n_address, INT32 n_
 		i = 0;
 		while( n_this > 0 )
 		{
-			state->sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
-			state->sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
-			state->sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
-			state->sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
+			state->m_sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
+			state->m_sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
+			state->m_sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
+			state->m_sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
 			n_address += 4;
 			i += 4;
 			n_this--;
 		}
 
-		am53cf96_write_data( n_this * 4, state->sector_buffer );
+		am53cf96_write_data( n_this * 4, state->m_sector_buffer );
 	}
 }
 

@@ -25,9 +25,9 @@ public:
 	rgum_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram;
-	UINT8 *cram;
-	UINT8 hbeat;
+	UINT8 *m_vram;
+	UINT8 *m_cram;
+	UINT8 m_hbeat;
 };
 
 
@@ -47,7 +47,7 @@ static SCREEN_UPDATE(royalgum)
 	{
 		for(x=0;x<66;x++)
 		{
-			int tile = state->vram[count] | ((state->cram[count] & 0xf) <<8);
+			int tile = state->m_vram[count] | ((state->m_cram[count] & 0xf) <<8);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
@@ -72,8 +72,8 @@ static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(rgum_state, vram)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_MEMBER(rgum_state, cram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_vram)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_cram)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -83,9 +83,9 @@ static CUSTOM_INPUT( rgum_heartbeat_r )
 {
 	rgum_state *state = field->port->machine().driver_data<rgum_state>();
 
-	state->hbeat ^= 1;
+	state->m_hbeat ^= 1;
 
-	return state->hbeat;
+	return state->m_hbeat;
 }
 
 

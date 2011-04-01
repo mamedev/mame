@@ -60,7 +60,7 @@ public:
 	dambustr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int noise_data;
+	int m_noise_data;
 };
 
 
@@ -69,8 +69,8 @@ public:
 static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 {
 	dambustr_state *state = device->machine().driver_data<dambustr_state>();
-	if (data != state->noise_data) {
-		state->noise_data = data;
+	if (data != state->m_noise_data) {
+		state->m_noise_data = data;
 		galaxian_noise_enable_w(device, offset, data);
 	}
 }

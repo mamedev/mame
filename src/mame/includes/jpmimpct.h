@@ -55,17 +55,17 @@ public:
 	jpmimpct_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 tms_irq;
-	UINT8 duart_1_irq;
-	struct duart_t duart_1;
-	UINT8 touch_cnt;
-	UINT8 touch_data[3];
-	int lamp_strobe;
-	UINT8 Lamps[256];
-	int optic_pattern;
-	int payen;
-	UINT16 *vram;
-	struct bt477_t bt477;
+	UINT8 m_tms_irq;
+	UINT8 m_duart_1_irq;
+	struct duart_t m_duart_1;
+	UINT8 m_touch_cnt;
+	UINT8 m_touch_data[3];
+	int m_lamp_strobe;
+	UINT8 m_Lamps[256];
+	int m_optic_pattern;
+	int m_payen;
+	UINT16 *m_vram;
+	struct bt477_t m_bt477;
 };
 
 

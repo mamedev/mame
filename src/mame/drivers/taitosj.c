@@ -174,27 +174,27 @@ TODO:
 static WRITE8_DEVICE_HANDLER( taitosj_sndnmi_msk_w )
 {
 	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->sndnmi_disable = data & 0x01;
+	state->m_sndnmi_disable = data & 0x01;
 }
 
 static WRITE8_HANDLER( taitosj_soundcommand_w )
 {
 	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	soundlatch_w(space,offset,data);
-	if (!state->sndnmi_disable) cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->m_sndnmi_disable) cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_DEVICE_HANDLER( input_port_4_f0_w )
 {
 	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->input_port_4_f0 = data >> 4;
+	state->m_input_port_4_f0 = data >> 4;
 }
 
 static CUSTOM_INPUT( input_port_4_f0_r )
 {
 	taitosj_state *state = field->port->machine().driver_data<taitosj_state>();
-	return state->input_port_4_f0;
+	return state->m_input_port_4_f0;
 }
 
 
@@ -204,16 +204,16 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_fake_data_r, taitosj_fake_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_fake_status_r)
-	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, characterram)
+	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, m_characterram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_1)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_2)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_3)
-	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE_MEMBER(taitosj_state, colscrolly)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, spriteram)
-	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE_MEMBER(taitosj_state, paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE_MEMBER(taitosj_state, collision_reg)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_1)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_2)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_3)
+	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE_MEMBER(taitosj_state, m_colscrolly)
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_spriteram)
+	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE_MEMBER(taitosj_state, m_paletteram)
+	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE_MEMBER(taitosj_state, m_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -223,15 +223,15 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
-	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, scroll)
-	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, colorbank)
+	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_scroll)
+	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_mode)
+	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -244,16 +244,16 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07fe) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x07fe) AM_READ(taitosj_mcu_status_r)
-	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, characterram)
+	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, m_characterram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_1)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_2)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_3)
-	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE_MEMBER(taitosj_state, colscrolly)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, spriteram)
-	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE_MEMBER(taitosj_state, paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE_MEMBER(taitosj_state, collision_reg)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_1)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_2)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_3)
+	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE_MEMBER(taitosj_state, m_colscrolly)
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_spriteram)
+	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE_MEMBER(taitosj_state, m_paletteram)
+	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE_MEMBER(taitosj_state, m_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -263,15 +263,15 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
-	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, scroll)
-	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, colorbank)
+	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_scroll)
+	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_mode)
+	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -293,11 +293,11 @@ static CUSTOM_INPUT( kikstart_gear_r )
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (input_port_read(field->port->machine(), port_tag) & 0x01) state->kikstart_gears[player] = 0x02;
-	if (input_port_read(field->port->machine(), port_tag) & 0x02) state->kikstart_gears[player] = 0x03;
-	if (input_port_read(field->port->machine(), port_tag) & 0x04) state->kikstart_gears[player] = 0x01;
+	if (input_port_read(field->port->machine(), port_tag) & 0x01) state->m_kikstart_gears[player] = 0x02;
+	if (input_port_read(field->port->machine(), port_tag) & 0x02) state->m_kikstart_gears[player] = 0x03;
+	if (input_port_read(field->port->machine(), port_tag) & 0x04) state->m_kikstart_gears[player] = 0x01;
 
-	return state->kikstart_gears[player];
+	return state->m_kikstart_gears[player];
 }
 
 
@@ -308,18 +308,18 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_READ(taitosj_mcu_status_r)
 	AM_RANGE(0x8802, 0x8802) AM_NOP
-	AM_RANGE(0x8a00, 0x8a5f) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, colscrolly)
-	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, characterram)
+	AM_RANGE(0x8a00, 0x8a5f) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_colscrolly)
+	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE_MEMBER(taitosj_state, m_characterram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_1)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_2)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, videoram_3)
-	AM_RANGE(0xd000, 0xd001) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, colorbank)
-	AM_RANGE(0xd002, 0xd007) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, scroll)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, spriteram)
-	AM_RANGE(0xd200, 0xd27f) AM_RAM AM_BASE_MEMBER(taitosj_state, paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_READONLY AM_BASE_MEMBER(taitosj_state, collision_reg)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_1)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_2)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_videoram_3)
+	AM_RANGE(0xd000, 0xd001) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_colorbank)
+	AM_RANGE(0xd002, 0xd007) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_scroll)
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_spriteram)
+	AM_RANGE(0xd200, 0xd27f) AM_RAM AM_BASE_MEMBER(taitosj_state, m_paletteram)
+	AM_RANGE(0xd300, 0xd300) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_READONLY AM_BASE_MEMBER(taitosj_state, m_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -330,12 +330,12 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd40e, 0xd40f) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
-	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, video_mode)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taitosj_state, kikstart_scrollram)// scroll ram + ???
+	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_BASE_MEMBER(taitosj_state, m_video_mode)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taitosj_state, m_kikstart_scrollram)// scroll ram + ???
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1737,15 +1737,15 @@ static const UINT8 voltable[256] =
 static WRITE8_DEVICE_HANDLER( dac_out_w )
 {
 	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->dac_out = data - 0x80;
-	dac_signed_data_16_w(device,state->dac_out * state->dac_vol + 0x8000);
+	state->m_dac_out = data - 0x80;
+	dac_signed_data_16_w(device,state->m_dac_out * state->m_dac_vol + 0x8000);
 }
 
 static WRITE8_DEVICE_HANDLER( dac_vol_w )
 {
 	taitosj_state *state = device->machine().driver_data<taitosj_state>();
-	state->dac_vol = voltable[data];
-	dac_signed_data_16_w(device,state->dac_out * state->dac_vol + 0x8000);
+	state->m_dac_vol = voltable[data];
+	dac_signed_data_16_w(device,state->m_dac_out * state->m_dac_vol + 0x8000);
 }
 
 
@@ -2711,23 +2711,23 @@ ROM_END
 static void reset_common(running_machine &machine)
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->sndnmi_disable = 1;
-	state->input_port_4_f0 = 0;
+	state->m_sndnmi_disable = 1;
+	state->m_input_port_4_f0 = 0;
 	/* start in 1st gear */
-	state->kikstart_gears[0] = 0x02;
-	state->kikstart_gears[1] = 0x02;
-	state->dac_out = 0;
-	state->dac_vol = 0;
+	state->m_kikstart_gears[0] = 0x02;
+	state->m_kikstart_gears[1] = 0x02;
+	state->m_dac_out = 0;
+	state->m_dac_vol = 0;
 }
 
 static void init_common(running_machine &machine)
 {
 	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->save_item(NAME(state->sndnmi_disable));
-	state->save_item(NAME(state->input_port_4_f0));
-	state->save_item(NAME(state->kikstart_gears));
-	state->save_item(NAME(state->dac_out));
-	state->save_item(NAME(state->dac_vol));
+	state->save_item(NAME(state->m_sndnmi_disable));
+	state->save_item(NAME(state->m_input_port_4_f0));
+	state->save_item(NAME(state->m_kikstart_gears));
+	state->save_item(NAME(state->m_dac_out));
+	state->save_item(NAME(state->m_dac_vol));
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, reset_common);
 }

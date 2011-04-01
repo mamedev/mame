@@ -13,7 +13,7 @@ void blockhl_tile_callback( running_machine &machine, int layer, int bank, int *
 {
 	blockhl_state *state = machine.driver_data<blockhl_state>();
 	*code |= ((*color & 0x0f) << 8);
-	*color = state->layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	*color = state->m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
 /***************************************************************************
@@ -31,7 +31,7 @@ void blockhl_sprite_callback( running_machine &machine, int *code, int *color, i
 	else
 		*priority = 0xfc; // under K052109_tilemap[1]
 
-	*color = state->sprite_colorbase + (*color & 0x0f);
+	*color = state->m_sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -47,10 +47,10 @@ VIDEO_START( blockhl )
 
 	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
 
-	state->layer_colorbase[0] = 0;
-	state->layer_colorbase[1] = 16;
-	state->layer_colorbase[2] = 32;
-	state->sprite_colorbase = 48;
+	state->m_layer_colorbase[0] = 0;
+	state->m_layer_colorbase[1] = 16;
+	state->m_layer_colorbase[2] = 32;
+	state->m_sprite_colorbase = 48;
 
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
@@ -61,12 +61,12 @@ SCREEN_UPDATE( blockhl )
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	k052109_tilemap_update(state->k052109);
+	k052109_tilemap_update(state->m_k052109);
 
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);	// tile 2
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 1, 0, 1);	// tile 1
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, 0, 0, 2);	// tile 0
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);	// tile 2
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 1, 0, 1);	// tile 1
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, 0, 0, 2);	// tile 0
 
-	k051960_sprites_draw(state->k051960, bitmap, cliprect, 0, -1);
+	k051960_sprites_draw(state->m_k051960, bitmap, cliprect, 0, -1);
 	return 0;
 }

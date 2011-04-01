@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( ikki_cpu1, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, videoram, videoram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ(ikki_e000_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
@@ -55,12 +55,12 @@ static ADDRESS_MAP_START( ikki_cpu1, AS_PROGRAM, 8 )
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("P2")
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(ikki_scrn_ctrl_w)
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
-	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_BASE_MEMBER(ikki_state, scroll)
+	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_BASE_MEMBER(ikki_state, m_scroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikki_cpu2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, spriteram, spriteram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_w)
@@ -210,15 +210,15 @@ static MACHINE_START( ikki )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->punch_through_pen));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_punch_through_pen));
 }
 
 static MACHINE_RESET( ikki )
 {
 	ikki_state *state = machine.driver_data<ikki_state>();
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( ikki, ikki_state )

@@ -6,24 +6,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  fgvideoram;
-	UINT8 *  bg1videoram;
-	UINT8 *  soundlatch2;
-//      UINT8 *  spriteram; // currently this uses generic buffered spriteram
-//      UINT8 *  paletteram;    // currently this uses generic palette handling
-//      UINT8 *  paletteram2;   // currently this uses generic palette handling
+	UINT8 *  m_fgvideoram;
+	UINT8 *  m_bg1videoram;
+	UINT8 *  m_soundlatch2;
+//      UINT8 *  m_spriteram; // currently this uses generic buffered spriteram
+//      UINT8 *  m_paletteram;    // currently this uses generic palette handling
+//      UINT8 *  m_paletteram2;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t  *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
-	UINT8    bg2_image;
-	int      bg2_avenger_hw;
-	UINT8    scroll_x[2], scroll_y[2];
+	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_bg1_tilemap;
+	tilemap_t  *m_bg2_tilemap;
+	UINT8    m_bg2_image;
+	int      m_bg2_avenger_hw;
+	UINT8    m_scroll_x[2];
+	UINT8    m_scroll_y[2];
 
 	/* misc */
-	UINT8    param[4];
-	int      palette_pen;
-	UINT8    soundstate;
-	UINT8    adpcm;
+	UINT8    m_param[4];
+	int      m_palette_pen;
+	UINT8    m_soundstate;
+	UINT8    m_adpcm;
 };
 
 

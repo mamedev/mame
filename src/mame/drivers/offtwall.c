@@ -33,8 +33,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	offtwall_state *state = machine.driver_data<offtwall_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -57,7 +57,7 @@ static MACHINE_RESET( offtwall )
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 1);
+	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 1);
 	atarijsa_reset();
 }
 
@@ -92,7 +92,7 @@ static READ16_HANDLER( special_port3_r )
 {
 	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 	int result = input_port_read(space->machine(), "260010");
-	if (state->cpu_to_sound_ready) result ^= 0x0020;
+	if (state->m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
 
@@ -153,10 +153,10 @@ static READ16_HANDLER( bankswitch_r )
 	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 
 	/* this is the table lookup; the bank is determined by the address that was requested */
-	state->bank_offset = (offset & 3) * 0x1000;
-	logerror("Bankswitch index %d -> %04X\n", offset, state->bank_offset);
+	state->m_bank_offset = (offset & 3) * 0x1000;
+	logerror("Bankswitch index %d -> %04X\n", offset, state->m_bank_offset);
 
-	return state->bankswitch_base[offset];
+	return state->m_bankswitch_base[offset];
 }
 
 
@@ -179,7 +179,7 @@ static READ16_HANDLER( bankrom_r )
 			return us >> 16;
 	}
 
-	return state->bankrom_base[(state->bank_offset + offset) & 0x3fff];
+	return state->m_bankrom_base[(state->m_bank_offset + offset) & 0x3fff];
 }
 
 
@@ -210,8 +210,8 @@ static READ16_HANDLER( spritecache_count_r )
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
 	{
-		UINT16 *data = &state->spritecache_count[-0x100];
-		int oldword = state->spritecache_count[0];
+		UINT16 *data = &state->m_spritecache_count[-0x100];
+		int oldword = state->m_spritecache_count[0];
 		int count = oldword >> 8;
 		int i, width = 0;
 
@@ -232,12 +232,12 @@ static READ16_HANDLER( spritecache_count_r )
 			}
 
 			/* update the final count in memory */
-			state->spritecache_count[0] = (count << 8) | (oldword & 0xff);
+			state->m_spritecache_count[0] = (count << 8) | (oldword & 0xff);
 		}
 	}
 
 	/* and then read the data */
-	return state->spritecache_count[offset];
+	return state->m_spritecache_count[offset];
 }
 
 
@@ -262,9 +262,9 @@ static READ16_HANDLER( unknown_verify_r )
 	offtwall_state *state = space->machine().driver_data<offtwall_state>();
 	int prevpc = cpu_get_previouspc(&space->device());
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
-		return state->unknown_verify_base[offset];
+		return state->m_unknown_verify_base[offset];
 	else
-		return state->unknown_verify_base[offset] | 0x100;
+		return state->m_unknown_verify_base[offset] | 0x100;
 }
 
 
@@ -277,7 +277,7 @@ static READ16_HANDLER( unknown_verify_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, bankrom_base)
+	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, m_bankrom_base)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
@@ -292,11 +292,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(offtwall_atarivc_r, offtwall_atarivc_w) AM_BASE_MEMBER(offtwall_state, atarivc_data)
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE_MEMBER(offtwall_state, playfield)
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE_MEMBER(offtwall_state, atarivc_eof_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(offtwall_atarivc_r, offtwall_atarivc_w) AM_BASE_MEMBER(offtwall_state, m_atarivc_data)
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE_MEMBER(offtwall_state, m_playfield)
+	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE_MEMBER(offtwall_state, m_atarivc_eof_data)
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(offtwall_state, playfield_upper)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(offtwall_state, m_playfield_upper)
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
 	AM_RANGE(0x3fd000, 0x3fd7ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3fd800, 0x3fffff) AM_RAM
@@ -497,9 +497,9 @@ static DRIVER_INIT( offtwall )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
-	state->bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037ec2, 0x037f39, FUNC(bankswitch_r));
-	state->unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf1e, 0x3fdf1f, FUNC(unknown_verify_r));
+	state->m_spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->m_bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037ec2, 0x037f39, FUNC(bankswitch_r));
+	state->m_unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf1e, 0x3fdf1f, FUNC(unknown_verify_r));
 }
 
 
@@ -510,9 +510,9 @@ static DRIVER_INIT( offtwalc )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
-	state->bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037eca, 0x037f43, FUNC(bankswitch_r));
-	state->unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf24, 0x3fdf25, FUNC(unknown_verify_r));
+	state->m_spritecache_count = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->m_bankswitch_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037eca, 0x037f43, FUNC(bankswitch_r));
+	state->m_unknown_verify_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf24, 0x3fdf25, FUNC(unknown_verify_r));
 }
 
 

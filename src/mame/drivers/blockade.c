@@ -65,7 +65,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 
 	if ((input_port_read(device->machine(), "IN0") & 0x80) == 0)
 	{
-		state->just_been_reset = 1;
+		state->m_just_been_reset = 1;
 		device_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -82,7 +82,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 	/* coin latch is bit 7 */
 	UINT8 temp = (input_port_read(space->machine(), "IN0") & 0x7f);
 
-	return (state->coin_latch << 7) | temp;
+	return (state->m_coin_latch << 7) | temp;
 }
 
 static WRITE8_HANDLER( blockade_coin_latch_w )
@@ -92,13 +92,13 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 	if (data & 0x80)
 	{
 		if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
-		if (state->just_been_reset)
+		if (state->m_just_been_reset)
 		{
-			state->just_been_reset = 0;
-			state->coin_latch = 0;
+			state->m_just_been_reset = 0;
+			state->m_coin_latch = 0;
 		}
 		else
-			state->coin_latch = 1;
+			state->m_coin_latch = 1;
 	}
 
 	if (data & 0x20)
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( blockade_coin_latch_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x6000)
-    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE_MEMBER(blockade_state, videoram) AM_MIRROR(0x6c00)
+    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE_MEMBER(blockade_state, m_videoram) AM_MIRROR(0x6c00)
     AM_RANGE(0x9000, 0x90ff) AM_RAM AM_MIRROR(0x6f00)
 ADDRESS_MAP_END
 
@@ -458,16 +458,16 @@ static MACHINE_START( blockade )
 {
 	blockade_state *state = machine.driver_data<blockade_state>();
 
-	state->save_item(NAME(state->coin_latch));
-	state->save_item(NAME(state->just_been_reset));
+	state->save_item(NAME(state->m_coin_latch));
+	state->save_item(NAME(state->m_just_been_reset));
 }
 
 static MACHINE_RESET( blockade )
 {
 	blockade_state *state = machine.driver_data<blockade_state>();
 
-	state->coin_latch = 1;
-	state->just_been_reset = 0;
+	state->m_coin_latch = 1;
+	state->m_just_been_reset = 0;
 }
 
 static MACHINE_CONFIG_START( blockade, blockade_state )

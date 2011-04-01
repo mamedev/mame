@@ -30,19 +30,19 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 16;
 
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 static MACHINE_START( runaway )
 {
 	runaway_state *state = machine.driver_data<runaway_state>();
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 static MACHINE_RESET( runaway )
 {
 	runaway_state *state = machine.driver_data<runaway_state>();
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(16), 16);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(16), 16);
 }
 
 
@@ -83,8 +83,8 @@ static WRITE8_HANDLER( runaway_irq_ack_w )
 
 static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE_MEMBER(runaway_state, video_ram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(runaway_state, sprite_ram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE_MEMBER(runaway_state, m_video_ram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(runaway_state, m_sprite_ram)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
 	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE("earom", atari_vg_earom_w)
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)

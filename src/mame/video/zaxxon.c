@@ -55,7 +55,7 @@ PALETTE_INIT( zaxxon )
 	}
 
 	/* color_prom now points to the beginning of the character color codes */
-	state->color_codes = &color_prom[256];
+	state->m_color_codes = &color_prom[256];
 }
 
 
@@ -83,8 +83,8 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
-	int code = state->videoram[tile_index];
-	int color = state->color_codes[sx + 32 * (sy / 4)] & 0x0f;
+	int code = state->m_videoram[tile_index];
+	int color = state->m_color_codes[sx + 32 * (sy / 4)] & 0x0f;
 
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
@@ -93,8 +93,8 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 static TILE_GET_INFO( razmataz_get_fg_tile_info )
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	int code = state->videoram[tile_index];
-	int color = state->color_codes[code] & 0x0f;
+	int code = state->m_videoram[tile_index];
+	int color = state->m_color_codes[code] & 0x0f;
 
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
@@ -103,8 +103,8 @@ static TILE_GET_INFO( razmataz_get_fg_tile_info )
 static TILE_GET_INFO( congo_get_fg_tile_info )
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	int code = state->videoram[tile_index] + (state->congo_fg_bank << 8);
-	int color = state->colorram[tile_index] & 0x1f;
+	int code = state->m_videoram[tile_index] + (state->m_congo_fg_bank << 8);
+	int color = state->m_colorram[tile_index] & 0x1f;
 
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
@@ -122,28 +122,28 @@ static void video_start_common(running_machine &machine, tile_get_info_func fg_t
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* reset globals */
-	state->bg_enable = 0;
-	state->bg_color = 0;
-	state->bg_position = 0;
-	state->fg_color = 0;
-	state->congo_fg_bank = 0;
-	state->congo_color_bank = 0;
-	memset(state->congo_custom, 0, sizeof(state->congo_custom));
+	state->m_bg_enable = 0;
+	state->m_bg_color = 0;
+	state->m_bg_position = 0;
+	state->m_fg_color = 0;
+	state->m_congo_fg_bank = 0;
+	state->m_congo_color_bank = 0;
+	memset(state->m_congo_custom, 0, sizeof(state->m_congo_custom));
 
 	/* create a background and foreground tilemap */
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8,8, 32,512);
-	state->fg_tilemap = tilemap_create(machine, fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8,8, 32,512);
+	state->m_fg_tilemap = tilemap_create(machine, fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scrolldx(state->fg_tilemap, 0, machine.primary_screen->width() - 256);
-	tilemap_set_scrolldy(state->fg_tilemap, 0, machine.primary_screen->height() - 256);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scrolldx(state->m_fg_tilemap, 0, machine.primary_screen->width() - 256);
+	tilemap_set_scrolldy(state->m_fg_tilemap, 0, machine.primary_screen->height() - 256);
 
 	/* register for save states */
-	state->save_item(NAME(state->bg_enable));
-	state->save_item(NAME(state->bg_color));
-	state->save_item(NAME(state->bg_position));
-	state->save_item(NAME(state->fg_color));
+	state->save_item(NAME(state->m_bg_enable));
+	state->save_item(NAME(state->m_bg_color));
+	state->save_item(NAME(state->m_bg_position));
+	state->save_item(NAME(state->m_fg_color));
 }
 
 
@@ -164,13 +164,13 @@ VIDEO_START( congo )
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	state->spriteram = auto_alloc_array(machine, UINT8, 0x100);
+	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x100);
 
 	/* register for save states */
-	state->save_item(NAME(state->congo_fg_bank));
-	state->save_item(NAME(state->congo_color_bank));
-	state->save_item(NAME(state->congo_custom));
-	state->save_pointer(NAME(state->spriteram), 0x100);
+	state->save_item(NAME(state->m_congo_fg_bank));
+	state->save_item(NAME(state->m_congo_color_bank));
+	state->save_item(NAME(state->m_congo_custom));
+	state->save_pointer(NAME(state->m_spriteram), 0x100);
 
 	video_start_common(machine, congo_get_fg_tile_info);
 }
@@ -189,7 +189,7 @@ WRITE8_HANDLER( zaxxon_flipscreen_w )
 
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(space->machine(), ~data & 1);
-	tilemap_set_flip(state->fg_tilemap, flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	tilemap_set_flip(state->m_fg_tilemap, flip_screen_get(space->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -198,8 +198,8 @@ WRITE8_HANDLER( zaxxon_fg_color_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* low bit selects high color palette index */
-	state->fg_color = (data & 1) * 0x80;
-	tilemap_set_palette_offset(state->fg_tilemap, state->fg_color + (state->congo_color_bank << 8));
+	state->m_fg_color = (data & 1) * 0x80;
+	tilemap_set_palette_offset(state->m_fg_tilemap, state->m_fg_color + (state->m_congo_color_bank << 8));
 }
 
 
@@ -209,9 +209,9 @@ WRITE8_HANDLER( zaxxon_bg_position_w )
 
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
-		state->bg_position = (state->bg_position & 0x700) | ((data << 0) & 0x0ff);
+		state->m_bg_position = (state->m_bg_position & 0x700) | ((data << 0) & 0x0ff);
 	else
-		state->bg_position = (state->bg_position & 0x0ff) | ((data << 8) & 0x700);
+		state->m_bg_position = (state->m_bg_position & 0x0ff) | ((data << 8) & 0x700);
 }
 
 
@@ -220,7 +220,7 @@ WRITE8_HANDLER( zaxxon_bg_color_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* low bit selects high color palette index */
-	state->bg_color = (data & 1) * 0x80;
+	state->m_bg_color = (data & 1) * 0x80;
 }
 
 
@@ -229,7 +229,7 @@ WRITE8_HANDLER( zaxxon_bg_enable_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* low bit enables/disables the background layer */
-	state->bg_enable = data & 1;
+	state->m_bg_enable = data & 1;
 }
 
 
@@ -238,8 +238,8 @@ WRITE8_HANDLER( congo_fg_bank_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* low bit controls the topmost character bit */
-	state->congo_fg_bank = data & 1;
-	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+	state->m_congo_fg_bank = data & 1;
+	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
 }
 
 
@@ -248,8 +248,8 @@ WRITE8_HANDLER( congo_color_bank_w )
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* low bit controls the topmost bit into the color PROM */
-	state->congo_color_bank = data & 1;
-	tilemap_set_palette_offset(state->fg_tilemap, state->fg_color + (state->congo_color_bank << 8));
+	state->m_congo_color_bank = data & 1;
+	tilemap_set_palette_offset(state->m_fg_tilemap, state->m_fg_color + (state->m_congo_color_bank << 8));
 }
 
 
@@ -264,8 +264,8 @@ WRITE8_HANDLER( zaxxon_videoram_w )
 {
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 
@@ -273,8 +273,8 @@ WRITE8_HANDLER( congo_colorram_w )
 {
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 
@@ -288,15 +288,15 @@ WRITE8_HANDLER( congo_colorram_w )
 WRITE8_HANDLER( congo_sprite_custom_w )
 {
 	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 
-	state->congo_custom[offset] = data;
+	state->m_congo_custom[offset] = data;
 
 	/* seems to trigger on a write of 1 to the 4th byte */
 	if (offset == 3 && data == 0x01)
 	{
-		UINT16 saddr = state->congo_custom[0] | (state->congo_custom[1] << 8);
-		int count = state->congo_custom[2];
+		UINT16 saddr = state->m_congo_custom[0] | (state->m_congo_custom[1] << 8);
+		int count = state->m_congo_custom[2];
 
 		/* count cycles (just a guess) */
 		device_adjust_icount(&space->device(), -count * 5);
@@ -327,10 +327,10 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
 
 	/* only draw if enabled */
-	if (state->bg_enable)
+	if (state->m_bg_enable)
 	{
-		bitmap_t *pixmap = tilemap_get_pixmap(state->bg_tilemap);
-		int colorbase = state->bg_color + (state->congo_color_bank << 8);
+		bitmap_t *pixmap = tilemap_get_pixmap(state->m_bg_tilemap);
+		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
 		int xmask = pixmap->width - 1;
 		int ymask = pixmap->height - 1;
 		int flipmask = flip_screen_get(machine) ? 0xff : 0x00;
@@ -356,7 +356,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 			/* base of the source row comes from VF plus the scroll value */
 			/* this is done by the 3 4-bit adders at U56, U74, U75 */
-			srcy = vf + ((state->bg_position << 1) ^ 0xfff) + 1;
+			srcy = vf + ((state->m_bg_position << 1) ^ 0xfff) + 1;
 			src = (UINT16 *)pixmap->base + (srcy & ymask) * pixmap->rowpixels;
 
 			/* loop over visible colums */
@@ -443,7 +443,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[2];
 	int flip = flip_screen_get(machine);
 	int flipmask = flip ? 0xff : 0x00;
@@ -456,7 +456,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		int flipy = (spriteram[offs + (flipymask >> 8)] ^ flipmask) & flipymask;
 		int flipx = (spriteram[offs + (flipxmask >> 8)] ^ flipmask) & flipxmask;
 		int code = spriteram[offs + 1];
-		int color = (spriteram[offs + 2] & 0x1f) + (state->congo_color_bank << 5);
+		int color = (spriteram[offs + 2] & 0x1f) + (state->m_congo_color_bank << 5);
 		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
@@ -481,7 +481,7 @@ SCREEN_UPDATE( zaxxon )
 
 	draw_background(screen->machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x140, 0x180);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -492,7 +492,7 @@ SCREEN_UPDATE( futspy )
 
 	draw_background(screen->machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x180, 0x180);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -503,7 +503,7 @@ SCREEN_UPDATE( razmataz )
 
 	draw_background(screen->machine(), bitmap, cliprect, FALSE);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x140, 0x180);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -514,6 +514,6 @@ SCREEN_UPDATE( congo )
 
 	draw_background(screen->machine(), bitmap, cliprect, TRUE);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x280, 0x180);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

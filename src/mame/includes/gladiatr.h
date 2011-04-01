@@ -6,25 +6,25 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	int data1;
-	int data2;
-	int flag1;
-	int flag2;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *textram;
-	int video_attributes;
-	int fg_scrollx;
-	int fg_scrolly;
-	int bg_scrollx;
-	int bg_scrolly;
-	int sprite_bank;
-	int sprite_buffer;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	int fg_tile_bank;
-	int bg_tile_bank;
-	UINT8 *spriteram;
+	int m_data1;
+	int m_data2;
+	int m_flag1;
+	int m_flag2;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_textram;
+	int m_video_attributes;
+	int m_fg_scrollx;
+	int m_fg_scrolly;
+	int m_bg_scrollx;
+	int m_bg_scrolly;
+	int m_sprite_bank;
+	int m_sprite_buffer;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	int m_fg_tile_bank;
+	int m_bg_tile_bank;
+	UINT8 *m_spriteram;
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

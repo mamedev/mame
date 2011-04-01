@@ -78,10 +78,10 @@ PALETTE_INIT( tceptor )
 
 	/* setup sprite mask color map */
 	/* tceptor2: only 0x23 */
-	memset(state->is_mask_spr, 0, sizeof state->is_mask_spr);
+	memset(state->m_is_mask_spr, 0, sizeof state->m_is_mask_spr);
 	for (i = 0; i < 0x400; i++)
 		if (colortable_entry_get_value(machine.colortable, i | 0x400) == SPR_MASK_COLOR)
-			state->is_mask_spr[i >> 4] = 1;
+			state->m_is_mask_spr[i >> 4] = 1;
 }
 
 
@@ -107,8 +107,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int offset = get_tile_addr(tile_index);
-	int code = state->tile_ram[offset];
-	int color = state->tile_attr[offset];
+	int code = state->m_tile_ram[offset];
+	int color = state->m_tile_attr[offset];
 
 	tileinfo->group = color;
 
@@ -138,16 +138,16 @@ static void tile_mark_dirty(tceptor_state *state, int offset)
 	}
 
 	if (x >= 0)
-		tilemap_mark_tile_dirty(state->tx_tilemap, x * 28 + y);
+		tilemap_mark_tile_dirty(state->m_tx_tilemap, x * 28 + y);
 }
 
 
 WRITE8_HANDLER( tceptor_tile_ram_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	if (state->tile_ram[offset] != data)
+	if (state->m_tile_ram[offset] != data)
 	{
-		state->tile_ram[offset] = data;
+		state->m_tile_ram[offset] = data;
 		tile_mark_dirty(state, offset);
 	}
 }
@@ -155,9 +155,9 @@ WRITE8_HANDLER( tceptor_tile_ram_w )
 WRITE8_HANDLER( tceptor_tile_attr_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	if (state->tile_attr[offset] != data)
+	if (state->m_tile_attr[offset] != data)
 	{
-		state->tile_attr[offset] = data;
+		state->m_tile_attr[offset] = data;
 		tile_mark_dirty(state, offset);
 	}
 }
@@ -168,33 +168,33 @@ WRITE8_HANDLER( tceptor_tile_attr_w )
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	UINT16 data = state->bg_ram[tile_index * 2] | (state->bg_ram[tile_index * 2 + 1] << 8);
+	UINT16 data = state->m_bg_ram[tile_index * 2] | (state->m_bg_ram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | 0x000;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO(state->bg, code, color, 0);
+	SET_TILE_INFO(state->m_bg, code, color, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	UINT16 data = state->bg_ram[tile_index * 2 + 0x1000] | (state->bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
+	UINT16 data = state->m_bg_ram[tile_index * 2 + 0x1000] | (state->m_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
 	int code = (data & 0x3ff) | 0x400;
 	int color = (data & 0xfc00) >> 10;
 
-	SET_TILE_INFO(state->bg, code, color, 0);
+	SET_TILE_INFO(state->m_bg, code, color, 0);
 }
 
 WRITE8_HANDLER( tceptor_bg_ram_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->bg_ram[offset] = data;
+	state->m_bg_ram[offset] = data;
 
 	offset /= 2;
 	if (offset < 0x800)
-		tilemap_mark_tile_dirty(state->bg1_tilemap, offset);
+		tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset);
 	else
-		tilemap_mark_tile_dirty(state->bg2_tilemap, offset - 0x800);
+		tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset - 0x800);
 }
 
 WRITE8_HANDLER( tceptor_bg_scroll_w )
@@ -203,27 +203,27 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 	switch (offset)
 	{
 	case 0:
-		state->bg1_scroll_x &= 0xff;
-		state->bg1_scroll_x |= data << 8;
+		state->m_bg1_scroll_x &= 0xff;
+		state->m_bg1_scroll_x |= data << 8;
 		break;
 	case 1:
-		state->bg1_scroll_x &= 0xff00;
-		state->bg1_scroll_x |= data;
+		state->m_bg1_scroll_x &= 0xff00;
+		state->m_bg1_scroll_x |= data;
 		break;
 	case 2:
-		state->bg1_scroll_y = data;
+		state->m_bg1_scroll_y = data;
 		break;
 
 	case 4:
-		state->bg2_scroll_x &= 0xff;
-		state->bg2_scroll_x |= data << 8;
+		state->m_bg2_scroll_x &= 0xff;
+		state->m_bg2_scroll_x |= data << 8;
 		break;
 	case 5:
-		state->bg2_scroll_x &= 0xff00;
-		state->bg2_scroll_x |= data;
+		state->m_bg2_scroll_x &= 0xff00;
+		state->m_bg2_scroll_x |= data;
 		break;
 	case 6:
-		state->bg2_scroll_y = data;
+		state->m_bg2_scroll_y = data;
 		break;
 	}
 }
@@ -245,7 +245,7 @@ static void decode_bg(running_machine &machine, const char * region)
 		128
 	};
 
-	int gfx_index = state->bg;
+	int gfx_index = state->m_bg;
 	UINT8 *src = machine.region(region)->base() + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
@@ -318,7 +318,7 @@ static void decode_sprite16(running_machine &machine, const char * region)
 			       4);
 		}
 
-	decode_sprite(machine, state->sprite16, &spr16_layout, dst);
+	decode_sprite(machine, state->m_sprite16, &spr16_layout, dst);
 }
 
 // fix sprite order
@@ -368,7 +368,7 @@ static void decode_sprite32(running_machine &machine, const char * region)
 		memcpy(&dst[size * (i + total)], &src[size * (code + total)], size);
 	}
 
-	decode_sprite(machine, state->sprite32, &spr32_layout, dst);
+	decode_sprite(machine, state->m_sprite32, &spr32_layout, dst);
 }
 
 VIDEO_START( tceptor )
@@ -376,7 +376,7 @@ VIDEO_START( tceptor )
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int gfx_index;
 
-	state->sprite_ram_buffered = auto_alloc_array_clear(machine, UINT16, 0x200/2);
+	state->m_sprite_ram_buffered = auto_alloc_array_clear(machine, UINT16, 0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -384,36 +384,36 @@ VIDEO_START( tceptor )
 			break;
 	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
-	state->bg = gfx_index++;
+	state->m_bg = gfx_index++;
 	decode_bg(machine, "gfx2");
 
-	state->sprite16 = gfx_index++;
+	state->m_sprite16 = gfx_index++;
 	decode_sprite16(machine, "gfx3");
 
-	state->sprite32 = gfx_index++;
+	state->m_sprite32 = gfx_index++;
 	decode_sprite32(machine, "gfx4");
 
 	/* allocate temp bitmaps */
-	state->temp_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_temp_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	namco_road_init(machine, gfx_index);
 
 	namco_road_set_transparent_color(colortable_entry_get_value(machine.colortable, 0xfff));
 
-	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,  8, 8, 34, 28);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,  8, 8, 34, 28);
 
-	tilemap_set_scrollx(state->tx_tilemap, 0, -2*8);
-	tilemap_set_scrolly(state->tx_tilemap, 0, 0);
-	colortable_configure_tilemap_groups(machine.colortable, state->tx_tilemap, machine.gfx[0], 7);
+	tilemap_set_scrollx(state->m_tx_tilemap, 0, -2*8);
+	tilemap_set_scrolly(state->m_tx_tilemap, 0, 0);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_tx_tilemap, machine.gfx[0], 7);
 
-	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
-	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
-	state_save_register_global_pointer(machine, state->sprite_ram_buffered, 0x200 / 2);
-	state_save_register_global(machine, state->bg1_scroll_x);
-	state_save_register_global(machine, state->bg1_scroll_y);
-	state_save_register_global(machine, state->bg2_scroll_x);
-	state_save_register_global(machine, state->bg2_scroll_y);
+	state_save_register_global_pointer(machine, state->m_sprite_ram_buffered, 0x200 / 2);
+	state_save_register_global(machine, state->m_bg1_scroll_x);
+	state_save_register_global(machine, state->m_bg1_scroll_y);
+	state_save_register_global(machine, state->m_bg2_scroll_x);
+	state_save_register_global(machine, state->m_bg2_scroll_y);
 }
 
 
@@ -443,8 +443,8 @@ VIDEO_START( tceptor )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	UINT16 *mem1 = &state->sprite_ram_buffered[0x000/2];
-	UINT16 *mem2 = &state->sprite_ram_buffered[0x100/2];
+	UINT16 *mem1 = &state->m_sprite_ram_buffered[0x000/2];
+	UINT16 *mem2 = &state->m_sprite_ram_buffered[0x100/2];
 	int need_mask = 0;
 	int i;
 
@@ -466,22 +466,22 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 			if (mem2[0 + i] & 0x2000)
 			{
-				gfx = state->sprite32;
+				gfx = state->m_sprite32;
 				code = mem1[0 + i] & 0x3ff;
 
 			}
 			else
 			{
-				gfx = state->sprite16;
+				gfx = state->m_sprite16;
 				code = mem1[0 + i] & 0x1ff;
 				scaley *= 2;
 			}
 
-			if (state->is_mask_spr[color])
+			if (state->m_is_mask_spr[color])
 			{
 				if (!need_mask)
 					// backup previous bitmap
-					copybitmap(state->temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+					copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
 				need_mask = 1;
 			}
@@ -515,7 +515,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 				if (colortable_entry_get_value(machine.colortable, *BITMAP_ADDR16(bitmap, y, x)) == SPR_MASK_COLOR)
 					// restore pixel
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->temp_bitmap, y, x);
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_temp_bitmap, y, x);
 	}
 }
 
@@ -525,7 +525,7 @@ SCREEN_UPDATE( tceptor )
 	tceptor_state *state = screen->machine().driver_data<tceptor_state>();
 	rectangle rect;
 	int pri;
-	int bg_center = 144 - ((((state->bg1_scroll_x + state->bg2_scroll_x ) & 0x1ff) - 288) / 2);
+	int bg_center = 144 - ((((state->m_bg1_scroll_x + state->m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
 	device_t *_2d_screen       = screen->machine().device("2dscreen");
 	device_t *_3d_left_screen  = screen->machine().device("3dleft");
@@ -544,16 +544,16 @@ SCREEN_UPDATE( tceptor )
 	// left background
 	rect = *cliprect;
 	rect.max_x = bg_center;
-	tilemap_set_scrollx(state->bg1_tilemap, 0, state->bg1_scroll_x + 12);
-	tilemap_set_scrolly(state->bg1_tilemap, 0, state->bg1_scroll_y + 20); //32?
-	tilemap_draw(bitmap, &rect, state->bg1_tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_bg1_tilemap, 0, state->m_bg1_scroll_x + 12);
+	tilemap_set_scrolly(state->m_bg1_tilemap, 0, state->m_bg1_scroll_y + 20); //32?
+	tilemap_draw(bitmap, &rect, state->m_bg1_tilemap, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect->max_x;
-	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bg2_scroll_x + 20);
-	tilemap_set_scrolly(state->bg2_tilemap, 0, state->bg2_scroll_y + 20); // 32?
-	tilemap_draw(bitmap, &rect, state->bg2_tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_bg2_tilemap, 0, state->m_bg2_scroll_x + 20);
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_bg2_scroll_y + 20); // 32?
+	tilemap_draw(bitmap, &rect, state->m_bg2_tilemap, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{
@@ -562,7 +562,7 @@ SCREEN_UPDATE( tceptor )
 		draw_sprites(screen->machine(), bitmap, cliprect, pri);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	return 0;
 }
 
@@ -570,5 +570,5 @@ SCREEN_UPDATE( tceptor )
 SCREEN_EOF( tceptor )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	memcpy(state->sprite_ram_buffered, state->sprite_ram, 0x200);
+	memcpy(state->m_sprite_ram_buffered, state->m_sprite_ram, 0x200);
 }

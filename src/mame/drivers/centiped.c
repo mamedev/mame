@@ -457,9 +457,9 @@ static MACHINE_START( centiped )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
 
-	state->save_item(NAME(state->oldpos));
-	state->save_item(NAME(state->sign));
-	state->save_item(NAME(state->dsw_select));
+	state->save_item(NAME(state->m_oldpos));
+	state->save_item(NAME(state->m_sign));
+	state->save_item(NAME(state->m_dsw_select));
 }
 
 
@@ -468,8 +468,8 @@ static MACHINE_RESET( centiped )
 	centiped_state *state = machine.driver_data<centiped_state>();
 
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	state->dsw_select = 0;
-	state->control_select = 0;
+	state->m_dsw_select = 0;
+	state->m_control_select = 0;
 }
 
 
@@ -480,7 +480,7 @@ static MACHINE_RESET( magworm )
 	MACHINE_RESET_CALL(centiped);
 
 	/* kludge: clear RAM so that magworm can be reset cleanly */
-	memset(state->rambase, 0, 0x400);
+	memset(state->m_rambase, 0, 0x400);
 }
 
 
@@ -523,23 +523,23 @@ INLINE int read_trackball(running_machine &machine, int idx, int switch_port)
 	static const char *const tracknames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	/* adjust idx if we're cocktail flipped */
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 		idx += 2;
 
 	/* if we're to read the dipswitches behind the trackball data, do it now */
-	if (state->dsw_select)
-		return (input_port_read(machine, portnames[switch_port]) & 0x7f) | state->sign[idx];
+	if (state->m_dsw_select)
+		return (input_port_read(machine, portnames[switch_port]) & 0x7f) | state->m_sign[idx];
 
 	/* get the new position and adjust the result */
 	newpos = input_port_read(machine, tracknames[idx]);
-	if (newpos != state->oldpos[idx])
+	if (newpos != state->m_oldpos[idx])
 	{
-		state->sign[idx] = (newpos - state->oldpos[idx]) & 0x80;
-		state->oldpos[idx] = newpos;
+		state->m_sign[idx] = (newpos - state->m_oldpos[idx]) & 0x80;
+		state->m_oldpos[idx] = newpos;
 	}
 
 	/* blend with the bits from the switch port */
-	return (input_port_read(machine, portnames[switch_port]) & 0x70) | (state->oldpos[idx] & 0x0f) | state->sign[idx];
+	return (input_port_read(machine, portnames[switch_port]) & 0x70) | (state->m_oldpos[idx] & 0x0f) | state->m_sign[idx];
 }
 
 
@@ -572,7 +572,7 @@ static READ8_HANDLER( milliped_IN2_r )
      * the inputs, and has the good side effect of disabling
      * the actual Joy1 inputs while control_select is no zero.
      */
-	if (0 != state->control_select) {
+	if (0 != state->m_control_select) {
 		/* Bottom 4 bits is our joystick inputs */
 		UINT8 joy2data = input_port_read(space->machine(), "IN3") & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
@@ -586,7 +586,7 @@ static WRITE8_HANDLER( input_select_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->dsw_select = (~data >> 7) & 1;
+	state->m_dsw_select = (~data >> 7) & 1;
 }
 
 /* used P2 controls if 1, P1 controls if 0 */
@@ -594,7 +594,7 @@ static WRITE8_HANDLER( control_select_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->control_select = (data >> 7) & 1;
+	state->m_control_select = (data >> 7) & 1;
 }
 
 
@@ -603,7 +603,7 @@ static READ8_HANDLER( mazeinv_input_r )
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
-	return input_port_read(space->machine(), sticknames[state->control_select]);
+	return input_port_read(space->machine(), sticknames[state->m_control_select]);
 }
 
 
@@ -611,7 +611,7 @@ static WRITE8_HANDLER( mazeinv_input_select_w )
 {
 	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->control_select = offset & 3;
+	state->m_control_select = offset & 3;
 }
 
 static READ8_HANDLER( bullsdrt_data_port_r )
@@ -688,9 +688,9 @@ static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 
 static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(centiped_state, rambase)
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_rambase)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(centiped_IN0_r)	/* IN0 */
@@ -714,8 +714,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x4000) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_MIRROR(0x4000) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x4000) AM_READ(centiped_IN0_r)	/* IN0 */
@@ -750,8 +750,8 @@ static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
 	AM_RANGE(0x2010, 0x2010) AM_READ(milliped_IN2_r)
@@ -781,8 +781,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")	/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")	/* IN0 */
@@ -808,8 +808,8 @@ static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN1")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("IN2")
@@ -852,8 +852,8 @@ static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_NOP
-	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
-	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(centiped_state, spriteram)
+	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
+	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
@@ -862,7 +862,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bullsdrt_port_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE_MEMBER(centiped_state, bullsdrt_tiles_bankram)
+	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE_MEMBER(centiped_state, m_bullsdrt_tiles_bankram)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496_w)
 ADDRESS_MAP_END
 
@@ -2005,7 +2005,7 @@ static DRIVER_INIT( bullsdrt )
 {
 	centiped_state *state = machine.driver_data<centiped_state>();
 
-	state->dsw_select = 0;
+	state->m_dsw_select = 0;
 }
 
 

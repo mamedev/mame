@@ -46,7 +46,7 @@ static WRITE16_HANDLER( soundcmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -191,7 +191,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
@@ -208,12 +208,12 @@ static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, m_objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -230,12 +230,12 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, m_objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, m_objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -790,7 +790,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	sf_state *state = device->machine().driver_data<sf_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -809,21 +809,21 @@ static MACHINE_START( sf )
 	sf_state *state = machine.driver_data<sf_state>();
 
 	/* devices */
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->sf_active));
-	state->save_item(NAME(state->bgscroll));
-	state->save_item(NAME(state->fgscroll));
+	state->save_item(NAME(state->m_sf_active));
+	state->save_item(NAME(state->m_bgscroll));
+	state->save_item(NAME(state->m_fgscroll));
 }
 
 static MACHINE_RESET( sf )
 {
 	sf_state *state = machine.driver_data<sf_state>();
 
-	state->sf_active = 0;
-	state->bgscroll = 0;
-	state->fgscroll = 0;
+	state->m_sf_active = 0;
+	state->m_bgscroll = 0;
+	state->m_fgscroll = 0;
 }
 
 static MACHINE_CONFIG_START( sf, sf_state )

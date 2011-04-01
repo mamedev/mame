@@ -21,33 +21,37 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    color_ram;
-	UINT16 *    spriteram;
-	UINT16 *    spriteext;
-	UINT16 *    spriteram_buffered, *spriteram_delayed;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-	size_t      spriteext_size;
-	size_t      spriteram_size;
+	UINT16 *    m_color_ram;
+	UINT16 *    m_spriteram;
+	UINT16 *    m_spriteext;
+	UINT16 *    m_spriteram_buffered;
+	UINT16 *    m_spriteram_delayed;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
+	size_t      m_spriteext_size;
+	size_t      m_spriteram_size;
 
 	/* video-related */
-	struct      slapshot_tempsprite *spritelist;
-	INT32       sprites_disabled, sprites_active_area, sprites_master_scrollx, sprites_master_scrolly;
-	int         sprites_flipscreen;
-	int         prepare_sprites;
-	int         dislayer[5];
+	struct      slapshot_tempsprite *m_spritelist;
+	INT32       m_sprites_disabled;
+	INT32       m_sprites_active_area;
+	INT32       m_sprites_master_scrollx;
+	INT32       m_sprites_master_scrolly;
+	int         m_sprites_flipscreen;
+	int         m_prepare_sprites;
+	int         m_dislayer[5];
 
-	UINT16      spritebank[8];
+	UINT16      m_spritebank[8];
 
 	/* misc */
-	INT32      banknum;
+	INT32      m_banknum;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *tc0140syt;
-	device_t *tc0480scp;
-	device_t *tc0360pri;
-	device_t *tc0640fio;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_tc0140syt;
+	device_t *m_tc0480scp;
+	device_t *m_tc0360pri;
+	device_t *m_tc0640fio;
 };
 
 

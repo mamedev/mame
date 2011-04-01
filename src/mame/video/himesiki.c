@@ -13,7 +13,7 @@ Video hardware
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
-	int code = state->bg_ram[tile_index * 2] + state->bg_ram[tile_index * 2 + 1] * 0x100 ;
+	int code = state->m_bg_ram[tile_index * 2] + state->m_bg_ram[tile_index * 2 + 1] * 0x100 ;
 	int col = code >> 12;
 
 	code &= 0xfff;
@@ -24,27 +24,27 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( himesiki )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
-	state->bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 WRITE8_HANDLER( himesiki_bg_ram_w )
 {
 	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->bg_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_bg_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( himesiki_scrollx_w )
 {
 	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->scrollx[offset] = data;
+	state->m_scrollx[offset] = data;
 }
 
 WRITE8_HANDLER( himesiki_flip_w )
 {
 	himesiki_state *state = space->machine().driver_data<himesiki_state>();
-	state->flipscreen = data & 0xc0;
-	flip_screen_set(space->machine(), state->flipscreen);
+	state->m_flipscreen = data & 0xc0;
+	flip_screen_set(space->machine(), state->m_flipscreen);
 
 	if (data & 0x3f)
 		logerror("p08_w %02x\n",data);
@@ -53,7 +53,7 @@ WRITE8_HANDLER( himesiki_flip_w )
 static void himesiki_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	for (offs = 0x100; offs < 0x160; offs += 4)
@@ -70,7 +70,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 		if (x > 0x1e0)
 			x -= 0x200;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			y = (y + 33) & 0xff;
 			x = 224 - x;
@@ -100,7 +100,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 		if (x > 0x1e0)
 			x -= 0x200;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			y += 49;
 			x = 240 - x;
@@ -120,10 +120,10 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 SCREEN_UPDATE( himesiki )
 {
 	himesiki_state *state = screen->machine().driver_data<himesiki_state>();
-	int x = -(state->scrollx[0] << 8 | state->scrollx[1]) & 0x1ff;
-	tilemap_set_scrolldx(state->bg_tilemap, x, x);
+	int x = -(state->m_scrollx[0] << 8 | state->m_scrollx[1]) & 0x1ff;
+	tilemap_set_scrolldx(state->m_bg_tilemap, x, x);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	himesiki_draw_sprites(screen->machine(), bitmap, cliprect);
 
 	return 0;

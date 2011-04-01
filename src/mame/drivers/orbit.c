@@ -35,15 +35,15 @@ static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
 	orbit_state *state = timer.machine().driver_data<orbit_state>();
 	int scanline = param;
-	int nmistate = (scanline & 32) && (state->misc_flags & 4);
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	int nmistate = (scanline & 32) && (state->m_misc_flags & 4);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -65,7 +65,7 @@ static void update_misc_flags(running_machine &machine, UINT8 val)
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
 
-	state->misc_flags = val;
+	state->m_misc_flags = val;
 
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
@@ -76,13 +76,13 @@ static void update_misc_flags(running_machine &machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(state->discrete, ORBIT_WARNING_EN, BIT(state->misc_flags, 7));
+	discrete_sound_w(state->m_discrete, ORBIT_WARNING_EN, BIT(state->m_misc_flags, 7));
 
-	set_led_status(machine, 0, BIT(state->misc_flags, 3));
-	set_led_status(machine, 1, BIT(state->misc_flags, 6));
+	set_led_status(machine, 0, BIT(state->m_misc_flags, 3));
+	set_led_status(machine, 1, BIT(state->m_misc_flags, 6));
 
-	coin_lockout_w(machine, 0, !BIT(state->misc_flags, 1));
-	coin_lockout_w(machine, 1, !BIT(state->misc_flags, 1));
+	coin_lockout_w(machine, 0, !BIT(state->m_misc_flags, 1));
+	coin_lockout_w(machine, 1, !BIT(state->m_misc_flags, 1));
 }
 
 
@@ -92,9 +92,9 @@ static WRITE8_HANDLER( orbit_misc_w )
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(space->machine(), state->misc_flags | (1 << bit));
+		update_misc_flags(space->machine(), state->m_misc_flags | (1 << bit));
 	else
-		update_misc_flags(space->machine(), state->misc_flags & ~(1 << bit));
+		update_misc_flags(space->machine(), state->m_misc_flags & ~(1 << bit));
 }
 
 
@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x07ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07ff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x07ff) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_BASE_MEMBER(orbit_state, playfield_ram)
-	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(orbit_state, sprite_ram)
+	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_BASE_MEMBER(orbit_state, m_playfield_ram)
+	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(orbit_state, m_sprite_ram)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_w)
 	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_noise_amp_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_amp_w)
@@ -276,11 +276,11 @@ static MACHINE_START( orbit )
 {
 	orbit_state *state = machine.driver_data<orbit_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->discrete = machine.device("discrete");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_discrete = machine.device("discrete");
 
-	state->save_item(NAME(state->misc_flags));
-	state->save_item(NAME(state->flip_screen));
+	state->save_item(NAME(state->m_misc_flags));
+	state->save_item(NAME(state->m_flip_screen));
 }
 
 static MACHINE_RESET( orbit )
@@ -288,7 +288,7 @@ static MACHINE_RESET( orbit )
 	orbit_state *state = machine.driver_data<orbit_state>();
 
 	update_misc_flags(machine, 0);
-	state->flip_screen = 0;
+	state->m_flip_screen = 0;
 }
 
 

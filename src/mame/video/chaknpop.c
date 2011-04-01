@@ -63,36 +63,36 @@ static void tx_tilemap_mark_all_dirty( running_machine &machine )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 
-	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
-	tilemap_set_flip(state->tx_tilemap, state->flip_x | state->flip_y);
+	tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+	tilemap_set_flip(state->m_tx_tilemap, state->m_flip_x | state->m_flip_y);
 }
 
 READ8_HANDLER( chaknpop_gfxmode_r )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
-	return state->gfxmode;
+	return state->m_gfxmode;
 }
 
 WRITE8_HANDLER( chaknpop_gfxmode_w )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 
-	if (state->gfxmode != data)
+	if (state->m_gfxmode != data)
 	{
 		int all_dirty = 0;
 
-		state->gfxmode = data;
-		memory_set_bank(space->machine(), "bank1", (state->gfxmode & GFX_VRAM_BANK) ? 1 : 0); 	/* Select 2 banks of 16k */
+		state->m_gfxmode = data;
+		memory_set_bank(space->machine(), "bank1", (state->m_gfxmode & GFX_VRAM_BANK) ? 1 : 0); 	/* Select 2 banks of 16k */
 
-		if (state->flip_x != (state->gfxmode & GFX_FLIP_X))
+		if (state->m_flip_x != (state->m_gfxmode & GFX_FLIP_X))
 		{
-			state->flip_x = state->gfxmode & GFX_FLIP_X;
+			state->m_flip_x = state->m_gfxmode & GFX_FLIP_X;
 			all_dirty = 1;
 		}
 
-		if (state->flip_y != (state->gfxmode & GFX_FLIP_Y))
+		if (state->m_flip_y != (state->m_gfxmode & GFX_FLIP_Y))
 		{
-			state->flip_y = state->gfxmode & GFX_FLIP_Y;
+			state->m_flip_y = state->m_gfxmode & GFX_FLIP_Y;
 			all_dirty = 1;
 		}
 
@@ -105,17 +105,17 @@ WRITE8_HANDLER( chaknpop_txram_w )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 
-	state->tx_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
+	state->m_tx_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( chaknpop_attrram_w )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 
-	if (state->attr_ram[offset] != data)
+	if (state->m_attr_ram[offset] != data)
 	{
-		state->attr_ram[offset] = data;
+		state->m_attr_ram[offset] = data;
 
 		if (offset == TX_COLOR1 || offset == TX_COLOR2)
 			tx_tilemap_mark_all_dirty(space->machine());
@@ -134,14 +134,14 @@ WRITE8_HANDLER( chaknpop_attrram_w )
 static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	int tile = state->tx_ram[tile_index];
-	int tile_h_bank = (state->gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
-	int color = state->attr_ram[TX_COLOR2];
+	int tile = state->m_tx_ram[tile_index];
+	int tile_h_bank = (state->m_gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */
+	int color = state->m_attr_ram[TX_COLOR2];
 
 	if (tile == 0x74)
-		color = state->attr_ram[TX_COLOR1];
+		color = state->m_attr_ram[TX_COLOR1];
 
-	if (state->gfxmode & GFX_TX_BANK1 && tile >= 0xc0)
+	if (state->m_gfxmode & GFX_TX_BANK1 && tile >= 0xc0)
 		tile += 0xc0;					/* 0xc0-0xff -> 0x180-0x1bf */
 
 	tile |= tile_h_bank;
@@ -166,17 +166,17 @@ VIDEO_START( chaknpop )
 	UINT8 *RAM = machine.region("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	state->tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	state->m_tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
 
-	state->vram1 = &RAM[0x10000];
-	state->vram2 = &RAM[0x12000];
-	state->vram3 = &RAM[0x14000];
-	state->vram4 = &RAM[0x16000];
+	state->m_vram1 = &RAM[0x10000];
+	state->m_vram2 = &RAM[0x12000];
+	state->m_vram3 = &RAM[0x14000];
+	state->m_vram4 = &RAM[0x16000];
 
-	state->save_pointer(NAME(state->vram1), 0x2000);
-	state->save_pointer(NAME(state->vram2), 0x2000);
-	state->save_pointer(NAME(state->vram3), 0x2000);
-	state->save_pointer(NAME(state->vram4), 0x2000);
+	state->save_pointer(NAME(state->m_vram1), 0x2000);
+	state->save_pointer(NAME(state->m_vram2), 0x2000);
+	state->save_pointer(NAME(state->m_vram3), 0x2000);
+	state->save_pointer(NAME(state->m_vram4), 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);
 	tx_tilemap_mark_all_dirty(machine);
@@ -195,21 +195,21 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->spr_ram_size; offs += 4)
+	for (offs = 0; offs < state->m_spr_ram_size; offs += 4)
 	{
-		int sx = state->spr_ram[offs + 3];
-		int sy = 256 - 15 - state->spr_ram[offs];
-		int flipx = state->spr_ram[offs+1] & 0x40;
-		int flipy = state->spr_ram[offs+1] & 0x80;
-		int color = (state->spr_ram[offs + 2] & 7);
-		int tile = (state->spr_ram[offs + 1] & 0x3f) | ((state->spr_ram[offs + 2] & 0x38) << 3);
+		int sx = state->m_spr_ram[offs + 3];
+		int sy = 256 - 15 - state->m_spr_ram[offs];
+		int flipx = state->m_spr_ram[offs+1] & 0x40;
+		int flipy = state->m_spr_ram[offs+1] & 0x80;
+		int color = (state->m_spr_ram[offs + 2] & 7);
+		int tile = (state->m_spr_ram[offs + 1] & 0x3f) | ((state->m_spr_ram[offs + 2] & 0x38) << 3);
 
-		if (state->flip_x)
+		if (state->m_flip_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (state->flip_y)
+		if (state->m_flip_y)
 		{
 			sy = 242 - sy;
 			flipy = !flipy;
@@ -227,7 +227,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	int dx = state->flip_x ? -1 : 1;
+	int dx = state->m_flip_x ? -1 : 1;
 	int offs, i;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -235,23 +235,23 @@ static void draw_bitmap( running_machine &machine, bitmap_t *bitmap, const recta
 		int x = ((offs & 0x1f) << 3) + 7;
 		int y = offs >> 5;
 
-		if (!state->flip_x)
+		if (!state->m_flip_x)
 			x = 255 - x;
 
-		if (!state->flip_y)
+		if (!state->m_flip_y)
 			y = 255 - y;
 
 		for (i = 0x80; i > 0; i >>= 1, x += dx)
 		{
 			pen_t color = 0;
 
-			if (state->vram1[offs] & i)
+			if (state->m_vram1[offs] & i)
 				color |= 0x200;	// green lower cage
-			if (state->vram2[offs] & i)
+			if (state->m_vram2[offs] & i)
 				color |= 0x080;
-			if (state->vram3[offs] & i)
+			if (state->m_vram3[offs] & i)
 				color |= 0x100;	// green upper cage
-			if (state->vram4[offs] & i)
+			if (state->m_vram4[offs] & i)
 				color |= 0x040;	// tx mask
 
 			if (color)
@@ -268,7 +268,7 @@ SCREEN_UPDATE( chaknpop )
 {
 	chaknpop_state *state = screen->machine().driver_data<chaknpop_state>();
 
-	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	draw_bitmap(screen->machine(), bitmap, cliprect);
 	return 0;

@@ -48,13 +48,13 @@ metlclsh:
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8 )
@@ -71,9 +71,9 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8 )
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 /**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
-/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_BASE_MEMBER(metlclsh_state, fgram)
+/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_BASE_MEMBER(metlclsh_state, m_fgram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_w	)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(metlclsh_state, spriteram, spriteram_size)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(metlclsh_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END
 
@@ -87,19 +87,19 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
@@ -116,10 +116,10 @@ static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
 	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
-	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_BASE_MEMBER(metlclsh_state, bgram) // this is banked
+	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE(metlclsh_bgram_w) AM_BASE_MEMBER(metlclsh_state, m_bgram) // this is banked
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
-	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE_MEMBER(metlclsh_state, scrollx)
+	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE_MEMBER(metlclsh_state, m_scrollx)
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
@@ -256,7 +256,7 @@ GFXDECODE_END
 static void metlclsh_irqhandler(device_t *device, int linestate)
 {
 	metlclsh_state *state = device->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->maincpu, M6809_IRQ_LINE, linestate);
+	device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -277,11 +277,11 @@ static MACHINE_START( metlclsh )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->subcpu = machine.device("sub");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->write_mask));
-	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->m_write_mask));
+	state->save_item(NAME(state->m_gfxbank));
 }
 
 static MACHINE_RESET( metlclsh )
@@ -290,8 +290,8 @@ static MACHINE_RESET( metlclsh )
 
 	flip_screen_set(machine, 0);
 
-	state->write_mask = 0;
-	state->gfxbank = 0;
+	state->m_write_mask = 0;
+	state->m_gfxbank = 0;
 }
 
 static MACHINE_CONFIG_START( metlclsh, metlclsh_state )

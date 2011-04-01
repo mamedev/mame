@@ -40,9 +40,9 @@ VIDEO_START( micro3d )
 	micro3d_state *state = machine.driver_data<micro3d_state>();
 
 	/* Allocate 512x12 x 2 3D frame buffers */
-	state->frame_buffers[0] = auto_alloc_array(machine, UINT16, 1024 * 512);
-	state->frame_buffers[1] = auto_alloc_array(machine, UINT16, 1024 * 512);
-	state->tmp_buffer = auto_alloc_array(machine, UINT16, 1024 * 512);
+	state->m_frame_buffers[0] = auto_alloc_array(machine, UINT16, 1024 * 512);
+	state->m_frame_buffers[1] = auto_alloc_array(machine, UINT16, 1024 * 512);
+	state->m_tmp_buffer = auto_alloc_array(machine, UINT16, 1024 * 512);
 }
 
 
@@ -50,11 +50,11 @@ VIDEO_RESET( micro3d )
 {
 	micro3d_state *state = machine.driver_data<micro3d_state>();
 
-	state->pipeline_state  = 0;
-	state->creg = 0;
+	state->m_pipeline_state  = 0;
+	state->m_creg = 0;
 
-	state->drawing_buffer = 0;
-	state->display_buffer = 1;
+	state->m_drawing_buffer = 0;
+	state->m_display_buffer = 1;
 }
 
 
@@ -68,16 +68,16 @@ void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanli
 {
 	micro3d_state *state = screen.machine().driver_data<micro3d_state>();
 
-	UINT16 *src = &state->micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	UINT16 *src = &state->m_micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr;
-	int sd_11_7 = (state->creg & 0x1f) << 7;
+	int sd_11_7 = (state->m_creg & 0x1f) << 7;
 	int x;
 
 	UINT16 *frame_src;
 
 	scanline = MAX((scanline - params->veblnk), 0);
-	frame_src = state->frame_buffers[state->display_buffer] + (scanline << 10);
+	frame_src = state->m_frame_buffers[state->m_display_buffer] + (scanline << 10);
 
 	/* TODO: XFER3DK - X/Y offsets for 3D */
 
@@ -123,14 +123,14 @@ WRITE16_HANDLER( micro3d_creg_w )
 	if (~data & 0x80)
 		cputag_set_input_line(space->machine(), "vgb", 0, CLEAR_LINE);
 
-	state->creg = data;
+	state->m_creg = data;
 }
 
 WRITE16_HANDLER( micro3d_xfer3dk_w )
 {
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->xfer3dk = data;
+	state->m_xfer3dk = data;
 }
 
 void micro3d_tms_interrupt(device_t *device, int state)
@@ -159,12 +159,12 @@ static int inside(micro3d_state *state, micro3d_vtx *v, enum planes plane)
 {
 	switch (plane)
 	{
-		case CLIP_Z_MIN: return v->z >= state->z_min;
-		case CLIP_Z_MAX: return v->z <= state->z_max;
-		case CLIP_X_MIN: return v->x >= state->x_min;
-		case CLIP_X_MAX: return v->x <= state->x_max;
-		case CLIP_Y_MIN: return v->y >= state->y_min;
-		case CLIP_Y_MAX: return v->y <= state->y_max;
+		case CLIP_Z_MIN: return v->z >= state->m_z_min;
+		case CLIP_Z_MAX: return v->z <= state->m_z_max;
+		case CLIP_X_MIN: return v->x >= state->m_x_min;
+		case CLIP_X_MAX: return v->x <= state->m_x_max;
+		case CLIP_Y_MIN: return v->y >= state->m_y_min;
+		case CLIP_Y_MAX: return v->y <= state->m_y_max;
 	}
 
 	return 0;
@@ -196,9 +196,9 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 				myz = 0.0;
 			}
 
-			vo.x = v2->x + (state->z_min - v2->z) * mxz;
-			vo.y = v2->y + (state->z_min - v2->z) * myz;
-			vo.z = state->z_min;
+			vo.x = v2->x + (state->m_z_min - v2->z) * mxz;
+			vo.y = v2->y + (state->m_z_min - v2->z) * myz;
+			vo.z = state->m_z_min;
 			break;
 		}
 		case CLIP_Z_MAX:
@@ -216,44 +216,44 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 				myz = 0.0;
 			}
 
-			vo.x = v2->x + (state->z_max - v2->z) * mxz;
-			vo.y = v2->y + (state->z_max - v2->z) * myz;
-			vo.z = state->z_max;
+			vo.x = v2->x + (state->m_z_max - v2->z) * mxz;
+			vo.y = v2->y + (state->m_z_max - v2->z) * myz;
+			vo.z = state->m_z_max;
 			break;
 		}
 		case CLIP_X_MIN:
 		{
-			vo.x = state->x_min;
-			vo.y = v2->y + (state->x_min - v2->x) * m;
+			vo.x = state->m_x_min;
+			vo.y = v2->y + (state->m_x_min - v2->x) * m;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_X_MAX:
 		{
-			vo.x = state->x_max;
-			vo.y = v2->y + (state->x_max - v2->x) * m;
+			vo.x = state->m_x_max;
+			vo.y = v2->y + (state->m_x_max - v2->x) * m;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_Y_MIN:
 		{
 			if (v1->x != v2->x)
-				vo.x = v2->x + (state->y_min - v2->y) / m;
+				vo.x = v2->x + (state->m_y_min - v2->y) / m;
 			else
 				vo.x = v2->x;
 
-			vo.y = state->y_min;
+			vo.y = state->m_y_min;
 			vo.z = 0;
 			break;
 		}
 		case CLIP_Y_MAX:
 		{
 			if (v1->x != v2->x)
-				vo.x = v2->x + (state->y_max - v2->y) / m;
+				vo.x = v2->x + (state->m_y_max - v2->y) / m;
 			else
 				vo.x = v2->x;
 
-			vo.y = state->y_max;
+			vo.y = state->m_y_max;
 			vo.z = 0;
 			break;
 		}
@@ -263,7 +263,7 @@ static micro3d_vtx intersect(micro3d_state *state, micro3d_vtx *v1, micro3d_vtx 
 
 INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
 {
-	UINT32 *draw_dpram = state->draw_dpram;
+	UINT32 *draw_dpram = state->m_draw_dpram;
 	int addr = y << 1;
 
 	if (draw_dpram[addr] == 0x3ff000)
@@ -273,7 +273,7 @@ INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
 	else
 	{
 		/* Check start */
-		if (x < (state->draw_dpram[addr] & 0x3ff))
+		if (x < (state->m_draw_dpram[addr] & 0x3ff))
 		{
 			draw_dpram[addr] &= ~0x3ff;
 			draw_dpram[addr] |= x;
@@ -402,16 +402,16 @@ static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UI
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &state->tmp_buffer[y * 1024];
+			UINT16 *dest = &state->m_tmp_buffer[y * 1024];
 
-			if (state->draw_dpram[addr] == 0x3ff000)
+			if (state->m_draw_dpram[addr] == 0x3ff000)
 			{
 				continue;
 			}
 			else
 			{
-				int start = state->draw_dpram[addr] & 0x3ff;
-				int end = (state->draw_dpram[addr] >> 12) & 0x3ff;
+				int start = state->m_draw_dpram[addr] & 0x3ff;
+				int end = (state->m_draw_dpram[addr] >> 12) & 0x3ff;
 
 				for (x = start; x <= end; ++x)
 					dest[x] = color;
@@ -443,16 +443,16 @@ static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UI
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &state->tmp_buffer[y * 1024];
+			UINT16 *dest = &state->m_tmp_buffer[y * 1024];
 
-			if (state->draw_dpram[addr] == 0x3ff000)
+			if (state->m_draw_dpram[addr] == 0x3ff000)
 			{
 				continue;
 			}
 			else
 			{
-				int start = state->draw_dpram[addr] & 0x3ff;
-				int end = (state->draw_dpram[addr] >> 12) & 0x3ff;
+				int start = state->m_draw_dpram[addr] & 0x3ff;
+				int end = (state->m_draw_dpram[addr] >> 12) & 0x3ff;
 
 				for (x = start; x <= end; ++x)
 				{
@@ -510,7 +510,7 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 {
 	int i;
 	int triangles = 0;
-	int vertices = state->fifo_idx / 3;
+	int vertices = state->m_fifo_idx / 3;
 	int min_y = 0x3ff;
 	int max_y = 0;
 
@@ -518,10 +518,10 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 	if (vertices == 0)
 	{
 		int y;
-		int val = ((state->x_mid + 16) << 12) | state->x_mid;
+		int val = ((state->m_x_mid + 16) << 12) | state->m_x_mid;
 
-		for (y = state->y_mid; y <= state->y_mid + 16; ++y)
-			state->draw_dpram[y << 1] = val;
+		for (y = state->m_y_mid; y <= state->m_y_mid + 16; ++y)
+			state->m_draw_dpram[y << 1] = val;
 
 		return;
 	}
@@ -535,17 +535,17 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 		micro3d_vtx vo, vm, vn;
 		micro3d_vtx vclip_list[10];
 
-		vo.x = state->vtx_fifo[0];
-		vo.y = state->vtx_fifo[1];
-		vo.z = state->vtx_fifo[2];
+		vo.x = state->m_vtx_fifo[0];
+		vo.y = state->m_vtx_fifo[1];
+		vo.z = state->m_vtx_fifo[2];
 
-		vm.x = state->vtx_fifo[(i - 1) * 3 + 0];
-		vm.y = state->vtx_fifo[(i - 1) * 3 + 1];
-		vm.z = state->vtx_fifo[(i - 1) * 3 + 2];
+		vm.x = state->m_vtx_fifo[(i - 1) * 3 + 0];
+		vm.y = state->m_vtx_fifo[(i - 1) * 3 + 1];
+		vm.z = state->m_vtx_fifo[(i - 1) * 3 + 2];
 
-		vn.x = state->vtx_fifo[i * 3 + 0];
-		vn.y = state->vtx_fifo[i * 3 + 1];
-		vn.z = state->vtx_fifo[i * 3 + 2];
+		vn.x = state->m_vtx_fifo[i * 3 + 0];
+		vn.y = state->m_vtx_fifo[i * 3 + 1];
+		vn.z = state->m_vtx_fifo[i * 3 + 2];
 
 		vclip_list[0] = vo;
 		vclip_list[1] = vm;
@@ -558,8 +558,8 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 		/* Perform perspective divide */
 		for (k = 0; k < clip_vertices; ++k)
 		{
-			vclip_list[k].x = vclip_list[k].x * state->z_min / vclip_list[k].z;
-			vclip_list[k].y = vclip_list[k].y * state->z_min / vclip_list[k].z;
+			vclip_list[k].x = vclip_list[k].x * state->m_z_min / vclip_list[k].z;
+			vclip_list[k].y = vclip_list[k].y * state->m_z_min / vclip_list[k].z;
 			vclip_list[k].z = 0;
 		}
 
@@ -577,11 +577,11 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 
 			triangles = TRUE;
 
-			a.x += state->x_mid;
-			a.y += state->y_mid;
+			a.x += state->m_x_mid;
+			a.y += state->m_y_mid;
 
-			b.x += state->x_mid;
-			b.y += state->y_mid;
+			b.x += state->m_x_mid;
+			b.y += state->m_y_mid;
 
 			/* Keep track of the y-extents so we don't have to scan every line later */
 			if (a.y < min_y)
@@ -601,8 +601,8 @@ static void draw_triangles(micro3d_state *state, UINT32 attr)
 			{
 				micro3d_vtx c = vclip_list[k];
 
-				c.x += state->x_mid;
-				c.y += state->y_mid;
+				c.x += state->m_x_mid;
+				c.y += state->m_y_mid;
 
 				if (c.y < min_y)
 					min_y = c.y;
@@ -651,44 +651,44 @@ WRITE32_HANDLER( micro3d_fifo_w )
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 	UINT32 opcode = data >> 24;
 
-	switch (state->draw_state)
+	switch (state->m_draw_state)
 	{
 		case STATE_DRAW_CMD:
 		{
-			state->draw_cmd = data;
+			state->m_draw_cmd = data;
 
 			switch (opcode)
 			{
 				case 0xb4:
 				{
-					state->x_mid = data & 0x3ff;
-					state->y_mid = (data >> 10) & 0x3ff;
+					state->m_x_mid = data & 0x3ff;
+					state->m_y_mid = (data >> 10) & 0x3ff;
 					break;
 				}
 				case 0xc8:
 				{
-					state->dpram_bank ^= 1;
+					state->m_dpram_bank ^= 1;
 					break;
 				}
 				case 0xbc:
 				{
-					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | state->dpram_bank);
-					state->pipe_data = state->draw_dpram[dpram_r_addr];
+					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | state->m_dpram_bank);
+					state->m_pipe_data = state->m_draw_dpram[dpram_r_addr];
 					cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, ASSERT_LINE);
 					break;
 				}
 				case 0x80:
 				{
 					int addr;
-					state->fifo_idx = 0;
-					state->draw_state = STATE_DRAW_VTX_DATA;
+					state->m_fifo_idx = 0;
+					state->m_draw_state = STATE_DRAW_VTX_DATA;
 
 					/* Invalidate the draw RAM
                      * TODO: Not sure this is the right place for it -
                      * causes monitor mode draw tests to fail
                      */
 					for (addr = 0; addr < 512; ++addr)
-						state->draw_dpram[addr << 1] = 0x3ff000;
+						state->m_draw_dpram[addr << 1] = 0x3ff000;
 
 					break;
 				}
@@ -700,35 +700,35 @@ WRITE32_HANDLER( micro3d_fifo_w )
 				case 0xd8:
 				{
 					/* TODO: We shouldn't need this extra buffer - is there some sort of sync missing? */
-					memcpy(state->frame_buffers[state->drawing_buffer], state->tmp_buffer, 512*1024*2);
-					state->drawing_buffer ^= 1;
+					memcpy(state->m_frame_buffers[state->m_drawing_buffer], state->m_tmp_buffer, 512*1024*2);
+					state->m_drawing_buffer ^= 1;
 					cputag_set_input_line(space->machine(), "vgb", 0, ASSERT_LINE);
 					break;
 				}
 				default:
-					state->draw_state = STATE_DRAW_CMD_DATA;
+					state->m_draw_state = STATE_DRAW_CMD_DATA;
 			}
 			break;
 		}
 		case STATE_DRAW_CMD_DATA:
 		{
-			switch (state->draw_cmd >> 24)
+			switch (state->m_draw_cmd >> 24)
 			{
-				case 0x90: state->z_min = VTX_SEX(data); break;
-				case 0x94: state->z_max = VTX_SEX(data); break;
-				case 0x98: state->y_max = VTX_SEX(data); break;
-				case 0x9c: state->x_min = VTX_SEX(data); break;
-				case 0xa0: state->x_max = VTX_SEX(data); break;
-				case 0xa4: state->y_min = VTX_SEX(data); break;
+				case 0x90: state->m_z_min = VTX_SEX(data); break;
+				case 0x94: state->m_z_max = VTX_SEX(data); break;
+				case 0x98: state->m_y_max = VTX_SEX(data); break;
+				case 0x9c: state->m_x_min = VTX_SEX(data); break;
+				case 0xa0: state->m_x_max = VTX_SEX(data); break;
+				case 0xa4: state->m_y_min = VTX_SEX(data); break;
 				case 0xb8:
 				{
-					state->draw_dpram[((state->draw_cmd & 0x1ff) << 1) | state->dpram_bank] = data & 0x00ffffff;
+					state->m_draw_dpram[((state->m_draw_cmd & 0x1ff) << 1) | state->m_dpram_bank] = data & 0x00ffffff;
 					break;
 				}
 				default:
-					popmessage("Unknown 3D command: %x %x\n", state->draw_cmd, data);
+					popmessage("Unknown 3D command: %x %x\n", state->m_draw_cmd, data);
 			}
-			state->draw_state = STATE_DRAW_CMD;
+			state->m_draw_state = STATE_DRAW_CMD;
 			break;
 		}
 		case STATE_DRAW_VTX_DATA:
@@ -736,11 +736,11 @@ WRITE32_HANDLER( micro3d_fifo_w )
 			if ((opcode == 0x85) || (opcode == 0x8a))
 			{
 				draw_triangles(state, data);
-				state->draw_state = STATE_DRAW_CMD;
+				state->m_draw_state = STATE_DRAW_CMD;
 			}
 			else
 			{
-				state->vtx_fifo[state->fifo_idx++] = VTX_SEX(data);
+				state->m_vtx_fifo[state->m_fifo_idx++] = VTX_SEX(data);
 			}
 			break;
 		}
@@ -751,7 +751,7 @@ WRITE32_HANDLER( micro3d_alt_fifo_w )
 {
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
-	state->vtx_fifo[state->fifo_idx++] = VTX_SEX(data);
+	state->m_vtx_fifo[state->m_fifo_idx++] = VTX_SEX(data);
 }
 
 READ32_HANDLER( micro3d_pipe_r )
@@ -759,7 +759,7 @@ READ32_HANDLER( micro3d_pipe_r )
 	micro3d_state *state = space->machine().driver_data<micro3d_state>();
 
 	cputag_set_input_line(space->machine(), "drmath", AM29000_INTR1, CLEAR_LINE);
-	return state->pipe_data;
+	return state->m_pipe_data;
 }
 
 INTERRUPT_GEN( micro3d_vblank )
@@ -767,5 +767,5 @@ INTERRUPT_GEN( micro3d_vblank )
 //  mc68901_int_gen(device->machine(), GPIP7);
 	micro3d_state *state = device->machine().driver_data<micro3d_state>();
 
-	state->display_buffer = state->drawing_buffer ^ 1;
+	state->m_display_buffer = state->m_drawing_buffer ^ 1;
 }

@@ -50,14 +50,14 @@ static WRITE16_HANDLER( mugsmash_reg2_w )
 {
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->regs2[offset] = data;
-	//popmessage ("Regs2 %04x, %04x, %04x, %04x", state->regs2[0], state->regs2[1], state->regs2[2], state->regs2[3]);
+	state->m_regs2[offset] = data;
+	//popmessage ("Regs2 %04x, %04x, %04x, %04x", state->m_regs2[0], state->m_regs2[1], state->m_regs2[2], state->m_regs2[3]);
 
 	switch (offset)
 	{
 	case 1:
 		soundlatch_w(space, 1, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -174,14 +174,14 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 
 static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE_MEMBER(mugsmash_state, videoram1)
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE_MEMBER(mugsmash_state, videoram2)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE_MEMBER(mugsmash_state, regs1)	/* video registers*/
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE_MEMBER(mugsmash_state, m_videoram1)
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE_MEMBER(mugsmash_state, m_videoram2)
+	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE_MEMBER(mugsmash_state, m_regs1)	/* video registers*/
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE_MEMBER(mugsmash_state, regs2) /* sound + ? */
+	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE_MEMBER(mugsmash_state, m_regs2) /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(mugsmash_state, spriteram) /* sprite ram */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(mugsmash_state, m_spriteram) /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
 #else
@@ -392,7 +392,7 @@ GFXDECODE_END
 static void irq_handler(device_t *device, int irq)
 {
 	mugsmash_state *state = device->machine().driver_data<mugsmash_state>();
-	device_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(state->m_audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -404,8 +404,8 @@ static MACHINE_START( mugsmash )
 {
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( mugsmash, mugsmash_state )

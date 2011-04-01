@@ -45,29 +45,29 @@ static TIMER_CALLBACK( interrupt_disable )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 	//interrupt_enable = 0;
-	cpu_interrupt_enable(state->maincpu, 0);
+	cpu_interrupt_enable(state->m_maincpu, 0);
 }
 
 static MACHINE_RESET( espial )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 
 	/* we must start with NMI interrupts disabled */
 	machine.scheduler().synchronize(FUNC(interrupt_disable));
-	state->sound_nmi_enabled = FALSE;
+	state->m_sound_nmi_enabled = FALSE;
 }
 
 static MACHINE_START( espial )
 {
 	espial_state *state = machine.driver_data<espial_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
 	//state_save_register_global_array(machine, mcu_out[1]);
-	state->save_item(NAME(state->sound_nmi_enabled));
+	state->save_item(NAME(state->m_sound_nmi_enabled));
 }
 
 
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( espial_master_interrupt_enable_w )
 WRITE8_HANDLER( espial_sound_nmi_enable_w )
 {
 	espial_state *state = space->machine().driver_data<espial_state>();
-	state->sound_nmi_enabled = data & 1;
+	state->m_sound_nmi_enabled = data & 1;
 }
 
 
@@ -88,7 +88,7 @@ INTERRUPT_GEN( espial_sound_nmi_gen )
 {
 	espial_state *state = device->machine().driver_data<espial_state>();
 
-	if (state->sound_nmi_enabled)
+	if (state->m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( espial_master_soundlatch_w )
 {
 	espial_state *state = space->machine().driver_data<espial_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -121,14 +121,14 @@ static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_1)
+	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_1)
 	AM_RANGE(0x8020, 0x803f) AM_READONLY
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, videoram)
-	AM_RANGE(0x8800, 0x880f) AM_WRITEONLY AM_BASE_MEMBER(espial_state, spriteram_3)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE_MEMBER(espial_state, attributeram)
-	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_2)
-	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE_MEMBER(espial_state, scrollram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE_MEMBER(espial_state, colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, m_videoram)
+	AM_RANGE(0x8800, 0x880f) AM_WRITEONLY AM_BASE_MEMBER(espial_state, m_spriteram_3)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE_MEMBER(espial_state, m_attributeram)
+	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_2)
+	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE_MEMBER(espial_state, m_scrollram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE_MEMBER(espial_state, m_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -146,13 +146,13 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_1)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, videoram)
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_3)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE_MEMBER(espial_state, attributeram)
-	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_2)
-	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE_MEMBER(espial_state, scrollram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE_MEMBER(espial_state, colorram)
+	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, m_videoram)
+	AM_RANGE(0x8800, 0x880f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_3)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE_MEMBER(espial_state, m_attributeram)
+	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE_MEMBER(espial_state, m_spriteram_2)
+	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE_MEMBER(espial_state, m_scrollram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE_MEMBER(espial_state, m_colorram)
 ADDRESS_MAP_END
 
 

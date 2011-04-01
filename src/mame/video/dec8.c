@@ -106,36 +106,36 @@ PALETTE_INIT( ghostb )
 WRITE8_HANDLER( dec8_bg_data_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->bg_data[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_bg_data[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 READ8_HANDLER( dec8_bg_data_r )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	return state->bg_data[offset];
+	return state->m_bg_data[offset];
 }
 
 
 WRITE8_HANDLER( dec8_videoram_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fix_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fix_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( srdarwin_videoram_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fix_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fix_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( dec8_scroll2_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->scroll2[offset] = data;
+	state->m_scroll2[offset] = data;
 }
 
 WRITE8_HANDLER( srdarwin_control_w )
@@ -146,11 +146,11 @@ WRITE8_HANDLER( srdarwin_control_w )
 	{
 	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
 		memory_set_bank(space->machine(), "bank1", (data >> 5));
-		state->scroll2[0] = data & 0xf;
+		state->m_scroll2[0] = data & 0xf;
 		return;
 
 	case 1:
-		state->scroll2[1] = data;
+		state->m_scroll2[1] = data;
 		return;
     }
 }
@@ -168,13 +168,13 @@ WRITE8_HANDLER( lastmisn_control_w )
     */
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 
-	state->scroll2[0] = (data >> 5) & 1;
-	state->scroll2[2] = (data >> 6) & 1;
+	state->m_scroll2[0] = (data >> 5) & 1;
+	state->m_scroll2[2] = (data >> 6) & 1;
 
 	if (data & 0x80)
-		device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )
@@ -184,20 +184,20 @@ WRITE8_HANDLER( shackled_control_w )
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 
-	state->scroll2[0] = (data >> 5) & 1;
-	state->scroll2[2] = (data >> 6) & 1;
+	state->m_scroll2[0] = (data >> 5) & 1;
+	state->m_scroll2[2] = (data >> 6) & 1;
 }
 
 WRITE8_HANDLER( lastmisn_scrollx_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->scroll2[1] = data;
+	state->m_scroll2[1] = data;
 }
 
 WRITE8_HANDLER( lastmisn_scrolly_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->scroll2[3] = data;
+	state->m_scroll2[3] = data;
 }
 
 WRITE8_HANDLER( gondo_scroll_w )
@@ -206,14 +206,14 @@ WRITE8_HANDLER( gondo_scroll_w )
 	switch (offset)
 	{
 	case 0x0:
-		state->scroll2[1] = data; /* X LSB */
+		state->m_scroll2[1] = data; /* X LSB */
 		break;
 	case 0x8:
-		state->scroll2[3] = data; /* Y LSB */
+		state->m_scroll2[3] = data; /* Y LSB */
 		break;
 	case 0x10:
-		state->scroll2[0] = (data >> 0) & 1; /* Bit 0: X MSB */
-		state->scroll2[2] = (data >> 1) & 1; /* Bit 1: Y MSB */
+		state->m_scroll2[0] = (data >> 0) & 1; /* Bit 0: X MSB */
+		state->m_scroll2[2] = (data >> 1) & 1; /* Bit 1: Y MSB */
 		/* Bit 2 is also used in Gondo & Garyoret */
 		break;
 	}
@@ -276,13 +276,13 @@ SCREEN_UPDATE( cobracom )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
 
-	flip_screen_set(screen->machine(), state->bg_control[0] >> 7);
+	flip_screen_set(screen->machine(), state->m_bg_control[0] >> 7);
 
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x04, 0x00, 0x03);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x00, 0x03);
 	screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x04, 0x04, 0x03);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x04, 0x03);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
@@ -293,7 +293,7 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
+	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
 	int color = (tile & 0xe000) >> 13;
 
 	SET_TILE_INFO(
@@ -306,11 +306,11 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 VIDEO_START( cobracom )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_cobracom_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
 
-	state->game_uses_priority = 0;
+	state->m_game_uses_priority = 0;
 	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0x3);
 	machine.device<deco_bac06_device>("tilegen2")->set_colmask(0x3);
 	
@@ -322,8 +322,8 @@ SCREEN_UPDATE( ghostb )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
@@ -331,7 +331,7 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
+	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
 	int color = (tile & 0xc00) >> 10;
 
 	SET_TILE_INFO(
@@ -344,10 +344,10 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 VIDEO_START( ghostb )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
+	state->m_fix_tilemap = tilemap_create(machine, get_ghostb_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
 
-	state->game_uses_priority = 0;
+	state->m_game_uses_priority = 0;
 	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0xf);
 }
 
@@ -356,13 +356,13 @@ VIDEO_START( ghostb )
 SCREEN_UPDATE( oscar )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	flip_screen_set(screen->machine(), state->bg_control[1] >> 7);
+	flip_screen_set(screen->machine(), state->m_bg_control[1] >> 7);
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x00, 0x00, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x00, 0x00, 0x0f);
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x08,0x08,0x08,0x08);
-	tilemap_draw(bitmap,cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap,cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
@@ -370,7 +370,7 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
+	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
 	int color = (tile & 0xf000) >> 14;
 
 	SET_TILE_INFO(
@@ -383,11 +383,11 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 VIDEO_START( oscar )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_oscar_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
 
-	state->game_uses_priority = 1;
+	state->m_game_uses_priority = 1;
 	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0x7);
 
 }
@@ -397,27 +397,27 @@ VIDEO_START( oscar )
 SCREEN_UPDATE( lastmisn )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->scroll2[0] << 8)+ state->scroll2[1]));
-	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8)+ state->scroll2[3]));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8)+ state->m_scroll2[1]));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8)+ state->m_scroll2[3]));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( shackled )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
-	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1 | 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 0, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0 | 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
@@ -431,10 +431,10 @@ static TILE_GET_INFO( get_lastmisn_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->bg_data[offs + 1] + (state->bg_data[offs] << 8);
+	int tile = state->m_bg_data[offs + 1] + (state->m_bg_data[offs] << 8);
 	int color = tile >> 12;
 
-	if (color > 7 && state->game_uses_priority)
+	if (color > 7 && state->m_game_uses_priority)
 		tileinfo->category = 1;
 	else
 		tileinfo->category = 0;
@@ -450,7 +450,7 @@ static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index << 1;
-	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
+	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
 	int color = (tile & 0xc000) >> 14;
 
 	SET_TILE_INFO(
@@ -463,22 +463,22 @@ static TILE_GET_INFO( get_lastmisn_fix_tile_info )
 VIDEO_START( lastmisn )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
-	state->game_uses_priority = 0;
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	state->m_game_uses_priority = 0;
 }
 
 VIDEO_START( shackled )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
-	state->fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_lastmisn_tile_info, lastmisn_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_lastmisn_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
-	tilemap_set_transmask(state->bg_tilemap, 0, 0x000f, 0xfff0); /* Bottom 12 pens */
-	state->game_uses_priority = 1;
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0x000f, 0xfff0); /* Bottom 12 pens */
+	state->m_game_uses_priority = 1;
 }
 
 /******************************************************************************/
@@ -486,20 +486,20 @@ VIDEO_START( shackled )
 SCREEN_UPDATE( srdarwin )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, (state->scroll2[0] << 8) + state->scroll2[1]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, (state->m_scroll2[0] << 8) + state->m_scroll2[1]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	srdarwin_draw_sprites(screen->machine(), bitmap, cliprect, 0); //* (srdarwin37b5gre)
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	srdarwin_draw_sprites(screen->machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
 static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	int tile = state->videoram[tile_index];
+	int tile = state->m_videoram[tile_index];
 	int color = 0; /* ? */
 
 	if (color > 1)
@@ -518,7 +518,7 @@ static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 static TILE_GET_INFO( get_srdarwin_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	int tile = state->bg_data[2 * tile_index + 1] + (state->bg_data[2 * tile_index] << 8);
+	int tile = state->m_bg_data[2 * tile_index + 1] + (state->m_bg_data[2 * tile_index] << 8);
 	int color = tile >> 12 & 3;
 	int bank;
 
@@ -536,14 +536,14 @@ static TILE_GET_INFO( get_srdarwin_tile_info )
 VIDEO_START( srdarwin )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->bg_tilemap = tilemap_create(machine, get_srdarwin_tile_info, tilemap_scan_rows, 16, 16, 32, 16);
-	state->fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_srdarwin_tile_info, tilemap_scan_rows, 16, 16, 32, 16);
+	state->m_fix_tilemap = tilemap_create(machine, get_srdarwin_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
-	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000); //* draw as background only
-	tilemap_set_transmask(state->bg_tilemap, 1, 0x00ff, 0xff00); /* Bottom 8 pens */
-	tilemap_set_transmask(state->bg_tilemap, 2, 0x00ff, 0xff00); /* Bottom 8 pens */
-	tilemap_set_transmask(state->bg_tilemap, 3, 0x0000, 0xffff); //* draw as foreground only
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0x0000); //* draw as background only
+	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x00ff, 0xff00); /* Bottom 8 pens */
+	tilemap_set_transmask(state->m_bg_tilemap, 2, 0x00ff, 0xff00); /* Bottom 8 pens */
+	tilemap_set_transmask(state->m_bg_tilemap, 3, 0x0000, 0xffff); //* draw as foreground only
 }
 
 /******************************************************************************/
@@ -551,27 +551,27 @@ VIDEO_START( srdarwin )
 SCREEN_UPDATE( gondo )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
-	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 2);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 1);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 2);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 1);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( garyoret )
 {
 	dec8_state *state = screen->machine().driver_data<dec8_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, ((state->scroll2[0] << 8) + state->scroll2[1]));
-	tilemap_set_scrolly(state->bg_tilemap, 0, ((state->scroll2[2] << 8) + state->scroll2[3]));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, ((state->m_scroll2[0] << 8) + state->m_scroll2[1]));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, ((state->m_scroll2[2] << 8) + state->m_scroll2[3]));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram16, 0x400, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
-	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	screen->machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x400, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fix_tilemap, 0, 0);
 	return 0;
 }
 
@@ -579,7 +579,7 @@ static TILE_GET_INFO( get_gondo_fix_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->videoram[offs + 1] + (state->videoram[offs] << 8);
+	int tile = state->m_videoram[offs + 1] + (state->m_videoram[offs] << 8);
 	int color = (tile & 0x7000) >> 12;
 
 	SET_TILE_INFO(
@@ -593,10 +593,10 @@ static TILE_GET_INFO( get_gondo_tile_info )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
 	int offs = tile_index * 2;
-	int tile = state->bg_data[offs + 1] + (state->bg_data[offs] << 8);
+	int tile = state->m_bg_data[offs + 1] + (state->m_bg_data[offs] << 8);
 	int color = tile>> 12;
 
-	if (color > 7 && state->game_uses_priority)
+	if (color > 7 && state->m_game_uses_priority)
 		tileinfo->category = 1;
 	else
 		tileinfo->category = 0;
@@ -611,22 +611,22 @@ static TILE_GET_INFO( get_gondo_tile_info )
 VIDEO_START( gondo )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
-	tilemap_set_transmask(state->bg_tilemap, 0, 0x00ff, 0xff00); /* Bottom 8 pens */
-	state->game_uses_priority = 0;
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0x00ff, 0xff00); /* Bottom 8 pens */
+	state->m_game_uses_priority = 0;
 }
 
 VIDEO_START( garyoret )
 {
 	dec8_state *state = machine.driver_data<dec8_state>();
-	state->fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fix_tilemap = tilemap_create(machine, get_gondo_fix_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_gondo_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->fix_tilemap, 0);
-	state->game_uses_priority = 1;
+	tilemap_set_transparent_pen(state->m_fix_tilemap, 0);
+	state->m_game_uses_priority = 1;
 }
 
 /******************************************************************************/

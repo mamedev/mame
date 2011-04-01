@@ -98,7 +98,7 @@ public:
 	pcat_nit_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *banked_nvram;
+	UINT8 *m_banked_nvram;
 };
 
 
@@ -159,7 +159,7 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 
 		space->install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
-		memory_set_bankptr(space->machine(), "nvrambank", state->banked_nvram);
+		memory_set_bankptr(space->machine(), "nvrambank", state->m_banked_nvram);
 
 	}
 }
@@ -390,7 +390,7 @@ ROM_END
 static DRIVER_INIT(pcat_nit)
 {
 	pcat_nit_state *state = machine.driver_data<pcat_nit_state>();
-	state->banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }

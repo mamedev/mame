@@ -57,7 +57,7 @@ WRITE16_HANDLER( ga2_dpram_w )
 READ16_HANDLER( ga2_dpram_r )
 {
 	segas32_state *state = space->machine().driver_data<segas32_state>();
-	return (state->ga2_dpram[offset])|(state->ga2_dpram[offset+1]<<8);
+	return (state->m_ga2_dpram[offset])|(state->m_ga2_dpram[offset+1]<<8);
 }
 
 
@@ -106,24 +106,24 @@ WRITE16_HANDLER(sonic_level_load_protection)
 	segas32_state *state = space->machine().driver_data<segas32_state>();
 	UINT16 level;
 //Perform write
-	state->system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (state->system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
+	state->m_system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (state->m_system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
 
 //Refresh current level
-		if (state->system32_workram[CLEARED_LEVELS / 2] == 0)
+		if (state->m_system32_workram[CLEARED_LEVELS / 2] == 0)
 		{
 			level = 0x0007;
 		}
 		else
 		{
 			const UINT8 *ROM = space->machine().region("maincpu")->base();
-			level =  *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
-			level |= *((ROM + LEVEL_ORDER_ARRAY) + (state->system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
+			level =  *((ROM + LEVEL_ORDER_ARRAY) + (state->m_system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
+			level |= *((ROM + LEVEL_ORDER_ARRAY) + (state->m_system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
-		state->system32_workram[CURRENT_LEVEL / 2] = level;
+		state->m_system32_workram[CURRENT_LEVEL / 2] = level;
 
 //Reset level status
-		state->system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
-		state->system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
+		state->m_system32_workram[CURRENT_LEVEL_STATUS / 2] = 0x0000;
+		state->m_system32_workram[(CURRENT_LEVEL_STATUS + 2) / 2] = 0x0000;
 }
 
 
@@ -150,7 +150,7 @@ READ16_HANDLER(brival_protection_r)
 		}
 	}
 
-	return state->system32_workram[0xba00/2 + offset];
+	return state->m_system32_workram[0xba00/2 + offset];
 }
 
 WRITE16_HANDLER(brival_protection_w)
@@ -199,7 +199,7 @@ WRITE16_HANDLER(brival_protection_w)
 	memcpy(ret, &ROM[protAddress[curProtType][0]], 16);
 	ret[16] = '\0';
 
-	memcpy(&state->system32_protram[protAddress[curProtType][1]], ret, 16);
+	memcpy(&state->m_system32_protram[protAddress[curProtType][1]], ret, 16);
 }
 
 
@@ -308,7 +308,7 @@ READ16_HANDLER(arf_wakeup_protection_r)
 WRITE16_HANDLER( jleague_protection_w )
 {
 	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA( &state->system32_workram[0xf700/2 + offset ] );
+	COMBINE_DATA( &state->m_system32_workram[0xf700/2 + offset ] );
 
 	switch( offset )
 	{
@@ -354,7 +354,7 @@ READ16_HANDLER( arescue_dsp_r )
 	segas32_state *state = space->machine().driver_data<segas32_state>();
 	if( offset == 4/2 )
 	{
-		switch( state->arescue_dsp_io[0] )
+		switch( state->m_arescue_dsp_io[0] )
 		{
 			case 0:
 			case 1:
@@ -362,26 +362,26 @@ READ16_HANDLER( arescue_dsp_r )
 				break;
 
 			case 3:
-				state->arescue_dsp_io[0] = 0x8000;
-				state->arescue_dsp_io[2/2] = 0x0001;
+				state->m_arescue_dsp_io[0] = 0x8000;
+				state->m_arescue_dsp_io[2/2] = 0x0001;
 				break;
 
 			case 6:
-				state->arescue_dsp_io[0] = 4 * state->arescue_dsp_io[2/2];
+				state->m_arescue_dsp_io[0] = 4 * state->m_arescue_dsp_io[2/2];
 				break;
 
 			default:
-				logerror("Unhandled DSP cmd %04x (%04x).\n", state->arescue_dsp_io[0], state->arescue_dsp_io[1] );
+				logerror("Unhandled DSP cmd %04x (%04x).\n", state->m_arescue_dsp_io[0], state->m_arescue_dsp_io[1] );
 				break;
 		}
 	}
 
-	return state->arescue_dsp_io[offset];
+	return state->m_arescue_dsp_io[offset];
 }
 
 WRITE16_HANDLER( arescue_dsp_w )
 {
 	segas32_state *state = space->machine().driver_data<segas32_state>();
-	COMBINE_DATA(&state->arescue_dsp_io[offset]);
+	COMBINE_DATA(&state->m_arescue_dsp_io[offset]);
 }
 

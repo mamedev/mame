@@ -5,17 +5,17 @@ public:
 	mugsmash_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram1;
-	UINT16 *videoram2;
-	UINT16 *spriteram;
-	UINT16 *regs1;
-	UINT16 *regs2;
+	UINT16 *m_videoram1;
+	UINT16 *m_videoram2;
+	UINT16 *m_spriteram;
+	UINT16 *m_regs1;
+	UINT16 *m_regs2;
 
-	tilemap_t *tilemap1;
-	tilemap_t *tilemap2;
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
 
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

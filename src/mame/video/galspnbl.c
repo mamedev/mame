@@ -32,7 +32,7 @@ PALETTE_INIT( galspnbl )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	galspnbl_state *state = machine.driver_data<galspnbl_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -46,7 +46,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = (state->spriteram_size - 16) / 2; offs >= 0; offs -= 8)
+	for (offs = (state->m_spriteram_size - 16) / 2; offs >= 0; offs -= 8)
 	{
 		int sx, sy, code, color, size, attr, flipx, flipy;
 		int col, row;
@@ -89,14 +89,14 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 	offs_t offs;
 
-//  int screenscroll = 4 - (state->scroll[0] & 0xff);
+//  int screenscroll = 4 - (state->m_scroll[0] & 0xff);
 
 	for (offs = 0; offs < 0x20000; offs++)
 	{
 		int y = offs >> 9;
 		int x = offs & 0x1ff;
 
-		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (state->bgvideoram[offs] >> 1);
+		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (state->m_bgvideoram[offs] >> 1);
 	}
 }
 
@@ -114,8 +114,8 @@ SCREEN_UPDATE( galspnbl )
 	{
 		int sx, sy, code, attr, color;
 
-		code = state->videoram[offs];
-		attr = state->colorram[offs];
+		code = state->m_videoram[offs];
+		attr = state->m_colorram[offs];
 		color = (attr & 0x00f0) >> 4;
 		sx = offs % 64;
 		sy = offs / 64;

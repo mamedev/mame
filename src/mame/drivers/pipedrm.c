@@ -211,14 +211,14 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static TIMER_CALLBACK( delayed_command_w	)
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
-	state->sound_command = param & 0xff;
-	state->pending_command = 1;
+	state->m_sound_command = param & 0xff;
+	state->m_pending_command = 1;
 
 	/* Hatris polls commands *and* listens to the NMI; this causes it to miss */
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		device_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -237,22 +237,22 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->pending_command = 0;
-	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	state->m_pending_command = 0;
+	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( pending_command_r )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	return state->pending_command;
+	return state->m_pending_command;
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	return state->sound_command;
+	return state->m_sound_command;
 }
 
 
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE_MEMBER(fromance_state, videoram, videoram_size)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE_MEMBER(fromance_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -559,7 +559,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	fromance_state *state = device->machine().driver_data<fromance_state>();
-	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -591,7 +591,7 @@ static MACHINE_START( pipedrm )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
 
-	state->subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("sub");
 
 	/* initialize main Z80 bank */
 	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x2000);
@@ -602,8 +602,8 @@ static MACHINE_START( pipedrm )
 	memory_set_bank(machine, "bank2", 0);
 
 	/* state save */
-	state->save_item(NAME(state->pending_command));
-	state->save_item(NAME(state->sound_command));
+	state->save_item(NAME(state->m_pending_command));
+	state->save_item(NAME(state->m_sound_command));
 
 	/* video-related elements are saved in VIDEO_START */
 }
@@ -613,24 +613,24 @@ static MACHINE_RESET( pipedrm )
 	fromance_state *state = machine.driver_data<fromance_state>();
 	int i;
 
-	state->pending_command = 0;
-	state->sound_command = 0;
+	state->m_pending_command = 0;
+	state->m_sound_command = 0;
 
-	state->flipscreen_old = -1;
-	state->scrollx_ofs = 0x159;
-	state->scrolly_ofs = 0x10;
+	state->m_flipscreen_old = -1;
+	state->m_scrollx_ofs = 0x159;
+	state->m_scrolly_ofs = 0x10;
 
-	state->selected_videoram = state->selected_paletteram = 0;
-	state->scrollx[0] = 0;
-	state->scrollx[1] = 0;
-	state->scrolly[0] = 0;
-	state->scrolly[1] = 0;
-	state->gfxreg = 0;
-	state->flipscreen = 0;
-	state->crtc_register = 0;
+	state->m_selected_videoram = state->m_selected_paletteram = 0;
+	state->m_scrollx[0] = 0;
+	state->m_scrollx[1] = 0;
+	state->m_scrolly[0] = 0;
+	state->m_scrolly[1] = 0;
+	state->m_gfxreg = 0;
+	state->m_flipscreen = 0;
+	state->m_crtc_register = 0;
 
 	for (i = 0; i < 0x10; i++)
-		state->crtc_data[i] = 0;
+		state->m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( pipedrm, fromance_state )
@@ -880,9 +880,9 @@ static DRIVER_INIT( pipedrm )
 	fromance_state *state = machine.driver_data<fromance_state>();
 
 	/* sprite RAM lives at the end of palette RAM */
-	state->spriteram = &machine.generic.paletteram.u8[0xc00];
-	state->spriteram_size = 0x400;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->spriteram);
+	state->m_spriteram = &machine.generic.paletteram.u8[0xc00];
+	state->m_spriteram_size = 0x400;
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->m_spriteram);
 }
 
 

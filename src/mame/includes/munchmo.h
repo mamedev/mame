@@ -11,26 +11,26 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      vreg;
-	UINT8 *      status_vram;
-	UINT8 *      sprite_xpos;
-	UINT8 *      sprite_attr;
-	UINT8 *      sprite_tile;
-	UINT8 *      videoram;
+	UINT8 *      m_vreg;
+	UINT8 *      m_status_vram;
+	UINT8 *      m_sprite_xpos;
+	UINT8 *      m_sprite_attr;
+	UINT8 *      m_sprite_tile;
+	UINT8 *      m_videoram;
 
 	/* video-related */
-	bitmap_t     *tmpbitmap;
-	int          palette_bank;
-	int          flipscreen;
+	bitmap_t     *m_tmpbitmap;
+	int          m_palette_bank;
+	int          m_flipscreen;
 
 	/* misc */
-	int          nmi_enable;
-	int          which;
-	UINT8        sound_nmi_enable;
+	int          m_nmi_enable;
+	int          m_which;
+	UINT8        m_sound_nmi_enable;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

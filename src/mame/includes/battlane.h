@@ -11,18 +11,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     tileram;
-	UINT8 *     spriteram;
+	UINT8 *     m_tileram;
+	UINT8 *     m_spriteram;
 
 	/* video-related */
-	tilemap_t     *bg_tilemap;
-	bitmap_t    *screen_bitmap;
-	int         video_ctrl;
-	int         cpu_control;	/* CPU interrupt control register */
+	tilemap_t     *m_bg_tilemap;
+	bitmap_t    *m_screen_bitmap;
+	int         m_video_ctrl;
+	int         m_cpu_control;	/* CPU interrupt control register */
 
 	/* devices */
-	device_t *maincpu;
-	device_t *subcpu;
+	device_t *m_maincpu;
+	device_t *m_subcpu;
 };
 
 

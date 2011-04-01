@@ -33,8 +33,8 @@ public:
 	timetrv_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *led_vram_lo;
-	UINT8 *led_vram_hi;
+	UINT8 *m_led_vram_lo;
+	UINT8 *m_led_vram_hi;
 };
 
 
@@ -47,7 +47,7 @@ static VIDEO_START( timetrv )
 static SCREEN_UPDATE( timetrv )
 {
 	timetrv_state *state = screen->machine().driver_data<timetrv_state>();
-	popmessage("%s%s",state->led_vram_lo,state->led_vram_hi);
+	popmessage("%s%s",state->m_led_vram_lo,state->m_led_vram_hi);
 	return 0;
 }
 
@@ -87,8 +87,8 @@ static ADDRESS_MAP_START( timetrv_io, AS_IO, 8 )
 	AM_RANGE(0x1080, 0x1082) AM_READ(in_r) //dsw
 	AM_RANGE(0x1100, 0x1105) AM_WRITENOP //laserdisc write area
 	AM_RANGE(0x1100, 0x1105) AM_READ(ld_r) //5 -> laserdisc read status
-	AM_RANGE(0x1180, 0x1187) AM_RAM AM_BASE_MEMBER(timetrv_state, led_vram_lo)//led string,part 1
-	AM_RANGE(0x1200, 0x1207) AM_RAM AM_BASE_MEMBER(timetrv_state, led_vram_hi)//led string,part 2
+	AM_RANGE(0x1180, 0x1187) AM_RAM AM_BASE_MEMBER(timetrv_state, m_led_vram_lo)//led string,part 1
+	AM_RANGE(0x1200, 0x1207) AM_RAM AM_BASE_MEMBER(timetrv_state, m_led_vram_hi)//led string,part 2
 	AM_RANGE(0xff80, 0xffff) AM_RAM //am80188-em-like cpu internal regs?
 ADDRESS_MAP_END
 

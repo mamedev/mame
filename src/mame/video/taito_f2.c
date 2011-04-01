@@ -30,45 +30,45 @@ static void taitof2_core_vh_start (running_machine &machine, int sprite_type, in
 {
 	int i;
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	state->sprite_type = sprite_type;
-	state->hide_pixels = hide;
-	state->flip_hide_pixels = flip_hide;
+	state->m_sprite_type = sprite_type;
+	state->m_hide_pixels = hide;
+	state->m_flip_hide_pixels = flip_hide;
 
-	state->spriteram_delayed = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
-	state->spriteram_buffered = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
-	state->spritelist = auto_alloc_array(machine, struct f2_tempsprite, 0x400);
+	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spritelist = auto_alloc_array(machine, struct f2_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
 	{
-		state->spritebank_buffered[i] = 0x400 * i;
-		state->spritebank[i] = state->spritebank_buffered[i];
+		state->m_spritebank_buffered[i] = 0x400 * i;
+		state->m_spritebank[i] = state->m_spritebank_buffered[i];
 	}
 
-	state->sprites_disabled = 1;
-	state->sprites_active_area = 0;
-	state->sprites_flipscreen = 0;
+	state->m_sprites_disabled = 1;
+	state->m_sprites_active_area = 0;
+	state->m_sprites_flipscreen = 0;
 
-	state->sprites_master_scrollx = 0;
-	state->sprites_master_scrolly = 0;
+	state->m_sprites_master_scrollx = 0;
+	state->m_sprites_master_scrolly = 0;
 
-	state->spriteblendmode = 0;
-	state->prepare_sprites = 0;
+	state->m_spriteblendmode = 0;
+	state->m_prepare_sprites = 0;
 
-	state->game = 0;	/* means NOT footchmp */
+	state->m_game = 0;	/* means NOT footchmp */
 
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->spritebank_buffered));
-	state->save_item(NAME(state->sprites_disabled));
-	state->save_item(NAME(state->sprites_active_area));
-	state->save_item(NAME(state->sprites_flipscreen));
-	state->save_item(NAME(state->sprites_master_scrollx));
-	state->save_item(NAME(state->sprites_master_scrolly));
-	state->save_item(NAME(state->tilepri));
-	state->save_item(NAME(state->spritepri));
-	state->save_item(NAME(state->spriteblendmode));
-	state->save_item(NAME(state->prepare_sprites));
-	state->save_pointer(NAME(state->spriteram_delayed), state->spriteram_size / 2);
-	state->save_pointer(NAME(state->spriteram_buffered), state->spriteram_size / 2);
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_spritebank_buffered));
+	state->save_item(NAME(state->m_sprites_disabled));
+	state->save_item(NAME(state->m_sprites_active_area));
+	state->save_item(NAME(state->m_sprites_flipscreen));
+	state->save_item(NAME(state->m_sprites_master_scrollx));
+	state->save_item(NAME(state->m_sprites_master_scrolly));
+	state->save_item(NAME(state->m_tilepri));
+	state->save_item(NAME(state->m_spritepri));
+	state->save_item(NAME(state->m_spriteblendmode));
+	state->save_item(NAME(state->m_prepare_sprites));
+	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram_size / 2);
+	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram_size / 2);
 }
 
 /**************************************************************************************/
@@ -141,7 +141,7 @@ VIDEO_START( taitof2_mjnquest )
 
 	taitof2_core_vh_start(machine, 0, 0, 0);
 
-	tc0100scn_set_bg_tilemask(state->tc0100scn, 0x7fff);
+	tc0100scn_set_bg_tilemask(state->m_tc0100scn, 0x7fff);
 }
 
 VIDEO_START( taitof2_footchmp )
@@ -150,7 +150,7 @@ VIDEO_START( taitof2_footchmp )
 
 	taitof2_core_vh_start(machine, 0, 3, 3);
 
-	state->game = FOOTCHMP;
+	state->m_game = FOOTCHMP;
 }
 
 VIDEO_START( taitof2_hthero )
@@ -159,7 +159,7 @@ VIDEO_START( taitof2_hthero )
 
 	taitof2_core_vh_start(machine, 0, 3, 3);
 
-	state->game = FOOTCHMP;
+	state->m_game = FOOTCHMP;
 }
 
 VIDEO_START( taitof2_deadconx )
@@ -196,8 +196,8 @@ VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->pivot_xdisp = -16;
-	state->pivot_ydisp = 0;
+	state->m_pivot_xdisp = -16;
+	state->m_pivot_ydisp = 0;
 	taitof2_core_vh_start(machine, 0, 3, 3);
 }
 
@@ -205,8 +205,8 @@ VIDEO_START( taitof2_pulirula )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
-	state->pivot_ydisp = 16;	/* block of ice after armour man) */
+	state->m_pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
+	state->m_pivot_ydisp = 16;	/* block of ice after armour man) */
 	taitof2_core_vh_start(machine, 2, 3, 3);
 }
 
@@ -214,8 +214,8 @@ VIDEO_START( taitof2_driftout )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	state->pivot_xdisp = -16;
-	state->pivot_ydisp = 16;
+	state->m_pivot_xdisp = -16;
+	state->m_pivot_ydisp = 16;
 	taitof2_core_vh_start(machine, 0, 3, 3);
 }
 
@@ -237,7 +237,7 @@ WRITE16_HANDLER( taitof2_sprite_extension_w )
 
 	if (offset < 0x800)
 	{
-		COMBINE_DATA(&state->sprite_extension[offset]);
+		COMBINE_DATA(&state->m_sprite_extension[offset]);
 	}
 }
 
@@ -255,8 +255,8 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	{
 		j = (offset & 1) << 1;   /* either set pair 0&1 or 2&3 */
 		i = data << 11;
-		state->spritebank_buffered[j] = i;
-		state->spritebank_buffered[j + 1] = (i + 0x400);
+		state->m_spritebank_buffered[j] = i;
+		state->m_spritebank_buffered[j + 1] = (i + 0x400);
 
 //logerror("bank %d, set to: %04x\n", j, i);
 //logerror("bank %d, paired so: %04x\n", j + 1, i + 0x400);
@@ -265,7 +265,7 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	else   /* last 4 are individual banks */
 	{
 		i = data << 10;
-		state->spritebank_buffered[offset] = i;
+		state->m_spritebank_buffered[offset] = i;
 
 //logerror("bank %d, new value: %04x\n", offset, i);
 	}
@@ -275,15 +275,15 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 WRITE16_HANDLER( koshien_spritebank_w )
 {
 	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	state->spritebank_buffered[0] = 0x0000;   /* never changes */
-	state->spritebank_buffered[1] = 0x0400;
+	state->m_spritebank_buffered[0] = 0x0000;   /* never changes */
+	state->m_spritebank_buffered[1] = 0x0400;
 
-	state->spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
-	state->spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
-	state->spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
-	state->spritebank_buffered[3] = state->spritebank_buffered[2] + 0x400;
-	state->spritebank_buffered[5] = state->spritebank_buffered[4] + 0x400;
-	state->spritebank_buffered[7] = state->spritebank_buffered[6] + 0x400;
+	state->m_spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
+	state->m_spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
+	state->m_spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
+	state->m_spritebank_buffered[3] = state->m_spritebank_buffered[2] + 0x400;
+	state->m_spritebank_buffered[5] = state->m_spritebank_buffered[4] + 0x400;
+	state->m_spritebank_buffered[7] = state->m_spritebank_buffered[6] + 0x400;
 }
 
 static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *dest_bmp, const rectangle *clip, const gfx_element *gfx,
@@ -378,29 +378,29 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *de
 						UINT8 tilemap_priority = 0, sprite_priority = 0;
 
 						// Get tilemap priority (0 - 0xf) for this destination pixel
-						if (pri[x] & 0x10) tilemap_priority = state->tilepri[4];
-						else if (pri[x] & 0x8) tilemap_priority = state->tilepri[3];
-						else if (pri[x] & 0x4) tilemap_priority = state->tilepri[2];
-						else if (pri[x] & 0x2) tilemap_priority = state->tilepri[1];
-						else if (pri[x] & 0x1) tilemap_priority = state->tilepri[0];
+						if (pri[x] & 0x10) tilemap_priority = state->m_tilepri[4];
+						else if (pri[x] & 0x8) tilemap_priority = state->m_tilepri[3];
+						else if (pri[x] & 0x4) tilemap_priority = state->m_tilepri[2];
+						else if (pri[x] & 0x2) tilemap_priority = state->m_tilepri[1];
+						else if (pri[x] & 0x1) tilemap_priority = state->m_tilepri[0];
 
 						// Get sprite priority (0 - 0xf) for this source pixel
 						if ((color & 0xc0) == 0xc0)
-							sprite_priority = state->spritepri[3];
+							sprite_priority = state->m_spritepri[3];
 						else if ((color & 0xc0) == 0x80)
-							sprite_priority = state->spritepri[2];
+							sprite_priority = state->m_spritepri[2];
 						else if ((color & 0xc0) == 0x40)
-							sprite_priority = state->spritepri[1];
+							sprite_priority = state->m_spritepri[1];
 						else if ((color & 0xc0) == 0x00)
-							sprite_priority = state->spritepri[0];
+							sprite_priority = state->m_spritepri[0];
 
 						// Blend mode 1 - Sprite under tilemap, use sprite palette with tilemap data
-						if ((state->spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority - 1))
+						if ((state->m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority - 1))
 						{
 							dest[x] = ((pal_base + c) & 0xfff0) | (dest[x] & 0xf);
 						}
 						// Blend mode 1 - Sprite over tilemap, use sprite data with tilemap palette
-						else if ((state->spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority + 1))
+						else if ((state->m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority + 1))
 						{
 							if (dest[x] & 0xf)
 								dest[x] = (dest[x] & 0xfff0) | ((pal_base + c) & 0xf);
@@ -408,12 +408,12 @@ static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_t *de
 								dest[x] = pal_base + c;
 						}
 						// Blend mode 2 - Sprite under tilemap, use sprite data with tilemap palette
-						else if ((state->spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority - 1))
+						else if ((state->m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority - 1))
 						{
 							dest[x] = (dest[x] & 0xffef);
 						}
 						// Blend mode 2 - Sprite over tilemap, alternate sprite palette, confirmed in Pulirula level 2
-						else if ((state->spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority + 1))
+						else if ((state->m_spriteblendmode & 0xc0) == 0x80 && sprite_priority == (tilemap_priority + 1))
 						{
 							dest[x] = ((pal_base + c) & 0xffef); // Pulirula level 2, Liquid Kids attract mode
 						}
@@ -507,19 +507,19 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
-	struct f2_tempsprite *sprite_ptr = state->spritelist;
+	struct f2_tempsprite *sprite_ptr = state->m_spritelist;
 
 	/* must remember enable status from last frame because driftout fails to
        reactivate them from a certain point onwards. */
-	int disabled = state->sprites_disabled;
+	int disabled = state->m_sprites_disabled;
 
 	/* must remember master scroll from previous frame because driftout
        sometimes doesn't set it. */
-	int master_scrollx = state->sprites_master_scrollx;
-	int master_scrolly = state->sprites_master_scrolly;
+	int master_scrollx = state->m_sprites_master_scrollx;
+	int master_scrolly = state->m_sprites_master_scrolly;
 
 	/* must also remember the sprite bank from previous frame. */
-	int area = state->sprites_active_area;
+	int area = state->m_sprites_active_area;
 
 	scroll1x = 0;
 	scroll1y = 0;
@@ -527,12 +527,12 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	xcurrent = ycurrent = 0;
 	color = 0;
 
-	f2_x_offset = state->hide_pixels;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-	if (state->sprites_flipscreen)
-		f2_x_offset = -state->flip_hide_pixels;		// was -f2_x_offset
+	f2_x_offset = state->m_hide_pixels;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
+	if (state->m_sprites_flipscreen)
+		f2_x_offset = -state->m_flip_hide_pixels;		// was -f2_x_offset
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
-	if (area == 0x8000 && state->spriteram_buffered[(0x8000 + 6) / 2] == 0 && state->spriteram_buffered[(0x8000 + 10) / 2] == 0)
+	if (area == 0x8000 && state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 && state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
 		area = 0;
 
 	for (off = 0; off < 0x4000; off += 16)
@@ -540,44 +540,44 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		/* sprites_active_area may change during processing */
 		int offs = off + area;
 
-		if (state->spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			disabled = state->spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			state->sprites_flipscreen = state->spriteram_buffered[(offs + 10) / 2] & 0x2000;
+			disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			state->m_sprites_flipscreen = state->m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
 
 			/* Get rid of 0-3 unwanted pixels on edge of screen. */
-			f2_x_offset = state->hide_pixels;
-			if (state->sprites_flipscreen)
-				f2_x_offset = -state->flip_hide_pixels;		// was -f2_x_offset
+			f2_x_offset = state->m_hide_pixels;
+			if (state->m_sprites_flipscreen)
+				f2_x_offset = -state->m_flip_hide_pixels;		// was -f2_x_offset
 
-			if (state->game == FOOTCHMP)
-				area = 0x8000 * (state->spriteram_buffered[(offs + 6) / 2] & 0x0001);
+			if (state->m_game == FOOTCHMP)
+				area = 0x8000 * (state->m_spriteram_buffered[(offs + 6) / 2] & 0x0001);
 			else
-				area = 0x8000 * (state->spriteram_buffered[(offs + 10) / 2] & 0x0001);
+				area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 //popmessage("%04x",area);
 
 		/* check for extra scroll offset */
-		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
+		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (master_scrollx >= 0x800)
 				master_scrollx -= 0x1000;   /* signed value */
 
-			master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (master_scrolly >= 0x800)
 				master_scrolly -= 0x1000;   /* signed value */
 		}
 
-		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
+		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			scroll1x = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (scroll1x >= 0x800)
 				scroll1x -= 0x1000;   /* signed value */
 
-			scroll1y = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			scroll1y = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (scroll1y >= 0x800)
 				scroll1y -= 0x1000;   /* signed value */
 		}
@@ -585,7 +585,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		if (disabled)
 			continue;
 
-		spritedata = state->spriteram_buffered[(offs + 8) / 2];
+		spritedata = state->m_spriteram_buffered[(offs + 8) / 2];
 
 		spritecont = (spritedata & 0xff00) >> 8;
 
@@ -593,11 +593,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		{
 			if (big_sprite == 0)   /* are we starting a big sprite ? */
 			{
-				xlatch = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-				ylatch = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+				xlatch = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+				ylatch = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 				x_no = 0;
 				y_no = 0;
-				zoomword = state->spriteram_buffered[(offs + 2) / 2];
+				zoomword = state->m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
 				big_sprite = 1;   /* we have started a new big sprite */
@@ -618,7 +618,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 // of anything.
 		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
 		{
-			x = state->spriteram_buffered[(offs + 4) / 2];
+			x = state->m_spriteram_buffered[(offs + 4) / 2];
 
 // Some absolute x values deduced here are 1 too high (scenes when you get
 // home run in Koshien, and may also relate to BG layer woods and stuff as you
@@ -641,7 +641,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				scrolly = scroll1y + master_scrolly;
 			}
 			x &= 0xfff;
-			y = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			y = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 
 			xcurrent = x;
 			ycurrent = y;
@@ -693,7 +693,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		}
 		else
 		{
-			zoomword = state->spriteram_buffered[(offs + 2) / 2];
+			zoomword = state->m_spriteram_buffered[(offs + 2) / 2];
 			zoomy = (zoomword >> 8) & 0xff;
 			zoomx = (zoomword >> 0) & 0xff;
 			zx = (0x100 - zoomx) / 16;
@@ -711,31 +711,31 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		/* spriteram[0x4000-7fff] has no corresponding extension area */
 		if (extoffs >= 0x8000) extoffs -= 0x4000;
 
-		if (state->sprite_type == 0)
+		if (state->m_sprite_type == 0)
 		{
-			code = state->spriteram_buffered[(offs) / 2] & 0x1fff;
+			code = state->m_spriteram_buffered[(offs) / 2] & 0x1fff;
 			i = (code & 0x1c00) >> 10;
-			code = state->spritebank[i] + (code & 0x3ff);
+			code = state->m_spritebank[i] + (code & 0x3ff);
 		}
 
-		if (state->sprite_type == 1)   /* Yuyugogo */
+		if (state->m_sprite_type == 1)   /* Yuyugogo */
 		{
-			code = state->spriteram_buffered[(offs) / 2] & 0x3ff;
-			i = (state->sprite_extension[(extoffs >> 4)] & 0x3f ) << 10;
+			code = state->m_spriteram_buffered[(offs) / 2] & 0x3ff;
+			i = (state->m_sprite_extension[(extoffs >> 4)] & 0x3f ) << 10;
 			code = (i | code);
 		}
 
-		if (state->sprite_type == 2)   /* Pulirula */
+		if (state->m_sprite_type == 2)   /* Pulirula */
 		{
-			code = state->spriteram_buffered[(offs) / 2] & 0xff;
-			i = (state->sprite_extension[(extoffs >> 4)] & 0xff00 );
+			code = state->m_spriteram_buffered[(offs) / 2] & 0xff;
+			i = (state->m_sprite_extension[(extoffs >> 4)] & 0xff00 );
 			code = (i | code);
 		}
 
-		if (state->sprite_type == 3)   /* Dinorex and a few quizzes */
+		if (state->m_sprite_type == 3)   /* Dinorex and a few quizzes */
 		{
-			code = state->spriteram_buffered[(offs) / 2] & 0xff;
-			i = (state->sprite_extension[(extoffs >> 4)] & 0xff ) << 8;
+			code = state->m_spriteram_buffered[(offs) / 2] & 0xff;
+			i = (state->m_sprite_extension[(extoffs >> 4)] & 0xff ) << 8;
 			code = (i | code);
 		}
 
@@ -750,7 +750,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		cury = (y + scrolly) & 0xfff;
 		if (cury >= 0x800)	cury -= 0x1000;   /* treat it as signed */
 
-		if (state->sprites_flipscreen)
+		if (state->m_sprites_flipscreen)
 		{
 			/* -zx/y is there to fix zoomed sprite coords in screenflip.
                drawgfxzoom does not know to draw from flip-side of sprites when
@@ -795,7 +795,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->spritelist)
+	while (sprite_ptr != state->m_spritelist)
 	{
 		sprite_ptr--;
 
@@ -825,14 +825,14 @@ static void update_spritebanks( running_machine &machine )
 #if 1
 	for (i = 0; i < 8; i ++)
 	{
-		state->spritebank[i] = state->spritebank_buffered[i];
+		state->m_spritebank[i] = state->m_spritebank_buffered[i];
 	}
 #else
 	/* this makes footchmp blobbing worse! */
 	for (i = 0; i < 8; i ++)
 	{
-		state->spritebank[i] = state->spritebank_eof[i];
-		state->spritebank_eof[i] = state->spritebank_buffered[i];
+		state->m_spritebank[i] = state->m_spritebank_eof[i];
+		state->m_spritebank_eof[i] = state->m_spritebank_buffered[i];
 	}
 #endif
 }
@@ -841,10 +841,10 @@ static void taitof2_handle_sprite_buffering( running_machine &machine )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	if (state->prepare_sprites)	/* no buffering */
+	if (state->m_prepare_sprites)	/* no buffering */
 	{
-		memcpy(state->spriteram_buffered, state->spriteram, state->spriteram_size);
-		state->prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram_size);
+		state->m_prepare_sprites = 0;
 	}
 }
 
@@ -859,36 +859,36 @@ static void taitof2_update_sprites_active_area( running_machine &machine )
 	taitof2_handle_sprite_buffering(machine);
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
-	if (state->sprites_active_area == 0x8000 &&
-			state->spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
-			state->spriteram_buffered[(0x8000 + 10) / 2] == 0)
-		state->sprites_active_area = 0;
+	if (state->m_sprites_active_area == 0x8000 &&
+			state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
+			state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
+		state->m_sprites_active_area = 0;
 
 	for (off = 0; off < 0x4000; off += 16)
 	{
 		/* sprites_active_area may change during processing */
-		int offs = off + state->sprites_active_area;
+		int offs = off + state->m_sprites_active_area;
 
-		if (state->spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			state->sprites_disabled = state->spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			if (state->game == FOOTCHMP)
-				state->sprites_active_area = 0x8000 * (state->spriteram_buffered[(offs + 6) / 2] & 0x0001);
+			state->m_sprites_disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			if (state->m_game == FOOTCHMP)
+				state->m_sprites_active_area = 0x8000 * (state->m_spriteram_buffered[(offs + 6) / 2] & 0x0001);
 			else
-				state->sprites_active_area = 0x8000 * (state->spriteram_buffered[(offs + 10) / 2] & 0x0001);
+				state->m_sprites_active_area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 		/* check for extra scroll offset */
-		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
+		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			state->sprites_master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (state->sprites_master_scrollx >= 0x800)
-				state->sprites_master_scrollx -= 0x1000;   /* signed value */
+			state->m_sprites_master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			if (state->m_sprites_master_scrollx >= 0x800)
+				state->m_sprites_master_scrollx -= 0x1000;   /* signed value */
 
-			state->sprites_master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (state->sprites_master_scrolly >= 0x800)
-				state->sprites_master_scrolly -= 0x1000;   /* signed value */
+			state->m_sprites_master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			if (state->m_sprites_master_scrolly >= 0x800)
+				state->m_sprites_master_scrolly -= 0x1000;   /* signed value */
 		}
 	}
 }
@@ -900,56 +900,56 @@ SCREEN_EOF( taitof2_no_buffer )
 
 	taitof2_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 1;
+	state->m_prepare_sprites = 1;
 }
 
 SCREEN_EOF( taitof2_full_buffer_delayed )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int i;
 
 	taitof2_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 0;
-	memcpy(state->spriteram_buffered, state->spriteram_delayed, state->spriteram_size);
-	for (i = 0; i < state->spriteram_size / 2; i++)
-		state->spriteram_buffered[i] = spriteram[i];
-	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
+	state->m_prepare_sprites = 0;
+	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+	for (i = 0; i < state->m_spriteram_size / 2; i++)
+		state->m_spriteram_buffered[i] = spriteram[i];
+	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 }
 
 SCREEN_EOF( taitof2_partial_buffer_delayed )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int i;
 
 	taitof2_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 0;
-	memcpy(state->spriteram_buffered, state->spriteram_delayed, state->spriteram_size);
-	for (i = 0;i < state->spriteram_size / 2; i += 4)
-		state->spriteram_buffered[i] = spriteram[i];
-	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
+	state->m_prepare_sprites = 0;
+	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+	for (i = 0;i < state->m_spriteram_size / 2; i += 4)
+		state->m_spriteram_buffered[i] = spriteram[i];
+	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 }
 
 SCREEN_EOF( taitof2_partial_buffer_delayed_thundfox )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int i;
 
 	taitof2_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 0;
-	memcpy(state->spriteram_buffered, state->spriteram_delayed, state->spriteram_size);
-	for (i = 0; i < state->spriteram_size / 2; i += 8)
+	state->m_prepare_sprites = 0;
+	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+	for (i = 0; i < state->m_spriteram_size / 2; i += 8)
 	{
-		state->spriteram_buffered[i]     = spriteram[i];
-		state->spriteram_buffered[i + 1] = spriteram[i + 1];
-		state->spriteram_buffered[i + 4] = spriteram[i + 4];
+		state->m_spriteram_buffered[i]     = spriteram[i];
+		state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
+		state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
 	}
-	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
+	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 }
 
 SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu )
@@ -958,23 +958,23 @@ SCREEN_EOF( taitof2_partial_buffer_delayed_qzchikyu )
        probably thundfox_eof_callback would work fine */
 
 	taitof2_state *state = machine.driver_data<taitof2_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int i;
 
 	taitof2_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 0;
-	memcpy(state->spriteram_buffered, state->spriteram_delayed, state->spriteram_size);
-	for (i = 0; i < state->spriteram_size / 2; i += 8)
+	state->m_prepare_sprites = 0;
+	memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
+	for (i = 0; i < state->m_spriteram_size / 2; i += 8)
 	{
-		state->spriteram_buffered[i]     = spriteram[i];
-		state->spriteram_buffered[i + 1] = spriteram[i + 1];
-		state->spriteram_buffered[i + 4] = spriteram[i + 4];
-		state->spriteram_buffered[i + 5] = spriteram[i + 5];	// not needed?
-		state->spriteram_buffered[i + 6] = spriteram[i + 6];	// not needed?
-		state->spriteram_buffered[i + 7] = spriteram[i + 7];	// not needed?
+		state->m_spriteram_buffered[i]     = spriteram[i];
+		state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
+		state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
+		state->m_spriteram_buffered[i + 5] = spriteram[i + 5];	// not needed?
+		state->m_spriteram_buffered[i + 6] = spriteram[i + 6];	// not needed?
+		state->m_spriteram_buffered[i + 7] = spriteram[i + 7];	// not needed?
 	}
-	memcpy(state->spriteram_delayed, spriteram, state->spriteram_size);
+	memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
 }
 
 
@@ -998,14 +998,14 @@ SCREEN_UPDATE( taitof2_yesnoj )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0100scn_tilemap_update(state->tc0100scn);
+	tc0100scn_tilemap_update(state->m_tc0100scn);
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 	draw_sprites(screen->machine(), bitmap, cliprect, NULL, 0);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->tc0100scn), 0, 0);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->tc0100scn) ^ 1, 0, 0);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, 2, 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn), 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn) ^ 1, 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
@@ -1016,14 +1016,14 @@ SCREEN_UPDATE( taitof2 )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0100scn_tilemap_update(state->tc0100scn);
+	tc0100scn_tilemap_update(state->m_tc0100scn);
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->tc0100scn), 0, 0);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->tc0100scn) ^ 1, 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn), 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, tc0100scn_bottomlayer(state->m_tc0100scn) ^ 1, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, NULL, 0);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, 2, 0, 0);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }
 
@@ -1035,28 +1035,28 @@ SCREEN_UPDATE( taitof2_pri )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0100scn_tilemap_update(state->tc0100scn);
+	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	layer[0] = tc0100scn_bottomlayer(state->tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(state->m_tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
-	state->tilepri[layer[0]] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;
-	state->tilepri[layer[1]] = tc0360pri_r(state->tc0360pri, 5) >> 4;
-	state->tilepri[layer[2]] = tc0360pri_r(state->tc0360pri, 4) >> 4;
+	state->m_tilepri[layer[0]] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;
+	state->m_tilepri[layer[1]] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;
+	state->m_tilepri[layer[2]] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;
 
-	state->spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	state->spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	state->spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	state->spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	state->m_spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	state->m_spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	state->m_spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	state->m_spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	state->spriteblendmode = tc0360pri_r(state->tc0360pri, 0) & 0xc0;
+	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
 
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[0], 0, 1);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], 0, 1);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	draw_sprites(screen->machine(), bitmap, cliprect, NULL, 1);
 	return 0;
@@ -1068,11 +1068,11 @@ static void draw_roz_layer( running_machine &machine, bitmap_t *bitmap, const re
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
 
-	if (state->tc0280grd != NULL)
-		tc0280grd_zoom_draw(state->tc0280grd, bitmap, cliprect, state->pivot_xdisp, state->pivot_ydisp, priority);
+	if (state->m_tc0280grd != NULL)
+		tc0280grd_zoom_draw(state->m_tc0280grd, bitmap, cliprect, state->m_pivot_xdisp, state->m_pivot_ydisp, priority);
 
-	if (state->tc0430grw != NULL)
-		tc0430grw_zoom_draw(state->tc0430grw, bitmap, cliprect, state->pivot_xdisp, state->pivot_ydisp, priority);
+	if (state->m_tc0430grw != NULL)
+		tc0430grw_zoom_draw(state->m_tc0430grw, bitmap, cliprect, state->m_pivot_xdisp, state->m_pivot_ydisp, priority);
 }
 
 SCREEN_UPDATE( taitof2_pri_roz )
@@ -1083,35 +1083,35 @@ SCREEN_UPDATE( taitof2_pri_roz )
 	int layer[3];
 	int drawn;
 	int i,j;
-	int roz_base_color = (tc0360pri_r(state->tc0360pri, 1) & 0x3f) << 2;
+	int roz_base_color = (tc0360pri_r(state->m_tc0360pri, 1) & 0x3f) << 2;
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	if (state->tc0280grd != NULL)
-		tc0280grd_tilemap_update(state->tc0280grd, roz_base_color);
+	if (state->m_tc0280grd != NULL)
+		tc0280grd_tilemap_update(state->m_tc0280grd, roz_base_color);
 
-	if (state->tc0430grw != NULL)
-		tc0430grw_tilemap_update(state->tc0430grw, roz_base_color);
+	if (state->m_tc0430grw != NULL)
+		tc0430grw_tilemap_update(state->m_tc0430grw, roz_base_color);
 
-	tc0100scn_tilemap_update(state->tc0100scn);
+	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	rozpri = (tc0360pri_r(state->tc0360pri, 1) & 0xc0) >> 6;
-	rozpri = (tc0360pri_r(state->tc0360pri, 8 + rozpri / 2) >> 4 * (rozpri & 1)) & 0x0f;
+	rozpri = (tc0360pri_r(state->m_tc0360pri, 1) & 0xc0) >> 6;
+	rozpri = (tc0360pri_r(state->m_tc0360pri, 8 + rozpri / 2) >> 4 * (rozpri & 1)) & 0x0f;
 
-	layer[0] = tc0100scn_bottomlayer(state->tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(state->m_tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
-	tilepri[layer[0]] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;
-	tilepri[layer[1]] = tc0360pri_r(state->tc0360pri, 5) >> 4;
-	tilepri[layer[2]] = tc0360pri_r(state->tc0360pri, 4) >> 4;
+	tilepri[layer[0]] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;
+	tilepri[layer[1]] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;
+	tilepri[layer[2]] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;
 
-	state->spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	state->spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	state->spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	state->spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	state->m_spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	state->m_spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	state->m_spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	state->m_spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	state->spriteblendmode = tc0360pri_r(state->tc0360pri, 0) & 0xc0;
+	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
@@ -1122,7 +1122,7 @@ SCREEN_UPDATE( taitof2_pri_roz )
 		if (rozpri == i)
 		{
 			draw_roz_layer(screen->machine(), bitmap, cliprect, 1 << drawn);
-			state->tilepri[drawn] = i;
+			state->m_tilepri[drawn] = i;
 			drawn++;
 		}
 
@@ -1130,8 +1130,8 @@ SCREEN_UPDATE( taitof2_pri_roz )
 		{
 			if (tilepri[layer[j]] == i)
 			{
-				tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[j], 0, 1 << drawn);
-				state->tilepri[drawn] = i;
+				tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[j], 0, 1 << drawn);
+				state->m_tilepri[drawn] = i;
 				drawn++;
 			}
 		}
@@ -1154,27 +1154,27 @@ SCREEN_UPDATE( taitof2_thundfox )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0100scn_tilemap_update(state->tc0100scn_1);
-	tc0100scn_tilemap_update(state->tc0100scn_2);
+	tc0100scn_tilemap_update(state->m_tc0100scn_1);
+	tc0100scn_tilemap_update(state->m_tc0100scn_2);
 
-	layer[0][0] = tc0100scn_bottomlayer(state->tc0100scn_1);
+	layer[0][0] = tc0100scn_bottomlayer(state->m_tc0100scn_1);
 	layer[0][1] = layer[0][0] ^ 1;
 	layer[0][2] = 2;
-	tilepri[0][layer[0][0]] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;
-	tilepri[0][layer[0][1]] = tc0360pri_r(state->tc0360pri, 5) >> 4;
-	tilepri[0][layer[0][2]] = tc0360pri_r(state->tc0360pri, 4) >> 4;
+	tilepri[0][layer[0][0]] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;
+	tilepri[0][layer[0][1]] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;
+	tilepri[0][layer[0][2]] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;
 
-	layer[1][0] = tc0100scn_bottomlayer(state->tc0100scn_2);
+	layer[1][0] = tc0100scn_bottomlayer(state->m_tc0100scn_2);
 	layer[1][1] = layer[1][0] ^ 1;
 	layer[1][2] = 2;
-	tilepri[1][layer[1][0]] = tc0360pri_r(state->tc0360pri, 9) & 0x0f;
-	tilepri[1][layer[1][1]] = tc0360pri_r(state->tc0360pri, 9) >> 4;
-	tilepri[1][layer[1][2]] = tc0360pri_r(state->tc0360pri, 8) >> 4;
+	tilepri[1][layer[1][0]] = tc0360pri_r(state->m_tc0360pri, 9) & 0x0f;
+	tilepri[1][layer[1][1]] = tc0360pri_r(state->m_tc0360pri, 9) >> 4;
+	tilepri[1][layer[1][2]] = tc0360pri_r(state->m_tc0360pri, 8) >> 4;
 
-	spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);	/* wrong color? */
@@ -1194,12 +1194,12 @@ SCREEN_UPDATE( taitof2_thundfox )
 		if (tilepri[0][drawn[0]] < tilepri[1][drawn[1]])
 		{
 			pick = 0;
-			tc0100scn = state->tc0100scn_1;
+			tc0100scn = state->m_tc0100scn_1;
 		}
 		else
 		{
 			pick = 1;
-			tc0100scn = state->tc0100scn_2;
+			tc0100scn = state->m_tc0100scn_2;
 		}
 
 		tc0100scn_tilemap_draw(tc0100scn , bitmap, cliprect, layer[pick][drawn[pick]], 0, 1 << (drawn[pick] + 2 * pick));
@@ -1207,12 +1207,12 @@ SCREEN_UPDATE( taitof2_thundfox )
 	}
 	while (drawn[0] < 2)
 	{
-		tc0100scn_tilemap_draw(state->tc0100scn_1, bitmap, cliprect, layer[0][drawn[0]], 0, 1 << drawn[0]);
+		tc0100scn_tilemap_draw(state->m_tc0100scn_1, bitmap, cliprect, layer[0][drawn[0]], 0, 1 << drawn[0]);
 		drawn[0]++;
 	}
 	while (drawn[1] < 2)
 	{
-		tc0100scn_tilemap_draw(state->tc0100scn_2, bitmap, cliprect, layer[1][drawn[1]], 0, 1 << (drawn[1] + 2));
+		tc0100scn_tilemap_draw(state->m_tc0100scn_2, bitmap, cliprect, layer[1][drawn[1]], 0, 1 << (drawn[1] + 2));
 		drawn[1]++;
 	}
 
@@ -1240,13 +1240,13 @@ SCREEN_UPDATE( taitof2_thundfox )
 
 	if (tilepri[0][2] < tilepri[1][2])
 	{
-		tc0100scn_tilemap_draw(state->tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
-		tc0100scn_tilemap_draw(state->tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
+		tc0100scn_tilemap_draw(state->m_tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
+		tc0100scn_tilemap_draw(state->m_tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
 	}
 	else
 	{
-		tc0100scn_tilemap_draw(state->tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
-		tc0100scn_tilemap_draw(state->tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
+		tc0100scn_tilemap_draw(state->m_tc0100scn_2, bitmap, cliprect, layer[1][2], 0, 0);
+		tc0100scn_tilemap_draw(state->m_tc0100scn_1, bitmap, cliprect, layer[0][2], 0, 0);
 	}
 	return 0;
 }
@@ -1289,9 +1289,9 @@ SCREEN_UPDATE( taitof2_metalb )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0480scp_tilemap_update(state->tc0480scp);
+	tc0480scp_tilemap_update(state->m_tc0480scp);
 
-	priority = tc0480scp_get_bg_priority(state->tc0480scp);
+	priority = tc0480scp_get_bg_priority(state->m_tc0480scp);
 
 	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -1304,27 +1304,27 @@ SCREEN_UPDATE( taitof2_metalb )
 	invlayer[layer[2]] = 2;
 	invlayer[layer[3]] = 3;
 
-	state->tilepri[invlayer[0]] = tc0360pri_r(state->tc0360pri, 4) & 0x0f;	/* bg0 */
-	state->tilepri[invlayer[1]] = tc0360pri_r(state->tc0360pri, 4) >> 4;	/* bg1 */
-	state->tilepri[invlayer[2]] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;	/* bg2 */
-	state->tilepri[invlayer[3]] = tc0360pri_r(state->tc0360pri, 5) >> 4;	/* bg3 */
-	state->tilepri[4] = tc0360pri_r(state->tc0360pri, 9) & 0x0f;			/* fg (text layer) */
+	state->m_tilepri[invlayer[0]] = tc0360pri_r(state->m_tc0360pri, 4) & 0x0f;	/* bg0 */
+	state->m_tilepri[invlayer[1]] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;	/* bg1 */
+	state->m_tilepri[invlayer[2]] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;	/* bg2 */
+	state->m_tilepri[invlayer[3]] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;	/* bg3 */
+	state->m_tilepri[4] = tc0360pri_r(state->m_tc0360pri, 9) & 0x0f;			/* fg (text layer) */
 
-	state->spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	state->spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	state->spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	state->spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	state->m_spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	state->m_spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	state->m_spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	state->m_spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
-	state->spriteblendmode = tc0360pri_r(state->tc0360pri, 0) & 0xc0;
+	state->m_spriteblendmode = tc0360pri_r(state->m_tc0360pri, 0) & 0xc0;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[1], 0, 2);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[2], 0, 4);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[3], 0, 8);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[4], 0, 16);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 16);
 
 	draw_sprites(screen->machine(), bitmap, cliprect, NULL, 1);
 	return 0;
@@ -1342,9 +1342,9 @@ SCREEN_UPDATE( taitof2_deadconx )
 
 	taitof2_handle_sprite_buffering(screen->machine());
 
-	tc0480scp_tilemap_update(state->tc0480scp);
+	tc0480scp_tilemap_update(state->m_tc0480scp);
 
-	priority = tc0480scp_get_bg_priority(state->tc0480scp);
+	priority = tc0480scp_get_bg_priority(state->m_tc0480scp);
 
 	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -1352,26 +1352,26 @@ SCREEN_UPDATE( taitof2_deadconx )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = tc0360pri_r(state->tc0360pri, 4) >> 4;      /* bg0 */
-	tilepri[1] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;    /* bg1 */
-	tilepri[2] = tc0360pri_r(state->tc0360pri, 5) >> 4;      /* bg2 */
-	tilepri[3] = tc0360pri_r(state->tc0360pri, 4) & 0x0f;    /* bg3 */
+	tilepri[0] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;      /* bg0 */
+	tilepri[1] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;    /* bg1 */
+	tilepri[2] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;      /* bg2 */
+	tilepri[3] = tc0360pri_r(state->m_tc0360pri, 4) & 0x0f;    /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = tc0360pri_r(state->tc0360pri, 7) >> 4;    /* fg (text layer) */
+	tilepri[layer[4]] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;    /* fg (text layer) */
 
-	spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[1], 0, 2);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[2], 0, 4);
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], 0 ,1);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -1394,6 +1394,6 @@ SCREEN_UPDATE( taitof2_deadconx )
     that the FG layer is always on top of sprites.
     */
 
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }

@@ -76,15 +76,15 @@ static WRITE16_HANDLER( hacked_controls_w )
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	logerror("%06x: hacked_controls_w %04x %02x\n", cpu_get_pc(&space->device()), offset, data);
-	COMBINE_DATA(&state->inp[offset]);
+	COMBINE_DATA(&state->m_inp[offset]);
 }
 
 static READ16_HANDLER( hacked_controls_r )
 {
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	logerror("%06x: hacked_controls_r %04x %04x\n", cpu_get_pc(&space->device()), offset, state->inp[offset]);
-	return state->inp[offset];
+	logerror("%06x: hacked_controls_r %04x %04x\n", cpu_get_pc(&space->device()), offset, state->m_inp[offset]);
+	return state->m_inp[offset];
 }
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
@@ -92,13 +92,13 @@ static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
 	data = input_port_read(space->machine(), "SYSTEM") >> 12;
-	state->inp[0] = data ^ 0x0f;
+	state->m_inp[0] = data ^ 0x0f;
 
 	data = input_port_read(space->machine(), "P2");
-	state->inp[1] = data ^ 0xff;
+	state->m_inp[1] = data ^ 0xff;
 
 	data = input_port_read(space->machine(), "P1");
-	state->inp[2] = data ^ 0xff;
+	state->m_inp[2] = data ^ 0xff;
 }
 
 
@@ -106,15 +106,15 @@ static WRITE16_HANDLER( hacked_soundcommand_w )
 {
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	COMBINE_DATA(&state->soundcommand);
-	soundlatch_w(space, 0, state->soundcommand & 0xff);
+	COMBINE_DATA(&state->m_soundcommand);
+	soundlatch_w(space, 0, state->m_soundcommand & 0xff);
 }
 
 static READ16_HANDLER( hacked_soundcommand_r )
 {
 	bionicc_state *state = space->machine().driver_data<bionicc_state>();
 
-	return state->soundcommand;
+	return state->m_soundcommand;
 }
 
 
@@ -156,10 +156,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
 	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)	/* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_BASE_MEMBER(bionicc_state, txvideoram)
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_BASE_MEMBER(bionicc_state, fgvideoram)
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_BASE_MEMBER(bionicc_state, bgvideoram)
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_BASE_MEMBER(bionicc_state, paletteram)
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(bionicc_txvideoram_w) AM_BASE_MEMBER(bionicc_state, m_txvideoram)
+	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(bionicc_fgvideoram_w) AM_BASE_MEMBER(bionicc_state, m_fgvideoram)
+	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bionicc_bgvideoram_w) AM_BASE_MEMBER(bionicc_state, m_bgvideoram)
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(bionicc_paletteram_w) AM_BASE_MEMBER(bionicc_state, m_paletteram)
 	AM_RANGE(0xffc000, 0xfffff7) AM_RAM	/* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w)	/* hack */
@@ -337,23 +337,23 @@ static MACHINE_START( bionicc )
 {
 	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->save_item(NAME(state->soundcommand));
-	state->save_item(NAME(state->inp));
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_soundcommand));
+	state->save_item(NAME(state->m_inp));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_RESET( bionicc )
 {
 	bionicc_state *state = machine.driver_data<bionicc_state>();
 
-	state->inp[0] = 0;
-	state->inp[1] = 0;
-	state->inp[2] = 0;
-	state->scroll[0] = 0;
-	state->scroll[1] = 0;
-	state->scroll[2] = 0;
-	state->scroll[3] = 0;
-	state->soundcommand = 0;
+	state->m_inp[0] = 0;
+	state->m_inp[1] = 0;
+	state->m_inp[2] = 0;
+	state->m_scroll[0] = 0;
+	state->m_scroll[1] = 0;
+	state->m_scroll[2] = 0;
+	state->m_scroll[3] = 0;
+	state->m_soundcommand = 0;
 }
 
 static MACHINE_CONFIG_START( bionicc, bionicc_state )

@@ -158,7 +158,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
-		if ( (data & (0x04 << i)) && !(state->old & (0x04 << i)) )
+		if ( (data & (0x04 << i)) && !(state->m_old & (0x04 << i)) )
 			lordgun_update_gun(device->machine(), i);
 
 	// latch the bit
@@ -170,9 +170,9 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 	// clock line asserted: write latch or select next bit to read
 	eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
-	state->whitescreen = data & 0x80;
+	state->m_whitescreen = data & 0x80;
 
-	state->old = data;
+	state->m_old = data;
 }
 
 static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
@@ -187,7 +187,7 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 	}
 
 	// bit 1? cleared during screen transitions
-	state->whitescreen = !(data & 0x02);
+	state->m_whitescreen = !(data & 0x02);
 
 	coin_counter_w(device->machine(), 0, data & 0x08);
 	coin_counter_w(device->machine(), 1, data & 0x10);
@@ -206,14 +206,14 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 static READ8_DEVICE_HANDLER( aliencha_dip_r )
 {
 	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	switch (state->aliencha_dip_sel & 0x70)
+	switch (state->m_aliencha_dip_sel & 0x70)
 	{
 		case 0x30:	return input_port_read(device->machine(), "DIP1");
 		case 0x60:	return input_port_read(device->machine(), "DIP2");
 		case 0x50:	return input_port_read(device->machine(), "DIP3");
 
 		default:
-			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine().describe_context(),state->aliencha_dip_sel);
+			logerror("%s: dip_r with unknown dip_sel = %02X\n",device->machine().describe_context(),state->m_aliencha_dip_sel);
 			return 0xff;
 	}
 }
@@ -221,7 +221,7 @@ static READ8_DEVICE_HANDLER( aliencha_dip_r )
 static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
 {
 	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	state->aliencha_dip_sel = data;
+	state->m_aliencha_dip_sel = data;
 }
 
 
@@ -229,7 +229,7 @@ static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
 static WRITE16_HANDLER( lordgun_priority_w )
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->priority);
+	COMBINE_DATA(&state->m_priority);
 //  popmessage("PR: %04x", data);
 }
 
@@ -237,25 +237,25 @@ static WRITE16_HANDLER( lordgun_priority_w )
 static READ16_HANDLER( lordgun_gun_0_x_r )
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->gun[0].hw_x;
+	return state->m_gun[0].hw_x;
 }
 
 static READ16_HANDLER( lordgun_gun_0_y_r )
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->gun[0].hw_y;
+	return state->m_gun[0].hw_y;
 }
 
 static READ16_HANDLER( lordgun_gun_1_x_r )
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->gun[1].hw_x;
+	return state->m_gun[1].hw_x;
 }
 
 static READ16_HANDLER( lordgun_gun_1_y_r )
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->gun[1].hw_y;
+	return state->m_gun[1].hw_y;
 }
 
 
@@ -270,23 +270,23 @@ static WRITE16_HANDLER( lordgun_soundlatch_w )
 static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, vram_0)	// DISPLAY
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, vram_1)	// DISPLAY
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, vram_2)	// DISPLAY
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram_0)	// DISPLAY
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram_1)	// DISPLAY
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram_2)	// DISPLAY
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, vram_3)	// DISPLAY
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, scrollram)							// LINE
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, spriteram, spriteram_size)						// ANIMATOR
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram_3)	// DISPLAY
+	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_scrollram)							// LINE
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, m_spriteram, m_spriteram_size)						// ANIMATOR
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_0)
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_1)
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_2)
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_3)
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_0)
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_1)
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_2)
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_3)
+	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_0)
+	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_1)
+	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_2)
+	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_3)
+	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_0)
+	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_1)
+	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_2)
+	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_3)
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x503800, 0x503801) AM_READ(lordgun_gun_0_x_r)
 	AM_RANGE(0x503a00, 0x503a01) AM_READ(lordgun_gun_1_x_r)
@@ -302,23 +302,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, vram_0)	// BACKGROUND 1
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, vram_1)	// BACKGROUND 2
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, vram_2)	// BACKGROUND 3
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram_0)	// BACKGROUND 1
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram_1)	// BACKGROUND 2
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram_2)	// BACKGROUND 3
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, vram_3)	// TEXT
-	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, scrollram)							// LINE OFFSET
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, spriteram, spriteram_size)						// ANIMATE
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram_3)	// TEXT
+	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_scrollram)							// LINE OFFSET
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, m_spriteram, m_spriteram_size)						// ANIMATE
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_0)
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_1)
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_2)
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_3)
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_0)
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_1)
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_2)
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_y_3)
+	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_0)
+	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_1)
+	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_2)
+	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_3)
+	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_0)
+	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_1)
+	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_2)
+	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_3)
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
 	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)

@@ -83,54 +83,54 @@ WRITE8_HANDLER( nbmj8991_blitter_w )
 
 	switch (offset)
 	{
-		case 0x00:	state->blitter_src_addr = (state->blitter_src_addr & 0xff00) | data; break;
-		case 0x01:	state->blitter_src_addr = (state->blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 0x00:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
+		case 0x01:	state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
 		case 0x02:	break;
 		case 0x03:	break;
-		case 0x04:	state->blitter_sizex = data; break;
-		case 0x05:	state->blitter_sizey = data;
+		case 0x04:	state->m_blitter_sizex = data; break;
+		case 0x05:	state->m_blitter_sizey = data;
 					/* writing here also starts the blit */
 					nbmj8991_gfxdraw(space->machine());
 					break;
-		case 0x06:	state->blitter_direction_x = (data & 0x01) ? 1 : 0;
-					state->blitter_direction_y = (data & 0x02) ? 1 : 0;
-					state->flipscreen = (data & 0x04) ? 0 : 1;
-					state->dispflag = (data & 0x10) ? 0 : 1;
+		case 0x06:	state->m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+					state->m_blitter_direction_y = (data & 0x02) ? 1 : 0;
+					state->m_flipscreen = (data & 0x04) ? 0 : 1;
+					state->m_dispflag = (data & 0x10) ? 0 : 1;
 					nbmj8991_vramflip(space->machine());
 					break;
 		case 0x07:	break;
-		case 0x10:	state->blitter_destx = (state->blitter_destx & 0xff00) | data; break;
-		case 0x20:	state->blitter_desty = (state->blitter_desty & 0xff00) | data; break;
-		case 0x30:	state->scrollx = (state->scrollx & 0xff00) | data; break;
-		case 0x40:	state->scrolly = (state->scrolly & 0xff00) | data; break;
-		case 0x50:	state->blitter_destx = (state->blitter_destx & 0x00ff) | ((data & 0x01) << 8);
-					state->blitter_desty = (state->blitter_desty & 0x00ff) | ((data & 0x02) << 7);
-					state->scrollx = (state->scrollx & 0x00ff) | ((data & 0x04) << 6);
-					state->scrolly = (state->scrolly & 0x00ff) | ((data & 0x08) << 5);
+		case 0x10:	state->m_blitter_destx = (state->m_blitter_destx & 0xff00) | data; break;
+		case 0x20:	state->m_blitter_desty = (state->m_blitter_desty & 0xff00) | data; break;
+		case 0x30:	state->m_scrollx = (state->m_scrollx & 0xff00) | data; break;
+		case 0x40:	state->m_scrolly = (state->m_scrolly & 0xff00) | data; break;
+		case 0x50:	state->m_blitter_destx = (state->m_blitter_destx & 0x00ff) | ((data & 0x01) << 8);
+					state->m_blitter_desty = (state->m_blitter_desty & 0x00ff) | ((data & 0x02) << 7);
+					state->m_scrollx = (state->m_scrollx & 0x00ff) | ((data & 0x04) << 6);
+					state->m_scrolly = (state->m_scrolly & 0x00ff) | ((data & 0x08) << 5);
 					break;
-		case 0x60:	state->gfxrom = data; break;
-		case 0x70:	state->clutsel = data; break;
+		case 0x60:	state->m_gfxrom = data; break;
+		case 0x70:	state->m_clutsel = data; break;
 	}
 
-	if ((0x20000 * state->gfxrom) > (gfxlen - 1))
+	if ((0x20000 * state->m_gfxrom) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->gfxrom &= (gfxlen / 0x20000 - 1);
+		state->m_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
 READ8_HANDLER( nbmj8991_clut_r )
 {
 	nbmj8991_state *state = space->machine().driver_data<nbmj8991_state>();
-	return state->clut[offset];
+	return state->m_clut[offset];
 }
 
 WRITE8_HANDLER( nbmj8991_clut_w )
 {
 	nbmj8991_state *state = space->machine().driver_data<nbmj8991_state>();
-	state->clut[((state->clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
+	state->m_clut[((state->m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
 
 /******************************************************************************
@@ -145,34 +145,34 @@ static void nbmj8991_vramflip(running_machine &machine)
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	if (state->flipscreen == state->flipscreen_old) return;
+	if (state->m_flipscreen == state->m_flipscreen_old) return;
 
 	for (y = 0; y < height / 2; y++)
 	{
 		for (x = 0; x < width / 2; x++)
 		{
 			// rotate 180 degrees (   0,   0) - ( 511, 511)
-			color1 = state->videoram[(y * width) + x];
-			color2 = state->videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
-			state->videoram[(y * width) + x] = color2;
-			state->videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)] = color1;
+			color1 = state->m_videoram[(y * width) + x];
+			color2 = state->m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
+			state->m_videoram[(y * width) + x] = color2;
+			state->m_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)] = color1;
 			// rotate 180 degrees ( 512,   0) - (1023, 511)
-			color1 = state->videoram[(y * width) + (x + (width / 2))];
-			color2 = state->videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))];
-			state->videoram[(y * width) + (x + (width / 2))] = color2;
-			state->videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))] = color1;
+			color1 = state->m_videoram[(y * width) + (x + (width / 2))];
+			color2 = state->m_videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))];
+			state->m_videoram[(y * width) + (x + (width / 2))] = color2;
+			state->m_videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))] = color1;
 		}
 	}
 
-	state->flipscreen_old = state->flipscreen;
-	state->screen_refresh = 1;
+	state->m_flipscreen_old = state->m_flipscreen;
+	state->m_screen_refresh = 1;
 }
 
 static void update_pixel(running_machine &machine, int x, int y)
 {
 	nbmj8991_state *state = machine.driver_data<nbmj8991_state>();
-	UINT8 color = state->videoram[(y * machine.primary_screen->width()) + x];
-	*BITMAP_ADDR16(state->tmpbitmap, y, x) = color;
+	UINT8 color = state->m_videoram[(y * machine.primary_screen->width()) + x];
+	*BITMAP_ADDR16(state->m_tmpbitmap, y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -197,34 +197,34 @@ static void nbmj8991_gfxdraw(running_machine &machine)
 
 	nb1413m3_busyctr = 0;
 
-	if (state->blitter_direction_x)
+	if (state->m_blitter_direction_x)
 	{
-		startx = state->blitter_destx;
-		sizex = state->blitter_sizex ^ 0xff;
+		startx = state->m_blitter_destx;
+		sizex = state->m_blitter_sizex ^ 0xff;
 		skipx = 1;
 	}
 	else
 	{
-		startx = state->blitter_destx + state->blitter_sizex;
-		sizex = state->blitter_sizex;
+		startx = state->m_blitter_destx + state->m_blitter_sizex;
+		sizex = state->m_blitter_sizex;
 		skipx = -1;
 	}
 
-	if (state->blitter_direction_y)
+	if (state->m_blitter_direction_y)
 	{
-		starty = state->blitter_desty;
-		sizey = state->blitter_sizey ^ 0xff;
+		starty = state->m_blitter_desty;
+		sizey = state->m_blitter_sizey ^ 0xff;
 		skipy = 1;
 	}
 	else
 	{
-		starty = state->blitter_desty + state->blitter_sizey;
-		sizey = state->blitter_sizey;
+		starty = state->m_blitter_desty + state->m_blitter_sizey;
+		sizey = state->m_blitter_sizey;
 		skipy = -1;
 	}
 
 	gfxlen = machine.region("gfx1")->bytes();
-	gfxaddr = (state->gfxrom << 17) + (state->blitter_src_addr << 1);
+	gfxaddr = (state->m_gfxrom << 17) + (state->m_blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
@@ -244,14 +244,14 @@ static void nbmj8991_gfxdraw(running_machine &machine)
 			dx2 = (2 * x + 1) & 0x3ff;
 			dy = y & 0x1ff;
 
-			if (!state->flipscreen)
+			if (!state->m_flipscreen)
 			{
 				dx1 ^= 0x1ff;
 				dx2 ^= 0x1ff;
 				dy ^= 0x1ff;
 			}
 
-			if (state->blitter_direction_x)
+			if (state->m_blitter_direction_x)
 			{
 				// flip
 				color1 = (color & 0x0f) >> 0;
@@ -264,17 +264,17 @@ static void nbmj8991_gfxdraw(running_machine &machine)
 				color2 = (color & 0x0f) >> 0;
 			}
 
-			color1 = state->clut[((state->clutsel & 0x7f) * 0x10) + color1];
-			color2 = state->clut[((state->clutsel & 0x7f) * 0x10) + color2];
+			color1 = state->m_clut[((state->m_clutsel & 0x7f) * 0x10) + color1];
+			color2 = state->m_clut[((state->m_clutsel & 0x7f) * 0x10) + color2];
 
 			if (color1 != 0xff)
 			{
-				state->videoram[(dy * width) + dx1] = color1;
+				state->m_videoram[(dy * width) + dx1] = color1;
 				update_pixel(machine, dx1, dy);
 			}
 			if (color2 != 0xff)
 			{
-				state->videoram[(dy * width) + dx2] = color2;
+				state->m_videoram[(dy * width) + dx2] = color2;
 				update_pixel(machine, dx2, dy);
 			}
 
@@ -296,10 +296,10 @@ VIDEO_START( nbmj8991 )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->videoram = auto_alloc_array(machine, UINT8, width * height);
-	state->clut = auto_alloc_array(machine, UINT8, 0x800);
-	memset(state->videoram, 0x00, (width * height * sizeof(UINT8)));
+	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_videoram = auto_alloc_array(machine, UINT8, width * height);
+	state->m_clut = auto_alloc_array(machine, UINT8, 0x800);
+	memset(state->m_videoram, 0x00, (width * height * sizeof(UINT8)));
 }
 
 SCREEN_UPDATE( nbmj8991_type1 )
@@ -307,34 +307,34 @@ SCREEN_UPDATE( nbmj8991_type1 )
 	nbmj8991_state *state = screen->machine().driver_data<nbmj8991_state>();
 	int x, y;
 
-	if (state->screen_refresh)
+	if (state->m_screen_refresh)
 	{
 		int width = screen->machine().primary_screen->width();
 		int height = screen->machine().primary_screen->height();
 
-		state->screen_refresh = 0;
+		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
 				update_pixel(screen->machine(), x, y);
 	}
 
-	if (state->dispflag)
+	if (state->m_dispflag)
 	{
 		int scrollx, scrolly;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
-			scrollx = (((-state->scrollx) + 0x000) & 0x1ff) * 2;
-			scrolly =  ((-state->scrolly) - 0x00f) & 0x1ff;
+			scrollx = (((-state->m_scrollx) + 0x000) & 0x1ff) * 2;
+			scrolly =  ((-state->m_scrolly) - 0x00f) & 0x1ff;
 		}
 		else
 		{
-			scrollx = (((-state->scrollx) - 0x100) & 0x1ff) * 2;
-			scrolly =  (( state->scrolly) + 0x0f1) & 0x1ff;
+			scrollx = (((-state->m_scrollx) - 0x100) & 0x1ff) * 2;
+			scrolly =  (( state->m_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, state->tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+		copyscrollbitmap(bitmap, state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
 		bitmap_fill(bitmap, 0, 0);
@@ -347,12 +347,12 @@ SCREEN_UPDATE( nbmj8991_type2 )
 	nbmj8991_state *state = screen->machine().driver_data<nbmj8991_state>();
 	int x, y;
 
-	if (state->screen_refresh)
+	if (state->m_screen_refresh)
 	{
 		int width = screen->width();
 		int height = screen->height();
 
-		state->screen_refresh = 0;
+		state->m_screen_refresh = 0;
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
@@ -363,18 +363,18 @@ SCREEN_UPDATE( nbmj8991_type2 )
 	{
 		int scrollx, scrolly;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
-			scrollx = (((-state->scrollx) + 0x000) & 0x1ff) * 2;
-			scrolly =  ((-state->scrolly) - 0x00f) & 0x1ff;
+			scrollx = (((-state->m_scrollx) + 0x000) & 0x1ff) * 2;
+			scrolly =  ((-state->m_scrolly) - 0x00f) & 0x1ff;
 		}
 		else
 		{
-			scrollx = (((-state->scrollx) - 0x100) & 0x1ff) * 2;
-			scrolly =  (( state->scrolly) + 0x0f1) & 0x1ff;
+			scrollx = (((-state->m_scrollx) - 0x100) & 0x1ff) * 2;
+			scrolly =  (( state->m_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, state->tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+		copyscrollbitmap(bitmap, state->m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
 		bitmap_fill(bitmap, 0, 0);

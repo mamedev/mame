@@ -24,17 +24,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	size_t   videoram_size;
+	UINT8 *  m_videoram;
+	size_t   m_videoram_size;
 
 	/* video-related */
-	int      marker_x, marker_y;
+	int      m_marker_x;
+	int      m_marker_y;
 
 	/* misc */
-	int      timer_count, sense_state, dac_data;
+	int      m_timer_count;
+	int      m_sense_state;
+	int      m_dac_data;
 
 	/* device */
-	device_t *dac;
+	device_t *m_dac;
 };
 
 

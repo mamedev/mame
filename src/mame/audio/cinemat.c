@@ -38,11 +38,11 @@
 #define SOUNDVAL_RISING_EDGE(bit)		RISING_EDGE(bit, bits_changed, sound_val)
 #define SOUNDVAL_FALLING_EDGE(bit)		FALLING_EDGE(bit, bits_changed, sound_val)
 
-#define SHIFTREG_RISING_EDGE(bit)		RISING_EDGE(bit, (state->last_shift ^ state->current_shift), state->current_shift)
-#define SHIFTREG_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->last_shift ^ state->current_shift), state->current_shift)
+#define SHIFTREG_RISING_EDGE(bit)		RISING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->m_last_shift ^ state->m_current_shift), state->m_current_shift)
 
-#define SHIFTREG2_RISING_EDGE(bit)		RISING_EDGE(bit, (state->last_shift2 ^ state->current_shift), state->current_shift)
-#define SHIFTREG2_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->last_shift2 ^ state->current_shift), state->current_shift)
+#define SHIFTREG2_RISING_EDGE(bit)		RISING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
+#define SHIFTREG2_FALLING_EDGE(bit)		FALLING_EDGE(bit, (state->m_last_shift2 ^ state->m_current_shift), state->m_current_shift)
 
 
 /*************************************
@@ -54,14 +54,14 @@
 WRITE8_HANDLER( cinemat_sound_control_w )
 {
 	cinemat_state *state = space->machine().driver_data<cinemat_state>();
-	UINT8 oldval = state->sound_control;
+	UINT8 oldval = state->m_sound_control;
 
 	/* form an 8-bit value with the new bit */
-	state->sound_control = (state->sound_control & ~(1 << offset)) | ((data & 1) << offset);
+	state->m_sound_control = (state->m_sound_control & ~(1 << offset)) | ((data & 1) << offset);
 
 	/* if something changed, call the sound subroutine */
-	if ((state->sound_control != oldval) && state->sound_handler)
-		(*state->sound_handler)(space->machine(), state->sound_control, state->sound_control ^ oldval);
+	if ((state->m_sound_control != oldval) && state->m_sound_handler)
+		(*state->m_sound_handler)(space->machine(), state->m_sound_control, state->m_sound_control ^ oldval);
 }
 
 
@@ -76,16 +76,16 @@ static MACHINE_START( generic )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
     /* register for save states */
-    state_save_register_global(machine, state->sound_control);
-    state_save_register_global(machine, state->current_shift);
-    state_save_register_global(machine, state->last_shift);
-    state_save_register_global(machine, state->last_shift2);
-    state_save_register_global(machine, state->current_pitch);
-    state_save_register_global(machine, state->last_frame);
-    state_save_register_global_array(machine, state->sound_fifo);
-    state_save_register_global(machine, state->sound_fifo_in);
-    state_save_register_global(machine, state->sound_fifo_out);
-    state_save_register_global(machine, state->last_portb_write);
+    state_save_register_global(machine, state->m_sound_control);
+    state_save_register_global(machine, state->m_current_shift);
+    state_save_register_global(machine, state->m_last_shift);
+    state_save_register_global(machine, state->m_last_shift2);
+    state_save_register_global(machine, state->m_current_pitch);
+    state_save_register_global(machine, state->m_last_frame);
+    state_save_register_global_array(machine, state->m_sound_fifo);
+    state_save_register_global(machine, state->m_sound_fifo_in);
+    state_save_register_global(machine, state->m_sound_fifo_out);
+    state_save_register_global(machine, state->m_last_portb_write);
 }
 
 
@@ -96,21 +96,21 @@ static void generic_init(running_machine &machine, void (*callback)(running_mach
 	MACHINE_RESET_CALL(cinemat);
 
 	/* set the sound handler */
-	state->sound_handler = callback;
+	state->m_sound_handler = callback;
 
 	/* reset sound control */
-	state->sound_control = 0x9f;
+	state->m_sound_control = 0x9f;
 
 	/* reset shift register values */
-    state->current_shift = 0xffff;
-    state->last_shift = 0xffff;
-    state->last_shift2 = 0xffff;
+    state->m_current_shift = 0xffff;
+    state->m_last_shift = 0xffff;
+    state->m_last_shift2 = 0xffff;
 
 	/* reset frame counters */
-    state->last_frame = 0;
+    state->m_last_frame = 0;
 
 	/* reset Star Castle pitch */
-    state->current_pitch = 0x10000;
+    state->m_current_pitch = 0x10000;
 }
 
 
@@ -283,7 +283,7 @@ static void speedfrk_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bi
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
 	{
-		state->current_shift = ((state->current_shift >> 1) & 0x7fff) | ((~sound_val << 13) & 1);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7fff) | ((~sound_val << 13) & 1);
 		/* high 12 bits control the frequency - counts from value to $FFF, carry triggers */
 		/* another counter */
 
@@ -499,7 +499,7 @@ static void tailg_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 		device_t *samples = machine.device("samples");
 
 		/* update the shift register (actually just a simple mux) */
-		state->current_shift = (state->current_shift & ~(1 << (sound_val & 7))) | (((sound_val >> 3) & 1) << (sound_val & 7));
+		state->m_current_shift = (state->m_current_shift & ~(1 << (sound_val & 7))) | (((sound_val >> 3) & 1) << (sound_val & 7));
 
 		/* explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x01))
@@ -532,10 +532,10 @@ static void tailg_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 			sample_start(samples, 5, 5, 0);
 
 		/* LED */
-		set_led_status(machine, 0, state->current_shift & 0x40);
+		set_led_status(machine, 0, state->m_current_shift & 0x40);
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 }
 
@@ -659,7 +659,7 @@ static void armora_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7f) | (sound_val & 0x80);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | (sound_val & 0x80);
 
 	/* execute on the rising edge of bit 0x01 */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -683,7 +683,7 @@ static void armora_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			sample_start(samples, 3, 3, 0);
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* tank sound - 0=on, 1=off */
@@ -762,14 +762,14 @@ static void ripoff_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		state->current_shift = ((state->current_shift >> 1) & 0x7f) | ((sound_val << 7) & 0x80);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | ((sound_val << 7) & 0x80);
 
 	/* execute on the rising edge of bit 0x04 */
 	if (SOUNDVAL_RISING_EDGE(0x04))
 	{
 		/* background - 0=on, 1=off, selected by bits 0x38 */
-		if ((((state->current_shift ^ state->last_shift) & 0x38) && !(state->current_shift & 0x04)) || SHIFTREG_FALLING_EDGE(0x04))
-			sample_start(samples, 5, 5 + ((state->current_shift >> 5) & 7), 1);
+		if ((((state->m_current_shift ^ state->m_last_shift) & 0x38) && !(state->m_current_shift & 0x04)) || SHIFTREG_FALLING_EDGE(0x04))
+			sample_start(samples, 5, 5 + ((state->m_current_shift >> 5) & 7), 1);
 		if (SHIFTREG_RISING_EDGE(0x04))
 			sample_stop(samples, 5);
 
@@ -784,7 +784,7 @@ static void ripoff_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			sample_stop(samples, 1);
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* torpedo - falling edge */
@@ -852,7 +852,7 @@ static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7f) | (sound_val & 0x80);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | (sound_val & 0x80);
 
 	/* execute on the rising edge of bit 0x01 */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -884,22 +884,22 @@ static void starcas_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
-		target_pitch = (state->current_shift & 7) + ((state->current_shift & 2) << 2);
+		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
         target_pitch = 0x5800 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->m_last_frame)
         {
-            if (state->current_pitch > target_pitch)
-                state->current_pitch -= 225;
-            if (state->current_pitch < target_pitch)
-                state->current_pitch += 150;
-            sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine.primary_screen->frame_number();
+            if (state->m_current_pitch > target_pitch)
+                state->m_current_pitch -= 225;
+            if (state->m_current_pitch < target_pitch)
+                state->m_current_pitch += 150;
+            sample_set_freq(samples, 4, state->m_current_pitch);
+            state->m_last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* loud explosion - falling edge */
@@ -966,13 +966,13 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7fff) | ((sound_val << 8) & 0x8000);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7fff) | ((sound_val << 8) & 0x8000);
 
 	/* execute on the rising edge of bit 0x02 */
 	if (SOUNDVAL_RISING_EDGE(0x02))
 	{
 		/* only the upper 8 bits matter */
-		state->current_shift >>= 8;
+		state->m_current_shift >>= 8;
 
 		/* loud explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
@@ -985,25 +985,25 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 		/* thrust - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x20))
 		{
-			state->target_volume = 1.0;
+			state->m_target_volume = 1.0;
 			if (!sample_playing(samples, 2))
 				sample_start(samples, 2, 2, 1);
 		}
 		if (SHIFTREG_RISING_EDGE(0x20))
-			state->target_volume = 0;
+			state->m_target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(samples, 2) && machine.primary_screen->frame_number() > state->last_frame)
+        if (sample_playing(samples, 2) && machine.primary_screen->frame_number() > state->m_last_frame)
         {
-            if (state->current_volume > state->target_volume)
-                state->current_volume -= 0.078f;
-            if (state->current_volume < state->target_volume)
-                state->current_volume += 0.078f;
-            if (state->current_volume > 0)
-                sample_set_volume(samples, 2, state->current_volume);
+            if (state->m_current_volume > state->m_target_volume)
+                state->m_current_volume -= 0.078f;
+            if (state->m_current_volume < state->m_target_volume)
+                state->m_current_volume += 0.078f;
+            if (state->m_current_volume > 0)
+                sample_set_volume(samples, 2, state->m_current_volume);
             else
                 sample_stop(samples, 2);
-            state->last_frame = machine.primary_screen->frame_number();
+            state->m_last_frame = machine.primary_screen->frame_number();
         }
 
 		/* fire - falling edge */
@@ -1025,7 +1025,7 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			sample_start(samples, 6, 6, 0);
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* clock music data on the rising edge of bit 0x01 */
@@ -1040,15 +1040,15 @@ static void solarq_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits
 			sample_stop(samples, 7);
 
 		/* set the frequency */
-		freq = 56818.181818 / (4096 - (state->current_shift & 0xfff));
+		freq = 56818.181818 / (4096 - (state->m_current_shift & 0xfff));
 		sample_set_freq(samples, 7, 44100 * freq / 1050);
 
 		/* set the volume */
-		vol = (~state->current_shift >> 12) & 7;
+		vol = (~state->m_current_shift >> 12) & 7;
 		sample_set_volume(samples, 7, vol / 7.0);
 
 		/* remember the previous value */
-		state->last_shift2 = state->current_shift;
+		state->m_last_shift2 = state->m_current_shift;
     }
 }
 
@@ -1107,13 +1107,13 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7fff) | ((sound_val << 8) & 0x8000);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7fff) | ((sound_val << 8) & 0x8000);
 
 	/* execute on the rising edge of bit 0x02 */
 	if (SOUNDVAL_RISING_EDGE(0x02))
 	{
 		/* only the upper 8 bits matter */
-		state->current_shift >>= 8;
+		state->m_current_shift >>= 8;
 
 		/* soft explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
@@ -1150,7 +1150,7 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 			sample_start(samples, 7, 7, 0);
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* clock music data on the rising edge of bit 0x01 */
@@ -1165,11 +1165,11 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
 			sample_stop(samples, 8);
 
 		/* set the frequency */
-		freq = 56818.181818 / (4096 - (state->current_shift & 0xfff));
+		freq = 56818.181818 / (4096 - (state->m_current_shift & 0xfff));
 		sample_set_freq(samples, 8, 44100 * freq / 1050);
 
 		/* set the volume */
-		vol = (~state->current_shift >> 12) & 3;
+		vol = (~state->m_current_shift >> 12) & 3;
 		sample_set_volume(samples, 8, vol / 3.0);
 
         /* cannon - falling edge */
@@ -1177,7 +1177,7 @@ static void boxingb_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bit
         	sample_start(samples, 9, 9, 0);
 
 		/* remember the previous value */
-		state->last_shift2 = state->current_shift;
+		state->m_last_shift2 = state->m_current_shift;
     }
 
 	/* bounce - rising edge */
@@ -1241,7 +1241,7 @@ static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_c
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7f) | (sound_val & 0x80);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | (sound_val & 0x80);
 
 	/* execute on the rising edge of bit 0x01 */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -1273,22 +1273,22 @@ static void wotw_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_c
 			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
-		target_pitch = (state->current_shift & 7) + ((state->current_shift & 2) << 2);
+		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->m_last_frame)
         {
-            if (state->current_pitch > target_pitch)
-                state->current_pitch -= 300;
-            if (state->current_pitch < target_pitch)
-                state->current_pitch += 200;
-            sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine.primary_screen->frame_number();
+            if (state->m_current_pitch > target_pitch)
+                state->m_current_pitch -= 300;
+            if (state->m_current_pitch < target_pitch)
+                state->m_current_pitch += 200;
+            sample_set_freq(samples, 4, state->m_current_pitch);
+            state->m_last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* loud explosion - falling edge */
@@ -1356,7 +1356,7 @@ static void wotwc_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		state->current_shift = ((state->current_shift >> 1) & 0x7f) | (sound_val & 0x80);
+		state->m_current_shift = ((state->m_current_shift >> 1) & 0x7f) | (sound_val & 0x80);
 
 	/* execute on the rising edge of bit 0x01 */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -1388,22 +1388,22 @@ static void wotwc_sound_w(running_machine &machine, UINT8 sound_val, UINT8 bits_
 			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
-		target_pitch = (state->current_shift & 7) + ((state->current_shift & 2) << 2);
+		target_pitch = (state->m_current_shift & 7) + ((state->m_current_shift & 2) << 2);
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (machine.primary_screen->frame_number() > state->last_frame)
+        if (machine.primary_screen->frame_number() > state->m_last_frame)
         {
-            if (state->current_pitch > target_pitch)
-                state->current_pitch -= 300;
-            if (state->current_pitch < target_pitch)
-                state->current_pitch += 200;
-            sample_set_freq(samples, 4, state->current_pitch);
-            state->last_frame = machine.primary_screen->frame_number();
+            if (state->m_current_pitch > target_pitch)
+                state->m_current_pitch -= 300;
+            if (state->m_current_pitch < target_pitch)
+                state->m_current_pitch += 200;
+            sample_set_freq(samples, 4, state->m_current_pitch);
+            state->m_last_frame = machine.primary_screen->frame_number();
         }
 
 		/* remember the previous value */
-		state->last_shift = state->current_shift;
+		state->m_last_shift = state->m_current_shift;
 	}
 
 	/* loud explosion - falling edge */
@@ -1446,8 +1446,8 @@ MACHINE_CONFIG_END
 static TIMER_CALLBACK( synced_sound_w )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->sound_fifo[state->sound_fifo_in] = param;
-	state->sound_fifo_in = (state->sound_fifo_in + 1) % 16;
+	state->m_sound_fifo[state->m_sound_fifo_in] = param;
+	state->m_sound_fifo_in = (state->m_sound_fifo_in + 1) % 16;
 }
 
 
@@ -1466,14 +1466,14 @@ static READ8_DEVICE_HANDLER( sound_porta_r )
 {
 	cinemat_state *state = device->machine().driver_data<cinemat_state>();
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
-	return state->sound_fifo[state->sound_fifo_out] | ((state->sound_fifo_in != state->sound_fifo_out) << 4);
+	return state->m_sound_fifo[state->m_sound_fifo_out] | ((state->m_sound_fifo_in != state->m_sound_fifo_out) << 4);
 }
 
 
 static READ8_DEVICE_HANDLER( sound_portb_r )
 {
 	cinemat_state *state = device->machine().driver_data<cinemat_state>();
-	return state->last_portb_write;
+	return state->m_last_portb_write;
 }
 
 
@@ -1481,19 +1481,19 @@ static WRITE8_DEVICE_HANDLER( sound_portb_w )
 {
 	cinemat_state *state = device->machine().driver_data<cinemat_state>();
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
-	if ((data & 1) != (state->last_portb_write & 1) && (data & 1) != 0)
-		state->sound_fifo_out = (state->sound_fifo_out + 1) % 16;
+	if ((data & 1) != (state->m_last_portb_write & 1) && (data & 1) != 0)
+		state->m_sound_fifo_out = (state->m_sound_fifo_out + 1) % 16;
 
 	/* watch for a 0->1 edge of bit 1 ("hard reset") to reset the FIFO */
-	if ((data & 2) != (state->last_portb_write & 2) && (data & 2) != 0)
-		state->sound_fifo_in = state->sound_fifo_out = 0;
+	if ((data & 2) != (state->m_last_portb_write & 2) && (data & 2) != 0)
+		state->m_sound_fifo_in = state->m_sound_fifo_out = 0;
 
 	/* bit 2 controls the global mute */
-	if ((data & 4) != (state->last_portb_write & 4))
+	if ((data & 4) != (state->m_last_portb_write & 4))
 		device->machine().sound().system_mute(data & 4);
 
 	/* remember the last value written */
-	state->last_portb_write = data;
+	state->m_last_portb_write = data;
 }
 
 
@@ -1541,8 +1541,8 @@ static MACHINE_RESET( demon_sound )
 	generic_init(machine, demon_sound_w);
 
 	/* reset the FIFO */
-	state->sound_fifo_in = state->sound_fifo_out = 0;
-	state->last_portb_write = 0xff;
+	state->m_sound_fifo_in = state->m_sound_fifo_out = 0;
+	state->m_last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
 	ay8910_set_volume(machine.device("ay1"), 0, 0);

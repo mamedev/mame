@@ -16,23 +16,23 @@
 typedef struct _warpwarp_sound_state warpwarp_sound_state;
 struct _warpwarp_sound_state
 {
-	INT16 *decay;
-	sound_stream *channel;
-	int sound_latch;
-	int music1_latch;
-	int music2_latch;
-	int sound_signal;
-	int sound_volume;
-	emu_timer *sound_volume_timer;
-	int music_signal;
-	int music_volume;
-	emu_timer *music_volume_timer;
-	int noise;
+	INT16 *m_decay;
+	sound_stream *m_channel;
+	int m_sound_latch;
+	int m_music1_latch;
+	int m_music2_latch;
+	int m_sound_signal;
+	int m_sound_volume;
+	emu_timer *m_sound_volume_timer;
+	int m_music_signal;
+	int m_music_volume;
+	emu_timer *m_music_volume_timer;
+	int m_noise;
 
-	int vcarry;
-	int vcount;
-	int mcarry;
-	int mcount;
+	int m_vcarry;
+	int m_vcount;
+	int m_mcarry;
+	int m_mcount;
 };
 
 INLINE warpwarp_sound_state *get_safe_token(device_t *device)
@@ -47,21 +47,21 @@ static TIMER_CALLBACK( sound_volume_decay )
 {
 	warpwarp_sound_state *state = (warpwarp_sound_state *)ptr;
 
-	if( --state->sound_volume < 0 )
-		state->sound_volume = 0;
+	if( --state->m_sound_volume < 0 )
+		state->m_sound_volume = 0;
 }
 
 WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
 
-	state->channel->update();
-	state->sound_latch = data & 0x0f;
-	state->sound_volume = 0x7fff; /* set sound_volume */
-	state->noise = 0x0000;  /* reset noise shifter */
+	state->m_channel->update();
+	state->m_sound_latch = data & 0x0f;
+	state->m_sound_volume = 0x7fff; /* set sound_volume */
+	state->m_noise = 0x0000;  /* reset noise shifter */
 
 	/* faster decay enabled? */
-	if( state->sound_latch & 8 )
+	if( state->m_sound_latch & 8 )
 	{
 		/*
          * R85(?) is 10k, Rb is 0, C92 is 1uF
@@ -73,7 +73,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          * 0.639 * 15k * 1uF -> 0.9585s
          */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		state->sound_volume_timer->adjust(period, 0, period);
+		state->m_sound_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -86,7 +86,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_sound_w )
          */
 		//attotime period = attotime::from_hz(32768) * 702900 / 100000;
 		attotime period = attotime::from_hz(32768) * 191700 / 100000;
-		state->sound_volume_timer->adjust(period, 0, period);
+		state->m_sound_volume_timer->adjust(period, 0, period);
 	}
 }
 
@@ -94,25 +94,25 @@ WRITE8_DEVICE_HANDLER( warpwarp_music1_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
 
-	state->channel->update();
-	state->music1_latch = data & 0x3f;
+	state->m_channel->update();
+	state->m_music1_latch = data & 0x3f;
 }
 
 static TIMER_CALLBACK( music_volume_decay )
 {
 	warpwarp_sound_state *state = (warpwarp_sound_state *)ptr;
-	if( --state->music_volume < 0 )
-		state->music_volume = 0;
+	if( --state->m_music_volume < 0 )
+		state->m_music_volume = 0;
 }
 
 WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
 {
 	warpwarp_sound_state *state = get_safe_token(device);
-	state->channel->update();
-	state->music2_latch = data & 0x3f;
-	state->music_volume = 0x7fff;
+	state->m_channel->update();
+	state->m_music2_latch = data & 0x3f;
+	state->m_music_volume = 0x7fff;
 	/* fast decay enabled? */
-	if( state->music2_latch & 0x10 )
+	if( state->m_music2_latch & 0x10 )
 	{
 		/*
          * Ra (R83?) is 10k, Rb is 0, C92 is 1uF
@@ -125,7 +125,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          * ...I'm sure this is off by one number of magnitude :/
          */
 		attotime period = attotime::from_hz(32768) * 95850 / 100000;
-		state->music_volume_timer->adjust(period, 0, period);
+		state->m_music_volume_timer->adjust(period, 0, period);
 	}
 	else
 	{
@@ -136,7 +136,7 @@ WRITE8_DEVICE_HANDLER( warpwarp_music2_w )
          */
 		//attotime period = attotime::from_hz(32768) * 3003300 / 100000;
 		attotime period = attotime::from_hz(32768) * 300330 / 100000;
-		state->music_volume_timer->adjust(period, 0, period);
+		state->m_music_volume_timer->adjust(period, 0, period);
 	}
 
 }
@@ -148,7 +148,7 @@ static STREAM_UPDATE( warpwarp_sound_update )
 
 	while (samples--)
 	{
-		*buffer++ = (state->sound_signal + state->music_signal) / 2;
+		*buffer++ = (state->m_sound_signal + state->m_music_signal) / 2;
 
 		/*
          * The music signal is selected at a rate of 2H (1.536MHz) from the
@@ -163,60 +163,60 @@ static STREAM_UPDATE( warpwarp_sound_update )
          * ...
          * 63 =   4 steps -> 48 kHz
          */
-		state->mcarry -= CLOCK_16H / (4 * (64 - state->music1_latch));
-		while( state->mcarry < 0 )
+		state->m_mcarry -= CLOCK_16H / (4 * (64 - state->m_music1_latch));
+		while( state->m_mcarry < 0 )
 		{
-			state->mcarry += CLOCK_16H;
-			state->mcount++;
-			state->music_signal = (state->mcount & ~state->music2_latch & 15) ? state->decay[state->music_volume] : 0;
+			state->m_mcarry += CLOCK_16H;
+			state->m_mcount++;
+			state->m_music_signal = (state->m_mcount & ~state->m_music2_latch & 15) ? state->m_decay[state->m_music_volume] : 0;
 			/* override by noise gate? */
-			if( (state->music2_latch & 32) && (state->noise & 0x8000) )
-				state->music_signal = state->decay[state->music_volume];
+			if( (state->m_music2_latch & 32) && (state->m_noise & 0x8000) )
+				state->m_music_signal = state->m_decay[state->m_music_volume];
 		}
 
 		/* clock 1V = 8kHz */
-		state->vcarry -= CLOCK_1V;
-		while (state->vcarry < 0)
+		state->m_vcarry -= CLOCK_1V;
+		while (state->m_vcarry < 0)
 		{
-			state->vcarry += CLOCK_16H;
-			state->vcount++;
+			state->m_vcarry += CLOCK_16H;
+			state->m_vcount++;
 
 			/* noise is clocked with raising edge of 2V */
-			if ((state->vcount & 3) == 2)
+			if ((state->m_vcount & 3) == 2)
 			{
 				/* bit0 = bit0 ^ !bit10 */
-				if ((state->noise & 1) == ((state->noise >> 10) & 1))
-					state->noise = (state->noise << 1) | 1;
+				if ((state->m_noise & 1) == ((state->m_noise >> 10) & 1))
+					state->m_noise = (state->m_noise << 1) | 1;
 				else
-					state->noise = state->noise << 1;
+					state->m_noise = state->m_noise << 1;
 			}
 
-			switch (state->sound_latch & 7)
+			switch (state->m_sound_latch & 7)
 			{
 			case 0: /* 4V */
-				state->sound_signal = (state->vcount & 0x04) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x04) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 1: /* 8V */
-				state->sound_signal = (state->vcount & 0x08) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x08) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 2: /* 16V */
-				state->sound_signal = (state->vcount & 0x10) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x10) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 3: /* 32V */
-				state->sound_signal = (state->vcount & 0x20) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = (state->m_vcount & 0x20) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 4: /* TONE1 */
-				state->sound_signal = !(state->vcount & 0x01) && !(state->vcount & 0x10) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x01) && !(state->m_vcount & 0x10) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 5: /* TONE2 */
-				state->sound_signal = !(state->vcount & 0x02) && !(state->vcount & 0x20) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x02) && !(state->m_vcount & 0x20) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			case 6: /* TONE3 */
-				state->sound_signal = !(state->vcount & 0x04) && !(state->vcount & 0x40) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = !(state->m_vcount & 0x04) && !(state->m_vcount & 0x40) ? state->m_decay[state->m_sound_volume] : 0;
 				break;
 			default: /* NOISE */
 				/* QH of 74164 #4V */
-				state->sound_signal = (state->noise & 0x8000) ? state->decay[state->sound_volume] : 0;
+				state->m_sound_signal = (state->m_noise & 0x8000) ? state->m_decay[state->m_sound_volume] : 0;
 			}
 
 		}
@@ -229,15 +229,15 @@ static DEVICE_START( warpwarp_sound )
 	running_machine &machine = device->machine();
 	int i;
 
-	state->decay = auto_alloc_array(machine, INT16, 32768);
+	state->m_decay = auto_alloc_array(machine, INT16, 32768);
 
 	for( i = 0; i < 0x8000; i++ )
-		state->decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
+		state->m_decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
+	state->m_channel = device->machine().sound().stream_alloc(*device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	state->sound_volume_timer = machine.scheduler().timer_alloc(FUNC(sound_volume_decay), state);
-	state->music_volume_timer = machine.scheduler().timer_alloc(FUNC(music_volume_decay), state);
+	state->m_sound_volume_timer = machine.scheduler().timer_alloc(FUNC(sound_volume_decay), state);
+	state->m_music_volume_timer = machine.scheduler().timer_alloc(FUNC(music_volume_decay), state);
 }
 
 

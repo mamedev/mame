@@ -166,22 +166,22 @@ static WRITE16_HANDLER( sound_command_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->pending_command = 1;
+		state->m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static CUSTOM_INPUT( country_sndpending_r )
 {
 	crshrace_state *state = field->port->machine().driver_data<crshrace_state>();
-	return state->pending_command;
+	return state->m_pending_command;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	crshrace_state *state = space->machine().driver_data<crshrace_state>();
-	state->pending_command = 0;
+	state->m_pending_command = 0;
 }
 
 
@@ -192,11 +192,11 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
 	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE_MEMBER(crshrace_state, videoram1)
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE_MEMBER(crshrace_state, m_videoram1)
 	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE_MEMBER(crshrace_state, videoram2)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE_MEMBER(crshrace_state, m_videoram2)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
@@ -428,7 +428,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	crshrace_state *state = device->machine().driver_data<crshrace_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -448,23 +448,23 @@ static MACHINE_START( crshrace )
 
 	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k053936 = machine.device("k053936");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k053936 = machine.device("k053936");
 
-	state->save_item(NAME(state->roz_bank));
-	state->save_item(NAME(state->gfxctrl));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->pending_command));
+	state->save_item(NAME(state->m_roz_bank));
+	state->save_item(NAME(state->m_gfxctrl));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_pending_command));
 }
 
 static MACHINE_RESET( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->roz_bank = 0;
-	state->gfxctrl = 0;
-	state->flipscreen = 0;
-	state->pending_command = 0;
+	state->m_roz_bank = 0;
+	state->m_gfxctrl = 0;
+	state->m_flipscreen = 0;
+	state->m_pending_command = 0;
 }
 
 static MACHINE_CONFIG_START( crshrace, crshrace_state )

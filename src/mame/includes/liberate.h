@@ -4,27 +4,27 @@ public:
 	liberate_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *paletteram;
-	UINT8 *spriteram;
-	UINT8 *scratchram;
-	UINT8 *charram;	/* prosoccr */
-	UINT8 *bg_vram; /* prosport */
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_paletteram;
+	UINT8 *m_spriteram;
+	UINT8 *m_scratchram;
+	UINT8 *m_charram;	/* prosoccr */
+	UINT8 *m_bg_vram; /* prosport */
 
-	UINT8 io_ram[16];
+	UINT8 m_io_ram[16];
 
-	int bank;
-	int latch;
-	UINT8 gfx_rom_readback;
-	int background_color;
-	int background_disable;
+	int m_bank;
+	int m_latch;
+	UINT8 m_gfx_rom_readback;
+	int m_background_color;
+	int m_background_disable;
 
-	tilemap_t *back_tilemap;
-	tilemap_t *fix_tilemap;
+	tilemap_t *m_back_tilemap;
+	tilemap_t *m_fix_tilemap;
 
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

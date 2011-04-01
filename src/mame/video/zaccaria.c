@@ -115,11 +115,11 @@ PALETTE_INIT( zaccaria )
 static TILE_GET_INFO( get_tile_info )
 {
 	zaccaria_state *state = machine.driver_data<zaccaria_state>();
-	UINT8 attr = state->videoram[tile_index + 0x400];
+	UINT8 attr = state->m_videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
-			state->videoram[tile_index] + ((attr & 0x03) << 8),
-			((attr & 0x0c) >> 2) + ((state->attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
+			state->m_videoram[tile_index] + ((attr & 0x03) << 8),
+			((attr & 0x0c) >> 2) + ((state->m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
 			0);
 }
 
@@ -134,9 +134,9 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( zaccaria )
 {
 	zaccaria_state *state = machine.driver_data<zaccaria_state>();
-	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_scroll_cols(state->bg_tilemap,32);
+	tilemap_set_scroll_cols(state->m_bg_tilemap,32);
 }
 
 
@@ -150,8 +150,8 @@ VIDEO_START( zaccaria )
 WRITE8_HANDLER( zaccaria_videoram_w )
 {
 	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( zaccaria_attributes_w )
@@ -159,18 +159,18 @@ WRITE8_HANDLER( zaccaria_attributes_w )
 	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	if (offset & 1)
 	{
-		if (state->attributesram[offset] != data)
+		if (state->m_attributesram[offset] != data)
 		{
 			int i;
 
 			for (i = offset / 2;i < 0x400;i += 32)
-				tilemap_mark_tile_dirty(state->bg_tilemap,i);
+				tilemap_mark_tile_dirty(state->m_bg_tilemap,i);
 		}
 	}
 	else
-		tilemap_set_scrolly(state->bg_tilemap,offset / 2,data);
+		tilemap_set_scrolly(state->m_bg_tilemap,offset / 2,data);
 
-	state->attributesram[offset] = data;
+	state->m_attributesram[offset] = data;
 }
 
 WRITE8_HANDLER( zaccaria_flip_screen_x_w )
@@ -246,13 +246,13 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( zaccaria )
 {
 	zaccaria_state *state = screen->machine().driver_data<zaccaria_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
-	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram2,2,1);
-	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram,1,0);
-	draw_sprites(screen->machine(),bitmap,cliprect,state->spriteram2+0x20,0,1);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram2,2,1);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram,1,0);
+	draw_sprites(screen->machine(),bitmap,cliprect,state->m_spriteram2+0x20,0,1);
 
 	return 0;
 }

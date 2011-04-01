@@ -48,8 +48,8 @@ public:
 	cmmb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 irq_mask;
+	UINT8 *m_videoram;
+	UINT8 m_irq_mask;
 };
 
 
@@ -61,7 +61,7 @@ static VIDEO_START( cmmb )
 static SCREEN_UPDATE( cmmb )
 {
 	cmmb_state *state = screen->machine().driver_data<cmmb_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x00000;
 
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( cmmb_output_w )
 			}
 			break;
 		case 0x03:
-			state->irq_mask = data & 0x80;
+			state->m_irq_mask = data & 0x80;
 			break;
 		case 0x07:
 			break;
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(cmmb_state, videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(cmmb_state, m_videoram)
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)

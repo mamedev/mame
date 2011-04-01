@@ -51,13 +51,13 @@ static void mcu_update_seed( running_machine &machine, UINT8 data )
 
 	if (!(data & 0x80))
 	{
-		state->mcu_seed += 0x83;
-		state->mcu_seed = (state->mcu_seed & 0x80) | (state->mcu_seed >> 1);
+		state->m_mcu_seed += 0x83;
+		state->m_mcu_seed = (state->m_mcu_seed & 0x80) | (state->m_mcu_seed >> 1);
 	}
 
-	state->mcu_seed += 0x19;
+	state->m_mcu_seed += 0x19;
 
-	//logerror("New seed: 0x%02x\n", state->mcu_seed);
+	//logerror("New seed: 0x%02x\n", state->m_mcu_seed);
 }
 
 
@@ -69,7 +69,7 @@ READ8_HANDLER( chaknpop_mcu_port_a_r )
 {
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 	//logerror("%04x: MCU port_a read\n", cpu_get_pc(&space->device()));
-	return state->mcu_result;
+	return state->m_mcu_result;
 }
 
 
@@ -91,30 +91,30 @@ WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 	chaknpop_state *state = space->machine().driver_data<chaknpop_state>();
 	UINT8 mcu_command;
 
-	mcu_command = data + state->mcu_seed;
-	state->mcu_result = 0;
+	mcu_command = data + state->m_mcu_seed;
+	state->m_mcu_result = 0;
 
 	if (mcu_command < 0x08)
 	{
 		mcu_update_seed(space->machine(), data);
 
-		state->mcu_result = mcu_data[state->mcu_select * 8 + mcu_command];
-		state->mcu_result -= state->mcu_seed;
+		state->m_mcu_result = mcu_data[state->m_mcu_select * 8 + mcu_command];
+		state->m_mcu_result -= state->m_mcu_seed;
 
-		mcu_update_seed(space->machine(), state->mcu_result);
+		mcu_update_seed(space->machine(), state->m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->m_mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
 		mcu_update_seed(space->machine(), data);
 
-		state->mcu_result = state->mcu_ram[0x380 + mcu_command];
-		state->mcu_result -= state->mcu_seed;
+		state->m_mcu_result = state->m_mcu_ram[0x380 + mcu_command];
+		state->m_mcu_result -= state->m_mcu_seed;
 
-		mcu_update_seed(space->machine(), state->mcu_result);
+		mcu_update_seed(space->machine(), state->m_mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(&space->device()), mcu_command, state->m_mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
@@ -122,9 +122,9 @@ WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 
 		if (mcu_command >= 0x40 && mcu_command < 0x60)
 		{
-			state->mcu_select = mcu_command - 0x40;
+			state->m_mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space->device()), state->mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(&space->device()), state->m_mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)

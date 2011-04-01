@@ -22,26 +22,26 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    hvc;
-	UINT8 *    videoram;
+	UINT8 *    m_hvc;
+	UINT8 *    m_videoram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* input */
-	UINT8 gear;
-	UINT8 track;
-	INT32 steering_buf;
-	INT32 steering_val;
-	UINT8 crash_en;
-	UINT8 crash_data;
-	UINT8 crash_data_en;	// IC D8
-	UINT8 ac_line;
-	INT32 last_steering_val;
+	UINT8 m_gear;
+	UINT8 m_track;
+	INT32 m_steering_buf;
+	INT32 m_steering_val;
+	UINT8 m_crash_en;
+	UINT8 m_crash_data;
+	UINT8 m_crash_data_en;	// IC D8
+	UINT8 m_ac_line;
+	INT32 m_last_steering_val;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *discrete;
+	device_t *m_maincpu;
+	device_t *m_discrete;
 };
 
 

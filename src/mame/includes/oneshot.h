@@ -6,23 +6,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *        sprites;
-	UINT16 *        bg_videoram;
-	UINT16 *        mid_videoram;
-	UINT16 *        fg_videoram;
-	UINT16 *        scroll;
+	UINT16 *        m_sprites;
+	UINT16 *        m_bg_videoram;
+	UINT16 *        m_mid_videoram;
+	UINT16 *        m_fg_videoram;
+	UINT16 *        m_scroll;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap, *mid_tilemap, *fg_tilemap;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_mid_tilemap;
+	tilemap_t  *m_fg_tilemap;
 
 	/* misc */
-	int gun_x_p1, gun_y_p1, gun_x_p2, gun_y_p2;
-	int gun_x_shift;
-	int p1_wobble, p2_wobble;
+	int m_gun_x_p1;
+	int m_gun_y_p1;
+	int m_gun_x_p2;
+	int m_gun_y_p2;
+	int m_gun_x_shift;
+	int m_p1_wobble;
+	int m_p2_wobble;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/oneshot.c -----------*/

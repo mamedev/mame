@@ -39,7 +39,7 @@ static INPUT_CHANGED( coin_inserted )
 	fcombat_state *state = field->port->machine().driver_data<fcombat_state>();
 
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -63,7 +63,7 @@ static READ8_HANDLER( fcombat_port01_r )
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return state->cocktail_flip ? input_port_read(space->machine(), "IN1") : input_port_read(space->machine(), "IN0");
+	return state->m_cocktail_flip ? input_port_read(space->machine(), "IN1") : input_port_read(space->machine(), "IN0");
 }
 
 
@@ -72,19 +72,19 @@ static READ8_HANDLER( fcombat_port01_r )
 static WRITE8_HANDLER(e900_w)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	state->fcombat_sh = data;
+	state->m_fcombat_sh = data;
 }
 
 static WRITE8_HANDLER(ea00_w)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	state->fcombat_sv = (state->fcombat_sv & 0xff00) | data;
+	state->m_fcombat_sv = (state->m_fcombat_sv & 0xff00) | data;
 }
 
 static WRITE8_HANDLER(eb00_w)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	state->fcombat_sv = (state->fcombat_sv & 0xff) | (data << 8);
+	state->m_fcombat_sv = (state->m_fcombat_sv & 0xff) | (data << 8);
 }
 
 
@@ -93,20 +93,20 @@ static WRITE8_HANDLER(eb00_w)
 static WRITE8_HANDLER(ec00_w)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	state->tx = data;
+	state->m_tx = data;
 }
 
 static WRITE8_HANDLER(ed00_w)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	state->ty = data;
+	state->m_ty = data;
 }
 
 static READ8_HANDLER(e300_r)
 {
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
-	int wx = (state->tx + state->fcombat_sh) / 16;
-	int wy = (state->ty * 2 + state->fcombat_sv) / 16;
+	int wx = (state->m_tx + state->m_fcombat_sh) / 16;
+	int wy = (state->m_ty * 2 + state->m_fcombat_sv) / 16;
 
 	return space->machine().region("user2")->base()[wx * 32 * 16 + wy];
 }
@@ -119,8 +119,8 @@ static WRITE8_HANDLER(ee00_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, videoram, videoram_size)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
 	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
@@ -269,30 +269,30 @@ static MACHINE_START( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->cocktail_flip));
-	state->save_item(NAME(state->char_palette));
-	state->save_item(NAME(state->sprite_palette));
-	state->save_item(NAME(state->char_bank));
-	state->save_item(NAME(state->fcombat_sh));
-	state->save_item(NAME(state->fcombat_sv));
-	state->save_item(NAME(state->tx));
-	state->save_item(NAME(state->ty));
+	state->save_item(NAME(state->m_cocktail_flip));
+	state->save_item(NAME(state->m_char_palette));
+	state->save_item(NAME(state->m_sprite_palette));
+	state->save_item(NAME(state->m_char_bank));
+	state->save_item(NAME(state->m_fcombat_sh));
+	state->save_item(NAME(state->m_fcombat_sv));
+	state->save_item(NAME(state->m_tx));
+	state->save_item(NAME(state->m_ty));
 }
 
 static MACHINE_RESET( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
 
-	state->cocktail_flip = 0;
-	state->char_palette = 0;
-	state->sprite_palette = 0;
-	state->char_bank = 0;
-	state->fcombat_sh = 0;
-	state->fcombat_sv = 0;
-	state->tx = 0;
-	state->ty = 0;
+	state->m_cocktail_flip = 0;
+	state->m_char_palette = 0;
+	state->m_sprite_palette = 0;
+	state->m_char_bank = 0;
+	state->m_fcombat_sh = 0;
+	state->m_fcombat_sv = 0;
+	state->m_tx = 0;
+	state->m_ty = 0;
 }
 
 static MACHINE_CONFIG_START( fcombat, fcombat_state )

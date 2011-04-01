@@ -241,9 +241,9 @@ public:
 	gticlub_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *work_ram;
-	UINT32 *sharc_dataram_0;
-	UINT32 *sharc_dataram_1;
+	UINT32 *m_work_ram;
+	UINT32 *m_sharc_dataram_0;
+	UINT32 *m_sharc_dataram_1;
 };
 
 
@@ -397,11 +397,11 @@ static MACHINE_START( gticlub )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->work_ram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE_MEMBER(gticlub_state, work_ram)		/* Work RAM */
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE_MEMBER(gticlub_state, m_work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
@@ -437,25 +437,25 @@ ADDRESS_MAP_END
 static READ32_HANDLER( dsp_dataram0_r )
 {
 	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	return state->sharc_dataram_0[offset] & 0xffff;
+	return state->m_sharc_dataram_0[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram0_w )
 {
 	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	state->sharc_dataram_0[offset] = data;
+	state->m_sharc_dataram_0[offset] = data;
 }
 
 static READ32_HANDLER( dsp_dataram1_r )
 {
 	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	return state->sharc_dataram_1[offset] & 0xffff;
+	return state->m_sharc_dataram_1[offset] & 0xffff;
 }
 
 static WRITE32_HANDLER( dsp_dataram1_w )
 {
 	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	state->sharc_dataram_1[offset] = data;
+	state->m_sharc_dataram_1[offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32 )
@@ -1156,7 +1156,7 @@ static DRIVER_INIT(gticlub)
 
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 
-	state->sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
+	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 
 	K001005_preprocess_texture_data(machine.region("gfx1")->base(), machine.region("gfx1")->bytes(), 1);
 }
@@ -1169,8 +1169,8 @@ static DRIVER_INIT(hangplt)
 	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
 	set_cgboard_texture_bank(machine, 1, "bank6", machine.region("user5")->base());
 
-	state->sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
-	state->sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
+	state->m_sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
+	state->m_sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
 }
 
 /*************************************************************************/

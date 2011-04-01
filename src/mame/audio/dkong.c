@@ -1116,7 +1116,7 @@ static SOUND_START( dkong)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
 
-	state->snd_rom = machine.region("soundcpu")->base();
+	state->m_snd_rom = machine.region("soundcpu")->base();
 }
 
 
@@ -1245,7 +1245,7 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
 	dkong_state *state = device->machine().driver_data<dkong_state>();
-	UINT8 page = latch8_r(state->dev_vp2, 0) & 0x47;
+	UINT8 page = latch8_r(state->m_dev_vp2, 0) & 0x47;
 
 	if ( page & 0x40 )
 	{
@@ -1254,7 +1254,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	else
 	{
 		/* printf("%s:rom access\n",device->machine().describe_context()); */
-		return (state->snd_rom[0x1000 + (page & 7) * 256 + offset]);
+		return (state->m_snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }
 

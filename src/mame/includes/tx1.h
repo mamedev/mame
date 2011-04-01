@@ -104,22 +104,22 @@ public:
 	tx1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	math_t math;
-	sn74s516_t sn74s516;
-	UINT8 *z80_ram;
-	UINT8 ppi_latch_a;
-	UINT8 ppi_latch_b;
-	UINT32 ts;
-	UINT16 *math_ram;
-	vregs_t vregs;
-	UINT16 *vram;
-	UINT16 *objram;
-	UINT16 *rcram;
-	emu_timer *interrupt_timer;
-	UINT8 *chr_bmp;
-	UINT8 *obj_bmp;
-	UINT8 *rod_bmp;
-	bitmap_t *bitmap;
+	math_t m_math;
+	sn74s516_t m_sn74s516;
+	UINT8 *m_z80_ram;
+	UINT8 m_ppi_latch_a;
+	UINT8 m_ppi_latch_b;
+	UINT32 m_ts;
+	UINT16 *m_math_ram;
+	vregs_t m_vregs;
+	UINT16 *m_vram;
+	UINT16 *m_objram;
+	UINT16 *m_rcram;
+	emu_timer *m_interrupt_timer;
+	UINT8 *m_chr_bmp;
+	UINT8 *m_obj_bmp;
+	UINT8 *m_rod_bmp;
+	bitmap_t *m_bitmap;
 };
 
 

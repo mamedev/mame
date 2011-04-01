@@ -84,7 +84,7 @@ static WRITE8_HANDLER( flower_irq_ack )
 static WRITE8_HANDLER( sn_irq_enable_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
-	*state->sn_irq_enable = data;
+	*state->m_sn_irq_enable = data;
 
 	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
 }
@@ -92,7 +92,7 @@ static WRITE8_HANDLER( sn_irq_enable_w )
 static INTERRUPT_GEN( sn_irq )
 {
 	flower_state *state = device->machine().driver_data<flower_state>();
-	if ((*state->sn_irq_enable & 1) == 1)
+	if ((*state->m_sn_irq_enable & 1) == 1)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	flower_state *state = space->machine().driver_data<flower_state>();
 	soundlatch_w(space, 0, data);
-	if ((*state->sn_nmi_enable & 1) == 1)
+	if ((*state->m_sn_nmi_enable & 1) == 1)
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -118,20 +118,20 @@ static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8 )
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("IN1CPU0")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc000, 0xddff) AM_SHARE("share1") AM_RAM
-	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE_MEMBER(flower_state, spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_SHARE("share3") AM_RAM_WRITE(flower_textram_w)  AM_BASE_MEMBER(flower_state, textram)
+	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE_MEMBER(flower_state, m_spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_SHARE("share3") AM_RAM_WRITE(flower_textram_w)  AM_BASE_MEMBER(flower_state, m_textram)
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share4") AM_RAM //only cleared?
-	AM_RANGE(0xf000, 0xf1ff) AM_SHARE("share5") AM_RAM_WRITE(flower_bg0ram_w)   AM_BASE_MEMBER(flower_state, bg0ram)
-	AM_RANGE(0xf200, 0xf200) AM_SHARE("share6") AM_RAM  AM_BASE_MEMBER(flower_state, bg0_scroll)
-	AM_RANGE(0xf800, 0xf9ff) AM_SHARE("share7") AM_RAM_WRITE(flower_bg1ram_w)  AM_BASE_MEMBER(flower_state, bg1ram)
-	AM_RANGE(0xfa00, 0xfa00) AM_SHARE("share8") AM_RAM AM_BASE_MEMBER(flower_state, bg1_scroll)
+	AM_RANGE(0xf000, 0xf1ff) AM_SHARE("share5") AM_RAM_WRITE(flower_bg0ram_w)   AM_BASE_MEMBER(flower_state, m_bg0ram)
+	AM_RANGE(0xf200, 0xf200) AM_SHARE("share6") AM_RAM  AM_BASE_MEMBER(flower_state, m_bg0_scroll)
+	AM_RANGE(0xf800, 0xf9ff) AM_SHARE("share7") AM_RAM_WRITE(flower_bg1ram_w)  AM_BASE_MEMBER(flower_state, m_bg1ram)
+	AM_RANGE(0xfa00, 0xfa00) AM_SHARE("share8") AM_RAM AM_BASE_MEMBER(flower_state, m_bg1_scroll)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sn_irq_enable_w) AM_BASE_MEMBER(flower_state, sn_irq_enable)
-	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE_MEMBER(flower_state, sn_nmi_enable)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sn_irq_enable_w) AM_BASE_MEMBER(flower_state, m_sn_irq_enable)
+	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE_MEMBER(flower_state, m_sn_nmi_enable)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound1_w)
 	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound2_w)

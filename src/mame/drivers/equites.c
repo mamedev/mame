@@ -399,7 +399,7 @@ D                                                                               
 static TIMER_CALLBACK( equites_nmi_callback )
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
@@ -407,22 +407,22 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 	equites_state *state = machine.driver_data<equites_state>();
 	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
-	msm5232_set_clock(state->msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
-//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", state->eq8155_port_c, state->eq8155_port_a, state->ay_port_a, state->ay_port_b, state->eq_cymbal_ctrl & 15);
+	msm5232_set_clock(state->m_msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", state->m_eq8155_port_c, state->m_eq8155_port_a, state->m_ay_port_a, state->m_ay_port_b, state->m_eq_cymbal_ctrl & 15);
 
-	state->cymvol *= 0.94f;
-	state->hihatvol *= 0.94f;
+	state->m_cymvol *= 0.94f;
+	state->m_hihatvol *= 0.94f;
 
-	state->msm->set_output_gain(10, state->hihatvol + state->cymvol * (state->ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	state->m_msm->set_output_gain(10, state->m_hihatvol + state->m_cymvol * (state->m_ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
 {
 	equites_state *state = machine.driver_data<equites_state>();
-	state->nmi_timer = machine.scheduler().timer_alloc(FUNC(equites_nmi_callback));
+	state->m_nmi_timer = machine.scheduler().timer_alloc(FUNC(equites_nmi_callback));
 
-	state->adjuster_timer = machine.scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
-	state->adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	state->m_adjuster_timer = machine.scheduler().timer_alloc(FUNC(equites_frq_adjuster_callback));
+	state->m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 static WRITE8_HANDLER(equites_c0f8_w)
@@ -432,17 +432,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(state->audio_cpu, I8085_RST75_LINE);
+			generic_pulse_irq_line(state->m_audio_cpu, I8085_RST75_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			device_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
+			device_set_input_line(state->m_audio_cpu, I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -450,7 +450,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 			break;
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
-			state->sound_prom_address = (state->sound_prom_address + 1) & 0x1f;
+			state->m_sound_prom_address = (state->m_sound_prom_address + 1) & 0x1f;
 //       at this point, the 5-bit value
 //       goes to an op-amp and to the base of a transistor. The transistor is part
 //       of a resonator that is used to generate the M5232 clock. The PROM doesn't
@@ -480,18 +480,18 @@ static WRITE8_DEVICE_HANDLER( equites_8910porta_w )
 
 	// bongo 1
 	sample_set_volume(device, 0, ((data & 0x30) >> 4) * 0.33);
-	if (data & ~state->ay_port_a & 0x80)
+	if (data & ~state->m_ay_port_a & 0x80)
 		sample_start(device, 0, 0, 0);
 
 	// bongo 2
 	sample_set_volume(device, 1, (data & 0x03) * 0.33);
-	if (data & ~state->ay_port_a & 0x08)
+	if (data & ~state->m_ay_port_a & 0x08)
 		sample_start(device, 1, 1, 0);
 
-	state->ay_port_a = data;
+	state->m_ay_port_a = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)", state->hihat, BIT(state->ay_port_b, 6), state->cymbal, state->ay_port_b & 3);
+popmessage("HH %d(%d) CYM %d(%d)", state->m_hihat, BIT(state->m_ay_port_b, 6), state->m_cymbal, state->m_ay_port_b & 3);
 #endif
 }
 
@@ -499,42 +499,42 @@ static WRITE8_DEVICE_HANDLER( equites_8910portb_w )
 {
 	equites_state *state = device->machine().driver_data<equites_state>();
 #if POPDRUMKIT
-if (data & ~state->ay_port_b & 0x08) state->cymbal++;
-if (data & ~state->ay_port_b & 0x04) state->hihat++;
+if (data & ~state->m_ay_port_b & 0x08) state->m_cymbal++;
+if (data & ~state->m_ay_port_b & 0x04) state->m_hihat++;
 #endif
 
 	// bongo 3
 	sample_set_volume(device, 2, ((data & 0x30)>>4) * 0.33);
-	if (data & ~state->ay_port_b & 0x80)
+	if (data & ~state->m_ay_port_b & 0x80)
 		sample_start(device, 2, 2, 0);
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.
-//  if (data & ~state->ay_port_b & 0x08)   cymbal hit trigger
-//  if (data & ~state->ay_port_b & 0x04)   hi-hat hit trigger
+//  if (data & ~state->m_ay_port_b & 0x08)   cymbal hit trigger
+//  if (data & ~state->m_ay_port_b & 0x04)   hi-hat hit trigger
 //  data & 3   cymbal volume
 //  data & 0x40  hi-hat enable
 
-	if (data & ~state->ay_port_b & 0x08)
-		state->cymvol = 1.0f;
+	if (data & ~state->m_ay_port_b & 0x08)
+		state->m_cymvol = 1.0f;
 
-	if (data & ~state->ay_port_b & 0x04)
-		state->hihatvol = 0.8f;
+	if (data & ~state->m_ay_port_b & 0x04)
+		state->m_hihatvol = 0.8f;
 
 	if (~data & 0x40)
-		state->hihatvol = 0.0f;
+		state->m_hihatvol = 0.0f;
 
-	state->ay_port_b = data;
+	state->m_ay_port_b = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)",state->hihat,BIT(state->ay_port_b,6),state->cymbal,state->ay_port_b & 3);
+popmessage("HH %d(%d) CYM %d(%d)",state->m_hihat,BIT(state->m_ay_port_b,6),state->m_cymbal,state->m_ay_port_b & 3);
 #endif
 }
 
 static WRITE8_HANDLER(equites_cymbal_ctrl_w)
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	state->eq_cymbal_ctrl++;
+	state->m_eq_cymbal_ctrl++;
 }
 
 
@@ -548,24 +548,24 @@ static void equites_update_dac( running_machine &machine )
 	// then it's disabled again.
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
-	if (state->eq8155_port_b & 1)
-		dac_signed_data_w(state->dac_1, state->dac_latch);
+	if (state->m_eq8155_port_b & 1)
+		dac_signed_data_w(state->m_dac_1, state->m_dac_latch);
 
-	if (state->eq8155_port_b & 2)
-		dac_signed_data_w(state->dac_2, state->dac_latch);
+	if (state->m_eq8155_port_b & 2)
+		dac_signed_data_w(state->m_dac_2, state->m_dac_latch);
 }
 
 static WRITE8_HANDLER( equites_dac_latch_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	state->dac_latch = data << 2;
+	state->m_dac_latch = data << 2;
 	equites_update_dac(space->machine());
 }
 
 static WRITE8_HANDLER( equites_8155_portb_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	state->eq8155_port_b = data;
+	state->m_eq8155_port_b = data;
 	equites_update_dac(space->machine());
 }
 
@@ -597,36 +597,36 @@ static WRITE8_HANDLER(equites_8155_w)
 	{
 		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
 			if (((data >> 6) & 3) == 3)
-				state->nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / state->timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / state->timer_count));
+				state->m_nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / state->m_timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / state->m_timer_count));
 			break;
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
-			state->eq8155_port_a = data;
-			state->msm->set_output_gain(0, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->msm->set_output_gain(1, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->msm->set_output_gain(2, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->msm->set_output_gain(3, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->msm->set_output_gain(4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->msm->set_output_gain(5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->msm->set_output_gain(6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->msm->set_output_gain(7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->m_eq8155_port_a = data;
+			state->m_msm->set_output_gain(0, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->m_msm->set_output_gain(1, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->m_msm->set_output_gain(2, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->m_msm->set_output_gain(3, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			state->m_msm->set_output_gain(4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->m_msm->set_output_gain(5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->m_msm->set_output_gain(6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			state->m_msm->set_output_gain(7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
 			equites_8155_portb_w(space, 0, data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
-			state->eq8155_port_c = data;
-			state->msm->set_output_gain(8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
+			state->m_eq8155_port_c = data;
+			state->m_msm->set_output_gain(8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
-				state->msm->set_output_gain(9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
+				state->m_msm->set_output_gain(9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
 			else
-				state->msm->set_output_gain(9, 0);	/* SOLO 16' from msm5232 */
+				state->m_msm->set_output_gain(9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
 		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
-			state->timer_count = (state->timer_count & 0xff00) | data;
+			state->m_timer_count = (state->m_timer_count & 0xff00) | data;
 			break;
 		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
-			state->timer_count = (state->timer_count & 0x00ff) | ((data & 0x3f) << 8);
+			state->m_timer_count = (state->m_timer_count & 0x00ff) | ((data & 0x3f) << 8);
 			break;
 	}
 }
@@ -645,19 +645,19 @@ static READ16_HANDLER(hvoltage_debug_r)
 static CUSTOM_INPUT( gekisou_unknown_status )
 {
 	equites_state *state = field->port->machine().driver_data<equites_state>();
-	return state->unknown_bit;
+	return state->m_unknown_bit;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_0_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	state->unknown_bit = 0;
+	state->m_unknown_bit = 0;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_1_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	state->unknown_bit = 1;
+	state->m_unknown_bit = 1;
 }
 
 /******************************************************************************/
@@ -667,35 +667,35 @@ static WRITE16_HANDLER( gekisou_unknown_1_w )
 static READ16_HANDLER(equites_spriteram_kludge_r)
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	if (state->spriteram[0] == 0x5555)
+	if (state->m_spriteram[0] == 0x5555)
 		return 0;
 	else
-		return state->spriteram[0];
+		return state->m_spriteram[0];
 }
 
 static READ16_HANDLER(mcu_r)
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	return 0xff00 | state->mcu_ram[offset];
+	return 0xff00 | state->m_mcu_ram[offset];
 }
 
 static WRITE16_HANDLER(mcu_w)
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
-		state->mcu_ram[offset] = data & 0xff;
+		state->m_mcu_ram[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	device_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(state->m_mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
 	equites_state *state = space->machine().driver_data<equites_state>();
-	device_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
+	device_set_input_line(state->m_mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -704,10 +704,10 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, bg_videoram)
+	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, m_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
-	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram)
+	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE_MEMBER(equites_state, m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE(equites_flip0_w)
@@ -725,7 +725,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_MEMBER(equites_state, workram) // work RAM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_MEMBER(equites_state, m_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
@@ -740,10 +740,10 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, bg_videoram)
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, m_bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
-	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram)	// sprite RAM 0,1
-	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram_2)	// sprite RAM 2 (8-bit)
+	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE_MEMBER(equites_state, m_spriteram)	// sprite RAM 0,1
+	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE_MEMBER(equites_state, m_spriteram_2)	// sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -765,7 +765,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(equites_state, mcu_ram) /* main CPU shared RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(equites_state, m_mcu_ram) /* main CPU shared RAM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1191,31 +1191,31 @@ static MACHINE_START( equites )
 {
 	equites_state *state = machine.driver_data<equites_state>();
 
-	state->mcu = machine.device("mcu");
-	state->audio_cpu = machine.device("audiocpu");
-	state->msm = machine.device<msm5232_device>("msm");
-	state->dac_1 = machine.device("dac1");
-	state->dac_2 = machine.device("dac2");
+	state->m_mcu = machine.device("mcu");
+	state->m_audio_cpu = machine.device("audiocpu");
+	state->m_msm = machine.device<msm5232_device>("msm");
+	state->m_dac_1 = machine.device("dac1");
+	state->m_dac_2 = machine.device("dac2");
 
-	state->save_item(NAME(state->fg_char_bank));
-	state->save_item(NAME(state->bgcolor));
-	state->save_item(NAME(state->splndrbt_bg_scrollx));
-	state->save_item(NAME(state->splndrbt_bg_scrolly));
-	state->save_item(NAME(state->sound_prom_address));
-	state->save_item(NAME(state->dac_latch));
-	state->save_item(NAME(state->eq8155_port_b));
-	state->save_item(NAME(state->eq8155_port_a));
-	state->save_item(NAME(state->eq8155_port_c));
-	state->save_item(NAME(state->ay_port_a));
-	state->save_item(NAME(state->ay_port_b));
-	state->save_item(NAME(state->eq_cymbal_ctrl));
-	state->save_item(NAME(state->cymvol));
-	state->save_item(NAME(state->hihatvol));
-	state->save_item(NAME(state->timer_count));
-	state->save_item(NAME(state->unknown_bit));
+	state->save_item(NAME(state->m_fg_char_bank));
+	state->save_item(NAME(state->m_bgcolor));
+	state->save_item(NAME(state->m_splndrbt_bg_scrollx));
+	state->save_item(NAME(state->m_splndrbt_bg_scrolly));
+	state->save_item(NAME(state->m_sound_prom_address));
+	state->save_item(NAME(state->m_dac_latch));
+	state->save_item(NAME(state->m_eq8155_port_b));
+	state->save_item(NAME(state->m_eq8155_port_a));
+	state->save_item(NAME(state->m_eq8155_port_c));
+	state->save_item(NAME(state->m_ay_port_a));
+	state->save_item(NAME(state->m_ay_port_b));
+	state->save_item(NAME(state->m_eq_cymbal_ctrl));
+	state->save_item(NAME(state->m_cymvol));
+	state->save_item(NAME(state->m_hihatvol));
+	state->save_item(NAME(state->m_timer_count));
+	state->save_item(NAME(state->m_unknown_bit));
 #if POPDRUMKIT
-	state->save_item(NAME(state->hihat));
-	state->save_item(NAME(state->cymbal));
+	state->save_item(NAME(state->m_hihat));
+	state->save_item(NAME(state->m_cymbal));
 #endif
 }
 
@@ -1225,24 +1225,24 @@ static MACHINE_RESET( equites )
 
 	flip_screen_set(machine, 0);
 
-	state->fg_char_bank = 0;
-	state->bgcolor = 0;
-	state->splndrbt_bg_scrollx = 0;
-	state->splndrbt_bg_scrolly = 0;
-	state->sound_prom_address = 0;
-	state->dac_latch = 0;
-	state->eq8155_port_b = 0;
-	state->eq8155_port_a = 0;
-	state->eq8155_port_c = 0;
-	state->ay_port_a = 0;
-	state->ay_port_b = 0;
-	state->eq_cymbal_ctrl = 0;
-	state->cymvol = 0.0;
-	state->hihatvol = 0.0;
-	state->timer_count = 0;
-	state->unknown_bit = 0;
+	state->m_fg_char_bank = 0;
+	state->m_bgcolor = 0;
+	state->m_splndrbt_bg_scrollx = 0;
+	state->m_splndrbt_bg_scrolly = 0;
+	state->m_sound_prom_address = 0;
+	state->m_dac_latch = 0;
+	state->m_eq8155_port_b = 0;
+	state->m_eq8155_port_a = 0;
+	state->m_eq8155_port_c = 0;
+	state->m_ay_port_a = 0;
+	state->m_ay_port_b = 0;
+	state->m_eq_cymbal_ctrl = 0;
+	state->m_cymvol = 0.0;
+	state->m_hihatvol = 0.0;
+	state->m_timer_count = 0;
+	state->m_unknown_bit = 0;
 #if POPDRUMKIT
-	state->hihat = state->cymbal = 0;
+	state->m_hihat = state->m_cymbal = 0;
 #endif
 }
 

@@ -97,13 +97,13 @@ WRITE8_HANDLER( asteroid_bank_switch_w )
 	asteroid_state *state = space->machine().driver_data<asteroid_state>();
 	if (data & 4)
 	{
-		memory_set_bankptr(space->machine(), "bank1", state->ram2);
-		memory_set_bankptr(space->machine(), "bank2", state->ram1);
+		memory_set_bankptr(space->machine(), "bank1", state->m_ram2);
+		memory_set_bankptr(space->machine(), "bank2", state->m_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank1", state->ram1);
-		memory_set_bankptr(space->machine(), "bank2", state->ram2);
+		memory_set_bankptr(space->machine(), "bank1", state->m_ram1);
+		memory_set_bankptr(space->machine(), "bank2", state->m_ram2);
 	}
 
 	set_led_status (space->machine(), 0, ~data & 0x02);
@@ -116,13 +116,13 @@ WRITE8_HANDLER( astdelux_bank_switch_w )
 	asteroid_state *state = space->machine().driver_data<asteroid_state>();
 	if (data & 0x80)
 	{
-		memory_set_bankptr(space->machine(), "bank1", state->ram2);
-		memory_set_bankptr(space->machine(), "bank2", state->ram1);
+		memory_set_bankptr(space->machine(), "bank1", state->m_ram2);
+		memory_set_bankptr(space->machine(), "bank2", state->m_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine(), "bank1", state->ram1);
-		memory_set_bankptr(space->machine(), "bank2", state->ram2);
+		memory_set_bankptr(space->machine(), "bank1", state->m_ram1);
+		memory_set_bankptr(space->machine(), "bank2", state->m_ram2);
 	}
 }
 

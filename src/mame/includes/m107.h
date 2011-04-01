@@ -19,18 +19,18 @@ public:
 	m107_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *scanline_timer;
-	UINT8 irq_vectorbase;
-	int irqvector;
-	int sound_status;
-	UINT16 *vram_data;
-	UINT8 spritesystem;
-	UINT8 sprite_display;
-	UINT16 raster_irq_position;
-	pf_layer_info pf_layer[4];
-	UINT16 control[0x10];
-	UINT16 *spriteram;
-	UINT16 *buffered_spriteram;
+	emu_timer *m_scanline_timer;
+	UINT8 m_irq_vectorbase;
+	int m_irqvector;
+	int m_sound_status;
+	UINT16 *m_vram_data;
+	UINT8 m_spritesystem;
+	UINT8 m_sprite_display;
+	UINT16 m_raster_irq_position;
+	pf_layer_info m_pf_layer[4];
+	UINT16 m_control[0x10];
+	UINT16 *m_spriteram;
+	UINT16 *m_buffered_spriteram;
 };
 
 

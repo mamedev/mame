@@ -37,43 +37,43 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     main_ram;
-	UINT8 *     colorram;
-	size_t      main_ram_size;
+	UINT8 *     m_main_ram;
+	UINT8 *     m_colorram;
+	size_t      m_main_ram_size;
 
 	/* sound-related */
-	UINT8       port_1_last;
-	UINT8       port_2_last;
-	UINT8       port_1_last_extra;
-	UINT8       port_2_last_extra;
-	UINT8       port_3_last_extra;
+	UINT8       m_port_1_last;
+	UINT8       m_port_2_last;
+	UINT8       m_port_1_last_extra;
+	UINT8       m_port_2_last_extra;
+	UINT8       m_port_3_last_extra;
 
 	/* misc game specific */
-	UINT16      phantom2_cloud_counter;
-	UINT8       invaders_flip_screen;
-	UINT8       rev_shift_res;
-	UINT8       maze_tone_timing_state;	/* output of IC C1, pin 5 */
-	UINT8       desertgun_controller_select;
-	UINT8       clowns_controller_select;
+	UINT16      m_phantom2_cloud_counter;
+	UINT8       m_invaders_flip_screen;
+	UINT8       m_rev_shift_res;
+	UINT8       m_maze_tone_timing_state;	/* output of IC C1, pin 5 */
+	UINT8       m_desertgun_controller_select;
+	UINT8       m_clowns_controller_select;
 
-	UINT8       spcenctr_strobe_state;
-	UINT8       spcenctr_trench_width;
-	UINT8       spcenctr_trench_center;
-	UINT8       spcenctr_trench_slope[16];  /* 16x4 bit RAM */
+	UINT8       m_spcenctr_strobe_state;
+	UINT8       m_spcenctr_trench_width;
+	UINT8       m_spcenctr_trench_center;
+	UINT8       m_spcenctr_trench_slope[16];  /* 16x4 bit RAM */
 
 	/* timer */
-	emu_timer   *interrupt_timer;
+	emu_timer   *m_interrupt_timer;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *mb14241;
-	device_t *samples;
-	device_t *samples1;
-	device_t *samples2;
-	device_t *sn1;
-	device_t *sn2;
-	device_t *sn;
-	device_t *discrete;
+	device_t *m_maincpu;
+	device_t *m_mb14241;
+	device_t *m_samples;
+	device_t *m_samples1;
+	device_t *m_samples2;
+	device_t *m_sn1;
+	device_t *m_sn2;
+	device_t *m_sn;
+	device_t *m_discrete;
 };
 
 

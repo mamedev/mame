@@ -11,21 +11,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoctrl;
-	UINT8 *  scrollram;
-	UINT8 *  paletteram;
+	UINT8 *  m_videoctrl;
+	UINT8 *  m_scrollram;
+	UINT8 *  m_paletteram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	int      irq_enable;
-	UINT8    *rambank;
-	UINT8    *spritebank;
+	int      m_irq_enable;
+	UINT8    *m_rambank;
+	UINT8    *m_spritebank;
 
 	/* devices */
-	device_t *mastercpu;
-	device_t *slavecpu;
+	device_t *m_mastercpu;
+	device_t *m_slavecpu;
 };
 
 

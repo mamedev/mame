@@ -8,7 +8,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	boogwing_state *state = machine.driver_data<boogwing_state>();
 	int offs;
 	int flipscreen = !flip_screen_get(machine);
-	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
 	{
@@ -125,7 +125,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		while (multi >= 0)
 		{
 			decocomn_pdrawgfx(
-					state->decocomn,
+					state->m_decocomn,
 					bitmap, cliprect, machine.gfx[gfx_region],
 					sprite - multi * inc,
 					colour,
@@ -141,15 +141,15 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( boogwing )
 {
 	boogwing_state *state = screen->machine().driver_data<boogwing_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	flip_screen_set(screen->machine(), BIT(flip, 7));
-	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
-	decocomn_clear_sprite_priority_bitmap(state->decocomn);
+	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0x400]); /* pen not confirmed */
 	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 
@@ -157,34 +157,34 @@ SCREEN_UPDATE( boogwing )
 	// bit&0x4 combines playfields
 	if ((priority & 0x7) == 0x5)
 	{
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_12_combine_draw(state->deco_tilegen2, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_12_combine_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 8);
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x3)
 	{
-		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
-		// deco16ic_tilemap_3_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 32);
+		// deco16ic_tilemap_3_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 32);
 	}
 	else
 	{
-		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 8);
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 32);
 	}
 
 	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 3);
 	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram2.u16, 4);
 
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -208,8 +208,8 @@ static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
 	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
-	device_set_input_line_vector(state->maincpu, 0, data);
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line_vector(state->m_maincpu, 0, data);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -217,10 +217,10 @@ static WRITE8_HANDLER( rallyx_bang_w )
 {
 	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
-	if (data == 0 && state->last_bang != 0)
-		sample_start(state->samples, 0, 0, 0);
+	if (data == 0 && state->m_last_bang != 0)
+		sample_start(state->m_samples, 0, 0, 0);
 
-	state->last_bang = data;
+	state->m_last_bang = data;
 }
 
 static WRITE8_HANDLER( rallyx_latch_w )
@@ -235,9 +235,9 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x01:	/* INT ON */
-			cpu_interrupt_enable(state->maincpu, bit);
+			cpu_interrupt_enable(state->m_maincpu, bit);
 			if (!bit)
-				device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+				device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x01:	/* INTST */
-			cpu_interrupt_enable(state->maincpu, bit);
+			cpu_interrupt_enable(state->m_maincpu, bit);
 			break;
 
 		case 0x02:	/* MUT */
@@ -319,12 +319,12 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, m_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
-	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, m_radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
@@ -341,13 +341,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, m_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, m_radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */
@@ -879,19 +879,19 @@ static MACHINE_START( rallyx )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->samples = machine.device("samples");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_samples = machine.device("samples");
 
-	state->save_item(NAME(state->last_bang));
-	state->save_item(NAME(state->stars_enable));
+	state->save_item(NAME(state->m_last_bang));
+	state->save_item(NAME(state->m_stars_enable));
 }
 
 static MACHINE_RESET( rallyx )
 {
 	rallyx_state *state = machine.driver_data<rallyx_state>();
 
-	state->last_bang = 0;
-	state->stars_enable = 0;
+	state->m_last_bang = 0;
+	state->m_stars_enable = 0;
 }
 
 static MACHINE_CONFIG_START( rallyx, rallyx_state )

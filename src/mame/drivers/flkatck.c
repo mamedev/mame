@@ -24,7 +24,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 {
 	flkatck_state *state = device->machine().driver_data<flkatck_state>();
 
-	if (state->irq_enabled)
+	if (state->m_irq_enabled)
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+			device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(space, 0, data);
@@ -85,13 +85,13 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 static READ8_HANDLER( multiply_r )
 {
 	flkatck_state *state = space->machine().driver_data<flkatck_state>();
-	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xff;
+	return (state->m_multiply_reg[0] * state->m_multiply_reg[1]) & 0xff;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
 	flkatck_state *state = space->machine().driver_data<flkatck_state>();
-	state->multiply_reg[offset] = data;
+	state->m_multiply_reg[offset] = data;
 }
 
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE_MEMBER(flkatck_state, k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE_MEMBER(flkatck_state, m_k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
@@ -202,12 +202,12 @@ static MACHINE_START( flkatck )
 
 	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k007121 = machine.device("k007121");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k007121 = machine.device("k007121");
 
-	state->save_item(NAME(state->irq_enabled));
-	state->save_item(NAME(state->multiply_reg));
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_irq_enabled));
+	state->save_item(NAME(state->m_multiply_reg));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_RESET( flkatck )
@@ -216,10 +216,10 @@ static MACHINE_RESET( flkatck )
 
 	k007232_set_bank(machine.device("konami"), 0, 1);
 
-	state->irq_enabled = 0;
-	state->multiply_reg[0] = 0;
-	state->multiply_reg[1] = 0;
-	state->flipscreen = 0;
+	state->m_irq_enabled = 0;
+	state->m_multiply_reg[0] = 0;
+	state->m_multiply_reg[1] = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( flkatck, flkatck_state )

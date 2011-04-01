@@ -82,14 +82,14 @@ public:
 	statriv2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	tilemap_t *tilemap;
-	UINT8 *question_offset;
-	UINT8 question_offset_low;
-	UINT8 question_offset_mid;
-	UINT8 question_offset_high;
-	UINT8 latched_coin;
-	UINT8 last_coin;
+	UINT8 *m_videoram;
+	tilemap_t *m_tilemap;
+	UINT8 *m_question_offset;
+	UINT8 m_question_offset_low;
+	UINT8 m_question_offset_mid;
+	UINT8 m_question_offset_high;
+	UINT8 m_latched_coin;
+	UINT8 m_last_coin;
 };
 
 
@@ -105,7 +105,7 @@ public:
 static TILE_GET_INFO( horizontal_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -115,7 +115,7 @@ static TILE_GET_INFO( horizontal_tile_info )
 static TILE_GET_INFO( vertical_tile_info )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -144,13 +144,13 @@ static PALETTE_INIT( statriv2 )
 static VIDEO_START( horizontal )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->tilemap = tilemap_create(machine, horizontal_tile_info ,tilemap_scan_rows, 8,15, 64,16);
+	state->m_tilemap = tilemap_create(machine, horizontal_tile_info ,tilemap_scan_rows, 8,15, 64,16);
 }
 
 static VIDEO_START( vertical )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->tilemap = tilemap_create(machine, vertical_tile_info, tilemap_scan_rows, 8,8, 32,32);
+	state->m_tilemap = tilemap_create(machine, vertical_tile_info, tilemap_scan_rows, 8,8, 32,32);
 }
 
 
@@ -164,9 +164,9 @@ static VIDEO_START( vertical )
 static WRITE8_HANDLER( statriv2_videoram_w )
 {
 	statriv2_state *state = space->machine().driver_data<statriv2_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap, offset & 0x3ff);
+	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x3ff);
 }
 
 
@@ -183,7 +183,7 @@ static SCREEN_UPDATE( statriv2 )
 	if (tms9927_screen_reset(screen->machine().device("tms")))
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	else
-		tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tilemap, 0, 0);
 	return 0;
 }
 
@@ -201,8 +201,8 @@ static INTERRUPT_GEN( statriv2_interrupt )
 	UINT8 new_coin = input_port_read(device->machine(), "COIN");
 
 	/* check the coin inputs once per frame */
-	state->latched_coin |= new_coin & (new_coin ^ state->last_coin);
-	state->last_coin = new_coin;
+	state->m_latched_coin |= new_coin & (new_coin ^ state->m_last_coin);
+	state->m_last_coin = new_coin;
 
 	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
 	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
@@ -223,13 +223,13 @@ static READ8_HANDLER( question_data_r )
 	UINT32 qromsize = space->machine().region("questions")->bytes();
 	UINT32 address;
 
-	if (state->question_offset_high == 0xff)
-		state->question_offset[state->question_offset_low]++;
+	if (state->m_question_offset_high == 0xff)
+		state->m_question_offset[state->m_question_offset_low]++;
 
-	address = state->question_offset[state->question_offset_low];
-	address |= state->question_offset[state->question_offset_mid] << 8;
-	if (state->question_offset_high != 0xff)
-		address |= state->question_offset[state->question_offset_high] << 16;
+	address = state->m_question_offset[state->m_question_offset_low];
+	address |= state->m_question_offset[state->m_question_offset_mid] << 8;
+	if (state->m_question_offset_high != 0xff)
+		address |= state->m_question_offset[state->m_question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }
@@ -245,7 +245,7 @@ static READ8_HANDLER( question_data_r )
 static CUSTOM_INPUT( latched_coin_r )
 {
 	statriv2_state *state = field->port->machine().driver_data<statriv2_state>();
-	return state->latched_coin;
+	return state->m_latched_coin;
 }
 
 
@@ -254,7 +254,7 @@ static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 	statriv2_state *state = device->machine().driver_data<statriv2_state>();
 	data >>= 4;
 	if (data != 0x0f)
-		state->latched_coin = 0;
+		state->m_latched_coin = 0;
 }
 
 
@@ -292,12 +292,12 @@ static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_MEMBER(statriv2_state, videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_MEMBER(statriv2_state, m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8 )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE_MEMBER(statriv2_state, question_offset)
+	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE_MEMBER(statriv2_state, m_question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
@@ -1003,36 +1003,36 @@ ROM_END
 static DRIVER_INIT( addr_lhx )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->question_offset_low = 0;
-	state->question_offset_mid = 1;
-	state->question_offset_high = 0xff;
+	state->m_question_offset_low = 0;
+	state->m_question_offset_mid = 1;
+	state->m_question_offset_high = 0xff;
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
 static DRIVER_INIT( addr_xlh )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->question_offset_low = 1;
-	state->question_offset_mid = 2;
-	state->question_offset_high = 0xff;
+	state->m_question_offset_low = 1;
+	state->m_question_offset_mid = 2;
+	state->m_question_offset_high = 0xff;
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
 static DRIVER_INIT( addr_xhl )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->question_offset_low = 2;
-	state->question_offset_mid = 1;
-	state->question_offset_high = 0xff;
+	state->m_question_offset_low = 2;
+	state->m_question_offset_mid = 1;
+	state->m_question_offset_high = 0xff;
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
 static DRIVER_INIT( addr_lmh )
 {
 	statriv2_state *state = machine.driver_data<statriv2_state>();
-	state->question_offset_low = 0;
-	state->question_offset_mid = 1;
-	state->question_offset_high = 2;
+	state->m_question_offset_low = 0;
+	state->m_question_offset_mid = 1;
+	state->m_question_offset_high = 2;
 }
 
 static DRIVER_INIT( addr_lmhe )

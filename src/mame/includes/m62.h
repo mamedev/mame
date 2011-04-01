@@ -5,29 +5,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *              spriteram;
-	size_t               spriteram_size;
+	UINT8 *              m_spriteram;
+	size_t               m_spriteram_size;
 
-	UINT8 *              m62_tileram;
-	UINT8 *              m62_textram;
-	UINT8 *              scrollram;
+	UINT8 *              m_m62_tileram;
+	UINT8 *              m_m62_textram;
+	UINT8 *              m_scrollram;
 
 	/* video-related */
-	tilemap_t*             bg_tilemap;
-	tilemap_t*             fg_tilemap;
-	int                  flipscreen;
+	tilemap_t*             m_bg_tilemap;
+	tilemap_t*             m_fg_tilemap;
+	int                  m_flipscreen;
 
-	const UINT8          *sprite_height_prom;
-	INT32                m62_background_hscroll;
-	INT32                m62_background_vscroll;
-	UINT8                kidniki_background_bank;
-	INT32                kidniki_text_vscroll;
-	int                  ldrun3_topbottom_mask;
-	INT32                spelunkr_palbank;
+	const UINT8          *m_sprite_height_prom;
+	INT32                m_m62_background_hscroll;
+	INT32                m_m62_background_vscroll;
+	UINT8                m_kidniki_background_bank;
+	INT32                m_kidniki_text_vscroll;
+	int                  m_ldrun3_topbottom_mask;
+	INT32                m_spelunkr_palbank;
 
 	/* misc */
-	int                 ldrun2_bankswap;	//ldrun2
-	int                 bankcontrol[2]; 	//ldrun2
+	int                 m_ldrun2_bankswap;	//ldrun2
+	int                 m_bankcontrol[2]; 	//ldrun2
 };
 
 

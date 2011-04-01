@@ -93,9 +93,9 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 		coin_counter_w(space->machine(), 3, data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		eeprom_set_cs_line(state->eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(state->eeprom, data & 0x80);
-		eeprom_set_clock_line(state->eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line(state->m_eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(state->m_eeprom, data & 0x80);
+		eeprom_set_clock_line(state->m_eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -107,9 +107,9 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 	{
 		coin_counter_w(space->machine(), 0,data & 0x20);
 
-		eeprom_set_cs_line(state->eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(state->eeprom, data & 4);
-		eeprom_set_clock_line(state->eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_cs_line(state->m_eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(state->m_eeprom, data & 4);
+		eeprom_set_clock_line(state->m_eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -125,8 +125,8 @@ static WRITE16_HANDLER( playmark_snd_command_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->snd_command = (data & 0xff);
-		state->snd_flag = 1;
+		state->m_snd_command = (data & 0xff);
+		state->m_snd_flag = 1;
 		device_yield(&space->device());
 	}
 }
@@ -136,14 +136,14 @@ static READ8_HANDLER( playmark_snd_command_r )
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 	int data = 0;
 
-	if ((state->oki_control & 0x38) == 0x30)
+	if ((state->m_oki_control & 0x38) == 0x30)
 	{
-		data = state->snd_command;
+		data = state->m_snd_command;
 		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(&space->device()), data);
 	}
-	else if ((state->oki_control & 0x38) == 0x28)
+	else if ((state->m_oki_control & 0x38) == 0x28)
 	{
-		data = (state->oki->read(*space, 0) & 0x0f);
+		data = (state->m_oki->read(*space, 0) & 0x0f);
 		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(&space->device()), data);
 	}
 
@@ -154,9 +154,9 @@ static READ8_HANDLER( playmark_snd_flag_r )
 {
 	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	if (state->snd_flag)
+	if (state->m_snd_flag)
 	{
-		state->snd_flag = 0;
+		state->m_snd_flag = 0;
 		return 0x00;
 	}
 
@@ -168,13 +168,13 @@ static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 {
 	playmark_state *state = device->machine().driver_data<playmark_state>();
 
-	if (state->old_oki_bank != (data & 7))
+	if (state->m_old_oki_bank != (data & 7))
 	{
-		state->old_oki_bank = data & 7;
+		state->m_old_oki_bank = data & 7;
 
-		if (((state->old_oki_bank - 1) * 0x40000) < device->machine().region("oki")->bytes())
+		if (((state->m_old_oki_bank - 1) * 0x40000) < device->machine().region("oki")->bytes())
 		{
-			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (state->old_oki_bank - 1));
+			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (state->m_old_oki_bank - 1));
 		}
 	}
 }
@@ -182,7 +182,7 @@ static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 static WRITE8_HANDLER( playmark_oki_w )
 {
 	playmark_state *state = space->machine().driver_data<playmark_state>();
-	state->oki_command = data;
+	state->m_oki_command = data;
 }
 
 static WRITE8_HANDLER( playmark_snd_control_w )
@@ -203,13 +203,13 @@ static WRITE8_HANDLER( playmark_snd_control_w )
         1   Not used
         0   Not used
     */
-	state->oki_control = data;
+	state->m_oki_control = data;
 
 	if ((data & 0x38) == 0x18)
 	{
 		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(&space->device()),playmark_oki_command,playmark_oki_control,playmark_snd_command);
 		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-		oki->write(*space, 0, state->oki_command);
+		oki->write(*space, 0, state->m_oki_command);
 	}
 }
 
@@ -225,14 +225,14 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_NOP				/* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
+	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
 	AM_RANGE(0x501000, 0x501fff) AM_WRITENOP	/* unused RAM? */
-	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
 	AM_RANGE(0x504000, 0x50ffff) AM_WRITENOP	/* unused RAM? */
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(bigtwin_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* always 3? */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE_MEMBER(playmark_state, bgvideoram)
+	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE_MEMBER(playmark_state, m_bgvideoram)
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
@@ -248,11 +248,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram3)
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
+	AM_RANGE(0x201000, 0x2013ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -267,11 +267,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram3)
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
-	AM_RANGE(0x50f000, 0x50ffff) AM_RAM AM_BASE_MEMBER(playmark_state, rowscroll)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
+	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
+	AM_RANGE(0x50f000, 0x50ffff) AM_RAM AM_BASE_MEMBER(playmark_state, m_rowscroll)
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(wbeachvl_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* 2 and 3 */
 //  AM_RANGE(0x700000, 0x700001) ?? written on startup
@@ -290,12 +290,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP				/* watchdog? irq ack? */
-	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(wbeachvl_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(wbeachvl_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(excelsr_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* 2 and 3 */
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE_MEMBER(playmark_state, bgvideoram)
+	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE_MEMBER(playmark_state, m_bgvideoram)
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
@@ -309,11 +309,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram3)
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
@@ -329,11 +329,11 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram3)
-	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, videoram2)
-	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, videoram1)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram1)
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x280800, 0x280fff) AM_RAM // unused
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
@@ -1037,40 +1037,40 @@ static MACHINE_START( playmark )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->oki = machine.device<okim6295_device>("oki");
-	state->eeprom = machine.device("eeprom");
+	state->m_oki = machine.device<okim6295_device>("oki");
+	state->m_eeprom = machine.device("eeprom");
 
-	state->save_item(NAME(state->bgscrollx));
-	state->save_item(NAME(state->bgscrolly));
-	state->save_item(NAME(state->bg_enable));
-	state->save_item(NAME(state->bg_full_size));
-	state->save_item(NAME(state->fgscrollx));
-	state->save_item(NAME(state->fg_rowscroll_enable));
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_bgscrollx));
+	state->save_item(NAME(state->m_bgscrolly));
+	state->save_item(NAME(state->m_bg_enable));
+	state->save_item(NAME(state->m_bg_full_size));
+	state->save_item(NAME(state->m_fgscrollx));
+	state->save_item(NAME(state->m_fg_rowscroll_enable));
+	state->save_item(NAME(state->m_scroll));
 
-	state->save_item(NAME(state->snd_command));
-	state->save_item(NAME(state->snd_flag));
-	state->save_item(NAME(state->oki_control));
-	state->save_item(NAME(state->oki_command));
-	state->save_item(NAME(state->old_oki_bank));
+	state->save_item(NAME(state->m_snd_command));
+	state->save_item(NAME(state->m_snd_flag));
+	state->save_item(NAME(state->m_oki_control));
+	state->save_item(NAME(state->m_oki_command));
+	state->save_item(NAME(state->m_old_oki_bank));
 }
 
 static MACHINE_RESET( playmark )
 {
 	playmark_state *state = machine.driver_data<playmark_state>();
 
-	state->bgscrollx = 0;
-	state->bgscrolly = 0;
-	state->bg_enable = 0;
-	state->bg_full_size = 0;
-	state->fgscrollx = 0;
-	state->fg_rowscroll_enable = 0;
-	memset(state->scroll, 0, ARRAY_LENGTH(state->scroll));
+	state->m_bgscrollx = 0;
+	state->m_bgscrolly = 0;
+	state->m_bg_enable = 0;
+	state->m_bg_full_size = 0;
+	state->m_fgscrollx = 0;
+	state->m_fg_rowscroll_enable = 0;
+	memset(state->m_scroll, 0, ARRAY_LENGTH(state->m_scroll));
 
-	state->snd_command = 0;
-	state->oki_control = 0;
-	state->oki_command = 0;
-	state->old_oki_bank = 0;
+	state->m_snd_command = 0;
+	state->m_oki_control = 0;
+	state->m_oki_command = 0;
+	state->m_old_oki_bank = 0;
 }
 
 static MACHINE_CONFIG_START( bigtwin, playmark_state )
@@ -1650,7 +1650,7 @@ static DRIVER_INIT( bigtwin )
 	UINT16 dst_pos = 0;
 	UINT8 data_hi, data_lo;
 
-	state->snd_flag = 0;
+	state->m_snd_flag = 0;
 
 	/**** Convert the PIC16C57 ASCII HEX dumps to pure HEX ****/
 	do

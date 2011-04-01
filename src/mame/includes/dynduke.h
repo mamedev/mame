@@ -4,21 +4,21 @@ public:
 	dynduke_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *back_data;
-	UINT16 *fore_data;
-	UINT16 *scroll_ram;
-	tilemap_t *bg_layer;
-	tilemap_t *fg_layer;
-	tilemap_t *tx_layer;
-	int back_bankbase;
-	int fore_bankbase;
-	int back_enable;
-	int fore_enable;
-	int sprite_enable;
-	int txt_enable;
-	int old_back;
-	int old_fore;
+	UINT16 *m_videoram;
+	UINT16 *m_back_data;
+	UINT16 *m_fore_data;
+	UINT16 *m_scroll_ram;
+	tilemap_t *m_bg_layer;
+	tilemap_t *m_fg_layer;
+	tilemap_t *m_tx_layer;
+	int m_back_bankbase;
+	int m_fore_bankbase;
+	int m_back_enable;
+	int m_fore_enable;
+	int m_sprite_enable;
+	int m_txt_enable;
+	int m_old_back;
+	int m_old_fore;
 };
 
 

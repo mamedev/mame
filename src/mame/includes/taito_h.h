@@ -11,17 +11,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    m68000_mainram;
+	UINT16 *    m_m68000_mainram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* misc */
-	INT32       banknum;
+	INT32       m_banknum;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *tc0080vco;
-	device_t *tc0220ioc;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_tc0080vco;
+	device_t *m_tc0220ioc;
 };
 
 /*----------- defined in video/taito_h.c -----------*/

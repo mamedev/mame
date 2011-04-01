@@ -78,16 +78,16 @@ public:
 	igspoker_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int nmi_enable;
-	int bg_enable;
-	int hopper;
-	UINT8 *fg_tile_ram;
-	UINT8 *fg_color_ram;
-	UINT8 *bg_tile_ram;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 out[3];
-	size_t protection_res;
+	int m_nmi_enable;
+	int m_bg_enable;
+	int m_hopper;
+	UINT8 *m_fg_tile_ram;
+	UINT8 *m_fg_color_ram;
+	UINT8 *m_bg_tile_ram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_out[3];
+	size_t m_protection_res;
 };
 
 
@@ -99,9 +99,9 @@ public:
 static MACHINE_RESET( igs )
 {
 	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->nmi_enable	=	0;
-	state->hopper		=	0;
-	state->bg_enable	=	1;
+	state->m_nmi_enable	=	0;
+	state->m_hopper		=	0;
+	state->m_bg_enable	=	1;
 }
 
 static INTERRUPT_GEN( igs_interrupt )
@@ -110,7 +110,7 @@ static INTERRUPT_GEN( igs_interrupt )
 	if (cpu_getiloops(device) % 2) {
 		device_set_input_line(device, 0, HOLD_LINE);
 	} else {
-		if (state->nmi_enable)
+		if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -131,14 +131,14 @@ static WRITE8_HANDLER( igs_irqack_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	igspoker_state *state = machine.driver_data<igspoker_state>();
-	int code = state->bg_tile_ram[tile_index];
+	int code = state->m_bg_tile_ram[tile_index];
 	SET_TILE_INFO(1 + (tile_index & 3), code, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	igspoker_state *state = machine.driver_data<igspoker_state>();
-	int code = state->fg_tile_ram[tile_index] | (state->fg_color_ram[tile_index] << 8);
+	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
@@ -146,31 +146,31 @@ static TILE_GET_INFO( get_fg_tile_info )
 static WRITE8_HANDLER( bg_tile_w )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->bg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
+	state->m_bg_tile_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_tile_w )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fg_tile_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fg_color_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 static VIDEO_START(igs_video)
 {
 	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
 static SCREEN_UPDATE(igs_video)
@@ -179,9 +179,9 @@ static SCREEN_UPDATE(igs_video)
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// FIX: CSK227IT must have some way to disable background, or wrong gfx?
-	if (state->bg_enable) tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	if (state->m_bg_enable) tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -189,13 +189,13 @@ static SCREEN_UPDATE(igs_video)
 static VIDEO_START(cpokerpk)
 {
 	igspoker_state *state = machine.driver_data<igspoker_state>();
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
 }
 
 static SCREEN_UPDATE(cpokerpk)
 {
 	igspoker_state *state = screen->machine().driver_data<igspoker_state>();
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -204,7 +204,7 @@ static SCREEN_UPDATE(cpokerpk)
 static void show_out(igspoker_state *state)
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x", state->out[0], state->out[1]);
+	popmessage("%02x %02x", state->m_out[0], state->m_out[1]);
 #endif
 }
 
@@ -214,16 +214,16 @@ static WRITE8_HANDLER( igs_nmi_and_coins_w )
 	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
 	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
 	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->out mech
+	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->m_out mech
 
-	set_led_status(space->machine(), 6,		data & 0x20);	// led for coin state->out / state->hopper active
+	set_led_status(space->machine(), 6,		data & 0x20);	// led for coin state->m_out / state->m_hopper active
 
-	state->nmi_enable = data & 0x80;     // nmi enable?
+	state->m_nmi_enable = data & 0x80;     // nmi enable?
 #ifdef VERBOSE
-	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space->device()),state->nmi_enable);
+	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space->device()),state->m_nmi_enable);
 #endif
 
-	state->out[0] = data;
+	state->m_out[0] = data;
 	show_out(state);
 }
 
@@ -248,9 +248,9 @@ static WRITE8_HANDLER( igs_lamps_w )
 	output_set_lamp_value(5, (data >> 2) & 1);		/* Lamp 5 - HOLD 5 */
 	output_set_lamp_value(6, (data & 1));			/* Lamp 6 - START */
 
-	state->hopper			=	(~data)& 0x80;
+	state->m_hopper			=	(~data)& 0x80;
 
-	state->out[1] = data;
+	state->m_out[1] = data;
 	show_out(state);
 }
 
@@ -260,9 +260,9 @@ static READ8_HANDLER( custom_io_r )
 {
 	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
-	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space->device()), (int) state->protection_res);
+	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space->device()), (int) state->m_protection_res);
 #endif
-	return state->protection_res;
+	return state->m_protection_res;
 }
 
 static WRITE8_HANDLER( custom_io_w )
@@ -274,47 +274,47 @@ static WRITE8_HANDLER( custom_io_w )
 
 	switch (data)
 	{
-		case 0x00: state->protection_res = input_port_read(space->machine(), "BUTTONS1"); break;
+		case 0x00: state->m_protection_res = input_port_read(space->machine(), "BUTTONS1"); break;
 		// CSK227
-		case 0x20: state->protection_res = 0x49; break;
-		case 0x21: state->protection_res = 0x47; break;
-		case 0x22: state->protection_res = 0x53; break;
-		case 0x24: state->protection_res = 0x41; break;
-		case 0x25: state->protection_res = 0x41; break;
-		case 0x26: state->protection_res = 0x7f; break;
-		case 0x27: state->protection_res = 0x41; break;
-		case 0x28: state->protection_res = 0x41; break;
-		case 0x2a: state->protection_res = 0x3e; break;
-		case 0x2b: state->protection_res = 0x41; break;
+		case 0x20: state->m_protection_res = 0x49; break;
+		case 0x21: state->m_protection_res = 0x47; break;
+		case 0x22: state->m_protection_res = 0x53; break;
+		case 0x24: state->m_protection_res = 0x41; break;
+		case 0x25: state->m_protection_res = 0x41; break;
+		case 0x26: state->m_protection_res = 0x7f; break;
+		case 0x27: state->m_protection_res = 0x41; break;
+		case 0x28: state->m_protection_res = 0x41; break;
+		case 0x2a: state->m_protection_res = 0x3e; break;
+		case 0x2b: state->m_protection_res = 0x41; break;
 		// CSK227 and NUMBER10
-		case 0x2c: state->protection_res = 0x49; break;
-		case 0x2d: state->protection_res = 0xf9; break;
-		case 0x2e: state->protection_res = 0x0a; break;
-		case 0x30: state->protection_res = 0x26; break;
-		case 0x31: state->protection_res = 0x49; break;
-		case 0x32: state->protection_res = 0x49; break;
-		case 0x33: state->protection_res = 0x49; break;
-		case 0x34: state->protection_res = 0x32; break;
+		case 0x2c: state->m_protection_res = 0x49; break;
+		case 0x2d: state->m_protection_res = 0xf9; break;
+		case 0x2e: state->m_protection_res = 0x0a; break;
+		case 0x30: state->m_protection_res = 0x26; break;
+		case 0x31: state->m_protection_res = 0x49; break;
+		case 0x32: state->m_protection_res = 0x49; break;
+		case 0x33: state->m_protection_res = 0x49; break;
+		case 0x34: state->m_protection_res = 0x32; break;
 		// NUMBER10
-		case 0x60: state->protection_res = 0x30; break;
-		case 0x61: state->protection_res = 0x31; break;
-		case 0x62: state->protection_res = 0x3e; break;
-		case 0x64: state->protection_res = 0x3c; break;
-		case 0x65: state->protection_res = 0x31; break;
-		case 0x66: state->protection_res = 0x39; break;
-		case 0x67: state->protection_res = 0x33; break;
-		case 0x68: state->protection_res = 0x35; break;
-		case 0x6a: state->protection_res = 0x40; break;
-		case 0x6b: state->protection_res = 0x43; break;
+		case 0x60: state->m_protection_res = 0x30; break;
+		case 0x61: state->m_protection_res = 0x31; break;
+		case 0x62: state->m_protection_res = 0x3e; break;
+		case 0x64: state->m_protection_res = 0x3c; break;
+		case 0x65: state->m_protection_res = 0x31; break;
+		case 0x66: state->m_protection_res = 0x39; break;
+		case 0x67: state->m_protection_res = 0x33; break;
+		case 0x68: state->m_protection_res = 0x35; break;
+		case 0x6a: state->m_protection_res = 0x40; break;
+		case 0x6b: state->m_protection_res = 0x43; break;
 		default:
-			state->protection_res = data;
+			state->m_protection_res = data;
 	}
 }
 
 static CUSTOM_INPUT( hopper_r )
 {
 	igspoker_state *state = field->port->machine().driver_data<igspoker_state>();
-	if (state->hopper) return !(field->port->machine().primary_screen->frame_number()%10);
+	if (state->m_hopper) return !(field->port->machine().primary_screen->frame_number()%10);
 	return input_code_pressed(field->port->machine(), KEYCODE_H);
 }
 
@@ -345,9 +345,9 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8 )
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
-	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE( bg_tile_w )  AM_BASE_MEMBER(igspoker_state, bg_tile_ram )
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, fg_color_ram )
+	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE( bg_tile_w )  AM_BASE_MEMBER(igspoker_state, m_bg_tile_ram )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, m_fg_color_ram )
 	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
 ADDRESS_MAP_END
 
@@ -955,8 +955,8 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8 )
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, fg_color_ram )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, m_fg_color_ram )
 	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
 ADDRESS_MAP_END
 
@@ -977,8 +977,8 @@ static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8 )
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, fg_color_ram )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(igspoker_state, m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(igspoker_state, m_fg_color_ram )
 	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
 ADDRESS_MAP_END
 

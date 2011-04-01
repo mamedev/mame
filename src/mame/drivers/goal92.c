@@ -21,7 +21,7 @@ static WRITE16_HANDLER( goal92_sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
-		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -50,19 +50,19 @@ static READ16_HANDLER( goal92_inputs_r )
 static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE_MEMBER(goal92_state, bg_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE_MEMBER(goal92_state, fg_data)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE_MEMBER(goal92_state, m_bg_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE_MEMBER(goal92_state, m_fg_data)
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE_MEMBER(goal92_state, tx_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE_MEMBER(goal92_state, m_tx_data)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_MEMBER(goal92_state, spriteram)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_MEMBER(goal92_state, m_spriteram)
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
 	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
 	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
-	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE_MEMBER(goal92_state, scrollram)
+	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE_MEMBER(goal92_state, m_scrollram)
 	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
 ADDRESS_MAP_END
 
@@ -78,7 +78,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 static WRITE8_HANDLER( adpcm_data_w )
 {
 	goal92_state *state = space->machine().driver_data<goal92_state>();
-	state->msm5205next = data;
+	state->m_msm5205next = data;
 }
 
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
@@ -214,7 +214,7 @@ static void irqhandler( device_t *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//goal92_state *state = device->machine().driver_data<goal92_state>();
-	//device_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -230,12 +230,12 @@ static const ym2203_interface ym2203_config =
 static void goal92_adpcm_int( device_t *device )
 {
 	goal92_state *state = device->machine().driver_data<goal92_state>();
-	msm5205_data_w(device, state->msm5205next);
-	state->msm5205next >>= 4;
-	state->adpcm_toggle^= 1;
+	msm5205_data_w(device, state->m_msm5205next);
+	state->m_msm5205next >>= 4;
+	state->m_adpcm_toggle^= 1;
 
-	if (state->adpcm_toggle)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_adpcm_toggle)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -297,20 +297,20 @@ static MACHINE_START( goal92 )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->fg_bank));
-	state->save_item(NAME(state->msm5205next));
-	state->save_item(NAME(state->adpcm_toggle));
+	state->save_item(NAME(state->m_fg_bank));
+	state->save_item(NAME(state->m_msm5205next));
+	state->save_item(NAME(state->m_adpcm_toggle));
 }
 
 static MACHINE_RESET( goal92 )
 {
 	goal92_state *state = machine.driver_data<goal92_state>();
 
-	state->fg_bank = 0;
-	state->msm5205next = 0;
-	state->adpcm_toggle = 0;
+	state->m_fg_bank = 0;
+	state->m_msm5205next = 0;
+	state->m_adpcm_toggle = 0;
 }
 
 static MACHINE_CONFIG_START( goal92, goal92_state )

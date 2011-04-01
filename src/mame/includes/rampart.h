@@ -12,8 +12,8 @@ public:
 	rampart_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16 *		bitmap;
-	UINT8			has_mo;
+	UINT16 *		m_bitmap;
+	UINT8			m_has_mo;
 };
 
 

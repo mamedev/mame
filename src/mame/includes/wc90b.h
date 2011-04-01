@@ -4,21 +4,21 @@ public:
 	wc90b_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int msm5205next;
-	int toggle;
-	UINT8 *fgvideoram;
-	UINT8 *bgvideoram;
-	UINT8 *txvideoram;
-	UINT8 *scroll1x;
-	UINT8 *scroll2x;
-	UINT8 *scroll1y;
-	UINT8 *scroll2y;
-	UINT8 *scroll_x_lo;
-	tilemap_t *tx_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	int m_msm5205next;
+	int m_toggle;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_txvideoram;
+	UINT8 *m_scroll1x;
+	UINT8 *m_scroll2x;
+	UINT8 *m_scroll1y;
+	UINT8 *m_scroll2y;
+	UINT8 *m_scroll_x_lo;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

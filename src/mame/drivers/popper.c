@@ -142,7 +142,7 @@ static READ8_HANDLER( popper_input_ports_r )
 static READ8_HANDLER( popper_soundcpu_nmi_r )
 {
 	popper_state *state = space->machine().driver_data<popper_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -155,13 +155,13 @@ static READ8_HANDLER( popper_soundcpu_nmi_r )
 static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1bf) AM_RAM
-	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE_MEMBER(popper_state, ol_videoram)
-	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE(popper_videoram_w) AM_BASE_MEMBER(popper_state, videoram)
+	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE_MEMBER(popper_state, m_ol_videoram)
+	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE(popper_videoram_w) AM_BASE_MEMBER(popper_state, m_videoram)
 	AM_RANGE(0xc620, 0xc9bf) AM_RAM
-	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE(popper_ol_attribram_w) AM_BASE_MEMBER(popper_state, ol_attribram)
-	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE_MEMBER(popper_state, attribram)
+	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE(popper_ol_attribram_w) AM_BASE_MEMBER(popper_state, m_ol_attribram)
+	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE_MEMBER(popper_state, m_attribram)
 	AM_RANGE(0xce20, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(popper_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(popper_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(interrupt_enable_w)
@@ -309,20 +309,20 @@ static MACHINE_START( popper )
 {
 	popper_state *state = machine.driver_data<popper_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->e002));
-	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_e002));
+	state->save_item(NAME(state->m_gfx_bank));
 }
 
 static MACHINE_RESET( popper )
 {
 	popper_state *state = machine.driver_data<popper_state>();
 
-	state->flipscreen = 0;
-	state->e002 = 0;
-	state->gfx_bank = 0;
+	state->m_flipscreen = 0;
+	state->m_e002 = 0;
+	state->m_gfx_bank = 0;
 }
 
 static MACHINE_CONFIG_START( popper, popper_state )

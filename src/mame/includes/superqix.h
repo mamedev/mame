@@ -4,34 +4,34 @@ public:
 	superqix_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	INT16 *samplebuf;
-	UINT8 port1;
-	UINT8 port2;
-	UINT8 port3;
-	UINT8 port3_latch;
-	UINT8 from_mcu;
-	UINT8 from_z80;
-	UINT8 portb;
-	int from_mcu_pending;
-	int from_z80_pending;
-	int invert_coin_lockout;
-	int oldpos[2];
-	int sign[2];
-	UINT8 portA_in;
-	UINT8 portB_out;
-	UINT8 portC;
-	int curr_player;
-	UINT8 *videoram;
-	UINT8 *bitmapram;
-	UINT8 *bitmapram2;
-	int pbillian_show_power;
-	int gfxbank;
-	bitmap_t *fg_bitmap[2];
-	int show_bitmap;
-	tilemap_t *bg_tilemap;
-	int last_power[2];
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	INT16 *m_samplebuf;
+	UINT8 m_port1;
+	UINT8 m_port2;
+	UINT8 m_port3;
+	UINT8 m_port3_latch;
+	UINT8 m_from_mcu;
+	UINT8 m_from_z80;
+	UINT8 m_portb;
+	int m_from_mcu_pending;
+	int m_from_z80_pending;
+	int m_invert_coin_lockout;
+	int m_oldpos[2];
+	int m_sign[2];
+	UINT8 m_portA_in;
+	UINT8 m_portB_out;
+	UINT8 m_portC;
+	int m_curr_player;
+	UINT8 *m_videoram;
+	UINT8 *m_bitmapram;
+	UINT8 *m_bitmapram2;
+	int m_pbillian_show_power;
+	int m_gfxbank;
+	bitmap_t *m_fg_bitmap[2];
+	int m_show_bitmap;
+	tilemap_t *m_bg_tilemap;
+	int m_last_power[2];
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

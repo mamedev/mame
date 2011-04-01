@@ -5,19 +5,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  paletteram;
-	UINT8 *  scroll;
+	UINT8 *  m_videoram;
+	UINT8 *  m_paletteram;
+	UINT8 *  m_scroll;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
-	UINT8     flip_x, flip_y;
+	tilemap_t  *m_bg_tilemap;
+	UINT8     m_flip_x;
+	UINT8     m_flip_y;
 
 	/* misc */
-	UINT8    irq_toggle, irq_enable;
+	UINT8    m_irq_toggle;
+	UINT8    m_irq_enable;
 
 	/* devices */
-	cpu_device *maincpu;
+	cpu_device *m_maincpu;
 };
 
 

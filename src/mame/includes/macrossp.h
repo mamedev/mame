@@ -11,32 +11,36 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *         mainram;
-	UINT32 *         scra_videoram;
-	UINT32 *         scra_videoregs;
-	UINT32 *         scrb_videoram;
-	UINT32 *         scrb_videoregs;
-	UINT32 *         scrc_videoram;
-	UINT32 *         scrc_videoregs;
-	UINT32 *         text_videoram;
-	UINT32 *         text_videoregs;
-	UINT32 *         spriteram;
-	UINT32 *         spriteram_old;
-	UINT32 *         spriteram_old2;
-	UINT32 *         paletteram;
-	size_t           spriteram_size;
+	UINT32 *         m_mainram;
+	UINT32 *         m_scra_videoram;
+	UINT32 *         m_scra_videoregs;
+	UINT32 *         m_scrb_videoram;
+	UINT32 *         m_scrb_videoregs;
+	UINT32 *         m_scrc_videoram;
+	UINT32 *         m_scrc_videoregs;
+	UINT32 *         m_text_videoram;
+	UINT32 *         m_text_videoregs;
+	UINT32 *         m_spriteram;
+	UINT32 *         m_spriteram_old;
+	UINT32 *         m_spriteram_old2;
+	UINT32 *         m_paletteram;
+	size_t           m_spriteram_size;
 
 	/* video-related */
-	tilemap_t  *scra_tilemap, *scrb_tilemap, *scrc_tilemap, *text_tilemap;
+	tilemap_t  *m_scra_tilemap;
+	tilemap_t  *m_scrb_tilemap;
+	tilemap_t  *m_scrc_tilemap;
+	tilemap_t  *m_text_tilemap;
 
 	/* misc */
-	int              sndpending;
-	int              snd_toggle;
-	INT32            fade_effect, old_fade;
+	int              m_sndpending;
+	int              m_snd_toggle;
+	INT32            m_fade_effect;
+	INT32 			 m_old_fade;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/macrossp.c -----------*/

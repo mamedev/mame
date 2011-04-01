@@ -11,37 +11,37 @@ class atarisy1_state : public atarigen_state
 public:
 	atarisy1_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config),
-		  joystick_timer(*this, "joystick_timer"),
-		  yscroll_reset_timer(*this, "yreset_timer"),
-		  scanline_timer(*this, "scan_timer"),
-		  int3off_timer(*this, "int3off_timer") { }
+		  m_joystick_timer(*this, "joystick_timer"),
+		  m_yscroll_reset_timer(*this, "yreset_timer"),
+		  m_scanline_timer(*this, "scan_timer"),
+		  m_int3off_timer(*this, "int3off_timer") { }
 
-	UINT16 *		bankselect;
+	UINT16 *		m_bankselect;
 
-	UINT8			joystick_type;
-	UINT8			trackball_type;
+	UINT8			m_joystick_type;
+	UINT8			m_trackball_type;
 
-	required_device<timer_device> joystick_timer;
-	UINT8			joystick_int;
-	UINT8			joystick_int_enable;
-	UINT8			joystick_value;
+	required_device<timer_device> m_joystick_timer;
+	UINT8			m_joystick_int;
+	UINT8			m_joystick_int_enable;
+	UINT8			m_joystick_value;
 
 	/* playfield parameters */
-	UINT16			playfield_lookup[256];
-	UINT8			playfield_tile_bank;
-	UINT16			playfield_priority_pens;
-	required_device<timer_device> yscroll_reset_timer;
+	UINT16			m_playfield_lookup[256];
+	UINT8			m_playfield_tile_bank;
+	UINT16			m_playfield_priority_pens;
+	required_device<timer_device> m_yscroll_reset_timer;
 
 	/* INT3 tracking */
-	int 			next_timer_scanline;
-	required_device<timer_device> scanline_timer;
-	required_device<timer_device> int3off_timer;
+	int 			m_next_timer_scanline;
+	required_device<timer_device> m_scanline_timer;
+	required_device<timer_device> m_int3off_timer;
 
 	/* graphics bank tracking */
-	UINT8			bank_gfx[3][8];
-	UINT8			bank_color_shift[MAX_GFX_ELEMENTS];
+	UINT8			m_bank_gfx[3][8];
+	UINT8			m_bank_color_shift[MAX_GFX_ELEMENTS];
 
-	UINT8			cur[2][2];
+	UINT8			m_cur[2][2];
 };
 
 

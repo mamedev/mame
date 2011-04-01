@@ -37,19 +37,19 @@ public:
 	drw80pkr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *bg_tilemap;
-	UINT8 t0;
-	UINT8 t1;
-	UINT8 p0;
-	UINT8 p1;
-	UINT8 p2;
-	UINT8 prog;
-	UINT8 bus;
-	UINT8 attract_mode;
-	UINT8 active_bank;
-	UINT8 pkr_io_ram[0x100];
-	UINT16 video_ram[0x0400];
-	UINT8 color_ram[0x0400];
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_t0;
+	UINT8 m_t1;
+	UINT8 m_p0;
+	UINT8 m_p1;
+	UINT8 m_p2;
+	UINT8 m_prog;
+	UINT8 m_bus;
+	UINT8 m_attract_mode;
+	UINT8 m_active_bank;
+	UINT8 m_pkr_io_ram[0x100];
+	UINT16 m_video_ram[0x0400];
+	UINT8 m_color_ram[0x0400];
 };
 
 
@@ -60,7 +60,7 @@ public:
 static MACHINE_START( drw80pkr )
 {
 	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	machine.device<nvram_device>("nvram")->set_base(state->pkr_io_ram, sizeof(state->pkr_io_ram));
+	machine.device<nvram_device>("nvram")->set_base(state->m_pkr_io_ram, sizeof(state->m_pkr_io_ram));
 }
 
 /*****************
@@ -70,51 +70,51 @@ static MACHINE_START( drw80pkr )
 static WRITE8_HANDLER( t0_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->t0 = data;
+	state->m_t0 = data;
 }
 
 static WRITE8_HANDLER( t1_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->t1 = data;
+	state->m_t1 = data;
 }
 
 static WRITE8_HANDLER( p0_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->p0 = data;
+	state->m_p0 = data;
 }
 
 static WRITE8_HANDLER( p1_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->p1 = data;
+	state->m_p1 = data;
 }
 
 static WRITE8_HANDLER( p2_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->p2 = data;
+	state->m_p2 = data;
 }
 
 static WRITE8_HANDLER( prog_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->prog = data;
+	state->m_prog = data;
 
 	// Bankswitch Program Memory
-	if (state->prog == 0x01)
+	if (state->m_prog == 0x01)
 	{
-		state->active_bank = state->active_bank ^ 0x01;
+		state->m_active_bank = state->m_active_bank ^ 0x01;
 
-		memory_set_bank(space->machine(), "bank1", state->active_bank);
+		memory_set_bank(space->machine(), "bank1", state->m_active_bank);
 	}
 }
 
 static WRITE8_HANDLER( bus_w )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-	state->bus = data;
+	state->m_bus = data;
 }
 
 static WRITE8_HANDLER( drw80pkr_io_w )
@@ -122,22 +122,22 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
 	UINT16 n_offs;
 
-	if (state->p2 == 0x3f || state->p2 == 0x7f)
+	if (state->m_p2 == 0x3f || state->m_p2 == 0x7f)
 	{
-		n_offs = ((state->p1 & 0xc0) << 2 ) + offset;
+		n_offs = ((state->m_p1 & 0xc0) << 2 ) + offset;
 
-		if (state->p2 == 0x3f)
+		if (state->m_p2 == 0x3f)
 		{
-			state->video_ram[n_offs] = data; // low address
+			state->m_video_ram[n_offs] = data; // low address
 		} else {
-			state->color_ram[n_offs] = data & 0x0f; // color palette
-			state->video_ram[n_offs] += ((data & 0xf0) << 4 ); // high address
+			state->m_color_ram[n_offs] = data & 0x0f; // color palette
+			state->m_video_ram[n_offs] += ((data & 0xf0) << 4 ); // high address
 		}
 
-		tilemap_mark_tile_dirty(state->bg_tilemap, n_offs);
+		tilemap_mark_tile_dirty(state->m_bg_tilemap, n_offs);
 	}
 
-	if (state->p2 == 0xc7)
+	if (state->m_p2 == 0xc7)
 	{
 		// CRTC Register
 		// R0 = 0x1f(31)    Horizontal Total
@@ -161,33 +161,33 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 		// R13 = 0x00       Display Start Address (Low)
 	}
 
-	if (state->p2 == 0xd7)
+	if (state->m_p2 == 0xd7)
 	{
 		// CRTC Address
 	}
 
-	if (state->p2 == 0xfb) {
-		state->pkr_io_ram[offset] = data;
+	if (state->m_p2 == 0xfb) {
+		state->m_pkr_io_ram[offset] = data;
 	}
 
-	if (state->p2 == 0xff)
+	if (state->m_p2 == 0xff)
 	{
-		if (state->p1 == 0xdf)
+		if (state->m_p1 == 0xdf)
 		{
-			state->attract_mode = data; // Latch this for use in input reads (0x01 = attract mode, 0x00 = game in progress)
+			state->m_attract_mode = data; // Latch this for use in input reads (0x01 = attract mode, 0x00 = game in progress)
 		}
 
-		if (state->p1 == 0xdb || state->p1 == 0xef || state->p1 == 0xf7 || state->p1 == 0xfb)
+		if (state->m_p1 == 0xdb || state->m_p1 == 0xef || state->m_p1 == 0xf7 || state->m_p1 == 0xfb)
 		{
 			// unknown, most likely lamps, meters, hopper etc.
 		}
 
 		// ay8910 control port
-		if (state->p1 == 0xfc)
+		if (state->m_p1 == 0xfc)
 			ay8910_address_w(space->machine().device("aysnd"), 0, data);
 
 		// ay8910_write_port_0_w
-		if (state->p1 == 0xfe)
+		if (state->m_p1 == 0xfe)
 			ay8910_data_w(space->machine().device("aysnd"), 0, data);
 	}
 }
@@ -199,37 +199,37 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 static READ8_HANDLER( t0_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->t0;
+    return state->m_t0;
 }
 
 static READ8_HANDLER( t1_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->t1;
+    return state->m_t1;
 }
 
 static READ8_HANDLER( p0_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->p0;
+    return state->m_p0;
 }
 
 static READ8_HANDLER( p1_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->p1;
+    return state->m_p1;
 }
 
 static READ8_HANDLER( p2_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->p2;
+    return state->m_p2;
 }
 
 static READ8_HANDLER( bus_r )
 {
 	drw80pkr_state *state = space->machine().driver_data<drw80pkr_state>();
-    return state->bus;
+    return state->m_bus;
 }
 
 static READ8_HANDLER( drw80pkr_io_r )
@@ -240,34 +240,34 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 	ret = 0x00;
 
-	if (state->p2 == 0x3b)
+	if (state->m_p2 == 0x3b)
 	{
 		// unknown
 	}
 
-	if (state->p2 == 0x7b)
+	if (state->m_p2 == 0x7b)
 	{
-		ret = state->pkr_io_ram[offset];
+		ret = state->m_pkr_io_ram[offset];
 	}
 
-	if (state->p2 == 0xf7)
+	if (state->m_p2 == 0xf7)
 	{
 		// unknown
 	}
 
-	if (state->p2 == 0xfb)
+	if (state->m_p2 == 0xfb)
 	{
-		ret = state->pkr_io_ram[offset];
+		ret = state->m_pkr_io_ram[offset];
 	}
 
-	if (state->p2 == 0xff)
+	if (state->m_p2 == 0xff)
 	{
-		if (state->p1 == 0x5f || state->p1 == 0x9f || state->p1 == 0xdb)
+		if (state->m_p1 == 0x5f || state->m_p1 == 0x9f || state->m_p1 == 0xdb)
 		{
 			// unknown
 		}
 
-		if (state->p1 == 0xfe)
+		if (state->m_p1 == 0xfe)
 		{
 			// Dip switches tied to sound chip
 			//
@@ -280,7 +280,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 			ret = 0x77; // double-up with credit payout
 		}
 
-		if ((state->attract_mode == 0x01 && state->p1 == 0xef) || state->p1 == 0xf7)
+		if ((state->m_attract_mode == 0x01 && state->m_p1 == 0xef) || state->m_p1 == 0xf7)
 		{
 
 			// TODO: Get Input Port Values
@@ -325,8 +325,8 @@ static READ8_HANDLER( drw80pkr_io_r )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	int color = state->color_ram[tile_index];
-	int code = state->video_ram[tile_index];
+	int color = state->m_color_ram[tile_index];
+	int code = state->m_video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -334,13 +334,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( drw80pkr )
 {
 	drw80pkr_state *state = machine.driver_data<drw80pkr_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 27);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 27);
 }
 
 static SCREEN_UPDATE( drw80pkr )
 {
 	drw80pkr_state *state = screen->machine().driver_data<drw80pkr_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	return 0;
 }

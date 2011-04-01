@@ -60,7 +60,7 @@ static READ8_DEVICE_HANDLER( timer_r )
 
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return state->audiocpu->total_cycles() / state->timer_rate;
+	return state->m_audiocpu->total_cycles() / state->m_timer_rate;
 }
 
 
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( jack_sh_command_w )
 {
 	jack_state *state = space->machine().driver_data<jack_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( joinem_misc_w )
 {
 	jack_state *state = space->machine().driver_data<jack_state>();
 	flip_screen_set(space->machine(), data & 0x80);
-	state->joinem_snd_bit = data & 1;
+	state->m_joinem_snd_bit = data & 1;
 }
 
 static CUSTOM_INPUT( sound_check_r )
@@ -86,7 +86,7 @@ static CUSTOM_INPUT( sound_check_r )
 	jack_state *state = field->port->machine().driver_data<jack_state>();
 	UINT8 ret = 0;
 
-	if ((input_port_read(field->port->machine(), "IN2") & 0x80) && !state->joinem_snd_bit)
+	if ((input_port_read(field->port->machine(), "IN2") & 0x80) && !state->m_joinem_snd_bit)
 		ret = 1;
 
 	return ret;
@@ -103,13 +103,13 @@ static READ8_HANDLER( striv_question_r )
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
 	{
-		state->remap_address[offset & 0x0f] = (offset & 0xf0) >> 4;
+		state->m_remap_address[offset & 0x0f] = (offset & 0xf0) >> 4;
 	}
 	// Select which rom to read and the high 5 bits of address
 	else if ((offset & 0xc00) == 0xc00)
 	{
-		state->question_rom = offset & 7;
-		state->question_address = (offset & 0xf8) << 7;
+		state->m_question_rom = offset & 7;
+		state->m_question_address = (offset & 0xf8) << 7;
 	}
 	// Read the actual byte from question roms
 	else
@@ -117,13 +117,13 @@ static READ8_HANDLER( striv_question_r )
 		UINT8 *ROM = space->machine().region("user1")->base();
 		int real_address;
 
-		real_address = state->question_address | (offset & 0x3f0) | state->remap_address[offset & 0x0f];
+		real_address = state->m_question_address | (offset & 0x3f0) | state->m_remap_address[offset & 0x0f];
 
 		// Check if it wants to read from the upper 8 roms or not
 		if (offset & 0x400)
-			real_address |= 0x8000 * (state->question_rom + 8);
+			real_address |= 0x8000 * (state->m_question_rom + 8);
 		else
-			real_address |= 0x8000 * state->question_rom;
+			real_address |= 0x8000 * state->m_question_rom;
 
 		return ROM[real_address];
 	}
@@ -140,7 +140,7 @@ static READ8_HANDLER( striv_question_r )
 static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, spriteram, spriteram_size)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
@@ -150,15 +150,15 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb505, 0xb505) AM_READ_PORT("IN3")
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
 	AM_RANGE(0xb600, 0xb61f) AM_WRITE(jack_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE_MEMBER(jack_state, videoram)
-	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE_MEMBER(jack_state, colorram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE_MEMBER(jack_state, m_videoram)
+	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE_MEMBER(jack_state, m_colorram)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, spriteram, spriteram_size)
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
@@ -167,8 +167,8 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("IN2")
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(joinem_misc_w)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE_MEMBER(jack_state, videoram)
-	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE_MEMBER(jack_state, colorram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE_MEMBER(jack_state, m_videoram)
+	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE_MEMBER(jack_state, m_colorram)
 ADDRESS_MAP_END
 
 
@@ -796,12 +796,12 @@ static MACHINE_START( jack )
 {
 	jack_state *state = machine.driver_data<jack_state>();
 
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->joinem_snd_bit));
-	state->save_item(NAME(state->question_address));
-	state->save_item(NAME(state->question_rom));
-	state->save_item(NAME(state->remap_address));
+	state->save_item(NAME(state->m_joinem_snd_bit));
+	state->save_item(NAME(state->m_question_address));
+	state->save_item(NAME(state->m_question_rom));
+	state->save_item(NAME(state->m_remap_address));
 }
 
 static MACHINE_RESET( jack )
@@ -809,12 +809,12 @@ static MACHINE_RESET( jack )
 	jack_state *state = machine.driver_data<jack_state>();
 	int i;
 
-	state->joinem_snd_bit = 0;
-	state->question_address = 0;
-	state->question_rom = 0;
+	state->m_joinem_snd_bit = 0;
+	state->m_question_address = 0;
+	state->m_question_rom = 0;
 
 	for (i = 0; i < 16; i++)
-		state->remap_address[i] = 0;
+		state->m_remap_address[i] = 0;
 }
 
 static MACHINE_CONFIG_START( jack, jack_state )
@@ -1351,20 +1351,20 @@ static void treahunt_decode( running_machine &machine )
 static DRIVER_INIT( jack )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	state->timer_rate = 128;
+	state->m_timer_rate = 128;
 }
 
 static DRIVER_INIT( treahunt )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	state->timer_rate = 128;
+	state->m_timer_rate = 128;
 	treahunt_decode(machine);
 }
 
 static DRIVER_INIT( zzyzzyxx )
 {
 	jack_state *state = machine.driver_data<jack_state>();
-	state->timer_rate = 16;
+	state->m_timer_rate = 16;
 }
 
 static DRIVER_INIT( loverboy )
@@ -1380,7 +1380,7 @@ static DRIVER_INIT( loverboy )
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
 
-	state->timer_rate = 16;
+	state->m_timer_rate = 16;
 }
 
 
@@ -1419,7 +1419,7 @@ static DRIVER_INIT( striv )
 	// Nop out unused sprites writes
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
 
-	state->timer_rate = 128;
+	state->m_timer_rate = 128;
 }
 
 /*************************************

@@ -46,8 +46,8 @@ WRITE8_HANDLER( carjmbre_flipscreen_w )
 {
 	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-	tilemap_set_flip_all(space->machine(), state->flipscreen);
+	state->m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	tilemap_set_flip_all(space->machine(), state->m_flipscreen);
 }
 
 WRITE8_HANDLER( carjmbre_bgcolor_w )
@@ -55,11 +55,11 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 	data = ~data & 0x3f;
 
-	if (data != state->bgcolor)
+	if (data != state->m_bgcolor)
 	{
 		int i;
 
-		state->bgcolor = data;
+		state->m_bgcolor = data;
 		if (data & 3)
 			for (i = 0; i < 64; i += 4)
 				palette_set_color(space->machine(), i, palette_get_color(space->machine(), data));
@@ -79,8 +79,8 @@ WRITE8_HANDLER( carjmbre_videoram_w )
 {
 	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->cj_tilemap, offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_cj_tilemap, offset & 0x3ff);
 }
 
 
@@ -88,8 +88,8 @@ WRITE8_HANDLER( carjmbre_videoram_w )
 static TILE_GET_INFO( get_carjmbre_tile_info )
 {
 	carjmbre_state *state = machine.driver_data<carjmbre_state>();
-	UINT32 tile_number = state->videoram[tile_index] & 0xff;
-	UINT8 attr = state->videoram[tile_index + 0x400];
+	UINT32 tile_number = state->m_videoram[tile_index] & 0xff;
+	UINT8 attr = state->m_videoram[tile_index + 0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
 
 	SET_TILE_INFO(
@@ -103,9 +103,9 @@ VIDEO_START( carjmbre )
 {
 	carjmbre_state *state = machine.driver_data<carjmbre_state>();
 
-	state->cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->bgcolor));
+	state->m_cj_tilemap = tilemap_create(machine, get_carjmbre_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_bgcolor));
 }
 
 SCREEN_UPDATE( carjmbre )
@@ -119,7 +119,7 @@ SCREEN_UPDATE( carjmbre )
 	//-xxx---- unused
 	//----xxxx colour
 
-	tilemap_draw(bitmap, cliprect, state->cj_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_cj_tilemap, 0, 0);
 
 	//spriteram[offs]
 	//+0       y pos
@@ -131,21 +131,21 @@ SCREEN_UPDATE( carjmbre )
 	//--xx---- unused
 	//----xxxx colour
 	//+3       x pos
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		//before copying the sprites to spriteram the game reorders the first
 		//sprite to last, sprite ordering is incorrect if this isn't undone
-		troffs = (offs - 4 + state->spriteram_size) % state->spriteram_size;
+		troffs = (offs - 4 + state->m_spriteram_size) % state->m_spriteram_size;
 
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
-		if (state->spriteram[troffs] > 0x02 && state->spriteram[troffs] < 0xfd)
+		if (state->m_spriteram[troffs] > 0x02 && state->m_spriteram[troffs] < 0xfd)
 		{
-			sx = state->spriteram[troffs + 3] - 7;
-			sy = 241 - state->spriteram[troffs];
-			flipx = (state->spriteram[troffs + 2] & 0x40) >> 6;
-			flipy = (state->spriteram[troffs + 2] & 0x80) >> 7;
+			sx = state->m_spriteram[troffs + 3] - 7;
+			sy = 241 - state->m_spriteram[troffs];
+			flipx = (state->m_spriteram[troffs + 2] & 0x40) >> 6;
+			flipy = (state->m_spriteram[troffs + 2] & 0x80) >> 7;
 
-			if (state->flipscreen)
+			if (state->m_flipscreen)
 			{
 				sx = (256 + (226 - sx)) % 256;
 				sy = 242 - sy;
@@ -154,8 +154,8 @@ SCREEN_UPDATE( carjmbre )
 			}
 
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1],
-					state->spriteram[troffs + 1],
-					state->spriteram[troffs + 2] & 0xf,
+					state->m_spriteram[troffs + 1],
+					state->m_spriteram[troffs + 2] & 0xf,
 					flipx,flipy,
 					sx,sy,0);
 		}

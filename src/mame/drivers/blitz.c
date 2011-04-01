@@ -298,10 +298,10 @@ public:
 	blitz_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
-	int mux_data;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
+	int m_mux_data;
 };
 
 
@@ -314,15 +314,15 @@ public:
 static WRITE8_HANDLER( megadpkr_videoram_w )
 {
 	blitz_state *state = space->machine().driver_data<blitz_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( megadpkr_colorram_w )
 {
 	blitz_state *state = space->machine().driver_data<blitz_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -337,8 +337,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   unused.
 */
 
-	int attr = state->colorram[tile_index];
-	int code = ((attr & 1) << 8) | state->videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
+	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
@@ -349,13 +349,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( megadpkr )
 {
 	blitz_state *state = machine.driver_data<blitz_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( megadpkr )
 {
 	blitz_state *state = screen->machine().driver_data<blitz_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -417,7 +417,7 @@ static PALETTE_INIT( megadpkr )
 static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 {
 	blitz_state *state = device->machine().driver_data<blitz_state>();
-	switch( state->mux_data & 0xf0 )		/* bits 4-7 */
+	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
 		case 0x10: return input_port_read(device->machine(), "IN0-0");
 		case 0x20: return input_port_read(device->machine(), "IN0-1");
@@ -431,7 +431,7 @@ static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
 	blitz_state *state = device->machine().driver_data<blitz_state>();
-	state->mux_data = data ^ 0xff;	/* inverted */
+	state->m_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -485,8 +485,8 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8 )
     AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 */
 
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE_MEMBER(blitz_state, videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_BASE_MEMBER(blitz_state, colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE_MEMBER(blitz_state, m_videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_BASE_MEMBER(blitz_state, m_colorram)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

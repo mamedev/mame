@@ -62,10 +62,10 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(commando_c804_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITE(commando_scrollx_w)
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITE(commando_scrolly_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_BASE_MEMBER(commando_state, videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_BASE_MEMBER(commando_state, colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE_MEMBER(commando_state, videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE_MEMBER(commando_state, colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_BASE_MEMBER(commando_state, m_videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_BASE_MEMBER(commando_state, m_colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE_MEMBER(commando_state, m_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE_MEMBER(commando_state, m_colorram)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xff80, 0xffff) AM_RAM
@@ -228,20 +228,20 @@ static MACHINE_START( commando )
 {
 	commando_state *state = machine.driver_data<commando_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->scroll_x));
-	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->m_scroll_x));
+	state->save_item(NAME(state->m_scroll_y));
 }
 
 static MACHINE_RESET( commando )
 {
 	commando_state *state = machine.driver_data<commando_state>();
 
-	state->scroll_x[0] = 0;
-	state->scroll_x[1] = 0;
-	state->scroll_y[0] = 0;
-	state->scroll_y[1] = 0;
+	state->m_scroll_x[0] = 0;
+	state->m_scroll_x[1] = 0;
+	state->m_scroll_y[0] = 0;
+	state->m_scroll_y[1] = 0;
 }
 
 

@@ -4,18 +4,18 @@ public:
 	taotaido_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int pending_command;
-	UINT16 *spriteram;
-	UINT16 *spriteram2;
-	UINT16 *scrollram;
-	UINT16 *bgram;
-	UINT16 sprite_character_bank_select[8];
-	UINT16 video_bank_select[8];
-	tilemap_t *bg_tilemap;
-	UINT16 *spriteram_old;
-	UINT16 *spriteram_older;
-	UINT16 *spriteram2_old;
-	UINT16 *spriteram2_older;
+	int m_pending_command;
+	UINT16 *m_spriteram;
+	UINT16 *m_spriteram2;
+	UINT16 *m_scrollram;
+	UINT16 *m_bgram;
+	UINT16 m_sprite_character_bank_select[8];
+	UINT16 m_video_bank_select[8];
+	tilemap_t *m_bg_tilemap;
+	UINT16 *m_spriteram_old;
+	UINT16 *m_spriteram_older;
+	UINT16 *m_spriteram2_old;
+	UINT16 *m_spriteram2_older;
 };
 
 

@@ -40,17 +40,17 @@ Stephh's notes (based on the game Z80 code and some tests) :
 static WRITE8_HANDLER( mnchmobl_nmi_enable_w )
 {
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->nmi_enable = data;
+	state->m_nmi_enable = data;
 }
 
 static INTERRUPT_GEN( mnchmobl_interrupt )
 {
 	munchmo_state *state = device->machine().driver_data<munchmo_state>();
-	state->which = !state->which;
+	state->m_which = !state->m_which;
 
-	if (state->which)
+	if (state->m_which)
 		device_set_input_line(device, 0, HOLD_LINE);
-	else if (state->nmi_enable)
+	else if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -58,7 +58,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 {
 	munchmo_state *state = device->machine().driver_data<munchmo_state>();
 
-	if (!(state->sound_nmi_enable))
+	if (!(state->m_sound_nmi_enable))
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -67,20 +67,20 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
 
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE );
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_enable_w )
 {
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->sound_nmi_enable = data & 1;
+	state->m_sound_nmi_enable = data & 1;
 }
 
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
 	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -93,12 +93,12 @@ static WRITE8_HANDLER( sound_nmi_ack_w )
 static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_xpos)
-	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_tile)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_attr)
-	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(munchmo_state, videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_xpos)
+	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_tile)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_attr)
+	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(munchmo_state, m_videoram)
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
-	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE_MEMBER(munchmo_state, status_vram)
+	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE_MEMBER(munchmo_state, m_status_vram)
 	AM_RANGE(0xbe00, 0xbe00) AM_WRITE(mnchmobl_soundlatch_w)
 	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(mnchmobl_palette_bank_w)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
 	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
-	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE_MEMBER(munchmo_state, vreg) /* MY0 1-8C */
+	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE_MEMBER(munchmo_state, m_vreg) /* MY0 1-8C */
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
@@ -309,23 +309,23 @@ static MACHINE_START( munchmo )
 {
 	munchmo_state *state = machine.driver_data<munchmo_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->palette_bank));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->which));
+	state->save_item(NAME(state->m_palette_bank));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_which));
 }
 
 static MACHINE_RESET( munchmo )
 {
 	munchmo_state *state = machine.driver_data<munchmo_state>();
 
-	state->palette_bank = 0;
-	state->flipscreen = 0;
-	state->nmi_enable = 0;
-	state->which = 0;
+	state->m_palette_bank = 0;
+	state->m_flipscreen = 0;
+	state->m_nmi_enable = 0;
+	state->m_which = 0;
 }
 
 static MACHINE_CONFIG_START( mnchmobl, munchmo_state )

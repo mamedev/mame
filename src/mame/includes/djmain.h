@@ -4,17 +4,17 @@ public:
 	djmain_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int sndram_bank;
-	UINT8 *sndram;
-	int turntable_select;
-	UINT8 turntable_last_pos[2];
-	UINT16 turntable_pos[2];
-	UINT8 pending_vb_int;
-	UINT16 v_ctrl;
-	UINT32 obj_regs[0xa0/4];
-	const UINT8 *ide_user_password;
-	const UINT8 *ide_master_password;
-	UINT32 *obj_ram;
+	int m_sndram_bank;
+	UINT8 *m_sndram;
+	int m_turntable_select;
+	UINT8 m_turntable_last_pos[2];
+	UINT16 m_turntable_pos[2];
+	UINT8 m_pending_vb_int;
+	UINT16 m_v_ctrl;
+	UINT32 m_obj_regs[0xa0/4];
+	const UINT8 *m_ide_user_password;
+	const UINT8 *m_ide_master_password;
+	UINT32 *m_obj_ram;
 };
 
 

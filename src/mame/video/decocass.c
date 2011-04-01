@@ -50,18 +50,18 @@ void decocass_video_state_save_init( running_machine &machine )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 
-	state->save_item(NAME(state->watchdog_count));
-	state->save_item(NAME(state->watchdog_flip));
-	state->save_item(NAME(state->color_missiles));
-	state->save_item(NAME(state->color_center_bot));
-	state->save_item(NAME(state->mode_set));
-	state->save_item(NAME(state->back_h_shift));
-	state->save_item(NAME(state->back_vl_shift));
-	state->save_item(NAME(state->back_vr_shift));
-	state->save_item(NAME(state->part_h_shift));
-	state->save_item(NAME(state->part_v_shift));
-	state->save_item(NAME(state->center_h_shift_space));
-	state->save_item(NAME(state->center_v_shift));
+	state->save_item(NAME(state->m_watchdog_count));
+	state->save_item(NAME(state->m_watchdog_flip));
+	state->save_item(NAME(state->m_color_missiles));
+	state->save_item(NAME(state->m_color_center_bot));
+	state->save_item(NAME(state->m_mode_set));
+	state->save_item(NAME(state->m_back_h_shift));
+	state->save_item(NAME(state->m_back_vl_shift));
+	state->save_item(NAME(state->m_back_vr_shift));
+	state->save_item(NAME(state->m_part_h_shift));
+	state->save_item(NAME(state->m_part_v_shift));
+	state->save_item(NAME(state->m_center_h_shift_space));
+	state->save_item(NAME(state->m_center_v_shift));
 }
 
 /********************************************
@@ -83,10 +83,10 @@ static TILEMAP_MAPPER( bgvideoram_scan_cols )
 static TILE_GET_INFO( get_bg_l_tile_info )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	int color = (state->color_center_bot >> 7) & 1;
+	int color = (state->m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
 			2,
-			(0x80 == (tile_index & 0x80)) ? 16 : state->bgvideoram[tile_index] >> 4,
+			(0x80 == (tile_index & 0x80)) ? 16 : state->m_bgvideoram[tile_index] >> 4,
 			color,
 			0);
 }
@@ -94,10 +94,10 @@ static TILE_GET_INFO( get_bg_l_tile_info )
 static TILE_GET_INFO( get_bg_r_tile_info )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	int color = (state->color_center_bot >> 7) & 1;
+	int color = (state->m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
 			2,
-			(0x00 == (tile_index & 0x80)) ? 16 : state->bgvideoram[tile_index] >> 4,
+			(0x00 == (tile_index & 0x80)) ? 16 : state->m_bgvideoram[tile_index] >> 4,
 			color,
 			TILE_FLIPY);
 }
@@ -105,12 +105,12 @@ static TILE_GET_INFO( get_bg_r_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	UINT8 code = state->fgvideoram[tile_index];
-	UINT8 attr = state->colorram[tile_index];
+	UINT8 code = state->m_fgvideoram[tile_index];
+	UINT8 attr = state->m_colorram[tile_index];
 	SET_TILE_INFO(
 			0,
 			256 * (attr & 3) + code,
-			state->color_center_bot & 1,
+			state->m_color_center_bot & 1,
 			0);
 }
 
@@ -123,17 +123,17 @@ static void draw_object( running_machine& machine, bitmap_t *bitmap, const recta
 	decocass_state *state = machine.driver_data<decocass_state>();
 	int sx, sy, color;
 
-	if (0 == (state->mode_set & 0x80))  /* part_h_enable off? */
+	if (0 == (state->m_mode_set & 0x80))  /* part_h_enable off? */
 		return;
 
-	color = (state->color_center_bot >> 4) & 15;
+	color = (state->m_color_center_bot >> 4) & 15;
 
-	sy = 192 - (state->part_v_shift & 0x7f);
+	sy = 192 - (state->m_part_v_shift & 0x7f);
 
-	if (state->part_h_shift & 0x80)
-		sx = (state->part_h_shift & 0x7f) + 1;
+	if (state->m_part_h_shift & 0x80)
+		sx = (state->m_part_h_shift & 0x7f) + 1;
 	else
-		sx = 91 - (state->part_h_shift & 0x7f);
+		sx = 91 - (state->m_part_h_shift & 0x7f);
 
 	drawgfx_transpen(bitmap, cliprect, machine.gfx[3], 0, color, 0, 0, sx + 64, sy, 0);
 	drawgfx_transpen(bitmap, cliprect, machine.gfx[3], 1, color, 0, 0, sx, sy, 0);
@@ -147,24 +147,24 @@ static void draw_center( running_machine& machine, bitmap_t *bitmap, const recta
 	int sx, sy, x, y, color;
 
 	color = 0;
-	if (state->color_center_bot & 0x10)
+	if (state->m_color_center_bot & 0x10)
 		color |= 4;
-	if (state->color_center_bot & 0x20)
+	if (state->m_color_center_bot & 0x20)
 		color |= 2;
-	if (state->color_center_bot & 0x40)
+	if (state->m_color_center_bot & 0x40)
 		color |= 1;
-	if (state->color_center_bot & 0x80)
+	if (state->m_color_center_bot & 0x80)
 		color = (color & 4) + ((color << 1) & 2) + ((color >> 1) & 1);
 
-	sy = state->center_v_shift;
-	sx = (state->center_h_shift_space >> 2) & 0x3c;
+	sy = state->m_center_v_shift;
+	sx = (state->m_center_h_shift_space >> 2) & 0x3c;
 
 	for (y = 0; y < 4; y++)
 		if ((sy + y) >= cliprect->min_y && (sy + y) <= cliprect->max_y)
 		{
-			if (((sy + y) & state->color_center_bot & 3) == (sy & state->color_center_bot & 3))
+			if (((sy + y) & state->m_color_center_bot & 3) == (sy & state->m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
-					if (0 != (x & 16) || 0 != (state->center_h_shift_space & 1))
+					if (0 != (x & 16) || 0 != (state->m_center_h_shift_space & 1))
 						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = color;
 		}
 }
@@ -186,7 +186,7 @@ WRITE8_HANDLER( decocass_paletteram_w )
 WRITE8_HANDLER( decocass_charram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->charram[offset] = data;
+	state->m_charram[offset] = data;
 	/* dirty sprite */
 	gfx_element_mark_dirty(space->machine().gfx[1], (offset >> 5) & 255);
 	/* dirty char */
@@ -197,41 +197,41 @@ WRITE8_HANDLER( decocass_charram_w )
 WRITE8_HANDLER( decocass_fgvideoram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( decocass_colorram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 static void mark_bg_tile_dirty( running_machine &machine, offs_t offset )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	if (offset & 0x80)
-		tilemap_mark_tile_dirty(state->bg_tilemap_r, offset);
+		tilemap_mark_tile_dirty(state->m_bg_tilemap_r, offset);
 	else
-		tilemap_mark_tile_dirty(state->bg_tilemap_l, offset);
+		tilemap_mark_tile_dirty(state->m_bg_tilemap_l, offset);
 }
 
 WRITE8_HANDLER( decocass_tileram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->tileram[offset] = data;
+	state->m_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
 	gfx_element_mark_dirty(space->machine().gfx[2], (offset / 64) & 15);
 	/* first 1KB of tile RAM is shared with tilemap RAM */
-	if (offset < state->bgvideoram_size)
+	if (offset < state->m_bgvideoram_size)
 		mark_bg_tile_dirty(space->machine(), offset);
 }
 
 WRITE8_HANDLER( decocass_objectram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->objectram[offset] = data;
+	state->m_objectram[offset] = data;
 	/* dirty the object */
 	gfx_element_mark_dirty(space->machine().gfx[3], 0);
 	gfx_element_mark_dirty(space->machine().gfx[3], 1);
@@ -240,7 +240,7 @@ WRITE8_HANDLER( decocass_objectram_w )
 WRITE8_HANDLER( decocass_bgvideoram_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	state->bgvideoram[offset] = data;
+	state->m_bgvideoram[offset] = data;
 	mark_bg_tile_dirty(space->machine(), offset);
 }
 
@@ -249,14 +249,14 @@ WRITE8_HANDLER( decocass_watchdog_count_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
-	state->watchdog_count = data & 0x0f;
+	state->m_watchdog_count = data & 0x0f;
 }
 
 WRITE8_HANDLER( decocass_watchdog_flip_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
-	state->watchdog_flip = data;
+	state->m_watchdog_flip = data;
 }
 
 WRITE8_HANDLER( decocass_color_missiles_w )
@@ -268,7 +268,7 @@ WRITE8_HANDLER( decocass_color_missiles_w )
      * D0-D2 to the IC0 inputs
      * D4-D6 to the IC1 inputs
      */
-	state->color_missiles = data & 0x77;
+	state->m_color_missiles = data & 0x77;
 }
 
 /*
@@ -284,7 +284,7 @@ WRITE8_HANDLER( decocass_color_missiles_w )
 WRITE8_HANDLER( decocass_mode_set_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->mode_set)
+	if (data == state->m_mode_set)
 		return;
 	LOG(1,("decocass_mode_set_w: $%02x (%s%s%s%s%s%s%s%s)\n", data,
 		(data & 0x01) ? "D0?" : "",
@@ -296,13 +296,13 @@ WRITE8_HANDLER( decocass_mode_set_w )
 		(data & 0x40) ? " tunnel" : "",
 		(data & 0x80) ? " part_h_enable" : ""));
 
-	state->mode_set = data;
+	state->m_mode_set = data;
 }
 
 WRITE8_HANDLER( decocass_color_center_bot_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->color_center_bot)
+	if (data == state->m_color_center_bot)
 		return;
 	LOG(1,("decocass_color_center_bot_w: $%02x (color:%d, center_bot:%d)\n", data, data & 3, data >> 4));
 	/*
@@ -316,75 +316,75 @@ WRITE8_HANDLER( decocass_color_center_bot_w )
      * D0   CLD3
      */
 
-	if ((state->color_center_bot ^ data) & 0x80)
+	if ((state->m_color_center_bot ^ data) & 0x80)
 	{
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap_r);
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap_l);
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap_r);
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap_l);
 	}
-	if ((state->color_center_bot ^ data) & 0x01)
-		tilemap_mark_all_tiles_dirty(state->fg_tilemap);
-	state->color_center_bot = data;
+	if ((state->m_color_center_bot ^ data) & 0x01)
+		tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
+	state->m_color_center_bot = data;
 }
 
 WRITE8_HANDLER( decocass_back_h_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->back_h_shift)
+	if (data == state->m_back_h_shift)
 		return;
 	LOG(1,("decocass_back_h_shift_w: $%02x\n", data));
-	state->back_h_shift = data;
+	state->m_back_h_shift = data;
 }
 
 WRITE8_HANDLER( decocass_back_vl_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->back_vl_shift)
+	if (data == state->m_back_vl_shift)
 		return;
 	LOG(1,("decocass_back_vl_shift_w: $%02x\n", data));
-	state->back_vl_shift = data;
+	state->m_back_vl_shift = data;
 }
 
 WRITE8_HANDLER( decocass_back_vr_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->back_vr_shift)
+	if (data == state->m_back_vr_shift)
 		return;
 	LOG(1,("decocass_back_vr_shift_w: $%02x\n", data));
-	state->back_vr_shift = data;
+	state->m_back_vr_shift = data;
 }
 
 WRITE8_HANDLER( decocass_part_h_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->part_v_shift )
+	if (data == state->m_part_v_shift )
 		return;
 	LOG(1,("decocass_part_h_shift_w: $%02x\n", data));
-	state->part_h_shift = data;
+	state->m_part_h_shift = data;
 }
 
 WRITE8_HANDLER( decocass_part_v_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->part_v_shift )
+	if (data == state->m_part_v_shift )
 		return;
 	LOG(1,("decocass_part_v_shift_w: $%02x\n", data));
-	state->part_v_shift = data;
+	state->m_part_v_shift = data;
 }
 
 WRITE8_HANDLER( decocass_center_h_shift_space_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	if (data == state->center_h_shift_space)
+	if (data == state->m_center_h_shift_space)
 		return;
 	LOG(1,("decocass_center_h_shift_space_w: $%02x\n", data));
-	state->center_h_shift_space = data;
+	state->m_center_h_shift_space = data;
 }
 
 WRITE8_HANDLER( decocass_center_v_shift_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(1,("decocass_center_v_shift_w: $%02x\n", data));
-	state->center_v_shift = data;
+	state->m_center_v_shift = data;
 }
 
 /********************************************
@@ -465,7 +465,7 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = (state->color_missiles >> 4) & 7;
+					*BITMAP_ADDR16(bitmap, sy, sx) = (state->m_color_missiles >> 4) & 7;
 				sx++;
 			}
 
@@ -481,7 +481,7 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = state->color_missiles & 7;
+					*BITMAP_ADDR16(bitmap, sy, sx) = state->m_color_missiles & 7;
 				sx++;
 			}
 	}
@@ -491,28 +491,28 @@ static void draw_missiles(running_machine &machine,bitmap_t *bitmap, const recta
 VIDEO_START( decocass )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	state->bg_tilemap_l = tilemap_create(machine, get_bg_l_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
-	state->bg_tilemap_r = tilemap_create(machine, get_bg_r_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, fgvideoram_scan_cols, 8, 8, 32, 32);
+	state->m_bg_tilemap_l = tilemap_create(machine, get_bg_l_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
+	state->m_bg_tilemap_r = tilemap_create(machine, get_bg_r_tile_info, bgvideoram_scan_cols, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, fgvideoram_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg_tilemap_l, 0);
-	tilemap_set_transparent_pen(state->bg_tilemap_r, 0);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap_l, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap_r, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	state->bg_tilemap_l_clip = machine.primary_screen->visible_area();
-	state->bg_tilemap_l_clip.max_y = 256 / 2 - 1;
+	state->m_bg_tilemap_l_clip = machine.primary_screen->visible_area();
+	state->m_bg_tilemap_l_clip.max_y = 256 / 2 - 1;
 
-	state->bg_tilemap_r_clip = machine.primary_screen->visible_area();
-	state->bg_tilemap_r_clip.min_y = 256 / 2;
+	state->m_bg_tilemap_r_clip = machine.primary_screen->visible_area();
+	state->m_bg_tilemap_r_clip.min_y = 256 / 2;
 
 	/* background videroam bits D0-D3 are shared with the tileram */
-	state->bgvideoram = state->tileram;
-	state->bgvideoram_size = 0x0400;	/* d000-d3ff */
+	state->m_bgvideoram = state->m_tileram;
+	state->m_bgvideoram_size = 0x0400;	/* d000-d3ff */
 
-	gfx_element_set_source(machine.gfx[0], state->charram);
-	gfx_element_set_source(machine.gfx[1], state->charram);
-	gfx_element_set_source(machine.gfx[2], state->tileram);
-	gfx_element_set_source(machine.gfx[3], state->objectram);
+	gfx_element_set_source(machine.gfx[0], state->m_charram);
+	gfx_element_set_source(machine.gfx[1], state->m_charram);
+	gfx_element_set_source(machine.gfx[2], state->m_tileram);
+	gfx_element_set_source(machine.gfx[3], state->m_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
      * now that dirty-tile tracking is handled by the core */
@@ -526,70 +526,70 @@ SCREEN_UPDATE( decocass )
 	rectangle clip;
 
 	if (0xc0 != (input_port_read(screen->machine(), "IN2") & 0xc0))  /* coin slots assert an NMI */
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
-	if (0 == (state->watchdog_flip & 0x04))
+	if (0 == (state->m_watchdog_flip & 0x04))
 		watchdog_reset(screen->machine());
-	else if (state->watchdog_count-- > 0)
+	else if (state->m_watchdog_count-- > 0)
 		watchdog_reset(screen->machine());
 
 #ifdef MAME_DEBUG
 	{
 		if (input_code_pressed_once(screen->machine(), KEYCODE_I))
-			state->showmsg ^= 1;
-		if (state->showmsg)
+			state->m_showmsg ^= 1;
+		if (state->m_showmsg)
 			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",
-				state->mode_set,
-				state->color_missiles,
-				state->color_center_bot,
-				state->back_h_shift,
-				state->back_vl_shift,
-				state->back_vr_shift,
-				state->part_h_shift,
-				state->part_v_shift,
-				state->center_h_shift_space,
-				state->center_v_shift);
+				state->m_mode_set,
+				state->m_color_missiles,
+				state->m_color_center_bot,
+				state->m_back_h_shift,
+				state->m_back_vl_shift,
+				state->m_back_vr_shift,
+				state->m_part_h_shift,
+				state->m_part_v_shift,
+				state->m_center_h_shift_space,
+				state->m_center_v_shift);
 	}
 #endif
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	scrolly_l = state->back_vl_shift;
-	scrolly_r = 256 - state->back_vr_shift;
+	scrolly_l = state->m_back_vl_shift;
+	scrolly_r = 256 - state->m_back_vr_shift;
 
-	scrollx = 256 - state->back_h_shift;
-	if (0 == (state->mode_set & 0x02))
+	scrollx = 256 - state->m_back_h_shift;
+	if (0 == (state->m_mode_set & 0x02))
 		scrollx += 256;
 
 #if 0
 /* this is wrong */
-	if (0 != state->back_h_shift && 0 == ((state->mode_set ^ (state->mode_set >> 1)) & 1))
+	if (0 != state->m_back_h_shift && 0 == ((state->m_mode_set ^ (state->m_mode_set >> 1)) & 1))
 		scrollx += 256;
 #endif
 
-	if (0 == (state->mode_set & 0x04))
+	if (0 == (state->m_mode_set & 0x04))
 		scrolly_r += 256;
 	else
 		scrolly_l += 256;
 
-	tilemap_set_scrollx(state->bg_tilemap_l, 0, scrollx);
-	tilemap_set_scrolly(state->bg_tilemap_l, 0, scrolly_l);
+	tilemap_set_scrollx(state->m_bg_tilemap_l, 0, scrollx);
+	tilemap_set_scrolly(state->m_bg_tilemap_l, 0, scrolly_l);
 
-	tilemap_set_scrollx(state->bg_tilemap_r, 0, scrollx);
-	tilemap_set_scrolly(state->bg_tilemap_r, 0, scrolly_r);
+	tilemap_set_scrollx(state->m_bg_tilemap_r, 0, scrollx);
+	tilemap_set_scrolly(state->m_bg_tilemap_r, 0, scrolly_r);
 
-	if (state->mode_set & 0x08)	/* bkg_ena on ? */
+	if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 	{
-		clip = state->bg_tilemap_l_clip;
+		clip = state->m_bg_tilemap_l_clip;
 		sect_rect(&clip, cliprect);
-		tilemap_draw(bitmap, &clip, state->bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, TILEMAP_DRAW_OPAQUE, 0);
 
-		clip = state->bg_tilemap_r_clip;
+		clip = state->m_bg_tilemap_r_clip;
 		sect_rect(&clip, cliprect);
-		tilemap_draw(bitmap, &clip, state->bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	if (state->mode_set & 0x20)
+	if (state->m_mode_set & 0x20)
 	{
 		draw_object(screen->machine(), bitmap, cliprect);
 		draw_center(screen->machine(), bitmap, cliprect);
@@ -598,19 +598,19 @@ SCREEN_UPDATE( decocass )
 	{
 		draw_object(screen->machine(), bitmap, cliprect);
 		draw_center(screen->machine(), bitmap, cliprect);
-		if (state->mode_set & 0x08)	/* bkg_ena on ? */
+		if (state->m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
-			clip = state->bg_tilemap_l_clip;
+			clip = state->m_bg_tilemap_l_clip;
 			sect_rect(&clip, cliprect);
-			tilemap_draw(bitmap, &clip, state->bg_tilemap_l, 0, 0);
+			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_l, 0, 0);
 
-			clip = state->bg_tilemap_r_clip;
+			clip = state->m_bg_tilemap_r_clip;
 			sect_rect(&clip, cliprect);
-			tilemap_draw(bitmap, &clip, state->bg_tilemap_r, 0, 0);
+			tilemap_draw(bitmap, &clip, state->m_bg_tilemap_r, 0, 0);
 		}
 	}
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	draw_sprites(screen->machine(), bitmap, cliprect, (state->color_center_bot >> 1) & 1, 0, 0, state->fgvideoram, 0x20);
-	draw_missiles(screen->machine(), bitmap, cliprect, 1, 0, state->colorram, 0x20);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, (state->m_color_center_bot >> 1) & 1, 0, 0, state->m_fgvideoram, 0x20);
+	draw_missiles(screen->machine(), bitmap, cliprect, 1, 0, state->m_colorram, 0x20);
 	return 0;
 }

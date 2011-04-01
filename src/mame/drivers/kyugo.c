@@ -37,7 +37,7 @@
 static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
 	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -49,15 +49,15 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, spriteram_2)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, m_bgattribram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_fgvideoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, m_spriteram_2)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, m_spriteram_1)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, shared_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, m_shared_ram)
 ADDRESS_MAP_END
 
 
@@ -451,15 +451,15 @@ static MACHINE_START( kyugo )
 {
 	kyugo_state *state = machine.driver_data<kyugo_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->subcpu = machine.device("sub");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->scroll_x_lo));
-	state->save_item(NAME(state->scroll_x_hi));
-	state->save_item(NAME(state->scroll_y));
-	state->save_item(NAME(state->bgpalbank));
-	state->save_item(NAME(state->fgcolor));
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_scroll_x_lo));
+	state->save_item(NAME(state->m_scroll_x_hi));
+	state->save_item(NAME(state->m_scroll_y));
+	state->save_item(NAME(state->m_bgpalbank));
+	state->save_item(NAME(state->m_fgcolor));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_RESET( kyugo )
@@ -470,12 +470,12 @@ static MACHINE_RESET( kyugo )
 	cpu_interrupt_enable(machine.device("maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
 
-	state->scroll_x_lo = 0;
-	state->scroll_x_hi = 0;
-	state->scroll_y = 0;
-	state->bgpalbank = 0;
-	state->fgcolor = 0;
-	state->flipscreen = 0;
+	state->m_scroll_x_lo = 0;
+	state->m_scroll_x_hi = 0;
+	state->m_scroll_y = 0;
+	state->m_bgpalbank = 0;
+	state->m_fgcolor = 0;
+	state->m_flipscreen = 0;
 }
 
 
@@ -1342,7 +1342,7 @@ static DRIVER_INIT( srdmissn )
 	kyugo_state *state = machine.driver_data<kyugo_state>();
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->shared_ram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->m_shared_ram);
 
 	/* extra RAM on sub CPU  */
 	machine.device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);

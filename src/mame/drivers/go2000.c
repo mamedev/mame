@@ -41,12 +41,12 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  videoram;
-	UINT16 *  videoram2;
-//  UINT16 *  paletteram;   // currently this uses generic palette handling
+	UINT16 *  m_videoram;
+	UINT16 *  m_videoram2;
+//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	device_t *soundcpu;
+	device_t *m_soundcpu;
 };
 
 
@@ -54,14 +54,14 @@ static WRITE16_HANDLER( sound_cmd_w )
 {
 	go2000_state *state = space->machine().driver_data<go2000_state>();
 	soundlatch_w(space, offset, data & 0xff);
-	device_set_input_line(state->soundcpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(go2000_state, videoram)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE_MEMBER(go2000_state, videoram2)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(go2000_state, m_videoram)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE_MEMBER(go2000_state, m_videoram2)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
@@ -180,8 +180,8 @@ static SCREEN_UPDATE(go2000)
 	{
 		for (y = 0; y < 32; y++)
 		{
-			int tile = state->videoram[count];
-			int attr = state->videoram2[count];
+			int tile = state->m_videoram[count];
+			int attr = state->m_videoram2[count];
 			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
@@ -192,8 +192,8 @@ static SCREEN_UPDATE(go2000)
 	{
 		for (y = 0; y < 32; y++)
 		{
-			int tile = state->videoram[count];
-			int attr = state->videoram2[count];
+			int tile = state->m_videoram[count];
+			int attr = state->m_videoram2[count];
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
@@ -214,9 +214,9 @@ static SCREEN_UPDATE(go2000)
 		int dx, dy;
 		int flipx, y0;
 
-		int y = state->videoram[offs + 0 + 0x00000 / 2];
-		int x = state->videoram[offs + 1 + 0x00000 / 2];
-		int dim = state->videoram2[offs + 0 + 0x00000 / 2];
+		int y = state->m_videoram[offs + 0 + 0x00000 / 2];
+		int x = state->m_videoram[offs + 1 + 0x00000 / 2];
+		int dim = state->m_videoram2[offs + 0 + 0x00000 / 2];
 
 		int bank	=	(x >> 12) & 0xf;
 
@@ -265,8 +265,8 @@ static SCREEN_UPDATE(go2000)
 			for (dx = 0; dx < dimx * 8; dx += 8)
 			{
 				int addr = (srcpg * 0x20 * 0x20) + ((srcx + tile_x) & 0x1f) * 0x20 + ((srcy + tile_y) & 0x1f);
-				int tile = state->videoram[addr + 0x00000 / 2];
-				int attr = state->videoram2[addr + 0x00000 / 2];
+				int tile = state->m_videoram[addr + 0x00000 / 2];
+				int attr = state->m_videoram2[addr + 0x00000 / 2];
 
 				int sx = x + dx;
 				int sy = (y + dy) & 0xff;
@@ -315,7 +315,7 @@ static MACHINE_START( go2000 )
 
 	memory_set_bank(machine, "bank1", 0);
 
-	state->soundcpu = machine.device("soundcpu");
+	state->m_soundcpu = machine.device("soundcpu");
 }
 
 static MACHINE_CONFIG_START( go2000, go2000_state )

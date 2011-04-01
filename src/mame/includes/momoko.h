@@ -11,25 +11,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        bg_scrollx;
-	UINT8 *        bg_scrolly;
-	UINT8 *        videoram;
-	UINT8 *        spriteram;
+	UINT8 *        m_bg_scrollx;
+	UINT8 *        m_bg_scrolly;
+	UINT8 *        m_videoram;
+	UINT8 *        m_spriteram;
 //  UINT8 *        paletteram;    // currently this uses generic palette handling
-	size_t         spriteram_size;
-	size_t         videoram_size;
+	size_t         m_spriteram_size;
+	size_t         m_videoram_size;
 
 	/* video-related */
-	UINT8          fg_scrollx;
-	UINT8          fg_scrolly;
-	UINT8          fg_select;
-	UINT8          text_scrolly;
-	UINT8          text_mode;
-	UINT8          bg_select;
-	UINT8          bg_priority;
-	UINT8          bg_mask;
-	UINT8          fg_mask;
-	UINT8          flipscreen;
+	UINT8          m_fg_scrollx;
+	UINT8          m_fg_scrolly;
+	UINT8          m_fg_select;
+	UINT8          m_text_scrolly;
+	UINT8          m_text_mode;
+	UINT8          m_bg_select;
+	UINT8          m_bg_priority;
+	UINT8          m_bg_mask;
+	UINT8          m_fg_mask;
+	UINT8          m_flipscreen;
 };
 
 

@@ -4,11 +4,11 @@ public:
 	speedspn_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *attram;
-	tilemap_t *tilemap;
-	UINT8 display_disable;
-	int bank_vidram;
-	UINT8* vidram;
+	UINT8 *m_attram;
+	tilemap_t *m_tilemap;
+	UINT8 m_display_disable;
+	int m_bank_vidram;
+	UINT8* m_vidram;
 };
 
 

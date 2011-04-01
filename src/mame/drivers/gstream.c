@@ -130,28 +130,35 @@ class gstream_state : public driver_device
 public:
 	gstream_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  oki_1(*this, "oki1"),
-		  oki_2(*this, "oki2") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_oki_1(*this, "oki1"),
+		  m_oki_2(*this, "oki2") { }
 
 	/* memory pointers */
-	UINT32 *  vram;
-	UINT32 *  workram;
-	UINT32 *  paletteram;
-//  UINT32 *  nvram;    // currently this uses generic nvram handling
+	UINT32 *  m_vram;
+	UINT32 *  m_workram;
+	UINT32 *  m_paletteram;
+//  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
-	tilemap_t   *tilemap1, *tilemap2, *tilemap3;
-	UINT32    tmap1_scrollx, tmap2_scrollx, tmap3_scrollx;
-	UINT32    tmap1_scrolly, tmap2_scrolly, tmap3_scrolly;
+	tilemap_t   *m_tilemap1;
+	tilemap_t   *m_tilemap2;
+	tilemap_t   *m_tilemap3;
+	UINT32    m_tmap1_scrollx;
+	UINT32    m_tmap2_scrollx;
+	UINT32    m_tmap3_scrollx;
+	UINT32    m_tmap1_scrolly;
+	UINT32    m_tmap2_scrolly;
+	UINT32    m_tmap3_scrolly;
 
 	/* misc */
-	int       oki_bank_0, oki_bank_1;
+	int       m_oki_bank_0;
+	int       m_oki_bank_1;
 
 	/* devices */
-	required_device<e132xt_device> maincpu;
-	required_device<okim6295_device> oki_1;
-	required_device<okim6295_device> oki_2;
+	required_device<e132xt_device> m_maincpu;
+	required_device<okim6295_device> m_oki_1;
+	required_device<okim6295_device> m_oki_2;
 };
 
 
@@ -188,36 +195,36 @@ static CUSTOM_INPUT( gstream_mirror_r )
 static WRITE32_HANDLER( gstream_palette_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 
-	palette_set_color_rgb(space->machine(), offset * 2, pal5bit(state->paletteram[offset] >> (0 + 16)),
-									pal5bit(state->paletteram[offset] >> (6 + 16)),
-									pal5bit(state->paletteram[offset] >> (11 + 16)));
+	palette_set_color_rgb(space->machine(), offset * 2, pal5bit(state->m_paletteram[offset] >> (0 + 16)),
+									pal5bit(state->m_paletteram[offset] >> (6 + 16)),
+									pal5bit(state->m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(space->machine(),offset * 2 + 1,pal5bit(state->paletteram[offset] >> (0)),
-									pal5bit(state->paletteram[offset] >> (6)),
-									pal5bit(state->paletteram[offset] >> (11)));
+	palette_set_color_rgb(space->machine(),offset * 2 + 1,pal5bit(state->m_paletteram[offset] >> (0)),
+									pal5bit(state->m_paletteram[offset] >> (6)),
+									pal5bit(state->m_paletteram[offset] >> (11)));
 }
 
 static WRITE32_HANDLER( gstream_vram_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	COMBINE_DATA(&state->vram[offset]);
+	COMBINE_DATA(&state->m_vram[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
 		if (offset >= 0x000 / 4 && offset < 0x400 / 4)
 		{
-			tilemap_mark_tile_dirty(state->tilemap1, offset - (0x000 / 4));
+			tilemap_mark_tile_dirty(state->m_tilemap1, offset - (0x000 / 4));
 		}
 		else if (offset >= 0x400 / 4 && offset < 0x800 / 4)
 		{
-			tilemap_mark_tile_dirty(state->tilemap2, offset - (0x400 / 4));
+			tilemap_mark_tile_dirty(state->m_tilemap2, offset - (0x400 / 4));
 		}
 		else if (offset >= 0x800 / 4 && offset < 0xc00 / 4)
 		{
-			tilemap_mark_tile_dirty(state->tilemap3, offset - (0x800 / 4));
+			tilemap_mark_tile_dirty(state->m_tilemap3, offset - (0x800 / 4));
 		}
 	}
 }
@@ -225,47 +232,47 @@ static WRITE32_HANDLER( gstream_vram_w )
 static WRITE32_HANDLER( gstream_tilemap1_scrollx_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap1_scrollx = data;
+	state->m_tmap1_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap1_scrolly_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap1_scrolly = data;
+	state->m_tmap1_scrolly = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap2_scrollx_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap2_scrollx = data;
+	state->m_tmap2_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap2_scrolly_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap2_scrolly = data;
+	state->m_tmap2_scrolly = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap3_scrollx_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap3_scrollx = data;
+	state->m_tmap3_scrollx = data;
 }
 
 static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->tmap3_scrolly = data;
+	state->m_tmap3_scrolly = data;
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, workram) // work ram
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, m_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, m_vram) // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE_MEMBER(gstream_state, paletteram)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE_MEMBER(gstream_state, m_paletteram)
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -313,30 +320,30 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 
 	//popmessage("oki_0 banking value = %X\noki_1 banking value = %X\n",data & 0xf,(data >> 4) & 0xf);
 
-	state->oki_bank_0 = bank_table_0[data & 0xf];
-	state->oki_bank_1 = bank_table_1[data & 0xf];		// (data >> 4) & 0xf ??
+	state->m_oki_bank_0 = bank_table_0[data & 0xf];
+	state->m_oki_bank_1 = bank_table_1[data & 0xf];		// (data >> 4) & 0xf ??
 
 	/* some values are already used in the table, so we force them manually */
 	if ((data == 0x6f) || (data == 0x6e))
 	{
-		state->oki_bank_0 = 0;	// level 3b-5a samples
-		state->oki_bank_1 = 6;		// level 3b-5a music
+		state->m_oki_bank_0 = 0;	// level 3b-5a samples
+		state->m_oki_bank_1 = 6;		// level 3b-5a music
 	}
 
 	if (data == 0x9b)
 	{
-		state->oki_bank_0 = 7;		// level 7 music
-		state->oki_bank_1 = 0;		// level 7 samples
+		state->m_oki_bank_0 = 7;		// level 7 music
+		state->m_oki_bank_1 = 0;		// level 7 samples
 	}
 
 	if (data == 0x9f)
 	{
-		state->oki_bank_0 = 0;		// end sequence samples
-		state->oki_bank_1 = 3;		// end sequence music
+		state->m_oki_bank_0 = 0;		// end sequence samples
+		state->m_oki_bank_1 = 3;		// end sequence music
 	}
 
-	state->oki_1->set_bank_base(state->oki_bank_0 * 0x40000);
-	state->oki_2->set_bank_base(state->oki_bank_1 * 0x40000);
+	state->m_oki_1->set_bank_base(state->m_oki_bank_0 * 0x40000);
+	state->m_oki_2->set_bank_base(state->m_oki_bank_1 * 0x40000);
 }
 
 static WRITE32_HANDLER( gstream_oki_4040_w )
@@ -432,16 +439,16 @@ GFXDECODE_END
 static TILE_GET_INFO( get_gs1_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x000 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x000 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno, palette + 0x10, 0);
 }
 
 static TILE_GET_INFO( get_gs2_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x400 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x400 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x1000, palette + 0x14, 0);
 }
 
@@ -449,8 +456,8 @@ static TILE_GET_INFO( get_gs2_tile_info )
 static TILE_GET_INFO( get_gs3_tile_info )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	int tileno = (state->vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
-	int palette = (state->vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
+	int tileno = (state->m_vram[tile_index + 0x800 / 4] & 0x0fff0000) >> 16;
+	int palette = (state->m_vram[tile_index + 0x800 / 4] & 0xc0000000) >> 30;
 	SET_TILE_INFO(0, tileno + 0x2000, palette + 0x18, 0);
 }
 
@@ -458,12 +465,12 @@ static TILE_GET_INFO( get_gs3_tile_info )
 static VIDEO_START(gstream)
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
-	state->tilemap1 = tilemap_create(machine, get_gs1_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
-	state->tilemap2 = tilemap_create(machine, get_gs2_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
-	state->tilemap3 = tilemap_create(machine, get_gs3_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
+	state->m_tilemap1 = tilemap_create(machine, get_gs1_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
+	state->m_tilemap2 = tilemap_create(machine, get_gs2_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
+	state->m_tilemap3 = tilemap_create(machine, get_gs3_tile_info, tilemap_scan_rows, 32, 32, 16, 16);
 
-	tilemap_set_transparent_pen(state->tilemap1, 0);
-	tilemap_set_transparent_pen(state->tilemap2, 0);
+	tilemap_set_transparent_pen(state->m_tilemap1, 0);
+	tilemap_set_transparent_pen(state->m_tilemap2, 0);
 }
 
 static SCREEN_UPDATE(gstream)
@@ -485,28 +492,28 @@ static SCREEN_UPDATE(gstream)
 	gstream_state *state = screen->machine().driver_data<gstream_state>();
 	int i;
 
-	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->tmap1_scrollx, state->tmap1_scrolly, state->tmap2_scrollx, state->tmap2_scrolly, state->tmap3_scrollx, state->tmap3_scrolly );
+	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->m_tmap1_scrollx, state->m_tmap1_scrolly, state->m_tmap2_scrollx, state->m_tmap2_scrolly, state->m_tmap3_scrollx, state->m_tmap3_scrolly );
 
-	tilemap_set_scrollx(state->tilemap3, 0, state->tmap3_scrollx >> 16);
-	tilemap_set_scrolly(state->tilemap3, 0, state->tmap3_scrolly >> 16);
+	tilemap_set_scrollx(state->m_tilemap3, 0, state->m_tmap3_scrollx >> 16);
+	tilemap_set_scrolly(state->m_tilemap3, 0, state->m_tmap3_scrolly >> 16);
 
-	tilemap_set_scrollx(state->tilemap1, 0, state->tmap1_scrollx >> 16);
-	tilemap_set_scrolly(state->tilemap1, 0, state->tmap1_scrolly >> 16);
+	tilemap_set_scrollx(state->m_tilemap1, 0, state->m_tmap1_scrollx >> 16);
+	tilemap_set_scrolly(state->m_tilemap1, 0, state->m_tmap1_scrolly >> 16);
 
-	tilemap_set_scrollx(state->tilemap2, 0, state->tmap2_scrollx >> 16);
-	tilemap_set_scrolly(state->tilemap2, 0, state->tmap2_scrolly >> 16);
+	tilemap_set_scrollx(state->m_tilemap2, 0, state->m_tmap2_scrollx >> 16);
+	tilemap_set_scrolly(state->m_tilemap2, 0, state->m_tmap2_scrolly >> 16);
 
-	tilemap_draw(bitmap, cliprect, state->tilemap3, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap3, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
 
 	for (i = 0x0000 / 4; i < 0x4000 / 4; i += 4)
 	{
 		/* Upper bits are used by the tilemaps */
-		int code = state->vram[i + 0] & 0xffff;
-		int x = state->vram[i + 1] & 0xffff;
-		int y = state->vram[i + 2] & 0xffff;
-		int col = state->vram[i + 3] & 0x1f;
+		int code = state->m_vram[i + 0] & 0xffff;
+		int x = state->m_vram[i + 1] & 0xffff;
+		int y = state->m_vram[i + 2] & 0xffff;
+		int col = state->m_vram[i + 3] & 0x1f;
 
 		/* co-ordinates are signed */
 		if (x & 0x8000) x -= 0x10000;
@@ -523,28 +530,28 @@ static MACHINE_START( gstream )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
 
-	state->save_item(NAME(state->tmap1_scrollx));
-	state->save_item(NAME(state->tmap2_scrollx));
-	state->save_item(NAME(state->tmap3_scrollx));
-	state->save_item(NAME(state->tmap1_scrolly));
-	state->save_item(NAME(state->tmap2_scrolly));
-	state->save_item(NAME(state->tmap3_scrolly));
-	state->save_item(NAME(state->oki_bank_0));
-	state->save_item(NAME(state->oki_bank_1));
+	state->save_item(NAME(state->m_tmap1_scrollx));
+	state->save_item(NAME(state->m_tmap2_scrollx));
+	state->save_item(NAME(state->m_tmap3_scrollx));
+	state->save_item(NAME(state->m_tmap1_scrolly));
+	state->save_item(NAME(state->m_tmap2_scrolly));
+	state->save_item(NAME(state->m_tmap3_scrolly));
+	state->save_item(NAME(state->m_oki_bank_0));
+	state->save_item(NAME(state->m_oki_bank_1));
 }
 
 static MACHINE_RESET( gstream )
 {
 	gstream_state *state = machine.driver_data<gstream_state>();
 
-	state->tmap1_scrollx = 0;
-	state->tmap2_scrollx = 0;
-	state->tmap3_scrollx = 0;
-	state->tmap1_scrolly = 0;
-	state->tmap2_scrolly = 0;
-	state->tmap3_scrolly = 0;
-	state->oki_bank_0 = 0;
-	state->oki_bank_1 = 0;
+	state->m_tmap1_scrollx = 0;
+	state->m_tmap2_scrollx = 0;
+	state->m_tmap3_scrollx = 0;
+	state->m_tmap1_scrolly = 0;
+	state->m_tmap2_scrolly = 0;
+	state->m_tmap3_scrolly = 0;
+	state->m_oki_bank_0 = 0;
+	state->m_oki_bank_1 = 0;
 }
 
 static MACHINE_CONFIG_START( gstream, gstream_state )
@@ -624,12 +631,12 @@ ROM_END
 static READ32_HANDLER( gstream_speedup_r )
 {
 	gstream_state *state = space->machine().driver_data<gstream_state>();
-	if (state->maincpu->state(STATE_GENPC) == 0xc0001592)
+	if (state->m_maincpu->state(STATE_GENPC) == 0xc0001592)
 	{
-		state->maincpu->eat_cycles(50);
+		state->m_maincpu->eat_cycles(50);
 	}
 
-	return state->workram[0xd1ee0 / 4];
+	return state->m_workram[0xd1ee0 / 4];
 }
 
 static DRIVER_INIT( gstream )

@@ -14,32 +14,44 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    spriteram;
-	UINT8 *    paletteram;
-	UINT8 *    bwp1_sharedram1;
-	UINT8 *    bwp2_sharedram1;
-	UINT8 *    bwp3_rombase;
-	size_t     bwp3_romsize;
+	UINT8 *    m_videoram;
+	UINT8 *    m_spriteram;
+	UINT8 *    m_paletteram;
+	UINT8 *    m_bwp1_sharedram1;
+	UINT8 *    m_bwp2_sharedram1;
+	UINT8 *    m_bwp3_rombase;
+	size_t     m_bwp3_romsize;
 
 	/* video-related */
-	tilemap_t *charmap, *fgmap, *bgmap;
-	UINT8 *srbase[4], *fgdata, *bgdata;
-	int *srxlat;
-	unsigned sreg[8], palatch, srbank, mapmask, mapflip;
+	tilemap_t *m_charmap;
+	tilemap_t *m_fgmap;
+	tilemap_t *m_bgmap;
+	UINT8 *m_srbase[4];
+	UINT8 *m_fgdata;
+	UINT8 *m_bgdata;
+	int *m_srxlat;
+	unsigned m_sreg[8];
+	unsigned m_palatch;
+	unsigned m_srbank;
+	unsigned m_mapmask;
+	unsigned m_mapflip;
 
 	/* sound-related */
-	UINT8 sound_fifo[MAX_SOUNDS];
-	int bwp3_nmimask, bwp3_u8F_d, ffcount, ffhead, fftail;
+	UINT8 m_sound_fifo[MAX_SOUNDS];
+	int m_bwp3_nmimask;
+	int m_bwp3_u8F_d;
+	int m_ffcount;
+	int m_ffhead;
+	int m_fftail;
 
 	/* misc */
-	UINT8 *bwp123_membase[3];
-	int coin;
+	UINT8 *m_bwp123_membase[3];
+	int m_coin;
 
 	/* device */
-	device_t *maincpu;
-	device_t *subcpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_subcpu;
+	device_t *m_audiocpu;
 };
 
 

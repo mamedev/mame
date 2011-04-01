@@ -7,23 +7,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  spriteram;
-	size_t   spriteram_size;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_spriteram;
+	size_t   m_spriteram_size;
 
 	/* video-related */
-	tilemap_t  *do_tilemap;
+	tilemap_t  *m_do_tilemap;
 
 	/* misc */
-	int      adpcm_pos, adpcm_idle;
-	int      adpcm_data;
-	int      adpcm_status;
-	UINT8    buffer0[9], buffer1[9];
+	int      m_adpcm_pos;
+	int      m_adpcm_idle;
+	int      m_adpcm_data;
+	int      m_adpcm_status;
+	UINT8    m_buffer0[9];
+	UINT8    m_buffer1[9];
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *slave;
+	cpu_device *m_maincpu;
+	cpu_device *m_slave;
 };
 
 

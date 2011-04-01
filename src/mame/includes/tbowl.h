@@ -4,21 +4,21 @@ public:
 	tbowl_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int adpcm_pos[2];
-	int adpcm_end[2];
-	int adpcm_data[2];
-	UINT8 *shared_ram;
-	UINT8 *txvideoram;
-	UINT8 *bgvideoram;
-	UINT8 *bg2videoram;
-	UINT8 *spriteram;
-	tilemap_t *tx_tilemap;
-	tilemap_t *bg_tilemap;
-	tilemap_t *bg2_tilemap;
-	UINT16 xscroll;
-	UINT16 yscroll;
-	UINT16 bg2xscroll;
-	UINT16 bg2yscroll;
+	int m_adpcm_pos[2];
+	int m_adpcm_end[2];
+	int m_adpcm_data[2];
+	UINT8 *m_shared_ram;
+	UINT8 *m_txvideoram;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_bg2videoram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_bg2_tilemap;
+	UINT16 m_xscroll;
+	UINT16 m_yscroll;
+	UINT16 m_bg2xscroll;
+	UINT16 m_bg2yscroll;
 };
 
 

@@ -11,39 +11,39 @@
 WRITE8_HANDLER( fgoal_color_w )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->current_color = data & 3;
+	state->m_current_color = data & 3;
 }
 
 
 WRITE8_HANDLER( fgoal_ypos_w )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->ypos = data;
+	state->m_ypos = data;
 }
 
 
 WRITE8_HANDLER( fgoal_xpos_w )
 {
 	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->xpos = data;
+	state->m_xpos = data;
 }
 
 
 VIDEO_START( fgoal )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
-	state->fgbitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->bgbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_fgbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_bgbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->save_item(NAME(*state->fgbitmap));
-	state->save_item(NAME(*state->bgbitmap));
+	state->save_item(NAME(*state->m_fgbitmap));
+	state->save_item(NAME(*state->m_bgbitmap));
 }
 
 
 SCREEN_UPDATE( fgoal )
 {
 	fgoal_state *state = screen->machine().driver_data<fgoal_state>();
-	const UINT8* VRAM = state->video_ram;
+	const UINT8* VRAM = state->m_video_ram;
 
 	int x;
 	int y;
@@ -51,16 +51,16 @@ SCREEN_UPDATE( fgoal )
 
 	/* draw color overlay foreground and background */
 
-	if (state->fgoal_player == 1 && (input_port_read(screen->machine(), "IN1") & 0x40))
+	if (state->m_fgoal_player == 1 && (input_port_read(screen->machine(), "IN1") & 0x40))
 	{
-		drawgfxzoom_opaque(state->fgbitmap, cliprect, screen->machine().gfx[0],
-			0, (state->fgoal_player << 2) | state->current_color,
+		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen->machine().gfx[0],
+			0, (state->m_fgoal_player << 2) | state->m_current_color,
 			1, 1,
 			0, 16,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->bgbitmap, cliprect, screen->machine().gfx[1],
+		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen->machine().gfx[1],
 			0, 0,
 			1, 1,
 			0, 16,
@@ -69,14 +69,14 @@ SCREEN_UPDATE( fgoal )
 	}
 	else
 	{
-		drawgfxzoom_opaque(state->fgbitmap, cliprect, screen->machine().gfx[0],
-			0, (state->fgoal_player << 2) | state->current_color,
+		drawgfxzoom_opaque(state->m_fgbitmap, cliprect, screen->machine().gfx[0],
+			0, (state->m_fgoal_player << 2) | state->m_current_color,
 			0, 0,
 			0, 0,
 			0x40000,
 			0x40000);
 
-		drawgfxzoom_opaque(state->bgbitmap, cliprect, screen->machine().gfx[1],
+		drawgfxzoom_opaque(state->m_bgbitmap, cliprect, screen->machine().gfx[1],
 			0, 0,
 			0, 0,
 			0, 0,
@@ -86,13 +86,13 @@ SCREEN_UPDATE( fgoal )
 
 	/* the ball has a fixed color */
 
-	for (y = state->ypos; y < state->ypos + 8; y++)
+	for (y = state->m_ypos; y < state->m_ypos + 8; y++)
 	{
-		for (x = state->xpos; x < state->xpos + 8; x++)
+		for (x = state->m_xpos; x < state->m_xpos + 8; x++)
 		{
 			if (y < 256 && x < 256)
 			{
-				*BITMAP_ADDR16(state->fgbitmap, y, x) = 128 + 16;
+				*BITMAP_ADDR16(state->m_fgbitmap, y, x) = 128 + 16;
 			}
 		}
 	}
@@ -103,8 +103,8 @@ SCREEN_UPDATE( fgoal )
 	{
 		UINT16* p = BITMAP_ADDR16(bitmap, y, 0);
 
-		const UINT16* FG = BITMAP_ADDR16(state->fgbitmap, y, 0);
-		const UINT16* BG = BITMAP_ADDR16(state->bgbitmap, y, 0);
+		const UINT16* FG = BITMAP_ADDR16(state->m_fgbitmap, y, 0);
+		const UINT16* BG = BITMAP_ADDR16(state->m_bgbitmap, y, 0);
 
 		for (x = 0; x < 256; x += 8)
 		{

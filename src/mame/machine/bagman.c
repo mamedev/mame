@@ -109,91 +109,91 @@ UINT8 row, column, val;
 		for (column = 0; column < 32; column++)
 		{
 			if ( fusemap[ rowoffs + column ] == 0 )
-				val &= state->columnvalue[column];
+				val &= state->m_columnvalue[column];
 		}
-		state->andmap[row] = val;
+		state->m_andmap[row] = val;
 	}
 
 /* I/O pin #19 */
 	val = 0; /*prepare for OR*/
 	for (row = 1; row < 8; row++)
-		val |= state->andmap[row];
-	if (state->andmap[0] == 1)
+		val |= state->m_andmap[row];
+	if (state->m_andmap[0] == 1)
 	{
-		state->columnvalue[2] = 1-val;
-		state->columnvalue[3] = val;
-		state->outvalue[0]    = 1-val;
+		state->m_columnvalue[2] = 1-val;
+		state->m_columnvalue[3] = val;
+		state->m_outvalue[0]    = 1-val;
 	}
 	else
 	{
 		/*pin is in INPUT configuration so it doesn't create output...*/
-		state->columnvalue[2] = 0;
-		state->columnvalue[3] = 1;
+		state->m_columnvalue[2] = 0;
+		state->m_columnvalue[3] = 1;
 	}
 
 /* O pin #18 (D1) */
 	val = 0; /*prepare for OR*/
 	for (row = 8; row < 16; row++)
-		val |= state->andmap[row];
-	state->columnvalue[6] = 1-val;
-	state->columnvalue[7] = val;
-	state->outvalue[1]    = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[6] = 1-val;
+	state->m_columnvalue[7] = val;
+	state->m_outvalue[1]    = 1-val;
 
 /* O pin #17 (D2) */
 	val = 0; /*prepare for OR*/
 	for (row = 16; row < 24; row++)
-		val |= state->andmap[row];
-	state->columnvalue[10] = 1-val;
-	state->columnvalue[11] = val;
-	state->outvalue[2]     = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[10] = 1-val;
+	state->m_columnvalue[11] = val;
+	state->m_outvalue[2]     = 1-val;
 
 /* O pin #16 (D3) */
 	val = 0; /*prepare for OR*/
 	for (row = 24; row < 32; row++)
-		val |= state->andmap[row];
-	state->columnvalue[14] = 1-val;
-	state->columnvalue[15] = val;
-	state->outvalue[3]     = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[14] = 1-val;
+	state->m_columnvalue[15] = val;
+	state->m_outvalue[3]     = 1-val;
 
 /* O pin #15 (D4) */
 	val = 0; /*prepare for OR*/
 	for (row = 32; row < 40; row++)
-		val |= state->andmap[row];
-	state->columnvalue[18] = 1-val;
-	state->columnvalue[19] = val;
-	state->outvalue[4]     = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[18] = 1-val;
+	state->m_columnvalue[19] = val;
+	state->m_outvalue[4]     = 1-val;
 
 /* O pin #14 (D5) */
 	val = 0; /*prepare for OR*/
 	for (row = 40; row < 48; row++)
-		val |= state->andmap[row];
-	state->columnvalue[22] = 1-val;
-	state->columnvalue[23] = val;
-	state->outvalue[5]     = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[22] = 1-val;
+	state->m_columnvalue[23] = val;
+	state->m_outvalue[5]     = 1-val;
 
 /* O pin #13 (D6) */
 	val = 0; /*prepare for OR*/
 	for (row = 48; row < 56; row++)
-		val |= state->andmap[row];
-	state->columnvalue[26] = 1-val;
-	state->columnvalue[27] = val;
-	state->outvalue[6]     = 1-val;
+		val |= state->m_andmap[row];
+	state->m_columnvalue[26] = 1-val;
+	state->m_columnvalue[27] = val;
+	state->m_outvalue[6]     = 1-val;
 
 /* I/O pin #12 */
 	val = 0; /*prepare for OR*/
 	for (row = 57; row < 64; row++)
-		val |= state->andmap[row];
-	if (state->andmap[56] == 1)
+		val |= state->m_andmap[row];
+	if (state->m_andmap[56] == 1)
 	{
-		state->columnvalue[30] = 1-val;
-		state->columnvalue[31] = val;
-		state->outvalue[7]     = 1-val;
+		state->m_columnvalue[30] = 1-val;
+		state->m_columnvalue[31] = val;
+		state->m_outvalue[7]     = 1-val;
 	}
 	else
 	{
 		/*pin is in INPUT configuration so it doesn't create output...*/
-		state->columnvalue[30] = 0;
-		state->columnvalue[31] = 1;
+		state->m_columnvalue[30] = 0;
+		state->m_columnvalue[31] = 1;
 	}
 
 }
@@ -205,8 +205,8 @@ WRITE8_HANDLER( bagman_pal16r6_w )
 UINT8 line;
 
 	line = offset * 4;
-	state->columnvalue[line    ] = data & 1;
-	state->columnvalue[line + 1] = 1 - (data & 1);
+	state->m_columnvalue[line    ] = data & 1;
+	state->m_columnvalue[line + 1] = 1 - (data & 1);
 }
 
 MACHINE_RESET( bagman )
@@ -228,8 +228,8 @@ READ8_HANDLER( bagman_pal16r6_r )
 {
 	bagman_state *state = space->machine().driver_data<bagman_state>();
 	update_pal(state);
-	return	(state->outvalue[6]) + (state->outvalue[5] << 1) + (state->outvalue[4] << 2) +
-		(state->outvalue[3] << 3) + (state->outvalue[2] << 4) + (state->outvalue[1] << 5);
+	return	(state->m_outvalue[6]) + (state->m_outvalue[5] << 1) + (state->m_outvalue[4] << 2) +
+		(state->m_outvalue[3] << 3) + (state->m_outvalue[2] << 4) + (state->m_outvalue[1] << 5);
 
 /* Bagman schematics show that this is right mapping order of PAL outputs to bits.
 ** This is the PAL 16R6 shown almost in the middle of the schematics.

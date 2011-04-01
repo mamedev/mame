@@ -91,28 +91,28 @@ static READ8_HANDLER( topgunbl_rotary_r )
 static WRITE8_HANDLER( jackal_flipscreen_w )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->irq_enable = data & 0x02;
+	state->m_irq_enable = data & 0x02;
 	flip_screen_set(space->machine(), data & 0x08);
 }
 
 static READ8_HANDLER( jackal_zram_r )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->rambank[0x0020 + offset];
+	return state->m_rambank[0x0020 + offset];
 }
 
 
 static READ8_HANDLER( jackal_voram_r )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->rambank[0x2000 + offset];
+	return state->m_rambank[0x2000 + offset];
 }
 
 
 static READ8_HANDLER( jackal_spriteram_r )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->spritebank[0x3000 + offset];
+	return state->m_spritebank[0x3000 + offset];
 }
 
 
@@ -127,8 +127,8 @@ static WRITE8_HANDLER( jackal_rambank_w )
 	coin_counter_w(space->machine(), 0, data & 0x01);
 	coin_counter_w(space->machine(), 1, data & 0x02);
 
-	state->spritebank = &rgn[((data & 0x08) << 13)];
-	state->rambank = &rgn[((data & 0x10) << 12)];
+	state->m_spritebank = &rgn[((data & 0x08) << 13)];
+	state->m_rambank = &rgn[((data & 0x10) << 12)];
 	memory_set_bank(space->machine(), "bank1", (data & 0x20) ? 1 : 0);
 }
 
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( jackal_rambank_w )
 static WRITE8_HANDLER( jackal_zram_w )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->rambank[0x0020 + offset] = data;
+	state->m_rambank[0x0020 + offset] = data;
 }
 
 
@@ -147,14 +147,14 @@ static WRITE8_HANDLER( jackal_voram_w )
 	if ((offset & 0xf800) == 0)
 		jackal_mark_tile_dirty(space->machine(), offset & 0x3ff);
 
-	state->rambank[0x2000 + offset] = data;
+	state->m_rambank[0x2000 + offset] = data;
 }
 
 
 static WRITE8_HANDLER( jackal_spriteram_w )
 {
 	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->spritebank[0x3000 + offset] = data;
+	state->m_spritebank[0x3000 + offset] = data;
 }
 
 /*************************************
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( jackal_spriteram_w )
  *************************************/
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE_MEMBER(jackal_state, videoctrl)	// scroll + other things
+	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE_MEMBER(jackal_state, m_videoctrl)	// scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(jackal_state, paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(jackal_state, m_paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM						// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -319,10 +319,10 @@ static INTERRUPT_GEN( jackal_interrupt )
 {
 	jackal_state *state = device->machine().driver_data<jackal_state>();
 
-	if (state->irq_enable)
+	if (state->m_irq_enable)
 	{
 		device_set_input_line(device, 0, HOLD_LINE);
-		device_set_input_line(state->slavecpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_slavecpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -342,10 +342,10 @@ static MACHINE_START( jackal )
 	memory_configure_bank(machine, "bank1", 1, 1, &ROM[0x14000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->mastercpu = machine.device("master");
-	state->slavecpu = machine.device("slave");
+	state->m_mastercpu = machine.device("master");
+	state->m_slavecpu = machine.device("slave");
 
-	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->m_irq_enable));
 }
 
 static MACHINE_RESET( jackal )
@@ -357,10 +357,10 @@ static MACHINE_RESET( jackal )
 	// at the beginning of the game. This fixes it.
 	machine.device("slave")->set_clock_scale(1.2f);
 
-	state->rambank = rgn;
-	state->spritebank = rgn;
+	state->m_rambank = rgn;
+	state->m_spritebank = rgn;
 
-	state->irq_enable = 0;
+	state->m_irq_enable = 0;
 }
 
 static MACHINE_CONFIG_START( jackal, jackal_state )

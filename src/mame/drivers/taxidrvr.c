@@ -26,27 +26,27 @@ static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device,8,data); }
 static READ8_DEVICE_HANDLER( p0a_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return state->latchA;
+	return state->m_latchA;
 }
 
 static READ8_DEVICE_HANDLER( p0c_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return (state->s1 << 7);
+	return (state->m_s1 << 7);
 }
 
 static WRITE8_DEVICE_HANDLER( p0b_w )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	state->latchB = data;
+	state->m_latchB = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p0c_w )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	state->s2 = data & 1;
+	state->m_s2 = data & 1;
 
-	state->bghide = data & 2;
+	state->m_bghide = data & 2;
 
 	/* bit 2 toggles during gameplay */
 
@@ -58,38 +58,38 @@ static WRITE8_DEVICE_HANDLER( p0c_w )
 static READ8_DEVICE_HANDLER( p1b_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return state->latchB;
+	return state->m_latchB;
 }
 
 static READ8_DEVICE_HANDLER( p1c_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return (state->s2 << 7) | (state->s4 << 6) | ((input_port_read(device->machine(), "SERVCOIN") & 1) << 4);
+	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((input_port_read(device->machine(), "SERVCOIN") & 1) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( p1a_w )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	state->latchA = data;
+	state->m_latchA = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p1c_w )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	state->s1 = data & 1;
-	state->s3 = (data & 2) >> 1;
+	state->m_s1 = data & 1;
+	state->m_s3 = (data & 2) >> 1;
 }
 
 static READ8_DEVICE_HANDLER( p8910_0a_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return state->latchA;
+	return state->m_latchA;
 }
 
 static READ8_DEVICE_HANDLER( p8910_1a_r )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	return state->s3;
+	return state->m_s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
@@ -97,7 +97,7 @@ static READ8_DEVICE_HANDLER( p8910_1a_r )
 static WRITE8_DEVICE_HANDLER( p8910_0b_w )
 {
 	taxidrvr_state *state = device->machine().driver_data<taxidrvr_state>();
-	state->s4 = data & 1;
+	state->m_s4 = data & 1;
 }
 
 
@@ -152,21 +152,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
 	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, vram4)			/* radar bitmap */
-	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram5)	/* "sprite1" bitmap */
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram6)	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, vram7)			/* "sprite3" bitmap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, m_vram4)			/* radar bitmap */
+	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram5)	/* "sprite1" bitmap */
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram6)	/* "sprite2" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, m_vram7)			/* "sprite3" bitmap */
 	AM_RANGE(0xe000, 0xf3ff) AM_READONLY
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram1)	/* car tilemap */
-	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram2)	/* bg1 tilemap */
-	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram0)	/* fg tilemap */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram3)	/* bg2 tilemap */
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram1)	/* car tilemap */
+	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram2)	/* bg1 tilemap */
+	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram0)	/* fg tilemap */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_vram3)	/* bg2 tilemap */
 	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
 	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
 	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
-	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, scroll)	/* bg scroll (three copies always identical) */
+	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, m_scroll)	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

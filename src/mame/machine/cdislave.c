@@ -341,14 +341,14 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
                 {
                     case 0x82: // Mute Audio
                         verboselog(m_machine, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
-                        dmadac_enable(&state->dmadac[0], 2, 0);
+                        dmadac_enable(&state->m_dmadac[0], 2, 0);
                         m_in_index = 0;
                         m_in_count = 0;
                         //cdic->audio_sample_timer->adjust(attotime::never);
                         break;
                     case 0x83: // Unmute Audio
                         verboselog(m_machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
-                        dmadac_enable(&state->dmadac[0], 2, 1);
+                        dmadac_enable(&state->m_dmadac[0], 2, 1);
                         m_in_index = 0;
                         m_in_count = 0;
                         break;

@@ -15,67 +15,71 @@ class taitof2_state : public driver_device
 public:
 	taitof2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki(*this, "oki") { }
+		  m_oki(*this, "oki") { }
 
 	/* memory pointers */
-	UINT16 *        sprite_extension;
-	UINT16 *        spriteram;
-	UINT16 *        spriteram_buffered;
-	UINT16 *        spriteram_delayed;
-	UINT16 *        cchip2_ram;	// for megablst only
-//  UINT16 *        paletteram;    // currently this uses generic palette handling
-	size_t          spriteram_size;
-	size_t          spriteext_size;
+	UINT16 *        m_sprite_extension;
+	UINT16 *        m_spriteram;
+	UINT16 *        m_spriteram_buffered;
+	UINT16 *        m_spriteram_delayed;
+	UINT16 *        m_cchip2_ram;	// for megablst only
+//  UINT16 *        m_paletteram;    // currently this uses generic palette handling
+	size_t          m_spriteram_size;
+	size_t          m_spriteext_size;
 
 
 	/* video-related */
-	struct f2_tempsprite *spritelist;
-	int             sprite_type;
+	struct f2_tempsprite *m_spritelist;
+	int             m_sprite_type;
 
-	UINT16          spritebank[8];
-//  UINT16          spritebank_eof[8];
-	UINT16          spritebank_buffered[8];
+	UINT16          m_spritebank[8];
+//  UINT16          m_spritebank_eof[8];
+	UINT16          m_spritebank_buffered[8];
 
-	INT32           sprites_disabled, sprites_active_area, sprites_master_scrollx, sprites_master_scrolly;
+	INT32           m_sprites_disabled;
+	INT32			m_sprites_active_area;
+	INT32			m_sprites_master_scrollx;
+	INT32			m_sprites_master_scrolly;
 	/* remember flip status over frames because driftout can fail to set it */
-	INT32           sprites_flipscreen;
+	INT32           m_sprites_flipscreen;
 
 	/* On the left hand screen edge (assuming horiz screen, no
        screenflip: in screenflip it is the right hand edge etc.)
        there may be 0-3 unwanted pixels in both tilemaps *and*
        sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
-	INT32           hide_pixels;
-	INT32           flip_hide_pixels;	/* Different in some games */
+	INT32           m_hide_pixels;
+	INT32           m_flip_hide_pixels;	/* Different in some games */
 
-	INT32           pivot_xdisp;	/* Needed in games with a pivot layer */
-	INT32           pivot_ydisp;
+	INT32           m_pivot_xdisp;	/* Needed in games with a pivot layer */
+	INT32           m_pivot_ydisp;
 
-	INT32           game;
+	INT32           m_game;
 
-	UINT8           tilepri[6]; // todo - move into taitoic.c
-	UINT8           spritepri[6]; // todo - move into taitoic.c
-	UINT8           spriteblendmode; // todo - move into taitoic.c
+	UINT8           m_tilepri[6]; // todo - move into taitoic.c
+	UINT8           m_spritepri[6]; // todo - move into taitoic.c
+	UINT8           m_spriteblendmode; // todo - move into taitoic.c
 
-	int             prepare_sprites;
+	int             m_prepare_sprites;
 
 	/* misc */
-	INT32           mjnquest_input;
-	int             last[2], nibble;
-	INT32           driveout_sound_latch;
-	INT32           oki_bank;
+	INT32           m_mjnquest_input;
+	int             m_last[2];
+	int             m_nibble;
+	INT32           m_driveout_sound_latch;
+	INT32           m_oki_bank;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	optional_device<okim6295_device> oki;
-	device_t *tc0100scn;
-	device_t *tc0100scn_1;
-	device_t *tc0100scn_2;
-	device_t *tc0360pri;
-	device_t *tc0280grd;
-	device_t *tc0430grw;
-	device_t *tc0480scp;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	optional_device<okim6295_device> m_oki;
+	device_t *m_tc0100scn;
+	device_t *m_tc0100scn_1;
+	device_t *m_tc0100scn_2;
+	device_t *m_tc0360pri;
+	device_t *m_tc0280grd;
+	device_t *m_tc0430grw;
+	device_t *m_tc0480scp;
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

@@ -25,24 +25,24 @@ public:
 	exidy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 last_dial;
-	UINT8 *videoram;
-	UINT8 *characterram;
-	UINT8 *color_latch;
-	UINT8 *sprite1_xpos;
-	UINT8 *sprite1_ypos;
-	UINT8 *sprite2_xpos;
-	UINT8 *sprite2_ypos;
-	UINT8 *spriteno;
-	UINT8 *sprite_enable;
-	UINT8 collision_mask;
-	UINT8 collision_invert;
-	int is_2bpp;
-	UINT8 int_condition;
-	bitmap_t *background_bitmap;
-	bitmap_t *motion_object_1_vid;
-	bitmap_t *motion_object_2_vid;
-	bitmap_t *motion_object_2_clip;
+	UINT8 m_last_dial;
+	UINT8 *m_videoram;
+	UINT8 *m_characterram;
+	UINT8 *m_color_latch;
+	UINT8 *m_sprite1_xpos;
+	UINT8 *m_sprite1_ypos;
+	UINT8 *m_sprite2_xpos;
+	UINT8 *m_sprite2_ypos;
+	UINT8 *m_spriteno;
+	UINT8 *m_sprite_enable;
+	UINT8 m_collision_mask;
+	UINT8 m_collision_invert;
+	int m_is_2bpp;
+	UINT8 m_int_condition;
+	bitmap_t *m_background_bitmap;
+	bitmap_t *m_motion_object_1_vid;
+	bitmap_t *m_motion_object_2_vid;
+	bitmap_t *m_motion_object_2_clip;
 };
 
 

@@ -4,15 +4,15 @@ public:
 	toki_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	int msm5205next;
-	int toggle;
-	UINT16 *background1_videoram16;
-	UINT16 *background2_videoram16;
-	UINT16 *scrollram16;
-	tilemap_t *background_layer;
-	tilemap_t *foreground_layer;
-	tilemap_t *text_layer;
+	UINT16 *m_videoram;
+	int m_msm5205next;
+	int m_toggle;
+	UINT16 *m_background1_videoram16;
+	UINT16 *m_background2_videoram16;
+	UINT16 *m_scrollram16;
+	tilemap_t *m_background_layer;
+	tilemap_t *m_foreground_layer;
+	tilemap_t *m_text_layer;
 };
 
 

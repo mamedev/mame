@@ -205,10 +205,10 @@ psoldier dip locations still need veritication.
 
 
 
-#define M92_IRQ_0 ((state->irq_vectorbase+0)/4)  /* VBL interrupt*/
-#define M92_IRQ_1 ((state->irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
-#define M92_IRQ_2 ((state->irq_vectorbase+8)/4)  /* Raster interrupt */
-#define M92_IRQ_3 ((state->irq_vectorbase+12)/4) /* Sound cpu interrupt */
+#define M92_IRQ_0 ((state->m_irq_vectorbase+0)/4)  /* VBL interrupt*/
+#define M92_IRQ_1 ((state->m_irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
+#define M92_IRQ_2 ((state->m_irq_vectorbase+8)/4)  /* Raster interrupt */
+#define M92_IRQ_3 ((state->m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
 
 
 static TIMER_CALLBACK( m92_scanline_interrupt );
@@ -219,7 +219,7 @@ static void set_m92_bank(running_machine &machine)
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1",&RAM[state->bankaddress]);
+	memory_set_bankptr(machine, "bank1",&RAM[state->m_bankaddress]);
 }
 
 static STATE_POSTLOAD( m92_postload )
@@ -230,18 +230,18 @@ static STATE_POSTLOAD( m92_postload )
 static MACHINE_START( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	state->save_item(NAME(state->irqvector));
-	state->save_item(NAME(state->sound_status));
-	state->save_item(NAME(state->bankaddress));
+	state->save_item(NAME(state->m_irqvector));
+	state->save_item(NAME(state->m_sound_status));
+	state->save_item(NAME(state->m_bankaddress));
 	machine.state().register_postload(m92_postload, NULL);
 
-	state->scanline_timer = machine.scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
+	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
 }
 
 static MACHINE_RESET( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 /*****************************************************************************/
@@ -252,7 +252,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	int scanline = param;
 
 	/* raster interrupt */
-	if (scanline == state->raster_irq_position)
+	if (scanline == state->m_raster_irq_position)
 	{
 		machine.primary_screen->update_partial(scanline);
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_2);
@@ -268,7 +268,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine.primary_screen->height())
 		scanline = 0;
-	state->scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 /*****************************************************************************/
@@ -305,7 +305,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 	m92_state *state = space->machine().driver_data<m92_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
+		state->m_bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
 		set_m92_bank(space->machine());
 	}
 }
@@ -313,7 +313,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 static CUSTOM_INPUT( m92_sprite_busy_r )
 {
 	m92_state *state = field->port->machine().driver_data<m92_state>();
-	return state->sprite_buffer_busy;
+	return state->m_sprite_buffer_busy;
 }
 
 /*****************************************************************************/
@@ -328,19 +328,19 @@ static TIMER_CALLBACK( setvector_callback )
 
 	switch(param)
 	{
-		case VECTOR_INIT:	state->irqvector = 0;		break;
-		case YM2151_ASSERT:	state->irqvector |= 0x2;	break;
-		case YM2151_CLEAR:	state->irqvector &= ~0x2;	break;
-		case V30_ASSERT:	state->irqvector |= 0x1;	break;
-		case V30_CLEAR:		state->irqvector &= ~0x1;	break;
+		case VECTOR_INIT:	state->m_irqvector = 0;		break;
+		case YM2151_ASSERT:	state->m_irqvector |= 0x2;	break;
+		case YM2151_CLEAR:	state->m_irqvector &= ~0x2;	break;
+		case V30_ASSERT:	state->m_irqvector |= 0x1;	break;
+		case V30_CLEAR:		state->m_irqvector &= ~0x1;	break;
 	}
 
-	if (state->irqvector & 0x2)		/* YM2151 has precedence */
+	if (state->m_irqvector & 0x2)		/* YM2151 has precedence */
 		device_set_input_line_vector(machine.device("soundcpu"), 0, 0x18);
-	else if (state->irqvector & 0x1)	/* V30 */
+	else if (state->m_irqvector & 0x1)	/* V30 */
 		device_set_input_line_vector(machine.device("soundcpu"), 0, 0x19);
 
-	if (state->irqvector == 0)	/* no IRQs pending */
+	if (state->m_irqvector == 0)	/* no IRQs pending */
 		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
 	else	/* IRQ pending */
 		cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
@@ -356,7 +356,7 @@ static READ16_HANDLER( m92_sound_status_r )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
 //logerror("%06x: read sound status\n",cpu_get_pc(&space->device()));
-	return state->sound_status;
+	return state->m_sound_status;
 }
 
 static READ16_HANDLER( m92_soundlatch_r )
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( m92_sound_irq_ack_w )
 static WRITE16_HANDLER( m92_sound_status_w )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
-	COMBINE_DATA(&state->sound_status);
+	COMBINE_DATA(&state->m_sound_status);
 	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, M92_IRQ_3);
 }
 
@@ -387,11 +387,11 @@ static WRITE16_HANDLER( m92_sound_reset_w )
 /* appears to be an earlier board */
 static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, vram_data)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, spritecontrol)
+	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, m_spritecontrol)
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
@@ -400,11 +400,11 @@ static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank2")	/* Mirror of rom:  Used by In The Hunt as protection */
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
-	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, spritecontrol)
+	AM_RANGE(0xf9000, 0xf900f) AM_WRITE(m92_spritecontrol_w) AM_BASE_MEMBER(m92_state, m_spritecontrol)
 	AM_RANGE(0xf9800, 0xf9801) AM_WRITE(m92_videocontrol_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -2090,7 +2090,7 @@ static void init_m92(running_machine &machine, int hasbanks)
 	if (hasbanks)
 	{
 		memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
-		state->bankaddress = 0xa0000; /* Initial bank */
+		state->m_bankaddress = 0xa0000; /* Initial bank */
 		set_m92_bank(machine);
 
 		/* Mirror used by In The Hunt for protection */
@@ -2103,9 +2103,9 @@ static void init_m92(running_machine &machine, int hasbanks)
 	if (RAM)
 		memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
 
-	state->game_kludge = 0;
-	state->irq_vectorbase = 0x80;
-	state->sprite_buffer_busy = 1;
+	state->m_game_kludge = 0;
+	state->m_irq_vectorbase = 0x80;
+	state->m_sprite_buffer_busy = 1;
 
 	setvector_callback(machine, NULL, VECTOR_INIT);
 }
@@ -2139,14 +2139,14 @@ static DRIVER_INIT( rtypeleo )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	init_m92(machine, 1);
-	state->irq_vectorbase = 0x20;
+	state->m_irq_vectorbase = 0x20;
 }
 
 static DRIVER_INIT( rtypelej )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	init_m92(machine, 1);
-	state->irq_vectorbase = 0x20;
+	state->m_irq_vectorbase = 0x20;
 }
 
 static DRIVER_INIT( majtitl2 )
@@ -2157,7 +2157,7 @@ static DRIVER_INIT( majtitl2 )
 	/* This game has an eprom on the game board */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0000, 0xf3fff, FUNC(m92_eeprom_r), FUNC(m92_eeprom_w));
 
-	state->game_kludge = 2;
+	state->m_game_kludge = 2;
 }
 
 static DRIVER_INIT( kaiteids )
@@ -2175,7 +2175,7 @@ static DRIVER_INIT( lethalth )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	init_m92(machine, 0);
-	state->irq_vectorbase = 0x20;
+	state->m_irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
 	machine.device("maincpu")->memory().space(AS_IO)->nop_write(0x20, 0x21);
@@ -2194,18 +2194,18 @@ static DRIVER_INIT( ssoldier )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	init_m92(machine, 1);
-	state->irq_vectorbase = 0x20;
+	state->m_irq_vectorbase = 0x20;
 	/* main CPU expects an answer even before writing the first command */
-	state->sound_status = 0x80;
+	state->m_sound_status = 0x80;
 }
 
 static DRIVER_INIT( psoldier )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	init_m92(machine, 1);
-	state->irq_vectorbase = 0x20;
+	state->m_irq_vectorbase = 0x20;
 	/* main CPU expects an answer even before writing the first command */
-	state->sound_status = 0x80;
+	state->m_sound_status = 0x80;
 }
 
 static DRIVER_INIT( dsoccr94j )

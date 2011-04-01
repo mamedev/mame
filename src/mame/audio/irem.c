@@ -14,12 +14,13 @@
 typedef struct _irem_audio_state irem_audio_state;
 struct _irem_audio_state
 {
-	UINT8                port1, port2;
+	UINT8                m_port1;
+	UINT8                m_port2;
 
-	device_t *ay1;
-	device_t *ay2;
-	device_t *adpcm1;
-	device_t *adpcm2;
+	device_t *m_ay1;
+	device_t *m_ay2;
+	device_t *m_adpcm1;
+	device_t *m_adpcm2;
 };
 
 INLINE irem_audio_state *get_safe_token( device_t *device )
@@ -43,13 +44,13 @@ static DEVICE_START( irem_audio )
 	irem_audio_state *state = get_safe_token(device);
 	running_machine &machine = device->machine();
 
-	state->adpcm1 = machine.device("msm1");
-	state->adpcm2 = machine.device("msm2");
-	state->ay1 = machine.device("ay1");
-	state->ay2 = machine.device("ay2");
+	state->m_adpcm1 = machine.device("msm1");
+	state->m_adpcm2 = machine.device("msm2");
+	state->m_ay1 = machine.device("ay1");
+	state->m_ay2 = machine.device("ay2");
 
-	device->save_item(NAME(state->port1));
-	device->save_item(NAME(state->port2));
+	device->save_item(NAME(state->m_port1));
+	device->save_item(NAME(state->m_port2));
 }
 
 
@@ -81,7 +82,7 @@ static WRITE8_DEVICE_HANDLER( m6803_port1_w )
 {
 	irem_audio_state *state = get_safe_token(device);
 
-	state->port1 = data;
+	state->m_port1 = data;
 }
 
 
@@ -90,27 +91,27 @@ static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 	irem_audio_state *state = get_safe_token(device);
 
 	/* write latch */
-	if ((state->port2 & 0x01) && !(data & 0x01))
+	if ((state->m_port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
-		if (state->port2 & 0x04)
+		if (state->m_port2 & 0x04)
 		{
 			/* PSG 0 or 1? */
-			if (state->port2 & 0x08)
-				ay8910_address_w(state->ay1, 0, state->port1);
-			if (state->port2 & 0x10)
-				ay8910_address_w(state->ay2, 0, state->port1);
+			if (state->m_port2 & 0x08)
+				ay8910_address_w(state->m_ay1, 0, state->m_port1);
+			if (state->m_port2 & 0x10)
+				ay8910_address_w(state->m_ay2, 0, state->m_port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
-			if (state->port2 & 0x08)
-				ay8910_data_w(state->ay1, 0, state->port1);
-			if (state->port2 & 0x10)
-				ay8910_data_w(state->ay2, 0, state->port1);
+			if (state->m_port2 & 0x08)
+				ay8910_data_w(state->m_ay1, 0, state->m_port1);
+			if (state->m_port2 & 0x10)
+				ay8910_data_w(state->m_ay2, 0, state->m_port1);
 		}
 	}
-	state->port2 = data;
+	state->m_port2 = data;
 }
 
 
@@ -126,10 +127,10 @@ static READ8_DEVICE_HANDLER( m6803_port1_r )
 	irem_audio_state *state = get_safe_token(device);
 
 	/* PSG 0 or 1? */
-	if (state->port2 & 0x08)
-		return ay8910_r(state->ay1, 0);
-	if (state->port2 & 0x10)
-		return ay8910_r(state->ay2, 0);
+	if (state->m_port2 & 0x08)
+		return ay8910_r(state->m_ay1, 0);
+	if (state->m_port2 & 0x10)
+		return ay8910_r(state->m_ay2, 0);
 	return 0xff;
 }
 
@@ -152,14 +153,14 @@ static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 	irem_audio_state *state = get_safe_token(device);
 
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
-	msm5205_playmode_w(state->adpcm1, (data >> 2) & 7);
-	if (state->adpcm2 != NULL)
-		msm5205_playmode_w(state->adpcm2, ((data >> 2) & 4) | 3);	/* always in slave mode */
+	msm5205_playmode_w(state->m_adpcm1, (data >> 2) & 7);
+	if (state->m_adpcm2 != NULL)
+		msm5205_playmode_w(state->m_adpcm2, ((data >> 2) & 4) | 3);	/* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
-	msm5205_reset_w(state->adpcm1, data & 1);
-	if (state->adpcm2 != NULL)
-		msm5205_reset_w(state->adpcm2, data & 2);
+	msm5205_reset_w(state->m_adpcm1, data & 1);
+	if (state->m_adpcm2 != NULL)
+		msm5205_reset_w(state->m_adpcm2, data & 2);
 }
 
 
@@ -190,12 +191,12 @@ static WRITE8_DEVICE_HANDLER( m52_adpcm_w )
 
 	if (offset & 1)
 	{
-		msm5205_data_w(state->adpcm1, data);
+		msm5205_data_w(state->m_adpcm1, data);
 	}
 	if (offset & 2)
 	{
-		if (state->adpcm2 != NULL)
-			msm5205_data_w(state->adpcm2, data);
+		if (state->m_adpcm2 != NULL)
+			msm5205_data_w(state->m_adpcm2, data);
 	}
 }
 
@@ -204,7 +205,7 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
 {
 	irem_audio_state *state = get_safe_token(device);
 
-	device_t *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
+	device_t *adpcm = (offset & 1) ? state->m_adpcm2 : state->m_adpcm1;
 	if (adpcm != NULL)
 		msm5205_data_w(adpcm, data);
 }

@@ -9,7 +9,7 @@
 #include "includes/aztarac.h"
 
 #define AVECTOR(m, x, y, color, intensity) \
-vector_add_point (m, state->xcenter + ((x) << 16), state->ycenter - ((y) << 16), color, intensity)
+vector_add_point (m, state->m_xcenter + ((x) << 16), state->m_ycenter - ((y) << 16), color, intensity)
 
 
 
@@ -25,7 +25,7 @@ INLINE void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c)
 WRITE16_HANDLER( aztarac_ubr_w )
 {
     aztarac_state *state = space->machine().driver_data<aztarac_state>();
-    UINT16 *vectorram = state->vectorram;
+    UINT16 *vectorram = state->m_vectorram;
     int x, y, c, intensity, xoffset, yoffset, color;
     int defaddr, objaddr=0, ndefs;
 
@@ -91,8 +91,8 @@ VIDEO_START( aztarac )
 	int xmax = visarea.max_x;
 	int ymax = visarea.max_y;
 
-	state->xcenter=((xmax + xmin) / 2) << 16;
-	state->ycenter=((ymax + ymin) / 2) << 16;
+	state->m_xcenter=((xmax + xmin) / 2) << 16;
+	state->m_ycenter=((ymax + ymin) / 2) << 16;
 
 	VIDEO_START_CALL(vector);
 }

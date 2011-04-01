@@ -96,8 +96,8 @@ static WRITE8_HANDLER( ctrl_w )
 {
 	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 
-	state->nmi_enable = data & 0x01;
-	state->irq_enable = data & 0x02;
+	state->m_nmi_enable = data & 0x01;
+	state->m_irq_enable = data & 0x02;
 	flip_screen_set(space->machine(), data & 0x08);
 }
 
@@ -105,7 +105,7 @@ static INTERRUPT_GEN( jb_interrupt )
 {
 	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
-	if (state->irq_enable)
+	if (state->m_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -113,7 +113,7 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 {
 	jailbrek_state *state = device->machine().driver_data<jailbrek_state>();
 
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -131,15 +131,15 @@ static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 }
 
 static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE_MEMBER(jailbrek_state, colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE_MEMBER(jailbrek_state, videoram)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(jailbrek_state, spriteram, spriteram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE_MEMBER(jailbrek_state, m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE_MEMBER(jailbrek_state, m_videoram)
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(jailbrek_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x10c0, 0x14ff) AM_RAM /* ??? */
 	AM_RANGE(0x1500, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x203f) AM_RAM AM_BASE_MEMBER(jailbrek_state, scroll_x)
+	AM_RANGE(0x2000, 0x203f) AM_RAM AM_BASE_MEMBER(jailbrek_state, m_scroll_x)
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP /* ??? */
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2042, 0x2042) AM_RAM AM_BASE_MEMBER(jailbrek_state, scroll_dir) /* bit 2 = scroll direction */
+	AM_RANGE(0x2042, 0x2042) AM_RAM AM_BASE_MEMBER(jailbrek_state, m_scroll_dir) /* bit 2 = scroll direction */
 	AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
 	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
@@ -240,15 +240,15 @@ GFXDECODE_END
 static MACHINE_START( jailbrek )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	state->save_item(NAME(state->irq_enable));
-	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->m_irq_enable));
+	state->save_item(NAME(state->m_nmi_enable));
 }
 
 static MACHINE_RESET( jailbrek )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	state->irq_enable = 0;
-	state->nmi_enable = 0;
+	state->m_irq_enable = 0;
+	state->m_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( jailbrek, jailbrek_state )

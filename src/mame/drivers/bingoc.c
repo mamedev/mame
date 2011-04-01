@@ -40,7 +40,7 @@ public:
 	bingoc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 x;
+	UINT8 m_x;
 };
 
 
@@ -73,16 +73,16 @@ static READ8_HANDLER( sound_test_r )
 	bingoc_state *state = space->machine().driver_data<bingoc_state>();
 
 	if(input_code_pressed_once(space->machine(), KEYCODE_Z))
-		state->x++;
+		state->m_x++;
 
 	if(input_code_pressed_once(space->machine(), KEYCODE_X))
-		state->x--;
+		state->m_x--;
 
 	if(input_code_pressed_once(space->machine(), KEYCODE_A))
 		return 0xff;
 
-	popmessage("%02x",state->x);
-	return state->x;
+	popmessage("%02x",state->m_x);
+	return state->m_x;
 }
 #else
 static WRITE16_HANDLER( main_sound_latch_w )

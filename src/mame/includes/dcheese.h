@@ -12,24 +12,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	UINT16   blitter_color[2];
-	UINT16   blitter_xparam[16];
-	UINT16   blitter_yparam[16];
-	UINT16   blitter_vidparam[32];
+	UINT16   m_blitter_color[2];
+	UINT16   m_blitter_xparam[16];
+	UINT16   m_blitter_yparam[16];
+	UINT16   m_blitter_vidparam[32];
 
-	bitmap_t *dstbitmap;
-	emu_timer *blitter_timer;
+	bitmap_t *m_dstbitmap;
+	emu_timer *m_blitter_timer;
 
 	/* misc */
-	UINT8    irq_state[5];
-	UINT8    soundlatch_full;
-	UINT8    sound_control;
-	UINT8    sound_msb_latch;
+	UINT8    m_irq_state[5];
+	UINT8    m_soundlatch_full;
+	UINT8    m_sound_control;
+	UINT8    m_sound_msb_latch;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *bsmt;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_bsmt;
 };
 
 

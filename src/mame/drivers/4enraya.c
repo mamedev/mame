@@ -56,23 +56,23 @@ Sound :
 static WRITE8_HANDLER( sound_data_w )
 {
 	_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
-	state->soundlatch = data;
+	state->m_soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	_4enraya_state *state = device->machine().driver_data<_4enraya_state>();
 
-	if ((state->last_snd_ctrl & 0x04) == 0x04 && (data & 0x4) == 0x00)
-		ay8910_data_address_w(device, state->last_snd_ctrl, state->soundlatch);
+	if ((state->m_last_snd_ctrl & 0x04) == 0x04 && (data & 0x4) == 0x00)
+		ay8910_data_address_w(device, state->m_last_snd_ctrl, state->m_soundlatch);
 
-	state->last_snd_ctrl = data;
+	state->m_last_snd_ctrl = data;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, videoram, videoram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_NOP
 ADDRESS_MAP_END
@@ -152,16 +152,16 @@ static MACHINE_START( 4enraya )
 {
 	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 
-	state->save_item(NAME(state->soundlatch));
-	state->save_item(NAME(state->last_snd_ctrl));
+	state->save_item(NAME(state->m_soundlatch));
+	state->save_item(NAME(state->m_last_snd_ctrl));
 }
 
 static MACHINE_RESET( 4enraya )
 {
 	_4enraya_state *state = machine.driver_data<_4enraya_state>();
 
-	state->soundlatch = 0;
-	state->last_snd_ctrl = 0;
+	state->m_soundlatch = 0;
+	state->m_last_snd_ctrl = 0;
 }
 
 static PALETTE_INIT( 4enraya )

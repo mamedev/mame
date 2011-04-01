@@ -106,7 +106,7 @@ public:
 	: md_base_state(machine, config) { }
 
 	// bootleg specific
-	int aladmdb_mcu_port;
+	int m_aladmdb_mcu_port;
 };
 
 class segac2_state : public md_base_state
@@ -116,28 +116,28 @@ public:
 	: md_base_state(machine, config) { }
 
 	// for Print Club only
-	int cam_data;
+	int m_cam_data;
 
-	int segac2_enable_display;
+	int m_segac2_enable_display;
 
-	UINT16* paletteram;
+	UINT16* m_paletteram;
 
 	/* internal states */
-	UINT8		misc_io_data[0x10];	/* holds values written to the I/O chip */
+	UINT8		m_misc_io_data[0x10];	/* holds values written to the I/O chip */
 
 	/* protection-related tracking */
-	int (*prot_func)(int in);		/* emulation of protection chip */
-	UINT8		prot_write_buf;		/* remembers what was written */
-	UINT8		prot_read_buf;		/* remembers what was returned */
+	int (*m_prot_func)(int in);		/* emulation of protection chip */
+	UINT8		m_prot_write_buf;		/* remembers what was written */
+	UINT8		m_prot_read_buf;		/* remembers what was returned */
 
 	/* palette-related variables */
-	UINT8		segac2_alt_palette_mode;
-	UINT8		palbank;
-	UINT8		bg_palbase;
-	UINT8		sp_palbase;
+	UINT8		m_segac2_alt_palette_mode;
+	UINT8		m_palbank;
+	UINT8		m_bg_palbase;
+	UINT8		m_sp_palbase;
 
 	/* sound-related variables */
-	UINT8		sound_banks;		/* number of sound banks */
+	UINT8		m_sound_banks;		/* number of sound banks */
 };
 
 class mplay_state : public md_base_state
@@ -146,24 +146,24 @@ public:
 	mplay_state(running_machine &machine, const driver_device_config_base &config)
 	: md_base_state(machine, config) { }
 
-	UINT32 bios_mode;  // determines whether ROM banks or Game data
+	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
 	// is to read from 0x8000-0xffff
 
-	UINT32 bios_bank; // ROM bank selection
-	UINT16 game_banksel;  // Game bank selection
-	UINT32 readpos;  // serial bank selection position (9-bit)
-	UINT32 mp_bios_bank_addr;
+	UINT32 m_bios_bank; // ROM bank selection
+	UINT16 m_game_banksel;  // Game bank selection
+	UINT32 m_readpos;  // serial bank selection position (9-bit)
+	UINT32 m_mp_bios_bank_addr;
 
-	UINT32 bios_width;  // determines the way the game info ROM is read
-	UINT8 bios_ctrl[6];
-	UINT8 bios_6600;
-	UINT8 bios_6403;
-	UINT8 bios_6404;
+	UINT32 m_bios_width;  // determines the way the game info ROM is read
+	UINT8 m_bios_ctrl[6];
+	UINT8 m_bios_6600;
+	UINT8 m_bios_6403;
+	UINT8 m_bios_6404;
 
-	UINT16 *genesis_io_ram;
-	UINT8* ic3_ram;
-	UINT8* ic37_ram;
-	UINT16 *ic36_ram;
+	UINT16 *m_genesis_io_ram;
+	UINT8* m_ic3_ram;
+	UINT8* m_ic37_ram;
+	UINT16 *m_ic36_ram;
 };
 
 class mtech_state : public md_base_state
@@ -172,18 +172,18 @@ public:
 	mtech_state(running_machine &machine, const driver_device_config_base &config)
 	: md_base_state(machine, config) { }
 
-	UINT8 mt_cart_select_reg;
-	UINT32 bios_port_ctrl;
-	int current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
-	UINT32 bios_ctrl_inputs;
-	UINT8 bios_ctrl[6];
+	UINT8 m_mt_cart_select_reg;
+	UINT32 m_bios_port_ctrl;
+	int m_current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	UINT32 m_bios_ctrl_inputs;
+	UINT8 m_bios_ctrl[6];
 
-	int mt_bank_addr;
+	int m_mt_bank_addr;
 
-	int cart_is_genesis[8];
+	int m_cart_is_genesis[8];
 
 	/* Megatech BIOS specific */
-	UINT8* megatech_banked_ram;
+	UINT8* m_megatech_banked_ram;
 };
 
 typedef struct _megadriv_cart  megadriv_cart;
@@ -219,11 +219,11 @@ public:
 	md_cons_state(running_machine &machine, const driver_device_config_base &config)
 	: md_base_state(machine, config) { }
 
-	emu_timer *mess_io_timeout[3];
-	int mess_io_stage[3];
-	UINT8 jcart_io_data[2];
+	emu_timer *m_mess_io_timeout[3];
+	int m_mess_io_stage[3];
+	UINT8 m_jcart_io_data[2];
 
-	megadriv_cart md_cart;
+	megadriv_cart m_md_cart;
 };
 
 class pico_state : public md_cons_state
@@ -232,7 +232,7 @@ public:
 	pico_state(running_machine &machine, const driver_device_config_base &config)
 	: md_cons_state(machine, config) { }
 
-	UINT8 page_register;
+	UINT8 m_page_register;
 };
 
 class mdsvp_state : public md_cons_state
@@ -241,14 +241,14 @@ public:
 	mdsvp_state(running_machine &machine, const driver_device_config_base &config)
 	: md_cons_state(machine, config) { }
 
-	UINT8 *iram; // IRAM (0-0x7ff)
-	UINT8 *dram; // [0x20000];
-	UINT32 pmac_read[6];	// read modes/addrs for PM0-PM5
-	UINT32 pmac_write[6];	// write ...
-	PAIR pmc;
-	UINT32 emu_status;
-	UINT16 XST;		// external status, mapped at a15000 and a15002 on 68k side.
-	UINT16 XST2;		// status of XST (bit1 set when 68k writes to XST)
+	UINT8 *m_iram; // IRAM (0-0x7ff)
+	UINT8 *m_dram; // [0x20000];
+	UINT32 m_pmac_read[6];	// read modes/addrs for PM0-PM5
+	UINT32 m_pmac_write[6];	// write ...
+	PAIR m_pmc;
+	UINT32 m_emu_status;
+	UINT16 m_XST;		// external status, mapped at a15000 and a15002 on 68k side.
+	UINT16 m_XST2;		// status of XST (bit1 set when 68k writes to XST)
 };
 
 class _32x_state : public md_base_state

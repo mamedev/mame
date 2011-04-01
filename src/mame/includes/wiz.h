@@ -4,23 +4,23 @@ public:
 	wiz_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int dsc0;
-	int dsc1;
-	UINT8 *videoram2;
-	UINT8 *colorram2;
-	UINT8 *attributesram;
-	UINT8 *attributesram2;
-	UINT8 *sprite_bank;
-	INT32 flipx;
-	INT32 flipy;
-	INT32 bgpen;
-	UINT8 char_bank[2];
-	UINT8 palbank[2];
-	int palette_bank;
-	UINT8 *spriteram;
-	UINT8 *spriteram2;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	int m_dsc0;
+	int m_dsc1;
+	UINT8 *m_videoram2;
+	UINT8 *m_colorram2;
+	UINT8 *m_attributesram;
+	UINT8 *m_attributesram2;
+	UINT8 *m_sprite_bank;
+	INT32 m_flipx;
+	INT32 m_flipy;
+	INT32 m_bgpen;
+	UINT8 m_char_bank[2];
+	UINT8 m_palbank[2];
+	int m_palette_bank;
+	UINT8 *m_spriteram;
+	UINT8 *m_spriteram2;
+	size_t m_spriteram_size;
 };
 
 

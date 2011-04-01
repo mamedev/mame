@@ -16,30 +16,33 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *    vram_0;
-	UINT32 *    vram_1;
-	UINT32 *    vram_2;
-	UINT32 *    vram_3;
-	UINT32 *    vregs;
-	UINT32 *    priority;
-	UINT32 *    tilebank;
-	UINT32 *    spriteram;
-	UINT32 *    buf_spriteram;
-	UINT32 *    buf_spriteram2;
-	UINT32 *    paletteram;
-	size_t      spriteram_size;
+	UINT32 *    m_vram_0;
+	UINT32 *    m_vram_1;
+	UINT32 *    m_vram_2;
+	UINT32 *    m_vram_3;
+	UINT32 *    m_vregs;
+	UINT32 *    m_priority;
+	UINT32 *    m_tilebank;
+	UINT32 *    m_spriteram;
+	UINT32 *    m_buf_spriteram;
+	UINT32 *    m_buf_spriteram2;
+	UINT32 *    m_paletteram;
+	size_t      m_spriteram_size;
 
 	/* video-related */
-	tilemap_t     *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
-	UINT32      spr_buffered_tilebank[2];
+	tilemap_t     *m_tilemap_0;
+	tilemap_t     *m_tilemap_1;
+	tilemap_t     *m_tilemap_2;
+	tilemap_t     *m_tilemap_3;
+	UINT32      m_spr_buffered_tilebank[2];
 
 	/* misc */
-	emu_timer   *raster_interrupt_timer;
-	UINT8       shared_ram[16];
+	emu_timer   *m_raster_interrupt_timer;
+	UINT8       m_shared_ram[16];
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

@@ -10,7 +10,7 @@ public:
 	hotstuff_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* bitmapram;
+	UINT16* m_bitmapram;
 };
 
 
@@ -37,7 +37,7 @@ SCREEN_UPDATE( hotstuff )
 
 		for (p=0;p<0x10;p++)
 		{
-			row_palette_data[p] = state->bitmapram[count+p];
+			row_palette_data[p] = state->m_bitmapram[count+p];
 
 			row_palette_data_as_rgb32_pen_data[p] = MAKE_RGB( (row_palette_data[p] & 0x0f00)>>4, (row_palette_data[p] & 0x00f0)>>0, (row_palette_data[p] & 0x000f)<<4  );
 
@@ -46,13 +46,13 @@ SCREEN_UPDATE( hotstuff )
 		for(x = 0; x < xxx; x++)
 		{
 			{
-				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->bitmapram[count] &0xf000)>>12];
+				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0xf000)>>12];
 				x++;
-				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->bitmapram[count] &0x0f00)>>8];
+				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x0f00)>>8];
 				x++;
-				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->bitmapram[count] &0x00f0)>>4];
+				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x00f0)>>4];
 				x++;
-				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->bitmapram[count] &0x000f)>>0];
+				*BITMAP_ADDR32(bitmap, y, x) = row_palette_data_as_rgb32_pen_data[(state->m_bitmapram[count] &0x000f)>>0];
 			}
 
 			count++;
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(hotstuff_state, bitmapram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(hotstuff_state, m_bitmapram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hotstuff )

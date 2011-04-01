@@ -14,16 +14,16 @@ WRITE16_HANDLER( prehisle_bg_videoram16_w )
 {
 	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
-	COMBINE_DATA(&state->bg_videoram16[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	COMBINE_DATA(&state->m_bg_videoram16[offset]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE16_HANDLER( prehisle_fg_videoram16_w )
 {
 	prehisle_state *state = space->machine().driver_data<prehisle_state>();
 
-	COMBINE_DATA(&state->videoram[offset]);
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	COMBINE_DATA(&state->m_videoram[offset]);
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 READ16_HANDLER( prehisle_control16_r )
@@ -34,7 +34,7 @@ READ16_HANDLER( prehisle_control16_r )
 	{
 	case 0x08: return input_port_read(space->machine(), "P2");						// Player 2
 	case 0x10: return input_port_read(space->machine(), "COIN");						// Coins, Tilt, Service
-	case 0x20: return input_port_read(space->machine(), "P1") ^ state->invert_controls;		// Player 1
+	case 0x20: return input_port_read(space->machine(), "P1") ^ state->m_invert_controls;		// Player 1
 	case 0x21: return input_port_read(space->machine(), "DSW0");						// DIPs
 	case 0x22: return input_port_read(space->machine(), "DSW1");						// DIPs + VBLANK
 	default: return 0;
@@ -50,11 +50,11 @@ WRITE16_HANDLER( prehisle_control16_w )
 
 	switch (offset)
 	{
-	case 0x00: tilemap_set_scrolly(state->bg_tilemap, 0, scroll); break;
-	case 0x08: tilemap_set_scrollx(state->bg_tilemap, 0, scroll); break;
-	case 0x10: tilemap_set_scrolly(state->bg2_tilemap, 0, scroll); break;
-	case 0x18: tilemap_set_scrollx(state->bg2_tilemap, 0, scroll); break;
-	case 0x23: state->invert_controls = data ? 0x00ff : 0x0000; break;
+	case 0x00: tilemap_set_scrolly(state->m_bg_tilemap, 0, scroll); break;
+	case 0x08: tilemap_set_scrollx(state->m_bg_tilemap, 0, scroll); break;
+	case 0x10: tilemap_set_scrolly(state->m_bg2_tilemap, 0, scroll); break;
+	case 0x18: tilemap_set_scrollx(state->m_bg2_tilemap, 0, scroll); break;
+	case 0x23: state->m_invert_controls = data ? 0x00ff : 0x0000; break;
 	case 0x28: coin_counter_w(space->machine(), 0, data & 1); break;
 	case 0x29: coin_counter_w(space->machine(), 1, data & 1); break;
 	case 0x30: flip_screen_set(space->machine(), data & 0x01); break;
@@ -77,7 +77,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
-	int attr = state->bg_videoram16[tile_index];
+	int attr = state->m_bg_videoram16[tile_index];
 	int code = attr & 0x7ff;
 	int color = attr >> 12;
 	int flags = (attr & 0x800) ? TILE_FLIPY : 0;
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
-	int attr = state->videoram[tile_index];
+	int attr = state->m_videoram[tile_index];
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
@@ -99,20 +99,20 @@ VIDEO_START( prehisle )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
 
-	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_cols,
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_cols,
 		 16, 16, 1024, 32);
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 16, 16, 256, 32);
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg_tilemap, 15);
-	tilemap_set_transparent_pen(state->fg_tilemap, 15);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 15);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 15);
 
 	/* register for saving */
-	state->save_item(NAME(state->invert_controls));
+	state->save_item(NAME(state->m_invert_controls));
 }
 
 /* sprite layout
@@ -131,7 +131,7 @@ o fedcba9876543210
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )
 {
 	prehisle_state *state = machine.driver_data<prehisle_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 1024; offs += 4)
@@ -168,10 +168,10 @@ SCREEN_UPDATE( prehisle )
 {
 	prehisle_state *state = screen->machine().driver_data<prehisle_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

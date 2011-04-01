@@ -4,12 +4,12 @@ public:
 	galpanic_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *bgvideoram;
-	UINT16 *fgvideoram;
-	size_t fgvideoram_size;
-	bitmap_t *sprites_bitmap;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_bgvideoram;
+	UINT16 *m_fgvideoram;
+	size_t m_fgvideoram_size;
+	bitmap_t *m_sprites_bitmap;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

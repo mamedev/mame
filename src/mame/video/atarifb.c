@@ -30,22 +30,22 @@ static void get_tile_info_common( running_machine &machine, tile_data *tileinfo,
 static TILE_GET_INFO( alpha1_get_tile_info )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
-	get_tile_info_common(machine, tileinfo, tile_index, state->alphap1_videoram);
+	get_tile_info_common(machine, tileinfo, tile_index, state->m_alphap1_videoram);
 }
 
 
 static TILE_GET_INFO( alpha2_get_tile_info )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
-	get_tile_info_common(machine, tileinfo, tile_index, state->alphap2_videoram);
+	get_tile_info_common(machine, tileinfo, tile_index, state->m_alphap2_videoram);
 }
 
 
 static TILE_GET_INFO( field_get_tile_info )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
-	int code = state->field_videoram[tile_index] & 0x3f;
-	int flipyx = state->field_videoram[tile_index] >> 6;
+	int code = state->m_field_videoram[tile_index] & 0x3f;
+	int flipyx = state->m_field_videoram[tile_index] >> 6;
 
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX(flipyx));
 }
@@ -63,8 +63,8 @@ WRITE8_HANDLER( atarifb_alpha1_videoram_w )
 {
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->alphap1_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->alpha1_tilemap, offset);
+	state->m_alphap1_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_alpha1_tilemap, offset);
 }
 
 
@@ -72,8 +72,8 @@ WRITE8_HANDLER( atarifb_alpha2_videoram_w )
 {
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->alphap2_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->alpha2_tilemap, offset);
+	state->m_alphap2_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_alpha2_tilemap, offset);
 }
 
 
@@ -81,8 +81,8 @@ WRITE8_HANDLER( atarifb_field_videoram_w )
 {
 	atarifb_state *state = space->machine().driver_data<atarifb_state>();
 
-	state->field_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->field_tilemap, offset);
+	state->m_field_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_field_tilemap, offset);
 }
 
 
@@ -97,9 +97,9 @@ VIDEO_START( atarifb )
 {
 	atarifb_state *state = machine.driver_data<atarifb_state>();
 
-	state->alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
-	state->alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
-	state->field_tilemap  = tilemap_create(machine, field_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
+	state->m_alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols, 8, 8, 3, 32);
+	state->m_field_tilemap  = tilemap_create(machine, field_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -112,12 +112,12 @@ static void draw_playfield_and_alpha( running_machine &machine, bitmap_t *bitmap
 	int scroll_x[1];
 	int scroll_y[1];
 
-	scroll_x[0] = - *state->scroll_register + 32 + playfield_x_offset;
+	scroll_x[0] = - *state->m_scroll_register + 32 + playfield_x_offset;
 	scroll_y[0] = 8 + playfield_y_offset;
 
-	copybitmap(bitmap, tilemap_get_pixmap(state->alpha1_tilemap), 0, 0, 35*8, 1*8, NULL);
-	copybitmap(bitmap, tilemap_get_pixmap(state->alpha2_tilemap), 0, 0,  0*8, 1*8, NULL);
-	copyscrollbitmap(bitmap, tilemap_get_pixmap(state->field_tilemap),  1, scroll_x, 1, scroll_y, &bigfield_area);
+	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha1_tilemap), 0, 0, 35*8, 1*8, NULL);
+	copybitmap(bitmap, tilemap_get_pixmap(state->m_alpha2_tilemap), 0, 0,  0*8, 1*8, NULL);
+	copyscrollbitmap(bitmap, tilemap_get_pixmap(state->m_field_tilemap),  1, scroll_x, 1, scroll_y, &bigfield_area);
 }
 
 
@@ -135,14 +135,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		int sx, sy;
 		int shade = 0;
 
-		sy = 255 - state->spriteram[obj * 2 + 1];
+		sy = 255 - state->m_spriteram[obj * 2 + 1];
 		if (sy == 255)
 			continue;
 
-		charcode = state->spriteram[obj * 2] & 0x3f;
-		flipx = (state->spriteram[obj * 2] & 0x40);
-		flipy = (state->spriteram[obj * 2] & 0x80);
-		sx = state->spriteram[obj * 2 + 0x20] + 8 * 3;
+		charcode = state->m_spriteram[obj * 2] & 0x3f;
+		flipx = (state->m_spriteram[obj * 2] & 0x40);
+		flipy = (state->m_spriteram[obj * 2] & 0x80);
+		sx = state->m_spriteram[obj * 2 + 0x20] + 8 * 3;
 
 		/* Note on Atari Soccer: */
 		/* There are 3 sets of 2 bits each, where the 2 bits represent */
@@ -150,13 +150,13 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		/* color of each bit in the sprite, but I haven't implemented it that way. */
 		if (is_soccer)
 		{
-			shade = ((state->spriteram[obj * 2 + 1 + 0x20]) & 0x07);
+			shade = ((state->m_spriteram[obj * 2 + 1 + 0x20]) & 0x07);
 
 			drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx + 1],
 				charcode, shade,
 				flipx, flipy, sx, sy, 0);
 
-			shade = ((state->spriteram[obj * 2 + 1 + 0x20]) & 0x08) >> 3;
+			shade = ((state->m_spriteram[obj * 2 + 1 + 0x20]) & 0x08) >> 3;
 		}
 
 		drawgfx_transpen(bitmap, &bigfield_area, machine.gfx[gfx],

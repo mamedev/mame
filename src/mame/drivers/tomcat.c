@@ -43,11 +43,11 @@ public:
 	tomcat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int control_num;
-	UINT16 *shared_ram;
-	UINT8 nvram[0x800];
-	int dsp_BIO;
-	int dsp_idle;
+	int m_control_num;
+	UINT16 *m_shared_ram;
+	UINT8 m_nvram[0x800];
+	int m_dsp_BIO;
+	int m_dsp_idle;
 };
 
 
@@ -55,13 +55,13 @@ public:
 static WRITE16_HANDLER(tomcat_adcon_w)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	state->control_num = data;
+	state->m_control_num = data;
 }
 
 static READ16_HANDLER(tomcat_adcread_r)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	switch( state->control_num )
+	switch( state->m_control_num )
 	{
 	case 0: return input_port_read(space->machine(), "STICKY");
 	case 1: return input_port_read(space->machine(), "STICKX");
@@ -164,7 +164,7 @@ static WRITE16_HANDLER(tomcat_mresh_w)
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
-	state->dsp_BIO = 0;
+	state->m_dsp_BIO = 0;
 	device_set_input_line(space->machine().device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
 }
 
@@ -187,13 +187,13 @@ static READ16_HANDLER(tomcat_inputs2_r)
 *       D9  /IDLE*      (TMS320 System)
 *       D8
 */
-	return state->dsp_idle ? 0 : (1 << 9);
+	return state->m_dsp_idle ? 0 : (1 << 9);
 }
 
 static READ16_HANDLER(tomcat_320bio_r)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	state->dsp_BIO = 1;
+	state->m_dsp_BIO = 1;
 	space->machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
@@ -203,19 +203,19 @@ static READ16_HANDLER(dsp_BIO_r)
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
 	if ( cpu_get_pc(&space->device()) == 0x0001 )
 	{
-		if ( state->dsp_idle == 0 )
+		if ( state->m_dsp_idle == 0 )
 		{
-			state->dsp_idle = 1;
-			state->dsp_BIO = 0;
+			state->m_dsp_idle = 1;
+			state->m_dsp_BIO = 0;
 		}
-		return !state->dsp_BIO;
+		return !state->m_dsp_BIO;
 	}
 	else if ( cpu_get_pc(&space->device()) == 0x0003 )
 	{
-		if ( state->dsp_BIO == 1 )
+		if ( state->m_dsp_BIO == 1 )
 		{
-			state->dsp_idle = 0;
-			state->dsp_BIO = 0;
+			state->m_dsp_idle = 0;
+			state->m_dsp_BIO = 0;
 			space->machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
 			return 0;
 		}
@@ -227,32 +227,32 @@ static READ16_HANDLER(dsp_BIO_r)
 	}
 	else
 	{
-		return !state->dsp_BIO;
+		return !state->m_dsp_BIO;
 	}
 }
 
 static READ16_HANDLER(tomcat_shared_ram_r)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	return state->shared_ram[offset];
+	return state->m_shared_ram[offset];
 }
 
 static WRITE16_HANDLER(tomcat_shared_ram_w)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	COMBINE_DATA(&state->shared_ram[offset]);
+	COMBINE_DATA(&state->m_shared_ram[offset]);
 }
 
 static READ8_HANDLER(tomcat_nvram_r)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	return state->nvram[offset];
+	return state->m_nvram[offset];
 }
 
 static WRITE8_HANDLER(tomcat_nvram_w)
 {
 	tomcat_state *state = space->machine().driver_data<tomcat_state>();
-	state->nvram[offset] = data;
+	state->m_nvram[offset] = data;
 }
 
 static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16 )
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(tomcat_state, shared_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(tomcat_state, m_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16 )
@@ -349,19 +349,19 @@ ROM_END
 static MACHINE_START(tomcat)
 {
 	tomcat_state *state = machine.driver_data<tomcat_state>();
-	((UINT16*)state->shared_ram)[0x0000] = 0xf600;
-	((UINT16*)state->shared_ram)[0x0001] = 0x0000;
-	((UINT16*)state->shared_ram)[0x0002] = 0xf600;
-	((UINT16*)state->shared_ram)[0x0003] = 0x0000;
+	((UINT16*)state->m_shared_ram)[0x0000] = 0xf600;
+	((UINT16*)state->m_shared_ram)[0x0001] = 0x0000;
+	((UINT16*)state->m_shared_ram)[0x0002] = 0xf600;
+	((UINT16*)state->m_shared_ram)[0x0003] = 0x0000;
 
-	machine.device<nvram_device>("nvram")->set_base(state->nvram, 0x800);
+	machine.device<nvram_device>("nvram")->set_base(state->m_nvram, 0x800);
 
-	state->save_item(NAME(state->nvram));
-	state->save_item(NAME(state->control_num));
-	state->save_item(NAME(state->dsp_BIO));
-	state->save_item(NAME(state->dsp_idle));
+	state->save_item(NAME(state->m_nvram));
+	state->save_item(NAME(state->m_control_num));
+	state->save_item(NAME(state->m_dsp_BIO));
+	state->save_item(NAME(state->m_dsp_idle));
 
-	state->dsp_BIO = 0;
+	state->m_dsp_BIO = 0;
 }
 
 static const riot6532_interface tomcat_riot6532_intf =

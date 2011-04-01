@@ -9,25 +9,25 @@ VIDEO_START( slapshot )
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int i;
 
-	state->spriteram_delayed = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
-	state->spriteram_buffered = auto_alloc_array(machine, UINT16, state->spriteram_size / 2);
-	state->spritelist = auto_alloc_array(machine, struct slapshot_tempsprite, 0x400);
+	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spritelist = auto_alloc_array(machine, struct slapshot_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
-		state->spritebank[i] = 0x400 * i;
+		state->m_spritebank[i] = 0x400 * i;
 
-	state->sprites_disabled = 1;
-	state->sprites_active_area = 0;
+	state->m_sprites_disabled = 1;
+	state->m_sprites_active_area = 0;
 
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->sprites_disabled));
-	state->save_item(NAME(state->sprites_active_area));
-	state->save_item(NAME(state->sprites_master_scrollx));
-	state->save_item(NAME(state->sprites_master_scrolly));
-	state->save_item(NAME(state->sprites_flipscreen));
-	state->save_item(NAME(state->prepare_sprites));
-	state->save_pointer(NAME(state->spriteram_delayed), state->spriteram_size / 2);
-	state->save_pointer(NAME(state->spriteram_buffered), state->spriteram_size / 2);
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_sprites_disabled));
+	state->save_item(NAME(state->m_sprites_active_area));
+	state->save_item(NAME(state->m_sprites_master_scrollx));
+	state->save_item(NAME(state->m_sprites_master_scrolly));
+	state->save_item(NAME(state->m_sprites_flipscreen));
+	state->save_item(NAME(state->m_prepare_sprites));
+	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram_size / 2);
+	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram_size / 2);
 }
 
 /************************************************************
@@ -102,19 +102,19 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
-	struct slapshot_tempsprite *sprite_ptr = state->spritelist;
+	struct slapshot_tempsprite *sprite_ptr = state->m_spritelist;
 
 	/* must remember enable status from last frame because driftout fails to
        reactivate them from a certain point onwards. */
-	int disabled = state->sprites_disabled;
+	int disabled = state->m_sprites_disabled;
 
 	/* must remember master scroll from previous frame because driftout
        sometimes doesn't set it. */
-	int master_scrollx = state->sprites_master_scrollx;
-	int master_scrolly = state->sprites_master_scrolly;
+	int master_scrollx = state->m_sprites_master_scrollx;
+	int master_scrolly = state->m_sprites_master_scrolly;
 
 	/* must also remember the sprite bank from previous frame. */
-	int area = state->sprites_active_area;
+	int area = state->m_sprites_active_area;
 
 	scroll1x = 0;
 	scroll1y = 0;
@@ -123,12 +123,12 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	color = 0;
 
 	x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-	if (state->sprites_flipscreen) x_offset = -x_offset;
+	if (state->m_sprites_flipscreen) x_offset = -x_offset;
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
 	if (area == 0x8000 &&
-			state->spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
-			state->spriteram_buffered[(0x8000 + 10) / 2] == 0)
+			state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
+			state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
 		area = 0;
 
 
@@ -137,37 +137,37 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		/* sprites_active_area may change during processing */
 		int offs = off + area;
 
-		if (state->spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			disabled = state->spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			state->sprites_flipscreen = state->spriteram_buffered[(offs + 10) / 2] & 0x2000;
+			disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			state->m_sprites_flipscreen = state->m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
 			x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-			if (state->sprites_flipscreen) x_offset = -x_offset;
-			area = 0x8000 * (state->spriteram_buffered[(offs + 10) / 2] & 0x0001);
+			if (state->m_sprites_flipscreen) x_offset = -x_offset;
+			area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 //popmessage("%04x",area);
 
 		/* check for extra scroll offset */
-		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
+		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (master_scrollx >= 0x800)
 				master_scrollx -= 0x1000;   /* signed value */
 
-			master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (master_scrolly >= 0x800)
 				master_scrolly -= 0x1000;   /* signed value */
 		}
 
-		if ((state->spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
+		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			scroll1x = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (scroll1x >= 0x800)
 				scroll1x -= 0x1000;   /* signed value */
 
-			scroll1y = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			scroll1y = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (scroll1y >= 0x800)
 				scroll1y -= 0x1000;   /* signed value */
 		}
@@ -175,7 +175,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		if (disabled)
 			continue;
 
-		spritedata = state->spriteram_buffered[(offs + 8) / 2];
+		spritedata = state->m_spriteram_buffered[(offs + 8) / 2];
 
 		spritecont = (spritedata & 0xff00) >> 8;
 
@@ -183,11 +183,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		{
 			if (big_sprite == 0)   /* are we starting a big sprite ? */
 			{
-				xlatch = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-				ylatch = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
+				xlatch = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+				ylatch = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 				x_no = 0;
 				y_no = 0;
-				zoomword = state->spriteram_buffered[(offs + 2) / 2];
+				zoomword = state->m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
 				big_sprite = 1;   /* we have started a new big sprite */
@@ -208,7 +208,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 // of anything.
 		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
 		{
-			x = state->spriteram_buffered[(offs + 4) / 2];
+			x = state->m_spriteram_buffered[(offs + 4) / 2];
 
 // DG: some absolute x values deduced here are 1 too high (scenes when you get
 // home run in Koshien, and may also relate to BG layer woods and stuff as you
@@ -231,7 +231,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				scrolly = scroll1y + master_scrolly;
 			}
 			x &= 0xfff;
-			y = state->spriteram_buffered[(offs+6)/2] & 0xfff;
+			y = state->m_spriteram_buffered[(offs+6)/2] & 0xfff;
 
 			xcurrent = x;
 			ycurrent = y;
@@ -279,7 +279,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		}
 		else
 		{
-			zoomword = state->spriteram_buffered[(offs+2)/2];
+			zoomword = state->m_spriteram_buffered[(offs+2)/2];
 			zoomy = (zoomword >> 8) & 0xff;
 			zoomx = (zoomword >> 0) & 0xff;
 			zx = (0x100 - zoomx) / 16;
@@ -299,8 +299,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		{
 			int i;
 
-			code = state->spriteram_buffered[(offs)/2] & 0xff;
-			i = (state->spriteext[(extoffs >> 4)] & 0xff00 );
+			code = state->m_spriteram_buffered[(offs)/2] & 0xff;
+			i = (state->m_spriteext[(extoffs >> 4)] & 0xff00 );
 			code = (i | code);
 		}
 
@@ -316,7 +316,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		cury = (y + scrolly) & 0xfff;
 		if (cury >= 0x800)	cury -= 0x1000;   /* treat it as signed */
 
-		if (state->sprites_flipscreen)
+		if (state->m_sprites_flipscreen)
 		{
 			/* -zx/y is there to fix zoomed sprite coords in screenflip.
                drawgfxzoom does not know to draw from flip-side of sprites when
@@ -362,7 +362,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->spritelist)
+	while (sprite_ptr != state->m_spritelist)
 	{
 		sprite_ptr--;
 
@@ -381,10 +381,10 @@ static void taito_handle_sprite_buffering( running_machine &machine )
 {
 	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	if (state->prepare_sprites)	/* no buffering */
+	if (state->m_prepare_sprites)	/* no buffering */
 	{
-		memcpy(state->spriteram_buffered, state->spriteram, state->spriteram_size);
-		state->prepare_sprites = 0;
+		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram_size);
+		state->m_prepare_sprites = 0;
 	}
 }
 
@@ -397,33 +397,33 @@ static void taito_update_sprites_active_area( running_machine &machine )
 	taito_handle_sprite_buffering(machine);
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
-	if (state->sprites_active_area == 0x8000 &&
-			state->spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
-			state->spriteram_buffered[(0x8000 + 10) / 2] == 0)
-		state->sprites_active_area = 0;
+	if (state->m_sprites_active_area == 0x8000 &&
+			state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
+			state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
+		state->m_sprites_active_area = 0;
 
 	for (off = 0; off < 0x4000; off += 16)
 	{
 		/* sprites_active_area may change during processing */
-		int offs = off + state->sprites_active_area;
+		int offs = off + state->m_sprites_active_area;
 
-		if (state->spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			state->sprites_disabled = state->spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			state->sprites_active_area = 0x8000 * (state->spriteram_buffered[(offs + 10) / 2] & 0x0001);
+			state->m_sprites_disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			state->m_sprites_active_area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 		/* check for extra scroll offset */
-		if ((state->spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
+		if ((state->m_spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
 		{
-			state->sprites_master_scrollx = state->spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (state->sprites_master_scrollx >= 0x800)
-				state->sprites_master_scrollx -= 0x1000;   /* signed value */
+			state->m_sprites_master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			if (state->m_sprites_master_scrollx >= 0x800)
+				state->m_sprites_master_scrollx -= 0x1000;   /* signed value */
 
-			state->sprites_master_scrolly = state->spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (state->sprites_master_scrolly >= 0x800)
-				state->sprites_master_scrolly -= 0x1000;   /* signed value */
+			state->m_sprites_master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			if (state->m_sprites_master_scrolly >= 0x800)
+				state->m_sprites_master_scrolly -= 0x1000;   /* signed value */
 		}
 	}
 }
@@ -434,7 +434,7 @@ SCREEN_EOF( taito_no_buffer )
 
 	taito_update_sprites_active_area(machine);
 
-	state->prepare_sprites = 1;
+	state->m_prepare_sprites = 1;
 }
 
 
@@ -465,40 +465,40 @@ SCREEN_UPDATE( slapshot )
 #ifdef MAME_DEBUG
 	if (input_code_pressed_once (screen->machine(), KEYCODE_Z))
 	{
-		state->dislayer[0] ^= 1;
-		popmessage("bg0: %01x",state->dislayer[0]);
+		state->m_dislayer[0] ^= 1;
+		popmessage("bg0: %01x",state->m_dislayer[0]);
 	}
 
 	if (input_code_pressed_once (screen->machine(), KEYCODE_X))
 	{
-		state->dislayer[1] ^= 1;
-		popmessage("bg1: %01x",state->dislayer[1]);
+		state->m_dislayer[1] ^= 1;
+		popmessage("bg1: %01x",state->m_dislayer[1]);
 	}
 
 	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
 	{
-		state->dislayer[2] ^= 1;
-		popmessage("bg2: %01x",state->dislayer[2]);
+		state->m_dislayer[2] ^= 1;
+		popmessage("bg2: %01x",state->m_dislayer[2]);
 	}
 
 	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
 	{
-		state->dislayer[3] ^= 1;
-		popmessage("bg3: %01x",state->dislayer[3]);
+		state->m_dislayer[3] ^= 1;
+		popmessage("bg3: %01x",state->m_dislayer[3]);
 	}
 
 	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
 	{
-		state->dislayer[4] ^= 1;
-		popmessage("text: %01x",state->dislayer[4]);
+		state->m_dislayer[4] ^= 1;
+		popmessage("text: %01x",state->m_dislayer[4]);
 	}
 #endif
 
 	taito_handle_sprite_buffering(screen->machine());
 
-	tc0480scp_tilemap_update(state->tc0480scp);
+	tc0480scp_tilemap_update(state->m_tc0480scp);
 
-	priority = tc0480scp_get_bg_priority(state->tc0480scp);
+	priority = tc0480scp_get_bg_priority(state->m_tc0480scp);
 
 	layer[0] = (priority & 0xf000) >> 12;	/* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
@@ -506,41 +506,41 @@ SCREEN_UPDATE( slapshot )
 	layer[3] = (priority & 0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	tilepri[0] = tc0360pri_r(state->tc0360pri, 4) & 0x0f;     /* bg0 */
-	tilepri[1] = tc0360pri_r(state->tc0360pri, 4) >> 4;       /* bg1 */
-	tilepri[2] = tc0360pri_r(state->tc0360pri, 5) & 0x0f;     /* bg2 */
-	tilepri[3] = tc0360pri_r(state->tc0360pri, 5) >> 4;       /* bg3 */
+	tilepri[0] = tc0360pri_r(state->m_tc0360pri, 4) & 0x0f;     /* bg0 */
+	tilepri[1] = tc0360pri_r(state->m_tc0360pri, 4) >> 4;       /* bg1 */
+	tilepri[2] = tc0360pri_r(state->m_tc0360pri, 5) & 0x0f;     /* bg2 */
+	tilepri[3] = tc0360pri_r(state->m_tc0360pri, 5) >> 4;       /* bg3 */
 
 /* we actually assume text layer is on top of everything anyway, but FWIW... */
-	tilepri[layer[4]] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;    /* fg (text layer) */
+	tilepri[layer[4]] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;    /* fg (text layer) */
 
-	spritepri[0] = tc0360pri_r(state->tc0360pri, 6) & 0x0f;
-	spritepri[1] = tc0360pri_r(state->tc0360pri, 6) >> 4;
-	spritepri[2] = tc0360pri_r(state->tc0360pri, 7) & 0x0f;
-	spritepri[3] = tc0360pri_r(state->tc0360pri, 7) >> 4;
+	spritepri[0] = tc0360pri_r(state->m_tc0360pri, 6) & 0x0f;
+	spritepri[1] = tc0360pri_r(state->m_tc0360pri, 6) >> 4;
+	spritepri[2] = tc0360pri_r(state->m_tc0360pri, 7) & 0x0f;
+	spritepri[3] = tc0360pri_r(state->m_tc0360pri, 7) >> 4;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[0]] == 0)
+	if (state->m_dislayer[layer[0]] == 0)
 #endif
-		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[0], 0, 1);
+		tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[0], 0, 1);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[1]] == 0)
+	if (state->m_dislayer[layer[1]] == 0)
 #endif
-		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[1], 0, 2);
+		tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[2]] == 0)
+	if (state->m_dislayer[layer[2]] == 0)
 #endif
-		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[2], 0, 4);
+		tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[2], 0, 4);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[3]] == 0)
+	if (state->m_dislayer[layer[3]] == 0)
 #endif
-		tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[3], 0, 8);
+		tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[3], 0, 8);
 
 	{
 		int primasks[4] = {0,0,0,0};
@@ -564,9 +564,9 @@ SCREEN_UPDATE( slapshot )
     */
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[4]] == 0)
+	if (state->m_dislayer[layer[4]] == 0)
 #endif
-	tc0480scp_tilemap_draw(state->tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	tc0480scp_tilemap_draw(state->m_tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	return 0;
 }
 

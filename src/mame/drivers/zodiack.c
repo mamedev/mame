@@ -89,7 +89,7 @@ static TIMER_CALLBACK( interrupt_disable )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 	//interrupt_enable = 0;
-	cpu_interrupt_enable(state->maincpu, 0);
+	cpu_interrupt_enable(state->m_maincpu, 0);
 }
 
 static WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
 static WRITE8_HANDLER( zodiac_sound_nmi_enable_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
-	state->sound_nmi_enabled = data & 1;
+	state->m_sound_nmi_enabled = data & 1;
 }
 
 
@@ -108,7 +108,7 @@ static INTERRUPT_GEN( zodiac_sound_nmi_gen )
 {
 	zodiack_state *state = device->machine().driver_data<zodiack_state>();
 
-	if (state->sound_nmi_enabled)
+	if (state->m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
@@ -124,18 +124,18 @@ static WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static MACHINE_START( zodiack )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	state->percuss_hardware = 0;
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_percuss_hardware = 0;
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->sound_nmi_enabled));
+	state->save_item(NAME(state->m_sound_nmi_enabled));
 }
 
 static MACHINE_RESET( zodiack )
@@ -144,7 +144,7 @@ static MACHINE_RESET( zodiack )
 
 	/* we must start with NMI interrupts disabled */
 	machine.scheduler().synchronize(FUNC(interrupt_disable));
-	state->sound_nmi_enabled = FALSE;
+	state->m_sound_nmi_enabled = FALSE;
 }
 
 static MACHINE_START( percuss )
@@ -153,7 +153,7 @@ static MACHINE_START( percuss )
 
 	MACHINE_START_CALL( zodiack );
 
-	state->percuss_hardware = 1;
+	state->m_percuss_hardware = 1;
 }
 
 
@@ -178,12 +178,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(zodiack_state, attributeram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, spriteram, spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, bulletsram, bulletsram_size)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(zodiack_state, m_attributeram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, m_bulletsram, m_bulletsram_size)
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_SIZE_MEMBER(zodiack_state, videoram, videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(zodiack_state, videoram_2)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_SIZE_MEMBER(zodiack_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(zodiack_state, m_videoram_2)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 

@@ -8,12 +8,12 @@
 static TILE_GET_INFO( get_bg0_tile_info )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->tilemapram[0 + tile_index * 2];
-	UINT16 attr    = state->tilemapram[1 + tile_index * 2];
+	UINT16 tilenum = state->m_tilemapram[0 + tile_index * 2];
+	UINT16 attr    = state->m_tilemapram[1 + tile_index * 2];
 
 	SET_TILE_INFO(
 			1,
-			(tilenum & 0xfff) + state->bg0_gfxset,
+			(tilenum & 0xfff) + state->m_bg0_gfxset,
 			(attr & 0x1f),
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
@@ -21,12 +21,12 @@ static TILE_GET_INFO( get_bg0_tile_info )
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->tilemapram[0x800 + tile_index * 2];
-	UINT16 attr    = state->tilemapram[0x801 + tile_index * 2];
+	UINT16 tilenum = state->m_tilemapram[0x800 + tile_index * 2];
+	UINT16 attr    = state->m_tilemapram[0x801 + tile_index * 2];
 
 	SET_TILE_INFO(
 			1,
-			(tilenum & 0xfff) + 0x2000 + state->bg1_gfxset,
+			(tilenum & 0xfff) + 0x2000 + state->m_bg1_gfxset,
 			(attr & 0x1f) + 0x30,
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 tilenum = state->tilemapram[0x1000 + tile_index];
+	UINT16 tilenum = state->m_tilemapram[0x1000 + tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -49,21 +49,21 @@ static void gcpinbal_core_vh_start( running_machine &machine )
 	int xoffs = 0;
 	int yoffs = 0;
 
-	state->tilemap[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->tilemap[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
-	state->tilemap[2] = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,8,8,64,64);
+	state->m_tilemap[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_tilemap[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
+	state->m_tilemap[2] = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,8,8,64,64);
 
-	tilemap_set_transparent_pen(state->tilemap[0], 0);
-	tilemap_set_transparent_pen(state->tilemap[1], 0);
-	tilemap_set_transparent_pen(state->tilemap[2], 0);
+	tilemap_set_transparent_pen(state->m_tilemap[0], 0);
+	tilemap_set_transparent_pen(state->m_tilemap[1], 0);
+	tilemap_set_transparent_pen(state->m_tilemap[2], 0);
 
 	/* flipscreen n/a */
-	tilemap_set_scrolldx(state->tilemap[0], -xoffs, 0);
-	tilemap_set_scrolldx(state->tilemap[1], -xoffs, 0);
-	tilemap_set_scrolldx(state->tilemap[2], -xoffs, 0);
-	tilemap_set_scrolldy(state->tilemap[0], -yoffs, 0);
-	tilemap_set_scrolldy(state->tilemap[1], -yoffs, 0);
-	tilemap_set_scrolldy(state->tilemap[2], -yoffs, 0);
+	tilemap_set_scrolldx(state->m_tilemap[0], -xoffs, 0);
+	tilemap_set_scrolldx(state->m_tilemap[1], -xoffs, 0);
+	tilemap_set_scrolldx(state->m_tilemap[2], -xoffs, 0);
+	tilemap_set_scrolldy(state->m_tilemap[0], -yoffs, 0);
+	tilemap_set_scrolldy(state->m_tilemap[1], -yoffs, 0);
+	tilemap_set_scrolldy(state->m_tilemap[2], -yoffs, 0);
 }
 
 VIDEO_START( gcpinbal )
@@ -79,20 +79,20 @@ VIDEO_START( gcpinbal )
 READ16_HANDLER( gcpinbal_tilemaps_word_r )
 {
 	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	return state->tilemapram[offset];
+	return state->m_tilemapram[offset];
 }
 
 WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 {
 	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	COMBINE_DATA(&state->tilemapram[offset]);
+	COMBINE_DATA(&state->m_tilemapram[offset]);
 
 	if (offset < 0x800)	/* BG0 */
-		tilemap_mark_tile_dirty(state->tilemap[0], offset / 2);
+		tilemap_mark_tile_dirty(state->m_tilemap[0], offset / 2);
 	else if ((offset < 0x1000))	/* BG1 */
-		tilemap_mark_tile_dirty(state->tilemap[1], (offset % 0x800) / 2);
+		tilemap_mark_tile_dirty(state->m_tilemap[1], (offset % 0x800) / 2);
 	else if ((offset < 0x1800))	/* FG */
-		tilemap_mark_tile_dirty(state->tilemap[2], (offset % 0x800));
+		tilemap_mark_tile_dirty(state->m_tilemap[2], (offset % 0x800));
 }
 
 
@@ -172,7 +172,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int y_offs )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs, chain_pos;
 	int x, y, curx, cury;
 	int priority = 0;
@@ -180,9 +180,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	UINT16 code;
 
 	/* According to Raine, word in ioc_ram determines sprite/tile priority... */
-	priority = (state->ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
+	priority = (state->m_ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
 
-	for (offs = state->spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
 	{
 		code = ((spriteram[offs + 5]) & 0xff) + (((spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
@@ -258,38 +258,38 @@ SCREEN_UPDATE( gcpinbal )
 #ifdef MAME_DEBUG
 	if (input_code_pressed_once(screen->machine(), KEYCODE_V))
 	{
-		state->dislayer[0] ^= 1;
-		popmessage("bg0: %01x", state->dislayer[0]);
+		state->m_dislayer[0] ^= 1;
+		popmessage("bg0: %01x", state->m_dislayer[0]);
 	}
 
 	if (input_code_pressed_once(screen->machine(), KEYCODE_B))
 	{
-		state->dislayer[1] ^= 1;
-		popmessage("bg1: %01x", state->dislayer[1]);
+		state->m_dislayer[1] ^= 1;
+		popmessage("bg1: %01x", state->m_dislayer[1]);
 	}
 
 	if (input_code_pressed_once(screen->machine(), KEYCODE_N))
 	{
-		state->dislayer[2] ^= 1;
-		popmessage("fg: %01x", state->dislayer[2]);
+		state->m_dislayer[2] ^= 1;
+		popmessage("fg: %01x", state->m_dislayer[2]);
 	}
 #endif
 
-	state->scrollx[0] =  state->ioc_ram[0x14 / 2];
-	state->scrolly[0] =  state->ioc_ram[0x16 / 2];
-	state->scrollx[1] =  state->ioc_ram[0x18 / 2];
-	state->scrolly[1] =  state->ioc_ram[0x1a / 2];
-	state->scrollx[2] =  state->ioc_ram[0x1c / 2];
-	state->scrolly[2] =  state->ioc_ram[0x1e / 2];
+	state->m_scrollx[0] =  state->m_ioc_ram[0x14 / 2];
+	state->m_scrolly[0] =  state->m_ioc_ram[0x16 / 2];
+	state->m_scrollx[1] =  state->m_ioc_ram[0x18 / 2];
+	state->m_scrolly[1] =  state->m_ioc_ram[0x1a / 2];
+	state->m_scrollx[2] =  state->m_ioc_ram[0x1c / 2];
+	state->m_scrolly[2] =  state->m_ioc_ram[0x1e / 2];
 
-	tile_sets = state->ioc_ram[0x88 / 2];
-	state->bg0_gfxset = (tile_sets & 0x400) ? 0x1000 : 0;
-	state->bg1_gfxset = (tile_sets & 0x800) ? 0x1000 : 0;
+	tile_sets = state->m_ioc_ram[0x88 / 2];
+	state->m_bg0_gfxset = (tile_sets & 0x400) ? 0x1000 : 0;
+	state->m_bg1_gfxset = (tile_sets & 0x800) ? 0x1000 : 0;
 
 	for (i = 0; i < 3; i++)
 	{
-		tilemap_set_scrollx(state->tilemap[i], 0, state->scrollx[i]);
-		tilemap_set_scrolly(state->tilemap[i], 0, state->scrolly[i]);
+		tilemap_set_scrollx(state->m_tilemap[i], 0, state->m_scrollx[i]);
+		tilemap_set_scrolly(state->m_tilemap[i], 0, state->m_scrolly[i]);
 	}
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
@@ -301,19 +301,19 @@ SCREEN_UPDATE( gcpinbal )
 
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[0]] == 0)
+	if (state->m_dislayer[layer[0]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->tilemap[layer[0]], TILEMAP_DRAW_OPAQUE, 1);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[0]], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[1]] == 0)
+	if (state->m_dislayer[layer[1]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->tilemap[layer[1]], 0, 2);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[1]], 0, 2);
 
 #ifdef MAME_DEBUG
-	if (state->dislayer[layer[2]] == 0)
+	if (state->m_dislayer[layer[2]] == 0)
 #endif
-	tilemap_draw(bitmap, cliprect, state->tilemap[layer[2]], 0, 4);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap[layer[2]], 0, 4);
 
 
 	draw_sprites(screen->machine(), bitmap, cliprect, 16);
@@ -321,7 +321,7 @@ SCREEN_UPDATE( gcpinbal )
 #if 0
 	{
 //      char buf[80];
-		sprintf(buf,"bg0_gfx: %04x bg1_gfx: %04x ", state->bg0_gfxset, state->bg1_gfxset);
+		sprintf(buf,"bg0_gfx: %04x bg1_gfx: %04x ", state->m_bg0_gfxset, state->m_bg1_gfxset);
 		popmessage(buf);
 	}
 #endif

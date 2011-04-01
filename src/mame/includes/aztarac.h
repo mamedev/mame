@@ -12,10 +12,10 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT16>	m_nvram;
-	int sound_status;
-	UINT16 *vectorram;
-	int xcenter;
-	int ycenter;
+	int m_sound_status;
+	UINT16 *m_vectorram;
+	int m_xcenter;
+	int m_ycenter;
 };
 
 /*----------- defined in audio/aztarac.c -----------*/

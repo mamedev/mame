@@ -6,54 +6,54 @@ public:
 	taitojc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int texture_x;
-	int texture_y;
+	int m_texture_x;
+	int m_texture_y;
 
-	UINT32 dsp_rom_pos;
-	UINT16 dsp_tex_address;
-	UINT16 dsp_tex_offset;
+	UINT32 m_dsp_rom_pos;
+	UINT16 m_dsp_tex_address;
+	UINT16 m_dsp_tex_offset;
 
 
-	int first_dsp_reset;
-	int viewport_data[3];
+	int m_first_dsp_reset;
+	int m_viewport_data[3];
 
-	INT32 projected_point_x;
-	INT32 projected_point_y;
-	INT32 projection_data[3];
+	INT32 m_projected_point_x;
+	INT32 m_projected_point_y;
+	INT32 m_projection_data[3];
 
-	INT32 intersection_data[3];
+	INT32 m_intersection_data[3];
 
-	UINT8 *texture;
-	bitmap_t *framebuffer;
-	bitmap_t *zbuffer;
+	UINT8 *m_texture;
+	bitmap_t *m_framebuffer;
+	bitmap_t *m_zbuffer;
 
-	UINT32 *vram;
-	UINT32 *objlist;
+	UINT32 *m_vram;
+	UINT32 *m_objlist;
 
 	//int debug_tex_pal;
 
-	int gfx_index;
+	int m_gfx_index;
 
-	UINT32 *char_ram;
-	UINT32 *tile_ram;
-	tilemap_t *tilemap;
+	UINT32 *m_char_ram;
+	UINT32 *m_tile_ram;
+	tilemap_t *m_tilemap;
 
-	poly_manager *poly;
+	poly_manager *m_poly;
 
-	UINT32 *f3_shared_ram;
-	UINT32 *main_ram;
-	UINT16 *dsp_shared_ram;
-	UINT32 *palette_ram;
+	UINT32 *m_f3_shared_ram;
+	UINT32 *m_main_ram;
+	UINT16 *m_dsp_shared_ram;
+	UINT32 *m_palette_ram;
 
-	UINT16 *polygon_fifo;
-	int polygon_fifo_ptr;
+	UINT16 *m_polygon_fifo;
+	int m_polygon_fifo_ptr;
 
-	UINT8 mcu_comm_main;
-	UINT8 mcu_comm_hc11;
-	UINT8 mcu_data_main;
-	UINT8 mcu_data_hc11;
+	UINT8 m_mcu_comm_main;
+	UINT8 m_mcu_comm_hc11;
+	UINT8 m_mcu_data_main;
+	UINT8 m_mcu_data_hc11;
 
-	UINT16 debug_dsp_ram[0x8000];
+	UINT16 m_debug_dsp_ram[0x8000];
 };
 
 

@@ -101,7 +101,7 @@ static WRITE8_HANDLER( himesiki_sound_w )
 {
 	himesiki_state *state = space->machine().driver_data<himesiki_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /****************************************************************************/
@@ -109,9 +109,9 @@ static WRITE8_HANDLER( himesiki_sound_w )
 static ADDRESS_MAP_START( himesiki_prm0, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(himesiki_state, spriteram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(himesiki_state, m_spriteram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_BASE_MEMBER(himesiki_state, bg_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM_WRITE(himesiki_bg_ram_w) AM_BASE_MEMBER(himesiki_state, m_bg_ram)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -274,19 +274,19 @@ static MACHINE_START( himesiki )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
-	state->subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_RESET( himesiki )
 {
 	himesiki_state *state = machine.driver_data<himesiki_state>();
 
-	state->scrollx[0] = 0;
-	state->scrollx[1] = 0;
-	state->flipscreen = 0;
+	state->m_scrollx[0] = 0;
+	state->m_scrollx[1] = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_CONFIG_START( himesiki, himesiki_state )

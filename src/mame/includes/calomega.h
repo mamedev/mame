@@ -4,13 +4,13 @@ public:
 	calomega_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 tx_line;
-	UINT8 rx_line;
-	int s903_mux_data;
-	int s905_mux_data;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
+	UINT8 m_tx_line;
+	UINT8 m_rx_line;
+	int m_s903_mux_data;
+	int m_s905_mux_data;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
 };
 
 

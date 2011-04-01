@@ -83,17 +83,17 @@ TODO:
 static MACHINE_START( lvpoker )
 {
 	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state_save_register_global(machine, state->payout);
-	state_save_register_global(machine, state->pulse);
-	state_save_register_global(machine, state->result);
+	state_save_register_global(machine, state->m_payout);
+	state_save_register_global(machine, state->m_pulse);
+	state_save_register_global(machine, state->m_result);
 }
 
 static MACHINE_RESET( lvpoker )
 {
 	lvcards_state *state = machine.driver_data<lvcards_state>();
-	state->payout = 0;
-	state->pulse = 0;
-	state->result = 0;
+	state->m_payout = 0;
+	state->m_pulse = 0;
+	state->m_result = 0;
 }
 
 static WRITE8_HANDLER(control_port_2_w)
@@ -102,13 +102,13 @@ static WRITE8_HANDLER(control_port_2_w)
 	switch (data)
 	{
 		case 0x60:
-		state->payout = 1;
+		state->m_payout = 1;
 		break;
 		case 0xc0:
-		state->payout = 1;
+		state->m_payout = 1;
 		break;
 		default:
-		state->payout = 0;
+		state->m_payout = 0;
 		break;
 	}
 }
@@ -119,13 +119,13 @@ static WRITE8_HANDLER(control_port_2a_w)
 	switch (data)
 	{
 		case 0x60:
-		state->payout = 1;
+		state->m_payout = 1;
 		break;
 		case 0x80:
-		state->payout = 1;
+		state->m_payout = 1;
 		break;
 		default:
-		state->payout = 0;
+		state->m_payout = 0;
 		break;
 	}
 }
@@ -133,28 +133,28 @@ static WRITE8_HANDLER(control_port_2a_w)
 static READ8_HANDLER( payout_r )
 {
 	lvcards_state *state = space->machine().driver_data<lvcards_state>();
-	state->result = input_port_read(space->machine(), "IN2");
+	state->m_result = input_port_read(space->machine(), "IN2");
 
-	if (state->payout)
+	if (state->m_payout)
 	{
-    	if ( state->pulse < 3 )
+    	if ( state->m_pulse < 3 )
 		{
-			state->result = state->result | 0x40;
-	        state->pulse++;
+			state->m_result = state->m_result | 0x40;
+	        state->m_pulse++;
         }
        else
     	{
-        	state->pulse = 0;
+        	state->m_pulse = 0;
         }
    }
-   return state->result;
+   return state->m_result;
 }
 
 static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
 	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2a_w)//AM_WRITENOP // ???
@@ -163,8 +163,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8  )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITENOP
@@ -180,8 +180,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lvpoker_map, AS_PROGRAM, 8  )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
 	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2_w)

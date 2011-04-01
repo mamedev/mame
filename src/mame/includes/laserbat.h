@@ -11,41 +11,49 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	tilemap_t    *bg_tilemap;
-	int        video_page;
+	tilemap_t    *m_bg_tilemap;
+	int        m_video_page;
 
 	/* misc */
-	int        input_mux;
-	int        active_8910, port0a, last_port0b;
-	int        cb1_toggle;
+	int        m_input_mux;
+	int        m_active_8910;
+	int        m_port0a;
+	int        m_last_port0b;
+	int        m_cb1_toggle;
 
 	/* information for the single 32x32 sprite displayed */
-	int        sprite_x;
-	int        sprite_y;
-	int        sprite_code;
-	int        sprite_color;
-	int        sprite_enable;
+	int        m_sprite_x;
+	int        m_sprite_y;
+	int        m_sprite_code;
+	int        m_sprite_color;
+	int        m_sprite_enable;
 
 	/* sound-related */
-	int        csound1;
-	int        ksound1, ksound2, ksound3;
-	int        degr, filt, a, us, bit14;
+	int        m_csound1;
+	int        m_ksound1;
+	int        m_ksound2;
+	int        m_ksound3;
+	int        m_degr;
+	int        m_filt;
+	int        m_a;
+	int        m_us;
+	int        m_bit14;
 
 	/* device */
-	device_t *audiocpu;
-	device_t *s2636_1;
-	device_t *s2636_2;
-	device_t *s2636_3;
-	device_t *pia;
-	device_t *sn;
-	device_t *tms1;
-	device_t *tms2;
-	device_t *ay1;
-	device_t *ay2;
+	device_t *m_audiocpu;
+	device_t *m_s2636_1;
+	device_t *m_s2636_2;
+	device_t *m_s2636_3;
+	device_t *m_pia;
+	device_t *m_sn;
+	device_t *m_tms1;
+	device_t *m_tms2;
+	device_t *m_ay1;
+	device_t *m_ay2;
 
 	// memory
-	UINT8      videoram[0x400];
-	UINT8      colorram[0x400];
+	UINT8      m_videoram[0x400];
+	UINT8      m_colorram[0x400];
 };
 
 

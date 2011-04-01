@@ -23,46 +23,46 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    video_ram;
-	UINT8 *    bullet_ram;
-	UINT8 *    fo_state;
-	UINT8 *    cvs_4_bit_dac_data;
-	UINT8 *    tms5110_ctl_data;
-	UINT8 *    dac3_state;
+	UINT8 *    m_video_ram;
+	UINT8 *    m_bullet_ram;
+	UINT8 *    m_fo_state;
+	UINT8 *    m_cvs_4_bit_dac_data;
+	UINT8 *    m_tms5110_ctl_data;
+	UINT8 *    m_dac3_state;
 
 	/* video-related */
-	struct cvs_star stars[CVS_MAX_STARS];
-	bitmap_t   *collision_background;
-	bitmap_t   *background_bitmap;
-	bitmap_t   *scrolled_collision_background;
-	int        collision_register;
-	int        total_stars;
-	int        stars_on;
-	UINT8      scroll_reg;
-	int        stars_scroll;
+	struct cvs_star m_stars[CVS_MAX_STARS];
+	bitmap_t   *m_collision_background;
+	bitmap_t   *m_background_bitmap;
+	bitmap_t   *m_scrolled_collision_background;
+	int        m_collision_register;
+	int        m_total_stars;
+	int        m_stars_on;
+	UINT8      m_scroll_reg;
+	int        m_stars_scroll;
 
 	/* misc */
-	emu_timer  *cvs_393hz_timer;
-	UINT8      cvs_393hz_clock;
+	emu_timer  *m_cvs_393hz_timer;
+	UINT8      m_cvs_393hz_clock;
 
-	UINT8      character_banking_mode;
-	UINT16     character_ram_page_start;
-	UINT16     speech_rom_bit_address;
+	UINT8      m_character_banking_mode;
+	UINT16     m_character_ram_page_start;
+	UINT16     m_speech_rom_bit_address;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *speech;
-	device_t *dac3;
-	device_t *tms;
-	device_t *s2636_0;
-	device_t *s2636_1;
-	device_t *s2636_2;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_speech;
+	device_t *m_dac3;
+	device_t *m_tms;
+	device_t *m_s2636_0;
+	device_t *m_s2636_1;
+	device_t *m_s2636_2;
 
 	/* memory */
-	UINT8      color_ram[0x400];
-	UINT8      palette_ram[0x10];
-	UINT8      character_ram[3 * 0x800];	/* only half is used, but
+	UINT8      m_color_ram[0x400];
+	UINT8      m_palette_ram[0x10];
+	UINT8      m_character_ram[3 * 0x800];	/* only half is used, but
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
 };
@@ -73,9 +73,10 @@ public:
 	quasar_state(running_machine &machine, const driver_device_config_base &config)
 		: cvs_state(machine, config) { }
 
-	UINT8 *    effectram;
-	UINT8      effectcontrol;
-	UINT8      page, io_page;
+	UINT8 *    m_effectram;
+	UINT8      m_effectcontrol;
+	UINT8      m_page;
+	UINT8      m_io_page;
 };
 
 

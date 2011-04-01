@@ -29,16 +29,16 @@ public:
 	tank8_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int collision_index;
-	UINT8 *video_ram;
-	UINT8 *pos_h_ram;
-	UINT8 *pos_v_ram;
-	UINT8 *pos_d_ram;
-	UINT8 *team;
-	tilemap_t *tilemap;
-	bitmap_t *helper1;
-	bitmap_t *helper2;
-	bitmap_t *helper3;
+	int m_collision_index;
+	UINT8 *m_video_ram;
+	UINT8 *m_pos_h_ram;
+	UINT8 *m_pos_v_ram;
+	UINT8 *m_pos_d_ram;
+	UINT8 *m_team;
+	tilemap_t *m_tilemap;
+	bitmap_t *m_helper1;
+	bitmap_t *m_helper2;
+	bitmap_t *m_helper3;
 };
 
 

@@ -670,7 +670,7 @@ static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 static READ8_DEVICE_HANDLER( s903_mux_port_r )
 {
 	calomega_state *state = device->machine().driver_data<calomega_state>();
-	switch( state->s903_mux_data & 0xf0 )	/* bits 4-7 */
+	switch( state->m_s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
 		case 0x10: return input_port_read(device->machine(), "IN0-0");
 		case 0x20: return input_port_read(device->machine(), "IN0-1");
@@ -684,7 +684,7 @@ static READ8_DEVICE_HANDLER( s903_mux_port_r )
 static WRITE8_DEVICE_HANDLER( s903_mux_w )
 {
 	calomega_state *state = device->machine().driver_data<calomega_state>();
-	state->s903_mux_data = data ^ 0xff;	/* inverted */
+	state->m_s903_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -692,7 +692,7 @@ static WRITE8_DEVICE_HANDLER( s903_mux_w )
 static READ8_DEVICE_HANDLER( s905_mux_port_r )
 {
 	calomega_state *state = device->machine().driver_data<calomega_state>();
-	switch( state->s905_mux_data & 0x0f )	/* bits 0-3 */
+	switch( state->m_s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
 		case 0x01: return input_port_read(device->machine(), "IN0-0");
 		case 0x02: return input_port_read(device->machine(), "IN0-1");
@@ -706,7 +706,7 @@ static READ8_DEVICE_HANDLER( s905_mux_port_r )
 static WRITE8_DEVICE_HANDLER( s905_mux_w )
 {
 	calomega_state *state = device->machine().driver_data<calomega_state>();
-	state->s905_mux_data = data ^ 0xff;	/* inverted */
+	state->m_s905_mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -844,8 +844,8 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -857,8 +857,8 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
 	AM_RANGE(0x1800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -870,8 +870,8 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -882,8 +882,8 @@ static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2655,13 +2655,13 @@ static const pia6821_interface sys906_pia1_intf =
 static READ_LINE_DEVICE_HANDLER( acia_rx_r )
 {
 	calomega_state *state = device->machine().driver_data<calomega_state>();
-	return state->rx_line;
+	return state->m_rx_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( acia_tx_w )
 {
 	calomega_state *drvstate = device->machine().driver_data<calomega_state>();
-	drvstate->tx_line = state;
+	drvstate->m_tx_line = state;
 }
 
 static ACIA6850_INTERFACE( acia6850_intf )

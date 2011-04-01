@@ -211,37 +211,37 @@ public:
 	halleys_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *render_layer[MAX_LAYERS];
-	UINT8 sound_fifo[MAX_SOUNDS];
-	UINT8 *gfx_plane02;
-	UINT8 *gfx_plane13;
-	UINT8 *collision_list;
-	UINT8 *scrolly0;
-	UINT8 *scrollx0;
-	UINT8 *scrolly1;
-	UINT8 *scrollx1;
-	UINT32 *internal_palette;
-	UINT32 *alpha_table;
-	UINT8 *cpu1_base;
-	UINT8 *gfx1_base;
-	UINT8 *blitter_ram;
-	UINT8 *io_ram;
-	size_t blitter_ramsize;
-	size_t io_ramsize;
-	int game_id;
-	int blitter_busy;
-	int collision_count;
-	int stars_enabled;
-	int bgcolor;
-	int ffcount;
-	int ffhead;
-	int fftail;
-	int mVectorType;
-	int sndnmi_mask;
-	int firq_level;
-	emu_timer *blitter_reset_timer;
-	offs_t collision_detection;
-	int latch_delay;
+	UINT16 *m_render_layer[MAX_LAYERS];
+	UINT8 m_sound_fifo[MAX_SOUNDS];
+	UINT8 *m_gfx_plane02;
+	UINT8 *m_gfx_plane13;
+	UINT8 *m_collision_list;
+	UINT8 *m_scrolly0;
+	UINT8 *m_scrollx0;
+	UINT8 *m_scrolly1;
+	UINT8 *m_scrollx1;
+	UINT32 *m_internal_palette;
+	UINT32 *m_alpha_table;
+	UINT8 *m_cpu1_base;
+	UINT8 *m_gfx1_base;
+	UINT8 *m_blitter_ram;
+	UINT8 *m_io_ram;
+	size_t m_blitter_ramsize;
+	size_t m_io_ramsize;
+	int m_game_id;
+	int m_blitter_busy;
+	int m_collision_count;
+	int m_stars_enabled;
+	int m_bgcolor;
+	int m_ffcount;
+	int m_ffhead;
+	int m_fftail;
+	int m_mVectorType;
+	int m_sndnmi_mask;
+	int m_firq_level;
+	emu_timer *m_blitter_reset_timer;
+	offs_t m_collision_detection;
+	int m_latch_delay;
 };
 
 
@@ -333,7 +333,7 @@ static void blit(halleys_state *state, int offset)
 	UINT16 ax; UINT8 al, ah;      // partial regs
 
 
-	param = state->blitter_ram + offset;
+	param = state->m_blitter_ram + offset;
 
 
 #if HALLEYS_DEBUG
@@ -355,11 +355,11 @@ if (0) {
 	// update sprite status
 	layer = (code>>3 & 2) | (code>>7 & 1);
 	offset >>= 4;
-	status = (stptr) ? state->cpu1_base[stptr] : ACTIVE;
+	status = (stptr) ? state->m_cpu1_base[stptr] : ACTIVE;
 	flags = mode;
 	group = mode & GROUP;
 	command = code & COMMAND;
-	if (state->game_id == GAME_HALLEYS)
+	if (state->m_game_id == GAME_HALLEYS)
 	{
 		if (!layer) flags |= PPCD_ON;
 		if (offset >= HALLEYS_SPLIT) flags |= AD_HIGH; else
@@ -387,7 +387,7 @@ if (0) {
 	src1 &= 0x3fff;
 	src2 &= 0x3fff;
 	bank = ((code & BANKBIT0) | (color & BANKBIT1)) << 8;
-	pal_ptr = state->internal_palette;
+	pal_ptr = state->m_internal_palette;
 
 
 	// the crossroad of fate
@@ -434,8 +434,8 @@ if (0) {
 
 
 	// calculate entry points and loop constants
-	src1_ptr = state->gfx_plane02 + ((bank + src1)<<3) + eax;
-	src2_ptr = state->gfx_plane13 + ((bank + src2)<<3) + eax;
+	src1_ptr = state->m_gfx_plane02 + ((bank + src1)<<3) + eax;
+	src2_ptr = state->m_gfx_plane13 + ((bank + src2)<<3) + eax;
 
 	if (!(flags & (S1_IDLE | S2_IDLE)))
 	{
@@ -445,7 +445,7 @@ if (0) {
 	}
 	else src_dy = src_dx = 0;
 
-	dst_ptr = state->render_layer[layer] + dst_skip;
+	dst_ptr = state->m_render_layer[layer] + dst_skip;
 
 
 	// look up pen values and set rendering flags
@@ -555,11 +555,11 @@ if (0) {
 		// update collision list if object collided with the other group
 		if (status & ACTIVE && ax & SP_COLLD)
 		{
-			state->collision_list[state->collision_count & (MAX_SPRITES-1)] = offset;
-			state->collision_count++;
+			state->m_collision_list[state->m_collision_count & (MAX_SPRITES-1)] = offset;
+			state->m_collision_count++;
 
 			#if HALLEYS_DEBUG
-				popmessage("ID:%02x CC:%3d", offset, state->collision_count);
+				popmessage("ID:%02x CC:%3d", offset, state->m_collision_count);
 			#endif
 		}
 
@@ -704,10 +704,10 @@ COMMAND_MODE:
 	if (flags & S1_IDLE) src_dx = 0; else src_dx = 1;
 	if (flags & S1_REV ) src_dx = -src_dx;
 
-	src_base = state->gfx1_base + bank;
+	src_base = state->m_gfx1_base + bank;
 
 	if (command == STARPASS1 || command == STARPASS2) layer = (layer & 1) + 4;
-	dst_base = state->render_layer[layer];
+	dst_base = state->m_render_layer[layer];
 
 
 //--------------------------------------------------------------------------
@@ -731,17 +731,17 @@ COMMAND_MODE:
 		if (!command && y == 0xff && h == 1)
 		{
 			y = 0; h = SCREEN_HEIGHT;
-			dst_base = state->render_layer[(layer&1)+4];
+			dst_base = state->m_render_layer[(layer&1)+4];
 			WARP_WIPE_COMMON
 
-			state->stars_enabled = ~layer & 1;
+			state->m_stars_enabled = ~layer & 1;
 		}
 
 		// wipe background and chain-wipe corresponding sprite layer when the command is zero
 		else
 		{
 			WARP_WIPE_COMMON
-			if (!command) { dst_base = state->render_layer[layer&1]; WARP_WIPE_COMMON }
+			if (!command) { dst_base = state->m_render_layer[layer&1]; WARP_WIPE_COMMON }
 		}
 
 	} else
@@ -793,7 +793,7 @@ COMMAND_MODE:
 			}
 		}
 
-		state->stars_enabled = layer & 1;
+		state->m_stars_enabled = layer & 1;
 
 		#undef RORB
 		#undef C2S
@@ -861,7 +861,7 @@ COMMAND_MODE:
 		if (flags & IGNORE_0) { w=8; h=8; WARP_WIPE_COMMON }
 
 		src1_ptr = src_base + src1;
-		dst_ptr = state->render_layer[2] + (y << SCREEN_WIDTH_L2);
+		dst_ptr = state->m_render_layer[2] + (y << SCREEN_WIDTH_L2);
 
 		src1_ptr += 8;
 		edx = -8;
@@ -980,7 +980,7 @@ static WRITE8_HANDLER( bgtile_w )
 	UINT16 *edi;
 	UINT16 ax;
 
-	state->cpu1_base[0x1f00+offset] = data;
+	state->m_cpu1_base[0x1f00+offset] = data;
 	offset -= 0x18;
 
 	if (offset >= 191) return;
@@ -991,7 +991,7 @@ static WRITE8_HANDLER( bgtile_w )
 	yskip = yskip * 48 + 24;
 	xskip = xskip * 5 + 2;
 
-	edi = state->render_layer[2] + (yskip<<SCREEN_WIDTH_L2) + xskip + (48<<SCREEN_WIDTH_L2);
+	edi = state->m_render_layer[2] + (yskip<<SCREEN_WIDTH_L2) + xskip + (48<<SCREEN_WIDTH_L2);
 	ecx = -(48<<SCREEN_WIDTH_L2);
 	ax = (UINT16)data | BG_RGB;
 
@@ -1002,7 +1002,7 @@ static WRITE8_HANDLER( bgtile_w )
 static READ8_HANDLER( blitter_status_r )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	if (state->game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (state->m_game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1015,14 +1015,14 @@ static READ8_HANDLER( blitter_r )
 
 	if (i==0 || i==4) return(1);
 
-	return(state->blitter_ram[offset]);
+	return(state->m_blitter_ram[offset]);
 }
 
 
 static TIMER_CALLBACK( blitter_reset )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
-	state->blitter_busy = 0;
+	state->m_blitter_busy = 0;
 }
 
 
@@ -1031,21 +1031,21 @@ static WRITE8_HANDLER( blitter_w )
 	halleys_state *state = space->machine().driver_data<halleys_state>();
 	int i = offset & 0xf;
 
-	state->blitter_ram[offset] = data;
+	state->m_blitter_ram[offset] = data;
 
 	if (i==0) blit(state, offset);
 
-	if (state->game_id == GAME_BENBEROB)
+	if (state->m_game_id == GAME_BENBEROB)
 	{
 		if (i==0 || (i==4 && !data))
 		{
-			state->blitter_busy = 0;
-			if (state->firq_level) cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			state->m_blitter_busy = 0;
+			if (state->m_firq_level) cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
-			state->blitter_busy = 1;
-			state->blitter_reset_timer->adjust(downcast<cpu_device *>(&space->device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
+			state->m_blitter_busy = 1;
+			state->m_blitter_reset_timer->adjust(downcast<cpu_device *>(&space->device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1076,14 +1076,14 @@ static READ8_HANDLER( collision_id_r )
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (state->game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==state->collision_detection) // HACK: collision detection bypass
+	if (state->m_game_id==GAME_HALLEYS && cpu_get_pc(&space->device())==state->m_collision_detection) // HACK: collision detection bypass
 	{
-		if (state->collision_count) { state->collision_count--; return(state->collision_list[state->collision_count]); }
+		if (state->m_collision_count) { state->m_collision_count--; return(state->m_collision_list[state->m_collision_count]); }
 
 		return(0);
 	}
 
-	return(state->io_ram[0x66]);
+	return(state->m_io_ram[0x66]);
 }
 
 
@@ -1094,7 +1094,7 @@ static PALETTE_INIT( halleys )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
 	UINT32 d, r, g, b, i, j, count;
-	UINT32 *pal_ptr = state->internal_palette;
+	UINT32 *pal_ptr = state->m_internal_palette;
 
 	for (count=0; count<1024; count++)
 	{
@@ -1188,7 +1188,7 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
 	UINT32 d, r, g, b, i, j;
-	UINT32 *pal_ptr = state->internal_palette;
+	UINT32 *pal_ptr = state->m_internal_palette;
 
 	space->machine().generic.paletteram.u8[offset] = data;
 	d = (UINT32)data;
@@ -1225,10 +1225,10 @@ static VIDEO_START( halleys )
 	int dst, src, c;
 
 	// create short cuts to scroll registers
-	state->scrolly0 = state->io_ram + HALLEYS_Y0;
-	state->scrollx0 = state->io_ram + HALLEYS_X0;
-	state->scrolly1 = state->io_ram + HALLEYS_Y1;
-	state->scrollx1 = state->io_ram + HALLEYS_X1;
+	state->m_scrolly0 = state->m_io_ram + HALLEYS_Y0;
+	state->m_scrollx0 = state->m_io_ram + HALLEYS_X0;
+	state->m_scrolly1 = state->m_io_ram + HALLEYS_Y1;
+	state->m_scrollx1 = state->m_io_ram + HALLEYS_X1;
 
 	// fill alpha table
 	for (src=0; src<256; src++)
@@ -1239,7 +1239,7 @@ static VIDEO_START( halleys )
 		c += (((src&0x0c)+(dst&0x0c))>>1) & 0x0c;
 		c += (((src&0x03)+(dst&0x03))>>1) & 0x03;
 
-		state->alpha_table[(src<<8)+dst] = c | BG_RGB;
+		state->m_alpha_table[(src<<8)+dst] = c | BG_RGB;
 	}
 }
 
@@ -1431,7 +1431,7 @@ static void filter_bitmap(running_machine &machine, bitmap_t *bitmap, int mask)
 	UINT32 *pal_ptr, *edi;
 	int esi, eax, ebx, ecx, edx;
 
-	pal_ptr = state->internal_palette;
+	pal_ptr = state->m_internal_palette;
 	esi = mask | 0xffffff00;
 	edi = (UINT32*)BITMAP_ADDR16(bitmap, VIS_MINY, VIS_MINX + CLIP_W);
 	dst_pitch = bitmap->rowpixels >> 1;
@@ -1469,26 +1469,26 @@ static SCREEN_UPDATE( halleys )
 	halleys_state *state = screen->machine().driver_data<halleys_state>();
 	int i, j;
 
-	if (state->stars_enabled)
+	if (state->m_stars_enabled)
 	{
-		copy_scroll_op(bitmap, state->render_layer[5], *state->scrollx0, *state->scrolly0);
-		copy_scroll_xp(bitmap, state->render_layer[4], *state->scrollx1, *state->scrolly1);
+		copy_scroll_op(bitmap, state->m_render_layer[5], *state->m_scrollx0, *state->m_scrolly0);
+		copy_scroll_xp(bitmap, state->m_render_layer[4], *state->m_scrollx1, *state->m_scrolly1);
 	}
 	else
-		bitmap_fill(bitmap, cliprect, state->bgcolor);
+		bitmap_fill(bitmap, cliprect, state->m_bgcolor);
 
 #ifdef MAME_DEBUG
-	if (input_port_read(screen->machine(), "DEBUG")) copy_scroll_xp(bitmap, state->render_layer[3], *state->scrollx0, *state->scrolly0); // not used???
+	if (input_port_read(screen->machine(), "DEBUG")) copy_scroll_xp(bitmap, state->m_render_layer[3], *state->m_scrollx0, *state->m_scrolly0); // not used???
 #endif
 
-	copy_scroll_xp(bitmap, state->render_layer[2], *state->scrollx1, *state->scrolly1);
-	copy_fixed_2b (bitmap, state->render_layer[1]);
-	copy_fixed_xp (bitmap, state->render_layer[0]);
+	copy_scroll_xp(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
+	copy_fixed_2b (bitmap, state->m_render_layer[1]);
+	copy_fixed_xp (bitmap, state->m_render_layer[0]);
 
 	// HALF-HACK: apply RGB filter when the following conditions are met
-	i = state->io_ram[0xa0];
-	j = state->io_ram[0xa1];
-	if (state->io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen->machine(), bitmap, i);
+	i = state->m_io_ram[0xa0];
+	j = state->m_io_ram[0xa1];
+	if (state->m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(screen->machine(), bitmap, i);
 	return 0;
 }
 
@@ -1496,13 +1496,13 @@ static SCREEN_UPDATE( halleys )
 static SCREEN_UPDATE( benberob )
 {
 	halleys_state *state = screen->machine().driver_data<halleys_state>();
-	if (state->io_ram[0xa0] & 0x80)
-		copy_scroll_op(bitmap, state->render_layer[2], *state->scrollx1, *state->scrolly1);
+	if (state->m_io_ram[0xa0] & 0x80)
+		copy_scroll_op(bitmap, state->m_render_layer[2], *state->m_scrollx1, *state->m_scrolly1);
 	else
-		bitmap_fill(bitmap, cliprect, state->bgcolor);
+		bitmap_fill(bitmap, cliprect, state->m_bgcolor);
 
-	copy_fixed_xp (bitmap, state->render_layer[1]);
-	copy_fixed_xp (bitmap, state->render_layer[0]);
+	copy_fixed_xp (bitmap, state->m_render_layer[1]);
+	copy_fixed_xp (bitmap, state->m_render_layer[0]);
 	return 0;
 }
 
@@ -1517,7 +1517,7 @@ static READ8_HANDLER( zero_r ) { return(0); }
 static READ8_HANDLER( debug_r )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	return(state->io_ram[offset]);
+	return(state->m_io_ram[offset]);
 }
 
 #endif
@@ -1547,19 +1547,19 @@ static INTERRUPT_GEN( halleys_interrupt )
 
                 Current implementation is quite safe although not 100% foul-proof.
             */
-			if (state->latch_delay) state->latch_delay--; else
-			if (state->ffcount)
+			if (state->m_latch_delay) state->m_latch_delay--; else
+			if (state->m_ffcount)
 			{
-				state->ffcount--;
-				latch_data = state->sound_fifo[state->fftail];
-				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
-				state->latch_delay = (latch_data) ? 0 : 4;
+				state->m_ffcount--;
+				latch_data = state->m_sound_fifo[state->m_fftail];
+				state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
+				state->m_latch_delay = (latch_data) ? 0 : 4;
 				soundlatch_w( device->memory().space(AS_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 
 			// clear collision list of this frame unconditionally
-			state->collision_count = 0;
+			state->m_collision_count = 0;
 		break;
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
@@ -1569,11 +1569,11 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 2:
-			state->mVectorType = 1; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->m_mVectorType = 1; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 
 		case 3:
-			state->mVectorType = 0; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->m_mVectorType = 0; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -1587,13 +1587,13 @@ static INTERRUPT_GEN( benberob_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (state->latch_delay) state->latch_delay--; else
-			if (state->ffcount)
+			if (state->m_latch_delay) state->m_latch_delay--; else
+			if (state->m_ffcount)
 			{
-				state->ffcount--;
-				latch_data = state->sound_fifo[state->fftail];
-				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
-				state->latch_delay = (latch_data) ? 0 : 4;
+				state->m_ffcount--;
+				latch_data = state->m_sound_fifo[state->m_fftail];
+				state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
+				state->m_latch_delay = (latch_data) ? 0 : 4;
 				soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
@@ -1606,7 +1606,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 		case 2:
 		case 3:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!state->blitter_busy) device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->firq_level++;
+			if (!state->m_blitter_busy) device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->m_firq_level++;
 		break;
 	}
 }
@@ -1615,16 +1615,16 @@ static INTERRUPT_GEN( benberob_interrupt )
 static READ8_HANDLER( vector_r )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	return(state->cpu1_base[0xffe0 + (offset^(state->mVectorType<<4))]);
+	return(state->m_cpu1_base[0xffe0 + (offset^(state->m_mVectorType<<4))]);
 }
 
 
 static WRITE8_HANDLER( firq_ack_w )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	state->io_ram[0x9c] = data;
+	state->m_io_ram[0x9c] = data;
 
-	if (state->firq_level) state->firq_level--;
+	if (state->m_firq_level) state->m_firq_level--;
 	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
@@ -1632,18 +1632,18 @@ static WRITE8_HANDLER( firq_ack_w )
 static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 {
 	halleys_state *state = device->machine().driver_data<halleys_state>();
-	state->sndnmi_mask = data & 1;
+	state->m_sndnmi_mask = data & 1;
 }
 
 
 static WRITE8_HANDLER( soundcommand_w )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	if (state->ffcount < MAX_SOUNDS)
+	if (state->m_ffcount < MAX_SOUNDS)
 	{
-		state->ffcount++;
-		state->sound_fifo[state->ffhead] = state->io_ram[0x8a] = data;
-		state->ffhead = (state->ffhead + 1) & (MAX_SOUNDS - 1);
+		state->m_ffcount++;
+		state->m_sound_fifo[state->m_ffhead] = state->m_io_ram[0x8a] = data;
+		state->m_ffhead = (state->m_ffhead + 1) & (MAX_SOUNDS - 1);
 	}
 }
 
@@ -1677,7 +1677,7 @@ static READ8_HANDLER( io_mirror_r )
 // Memory Maps
 
 static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE_MEMBER(halleys_state, blitter_ram) AM_SIZE_MEMBER(halleys_state, blitter_ramsize)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE_MEMBER(halleys_state, m_blitter_ram) AM_SIZE_MEMBER(halleys_state, m_blitter_ramsize)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfeff) AM_RAM					// work ram
@@ -1695,7 +1695,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")	// dipswitch 3
 	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")	// dipswitch 2
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_BASE_MEMBER(halleys_state, io_ram) AM_SIZE_MEMBER(halleys_state, io_ramsize)	// I/O write fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_BASE_MEMBER(halleys_state, m_io_ram) AM_SIZE_MEMBER(halleys_state, m_io_ramsize)	// I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
@@ -1956,16 +1956,16 @@ INPUT_PORTS_END
 static MACHINE_RESET( halleys )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
-	state->mVectorType     = 0;
-	state->firq_level      = 0;
-	state->blitter_busy    = 0;
-	state->collision_count = 0;
-	state->stars_enabled   = 0;
-	state->bgcolor         = get_black_pen(machine);
-	state->fftail = state->ffhead = state->ffcount = 0;
+	state->m_mVectorType     = 0;
+	state->m_firq_level      = 0;
+	state->m_blitter_busy    = 0;
+	state->m_collision_count = 0;
+	state->m_stars_enabled   = 0;
+	state->m_bgcolor         = get_black_pen(machine);
+	state->m_fftail = state->m_ffhead = state->m_ffcount = 0;
 
-	memset(state->io_ram, 0xff, state->io_ramsize);
-	memset(state->render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
+	memset(state->m_io_ram, 0xff, state->m_io_ramsize);
+	memset(state->m_render_layer[0], 0, SCREEN_BYTESIZE * MAX_LAYERS);
 }
 
 
@@ -2188,34 +2188,34 @@ static void init_common(running_machine &machine)
 
 	// allocate memory for unpacked graphics
 	buf = auto_alloc_array(machine, UINT8, 0x100000);
-	state->gfx_plane02 = buf;
-	state->gfx_plane13 = buf + 0x80000;
+	state->m_gfx_plane02 = buf;
+	state->m_gfx_plane13 = buf + 0x80000;
 
 
 	// allocate memory for render layers
 	buf = auto_alloc_array(machine, UINT8, SCREEN_BYTESIZE * MAX_LAYERS);
-	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) state->render_layer[i] = (UINT16*)buf;
+	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) state->m_render_layer[i] = (UINT16*)buf;
 
 
 	// allocate memory for pre-processed ROMs
-	state->gfx1_base = auto_alloc_array(machine, UINT8, 0x20000);
+	state->m_gfx1_base = auto_alloc_array(machine, UINT8, 0x20000);
 
 
 	// allocate memory for alpha table
-	state->alpha_table = auto_alloc_array(machine, UINT32, 0x10000);
+	state->m_alpha_table = auto_alloc_array(machine, UINT32, 0x10000);
 
 
 	// allocate memory for internal palette
-	state->internal_palette = auto_alloc_array(machine, UINT32, PALETTE_SIZE);
+	state->m_internal_palette = auto_alloc_array(machine, UINT32, PALETTE_SIZE);
 
 
 	// allocate memory for hardware collision list
-	state->collision_list = auto_alloc_array(machine, UINT8, MAX_SPRITES);
+	state->m_collision_list = auto_alloc_array(machine, UINT8, MAX_SPRITES);
 
 
 	// decrypt main program ROM
-	rom = state->cpu1_base = machine.region("maincpu")->base();
-	buf = state->gfx1_base;
+	rom = state->m_cpu1_base = machine.region("maincpu")->base();
+	buf = state->m_gfx1_base;
 
 	for (i=0; i<0x10000; i++)
 	{
@@ -2228,14 +2228,14 @@ static void init_common(running_machine &machine)
 
 	// swap graphics ROM addresses and unpack each pixel
 	rom = machine.region("gfx1")->base();
-	buf = state->gfx_plane02;
+	buf = state->m_gfx_plane02;
 
 	for (i=0xffff; i>=0; i--)
 	{
 		al = rom[i];
 		ah = rom[i+0x10000];
-		state->gfx1_base[0xffff-i] = al;
-		state->gfx1_base[0x1ffff-i] = ah;
+		state->m_gfx1_base[0xffff-i] = al;
+		state->m_gfx1_base[0x1ffff-i] = ah;
 
 		buf[0] = dl = (al    & 1) | (ah<<2 & 4);  dl <<= 1;
 		buf[1] = dh = (al>>1 & 1) | (ah<<1 & 4);  dh <<= 1;
@@ -2262,19 +2262,19 @@ static void init_common(running_machine &machine)
 static DRIVER_INIT( benberob )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
-	state->game_id = GAME_BENBEROB;
+	state->m_game_id = GAME_BENBEROB;
 
 	init_common(machine);
 
-	state->blitter_reset_timer = machine.scheduler().timer_alloc(FUNC(blitter_reset));
+	state->m_blitter_reset_timer = machine.scheduler().timer_alloc(FUNC(blitter_reset));
 }
 
 
 static DRIVER_INIT( halleys )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
-	state->game_id = GAME_HALLEYS;
-	state->collision_detection = 0xb114;
+	state->m_game_id = GAME_HALLEYS;
+	state->m_collision_detection = 0xb114;
 
 	init_common(machine);
 }
@@ -2282,8 +2282,8 @@ static DRIVER_INIT( halleys )
 static DRIVER_INIT( halley87 )
 {
 	halleys_state *state = machine.driver_data<halleys_state>();
-	state->game_id = GAME_HALLEYS;
-	state->collision_detection = 0xb10d;
+	state->m_game_id = GAME_HALLEYS;
+	state->m_collision_detection = 0xb10d;
 
 	init_common(machine);
 }

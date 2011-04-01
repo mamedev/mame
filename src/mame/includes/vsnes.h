@@ -4,37 +4,37 @@ public:
 	vsnes_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *work_ram;
-	UINT8 *work_ram_1;
-	int coin;
-	int do_vrom_bank;
-	int input_latch[4];
-	int sound_fix;
-	UINT8 last_bank;
-	UINT8* vram;
-	UINT8* vrom[2];
-	UINT8* nt_ram[2];
-	UINT8* nt_page[2][4];
-	UINT32 vrom_size[2];
-	int vrom_banks;
-	int zapstore;
-	int old_bank;
-	int drmario_shiftreg;
-	int drmario_shiftcount;
-	int size16k;
-	int switchlow;
-	int vrom4k;
-	int MMC3_cmd;
-	int MMC3_prg_bank[4];
-	int MMC3_chr_bank[6];
-	int MMC3_prg_mask;
-	int IRQ_enable;
-	int IRQ_count;
-	int IRQ_count_latch;
-	int VSindex;
-	int supxevs_prot_index;
-	int security_counter;
-	int ret;
+	UINT8 *m_work_ram;
+	UINT8 *m_work_ram_1;
+	int m_coin;
+	int m_do_vrom_bank;
+	int m_input_latch[4];
+	int m_sound_fix;
+	UINT8 m_last_bank;
+	UINT8* m_vram;
+	UINT8* m_vrom[2];
+	UINT8* m_nt_ram[2];
+	UINT8* m_nt_page[2][4];
+	UINT32 m_vrom_size[2];
+	int m_vrom_banks;
+	int m_zapstore;
+	int m_old_bank;
+	int m_drmario_shiftreg;
+	int m_drmario_shiftcount;
+	int m_size16k;
+	int m_switchlow;
+	int m_vrom4k;
+	int m_MMC3_cmd;
+	int m_MMC3_prg_bank[4];
+	int m_MMC3_chr_bank[6];
+	int m_MMC3_prg_mask;
+	int m_IRQ_enable;
+	int m_IRQ_count;
+	int m_IRQ_count_latch;
+	int m_VSindex;
+	int m_supxevs_prot_index;
+	int m_security_counter;
+	int m_ret;
 };
 
 

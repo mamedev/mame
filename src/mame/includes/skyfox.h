@@ -11,18 +11,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    spriteram;
-	size_t     spriteram_size;
+	UINT8 *    m_spriteram;
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	UINT8      vreg[8];
-	int        bg_pos, bg_ctrl;
+	UINT8      m_vreg[8];
+	int        m_bg_pos;
+	int        m_bg_ctrl;
 
 	/* misc */
-	int        palette_selected;
+	int        m_palette_selected;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 /*----------- defined in video/skyfox.c -----------*/

@@ -52,13 +52,13 @@ TODO:
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->nmi_enabled = data;
+	state->m_nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( samurai_interrupt )
 {
 	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( unknown_d803_r )
@@ -89,21 +89,21 @@ static READ8_HANDLER( unknown_d938_r )
 static WRITE8_HANDLER( sound_command1_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->sound_command1 = data;
+	state->m_sound_command1 = data;
 	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->sound_command2 = data;
+	state->m_sound_command2 = data;
 	cputag_set_input_line(space->machine(), "audio2", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->sound_command3 = data;
+	state->m_sound_command3 = data;
 	cputag_set_input_line(space->machine(), "audio3", 0, HOLD_LINE );
 }
 
@@ -128,11 +128,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, m_videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, m_colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, bg_videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_MEMBER(tsamurai_state, spriteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, m_bg_videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_MEMBER(tsamurai_state, m_spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(sound_command1_w)
@@ -161,11 +161,11 @@ static ADDRESS_MAP_START( m660_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, m_videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_MEMBER(tsamurai_state, m_colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, bg_videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_MEMBER(tsamurai_state, spriteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE_MEMBER(tsamurai_state, m_bg_videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_MEMBER(tsamurai_state, m_spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP/* This is always written with F401, F402 & F403 data */
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(sound_command3_w)
@@ -206,19 +206,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER( sound_command1_r )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	return state->sound_command1;
+	return state->m_sound_command1;
 }
 
 static READ8_HANDLER( sound_command2_r )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	return state->sound_command2;
+	return state->m_sound_command2;
 }
 
 static READ8_HANDLER( sound_command3_r )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	return state->sound_command3;
+	return state->m_sound_command3;
 }
 
 /*******************************************************************************/
@@ -280,13 +280,13 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w )
 {
 	tsamurai_state *state = space->machine().driver_data<tsamurai_state>();
-	state->vsgongf_sound_nmi_enabled = data;
+	state->m_vsgongf_sound_nmi_enabled = data;
 }
 
 static INTERRUPT_GEN( vsgongf_sound_interrupt )
 {
 	tsamurai_state *state = device->machine().driver_data<tsamurai_state>();
-	if (state->vsgongf_sound_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_vsgongf_sound_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */
@@ -325,8 +325,8 @@ static ADDRESS_MAP_START( vsgongf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
 	AM_RANGE(0xa100, 0xa100) AM_READ(vsgongf_a100_r) /* protection */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					 /* work ram */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_BASE_MEMBER(tsamurai_state, spriteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_MEMBER(tsamurai_state, m_videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_BASE_MEMBER(tsamurai_state, m_spriteram)
 	AM_RANGE(0xe440, 0xe47b) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(vsgongf_sound_command_w)
 	AM_RANGE(0xec00, 0xec06) AM_WRITEONLY

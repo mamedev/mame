@@ -22,7 +22,7 @@ WRITE16_HANDLER( rainbow_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		pc090oj_set_sprite_ctrl(state->pc090oj, (data & 0xe0) >> 5);
+		pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0xe0) >> 5);
 	}
 }
 
@@ -36,7 +36,7 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		state->sprite_ctrl = data;
+		state->m_sprite_ctrl = data;
 	}
 }
 
@@ -47,17 +47,17 @@ SCREEN_UPDATE( rainbow )
 	rainbow_state *state = screen->machine().driver_data<rainbow_state>();
 	int layer[2];
 
-	pc080sn_tilemap_update(state->pc080sn);
+	pc080sn_tilemap_update(state->m_pc080sn);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	pc080sn_tilemap_draw(state->pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	pc080sn_tilemap_draw(state->pc080sn, bitmap, cliprect, layer[1], 0, 2);
+	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[1], 0, 2);
 
-	pc090oj_draw_sprites(state->pc090oj, bitmap, cliprect, 1);
+	pc090oj_draw_sprites(state->m_pc090oj, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -76,38 +76,38 @@ VIDEO_START( jumping )
 {
 	rainbow_state *state = machine.driver_data<rainbow_state>();
 
-	pc080sn_set_trans_pen(state->pc080sn, 1, 15);
+	pc080sn_set_trans_pen(state->m_pc080sn, 1, 15);
 
-	state->sprite_ctrl = 0;
-	state->sprites_flipscreen = 0;
+	state->m_sprite_ctrl = 0;
+	state->m_sprites_flipscreen = 0;
 
 	/* not 100% sure Jumping needs to save both... */
-	state->save_item(NAME(state->sprite_ctrl));
-	state->save_item(NAME(state->sprites_flipscreen));
+	state->save_item(NAME(state->m_sprite_ctrl));
+	state->save_item(NAME(state->m_sprites_flipscreen));
 }
 
 
 SCREEN_UPDATE( jumping )
 {
 	rainbow_state *state = screen->machine().driver_data<rainbow_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs, layer[2];
-	int sprite_colbank = (state->sprite_ctrl & 0xe0) >> 1;
+	int sprite_colbank = (state->m_sprite_ctrl & 0xe0) >> 1;
 
-	pc080sn_tilemap_update(state->pc080sn);
+	pc080sn_tilemap_update(state->m_pc080sn);
 
 	/* Override values, or foreground layer is in wrong position */
-	pc080sn_set_scroll(state->pc080sn, 1, 16, 0);
+	pc080sn_set_scroll(state->m_pc080sn, 1, 16, 0);
 
 	layer[0] = 0;
 	layer[1] = 1;
 
 	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
-	pc080sn_tilemap_draw(state->pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
+	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Draw the sprites. 128 sprites in total */
-	for (offs = state->spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram[offs];
 		if (tile < screen->machine().gfx[1]->total_elements)
@@ -130,12 +130,12 @@ SCREEN_UPDATE( jumping )
 		}
 	}
 
-	pc080sn_tilemap_draw(state->pc080sn, bitmap, cliprect, layer[1], 0, 0);
+	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[1], 0, 0);
 
 #if 0
 	{
 		char buf[80];
-		sprintf(buf,"sprite_ctrl: %04x", state->sprite_ctrl);
+		sprintf(buf,"sprite_ctrl: %04x", state->m_sprite_ctrl);
 		popmessage(buf);
 	}
 #endif

@@ -16,17 +16,17 @@ The DS5002FP has up to 128KB undumped gameplay code making the game unplayable :
 static WRITE16_HANDLER( clr_int_w )
 {
 	glass_state *state = space->machine().driver_data<glass_state>();
-	state->cause_interrupt = 1;
+	state->m_cause_interrupt = 1;
 }
 
 static INTERRUPT_GEN( glass_interrupt )
 {
 	glass_state *state = device->machine().driver_data<glass_state>();
 
-	if (state->cause_interrupt)
+	if (state->m_cause_interrupt)
 	{
 		device_set_input_line(device, 6, HOLD_LINE);
-		state->cause_interrupt = 0;
+		state->m_cause_interrupt = 0;
 	}
 }
 
@@ -80,12 +80,12 @@ static WRITE16_HANDLER( glass_coin_w )
 
 static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE_MEMBER(glass_state, videoram)						/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE_MEMBER(glass_state, m_videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(glass_state, vregs)									/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(glass_state, m_vregs)									/* Video Registers */
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(glass_state, spriteram)											/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(glass_state, m_spriteram)											/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -175,10 +175,10 @@ static MACHINE_START( glass )
 {
 	glass_state *state = machine.driver_data<glass_state>();
 
-	state->save_item(NAME(state->cause_interrupt));
-	state->save_item(NAME(state->current_bit));
-	state->save_item(NAME(state->current_command));
-	state->save_item(NAME(state->blitter_serial_buffer));
+	state->save_item(NAME(state->m_cause_interrupt));
+	state->save_item(NAME(state->m_current_bit));
+	state->save_item(NAME(state->m_current_command));
+	state->save_item(NAME(state->m_blitter_serial_buffer));
 }
 
 static MACHINE_RESET( glass )
@@ -186,12 +186,12 @@ static MACHINE_RESET( glass )
 	glass_state *state = machine.driver_data<glass_state>();
 	int i;
 
-	state->cause_interrupt = 1;
-	state->current_bit = 0;
-	state->current_command = 0;
+	state->m_cause_interrupt = 1;
+	state->m_current_bit = 0;
+	state->m_current_command = 0;
 
 	for (i = 0; i < 5; i++)
-		state->blitter_serial_buffer[i] = 0;
+		state->m_blitter_serial_buffer[i] = 0;
 }
 
 static MACHINE_CONFIG_START( glass, glass_state )

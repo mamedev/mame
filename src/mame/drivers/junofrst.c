@@ -95,15 +95,16 @@ public:
 	junofrst_state(running_machine &machine, const driver_device_config_base &config)
 		: tutankhm_state(machine, config) { }
 
-	UINT8     blitterdata[4];
-	int      i8039_status, last_irq;
+	UINT8     m_blitterdata[4];
+	int      m_i8039_status;
+	int      m_last_irq;
 
-	cpu_device *soundcpu;
-	device_t *i8039;
+	cpu_device *m_soundcpu;
+	device_t *m_i8039;
 
-	device_t *filter_0_0;
-	device_t *filter_0_1;
-	device_t *filter_0_2;
+	device_t *m_filter_0_0;
+	device_t *m_filter_0_1;
+	device_t *m_filter_0_2;
 };
 
 
@@ -128,7 +129,7 @@ public:
 static WRITE8_HANDLER( junofrst_blitter_w )
 {
 	junofrst_state *state = space->machine().driver_data<junofrst_state>();
-	state->blitterdata[offset] = data;
+	state->m_blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */
 	if (offset == 3)
@@ -136,10 +137,10 @@ static WRITE8_HANDLER( junofrst_blitter_w )
 		int i;
 		UINT8 *gfx_rom = space->machine().region("gfx1")->base();
 
-		offs_t src = ((state->blitterdata[2] << 8) | state->blitterdata[3]) & 0xfffc;
-		offs_t dest = (state->blitterdata[0] << 8) | state->blitterdata[1];
+		offs_t src = ((state->m_blitterdata[2] << 8) | state->m_blitterdata[3]) & 0xfffc;
+		offs_t dest = (state->m_blitterdata[0] << 8) | state->m_blitterdata[1];
 
-		int copy = state->blitterdata[3] & 0x01;
+		int copy = state->m_blitterdata[3] & 0x01;
 
 		/* 16x16 graphics */
 		for (i = 0; i < 16; i++)
@@ -165,9 +166,9 @@ static WRITE8_HANDLER( junofrst_blitter_w )
 						data = 0;
 
 					if (dest & 1)
-						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0x0f) | (data << 4);
+						state->m_videoram[dest >> 1] = (state->m_videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
-						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0xf0) | data;
+						state->m_videoram[dest >> 1] = (state->m_videoram[dest >> 1] & 0xf0) | data;
 				}
 
 				dest += 1;
@@ -194,18 +195,18 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (state->soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
+	timer = (state->m_soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
-	return (timer << 4) | state->i8039_status;
+	return (timer << 4) | state->m_i8039_status;
 }
 
 
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
 	junofrst_state *state = device->machine().driver_data<junofrst_state>();
-	device_t *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
+	device_t *filter[3] = { state->m_filter_0_0, state->m_filter_0_1, state->m_filter_0_2 };
 	int i;
 
 	for (i = 0; i < 3; i++)
@@ -227,20 +228,20 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
 	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
-	if (state->last_irq == 0 && data == 1)
+	if (state->m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->m_soundcpu, 0, HOLD_LINE, 0xff);
 	}
 
-	state->last_irq = data;
+	state->m_last_irq = data;
 }
 
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
 	junofrst_state *state = space->machine().driver_data<junofrst_state>();
-	device_set_input_line(state->i8039, 0, ASSERT_LINE);
+	device_set_input_line(state->m_i8039, 0, ASSERT_LINE);
 }
 
 
@@ -249,8 +250,8 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	junofrst_state *state = space->machine().driver_data<junofrst_state>();
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->i8039, 0, CLEAR_LINE);
-	state->i8039_status = (data & 0x70) >> 4;
+		device_set_input_line(state->m_i8039, 0, CLEAR_LINE);
+	state->m_i8039_status = (data & 0x70) >> 4;
 }
 
 
@@ -269,8 +270,8 @@ static WRITE8_HANDLER( junofrst_coin_counter_w )
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(junofrst_state, videoram)
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(junofrst_state, paletteram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(junofrst_state, m_videoram)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(junofrst_state, m_paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
@@ -279,7 +280,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(junofrst_state, scroll)  /* not used in Juno */
+	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(junofrst_state, m_scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_w)
@@ -372,32 +373,32 @@ static MACHINE_START( junofrst )
 {
 	junofrst_state *state = machine.driver_data<junofrst_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->i8039 = machine.device("mcu");
-	state->soundcpu = machine.device<cpu_device>("audiocpu");
-	state->filter_0_0 = machine.device("filter.0.0");
-	state->filter_0_1 = machine.device("filter.0.1");
-	state->filter_0_2 = machine.device("filter.0.2");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_i8039 = machine.device("mcu");
+	state->m_soundcpu = machine.device<cpu_device>("audiocpu");
+	state->m_filter_0_0 = machine.device("filter.0.0");
+	state->m_filter_0_1 = machine.device("filter.0.1");
+	state->m_filter_0_2 = machine.device("filter.0.2");
 
-	state->save_item(NAME(state->i8039_status));
-	state->save_item(NAME(state->last_irq));
-	state->save_item(NAME(state->flip_x));
-	state->save_item(NAME(state->flip_y));
-	state->save_item(NAME(state->blitterdata));
+	state->save_item(NAME(state->m_i8039_status));
+	state->save_item(NAME(state->m_last_irq));
+	state->save_item(NAME(state->m_flip_x));
+	state->save_item(NAME(state->m_flip_y));
+	state->save_item(NAME(state->m_blitterdata));
 }
 
 static MACHINE_RESET( junofrst )
 {
 	junofrst_state *state = machine.driver_data<junofrst_state>();
 
-	state->i8039_status = 0;
-	state->last_irq = 0;
-	state->flip_x = 0;
-	state->flip_y = 0;
-	state->blitterdata[0] = 0;
-	state->blitterdata[1] = 0;
-	state->blitterdata[2] = 0;
-	state->blitterdata[3] = 0;
+	state->m_i8039_status = 0;
+	state->m_last_irq = 0;
+	state->m_flip_x = 0;
+	state->m_flip_y = 0;
+	state->m_blitterdata[0] = 0;
+	state->m_blitterdata[1] = 0;
+	state->m_blitterdata[2] = 0;
+	state->m_blitterdata[3] = 0;
 }
 
 static MACHINE_CONFIG_START( junofrst, junofrst_state )

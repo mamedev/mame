@@ -12,7 +12,7 @@ public:
 	blstroid_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16 *		priorityram;
+	UINT16 *		m_priorityram;
 };
 
 

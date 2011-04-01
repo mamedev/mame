@@ -137,8 +137,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -159,7 +159,7 @@ static MACHINE_START( gauntlet )
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	atarigen_init(machine);
 
-	state->save_item(NAME(state->sound_reset_val));
+	state->save_item(NAME(state->m_sound_reset_val));
 }
 
 
@@ -167,7 +167,7 @@ static MACHINE_RESET( gauntlet )
 {
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 
-	state->sound_reset_val = 1;
+	state->m_sound_reset_val = 1;
 
 	atarigen_eeprom_reset(state);
 	atarigen_slapstic_reset(state);
@@ -188,8 +188,8 @@ static READ16_HANDLER( port4_r )
 {
 	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	int temp = input_port_read(space->machine(), "803008");
-	if (state->cpu_to_sound_ready) temp ^= 0x0020;
-	if (state->sound_to_cpu_ready) temp ^= 0x0010;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x0020;
+	if (state->m_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
 }
 
@@ -206,14 +206,14 @@ static WRITE16_HANDLER( sound_reset_w )
 	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		int oldword = state->sound_reset_val;
-		COMBINE_DATA(&state->sound_reset_val);
+		int oldword = state->m_sound_reset_val;
+		COMBINE_DATA(&state->m_sound_reset_val);
 
-		if ((oldword ^ state->sound_reset_val) & 1)
+		if ((oldword ^ state->m_sound_reset_val) & 1)
 		{
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset(space->machine());
-			if (state->sound_reset_val & 1)
+			if (state->m_sound_reset_val & 1)
 			{
 				devtag_reset(space->machine(), "ymsnd");
 				devtag_reset(space->machine(), "tms");
@@ -239,8 +239,8 @@ static READ8_HANDLER( switch_6502_r )
 	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	int temp = 0x30;
 
-	if (state->cpu_to_sound_ready) temp ^= 0x80;
-	if (state->sound_to_cpu_ready) temp ^= 0x40;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x80;
+	if (state->m_sound_to_cpu_ready) temp ^= 0x40;
 	if (!tms5220_readyq_r(space->machine().device("tms"))) temp ^= 0x20;
 	if (!(input_port_read(space->machine(), "803008") & 0x0008)) temp ^= 0x10;
 
@@ -324,14 +324,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE(atarigen_sound_w)
 
 	/* VBUS */
-	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(gauntlet_state, playfield)
+	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(gauntlet_state, m_playfield)
 	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
-	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_BASE_MEMBER(gauntlet_state, yscroll)
-	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(gauntlet_state, alpha)
+	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_BASE_MEMBER(gauntlet_state, m_yscroll)
+	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(gauntlet_state, m_alpha)
 	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_BASE_MEMBER(gauntlet_state, xscroll)
+	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_BASE_MEMBER(gauntlet_state, m_xscroll)
 ADDRESS_MAP_END
 
 
@@ -1625,7 +1625,7 @@ static void gauntlet_common_init(running_machine &machine, int slapstic, int vin
 {
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
 	UINT8 *rom = machine.region("maincpu")->base();
-	state->eeprom_default = NULL;
+	state->m_eeprom_default = NULL;
 	atarigen_slapstic_init(machine.device("maincpu"), 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
@@ -1636,7 +1636,7 @@ static void gauntlet_common_init(running_machine &machine, int slapstic, int vin
 	atarigen_swap_mem(rom + 0x070000, rom + 0x078000, 0x8000);
 
 	/* indicate whether or not we are vindicators 2 */
-	state->vindctr2_screen_refresh = vindctr2;
+	state->m_vindctr2_screen_refresh = vindctr2;
 }
 
 

@@ -35,13 +35,13 @@ public:
 	tickee_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *control;
-	UINT16 *vram;
-	emu_timer *setup_gun_timer;
-	int beamxadd;
-	int beamyadd;
-	int palette_bank;
-	UINT8 gunx[2];
+	UINT16 *m_control;
+	UINT16 *m_vram;
+	emu_timer *m_setup_gun_timer;
+	int m_beamxadd;
+	int m_beamyadd;
+	int m_palette_bank;
+	UINT8 m_gunx[2];
 };
 
 
@@ -79,7 +79,7 @@ static TIMER_CALLBACK( trigger_gun_interrupt )
 	int beamx = (machine.primary_screen->hpos()/2)-58;
 
 	/* once we're ready to fire, set the X coordinate and assert the line */
-	state->gunx[which] = beamx;
+	state->m_gunx[which] = beamx;
 
 	/* fire the IRQ at the correct moment */
 	cputag_set_input_line(machine, "maincpu", param, ASSERT_LINE);
@@ -99,22 +99,22 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	state->setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
+	state->m_setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
 
 	/* only do work if the palette is flashed */
-	if (state->control)
-		if (!state->control[2])
+	if (state->m_control)
+		if (!state->m_control[2])
 			return;
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 0);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 0);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd, beamx + state->m_beamxadd), FUNC(trigger_gun_interrupt), 0);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd + 1, beamx + state->m_beamxadd), FUNC(clear_gun_interrupt), 0);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd, beamx + state->beamxadd), FUNC(trigger_gun_interrupt), 1);
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->beamyadd + 1, beamx + state->beamxadd), FUNC(clear_gun_interrupt), 1);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd, beamx + state->m_beamxadd), FUNC(trigger_gun_interrupt), 1);
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(beamy + state->m_beamyadd + 1, beamx + state->m_beamxadd), FUNC(clear_gun_interrupt), 1);
 }
 
 
@@ -129,8 +129,8 @@ static VIDEO_START( tickee )
 {
 	tickee_state *state = machine.driver_data<tickee_state>();
 	/* start a timer going on the first scanline of every frame */
-	state->setup_gun_timer = machine.scheduler().timer_alloc(FUNC(setup_gun_interrupts));
-	state->setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
+	state->m_setup_gun_timer = machine.scheduler().timer_alloc(FUNC(setup_gun_interrupts));
+	state->m_setup_gun_timer->adjust(machine.primary_screen->time_until_pos(0));
 }
 
 
@@ -144,14 +144,14 @@ static VIDEO_START( tickee )
 static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	/* blank palette: fill with pen 255 */
-	if (state->control[2])
+	if (state->m_control[2])
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = pens[0xff];
@@ -170,13 +170,13 @@ static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
-	UINT16 *src = &state->vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
-	if (state->palette_bank)
+	if (state->m_palette_bank)
 	{
 		/* blank palette: fill with pen 255 */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
@@ -207,15 +207,15 @@ static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 static MACHINE_RESET( tickee )
 {
 	tickee_state *state = machine.driver_data<tickee_state>();
-	state->beamxadd = 50;
-	state->beamyadd = 0;
+	state->m_beamxadd = 50;
+	state->m_beamyadd = 0;
 }
 
 static MACHINE_RESET( rapidfir )
 {
 	tickee_state *state = machine.driver_data<tickee_state>();
-	state->beamxadd = 0;
-	state->beamyadd = -5;
+	state->m_beamxadd = 0;
+	state->m_beamyadd = -5;
 }
 
 
@@ -230,14 +230,14 @@ static WRITE16_HANDLER( rapidfir_transparent_w )
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
-	COMBINE_DATA(&state->vram[offset]);
+	COMBINE_DATA(&state->m_vram[offset]);
 }
 
 
 static READ16_HANDLER( rapidfir_transparent_r )
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->vram[offset];
+	return state->m_vram[offset];
 }
 
 
@@ -245,7 +245,7 @@ static void rapidfir_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(shiftreg, &state->vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &state->m_vram[TOWORD(address)], TOBYTE(0x2000));
 }
 
 
@@ -253,7 +253,7 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (address < 0x800000)
-		memcpy(&state->vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&state->m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
 }
 
 
@@ -267,7 +267,7 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
 static WRITE16_HANDLER( tickee_control_w )
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
-	UINT16 olddata = state->control[offset];
+	UINT16 olddata = state->m_control[offset];
 
 	/* offsets:
 
@@ -276,7 +276,7 @@ static WRITE16_HANDLER( tickee_control_w )
         6 = lamps? (changing all the time)
     */
 
-	COMBINE_DATA(&state->control[offset]);
+	COMBINE_DATA(&state->m_control[offset]);
 
 	if (offset == 3)
 	{
@@ -284,8 +284,8 @@ static WRITE16_HANDLER( tickee_control_w )
 		ticket_dispenser_w(space->machine().device("ticket2"), 0, (data & 4) << 5);
 	}
 
-	if (olddata != state->control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space->device()), offset, state->control[offset], olddata);
+	if (olddata != state->m_control[offset])
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space->device()), offset, state->m_control[offset], olddata);
 }
 
 
@@ -305,14 +305,14 @@ static READ16_HANDLER( ffff_r )
 static READ16_HANDLER( rapidfir_gun1_r )
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->gunx[0];
+	return state->m_gunx[0];
 }
 
 
 static READ16_HANDLER( rapidfir_gun2_r )
 {
 	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->gunx[1];
+	return state->m_gunx[1];
 }
 
 
@@ -332,7 +332,7 @@ static WRITE16_HANDLER( rapidfir_control_w )
 	tickee_state *state = space->machine().driver_data<tickee_state>();
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
-		state->palette_bank = data & 1;
+		state->m_palette_bank = data & 1;
 }
 
 
@@ -378,7 +378,7 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
  *************************************/
 
 static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8("ym2", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, control)
+	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 /* addreses in the 04x range shifted slightly...*/
 static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
 	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8("ym2", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, control)
+	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -412,14 +412,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, vram)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8("ym", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, control)
+	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
@@ -429,7 +429,7 @@ ADDRESS_MAP_END
 
 /* newer hardware */
 static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(tickee_state, vram)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfc000000, 0xfc00000f) AM_READ(rapidfir_gun1_r)

@@ -40,27 +40,27 @@ static MACHINE_RESET(ssrj)
 	UINT8 *rom = machine.region("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
-	state->oldport = 0x80;
+	state->m_oldport = 0x80;
 }
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
 	ssrj_state *state = space->machine().driver_data<ssrj_state>();
 	int port = input_port_read(space->machine(), "IN1") - 0x80;
-	int retval = port - state->oldport;
+	int retval = port - state->m_oldport;
 
-	state->oldport = port;
+	state->m_oldport = port;
 	return retval;
 }
 
 static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE_MEMBER(ssrj_state, vram1)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE_MEMBER(ssrj_state, vram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(ssrj_state, vram3)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE_MEMBER(ssrj_state, vram4)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE_MEMBER(ssrj_state, m_vram1)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE_MEMBER(ssrj_state, m_vram2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(ssrj_state, m_vram3)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE_MEMBER(ssrj_state, m_vram4)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ssrj_state, scrollram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ssrj_state, m_scrollram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")

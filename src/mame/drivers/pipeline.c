@@ -78,22 +78,22 @@ public:
 	pipeline_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *tilemap1;
-	tilemap_t *tilemap2;
-	UINT8 *vram1;
-	UINT8 *vram2;
-	UINT8 vidctrl;
-	UINT8 *palram;
-	UINT8 toMCU;
-	UINT8 fromMCU;
-	UINT8 ddrA;
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
+	UINT8 *m_vram1;
+	UINT8 *m_vram2;
+	UINT8 m_vidctrl;
+	UINT8 *m_palram;
+	UINT8 m_toMCU;
+	UINT8 m_fromMCU;
+	UINT8 m_ddrA;
 };
 
 
 static TILE_GET_INFO( get_tile_info )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code = state->vram2[tile_index]+state->vram2[tile_index+0x800]*256;
+	int code = state->m_vram2[tile_index]+state->m_vram2[tile_index+0x800]*256;
 	SET_TILE_INFO(
 		0,
 		code,
@@ -104,8 +104,8 @@ static TILE_GET_INFO( get_tile_info )
 static TILE_GET_INFO( get_tile_info2 )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	int code =state->vram1[tile_index]+((state->vram1[tile_index+0x800]>>4))*256;
-	int color=((state->vram1[tile_index+0x800])&0xf);
+	int code =state->m_vram1[tile_index]+((state->m_vram1[tile_index+0x800]>>4))*256;
+	int color=((state->m_vram1[tile_index+0x800])&0xf);
 	SET_TILE_INFO
 	(
 		1,
@@ -118,17 +118,17 @@ static TILE_GET_INFO( get_tile_info2 )
 static VIDEO_START ( pipeline )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	state->palram=auto_alloc_array(machine, UINT8, 0x1000);
-	state->tilemap1 = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
-	state->tilemap2 = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,64,32 );
-	tilemap_set_transparent_pen(state->tilemap2,0);
+	state->m_palram=auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_tilemap1 = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
+	state->m_tilemap2 = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,64,32 );
+	tilemap_set_transparent_pen(state->m_tilemap2,0);
 }
 
 static SCREEN_UPDATE( pipeline )
 {
 	pipeline_state *state = screen->machine().driver_data<pipeline_state>();
-	tilemap_draw(bitmap,cliprect,state->tilemap1, 0,0);
-	tilemap_draw(bitmap,cliprect,state->tilemap2, 0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tilemap1, 0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tilemap2, 0,0);
 	return 0;
 }
 
@@ -136,24 +136,24 @@ static SCREEN_UPDATE( pipeline )
 static WRITE8_DEVICE_HANDLER(vidctrl_w)
 {
 	pipeline_state *state = device->machine().driver_data<pipeline_state>();
-	state->vidctrl=data;
+	state->m_vidctrl=data;
 }
 
 static WRITE8_HANDLER(vram2_w)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	if(!(state->vidctrl&1))
+	if(!(state->m_vidctrl&1))
 	{
-		tilemap_mark_tile_dirty(state->tilemap1,offset&0x7ff);
-		state->vram2[offset]=data;
+		tilemap_mark_tile_dirty(state->m_tilemap1,offset&0x7ff);
+		state->m_vram2[offset]=data;
 	}
 	else
 	{
-		 state->palram[offset]=data;
+		 state->m_palram[offset]=data;
 		 if(offset<0x300)
 		 {
 			offset&=0xff;
-			palette_set_color_rgb(space->machine(), offset, pal6bit(state->palram[offset]), pal6bit(state->palram[offset+0x100]), pal6bit(state->palram[offset+0x200]));
+			palette_set_color_rgb(space->machine(), offset, pal6bit(state->m_palram[offset]), pal6bit(state->m_palram[offset+0x100]), pal6bit(state->m_palram[offset+0x200]));
 		 }
 	}
 }
@@ -161,20 +161,20 @@ static WRITE8_HANDLER(vram2_w)
 static WRITE8_HANDLER(vram1_w)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	tilemap_mark_tile_dirty(state->tilemap2,offset&0x7ff);
-	state->vram1[offset]=data;
+	tilemap_mark_tile_dirty(state->m_tilemap2,offset&0x7ff);
+	state->m_vram1[offset]=data;
 }
 
 static READ8_DEVICE_HANDLER(protection_r)
 {
 	pipeline_state *state = device->machine().driver_data<pipeline_state>();
-	return state->fromMCU;
+	return state->m_fromMCU;
 }
 
 static TIMER_CALLBACK( protection_deferred_w )
 {
 	pipeline_state *state = machine.driver_data<pipeline_state>();
-	state->toMCU = param;
+	state->m_toMCU = param;
 }
 
 static WRITE8_DEVICE_HANDLER(protection_w)
@@ -186,8 +186,8 @@ static WRITE8_DEVICE_HANDLER(protection_w)
 static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_BASE_MEMBER(pipeline_state, vram1)
-	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_BASE_MEMBER(pipeline_state, vram2)
+	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_BASE_MEMBER(pipeline_state, m_vram1)
+	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_BASE_MEMBER(pipeline_state, m_vram2)
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb830, 0xb830) AM_NOP
@@ -209,19 +209,19 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(mcu_portA_w)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	state->fromMCU=data;
+	state->m_fromMCU=data;
 }
 
 static READ8_HANDLER(mcu_portA_r)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	return (state->fromMCU&state->ddrA)|(state->toMCU& ~state->ddrA);
+	return (state->m_fromMCU&state->m_ddrA)|(state->m_toMCU& ~state->m_ddrA);
 }
 
 static WRITE8_HANDLER(mcu_ddrA_w)
 {
 	pipeline_state *state = space->machine().driver_data<pipeline_state>();
-	state->ddrA=data;
+	state->m_ddrA=data;
 }
 
 static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8 )

@@ -21,21 +21,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *   bg0_videoram;
-	UINT8     paletteram[0x4000];
-	UINT8 *   bg0_regs_x;
-	UINT8 *   bg1_regs_x;
-	UINT8 *   bg2_regs_x;
-	UINT8 *   bg0_regs_y;
-	UINT8 *   bg1_regs_y;
-	UINT8 *   bg2_regs_y;
+	UINT8 *   m_bg0_videoram;
+	UINT8     m_paletteram[0x4000];
+	UINT8 *   m_bg0_regs_x;
+	UINT8 *   m_bg1_regs_x;
+	UINT8 *   m_bg2_regs_x;
+	UINT8 *   m_bg0_regs_y;
+	UINT8 *   m_bg1_regs_y;
+	UINT8 *   m_bg2_regs_y;
 
 	/* video-related */
-	tilemap_t  *bg0_tilemap, *bg1_tilemap, *bg2_tilemap;
-	int      video_bank;
-	int      irq_enable;
-	int      bg1_bank, bg2_bank;
-	int      old_bank;
+	tilemap_t  *m_bg0_tilemap;
+	tilemap_t  *m_bg1_tilemap;
+	tilemap_t  *m_bg2_tilemap;
+	int      m_video_bank;
+	int      m_irq_enable;
+	int      m_bg1_bank;
+	int      m_bg2_bank;
+	int      m_old_bank;
 };
 
 
@@ -43,7 +46,7 @@ public:
 static TILE_GET_INFO( get_bg1_tile_info )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	UINT8 *region = machine.region("gfx3")->base() + 0x200000 + 0x80000 * state->bg1_bank;
+	UINT8 *region = machine.region("gfx3")->base() + 0x200000 + 0x80000 * state->m_bg1_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(2, code, code >> 12, 0);
 }
@@ -51,7 +54,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	UINT8 *region = machine.region("gfx2")->base() + 0x200000 + 0x80000 * state->bg2_bank;
+	UINT8 *region = machine.region("gfx2")->base() + 0x200000 + 0x80000 * state->m_bg2_bank;
 	int code = region[tile_index * 2] + (region[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(1, code, code >> 12, 0);
 }
@@ -59,27 +62,27 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static TILE_GET_INFO( get_bg0_tile_info )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	int code = state->bg0_videoram[tile_index * 2] + (state->bg0_videoram[tile_index * 2 + 1] << 8);
+	int code = state->m_bg0_videoram[tile_index * 2] + (state->m_bg0_videoram[tile_index * 2 + 1] << 8);
 	SET_TILE_INFO(0, code, code >> 12, 0);
 }
 
 static VIDEO_START( cultures )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	state->bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows, 8, 8, 64, 128);
-	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
-	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
+	state->m_bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows, 8, 8, 64, 128);
+	state->m_bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows, 8, 8, 512, 512);
 
-	tilemap_set_transparent_pen(state->bg1_tilemap, 0);
-	tilemap_set_transparent_pen(state->bg0_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg1_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg0_tilemap, 0);
 
-	tilemap_set_scrolldx(state->bg0_tilemap, 502, 10);
-	tilemap_set_scrolldx(state->bg1_tilemap, 502, 10);
-	tilemap_set_scrolldx(state->bg2_tilemap, 502, 10);
+	tilemap_set_scrolldx(state->m_bg0_tilemap, 502, 10);
+	tilemap_set_scrolldx(state->m_bg1_tilemap, 502, 10);
+	tilemap_set_scrolldx(state->m_bg2_tilemap, 502, 10);
 
-	tilemap_set_scrolldy(state->bg0_tilemap, 255, 0);
-	tilemap_set_scrolldy(state->bg1_tilemap, 255, 0);
-	tilemap_set_scrolldy(state->bg2_tilemap, 255, 0);
+	tilemap_set_scrolldy(state->m_bg0_tilemap, 255, 0);
+	tilemap_set_scrolldy(state->m_bg1_tilemap, 255, 0);
+	tilemap_set_scrolldy(state->m_bg2_tilemap, 255, 0);
 }
 
 static SCREEN_UPDATE( cultures )
@@ -88,26 +91,26 @@ static SCREEN_UPDATE( cultures )
 	int attr;
 
 	// tilemaps attributes
-	attr = (state->bg0_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->bg0_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->bg0_tilemap, attr);
+	attr = (state->m_bg0_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg0_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->m_bg0_tilemap, attr);
 
-	attr = (state->bg1_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->bg1_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->bg1_tilemap, attr);
+	attr = (state->m_bg1_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg1_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->m_bg1_tilemap, attr);
 
-	attr = (state->bg2_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->bg2_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
-	tilemap_set_flip(state->bg2_tilemap, attr);
+	attr = (state->m_bg2_regs_x[3] & 1 ? TILEMAP_FLIPX : 0) | (state->m_bg2_regs_y[3] & 1 ? TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->m_bg2_tilemap, attr);
 
 	// tilemaps scrolls
-	tilemap_set_scrollx(state->bg0_tilemap, 0, (state->bg0_regs_x[2] << 8) + state->bg0_regs_x[0]);
-	tilemap_set_scrollx(state->bg1_tilemap, 0, (state->bg1_regs_x[2] << 8) + state->bg1_regs_x[0]);
-	tilemap_set_scrollx(state->bg2_tilemap, 0, (state->bg2_regs_x[2] << 8) + state->bg2_regs_x[0]);
-	tilemap_set_scrolly(state->bg0_tilemap, 0, (state->bg0_regs_y[2] << 8) + state->bg0_regs_y[0]);
-	tilemap_set_scrolly(state->bg1_tilemap, 0, (state->bg1_regs_y[2] << 8) + state->bg1_regs_y[0]);
-	tilemap_set_scrolly(state->bg2_tilemap, 0, (state->bg2_regs_y[2] << 8) + state->bg2_regs_y[0]);
+	tilemap_set_scrollx(state->m_bg0_tilemap, 0, (state->m_bg0_regs_x[2] << 8) + state->m_bg0_regs_x[0]);
+	tilemap_set_scrollx(state->m_bg1_tilemap, 0, (state->m_bg1_regs_x[2] << 8) + state->m_bg1_regs_x[0]);
+	tilemap_set_scrollx(state->m_bg2_tilemap, 0, (state->m_bg2_regs_x[2] << 8) + state->m_bg2_regs_x[0]);
+	tilemap_set_scrolly(state->m_bg0_tilemap, 0, (state->m_bg0_regs_y[2] << 8) + state->m_bg0_regs_y[0]);
+	tilemap_set_scrolly(state->m_bg1_tilemap, 0, (state->m_bg1_regs_y[2] << 8) + state->m_bg1_regs_y[0]);
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, (state->m_bg2_regs_y[2] << 8) + state->m_bg2_regs_y[0]);
 
-	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->bg0_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg0_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 
 	return 0;
 }
@@ -116,18 +119,18 @@ static WRITE8_HANDLER( cpu_bankswitch_w )
 {
 	cultures_state *state = space->machine().driver_data<cultures_state>();
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
-	state->video_bank = ~data & 0x20;
+	state->m_video_bank = ~data & 0x20;
 }
 
 static WRITE8_HANDLER( bg0_videoram_w )
 {
 	cultures_state *state = space->machine().driver_data<cultures_state>();
-	if (state->video_bank == 0)
+	if (state->m_video_bank == 0)
 	{
 		int r, g, b, datax;
-		state->paletteram[offset] = data;
+		state->m_paletteram[offset] = data;
 		offset >>= 1;
-		datax = state->paletteram[offset * 2] + 256 * state->paletteram[offset * 2 + 1];
+		datax = state->m_paletteram[offset * 2] + 256 * state->m_paletteram[offset * 2 + 1];
 
 		r = ((datax >> 7) & 0x1e) | ((datax & 0x4000) ? 0x1 : 0);
 		g = ((datax >> 3) & 0x1e) | ((datax & 0x2000) ? 0x1 : 0);
@@ -137,8 +140,8 @@ static WRITE8_HANDLER( bg0_videoram_w )
 	}
 	else
 	{
-		state->bg0_videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->bg0_tilemap, offset >> 1);
+		state->m_bg0_videoram[offset] = data;
+		tilemap_mark_tile_dirty(state->m_bg0_tilemap, offset >> 1);
 	}
 }
 
@@ -147,32 +150,32 @@ static WRITE8_HANDLER( misc_w )
 	cultures_state *state = space->machine().driver_data<cultures_state>();
 	int new_bank = data & 0xf;
 
-	if (state->old_bank != new_bank)
+	if (state->m_old_bank != new_bank)
 	{
 		// oki banking
 		UINT8 *src = space->machine().region("oki")->base() + 0x40000 + 0x20000 * new_bank;
 		UINT8 *dst = space->machine().region("oki")->base() + 0x20000;
 		memcpy(dst, src, 0x20000);
 
-		state->old_bank = new_bank;
+		state->m_old_bank = new_bank;
 	}
 
-	state->irq_enable = data & 0x80;
+	state->m_irq_enable = data & 0x80;
 }
 
 static WRITE8_HANDLER( bg_bank_w )
 {
 	cultures_state *state = space->machine().driver_data<cultures_state>();
-	if (state->bg1_bank != (data & 3))
+	if (state->m_bg1_bank != (data & 3))
 	{
-		state->bg1_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(state->bg1_tilemap);
+		state->m_bg1_bank = data & 3;
+		tilemap_mark_all_tiles_dirty(state->m_bg1_tilemap);
 	}
 
-	if (state->bg2_bank != ((data & 0xc) >> 2))
+	if (state->m_bg2_bank != ((data & 0xc) >> 2))
 	{
-		state->bg2_bank = (data & 0xc) >> 2;
-		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
+		state->m_bg2_bank = (data & 0xc) >> 2;
+		tilemap_mark_all_tiles_dirty(state->m_bg2_tilemap);
 	}
 	coin_counter_w(space->machine(), 0, data & 0x10);
 }
@@ -180,7 +183,7 @@ static WRITE8_HANDLER( bg_bank_w )
 static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE_MEMBER(cultures_state, bg0_videoram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE_MEMBER(cultures_state, m_bg0_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -189,12 +192,12 @@ static ADDRESS_MAP_START( cultures_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_RAM
 	AM_RANGE(0x10, 0x13) AM_RAM
-	AM_RANGE(0x20, 0x23) AM_RAM AM_BASE_MEMBER(cultures_state, bg0_regs_x)
-	AM_RANGE(0x30, 0x33) AM_RAM AM_BASE_MEMBER(cultures_state, bg0_regs_y)
-	AM_RANGE(0x40, 0x43) AM_RAM AM_BASE_MEMBER(cultures_state, bg1_regs_x)
-	AM_RANGE(0x50, 0x53) AM_RAM AM_BASE_MEMBER(cultures_state, bg1_regs_y)
-	AM_RANGE(0x60, 0x63) AM_RAM AM_BASE_MEMBER(cultures_state, bg2_regs_x)
-	AM_RANGE(0x70, 0x73) AM_RAM AM_BASE_MEMBER(cultures_state, bg2_regs_y)
+	AM_RANGE(0x20, 0x23) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg0_regs_x)
+	AM_RANGE(0x30, 0x33) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg0_regs_y)
+	AM_RANGE(0x40, 0x43) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg1_regs_x)
+	AM_RANGE(0x50, 0x53) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg1_regs_y)
+	AM_RANGE(0x60, 0x63) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg2_regs_x)
+	AM_RANGE(0x70, 0x73) AM_RAM AM_BASE_MEMBER(cultures_state, m_bg2_regs_y)
 	AM_RANGE(0x80, 0x80) AM_WRITE(cpu_bankswitch_w)
 	AM_RANGE(0x90, 0x90) AM_WRITE(misc_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(bg_bank_w)
@@ -353,7 +356,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( cultures_interrupt )
 {
 	cultures_state *state = device->machine().driver_data<cultures_state>();
-	if (state->irq_enable)
+	if (state->m_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -364,22 +367,22 @@ static MACHINE_START( cultures )
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 
-	state->save_item(NAME(state->paletteram));
-	state->save_item(NAME(state->old_bank));
-	state->save_item(NAME(state->video_bank));
-	state->save_item(NAME(state->irq_enable));
-	state->save_item(NAME(state->bg1_bank));
-	state->save_item(NAME(state->bg2_bank));
+	state->save_item(NAME(state->m_paletteram));
+	state->save_item(NAME(state->m_old_bank));
+	state->save_item(NAME(state->m_video_bank));
+	state->save_item(NAME(state->m_irq_enable));
+	state->save_item(NAME(state->m_bg1_bank));
+	state->save_item(NAME(state->m_bg2_bank));
 }
 
 static MACHINE_RESET( cultures )
 {
 	cultures_state *state = machine.driver_data<cultures_state>();
-	state->old_bank = -1;
-	state->video_bank = 0;
-	state->irq_enable = 0;
-	state->bg1_bank = 0;
-	state->bg2_bank = 0;
+	state->m_old_bank = -1;
+	state->m_video_bank = 0;
+	state->m_irq_enable = 0;
+	state->m_bg1_bank = 0;
+	state->m_bg2_bank = 0;
 }
 
 static MACHINE_CONFIG_START( cultures, cultures_state )

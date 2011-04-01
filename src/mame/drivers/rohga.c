@@ -118,7 +118,7 @@ static READ16_HANDLER( rohga_irq_ack_r )
 {
 	rohga_state *state = space->machine().driver_data<rohga_state>();
 
-	device_set_input_line(state->maincpu, 6, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
 	return 0;
 }
 
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
 	rohga_state *state = space->machine().driver_data<rohga_state>();
-	device_set_input_line(state->maincpu, 6, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
 }
 
 /**********************************************************************************/
@@ -155,10 +155,10 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
-	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
-	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
-	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
-	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
+	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf1_rowscroll)
+	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf2_rowscroll)
+	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
+	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -174,8 +174,8 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x20a000, 0x20afff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
 	AM_RANGE(0x20b000, 0x20b3ff) AM_WRITEONLY /* ? Always 0 written */
-	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
-	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
+	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
+	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
@@ -204,10 +204,10 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x208000, 0x2087ff) AM_MIRROR(0x800) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x20a000, 0x20a7ff) AM_MIRROR(0x800) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
-	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
-	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf2_rowscroll)
+	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
+	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
@@ -248,10 +248,10 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
-	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
-	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
-	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
+	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf1_rowscroll)
+	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf2_rowscroll)
+	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf3_rowscroll)
+	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, m_pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -723,14 +723,14 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	rohga_state *driver_state = device->machine().driver_data<rohga_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	rohga_state *state = device->machine().driver_data<rohga_state>();
-	state->oki1->set_bank_base(BIT(data, 0) * 0x40000);
-	state->oki2->set_bank_base(BIT(data, 1) * 0x40000);
+	state->m_oki1->set_bank_base(BIT(data, 0) * 0x40000);
+	state->m_oki2->set_bank_base(BIT(data, 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

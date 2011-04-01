@@ -115,7 +115,7 @@ static READ8_HANDLER( in0_port_r )
 	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	int in0 = input_port_read(space->machine(), "IN0");
 
-	if ( state->cocktail )
+	if ( state->m_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
@@ -149,13 +149,13 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
 	UINT8 seedxx;
 
-	seedxx = (state->r_index < 0x89) ? 1 : 0;
+	seedxx = (state->m_r_index < 0x89) ? 1 : 0;
 
-	state->prot_count = (state->prot_count + 1) % 4;
-	if(state->popflame_prot_seed == 0x10)
-		return seed10[state->prot_count] | seedxx;
+	state->m_prot_count = (state->m_prot_count + 1) % 4;
+	if(state->m_popflame_prot_seed == 0x10)
+		return seed10[state->m_prot_count] | seedxx;
 	else
-		return seed00[state->prot_count] | seedxx;
+		return seed00[state->m_prot_count] | seedxx;
 
 #if 0
 	if ( cpu_get_pc(&space->device()) == (0x26F2 + 0x03) )
@@ -235,12 +235,12 @@ static WRITE8_HANDLER( popflame_protection_w )
     ---- --x- puts a bit into the write buffer
     ---- ---x reset write index buffer
     */
-	if(data & 1 && ((state->popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
-		state->r_index = 0;
-	if(data & 8 && ((state->popflame_prot_seed & 8) == 0))
-		state->r_index++;
+	if(data & 1 && ((state->m_popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
+		state->m_r_index = 0;
+	if(data & 8 && ((state->m_popflame_prot_seed & 8) == 0))
+		state->m_r_index++;
 
-	state->popflame_prot_seed = data & 0x10;
+	state->m_popflame_prot_seed = data & 0x10;
 
 }
 
@@ -249,10 +249,10 @@ static WRITE8_HANDLER( popflame_protection_w )
 static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -262,10 +262,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram2)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, m_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -864,7 +864,7 @@ static DRIVER_INIT( popflame )
 static READ8_HANDLER( trvmstr_questions_r )
 {
 	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
-	return space->machine().region("user1")->base()[state->question_offset];
+	return space->machine().region("user1")->base()[state->m_question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )
@@ -873,13 +873,13 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 	switch(offset)
 	{
 	case 0:
-		state->question_offset = (state->question_offset & 0xffff00) | data;
+		state->m_question_offset = (state->m_question_offset & 0xffff00) | data;
 		break;
 	case 1:
-		state->question_offset = (state->question_offset & 0xff00ff) | (data << 8);
+		state->m_question_offset = (state->m_question_offset & 0xff00ff) | (data << 8);
 		break;
 	case 2:
-		state->question_offset = (state->question_offset & 0x00ffff) | (data << 16);
+		state->m_question_offset = (state->m_question_offset & 0x00ffff) | (data << 16);
 		break;
 	}
 }

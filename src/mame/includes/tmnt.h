@@ -6,50 +6,58 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *   tmnt2_1c0800;
-	UINT16 *   sunset_104000;
-	UINT16 *   tmnt2_rom;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-//  UINT8 *     nvram;    // currently cuebrick uses generic nvram handling
-//  UINT8 *     cuebrick_nvram;
-	UINT16 *spriteram;
+	UINT16 *   m_tmnt2_1c0800;
+	UINT16 *   m_sunset_104000;
+	UINT16 *   m_tmnt2_rom;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
+//  UINT8 *     m_nvram;    // currently cuebrick uses generic nvram handling
+//  UINT8 *     m_cuebrick_nvram;
+	UINT16 *m_spriteram;
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase;
-	int        layerpri[3];
-	int        sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way...
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
+	int        m_layerpri[3];
+	int        m_sorted_layer[3];	// this might not be necessary, but tmnt2 uses it in a strange way...
 
-	tilemap_t  *roz_tilemap;
-	int        glfgreat_roz_rom_bank, glfgreat_roz_char_bank, glfgreat_roz_rom_mode;
-	int        glfgreat_pixel;
-	int        prmrsocr_sprite_bank;
-	int        blswhstl_rombank;
-	int        tmnt_priorityflag;
-	int        lastdim, lasten, dim_c, dim_v;	/* lgtnfght, ssriders, tmnt2 only */
+	tilemap_t  *m_roz_tilemap;
+	int        m_glfgreat_roz_rom_bank;
+	int        m_glfgreat_roz_char_bank;
+	int        m_glfgreat_roz_rom_mode;
+	int        m_glfgreat_pixel;
+	int        m_prmrsocr_sprite_bank;
+	int        m_blswhstl_rombank;
+	int        m_tmnt_priorityflag;
+	int        m_lastdim;
+	int        m_lasten;
+	int        m_dim_c;
+	int        m_dim_v;	/* lgtnfght, ssriders, tmnt2 only */
 
 	/* misc */
-	int        tmnt_soundlatch;
-	int        cuebrick_snd_irqlatch, cuebrick_nvram_bank;
-	int        toggle, last;
+	int        m_tmnt_soundlatch;
+	int        m_cuebrick_snd_irqlatch;
+	int        m_cuebrick_nvram_bank;
+	int        m_toggle;
+	int        m_last;
 	UINT16	   m_cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k007232;
-	device_t *k053260;
-	device_t *k054539;
-	device_t *k052109;
-	device_t *k051960;
-	device_t *k053245;
-	device_t *k053251;
-	device_t *k053936;
-	device_t *k054000;
-	device_t *upd;
-	device_t *samples;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k007232;
+	device_t *m_k053260;
+	device_t *m_k054539;
+	device_t *m_k052109;
+	device_t *m_k051960;
+	device_t *m_k053245;
+	device_t *m_k053251;
+	device_t *m_k053936;
+	device_t *m_k054000;
+	device_t *m_upd;
+	device_t *m_samples;
 
 	/* memory buffers */
-	INT16      sampledata[0x40000];
+	INT16      m_sampledata[0x40000];
 };
 
 

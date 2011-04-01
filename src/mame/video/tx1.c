@@ -35,7 +35,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	cputag_set_input_line_and_vector(machine, "main_cpu", 0, HOLD_LINE, 0xff);
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 
@@ -146,7 +146,7 @@ PALETTE_INIT( tx1 )
 WRITE16_HANDLER( tx1_bankcs_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &tx1_vregs = state->vregs;
+	vregs_t &tx1_vregs = state->m_vregs;
 
 	// AAB2 = /BASET0
 	// AAB3 = /BASET
@@ -201,27 +201,27 @@ WRITE16_HANDLER( tx1_slincs_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
 	if (offset == 1)
-		state->vregs.slin_inc = data;
+		state->m_vregs.slin_inc = data;
 	else
-		state->vregs.slin_inc = state->vregs.slin_val = 0;
+		state->m_vregs.slin_inc = state->m_vregs.slin_val = 0;
 }
 
 WRITE16_HANDLER( tx1_slock_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->vregs.slock = data & 1;
+	state->m_vregs.slock = data & 1;
 }
 
 WRITE16_HANDLER( tx1_scolst_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->vregs.scol = data & 0x0707;
+	state->m_vregs.scol = data & 0x0707;
 }
 
 WRITE16_HANDLER( tx1_flgcs_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->vregs.flags = data & 0xff;
+	state->m_vregs.flags = data & 0xff;
 }
 
 
@@ -234,7 +234,7 @@ WRITE16_HANDLER( tx1_flgcs_w )
 static void tx1_draw_char(running_machine &machine, UINT8 *bitmap)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *tx1_vram = state->vram;
+	UINT16 *tx1_vram = state->m_vram;
 	INT32 x, y;
 	UINT32 scroll_x;
 	UINT8 *chars, *gfx2;
@@ -258,7 +258,7 @@ static void tx1_draw_char(running_machine &machine, UINT8 *bitmap)
 		y_offs = y;
 
 		if ((y_offs >= 64) && (y_offs < 128))
-			x_offs = state->vregs.slock ? scroll_x : 0;
+			x_offs = state->m_vregs.slock ? scroll_x : 0;
 		else
 			x_offs = 0;
 
@@ -325,7 +325,7 @@ INLINE void tx1_draw_road_pixel(running_machine &machine, int screen, UINT8 *bmp
 								UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	vregs_t &tx1_vregs = state->vregs;
+	vregs_t &tx1_vregs = state->m_vregs;
 	UINT8 a0 = BIT(apix[0], pixnuma);
 	UINT8 a1 = BIT(apix[1], pixnuma);
 	UINT8 a2 = BIT(apix[2], pixnuma);
@@ -402,8 +402,8 @@ INLINE void tx1_draw_road_pixel(running_machine &machine, int screen, UINT8 *bmp
 static void tx1_draw_road(running_machine &machine, UINT8 *bitmap)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *tx1_rcram = state->rcram;
-	vregs_t &tx1_vregs = state->vregs;
+	UINT16 *tx1_rcram = state->m_rcram;
+	vregs_t &tx1_vregs = state->m_vregs;
 	INT32	y;
 	UINT32	rva9_8;
 	UINT32	rva7;
@@ -857,7 +857,7 @@ static void tx1_draw_road(running_machine &machine, UINT8 *bitmap)
 static void tx1_draw_objects(running_machine &machine, UINT8 *bitmap)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *tx1_objram = state->objram;
+	UINT16 *tx1_objram = state->m_objram;
 #define FRAC	16
 
 	UINT32 offs;
@@ -1110,25 +1110,25 @@ VIDEO_START( tx1 )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate a large bitmap that covers the three screens */
-	state->bitmap = auto_bitmap_alloc(machine, 768, 256, BITMAP_FORMAT_INDEXED16);
+	state->m_bitmap = auto_bitmap_alloc(machine, 768, 256, BITMAP_FORMAT_INDEXED16);
 
 	/* Allocate some bitmaps */
-	state->chr_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
-	state->obj_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
-	state->rod_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 SCREEN_EOF( tx1 )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	/* /VSYNC: Update TZ113 */
-	state->vregs.slin_val += state->vregs.slin_inc;
+	state->m_vregs.slin_val += state->m_vregs.slin_inc;
 }
 
 static void tx1_combine_layers(running_machine &machine, bitmap_t *bitmap, int screen)
@@ -1145,9 +1145,9 @@ static void tx1_combine_layers(running_machine &machine, bitmap_t *bitmap, int s
 
 		UINT32 bmp_offset = y * 768 + x_offset;
 
-		UINT8 *chr_addr = state->chr_bmp + bmp_offset;
-		UINT8 *rod_addr = state->rod_bmp + bmp_offset;
-		UINT8 *obj_addr = state->obj_bmp + bmp_offset;
+		UINT8 *chr_addr = state->m_chr_bmp + bmp_offset;
+		UINT8 *rod_addr = state->m_rod_bmp + bmp_offset;
+		UINT8 *obj_addr = state->m_obj_bmp + bmp_offset;
 
 		for (x = 0; x < 256; ++x)
 		{
@@ -1191,11 +1191,11 @@ SCREEN_UPDATE( tx1 )
 
 	if (screen == left_screen)
 	{
-		memset(state->obj_bmp, 0, 768*240);
+		memset(state->m_obj_bmp, 0, 768*240);
 
-		tx1_draw_char(screen->machine(), state->chr_bmp);
-		tx1_draw_road(screen->machine(), state->rod_bmp);
-		tx1_draw_objects(screen->machine(), state->obj_bmp);
+		tx1_draw_char(screen->machine(), state->m_chr_bmp);
+		tx1_draw_road(screen->machine(), state->m_rod_bmp);
+		tx1_draw_objects(screen->machine(), state->m_obj_bmp);
 
 		tx1_combine_layers(screen->machine(), bitmap, 0);
 	}
@@ -1293,7 +1293,7 @@ PALETTE_INIT( buggyboy )
 static void buggyboy_draw_char(running_machine &machine, UINT8 *bitmap, int wide)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *buggyboy_vram = state->vram;
+	UINT16 *buggyboy_vram = state->m_vram;
 	INT32 x, y;
 	UINT32 scroll_x, scroll_y;
 	UINT8 *chars, *gfx2;
@@ -1520,8 +1520,8 @@ static void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld,
 static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *buggyboy_rcram = state->rcram;
-	vregs_t &vregs = state->vregs;
+	UINT16 *buggyboy_rcram = state->m_rcram;
+	vregs_t &vregs = state->m_vregs;
 	INT32 x;
 	UINT32 y;
 	UINT16 rva_offs;
@@ -2152,8 +2152,8 @@ static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 static void buggybjr_draw_road(running_machine &machine, UINT8 *bitmap, int wide)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *buggyboy_rcram = state->rcram;
-	vregs_t &vregs = state->vregs;
+	UINT16 *buggyboy_rcram = state->m_rcram;
+	vregs_t &vregs = state->m_vregs;
 	INT32 x;
 	UINT32 y;
 	UINT16 rva_offs;
@@ -2572,7 +2572,7 @@ static void buggybjr_draw_road(running_machine &machine, UINT8 *bitmap, int wide
 static void buggyboy_draw_objs(running_machine &machine, UINT8 *bitmap, int wide)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT16 *buggyboy_objram = state->objram;
+	UINT16 *buggyboy_objram = state->m_objram;
 #define FRAC	16
 
 	UINT32 offs;
@@ -2842,7 +2842,7 @@ static void buggyboy_draw_objs(running_machine &machine, UINT8 *bitmap, int wide
 WRITE16_HANDLER( buggyboy_gas_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &vregs = state->vregs;
+	vregs_t &vregs = state->m_vregs;
 	offset <<= 1;
 
 	switch (offset & 0xe0)
@@ -2917,7 +2917,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 WRITE16_HANDLER( buggyboy_sky_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->vregs.sky = data;
+	state->m_vregs.sky = data;
 }
 
 
@@ -2952,12 +2952,12 @@ static void bb_combine_layers(running_machine &machine, bitmap_t *bitmap, int sc
 
 		UINT32 bmp_offset = y * bmp_stride + x_offset;
 
-		UINT8 *chr_addr = state->chr_bmp + bmp_offset;
-		UINT8 *rod_addr = state->rod_bmp + bmp_offset;
-		UINT8 *obj_addr = state->obj_bmp + bmp_offset;
+		UINT8 *chr_addr = state->m_chr_bmp + bmp_offset;
+		UINT8 *rod_addr = state->m_rod_bmp + bmp_offset;
+		UINT8 *obj_addr = state->m_obj_bmp + bmp_offset;
 
-		UINT32 sky_en = BIT(state->vregs.sky, 7);
-		UINT32 sky_val = (((state->vregs.sky & 0x7f) + y) >> 2) & 0x3f;
+		UINT32 sky_en = BIT(state->m_vregs.sky, 7);
+		UINT32 sky_val = (((state->m_vregs.sky & 0x7f) + y) >> 2) & 0x3f;
 
 		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -2999,30 +2999,30 @@ VIDEO_START( buggyboy )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate some bitmaps */
-	state->chr_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
-	state->obj_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
-	state->rod_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 VIDEO_START( buggybjr )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	/* Allocate some bitmaps */
-	state->chr_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
-	state->obj_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
-	state->rod_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	state->m_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	state->m_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	state->m_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
 
 	/* Set a timer to run the interrupts */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 
 	/* /CUDISP CRTC interrupt */
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
 
 SCREEN_EOF( buggyboy )
@@ -3030,10 +3030,10 @@ SCREEN_EOF( buggyboy )
 	tx1_state *state = machine.driver_data<tx1_state>();
 
 	/* /VSYNC: Update TZ113 @ 219 */
-	state->vregs.slin_val += state->vregs.slin_inc;
+	state->m_vregs.slin_val += state->m_vregs.slin_inc;
 
 	/* /VSYNC: Clear wave LFSR */
-	state->vregs.wave_lfsr = 0;
+	state->m_vregs.wave_lfsr = 0;
 }
 
 
@@ -3046,12 +3046,12 @@ SCREEN_UPDATE( buggyboy )
 
 	if (screen == left_screen)
 	{
-		memset(state->obj_bmp, 0, 768*240);
-		memset(state->rod_bmp, 0, 768*240);
+		memset(state->m_obj_bmp, 0, 768*240);
+		memset(state->m_rod_bmp, 0, 768*240);
 
-		buggyboy_draw_char(screen->machine(), state->chr_bmp, 1);
-		buggyboy_draw_road(screen->machine(), state->rod_bmp);
-		buggyboy_draw_objs(screen->machine(), state->obj_bmp, 1);
+		buggyboy_draw_char(screen->machine(), state->m_chr_bmp, 1);
+		buggyboy_draw_road(screen->machine(), state->m_rod_bmp);
+		buggyboy_draw_objs(screen->machine(), state->m_obj_bmp, 1);
 
 		bb_combine_layers(screen->machine(), bitmap, 0);
 	}
@@ -3071,11 +3071,11 @@ SCREEN_UPDATE( buggyboy )
 SCREEN_UPDATE( buggybjr )
 {
 	tx1_state *state = screen->machine().driver_data<tx1_state>();
-	memset(state->obj_bmp, 0, 256*240);
+	memset(state->m_obj_bmp, 0, 256*240);
 
-	buggyboy_draw_char(screen->machine(), state->chr_bmp, 0);
-	buggybjr_draw_road(screen->machine(), state->rod_bmp, 0);
-	buggyboy_draw_objs(screen->machine(), state->obj_bmp, 0);
+	buggyboy_draw_char(screen->machine(), state->m_chr_bmp, 0);
+	buggybjr_draw_road(screen->machine(), state->m_rod_bmp, 0);
+	buggyboy_draw_objs(screen->machine(), state->m_obj_bmp, 0);
 
 	bb_combine_layers(screen->machine(), bitmap, -1);
 	return 0;

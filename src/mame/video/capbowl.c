@@ -19,7 +19,7 @@
 static void generate_interrupt( running_machine &machine, int state )
 {
 	capbowl_state *driver = machine.driver_data<capbowl_state>();
-	device_set_input_line(driver->maincpu, M6809_FIRQ_LINE, state);
+	device_set_input_line(driver->m_maincpu, M6809_FIRQ_LINE, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -64,7 +64,7 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(space, col, *state->rowaddress, func, data);
+	tms34061_w(space, col, *state->m_rowaddress, func, data);
 }
 
 
@@ -80,7 +80,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(space, col, *state->rowaddress, func);
+	return tms34061_r(space, col, *state->m_rowaddress, func);
 }
 
 
@@ -98,15 +98,15 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 	switch (offset)
 	{
 		case 0x08:	  /* Write address high byte (only 2 bits used) */
-			state->blitter_addr = (state->blitter_addr & ~0xff0000) | (data << 16);
+			state->m_blitter_addr = (state->m_blitter_addr & ~0xff0000) | (data << 16);
 			break;
 
 		case 0x17:    /* Write address mid byte (8 bits)   */
-			state->blitter_addr = (state->blitter_addr & ~0x00ff00) | (data << 8);
+			state->m_blitter_addr = (state->m_blitter_addr & ~0x00ff00) | (data << 8);
 			break;
 
 		case 0x18:	  /* Write Address low byte (8 bits)   */
-			state->blitter_addr = (state->blitter_addr & ~0x0000ff) | (data << 0);
+			state->m_blitter_addr = (state->m_blitter_addr & ~0x0000ff) | (data << 0);
 			break;
 
 		default:
@@ -119,7 +119,7 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 READ8_HANDLER( bowlrama_blitter_r )
 {
 	capbowl_state *state = space->machine().driver_data<capbowl_state>();
-	UINT8 data = space->machine().region("gfx1")->base()[state->blitter_addr];
+	UINT8 data = space->machine().region("gfx1")->base()[state->m_blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)
@@ -138,7 +138,7 @@ READ8_HANDLER( bowlrama_blitter_r )
 		/* Read data and increment address */
 		case 4:
 			result = data;
-			state->blitter_addr = (state->blitter_addr + 1) & 0x3ffff;
+			state->m_blitter_addr = (state->m_blitter_addr + 1) & 0x3ffff;
 			break;
 
 		default:

@@ -59,7 +59,7 @@ Notes:
 static INTERRUPT_GEN( rockrage_interrupt )
 {
 	rockrage_state *state = device->machine().driver_data<rockrage_state>();
-	if (k007342_is_int_enabled(state->k007342))
+	if (k007342_is_int_enabled(state->m_k007342))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
 	rockrage_state *state = space->machine().driver_data<rockrage_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r )
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)					/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)					/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE_MEMBER(rockrage_state, paletteram)						/* Palette */
+	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE_MEMBER(rockrage_state, m_paletteram)						/* Palette */
 	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w)							/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
@@ -278,21 +278,21 @@ static MACHINE_START( rockrage )
 
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k007342 = machine.device("k007342");
-	state->k007420 = machine.device("k007420");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k007342 = machine.device("k007342");
+	state->m_k007420 = machine.device("k007420");
 
-	state->save_item(NAME(state->vreg));
-	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->m_vreg));
+	state->save_item(NAME(state->m_layer_colorbase));
 }
 
 static MACHINE_RESET( rockrage )
 {
 	rockrage_state *state = machine.driver_data<rockrage_state>();
 
-	state->vreg = 0;
-	state->layer_colorbase[0] = 0x00;
-	state->layer_colorbase[1] = 0x10;
+	state->m_vreg = 0;
+	state->m_layer_colorbase[0] = 0x00;
+	state->m_layer_colorbase[1] = 0x10;
 }
 
 static MACHINE_CONFIG_START( rockrage, rockrage_state )

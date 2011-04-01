@@ -149,7 +149,7 @@ static WRITE16_HANDLER( mcat_soundlatch_w )
 	mcatadv_state *state = space->machine().driver_data<mcatadv_state>();
 
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -178,16 +178,16 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16 )
 
 //  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
 
-	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE_MEMBER(mcatadv_state, scroll1)
-	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE_MEMBER(mcatadv_state, scroll2)
+	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_scroll1)
+	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_scroll2)
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE_MEMBER(mcatadv_state, videoram1) // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE_MEMBER(mcatadv_state, videoram2) // Tilemap 1
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE_MEMBER(mcatadv_state, m_videoram1) // Tilemap 0
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE_MEMBER(mcatadv_state, m_videoram2) // Tilemap 1
 
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_MEMBER(mcatadv_state, spriteram, spriteram_size) // Sprites, two halves for double buffering
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_MEMBER(mcatadv_state, m_spriteram, m_spriteram_size) // Sprites, two halves for double buffering
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM // Tests more than is needed?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE_MEMBER(mcatadv_state, vidregs)
+	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_vidregs)
 
 	AM_RANGE(0xb00018, 0xb00019) AM_WRITE(watchdog_reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
@@ -417,7 +417,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int irq )
 {
 	mcatadv_state *state = device->machine().driver_data<mcatadv_state>();
-	device_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface mcatadv_ym2610_interface =
@@ -434,11 +434,11 @@ static MACHINE_START( mcatadv )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 1);
 
-	state->maincpu = machine.device("maincpu");
-	state->soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_soundcpu = machine.device("soundcpu");
 
-	state->save_item(NAME(state->palette_bank1));
-	state->save_item(NAME(state->palette_bank2));
+	state->save_item(NAME(state->m_palette_bank1));
+	state->save_item(NAME(state->m_palette_bank2));
 }
 
 static MACHINE_CONFIG_START( mcatadv, mcatadv_state )

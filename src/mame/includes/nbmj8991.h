@@ -4,24 +4,24 @@ public:
 	nbmj8991_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int scrollx;
-	int scrolly;
-	int blitter_destx;
-	int blitter_desty;
-	int blitter_sizex;
-	int blitter_sizey;
-	int blitter_src_addr;
-	int blitter_direction_x;
-	int blitter_direction_y;
-	int gfxrom;
-	int dispflag;
-	int flipscreen;
-	int clutsel;
-	int screen_refresh;
-	bitmap_t *tmpbitmap;
-	UINT8 *videoram;
-	UINT8 *clut;
-	int flipscreen_old;
+	int m_scrollx;
+	int m_scrolly;
+	int m_blitter_destx;
+	int m_blitter_desty;
+	int m_blitter_sizex;
+	int m_blitter_sizey;
+	int m_blitter_src_addr;
+	int m_blitter_direction_x;
+	int m_blitter_direction_y;
+	int m_gfxrom;
+	int m_dispflag;
+	int m_flipscreen;
+	int m_clutsel;
+	int m_screen_refresh;
+	bitmap_t *m_tmpbitmap;
+	UINT8 *m_videoram;
+	UINT8 *m_clut;
+	int m_flipscreen_old;
 };
 
 

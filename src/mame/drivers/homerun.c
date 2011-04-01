@@ -25,19 +25,19 @@ Todo :
 static WRITE8_DEVICE_HANDLER(pa_w)
 {
 	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->xpa = data;
+	state->m_xpa = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pb_w)
 {
 	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->xpb = data;
+	state->m_xpb = data;
 }
 
 static WRITE8_DEVICE_HANDLER(pc_w)
 {
 	homerun_state *state = device->machine().driver_data<homerun_state>();
-	state->xpc = data;
+	state->m_xpc = data;
 }
 
 
@@ -56,8 +56,8 @@ static const ppi8255_interface ppi8255_intf =
 static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(homerun_state, spriteram, spriteram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, m_videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(homerun_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
@@ -198,24 +198,24 @@ static MACHINE_START( homerun )
 	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
 	memory_configure_bank(machine, "bank1", 1, 7, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->gfx_ctrl));
-	state->save_item(NAME(state->gc_up));
-	state->save_item(NAME(state->gc_down));
-	state->save_item(NAME(state->xpa));
-	state->save_item(NAME(state->xpb));
-	state->save_item(NAME(state->xpc));
+	state->save_item(NAME(state->m_gfx_ctrl));
+	state->save_item(NAME(state->m_gc_up));
+	state->save_item(NAME(state->m_gc_down));
+	state->save_item(NAME(state->m_xpa));
+	state->save_item(NAME(state->m_xpb));
+	state->save_item(NAME(state->m_xpc));
 }
 
 static MACHINE_RESET( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
 
-	state->gfx_ctrl = 0;
-	state->gc_up = 0;
-	state->gc_down = 0;
-	state->xpa = 0;
-	state->xpb = 0;
-	state->xpc = 0;
+	state->m_gfx_ctrl = 0;
+	state->m_gc_up = 0;
+	state->m_gc_down = 0;
+	state->m_xpa = 0;
+	state->m_xpb = 0;
+	state->m_xpc = 0;
 }
 
 static MACHINE_CONFIG_START( homerun, homerun_state )

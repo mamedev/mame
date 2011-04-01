@@ -40,8 +40,8 @@ WRITE8_HANDLER( subs_invert2_w )
 SCREEN_UPDATE( subs )
 {
 	subs_state *state = screen->machine().driver_data<subs_state>();
-	UINT8 *videoram = state->videoram;
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *videoram = state->m_videoram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	device_t *left_screen  = screen->machine().device("lscreen");

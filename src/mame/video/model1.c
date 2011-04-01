@@ -417,26 +417,26 @@ static int comp_quads(const void *q1, const void *q2)
 
 static void sort_quads(model1_state *state)
 {
-	int count = state->quadpt - state->quaddb;
+	int count = state->m_quadpt - state->m_quaddb;
 	int i;
 	for(i=0; i<count; i++)
-		state->quadind[i] = state->quaddb+i;
-	qsort(state->quadind, count, sizeof(struct quad_m1 *), comp_quads);
+		state->m_quadind[i] = state->m_quaddb+i;
+	qsort(state->m_quadind, count, sizeof(struct quad_m1 *), comp_quads);
 }
 
 static void unsort_quads(model1_state *state)
 {
-	int count = state->quadpt - state->quaddb;
+	int count = state->m_quadpt - state->m_quaddb;
 	int i;
 	for(i=0; i<count; i++)
-		state->quadind[i] = state->quaddb+i;
+		state->m_quadind[i] = state->m_quaddb+i;
 }
 
 
 static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	struct view *view = state->view;
-	int count = state->quadpt - state->quaddb;
+	struct view *view = state->m_view;
+	int count = state->m_quadpt - state->m_quaddb;
 	int i;
 
 	/* clip to the cliprect */
@@ -450,7 +450,7 @@ static void draw_quads(model1_state *state, bitmap_t *bitmap, const rectangle *c
 	view->y2 = MIN(view->y2, cliprect->max_y);
 
 	for(i=0; i<count; i++) {
-		struct quad_m1 *q = state->quadind[i];
+		struct quad_m1 *q = state->m_quadind[i];
 
 		fill_quad(bitmap, view, q);
 #if 0
@@ -584,7 +584,7 @@ static void fclip_push_quad_next(model1_state *state, int level, struct quad_m1 
 
 static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q)
 {
-	struct view *view = state->view;
+	struct view *view = state->m_view;
 	int i, j;
 	struct point *pt[4], *pi1, *pi2;
 	int is_out[4], is_out2[4];
@@ -595,8 +595,8 @@ static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q)
 		for(i=0; i<4; i++)
 			LOG_TGP((" (%f, %f, %f)", q->p[i]->x, q->p[i]->y, q->p[i]->z));
 		LOG_TGP(("\n"));
-		*state->quadpt = *q;
-		state->quadpt++;
+		*state->m_quadpt = *q;
+		state->m_quadpt++;
 		return;
 	}
 
@@ -634,38 +634,38 @@ static void fclip_push_quad(model1_state *state, int level, struct quad_m1 *q)
 	if(is_out2[1])
 		if(is_out2[2]) {
 			// pt 0,1,2 clipped out, one triangle left
-			fclip_point(view, state->pointpt, pt[2], pt[3]);
-			pi1 = state->pointpt++;
-			fclip_point(view, state->pointpt, pt[3], pt[0]);
-			pi2 = state->pointpt++;
+			fclip_point(view, state->m_pointpt, pt[2], pt[3]);
+			pi1 = state->m_pointpt++;
+			fclip_point(view, state->m_pointpt, pt[3], pt[0]);
+			pi2 = state->m_pointpt++;
 			fclip_push_quad_next(state, level, q, pi1, pt[3], pi2, pi2);
 		} else {
 			// pt 0,1 clipped out, one quad left
-			fclip_point(view, state->pointpt, pt[1], pt[2]);
-			pi1 = state->pointpt++;
-			fclip_point(view, state->pointpt, pt[3], pt[0]);
-			pi2 = state->pointpt++;
+			fclip_point(view, state->m_pointpt, pt[1], pt[2]);
+			pi1 = state->m_pointpt++;
+			fclip_point(view, state->m_pointpt, pt[3], pt[0]);
+			pi2 = state->m_pointpt++;
 			fclip_push_quad_next(state, level, q, pi1, pt[2], pt[3], pi2);
 		}
 	else
 		if(is_out2[2]) {
 			// pt 0,2 clipped out, shouldn't happen, two triangles
-			fclip_point(view, state->pointpt, pt[0], pt[1]);
-			pi1 = state->pointpt++;
-			fclip_point(view, state->pointpt, pt[1], pt[2]);
-			pi2 = state->pointpt++;
+			fclip_point(view, state->m_pointpt, pt[0], pt[1]);
+			pi1 = state->m_pointpt++;
+			fclip_point(view, state->m_pointpt, pt[1], pt[2]);
+			pi2 = state->m_pointpt++;
 			fclip_push_quad_next(state, level, q, pi1, pt[1], pi2, pi2);
-			fclip_point(view, state->pointpt, pt[2], pt[3]);
-			pi1 = state->pointpt++;
-			fclip_point(view, state->pointpt, pt[3], pt[0]);
-			pi2 = state->pointpt++;
+			fclip_point(view, state->m_pointpt, pt[2], pt[3]);
+			pi1 = state->m_pointpt++;
+			fclip_point(view, state->m_pointpt, pt[3], pt[0]);
+			pi2 = state->m_pointpt++;
 			fclip_push_quad_next(state, level, q, pi1, pt[3], pi2, pi2);
 		} else {
 			// pt 0 clipped out, one decagon left, split in quad+tri
-			fclip_point(view, state->pointpt, pt[0], pt[1]);
-			pi1 = state->pointpt++;
-			fclip_point(view, state->pointpt, pt[3], pt[0]);
-			pi2 = state->pointpt++;
+			fclip_point(view, state->m_pointpt, pt[0], pt[1]);
+			pi1 = state->m_pointpt++;
+			fclip_point(view, state->m_pointpt, pt[3], pt[0]);
+			pi2 = state->m_pointpt++;
 			fclip_push_quad_next(state, level, q, pi1, pt[1], pt[2], pt[3]);
 			fclip_push_quad_next(state, level, q, pt[3], pi2, pi1, pi1);
 		}
@@ -727,7 +727,7 @@ static float compute_specular(struct vector *normal, struct vector *light,float 
 static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	struct view *view = state->view;
+	struct view *view = state->m_view;
 	int i;
 	UINT32 flags;
 	struct point *old_p0, *old_p1, *p0, *p1;
@@ -742,9 +742,9 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 	float *poly_data;
 
 	if(poly_adr & 0x800000)
-		poly_data=(float *) state->poly_ram;
+		poly_data=(float *) state->m_poly_ram;
 	else
-		poly_data=(float *) state->poly_rom;
+		poly_data=(float *) state->m_poly_rom;
 
 	poly_adr &= 0x7fffff;
 #if 0
@@ -773,8 +773,8 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 	if(!size)
 		size = 0xffffffff;
 
-	old_p0 = state->pointpt++;
-	old_p1 = state->pointpt++;
+	old_p0 = state->m_pointpt++;
+	old_p1 = state->m_pointpt++;
 
 	old_p0->x = poly_data[poly_adr+0];
 	old_p0->y = poly_data[poly_adr+1];
@@ -815,8 +815,8 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 			tex_adr ++;
 		lightmode=(flags>>17)&15;
 
-		p0 = state->pointpt++;
-		p1 = state->pointpt++;
+		p0 = state->m_pointpt++;
+		p1 = state->m_pointpt++;
 
 		vn.x = poly_data[poly_adr+1];
 		vn.y = poly_data[poly_adr+2];
@@ -896,23 +896,23 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 #if 0
 			float dif=mult_vector(&vn, &view->light);
 			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif);
-			cquad.col = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
-			cquad.col = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+			cquad.col = scale_color(machine.pens[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+			cquad.col = scale_color(machine.pens[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
 #endif
 			float dif=mult_vector(&vn, &view->light);
 			float spec=compute_specular(&vn,&view->light,dif,lightmode);
 			float ln=view->lightparams[lightmode].a + view->lightparams[lightmode].d*MAX(0.0,dif) + spec;
 			int lumval=255.0*MIN(1.0,ln);
-			int color=state->paletteram16[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)];
+			int color=state->m_paletteram16[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
 			lumval>>=2;	//there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
-			r=(state->color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
-			g=(state->color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
-			b=(state->color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
+			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
+			g=(state->m_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
+			b=(state->m_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
 
@@ -941,7 +941,7 @@ static void push_object(running_machine &machine, UINT32 tex_adr, UINT32 poly_ad
 
 static UINT16 *push_direct(model1_state *state, UINT16 *list)
 {
-	struct view *view = state->view;
+	struct view *view = state->m_view;
 	UINT32 flags;
 	UINT32 tex_adr, lum, v1, v2;
 	struct point *old_p0, *old_p1, *p0, *p1;
@@ -953,8 +953,8 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 	v1      = readi(list+2);
 	v2      = readi(list+10);
 
-	old_p0 = state->pointpt++;
-	old_p1 = state->pointpt++;
+	old_p0 = state->m_pointpt++;
+	old_p1 = state->m_pointpt++;
 
 	old_p0->x = readf(list+4);
 	old_p0->y = readf(list+6);
@@ -995,8 +995,8 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 		// list+4 is 0?
 		// list+12 is z?
 
-		p0 = state->pointpt++;
-		p1 = state->pointpt++;
+		p0 = state->m_pointpt++;
+		p1 = state->m_pointpt++;
 
 		lum   = readi(list+2);
 		v1    = readi(list+4);
@@ -1061,19 +1061,19 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 		cquad.z    = z;
 		{
 			int lumval=((float) (lum>>24)) * 2.0;
-			int color=state->paletteram16[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)];
+			int color=state->m_paletteram16[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)];
 			int r=(color>>0x0)&0x1f;
 			int g=(color>>0x5)&0x1f;
 			int b=(color>>0xA)&0x1f;
 			lumval>>=2;	//there must be a luma translation table somewhere
 			if(lumval>0x3f) lumval=0x3f;
 			else if(lumval<0) lumval=0;
-			r=(state->color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
-			g=(state->color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
-			b=(state->color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
+			r=(state->m_color_xlat[(r<<8)|lumval|0x0]>>3)&0x1f;
+			g=(state->m_color_xlat[(g<<8)|lumval|0x2000]>>3)&0x1f;
+			b=(state->m_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
-		//cquad.col  = scale_color(machine.pens[0x1000|(state->tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
+		//cquad.col  = scale_color(machine.pens[0x1000|(state->m_tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if(flags & 0x00002000)
 			cquad.col |= MOIRE;
 
@@ -1121,14 +1121,14 @@ static UINT16 *skip_direct(UINT16 *list)
 
 static void draw_objects(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	if(state->quadpt != state->quaddb) {
+	if(state->m_quadpt != state->m_quaddb) {
 		LOG_TGP(("VIDEO: sort&draw\n"));
 		sort_quads(state);
 		draw_quads(state, bitmap, cliprect);
 	}
 
-	state->quadpt = state->quaddb;
-	state->pointpt = state->pointdb;
+	state->m_quadpt = state->m_quaddb;
+	state->m_pointpt = state->m_pointdb;
 }
 
 static UINT16 *draw_direct(model1_state *state, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *list)
@@ -1142,54 +1142,54 @@ static UINT16 *draw_direct(model1_state *state, bitmap_t *bitmap, const rectangl
 	unsort_quads(state);
 	draw_quads(state, bitmap, cliprect);
 
-	state->quadpt = state->quaddb;
-	state->pointpt = state->pointdb;
+	state->m_quadpt = state->m_quaddb;
+	state->m_pointpt = state->m_pointdb;
 	return res;
 }
 
 static UINT16 *get_list(model1_state *state)
 {
-	if(!(state->listctl[0] & 4))
-		state->listctl[0] = (state->listctl[0] & ~0x40) | (state->listctl[0] & 8 ? 0x40 : 0);
-	return state->listctl[0] & 0x40 ? state->display_list1 : state->display_list0;
+	if(!(state->m_listctl[0] & 4))
+		state->m_listctl[0] = (state->m_listctl[0] & ~0x40) | (state->m_listctl[0] & 8 ? 0x40 : 0);
+	return state->m_listctl[0] & 0x40 ? state->m_display_list1 : state->m_display_list0;
 }
 
 static int get_list_number(model1_state *state)
 {
-	if(!(state->listctl[0] & 4))
-		state->listctl[0] = (state->listctl[0] & ~0x40) | (state->listctl[0] & 8 ? 0x40 : 0);
-	return state->listctl[0] & 0x40 ? 0 : 1;
+	if(!(state->m_listctl[0] & 4))
+		state->m_listctl[0] = (state->m_listctl[0] & ~0x40) | (state->m_listctl[0] & 8 ? 0x40 : 0);
+	return state->m_listctl[0] & 0x40 ? 0 : 1;
 }
 
 static void end_frame(running_machine &machine)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	if((state->listctl[0] & 4) && (machine.primary_screen->frame_number() & 1))
-		state->listctl[0] ^= 0x40;
+	if((state->m_listctl[0] & 4) && (machine.primary_screen->frame_number() & 1))
+		state->m_listctl[0] ^= 0x40;
 }
 
 READ16_HANDLER( model1_listctl_r )
 {
 	model1_state *state = space->machine().driver_data<model1_state>();
 	if(!offset)
-		return state->listctl[0] | 0x30;
+		return state->m_listctl[0] | 0x30;
 	else
-		return state->listctl[1];
+		return state->m_listctl[1];
 }
 
 WRITE16_HANDLER( model1_listctl_w )
 {
 	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->listctl+offset);
-	LOG_TGP(("VIDEO: control=%08x\n", (state->listctl[1]<<16)|state->listctl[0]));
+	COMBINE_DATA(state->m_listctl+offset);
+	LOG_TGP(("VIDEO: control=%08x\n", (state->m_listctl[1]<<16)|state->m_listctl[0]));
 }
 
 static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	struct view *view = state->view;
-	state->render_done = 1;
-	if((state->listctl[1] & 0x1f) == 0x1f) {
+	struct view *view = state->m_view;
+	state->m_render_done = 1;
+	if((state->m_listctl[1] & 0x1f) == 0x1f) {
 		UINT16 *list = get_list(state);
 		int zz = 0;
 		LOG_TGP(("VIDEO: render list %d\n", get_list_number(state)));
@@ -1201,7 +1201,7 @@ static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectang
 
 		for(;;) {
 			int type = (list[1]<<16)|list[0];
-			state->glist=list;
+			state->m_glist=list;
 			switch(type & 15) {
 			case 0:
 				list += 2;
@@ -1246,7 +1246,7 @@ static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectang
 				int i;
 				LOG_TGP(("ZVIDEO:   color write, adr=%x, len=%x\n", adr, len));
 				for(i=0; i<len; i++)
-					state->tgp_ram[adr-0x40000+i] = list[6+2*i];
+					state->m_tgp_ram[adr-0x40000+i] = list[6+2*i];
 				list += 6+len*2;
 				break;
 			}
@@ -1257,7 +1257,7 @@ static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectang
 					int i;
 					for(i=0;i<len;++i)
 					{
-						state->poly_ram[adr-0x800000+i]=readi(list+2*i+6);
+						state->m_poly_ram[adr-0x800000+i]=readi(list+2*i+6);
 					}
 					list+=6+len*2;
 				}
@@ -1341,7 +1341,7 @@ static void tgp_render(running_machine &machine, bitmap_t *bitmap, const rectang
 static void tgp_scan(running_machine &machine)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	struct view *view = state->view;
+	struct view *view = state->m_view;
 #if 0
 	if (input_code_pressed_once(machine, KEYCODE_F))
         {
@@ -1349,13 +1349,13 @@ static void tgp_scan(running_machine &machine)
 		fp=fopen("tgp-ram.bin", "w+b");
 		if (fp)
                 {
-			fwrite(state->tgp_ram, (0x100000-0x40000)*2, 1, fp);
+			fwrite(state->m_tgp_ram, (0x100000-0x40000)*2, 1, fp);
 			fclose(fp);
                 }
 		exit(0);
         }
 #endif
-	if(!state->render_done && (state->listctl[1] & 0x1f) == 0x1f) {
+	if(!state->m_render_done && (state->m_listctl[1] & 0x1f) == 0x1f) {
 		UINT16 *list = get_list(state);
 		// Skip everything but the data uploads
 		LOG_TGP(("VIDEO: scan list %d\n", get_list_number(state)));
@@ -1380,7 +1380,7 @@ static void tgp_scan(running_machine &machine)
 				int i;
 				LOG_TGP(("ZVIDEO:   scan color write, adr=%x, len=%x\n", adr, len));
 				for(i=0; i<len; i++)
-					state->tgp_ram[adr-0x40000+i] = list[6+2*i];
+					state->m_tgp_ram[adr-0x40000+i] = list[6+2*i];
 				list += 6+len*2;
 				break;
 			}
@@ -1391,7 +1391,7 @@ static void tgp_scan(running_machine &machine)
 					int i;
 					for(i=0;i<len;++i)
 					{
-						state->poly_ram[adr-0x800000+i]=readi(list+2*i+6);
+						state->m_poly_ram[adr-0x800000+i]=readi(list+2*i+6);
 					}
 					list+=6+len*2;
 				}
@@ -1442,38 +1442,38 @@ static void tgp_scan(running_machine &machine)
 	end:
 		;
 	}
-	state->render_done = 0;
+	state->m_render_done = 0;
 }
 
 VIDEO_START(model1)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	state->paletteram16 = machine.generic.paletteram.u16;
+	state->m_paletteram16 = machine.generic.paletteram.u16;
 
-	state->view = auto_alloc_clear(machine, struct view);
+	state->m_view = auto_alloc_clear(machine, struct view);
 
 	sys24_tile_vh_start(machine, 0x3fff);
 
-	state->poly_rom = (UINT32 *)machine.region("user1")->base();
-	state->poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
-	state->tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
-	state->pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
-	state->quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
-	state->quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
+	state->m_poly_rom = (UINT32 *)machine.region("user1")->base();
+	state->m_poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
+	state->m_tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
+	state->m_pointdb = auto_alloc_array_clear(machine, struct point, 1000000*2);
+	state->m_quaddb  = auto_alloc_array_clear(machine, struct quad_m1, 1000000);
+	state->m_quadind = auto_alloc_array_clear(machine, struct quad_m1 *, 1000000);
 
-	state->pointpt = state->pointdb;
-	state->quadpt = state->quaddb;
-	state->listctl[0] = state->listctl[1] = 0;
+	state->m_pointpt = state->m_pointdb;
+	state->m_quadpt = state->m_quaddb;
+	state->m_listctl[0] = state->m_listctl[1] = 0;
 
-	state_save_register_global_pointer(machine, state->tgp_ram, 0x100000-0x40000);
-	state_save_register_global_pointer(machine, state->poly_ram, 0x40000);
-	state_save_register_global_array(machine, state->listctl);
+	state_save_register_global_pointer(machine, state->m_tgp_ram, 0x100000-0x40000);
+	state_save_register_global_pointer(machine, state->m_poly_ram, 0x40000);
+	state_save_register_global_array(machine, state->m_listctl);
 }
 
 SCREEN_UPDATE(model1)
 {
 	model1_state *state = screen->machine().driver_data<model1_state>();
-	struct view *view = state->view;
+	struct view *view = state->m_view;
 #if 0
 	{
 		int mod = 0;

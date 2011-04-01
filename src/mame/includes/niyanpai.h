@@ -6,33 +6,33 @@ public:
 	niyanpai_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int musobana_inputport;
-	int musobana_outcoin_flag;
-	UINT8 pio_dir[5];
-	UINT8 pio_latch[5];
-	int scrollx[VRAM_MAX];
-	int scrolly[VRAM_MAX];
-	int blitter_destx[VRAM_MAX];
-	int blitter_desty[VRAM_MAX];
-	int blitter_sizex[VRAM_MAX];
-	int blitter_sizey[VRAM_MAX];
-	int blitter_src_addr[VRAM_MAX];
-	int blitter_direction_x[VRAM_MAX];
-	int blitter_direction_y[VRAM_MAX];
-	int dispflag[VRAM_MAX];
-	int flipscreen[VRAM_MAX];
-	int clutmode[VRAM_MAX];
-	int transparency[VRAM_MAX];
-	int clutsel[VRAM_MAX];
-	int screen_refresh;
-	int nb19010_busyctr;
-	int nb19010_busyflag;
-	bitmap_t *tmpbitmap[VRAM_MAX];
-	UINT16 *videoram[VRAM_MAX];
-	UINT16 *videoworkram[VRAM_MAX];
-	UINT16 *palette;
-	UINT8 *clut[VRAM_MAX];
-	int flipscreen_old[VRAM_MAX];
+	int m_musobana_inputport;
+	int m_musobana_outcoin_flag;
+	UINT8 m_pio_dir[5];
+	UINT8 m_pio_latch[5];
+	int m_scrollx[VRAM_MAX];
+	int m_scrolly[VRAM_MAX];
+	int m_blitter_destx[VRAM_MAX];
+	int m_blitter_desty[VRAM_MAX];
+	int m_blitter_sizex[VRAM_MAX];
+	int m_blitter_sizey[VRAM_MAX];
+	int m_blitter_src_addr[VRAM_MAX];
+	int m_blitter_direction_x[VRAM_MAX];
+	int m_blitter_direction_y[VRAM_MAX];
+	int m_dispflag[VRAM_MAX];
+	int m_flipscreen[VRAM_MAX];
+	int m_clutmode[VRAM_MAX];
+	int m_transparency[VRAM_MAX];
+	int m_clutsel[VRAM_MAX];
+	int m_screen_refresh;
+	int m_nb19010_busyctr;
+	int m_nb19010_busyflag;
+	bitmap_t *m_tmpbitmap[VRAM_MAX];
+	UINT16 *m_videoram[VRAM_MAX];
+	UINT16 *m_videoworkram[VRAM_MAX];
+	UINT16 *m_palette;
+	UINT8 *m_clut[VRAM_MAX];
+	int m_flipscreen_old[VRAM_MAX];
 };
 
 

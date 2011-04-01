@@ -11,26 +11,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *       videoram;
-	UINT8 *       colorram;
-	UINT8 *       videoram2;
-	UINT8 *       colorram2;
-	UINT8 *       scroll;
-	UINT8 *       spriteram;
-	UINT8 *       spriteram_2;
-	size_t        videoram_size;
-	size_t        spriteram_size;
+	UINT8 *       m_videoram;
+	UINT8 *       m_colorram;
+	UINT8 *       m_videoram2;
+	UINT8 *       m_colorram2;
+	UINT8 *       m_scroll;
+	UINT8 *       m_spriteram;
+	UINT8 *       m_spriteram_2;
+	size_t        m_videoram_size;
+	size_t        m_spriteram_size;
 
 	/* video-related */
-	tilemap_t       *fg_tilemap, *bg_tilemap;
-	int           spriterambank, charbank;
+	tilemap_t       *m_fg_tilemap;
+	tilemap_t       *m_bg_tilemap;
+	int           m_spriterambank;
+	int           m_charbank;
 
 	/* misc */
-	int           T1_line;
-	UINT8         nmi_enable, irq_enable;
+	int           m_T1_line;
+	UINT8         m_nmi_enable;
+	UINT8         m_irq_enable;
 
 	/* devices */
-	device_t *audio_cpu;
+	device_t *m_audio_cpu;
 };
 
 

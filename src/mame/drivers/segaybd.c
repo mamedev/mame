@@ -66,8 +66,8 @@ static void yboard_generic_init( running_machine &machine )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	/* reset globals */
-	state->vblank_irq_state = 0;
-	state->timer_irq_state = 0;
+	state->m_vblank_irq_state = 0;
+	state->m_timer_irq_state = 0;
 
 	ybd_output_cb1 = NULL;
 	ybd_output_cb2 = NULL;
@@ -85,17 +85,17 @@ static void update_main_irqs(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	device_set_input_line(state->maincpu, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->subx, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->suby, 2, state->timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->maincpu, 4, state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->subx, 4, state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->suby, 4, state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->maincpu, 6, state->timer_irq_state && state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->subx, 6, state->timer_irq_state && state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	device_set_input_line(state->suby, 6, state->timer_irq_state && state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 2, state->m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_subx, 2, state->m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_suby, 2, state->m_timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 4, state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_subx, 4, state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_suby, 4, state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 6, state->m_timer_irq_state && state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_subx, 6, state->m_timer_irq_state && state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_suby, 6, state->m_timer_irq_state && state->m_vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (state->timer_irq_state || state->vblank_irq_state)
+	if (state->m_timer_irq_state || state->m_vblank_irq_state)
 		machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
@@ -140,31 +140,31 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* on scanline 'irq2_scanline' generate an IRQ2 */
-	if (scanline == state->irq2_scanline)
+	if (scanline == state->m_irq2_scanline)
 	{
-		state->timer_irq_state = 1;
-		scanline = state->irq2_scanline + 1;
+		state->m_timer_irq_state = 1;
+		scanline = state->m_irq2_scanline + 1;
 	}
 
 	/* on scanline 'irq2_scanline' + 1, clear the IRQ2 */
-	else if (scanline == state->irq2_scanline + 1)
+	else if (scanline == state->m_irq2_scanline + 1)
 	{
-		state->timer_irq_state = 0;
+		state->m_timer_irq_state = 0;
 		scanline = 223;
 	}
 
 	/* on scanline 223 generate VBLANK for all CPUs */
 	else if (scanline == 223)
 	{
-		state->vblank_irq_state = 1;
+		state->m_vblank_irq_state = 1;
 		scanline = 224;
 	}
 
 	/* on scanline 224 we turn it off */
 	else if (scanline == 224)
 	{
-		state->vblank_irq_state = 0;
-		scanline = state->irq2_scanline;
+		state->m_vblank_irq_state = 0;
+		scanline = state->m_irq2_scanline;
 	}
 
 	/* update IRQs on the main CPU */
@@ -176,15 +176,15 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
 	{
-		int old = state->irq2_scanline;
+		int old = state->m_irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (input_code_pressed(timer->machine(), KEYCODE_Q)) { while (input_code_pressed(timer->machine(), KEYCODE_Q)) ; state->irq2_scanline -= 10; }
-		if (input_code_pressed(timer->machine(), KEYCODE_W)) { while (input_code_pressed(timer->machine(), KEYCODE_W)) ; state->irq2_scanline -= 1; }
-		if (input_code_pressed(timer->machine(), KEYCODE_E)) { while (input_code_pressed(timer->machine(), KEYCODE_E)) ; state->irq2_scanline += 1; }
-		if (input_code_pressed(timer->machine(), KEYCODE_R)) { while (input_code_pressed(timer->machine(), KEYCODE_R)) ; state->irq2_scanline += 10; }
-		if (old != state->irq2_scanline)
-			popmessage("scanline = %d", state->irq2_scanline);
+		if (input_code_pressed(timer->machine(), KEYCODE_Q)) { while (input_code_pressed(timer->machine(), KEYCODE_Q)) ; state->m_irq2_scanline -= 10; }
+		if (input_code_pressed(timer->machine(), KEYCODE_W)) { while (input_code_pressed(timer->machine(), KEYCODE_W)) ; state->m_irq2_scanline -= 1; }
+		if (input_code_pressed(timer->machine(), KEYCODE_E)) { while (input_code_pressed(timer->machine(), KEYCODE_E)) ; state->m_irq2_scanline += 1; }
+		if (input_code_pressed(timer->machine(), KEYCODE_R)) { while (input_code_pressed(timer->machine(), KEYCODE_R)) ; state->m_irq2_scanline += 10; }
+		if (old != state->m_irq2_scanline)
+			popmessage("scanline = %d", state->m_irq2_scanline);
 	}
 #endif
 }
@@ -194,16 +194,16 @@ static MACHINE_START( yboard )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->soundcpu = machine.device("soundcpu");
-	state->subx = machine.device("subx");
-	state->suby = machine.device("suby");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_soundcpu = machine.device("soundcpu");
+	state->m_subx = machine.device("subx");
+	state->m_suby = machine.device("suby");
 
-	state->save_item(NAME(state->vblank_irq_state));
-	state->save_item(NAME(state->timer_irq_state));
-	state->save_item(NAME(state->irq2_scanline));
-	state->save_item(NAME(state->misc_io_data));
-	state->save_item(NAME(state->analog_data));
+	state->save_item(NAME(state->m_vblank_irq_state));
+	state->save_item(NAME(state->m_timer_irq_state));
+	state->save_item(NAME(state->m_irq2_scanline));
+	state->save_item(NAME(state->m_misc_io_data));
+	state->save_item(NAME(state->m_analog_data));
 }
 
 
@@ -211,9 +211,9 @@ static MACHINE_RESET( yboard )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	state->irq2_scanline = 170;
+	state->m_irq2_scanline = 170;
 
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(223), 223);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(223), 223);
 }
 
 
@@ -228,17 +228,17 @@ static void sound_cpu_irq(device_t *device, int state)
 {
 	segas1x_state *driver = device->machine().driver_data<segas1x_state>();
 
-	device_set_input_line(driver->soundcpu, 0, state);
+	device_set_input_line(driver->m_soundcpu, 0, state);
 }
 
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, param);
-	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -252,7 +252,7 @@ static WRITE16_HANDLER( sound_data_w )
 static READ8_HANDLER( sound_data_r )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
-	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -282,8 +282,8 @@ static READ16_HANDLER( io_chip_r )
 		case 0x0c/2:
 		case 0x0e/2:
 			/* if the port is configured as an output, return the last thing written */
-			if (state->misc_io_data[0x1e/2] & (1 << offset))
-				return state->misc_io_data[offset];
+			if (state->m_misc_io_data[0x1e/2] & (1 << offset))
+				return state->m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
 			return input_port_read(space->machine(), portnames[offset]);
@@ -301,12 +301,12 @@ static READ16_HANDLER( io_chip_r )
 		/* CNT register & mirror */
 		case 0x18/2:
 		case 0x1c/2:
-			return state->misc_io_data[0x1c/2];
+			return state->m_misc_io_data[0x1c/2];
 
 		/* port direction register & mirror */
 		case 0x1a/2:
 		case 0x1e/2:
-			return state->misc_io_data[0x1e/2];
+			return state->m_misc_io_data[0x1e/2];
 	}
 	return 0xffff;
 }
@@ -319,8 +319,8 @@ static WRITE16_HANDLER( io_chip_w )
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-	old = state->misc_io_data[offset];
-	state->misc_io_data[offset] = data;
+	old = state->m_misc_io_data[offset];
+	state->m_misc_io_data[offset] = data;
 
 	switch (offset)
 	{
@@ -355,9 +355,9 @@ static WRITE16_HANDLER( io_chip_w )
 			segaic16_set_display_enable(space->machine(), data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20))
 				watchdog_reset_w(space, 0, 0);
-			device_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			device_set_input_line(state->subx, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			device_set_input_line(state->suby, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			device_set_input_line(state->m_subx, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(state->m_suby, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */
@@ -390,8 +390,8 @@ static READ16_HANDLER( analog_r )
 	int result = 0xff;
 	if (ACCESSING_BITS_0_7)
 	{
-		result = state->analog_data[offset & 3] & 0x80;
-		state->analog_data[offset & 3] <<= 1;
+		result = state->m_analog_data[offset & 3] & 0x80;
+		state->m_analog_data[offset & 3] <<= 1;
 	}
 	return result;
 }
@@ -401,10 +401,10 @@ static WRITE16_HANDLER( analog_w )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
-	int selected = ((offset & 3) == 3) ? (3 + (state->misc_io_data[0x08/2] & 3)) : (offset & 3);
+	int selected = ((offset & 3) == 3) ? (3 + (state->m_misc_io_data[0x08/2] & 3)) : (offset & 3);
 	int value = input_port_read_safe(space->machine(), ports[selected], 0xff);
 
-	state->analog_data[offset & 3] = value;
+	state->m_analog_data[offset & 3] = value;
 }
 
 

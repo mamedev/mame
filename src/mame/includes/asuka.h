@@ -14,26 +14,26 @@ public:
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
-	UINT16      video_ctrl;
-	UINT16      video_mask;
+	UINT16      m_video_ctrl;
+	UINT16      m_video_mask;
 
 	/* c-chip */
-	int         current_round;
-	int         current_bank;
+	int         m_current_round;
+	int         m_current_bank;
 
-	UINT8       cval[26];
-	UINT8       cc_port;
-	UINT8       restart_status;
+	UINT8       m_cval[26];
+	UINT8       m_cc_port;
+	UINT8       m_restart_status;
 
 	/* misc */
-	int         adpcm_pos;
-	int         adpcm_data;
+	int         m_adpcm_pos;
+	int         m_adpcm_data;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *pc090oj;
-	device_t *tc0100scn;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_pc090oj;
+	device_t *m_tc0100scn;
 };
 
 

@@ -20,15 +20,15 @@
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 attr = state->fgcolorram[tile_index];
+	UINT8 attr = state->m_fgcolorram[tile_index];
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
-	if (state->is_senjyo && (tile_index & 0x1f) >= 32-8)
+	if (state->m_is_senjyo && (tile_index & 0x1f) >= 32-8)
 		flags |= TILE_FORCE_LAYER0;
 
 	SET_TILE_INFO(
 			0,
-			state->fgvideoram[tile_index] + ((attr & 0x10) << 4),
+			state->m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
 			flags);
 }
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 static TILE_GET_INFO( senjyo_bg1_tile_info )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->bg1videoram[tile_index];
+	UINT8 code = state->m_bg1videoram[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -51,7 +51,7 @@ static TILE_GET_INFO( starforc_bg1_tile_info )
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
 	static const UINT8 colormap[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->bg1videoram[tile_index];
+	UINT8 code = state->m_bg1videoram[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -63,7 +63,7 @@ static TILE_GET_INFO( starforc_bg1_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->bg2videoram[tile_index];
+	UINT8 code = state->m_bg2videoram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -75,7 +75,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static TILE_GET_INFO( get_bg3_tile_info )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 code = state->bg3videoram[tile_index];
+	UINT8 code = state->m_bg3videoram[tile_index];
 
 	SET_TILE_INFO(
 			3,
@@ -96,26 +96,26 @@ VIDEO_START( senjyo )
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	if (state->is_senjyo)
+	if (state->m_is_senjyo)
 	{
-		state->bg1_tilemap = tilemap_create(machine, senjyo_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
-		state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,    tilemap_scan_rows, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
-		state->bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,    tilemap_scan_rows, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = tilemap_create(machine, senjyo_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
+		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,    tilemap_scan_rows, 16, 16, 16, 48);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,    tilemap_scan_rows, 16, 16, 16, 56);	/* only 16x32 used by Star Force */
 	}
 	else
 	{
-		state->bg1_tilemap = tilemap_create(machine, starforc_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
-		state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
-		state->bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg1_tilemap = tilemap_create(machine, starforc_bg1_tile_info, tilemap_scan_rows, 16, 16, 16, 32);
+		state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
+		state->m_bg3_tilemap = tilemap_create(machine, get_bg3_tile_info,      tilemap_scan_rows, 16, 16, 16, 32);	/* only 16x32 used by Star Force */
 	}
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->bg1_tilemap, 0);
-	tilemap_set_transparent_pen(state->bg2_tilemap, 0);
-	tilemap_set_transparent_pen(state->bg3_tilemap, 0);
-	tilemap_set_scroll_cols(state->fg_tilemap, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg1_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg2_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg3_tilemap, 0);
+	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
 }
 
 
@@ -130,43 +130,43 @@ WRITE8_HANDLER( senjyo_fgvideoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 WRITE8_HANDLER( senjyo_fgcolorram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->fgcolorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_fgcolorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 WRITE8_HANDLER( senjyo_bg1videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->bg1videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg1_tilemap, offset);
+	state->m_bg1videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg1_tilemap, offset);
 }
 WRITE8_HANDLER( senjyo_bg2videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->bg2videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg2_tilemap, offset);
+	state->m_bg2videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
 }
 WRITE8_HANDLER( senjyo_bg3videoram_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->bg3videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg3_tilemap, offset);
+	state->m_bg3videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg3_tilemap, offset);
 }
 
 WRITE8_HANDLER( senjyo_bgstripes_w )
 {
 	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	*state->bgstripesram = data;
+	*state->m_bgstripesram = data;
 }
 
 /***************************************************************************
@@ -181,7 +181,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const recta
 	int x,y,pen,strwid,count;
 
 
-	if (state->bgstripes == 0xff)	/* off */
+	if (state->m_bgstripes == 0xff)	/* off */
 		bitmap_fill(bitmap,cliprect,0);
 	else
 	{
@@ -189,7 +189,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_t *bitmap,const recta
 
 		pen = 0;
 		count = 0;
-		strwid = state->bgstripes;
+		strwid = state->m_bgstripes;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 
@@ -219,7 +219,7 @@ static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle
 
 	for (offs = 0;offs < 0x400;offs++)
 		for (x = 0;x < 8;x++)
-			if (state->radarram[offs] & (1 << x))
+			if (state->m_radarram[offs] & (1 << x))
 			{
 				int sx, sy;
 
@@ -241,16 +241,16 @@ static void draw_radar(running_machine &machine,bitmap_t *bitmap,const rectangle
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int priority)
 {
 	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int big,sx,sy,flipx,flipy;
 
 		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
 		{
-			if (state->is_senjyo)	/* Senjyo */
+			if (state->m_is_senjyo)	/* Senjyo */
 				big = (spriteram[offs] & 0x80);
 			else	/* Star Force */
 				big = ((spriteram[offs] & 0xc0) == 0xc0);
@@ -304,50 +304,50 @@ SCREEN_UPDATE( senjyo )
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)
-			tilemap_set_scrolly(state->fg_tilemap, i, state->fgscroll[i]);
+			tilemap_set_scrolly(state->m_fg_tilemap, i, state->m_fgscroll[i]);
 
-		scrollx = state->scrollx1[0];
-		scrolly = state->scrolly1[0] + 256 * state->scrolly1[1];
+		scrollx = state->m_scrollx1[0];
+		scrolly = state->m_scrolly1[0] + 256 * state->m_scrolly1[1];
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->bg1_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->bg1_tilemap, 0, scrolly);
+		tilemap_set_scrollx(state->m_bg1_tilemap, 0, scrollx);
+		tilemap_set_scrolly(state->m_bg1_tilemap, 0, scrolly);
 
-		scrollx = state->scrollx2[0];
-		scrolly = state->scrolly2[0] + 256 * state->scrolly2[1];
-		if (state->scrollhack)	/* Star Force, but NOT the encrypted version */
+		scrollx = state->m_scrollx2[0];
+		scrolly = state->m_scrolly2[0] + 256 * state->m_scrolly2[1];
+		if (state->m_scrollhack)	/* Star Force, but NOT the encrypted version */
 		{
-			scrollx = state->scrollx1[0];
-			scrolly = state->scrolly1[0] + 256 * state->scrolly1[1];
+			scrollx = state->m_scrollx1[0];
+			scrolly = state->m_scrolly1[0] + 256 * state->m_scrolly1[1];
 		}
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->bg2_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->bg2_tilemap, 0, scrolly);
+		tilemap_set_scrollx(state->m_bg2_tilemap, 0, scrollx);
+		tilemap_set_scrolly(state->m_bg2_tilemap, 0, scrolly);
 
-		scrollx = state->scrollx3[0];
-		scrolly = state->scrolly3[0] + 256 * state->scrolly3[1];
+		scrollx = state->m_scrollx3[0];
+		scrolly = state->m_scrolly3[0] + 256 * state->m_scrolly3[1];
 		if (flip)
 			scrollx = -scrollx;
-		tilemap_set_scrollx(state->bg3_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->bg3_tilemap, 0, scrolly);
+		tilemap_set_scrollx(state->m_bg3_tilemap, 0, scrollx);
+		tilemap_set_scrolly(state->m_bg3_tilemap, 0, scrolly);
 	}
 
 	draw_bgbitmap(screen->machine(), bitmap, cliprect);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->bg3_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg3_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 1);
-	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 2);
-	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg1_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 3);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	draw_radar(screen->machine(), bitmap, cliprect);
 
 #if 0
 {
 	char baf[80];
-	UINT8 *senjyo_scrolly3 = state->scrolly3;
+	UINT8 *senjyo_scrolly3 = state->m_scrolly3;
 
 	sprintf(baf,"%02x %02x %02x %02x %02x %02x %02x %02x",
 		senjyo_scrolly3[0x00],

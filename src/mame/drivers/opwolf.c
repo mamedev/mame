@@ -287,13 +287,13 @@ register. So what is controlling priority.
 static READ16_HANDLER( cchip_r )
 {
 	opwolf_state *state = space->machine().driver_data<opwolf_state>();
-	return state->cchip_ram[offset];
+	return state->m_cchip_ram[offset];
 }
 
 static WRITE16_HANDLER( cchip_w )
 {
 	opwolf_state *state = space->machine().driver_data<opwolf_state>();
-	state->cchip_ram[offset] = data &0xff;
+	state->m_cchip_ram[offset] = data &0xff;
 }
 
 /**********************************************************
@@ -324,9 +324,9 @@ static READ16_HANDLER( opwolf_lightgun_r )
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 			scaled = (input_port_read(space->machine(), P1X_PORT_TAG) * 320 ) / 256;
-			return (scaled + 0x15 + state->opwolf_gun_xoffs);
+			return (scaled + 0x15 + state->m_opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (input_port_read(space->machine(), P1Y_PORT_TAG) - 0x24 + state->opwolf_gun_yoffs);
+			return (input_port_read(space->machine(), P1Y_PORT_TAG) - 0x24 + state->m_opwolf_gun_yoffs);
 	}
 
 	return 0xff;
@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP			/* unknown write, 0 then 1 each interrupt */
 	AM_RANGE(0x9800, 0x9800) AM_READ(z80_input2_r)	/* read at PC=$631: poked to $c005 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* IRQ acknowledge (unimplemented) */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(opwolf_state, cchip_ram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(opwolf_state, m_cchip_ram)
 ADDRESS_MAP_END
 
 
@@ -433,34 +433,34 @@ static MACHINE_START( opwolf )
 {
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
-	state->pc080sn = machine.device("pc080sn");
-	state->pc090oj = machine.device("pc090oj");
-	state->msm1 = machine.device("msm1");
-	state->msm2 = machine.device("msm2");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_pc080sn = machine.device("pc080sn");
+	state->m_pc090oj = machine.device("pc090oj");
+	state->m_msm1 = machine.device("msm1");
+	state->m_msm2 = machine.device("msm2");
 
-	state->save_item(NAME(state->sprite_ctrl));
-	state->save_item(NAME(state->sprites_flipscreen));
+	state->save_item(NAME(state->m_sprite_ctrl));
+	state->save_item(NAME(state->m_sprites_flipscreen));
 
-	state->save_item(NAME(state->adpcm_b));
-	state->save_item(NAME(state->adpcm_c));
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_end));
+	state->save_item(NAME(state->m_adpcm_b));
+	state->save_item(NAME(state->m_adpcm_c));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_end));
 }
 
 static MACHINE_RESET( opwolf )
 {
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 
-	state->adpcm_b[0] = state->adpcm_b[1] = 0;
-	state->adpcm_c[0] = state->adpcm_c[1] = 0;
-	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
-	state->adpcm_end[0] = state->adpcm_end[1] = 0;
-	state->adpcm_data[0] = state->adpcm_data[1] = -1;
+	state->m_adpcm_b[0] = state->m_adpcm_b[1] = 0;
+	state->m_adpcm_c[0] = state->m_adpcm_c[1] = 0;
+	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
+	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
+	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
 
-	state->sprite_ctrl = 0;
-	state->sprites_flipscreen = 0;
+	state->m_sprite_ctrl = 0;
+	state->m_sprites_flipscreen = 0;
 
 	msm5205_reset_w(machine.device("msm1"), 1);
 	msm5205_reset_w(machine.device("msm2"), 1);
@@ -470,18 +470,18 @@ static void opwolf_msm5205_vck( device_t *device )
 {
 	opwolf_state *state = device->machine().driver_data<opwolf_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
-	if (state->adpcm_data[chip] != -1)
+	if (state->m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device, state->adpcm_data[chip] & 0x0f);
-		state->adpcm_data[chip] = -1;
-		if (state->adpcm_pos[chip] == state->adpcm_end[chip])
+		msm5205_data_w(device, state->m_adpcm_data[chip] & 0x0f);
+		state->m_adpcm_data[chip] = -1;
+		if (state->m_adpcm_pos[chip] == state->m_adpcm_end[chip])
 			msm5205_reset_w(device, 1);
 	}
 	else
 	{
-		state->adpcm_data[chip] = device->machine().region("adpcm")->base()[state->adpcm_pos[chip]];
-		state->adpcm_pos[chip] = (state->adpcm_pos[chip] + 1) & 0x7ffff;
-		msm5205_data_w(device, state->adpcm_data[chip] >> 4);
+		state->m_adpcm_data[chip] = device->machine().region("adpcm")->base()[state->m_adpcm_pos[chip]];
+		state->m_adpcm_pos[chip] = (state->m_adpcm_pos[chip] + 1) & 0x7ffff;
+		msm5205_data_w(device, state->m_adpcm_data[chip] >> 4);
 	}
 }
 
@@ -491,16 +491,16 @@ static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
 	int start;
 	int end;
 
-	state->adpcm_b[offset] = data;
+	state->m_adpcm_b[offset] = data;
 
 	if (offset == 0x04) //trigger ?
 	{
-		start = state->adpcm_b[0] + state->adpcm_b[1] * 256;
-		end   = state->adpcm_b[2] + state->adpcm_b[3] * 256;
+		start = state->m_adpcm_b[0] + state->m_adpcm_b[1] * 256;
+		end   = state->m_adpcm_b[2] + state->m_adpcm_b[3] * 256;
 		start *= 16;
 		end   *= 16;
-		state->adpcm_pos[0] = start;
-		state->adpcm_end[0] = end;
+		state->m_adpcm_pos[0] = start;
+		state->m_adpcm_end[0] = end;
 		msm5205_reset_w(device, 0);
 	}
 
@@ -514,16 +514,16 @@ static WRITE8_DEVICE_HANDLER( opwolf_adpcm_c_w )
 	int start;
 	int end;
 
-	state->adpcm_c[offset] = data;
+	state->m_adpcm_c[offset] = data;
 
 	if (offset == 0x04) //trigger ?
 	{
-		start = state->adpcm_c[0] + state->adpcm_c[1] * 256;
-		end   = state->adpcm_c[2] + state->adpcm_c[3] * 256;
+		start = state->m_adpcm_c[0] + state->m_adpcm_c[1] * 256;
+		end   = state->m_adpcm_c[2] + state->m_adpcm_c[3] * 256;
 		start *= 16;
 		end   *= 16;
-		state->adpcm_pos[1] = start;
-		state->adpcm_end[1] = end;
+		state->m_adpcm_pos[1] = start;
+		state->m_adpcm_end[1] = end;
 		msm5205_reset_w(device, 0);
 	}
 
@@ -696,7 +696,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	opwolf_state *state = device->machine().driver_data<opwolf_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -986,13 +986,13 @@ static DRIVER_INIT( opwolf )
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 	UINT16* rom = (UINT16*)machine.region("maincpu")->base();
 
-	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
+	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
 	opwolf_cchip_init(machine);
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
-	state->opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
-	state->opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
+	state->m_opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
+	state->m_opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
 	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
@@ -1003,11 +1003,11 @@ static DRIVER_INIT( opwolfb )
 	opwolf_state *state = machine.driver_data<opwolf_state>();
 	UINT16* rom = (UINT16*)machine.region("maincpu")->base();
 
-	state->opwolf_region = rom[0x03fffe / 2] & 0xff;
+	state->m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
 	/* bootleg needs different range of raw gun coords */
-	state->opwolf_gun_xoffs = -2;
-	state->opwolf_gun_yoffs = 17;
+	state->m_opwolf_gun_xoffs = -2;
+	state->m_opwolf_gun_yoffs = 17;
 
 	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }

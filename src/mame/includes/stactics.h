@@ -14,28 +14,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* machine state */
-	int    vert_pos;
-	int    horiz_pos;
-	UINT8 *motor_on;
+	int    m_vert_pos;
+	int    m_horiz_pos;
+	UINT8 *m_motor_on;
 
 	/* video state */
-	UINT8 *videoram_b;
-	UINT8 *videoram_d;
-	UINT8 *videoram_e;
-	UINT8 *videoram_f;
-	UINT8 *palette;
-	UINT8 *display_buffer;
-	UINT8 *lamps;
+	UINT8 *m_videoram_b;
+	UINT8 *m_videoram_d;
+	UINT8 *m_videoram_e;
+	UINT8 *m_videoram_f;
+	UINT8 *m_palette;
+	UINT8 *m_display_buffer;
+	UINT8 *m_lamps;
 
-	UINT8  y_scroll_d;
-	UINT8  y_scroll_e;
-	UINT8  y_scroll_f;
-	UINT8  frame_count;
-	UINT8  shot_standby;
-	UINT8  shot_arrive;
-	UINT16 beam_state;
-	UINT16 old_beam_state;
-	UINT16 beam_states_per_frame;
+	UINT8  m_y_scroll_d;
+	UINT8  m_y_scroll_e;
+	UINT8  m_y_scroll_f;
+	UINT8  m_frame_count;
+	UINT8  m_shot_standby;
+	UINT8  m_shot_arrive;
+	UINT16 m_beam_state;
+	UINT16 m_old_beam_state;
+	UINT16 m_beam_states_per_frame;
 };
 
 

@@ -101,8 +101,8 @@ INLINE int adjust_xy(segag80v_state *state, int rawx, int rawy, int *outx, int *
 		*outy &= 0x3ff;
 
 	/* convert into .16 values */
-	*outx = (*outx - (state->min_x - 512)) << 16;
-	*outy = (*outy - (state->min_y - 512)) << 16;
+	*outx = (*outx - (state->m_min_x - 512)) << 16;
+	*outy = (*outy - (state->m_min_y - 512)) << 16;
 	return clipped;
 }
 
@@ -113,7 +113,7 @@ static void sega_generate_vector_list(running_machine &machine)
 	UINT8 *sintable = machine.region("proms")->base();
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
-	UINT8 *vectorram = state->vectorram;
+	UINT8 *vectorram = state->m_vectorram;
 
 	vector_clear_list();
 
@@ -326,10 +326,10 @@ static void sega_generate_vector_list(running_machine &machine)
 VIDEO_START( segag80v )
 {
 	segag80v_state *state = machine.driver_data<segag80v_state>();
-	assert_always(state->vectorram_size != 0, "vectorram==0");
+	assert_always(state->m_vectorram_size != 0, "vectorram==0");
 
-	state->min_x =machine.primary_screen->visible_area().min_x;
-	state->min_y =machine.primary_screen->visible_area().min_y;
+	state->m_min_x =machine.primary_screen->visible_area().min_x;
+	state->m_min_y =machine.primary_screen->visible_area().min_y;
 
 	VIDEO_START_CALL(vector);
 }

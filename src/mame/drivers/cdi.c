@@ -56,13 +56,13 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *************************/
 
 static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16 )
-    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,planea)
-    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,planeb)
+    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planea)
+    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planeb)
 #if ENABLE_UART_PRINTING
     AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
 #endif
 	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdic_ram_r, cdic_ram_w)
-    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,cdic_regs.ram)
+    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,m_cdic_regs.ram)
 	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdic_r, cdic_w)
 	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", slave_r, slave_w)
     //AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
@@ -82,7 +82,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( mcu_input )
 {
     cdi_state *state = field->port->machine().driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 	bool send = false;
 
 	switch((FPTR)param)
@@ -194,23 +194,23 @@ static MACHINE_START( cdi )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
 
-    scc68070_register_globals(machine, &state->scc68070_regs);
+    scc68070_register_globals(machine, &state->m_scc68070_regs);
 }
 
 static MACHINE_RESET( cdi )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
     UINT16 *src   = (UINT16*)machine.region("maincpu")->base();
-    UINT16 *dst   = state->planea;
+    UINT16 *dst   = state->m_planea;
     //device_t *cdrom_dev = machine.device("cdrom");
     memcpy(dst, src, 0x8);
 
-    scc68070_init(machine, &state->scc68070_regs);
+    scc68070_init(machine, &state->m_scc68070_regs);
 
     machine.device("maincpu")->reset();
 
-    state->dmadac[0] = machine.device<dmadac_sound_device>("dac1");
-    state->dmadac[1] = machine.device<dmadac_sound_device>("dac2");
+    state->m_dmadac[0] = machine.device<dmadac_sound_device>("dac1");
+    state->m_dmadac[1] = machine.device<dmadac_sound_device>("dac2");
 }
 
 static MACHINE_RESET( quizrd12 )

@@ -56,7 +56,7 @@ static WRITE8_HANDLER( sspeedr_time_w )
 	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	data = data & 15;
 	output_set_digit_value(0x18 + offset, ls48_map[data]);
-	state->led_TIME[offset] = data;
+	state->m_led_TIME[offset] = data;
 }
 
 
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( sspeedr_score_w )
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
 	output_set_digit_value(offset, ls48_map[data]);
-	state->led_SCORE[offset] = data;
+	state->m_led_SCORE[offset] = data;
 }
 
 

@@ -36,29 +36,29 @@ public:
 	firetrk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 in_service_mode;
-	UINT32 dial[2];
-	UINT8 steer_dir[2];
-	UINT8 steer_flag[2];
-	UINT8 gear;
-	UINT8 *alpha_num_ram;
-	UINT8 *playfield_ram;
-	UINT8 *scroll_x;
-	UINT8 *scroll_y;
-	UINT8 *car_rot;
-	UINT8 *drone_rot;
-	UINT8 *drone_x;
-	UINT8 *drone_y;
-	UINT8 *blink;
-	UINT8 flash;
-	UINT8 crash[2];
-	UINT8 skid[2];
-	bitmap_t *helper1;
-	bitmap_t *helper2;
-	UINT32 color1_mask;
-	UINT32 color2_mask;
-	tilemap_t *tilemap1;
-	tilemap_t *tilemap2;
+	UINT8 m_in_service_mode;
+	UINT32 m_dial[2];
+	UINT8 m_steer_dir[2];
+	UINT8 m_steer_flag[2];
+	UINT8 m_gear;
+	UINT8 *m_alpha_num_ram;
+	UINT8 *m_playfield_ram;
+	UINT8 *m_scroll_x;
+	UINT8 *m_scroll_y;
+	UINT8 *m_car_rot;
+	UINT8 *m_drone_rot;
+	UINT8 *m_drone_x;
+	UINT8 *m_drone_y;
+	UINT8 *m_blink;
+	UINT8 m_flash;
+	UINT8 m_crash[2];
+	UINT8 m_skid[2];
+	bitmap_t *m_helper1;
+	bitmap_t *m_helper2;
+	UINT32 m_color1_mask;
+	UINT32 m_color2_mask;
+	tilemap_t *m_tilemap1;
+	tilemap_t *m_tilemap2;
 };
 
 

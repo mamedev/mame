@@ -25,7 +25,7 @@
 static READ16_HANDLER( fatfury2_protection_16_r )
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	UINT16 res = state->fatfury2_prot_data >> 24;
+	UINT16 res = state->m_fatfury2_prot_data >> 24;
 
 	switch (offset)
 	{
@@ -55,27 +55,27 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 	switch (offset)
 	{
 		case 0x11112/2: /* data == 0x1111; expects 0xff000000 back */
-			state->fatfury2_prot_data = 0xff000000;
+			state->m_fatfury2_prot_data = 0xff000000;
 			break;
 
 		case 0x33332/2: /* data == 0x3333; expects 0x0000ffff back */
-			state->fatfury2_prot_data = 0x0000ffff;
+			state->m_fatfury2_prot_data = 0x0000ffff;
 			break;
 
 		case 0x44442/2: /* data == 0x4444; expects 0x00ff0000 back */
-			state->fatfury2_prot_data = 0x00ff0000;
+			state->m_fatfury2_prot_data = 0x00ff0000;
 			break;
 
 		case 0x55552/2: /* data == 0x5555; read back from 55550, ffff0, 00000, ff000 */
-			state->fatfury2_prot_data = 0xff00ff00;
+			state->m_fatfury2_prot_data = 0xff00ff00;
 			break;
 
 		case 0x56782/2: /* data == 0x1234; read back from 36000 *or* 36004 */
-			state->fatfury2_prot_data = 0xf05a3601;
+			state->m_fatfury2_prot_data = 0xf05a3601;
 			break;
 
 		case 0x42812/2: /* data == 0x1824; read back from 36008 *or* 3600c */
-			state->fatfury2_prot_data = 0x81422418;
+			state->m_fatfury2_prot_data = 0x81422418;
 			break;
 
 		case 0x55550/2:
@@ -85,7 +85,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 		case 0x36004/2:
 		case 0x36008/2:
 		case 0x3600c/2:
-			state->fatfury2_prot_data <<= 8;
+			state->m_fatfury2_prot_data <<= 8;
 			break;
 
 		default:
@@ -103,9 +103,9 @@ void fatfury2_install_protection( running_machine &machine )
 	/* 0x2xxxxx range. There are several checks all around the code. */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x2fffff, FUNC(fatfury2_protection_16_r), FUNC(fatfury2_protection_16_w));
 
-	state->fatfury2_prot_data = 0;
+	state->m_fatfury2_prot_data = 0;
 
-	state->save_item(NAME(state->fatfury2_prot_data));
+	state->save_item(NAME(state->m_fatfury2_prot_data));
 }
 
 
@@ -376,18 +376,18 @@ static READ16_HANDLER( prot_9a37_r )
 static READ16_HANDLER( sma_random_r )
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	UINT16 old = state->neogeo_rng;
+	UINT16 old = state->m_neogeo_rng;
 
-	UINT16 newbit = ((state->neogeo_rng >> 2) ^
-					 (state->neogeo_rng >> 3) ^
-					 (state->neogeo_rng >> 5) ^
-					 (state->neogeo_rng >> 6) ^
-					 (state->neogeo_rng >> 7) ^
-					 (state->neogeo_rng >>11) ^
-					 (state->neogeo_rng >>12) ^
-					 (state->neogeo_rng >>15)) & 1;
+	UINT16 newbit = ((state->m_neogeo_rng >> 2) ^
+					 (state->m_neogeo_rng >> 3) ^
+					 (state->m_neogeo_rng >> 5) ^
+					 (state->m_neogeo_rng >> 6) ^
+					 (state->m_neogeo_rng >> 7) ^
+					 (state->m_neogeo_rng >>11) ^
+					 (state->m_neogeo_rng >>12) ^
+					 (state->m_neogeo_rng >>15)) & 1;
 
-	state->neogeo_rng = (state->neogeo_rng << 1) | newbit;
+	state->m_neogeo_rng = (state->m_neogeo_rng << 1) | newbit;
 
 	return old;
 }
@@ -396,14 +396,14 @@ static READ16_HANDLER( sma_random_r )
 void neogeo_reset_rng( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->neogeo_rng = 0x2345;
+	state->m_neogeo_rng = 0x2345;
 }
 
 
 static void sma_install_random_read_handler( running_machine &machine, int addr1, int addr2 )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->save_item(NAME(state->neogeo_rng));
+	state->save_item(NAME(state->m_neogeo_rng));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(addr1, addr1 + 1, FUNC(sma_random_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(addr2, addr2 + 1, FUNC(sma_random_r));
@@ -463,14 +463,14 @@ void kof2000_install_protection( running_machine &machine )
 static void pvc_w8( running_machine &machine, offs_t offset, UINT8 data )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	*(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset)) = data;
+	*(((UINT8*)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(offset)) = data;
 }
 
 
 static UINT8 pvc_r8( running_machine &machine, offs_t offset )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	return *(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset));
+	return *(((UINT8*)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(offset));
 }
 
 
@@ -505,10 +505,10 @@ static void pvc_write_bankswitch( address_space *space )
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	UINT32 bankaddress;
 
-	bankaddress = ((state->pvc_cartridge_ram[0xff8] >> 8)|(state->pvc_cartridge_ram[0xff9] << 8));
-	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
-	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
-	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
+	bankaddress = ((state->m_pvc_cartridge_ram[0xff8] >> 8)|(state->m_pvc_cartridge_ram[0xff9] << 8));
+	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
+	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
+	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
 	neogeo_set_main_cpu_bank_address(space, bankaddress + 0x100000);
 }
 
@@ -516,7 +516,7 @@ static void pvc_write_bankswitch( address_space *space )
 static READ16_HANDLER( pvc_prot_r )
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	return state->pvc_cartridge_ram[offset];
+	return state->m_pvc_cartridge_ram[offset];
 }
 
 
@@ -524,7 +524,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 {
 	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
-	COMBINE_DATA(&state->pvc_cartridge_ram[offset] );
+	COMBINE_DATA(&state->m_pvc_cartridge_ram[offset] );
 	if (offset == 0xff0)
 		pvc_prot1(space->machine());
 	else if(offset >= 0xff4 && offset <= 0xff5)
@@ -537,8 +537,8 @@ static WRITE16_HANDLER( pvc_prot_w )
 void install_pvc_protection( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
-	state->save_pointer(NAME(state->pvc_cartridge_ram), 0x2000 / 2);
+	state->m_pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
+	state->save_pointer(NAME(state->m_pvc_cartridge_ram), 0x2000 / 2);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2fe000, 0x2fffff, FUNC(pvc_prot_r), FUNC(pvc_prot_w));
 }

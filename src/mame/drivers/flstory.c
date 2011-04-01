@@ -21,30 +21,30 @@
 static READ8_HANDLER( from_snd_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->snd_flag = 0;
-	return state->snd_data;
+	state->m_snd_flag = 0;
+	return state->m_snd_data;
 }
 
 static READ8_HANDLER( snd_flag_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return state->snd_flag | 0xfd;
+	return state->m_snd_flag | 0xfd;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->snd_data = data;
-	state->snd_flag = 2;
+	state->m_snd_data = data;
+	state->m_snd_flag = 2;
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
-	if (state->sound_nmi_enable)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_sound_nmi_enable)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->pending_nmi = 1;
+		state->m_pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -57,23 +57,23 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( nmi_disable_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->sound_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->sound_nmi_enable = 1;
-	if (state->pending_nmi)
+	state->m_sound_nmi_enable = 1;
+	if (state->m_pending_nmi)
 	{
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->pending_nmi = 0;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_pending_nmi = 0;
 	}
 }
 
 static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(flstory_mcu_r, flstory_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -89,8 +89,8 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(onna34ro_mcu_r, onna34ro_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -115,25 +115,25 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
 	flstory_state *state = field->port->machine().driver_data<flstory_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
 }
 
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -150,35 +150,35 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 
 static READ8_HANDLER( rumba_mcu_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd);
+	//printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd);
 
-	if((state->mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
+	if((state->m_mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
 		return 0;
 
-	switch(state->mcu_cmd)
+	switch(state->m_mcu_cmd)
 	{
 		case 0x73: return 0xa4; //initial MCU check
-		case 0x33: return state->mcu_b2_res; //0xb2 result
-		case 0x31: return state->mcu_b1_res; //0xb1 result
+		case 0x33: return state->m_mcu_b2_res; //0xb2 result
+		case 0x31: return state->m_mcu_b1_res; //0xb1 result
 
-		case 0x35: state->mcu_b5_res = 1; state->mcu_b6_res = 1; return 0;
-		case 0x36: return state->mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
-		case 0x37: return state->mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
-		case 0x38: return state->mcu_b6_res; //x value
+		case 0x35: state->m_mcu_b5_res = 1; state->m_mcu_b6_res = 1; return 0;
+		case 0x36: return state->m_mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
+		case 0x37: return state->m_mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
+		case 0x38: return state->m_mcu_b6_res; //x value
 
-		case 0x3b: return state->mcu_bb_res; //0xbb result
+		case 0x3b: return state->m_mcu_bb_res; //0xbb result
 		case 0x40: return 0;
 		case 0x41: return 0;
 		case 0x42:
@@ -205,7 +205,7 @@ static READ8_HANDLER( rumba_mcu_r )
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd); break;
 	}
 
 	return 0;
@@ -214,19 +214,19 @@ static READ8_HANDLER( rumba_mcu_r )
 static WRITE8_HANDLER( rumba_mcu_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//if((state->mcu_cmd & 0xf0) == 0xc0)
+	//if((state->m_mcu_cmd & 0xf0) == 0xc0)
 	//  printf("%02x ",data);
 
-	//if(state->mcu_cmd == 0x42)
+	//if(state->m_mcu_cmd == 0x42)
 	//  printf("\n");
 
-	if(state->mcu_param)
+	if(state->m_mcu_param)
 	{
-		state->mcu_param = 0; // clear param
+		state->m_mcu_param = 0; // clear param
 
-		//printf("%02x %02x\n",state->mcu_cmd,data);
+		//printf("%02x %02x\n",state->m_mcu_cmd,data);
 
-		switch(state->mcu_cmd)
+		switch(state->m_mcu_cmd)
 		{
 			case 0xb0: // counter, used by command 0xb1 (and something else?
 			{
@@ -234,21 +234,21 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
                 */
 
-				state->mcu_counter = data;
+				state->m_mcu_counter = data;
 
 				break;
 			}
 			case 0xb1: // player death sequence, controls X position
 			{
-				state->mcu_b1_res = data;
+				state->m_mcu_b1_res = data;
 
 				/* TODO: this is pretty hard to simulate ... */
-				if(state->mcu_counter >= 0x10)
-					state->mcu_b1_res++; // left
-				else if(state->mcu_counter >= 0x08)
-					state->mcu_b1_res--; // right
+				if(state->m_mcu_counter >= 0x10)
+					state->m_mcu_b1_res++; // left
+				else if(state->m_mcu_counter >= 0x08)
+					state->m_mcu_b1_res--; // right
 				else
-					state->mcu_b1_res++; // left again
+					state->m_mcu_b1_res++; // left again
 
 				break;
 			}
@@ -260,10 +260,10 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 				switch(data)
 				{
-					case 1: state->mcu_b2_res = 0xaa; break; //left
-					case 2: state->mcu_b2_res = 0xaa; break; //right
-					case 4: state->mcu_b2_res = 0xab; break; //down
-					case 8: state->mcu_b2_res = 0xa9; break; //up
+					case 1: state->m_mcu_b2_res = 0xaa; break; //left
+					case 2: state->m_mcu_b2_res = 0xaa; break; //right
+					case 4: state->m_mcu_b2_res = 0xab; break; //down
+					case 8: state->m_mcu_b2_res = 0xa9; break; //up
 				}
 				break;
 			}
@@ -273,15 +273,15 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
                 */
 
-				state->mcu_bb_res = data;
-				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space->device()),state->mcu_cmd,data);
+				state->m_mcu_bb_res = data;
+				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd,data);
 				break;
 			}
 			case 0xb4: // when the bird touches the top / bottom / left / right of the screen, for correct repositioning
 			{
-				state->mcu_b4_cmd = data;
+				state->m_mcu_b4_cmd = data;
 
-				//popmessage("%02x",state->mcu_b4_cmd);
+				//popmessage("%02x",state->m_mcu_b4_cmd);
 
 				/*
                 sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
@@ -301,48 +301,48 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xb5: // bird X coord
 			{
 				/* TODO: values might be off by one */
-				state->mcu_b5_res = data;
+				state->m_mcu_b5_res = data;
 
-				if(state->mcu_b4_cmd == 3) // from right to left
-					state->mcu_b5_res = 0x0d;
+				if(state->m_mcu_b4_cmd == 3) // from right to left
+					state->m_mcu_b5_res = 0x0d;
 
-				if(state->mcu_b4_cmd == 2) // from left to right
-					state->mcu_b5_res = 0xe4;
+				if(state->m_mcu_b4_cmd == 2) // from left to right
+					state->m_mcu_b5_res = 0xe4;
 
 				break;
 			}
 			case 0xb6: // bird Y coord
 			{
-				state->mcu_b6_res = data;
+				state->m_mcu_b6_res = data;
 
-				if(state->mcu_b4_cmd == 1) // from up to down
-					state->mcu_b6_res = 0x04;
+				if(state->m_mcu_b4_cmd == 1) // from up to down
+					state->m_mcu_b6_res = 0x04;
 
-				if(state->mcu_b4_cmd == 4) // from down to up
-					state->mcu_b6_res = 0xdc;
+				if(state->m_mcu_b4_cmd == 4) // from down to up
+					state->m_mcu_b6_res = 0xdc;
 
 				break;
 			}
 		}
 
-		//if((state->mcu_cmd & 0xf0) == 0xc0)
+		//if((state->m_mcu_cmd & 0xf0) == 0xc0)
 		//  printf("%02x ",data);
 
-		//if(state->mcu_cmd == 0xc7)
+		//if(state->m_mcu_cmd == 0xc7)
 		//  printf("\n");
 
 		return;
 	}
 
-	state->mcu_cmd = data;
+	state->m_mcu_cmd = data;
 
-	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && state->mcu_param == 0)
-		state->mcu_param = 1;
+	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && state->m_mcu_param == 0)
+		state->m_mcu_param = 1;
 }
 
 static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 //  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -359,12 +359,12 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 
@@ -379,8 +379,8 @@ static MACHINE_RESET( ta7630 )
 	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		state->vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->vol_ctrl[15 - i], db);*/
+		state->m_vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->m_vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -397,30 +397,30 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
 	flstory_state *state = device->machine().driver_data<flstory_state>();
 
-	state->snd_ctrl0 = data & 0xff;
-	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
+	state->m_snd_ctrl0 = data & 0xff;
+	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(0, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(1, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(2, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
-	sound->set_output_gain(3, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(0, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(1, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(2, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound->set_output_gain(3, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
 
 }
 static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 {
 	flstory_state *state = device->machine().driver_data<flstory_state>();
 
-	state->snd_ctrl1 = data & 0xff;
-	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
+	state->m_snd_ctrl1 = data & 0xff;
+	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
 	device_sound_interface *sound;
 	device->interface(sound);
-	sound->set_output_gain(4, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(5, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(6, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
-	sound->set_output_gain(7, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(4, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(5, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(6, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound->set_output_gain(7, state->m_vol_ctrl[(state->m_snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_2_w )
@@ -428,21 +428,21 @@ static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 	flstory_state *state = device->machine().driver_data<flstory_state>();
 	int i;
 
-	state->snd_ctrl2 = data & 0xff;
-	//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
+	state->m_snd_ctrl2 = data & 0xff;
+	//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
 
 	device_sound_interface *sound;
 	device->interface(sound);
 	for (i = 0; i < 3; i++)
-		sound->set_output_gain(i, state->vol_ctrl[(state->snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
+		sound->set_output_gain(i, state->m_vol_ctrl[(state->m_snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 {
 	flstory_state *state = device->machine().driver_data<flstory_state>();
 
-	state->snd_ctrl3 = data & 0xff;
-	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
+	state->m_snd_ctrl3 = data & 0xff;
+	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
 }
 
 
@@ -1016,40 +1016,40 @@ static MACHINE_START( flstory )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->mcu = machine.device("mcu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_mcu = machine.device("mcu");
 
 	/* video */
-	state->save_item(NAME(state->char_bank));
-	state->save_item(NAME(state->palette_bank));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->gfxctrl));
+	state->save_item(NAME(state->m_char_bank));
+	state->save_item(NAME(state->m_palette_bank));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_gfxctrl));
 	/* sound */
-	state->save_item(NAME(state->snd_data));
-	state->save_item(NAME(state->snd_flag));
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->vol_ctrl));
-	state->save_item(NAME(state->snd_ctrl0));
-	state->save_item(NAME(state->snd_ctrl1));
-	state->save_item(NAME(state->snd_ctrl2));
-	state->save_item(NAME(state->snd_ctrl3));
+	state->save_item(NAME(state->m_snd_data));
+	state->save_item(NAME(state->m_snd_flag));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_vol_ctrl));
+	state->save_item(NAME(state->m_snd_ctrl0));
+	state->save_item(NAME(state->m_snd_ctrl1));
+	state->save_item(NAME(state->m_snd_ctrl2));
+	state->save_item(NAME(state->m_snd_ctrl3));
 	/* mcu */
-	state->save_item(NAME(state->from_main));
-	state->save_item(NAME(state->from_mcu));
-	state->save_item(NAME(state->mcu_sent));
-	state->save_item(NAME(state->main_sent));
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
-	state->save_item(NAME(state->port_b_in));
-	state->save_item(NAME(state->port_b_out));
-	state->save_item(NAME(state->ddr_b));
-	state->save_item(NAME(state->port_c_in));
-	state->save_item(NAME(state->port_c_out));
-	state->save_item(NAME(state->ddr_c));
-	state->save_item(NAME(state->mcu_select));
+	state->save_item(NAME(state->m_from_main));
+	state->save_item(NAME(state->m_from_mcu));
+	state->save_item(NAME(state->m_mcu_sent));
+	state->save_item(NAME(state->m_main_sent));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
+	state->save_item(NAME(state->m_port_b_in));
+	state->save_item(NAME(state->m_port_b_out));
+	state->save_item(NAME(state->m_ddr_b));
+	state->save_item(NAME(state->m_port_c_in));
+	state->save_item(NAME(state->m_port_c_out));
+	state->save_item(NAME(state->m_ddr_c));
+	state->save_item(NAME(state->m_mcu_select));
 }
 
 static MACHINE_RESET( flstory )
@@ -1059,34 +1059,34 @@ static MACHINE_RESET( flstory )
 	MACHINE_RESET_CALL(ta7630);
 
 	/* video */
-	state->char_bank = 0;
-	state->palette_bank = 0;
-	state->flipscreen = 0;
-	state->gfxctrl = 0;
+	state->m_char_bank = 0;
+	state->m_palette_bank = 0;
+	state->m_flipscreen = 0;
+	state->m_gfxctrl = 0;
 	/* sound */
-	state->snd_data = 0;
-	state->snd_flag = 0;
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->snd_ctrl0 = 0;
-	state->snd_ctrl1 = 0;
-	state->snd_ctrl2 = 0;
-	state->snd_ctrl3 = 0;
+	state->m_snd_data = 0;
+	state->m_snd_flag = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_snd_ctrl0 = 0;
+	state->m_snd_ctrl1 = 0;
+	state->m_snd_ctrl2 = 0;
+	state->m_snd_ctrl3 = 0;
 	/* mcu */
-	state->from_main = 0;
-	state->from_mcu = 0;
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
-	state->mcu_select = 0;
+	state->m_from_main = 0;
+	state->m_from_mcu = 0;
+	state->m_mcu_sent = 0;
+	state->m_main_sent = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_port_c_in = 0;
+	state->m_port_c_out = 0;
+	state->m_ddr_c = 0;
+	state->m_mcu_select = 0;
 }
 
 static MACHINE_CONFIG_START( flstory, flstory_state )
@@ -1268,7 +1268,7 @@ static MACHINE_RESET( rumba )
 {
 	flstory_state *state = machine.driver_data<flstory_state>();
 	MACHINE_RESET_CALL(flstory);
-	state->mcu_cmd = 0;
+	state->m_mcu_cmd = 0;
 }
 
 static MACHINE_CONFIG_START( rumba, flstory_state )

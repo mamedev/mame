@@ -26,7 +26,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
     */
 
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
-	const UINT16 *source = state->spriteram;
+	const UINT16 *source = state->m_spriteram;
 	const UINT16 *finish = source + 0x2000;
 	const gfx_element *gfx = machine.gfx[0];
 
@@ -73,9 +73,9 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	int tileno, colour, fx;
 
-	tileno = state->videoram1[tile_index * 2 + 1];
-	colour = state->videoram1[tile_index * 2] & 0x000f;
-	fx = (state->videoram1[tile_index * 2] & 0xc0) >> 6;
+	tileno = state->m_videoram1[tile_index * 2 + 1];
+	colour = state->m_videoram1[tile_index * 2] & 0x000f;
+	fx = (state->m_videoram1[tile_index * 2] & 0xc0) >> 6;
 
 	SET_TILE_INFO(1, tileno, colour, TILE_FLIPYX(fx));
 }
@@ -84,8 +84,8 @@ WRITE16_HANDLER( mugsmash_videoram1_w )
 {
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->videoram1[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap1, offset / 2);
+	state->m_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap1, offset / 2);
 }
 
 static TILE_GET_INFO( get_mugsmash_tile_info2 )
@@ -102,9 +102,9 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 	int tileno, colour, fx;
 
-	tileno = state->videoram2[tile_index * 2 + 1];
-	colour = state->videoram2[tile_index * 2] & 0x000f;
-	fx = (state->videoram2[tile_index * 2] & 0xc0) >> 6;
+	tileno = state->m_videoram2[tile_index * 2 + 1];
+	colour = state->m_videoram2[tile_index * 2] & 0x000f;
+	fx = (state->m_videoram2[tile_index * 2] & 0xc0) >> 6;
 
 	SET_TILE_INFO(1, tileno, 16 + colour, TILE_FLIPYX(fx));
 }
@@ -113,30 +113,30 @@ WRITE16_HANDLER( mugsmash_videoram2_w )
 {
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap2, offset / 2);
+	state->m_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap2, offset / 2);
 }
 
 WRITE16_HANDLER (mugsmash_reg_w)
 {
 	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->regs1[offset] = data;
+	state->m_regs1[offset] = data;
 //  popmessage ("Regs %04x, %04x, %04x, %04x", mugsmash_regs1[0], mugsmash_regs1[1],mugsmash_regs1[2], mugsmash_regs1[3]);
 
 	switch (offset)
 	{
 	case 0:
-		tilemap_set_scrollx(state->tilemap2, 0, state->regs1[2] + 7);
+		tilemap_set_scrollx(state->m_tilemap2, 0, state->m_regs1[2] + 7);
 		break;
 	case 1:
-		tilemap_set_scrolly(state->tilemap2, 0, state->regs1[3] + 4);
+		tilemap_set_scrolly(state->m_tilemap2, 0, state->m_regs1[3] + 4);
 		break;
 	case 2:
-		tilemap_set_scrollx(state->tilemap1, 0, state->regs1[0] + 3);
+		tilemap_set_scrollx(state->m_tilemap1, 0, state->m_regs1[0] + 3);
 		break;
 	case 3:
-		tilemap_set_scrolly(state->tilemap1, 0, state->regs1[1] + 4);
+		tilemap_set_scrolly(state->m_tilemap1, 0, state->m_regs1[1] + 4);
 		break;
 	}
 }
@@ -145,18 +145,18 @@ VIDEO_START( mugsmash )
 {
 	mugsmash_state *state = machine.driver_data<mugsmash_state>();
 
-	state->tilemap1 = tilemap_create(machine, get_mugsmash_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
-	tilemap_set_transparent_pen(state->tilemap1, 0);
+	state->m_tilemap1 = tilemap_create(machine, get_mugsmash_tile_info1, tilemap_scan_rows, 16, 16, 32, 32);
+	tilemap_set_transparent_pen(state->m_tilemap1, 0);
 
-	state->tilemap2 = tilemap_create(machine, get_mugsmash_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_tilemap2 = tilemap_create(machine, get_mugsmash_tile_info2, tilemap_scan_rows, 16, 16, 32, 32);
 }
 
 SCREEN_UPDATE( mugsmash )
 {
 	mugsmash_state *state = screen->machine().driver_data<mugsmash_state>();
 
-	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap1, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

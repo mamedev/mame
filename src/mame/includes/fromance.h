@@ -14,33 +14,43 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers (used by pipedrm) */
-	UINT8 *  videoram;
-	UINT8 *  spriteram;
-//  UINT8 *  paletteram;    // currently this uses generic palette handling
-	size_t   videoram_size;
-	size_t   spriteram_size;
+	UINT8 *  m_videoram;
+	UINT8 *  m_spriteram;
+//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
+	size_t   m_videoram_size;
+	size_t   m_spriteram_size;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*fg_tilemap;
-	UINT8    *local_videoram[2];
-	UINT8    *local_paletteram;
-	UINT8    selected_videoram, selected_paletteram;
-	UINT32   scrollx[2], scrolly[2];
-	UINT8    gfxreg;
-	UINT8    flipscreen, flipscreen_old;
-	UINT32   scrolly_ofs, scrollx_ofs;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	UINT8    *m_local_videoram[2];
+	UINT8    *m_local_paletteram;
+	UINT8    m_selected_videoram;
+	UINT8    m_selected_paletteram;
+	UINT32   m_scrollx[2];
+	UINT32   m_scrolly[2];
+	UINT8    m_gfxreg;
+	UINT8    m_flipscreen;
+	UINT8    m_flipscreen_old;
+	UINT32   m_scrolly_ofs;
+	UINT32   m_scrollx_ofs;
 
-	UINT8    crtc_register;
-	UINT8    crtc_data[0x10];
-	emu_timer *crtc_timer;
+	UINT8    m_crtc_register;
+	UINT8    m_crtc_data[0x10];
+	emu_timer *m_crtc_timer;
 
 	/* misc */
-	UINT8    directionflag, commanddata, portselect;
-	UINT8    adpcm_reset, adpcm_data, vclk_left;
-	UINT8    pending_command, sound_command;
+	UINT8    m_directionflag;
+	UINT8    m_commanddata;
+	UINT8    m_portselect;
+	UINT8    m_adpcm_reset;
+	UINT8    m_adpcm_data;
+	UINT8    m_vclk_left;
+	UINT8    m_pending_command;
+	UINT8    m_sound_command;
 
 	/* devices */
-	device_t *subcpu;
+	device_t *m_subcpu;
 };
 
 

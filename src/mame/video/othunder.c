@@ -9,7 +9,7 @@ VIDEO_START( othunder )
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
 	othunder_state *state = machine.driver_data<othunder_state>();
-	state->spritelist = auto_alloc_array(machine, struct othunder_tempsprite, 0x2000);
+	state->m_spritelist = auto_alloc_array(machine, struct othunder_tempsprite, 0x2000);
 }
 
 
@@ -68,7 +68,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	othunder_state *state = machine.driver_data<othunder_state>();
 	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
 	UINT16 tile_mask = (machine.gfx[0]->total_elements) - 1;
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -78,9 +78,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
        while processing sprite ram and then draw them all at the end */
-	struct othunder_tempsprite *sprite_ptr = state->spritelist;
+	struct othunder_tempsprite *sprite_ptr = state->m_spritelist;
 
-	for (offs = (state->spriteram_size / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram_size / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram16[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -181,7 +181,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->spritelist)
+	while (sprite_ptr != state->m_spritelist)
 	{
 		sprite_ptr--;
 
@@ -205,9 +205,9 @@ SCREEN_UPDATE( othunder )
 	othunder_state *state = screen->machine().driver_data<othunder_state>();
 	int layer[3];
 
-	tc0100scn_tilemap_update(state->tc0100scn);
+	tc0100scn_tilemap_update(state->m_tc0100scn);
 
-	layer[0] = tc0100scn_bottomlayer(state->tc0100scn);
+	layer[0] = tc0100scn_bottomlayer(state->m_tc0100scn);
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
@@ -216,9 +216,9 @@ SCREEN_UPDATE( othunder )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[1], 0, 2);
-	tc0100scn_tilemap_draw(state->tc0100scn, bitmap, cliprect, layer[2], 0, 4);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[1], 0, 2);
+	tc0100scn_tilemap_draw(state->m_tc0100scn, bitmap, cliprect, layer[2], 0, 4);
 
 	/* Sprites can be under/over the layer below text layer */
 	{

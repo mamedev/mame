@@ -251,7 +251,7 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 			data = (input_port_read(space->machine(), "EXTRA") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read(space->machine(), "OTHER") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine(), "MISC") & 0x38) << 8) | (state->vblank << 8);
+			data = (input_port_read(space->machine(), "OTHER") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0xc0) << 2) | ((input_port_read(space->machine(), "MISC") & 0x38) << 8) | (state->m_vblank << 8);
 			break;
 	}
 
@@ -285,29 +285,29 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 {
 	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
-	state->video_enable = data & 8;	/* probably */
+	state->m_irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
+	state->m_video_enable = data & 8;	/* probably */
 
 	/* check if there's a high transition to enable the raster IRQ */
-	if((~state->prev_value & 4) && (data & 4))
+	if((~state->m_prev_value & 4) && (data & 4))
 	{
-		state->raster_irq_enable = 1;
+		state->m_raster_irq_enable = 1;
 	}
 
 	/* check if there's a low transition to disable the raster IRQ */
-	if((state->prev_value & 4) && (~data & 4))
+	if((state->m_prev_value & 4) && (~data & 4))
 	{
-		state->raster_irq_enable = 0;
+		state->m_raster_irq_enable = 0;
 	}
 
-	state->prev_value = data;
+	state->m_prev_value = data;
 }
 
 static WRITE16_HANDLER( shadfrce_scanline_w )
 {
 	shadfrce_state *state = space->machine().driver_data<shadfrce_state>();
 
-	state->raster_scanline = data;	/* guess, 0 is always written */
+	state->m_raster_scanline = data;	/* guess, 0 is always written */
 }
 
 static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
@@ -318,28 +318,28 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
-		state->vblank = 0;
+		state->m_vblank = 0;
 	}
 	/* Hack */
 	else if (scanline == (248-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
-		state->vblank = 4;
+		state->m_vblank = 4;
 	}
 
 	/* Raster interrupt - Perform raster effect on given scanline */
-	if (state->raster_irq_enable)
+	if (state->m_raster_irq_enable)
 	{
-		if (scanline == state->raster_scanline)
+		if (scanline == state->m_raster_scanline)
 		{
-			state->raster_scanline = (state->raster_scanline + 1) % 240;
-			if (state->raster_scanline > 0)
-				timer.machine().primary_screen->update_partial(state->raster_scanline - 1);
+			state->m_raster_scanline = (state->m_raster_scanline + 1) % 240;
+			if (state->m_raster_scanline > 0)
+				timer.machine().primary_screen->update_partial(state->m_raster_scanline - 1);
 			cputag_set_input_line(timer.machine(), "maincpu", 1, ASSERT_LINE);
 		}
 	}
 
 	/* An interrupt is generated every 16 scanlines */
-	if (state->irqs_enable)
+	if (state->m_irqs_enable)
 	{
 		if (scanline % 16 == 0)
 		{
@@ -350,7 +350,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	}
 
 	/* Vblank is raised on scanline 248 */
-	if (state->irqs_enable)
+	if (state->m_irqs_enable)
 	{
 		if (scanline == 248)
 		{
@@ -366,12 +366,12 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 
 static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE_MEMBER(shadfrce_state,bg0videoram) /* video */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE_MEMBER(shadfrce_state,m_bg0videoram) /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE_MEMBER(shadfrce_state,bg1videoram) /* bg 2 */
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE_MEMBER(shadfrce_state,m_bg1videoram) /* bg 2 */
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE_MEMBER(shadfrce_state,fgvideoram)
-	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE_MEMBER(shadfrce_state,spvideoram) AM_SIZE_MEMBER(shadfrce_state,spvideoram_size) /* sprites */
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE_MEMBER(shadfrce_state,m_fgvideoram)
+	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE_MEMBER(shadfrce_state,m_spvideoram) AM_SIZE_MEMBER(shadfrce_state,m_spvideoram_size) /* sprites */
 	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */

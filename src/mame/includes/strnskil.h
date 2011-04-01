@@ -4,12 +4,12 @@ public:
 	strnskil_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *xscroll;
-	UINT8 scrl_ctrl;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	UINT8 *m_xscroll;
+	UINT8 m_scrl_ctrl;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

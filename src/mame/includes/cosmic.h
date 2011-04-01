@@ -15,27 +15,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        videoram;
-	UINT8 *        spriteram;
-	size_t         videoram_size;
-	size_t         spriteram_size;
+	UINT8 *        m_videoram;
+	UINT8 *        m_spriteram;
+	size_t         m_videoram_size;
+	size_t         m_spriteram_size;
 
 	/* video-related */
-	pen_t          (*map_color)(running_machine &machine, UINT8 x, UINT8 y);
-	int            color_registers[3];
-	int            background_enable;
-	int            magspot_pen_mask;
+	pen_t          (*m_map_color)(running_machine &machine, UINT8 x, UINT8 y);
+	int            m_color_registers[3];
+	int            m_background_enable;
+	int            m_magspot_pen_mask;
 
 	/* sound-related */
-	int            sound_enabled;
-	int            march_select, gun_die_select, dive_bomb_b_select;
+	int            m_sound_enabled;
+	int            m_march_select;
+	int            m_gun_die_select;
+	int            m_dive_bomb_b_select;
 
 	/* misc */
-	UINT32         pixel_clock;
+	UINT32         m_pixel_clock;
 
 	/* devices */
-	device_t *samples;
-	device_t *dac;
+	device_t *m_samples;
+	device_t *m_dac;
 };
 
 

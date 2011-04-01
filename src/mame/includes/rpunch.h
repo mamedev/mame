@@ -4,21 +4,21 @@ public:
 	rpunch_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT8 sound_data;
-	UINT8 sound_busy;
-	UINT8 ym2151_irq;
-	UINT8 upd_rom_bank;
-	UINT16 *bitmapram;
-	size_t bitmapram_size;
-	int sprite_palette;
-	tilemap_t *background[2];
-	UINT16 videoflags;
-	UINT8 crtc_register;
-	emu_timer *crtc_timer;
-	UINT8 bins;
-	UINT8 gins;
-	UINT16 *spriteram;
+	UINT16 *m_videoram;
+	UINT8 m_sound_data;
+	UINT8 m_sound_busy;
+	UINT8 m_ym2151_irq;
+	UINT8 m_upd_rom_bank;
+	UINT16 *m_bitmapram;
+	size_t m_bitmapram_size;
+	int m_sprite_palette;
+	tilemap_t *m_background[2];
+	UINT16 m_videoflags;
+	UINT8 m_crtc_register;
+	emu_timer *m_crtc_timer;
+	UINT8 m_bins;
+	UINT8 m_gins;
+	UINT16 *m_spriteram;
 };
 
 

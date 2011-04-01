@@ -33,9 +33,9 @@
 static void update_interrupts(running_machine &machine)
 {
 	skullxbo_state *state = machine.driver_data<skullxbo_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 4, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -48,11 +48,11 @@ static TIMER_CALLBACK( irq_gen )
 static void alpha_row_update(screen_device &screen, int scanline)
 {
 	skullxbo_state *state = screen.machine().driver_data<skullxbo_state>();
-	UINT16 *check = &state->alpha[(scanline / 8) * 64 + 42];
+	UINT16 *check = &state->m_alpha[(scanline / 8) * 64 + 42];
 
 	/* check for interrupts in the alpha ram */
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
-	if (check < &state->alpha[0x7c0] && (*check & 0x8000))
+	if (check < &state->m_alpha[0x7c0] && (*check & 0x8000))
 	{
 		int	width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
@@ -98,7 +98,7 @@ static READ16_HANDLER( special_port1_r )
 {
 	skullxbo_state *state = space->machine().driver_data<skullxbo_state>();
 	int temp = input_port_read(space->machine(), "FF5802");
-	if (state->cpu_to_sound_ready) temp ^= 0x0040;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(*space->machine().primary_screen)) temp ^= 0x0010;
 	return temp;
 }
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff1400, 0xff17ff) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff1800, 0xff1bff) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xff1c00, 0xff1c7f) AM_WRITE(skullxbo_playfieldlatch_w)
-	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_BASE_MEMBER(skullxbo_state, xscroll)
+	AM_RANGE(0xff1c80, 0xff1cff) AM_WRITE(skullxbo_xscroll_w) AM_BASE_MEMBER(skullxbo_state, m_xscroll)
 	AM_RANGE(0xff1d00, 0xff1d7f) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff1d80, 0xff1dff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff1e00, 0xff1e7f) AM_WRITE(skullxbo_playfieldlatch_w)
@@ -141,16 +141,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff1f00, 0xff1f7f) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff1f80, 0xff1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_BASE_MEMBER(skullxbo_state, yscroll)
+	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_BASE_MEMBER(skullxbo_state, m_yscroll)
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff5000, 0xff5001) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ(atarigen_eeprom_r)
-	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(skullxbo_state, playfield)
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(skullxbo_state, playfield_upper)
-	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(skullxbo_state, alpha)
+	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(skullxbo_state, m_playfield)
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(skullxbo_state, m_playfield_upper)
+	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(skullxbo_state, m_alpha)
 	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM

@@ -896,7 +896,7 @@ static void parse_control( running_machine &machine )
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -907,18 +907,18 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
-	state->cpua_ctrl = data;
+	state->m_cpua_ctrl = data;
 
 	parse_control(space->machine());
 
 	// Chase HQ: handle the lights
-	if (state->chasehq_lamps)
+	if (state->m_chasehq_lamps)
 	{
 		output_set_lamp_value(0, (data & 0x20) ? 1 : 0);
 		output_set_lamp_value(1, (data & 0x40) ? 1 : 0);
 	}
 
-	if (state->dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
+	if (state->m_dblaxle_vibration) output_set_value("Wheel_Vibration", (data & 0x04)>>2);
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
 }
 
@@ -932,7 +932,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -940,14 +940,14 @@ static TIMER_CALLBACK( taitoz_interrupt6 )
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->subcpu, 5, HOLD_LINE);
+	device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	device_set_input_line(state->subcpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);
 }
 #endif
 
@@ -962,9 +962,9 @@ static INTERRUPT_GEN( sci_interrupt )
        so in theory only needs updating every other frame. */
 
 	taitoz_state *state = device->machine().driver_data<taitoz_state>();
-	state->sci_int6 = !state->sci_int6;
+	state->m_sci_int6 = !state->m_sci_int6;
 
-	if (state->sci_int6)
+	if (state->m_sci_int6)
 		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
 	device_set_input_line(device, 4, HOLD_LINE);
@@ -980,9 +980,9 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	// Unsure how many int6's per frame, copy SCI for now
 
 	taitoz_state *state = device->machine().driver_data<taitoz_state>();
-	state->dblaxle_int6 = !state->dblaxle_int6;
+	state->m_dblaxle_int6 = !state->m_dblaxle_int6;
 
-	if (state->dblaxle_int6)
+	if (state->m_dblaxle_int6)
 		device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
 	device_set_input_line(device, 4, HOLD_LINE);
@@ -1030,7 +1030,7 @@ static const eeprom_interface spacegun_eeprom_intf =
 static READ16_HANDLER( eep_latch_r )
 {
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	return state->eep_latch;
+	return state->m_eep_latch;
 }
 #endif
 
@@ -1048,12 +1048,12 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
             0x000000    eeprom data
             x0000000    (unused)                  */
 
-			COMBINE_DATA(&state->eep_latch);
+			COMBINE_DATA(&state->m_eep_latch);
 			input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 			break;
 
 		default:
-			tc0220ioc_w(state->tc0220ioc, offset, data);	/* might be a 510NIO ! */
+			tc0220ioc_w(state->m_tc0220ioc, offset, data);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1067,7 +1067,7 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 	/* Bypass TC0220IOC controller for analog input */
 
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(state->m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine(), "FAKE");
 
@@ -1098,7 +1098,7 @@ static READ8_HANDLER( contcirc_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->m_tc0220ioc, offset);
 	}
 }
 
@@ -1108,7 +1108,7 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 	/* Bypass TC0220IOC controller for extra inputs */
 
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(state->m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int fake = input_port_read(space->machine(), "FAKE");
 
@@ -1150,7 +1150,7 @@ static READ8_HANDLER( chasehq_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->m_tc0220ioc, offset);
 	}
 }
 
@@ -1256,10 +1256,10 @@ static READ16_HANDLER( spacegun_input_bypass_r )
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_read_bit(state->eeprom) << 7;
+			return eeprom_read_bit(state->m_eeprom) << 7;
 
 		default:
-			return tc0220ioc_r(state->tc0220ioc, offset);	/* might be a 510NIO ! */
+			return tc0220ioc_r(state->m_tc0220ioc, offset);	/* might be a 510NIO ! */
 	}
 }
 
@@ -1423,14 +1423,14 @@ static READ16_HANDLER( aquajack_unknown_r )
 static void reset_sound_region( running_machine &machine )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	memory_set_bank(machine,  "bank10", state->banknum);
+	memory_set_bank(machine,  "bank10", state->m_banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
-	state->banknum = data & 7;
+	state->m_banknum = data & 7;
 	reset_sound_region(space->machine());
 }
 
@@ -1439,9 +1439,9 @@ static WRITE16_HANDLER( taitoz_sound_w )
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 0)
-		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1459,7 +1459,7 @@ static READ16_HANDLER( taitoz_sound_r )
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 1)
-		return (tc0140syt_comm_r(state->tc0140syt, 0) & 0xff);
+		return (tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff);
 	else
 		return 0;
 }
@@ -1470,9 +1470,9 @@ static WRITE16_HANDLER( taitoz_msb_sound_w )
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 0)
-		tc0140syt_port_w(state->tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_port_w(state->m_tc0140syt, 0, (data >> 8) & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->tc0140syt, 0, (data >> 8) & 0xff);
+		tc0140syt_comm_w(state->m_tc0140syt, 0, (data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -1490,7 +1490,7 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff) << 8);
+		return ((tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff) << 8);
 	else
 		return 0;
 }
@@ -1505,8 +1505,8 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 
 	offset = offset & 3;
 
-//  state->pandata[offset] = data;
-//  popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
+//  state->m_pandata[offset] = data;
+//  popmessage(" pan %02x %02x %02x %02x", state->m_pandata[0], state->m_pandata[1], state->m_pandata[2], state->m_pandata[3] );
 
 	flt_volume_set_volume(space->machine().device(fltname[offset & 3]), data / 255.0f);
 }
@@ -1532,7 +1532,7 @@ static ADDRESS_MAP_START( contcirc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x301fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)	/* "root ram" */
-	AM_RANGE(0x400000, 0x4006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0x400000, 0x4006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16 )
@@ -1557,7 +1557,7 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe00000, 0xe003ff) AM_READWRITE(chasehq_motor_r, chasehq_motor_w)	/* motor cpu */
 ADDRESS_MAP_END
 
@@ -1574,7 +1574,7 @@ static ADDRESS_MAP_START( enforce_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(cpua_ctrl_w)	// works without?
-	AM_RANGE(0x300000, 0x3006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0x300000, 0x3006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)	/* "root ram" ??? */
 	AM_RANGE(0x500000, 0x500007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
@@ -1599,7 +1599,7 @@ static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
@@ -1629,7 +1629,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)
 ADDRESS_MAP_END
 
@@ -1651,7 +1651,7 @@ static ADDRESS_MAP_START( nightstr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe00000, 0xe00011) AM_WRITE(nightstr_motor_w)    /* Motor outputs */
 	AM_RANGE(0xe40000, 0xe40007) AM_READWRITE(nightstr_stick_r, bshark_stick_w)
 ADDRESS_MAP_END
@@ -1673,7 +1673,7 @@ static ADDRESS_MAP_START( aquajack_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_DEVREADWRITE("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0xc40000, 0xc403ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0xc40000, 0xc403ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16 )
@@ -1692,7 +1692,7 @@ static ADDRESS_MAP_START( spacegun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x30c000, 0x30ffff) AM_RAM
 	AM_RANGE(0x310000, 0x31ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x500000, 0x5005ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size)
+	AM_RANGE(0x500000, 0x5005ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
@@ -1724,7 +1724,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemap mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size) /* mostly unused ? */
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size) /* mostly unused ? */
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* set in int6, seems to stay zero */
 ADDRESS_MAP_END
 
@@ -1748,7 +1748,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_word_r, tc0480scp_word_w)	  /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, spriteram, spriteram_size) /* mostly unused ? */
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size) /* mostly unused ? */
 	AM_RANGE(0xb08000, 0xb08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* alternates 0/0x100 */
 ADDRESS_MAP_END
 
@@ -2805,7 +2805,7 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 static void irqhandler(device_t *device, int irq)
 {
 	taitoz_state *state = device->machine().driver_data<taitoz_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
@@ -2813,7 +2813,7 @@ static void irqhandlerb(device_t *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
 //  taitoz_state *state = device->machine().driver_data<taitoz_state>();
-//  device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2968,24 +2968,24 @@ static MACHINE_START( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->subcpu = machine.device("sub");
-	state->audiocpu = machine.device("audiocpu");
-	state->eeprom = machine.device("eeprom");
-	state->tc0100scn = machine.device("tc0100scn");
-	state->tc0150rod = machine.device("tc0150rod");
-	state->tc0480scp = machine.device("tc0480scp");
-	state->tc0220ioc = machine.device("tc0220ioc");
-	state->tc0140syt = machine.device("tc0140syt");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_eeprom = machine.device("eeprom");
+	state->m_tc0100scn = machine.device("tc0100scn");
+	state->m_tc0150rod = machine.device("tc0150rod");
+	state->m_tc0480scp = machine.device("tc0480scp");
+	state->m_tc0220ioc = machine.device("tc0220ioc");
+	state->m_tc0140syt = machine.device("tc0140syt");
 
-	state->save_item(NAME(state->cpua_ctrl));
+	state->save_item(NAME(state->m_cpua_ctrl));
 
 	/* these are specific to various games: we ought to split the inits */
-	state->save_item(NAME(state->sci_int6));
-	state->save_item(NAME(state->dblaxle_int6));
-	state->save_item(NAME(state->ioc220_port));
+	state->save_item(NAME(state->m_sci_int6));
+	state->save_item(NAME(state->m_dblaxle_int6));
+	state->save_item(NAME(state->m_ioc220_port));
 
-	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->m_banknum));
 }
 
 static MACHINE_START( taitoz )
@@ -3003,11 +3003,11 @@ static MACHINE_RESET( taitoz )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
 
-	state->banknum = -1;
-	state->cpua_ctrl = 0xff;
-	state->sci_int6 = 0;
-	state->dblaxle_int6 = 0;
-	state->ioc220_port = 0;
+	state->m_banknum = -1;
+	state->m_cpua_ctrl = 0xff;
+	state->m_sci_int6 = 0;
+	state->m_dblaxle_int6 = 0;
+	state->m_ioc220_port = 0;
 }
 
 /* Contcirc vis area seems narrower than the other games... */
@@ -4865,15 +4865,15 @@ ROM_END
 static DRIVER_INIT( taitoz )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->chasehq_lamps = 0;
-	state->dblaxle_vibration = 0;
+	state->m_chasehq_lamps = 0;
+	state->m_dblaxle_vibration = 0;
 }
 
 static DRIVER_INIT( dblaxle )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->chasehq_lamps = 0;
-	state->dblaxle_vibration = 1;
+	state->m_chasehq_lamps = 0;
+	state->m_dblaxle_vibration = 1;
 }
 
 static STATE_POSTLOAD( bshark_postload )
@@ -4884,19 +4884,19 @@ static STATE_POSTLOAD( bshark_postload )
 static DRIVER_INIT( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->chasehq_lamps = 0;
-	state->dblaxle_vibration = 0;
-	state->eep_latch = 0;
+	state->m_chasehq_lamps = 0;
+	state->m_dblaxle_vibration = 0;
+	state->m_eep_latch = 0;
 
 	machine.state().register_postload(bshark_postload, NULL);
-	state->save_item(NAME(state->eep_latch));
+	state->save_item(NAME(state->m_eep_latch));
 }
 
 static DRIVER_INIT( chasehq )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->chasehq_lamps = 1;
-	state->dblaxle_vibration = 0;
+	state->m_chasehq_lamps = 1;
+	state->m_dblaxle_vibration = 0;
 }
 
 

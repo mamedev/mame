@@ -15,31 +15,31 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 *mayday_protection;
-	UINT8 *videoram;
-	UINT8 *williams2_tileram;
-	UINT8 *blaster_palette_0;
-	UINT8 *blaster_scanline_control;
-	UINT8 blitter_config;
-	UINT16 blitter_clip_address;
-	UINT8 blitter_window_enable;
-	UINT8 williams2_tilemap_config;
-	UINT8 cocktail;
-	UINT8 blaster_bank;
-	UINT8 vram_bank;
-	UINT16 joust2_current_sound_data;
-	UINT8 port_select;
-	rgb_t *palette_lookup;
-	UINT8 blitterram[8];
-	UINT8 blitter_xor;
-	UINT8 blitter_remap_index;
-	const UINT8 *blitter_remap;
-	UINT8 *blitter_remap_lookup;
-	rgb_t blaster_color0;
-	UINT8 blaster_video_control;
-	tilemap_t *bg_tilemap;
-	UINT16 tilemap_xscroll;
-	UINT8 williams2_fg_color;
+	UINT8 *m_mayday_protection;
+	UINT8 *m_videoram;
+	UINT8 *m_williams2_tileram;
+	UINT8 *m_blaster_palette_0;
+	UINT8 *m_blaster_scanline_control;
+	UINT8 m_blitter_config;
+	UINT16 m_blitter_clip_address;
+	UINT8 m_blitter_window_enable;
+	UINT8 m_williams2_tilemap_config;
+	UINT8 m_cocktail;
+	UINT8 m_blaster_bank;
+	UINT8 m_vram_bank;
+	UINT16 m_joust2_current_sound_data;
+	UINT8 m_port_select;
+	rgb_t *m_palette_lookup;
+	UINT8 m_blitterram[8];
+	UINT8 m_blitter_xor;
+	UINT8 m_blitter_remap_index;
+	const UINT8 *m_blitter_remap;
+	UINT8 *m_blitter_remap_lookup;
+	rgb_t m_blaster_color0;
+	UINT8 m_blaster_video_control;
+	tilemap_t *m_bg_tilemap;
+	UINT16 m_tilemap_xscroll;
+	UINT8 m_williams2_fg_color;
 };
 
 

@@ -376,7 +376,7 @@ VIDEO_START(skns)
 {
 	skns_state *state = machine.driver_data<skns_state>();
 
-	state->spritegen = machine.device<sknsspr_device>("spritegen");
+	state->m_spritegen = machine.device<sknsspr_device>("spritegen");
 
 	skns_tilemap_A = tilemap_create(machine, get_tilemap_A_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_A,0);
@@ -647,7 +647,7 @@ SCREEN_UPDATE(skns)
 	bitmap_fill(sprite_bitmap, cliprect, 0x0000);
 
 	if (suprnova_alt_enable_sprites)
-		state->spritegen->skns_draw_sprites(screen->machine(), sprite_bitmap, cliprect, screen->machine().generic.spriteram.u32, screen->machine().generic.spriteram_size, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), skns_spc_regs );
+		state->m_spritegen->skns_draw_sprites(screen->machine(), sprite_bitmap, cliprect, screen->machine().generic.spriteram.u32, screen->machine().generic.spriteram_size, screen->machine().region("gfx1")->base(), screen->machine().region ("gfx1")->bytes(), skns_spc_regs );
 
 
 	return 0;

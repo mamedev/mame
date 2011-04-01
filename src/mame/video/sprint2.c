@@ -37,7 +37,7 @@ PALETTE_INIT( sprint2 )
 static TILE_GET_INFO( get_tile_info )
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 code = state->video_ram[tile_index];
+	UINT8 code = state->m_video_ram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x3f, code >> 7, 0);
 }
@@ -46,41 +46,41 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( sprint2 )
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	state->helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
 
 
 READ8_HANDLER( sprint2_collision1_r )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->collision[0];
+	return state->m_collision[0];
 }
 READ8_HANDLER( sprint2_collision2_r )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->collision[1];
+	return state->m_collision[1];
 }
 
 
 WRITE8_HANDLER( sprint2_collision_reset1_w )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->collision[0] = 0;
+	state->m_collision[0] = 0;
 }
 WRITE8_HANDLER( sprint2_collision_reset2_w )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->collision[1] = 0;
+	state->m_collision[1] = 0;
 }
 
 
 WRITE8_HANDLER( sprint2_video_ram_w )
 {
 	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -94,7 +94,7 @@ static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rec
 	for (y = rect->min_y; y <= rect->max_y; y++)
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, *BITMAP_ADDR16(state->helper, y, x));
+			UINT16 a = colortable_entry_get_value(colortable, *BITMAP_ADDR16(state->m_helper, y, x));
 
 			if (a == 0)
 				data |= 0x40;
@@ -124,10 +124,10 @@ INLINE int get_sprite_y(UINT8 *video_ram, int n)
 SCREEN_UPDATE( sprint2 )
 {
 	sprint2_state *state = screen->machine().driver_data<sprint2_state>();
-	UINT8 *video_ram = state->video_ram;
+	UINT8 *video_ram = state->m_video_ram;
 	int i;
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the sprites */
 
@@ -147,7 +147,7 @@ SCREEN_UPDATE( sprint2 )
 SCREEN_EOF( sprint2 )
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 *video_ram = state->video_ram;
+	UINT8 *video_ram = state->m_video_ram;
 	int i;
 	int j;
 	const rectangle &visarea = machine.primary_screen->visible_area();
@@ -155,8 +155,8 @@ SCREEN_EOF( sprint2 )
 	/*
      * Collisions are detected for both player cars:
      *
-     * D7 => state->collision w/ white playfield
-     * D6 => state->collision w/ black playfield or another car
+     * D7 => state->m_collision w/ white playfield
+     * D6 => state->m_collision w/ black playfield or another car
      *
      */
 
@@ -180,23 +180,23 @@ SCREEN_EOF( sprint2 )
 
 		/* check for sprite-tilemap collisions */
 
-		tilemap_draw(state->helper, &rect, state->bg_tilemap, 0, 0);
+		tilemap_draw(state->m_helper, &rect, state->m_bg_tilemap, 0, 0);
 
-		drawgfx_transpen(state->helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->collision[i] |= collision_check(state, machine.colortable, &rect);
+		state->m_collision[i] |= collision_check(state, machine.colortable, &rect);
 
 		/* check for sprite-sprite collisions */
 
 		for (j = 0; j < 4; j++)
 			if (j != i)
 			{
-				drawgfx_transpen(state->helper, &rect, machine.gfx[1],
+				drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
 					get_sprite_code(video_ram, j),
 					1,
 					0, 0,
@@ -204,13 +204,13 @@ SCREEN_EOF( sprint2 )
 					get_sprite_y(video_ram, j), 0);
 			}
 
-		drawgfx_transpen(state->helper, &rect, machine.gfx[1],
+		drawgfx_transpen(state->m_helper, &rect, machine.gfx[1],
 			get_sprite_code(video_ram, i),
 			0,
 			0, 0,
 			get_sprite_x(video_ram, i),
 			get_sprite_y(video_ram, i), 1);
 
-		state->collision[i] |= collision_check(state, machine.colortable, &rect);
+		state->m_collision[i] |= collision_check(state, machine.colortable, &rect);
 	}
 }

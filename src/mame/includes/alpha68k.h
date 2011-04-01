@@ -11,28 +11,35 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    videoram;
-	UINT16 *    spriteram;
-	UINT16 *    shared_ram;
-	UINT16 *    paletteram;
+	UINT16 *    m_videoram;
+	UINT16 *    m_spriteram;
+	UINT16 *    m_shared_ram;
+	UINT16 *    m_paletteram;
 
 	/* video-related */
-	tilemap_t     *fix_tilemap;
-	int         bank_base, flipscreen, last_bank;
-	int         buffer_28, buffer_60, buffer_68;
+	tilemap_t     *m_fix_tilemap;
+	int         m_bank_base;
+	int			m_flipscreen;
+	int			m_last_bank;
+	int         m_buffer_28;
+	int			m_buffer_60;
+	int			m_buffer_68;
 
 	/* misc */
-	int         invert_controls;
-	int         microcontroller_id;
-	int         coin_id;
-	unsigned    trigstate, deposits1, deposits2, credits;
-	unsigned    coinvalue;
-	unsigned    microcontroller_data;
-	int         latch;
-	unsigned    game_id;	// see below
+	int         m_invert_controls;
+	int         m_microcontroller_id;
+	int         m_coin_id;
+	unsigned    m_trigstate;
+	unsigned	m_deposits1;
+	unsigned	m_deposits2;
+	unsigned	m_credits;
+	unsigned    m_coinvalue;
+	unsigned    m_microcontroller_data;
+	int         m_latch;
+	unsigned    m_game_id;	// see below
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 /* game_id - used to deal with a few game specific situations */

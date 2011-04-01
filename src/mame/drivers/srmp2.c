@@ -86,7 +86,7 @@ static INTERRUPT_GEN( srmp2_interrupt )
 static MACHINE_START( srmp2 )
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 
 	iox.reset = 0x1f;
 	iox.ff_event = -1;
@@ -101,7 +101,7 @@ static MACHINE_START( srmp2 )
 static MACHINE_START( srmp3 )
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 
 	iox.reset = 0xc8;
 	iox.ff_event = 0xef;
@@ -115,7 +115,7 @@ static MACHINE_START( srmp3 )
 static MACHINE_START( rmgoldyh )
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 
 	iox.reset = 0xc8;
 	iox.ff_event = 0xff;
@@ -145,8 +145,8 @@ static WRITE16_HANDLER( srmp2_flags_w )
 
 	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
 	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
-	state->adpcm_bank = ( (data & 0x20) >> 5 );
-	state->color_bank = ( (data & 0x80) >> 7 );
+	state->m_adpcm_bank = ( (data & 0x20) >> 5 );
+	state->m_color_bank = ( (data & 0x80) >> 7 );
 }
 
 
@@ -171,8 +171,8 @@ static WRITE16_HANDLER( mjyuugi_adpcm_bank_w )
 
 	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	state->adpcm_bank = (data & 0x0f);
-	state->gfx_bank = ((data >> 4) & 0x03);
+	state->m_adpcm_bank = (data & 0x0f);
+	state->m_gfx_bank = ((data >> 4) & 0x03);
 }
 
 
@@ -188,15 +188,15 @@ static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
 	UINT8 *ROM = device->machine().region("adpcm")->base();
 
-	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
-	state->adpcm_eptr  = (state->adpcm_eptr - 1) & 0x0ffff;
+	state->m_adpcm_sptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
+	state->m_adpcm_eptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
+	state->m_adpcm_eptr  = (state->m_adpcm_eptr - 1) & 0x0ffff;
 
-	state->adpcm_sptr += (state->adpcm_bank * 0x10000);
-	state->adpcm_eptr += (state->adpcm_bank * 0x10000);
+	state->m_adpcm_sptr += (state->m_adpcm_bank * 0x10000);
+	state->m_adpcm_eptr += (state->m_adpcm_bank * 0x10000);
 
 	msm5205_reset_w(device, 0);
-	state->adpcm_data = -1;
+	state->m_adpcm_data = -1;
 }
 
 
@@ -212,15 +212,15 @@ static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
 	UINT8 *ROM = device->machine().region("adpcm")->base();
 
-	state->adpcm_sptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	state->adpcm_eptr = (ROM[((state->adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
-	state->adpcm_eptr  = (state->adpcm_eptr - 1) & 0x0ffff;
+	state->m_adpcm_sptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
+	state->m_adpcm_eptr = (ROM[((state->m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
+	state->m_adpcm_eptr  = (state->m_adpcm_eptr - 1) & 0x0ffff;
 
-	state->adpcm_sptr += (state->adpcm_bank * 0x10000);
-	state->adpcm_eptr += (state->adpcm_bank * 0x10000);
+	state->m_adpcm_sptr += (state->m_adpcm_bank * 0x10000);
+	state->m_adpcm_eptr += (state->m_adpcm_bank * 0x10000);
 
 	msm5205_reset_w(device, 0);
-	state->adpcm_data = -1;
+	state->m_adpcm_data = -1;
 }
 
 
@@ -229,28 +229,28 @@ static void srmp2_adpcm_int(device_t *device)
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
 	UINT8 *ROM = device->machine().region("adpcm")->base();
 
-	if (state->adpcm_sptr)
+	if (state->m_adpcm_sptr)
 	{
-		if (state->adpcm_data == -1)
+		if (state->m_adpcm_data == -1)
 		{
-			state->adpcm_data = ROM[state->adpcm_sptr];
+			state->m_adpcm_data = ROM[state->m_adpcm_sptr];
 
-			if (state->adpcm_sptr >= state->adpcm_eptr)
+			if (state->m_adpcm_sptr >= state->m_adpcm_eptr)
 			{
 				msm5205_reset_w(device, 1);
-				state->adpcm_data = 0;
-				state->adpcm_sptr = 0;
+				state->m_adpcm_data = 0;
+				state->m_adpcm_sptr = 0;
 			}
 			else
 			{
-				msm5205_data_w(device, ((state->adpcm_data >> 4) & 0x0f));
+				msm5205_data_w(device, ((state->m_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			msm5205_data_w(device, ((state->adpcm_data >> 0) & 0x0f));
-			state->adpcm_sptr++;
-			state->adpcm_data = -1;
+			msm5205_data_w(device, ((state->m_adpcm_data >> 0) & 0x0f));
+			state->m_adpcm_sptr++;
+			state->m_adpcm_data = -1;
 		}
 	}
 	else
@@ -289,7 +289,7 @@ static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
 static READ8_HANDLER( iox_mux_r )
 {
 	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 
 	/* first off check any pending protection value */
 	{
@@ -340,7 +340,7 @@ static READ8_HANDLER( iox_status_r )
 static WRITE8_HANDLER( iox_command_w )
 {
 	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 	/*
     bit wise command port apparently
     0x01: selects both sides
@@ -355,7 +355,7 @@ static WRITE8_HANDLER( iox_command_w )
 static WRITE8_HANDLER( iox_data_w )
 {
 	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->iox;
+	iox_t &iox = state->m_iox;
 	iox.data = data;
 
 	if(data == iox.reset && iox.reset != -1) //resets device
@@ -379,7 +379,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 	UINT8 *ROM = space->machine().region("maincpu")->base();
 	int addr;
 
-	state->adpcm_bank = ((data & 0xe0) >> 5);
+	state->m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
 	else addr = 0x10000;
@@ -397,8 +397,8 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)		/* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u16)		/* Sprites Y */
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u16)		/* Sprites Code + X + Attr */
+	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram1.u16)		/* Sprites Y */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
@@ -434,9 +434,9 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u16)	/* Sprites Y */
+	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram1.u16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u16)	/* Sprites Code + X + Attr */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -452,7 +452,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 
 	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
 	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
-	state->gfx_bank = (data >> 6) & 0x03;
+	state->m_gfx_bank = (data >> 6) & 0x03;
 }
 
 
@@ -461,10 +461,10 @@ static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")	/* work ram */
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u8)				/* Sprites Y */
+	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram1.u8)				/* Sprites Y */
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u8)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram3.u8)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u8)			/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram3.u8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8 )
@@ -484,10 +484,10 @@ static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")	/* work ram */
-	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u8)				/* Sprites Y */
+	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram1.u8)				/* Sprites Y */
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u8)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram3.u8)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u8)			/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram3.u8)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( rmgoldyh_rombank_w )
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( rmgoldyh_rombank_w )
 	UINT8 *ROM = space->machine().region("maincpu")->base();
 	int addr;
 
-	state->adpcm_bank = ((data & 0xe0) >> 5);
+	state->m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
 	else addr = 0x10000;

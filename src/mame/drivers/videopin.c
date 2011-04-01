@@ -27,19 +27,19 @@ static void update_plunger(running_machine &machine)
 	videopin_state *state = machine.driver_data<videopin_state>();
 	UINT8 val = input_port_read(machine, "IN2");
 
-	if (state->prev != val)
+	if (state->m_prev != val)
 	{
 		if (val == 0)
 		{
-			state->time_released = machine.time();
+			state->m_time_released = machine.time();
 
-			if (!state->mask)
+			if (!state->m_mask)
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-			state->time_pushed = machine.time();
+			state->m_time_pushed = machine.time();
 
-		state->prev = val;
+		state->m_prev = val;
 	}
 }
 
@@ -77,7 +77,7 @@ static MACHINE_RESET( videopin )
 static double calc_plunger_pos(running_machine &machine)
 {
 	videopin_state *state = machine.driver_data<videopin_state>();
-	return (machine.time().as_double() - state->time_released.as_double()) * (state->time_released.as_double() - state->time_pushed.as_double() + 0.2);
+	return (machine.time().as_double() - state->m_time_released.as_double()) * (state->m_time_released.as_double() - state->m_time_pushed.as_double() + 0.2);
 }
 
 
@@ -148,9 +148,9 @@ static WRITE8_DEVICE_HANDLER( videopin_out1_w )
 	/* D6 => NOT USED */
 	/* D7 => NOT USED */
 
-	state->mask = ~data & 0x10;
+	state->m_mask = ~data & 0x10;
 
-	if (state->mask)
+	if (state->m_mask)
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(device->machine(), ~data & 0x08);
@@ -195,7 +195,7 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE_MEMBER(videopin_state, video_ram)
+	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE_MEMBER(videopin_state, m_video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE("discrete", videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)

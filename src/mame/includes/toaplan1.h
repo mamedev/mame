@@ -10,77 +10,80 @@ public:
 	toaplan1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int unk_reset_port;
-	UINT16 *colorram1;
-	UINT16 *colorram2;
-	size_t colorram1_size;
-	size_t colorram2_size;
+	int m_unk_reset_port;
+	UINT16 *m_colorram1;
+	UINT16 *m_colorram2;
+	size_t m_colorram1_size;
+	size_t m_colorram2_size;
 
-	UINT8 *sharedram;
+	UINT8 *m_sharedram;
 
-	int coin_count; /* coin count increments on startup ? , so dont count it */
-	int intenable;
+	int m_coin_count; /* coin count increments on startup ? , so dont count it */
+	int m_intenable;
 
 	/* Demon world */
-	int dsp_on;
-	int dsp_BIO;
-	int dsp_execute;
-	UINT32 dsp_addr_w;
-	UINT32 main_ram_seg;
+	int m_dsp_on;
+	int m_dsp_BIO;
+	int m_dsp_execute;
+	UINT32 m_dsp_addr_w;
+	UINT32 m_main_ram_seg;
 
-	UINT8 vimana_coins[2];
-	UINT8 vimana_credits;
-	UINT8 vimana_latch;
+	UINT8 m_vimana_coins[2];
+	UINT8 m_vimana_credits;
+	UINT8 m_vimana_latch;
 
-	UINT16 *pf4_tilevram16;	/*  ||  Drawn in this order */
-	UINT16 *pf3_tilevram16;	/*  ||  */
-	UINT16 *pf2_tilevram16;	/* \||/ */
-	UINT16 *pf1_tilevram16;	/*  \/  */
+	UINT16 *m_pf4_tilevram16;	/*  ||  Drawn in this order */
+	UINT16 *m_pf3_tilevram16;	/*  ||  */
+	UINT16 *m_pf2_tilevram16;	/* \||/ */
+	UINT16 *m_pf1_tilevram16;	/*  \/  */
 
-	size_t spriteram_size;
-	UINT16 *spriteram;
-	UINT16 *buffered_spriteram;
-	UINT16 *spritesizeram16;
-	UINT16 *buffered_spritesizeram16;
+	size_t m_spriteram_size;
+	UINT16 *m_spriteram;
+	UINT16 *m_buffered_spriteram;
+	UINT16 *m_spritesizeram16;
+	UINT16 *m_buffered_spritesizeram16;
 
-	INT32 bcu_flipscreen;		/* Tile   controller flip flag */
-	INT32 fcu_flipscreen;		/* Sprite controller flip flag */
+	INT32 m_bcu_flipscreen;		/* Tile   controller flip flag */
+	INT32 m_fcu_flipscreen;		/* Sprite controller flip flag */
 
-	INT32 pf_voffs;
-	INT32 spriteram_offs;
+	INT32 m_pf_voffs;
+	INT32 m_spriteram_offs;
 
-	INT32 pf1_scrollx;
-	INT32 pf1_scrolly;
-	INT32 pf2_scrollx;
-	INT32 pf2_scrolly;
-	INT32 pf3_scrollx;
-	INT32 pf3_scrolly;
-	INT32 pf4_scrollx;
-	INT32 pf4_scrolly;
-	INT32 scrollx_offs1;
-	INT32 scrollx_offs2;
-	INT32 scrollx_offs3;
-	INT32 scrollx_offs4;
-	INT32 scrolly_offs;
+	INT32 m_pf1_scrollx;
+	INT32 m_pf1_scrolly;
+	INT32 m_pf2_scrollx;
+	INT32 m_pf2_scrolly;
+	INT32 m_pf3_scrollx;
+	INT32 m_pf3_scrolly;
+	INT32 m_pf4_scrollx;
+	INT32 m_pf4_scrolly;
+	INT32 m_scrollx_offs1;
+	INT32 m_scrollx_offs2;
+	INT32 m_scrollx_offs3;
+	INT32 m_scrollx_offs4;
+	INT32 m_scrolly_offs;
 
 
 #ifdef MAME_DEBUG
-	int display_pf1;
-	int display_pf2;
-	int display_pf3;
-	int display_pf4;
-	int displog;
+	int m_display_pf1;
+	int m_display_pf2;
+	int m_display_pf3;
+	int m_display_pf4;
+	int m_displog;
 #endif
 
-	INT32 tiles_offsetx;
-	INT32 tiles_offsety;
+	INT32 m_tiles_offsetx;
+	INT32 m_tiles_offsety;
 
-	int reset;		/* Hack! See toaplan1_bcu_control below */
+	int m_reset;		/* Hack! See toaplan1_bcu_control below */
 
-	tilemap_t *pf1_tilemap, *pf2_tilemap, *pf3_tilemap, *pf4_tilemap;
+	tilemap_t *m_pf1_tilemap;
+	tilemap_t *m_pf2_tilemap;
+	tilemap_t *m_pf3_tilemap;
+	tilemap_t *m_pf4_tilemap;
 
 	// an empty tile, so that we can safely disable tiles
-	UINT8        empty_tile[8*8];
+	UINT8        m_empty_tile[8*8];
 };
 
 

@@ -43,15 +43,15 @@ PALETTE_INIT( tagteam )
 WRITE8_HANDLER( tagteam_videoram_w )
 {
 	tagteam_state *state = space->machine().driver_data<tagteam_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tagteam_colorram_w )
 {
 	tagteam_state *state = space->machine().driver_data<tagteam_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 READ8_HANDLER( tagteam_mirrorvideoram_r )
@@ -64,7 +64,7 @@ READ8_HANDLER( tagteam_mirrorvideoram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->videoram[offset];
+	return state->m_videoram[offset];
 }
 
 READ8_HANDLER( tagteam_mirrorcolorram_r )
@@ -77,7 +77,7 @@ READ8_HANDLER( tagteam_mirrorcolorram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return state->colorram[offset];
+	return state->m_colorram[offset];
 }
 
 WRITE8_HANDLER( tagteam_mirrorvideoram_w )
@@ -110,7 +110,7 @@ WRITE8_HANDLER( tagteam_control_w )
 logerror("%04x: control = %02x\n",cpu_get_pc(&space->device()),data);
 
 	/* bit 7 is the palette bank */
-	state->palettebank = (data & 0x80) >> 7;
+	state->m_palettebank = (data & 0x80) >> 7;
 }
 
 WRITE8_HANDLER( tagteam_flipscreen_w )
@@ -125,8 +125,8 @@ WRITE8_HANDLER( tagteam_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	tagteam_state *state = machine.driver_data<tagteam_state>();
-	int code = state->videoram[tile_index] + 256 * state->colorram[tile_index];
-	int color = state->palettebank * 2; // GUESS
+	int code = state->m_videoram[tile_index] + 256 * state->m_colorram[tile_index];
+	int color = state->m_palettebank * 2; // GUESS
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( tagteam )
 {
 	tagteam_state *state = machine.driver_data<tagteam_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
 		 8, 8, 32, 32);
 }
 
@@ -145,15 +145,15 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0; offs < 0x20; offs += 4)
 	{
-		int spritebank = (state->videoram[offs] & 0x30) << 4;
-		int code = state->videoram[offs + 1] + 256 * spritebank;
-		int color = 1 + 2 * state->palettebank; // GUESS
-		int flipx = state->videoram[offs] & 0x04;
-		int flipy = state->videoram[offs] & 0x02;
-		int sx = 240 - state->videoram[offs + 3];
-		int sy = 240 - state->videoram[offs + 2];
+		int spritebank = (state->m_videoram[offs] & 0x30) << 4;
+		int code = state->m_videoram[offs + 1] + 256 * spritebank;
+		int color = 1 + 2 * state->m_palettebank; // GUESS
+		int flipx = state->m_videoram[offs] & 0x04;
+		int flipy = state->m_videoram[offs] & 0x02;
+		int sx = 240 - state->m_videoram[offs + 3];
+		int sy = 240 - state->m_videoram[offs + 2];
 
-		if (!(state->videoram[offs] & 0x01)) continue;
+		if (!(state->m_videoram[offs] & 0x01)) continue;
 
 		if (flip_screen_get(machine))
 		{
@@ -171,8 +171,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		/* Wrap around */
 
-		code = state->videoram[offs + 0x20] + 256 * spritebank;
-		color = state->palettebank;
+		code = state->m_videoram[offs + 0x20] + 256 * spritebank;
+		color = state->m_palettebank;
 		sy += (flip_screen_get(machine) ? -256 : 256);
 
 		drawgfx_transpen(bitmap, cliprect,
@@ -186,7 +186,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( tagteam )
 {
 	tagteam_state *state = screen->machine().driver_data<tagteam_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

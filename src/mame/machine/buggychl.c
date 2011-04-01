@@ -5,12 +5,20 @@
 typedef struct _buggychl_mcu_state buggychl_mcu_state;
 struct _buggychl_mcu_state
 {
-	UINT8       port_a_in, port_a_out, ddr_a;
-	UINT8       port_b_in, port_b_out, ddr_b;
-	UINT8       port_c_in, port_c_out, ddr_c;
-	UINT8       from_main, from_mcu;
-	int         mcu_sent, main_sent;
-	device_t *mcu;
+	UINT8       m_port_a_in;
+	UINT8       m_port_a_out;
+	UINT8       m_ddr_a;
+	UINT8       m_port_b_in;
+	UINT8       m_port_b_out;
+	UINT8       m_ddr_b;
+	UINT8       m_port_c_in;
+	UINT8       m_port_c_out;
+	UINT8       m_ddr_c;
+	UINT8       m_from_main;
+	UINT8       m_from_mcu;
+	int         m_mcu_sent;
+	int         m_main_sent;
+	device_t *m_mcu;
 };
 
 
@@ -33,21 +41,21 @@ INLINE buggychl_mcu_state *get_safe_token( device_t *device )
 static READ8_DEVICE_HANDLER( buggychl_68705_port_a_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(state->mcu), state->port_a_in);
-	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
+	//logerror("%04x: 68705 port A read %02x\n", cpu_get_pc(state->m_mcu), state->m_port_a_in);
+	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_a_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(state->mcu), data);
-	state->port_a_out = data;
+	//logerror("%04x: 68705 port A write %02x\n", cpu_get_pc(state->m_mcu), data);
+	state->m_port_a_out = data;
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_a_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	state->ddr_a = data;
+	state->m_ddr_a = data;
 }
 
 
@@ -74,36 +82,36 @@ static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_a_w )
 static READ8_DEVICE_HANDLER( buggychl_68705_port_b_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
+	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_b_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(state->mcu), data);
+	logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(state->m_mcu), data);
 
-	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
+	if ((state->m_ddr_b & 0x02) && (~data & 0x02) && (state->m_port_b_out & 0x02))
 	{
-		state->port_a_in = state->from_main;
-		if (state->main_sent)
-			device_set_input_line(state->mcu, 0, CLEAR_LINE);
-		state->main_sent = 0;
-		logerror("read command %02x from main cpu\n", state->port_a_in);
+		state->m_port_a_in = state->m_from_main;
+		if (state->m_main_sent)
+			device_set_input_line(state->m_mcu, 0, CLEAR_LINE);
+		state->m_main_sent = 0;
+		logerror("read command %02x from main cpu\n", state->m_port_a_in);
 	}
-	if ((state->ddr_b & 0x04) && (data & 0x04) && (~state->port_b_out & 0x04))
+	if ((state->m_ddr_b & 0x04) && (data & 0x04) && (~state->m_port_b_out & 0x04))
 	{
-		logerror("send command %02x to main cpu\n", state->port_a_out);
-		state->from_mcu = state->port_a_out;
-		state->mcu_sent = 1;
+		logerror("send command %02x to main cpu\n", state->m_port_a_out);
+		state->m_from_mcu = state->m_port_a_out;
+		state->m_mcu_sent = 1;
 	}
 
-	state->port_b_out = data;
+	state->m_port_b_out = data;
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_b_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	state->ddr_b = data;
+	state->m_ddr_b = data;
 }
 
 
@@ -119,44 +127,44 @@ static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_b_w )
 static READ8_DEVICE_HANDLER( buggychl_68705_port_c_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	state->port_c_in = 0;
-	if (state->main_sent)
-		state->port_c_in |= 0x01;
-	if (!state->mcu_sent)
-		state->port_c_in |= 0x02;
-	logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(state->mcu), state->port_c_in);
-	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
+	state->m_port_c_in = 0;
+	if (state->m_main_sent)
+		state->m_port_c_in |= 0x01;
+	if (!state->m_mcu_sent)
+		state->m_port_c_in |= 0x02;
+	logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(state->m_mcu), state->m_port_c_in);
+	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_port_c_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(state->mcu), data);
-	state->port_c_out = data;
+	logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(state->m_mcu), data);
+	state->m_port_c_out = data;
 }
 
 static WRITE8_DEVICE_HANDLER( buggychl_68705_ddr_c_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	state->ddr_c = data;
+	state->m_ddr_c = data;
 }
 
 
 WRITE8_DEVICE_HANDLER( buggychl_mcu_w )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: mcu_w %02x\n", cpu_get_pc(state->mcu), data);
-	state->from_main = data;
-	state->main_sent = 1;
-	device_set_input_line(state->mcu, 0, ASSERT_LINE);
+	logerror("%04x: mcu_w %02x\n", cpu_get_pc(state->m_mcu), data);
+	state->m_from_main = data;
+	state->m_main_sent = 1;
+	device_set_input_line(state->m_mcu, 0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( buggychl_mcu_r )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
-	logerror("%04x: mcu_r %02x\n", cpu_get_pc(state->mcu), state->from_mcu);
-	state->mcu_sent = 0;
-	return state->from_mcu;
+	logerror("%04x: mcu_r %02x\n", cpu_get_pc(state->m_mcu), state->m_from_mcu);
+	state->m_mcu_sent = 0;
+	return state->m_from_mcu;
 }
 
 READ8_DEVICE_HANDLER( buggychl_mcu_status_r )
@@ -166,10 +174,10 @@ READ8_DEVICE_HANDLER( buggychl_mcu_status_r )
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",cpu_get_pc(state->mcu));
-	if (!state->main_sent)
+	//logerror("%04x: mcu_status_r\n",cpu_get_pc(state->m_mcu));
+	if (!state->m_main_sent)
 		res |= 0x01;
-	if (state->mcu_sent)
+	if (state->m_mcu_sent)
 		res |= 0x02;
 
 	return res;
@@ -191,40 +199,40 @@ static DEVICE_START( buggychl_mcu )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
 
-	state->mcu = device->machine().device("mcu");
+	state->m_mcu = device->machine().device("mcu");
 
-	device->save_item(NAME(state->from_main));
-	device->save_item(NAME(state->from_mcu));
-	device->save_item(NAME(state->mcu_sent));
-	device->save_item(NAME(state->main_sent));
-	device->save_item(NAME(state->port_a_in));
-	device->save_item(NAME(state->port_a_out));
-	device->save_item(NAME(state->ddr_a));
-	device->save_item(NAME(state->port_b_in));
-	device->save_item(NAME(state->port_b_out));
-	device->save_item(NAME(state->ddr_b));
-	device->save_item(NAME(state->port_c_in));
-	device->save_item(NAME(state->port_c_out));
-	device->save_item(NAME(state->ddr_c));
+	device->save_item(NAME(state->m_from_main));
+	device->save_item(NAME(state->m_from_mcu));
+	device->save_item(NAME(state->m_mcu_sent));
+	device->save_item(NAME(state->m_main_sent));
+	device->save_item(NAME(state->m_port_a_in));
+	device->save_item(NAME(state->m_port_a_out));
+	device->save_item(NAME(state->m_ddr_a));
+	device->save_item(NAME(state->m_port_b_in));
+	device->save_item(NAME(state->m_port_b_out));
+	device->save_item(NAME(state->m_ddr_b));
+	device->save_item(NAME(state->m_port_c_in));
+	device->save_item(NAME(state->m_port_c_out));
+	device->save_item(NAME(state->m_ddr_c));
 }
 
 static DEVICE_RESET( buggychl_mcu )
 {
 	buggychl_mcu_state *state = get_safe_token(device);
 
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
+	state->m_mcu_sent = 0;
+	state->m_main_sent = 0;
+	state->m_from_main = 0;
+	state->m_from_mcu = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_port_c_in = 0;
+	state->m_port_c_out = 0;
+	state->m_ddr_c = 0;
 }
 
 /*****************************************************************************

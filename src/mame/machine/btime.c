@@ -11,9 +11,9 @@ READ8_HANDLER( mmonkey_protection_r )
 	int ret = 0;
 
 	if (offset == 0x0000)
-		ret = state->protection_status;
+		ret = state->m_protection_status;
 	else if (offset == 0x0e00)
-		ret = state->protection_ret;
+		ret = state->m_protection_ret;
 	else if (offset >= 0x0d00 && offset <= 0x0d02)
 		ret = RAM[BASE + offset];  /* addition result */
 	else
@@ -34,7 +34,7 @@ WRITE8_HANDLER( mmonkey_protection_w )
 		{
 			int i, s1, s2, r;
 
-			switch (state->protection_command)
+			switch (state->m_protection_command)
 			{
 			case 0:	/* score addition */
 
@@ -64,26 +64,26 @@ WRITE8_HANDLER( mmonkey_protection_w )
 				/* instanteniously in emulation time */
 				for (i = 0; i < 0x100; i++)
 				{
-					if (RAM[BASE + 0x0f00 + i] == state->protection_value)
+					if (RAM[BASE + 0x0f00 + i] == state->m_protection_value)
 					{
-						state->protection_ret = i;
+						state->m_protection_ret = i;
 						break;
 					}
 				}
 				break;
 
 			default:
-				logerror("Unemulated protection command=%02X.  PC=%04X\n", state->protection_command, cpu_get_pc(&space->device()));
+				logerror("Unemulated protection command=%02X.  PC=%04X\n", state->m_protection_command, cpu_get_pc(&space->device()));
 				break;
 			}
 
-			state->protection_status = 0;
+			state->m_protection_status = 0;
 		}
 	}
 	else if (offset == 0x0c00)
-		state->protection_command = data;
+		state->m_protection_command = data;
 	else if (offset == 0x0e00)
-		state->protection_value = data;
+		state->m_protection_value = data;
 	else if (offset >= 0x0f00)
 		RAM[BASE + offset] = data;   /* decrypt table */
 	else if (offset >= 0x0d00 && offset <= 0x0d05)

@@ -11,20 +11,26 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    spriteram;
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
-	size_t     spriteram_size;
+	UINT8 *    m_spriteram;
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	tilemap_t    *fg_tilemap, *bg_tilemap;
-	UINT8      *textram, *scrollram;
-	UINT8      scroll_x[2], scroll_y[2];
-	int        tilebank, spritebank;
-	int        text_on, bg_on, obj_on;
-	int        flipscreen;
+	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap;
+	UINT8      *m_textram;
+	UINT8      *m_scrollram;
+	UINT8      m_scroll_x[2];
+	UINT8      m_scroll_y[2];
+	int        m_tilebank;
+	int        m_spritebank;
+	int        m_text_on;
+	int        m_bg_on;
+	int        m_obj_on;
+	int        m_flipscreen;
 
 	/* misc */
-	UINT8      rambank;
+	UINT8      m_rambank;
 };
 
 /*----------- defined in video/cbasebal.c -----------*/

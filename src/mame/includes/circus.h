@@ -7,19 +7,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * videoram;
+	UINT8 * m_videoram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
-	int clown_x, clown_y, clown_z;
+	tilemap_t  *m_bg_tilemap;
+	int m_clown_x;
+	int m_clown_y;
+	int m_clown_z;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *samples;
-	device_t *discrete;
+	device_t *m_maincpu;
+	device_t *m_samples;
+	device_t *m_discrete;
 
 	/* game id */
-	int game_id;
+	int m_game_id;
 };
 
 

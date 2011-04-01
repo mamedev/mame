@@ -4,13 +4,13 @@ public:
 	portrait_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *bgvideoram;
-	UINT8 *fgvideoram;
-	int scroll;
-	tilemap_t *foreground;
-	tilemap_t *background;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_fgvideoram;
+	int m_scroll;
+	tilemap_t *m_foreground;
+	tilemap_t *m_background;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

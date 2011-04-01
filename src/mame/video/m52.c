@@ -117,8 +117,8 @@ PALETTE_INIT( m52 )
 static TILE_GET_INFO( get_tile_info )
 {
 	m52_state *state = machine.driver_data<m52_state>();
-	UINT8 video = state->videoram[tile_index];
-	UINT8 color = state->colorram[tile_index];
+	UINT8 video = state->m_videoram[tile_index];
+	UINT8 color = state->m_colorram[tile_index];
 
 	int flag = 0;
 	int code = 0;
@@ -150,18 +150,18 @@ VIDEO_START( m52 )
 {
 	m52_state *state = machine.driver_data<m52_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
-	tilemap_set_scrolldx(state->bg_tilemap, 128 - 1, -1);
-	tilemap_set_scrolldy(state->bg_tilemap, 16, 16);
-	tilemap_set_scroll_rows(state->bg_tilemap, 4); /* only lines 192-256 scroll */
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	tilemap_set_scrolldx(state->m_bg_tilemap, 128 - 1, -1);
+	tilemap_set_scrolldy(state->m_bg_tilemap, 16, 16);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 4); /* only lines 192-256 scroll */
 
-	state->save_item(NAME(state->bg1xpos));
-	state->save_item(NAME(state->bg1ypos));
-	state->save_item(NAME(state->bg2xpos));
-	state->save_item(NAME(state->bg2ypos));
-	state->save_item(NAME(state->bgcontrol));
+	state->save_item(NAME(state->m_bg1xpos));
+	state->save_item(NAME(state->m_bg1ypos));
+	state->save_item(NAME(state->m_bg2xpos));
+	state->save_item(NAME(state->m_bg2ypos));
+	state->save_item(NAME(state->m_bgcontrol));
 }
 
 
@@ -182,10 +182,10 @@ WRITE8_HANDLER( m52_scroll_w )
 
     So we set the first 3 quarters to 255 and the last to the scroll value
 */
-	tilemap_set_scrollx(state->bg_tilemap, 0, 255);
-	tilemap_set_scrollx(state->bg_tilemap, 1, 255);
-	tilemap_set_scrollx(state->bg_tilemap, 2, 255);
-	tilemap_set_scrollx(state->bg_tilemap, 3, -data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, 255);
+	tilemap_set_scrollx(state->m_bg_tilemap, 1, 255);
+	tilemap_set_scrollx(state->m_bg_tilemap, 2, 255);
+	tilemap_set_scrollx(state->m_bg_tilemap, 3, -data);
 }
 
 
@@ -200,8 +200,8 @@ WRITE8_HANDLER( m52_videoram_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -209,8 +209,8 @@ WRITE8_HANDLER( m52_colorram_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -230,9 +230,9 @@ READ8_HANDLER( m52_protection_r )
 	int popcount = 0;
 	int temp;
 
-	for (temp = state->bg1xpos & 0x7f; temp != 0; temp >>= 1)
+	for (temp = state->m_bg1xpos & 0x7f; temp != 0; temp >>= 1)
 		popcount += temp & 1;
-	return popcount ^ (state->bg1xpos >> 7);
+	return popcount ^ (state->m_bg1xpos >> 7);
 }
 
 
@@ -246,31 +246,31 @@ READ8_HANDLER( m52_protection_r )
 WRITE8_HANDLER( m52_bg1ypos_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
-	state->bg1ypos = data;
+	state->m_bg1ypos = data;
 }
 
 WRITE8_HANDLER( m52_bg1xpos_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
-	state->bg1xpos = data;
+	state->m_bg1xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2xpos_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
-	state->bg2xpos = data;
+	state->m_bg2xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2ypos_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
-	state->bg2ypos = data;
+	state->m_bg2ypos = data;
 }
 
 WRITE8_HANDLER( m52_bgcontrol_w )
 {
 	m52_state *state = space->machine().driver_data<m52_state>();
-	state->bgcontrol = data;
+	state->m_bgcontrol = data;
 }
 
 
@@ -367,31 +367,31 @@ SCREEN_UPDATE( m52 )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (!(state->bgcontrol & 0x20))
+	if (!(state->m_bgcontrol & 0x20))
 	{
-		if (!(state->bgcontrol & 0x10))
-			draw_background(screen->machine(), bitmap, cliprect, state->bg2xpos, state->bg2ypos, 2); /* distant mountains */
+		if (!(state->m_bgcontrol & 0x10))
+			draw_background(screen->machine(), bitmap, cliprect, state->m_bg2xpos, state->m_bg2ypos, 2); /* distant mountains */
 
-		if (!(state->bgcontrol & 0x02))
-			draw_background(screen->machine(), bitmap, cliprect, state->bg1xpos, state->bg1ypos, 3); /* hills */
+		if (!(state->m_bgcontrol & 0x02))
+			draw_background(screen->machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 3); /* hills */
 
-		if (!(state->bgcontrol & 0x04))
-			draw_background(screen->machine(), bitmap, cliprect, state->bg1xpos, state->bg1ypos, 4); /* cityscape */
+		if (!(state->m_bgcontrol & 0x04))
+			draw_background(screen->machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
 	}
 
-	tilemap_set_flip(state->bg_tilemap, flip_screen_get(screen->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(state->m_bg_tilemap, flip_screen_get(screen->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* draw the sprites */
 	for (offs = 0xfc; offs >= 0; offs -= 4)
 	{
-		int sy = 257 - state->spriteram[offs];
-		int color = state->spriteram[offs + 1] & 0x3f;
-		int flipx = state->spriteram[offs + 1] & 0x40;
-		int flipy = state->spriteram[offs + 1] & 0x80;
-		int code = state->spriteram[offs + 2];
-		int sx = state->spriteram[offs + 3];
+		int sy = 257 - state->m_spriteram[offs];
+		int color = state->m_spriteram[offs + 1] & 0x3f;
+		int flipx = state->m_spriteram[offs + 1] & 0x40;
+		int flipy = state->m_spriteram[offs + 1] & 0x80;
+		int code = state->m_spriteram[offs + 2];
+		int sx = state->m_spriteram[offs + 3];
 		rectangle clip;
 
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */

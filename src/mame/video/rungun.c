@@ -17,39 +17,39 @@
 static TILE_GET_INFO( ttl_get_tile_info )
 {
 	rungun_state *state = machine.driver_data<rungun_state>();
-	UINT8 *lvram = (UINT8 *)state->ttl_vram;
+	UINT8 *lvram = (UINT8 *)state->m_ttl_vram;
 	int attr, code;
 
 	attr = (lvram[BYTE_XOR_LE(tile_index<<2)] & 0xf0) >> 4;
 	code = ((lvram[BYTE_XOR_LE(tile_index<<2)] & 0x0f) << 8) | (lvram[BYTE_XOR_LE((tile_index<<2)+2)]);
 
-	SET_TILE_INFO(state->ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO(state->m_ttl_gfx_index, code, attr, 0);
 }
 
 void rng_sprite_callback( running_machine &machine, int *code, int *color, int *priority_mask )
 {
 	rungun_state *state = machine.driver_data<rungun_state>();
-	*color = state->sprite_colorbase | (*color & 0x001f);
+	*color = state->m_sprite_colorbase | (*color & 0x001f);
 }
 
 READ16_HANDLER( rng_ttl_ram_r )
 {
 	rungun_state *state = space->machine().driver_data<rungun_state>();
-	return state->ttl_vram[offset];
+	return state->m_ttl_vram[offset];
 }
 
 WRITE16_HANDLER( rng_ttl_ram_w )
 {
 	rungun_state *state = space->machine().driver_data<rungun_state>();
-	COMBINE_DATA(&state->ttl_vram[offset]);
+	COMBINE_DATA(&state->m_ttl_vram[offset]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
 WRITE16_HANDLER(rng_936_videoram_w)
 {
 	rungun_state *state = space->machine().driver_data<rungun_state>();
-	COMBINE_DATA(&state->_936_videoram[offset]);
-	tilemap_mark_tile_dirty(state->_936_tilemap, offset / 2);
+	COMBINE_DATA(&state->m_936_videoram[offset]);
+	tilemap_mark_tile_dirty(state->m_936_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_rng_936_tile_info )
@@ -57,9 +57,9 @@ static TILE_GET_INFO( get_rng_936_tile_info )
 	rungun_state *state = machine.driver_data<rungun_state>();
 	int tileno, colour, flipx;
 
-	tileno = state->_936_videoram[tile_index * 2 + 1] & 0x3fff;
-	flipx = (state->_936_videoram[tile_index * 2 + 1] & 0xc000) >> 14;
-	colour = 0x10 + (state->_936_videoram[tile_index * 2] & 0x000f);
+	tileno = state->m_936_videoram[tile_index * 2 + 1] & 0x3fff;
+	flipx = (state->m_936_videoram[tile_index * 2 + 1] & 0xc000) >> 14;
+	colour = 0x10 + (state->m_936_videoram[tile_index * 2] & 0x000f);
 
 	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx));
 }
@@ -81,8 +81,8 @@ VIDEO_START( rng )
 	rungun_state *state = machine.driver_data<rungun_state>();
 	int gfx_index;
 
-	state->_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
-	tilemap_set_transparent_pen(state->_936_tilemap, 0);
+	state->m_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows, 16, 16, 128, 128);
+	tilemap_set_transparent_pen(state->m_936_tilemap, 0);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -93,14 +93,14 @@ VIDEO_START( rng )
 
 	// decode the ttl layer's gfx
 	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx3")->base(), machine.total_colors() / 16, 0);
-	state->ttl_gfx_index = gfx_index;
+	state->m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap
-	state->ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->ttl_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_ttl_tilemap, 0);
 
-	state->sprite_colorbase = 0x20;
+	state->m_sprite_colorbase = 0x20;
 }
 
 SCREEN_UPDATE(rng)
@@ -110,11 +110,11 @@ SCREEN_UPDATE(rng)
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->_936_tilemap, 0, 0, 1);
+	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_936_tilemap, 0, 0, 1);
 
-	k053247_sprites_draw(state->k055673, bitmap, cliprect);
+	k053247_sprites_draw(state->m_k055673, bitmap, cliprect);
 
-	tilemap_mark_all_tiles_dirty(state->ttl_tilemap);
-	tilemap_draw(bitmap, cliprect, state->ttl_tilemap, 0, 0);
+	tilemap_mark_all_tiles_dirty(state->m_ttl_tilemap);
+	tilemap_draw(bitmap, cliprect, state->m_ttl_tilemap, 0, 0);
 	return 0;
 }

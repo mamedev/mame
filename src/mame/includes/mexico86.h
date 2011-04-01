@@ -6,33 +6,39 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     protection_ram;
-	UINT8 *     videoram;
-	UINT8 *     objectram;
-	size_t      objectram_size;
+	UINT8 *     m_protection_ram;
+	UINT8 *     m_videoram;
+	UINT8 *     m_objectram;
+	size_t      m_objectram_size;
 
 	/* video-related */
-	int      charbank;
+	int      m_charbank;
 
 	/* mcu */
 	/* mexico86 68705 protection */
-	UINT8    port_a_in, port_a_out, ddr_a;
-	UINT8    port_b_in, port_b_out, ddr_b;
-	int      address, latch;
+	UINT8    m_port_a_in;
+	UINT8    m_port_a_out;
+	UINT8    m_ddr_a;
+	UINT8    m_port_b_in;
+	UINT8    m_port_b_out;
+	UINT8    m_ddr_b;
+	int      m_address;
+	int      m_latch;
 	/* kikikai mcu simulation */
-	int      mcu_running, mcu_initialised;
-	int      coin_last;
+	int      m_mcu_running;
+	int      m_mcu_initialised;
+	int      m_coin_last;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *mcu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_mcu;
 
 	/* queue */
-	UINT8 queue[64];
-	int qfront;
-	int qstate;
+	UINT8 m_queue[64];
+	int m_qfront;
+	int m_qstate;
 };
 
 

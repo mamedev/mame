@@ -615,15 +615,15 @@ static void real3d_dma_callback(running_machine &machine, UINT32 src, UINT32 dst
 static void update_irq_state(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	if ((state->irq_enable & state->irq_state) || state->scsi_irq_state)
+	if ((state->m_irq_enable & state->m_irq_state) || state->m_scsi_irq_state)
 	{
-//      printf("IRQ set: state %x enable %x scsi %x\n", state->irq_state, state->irq_enable, state->scsi_irq_state);
+//      printf("IRQ set: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, ASSERT_LINE);
-		state->scsi_irq_state = 0;
+		state->m_scsi_irq_state = 0;
 	}
 	else
 	{
-//      printf("IRQ clear: state %x enable %x scsi %x\n", state->irq_state, state->irq_enable, state->scsi_irq_state);
+//      printf("IRQ clear: state %x enable %x scsi %x\n", state->m_irq_state, state->m_irq_enable, state->m_scsi_irq_state);
 		cputag_set_input_line(machine, "maincpu", PPC_IRQ, CLEAR_LINE);
 	}
 }
@@ -632,9 +632,9 @@ void model3_set_irq_line(running_machine &machine, UINT8 bit, int line)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	if (line != CLEAR_LINE)
-		state->irq_state |= bit;
+		state->m_irq_state |= bit;
 	else
-		state->irq_state &= ~bit;
+		state->m_irq_state &= ~bit;
 	update_irq_state(machine);
 }
 
@@ -645,8 +645,8 @@ void model3_set_irq_line(running_machine &machine, UINT8 bit, int line)
 
 static UINT32 pci_device_get_reg(model3_state *state)
 {
-	int device = state->pci_device;
-	int reg = state->pci_reg;
+	int device = state->m_pci_device;
+	int reg = state->m_pci_reg;
 
 	switch(device)
 	{
@@ -662,7 +662,7 @@ static UINT32 pci_device_get_reg(model3_state *state)
 		case 13:		/* Real3D Controller chip */
 			switch(reg)
 			{
-				case 0:		return state->real3d_device_id;	/* PCI Vendor ID & Device ID */
+				case 0:		return state->m_real3d_device_id;	/* PCI Vendor ID & Device ID */
 				default:
 					logerror("pci_device_get_reg: Real3D controller, unknown reg %02X", reg);
 					break;
@@ -698,8 +698,8 @@ static UINT32 pci_device_get_reg(model3_state *state)
 
 static void pci_device_set_reg(model3_state *state, UINT32 value)
 {
-	int device = state->pci_device;
-	int reg = state->pci_reg;
+	int device = state->m_pci_device;
+	int reg = state->m_pci_reg;
 
 	switch(device)
 	{
@@ -774,7 +774,7 @@ static READ64_HANDLER( mpc105_addr_r )
 	model3_state *state = space->machine().driver_data<model3_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)state->mpc105_addr << 32;
+		return (UINT64)state->m_mpc105_addr << 32;
 	}
 	return 0;
 }
@@ -785,21 +785,21 @@ static WRITE64_HANDLER( mpc105_addr_w )
 	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->mpc105_addr = data >> 32;
+		state->m_mpc105_addr = data >> 32;
 
-		state->pci_bus = (d >> 16) & 0xff;
-		state->pci_device = (d >> 11) & 0x1f;
-		state->pci_function = (d >> 8) & 0x7;
-		state->pci_reg = (d >> 2) & 0x3f;
+		state->m_pci_bus = (d >> 16) & 0xff;
+		state->m_pci_device = (d >> 11) & 0x1f;
+		state->m_pci_function = (d >> 8) & 0x7;
+		state->m_pci_reg = (d >> 2) & 0x3f;
 	}
 }
 
 static READ64_HANDLER( mpc105_data_r )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(state->mpc105_regs[(state->pci_reg/2)+1])) << 32) |
-			   ((UINT64)(FLIPENDIAN_INT32(state->mpc105_regs[(state->pci_reg/2)+0])));
+	if(state->m_pci_device == 0) {
+		return ((UINT64)(FLIPENDIAN_INT32(state->m_mpc105_regs[(state->m_pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(state->m_mpc105_regs[(state->m_pci_reg/2)+0])));
 	}
 	return FLIPENDIAN_INT32(pci_device_get_reg(state));
 }
@@ -807,9 +807,9 @@ static READ64_HANDLER( mpc105_data_r )
 static WRITE64_HANDLER( mpc105_data_w )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->pci_device == 0) {
-		state->mpc105_regs[(state->pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->mpc105_regs[(state->pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+	if(state->m_pci_device == 0) {
+		state->m_mpc105_regs[(state->m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		state->m_mpc105_regs[(state->m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
@@ -821,31 +821,31 @@ static WRITE64_HANDLER( mpc105_data_w )
 static READ64_HANDLER( mpc105_reg_r )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	return ((UINT64)(state->mpc105_regs[(offset*2)+0]) << 32) |
-			(UINT64)(state->mpc105_regs[(offset*2)+1]);
+	return ((UINT64)(state->m_mpc105_regs[(offset*2)+0]) << 32) |
+			(UINT64)(state->m_mpc105_regs[(offset*2)+1]);
 }
 
 static WRITE64_HANDLER( mpc105_reg_w )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	state->mpc105_regs[(offset*2)+0] = (UINT32)(data >> 32);
-	state->mpc105_regs[(offset*2)+1] = (UINT32)data;
+	state->m_mpc105_regs[(offset*2)+0] = (UINT32)(data >> 32);
+	state->m_mpc105_regs[(offset*2)+1] = (UINT32)data;
 }
 
 static void mpc105_init(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	/* set reset values */
-	memset(state->mpc105_regs, 0, sizeof(state->mpc105_regs));
-	state->mpc105_regs[0x00/4] = 0x00011057;		/* Vendor ID & Device ID */
-	state->mpc105_regs[0x04/4] = 0x00800006;		/* PCI Command & PCI Status */
-	state->mpc105_regs[0x08/4] = 0x00060000;		/* Class code */
-	state->mpc105_regs[0xa8/4] = 0x0010ff00;		/* Processor interface configuration 1 */
-	state->mpc105_regs[0xac/4] = 0x060c000c;		/* Processor interface configuration 2 */
-	state->mpc105_regs[0xb8/4] = 0x04000000;
-	state->mpc105_regs[0xf0/4] = 0x0000ff02;		/* Memory control configuration 1 */
-	state->mpc105_regs[0xf4/4] = 0x00030000;		/* Memory control configuration 2 */
-	state->mpc105_regs[0xfc/4] = 0x00000010;		/* Memory control configuration 4 */
+	memset(state->m_mpc105_regs, 0, sizeof(state->m_mpc105_regs));
+	state->m_mpc105_regs[0x00/4] = 0x00011057;		/* Vendor ID & Device ID */
+	state->m_mpc105_regs[0x04/4] = 0x00800006;		/* PCI Command & PCI Status */
+	state->m_mpc105_regs[0x08/4] = 0x00060000;		/* Class code */
+	state->m_mpc105_regs[0xa8/4] = 0x0010ff00;		/* Processor interface configuration 1 */
+	state->m_mpc105_regs[0xac/4] = 0x060c000c;		/* Processor interface configuration 2 */
+	state->m_mpc105_regs[0xb8/4] = 0x04000000;
+	state->m_mpc105_regs[0xf0/4] = 0x0000ff02;		/* Memory control configuration 1 */
+	state->m_mpc105_regs[0xf4/4] = 0x00030000;		/* Memory control configuration 2 */
+	state->m_mpc105_regs[0xfc/4] = 0x00000010;		/* Memory control configuration 4 */
 }
 
 /*****************************************************************************/
@@ -857,7 +857,7 @@ static READ64_HANDLER( mpc106_addr_r )
 	model3_state *state = space->machine().driver_data<model3_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		return (UINT64)state->mpc106_addr << 32;
+		return (UINT64)state->m_mpc106_addr << 32;
 	}
 	return 0;
 }
@@ -871,16 +871,16 @@ static WRITE64_HANDLER( mpc106_addr_w )
 
 		if (((d >> 8) & 0xffffff) == 0x800000)
 		{
-			state->mpc106_addr = d & 0xff;
+			state->m_mpc106_addr = d & 0xff;
 		}
 		else
 		{
-			state->mpc106_addr = data >> 32;
+			state->m_mpc106_addr = data >> 32;
 
-			state->pci_bus = (d >> 16) & 0xff;
-			state->pci_device = (d >> 11) & 0x1f;
-			state->pci_function = (d >> 8) & 0x7;
-			state->pci_reg = (d >> 2) & 0x3f;
+			state->m_pci_bus = (d >> 16) & 0xff;
+			state->m_pci_device = (d >> 11) & 0x1f;
+			state->m_pci_function = (d >> 8) & 0x7;
+			state->m_pci_reg = (d >> 2) & 0x3f;
 		}
 	}
 }
@@ -888,9 +888,9 @@ static WRITE64_HANDLER( mpc106_addr_w )
 static READ64_HANDLER( mpc106_data_r )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->pci_device == 0) {
-		return ((UINT64)(FLIPENDIAN_INT32(state->mpc106_regs[(state->pci_reg/2)+1])) << 32) |
-			   ((UINT64)(FLIPENDIAN_INT32(state->mpc106_regs[(state->pci_reg/2)+0])));
+	if(state->m_pci_device == 0) {
+		return ((UINT64)(FLIPENDIAN_INT32(state->m_mpc106_regs[(state->m_pci_reg/2)+1])) << 32) |
+			   ((UINT64)(FLIPENDIAN_INT32(state->m_mpc106_regs[(state->m_pci_reg/2)+0])));
 	}
 	if (ACCESSING_BITS_32_63)
 	{
@@ -905,9 +905,9 @@ static READ64_HANDLER( mpc106_data_r )
 static WRITE64_HANDLER( mpc106_data_w )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	if(state->pci_device == 0) {
-		state->mpc106_regs[(state->pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
-		state->mpc106_regs[(state->pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
+	if(state->m_pci_device == 0) {
+		state->m_mpc106_regs[(state->m_pci_reg/2)+1] = FLIPENDIAN_INT32((UINT32)(data >> 32));
+		state->m_mpc106_regs[(state->m_pci_reg/2)+0] = FLIPENDIAN_INT32((UINT32)(data));
 		return;
 	}
 	if (ACCESSING_BITS_0_31)
@@ -919,36 +919,36 @@ static WRITE64_HANDLER( mpc106_data_w )
 static READ64_HANDLER( mpc106_reg_r )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	return ((UINT64)(state->mpc106_regs[(offset*2)+0]) << 32) |
-			(UINT64)(state->mpc106_regs[(offset*2)+1]);
+	return ((UINT64)(state->m_mpc106_regs[(offset*2)+0]) << 32) |
+			(UINT64)(state->m_mpc106_regs[(offset*2)+1]);
 }
 
 static WRITE64_HANDLER( mpc106_reg_w )
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	state->mpc106_regs[(offset*2)+0] = (UINT32)(data >> 32);
-	state->mpc106_regs[(offset*2)+1] = (UINT32)data;
+	state->m_mpc106_regs[(offset*2)+0] = (UINT32)(data >> 32);
+	state->m_mpc106_regs[(offset*2)+1] = (UINT32)data;
 }
 
 static void mpc106_init(running_machine &machine)
 {
 	model3_state *state = machine.driver_data<model3_state>();
 	/* set reset values */
-	memset(state->mpc106_regs, 0, sizeof(state->mpc106_regs));
-	state->mpc106_regs[0x00/4] = 0x00021057;		/* Vendor ID & Device ID */
-	state->mpc106_regs[0x04/4] = 0x00800006;		/* PCI Command & PCI Status */
-	state->mpc106_regs[0x08/4] = 0x00060000;		/* Class code */
-	state->mpc106_regs[0x0c/4] = 0x00000800;		/* Cache line size */
-	state->mpc106_regs[0x70/4] = 0x00cd0000;		/* Output driver control */
-	state->mpc106_regs[0xa8/4] = 0x0010ff00;		/* Processor interface configuration 1 */
-	state->mpc106_regs[0xac/4] = 0x060c000c;		/* Processor interface configuration 2 */
-	state->mpc106_regs[0xb8/4] = 0x04000000;
-	state->mpc106_regs[0xc0/4] = 0x00000100;		/* Error enabling 1 */
-	state->mpc106_regs[0xe0/4] = 0x00420fff;		/* Emulation support configuration 1 */
-	state->mpc106_regs[0xe8/4] = 0x00200000;		/* Emulation support configuration 2 */
-	state->mpc106_regs[0xf0/4] = 0x0000ff02;		/* Memory control configuration 1 */
-	state->mpc106_regs[0xf4/4] = 0x00030000;		/* Memory control configuration 2 */
-	state->mpc106_regs[0xfc/4] = 0x00000010;		/* Memory control configuration 4 */
+	memset(state->m_mpc106_regs, 0, sizeof(state->m_mpc106_regs));
+	state->m_mpc106_regs[0x00/4] = 0x00021057;		/* Vendor ID & Device ID */
+	state->m_mpc106_regs[0x04/4] = 0x00800006;		/* PCI Command & PCI Status */
+	state->m_mpc106_regs[0x08/4] = 0x00060000;		/* Class code */
+	state->m_mpc106_regs[0x0c/4] = 0x00000800;		/* Cache line size */
+	state->m_mpc106_regs[0x70/4] = 0x00cd0000;		/* Output driver control */
+	state->m_mpc106_regs[0xa8/4] = 0x0010ff00;		/* Processor interface configuration 1 */
+	state->m_mpc106_regs[0xac/4] = 0x060c000c;		/* Processor interface configuration 2 */
+	state->m_mpc106_regs[0xb8/4] = 0x04000000;
+	state->m_mpc106_regs[0xc0/4] = 0x00000100;		/* Error enabling 1 */
+	state->m_mpc106_regs[0xe0/4] = 0x00420fff;		/* Emulation support configuration 1 */
+	state->m_mpc106_regs[0xe8/4] = 0x00200000;		/* Emulation support configuration 2 */
+	state->m_mpc106_regs[0xf0/4] = 0x0000ff02;		/* Memory control configuration 1 */
+	state->m_mpc106_regs[0xf4/4] = 0x00030000;		/* Memory control configuration 2 */
+	state->m_mpc106_regs[0xfc/4] = 0x00000010;		/* Memory control configuration 4 */
 }
 
 /*****************************************************************************/
@@ -1025,7 +1025,7 @@ static UINT32 scsi_fetch(running_machine &machine, UINT32 dsp)
 static void scsi_irq_callback(running_machine &machine, int state)
 {
 	model3_state *drvstate = machine.driver_data<model3_state>();
-	drvstate->scsi_irq_state = state;
+	drvstate->m_scsi_irq_state = state;
 	update_irq_state(machine);
 }
 
@@ -1039,10 +1039,10 @@ static READ64_HANDLER( real3d_dma_r )
 	switch(offset)
 	{
 		case 1:
-			return (state->dma_irq << 24) | (state->dma_endian << 8);
+			return (state->m_dma_irq << 24) | (state->m_dma_endian << 8);
 		case 2:
 			if(ACCESSING_BITS_0_31) {
-				return state->dma_data;
+				return state->m_dma_data;
 			}
 			break;
 	}
@@ -1057,11 +1057,11 @@ static WRITE64_HANDLER( real3d_dma_w )
 	{
 		case 0:
 			if(ACCESSING_BITS_32_63) {		/* DMA source address */
-				state->dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
+				state->m_dma_source = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {		/* DMA destination address */
-				state->dma_dest = FLIPENDIAN_INT32((UINT32)(data));
+				state->m_dma_dest = FLIPENDIAN_INT32((UINT32)(data));
 				return;
 			}
 			break;
@@ -1069,29 +1069,29 @@ static WRITE64_HANDLER( real3d_dma_w )
 			if(ACCESSING_BITS_32_63)		/* DMA length */
 			{
 				int length = FLIPENDIAN_INT32((UINT32)(data >> 32)) * 4;
-				if (state->dma_endian & 0x80)
+				if (state->m_dma_endian & 0x80)
 				{
-					real3d_dma_callback(space->machine(), state->dma_source, state->dma_dest, length, 0);
+					real3d_dma_callback(space->machine(), state->m_dma_source, state->m_dma_dest, length, 0);
 				}
 				else
 				{
-					real3d_dma_callback(space->machine(), state->dma_source, state->dma_dest, length, 1);
+					real3d_dma_callback(space->machine(), state->m_dma_source, state->m_dma_dest, length, 1);
 				}
-				state->dma_irq |= 0x01;
+				state->m_dma_irq |= 0x01;
 				scsi_irq_callback(space->machine(), 1);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
-					state->dma_irq &= ~0x1;
+					state->m_dma_irq &= ~0x1;
 					scsi_irq_callback(space->machine(), 0);
 				}
 				return;
 			}
 			else if(ACCESSING_BITS_8_15)
 			{
-				state->dma_endian = (data >> 8) & 0xff;
+				state->m_dma_endian = (data >> 8) & 0xff;
 				return;
 			}
 			break;
@@ -1099,16 +1099,16 @@ static WRITE64_HANDLER( real3d_dma_w )
 			if(ACCESSING_BITS_32_63) {		/* DMA command */
 				UINT32 cmd = FLIPENDIAN_INT32((UINT32)(data >> 32));
 				if(cmd & 0x20000000) {
-					state->dma_data = FLIPENDIAN_INT32(state->real3d_device_id);	/* (PCI Vendor & Device ID) */
+					state->m_dma_data = FLIPENDIAN_INT32(state->m_real3d_device_id);	/* (PCI Vendor & Device ID) */
 				}
 				else if(cmd & 0x80000000) {
-					state->dma_status ^= 0xffffffff;
-					state->dma_data = state->dma_status;
+					state->m_dma_status ^= 0xffffffff;
+					state->m_dma_data = state->m_dma_status;
 				}
 				return;
 			}
 			if(ACCESSING_BITS_0_31) {		/* ??? */
-				state->dma_data = 0xffffffff;
+				state->m_dma_data = 0xffffffff;
 				return;
 			}
 			return;
@@ -1191,7 +1191,7 @@ static void configure_fast_ram(running_machine &machine)
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->work_ram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x007fffff, FALSE, state->m_work_ram);
 }
 
 static MACHINE_START(model3_10)
@@ -1218,14 +1218,14 @@ static MACHINE_START(model3_21)
 static void model3_init(running_machine &machine, int step)
 {
 	model3_state *state = machine.driver_data<model3_state>();
-	state->step = step;
+	state->m_step = step;
 	memory_set_bankptr(machine,  "bank1", machine.region( "user1" )->base() + 0x800000 ); /* banked CROM */
 
 	memory_set_bankptr(machine, "bank4", machine.region("samples")->base() + 0x200000);
 	memory_set_bankptr(machine, "bank5", machine.region("samples")->base() + 0x600000);
 
 	// copy the 68k vector table into RAM
-	memcpy(state->soundram, machine.region("audiocpu")->base()+0x80000, 16);
+	memcpy(state->m_soundram, machine.region("audiocpu")->base()+0x80000, 16);
 	machine.device("audiocpu")->reset();
 
 	model3_machine_init(machine, step);	// step 1.5
@@ -1242,7 +1242,7 @@ static void model3_init(running_machine &machine, int step)
 		{
 			mpc105_init(machine);
 		}
-		state->real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
+		state->m_real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
 	else {
 		mpc106_init(machine);
@@ -1251,11 +1251,11 @@ static void model3_init(running_machine &machine, int step)
 		if (mame_stricmp(machine.system().name, "magtruck") == 0 ||
 		    mame_stricmp(machine.system().name, "von254g") == 0)
 		{
-			state->real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
+			state->m_real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 		}
 		else
 		{
-			state->real3d_device_id = 0x178611db;	/* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
+			state->m_real3d_device_id = 0x178611db;	/* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
 		}
 	}
 }
@@ -1274,11 +1274,11 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)state->controls_bank << 56;
+				return (UINT64)state->m_controls_bank << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				if(state->controls_bank & 0x1)
+				if(state->m_controls_bank & 0x1)
 				{
 					return (input_port_read(space->machine(), "IN1")) << 24;
 				}
@@ -1312,14 +1312,14 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 5:
 			if (ACCESSING_BITS_24_31)					/* Serial comm RX FIFO 1 */
 			{
-				return (UINT64)state->serial_fifo1 << 24;
+				return (UINT64)state->m_serial_fifo1 << 24;
 			}
 			break;
 
 		case 6:
 			if (ACCESSING_BITS_56_63)		/* Serial comm RX FIFO 2 */
 			{
-				return (UINT64)state->serial_fifo2 << 56;
+				return (UINT64)state->m_serial_fifo2 << 56;
 			}
 			else if (ACCESSING_BITS_24_31)				/* Serial comm full/empty flags */
 			{
@@ -1331,9 +1331,9 @@ static READ64_HANDLER( model3_ctrl_r )
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
 				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				UINT8 adc_data = input_port_read_safe(space->machine(), adcnames[state->adc_channel], 0);
-				state->adc_channel++;
-				state->adc_channel &= 0x7;
+				UINT8 adc_data = input_port_read_safe(space->machine(), adcnames[state->m_adc_channel], 0);
+				state->m_adc_channel++;
+				state->m_adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
 			}
 			break;
@@ -1356,16 +1356,16 @@ static WRITE64_HANDLER( model3_ctrl_w )
 				eeprom_write_bit(device, (reg & 0x20) ? 1 : 0);
 				eeprom_set_clock_line(device, (reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom_set_cs_line(device, (reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-				state->controls_bank = reg & 0xff;
+				state->m_controls_bank = reg & 0xff;
 			}
 			return;
 
 		case 2:
-			COMBINE_DATA(&state->controls_2);
+			COMBINE_DATA(&state->m_controls_2);
 			return;
 
 		case 3:
-			COMBINE_DATA(&state->controls_3);
+			COMBINE_DATA(&state->m_controls_3);
 			return;
 
 		case 4:
@@ -1378,40 +1378,40 @@ static WRITE64_HANDLER( model3_ctrl_w )
 				switch(data >> 24)
 				{
 					case 0x00:
-						state->lightgun_reg_sel = state->serial_fifo2;
+						state->m_lightgun_reg_sel = state->m_serial_fifo2;
 						break;
 					case 0x87:
-						state->serial_fifo1 = 0;
-						switch(state->lightgun_reg_sel)		/* read lightrun register */
+						state->m_serial_fifo1 = 0;
+						switch(state->m_lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								state->serial_fifo2 = input_port_read(space->machine(), "LIGHT0_Y") & 0xff;
+								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT0_Y") & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								state->serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_Y") >> 8) & 0x3;
+								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_Y") >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								state->serial_fifo2 = input_port_read(space->machine(), "LIGHT0_X") & 0xff;
+								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT0_X") & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								state->serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_X") >> 8) & 0x3;
+								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT0_X") >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								state->serial_fifo2 = input_port_read(space->machine(), "LIGHT1_Y") & 0xff;
+								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT1_Y") & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								state->serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_Y") >> 8) & 0x3;
+								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_Y") >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								state->serial_fifo2 = input_port_read(space->machine(), "LIGHT1_X") & 0xff;
+								state->m_serial_fifo2 = input_port_read(space->machine(), "LIGHT1_X") & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								state->serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_X") >> 8) & 0x3;
+								state->m_serial_fifo2 = (input_port_read(space->machine(), "LIGHT1_X") >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
-								state->serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
+								state->m_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
 								if(input_port_read(space->machine(), "OFFSCREEN") & 0x1) {
-									state->serial_fifo2 |= 0x01;
+									state->m_serial_fifo2 |= 0x01;
 								}
 								break;
 						}
@@ -1426,7 +1426,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 5:
 			if (ACCESSING_BITS_56_63)	/* Serial comm TX FIFO 2 */
 			{
-				state->serial_fifo2 = data >> 56;
+				state->m_serial_fifo2 = data >> 56;
 				return;
 			}
 			break;
@@ -1434,7 +1434,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 7:
 			if (ACCESSING_BITS_24_31)	/* ADC Channel selection */
 			{
-				state->adc_channel = (data >> 24) & 0xf;
+				state->m_adc_channel = (data >> 24) & 0xf;
 			}
 			return;
 	}
@@ -1452,7 +1452,7 @@ static READ64_HANDLER( model3_sys_r )
 		case 0x08/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				return ((UINT64)state->crom_bank << 56);
+				return ((UINT64)state->m_crom_bank << 56);
 			}
 			break;
 
@@ -1465,13 +1465,13 @@ static READ64_HANDLER( model3_sys_r )
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return (state->irq_enable<<24);
+				return (state->m_irq_enable<<24);
 			}
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x (PC %x)\n", state->irq_state, cpu_get_pc(&space->device()));
-			return (UINT64)state->irq_state<<56 | 0xff000000;
+//          printf("read irq_state %x (PC %x)\n", state->m_irq_state, cpu_get_pc(&space->device()));
+			return (UINT64)state->m_irq_state<<56 | 0xff000000;
 			break;
 	}
 
@@ -1489,14 +1489,14 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x10/8:
 			if (ACCESSING_BITS_24_31)
 			{
-				state->irq_enable = (data>>24)&0xff;
+				state->m_irq_enable = (data>>24)&0xff;
 			}
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
 		case 0x18/8:
 			if ((mem_mask & 0xff000000) == 0xff000000)	// int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
 			{						// may also be a secondary enable based on behavior of e.g. magtruck VBL handler
-//              UINT32 old_irq = state->irq_state;
+//              UINT32 old_irq = state->m_irq_state;
 				UINT8 ack = (data>>24)&0xff, realack;
 				int i;
 
@@ -1518,7 +1518,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 //                      printf("%x to ack (realack %x)\n", ack, realack);
 
-						state->irq_state &= realack;
+						state->m_irq_state &= realack;
 						break;
 				}
 			}
@@ -1530,7 +1530,7 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x08/8:
 			if (ACCESSING_BITS_56_63)
 			{
-				state->crom_bank = data >> 56;
+				state->m_crom_bank = data >> 56;
 
 				data >>= 56;
 				data = (~data) & 0x7;
@@ -1576,16 +1576,16 @@ static WRITE64_HANDLER( model3_rtc_w )
 static READ64_HANDLER(real3d_status_r)
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	state->real3d_status ^= U64(0xffffffffffffffff);
+	state->m_real3d_status ^= U64(0xffffffffffffffff);
 	if (offset == 0)
 	{
 		/* pretty sure this is VBLANK */
-		state->real3d_status &= ~U64(0x0000000200000000);
+		state->m_real3d_status &= ~U64(0x0000000200000000);
 		if (space->machine().primary_screen->vblank())
-			state->real3d_status |= U64(0x0000000200000000);
-		return state->real3d_status;
+			state->m_real3d_status |= U64(0x0000000200000000);
+		return state->m_real3d_status;
 	}
-	return state->real3d_status;
+	return state->m_real3d_status;
 }
 
 /* SCSP interface */
@@ -1617,13 +1617,13 @@ static READ64_HANDLER(network_r)
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
 	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(&space->device()));
-	return state->network_ram[offset];
+	return state->m_network_ram[offset];
 }
 
 static WRITE64_HANDLER(network_w)
 {
 	model3_state *state = space->machine().driver_data<model3_state>();
-	COMBINE_DATA(state->network_ram + offset);
+	COMBINE_DATA(state->m_network_ram + offset);
 	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(&space->device()));
 }
 
@@ -1720,53 +1720,53 @@ static READ64_HANDLER(model3_security_r)
 			if (mame_stricmp(space->machine().system().name, "vs299") == 0 ||
 				mame_stricmp(space->machine().system().name, "vs2v991") == 0)
 			{
-				return (UINT64)vs299_prot_data[state->prot_data_ptr++] << 48;
+				return (UINT64)vs299_prot_data[state->m_prot_data_ptr++] << 48;
 			}
 			else if (mame_stricmp(space->machine().system().name, "swtrilgy") == 0 ||
 					 mame_stricmp(space->machine().system().name, "swtrilgya") == 0)
 			{
-				UINT64 data = (UINT64)swt_prot_data[state->prot_data_ptr++] << 16;
-				if (state->prot_data_ptr > 0x38)
+				UINT64 data = (UINT64)swt_prot_data[state->m_prot_data_ptr++] << 16;
+				if (state->m_prot_data_ptr > 0x38)
 				{
-					state->prot_data_ptr = 0;
+					state->m_prot_data_ptr = 0;
 				}
 				return data;
 			}
 			else if (mame_stricmp(space->machine().system().name, "fvipers2") == 0)
 			{
-				UINT64 data = (UINT64)fvipers2_prot_data[state->prot_data_ptr++] << 16;
-				if (state->prot_data_ptr >= 0x41)
+				UINT64 data = (UINT64)fvipers2_prot_data[state->m_prot_data_ptr++] << 16;
+				if (state->m_prot_data_ptr >= 0x41)
 				{
-					state->prot_data_ptr = 0;
+					state->m_prot_data_ptr = 0;
 				}
 				return data;
 			}
 			else if (mame_stricmp(space->machine().system().name, "spikeout") == 0 ||
 					 mame_stricmp(space->machine().system().name, "spikeofe") == 0)
 			{
-				UINT64 data = (UINT64)spikeout_prot_data[state->prot_data_ptr++] << 16;
-				if (state->prot_data_ptr >= 0x55)
+				UINT64 data = (UINT64)spikeout_prot_data[state->m_prot_data_ptr++] << 16;
+				if (state->m_prot_data_ptr >= 0x55)
 				{
-					state->prot_data_ptr = 0;
+					state->m_prot_data_ptr = 0;
 				}
 				return data;
 			}
 			else if (mame_stricmp(space->machine().system().name, "eca") == 0 ||
 					 mame_stricmp(space->machine().system().name, "ecax") == 0)
 			{
-				UINT64 data = (UINT64)eca_prot_data[state->prot_data_ptr++] << 16;
-				if (state->prot_data_ptr >= 0x31)
+				UINT64 data = (UINT64)eca_prot_data[state->m_prot_data_ptr++] << 16;
+				if (state->m_prot_data_ptr >= 0x31)
 				{
-					state->prot_data_ptr = 0;
+					state->m_prot_data_ptr = 0;
 				}
 				return data;
 			}
 			else if (mame_stricmp(space->machine().system().name, "oceanhun") == 0)
 			{
-				UINT64 data = (UINT64)oceanhun_prot_data[state->prot_data_ptr++] << 16;
-				if (state->prot_data_ptr >= 58)
+				UINT64 data = (UINT64)oceanhun_prot_data[state->m_prot_data_ptr++] << 16;
+				if (state->m_prot_data_ptr >= 58)
 				{
-					state->prot_data_ptr = 0;
+					state->m_prot_data_ptr = 0;
 				}
 				return data;
 			}
@@ -1791,7 +1791,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 }
 
 static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_MEMBER(model3_state, work_ram)	/* work RAM */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_MEMBER(model3_state, m_work_ram)	/* work RAM */
 
 	AM_RANGE(0x84000000, 0x8400003f) AM_READ( real3d_status_r )
 	AM_RANGE(0x88000000, 0x88000007) AM_WRITE( real3d_cmd_w )
@@ -1808,7 +1808,7 @@ static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64)
 
 	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE( model3_char_r, model3_char_w )	/* character RAM */
 	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE( model3_tile_r, model3_tile_w )	/* tilemaps */
-	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE( model3_palette_r, model3_palette_w ) AM_BASE_MEMBER(model3_state, paletteram64) /* palette */
+	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE( model3_palette_r, model3_palette_w ) AM_BASE_MEMBER(model3_state, m_paletteram64) /* palette */
 	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE( model3_vid_reg_r, model3_vid_reg_w )
 
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -4911,7 +4911,7 @@ static WRITE16_HANDLER( model3snd_ctrl )
 }
 
 static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_BASE_MEMBER(model3_state, soundram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_BASE_MEMBER(model3_state, m_soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_r, scsp_w)
@@ -4928,7 +4928,7 @@ static void scsp_irq(device_t *device, int irq)
 	model3_state *state = device->machine().driver_data<model3_state>();
 	if (irq > 0)
 	{
-		state->scsp_last_line = irq;
+		state->m_scsp_last_line = irq;
 		cputag_set_input_line(device->machine(), "audiocpu", irq, ASSERT_LINE);
 	}
 	else
@@ -4961,14 +4961,14 @@ static const scsp_interface scsp2_interface =
 static INTERRUPT_GEN(model3_interrupt)
 {
 	model3_state *state = device->machine().driver_data<model3_state>();
-	if (state->vblank == 0) {
+	if (state->m_vblank == 0) {
 		model3_set_irq_line(device->machine(), 0x02, ASSERT_LINE);
 	} else {
 		model3_set_irq_line(device->machine(), 0x0d, ASSERT_LINE);
 	}
 
-	state->vblank++;
-	state->vblank &= 1;
+	state->m_vblank++;
+	state->m_vblank &= 1;
 }
 
 static const powerpc_config model3_10 =
@@ -5162,8 +5162,8 @@ static void interleave_vroms(running_machine &machine)
 	int vrom_length = machine.region("user3")->bytes();
 	UINT16 *vrom;
 
-	state->vrom = auto_alloc_array(machine, UINT32, 0x4000000/4);
-	vrom = (UINT16 *)state->vrom;
+	state->m_vrom = auto_alloc_array(machine, UINT32, 0x4000000/4);
+	vrom = (UINT16 *)state->m_vrom;
 
 	if( vrom_length <= 0x1000000 ) {
 		start = 0x1000000;
@@ -5422,7 +5422,7 @@ static DRIVER_INIT( harley )
 	UINT32 *rom = (UINT32*)machine.region("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	state->network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
+	state->m_network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00fffff, FUNC(network_r), FUNC(network_w) );
 
 	rom[(0x50e8d4^4)/4] = 0x60000000;

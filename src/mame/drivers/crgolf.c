@@ -52,19 +52,19 @@ static MACHINE_START( crgolf )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
 	/* configure the banking */
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
-	state->save_item(NAME(state->port_select));
-	state->save_item(NAME(state->main_to_sound_data));
-	state->save_item(NAME(state->sound_to_main_data));
-	state->save_item(NAME(state->sample_offset));
-	state->save_item(NAME(state->sample_count));
+	state->save_item(NAME(state->m_port_select));
+	state->save_item(NAME(state->m_main_to_sound_data));
+	state->save_item(NAME(state->m_sound_to_main_data));
+	state->save_item(NAME(state->m_sample_offset));
+	state->save_item(NAME(state->m_sample_count));
 }
 
 
@@ -72,11 +72,11 @@ static MACHINE_RESET( crgolf )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	state->port_select = 0;
-	state->main_to_sound_data = 0;
-	state->sound_to_main_data = 0;
-	state->sample_offset = 0;
-	state->sample_count = 0;
+	state->m_port_select = 0;
+	state->m_main_to_sound_data = 0;
+	state->m_sound_to_main_data = 0;
+	state->m_sample_offset = 0;
+	state->m_sample_count = 0;
 }
 
 
@@ -91,7 +91,7 @@ static READ8_HANDLER( switch_input_r )
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	return input_port_read(space->machine(), portnames[state->port_select]);
+	return input_port_read(space->machine(), portnames[state->m_port_select]);
 }
 
 
@@ -105,13 +105,13 @@ static WRITE8_HANDLER( switch_input_select_w )
 {
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	if (!(data & 0x40)) state->port_select = 6;
-	if (!(data & 0x20)) state->port_select = 5;
-	if (!(data & 0x10)) state->port_select = 4;
-	if (!(data & 0x08)) state->port_select = 3;
-	if (!(data & 0x04)) state->port_select = 2;
-	if (!(data & 0x02)) state->port_select = 1;
-	if (!(data & 0x01)) state->port_select = 0;
+	if (!(data & 0x40)) state->m_port_select = 6;
+	if (!(data & 0x20)) state->m_port_select = 5;
+	if (!(data & 0x10)) state->m_port_select = 4;
+	if (!(data & 0x08)) state->m_port_select = 3;
+	if (!(data & 0x04)) state->m_port_select = 2;
+	if (!(data & 0x02)) state->m_port_select = 1;
+	if (!(data & 0x01)) state->m_port_select = 0;
 }
 
 
@@ -132,8 +132,8 @@ static TIMER_CALLBACK( main_to_sound_callback )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
-	state->main_to_sound_data = param;
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_main_to_sound_data = param;
 }
 
 
@@ -147,8 +147,8 @@ static READ8_HANDLER( main_to_sound_r )
 {
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return state->main_to_sound_data;
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	return state->m_main_to_sound_data;
 }
 
 
@@ -163,8 +163,8 @@ static TIMER_CALLBACK( sound_to_main_callback )
 {
 	crgolf_state *state = machine.driver_data<crgolf_state>();
 
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-	state->sound_to_main_data = param;
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	state->m_sound_to_main_data = param;
 }
 
 
@@ -178,8 +178,8 @@ static READ8_HANDLER( sound_to_main_r )
 {
 	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return state->sound_to_main_data;
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	return state->m_sound_to_main_data;
 }
 
 
@@ -195,21 +195,21 @@ static void vck_callback( device_t *device )
 	crgolf_state *state = device->machine().driver_data<crgolf_state>();
 
 	/* only play back if we have data remaining */
-	if (state->sample_count != 0xff)
+	if (state->m_sample_count != 0xff)
 	{
-		UINT8 data = device->machine().region("adpcm")->base()[state->sample_offset >> 1];
+		UINT8 data = device->machine().region("adpcm")->base()[state->m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		msm5205_data_w(device, (data >> (4 * (~state->sample_offset & 1))) & 0x0f);
-		state->sample_offset++;
+		msm5205_data_w(device, (data >> (4 * (~state->m_sample_offset & 1))) & 0x0f);
+		state->m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
-		if (!(state->sample_offset & 0xff))
+		if (!(state->m_sample_offset & 0xff))
 		{
-			state->sample_count--;
+			state->m_sample_count--;
 
 			/* if we hit 0xff, automatically turn off playback */
-			if (state->sample_count == 0xff)
+			if (state->m_sample_count == 0xff)
 				msm5205_reset_w(device, 1);
 		}
 	}
@@ -229,12 +229,12 @@ static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
 
 		/* offset 1 is the length/256 nibbles */
 		case 1:
-			state->sample_count = data;
+			state->m_sample_count = data;
 			break;
 
 		/* offset 2 is the offset/256 nibbles */
 		case 2:
-			state->sample_offset = data << 8;
+			state->m_sample_offset = data << 8;
 			break;
 
 		/* offset 3 turns on playback */
@@ -256,11 +256,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, color_select)
-	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screen_flip)
-	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screen_select)
-	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screenb_enable)
-	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screena_enable)
+	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_color_select)
+	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screen_flip)
+	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screen_select)
+	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screenb_enable)
+	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screena_enable)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0xa000, 0xffff) AM_READWRITE(crgolf_videoram_r, crgolf_videoram_w)

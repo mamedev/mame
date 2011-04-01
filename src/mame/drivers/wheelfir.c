@@ -231,41 +231,41 @@ public:
 	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *maincpu;
-	device_t *subcpu;
-	device_t *screen;
-	device_t *eeprom;
+	device_t *m_maincpu;
+	device_t *m_subcpu;
+	device_t *m_screen;
+	device_t *m_eeprom;
 
-	INT32 *zoom_table;
-	UINT16 *blitter_data;
+	INT32 *m_zoom_table;
+	UINT16 *m_blitter_data;
 
-	UINT8 *palette;
-	INT32 palpos;
+	UINT8 *m_palette;
+	INT32 m_palpos;
 
-	INT32 current_scanline;
-	scroll_info *scanlines;
+	INT32 m_current_scanline;
+	scroll_info *m_scanlines;
 
-	INT32 soundlatch;
+	INT32 m_soundlatch;
 
-	INT32 direct_write_x0;
-	INT32 direct_write_x1;
-	INT32 direct_write_y0;
-	INT32 direct_write_y1;
-	INT32 direct_write_idx;
+	INT32 m_direct_write_x0;
+	INT32 m_direct_write_x1;
+	INT32 m_direct_write_y0;
+	INT32 m_direct_write_y1;
+	INT32 m_direct_write_idx;
 
-	INT32 toggle_bit;
-	INT16 scanline_cnt;
+	INT32 m_toggle_bit;
+	INT16 m_scanline_cnt;
 
 
-	bitmap_t *tmp_bitmap[2];
+	bitmap_t *m_tmp_bitmap[2];
 
 	INT32 get_scale(INT32 index)
 	{
 		while(index<ZOOM_TABLE_SIZE)
 		{
-			if(zoom_table[index]>=0)
+			if(m_zoom_table[index]>=0)
 			{
-				return zoom_table[index];
+				return m_zoom_table[index];
 			}
 			++index;
 		}
@@ -285,13 +285,13 @@ static READ16_HANDLER( wheelfir_status_r )
 
 */
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	return state->toggle_bit| (space->machine().rand()&0x2000);
+	return state->m_toggle_bit| (space->machine().rand()&0x2000);
 }
 
 static WRITE16_HANDLER( wheelfir_scanline_cnt_w )
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	COMBINE_DATA(&state->scanline_cnt);
+	COMBINE_DATA(&state->m_scanline_cnt);
 }
 
 
@@ -299,33 +299,33 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
 
-	COMBINE_DATA(&state->blitter_data[offset]);
+	COMBINE_DATA(&state->m_blitter_data[offset]);
 
 	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
 	{
 		int x,y;
 
 
-		int direct_width=state->direct_write_x1-state->direct_write_x0+1;
-		int direct_height=state->direct_write_y1-state->direct_write_y0+1;
+		int direct_width=state->m_direct_write_x1-state->m_direct_write_x0+1;
+		int direct_height=state->m_direct_write_y1-state->m_direct_write_y0+1;
 
 		int sixdat = data&0xff;
 
 		if(direct_width>0 && direct_height>0)
 		{
-			x= state->direct_write_idx % direct_width;
-			y = (state->direct_write_idx / direct_width) %direct_height;
+			x= state->m_direct_write_idx % direct_width;
+			y = (state->m_direct_write_idx / direct_width) %direct_height;
 
-			x+=state->direct_write_x0;
-			y+=state->direct_write_y0;
+			x+=state->m_direct_write_x0;
+			y+=state->m_direct_write_y0;
 
 			if(x<512 && y <512)
 			{
-				*BITMAP_ADDR16(state->tmp_bitmap[LAYER_BG], y, x) = sixdat;
+				*BITMAP_ADDR16(state->m_tmp_bitmap[LAYER_BG], y, x) = sixdat;
 			}
 		}
 
-		++state->direct_write_idx;
+		++state->m_direct_write_idx;
 
 		return;
 
@@ -336,32 +336,32 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 	if(offset==0x0a && ACCESSING_BITS_0_7)
 	{
-		xscroll = (state->blitter_data[0xa]&0x00ff) | (state->blitter_data[0x8]&0x0040) << 2;
+		xscroll = (state->m_blitter_data[0xa]&0x00ff) | (state->m_blitter_data[0x8]&0x0040) << 2;
 	}
 
 	if(offset==0x0b && ACCESSING_BITS_0_7)
 	{
-		yscroll = (state->blitter_data[0xb]&0x00ff) | (state->blitter_data[0x8]&0x0080) << 1;
+		yscroll = (state->m_blitter_data[0xb]&0x00ff) | (state->m_blitter_data[0x8]&0x0080) << 1;
 	}
 
 	if(offset==0x8 && ACCESSING_BITS_0_7)
 	{
-		xscroll = (state->blitter_data[0xa]&0x00ff) | (state->blitter_data[0x8]&0x0040) << 2;
-		yscroll = (state->blitter_data[0xb]&0x00ff) | (state->blitter_data[0x8]&0x0080) << 1;
+		xscroll = (state->m_blitter_data[0xa]&0x00ff) | (state->m_blitter_data[0x8]&0x0040) << 2;
+		yscroll = (state->m_blitter_data[0xb]&0x00ff) | (state->m_blitter_data[0x8]&0x0080) << 1;
 	}
 
 	if(xscroll>=0)
 	{
-		int scl=state->current_scanline>=NUM_SCANLINES?0:state->current_scanline;
-		state->scanlines[scl].x=xscroll;
-		state->scanlines[scl].unkbits=state->blitter_data[0x8]&0xff;
+		int scl=state->m_current_scanline>=NUM_SCANLINES?0:state->m_current_scanline;
+		state->m_scanlines[scl].x=xscroll;
+		state->m_scanlines[scl].unkbits=state->m_blitter_data[0x8]&0xff;
 	}
 
 	if(yscroll>=0)
 	{
-		int scl=state->current_scanline>=NUM_SCANLINES?0:state->current_scanline;
-		state->scanlines[scl].y=yscroll;
-		state->scanlines[scl].unkbits=state->blitter_data[0x8]&0xff;
+		int scl=state->m_current_scanline>=NUM_SCANLINES?0:state->m_current_scanline;
+		state->m_scanlines[scl].y=yscroll;
+		state->m_scanlines[scl].unkbits=state->m_blitter_data[0x8]&0xff;
 	}
 
 
@@ -376,32 +376,32 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			int width = space->machine().primary_screen->width();
 			int height = space->machine().primary_screen->height();
 
-			int src_x0=(state->blitter_data[0]>>8)+((state->blitter_data[6]&0x100)?256:0);
-			int src_y0=(state->blitter_data[2]>>8)+((state->blitter_data[6]&0x200)?256:0);
+			int src_x0=(state->m_blitter_data[0]>>8)+((state->m_blitter_data[6]&0x100)?256:0);
+			int src_y0=(state->m_blitter_data[2]>>8)+((state->m_blitter_data[6]&0x200)?256:0);
 
-			int dst_x0=(state->blitter_data[0]&0xff)+((state->blitter_data[7]&0x40)?256:0);
-			int dst_y0=(state->blitter_data[2]&0xff)+((state->blitter_data[7]&0x80)?256:0);
+			int dst_x0=(state->m_blitter_data[0]&0xff)+((state->m_blitter_data[7]&0x40)?256:0);
+			int dst_y0=(state->m_blitter_data[2]&0xff)+((state->m_blitter_data[7]&0x80)?256:0);
 
-			int dst_x1=(state->blitter_data[1]&0xff)+((state->blitter_data[9]&4)?256:0);
-			int dst_y1=(state->blitter_data[3]&0xff)+((state->blitter_data[9]&8)?256:0);
+			int dst_x1=(state->m_blitter_data[1]&0xff)+((state->m_blitter_data[9]&4)?256:0);
+			int dst_y1=(state->m_blitter_data[3]&0xff)+((state->m_blitter_data[9]&8)?256:0);
 
-			int x_dst_step=(state->blitter_data[7]&0x1)?1:-1;
-			int y_dst_step=(state->blitter_data[7]&0x2)?1:-1;
+			int x_dst_step=(state->m_blitter_data[7]&0x1)?1:-1;
+			int y_dst_step=(state->m_blitter_data[7]&0x2)?1:-1;
 
-			int x_src_step=(state->blitter_data[8]&0x4000)?1:-1;
-			int y_src_step=(state->blitter_data[8]&0x8000)?1:-1;
+			int x_src_step=(state->m_blitter_data[8]&0x4000)?1:-1;
+			int y_src_step=(state->m_blitter_data[8]&0x8000)?1:-1;
 
-			int page=((state->blitter_data[6])>>10)*0x40000;
+			int page=((state->m_blitter_data[6])>>10)*0x40000;
 
 
 			if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
 			{
 
-					state->direct_write_x0=dst_x0;
-					state->direct_write_x1=dst_x1;
-					state->direct_write_y0=dst_y0;
-					state->direct_write_y1=dst_y1;
-					state->direct_write_idx=0;
+					state->m_direct_write_x0=dst_x0;
+					state->m_direct_write_x1=dst_x1;
+					state->m_direct_write_y0=dst_y0;
+					state->m_direct_write_y1=dst_y1;
+					state->m_direct_write_idx=0;
 
 			}
 
@@ -447,32 +447,32 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 			int d1, d2, hflag, dflag, index;
 
-			d1=((state->blitter_data[0x0a]&0x1f00)>>8);
+			d1=((state->m_blitter_data[0x0a]&0x1f00)>>8);
 
-			d2=((state->blitter_data[0x0b]&0x1f00)>>8);
+			d2=((state->m_blitter_data[0x0b]&0x1f00)>>8);
 
 
-			d1|=((state->blitter_data[0x8]&0x100)>>3);
-			d2|=((state->blitter_data[0x8]&0x400)>>5);
-			hflag=(state->blitter_data[0x9]&0x1)?1:0;
-			dflag=(state->blitter_data[0x8]&0x1000)?1:0;
+			d1|=((state->m_blitter_data[0x8]&0x100)>>3);
+			d2|=((state->m_blitter_data[0x8]&0x400)>>5);
+			hflag=(state->m_blitter_data[0x9]&0x1)?1:0;
+			dflag=(state->m_blitter_data[0x8]&0x1000)?1:0;
 			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
 
 
 			float scale_x=state->get_scale(index);
 
-			d1=((state->blitter_data[0x0b]&0xc000)>>14) |
-				((state->blitter_data[0x0c]&0xc000)>>12) |
-				((state->blitter_data[0x0a]&0x4000)>>10);
+			d1=((state->m_blitter_data[0x0b]&0xc000)>>14) |
+				((state->m_blitter_data[0x0c]&0xc000)>>12) |
+				((state->m_blitter_data[0x0a]&0x4000)>>10);
 
-			d2=((state->blitter_data[0x0c]&0x1f00)>>8);
+			d2=((state->m_blitter_data[0x0c]&0x1f00)>>8);
 
 
-			d1|=((state->blitter_data[0x8]&0x200)>>4);
-			d2|=((state->blitter_data[0x8]&0x800)>>6);
+			d1|=((state->m_blitter_data[0x8]&0x200)>>4);
+			d2|=((state->m_blitter_data[0x8]&0x800)>>6);
 
-			hflag=(state->blitter_data[0x9]&0x2)?1:0;
-			dflag=(state->blitter_data[0x8]&0x2000)?1:0;
+			hflag=(state->m_blitter_data[0x9]&0x2)?1:0;
+			dflag=(state->m_blitter_data[0x8]&0x2000)?1:0;
 			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
 
 
@@ -491,7 +491,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			float idx_x,idx_y;
 
 			int vpage=LAYER_FG;
-			if(state->blitter_data[0x7]&0x10)
+			if(state->m_blitter_data[0x7]&0x10)
 			{
 				vpage=LAYER_BG;
 /*
@@ -499,7 +499,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
                 for(int i=0;i<16;++i)
                 {
-                    printf("%x = %.4x\n",i,state->blitter_data[i]);
+                    printf("%x = %.4x\n",i,state->m_blitter_data[i]);
                 }
 
                 printf("\n");
@@ -509,7 +509,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			bool endx=false;
 			bool endy=false;
 
-			if(state->blitter_data[0x7]&0x0c)
+			if(state->m_blitter_data[0x7]&0x0c)
 			{
 				//???
 			}
@@ -539,7 +539,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 						//hack for clear
 						if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-					//      *BITMAP_ADDR16(state->tmp_bitmap[vpage], screen_y , screen_x ) =0;
+					//      *BITMAP_ADDR16(state->m_tmp_bitmap[vpage], screen_y , screen_x ) =0;
 						}
 					}
 					else
@@ -548,7 +548,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 						if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-							*BITMAP_ADDR16(state->tmp_bitmap[vpage], screen_y , screen_x ) = pix;
+							*BITMAP_ADDR16(state->m_tmp_bitmap[vpage], screen_y , screen_x ) = pix;
 						}
 					}
 				}
@@ -560,8 +560,8 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 static VIDEO_START(wheelfir)
 {
 	wheelfir_state *state = machine.driver_data<wheelfir_state>();
-	state->tmp_bitmap[0] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
-	state->tmp_bitmap[1] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap[0] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap[1] = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 }
 
 static SCREEN_UPDATE(wheelfir)
@@ -572,22 +572,22 @@ static SCREEN_UPDATE(wheelfir)
 
 	for(int y=0;y<NUM_SCANLINES;++y)
 	{
-		UINT16 *source = BITMAP_ADDR16(state->tmp_bitmap[LAYER_BG],( (state->scanlines[y].y)&511), 0);
+		UINT16 *source = BITMAP_ADDR16(state->m_tmp_bitmap[LAYER_BG],( (state->m_scanlines[y].y)&511), 0);
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (int x=0;x<336;x++)
 		{
 
-			dest[x] = source[ (x+(state->scanlines[y].x)) &511];
+			dest[x] = source[ (x+(state->m_scanlines[y].x)) &511];
 
 		}
 	}
 
-	copybitmap_trans(bitmap, state->tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, state->m_tmp_bitmap[LAYER_FG], 0, 0, 0, 0, cliprect, 0);
 
 /*
     {
-        bitmap_fill(state->tmp_bitmap[LAYER_BG], &screen->visible_area(),0);
+        bitmap_fill(state->m_tmp_bitmap[LAYER_BG], &screen->visible_area(),0);
 
     }
 */
@@ -598,29 +598,29 @@ static SCREEN_UPDATE(wheelfir)
 static SCREEN_EOF( wheelfir )
 {
 	wheelfir_state *state = machine.driver_data<wheelfir_state>();
-	bitmap_fill(state->tmp_bitmap[LAYER_FG], &machine.primary_screen->visible_area(),0);
+	bitmap_fill(state->m_tmp_bitmap[LAYER_FG], &machine.primary_screen->visible_area(),0);
 }
 
 
 static WRITE16_HANDLER( pal_reset_pos_w )
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	state->palpos = 0;
+	state->m_palpos = 0;
 }
 
 static WRITE16_HANDLER( pal_data_w )
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	int color=state->palpos/3;
-	state->palette[state->palpos] = data & 0xff;
-	++state->palpos;
+	int color=state->m_palpos/3;
+	state->m_palette[state->m_palpos] = data & 0xff;
+	++state->m_palpos;
 
-	state->palpos %=NUM_COLORS*3;
+	state->m_palpos %=NUM_COLORS*3;
 
 	{
-		int r = state->palette[color*3];
-		int g = state->palette[color*3+1];
-		int b = state->palette[color*3+2];
+		int r = state->m_palette[color*3];
+		int g = state->m_palette[color*3+1];
+		int b = state->m_palette[color*3+2];
 		palette_set_color(space->machine(), color, MAKE_RGB(r,g,b));
 	}
 
@@ -634,7 +634,7 @@ static WRITE16_HANDLER(wheelfir_7c0000_w)
 static WRITE16_HANDLER(wheelfir_snd_w)
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	COMBINE_DATA(&state->soundlatch);
+	COMBINE_DATA(&state->m_soundlatch);
 	cputag_set_input_line(space->machine(), "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
 	space->machine().scheduler().synchronize();
 }
@@ -642,7 +642,7 @@ static WRITE16_HANDLER(wheelfir_snd_w)
 static READ16_HANDLER( wheelfir_snd_r )
 {
 	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	return state->soundlatch;
+	return state->m_soundlatch;
 }
 
 static WRITE16_HANDLER(coin_cnt_w)
@@ -721,25 +721,25 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	wheelfir_state *state = timer.machine().driver_data<wheelfir_state>();
 	timer.machine().scheduler().synchronize();
-	state->current_scanline=param;
+	state->m_current_scanline=param;
 
-	if(state->current_scanline<NUM_SCANLINES)
+	if(state->m_current_scanline<NUM_SCANLINES)
 	{
 		//visible scanline
 
-		state->toggle_bit = 0x0000;
+		state->m_toggle_bit = 0x0000;
 
-		--state->scanline_cnt;
+		--state->m_scanline_cnt;
 
-		if(state->current_scanline>0)
+		if(state->m_current_scanline>0)
 		{
 			//copy scanline offset
-			state->scanlines[state->current_scanline].x=(state->scanlines[state->current_scanline-1].x);
-			state->scanlines[state->current_scanline].y=(state->scanlines[state->current_scanline-1].y+1);
-			state->scanlines[state->current_scanline].unkbits=state->scanlines[state->current_scanline-1].unkbits;
+			state->m_scanlines[state->m_current_scanline].x=(state->m_scanlines[state->m_current_scanline-1].x);
+			state->m_scanlines[state->m_current_scanline].y=(state->m_scanlines[state->m_current_scanline-1].y+1);
+			state->m_scanlines[state->m_current_scanline].unkbits=state->m_scanlines[state->m_current_scanline-1].unkbits;
 		}
 
-		if(state->scanline_cnt==0) //<=0 ?
+		if(state->m_scanline_cnt==0) //<=0 ?
 		{
 			cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
@@ -747,9 +747,9 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	}
 	else
 	{
-		if(state->current_scanline==NUM_SCANLINES) /* vblank */
+		if(state->m_current_scanline==NUM_SCANLINES) /* vblank */
 		{
-			state->toggle_bit = 0x8000;
+			state->m_toggle_bit = 0x8000;
 			cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
 		}
 	}
@@ -764,21 +764,21 @@ static MACHINE_START( wheelfir )
 {
 	wheelfir_state *state = machine.driver_data<wheelfir_state>();
 
-	state->maincpu = machine.device( "maincpu");
-	state->subcpu = machine.device(  "subcpu");
-	state->screen = machine.device(  "screen");
-	state->eeprom = machine.device(  "eeprom");
+	state->m_maincpu = machine.device( "maincpu");
+	state->m_subcpu = machine.device(  "subcpu");
+	state->m_screen = machine.device(  "screen");
+	state->m_eeprom = machine.device(  "eeprom");
 
-	state->zoom_table = auto_alloc_array(machine, INT32, ZOOM_TABLE_SIZE);
-	state->blitter_data = auto_alloc_array(machine, UINT16, 16);
+	state->m_zoom_table = auto_alloc_array(machine, INT32, ZOOM_TABLE_SIZE);
+	state->m_blitter_data = auto_alloc_array(machine, UINT16, 16);
 
-	state->scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine, UINT8, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
-	state->palette=auto_alloc_array(machine, UINT8, NUM_COLORS*3);
+	state->m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine, UINT8, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
+	state->m_palette=auto_alloc_array(machine, UINT8, NUM_COLORS*3);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
 	{
-		state->zoom_table[i]=-1;
+		state->m_zoom_table[i]=-1;
 	}
 
 	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
@@ -796,7 +796,7 @@ static MACHINE_START( wheelfir )
 		int dflag=(ROM[0x200+1+i]&0x10)?1:0;
 
 		int index=d0|(d1<<6)|(hflag<<12)|(dflag<<13);
-		state->zoom_table[index]=j;
+		state->m_zoom_table[index]=j;
 	}
 }
 

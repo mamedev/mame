@@ -104,22 +104,22 @@ static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 me
 	UINT8 trackball_pos = input_port_read(space->machine(), which ? "DIAL1" : "DIAL0");
 
 	/* Calculate the change from the last position. */
-	UINT8 trackball_diff = state->trackball_old[which] - trackball_pos;
+	UINT8 trackball_diff = state->m_trackball_old[which] - trackball_pos;
 
 	/* Store the new position for the next comparision. */
-	state->trackball_old[which] = trackball_pos;
+	state->m_trackball_old[which] = trackball_pos;
 
 	/* Move the sign bit to the high bit of the 6-bit trackball count. */
 	if (trackball_diff & 0x80)
 		trackball_diff |= 0x20;
 
 	/* Keep adding the changes.  The counters will be reset later by a hardware write. */
-	state->aimpos[which] = (state->aimpos[which] + trackball_diff) & 0x3f;
+	state->m_aimpos[which] = (state->m_aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
 	port = which ? input_port_read(space->machine(), "P2") : input_port_read(space->machine(), "P1");
 
-	return (port & 0xc0ff) | (state->aimpos[which] << 8);
+	return (port & 0xc0ff) | (state->m_aimpos[which] << 8);
 }
 
 
@@ -150,16 +150,16 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* Bit 0-1= Resets analog controls */
-		if ((data & 0x0001) && !(state->last & 0x0001))
-			state->aimpos[0] = 0;
-		if ((data & 0x0002) && !(state->last & 0x0002))
-			state->aimpos[1] = 0;
+		if ((data & 0x0001) && !(state->m_last & 0x0001))
+			state->m_aimpos[0] = 0;
+		if ((data & 0x0002) && !(state->m_last & 0x0002))
+			state->m_aimpos[1] = 0;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		/* Bit 13 = Resets the slave CPU */
-		if ((data & 0x2000) && !(state->last & 0x2000))
+		if ((data & 0x2000) && !(state->m_last & 0x2000))
 			cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
@@ -167,7 +167,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 		coin_counter_w(space->machine(), 1, data & 0x4000);
 	}
 
-	COMBINE_DATA(&state->last);
+	COMBINE_DATA(&state->m_last);
 }
 
 
@@ -175,7 +175,7 @@ static TIMER_CALLBACK( sound_delayed_w )
 {
 	exterm_state *state = machine.driver_data<exterm_state>();
 	/* data is latched independently for both sound CPUs */
-	state->master_sound_latch = state->slave_sound_latch = param;
+	state->m_master_sound_latch = state->m_slave_sound_latch = param;
 	cputag_set_input_line(machine, "audiocpu", M6502_IRQ_LINE, ASSERT_LINE);
 	cputag_set_input_line(machine, "audioslave", M6502_IRQ_LINE, ASSERT_LINE);
 }
@@ -199,7 +199,7 @@ static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
 {
 	exterm_state *state = timer.machine().driver_data<exterm_state>();
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
-	if (state->sound_control & 0x01)
+	if (state->m_sound_control & 0x01)
 		cputag_set_input_line(timer.machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -208,7 +208,7 @@ static WRITE8_DEVICE_HANDLER( ym2151_data_latch_w )
 {
 	exterm_state *state = device->machine().driver_data<exterm_state>();
 	/* bit 7 of the sound control selects which port */
-	ym2151_w(device, state->sound_control >> 7, data);
+	ym2151_w(device, state->m_sound_control >> 7, data);
 }
 
 
@@ -228,7 +228,7 @@ static READ8_HANDLER( sound_master_latch_r )
 	exterm_state *state = space->machine().driver_data<exterm_state>();
 	/* read latch and clear interrupt */
 	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
-	return state->master_sound_latch;
+	return state->m_master_sound_latch;
 }
 
 
@@ -237,7 +237,7 @@ static READ8_HANDLER( sound_slave_latch_r )
 	exterm_state *state = space->machine().driver_data<exterm_state>();
 	/* read latch and clear interrupt */
 	cputag_set_input_line(space->machine(), "audioslave", M6502_IRQ_LINE, CLEAR_LINE);
-	return state->slave_sound_latch;
+	return state->m_slave_sound_latch;
 }
 
 
@@ -245,8 +245,8 @@ static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
 {
 	exterm_state *state = device->machine().driver_data<exterm_state>();
 	/* DAC A is used to modulate DAC B */
-	state->dac_value[offset & 1] = data;
-	dac_data_16_w(device, (state->dac_value[0] ^ 0xff) * state->dac_value[1]);
+	state->m_dac_value[offset & 1] = data;
+	dac_data_16_w(device, (state->m_dac_value[0] ^ 0xff) * state->m_dac_value[1]);
 }
 
 
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( sound_control_w )
     D1 = to LED
     D0 = enable NMI timer
 */
-	state->sound_control = data;
+	state->m_sound_control = data;
 }
 
 
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( sound_control_w )
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfc700000) AM_RAM AM_BASE_MEMBER(exterm_state, master_videoram)
+	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfc700000) AM_RAM AM_BASE_MEMBER(exterm_state, m_master_videoram)
 	AM_RANGE(0x00800000, 0x00bfffff) AM_MIRROR(0xfc400000) AM_RAM
 	AM_RANGE(0x01000000, 0x013fffff) AM_MIRROR(0xfc000000) AM_READWRITE(exterm_host_data_r, exterm_host_data_w)
 	AM_RANGE(0x01400000, 0x0143ffff) AM_MIRROR(0xfc000000) AM_READ(exterm_input_port_0_r)
@@ -298,7 +298,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfbf00000) AM_RAM AM_BASE_MEMBER(exterm_state, slave_videoram)
+	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfbf00000) AM_RAM AM_BASE_MEMBER(exterm_state, m_slave_videoram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_MIRROR(0xfb800000) AM_RAM
 ADDRESS_MAP_END
 

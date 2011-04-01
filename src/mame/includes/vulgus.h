@@ -4,15 +4,15 @@ public:
 	vulgus_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *fgvideoram;
-	UINT8 *bgvideoram;
-	UINT8 *scroll_low;
-	UINT8 *scroll_high;
-	int palette_bank;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_scroll_low;
+	UINT8 *m_scroll_high;
+	int m_palette_bank;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

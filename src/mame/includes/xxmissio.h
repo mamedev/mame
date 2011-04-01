@@ -4,15 +4,15 @@ public:
 	xxmissio_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 status;
-	UINT8 *bgram;
-	UINT8 *fgram;
-	UINT8 *spriteram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT8 xscroll;
-	UINT8 yscroll;
-	UINT8 flipscreen;
+	UINT8 m_status;
+	UINT8 *m_bgram;
+	UINT8 *m_fgram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 m_xscroll;
+	UINT8 m_yscroll;
+	UINT8 m_flipscreen;
 };
 
 

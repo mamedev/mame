@@ -57,8 +57,8 @@ WRITE8_HANDLER( seicross_videoram_w )
 {
 	seicross_state *state = space->machine().driver_data<seicross_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( seicross_colorram_w )
@@ -70,19 +70,19 @@ WRITE8_HANDLER( seicross_colorram_w )
 
 	offset &= 0xffdf;
 
-	state->colorram[offset] = data;
-	state->colorram[offset + 0x20] = data;
+	state->m_colorram[offset] = data;
+	state->m_colorram[offset + 0x20] = data;
 
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset + 0x20);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset + 0x20);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	seicross_state *state = machine.driver_data<seicross_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x10) << 4);
-	int color = state->colorram[tile_index] & 0x0f;
-	int flags = ((state->colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x10) << 4);
+	int color = state->m_colorram[tile_index] & 0x0f;
+	int flags = ((state->m_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->m_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -91,20 +91,20 @@ VIDEO_START( seicross )
 {
 	seicross_state *state = machine.driver_data<seicross_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scroll_cols(state->bg_tilemap, 32);
+	tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	seicross_state *state = machine.driver_data<seicross_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
@@ -120,7 +120,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					x-256,240-spriteram[offs + 2],0);
 	}
 
-	for (offs = state->spriteram2_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram2_size - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
@@ -143,9 +143,9 @@ SCREEN_UPDATE( seicross )
 	int col;
 
 	for (col = 0; col < 32; col++)
-		tilemap_set_scrolly(state->bg_tilemap, col, state->row_scroll[col]);
+		tilemap_set_scrolly(state->m_bg_tilemap, col, state->m_row_scroll[col]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

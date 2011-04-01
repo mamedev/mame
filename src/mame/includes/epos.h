@@ -11,14 +11,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	size_t   videoram_size;
+	UINT8 *  m_videoram;
+	size_t   m_videoram_size;
 
 	/* video-related */
-	UINT8    palette;
+	UINT8    m_palette;
 
 	/* misc */
-	int      counter;
+	int      m_counter;
 };
 
 

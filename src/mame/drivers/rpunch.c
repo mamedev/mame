@@ -125,8 +125,8 @@
 static void ym2151_irq_gen(device_t *device, int state)
 {
 	rpunch_state *drvstate = device->machine().driver_data<rpunch_state>();
-	drvstate->ym2151_irq = state;
-	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->ym2151_irq | drvstate->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	drvstate->m_ym2151_irq = state;
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (drvstate->m_ym2151_irq | drvstate->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -159,9 +159,9 @@ static CUSTOM_INPUT( hi_bits_r )
 static TIMER_CALLBACK( sound_command_w_callback )
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
-	state->sound_busy = 1;
-	state->sound_data = param;
-	cputag_set_input_line(machine, "audiocpu", 0, (state->ym2151_irq | state->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_sound_busy = 1;
+	state->m_sound_data = param;
+	cputag_set_input_line(machine, "audiocpu", 0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -175,16 +175,16 @@ static WRITE16_HANDLER( sound_command_w )
 static READ8_HANDLER( sound_command_r )
 {
 	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	state->sound_busy = 0;
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->ym2151_irq | state->sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-	return state->sound_data;
+	state->m_sound_busy = 0;
+	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	return state->m_sound_data;
 }
 
 
 static READ16_HANDLER( sound_busy_r )
 {
 	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	return state->sound_busy;
+	return state->m_sound_busy;
 }
 
 
@@ -198,11 +198,11 @@ static READ16_HANDLER( sound_busy_r )
 static WRITE8_DEVICE_HANDLER( upd_control_w )
 {
 	rpunch_state *state = device->machine().driver_data<rpunch_state>();
-	if ((data & 1) != state->upd_rom_bank)
+	if ((data & 1) != state->m_upd_rom_bank)
 	{
 		UINT8 *snd = device->machine().region("upd")->base();
-		state->upd_rom_bank = data & 1;
-		memcpy(snd, snd + 0x20000 * (state->upd_rom_bank + 1), 0x20000);
+		state->m_upd_rom_bank = data & 1;
+		memcpy(snd, snd + 0x20000 * (state->m_upd_rom_bank + 1), 0x20000);
 	}
 	upd7759_reset_w(device, data >> 7);
 }
@@ -226,9 +226,9 @@ static WRITE8_DEVICE_HANDLER( upd_data_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_BASE_MEMBER(rpunch_state, bitmapram) AM_SIZE_MEMBER(rpunch_state, bitmapram_size)
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(rpunch_state, spriteram)
-	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_MEMBER(rpunch_state, videoram)
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_BASE_MEMBER(rpunch_state, m_bitmapram) AM_SIZE_MEMBER(rpunch_state, m_bitmapram_size)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(rpunch_state, m_spriteram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_MEMBER(rpunch_state, m_videoram)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(rpunch_crtc_data_w)
@@ -698,7 +698,7 @@ ROM_END
 static DRIVER_INIT( rabiolep )
 {
 	rpunch_state *state = machine.driver_data<rpunch_state>();
-	state->sprite_palette = 0x300;
+	state->m_sprite_palette = 0x300;
 }
 
 
@@ -707,8 +707,8 @@ static DRIVER_INIT( svolley )
 	rpunch_state *state = machine.driver_data<rpunch_state>();
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
-	state->sprite_palette = 0x080;
-	state->bitmapram = NULL;
+	state->m_sprite_palette = 0x080;
+	state->m_bitmapram = NULL;
 }
 
 

@@ -68,11 +68,11 @@ static ADDRESS_MAP_START( ginganin_map, AS_PROGRAM, 16 )
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
-	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE_MEMBER(ginganin_state, txtram)
-	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE_SIZE_MEMBER(ginganin_state, spriteram, spriteram_size)
+	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE_MEMBER(ginganin_state, m_txtram)
+	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE_SIZE_MEMBER(ginganin_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x050000, 0x0507ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE_MEMBER(ginganin_state, vregs)
-	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE_MEMBER(ginganin_state, fgram)
+	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE_MEMBER(ginganin_state, m_vregs)
+	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE_MEMBER(ginganin_state, m_fgram)
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -90,24 +90,24 @@ static WRITE8_HANDLER( MC6840_control_port_0_w )
     (This routine hasn't been completed yet.) */
 
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->MC6840_index0 = data;
+	state->m_MC6840_index0 = data;
 
-	if (state->MC6840_index0 & 0x80)	/* enable timer output */
+	if (state->m_MC6840_index0 & 0x80)	/* enable timer output */
 	{
-		if ((state->MC6840_register0 != state->S_TEMPO) && (state->MC6840_register0 != 0))
+		if ((state->m_MC6840_register0 != state->m_S_TEMPO) && (state->m_MC6840_register0 != 0))
 		{
-			state->S_TEMPO = state->MC6840_register0;
+			state->m_S_TEMPO = state->m_MC6840_register0;
 #ifdef MAME_DEBUG
-			popmessage("I0:0x%02X R0:0x%02X I1:0x%02X R1:0x%02X", state->MC6840_index0, state->MC6840_register0, state->MC6840_index1, state->MC6840_register1);
+			popmessage("I0:0x%02X R0:0x%02X I1:0x%02X R1:0x%02X", state->m_MC6840_index0, state->m_MC6840_register0, state->m_MC6840_index1, state->m_MC6840_register1);
 #endif
 		}
-		state->MC6809_FLAG = 1;
+		state->m_MC6809_FLAG = 1;
 	}
 	else
-		state->MC6809_FLAG = 0;
+		state->m_MC6809_FLAG = 0;
 
 #ifdef MAME_DEBUG
-	logerror("MC6840 Write:(0x%02X)0x%02X\n", state->MC6840_register0,  data);
+	logerror("MC6840 Write:(0x%02X)0x%02X\n", state->m_MC6840_register0,  data);
 #endif
 }
 
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( MC6840_control_port_1_w )
     (This routine hasn't been completed yet.) */
 
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->MC6840_index1 = data;
+	state->m_MC6840_index1 = data;
 }
 
 static WRITE8_HANDLER( MC6840_write_port_0_w )
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( MC6840_write_port_0_w )
     (This routine hasn't been completed yet.) */
 
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->MC6840_register0 = data;
+	state->m_MC6840_register0 = data;
 }
 
 static WRITE8_HANDLER( MC6840_write_port_1_w )
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( MC6840_write_port_1_w )
     (This routine hasn't been completed yet.) */
 
 	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->MC6840_register1 = data;
+	state->m_MC6840_register1 = data;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -280,21 +280,21 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 
 	ginganin_state *state = device->machine().driver_data<ginganin_state>();
 
-	if (state->S_TEMPO_OLD != state->S_TEMPO)
+	if (state->m_S_TEMPO_OLD != state->m_S_TEMPO)
 	{
-		state->S_TEMPO_OLD = state->S_TEMPO;
-		state->MC6809_CTR = 0;
+		state->m_S_TEMPO_OLD = state->m_S_TEMPO;
+		state->m_MC6809_CTR = 0;
 	}
 
-	if (state->MC6809_FLAG != 0)
+	if (state->m_MC6809_FLAG != 0)
 	{
-		if (state->MC6809_CTR > state->S_TEMPO)
+		if (state->m_MC6809_CTR > state->m_S_TEMPO)
 		{
-			state->MC6809_CTR = 0;
+			state->m_MC6809_CTR = 0;
 			device_set_input_line(device, 0, HOLD_LINE);
 		}
 		else
-			state->MC6809_CTR++;
+			state->m_MC6809_CTR++;
 	}
 }
 
@@ -306,34 +306,34 @@ static MACHINE_START( ginganin )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->layers_ctrl));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->MC6840_index0));
-	state->save_item(NAME(state->MC6840_register0));
-	state->save_item(NAME(state->MC6840_index1));
-	state->save_item(NAME(state->MC6840_register1));
-	state->save_item(NAME(state->S_TEMPO));
-	state->save_item(NAME(state->S_TEMPO_OLD));
-	state->save_item(NAME(state->MC6809_CTR));
-	state->save_item(NAME(state->MC6809_FLAG));
+	state->save_item(NAME(state->m_layers_ctrl));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_MC6840_index0));
+	state->save_item(NAME(state->m_MC6840_register0));
+	state->save_item(NAME(state->m_MC6840_index1));
+	state->save_item(NAME(state->m_MC6840_register1));
+	state->save_item(NAME(state->m_S_TEMPO));
+	state->save_item(NAME(state->m_S_TEMPO_OLD));
+	state->save_item(NAME(state->m_MC6809_CTR));
+	state->save_item(NAME(state->m_MC6809_FLAG));
 }
 
 static MACHINE_RESET( ginganin )
 {
 	ginganin_state *state = machine.driver_data<ginganin_state>();
 
-	state->layers_ctrl = 0;
-	state->flipscreen = 0;
-	state->MC6840_index0 = 0;
-	state->MC6840_register0 = 0;
-	state->MC6840_index1 = 0;
-	state->MC6840_register1 = 0;
-	state->S_TEMPO = 0;
-	state->S_TEMPO_OLD = 0;
-	state->MC6809_CTR = 0;
-	state->MC6809_FLAG = 0;
+	state->m_layers_ctrl = 0;
+	state->m_flipscreen = 0;
+	state->m_MC6840_index0 = 0;
+	state->m_MC6840_register0 = 0;
+	state->m_MC6840_index1 = 0;
+	state->m_MC6840_register1 = 0;
+	state->m_S_TEMPO = 0;
+	state->m_S_TEMPO_OLD = 0;
+	state->m_MC6809_CTR = 0;
+	state->m_MC6809_FLAG = 0;
 }
 
 

@@ -11,18 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  bgvideoram;
-	UINT16 *  fgvideoram;
-	UINT16 *  txvideoram;
-	UINT16 *  paletteram;
-//  UINT16 *  spriteram;  // needed for EOF, but currently handled through buffer_spriteram16
+	UINT16 *  m_bgvideoram;
+	UINT16 *  m_fgvideoram;
+	UINT16 *  m_txvideoram;
+	UINT16 *  m_paletteram;
+//  UINT16 *  m_spriteram;  // needed for EOF, but currently handled through buffer_spriteram16
 
 	/* video-related */
-	tilemap_t   *tx_tilemap, *bg_tilemap, *fg_tilemap;
-	UINT16    scroll[4];
+	tilemap_t   *m_tx_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	tilemap_t   *m_fg_tilemap;
+	UINT16    m_scroll[4];
 
-	UINT16    inp[3];
-	UINT16    soundcommand;
+	UINT16    m_inp[3];
+	UINT16    m_soundcommand;
 };
 
 

@@ -5,15 +5,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  spriteram;
-	UINT8 *  spriteram2;
-	size_t   spriteram_size;
+	UINT8 *  m_videoram;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_spriteram2;
+	size_t   m_spriteram_size;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
-	int      yiear_nmi_enable;
+	int      m_yiear_nmi_enable;
 };
 
 

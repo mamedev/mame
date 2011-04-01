@@ -261,25 +261,25 @@ static READ16_HANDLER( cps1_hack_dsw_r )
 static READ16_HANDLER( forgottn_dial_0_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return ((input_port_read(space->machine(), "DIAL0") - state->dial[0]) >> (8 * offset)) & 0xff;
+	return ((input_port_read(space->machine(), "DIAL0") - state->m_dial[0]) >> (8 * offset)) & 0xff;
 }
 
 static READ16_HANDLER( forgottn_dial_1_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return ((input_port_read(space->machine(), "DIAL1") - state->dial[1]) >> (8 * offset)) & 0xff;
+	return ((input_port_read(space->machine(), "DIAL1") - state->m_dial[1]) >> (8 * offset)) & 0xff;
 }
 
 static WRITE16_HANDLER( forgottn_dial_0_reset_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->dial[0] = input_port_read(space->machine(), "DIAL0");
+	state->m_dial[0] = input_port_read(space->machine(), "DIAL0");
 }
 
 static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->dial[1] = input_port_read(space->machine(), "DIAL1");
+	state->m_dial[1] = input_port_read(space->machine(), "DIAL1");
 }
 
 
@@ -366,7 +366,7 @@ static READ16_HANDLER( qsound_rom_r )
 READ16_HANDLER( qsound_sharedram1_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return state->qsound_sharedram1[offset] | 0xff00;
+	return state->m_qsound_sharedram1[offset] | 0xff00;
 }
 
 WRITE16_HANDLER( qsound_sharedram1_w )
@@ -374,13 +374,13 @@ WRITE16_HANDLER( qsound_sharedram1_w )
 	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->qsound_sharedram1[offset] = data;
+		state->m_qsound_sharedram1[offset] = data;
 }
 
 static READ16_HANDLER( qsound_sharedram2_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return state->qsound_sharedram2[offset] | 0xff00;
+	return state->m_qsound_sharedram2[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( qsound_sharedram2_w )
@@ -388,7 +388,7 @@ static WRITE16_HANDLER( qsound_sharedram2_w )
 	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->qsound_sharedram2[offset] = data;
+		state->m_qsound_sharedram2[offset] = data;
 }
 
 static WRITE8_HANDLER( qsound_banksw_w )
@@ -551,13 +551,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800020, 0x800021) AM_READNOP						/* ? Used by Rockman ? not mapped according to PAL */
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)	/* CPS-A custom */
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it a a different
        address, see DRIVER_INIT */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, cps_b_regs)
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs)
 	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)	/* Sound command */
 	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -601,9 +601,9 @@ static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, cps_a_regs)	/* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, cps_b_regs)	/* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, gfxram, gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs)	/* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)			/* Slammasters protection */
 	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ_PORT("IN2")			/* Player 3 controls (later games) */
@@ -617,11 +617,11 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8 )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(cps_state, qsound_sharedram1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(cps_state, m_qsound_sharedram1)
 	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
 	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_r)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(cps_state, qsound_sharedram2)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(cps_state, m_qsound_sharedram2)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -2923,7 +2923,7 @@ GFXDECODE_END
 static void cps1_irq_handler_mus(device_t *device, int irq)
 {
 	cps_state *state = device->machine().driver_data<cps_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -2946,8 +2946,8 @@ static MACHINE_START( common )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_START( cps1 )
@@ -9970,10 +9970,10 @@ static DRIVER_INIT( forgottn )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x800052, 0x800055, FUNC(forgottn_dial_0_r));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80005a, 0x80005d, FUNC(forgottn_dial_1_r));
 
-	state->save_item(NAME(state->dial));
+	state->save_item(NAME(state->m_dial));
 
-	state->dial[0] = 0;
-	state->dial[1] = 0;
+	state->m_dial[0] = 0;
+	state->m_dial[1] = 0;
 
 	DRIVER_INIT_CALL(cps1);
 }

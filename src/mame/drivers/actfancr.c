@@ -37,13 +37,13 @@
 static WRITE8_HANDLER( triothep_control_select_w )
 {
 	actfancr_state *state = space->machine().driver_data<actfancr_state>();
-	state->trio_control_select = data;
+	state->m_trio_control_select = data;
 }
 
 static READ8_HANDLER( triothep_control_r )
 {
 	actfancr_state *state = space->machine().driver_data<actfancr_state>();
-	switch (state->trio_control_select)
+	switch (state->m_trio_control_select)
 	{
 		case 0: return input_port_read(space->machine(), "P1");
 		case 1: return input_port_read(space->machine(), "P2");
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( actfancr_sound_w )
 {
 	actfancr_state *state = space->machine().driver_data<actfancr_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( actfancr_buffer_spriteram_w)
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i=0;i<0x800/2;i++)
 	{
-		state->spriteram16[i] = buffered_spriteram[i*2] | (buffered_spriteram[(i*2)+1] <<8);
+		state->m_spriteram16[i] = buffered_spriteram[i*2] | (buffered_spriteram[(i*2)+1] <<8);
 	}
 }
 
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, main_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, m_main_ram) /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, main_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, m_main_ram) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -285,7 +285,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int linestate)
 {
 	actfancr_state *state = device->machine().driver_data<actfancr_state>();
-	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
+	device_set_input_line(state->m_audiocpu, 0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -299,8 +299,8 @@ static MACHINE_START( actfancr )
 {
 	actfancr_state *state = machine.driver_data<actfancr_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_START( triothep )
@@ -309,13 +309,13 @@ static MACHINE_START( triothep )
 
 	MACHINE_START_CALL(actfancr);
 
-	state->save_item(NAME(state->trio_control_select));
+	state->save_item(NAME(state->m_trio_control_select));
 }
 
 static MACHINE_RESET( actfancr )
 {
 	actfancr_state *state = machine.driver_data<actfancr_state>();
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_RESET( triothep )
@@ -323,7 +323,7 @@ static MACHINE_RESET( triothep )
 	actfancr_state *state = machine.driver_data<actfancr_state>();
 
 	MACHINE_RESET_CALL(actfancr);
-	state->trio_control_select = 0;
+	state->m_trio_control_select = 0;
 }
 
 /******************************************************************************/

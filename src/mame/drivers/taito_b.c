@@ -189,7 +189,7 @@ static WRITE8_HANDLER( bankswitch_w )
 static TIMER_CALLBACK( rsaga2_interrupt2  )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 2, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rastansaga2_interrupt )
@@ -202,7 +202,7 @@ static INTERRUPT_GEN( rastansaga2_interrupt )
 static TIMER_CALLBACK( crimec_interrupt3 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 3, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( crimec_interrupt )
@@ -215,7 +215,7 @@ static INTERRUPT_GEN( crimec_interrupt )
 static TIMER_CALLBACK( hitice_interrupt6 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hitice_interrupt )
@@ -228,7 +228,7 @@ static INTERRUPT_GEN( hitice_interrupt )
 static TIMER_CALLBACK( rambo3_interrupt1 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( rambo3_interrupt )
@@ -241,7 +241,7 @@ static INTERRUPT_GEN( rambo3_interrupt )
 static TIMER_CALLBACK( pbobble_interrupt5 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 5, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pbobble_interrupt )
@@ -253,7 +253,7 @@ static INTERRUPT_GEN( pbobble_interrupt )
 static TIMER_CALLBACK( viofight_interrupt1 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( viofight_interrupt )
@@ -265,7 +265,7 @@ static INTERRUPT_GEN( viofight_interrupt )
 static TIMER_CALLBACK( masterw_interrupt4 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( masterw_interrupt )
@@ -277,7 +277,7 @@ static INTERRUPT_GEN( masterw_interrupt )
 static TIMER_CALLBACK( silentd_interrupt4 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( silentd_interrupt )
@@ -289,7 +289,7 @@ static INTERRUPT_GEN( silentd_interrupt )
 static TIMER_CALLBACK( selfeena_interrupt4 )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( selfeena_interrupt )
@@ -301,7 +301,7 @@ static INTERRUPT_GEN( selfeena_interrupt )
 static TIMER_CALLBACK( sbm_interrupt5 )//4
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
-	device_set_input_line(state->maincpu, 5, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( sbm_interrupt )//5
@@ -360,12 +360,12 @@ static WRITE16_HANDLER( gain_control_w )
 	{
 		if (offset == 0)
 		{
-			mb87078_data_w(state->mb87078, data >> 8, 0);
+			mb87078_data_w(state->m_mb87078, data >> 8, 0);
     	      //logerror("MB87078 dsel=0 data=%4x\n", data);
 		}
 		else
 		{
-			mb87078_data_w(state->mb87078, data >> 8, 1);
+			mb87078_data_w(state->m_mb87078, data >> 8, 1);
 	           //logerror("MB87078 dsel=1 data=%4x\n", data);
 		}
 	}
@@ -391,14 +391,14 @@ static const eeprom_interface taitob_eeprom_intf =
 static READ16_HANDLER( eep_latch_r )
 {
 	taitob_state *state = space->machine().driver_data<taitob_state>();
-	return state->eep_latch;
+	return state->m_eep_latch;
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
 	taitob_state *state = space->machine().driver_data<taitob_state>();
 
-	COMBINE_DATA(&state->eep_latch);
+	COMBINE_DATA(&state->m_eep_latch);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -432,14 +432,14 @@ static WRITE16_HANDLER( eeprom_w )
 static READ16_HANDLER( player_34_coin_ctrl_r )
 {
 	taitob_state *state = space->machine().driver_data<taitob_state>();
-	return state->coin_word;
+	return state->m_coin_word;
 }
 
 static WRITE16_HANDLER( player_34_coin_ctrl_w )
 {
 	taitob_state *state = space->machine().driver_data<taitob_state>();
 
-	COMBINE_DATA(&state->coin_word);
+	COMBINE_DATA(&state->m_coin_word);
 
 	/* coin counters and lockout */
 	coin_lockout_w(space->machine(), 2, ~data & 0x0100);
@@ -457,7 +457,7 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 			return input_port_read(space->machine(), "COIN") << 8;
 
 		default:
-			return tc0640fio_r(state->tc0640fio, offset) << 8;
+			return tc0640fio_r(state->m_tc0640fio, offset) << 8;
 	}
 }
 
@@ -465,18 +465,18 @@ static WRITE16_HANDLER( spacedxo_tc0220ioc_w )
 {
 	taitob_state *state = space->machine().driver_data<taitob_state>();
 	if (ACCESSING_BITS_0_7)
-		tc0220ioc_w(state->tc0220ioc, offset, data & 0xff);
+		tc0220ioc_w(state->m_tc0220ioc, offset, data & 0xff);
 	else
 	{
 		/* spacedxo also writes here - bug? */
-		tc0220ioc_w(state->tc0220ioc, offset, (data >> 8) & 0xff);
+		tc0220ioc_w(state->m_tc0220ioc, offset, (data >> 8) & 0xff);
 	}
 }
 
 
 #define TC0180VCU_MEMRW( ADDR )											\
 	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)	\
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE_MEMBER(taitob_state, spriteram)	\
+	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE_MEMBER(taitob_state, m_spriteram)	\
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
 	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
 	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE_MEMBER(taitob_state, pixelram)
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_BASE_MEMBER(taitob_state, m_pixelram)
 //  { 0xbffff0, 0xbffff1, ???
 	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
@@ -2092,7 +2092,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitob_state *state = device->machine().driver_data<taitob_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2131,7 +2131,7 @@ static void mb87078_gain_changed( running_machine &machine, int channel, int per
 	if (channel == 1)
 	{
 		device_sound_interface *sound;
-		state->ym->interface(sound);
+		state->m_ym->interface(sound);
 		sound->set_output_gain(0, percent / 100.0);
 		sound->set_output_gain(1, percent / 100.0);
 		sound->set_output_gain(2, percent / 100.0);
@@ -2196,24 +2196,24 @@ static MACHINE_START( taitob )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->mb87078 = machine.device("mb87078");
-	state->ym = machine.device("ymsnd");
-	state->tc0180vcu = machine.device("tc0180vcu");
-	state->tc0640fio = machine.device("tc0640fio");
-	state->tc0220ioc = machine.device("tc0220ioc");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_mb87078 = machine.device("mb87078");
+	state->m_ym = machine.device("ymsnd");
+	state->m_tc0180vcu = machine.device("tc0180vcu");
+	state->m_tc0640fio = machine.device("tc0640fio");
+	state->m_tc0220ioc = machine.device("tc0220ioc");
 
-	state->save_item(NAME(state->eep_latch));
-	state->save_item(NAME(state->coin_word));
+	state->save_item(NAME(state->m_eep_latch));
+	state->save_item(NAME(state->m_coin_word));
 }
 
 static MACHINE_RESET( taitob )
 {
 	taitob_state *state = machine.driver_data<taitob_state>();
 
-	state->eep_latch = 0;
-	state->coin_word = 0;
+	state->m_eep_latch = 0;
+	state->m_coin_word = 0;
 }
 
 static MACHINE_CONFIG_START( rastsag2, taitob_state )

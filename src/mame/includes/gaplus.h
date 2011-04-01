@@ -12,13 +12,13 @@ public:
 	gaplus_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *customio_3;
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	tilemap_t *bg_tilemap;
-	UINT8 starfield_control[4];
-	int total_stars;
-	struct star stars[MAX_STARS];
+	UINT8 *m_customio_3;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_starfield_control[4];
+	int m_total_stars;
+	struct star m_stars[MAX_STARS];
 };
 
 

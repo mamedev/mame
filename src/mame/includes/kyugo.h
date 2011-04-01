@@ -11,23 +11,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     fgvideoram;
-	UINT8 *     bgvideoram;
-	UINT8 *     bgattribram;
-	UINT8 *     spriteram_1;
-	UINT8 *     spriteram_2;
-	UINT8 *     shared_ram;
+	UINT8 *     m_fgvideoram;
+	UINT8 *     m_bgvideoram;
+	UINT8 *     m_bgattribram;
+	UINT8 *     m_spriteram_1;
+	UINT8 *     m_spriteram_2;
+	UINT8 *     m_shared_ram;
 
 	/* video-related */
-	tilemap_t     *bg_tilemap, *fg_tilemap;
-	UINT8       scroll_x_lo, scroll_x_hi, scroll_y;
-	int         bgpalbank, fgcolor;
-	int         flipscreen;
-	const UINT8 *color_codes;
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
+	UINT8       m_scroll_x_lo;
+	UINT8       m_scroll_x_hi;
+	UINT8       m_scroll_y;
+	int         m_bgpalbank;
+	int         m_fgcolor;
+	int         m_flipscreen;
+	const UINT8 *m_color_codes;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *subcpu;
+	device_t *m_maincpu;
+	device_t *m_subcpu;
 };
 
 

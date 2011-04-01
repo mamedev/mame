@@ -11,22 +11,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    pf1_videoram;
-	UINT8 *    pf2_videoram;
-	UINT8 *    paletteram;
-//  UINT8 *    spriteram;
-//  UINT8 *    spriteram2;
+	UINT8 *    m_pf1_videoram;
+	UINT8 *    m_pf2_videoram;
+	UINT8 *    m_paletteram;
+//  UINT8 *    m_spriteram;
+//  UINT8 *    m_spriteram2;
 
 	/* video-related */
-	tilemap_t    *fg_tilemap, *bg_tilemap;
-	int        pf2_bankbase, pf1_bankbase;
-	int        old_pf1, old_pf2;
-	int        gfx_bank;
+	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap;
+	int        m_pf2_bankbase;
+	int        m_pf1_bankbase;
+	int        m_old_pf1;
+	int        m_old_pf2;
+	int        m_gfx_bank;
 
 	/* devices */
-	device_t *audiocpu;
-	device_t *k007121_1;
-	device_t *k007121_2;
+	device_t *m_audiocpu;
+	device_t *m_k007121_1;
+	device_t *m_k007121_2;
 };
 
 

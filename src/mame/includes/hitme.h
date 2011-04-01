@@ -19,13 +19,13 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
+	UINT8 *  m_videoram;
 
 	/* video-related */
-	tilemap_t  *tilemap;
+	tilemap_t  *m_tilemap;
 
 	/* misc */
-	attotime timeout_time;
+	attotime m_timeout_time;
 };
 
 

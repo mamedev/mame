@@ -55,12 +55,12 @@ public:
 	r2dtank_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 flipscreen;
-	UINT32 ttl74123_output;
-	UINT8 AY8910_selected;
-	pen_t pens[NUM_PENS];
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 m_flipscreen;
+	UINT32 m_ttl74123_output;
+	UINT8 m_AY8910_selected;
+	pen_t m_pens[NUM_PENS];
 };
 
 
@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( AY8910_select_w )
        D3 - selects ay8910 #0
        D4 - selects ay8910 #1
        D5-D7 - not used */
-	state->AY8910_selected = data;
+	state->m_AY8910_selected = data;
 
 if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", device->machine().describe_context(), data);
 }
@@ -161,10 +161,10 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
 	UINT8 ret = 0;
 
-	if (state->AY8910_selected & 0x08)
+	if (state->m_AY8910_selected & 0x08)
 		ret = ay8910_r(device->machine().device("ay1"), 0);
 
-	if (state->AY8910_selected & 0x10)
+	if (state->m_AY8910_selected & 0x10)
 		ret = ay8910_r(device->machine().device("ay2"), 0);
 
 	return ret;
@@ -174,11 +174,11 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 static WRITE8_DEVICE_HANDLER( AY8910_port_w )
 {
 	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
-	if (state->AY8910_selected & 0x08)
-		ay8910_data_address_w(device->machine().device("ay1"), state->AY8910_selected >> 2, data);
+	if (state->m_AY8910_selected & 0x08)
+		ay8910_data_address_w(device->machine().device("ay1"), state->m_AY8910_selected >> 2, data);
 
-	if (state->AY8910_selected & 0x10)
-		ay8910_data_address_w(device->machine().device("ay2"), state->AY8910_selected >> 2, data);
+	if (state->m_AY8910_selected & 0x10)
+		ay8910_data_address_w(device->machine().device("ay2"), state->m_AY8910_selected >> 2, data);
 }
 
 
@@ -222,14 +222,14 @@ static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 	r2dtank_state *state = device->machine().driver_data<r2dtank_state>();
 	device_t *pia = device->machine().device("pia_main");
 	pia6821_ca1_w(pia, data);
-	state->ttl74123_output = data;
+	state->m_ttl74123_output = data;
 }
 
 
 static CUSTOM_INPUT( get_ttl74123_output )
 {
 	r2dtank_state *state = field->port->machine().driver_data<r2dtank_state>();
-	return state->ttl74123_output;
+	return state->m_ttl74123_output;
 }
 
 
@@ -290,9 +290,9 @@ static MACHINE_START( r2dtank )
 {
 	r2dtank_state *state = machine.driver_data<r2dtank_state>();
 	/* setup for save states */
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->ttl74123_output);
-	state_save_register_global(machine, state->AY8910_selected);
+	state_save_register_global(machine, state->m_flipscreen);
+	state_save_register_global(machine, state->m_ttl74123_output);
+	state_save_register_global(machine, state->m_AY8910_selected);
 }
 
 
@@ -307,7 +307,7 @@ static MACHINE_START( r2dtank )
 static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
 	r2dtank_state *drvstate = device->machine().driver_data<r2dtank_state>();
-	drvstate->flipscreen = !state;
+	drvstate->m_flipscreen = !state;
 }
 
 
@@ -319,10 +319,10 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		state->pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		state->m_pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
-	return state->pens;
+	return state->m_pens;
 }
 
 
@@ -344,17 +344,17 @@ static MC6845_UPDATE_ROW( update_row )
 					  ((ra << 5) & 0x00e0) |
 					  ((ma << 0) & 0x001f);
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 			offs = offs ^ 0x1fff;
 
-		data = state->videoram[offs];
-		fore_color = (state->colorram[offs] >> 5) & 0x07;
+		data = state->m_videoram[offs];
+		fore_color = (state->m_colorram[offs] >> 5) & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 bit, color;
 
-			if (state->flipscreen)
+			if (state->m_flipscreen)
 			{
 				bit = data & 0x01;
 				data = data >> 1;
@@ -420,9 +420,9 @@ static WRITE8_DEVICE_HANDLER( pia_comp_w )
 
 
 static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, videoram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_colorram)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia_main", pia6821_r, pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)

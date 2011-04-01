@@ -6,11 +6,11 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 *sndram;
-	UINT16 *workram;
-	UINT16 control;
-	INT32 gp2_irq_control;
-	INT32 pal;
+	UINT8 *m_sndram;
+	UINT16 *m_workram;
+	UINT16 m_control;
+	INT32 m_gp2_irq_control;
+	INT32 m_pal;
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/

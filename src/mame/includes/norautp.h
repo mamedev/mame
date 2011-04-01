@@ -12,8 +12,8 @@ public:
 	norautp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *np_vram;
-	UINT16 np_addr;
+	UINT16 *m_np_vram;
+	UINT16 m_np_addr;
 };
 
 

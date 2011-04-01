@@ -33,23 +33,24 @@ typedef struct _flower_sound_state flower_sound_state;
 struct _flower_sound_state
 {
 	/* data about the sound system */
-	sound_channel channel_list[MAX_VOICES];
-	sound_channel *last_channel;
+	sound_channel m_channel_list[MAX_VOICES];
+	sound_channel *m_last_channel;
 
 	/* global sound parameters */
-	const UINT8 *sound_rom1, *sound_rom2;
-	UINT8 num_voices;
-	UINT8 sound_enable;
-	sound_stream * stream;
+	const UINT8 *m_sound_rom1;
+	const UINT8 *m_sound_rom2;
+	UINT8 m_num_voices;
+	UINT8 m_sound_enable;
+	sound_stream * m_stream;
 
 	/* mixer tables and internal buffers */
-	INT16 *mixer_table;
-	INT16 *mixer_lookup;
-	short *mixer_buffer;
-	short *mixer_buffer_2;
+	INT16 *m_mixer_table;
+	INT16 *m_mixer_lookup;
+	short *m_mixer_buffer;
+	short *m_mixer_buffer_2;
 
-	UINT8 soundregs1[0x40];
-	UINT8 soundregs2[0x40];
+	UINT8 m_soundregs1[0x40];
+	UINT8 m_soundregs2[0x40];
 };
 
 INLINE flower_sound_state *get_safe_token( device_t *device )
@@ -68,18 +69,18 @@ static void make_mixer_table(device_t *device, int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	state->mixer_table = auto_alloc_array(device->machine(), INT16, 256 * voices);
+	state->m_mixer_table = auto_alloc_array(device->machine(), INT16, 256 * voices);
 
 	/* find the middle of the table */
-	state->mixer_lookup = state->mixer_table + (128 * voices);
+	state->m_mixer_lookup = state->m_mixer_table + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (i = 0; i < count; i++)
 	{
 		int val = i * gain * 16 / voices;
 		if (val > 32767) val = 32767;
-		state->mixer_lookup[ i] = val;
-		state->mixer_lookup[-i] = -val;
+		state->m_mixer_lookup[ i] = val;
+		state->m_mixer_lookup[-i] = -val;
 	}
 }
 
@@ -94,17 +95,17 @@ static STREAM_UPDATE( flower_update_mono )
 	int i;
 
 	/* if no sound, we're done */
-	if (state->sound_enable == 0)
+	if (state->m_sound_enable == 0)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(state->mixer_buffer, 0, samples * sizeof(short));
+	memset(state->m_mixer_buffer, 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
-	for (voice = state->channel_list; voice < state->last_channel; voice++)
+	for (voice = state->m_channel_list; voice < state->m_last_channel; voice++)
 	{
 		int f = 256*voice->frequency;
 		int v = voice->volume;
@@ -112,10 +113,10 @@ static STREAM_UPDATE( flower_update_mono )
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const UINT8 *w = &state->sound_rom1[voice->rom_offset];
+			const UINT8 *w = &state->m_sound_rom1[voice->rom_offset];
 			int c = voice->counter;
 
-			mix = state->mixer_buffer;
+			mix = state->m_mixer_buffer;
 
 			/* add our contribution */
 			for (i = 0; i < samples; i++)
@@ -137,7 +138,7 @@ static STREAM_UPDATE( flower_update_mono )
 						else
 						{
 //                          *mix++ += ((w[offs] - 0x80) * v) / 16;
-							*mix++ += state->sound_rom2[v*256 + w[offs]] - 0x80;
+							*mix++ += state->m_sound_rom2[v*256 + w[offs]] - 0x80;
 						}
 					}
 				}
@@ -146,7 +147,7 @@ static STREAM_UPDATE( flower_update_mono )
 					offs = (c >> 15) & 0x1ff;
 
 //                  *mix++ += ((w[offs] - 0x80) * v) / 16;
-					*mix++ += state->sound_rom2[v*256 + w[offs]] - 0x80;
+					*mix++ += state->m_sound_rom2[v*256 + w[offs]] - 0x80;
 				}
 			}
 
@@ -156,9 +157,9 @@ static STREAM_UPDATE( flower_update_mono )
 	}
 
 	/* mix it down */
-	mix = state->mixer_buffer;
+	mix = state->m_mixer_buffer;
 	for (i = 0; i < samples; i++)
-		*buffer++ = state->mixer_lookup[*mix++];
+		*buffer++ = state->m_mixer_lookup[*mix++];
 }
 
 
@@ -171,33 +172,33 @@ static DEVICE_START( flower_sound )
 	int i;
 
 	/* get stream channels */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, samplerate, 0, flower_update_mono);
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, samplerate, 0, flower_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	state->mixer_buffer = auto_alloc_array(device->machine(), short, 2 * samplerate);
-	state->mixer_buffer_2 = state->mixer_buffer + samplerate;
+	state->m_mixer_buffer = auto_alloc_array(device->machine(), short, 2 * samplerate);
+	state->m_mixer_buffer_2 = state->m_mixer_buffer + samplerate;
 
 	/* build the mixer table */
 	make_mixer_table(device, 8, defgain);
 
 	/* extract globals from the interface */
-	state->num_voices = 8;
-	state->last_channel = state->channel_list + state->num_voices;
+	state->m_num_voices = 8;
+	state->m_last_channel = state->m_channel_list + state->m_num_voices;
 
-	state->sound_rom1 = machine.region("sound1")->base();
-	state->sound_rom2 = machine.region("sound2")->base();
+	state->m_sound_rom1 = machine.region("sound1")->base();
+	state->m_sound_rom2 = machine.region("sound2")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
-	state->sound_enable = 1;
+	state->m_sound_enable = 1;
 
 	/* save globals */
-	device->save_item(NAME(state->num_voices));
-	device->save_item(NAME(state->sound_enable));
+	device->save_item(NAME(state->m_num_voices));
+	device->save_item(NAME(state->m_sound_enable));
 
 	/* reset all the voices */
-	for (i = 0; i < state->num_voices; i++)
+	for (i = 0; i < state->m_num_voices; i++)
 	{
-		voice = &state->channel_list[i];
+		voice = &state->m_channel_list[i];
 
 		voice->frequency = 0;
 		voice->volume = 0;
@@ -240,25 +241,25 @@ WRITE8_DEVICE_HANDLER( flower_sound1_w )
 	int base;
 
 	/* update the streams */
-	state->stream->update();
+	state->m_stream->update();
 
 	/* set the register */
-	state->soundregs1[offset] = data;
+	state->m_soundregs1[offset] = data;
 
 	/* recompute all the voice parameters */
-	for (base = 0, voice = state->channel_list; voice < state->last_channel; voice++, base += 8)
+	for (base = 0, voice = state->m_channel_list; voice < state->m_last_channel; voice++, base += 8)
 	{
-		voice->frequency = state->soundregs1[2 + base] & 0x0f;
-		voice->frequency = voice->frequency * 16 + ((state->soundregs1[3 + base]) & 0x0f);
-		voice->frequency = voice->frequency * 16 + ((state->soundregs1[0 + base]) & 0x0f);
-		voice->frequency = voice->frequency * 16 + ((state->soundregs1[1 + base]) & 0x0f);
+		voice->frequency = state->m_soundregs1[2 + base] & 0x0f;
+		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[3 + base]) & 0x0f);
+		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[0 + base]) & 0x0f);
+		voice->frequency = voice->frequency * 16 + ((state->m_soundregs1[1 + base]) & 0x0f);
 
-		voice->volume = (state->soundregs1[7 + base] >> 4) | ((state->soundregs2[7 + base] & 0x03) << 4);
+		voice->volume = (state->m_soundregs1[7 + base] >> 4) | ((state->m_soundregs2[7 + base] & 0x03) << 4);
 // the following would fix the hanging notes...
-//if ((state->soundregs2[7 + base] & 0x01) == 0)
+//if ((state->m_soundregs2[7 + base] & 0x01) == 0)
 //  voice->volume = 0;
 
-		if (state->soundregs1[4 + base] & 0x10)
+		if (state->m_soundregs1[4 + base] & 0x10)
 		{
 			voice->oneshot = 0;
 			voice->oneshotplaying = 0;
@@ -278,35 +279,35 @@ WRITE8_DEVICE_HANDLER( flower_sound2_w )
 
 /*
 popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x",
-        state->soundregs2[7 + 8*0],state->soundregs1[7 + 8*0],
-        state->soundregs2[7 + 8*1],state->soundregs1[7 + 8*1],
-        state->soundregs2[7 + 8*2],state->soundregs1[7 + 8*2],
-        state->soundregs2[7 + 8*3],state->soundregs1[7 + 8*3],
-        state->soundregs2[7 + 8*4],state->soundregs1[7 + 8*4],
-        state->soundregs2[7 + 8*5],state->soundregs1[7 + 8*5],
-        state->soundregs2[7 + 8*6],state->soundregs1[7 + 8*6],
-        state->soundregs2[7 + 8*7],state->soundregs1[7 + 8*7]
+        state->m_soundregs2[7 + 8*0],state->m_soundregs1[7 + 8*0],
+        state->m_soundregs2[7 + 8*1],state->m_soundregs1[7 + 8*1],
+        state->m_soundregs2[7 + 8*2],state->m_soundregs1[7 + 8*2],
+        state->m_soundregs2[7 + 8*3],state->m_soundregs1[7 + 8*3],
+        state->m_soundregs2[7 + 8*4],state->m_soundregs1[7 + 8*4],
+        state->m_soundregs2[7 + 8*5],state->m_soundregs1[7 + 8*5],
+        state->m_soundregs2[7 + 8*6],state->m_soundregs1[7 + 8*6],
+        state->m_soundregs2[7 + 8*7],state->m_soundregs1[7 + 8*7]
     );
 */
 
 	/* update the streams */
-	state->stream->update();
+	state->m_stream->update();
 
 	/* set the register */
-	state->soundregs2[offset] = data;
+	state->m_soundregs2[offset] = data;
 
 	/* recompute all the voice parameters */
-	voice = &state->channel_list[offset/8];
+	voice = &state->m_channel_list[offset/8];
 	if (voice->oneshot)
 	{
 		int start;
 
-		start = state->soundregs2[5 + base] & 0x0f;
-		start = start * 16 + ((state->soundregs2[4 + base]) & 0x0f);
-		start = start * 16 + ((state->soundregs2[3 + base]) & 0x0f);
-		start = start * 16 + ((state->soundregs2[2 + base]) & 0x0f);
-		start = start * 16 + ((state->soundregs2[1 + base]) & 0x0f);
-		start = start * 16 + ((state->soundregs2[0 + base]) & 0x0f);
+		start = state->m_soundregs2[5 + base] & 0x0f;
+		start = start * 16 + ((state->m_soundregs2[4 + base]) & 0x0f);
+		start = start * 16 + ((state->m_soundregs2[3 + base]) & 0x0f);
+		start = start * 16 + ((state->m_soundregs2[2 + base]) & 0x0f);
+		start = start * 16 + ((state->m_soundregs2[1 + base]) & 0x0f);
+		start = start * 16 + ((state->m_soundregs2[0 + base]) & 0x0f);
 
 		voice->rom_offset = (start >> 7) & 0x7fff;
 
@@ -317,8 +318,8 @@ popmessage("%02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%02x %02x%
 	{
 		int start;
 
-		start = state->soundregs2[5 + base] & 0x0f;
-		start = start * 16 + ((state->soundregs2[4 + base]) & 0x0f);
+		start = state->m_soundregs2[5 + base] & 0x0f;
+		start = start * 16 + ((state->m_soundregs2[4 + base]) & 0x0f);
 
 		voice->rom_offset = (start << 9) & 0x7fff;	// ???
 		voice->oneshot = 0;

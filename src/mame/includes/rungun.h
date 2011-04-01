@@ -11,27 +11,29 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    _936_videoram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
+	UINT16 *    m_936_videoram;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t   *ttl_tilemap, *_936_tilemap;
-	UINT16      ttl_vram[0x1000];
-	int         ttl_gfx_index, sprite_colorbase;
+	tilemap_t   *m_ttl_tilemap;
+	tilemap_t   *m_936_tilemap;
+	UINT16      m_ttl_vram[0x1000];
+	int         m_ttl_gfx_index;
+	int         m_sprite_colorbase;
 
 	/* misc */
-	UINT16      sysreg[0x20];
-	int         z80_control;
-	int         sound_status;
+	UINT16      m_sysreg[0x20];
+	int         m_z80_control;
+	int         m_sound_status;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k054539_1;
-	device_t *k054539_2;
-	device_t *k053936;
-	device_t *k055673;
-	device_t *k053252;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k054539_1;
+	device_t *m_k054539_2;
+	device_t *m_k053936;
+	device_t *m_k055673;
+	device_t *m_k053252;
 };
 
 

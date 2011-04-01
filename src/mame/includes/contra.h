@@ -11,26 +11,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        spriteram;
-	UINT8 *        buffered_spriteram;
-	UINT8 *        buffered_spriteram_2;
-	UINT8 *        paletteram;
-	UINT8 *        bg_vram;
-	UINT8 *        bg_cram;
-	UINT8 *        fg_vram;
-	UINT8 *        fg_cram;
-	UINT8 *        tx_vram;
-	UINT8 *        tx_cram;
+	UINT8 *        m_spriteram;
+	UINT8 *        m_buffered_spriteram;
+	UINT8 *        m_buffered_spriteram_2;
+	UINT8 *        m_paletteram;
+	UINT8 *        m_bg_vram;
+	UINT8 *        m_bg_cram;
+	UINT8 *        m_fg_vram;
+	UINT8 *        m_fg_cram;
+	UINT8 *        m_tx_vram;
+	UINT8 *        m_tx_cram;
 	// this driver also uses a large generic spriteram region...
 
 	/* video-related */
-	tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
-	rectangle bg_clip, fg_clip, tx_clip;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	rectangle m_bg_clip;
+	rectangle m_fg_clip;
+	rectangle m_tx_clip;
 
 	/* devices */
-	device_t *audiocpu;
-	device_t *k007121_1;
-	device_t *k007121_2;
+	device_t *m_audiocpu;
+	device_t *m_k007121_1;
+	device_t *m_k007121_2;
 };
 
 

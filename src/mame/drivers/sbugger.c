@@ -111,8 +111,8 @@ Sound PCB
 
 static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE_MEMBER(sbugger_state,videoram_attr)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE_MEMBER(sbugger_state,videoram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE_MEMBER(sbugger_state,m_videoram_attr)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE_MEMBER(sbugger_state,m_videoram)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM /* sp is set to e0ff */
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END

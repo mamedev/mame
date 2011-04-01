@@ -61,15 +61,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	tilemap_t  *m14_tilemap;
-	UINT8 *  video_ram;
-	UINT8 *  color_ram;
+	tilemap_t  *m_m14_tilemap;
+	UINT8 *  m_video_ram;
+	UINT8 *  m_color_ram;
 
 	/* input-related */
-	UINT8 hop_mux;
+	UINT8 m_hop_mux;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 
@@ -101,8 +101,8 @@ static TILE_GET_INFO( m14_get_tile_info )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	int code = state->video_ram[tile_index];
-	int color = state->color_ram[tile_index] & 0x0f;
+	int code = state->m_video_ram[tile_index];
+	int color = state->m_color_ram[tile_index] & 0x0f;
 
 	/* colorram & 0xf0 used but unknown purpose*/
 
@@ -117,14 +117,14 @@ static VIDEO_START( m14 )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	state->m14_tilemap = tilemap_create(machine, m14_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_m14_tilemap = tilemap_create(machine, m14_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( m14 )
 {
 	m14_state *state = screen->machine().driver_data<m14_state>();
 
-	tilemap_draw(bitmap, cliprect, state->m14_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_m14_tilemap, 0, 0);
 	return 0;
 }
 
@@ -133,16 +133,16 @@ static WRITE8_HANDLER( m14_vram_w )
 {
 	m14_state *state = space->machine().driver_data<m14_state>();
 
-	state->video_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m14_tilemap, offset);
+	state->m_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_m14_tilemap, offset);
 }
 
 static WRITE8_HANDLER( m14_cram_w )
 {
 	m14_state *state = space->machine().driver_data<m14_state>();
 
-	state->color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->m14_tilemap, offset);
+	state->m_color_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_m14_tilemap, offset);
 }
 
 /*************************************
@@ -162,9 +162,9 @@ static READ8_HANDLER( input_buttons_r )
 {
 	m14_state *state = space->machine().driver_data<m14_state>();
 
-	if (state->hop_mux)
+	if (state->m_hop_mux)
 	{
-		state->hop_mux = 0;
+		state->m_hop_mux = 0;
 		return 0; //0x43 status bits
 	}
 	else
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( hopper_w )
 
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */
-	state->hop_mux = data & 2;
+	state->m_hop_mux = data & 2;
 	//popmessage("%02x",data);
 }
 
@@ -201,8 +201,8 @@ static WRITE8_HANDLER( hopper_w )
 static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE_MEMBER(m14_state, video_ram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE_MEMBER(m14_state, color_ram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE_MEMBER(m14_state, m_video_ram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE_MEMBER(m14_state, m_color_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8 )
@@ -225,7 +225,7 @@ static INPUT_CHANGED( left_coin_inserted )
 	m14_state *state = field->port->machine().driver_data<m14_state>();
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		device_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -233,7 +233,7 @@ static INPUT_CHANGED( right_coin_inserted )
 	m14_state *state = field->port->machine().driver_data<m14_state>();
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		device_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
@@ -316,16 +316,16 @@ static MACHINE_START( m14 )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->hop_mux));
+	state->save_item(NAME(state->m_hop_mux));
 }
 
 static MACHINE_RESET( m14 )
 {
 	m14_state *state = machine.driver_data<m14_state>();
 
-	state->hop_mux = 0;
+	state->m_hop_mux = 0;
 }
 
 

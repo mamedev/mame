@@ -10,14 +10,14 @@ public:
 	lethalj_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 blitter_data[8];
-	UINT16 *screenram;
-	UINT8 vispage;
-	UINT16 *blitter_base;
-	int blitter_rows;
-	UINT16 gunx;
-	UINT16 guny;
-	UINT8 blank_palette;
+	UINT16 m_blitter_data[8];
+	UINT16 *m_screenram;
+	UINT8 m_vispage;
+	UINT16 *m_blitter_base;
+	int m_blitter_rows;
+	UINT16 m_gunx;
+	UINT16 m_guny;
+	UINT8 m_blank_palette;
 };
 
 

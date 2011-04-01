@@ -43,10 +43,10 @@ WRITE8_HANDLER( tgtball_flipscreen_w )
 WRITE8_HANDLER( paradise_palette_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->paletteram[offset] = data;
+	state->m_paletteram[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(space->machine(), offset, state->paletteram[offset + 0x800 * 0], state->paletteram[offset + 0x800 * 1],
-		state->paletteram[offset + 0x800 * 2]);
+	palette_set_color_rgb(space->machine(), offset, state->m_paletteram[offset + 0x800 * 0], state->m_paletteram[offset + 0x800 * 1],
+		state->m_paletteram[offset + 0x800 * 2]);
 }
 
 /***************************************************************************
@@ -64,8 +64,8 @@ WRITE8_HANDLER( paradise_palette_w )
 WRITE8_HANDLER( paradise_vram_0_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->vram_0[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap_0, offset % 0x400);
+	state->m_vram_0[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap_0, offset % 0x400);
 }
 
 /* 16 color tiles with paradise_palbank as color code */
@@ -77,21 +77,21 @@ WRITE8_HANDLER( paradise_palbank_w )
 	int bank2 = (data & 0xf0);
 
 	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(space->machine(), 0x800 + i, state->paletteram[0x200 + bank2 + i + 0x800 * 0], state->paletteram[0x200 + bank2 + i + 0x800 * 1],
-								state->paletteram[0x200 + bank2 + i + 0x800 * 2]);
+		palette_set_color_rgb(space->machine(), 0x800 + i, state->m_paletteram[0x200 + bank2 + i + 0x800 * 0], state->m_paletteram[0x200 + bank2 + i + 0x800 * 1],
+								state->m_paletteram[0x200 + bank2 + i + 0x800 * 2]);
 
-	if (state->palbank != bank1)
+	if (state->m_palbank != bank1)
 	{
-		state->palbank = bank1;
-		tilemap_mark_all_tiles_dirty(state->tilemap_0);
+		state->m_palbank = bank1;
+		tilemap_mark_all_tiles_dirty(state->m_tilemap_0);
 	}
 }
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
-	int code = state->vram_0[tile_index] + (state->vram_0[tile_index + 0x400] << 8);
-	SET_TILE_INFO(1, code, state->palbank, 0);
+	int code = state->m_vram_0[tile_index] + (state->m_vram_0[tile_index + 0x400] << 8);
+	SET_TILE_INFO(1, code, state->m_palbank, 0);
 }
 
 
@@ -99,14 +99,14 @@ static TILE_GET_INFO( get_tile_info_0 )
 WRITE8_HANDLER( paradise_vram_1_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->vram_1[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap_1, offset % 0x400);
+	state->m_vram_1[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap_1, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
-	int code = state->vram_1[tile_index] + (state->vram_1[tile_index + 0x400] << 8);
+	int code = state->m_vram_1[tile_index] + (state->m_vram_1[tile_index + 0x400] << 8);
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
@@ -115,14 +115,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 WRITE8_HANDLER( paradise_vram_2_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->vram_2[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap_2, offset % 0x400);
+	state->m_vram_2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap_2, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_2 )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
-	int code = state->vram_2[tile_index] + (state->vram_2[tile_index + 0x400] << 8);
+	int code = state->m_vram_2[tile_index] + (state->m_vram_2[tile_index + 0x400] << 8);
 	SET_TILE_INFO(3, code, 0, 0);
 }
 
@@ -133,13 +133,13 @@ WRITE8_HANDLER( paradise_pixmap_w )
 	paradise_state *state = space->machine().driver_data<paradise_state>();
 	int x, y;
 
-	state->videoram[offset] = data;
+	state->m_videoram[offset] = data;
 
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	*BITMAP_ADDR16(state->tmpbitmap, y, x + 0) = 0x80f - (data >> 4);
-	*BITMAP_ADDR16(state->tmpbitmap, y, x + 1) = 0x80f - (data & 0x0f);
+	*BITMAP_ADDR16(state->m_tmpbitmap, y, x + 0) = 0x80f - (data >> 4);
+	*BITMAP_ADDR16(state->m_tmpbitmap, y, x + 1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -153,18 +153,18 @@ VIDEO_START( paradise )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 
-	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x20, 0x20);
-	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x20, 0x20);
-	state->tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 0x20, 0x20);
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, 0x20, 0x20);
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, 0x20, 0x20);
+	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 0x20, 0x20);
 
 	/* pixmap */
-	state->tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
-	tilemap_set_transparent_pen(state->tilemap_0, 0x0f);
-	tilemap_set_transparent_pen(state->tilemap_1, 0xff);
-	tilemap_set_transparent_pen(state->tilemap_2, 0xff);
+	tilemap_set_transparent_pen(state->m_tilemap_0, 0x0f);
+	tilemap_set_transparent_pen(state->m_tilemap_1, 0xff);
+	tilemap_set_transparent_pen(state->m_tilemap_2, 0xff);
 
-	state->save_item(NAME(*state->tmpbitmap));
+	state->save_item(NAME(*state->m_tmpbitmap));
 }
 
 
@@ -178,15 +178,15 @@ VIDEO_START( paradise )
 WRITE8_HANDLER( paradise_priority_w )
 {
 	paradise_state *state = space->machine().driver_data<paradise_state>();
-	state->priority = data;
+	state->m_priority = data;
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int i;
-	for (i = 0; i < state->spriteram_size ; i += state->sprite_inc)
+	for (i = 0; i < state->m_spriteram_size ; i += state->m_sprite_inc)
 	{
 		int code = spriteram[i + 0];
 		int x    = spriteram[i + 1];
@@ -250,30 +250,30 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	if (!(state->priority & 4))	/* Screen blanking */
+	if (!(state->m_priority & 4))	/* Screen blanking */
 		return 0;
 
-	if (state->priority & 1)
+	if (state->m_priority & 1)
 		if (layers_ctrl & 16)
 			draw_sprites(screen->machine(), bitmap, cliprect);
 
-	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
-	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
-	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->tmpbitmap, flip_screen_get(screen->machine()), flip_screen_get(screen->machine()), 0, 0, cliprect, 0x80f);
+	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
+	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
+	if (layers_ctrl & 4)	copybitmap_trans(bitmap, state->m_tmpbitmap, flip_screen_get(screen->machine()), flip_screen_get(screen->machine()), 0, 0, cliprect, 0x80f);
 
-	if (state->priority & 2)
+	if (state->m_priority & 2)
 	{
-		if (!(state->priority & 1))
+		if (!(state->m_priority & 1))
 			if (layers_ctrl & 16)
 				draw_sprites(screen->machine(), bitmap, cliprect);
 		if (layers_ctrl & 8)
-			tilemap_draw(bitmap,cliprect, state->tilemap_2, 0, 0);
+			tilemap_draw(bitmap,cliprect, state->m_tilemap_2, 0, 0);
 	}
 	else
 	{
 		if (layers_ctrl & 8)
-			tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
-		if (!(state->priority & 1))
+			tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
+		if (!(state->m_priority & 1))
 			if (layers_ctrl & 16)
 				draw_sprites(screen->machine(), bitmap, cliprect);
 	}
@@ -287,26 +287,26 @@ SCREEN_UPDATE( torus )
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	if (!(state->priority & 2))	/* Screen blanking */
+	if (!(state->m_priority & 2))	/* Screen blanking */
 		return 0;
 
-	if (state->priority & 1)
+	if (state->m_priority & 1)
 		draw_sprites(screen->machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0,0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0,0);
 
-	if (state->priority & 4)
+	if (state->m_priority & 4)
 	{
-		if (!(state->priority & 1))
+		if (!(state->m_priority & 1))
 			draw_sprites(screen->machine(), bitmap, cliprect);
 
-		tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
 
-		if (!(state->priority & 1))
+		if (!(state->m_priority & 1))
 			draw_sprites(screen->machine(), bitmap,cliprect);
 	}
 	return 0;
@@ -318,9 +318,9 @@ SCREEN_UPDATE( madball )
 	paradise_state *state = screen->machine().driver_data<paradise_state>();
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
-	tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->tilemap_2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap_2, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

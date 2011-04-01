@@ -36,22 +36,23 @@ typedef struct _wiping_sound_state wiping_sound_state;
 struct _wiping_sound_state
 {
 	/* data about the sound system */
-	sound_channel channel_list[MAX_VOICES];
-	sound_channel *last_channel;
+	sound_channel m_channel_list[MAX_VOICES];
+	sound_channel *m_last_channel;
 
 	/* global sound parameters */
-	const UINT8 *sound_prom,*sound_rom;
-	int num_voices;
-	int sound_enable;
-	sound_stream *stream;
+	const UINT8 *m_sound_prom;
+	const UINT8 *m_sound_rom;
+	int m_num_voices;
+	int m_sound_enable;
+	sound_stream *m_stream;
 
 	/* mixer tables and internal buffers */
-	INT16 *mixer_table;
-	INT16 *mixer_lookup;
-	short *mixer_buffer;
-	short *mixer_buffer_2;
+	INT16 *m_mixer_table;
+	INT16 *m_mixer_lookup;
+	short *m_mixer_buffer;
+	short *m_mixer_buffer_2;
 
-	UINT8 soundregs[0x4000];
+	UINT8 m_soundregs[0x4000];
 };
 
 
@@ -71,18 +72,18 @@ static void make_mixer_table(device_t *device, int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	state->mixer_table = auto_alloc_array(device->machine(), INT16, 256 * voices);
+	state->m_mixer_table = auto_alloc_array(device->machine(), INT16, 256 * voices);
 
 	/* find the middle of the table */
-	state->mixer_lookup = state->mixer_table + (128 * voices);
+	state->m_mixer_lookup = state->m_mixer_table + (128 * voices);
 
 	/* fill in the table - 16 bit case */
 	for (i = 0; i < count; i++)
 	{
 		int val = i * gain * 16 / voices;
 		if (val > 32767) val = 32767;
-		state->mixer_lookup[ i] = val;
-		state->mixer_lookup[-i] = -val;
+		state->m_mixer_lookup[ i] = val;
+		state->m_mixer_lookup[-i] = -val;
 	}
 }
 
@@ -97,17 +98,17 @@ static STREAM_UPDATE( wiping_update_mono )
 	int i;
 
 	/* if no sound, we're done */
-	if (state->sound_enable == 0)
+	if (state->m_sound_enable == 0)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(state->mixer_buffer, 0, samples * sizeof(short));
+	memset(state->m_mixer_buffer, 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
-	for (voice = state->channel_list; voice < state->last_channel; voice++)
+	for (voice = state->m_channel_list; voice < state->m_last_channel; voice++)
 	{
 		int f = 16*voice->frequency;
 		int v = voice->volume;
@@ -118,7 +119,7 @@ static STREAM_UPDATE( wiping_update_mono )
 			const UINT8 *w = voice->wave;
 			int c = voice->counter;
 
-			mix = state->mixer_buffer;
+			mix = state->m_mixer_buffer;
 
 			/* add our contribution */
 			for (i = 0; i < samples; i++)
@@ -165,9 +166,9 @@ static STREAM_UPDATE( wiping_update_mono )
 	}
 
 	/* mix it down */
-	mix = state->mixer_buffer;
+	mix = state->m_mixer_buffer;
 	for (i = 0; i < samples; i++)
-		*buffer++ = state->mixer_lookup[*mix++];
+		*buffer++ = state->m_mixer_lookup[*mix++];
 }
 
 
@@ -179,31 +180,31 @@ static DEVICE_START( wiping_sound )
 	sound_channel *voice;
 
 	/* get stream channels */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, samplerate, NULL, wiping_update_mono);
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, samplerate, NULL, wiping_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	state->mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
-	state->mixer_buffer_2 = state->mixer_buffer + samplerate;
+	state->m_mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
+	state->m_mixer_buffer_2 = state->m_mixer_buffer + samplerate;
 
 	/* build the mixer table */
 	make_mixer_table(device, 8, defgain);
 
 	/* extract globals from the interface */
-	state->num_voices = 8;
-	state->last_channel = state->channel_list + state->num_voices;
+	state->m_num_voices = 8;
+	state->m_last_channel = state->m_channel_list + state->m_num_voices;
 
-	state->sound_rom = machine.region("samples")->base();
-	state->sound_prom = machine.region("soundproms")->base();
+	state->m_sound_rom = machine.region("samples")->base();
+	state->m_sound_prom = machine.region("soundproms")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
-	state->sound_enable = 1;
+	state->m_sound_enable = 1;
 
 	/* reset all the voices */
-	for (voice = state->channel_list; voice < state->last_channel; voice++)
+	for (voice = state->m_channel_list; voice < state->m_last_channel; voice++)
 	{
 		voice->frequency = 0;
 		voice->volume = 0;
-		voice->wave = &state->sound_prom[0];
+		voice->wave = &state->m_sound_prom[0];
 		voice->counter = 0;
 	}
 }
@@ -236,30 +237,30 @@ WRITE8_DEVICE_HANDLER( wiping_sound_w )
 	int base;
 
 	/* update the streams */
-	state->stream->update();
+	state->m_stream->update();
 
 	/* set the register */
-	state->soundregs[offset] = data;
+	state->m_soundregs[offset] = data;
 
 	/* recompute all the voice parameters */
 	if (offset <= 0x3f)
 	{
-		for (base = 0, voice = state->channel_list; voice < state->last_channel; voice++, base += 8)
+		for (base = 0, voice = state->m_channel_list; voice < state->m_last_channel; voice++, base += 8)
 		{
-			voice->frequency = state->soundregs[0x02 + base] & 0x0f;
-			voice->frequency = voice->frequency * 16 + ((state->soundregs[0x01 + base]) & 0x0f);
-			voice->frequency = voice->frequency * 16 + ((state->soundregs[0x00 + base]) & 0x0f);
+			voice->frequency = state->m_soundregs[0x02 + base] & 0x0f;
+			voice->frequency = voice->frequency * 16 + ((state->m_soundregs[0x01 + base]) & 0x0f);
+			voice->frequency = voice->frequency * 16 + ((state->m_soundregs[0x00 + base]) & 0x0f);
 
-			voice->volume = state->soundregs[0x07 + base] & 0x0f;
-			if (state->soundregs[0x5 + base] & 0x0f)
+			voice->volume = state->m_soundregs[0x07 + base] & 0x0f;
+			if (state->m_soundregs[0x5 + base] & 0x0f)
 			{
-				voice->wave = &state->sound_rom[128 * (16 * (state->soundregs[0x5 + base] & 0x0f)
-						+ (state->soundregs[0x2005 + base] & 0x0f))];
+				voice->wave = &state->m_sound_rom[128 * (16 * (state->m_soundregs[0x5 + base] & 0x0f)
+						+ (state->m_soundregs[0x2005 + base] & 0x0f))];
 				voice->oneshot = 1;
 			}
 			else
 			{
-				voice->wave = &state->sound_rom[16 * (state->soundregs[0x3 + base] & 0x0f)];
+				voice->wave = &state->m_sound_rom[16 * (state->m_soundregs[0x3 + base] & 0x0f)];
 				voice->oneshot = 0;
 				voice->oneshotplaying = 0;
 			}
@@ -267,7 +268,7 @@ WRITE8_DEVICE_HANDLER( wiping_sound_w )
 	}
 	else if (offset >= 0x2000)
 	{
-		voice = &state->channel_list[(offset & 0x3f)/8];
+		voice = &state->m_channel_list[(offset & 0x3f)/8];
 		if (voice->oneshot)
 		{
 			voice->counter = 0;

@@ -38,7 +38,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 	/* bit 5 used but unknown */
 
 	/* bits 6-7 select RAM bank */
-	state->rambank = (data & 0xc0) >> 6;
+	state->m_rambank = (data & 0xc0) >> 6;
 }
 
 
@@ -46,7 +46,7 @@ static READ8_HANDLER( bankedram_r )
 {
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	switch (state->rambank)
+	switch (state->m_rambank)
 	{
 	case 2:
 		return cbasebal_textram_r(space, offset);	/* VRAM */
@@ -65,7 +65,7 @@ static WRITE8_HANDLER( bankedram_w )
 {
 	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	switch (state->rambank)
+	switch (state->m_rambank)
 	{
 	case 2:
 		cbasebal_textram_w(space, offset, data);
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cbasebal_state, spriteram, spriteram_size)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cbasebal_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8 )
@@ -248,32 +248,32 @@ static MACHINE_START( cbasebal )
 
 	memory_configure_bank(machine, "bank1", 0, 32, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->rambank));
-	state->save_item(NAME(state->tilebank));
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->text_on));
-	state->save_item(NAME(state->bg_on));
-	state->save_item(NAME(state->obj_on));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->scroll_x));
-	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->m_rambank));
+	state->save_item(NAME(state->m_tilebank));
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_text_on));
+	state->save_item(NAME(state->m_bg_on));
+	state->save_item(NAME(state->m_obj_on));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_scroll_x));
+	state->save_item(NAME(state->m_scroll_y));
 }
 
 static MACHINE_RESET( cbasebal )
 {
 	cbasebal_state *state = machine.driver_data<cbasebal_state>();
 
-	state->rambank = 0;
-	state->tilebank = 0;
-	state->spritebank = 0;
-	state->text_on = 0;
-	state->bg_on = 0;
-	state->obj_on = 0;
-	state->flipscreen = 0;
-	state->scroll_x[0] = 0;
-	state->scroll_x[1] = 0;
-	state->scroll_y[0] = 0;
-	state->scroll_y[1] = 0;
+	state->m_rambank = 0;
+	state->m_tilebank = 0;
+	state->m_spritebank = 0;
+	state->m_text_on = 0;
+	state->m_bg_on = 0;
+	state->m_obj_on = 0;
+	state->m_flipscreen = 0;
+	state->m_scroll_x[0] = 0;
+	state->m_scroll_x[1] = 0;
+	state->m_scroll_y[0] = 0;
+	state->m_scroll_y[1] = 0;
 }
 
 static MACHINE_CONFIG_START( cbasebal, cbasebal_state )

@@ -65,10 +65,10 @@ public:
 	sfkick_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *main_mem;
-	int bank_cfg;
-	int bank[8];
-	int input_mux;
+	UINT8 *m_main_mem;
+	int m_bank_cfg;
+	int m_bank[8];
+	int m_input_mux;
 };
 
 
@@ -84,7 +84,7 @@ public:
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
 	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	switch(state->input_mux&0x0f)
+	switch(state->m_input_mux&0x0f)
 	{
 		case 0: return input_port_read(device->machine(), "IN0");
 		case 1: return input_port_read(device->machine(), "IN1");
@@ -99,7 +99,7 @@ static void sfkick_remap_banks(running_machine &machine)
 {
 	sfkick_state *state = machine.driver_data<sfkick_state>();
 	/* 0000-3ffff */
-	switch(state->bank_cfg&3)
+	switch(state->m_bank_cfg&3)
 	{
 		case 0: /* bios */
 		{
@@ -120,8 +120,8 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			memory_set_bankptr(machine,"bank1", mem+0x2000*state->bank[0]);
-			memory_set_bankptr(machine,"bank2", mem+0x2000*state->bank[1]);
+			memory_set_bankptr(machine,"bank1", mem+0x2000*state->m_bank[0]);
+			memory_set_bankptr(machine,"bank2", mem+0x2000*state->m_bank[1]);
 		}
 		break;
 
@@ -135,7 +135,7 @@ static void sfkick_remap_banks(running_machine &machine)
 	}
 
 	/* 4000-7ffff */
-	switch((state->bank_cfg>>2)&3)
+	switch((state->m_bank_cfg>>2)&3)
 	{
 		case 0: /* bios - upper part */
 		{
@@ -157,14 +157,14 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			memory_set_bankptr(machine,"bank3", mem+0x2000*state->bank[2]);
-			memory_set_bankptr(machine,"bank4", mem+0x2000*state->bank[3]);
+			memory_set_bankptr(machine,"bank3", mem+0x2000*state->m_bank[2]);
+			memory_set_bankptr(machine,"bank4", mem+0x2000*state->m_bank[3]);
 		}
 		break;
 	}
 
 	/* 8000-bffff */
-	switch((state->bank_cfg>>4)&3)
+	switch((state->m_bank_cfg>>4)&3)
 	{
 		case 0: /* cartridge */
 		{
@@ -186,14 +186,14 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			memory_set_bankptr(machine,"bank5", mem+0x2000*state->bank[4]);
-			memory_set_bankptr(machine,"bank6", mem+0x2000*state->bank[5]);
+			memory_set_bankptr(machine,"bank5", mem+0x2000*state->m_bank[4]);
+			memory_set_bankptr(machine,"bank6", mem+0x2000*state->m_bank[5]);
 		}
 		break;
 	}
 
 	/* c000-fffff */
-	switch((state->bank_cfg>>6)&3)
+	switch((state->m_bank_cfg>>6)&3)
 	{
 		case 0: /* unknown */
 		case 1:
@@ -207,15 +207,15 @@ static void sfkick_remap_banks(running_machine &machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = machine.region("banked")->base();
-			memory_set_bankptr(machine,"bank7", mem+0x2000*state->bank[6]);
-			memory_set_bankptr(machine,"bank8", mem+0x2000*state->bank[7]);
+			memory_set_bankptr(machine,"bank7", mem+0x2000*state->m_bank[6]);
+			memory_set_bankptr(machine,"bank8", mem+0x2000*state->m_bank[7]);
 		}
 		break;
 
 		case 3: /* RAM */
 		{
-			memory_set_bankptr(machine,"bank7", state->main_mem);
-			memory_set_bankptr(machine,"bank8", state->main_mem+0x2000);
+			memory_set_bankptr(machine,"bank7", state->m_main_mem);
+			memory_set_bankptr(machine,"bank8", state->m_main_mem+0x2000);
 		}
 		break;
 	}
@@ -224,7 +224,7 @@ static void sfkick_remap_banks(running_machine &machine)
 static WRITE8_DEVICE_HANDLER ( ppi_port_a_w )
 {
 	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	state->bank_cfg=data;
+	state->m_bank_cfg=data;
 	sfkick_remap_banks(device->machine());
 }
 
@@ -234,16 +234,16 @@ static void sfkick_bank_set(running_machine &machine,int num, int data)
 	/* ignore bit 1 */
 	data&=0xf;
 	num&=5;
-	state->bank[num]=data;
+	state->m_bank[num]=data;
 	num|=2;
-	state->bank[num]=data;
+	state->m_bank[num]=data;
 	sfkick_remap_banks(machine);
 }
 
 static WRITE8_HANDLER(page0_w)
 {
 	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if((state->bank_cfg&3)==2)
+	if((state->m_bank_cfg&3)==2)
 	{
 		if(offset<0x2000)
 		{
@@ -259,7 +259,7 @@ static WRITE8_HANDLER(page0_w)
 static WRITE8_HANDLER(page1_w)
 {
 	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->bank_cfg>>2)&3)==2)
+	if(((state->m_bank_cfg>>2)&3)==2)
 	{
 		if(offset<0x2000)
 		{
@@ -275,7 +275,7 @@ static WRITE8_HANDLER(page1_w)
 static WRITE8_HANDLER(page2_w)
 {
 	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->bank_cfg>>4)&3)==2)
+	if(((state->m_bank_cfg>>4)&3)==2)
 	{
 		if(offset<0x2000)
 		{
@@ -291,7 +291,7 @@ static WRITE8_HANDLER(page2_w)
 static WRITE8_HANDLER(page3_w)
 {
 	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->bank_cfg>>6)&3)==2)
+	if(((state->m_bank_cfg>>6)&3)==2)
 	{
 		if(offset<0x2000)
 		{
@@ -304,9 +304,9 @@ static WRITE8_HANDLER(page3_w)
 	}
 	else
 	{
-		if(((state->bank_cfg>>6)&3)==3)
+		if(((state->m_bank_cfg>>6)&3)==3)
 		{
-			state->main_mem[offset]=data;
+			state->m_main_mem[offset]=data;
 		}
 	}
 }
@@ -354,7 +354,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER ( ppi_port_c_w )
 {
 	sfkick_state *state = device->machine().driver_data<sfkick_state>();
-	state->input_mux=data;
+	state->m_input_mux=data;
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -446,15 +446,15 @@ static MACHINE_RESET(sfkick)
 {
 	sfkick_state *state = machine.driver_data<sfkick_state>();
 	v9938_reset(0);
-	state->bank_cfg=0;
-	state->bank[0]=0;
-	state->bank[1]=0;
-	state->bank[2]=0;
-	state->bank[3]=0;
-	state->bank[4]=0;
-	state->bank[5]=0;
-	state->bank[6]=0;
-	state->bank[7]=0;
+	state->m_bank_cfg=0;
+	state->m_bank[0]=0;
+	state->m_bank[1]=0;
+	state->m_bank[2]=0;
+	state->m_bank[3]=0;
+	state->m_bank[4]=0;
+	state->m_bank[5]=0;
+	state->m_bank[6]=0;
+	state->m_bank[7]=0;
 	sfkick_remap_banks(machine);
 }
 
@@ -521,7 +521,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(sfkick)
 {
 	sfkick_state *state = machine.driver_data<sfkick_state>();
-	state->main_mem=auto_alloc_array(machine, UINT8, 0x4000);
+	state->m_main_mem=auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 

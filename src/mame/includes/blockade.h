@@ -7,14 +7,14 @@ public:
 	blockade_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *  videoram;
+	UINT8 *  m_videoram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* input-related */
-	UINT8 coin_latch;  /* Active Low */
-	UINT8 just_been_reset;
+	UINT8 m_coin_latch;  /* Active Low */
+	UINT8 m_just_been_reset;
 };
 
 

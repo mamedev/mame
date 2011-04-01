@@ -6,18 +6,18 @@ public:
 	tiamc1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *tileram;
-	UINT8 *charram;
-	UINT8 *spriteram_x;
-	UINT8 *spriteram_y;
-	UINT8 *spriteram_a;
-	UINT8 *spriteram_n;
-	UINT8 layers_ctrl;
-	UINT8 bg_vshift;
-	UINT8 bg_hshift;
-	tilemap_t *bg_tilemap1;
-	tilemap_t *bg_tilemap2;
-	rgb_t *palette;
+	UINT8 *m_tileram;
+	UINT8 *m_charram;
+	UINT8 *m_spriteram_x;
+	UINT8 *m_spriteram_y;
+	UINT8 *m_spriteram_a;
+	UINT8 *m_spriteram_n;
+	UINT8 m_layers_ctrl;
+	UINT8 m_bg_vshift;
+	UINT8 m_bg_hshift;
+	tilemap_t *m_bg_tilemap1;
+	tilemap_t *m_bg_tilemap2;
+	rgb_t *m_palette;
 };
 
 

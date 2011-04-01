@@ -11,21 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        bgvideoram;
-	UINT8 *        fgvideoram;
-	UINT8 *        spriteram;
-	size_t         spriteram_size;
+	UINT8 *        m_bgvideoram;
+	UINT8 *        m_fgvideoram;
+	UINT8 *        m_spriteram;
+	size_t         m_spriteram_size;
 
 	/* video-related */
-	tilemap_t        *bg_tilemap, *fg_tilemap;
-	UINT8          vreg[4];
+	tilemap_t        *m_bg_tilemap;
+	tilemap_t        *m_fg_tilemap;
+	UINT8          m_vreg[4];
 
 	/* sound-related */
-	int            pulse;
-	int            timer;	// kludge for ym3526 in mightguy
+	int            m_pulse;
+	int            m_timer;	// kludge for ym3526 in mightguy
 
 	/* devices */
-	cpu_device *audiocpu;
+	cpu_device *m_audiocpu;
 };
 
 

@@ -52,10 +52,10 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, bg_videoram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, m_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, m_bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, spriteram, spriteram_size)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
@@ -72,10 +72,10 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, bg_videoram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, m_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, m_bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, spriteram, spriteram_size)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -314,7 +314,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	crospang_state *state = device->machine().driver_data<crospang_state>();
-	device_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->m_audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -327,22 +327,22 @@ static MACHINE_START( crospang )
 {
 	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->bestri_tilebank));
-	state->save_item(NAME(state->xsproff));
-	state->save_item(NAME(state->ysproff));
+	state->save_item(NAME(state->m_bestri_tilebank));
+	state->save_item(NAME(state->m_xsproff));
+	state->save_item(NAME(state->m_ysproff));
 }
 
 static MACHINE_RESET( crospang )
 {
 	crospang_state *state = machine.driver_data<crospang_state>();
 
-	state->bestri_tilebank = 0;
-//  state->xsproff = 4;
-//  state->ysproff = 7;
-	state->xsproff = 5;
-	state->ysproff = 7;
+	state->m_bestri_tilebank = 0;
+//  state->m_xsproff = 4;
+//  state->m_ysproff = 7;
+	state->m_xsproff = 5;
+	state->m_ysproff = 7;
 }
 
 

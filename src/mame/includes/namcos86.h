@@ -4,18 +4,18 @@ public:
 	namcos86_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *spriteram;
-	int wdog;
-	UINT8 *rthunder_videoram1;
-	UINT8 *rthunder_videoram2;
-	UINT8 *rthunder_spriteram;
-	int tilebank;
-	int xscroll[4];
-	int yscroll[4];
-	tilemap_t *bg_tilemap[4];
-	int backcolor;
-	const UINT8 *tile_address_prom;
-	int copy_sprites;
+	UINT8 *m_spriteram;
+	int m_wdog;
+	UINT8 *m_rthunder_videoram1;
+	UINT8 *m_rthunder_videoram2;
+	UINT8 *m_rthunder_spriteram;
+	int m_tilebank;
+	int m_xscroll[4];
+	int m_yscroll[4];
+	tilemap_t *m_bg_tilemap[4];
+	int m_backcolor;
+	const UINT8 *m_tile_address_prom;
+	int m_copy_sprites;
 };
 
 

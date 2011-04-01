@@ -6,26 +6,35 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      scrollram;
-	UINT8 *      videoram;
-	UINT8 *      spriteram;
-	size_t       spriteram_size;
-	size_t       videoram_size;
+	UINT8 *      m_scrollram;
+	UINT8 *      m_videoram;
+	UINT8 *      m_spriteram;
+	size_t       m_spriteram_size;
+	size_t       m_videoram_size;
 
 	/* misc */
-	int sound_pending;
-	int sound_nmi_enable, pending_nmi, sound_cmd, sound_result;
+	int m_sound_pending;
+	int m_sound_nmi_enable;
+	int m_pending_nmi;
+	int m_sound_cmd;
+	int m_sound_result;
 
 	/* mcu */
-	UINT8 from_main, from_mcu;
-	int mcu_sent, main_sent;
-	UINT8 port_a_in, port_a_out, ddr_a;
-	UINT8 port_b_in, port_b_out, ddr_b;
+	UINT8 m_from_main;
+	UINT8 m_from_mcu;
+	int m_mcu_sent;
+	int m_main_sent;
+	UINT8 m_port_a_in;
+	UINT8 m_port_a_out;
+	UINT8 m_ddr_a;
+	UINT8 m_port_b_in;
+	UINT8 m_port_b_out;
+	UINT8 m_ddr_b;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *mcu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_mcu;
 };
 
 /*----------- defined in machine/lsasquad.c -----------*/

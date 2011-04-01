@@ -37,22 +37,22 @@ PALETTE_INIT( jailbrek )
 WRITE8_HANDLER( jailbrek_videoram_w )
 {
 	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( jailbrek_colorram_w )
 {
 	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -61,17 +61,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( jailbrek )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
-	tilemap_set_scrolldx(state->bg_tilemap, 0, 396 - 256);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scrolldx(state->m_bg_tilemap, 0, 396 - 256);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int i;
 
-	for (i = 0; i < state->spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram_size; i += 4)
 	{
 		int attr = spriteram[i + 1];	// attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
@@ -102,26 +102,26 @@ SCREEN_UPDATE( jailbrek )
 
 	// added support for vertical scrolling (credits).  23/1/2002  -BR
 	// bit 2 appears to be horizontal/vertical scroll control
-	if (state->scroll_dir[0] & 0x04)
+	if (state->m_scroll_dir[0] & 0x04)
 	{
-		tilemap_set_scroll_cols(state->bg_tilemap, 32);
-		tilemap_set_scroll_rows(state->bg_tilemap, 1);
-		tilemap_set_scrollx(state->bg_tilemap, 0, 0);
+		tilemap_set_scroll_cols(state->m_bg_tilemap, 32);
+		tilemap_set_scroll_rows(state->m_bg_tilemap, 1);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
 
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrolly(state->bg_tilemap, i, ((state->scroll_x[i + 32] << 8) + state->scroll_x[i]));
+			tilemap_set_scrolly(state->m_bg_tilemap, i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
 	}
 	else
 	{
-		tilemap_set_scroll_rows(state->bg_tilemap, 32);
-		tilemap_set_scroll_cols(state->bg_tilemap, 1);
-		tilemap_set_scrolly(state->bg_tilemap, 0, 0);
+		tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+		tilemap_set_scroll_cols(state->m_bg_tilemap, 1);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
 
 		for (i = 0; i < 32; i++)
-			tilemap_set_scrollx(state->bg_tilemap, i, ((state->scroll_x[i + 32] << 8) + state->scroll_x[i]));
+			tilemap_set_scrollx(state->m_bg_tilemap, i, ((state->m_scroll_x[i + 32] << 8) + state->m_scroll_x[i]));
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

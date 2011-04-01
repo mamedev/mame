@@ -90,10 +90,10 @@ PALETTE_INIT( pandoras )
 static TILE_GET_INFO( get_tile_info0 )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
-	UINT8 attr = state->colorram[tile_index];
+	UINT8 attr = state->m_colorram[tile_index];
 	SET_TILE_INFO(
 			1,
-			state->videoram[tile_index] + ((attr & 0x10) << 4),
+			state->m_videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 	tileinfo->category = (attr & 0x20) >> 5;
@@ -108,9 +108,9 @@ static TILE_GET_INFO( get_tile_info0 )
 VIDEO_START( pandoras )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
-	state->layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_layer0 = tilemap_create(machine, get_tile_info0, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 /***************************************************************************
@@ -123,31 +123,31 @@ WRITE8_HANDLER( pandoras_vram_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_mark_tile_dirty(state->layer0, offset);
-	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_layer0, offset);
+	state->m_videoram[offset] = data;
 }
 
 WRITE8_HANDLER( pandoras_cram_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_mark_tile_dirty(state->layer0, offset);
-	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_layer0, offset);
+	state->m_colorram[offset] = data;
 }
 
 WRITE8_HANDLER( pandoras_scrolly_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	tilemap_set_scrolly(state->layer0, 0, data);
+	tilemap_set_scrolly(state->m_layer0, 0, data);
 }
 
 WRITE8_HANDLER( pandoras_flipscreen_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	state->flipscreen = data;
-	tilemap_set_flip_all(space->machine(), state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->m_flipscreen = data;
+	tilemap_set_flip_all(space->machine(), state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 /***************************************************************************
@@ -180,8 +180,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( pandoras )
 {
 	pandoras_state *state = screen->machine().driver_data<pandoras_state>();
-	tilemap_draw(bitmap,cliprect, state->layer0, 1 ,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, &state->spriteram[0x800] );
-	tilemap_draw(bitmap,cliprect, state->layer0, 0 ,0);
+	tilemap_draw(bitmap,cliprect, state->m_layer0, 1 ,0);
+	draw_sprites(screen->machine(), bitmap, cliprect, &state->m_spriteram[0x800] );
+	tilemap_draw(bitmap,cliprect, state->m_layer0, 0 ,0);
 	return 0;
 }

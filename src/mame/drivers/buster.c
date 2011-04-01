@@ -17,8 +17,8 @@ public:
 	buster_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *rom;
-	UINT8 *vram;
+	UINT8 *m_rom;
+	UINT8 *m_vram;
 };
 
 
@@ -39,7 +39,7 @@ static SCREEN_UPDATE(buster)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (state->vram[count+1])|(state->vram[count]<<8);
+			int tile = (state->m_vram[count+1])|(state->m_vram[count]<<8);
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*4);
 
@@ -50,9 +50,9 @@ static SCREEN_UPDATE(buster)
 }
 
 static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(buster_state, rom)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(buster_state, m_rom)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, vram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, m_vram)
 //  AM_RANGE(0x6000, 0x6000) MC6845 address
 //  AM_RANGE(0x6001, 0x6001) MC6845 data
 	AM_RANGE(0x7000, 0xafff) AM_ROM
@@ -125,7 +125,7 @@ static DRIVER_INIT( buster )
 	buster_state *state = machine.driver_data<buster_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->rom, ROM, 0x4000);
+	memcpy(state->m_rom, ROM, 0x4000);
 }
 
 GAME( 1987, buster,  0,    buster, buster,  buster, ROT0, "Marian Electronics Ltd.", "Buster", GAME_NOT_WORKING|GAME_NO_SOUND )

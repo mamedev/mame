@@ -57,7 +57,7 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = FIRST_INT_VPOS;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline - 1, INT_HPOS), scanline);
 }
 
 
@@ -92,7 +92,7 @@ static void set_palette(running_machine &machine, mystston_state *state)
 		if (i & 0x20)
 			data = color_prom[i & 0x1f];
 		else
-			data = state->paletteram[i];
+			data = state->m_paletteram[i];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;
@@ -127,7 +127,7 @@ WRITE8_HANDLER( mystston_video_control_w )
 {
 	mystston_state *state = space->machine().driver_data<mystston_state>();
 
-	*state->video_control = data;
+	*state->m_video_control = data;
 
 	/* D0-D1 - foreground text color */
 	/* D2 - background page select */
@@ -153,8 +153,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	mystston_state *state = machine.driver_data<mystston_state>();
 
-	int page = (*state->video_control & 0x04) << 8;
-	int code = ((state->bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | state->bg_videoram[page | tile_index];
+	int page = (*state->m_video_control & 0x04) << 8;
+	int code = ((state->m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | state->m_bg_videoram[page | tile_index];
 	int flags = (tile_index & 0x10) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(1, code, 0, flags);
@@ -165,8 +165,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	mystston_state *state = machine.driver_data<mystston_state>();
 
-	int code = ((state->fg_videoram[0x400 | tile_index] & 0x07) << 8) | state->fg_videoram[tile_index];
-	int color = ((*state->video_control & 0x01) << 1) | ((*state->video_control & 0x02) >> 1);
+	int code = ((state->m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | state->m_fg_videoram[tile_index];
+	int color = ((*state->m_video_control & 0x01) << 1) | ((*state->m_video_control & 0x02) >> 1);
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -186,16 +186,16 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 
 	for (offs = 0; offs < 0x60; offs += 4)
 	{
-		int attr = state->spriteram[offs];
+		int attr = state->m_spriteram[offs];
 
 		if (attr & 0x01)
 		{
-			int code = ((attr & 0x10) << 4) | state->spriteram[offs + 1];
+			int code = ((attr & 0x10) << 4) | state->m_spriteram[offs + 1];
 			int color = (attr & 0x08) >> 3;
 			int flipx = attr & 0x04;
 			int flipy = attr & 0x02;
-			int x = 240 - state->spriteram[offs + 3];
-			int y = (240 - state->spriteram[offs + 2]) & 0xff;
+			int x = 240 - state->m_spriteram[offs + 3];
+			int y = (240 - state->m_spriteram[offs + 2]) & 0xff;
 
 			if (flip)
 			{
@@ -222,13 +222,13 @@ static VIDEO_START( mystston )
 {
 	mystston_state *state = machine.driver_data<mystston_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,  8,  8, 32, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,  8,  8, 32, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
 	/* create the interrupt timer */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_callback));
 }
 
 
@@ -243,7 +243,7 @@ static VIDEO_RESET( mystston )
 {
 	mystston_state *state = machine.driver_data<mystston_state>();
 
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
 
@@ -258,17 +258,17 @@ static SCREEN_UPDATE( mystston )
 {
 	mystston_state *state = screen->machine().driver_data<mystston_state>();
 
-	int flip = (*state->video_control & 0x80) ^ ((input_port_read(screen->machine(), "DSW1") & 0x20) << 2);
+	int flip = (*state->m_video_control & 0x80) ^ ((input_port_read(screen->machine(), "DSW1") & 0x20) << 2);
 
 	set_palette(screen->machine(), state);
 
 	tilemap_mark_all_tiles_dirty_all(screen->machine());
-	tilemap_set_scrolly(state->bg_tilemap, 0, *state->scroll);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll);
 	tilemap_set_flip_all(screen->machine(), flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(bitmap, cliprect, screen->machine().gfx[2], flip);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }

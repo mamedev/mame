@@ -22,20 +22,20 @@ public:
 	triplhnt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 cmos[16];
-	UINT8 da_latch;
-	UINT8 misc_flags;
-	UINT8 cmos_latch;
-	UINT8 hit_code;
-	UINT8* playfield_ram;
-	UINT8* vpos_ram;
-	UINT8* hpos_ram;
-	UINT8* code_ram;
-	UINT8* orga_ram;
-	int sprite_zoom;
-	int sprite_bank;
-	bitmap_t* helper;
-	tilemap_t* bg_tilemap;
+	UINT8 m_cmos[16];
+	UINT8 m_da_latch;
+	UINT8 m_misc_flags;
+	UINT8 m_cmos_latch;
+	UINT8 m_hit_code;
+	UINT8* m_playfield_ram;
+	UINT8* m_vpos_ram;
+	UINT8* m_hpos_ram;
+	UINT8* m_code_ram;
+	UINT8* m_orga_ram;
+	int m_sprite_zoom;
+	int m_sprite_bank;
+	bitmap_t* m_helper;
+	tilemap_t* m_bg_tilemap;
 };
 
 

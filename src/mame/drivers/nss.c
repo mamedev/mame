@@ -304,8 +304,8 @@ public:
 	nss_state(running_machine &machine, const driver_device_config_base &config)
 		: snes_state(machine, config) { }
 
-	UINT8 m50458_rom_bank;
-	UINT8 vblank_bit;
+	UINT8 m_m50458_rom_bank;
+	UINT8 m_vblank_bit;
 };
 
 
@@ -382,7 +382,7 @@ static WRITE8_HANDLER( nss_eeprom_w )
 static READ8_HANDLER( m50458_r )
 {
 	nss_state *state = space->machine().driver_data<nss_state>();
-	if(state->m50458_rom_bank)
+	if(state->m_m50458_rom_bank)
 	{
 		UINT8 *gfx_rom = space->machine().region("m50458_gfx")->base();
 
@@ -401,7 +401,7 @@ static READ8_HANDLER( m50458_r )
 static WRITE8_HANDLER( m50458_w )
 {
 	nss_state *state = space->machine().driver_data<nss_state>();
-	if(state->m50458_rom_bank)
+	if(state->m_m50458_rom_bank)
 		logerror("Warning: write to M50458 GFX ROM!\n");
 	else
 	{
@@ -430,9 +430,9 @@ static READ8_HANDLER( port00_r )
     */
 
 
-	state->vblank_bit^=0x40;
+	state->m_vblank_bit^=0x40;
 
-	return state->vblank_bit | 0xbf;
+	return state->m_vblank_bit | 0xbf;
 }
 
 
@@ -472,7 +472,7 @@ static WRITE8_HANDLER( port80_w )
     */
 
 	memory_set_bank(space->machine(), "bank1", data & 1);
-	state->m50458_rom_bank = data & 4;
+	state->m_m50458_rom_bank = data & 4;
 }
 
 static WRITE8_HANDLER( port82_w ) // EEPROM2?
@@ -505,7 +505,7 @@ static MACHINE_START( nss )
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->m50458_rom_bank = 0;
+	state->m_m50458_rom_bank = 0;
 
 	MACHINE_START_CALL(snes);
 }

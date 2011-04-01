@@ -13,19 +13,21 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
 
 	/* misc */
-	UINT8    abca;
-	UINT8    dr, ds, sh;
-	UINT8    input_mux;
-	UINT8    di;
+	UINT8    m_abca;
+	UINT8    m_dr;
+	UINT8    m_ds;
+	UINT8    m_sh;
+	UINT8    m_input_mux;
+	UINT8    m_di;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *ppi_0;
-	device_t *ppi_1;
+	device_t *m_maincpu;
+	device_t *m_ppi_0;
+	device_t *m_ppi_1;
 };
 
 

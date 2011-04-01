@@ -557,7 +557,7 @@ static int DebugTextureDisplay( psx_gpu *p_psxgpu, bitmap_t *bitmap )
 
 static STATE_POSTLOAD( updatevisiblearea )
 {
-	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->m_p_psxgpu;
 	rectangle visarea;
 	float refresh;
 
@@ -786,7 +786,7 @@ static void psx_gpu_init( running_machine &machine, int n_gputype )
 	state_save_register_global( machine, p_psxgpu->n_ti );
 
 	machine.state().register_postload( updatevisiblearea, NULL );
-	machine.driver_data<psx_state>()->p_psxgpu = p_psxgpu;
+	machine.driver_data<psx_state>()->m_p_psxgpu = p_psxgpu;
 }
 
 VIDEO_START( psx_type1 )
@@ -801,7 +801,7 @@ VIDEO_START( psx_type2 )
 
 SCREEN_UPDATE( psx )
 {
-	psx_gpu *p_psxgpu = screen->machine().driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = screen->machine().driver_data<psx_state>()->m_p_psxgpu;
 	UINT32 n_x;
 	UINT32 n_y;
 	int n_top;
@@ -3197,7 +3197,7 @@ static void MoveImage( psx_gpu *p_psxgpu )
 
 void psx_gpu_write( running_machine &machine, UINT32 *p_ram, INT32 n_size )
 {
-	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->m_p_psxgpu;
 
 	while( n_size > 0 )
 	{
@@ -3683,7 +3683,7 @@ void psx_gpu_write( running_machine &machine, UINT32 *p_ram, INT32 n_size )
 
 WRITE32_HANDLER( psx_gpu_w )
 {
-	psx_gpu *p_psxgpu = space->machine().driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = space->machine().driver_data<psx_state>()->m_p_psxgpu;
 
 	switch( offset )
 	{
@@ -3849,7 +3849,7 @@ WRITE32_HANDLER( psx_gpu_w )
 
 void psx_gpu_read( running_machine &machine, UINT32 *p_ram, INT32 n_size )
 {
-	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->m_p_psxgpu;
 
 	while( n_size > 0 )
 	{
@@ -3899,7 +3899,7 @@ void psx_gpu_read( running_machine &machine, UINT32 *p_ram, INT32 n_size )
 
 READ32_HANDLER( psx_gpu_r )
 {
-	psx_gpu *p_psxgpu = space->machine().driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = space->machine().driver_data<psx_state>()->m_p_psxgpu;
 	UINT32 data;
 
 	switch( offset )
@@ -3921,7 +3921,7 @@ READ32_HANDLER( psx_gpu_r )
 
 INTERRUPT_GEN( psx_vblank )
 {
-	psx_gpu *p_psxgpu = device->machine().driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = device->machine().driver_data<psx_state>()->m_p_psxgpu;
 
 #if defined( MAME_DEBUG )
 	DebugCheckKeys(p_psxgpu);
@@ -3948,7 +3948,7 @@ void psx_gpu_reset( running_machine &machine )
 
 void psx_lightgun_set( running_machine &machine, int n_x, int n_y )
 {
-	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->p_psxgpu;
+	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->m_p_psxgpu;
 
 	p_psxgpu->n_lightgun_x = n_x;
 	p_psxgpu->n_lightgun_y = n_y;

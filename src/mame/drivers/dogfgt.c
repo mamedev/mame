@@ -17,13 +17,13 @@ driver by Nicola Salmoria
 static READ8_HANDLER( sharedram_r )
 {
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	return state->sharedram[offset];
+	return state->m_sharedram[offset];
 }
 
 static WRITE8_HANDLER( sharedram_w )
 {
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	state->sharedram[offset] = data;
+	state->m_sharedram[offset] = data;
 }
 
 
@@ -32,19 +32,19 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		device_set_input_line(state->subcpu, 0, ASSERT_LINE);
+		device_set_input_line(state->m_subcpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	device_set_input_line(state->subcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
 {
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	state->soundlatch = data;
+	state->m_soundlatch = data;
 }
 
 static WRITE8_HANDLER( dogfgt_soundcontrol_w )
@@ -52,22 +52,22 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
-	if ((state->last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
+	if ((state->m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		ay8910_data_address_w(space->machine().device("ay1"), state->m_last_snd_ctrl >> 4, state->m_soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
-	if ((state->last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
+	if ((state->m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		ay8910_data_address_w(space->machine().device("ay2"), state->m_last_snd_ctrl >> 6, state->m_soundlatch);
 
-	state->last_snd_ctrl = data;
+	state->m_last_snd_ctrl = data;
 }
 
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, sharedram)
-	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE_MEMBER(dogfgt_state, spriteram, spriteram_size)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, bgvideoram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, m_sharedram)
+	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE_MEMBER(dogfgt_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, m_bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
 	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
@@ -217,16 +217,16 @@ static MACHINE_START( dogfgt )
 {
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 
-	state->subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->bm_plane));
-	state->save_item(NAME(state->lastflip));
-	state->save_item(NAME(state->pixcolor));
-	state->save_item(NAME(state->lastpixcolor));
-	state->save_item(NAME(state->soundlatch));
-	state->save_item(NAME(state->last_snd_ctrl));
+	state->save_item(NAME(state->m_bm_plane));
+	state->save_item(NAME(state->m_lastflip));
+	state->save_item(NAME(state->m_pixcolor));
+	state->save_item(NAME(state->m_lastpixcolor));
+	state->save_item(NAME(state->m_soundlatch));
+	state->save_item(NAME(state->m_last_snd_ctrl));
 
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_RESET( dogfgt )
@@ -234,15 +234,15 @@ static MACHINE_RESET( dogfgt )
 	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int i;
 
-	state->bm_plane = 0;
-	state->lastflip = 0;
-	state->pixcolor = 0;
-	state->lastpixcolor = 0;
-	state->soundlatch = 0;
-	state->last_snd_ctrl = 0;
+	state->m_bm_plane = 0;
+	state->m_lastflip = 0;
+	state->m_pixcolor = 0;
+	state->m_lastpixcolor = 0;
+	state->m_soundlatch = 0;
+	state->m_last_snd_ctrl = 0;
 
 	for (i = 0; i < 3; i++)
-		state->scroll[i] = 0;
+		state->m_scroll[i] = 0;
 }
 
 

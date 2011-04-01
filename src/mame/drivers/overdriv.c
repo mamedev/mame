@@ -85,7 +85,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 {
 	overdriv_state *state = device->machine().driver_data<overdriv_state>();
 
-	if (k053246_is_irq_enabled(state->k053246))
+	if (k053246_is_irq_enabled(state->m_k053246))
 		device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		device_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
@@ -112,18 +112,18 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 static READ16_HANDLER( cpuB_ctrl_r )
 {
 	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	return state->cpuB_ctrl;
+	return state->m_cpuB_ctrl;
 }
 
 static WRITE16_HANDLER( cpuB_ctrl_w )
 {
 	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	COMBINE_DATA(&state->cpuB_ctrl);
+	COMBINE_DATA(&state->m_cpuB_ctrl);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		k053246_set_objcha_line(state->k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(state->m_k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -140,19 +140,19 @@ static READ8_DEVICE_HANDLER( overdriv_sound_r )
 static WRITE16_HANDLER( overdriv_soundirq_w )
 {
 	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
 	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->subcpu, 5, HOLD_LINE);
+	device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
 	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->subcpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);
 }
 
 
@@ -298,32 +298,32 @@ static MACHINE_START( overdriv )
 {
 	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->subcpu = machine.device("sub");
-	state->k051316_1 = machine.device("k051316_1");
-	state->k051316_2 = machine.device("k051316_2");
-	state->k053260_1 = machine.device("k053260_1");
-	state->k053260_2 = machine.device("k053260_2");
-	state->k053246 = machine.device("k053246");
-	state->k053251 = machine.device("k053251");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_k051316_1 = machine.device("k051316_1");
+	state->m_k051316_2 = machine.device("k051316_2");
+	state->m_k053260_1 = machine.device("k053260_1");
+	state->m_k053260_2 = machine.device("k053260_2");
+	state->m_k053246 = machine.device("k053246");
+	state->m_k053251 = machine.device("k053251");
 
-	state->save_item(NAME(state->cpuB_ctrl));
-	state->save_item(NAME(state->sprite_colorbase));
-	state->save_item(NAME(state->zoom_colorbase));
-	state->save_item(NAME(state->road_colorbase));
+	state->save_item(NAME(state->m_cpuB_ctrl));
+	state->save_item(NAME(state->m_sprite_colorbase));
+	state->save_item(NAME(state->m_zoom_colorbase));
+	state->save_item(NAME(state->m_road_colorbase));
 }
 
 static MACHINE_RESET( overdriv )
 {
 	overdriv_state *state = machine.driver_data<overdriv_state>();
 
-	state->cpuB_ctrl = 0;
-	state->sprite_colorbase = 0;
-	state->zoom_colorbase[0] = 0;
-	state->zoom_colorbase[1] = 0;
-	state->road_colorbase[0] = 0;
-	state->road_colorbase[1] = 0;
+	state->m_cpuB_ctrl = 0;
+	state->m_sprite_colorbase = 0;
+	state->m_zoom_colorbase[0] = 0;
+	state->m_zoom_colorbase[1] = 0;
+	state->m_road_colorbase[0] = 0;
+	state->m_road_colorbase[1] = 0;
 
 	/* start with cpu B halted */
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);

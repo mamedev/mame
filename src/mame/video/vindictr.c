@@ -18,7 +18,7 @@
 static TILE_GET_INFO( get_alpha_tile_info )
 {
 	vindictr_state *state = machine.driver_data<vindictr_state>();
-	UINT16 data = state->alpha[tile_index];
+	UINT16 data = state->m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -29,8 +29,8 @@ static TILE_GET_INFO( get_alpha_tile_info )
 static TILE_GET_INFO( get_playfield_tile_info )
 {
 	vindictr_state *state = machine.driver_data<vindictr_state>();
-	UINT16 data = state->playfield[tile_index];
-	int code = (state->playfield_tile_bank * 0x1000) + (data & 0xfff);
+	UINT16 data = state->m_playfield[tile_index];
+	int code = (state->m_playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
 }
@@ -84,19 +84,19 @@ VIDEO_START( vindictr )
 	vindictr_state *state = machine.driver_data<vindictr_state>();
 
 	/* initialize the playfield */
-	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 
 	/* save states */
-	state->save_item(NAME(state->playfield_tile_bank));
-	state->save_item(NAME(state->playfield_xscroll));
-	state->save_item(NAME(state->playfield_yscroll));
+	state->save_item(NAME(state->m_playfield_tile_bank));
+	state->save_item(NAME(state->m_playfield_xscroll));
+	state->save_item(NAME(state->m_playfield_yscroll));
 }
 
 
@@ -140,13 +140,13 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 void vindictr_scanline_update(screen_device &screen, int scanline)
 {
 	vindictr_state *state = screen.machine().driver_data<vindictr_state>();
-	UINT16 *base = &state->alpha[((scanline - 8) / 8) * 64 + 42];
+	UINT16 *base = &state->m_alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base < state->alpha)
+	if (base < state->m_alpha)
 		base += 0x7c0;
-	else if (base >= &state->alpha[0x7c0])
+	else if (base >= &state->m_alpha[0x7c0])
 		return;
 
 	/* update the current parameters */
@@ -157,20 +157,20 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 		switch ((data >> 9) & 7)
 		{
 			case 2:		/* /PFB */
-				if (state->playfield_tile_bank != (data & 7))
+				if (state->m_playfield_tile_bank != (data & 7))
 				{
 					screen.update_partial(scanline - 1);
-					state->playfield_tile_bank = data & 7;
-					tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
+					state->m_playfield_tile_bank = data & 7;
+					tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
 				}
 				break;
 
 			case 3:		/* /PFHSLD */
-				if (state->playfield_xscroll != (data & 0x1ff))
+				if (state->m_playfield_xscroll != (data & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					tilemap_set_scrollx(state->playfield_tilemap, 0, data);
-					state->playfield_xscroll = data & 0x1ff;
+					tilemap_set_scrollx(state->m_playfield_tilemap, 0, data);
+					state->m_playfield_xscroll = data & 0x1ff;
 				}
 				break;
 
@@ -197,10 +197,10 @@ void vindictr_scanline_update(screen_device &screen, int scanline)
 				if (offset > visible_area.max_y)
 					offset -= visible_area.max_y + 1;
 
-				if (state->playfield_yscroll != ((data - offset) & 0x1ff))
+				if (state->m_playfield_yscroll != ((data - offset) & 0x1ff))
 				{
 					screen.update_partial(scanline - 1);
-					tilemap_set_scrolly(state->playfield_tilemap, 0, data - offset);
+					tilemap_set_scrolly(state->m_playfield_tilemap, 0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}
 				break;
@@ -225,7 +225,7 @@ SCREEN_UPDATE( vindictr )
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -266,7 +266,7 @@ SCREEN_UPDATE( vindictr )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

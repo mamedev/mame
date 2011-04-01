@@ -420,9 +420,9 @@ public:
 	avt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
 };
 
 
@@ -435,16 +435,16 @@ public:
 static WRITE8_HANDLER( avt_videoram_w )
 {
 	avt_state *state = space->machine().driver_data<avt_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( avt_colorram_w )
 {
 	avt_state *state = space->machine().driver_data<avt_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -456,8 +456,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xxxx ----   color code.
     ---- xxxx   seems unused.
 */
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index];
 	int color = (attr & 0xf0)>>4;
 
 	SET_TILE_INFO( 0, code, color, 0);
@@ -467,14 +467,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( avt )
 {
 	avt_state *state = machine.driver_data<avt_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
 }
 
 
 static SCREEN_UPDATE( avt )
 {
 	avt_state *state = screen->machine().driver_data<avt_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -549,8 +549,8 @@ static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE_MEMBER(avt_state, videoram)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE_MEMBER(avt_state, colorram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE_MEMBER(avt_state, m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE_MEMBER(avt_state, m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, AS_IO, 8 )

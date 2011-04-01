@@ -85,15 +85,15 @@ public:
 	vmetal_state(running_machine &machine, const driver_device_config_base &config)
 		: metro_state(machine, config) { }
 
-	UINT16 *texttileram;
-	UINT16 *mid1tileram;
-	UINT16 *mid2tileram;
-	UINT16 *tlookup;
-	UINT16 *_videoregs;
+	UINT16 *m_texttileram;
+	UINT16 *m_mid1tileram;
+	UINT16 *m_mid2tileram;
+	UINT16 *m_tlookup;
+	UINT16 *m_videoregs;
 
-	tilemap_t *texttilemap;
-	tilemap_t *mid1tilemap;
-	tilemap_t *mid2tilemap;
+	tilemap_t *m_texttilemap;
+	tilemap_t *m_mid1tilemap;
+	tilemap_t *m_mid2tilemap;
 };
 
 
@@ -106,7 +106,7 @@ static READ16_HANDLER ( varia_crom_read )
 	UINT16 retdat;
 
 	offset = offset << 1;
-	offset |= (state->_videoregs[0x0ab / 2] & 0x7f) << 16;
+	offset |= (state->m_videoregs[0x0ab / 2] & 0x7f) << 16;
 	retdat = ((cgrom[offset] << 8) | (cgrom[offset + 1]));
 	// popmessage("varia romread offset %06x data %04x", offset, retdat);
 
@@ -118,7 +118,7 @@ static void get_vmetal_tlookup(running_machine &machine, UINT16 data, UINT16 *ti
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
 	int idx = ((data & 0x7fff) >> 4) * 2;
-	UINT32 lookup = (state->tlookup[idx] << 16) | state->tlookup[idx + 1];
+	UINT32 lookup = (state->m_tlookup[idx] << 16) | state->m_tlookup[idx + 1];
 
 	*tileno = (data & 0xf) | ((lookup >> 2) & 0xfff0);
 	*color = (lookup >> 20) & 0xff;
@@ -128,22 +128,22 @@ static void get_vmetal_tlookup(running_machine &machine, UINT16 data, UINT16 *ti
 static WRITE16_HANDLER( vmetal_texttileram_w )
 {
 	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->texttileram[offset]);
-	tilemap_mark_tile_dirty(state->texttilemap, offset);
+	COMBINE_DATA(&state->m_texttileram[offset]);
+	tilemap_mark_tile_dirty(state->m_texttilemap, offset);
 }
 
 static WRITE16_HANDLER( vmetal_mid1tileram_w )
 {
 	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->mid1tileram[offset]);
-	tilemap_mark_tile_dirty(state->mid1tilemap, offset);
+	COMBINE_DATA(&state->m_mid1tileram[offset]);
+	tilemap_mark_tile_dirty(state->m_mid1tilemap, offset);
 }
 
 static WRITE16_HANDLER( vmetal_mid2tileram_w )
 {
 	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->mid2tileram[offset]);
-	tilemap_mark_tile_dirty(state->mid2tilemap, offset);
+	COMBINE_DATA(&state->m_mid2tileram[offset]);
+	tilemap_mark_tile_dirty(state->m_mid2tilemap, offset);
 }
 
 
@@ -218,18 +218,18 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 
 static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(vmetal_state, texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(vmetal_state, mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE_MEMBER(vmetal_state, mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(vmetal_state, m_texttileram)
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid1tileram)
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid2tileram)
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
 	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(vmetal_state, spriteram, spriteram_size)
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(vmetal_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, _videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, videoregs)	// Video Registers
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_tlookup)
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_videoregs)
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, m_videoregs)	// Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
@@ -363,9 +363,9 @@ static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
 	UINT32 tile;
-	UINT16 color, data = state->texttileram[tile_index];
+	UINT16 color, data = state->m_texttileram[tile_index];
 	int idx = ((data & 0x7fff) >> 4) * 2;
-	UINT32 lookup = (state->tlookup[idx] << 16) | state->tlookup[idx + 1];
+	UINT32 lookup = (state->m_tlookup[idx] << 16) | state->m_tlookup[idx + 1];
 
 	tile = (data & 0xf) | (lookup & 0x7fff0);
 	color = ((lookup >> 20) & 0x1f) + 0xe0;
@@ -380,7 +380,7 @@ static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
-	UINT16 tile, color, data = state->mid1tileram[tile_index];
+	UINT16 tile, color, data = state->m_mid1tileram[tile_index];
 
 	get_vmetal_tlookup(machine, data, &tile, &color);
 
@@ -393,7 +393,7 @@ static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
-	UINT16 tile, color, data = state->mid2tileram[tile_index];
+	UINT16 tile, color, data = state->m_mid2tileram[tile_index];
 
 	get_vmetal_tlookup(machine, data, &tile, &color);
 
@@ -407,13 +407,13 @@ static VIDEO_START(varia)
 {
 	vmetal_state *state = machine.driver_data<vmetal_state>();
 
-	state->texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, tilemap_scan_rows,  8,  8, 256, 256);
-	state->mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
-	state->mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
+	state->m_texttilemap = tilemap_create(machine, get_vmetal_texttilemap_tile_info, tilemap_scan_rows,  8,  8, 256, 256);
+	state->m_mid1tilemap = tilemap_create(machine, get_vmetal_mid1tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
+	state->m_mid2tilemap = tilemap_create(machine, get_vmetal_mid2tilemap_tile_info, tilemap_scan_rows, 16, 16, 256, 256);
 
-	tilemap_set_transparent_pen(state->texttilemap, 15);
-	tilemap_set_transparent_pen(state->mid1tilemap, 15);
-	tilemap_set_transparent_pen(state->mid2tilemap, 15);
+	tilemap_set_transparent_pen(state->m_texttilemap, 15);
+	tilemap_set_transparent_pen(state->m_mid1tilemap, 15);
+	tilemap_set_transparent_pen(state->m_mid2tilemap, 15);
 }
 
 static SCREEN_UPDATE(varia)
@@ -423,18 +423,18 @@ static SCREEN_UPDATE(varia)
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	tilemap_set_scrollx(state->mid2tilemap, 0, state->_videoregs[0x06a/2]-64 /*+ state->_videoregs[0x066/2]*/);
-	tilemap_set_scrollx(state->mid1tilemap, 0, state->_videoregs[0x07a/2]-64 /*+ state->_videoregs[0x076/2]*/);
-	tilemap_set_scrollx(state->texttilemap, 0, -64 /*+ state->_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->m_mid2tilemap, 0, state->m_videoregs[0x06a/2]-64 /*+ state->m_videoregs[0x066/2]*/);
+	tilemap_set_scrollx(state->m_mid1tilemap, 0, state->m_videoregs[0x07a/2]-64 /*+ state->m_videoregs[0x076/2]*/);
+	tilemap_set_scrollx(state->m_texttilemap, 0, -64 /*+ state->m_videoregs[0x076/2]*/);
 
-	tilemap_set_scrolly(state->mid2tilemap, 0, -64);
-	tilemap_set_scrolly(state->mid1tilemap, 0, -64);
-	tilemap_set_scrolly(state->texttilemap, 0, -64);
+	tilemap_set_scrolly(state->m_mid2tilemap, 0, -64);
+	tilemap_set_scrolly(state->m_mid1tilemap, 0, -64);
+	tilemap_set_scrolly(state->m_texttilemap, 0, -64);
 
-	tilemap_draw(bitmap, cliprect, state->mid1tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->mid2tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_mid1tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_mid2tilemap, 0, 0);
 	metro_draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->texttilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_texttilemap, 0, 0);
 	return 0;
 }
 

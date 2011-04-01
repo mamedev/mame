@@ -4,15 +4,15 @@ public:
 	sprint4_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int da_latch;
-	int steer_FF1[4];
-	int steer_FF2[4];
-	int gear[4];
-	UINT8 last_wheel[4];
-	int collision[4];
-	tilemap_t* playfield;
-	bitmap_t* helper;
+	UINT8 *m_videoram;
+	int m_da_latch;
+	int m_steer_FF1[4];
+	int m_steer_FF2[4];
+	int m_gear[4];
+	UINT8 m_last_wheel[4];
+	int m_collision[4];
+	tilemap_t* m_playfield;
+	bitmap_t* m_helper;
 };
 
 

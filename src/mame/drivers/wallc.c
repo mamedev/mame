@@ -59,8 +59,8 @@ public:
 	wallc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	tilemap_t *m_bg_tilemap;
 };
 
 
@@ -129,28 +129,28 @@ static PALETTE_INIT( wallc )
 static WRITE8_HANDLER( wallc_videoram_w )
 {
 	wallc_state *state = space->machine().driver_data<wallc_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	wallc_state *state = machine.driver_data<wallc_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
 }
 
 static VIDEO_START( wallc )
 {
 	wallc_state *state = machine.driver_data<wallc_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_y,	8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( wallc )
 {
 	wallc_state *state = screen->machine().driver_data<wallc_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -161,7 +161,7 @@ static WRITE8_HANDLER( wallc_coin_counter_w )
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE_MEMBER(wallc_state, videoram)	/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE_MEMBER(wallc_state, m_videoram)	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")

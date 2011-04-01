@@ -69,7 +69,7 @@ static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
 	funybubl_state *state = space->machine().driver_data<funybubl_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
@@ -82,7 +82,7 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 static ADDRESS_MAP_START( funybubl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") // banked port 1?
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE_MEMBER(funybubl_state, paletteram) // palette
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE_MEMBER(funybubl_state, m_paletteram) // palette
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank1") // banked port 0?
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -205,11 +205,11 @@ static MACHINE_START( funybubl )
 	funybubl_state *state = machine.driver_data<funybubl_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->banked_vram));
+	state->save_item(NAME(state->m_banked_vram));
 
-	memory_configure_bank(machine, "bank1", 0, 2, &state->banked_vram[0x0000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 2, &state->m_banked_vram[0x0000], 0x1000);
 	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x10000], 0x4000);
 
 	memory_set_bank(machine, "bank1", 0);

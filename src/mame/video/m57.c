@@ -113,8 +113,8 @@ static TILE_GET_INFO( get_tile_info )
 {
 	m57_state *state = machine.driver_data<m57_state>();
 
-	UINT8 attr = state->videoram[tile_index * 2 + 0];
-	UINT16 code = state->videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
+	UINT8 attr = state->m_videoram[tile_index * 2 + 0];
+	UINT16 code = state->m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
 	SET_TILE_INFO(0, code, attr & 0x0f, TILE_FLIPXY(attr >> 4));
 }
@@ -130,8 +130,8 @@ WRITE8_HANDLER( m57_videoram_w )
 {
 	m57_state *state = space->machine().driver_data<m57_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 
@@ -145,10 +145,10 @@ VIDEO_START( m57 )
 {
 	m57_state *state = machine.driver_data<m57_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_scroll_rows(state->bg_tilemap, 256);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 256);
 
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 
@@ -163,8 +163,8 @@ WRITE8_HANDLER( m57_flipscreen_w )
 	m57_state *state = space->machine().driver_data<m57_state>();
 
 	/* screen flip is handled both by software and hardware */
-	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
-	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->m_flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
+	tilemap_set_flip(state->m_bg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	coin_counter_w(space->machine(), 0,data & 0x02);
 	coin_counter_w(space->machine(), 1,data & 0x20);
@@ -185,14 +185,14 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap, const re
 
 	// from 64 to 127: not wrapped
 	for (y = 64; y < 128; y++)
-		tilemap_set_scrollx(state->bg_tilemap, y, state->scrollram[0x40]);
+		tilemap_set_scrollx(state->m_bg_tilemap, y, state->m_scrollram[0x40]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	// from 128 to 255: wrapped
 	for (y = 128; y <= cliprect->max_y; y++)
 	{
-		scrolly = state->scrollram[y] + (state->scrollram[y + 0x100] << 8);
+		scrolly = state->m_scrollram[y] + (state->m_scrollram[y + 0x100] << 8);
 
 		if (scrolly >= 0)
 		{
@@ -226,12 +226,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		UINT8 attributes = state->spriteram[offs + 1];
-		int sx = state->spriteram[offs + 3];
-		int sy = ((224 - state->spriteram[offs + 0] - 32) & 0xff) + 32;
-		int code = state->spriteram[offs + 2];
+		UINT8 attributes = state->m_spriteram[offs + 1];
+		int sx = state->m_spriteram[offs + 3];
+		int sy = ((224 - state->m_spriteram[offs + 0] - 32) & 0xff) + 32;
+		int code = state->m_spriteram[offs + 2];
 		int color = attributes & 0x1f;
 		int flipy = attributes & 0x80;
 		int flipx = attributes & 0x40;
@@ -242,7 +242,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		if (code & 0x80) bank += 1;
 		if (attributes & 0x20) bank += 2;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sx = 240 - sx;
 			sy = 224 - sy;

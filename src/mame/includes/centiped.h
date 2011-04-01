@@ -10,18 +10,18 @@ public:
 	centiped_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 oldpos[4];
-	UINT8 sign[4];
-	UINT8 dsw_select;
-	UINT8 control_select;
-	UINT8 *rambase;
-	UINT8 flipscreen;
-	UINT8 *bullsdrt_tiles_bankram;
-	tilemap_t *bg_tilemap;
-	UINT8 bullsdrt_sprites_bank;
-	UINT8 penmask[64];
-	UINT8 *spriteram;
+	UINT8 *m_videoram;
+	UINT8 m_oldpos[4];
+	UINT8 m_sign[4];
+	UINT8 m_dsw_select;
+	UINT8 m_control_select;
+	UINT8 *m_rambase;
+	UINT8 m_flipscreen;
+	UINT8 *m_bullsdrt_tiles_bankram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_bullsdrt_sprites_bank;
+	UINT8 m_penmask[64];
+	UINT8 *m_spriteram;
 };
 
 

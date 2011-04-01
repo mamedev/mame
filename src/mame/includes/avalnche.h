@@ -14,10 +14,10 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	UINT8 *  videoram;
-	size_t   videoram_size;
+	UINT8 *  m_videoram;
+	size_t   m_videoram_size;
 
-	UINT8    avalance_video_inverted;
+	UINT8    m_avalance_video_inverted;
 };
 
 /*----------- defined in audio/avalnche.c -----------*/

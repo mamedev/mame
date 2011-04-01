@@ -161,9 +161,9 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite );
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,fg0_videoram)	/* FG0 Ram */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,bg0_videoram)	/* BG0 Ram */
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE_MEMBER(wwfsstar_state,spriteram)		/* SPR Ram */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_fg0_videoram)	/* FG0 Ram */
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_bg0_videoram)	/* BG0 Ram */
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE_MEMBER(wwfsstar_state,m_spriteram)		/* SPR Ram */
 	AM_RANGE(0x140000, 0x140fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(wwfsstar_irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
@@ -199,10 +199,10 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 	switch (offset)
 	{
 		case 0x00:
-			state->scrollx = data;
+			state->m_scrollx = data;
 			break;
 		case 0x01:
-			state->scrolly = data;
+			state->m_scrolly = data;
 			break;
 	}
 }
@@ -248,12 +248,12 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
-		state->vblank = 0;
+		state->m_vblank = 0;
 	}
 	/* Hack */
 	else if (scanline == (240-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
-		state->vblank = 1;
+		state->m_vblank = 1;
 	}
 
 	/* An interrupt is generated every 16 scanlines */
@@ -276,7 +276,7 @@ static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
 	wwfsstar_state *state = field->port->machine().driver_data<wwfsstar_state>();
 
-	return state->vblank;
+	return state->m_vblank;
 }
 
 /*******************************************************************************

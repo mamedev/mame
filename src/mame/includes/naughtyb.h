@@ -4,16 +4,16 @@ public:
 	naughtyb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 popflame_prot_seed;
-	int r_index;
-	int prot_count;
-	int question_offset;
-	UINT8 *videoram2;
-	UINT8 *scrollreg;
-	int cocktail;
-	UINT8 palreg;
-	int bankreg;
+	UINT8 *m_videoram;
+	UINT8 m_popflame_prot_seed;
+	int m_r_index;
+	int m_prot_count;
+	int m_question_offset;
+	UINT8 *m_videoram2;
+	UINT8 *m_scrollreg;
+	int m_cocktail;
+	UINT8 m_palreg;
+	int m_bankreg;
 };
 
 

@@ -45,8 +45,8 @@ static WRITE8_HANDLER( kopunch_coin_w )
 static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_MEMBER(kopunch_state, videoram)
-	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_BASE_MEMBER(kopunch_state, videoram2)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_MEMBER(kopunch_state, m_videoram)
+	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_BASE_MEMBER(kopunch_state, m_videoram2)
 	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
 ADDRESS_MAP_END
 
@@ -74,7 +74,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		device_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -83,7 +83,7 @@ static INPUT_CHANGED( right_coin_inserted )
 
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		device_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( kopunch )
@@ -175,16 +175,16 @@ static MACHINE_START( kopunch )
 {
 	kopunch_state *state = machine.driver_data<kopunch_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->gfxbank));
+	state->save_item(NAME(state->m_gfxbank));
 }
 
 static MACHINE_RESET( kopunch )
 {
 	kopunch_state *state = machine.driver_data<kopunch_state>();
 
-	state->gfxbank = 0;
+	state->m_gfxbank = 0;
 }
 
 static MACHINE_CONFIG_START( kopunch, kopunch_state )

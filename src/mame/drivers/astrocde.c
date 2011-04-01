@@ -586,7 +586,7 @@ static WRITE8_HANDLER( tenpindx_lights_w )
 static ADDRESS_MAP_START( seawolf2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -594,14 +594,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ebases_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacezap_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
@@ -610,7 +610,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wow_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
 	AM_RANGE(0xd040, 0xdfff) AM_RAM
@@ -620,7 +620,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")

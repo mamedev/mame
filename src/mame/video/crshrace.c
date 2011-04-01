@@ -12,15 +12,15 @@
 static TILE_GET_INFO( get_tile_info1 )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
-	int code = state->videoram1[tile_index];
+	int code = state->m_videoram1[tile_index];
 
-	SET_TILE_INFO(1, (code & 0xfff) + (state->roz_bank << 12), code >> 12, 0);
+	SET_TILE_INFO(1, (code & 0xfff) + (state->m_roz_bank << 12), code >> 12, 0);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
-	int code = state->videoram2[tile_index];
+	int code = state->m_videoram2[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -36,11 +36,11 @@ VIDEO_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 64, 64);
-	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->tilemap1, 0x0f);
-	tilemap_set_transparent_pen(state->tilemap2, 0xff);
+	tilemap_set_transparent_pen(state->m_tilemap1, 0x0f);
+	tilemap_set_transparent_pen(state->m_tilemap2, 0xff);
 }
 
 
@@ -54,16 +54,16 @@ WRITE16_HANDLER( crshrace_videoram1_w )
 {
 	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
-	COMBINE_DATA(&state->videoram1[offset]);
-	tilemap_mark_tile_dirty(state->tilemap1, offset);
+	COMBINE_DATA(&state->m_videoram1[offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap1, offset);
 }
 
 WRITE16_HANDLER( crshrace_videoram2_w )
 {
 	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
-	COMBINE_DATA(&state->videoram2[offset]);
-	tilemap_mark_tile_dirty(state->tilemap2, offset);
+	COMBINE_DATA(&state->m_videoram2[offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap2, offset);
 }
 
 WRITE16_HANDLER( crshrace_roz_bank_w )
@@ -72,10 +72,10 @@ WRITE16_HANDLER( crshrace_roz_bank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->roz_bank != (data & 0xff))
+		if (state->m_roz_bank != (data & 0xff))
 		{
-			state->roz_bank = data & 0xff;
-			tilemap_mark_all_tiles_dirty(state->tilemap1);
+			state->m_roz_bank = data & 0xff;
+			tilemap_mark_all_tiles_dirty(state->m_tilemap1);
 		}
 	}
 }
@@ -87,8 +87,8 @@ WRITE16_HANDLER( crshrace_gfxctrl_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->gfxctrl = data & 0xdf;
-		state->flipscreen = data & 0x20;
+		state->m_gfxctrl = data & 0xdf;
+		state->m_flipscreen = data & 0x20;
 	}
 }
 
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 				code = buffered_spriteram_2[map_start & 0x7fff];
 				map_start++;
 
-				if (state->flipscreen)
+				if (state->m_flipscreen)
 					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[2],
 							code,
 							color,
@@ -174,14 +174,14 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
-	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_tilemap2, 0, 0);
 }
 
 
 static void draw_fg(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
-	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->tilemap1, 0, 0, 1);
+	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_tilemap1, 0, 0, 1);
 }
 
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE( crshrace )
 {
 	crshrace_state *state = screen->machine().driver_data<crshrace_state>();
 
-	if (state->gfxctrl & 0x04)	/* display disable? */
+	if (state->m_gfxctrl & 0x04)	/* display disable? */
 	{
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		return 0;
@@ -197,7 +197,7 @@ SCREEN_UPDATE( crshrace )
 
 	bitmap_fill(bitmap, cliprect, 0x1ff);
 
-	switch (state->gfxctrl & 0xfb)
+	switch (state->m_gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
 			draw_sprites(screen->machine(), bitmap, cliprect);
@@ -211,7 +211,7 @@ SCREEN_UPDATE( crshrace )
 			draw_sprites(screen->machine(), bitmap, cliprect);
 			break;
 		default:
-			popmessage("gfxctrl = %02x", state->gfxctrl);
+			popmessage("gfxctrl = %02x", state->m_gfxctrl);
 			break;
 	}
 	return 0;

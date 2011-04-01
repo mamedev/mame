@@ -62,8 +62,8 @@ static void srmp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 */
 
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	UINT16 *spriteram16 = state->spriteram1.u16;
-	UINT16 *spriteram16_2 = state->spriteram2.u16;
+	UINT16 *spriteram16 = state->m_spriteram1.u16;
+	UINT16 *spriteram16_2 = state->m_spriteram2.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -101,7 +101,7 @@ static void srmp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 
 		code = code & 0x3fff;
 
-		if (state->color_bank) color |= 0x20;
+		if (state->m_color_bank) color |= 0x20;
 
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
 				code,
@@ -116,9 +116,9 @@ static void srmp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 static void srmp3_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	UINT8 *spriteram = state->spriteram1.u8;
-	UINT8 *spriteram_2 = state->spriteram2.u8;
-	UINT8 *spriteram_3 = state->spriteram3.u8;
+	UINT8 *spriteram = state->m_spriteram1.u8;
+	UINT8 *spriteram_2 = state->m_spriteram2.u8;
+	UINT8 *spriteram_3 = state->m_spriteram3.u8;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -226,9 +226,9 @@ static void srmp3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 */
 
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	UINT8 *spriteram = state->spriteram1.u8;
-	UINT8 *spriteram_2 = state->spriteram2.u8;
-	UINT8 *spriteram_3 = state->spriteram3.u8;
+	UINT8 *spriteram = state->m_spriteram1.u8;
+	UINT8 *spriteram_2 = state->m_spriteram2.u8;
+	UINT8 *spriteram_3 = state->m_spriteram3.u8;
 	int offs;
 	int xoffs, yoffs;
 
@@ -258,7 +258,7 @@ static void srmp3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 		int flipy	=	code & 0x4000;
 
 		code = (code & 0x1fff);
-		if (gfxbank) code += ((state->gfx_bank + 1) * 0x2000);
+		if (gfxbank) code += ((state->m_gfx_bank + 1) * 0x2000);
 
 		if (flip)
 		{
@@ -280,8 +280,8 @@ static void srmp3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const
 static void mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	UINT16 *spriteram16 = state->spriteram1.u16;
-	UINT16 *spriteram16_2 = state->spriteram2.u16;
+	UINT16 *spriteram16 = state->m_spriteram1.u16;
+	UINT16 *spriteram16_2 = state->m_spriteram2.u16;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -385,8 +385,8 @@ static void mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 */
 
 	srmp2_state *state = machine.driver_data<srmp2_state>();
-	UINT16 *spriteram16 = state->spriteram1.u16;
-	UINT16 *spriteram16_2 = state->spriteram2.u16;
+	UINT16 *spriteram16 = state->m_spriteram1.u16;
+	UINT16 *spriteram16_2 = state->m_spriteram2.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -419,7 +419,7 @@ static void mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 		int flipy	=	code & 0x4000;
 
 		code = (code & 0x1fff);
-		if (gfxbank) code += ((state->gfx_bank + 1) * 0x2000);
+		if (gfxbank) code += ((state->m_gfx_bank + 1) * 0x2000);
 
 		if (flip)
 		{

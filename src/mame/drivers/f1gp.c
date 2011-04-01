@@ -31,13 +31,13 @@
 static READ16_HANDLER( sharedram_r )
 {
 	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	return state->sharedram[offset];
+	return state->m_sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
 	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	COMBINE_DATA(&state->sharedram[offset]);
+	COMBINE_DATA(&state->m_sharedram[offset]);
 }
 
 static READ16_HANDLER( extrarom_r )
@@ -70,22 +70,22 @@ static WRITE16_HANDLER( sound_command_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->pending_command = 1;
+		state->m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static READ16_HANDLER( command_pending_r )
 {
 	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	return (state->pending_command ? 0xff : 0);
+	return (state->m_pending_command ? 0xff : 0);
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	f1gp_state *state = space->machine().driver_data<f1gp_state>();
-	state->pending_command = 0;
+	state->m_pending_command = 0;
 }
 
 
@@ -94,17 +94,17 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, rozvideoram)
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, m_rozvideoram)
 	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
 	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
 	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)							 /* mirror */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, spr1cgram, spr1cgram_size)				// SPR-1 CG RAM
-	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, spr2cgram, spr2cgram_size)				// SPR-2 CG RAM
-	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_BASE_MEMBER(f1gp_state, spr1vram)								// SPR-1 VRAM
-	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_BASE_MEMBER(f1gp_state, spr2vram)								// SPR-2 VRAM
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, m_spr1cgram, m_spr1cgram_size)				// SPR-1 CG RAM
+	AM_RANGE(0xe04000, 0xe07fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, m_spr2cgram, m_spr2cgram_size)				// SPR-2 CG RAM
+	AM_RANGE(0xf00000, 0xf003ff) AM_RAM AM_BASE_MEMBER(f1gp_state, m_spr1vram)								// SPR-1 VRAM
+	AM_RANGE(0xf10000, 0xf103ff) AM_RAM AM_BASE_MEMBER(f1gp_state, m_spr2vram)								// SPR-2 VRAM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM															// WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, sharedram)		// DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, fgvideoram)			// CHARACTER
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, m_sharedram)		// DUAL RAM
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, m_fgvideoram)			// CHARACTER
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(f1gp_gfxctrl_w)
@@ -121,12 +121,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_MEMBER(f1gp_state, sprcgram)									// SPR-1 CG RAM + SPR-2 CG RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, rozvideoram)	// BACK VRAM
-	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_BASE_MEMBER(f1gp_state, spritelist)							// not checked + SPR-1 VRAM + SPR-2 VRAM
+	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_MEMBER(f1gp_state, m_sprcgram)									// SPR-1 CG RAM + SPR-2 CG RAM
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, m_rozvideoram)	// BACK VRAM
+	AM_RANGE(0xe00000, 0xe00fff) AM_RAM AM_BASE_MEMBER(f1gp_state, m_spritelist)							// not checked + SPR-1 VRAM + SPR-2 VRAM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM																// WORK RAM-1
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, sharedram)			// DUAL RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, fgvideoram)				// CHARACTER
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, m_sharedram)			// DUAL RAM
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, m_fgvideoram)				// CHARACTER
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)			// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -187,9 +187,9 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, spriteram, spriteram_size)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE_SIZE_MEMBER(f1gp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_READWRITE(f1gp_zoomdata_r, f1gp_zoomdata_w)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, rozvideoram)
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w) AM_BASE_MEMBER(f1gp_state, m_rozvideoram)
 	AM_RANGE(0xd02000, 0xd03fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
 	AM_RANGE(0xd04000, 0xd05fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
 	AM_RANGE(0xd06000, 0xd07fff) AM_READWRITE(f1gp_rozvideoram_r, f1gp_rozvideoram_w)	/* mirror */
@@ -198,21 +198,21 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf003ff) AM_RAM //unused
 	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
-	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, sharedram)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, fgvideoram)
+	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(f1gp_state, m_sharedram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE_MEMBER(f1gp_state, m_fgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
-	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE_MEMBER(f1gp_state, fgregs)
+	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE_MEMBER(f1gp_state, m_fgregs)
 	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
 	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_BASE_MEMBER(f1gp_state, rozregs)
+	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_BASE_MEMBER(f1gp_state, m_rozregs)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16 )
@@ -412,7 +412,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	f1gp_state *state = device->machine().driver_data<f1gp_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -435,11 +435,11 @@ static MACHINE_START( f1gpb )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->save_item(NAME(state->pending_command));
-	state->save_item(NAME(state->roz_bank));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->gfxctrl));
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_pending_command));
+	state->save_item(NAME(state->m_roz_bank));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_gfxctrl));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_START( f1gp )
@@ -449,8 +449,8 @@ static MACHINE_START( f1gp )
 
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k053936 = machine.device("k053936");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k053936 = machine.device("k053936");
 
 	MACHINE_START_CALL(f1gpb);
 }
@@ -459,12 +459,12 @@ static MACHINE_RESET( f1gp )
 {
 	f1gp_state *state = machine.driver_data<f1gp_state>();
 
-	state->pending_command = 0;
-	state->roz_bank = 0;
-	state->flipscreen = 0;
-	state->gfxctrl = 0;
-	state->scroll[0] = 0;
-	state->scroll[1] = 0;
+	state->m_pending_command = 0;
+	state->m_roz_bank = 0;
+	state->m_flipscreen = 0;
+	state->m_gfxctrl = 0;
+	state->m_scroll[0] = 0;
+	state->m_scroll[1] = 0;
 }
 
 static MACHINE_CONFIG_START( f1gp, f1gp_state )

@@ -14,23 +14,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram_a;
-	UINT8 *  videoram_b;
-	UINT8 *  color_select;
-	UINT8 *  screen_flip;
-	UINT8 *  screen_select;
-	UINT8 *  screena_enable;
-	UINT8 *  screenb_enable;
+	UINT8 *  m_videoram_a;
+	UINT8 *  m_videoram_b;
+	UINT8 *  m_color_select;
+	UINT8 *  m_screen_flip;
+	UINT8 *  m_screen_select;
+	UINT8 *  m_screena_enable;
+	UINT8 *  m_screenb_enable;
 
 	/* misc */
-	UINT8    port_select;
-	UINT8    main_to_sound_data, sound_to_main_data;
-	UINT16   sample_offset;
-	UINT8    sample_count;
+	UINT8    m_port_select;
+	UINT8    m_main_to_sound_data;
+	UINT8    m_sound_to_main_data;
+	UINT16   m_sample_offset;
+	UINT8    m_sample_count;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/crgolf.c -----------*/

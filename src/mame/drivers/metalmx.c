@@ -284,7 +284,7 @@ static SCREEN_UPDATE( metalmx )
 	metalmx_state *state = screen->machine().driver_data<metalmx_state>();
 
 //  UINT32 *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
-	UINT16 *src_base = state->gsp_vram;
+	UINT16 *src_base = state->m_gsp_vram;
 	int y;
 
 	for (y = 0; y < 384; ++y)
@@ -334,8 +334,8 @@ static WRITE32_HANDLER( reset_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		device_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		device_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->m_dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->m_dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -387,7 +387,7 @@ static WRITE32_HANDLER( dsp32c_1_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	state->dsp32c_1->pio_w(offset, data);
+	state->m_dsp32c_1->pio_w(offset, data);
 }
 
 static READ32_HANDLER( dsp32c_1_r )
@@ -400,7 +400,7 @@ static READ32_HANDLER( dsp32c_1_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = state->dsp32c_1->pio_r(offset);
+	data = state->m_dsp32c_1->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -419,7 +419,7 @@ static WRITE32_HANDLER( dsp32c_2_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	state->dsp32c_2->pio_w(offset, data);
+	state->m_dsp32c_2->pio_w(offset, data);
 }
 
 static READ32_HANDLER( dsp32c_2_r )
@@ -432,7 +432,7 @@ static READ32_HANDLER( dsp32c_2_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = state->dsp32c_2->pio_r(offset);
+	data = state->m_dsp32c_2->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -470,34 +470,34 @@ static READ32_HANDLER( host_dram_r )
 {
 	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	return (state->gsp_dram[offset * 2] << 16) | state->gsp_dram[offset * 2 + 1];
+	return (state->m_gsp_dram[offset * 2] << 16) | state->m_gsp_dram[offset * 2 + 1];
 }
 
 static WRITE32_HANDLER( host_dram_w )
 {
 	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	COMBINE_DATA(state->gsp_dram + offset * 2 + 1);
+	COMBINE_DATA(state->m_gsp_dram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->gsp_dram + offset * 2);
+	COMBINE_DATA(state->m_gsp_dram + offset * 2);
 }
 
 static READ32_HANDLER( host_vram_r )
 {
 	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	return (state->gsp_vram[offset * 2] << 16) | state->gsp_vram[offset * 2 + 1];
+	return (state->m_gsp_vram[offset * 2] << 16) | state->m_gsp_vram[offset * 2 + 1];
 }
 
 static WRITE32_HANDLER( host_vram_w )
 {
 	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	COMBINE_DATA(state->gsp_vram + offset * 2 + 1);
+	COMBINE_DATA(state->m_gsp_vram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->gsp_vram + offset * 2);
+	COMBINE_DATA(state->m_gsp_vram + offset * 2);
 }
 
 static void tms_interrupt(device_t *device, int state)
@@ -560,7 +560,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(metalmx_state, adsp_internal_program_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_adsp_internal_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16 )
@@ -580,8 +580,8 @@ static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
 	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE(tms34020_io_register_r, tms34020_io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE_MEMBER(metalmx_state, gsp_dram)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_MEMBER(metalmx_state, gsp_vram)
+	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_gsp_dram)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_gsp_vram)
 ADDRESS_MAP_END
 
 
@@ -782,7 +782,7 @@ static DRIVER_INIT( metalmx )
 	UINT8 *adsp_boot = (UINT8*)machine.region("adsp")->base();
 	metalmx_state *state = machine.driver_data<metalmx_state>();
 
-	state->adsp->load_boot_data(adsp_boot, state->adsp_internal_program_ram);
+	state->m_adsp->load_boot_data(adsp_boot, state->m_adsp_internal_program_ram);
 
 	cage_init(machine, 0); // TODO: speedup address
 	cage_set_irq_handler(cage_irq_callback);
@@ -792,8 +792,8 @@ static MACHINE_RESET( metalmx )
 {
 	metalmx_state *state = machine.driver_data<metalmx_state>();
 
-	device_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
-	device_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->m_dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->m_dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

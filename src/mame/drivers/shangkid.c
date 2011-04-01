@@ -81,13 +81,13 @@ static WRITE8_HANDLER( shangkid_cpu_reset_w )
 static WRITE8_HANDLER( shangkid_sound_enable_w )
 {
 	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	state->bbx_sound_enable = data;
+	state->m_bbx_sound_enable = data;
 }
 
 static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
 {
 	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	if( state->bbx_sound_enable )
+	if( state->m_bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
 static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 {
 	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	if( state->bbx_sound_enable )
+	if( state->m_bbx_sound_enable )
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
@@ -111,7 +111,7 @@ static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 {
 	shangkid_state *state = device->machine().driver_data<shangkid_state>();
-	state->sound_latch = data;
+	state->m_sound_latch = data;
 }
 
 /***************************************************************************************/
@@ -119,7 +119,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 static READ8_HANDLER( shangkid_soundlatch_r )
 {
 	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	return state->sound_latch;
+	return state->m_sound_latch;
 }
 
 /***************************************************************************************/
@@ -127,13 +127,13 @@ static READ8_HANDLER( shangkid_soundlatch_r )
 static DRIVER_INIT( chinhero )
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->gfx_type = 0;
+	state->m_gfx_type = 0;
 }
 
 static DRIVER_INIT( shangkid )
 {
 	shangkid_state *state = machine.driver_data<shangkid_state>();
-	state->gfx_type = 1;
+	state->m_gfx_type = 1;
 
 	/* set up banking */
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x8000, 0x8000);
@@ -248,10 +248,10 @@ static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, m_videoreg)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, m_videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8 )
@@ -269,10 +269,10 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, m_videoreg)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, m_videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -438,7 +438,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( dynamski_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(shangkid_state, videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_videoram) /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM

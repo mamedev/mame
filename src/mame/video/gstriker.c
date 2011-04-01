@@ -31,26 +31,26 @@ static TILE_GET_INFO( VS920A_get_tile_info )
 	int data;
 	int tileno, pal;
 
-	data = state->VS920A_cur_chip->vram[tile_index];
+	data = state->m_VS920A_cur_chip->vram[tile_index];
 
 	tileno = data & 0xFFF;
 	pal =   (data >> 12) & 0xF;
 
-	SET_TILE_INFO(state->VS920A_cur_chip->gfx_region, tileno, state->VS920A_cur_chip->pal_base + pal, 0);
+	SET_TILE_INFO(state->m_VS920A_cur_chip->gfx_region, tileno, state->m_VS920A_cur_chip->pal_base + pal, 0);
 }
 
 WRITE16_HANDLER( VS920A_0_vram_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->VS920A[0].vram[offset]);
-	tilemap_mark_tile_dirty(state->VS920A[0].tmap, offset);
+	COMBINE_DATA(&state->m_VS920A[0].vram[offset]);
+	tilemap_mark_tile_dirty(state->m_VS920A[0].tmap, offset);
 }
 
 WRITE16_HANDLER( VS920A_1_vram_w )
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->VS920A[1].vram[offset]);
-	tilemap_mark_tile_dirty(state->VS920A[1].tmap, offset);
+	COMBINE_DATA(&state->m_VS920A[1].vram[offset]);
+	tilemap_mark_tile_dirty(state->m_VS920A[1].tmap, offset);
 }
 
 static void VS920A_init(running_machine &machine, int numchips)
@@ -63,32 +63,32 @@ static void VS920A_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
+		state->m_VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
 
-		tilemap_set_transparent_pen(state->VS920A[i].tmap, 0);
+		tilemap_set_transparent_pen(state->m_VS920A[i].tmap, 0);
 	}
 }
 
 static tilemap_t* VS920A_get_tilemap(gstriker_state *state, int numchip)
 {
-	return state->VS920A[numchip].tmap;
+	return state->m_VS920A[numchip].tmap;
 }
 
 static void VS920A_set_pal_base(gstriker_state *state, int numchip, int pal_base)
 {
-	state->VS920A[numchip].pal_base = pal_base;
+	state->m_VS920A[numchip].pal_base = pal_base;
 }
 
 static void VS920A_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
 {
-	state->VS920A[numchip].gfx_region = gfx_region;
+	state->m_VS920A[numchip].gfx_region = gfx_region;
 }
 
 static void VS920A_draw(gstriker_state *state, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
-	state->VS920A_cur_chip = &state->VS920A[numchip];
+	state->m_VS920A_cur_chip = &state->m_VS920A[numchip];
 
-	tilemap_draw(screen, cliprect, state->VS920A_cur_chip->tmap, 0, priority);
+	tilemap_draw(screen, cliprect, state->m_VS920A_cur_chip->tmap, 0, priority);
 }
 
 
@@ -147,18 +147,18 @@ static TILE_GET_INFO( MB60553_get_tile_info )
 	int data, bankno;
 	int tileno, pal;
 
-	data = state->MB60553_cur_chip->vram[tile_index];
+	data = state->m_MB60553_cur_chip->vram[tile_index];
 
 	tileno = data & 0x1FF;
 	pal = (data >> 12) & 0xF;
 	bankno = (data >> 9) & 0x7;
 
-	SET_TILE_INFO(state->MB60553->gfx_region, tileno + state->MB60553_cur_chip->bank[bankno] * 0x200, pal + state->MB60553->pal_base, 0);
+	SET_TILE_INFO(state->m_MB60553->gfx_region, tileno + state->m_MB60553_cur_chip->bank[bankno] * 0x200, pal + state->m_MB60553->pal_base, 0);
 }
 
 static void MB60553_reg_written(gstriker_state *state, int numchip, int num_reg)
 {
-	tMB60553* cur = &state->MB60553[numchip];
+	tMB60553* cur = &state->m_MB60553[numchip];
 
 	switch (num_reg)
 	{
@@ -221,20 +221,20 @@ static void MB60553_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->MB60553[i].tmap = tilemap_create(machine, MB60553_get_tile_info,twc94_scan, 16,16,128,64);
+		state->m_MB60553[i].tmap = tilemap_create(machine, MB60553_get_tile_info,twc94_scan, 16,16,128,64);
 
-		tilemap_set_transparent_pen(state->MB60553[i].tmap, 0);
+		tilemap_set_transparent_pen(state->m_MB60553[i].tmap, 0);
 	}
 }
 
 static void MB60553_set_pal_base(gstriker_state *state, int numchip, int pal_base)
 {
-	state->MB60553[numchip].pal_base = pal_base;
+	state->m_MB60553[numchip].pal_base = pal_base;
 }
 
 static void MB60553_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
 {
-	state->MB60553[numchip].gfx_region = gfx_region;
+	state->m_MB60553[numchip].gfx_region = gfx_region;
 }
 
 /* THIS IS STILL WRONG! */
@@ -243,7 +243,7 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_t* screen
 	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int line;
 	rectangle clip;
-	state->MB60553_cur_chip = &state->MB60553[numchip];
+	state->m_MB60553_cur_chip = &state->m_MB60553[numchip];
 
 	clip.min_x = machine.primary_screen->visible_area().min_x;
 	clip.max_x = machine.primary_screen->visible_area().max_x;
@@ -257,19 +257,19 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_t* screen
 
 		UINT32 incxx,incyy;
 
-		startx = state->MB60553_cur_chip->regs[0];
-		starty = state->MB60553_cur_chip->regs[1];
+		startx = state->m_MB60553_cur_chip->regs[0];
+		starty = state->m_MB60553_cur_chip->regs[1];
 
 		startx += (24<<4); // maybe not..
 
-		startx -=  state->lineram[(line)*8+7]/2;
+		startx -=  state->m_lineram[(line)*8+7]/2;
 
-		incxx = state->lineram[(line)*8+0]<<4;
-		incyy = state->lineram[(line)*8+3]<<4;
+		incxx = state->m_lineram[(line)*8+0]<<4;
+		incyy = state->m_lineram[(line)*8+3]<<4;
 
 		clip.min_y = clip.max_y = line;
 
-		tilemap_draw_roz(screen,&clip,state->MB60553_cur_chip->tmap,startx<<12,starty<<12,
+		tilemap_draw_roz(screen,&clip,state->m_MB60553_cur_chip->tmap,startx<<12,starty<<12,
 				incxx,0,0,incyy,
 				1,
 				0,priority);
@@ -282,46 +282,46 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_t* screen
 
 static tilemap_t* MB60553_get_tilemap(gstriker_state *state, int numchip)
 {
-	return state->MB60553[numchip].tmap;
+	return state->m_MB60553[numchip].tmap;
 }
 
 
 WRITE16_HANDLER(MB60553_0_regs_w)
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	UINT16 oldreg = state->MB60553[0].regs[offset];
+	UINT16 oldreg = state->m_MB60553[0].regs[offset];
 
-	COMBINE_DATA(&state->MB60553[0].regs[offset]);
+	COMBINE_DATA(&state->m_MB60553[0].regs[offset]);
 
-	if (state->MB60553[0].regs[offset] != oldreg)
+	if (state->m_MB60553[0].regs[offset] != oldreg)
 		MB60553_reg_written(state, 0, offset);
 }
 
 WRITE16_HANDLER(MB60553_1_regs_w)
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	UINT16 oldreg = state->MB60553[1].regs[offset];
+	UINT16 oldreg = state->m_MB60553[1].regs[offset];
 
-	COMBINE_DATA(&state->MB60553[1].regs[offset]);
+	COMBINE_DATA(&state->m_MB60553[1].regs[offset]);
 
-	if (state->MB60553[1].regs[offset] != oldreg)
+	if (state->m_MB60553[1].regs[offset] != oldreg)
 		MB60553_reg_written(state, 1, offset);
 }
 
 WRITE16_HANDLER(MB60553_0_vram_w)
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->MB60553[0].vram[offset]);
+	COMBINE_DATA(&state->m_MB60553[0].vram[offset]);
 
-	tilemap_mark_tile_dirty(state->MB60553[0].tmap, offset);
+	tilemap_mark_tile_dirty(state->m_MB60553[0].tmap, offset);
 }
 
 WRITE16_HANDLER(MB60553_1_vram_w)
 {
 	gstriker_state *state = space->machine().driver_data<gstriker_state>();
-	COMBINE_DATA(&state->MB60553[1].vram[offset]);
+	COMBINE_DATA(&state->m_MB60553[1].vram[offset]);
 
-	tilemap_mark_tile_dirty(state->MB60553[1].tmap, offset);
+	tilemap_mark_tile_dirty(state->m_MB60553[1].tmap, offset);
 }
 
 
@@ -435,7 +435,7 @@ static void CG10103_draw_sprite(running_machine &machine, bitmap_t* screen, cons
 
 	// @@@ Add here optional connection to the VS9210 for extra level of tile number indirection
 #if 0
-	if (state->CG10103_cur_chip->connected_vs9210)
+	if (state->m_CG10103_cur_chip->connected_vs9210)
 	{
 		// ...
 	}
@@ -449,8 +449,8 @@ static void CG10103_draw_sprite(running_machine &machine, bitmap_t* screen, cons
 		for (x=0;x<xnum;x++)
 		{
 			// Hack to handle horizontal wrapping
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
-			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->CG10103_cur_chip->gfx_region], tile, color+state->CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, state->CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->m_CG10103_cur_chip->gfx_region], tile, color+state->m_CG10103_cur_chip->pal_base, flipx, flipy, xp>>16, ypos>>16, xfact, yfact, state->m_CG10103_cur_chip->transpen);
+			drawgfxzoom_transpen(screen, cliprect, machine.gfx[state->m_CG10103_cur_chip->gfx_region], tile, color+state->m_CG10103_cur_chip->pal_base, flipx, flipy, (xp>>16) - 0x200, ypos>>16, xfact, yfact, state->m_CG10103_cur_chip->transpen);
 			xp += xstep;
 			tile++;
 		}
@@ -466,9 +466,9 @@ static void CG10103_draw(running_machine &machine, int numchip, bitmap_t* screen
 	UINT16* splist;
 	int i;
 
-	state->CG10103_cur_chip = &state->CG10103[numchip];
+	state->m_CG10103_cur_chip = &state->m_CG10103[numchip];
 
-	splist = state->CG10103_cur_chip->vram;
+	splist = state->m_CG10103_cur_chip->vram;
 
 	// Parse the sorting list
 	for (i=0;i<0x400;i++)
@@ -486,7 +486,7 @@ static void CG10103_draw(running_machine &machine, int numchip, bitmap_t* screen
 			int num = cmd & 0xFF;
 
 			// Draw the sprite
-			CG10103_draw_sprite(machine, screen, cliprect, state->CG10103_cur_chip->vram + 0x400 + num*4, priority);
+			CG10103_draw_sprite(machine, screen, cliprect, state->m_CG10103_cur_chip->vram + 0x400 + num*4, priority);
 		}
 	}
 }
@@ -507,17 +507,17 @@ static void CG10103_init(int numchips)
 
 static void CG10103_set_pal_base(gstriker_state *state, int numchip, int pal_base)
 {
-	state->CG10103[numchip].pal_base = pal_base;
+	state->m_CG10103[numchip].pal_base = pal_base;
 }
 
 static void CG10103_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
 {
-	state->CG10103[numchip].gfx_region = gfx_region;
+	state->m_CG10103[numchip].gfx_region = gfx_region;
 }
 
 static void CG10103_set_transpen(gstriker_state *state, int numchip, int transpen)
 {
-	state->CG10103[numchip].transpen = transpen;
+	state->m_CG10103[numchip].transpen = transpen;
 }
 
 
@@ -550,8 +550,8 @@ SCREEN_UPDATE(gstriker)
 
 #if 0
 	popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
-		(UINT16)state->MB60553[0].regs[0], (UINT16)state->MB60553[0].regs[1], (UINT16)state->MB60553[0].regs[2], (UINT16)state->MB60553[0].regs[3],
-		(UINT16)state->MB60553[0].regs[4], (UINT16)state->MB60553[0].regs[5], (UINT16)state->MB60553[0].regs[6], (UINT16)state->MB60553[0].regs[7]
+		(UINT16)state->m_MB60553[0].regs[0], (UINT16)state->m_MB60553[0].regs[1], (UINT16)state->m_MB60553[0].regs[2], (UINT16)state->m_MB60553[0].regs[3],
+		(UINT16)state->m_MB60553[0].regs[4], (UINT16)state->m_MB60553[0].regs[5], (UINT16)state->m_MB60553[0].regs[6], (UINT16)state->m_MB60553[0].regs[7]
 	);
 #endif
 

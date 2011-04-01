@@ -77,43 +77,43 @@ IO ports and memory map changes. Dip switches differ too.
 static WRITE8_HANDLER( control_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->nmi_enable = data & 1;
+	state->m_nmi_enable = data & 1;
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	if (!(data & 1))
-		device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 	msm5205_reset_w(device, !(data & 1));
-	state->sound_nmi_enable = ((data >> 1) & 1);
+	state->m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_msm_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->msm_data = data;
-	state->msm_play_lo_nibble = 1;
+	state->m_msm_data = data;
+	state->m_msm_play_lo_nibble = 1;
 }
 
 static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, colorram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, m_colorram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( sound_reset_r )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( kc_sound_control_w )
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 
 	if (offset == 0)
-		state->sound_nmi_enable = ((data >> 7) & 1);
+		state->m_sound_nmi_enable = ((data >> 7) & 1);
 //  else
 //      DAC_set_volume(0, (data == 1) ? 255 : 0, 0);
 }
@@ -166,9 +166,9 @@ static WRITE8_HANDLER( kc_sound_control_w )
 static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, colorram)
-	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, m_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, m_colorram)
+	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -349,7 +349,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( kc_interrupt )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -357,17 +357,17 @@ static void msmint( device_t *device )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 
-	if (state->msm_play_lo_nibble)
-		msm5205_data_w(device, state->msm_data & 0x0f);
+	if (state->m_msm_play_lo_nibble)
+		msm5205_data_w(device, state->m_msm_data & 0x0f);
 	else
-		msm5205_data_w(device, (state->msm_data >> 4) & 0x0f);
+		msm5205_data_w(device, (state->m_msm_data >> 4) & 0x0f);
 
-	state->msm_play_lo_nibble ^= 1;
+	state->m_msm_play_lo_nibble ^= 1;
 
-	if (!(state->counter ^= 1))
+	if (!(state->m_counter ^= 1))
 	{
-		if (state->sound_nmi_enable)
-			device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->m_sound_nmi_enable)
+			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -384,7 +384,7 @@ static const msm5205_interface msm_interface =
 static INTERRUPT_GEN( sound_int )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
-	if (state->sound_nmi_enable)
+	if (state->m_sound_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -393,10 +393,10 @@ static MACHINE_START( kchamp )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->sound_nmi_enable));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_sound_nmi_enable));
 }
 
 static MACHINE_START( kchampvs )
@@ -405,17 +405,17 @@ static MACHINE_START( kchampvs )
 
 	MACHINE_START_CALL(kchamp);
 
-	state->save_item(NAME(state->msm_data));
-	state->save_item(NAME(state->msm_play_lo_nibble));
-	state->save_item(NAME(state->counter));
+	state->save_item(NAME(state->m_msm_data));
+	state->save_item(NAME(state->m_msm_play_lo_nibble));
+	state->save_item(NAME(state->m_counter));
 }
 
 static MACHINE_RESET( kchamp )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 
-	state->nmi_enable = 0;
-	state->sound_nmi_enable = 0;
+	state->m_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( kchampvs, kchamp_state )
@@ -770,9 +770,9 @@ static DRIVER_INIT( kchampvs )
 	decrypted[A] = rom[A];	/* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
 
-	state->counter = 0;
-	state->msm_data = 0;
-	state->msm_play_lo_nibble = 0;
+	state->m_counter = 0;
+	state->m_msm_data = 0;
+	state->m_msm_play_lo_nibble = 0;
 }
 
 
@@ -781,9 +781,9 @@ static DRIVER_INIT( kchampvs2 )
 	kchamp_state *state = machine.driver_data<kchamp_state>();
 
 	decrypt_code(machine);
-	state->counter = 0;
-	state->msm_data = 0;
-	state->msm_play_lo_nibble = 1;
+	state->m_counter = 0;
+	state->m_msm_data = 0;
+	state->m_msm_play_lo_nibble = 1;
 }
 
 

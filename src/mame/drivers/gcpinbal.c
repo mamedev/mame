@@ -45,7 +45,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	device_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 1, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -55,7 +55,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		device_set_input_line(state->maincpu, 3, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 	}
 }
 #endif
@@ -93,20 +93,20 @@ static READ16_HANDLER( ioc_r )
 
 		case 0x50:
 		case 0x51:
-			return state->oki->read(*space, 0) << 8;
+			return state->m_oki->read(*space, 0) << 8;
 
 	}
 
 //logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space->device()),offset);
 
-	return state->ioc_ram[offset];
+	return state->m_ioc_ram[offset];
 }
 
 
 static WRITE16_HANDLER( ioc_w )
 {
 	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	COMBINE_DATA(&state->ioc_ram[offset]);
+	COMBINE_DATA(&state->m_ioc_ram[offset]);
 
 //  switch (offset)
 //  {
@@ -135,54 +135,54 @@ static WRITE16_HANDLER( ioc_w )
 
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
-			state->msm_bank = data & 0x1000 ? 0x100000 : 0;
-			state->oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
+			state->m_msm_bank = data & 0x1000 ? 0x100000 : 0;
+			state->m_oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
 			break;
 
 		case 0x45:
-			//state->adpcm_idle = 1;
+			//state->m_adpcm_idle = 1;
 			break;
 
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			state->oki->write(*space, 0, data >> 8);
+			state->m_oki->write(*space, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
 		case 0x60:
-			state->msm_start &= 0xffff00;
-			state->msm_start |= (data >> 8);
+			state->m_msm_start &= 0xffff00;
+			state->m_msm_start |= (data >> 8);
 			break;
 		case 0x61:
-			state->msm_start &= 0xff00ff;
-			state->msm_start |= data;
+			state->m_msm_start &= 0xff00ff;
+			state->m_msm_start |= data;
 			break;
 		case 0x62:
-			state->msm_start &= 0x00ffff;
-			state->msm_start |= (data << 8);
+			state->m_msm_start &= 0x00ffff;
+			state->m_msm_start |= (data << 8);
 			break;
 		case 0x63:
-			state->msm_end &= 0xffff00;
-			state->msm_end |= (data >> 8);
+			state->m_msm_end &= 0xffff00;
+			state->m_msm_end |= (data >> 8);
 			break;
 		case 0x64:
-			state->msm_end &= 0xff00ff;
-			state->msm_end |= data;
+			state->m_msm_end &= 0xff00ff;
+			state->m_msm_end |= data;
 			break;
 		case 0x65:
-			state->msm_end &= 0x00ffff;
-			state->msm_end |= (data << 8);
+			state->m_msm_end &= 0x00ffff;
+			state->m_msm_end |= (data << 8);
 			break;
 		case 0x66:
-			if (state->msm_start < state->msm_end)
+			if (state->m_msm_start < state->m_msm_end)
 			{
 				/* data written here is adpcm param? */
-				//popmessage("%08x %08x", state->msm_start + state->msm_bank, state->msm_end);
-				state->adpcm_idle = 0;
-				msm5205_reset_w(state->msm, 0);
-				state->adpcm_start = state->msm_start + state->msm_bank;
-				state->adpcm_end = state->msm_end;
+				//popmessage("%08x %08x", state->m_msm_start + state->m_msm_bank, state->m_msm_end);
+				state->m_adpcm_idle = 0;
+				msm5205_reset_w(state->m_msm, 0);
+				state->m_adpcm_start = state->m_msm_start + state->m_msm_bank;
+				state->m_adpcm_end = state->m_msm_end;
 //              ADPCM_stop(0);
 //              ADPCM_play(0, start+bank, end-start);
 			}
@@ -206,23 +206,23 @@ static void gcp_adpcm_int( device_t *device )
 {
 	gcpinbal_state *state = device->machine().driver_data<gcpinbal_state>();
 
-	if (state->adpcm_idle)
+	if (state->m_adpcm_idle)
 		msm5205_reset_w(device, 1);
-	if (state->adpcm_start >= 0x200000 || state->adpcm_start > state->adpcm_end)
+	if (state->m_adpcm_start >= 0x200000 || state->m_adpcm_start > state->m_adpcm_end)
 	{
 		//msm5205_reset_w(device,1);
-		state->adpcm_start = state->msm_start + state->msm_bank;
-		state->adpcm_trigger = 0;
+		state->m_adpcm_start = state->m_msm_start + state->m_msm_bank;
+		state->m_adpcm_trigger = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("msm")->base();
 
-		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_start] & 0x0f) : (ROM[state->adpcm_start] & 0xf0) >> 4));
-		msm5205_data_w(device, state->adpcm_data & 0xf);
-		state->adpcm_trigger ^= 1;
-		if (state->adpcm_trigger == 0)
-			state->adpcm_start++;
+		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_start] & 0x0f) : (ROM[state->m_adpcm_start] & 0xf0) >> 4));
+		msm5205_data_w(device, state->m_adpcm_data & 0xf);
+		state->m_adpcm_trigger ^= 1;
+		if (state->m_adpcm_trigger == 0)
+			state->m_adpcm_start++;
 	}
 }
 
@@ -233,10 +233,10 @@ static void gcp_adpcm_int( device_t *device )
 
 static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE_MEMBER(gcpinbal_state, tilemapram)
-	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_MEMBER(gcpinbal_state, spriteram, spriteram_size)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE_MEMBER(gcpinbal_state, m_tilemapram)
+	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_MEMBER(gcpinbal_state, m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE_MEMBER(gcpinbal_state, ioc_ram)
+	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE_MEMBER(gcpinbal_state, m_ioc_ram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM	/* RAM */
 ADDRESS_MAP_END
 
@@ -396,18 +396,18 @@ static MACHINE_START( gcpinbal )
 {
 	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->bg0_gfxset));
-	state->save_item(NAME(state->bg1_gfxset));
-	state->save_item(NAME(state->msm_start));
-	state->save_item(NAME(state->msm_end));
-	state->save_item(NAME(state->msm_bank));
-	state->save_item(NAME(state->adpcm_start));
-	state->save_item(NAME(state->adpcm_end));
-	state->save_item(NAME(state->adpcm_idle));
-	state->save_item(NAME(state->adpcm_trigger));
-	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_bg0_gfxset));
+	state->save_item(NAME(state->m_bg1_gfxset));
+	state->save_item(NAME(state->m_msm_start));
+	state->save_item(NAME(state->m_msm_end));
+	state->save_item(NAME(state->m_msm_bank));
+	state->save_item(NAME(state->m_adpcm_start));
+	state->save_item(NAME(state->m_adpcm_end));
+	state->save_item(NAME(state->m_adpcm_idle));
+	state->save_item(NAME(state->m_adpcm_trigger));
+	state->save_item(NAME(state->m_adpcm_data));
 }
 
 static MACHINE_RESET( gcpinbal )
@@ -417,20 +417,20 @@ static MACHINE_RESET( gcpinbal )
 
 	for (i = 0; i < 3; i++)
 	{
-		state->scrollx[i] = 0;
-		state->scrolly[i] = 0;
+		state->m_scrollx[i] = 0;
+		state->m_scrolly[i] = 0;
 	}
 
-	state->adpcm_idle = 1;
-	state->adpcm_start = 0;
-	state->adpcm_end = 0;
-	state->adpcm_trigger = 0;
-	state->adpcm_data = 0;
-	state->bg0_gfxset = 0;
-	state->bg1_gfxset = 0;
-	state->msm_start = 0;
-	state->msm_end = 0;
-	state->msm_bank = 0;
+	state->m_adpcm_idle = 1;
+	state->m_adpcm_start = 0;
+	state->m_adpcm_end = 0;
+	state->m_adpcm_trigger = 0;
+	state->m_adpcm_data = 0;
+	state->m_bg0_gfxset = 0;
+	state->m_bg1_gfxset = 0;
+	state->m_msm_start = 0;
+	state->m_msm_end = 0;
+	state->m_msm_bank = 0;
 }
 
 static MACHINE_CONFIG_START( gcpinbal, gcpinbal_state )

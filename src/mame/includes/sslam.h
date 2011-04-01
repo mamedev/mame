@@ -4,29 +4,29 @@ public:
 	sslam_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *music_timer;
+	emu_timer *m_music_timer;
 
-	int sound;
-	int melody;
-	int bar;
-	int track;
-	int snd_bank;
+	int m_sound;
+	int m_melody;
+	int m_bar;
+	int m_track;
+	int m_snd_bank;
 
-	UINT16 *bg_tileram;
-	UINT16 *tx_tileram;
-	UINT16 *md_tileram;
-	UINT16 *spriteram;
-	UINT16 *regs;
+	UINT16 *m_bg_tileram;
+	UINT16 *m_tx_tileram;
+	UINT16 *m_md_tileram;
+	UINT16 *m_spriteram;
+	UINT16 *m_regs;
 
-	UINT8 oki_control;
-	UINT8 oki_command;
-	UINT8 oki_bank;
+	UINT8 m_oki_control;
+	UINT8 m_oki_command;
+	UINT8 m_oki_bank;
 
-	tilemap_t *bg_tilemap;
-	tilemap_t *tx_tilemap;
-	tilemap_t *md_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_md_tilemap;
 
-	int sprites_x_offset;
+	int m_sprites_x_offset;
 };
 
 

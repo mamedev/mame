@@ -38,7 +38,7 @@ Verified Dip locations and recommended settings with manual
 static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM							// ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM							// RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_MEMBER(skyfox_state, spriteram, spriteram_size)	// Sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_MEMBER(skyfox_state, m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xd400, 0xdfff) AM_RAM							// RAM?
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted )
 {
 	skyfox_state *state = field->port->machine().driver_data<skyfox_state>();
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( skyfox )
@@ -217,25 +217,25 @@ static INTERRUPT_GEN( skyfox_interrupt )
 	skyfox_state *state = device->machine().driver_data<skyfox_state>();
 
 	/* Scroll the bg */
-	state->bg_pos += (state->bg_ctrl >> 1) & 0x7;	// maybe..
+	state->m_bg_pos += (state->m_bg_ctrl >> 1) & 0x7;	// maybe..
 }
 
 static MACHINE_START( skyfox )
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->bg_pos));
-	state->save_item(NAME(state->bg_ctrl));
+	state->save_item(NAME(state->m_bg_pos));
+	state->save_item(NAME(state->m_bg_ctrl));
 }
 
 static MACHINE_RESET( skyfox )
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
 
-	state->bg_pos = 0;
-	state->bg_ctrl = 0;
+	state->m_bg_pos = 0;
+	state->m_bg_ctrl = 0;
 }
 
 static MACHINE_CONFIG_START( skyfox, skyfox_state )

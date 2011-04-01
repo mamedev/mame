@@ -29,29 +29,29 @@ Protection comms between main cpu and i8751
 static READ8_HANDLER( blktiger_from_mcu_r )
 {
 	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	return state->i8751_latch;
+	return state->m_i8751_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
 	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	device_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
-	state->z80_latch = data;
+	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
+	state->m_z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
 	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	device_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
+	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
-	return state->z80_latch;
+	return state->m_z80_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_main_w )
 {
 	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	//printf("%02x write\n",data);
-	state->i8751_latch = data;
+	state->m_i8751_latch = data;
 }
 
 
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, txvideoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, m_txvideoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
@@ -266,7 +266,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	blktiger_state *state = device->machine().driver_data<blktiger_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -283,21 +283,21 @@ static MACHINE_START( blktiger )
 {
 	blktiger_state *state = machine.driver_data<blktiger_state>();
 
-	state->audiocpu = machine.device("audiocpu");
-	state->mcu = machine.device("mcu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_mcu = machine.device("mcu");
 
 	/* configure bankswitching */
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->scroll_bank));
-	state->save_item(NAME(state->screen_layout));
-	state->save_item(NAME(state->chon));
-	state->save_item(NAME(state->objon));
-	state->save_item(NAME(state->bgon));
-	state->save_item(NAME(state->z80_latch));
-	state->save_item(NAME(state->i8751_latch));
-	state->save_item(NAME(state->scroll_x));
-	state->save_item(NAME(state->scroll_y));
+	state->save_item(NAME(state->m_scroll_bank));
+	state->save_item(NAME(state->m_screen_layout));
+	state->save_item(NAME(state->m_chon));
+	state->save_item(NAME(state->m_objon));
+	state->save_item(NAME(state->m_bgon));
+	state->save_item(NAME(state->m_z80_latch));
+	state->save_item(NAME(state->m_i8751_latch));
+	state->save_item(NAME(state->m_scroll_x));
+	state->save_item(NAME(state->m_scroll_y));
 }
 
 static MACHINE_RESET( blktiger )
@@ -307,14 +307,14 @@ static MACHINE_RESET( blktiger )
 	/* configure bankswitching */
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
-	state->scroll_x[0] = 0;
-	state->scroll_x[1] = 0;
-	state->scroll_y[0] = 0;
-	state->scroll_y[1] = 0;
-	state->scroll_bank = 0;
-	state->screen_layout = 0;
-	state->z80_latch = 0;
-	state->i8751_latch = 0;
+	state->m_scroll_x[0] = 0;
+	state->m_scroll_x[1] = 0;
+	state->m_scroll_y[0] = 0;
+	state->m_scroll_y[1] = 0;
+	state->m_scroll_bank = 0;
+	state->m_screen_layout = 0;
+	state->m_z80_latch = 0;
+	state->m_i8751_latch = 0;
 }
 
 static MACHINE_CONFIG_START( blktiger, blktiger_state )

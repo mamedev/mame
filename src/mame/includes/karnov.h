@@ -11,26 +11,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    videoram;
-	UINT16 *    ram;
-	UINT16 *    pf_data;
-//  UINT16 *    spriteram;  // currently this uses generic buffered spriteram
+	UINT16 *    m_videoram;
+	UINT16 *    m_ram;
+	UINT16 *    m_pf_data;
+//  UINT16 *    m_spriteram;  // currently this uses generic buffered spriteram
 
 	/* video-related */
-	bitmap_t    *bitmap_f;
-	tilemap_t     *fix_tilemap;
-	int         flipscreen;
-	UINT16      scroll[2];
+	bitmap_t    *m_bitmap_f;
+	tilemap_t     *m_fix_tilemap;
+	int         m_flipscreen;
+	UINT16      m_scroll[2];
 
 	/* misc */
-	UINT16      i8751_return, i8751_needs_ack, i8751_coin_pending, i8751_command_queue;
-	int         i8751_level;	// needed by chelnov
-	int         microcontroller_id, coin_mask;
-	int         latch;
+	UINT16      m_i8751_return;
+	UINT16      m_i8751_needs_ack;
+	UINT16      m_i8751_coin_pending;
+	UINT16      m_i8751_command_queue;
+	int         m_i8751_level;	// needed by chelnov
+	int         m_microcontroller_id;
+	int         m_coin_mask;
+	int         m_latch;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 enum {

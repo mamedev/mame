@@ -95,12 +95,12 @@ static WRITE8_DEVICE_HANDLER( io_select_w )
 
 	switch (data)
 	{
-	case 0x01: state->current_port = 0; break;
-	case 0x02: state->current_port = 1; break;
-	case 0x04: state->current_port = 2; break;
-	case 0x08: state->current_port = 3; break;
-	case 0x80: state->current_port = 4; break;
-	case 0x40: state->current_port = 5; break;
+	case 0x01: state->m_current_port = 0; break;
+	case 0x02: state->m_current_port = 1; break;
+	case 0x04: state->m_current_port = 2; break;
+	case 0x08: state->m_current_port = 3; break;
+	case 0x80: state->m_current_port = 4; break;
+	case 0x40: state->m_current_port = 5; break;
 	}
 }
 
@@ -110,7 +110,7 @@ static READ8_DEVICE_HANDLER( io_port_r )
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	return input_port_read(device->machine(), portnames[state->current_port]);
+	return input_port_read(device->machine(), portnames[state->m_current_port]);
 }
 
 
@@ -141,11 +141,11 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
-		state->riot->reset();
+		state->m_riot->reset();
 		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
@@ -154,14 +154,14 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 static WRITE8_DEVICE_HANDLER( audio_cmd_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
-	riot6532_porta_in_set(state->riot, data, 0x7f);
+	riot6532_porta_in_set(state->m_riot, data, 0x7f);
 }
 
 
 static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
-	riot6532_porta_in_set(state->riot, data << 7, 0x80);
+	riot6532_porta_in_set(state->m_riot, data << 7, 0x80);
 }
 
 
@@ -186,7 +186,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
 	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
 
-	device_set_input_line(gameplan->audiocpu, 0, state);
+	device_set_input_line(gameplan->m_audiocpu, 0, state);
 	if (state == ASSERT_LINE)
 		device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
@@ -984,27 +984,27 @@ static MACHINE_START( gameplan )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->riot = machine.device("riot");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_riot = machine.device("riot");
 
 	/* register for save states */
-	state->save_item(NAME(state->current_port));
-	state->save_item(NAME(state->video_x));
-	state->save_item(NAME(state->video_y));
-	state->save_item(NAME(state->video_command));
-	state->save_item(NAME(state->video_data));
+	state->save_item(NAME(state->m_current_port));
+	state->save_item(NAME(state->m_video_x));
+	state->save_item(NAME(state->m_video_y));
+	state->save_item(NAME(state->m_video_command));
+	state->save_item(NAME(state->m_video_data));
 }
 
 
 static MACHINE_RESET( gameplan )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->current_port = 0;
-	state->video_x = 0;
-	state->video_y = 0;
-	state->video_command = 0;
-	state->video_data = 0;
+	state->m_current_port = 0;
+	state->m_video_x = 0;
+	state->m_video_y = 0;
+	state->m_video_command = 0;
+	state->m_video_data = 0;
 }
 
 static MACHINE_CONFIG_START( gameplan, gameplan_state )

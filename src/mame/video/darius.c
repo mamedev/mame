@@ -19,7 +19,7 @@ INLINE void actual_get_fg_tile_info( running_machine &machine, tile_data *tilein
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	actual_get_fg_tile_info(machine, tileinfo, tile_index, state->fg_ram, 2);
+	actual_get_fg_tile_info(machine, tileinfo, tile_index, state->m_fg_ram, 2);
 }
 
 /***************************************************************************/
@@ -28,9 +28,9 @@ VIDEO_START( darius )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
 /***************************************************************************/
@@ -39,9 +39,9 @@ WRITE16_HANDLER( darius_fg_layer_w )
 {
 	darius_state *state = space->machine().driver_data<darius_state>();
 
-	COMBINE_DATA(&state->fg_ram[offset]);
+	COMBINE_DATA(&state->m_fg_ram[offset]);
 	if (offset < 0x4000)
-		tilemap_mark_tile_dirty(state->fg_tilemap, (offset & 0x1fff));
+		tilemap_mark_tile_dirty(state->m_fg_tilemap, (offset & 0x1fff));
 }
 
 /***************************************************************************/
@@ -49,12 +49,12 @@ WRITE16_HANDLER( darius_fg_layer_w )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs, curx, cury;
 	UINT16 code, data, sx, sy;
 	UINT8 flipx, flipy, color, priority;
 
-	for (offs = state->spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
 	{
 		code = spriteram[offs + 2] & 0x1fff;
 
@@ -97,29 +97,29 @@ SCREEN_UPDATE( darius )
 	darius_state *state = screen->machine().driver_data<darius_state>();
 	int xoffs = 0;
 
-	if (screen == state->lscreen)
+	if (screen == state->m_lscreen)
 		xoffs = 36 * 8 * 0;
-	else if (screen == state->mscreen)
+	else if (screen == state->m_mscreen)
 		xoffs = 36 * 8 * 1;
-	else if (screen == state->rscreen)
+	else if (screen == state->m_rscreen)
 		xoffs = 36 * 8 * 2;
 
-	pc080sn_tilemap_update(state->pc080sn);
+	pc080sn_tilemap_update(state->m_pc080sn);
 
 	// draw bottom layer(always active)
-	pc080sn_tilemap_draw_offset(state->pc080sn, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
+	pc080sn_tilemap_draw_offset(state->m_pc080sn, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0, -xoffs, 0);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen->machine(), bitmap, cliprect, 0, xoffs, -8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
-	pc080sn_tilemap_draw_offset(state->pc080sn, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
+	pc080sn_tilemap_draw_offset(state->m_pc080sn, bitmap, cliprect, 1, 0, 0, -xoffs, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect, 1, xoffs, -8); // draw sprites with priority 1 which are over the mid layer
 
 	/* top(text) layer is in fixed position */
-	tilemap_set_scrollx(state->fg_tilemap, 0, 0 + xoffs);
-	tilemap_set_scrolly(state->fg_tilemap, 0, -8);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_fg_tilemap, 0, 0 + xoffs);
+	tilemap_set_scrolly(state->m_fg_tilemap, 0, -8);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

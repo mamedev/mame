@@ -4,19 +4,19 @@ public:
 	tp84_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	cpu_device *audiocpu;
-	UINT8 *bg_videoram;
-	UINT8 *bg_colorram;
-	UINT8 *fg_videoram;
-	UINT8 *fg_colorram;
-	UINT8 *spriteram;
-	UINT8 *scroll_x;
-	UINT8 *scroll_y;
-	UINT8 *palette_bank;
-	UINT8 *flipscreen_x;
-	UINT8 *flipscreen_y;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	cpu_device *m_audiocpu;
+	UINT8 *m_bg_videoram;
+	UINT8 *m_bg_colorram;
+	UINT8 *m_fg_videoram;
+	UINT8 *m_fg_colorram;
+	UINT8 *m_spriteram;
+	UINT8 *m_scroll_x;
+	UINT8 *m_scroll_y;
+	UINT8 *m_palette_bank;
+	UINT8 *m_flipscreen_x;
+	UINT8 *m_flipscreen_y;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
 

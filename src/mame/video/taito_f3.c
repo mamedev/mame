@@ -328,19 +328,19 @@ static void init_alpha_blend_func(running_machine &machine);
 static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *f3_line_ram = state->f3_line_ram;
+	UINT32 *f3_line_ram = state->m_f3_line_ram;
 	int l[16];
 	char buf[64*16];
 	char *bufptr = buf;
 
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->f3_control_0[0]>>22,(state->f3_control_0[0]&0xffff)>>6,state->f3_control_0[1]>>22,(state->f3_control_0[1]&0xffff)>>6);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->f3_control_0[2]>>23,(state->f3_control_0[2]&0xffff)>>7,state->f3_control_0[3]>>23,(state->f3_control_0[3]&0xffff)>>7);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->f3_control_1[0]>>16,state->f3_control_1[0]&0xffff,state->f3_control_1[1]>>16,state->f3_control_1[1]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->f3_control_1[2]>>16,state->f3_control_1[2]&0xffff,state->f3_control_1[3]>>16,state->f3_control_1[3]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[0]>>22,(state->m_f3_control_0[0]&0xffff)>>6,state->m_f3_control_0[1]>>22,(state->m_f3_control_0[1]&0xffff)>>6);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[2]>>23,(state->m_f3_control_0[2]&0xffff)>>7,state->m_f3_control_0[3]>>23,(state->m_f3_control_0[3]&0xffff)>>7);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[0]>>16,state->m_f3_control_1[0]&0xffff,state->m_f3_control_1[1]>>16,state->m_f3_control_1[1]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[2]>>16,state->m_f3_control_1[2]&0xffff,state->m_f3_control_1[3]>>16,state->m_f3_control_1[3]&0xffff);
 
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->spriteram32_buffered[0]>>16,state->spriteram32_buffered[0]&0xffff,state->spriteram32_buffered[1]>>16,state->spriteram32_buffered[1]&0xffff,state->spriteram32_buffered[2]>>16,state->spriteram32_buffered[2]&0xffff,state->spriteram32_buffered[3]>>16,state->spriteram32_buffered[3]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->spriteram32_buffered[4]>>16,state->spriteram32_buffered[4]&0xffff,state->spriteram32_buffered[5]>>16,state->spriteram32_buffered[5]&0xffff,state->spriteram32_buffered[6]>>16,state->spriteram32_buffered[6]&0xffff,state->spriteram32_buffered[7]>>16,state->spriteram32_buffered[7]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->spriteram32_buffered[8]>>16,state->spriteram32_buffered[8]&0xffff,state->spriteram32_buffered[9]>>16,state->spriteram32_buffered[9]&0xffff,state->spriteram32_buffered[10]>>16,state->spriteram32_buffered[10]&0xffff,state->spriteram32_buffered[11]>>16,state->spriteram32_buffered[11]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[0]>>16,state->m_spriteram32_buffered[0]&0xffff,state->m_spriteram32_buffered[1]>>16,state->m_spriteram32_buffered[1]&0xffff,state->m_spriteram32_buffered[2]>>16,state->m_spriteram32_buffered[2]&0xffff,state->m_spriteram32_buffered[3]>>16,state->m_spriteram32_buffered[3]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[4]>>16,state->m_spriteram32_buffered[4]&0xffff,state->m_spriteram32_buffered[5]>>16,state->m_spriteram32_buffered[5]&0xffff,state->m_spriteram32_buffered[6]>>16,state->m_spriteram32_buffered[6]&0xffff,state->m_spriteram32_buffered[7]>>16,state->m_spriteram32_buffered[7]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[8]>>16,state->m_spriteram32_buffered[8]&0xffff,state->m_spriteram32_buffered[9]>>16,state->m_spriteram32_buffered[9]&0xffff,state->m_spriteram32_buffered[10]>>16,state->m_spriteram32_buffered[10]&0xffff,state->m_spriteram32_buffered[11]>>16,state->m_spriteram32_buffered[11]&0xffff);
 
 	l[0]=f3_line_ram[0x0040]&0xffff;
 	l[1]=f3_line_ram[0x00c0]&0xffff;
@@ -422,31 +422,31 @@ INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int til
 static TILE_GET_INFO( get_tile_info1 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_1);
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_1);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_2);
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_2);
 }
 
 static TILE_GET_INFO( get_tile_info3 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_3);
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_3);
 }
 
 static TILE_GET_INFO( get_tile_info4 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	get_tile_info(machine,tileinfo,tile_index,state->f3_pf_data_4);
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_4);
 }
 
 static TILE_GET_INFO( get_tile_info_vram )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *videoram = state->videoram;
+	UINT32 *videoram = state->m_videoram;
 	int vram_tile;
 	int flags=0;
 
@@ -468,11 +468,11 @@ static TILE_GET_INFO( get_tile_info_vram )
 static TILE_GET_INFO( get_tile_info_pixel )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *videoram = state->videoram;
+	UINT32 *videoram = state->m_videoram;
 	int vram_tile,col_off;
 	int flags=0;
-	int y_offs=(state->f3_control_1[2]&0x1ff);
-	if (state->flipscreen) y_offs+=0x100;
+	int y_offs=(state->m_f3_control_1[2]&0x1ff);
+	if (state->m_flipscreen) y_offs+=0x100;
 
 	/* Colour is shared with VRAM layer */
 	if ((((tile_index%32)*8 + y_offs)&0x1ff)>0xff)
@@ -500,19 +500,19 @@ static TILE_GET_INFO( get_tile_info_pixel )
 SCREEN_EOF( f3 )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	if (state->sprite_lag==2)
+	if (state->m_sprite_lag==2)
 	{
 		if (machine.video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, state->spriteram32_buffered);
+			get_sprite_info(machine, state->m_spriteram32_buffered);
 		}
-		memcpy(state->spriteram32_buffered,state->spriteram,state->spriteram_size);
+		memcpy(state->m_spriteram32_buffered,state->m_spriteram,state->m_spriteram_size);
 	}
-	else if (state->sprite_lag==1)
+	else if (state->m_sprite_lag==1)
 	{
 		if (machine.video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, state->spriteram);
+			get_sprite_info(machine, state->m_spriteram);
 		}
 	}
 }
@@ -523,112 +523,112 @@ VIDEO_START( f3 )
 	const struct F3config *pCFG=&f3_config_table[0];
 	int width, height, i;
 
-	state->f3_alpha_level_2as=127;
-	state->f3_alpha_level_2ad=127;
-	state->f3_alpha_level_3as=127;
-	state->f3_alpha_level_3ad=127;
-	state->f3_alpha_level_2bs=127;
-	state->f3_alpha_level_2bd=127;
-	state->f3_alpha_level_3bs=127;
-	state->f3_alpha_level_3bd=127;
-	state->alpha_level_last = -1;
+	state->m_f3_alpha_level_2as=127;
+	state->m_f3_alpha_level_2ad=127;
+	state->m_f3_alpha_level_3as=127;
+	state->m_f3_alpha_level_3ad=127;
+	state->m_f3_alpha_level_2bs=127;
+	state->m_f3_alpha_level_2bd=127;
+	state->m_f3_alpha_level_3bs=127;
+	state->m_f3_alpha_level_3bd=127;
+	state->m_alpha_level_last = -1;
 
-	state->pdest_2a = 0x10;
-	state->pdest_2b = 0x20;
-	state->tr_2a = 0;
-	state->tr_2b = 1;
-	state->pdest_3a = 0x40;
-	state->pdest_3b = 0x80;
-	state->tr_3a = 0;
-	state->tr_3b = 1;
+	state->m_pdest_2a = 0x10;
+	state->m_pdest_2b = 0x20;
+	state->m_tr_2a = 0;
+	state->m_tr_2b = 1;
+	state->m_pdest_3a = 0x40;
+	state->m_pdest_3b = 0x80;
+	state->m_tr_3a = 0;
+	state->m_tr_3b = 1;
 
-	state->spritelist=0;
-	state->spriteram32_buffered=0;
-	state->pf_line_inf=0;
-	state->pri_alp_bitmap=0;
-	state->tile_opaque_sp=0;
+	state->m_spritelist=0;
+	state->m_spriteram32_buffered=0;
+	state->m_pf_line_inf=0;
+	state->m_pri_alp_bitmap=0;
+	state->m_tile_opaque_sp=0;
 
 	/* Setup individual game */
 	do {
-		if (pCFG->name==state->f3_game)
+		if (pCFG->name==state->m_f3_game)
 		{
 			break;
 		}
 		pCFG++;
 	} while(pCFG->name);
 
-	state->f3_game_config=pCFG;
+	state->m_f3_game_config=pCFG;
 
-	if (state->f3_game_config->extend) {
-		state->pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);
-		state->pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,64,32);
-		state->pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,64,32);
-		state->pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,64,32);
+	if (state->m_f3_game_config->extend) {
+		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);
+		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,64,32);
+		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,64,32);
+		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,64,32);
 
-		state->f3_pf_data_1=state->f3_pf_data+0x0000;
-		state->f3_pf_data_2=state->f3_pf_data+0x0800;
-		state->f3_pf_data_3=state->f3_pf_data+0x1000;
-		state->f3_pf_data_4=state->f3_pf_data+0x1800;
+		state->m_f3_pf_data_1=state->m_f3_pf_data+0x0000;
+		state->m_f3_pf_data_2=state->m_f3_pf_data+0x0800;
+		state->m_f3_pf_data_3=state->m_f3_pf_data+0x1000;
+		state->m_f3_pf_data_4=state->m_f3_pf_data+0x1800;
 
-		state->width_mask=0x3ff;
-		state->twidth_mask=0x3f;
-		state->twidth_mask_bit=6;
+		state->m_width_mask=0x3ff;
+		state->m_twidth_mask=0x3f;
+		state->m_twidth_mask_bit=6;
 
 	} else {
-		state->pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
-		state->pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,32,32);
-		state->pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,32,32);
-		state->pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,32,32);
+		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
+		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,32,32);
+		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,32,32);
+		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,32,32);
 
-		state->f3_pf_data_1=state->f3_pf_data+0x0000;
-		state->f3_pf_data_2=state->f3_pf_data+0x0400;
-		state->f3_pf_data_3=state->f3_pf_data+0x0800;
-		state->f3_pf_data_4=state->f3_pf_data+0x0c00;
+		state->m_f3_pf_data_1=state->m_f3_pf_data+0x0000;
+		state->m_f3_pf_data_2=state->m_f3_pf_data+0x0400;
+		state->m_f3_pf_data_3=state->m_f3_pf_data+0x0800;
+		state->m_f3_pf_data_4=state->m_f3_pf_data+0x0c00;
 
-		state->width_mask=0x1ff;
-		state->twidth_mask=0x1f;
-		state->twidth_mask_bit=5;
+		state->m_width_mask=0x1ff;
+		state->m_twidth_mask=0x1f;
+		state->m_twidth_mask_bit=5;
 	}
 
-	state->spriteram32_buffered = auto_alloc_array(machine, UINT32, 0x10000/4);
-	state->spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
-	state->sprite_end = state->spritelist;
-	state->vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
-	state->pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
-	state->pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
-	state->sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
+	state->m_spriteram32_buffered = auto_alloc_array(machine, UINT32, 0x10000/4);
+	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
+	state->m_sprite_end = state->m_spritelist;
+	state->m_vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
+	state->m_pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
+	state->m_pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
+	state->m_sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
-	state->tile_opaque_sp = auto_alloc_array(machine, UINT8, machine.gfx[2]->total_elements);
+	state->m_pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
+	state->m_tile_opaque_sp = auto_alloc_array(machine, UINT8, machine.gfx[2]->total_elements);
 	for (i=0; i<4; i++)
-		state->tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);
+		state->m_tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);
 
-	tilemap_set_transparent_pen(state->pf1_tilemap,0);
-	tilemap_set_transparent_pen(state->pf2_tilemap,0);
-	tilemap_set_transparent_pen(state->pf3_tilemap,0);
-	tilemap_set_transparent_pen(state->pf4_tilemap,0);
-	tilemap_set_transparent_pen(state->vram_layer,0);
-	tilemap_set_transparent_pen(state->pixel_layer,0);
+	tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
+	tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
+	tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
+	tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
+	tilemap_set_transparent_pen(state->m_vram_layer,0);
+	tilemap_set_transparent_pen(state->m_pixel_layer,0);
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
 	/* top bits in the gfx data are cleared later.                      */
 	machine.gfx[1]->color_granularity=16;
 	machine.gfx[2]->color_granularity=16;
 
-	state->flipscreen = 0;
-	memset(state->spriteram32_buffered,0,state->spriteram_size);
-	memset(state->spriteram,0,state->spriteram_size);
+	state->m_flipscreen = 0;
+	memset(state->m_spriteram32_buffered,0,state->m_spriteram_size);
+	memset(state->m_spriteram,0,state->m_spriteram_size);
 
-	state_save_register_global_array(machine, state->f3_control_0);
-	state_save_register_global_array(machine, state->f3_control_1);
+	state_save_register_global_array(machine, state->m_f3_control_0);
+	state_save_register_global_array(machine, state->m_f3_control_1);
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->f3_vram);
-	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->f3_pivot_ram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_f3_vram);
+	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_f3_pivot_ram);
 
-	state->f3_skip_this_frame=0;
+	state->m_f3_skip_this_frame=0;
 
-	state->sprite_lag=state->f3_game_config->sprite_lag;
+	state->m_sprite_lag=state->m_f3_game_config->sprite_lag;
 
 	init_alpha_blend_func(machine);
 
@@ -650,8 +650,8 @@ VIDEO_START( f3 )
 				}
 				dp += sprite_gfx->line_modulo;
 			}
-			if(chk_trans_or_opa==1) state->tile_opaque_sp[c]=1;
-			else					state->tile_opaque_sp[c]=0;
+			if(chk_trans_or_opa==1) state->m_tile_opaque_sp[c]=1;
+			else					state->m_tile_opaque_sp[c]=0;
 		}
 	}
 
@@ -682,7 +682,7 @@ VIDEO_START( f3 )
 					}
 					dp += pf_gfx->line_modulo;
 				}
-				state->tile_opaque_pf[extra_planes][c]=chk_trans_or_opa;
+				state->m_tile_opaque_pf[extra_planes][c]=chk_trans_or_opa;
 			}
 		}
 	}
@@ -693,63 +693,63 @@ VIDEO_START( f3 )
 WRITE32_HANDLER( f3_pf_data_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->f3_pf_data[offset]);
+	COMBINE_DATA(&state->m_f3_pf_data[offset]);
 
-	if (state->f3_game_config->extend) {
-		if (offset<0x800) tilemap_mark_tile_dirty(state->pf1_tilemap,offset-0x0000);
-		else if (offset<0x1000) tilemap_mark_tile_dirty(state->pf2_tilemap,offset-0x0800);
-		else if (offset<0x1800) tilemap_mark_tile_dirty(state->pf3_tilemap,offset-0x1000);
-		else if (offset<0x2000) tilemap_mark_tile_dirty(state->pf4_tilemap,offset-0x1800);
+	if (state->m_f3_game_config->extend) {
+		if (offset<0x800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset-0x0000);
+		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,offset-0x0800);
+		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,offset-0x1000);
+		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,offset-0x1800);
 	} else {
-		if (offset<0x400) tilemap_mark_tile_dirty(state->pf1_tilemap,offset-0x0000);
-		else if (offset<0x800) tilemap_mark_tile_dirty(state->pf2_tilemap,offset-0x0400);
-		else if (offset<0xc00) tilemap_mark_tile_dirty(state->pf3_tilemap,offset-0x0800);
-		else if (offset<0x1000) tilemap_mark_tile_dirty(state->pf4_tilemap,offset-0xc00);
+		if (offset<0x400) tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset-0x0000);
+		else if (offset<0x800) tilemap_mark_tile_dirty(state->m_pf2_tilemap,offset-0x0400);
+		else if (offset<0xc00) tilemap_mark_tile_dirty(state->m_pf3_tilemap,offset-0x0800);
+		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,offset-0xc00);
 	}
 }
 
 WRITE32_HANDLER( f3_control_0_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->f3_control_0[offset]);
+	COMBINE_DATA(&state->m_f3_control_0[offset]);
 }
 
 WRITE32_HANDLER( f3_control_1_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->f3_control_1[offset]);
+	COMBINE_DATA(&state->m_f3_control_1[offset]);
 }
 
 WRITE32_HANDLER( f3_videoram_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	UINT32 *videoram = state->videoram;
+	UINT32 *videoram = state->m_videoram;
 	int tile,col_off;
 	COMBINE_DATA(&videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->vram_layer,offset<<1);
-	tilemap_mark_tile_dirty(state->vram_layer,(offset<<1)+1);
+	tilemap_mark_tile_dirty(state->m_vram_layer,offset<<1);
+	tilemap_mark_tile_dirty(state->m_vram_layer,(offset<<1)+1);
 
 	if (offset>0x3ff) offset-=0x400;
 
 	tile=offset<<1;
 	col_off=((tile&0x3f)*32)+((tile&0xfc0)>>6);
 
-	tilemap_mark_tile_dirty(state->pixel_layer,col_off);
-	tilemap_mark_tile_dirty(state->pixel_layer,col_off+32);
+	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off);
+	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off+32);
 }
 
 WRITE32_HANDLER( f3_vram_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->f3_vram[offset]);
+	COMBINE_DATA(&state->m_f3_vram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
 }
 
 WRITE32_HANDLER( f3_pivot_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->f3_pivot_ram[offset]);
+	COMBINE_DATA(&state->m_f3_pivot_ram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[3], offset/8);
 }
 
@@ -762,16 +762,16 @@ WRITE32_HANDLER( f3_lineram_w )
     emulation certainly doesn't like it, so I've chosen to catch the bug here, and prevent
     the trashing of priority ram.  If anyone has information on what the real machine does,
     please let me know! */
-	if (state->f3_game==DARIUSG) {
-		if (state->f3_skip_this_frame)
+	if (state->m_f3_game==DARIUSG) {
+		if (state->m_f3_skip_this_frame)
 			return;
 		if (offset==0xb000/4 && data==0x003f0000) {
-			state->f3_skip_this_frame=1;
+			state->m_f3_skip_this_frame=1;
 			return;
 		}
 	}
 
-	COMBINE_DATA(&state->f3_line_ram[offset]);
+	COMBINE_DATA(&state->m_f3_line_ram[offset]);
 }
 
 WRITE32_HANDLER( f3_palette_24bit_w )
@@ -782,14 +782,14 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
 
 	/* 12 bit palette games - there has to be a palette select bit somewhere */
-	if (state->f3_game==SPCINVDX || state->f3_game==RIDINGF || state->f3_game==ARABIANM || state->f3_game==RINGRAGE) {
+	if (state->m_f3_game==SPCINVDX || state->m_f3_game==RIDINGF || state->m_f3_game==ARABIANM || state->m_f3_game==RINGRAGE) {
 		b = 15 * ((space->machine().generic.paletteram.u32[offset] >> 4) & 0xf);
 		g = 15 * ((space->machine().generic.paletteram.u32[offset] >> 8) & 0xf);
 		r = 15 * ((space->machine().generic.paletteram.u32[offset] >> 12) & 0xf);
 	}
 
 	/* This is weird - why are only the sprites and VRAM palettes 21 bit? */
-	else if (state->f3_game==CLEOPATR) {
+	else if (state->m_f3_game==CLEOPATR) {
 		if (offset<0x100 || offset>0x1000) {
 			r = ((space->machine().generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine().generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
@@ -802,7 +802,7 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 	}
 
 	/* Another weird couple - perhaps this is alpha blending related? */
-	else if (state->f3_game==TWINQIX || state->f3_game==RECALH) {
+	else if (state->m_f3_game==TWINQIX || state->m_f3_game==RECALH) {
 		if (offset>0x1c00) {
 			r = ((space->machine().generic.paletteram.u32[offset] >>16) & 0x7f)<<1;
 			g = ((space->machine().generic.paletteram.u32[offset] >> 8) & 0x7f)<<1;
@@ -837,36 +837,36 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 
 INLINE void f3_alpha_set_level(taito_f3_state *state)
 {
-//  SET_ALPHA_LEVEL(state->alpha_s_1_1, state->f3_alpha_level_2ad)
-	SET_ALPHA_LEVEL(state->alpha_s_1_1, 255-state->f3_alpha_level_2as)
-//  SET_ALPHA_LEVEL(state->alpha_s_1_2, state->f3_alpha_level_2bd)
-	SET_ALPHA_LEVEL(state->alpha_s_1_2, 255-state->f3_alpha_level_2bs)
-	SET_ALPHA_LEVEL(state->alpha_s_1_4, state->f3_alpha_level_3ad)
-//  SET_ALPHA_LEVEL(state->alpha_s_1_5, state->f3_alpha_level_3ad*state->f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_1_5, state->f3_alpha_level_3ad*(255-state->f3_alpha_level_2as)/255)
-//  SET_ALPHA_LEVEL(state->alpha_s_1_6, state->f3_alpha_level_3ad*state->f3_alpha_level_2bd/255)
-	SET_ALPHA_LEVEL(state->alpha_s_1_6, state->f3_alpha_level_3ad*(255-state->f3_alpha_level_2bs)/255)
-	SET_ALPHA_LEVEL(state->alpha_s_1_8, state->f3_alpha_level_3bd)
-//  SET_ALPHA_LEVEL(state->alpha_s_1_9, state->f3_alpha_level_3bd*state->f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_1_9, state->f3_alpha_level_3bd*(255-state->f3_alpha_level_2as)/255)
-//  SET_ALPHA_LEVEL(state->alpha_s_1_a, state->f3_alpha_level_3bd*state->f3_alpha_level_2bd/255)
-	SET_ALPHA_LEVEL(state->alpha_s_1_a, state->f3_alpha_level_3bd*(255-state->f3_alpha_level_2bs)/255)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_1, state->m_f3_alpha_level_2ad)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_1, 255-state->m_f3_alpha_level_2as)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_2, state->m_f3_alpha_level_2bd)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_2, 255-state->m_f3_alpha_level_2bs)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_4, state->m_f3_alpha_level_3ad)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_5, state->m_f3_alpha_level_3ad*state->m_f3_alpha_level_2ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_5, state->m_f3_alpha_level_3ad*(255-state->m_f3_alpha_level_2as)/255)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_6, state->m_f3_alpha_level_3ad*state->m_f3_alpha_level_2bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_6, state->m_f3_alpha_level_3ad*(255-state->m_f3_alpha_level_2bs)/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_8, state->m_f3_alpha_level_3bd)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_9, state->m_f3_alpha_level_3bd*state->m_f3_alpha_level_2ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_9, state->m_f3_alpha_level_3bd*(255-state->m_f3_alpha_level_2as)/255)
+//  SET_ALPHA_LEVEL(state->m_alpha_s_1_a, state->m_f3_alpha_level_3bd*state->m_f3_alpha_level_2bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_1_a, state->m_f3_alpha_level_3bd*(255-state->m_f3_alpha_level_2bs)/255)
 
-	SET_ALPHA_LEVEL(state->alpha_s_2a_0, state->f3_alpha_level_2as)
-	SET_ALPHA_LEVEL(state->alpha_s_2a_4, state->f3_alpha_level_2as*state->f3_alpha_level_3ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_2a_8, state->f3_alpha_level_2as*state->f3_alpha_level_3bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2a_0, state->m_f3_alpha_level_2as)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2a_4, state->m_f3_alpha_level_2as*state->m_f3_alpha_level_3ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2a_8, state->m_f3_alpha_level_2as*state->m_f3_alpha_level_3bd/255)
 
-	SET_ALPHA_LEVEL(state->alpha_s_2b_0, state->f3_alpha_level_2bs)
-	SET_ALPHA_LEVEL(state->alpha_s_2b_4, state->f3_alpha_level_2bs*state->f3_alpha_level_3ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_2b_8, state->f3_alpha_level_2bs*state->f3_alpha_level_3bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2b_0, state->m_f3_alpha_level_2bs)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2b_4, state->m_f3_alpha_level_2bs*state->m_f3_alpha_level_3ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_2b_8, state->m_f3_alpha_level_2bs*state->m_f3_alpha_level_3bd/255)
 
-	SET_ALPHA_LEVEL(state->alpha_s_3a_0, state->f3_alpha_level_3as)
-	SET_ALPHA_LEVEL(state->alpha_s_3a_1, state->f3_alpha_level_3as*state->f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_3a_2, state->f3_alpha_level_3as*state->f3_alpha_level_2bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3a_0, state->m_f3_alpha_level_3as)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3a_1, state->m_f3_alpha_level_3as*state->m_f3_alpha_level_2ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3a_2, state->m_f3_alpha_level_3as*state->m_f3_alpha_level_2bd/255)
 
-	SET_ALPHA_LEVEL(state->alpha_s_3b_0, state->f3_alpha_level_3bs)
-	SET_ALPHA_LEVEL(state->alpha_s_3b_1, state->f3_alpha_level_3bs*state->f3_alpha_level_2ad/255)
-	SET_ALPHA_LEVEL(state->alpha_s_3b_2, state->f3_alpha_level_3bs*state->f3_alpha_level_2bd/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3b_0, state->m_f3_alpha_level_3bs)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3b_1, state->m_f3_alpha_level_3bs*state->m_f3_alpha_level_2ad/255)
+	SET_ALPHA_LEVEL(state->m_alpha_s_3b_2, state->m_f3_alpha_level_3bs*state->m_f3_alpha_level_2bd/255)
 }
 #undef SET_ALPHA_LEVEL
 
@@ -881,7 +881,7 @@ INLINE void f3_alpha_set_level(taito_f3_state *state)
 INLINE void f3_alpha_blend32_s( taito_f3_state *state, int alphas, UINT32 s )
 {
 	UINT8 *sc = (UINT8 *)&s;
-	UINT8 *dc = (UINT8 *)&state->dval;
+	UINT8 *dc = (UINT8 *)&state->m_dval;
 	dc[COLOR1] = (alphas * sc[COLOR1]) >> 8;
 	dc[COLOR2] = (alphas * sc[COLOR2]) >> 8;
 	dc[COLOR3] = (alphas * sc[COLOR3]) >> 8;
@@ -890,42 +890,42 @@ INLINE void f3_alpha_blend32_s( taito_f3_state *state, int alphas, UINT32 s )
 INLINE void f3_alpha_blend32_d( taito_f3_state *state, int alphas, UINT32 s )
 {
 	UINT8 *sc = (UINT8 *)&s;
-	UINT8 *dc = (UINT8 *)&state->dval;
-	dc[COLOR1] = state->add_sat[dc[COLOR1]][(alphas * sc[COLOR1]) >> 8];
-	dc[COLOR2] = state->add_sat[dc[COLOR2]][(alphas * sc[COLOR2]) >> 8];
-	dc[COLOR3] = state->add_sat[dc[COLOR3]][(alphas * sc[COLOR3]) >> 8];
+	UINT8 *dc = (UINT8 *)&state->m_dval;
+	dc[COLOR1] = state->m_add_sat[dc[COLOR1]][(alphas * sc[COLOR1]) >> 8];
+	dc[COLOR2] = state->m_add_sat[dc[COLOR2]][(alphas * sc[COLOR2]) >> 8];
+	dc[COLOR3] = state->m_add_sat[dc[COLOR3]][(alphas * sc[COLOR3]) >> 8];
 }
 
 /*============================================================================*/
 
-INLINE void f3_alpha_blend_1_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_1,s);}
-INLINE void f3_alpha_blend_1_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_2,s);}
-INLINE void f3_alpha_blend_1_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_4,s);}
-INLINE void f3_alpha_blend_1_5( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_5,s);}
-INLINE void f3_alpha_blend_1_6( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_6,s);}
-INLINE void f3_alpha_blend_1_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_8,s);}
-INLINE void f3_alpha_blend_1_9( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_9,s);}
-INLINE void f3_alpha_blend_1_a( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_1_a,s);}
+INLINE void f3_alpha_blend_1_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_1,s);}
+INLINE void f3_alpha_blend_1_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_2,s);}
+INLINE void f3_alpha_blend_1_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_4,s);}
+INLINE void f3_alpha_blend_1_5( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_5,s);}
+INLINE void f3_alpha_blend_1_6( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_6,s);}
+INLINE void f3_alpha_blend_1_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_8,s);}
+INLINE void f3_alpha_blend_1_9( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_9,s);}
+INLINE void f3_alpha_blend_1_a( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_1_a,s);}
 
-INLINE void f3_alpha_blend_2a_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->alpha_s_2a_0,s);}
-INLINE void f3_alpha_blend_2a_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_2a_4,s);}
-INLINE void f3_alpha_blend_2a_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_2a_8,s);}
+INLINE void f3_alpha_blend_2a_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->m_alpha_s_2a_0,s);}
+INLINE void f3_alpha_blend_2a_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_2a_4,s);}
+INLINE void f3_alpha_blend_2a_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_2a_8,s);}
 
-INLINE void f3_alpha_blend_2b_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->alpha_s_2b_0,s);}
-INLINE void f3_alpha_blend_2b_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_2b_4,s);}
-INLINE void f3_alpha_blend_2b_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_2b_8,s);}
+INLINE void f3_alpha_blend_2b_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->m_alpha_s_2b_0,s);}
+INLINE void f3_alpha_blend_2b_4( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_2b_4,s);}
+INLINE void f3_alpha_blend_2b_8( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_2b_8,s);}
 
-INLINE void f3_alpha_blend_3a_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->alpha_s_3a_0,s);}
-INLINE void f3_alpha_blend_3a_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_3a_1,s);}
-INLINE void f3_alpha_blend_3a_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_3a_2,s);}
+INLINE void f3_alpha_blend_3a_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->m_alpha_s_3a_0,s);}
+INLINE void f3_alpha_blend_3a_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_3a_1,s);}
+INLINE void f3_alpha_blend_3a_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_3a_2,s);}
 
-INLINE void f3_alpha_blend_3b_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->alpha_s_3b_0,s);}
-INLINE void f3_alpha_blend_3b_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_3b_1,s);}
-INLINE void f3_alpha_blend_3b_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->alpha_s_3b_2,s);}
+INLINE void f3_alpha_blend_3b_0( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_s(state, state->m_alpha_s_3b_0,s);}
+INLINE void f3_alpha_blend_3b_1( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_3b_1,s);}
+INLINE void f3_alpha_blend_3b_2( taito_f3_state *state, UINT32 s ){f3_alpha_blend32_d(state, state->m_alpha_s_3b_2,s);}
 
 /*============================================================================*/
 
-static int dpix_1_noalpha(taito_f3_state *state, UINT32 s_pix) {state->dval = s_pix; return 1;}
+static int dpix_1_noalpha(taito_f3_state *state, UINT32 s_pix) {state->m_dval = s_pix; return 1;}
 static int dpix_ret1(taito_f3_state *state, UINT32 s_pix) {return 1;}
 static int dpix_ret0(taito_f3_state *state, UINT32 s_pix) {return 0;}
 static int dpix_1_1(taito_f3_state *state, UINT32 s_pix) {if(s_pix) f3_alpha_blend_1_1(state, s_pix); return 1;}
@@ -940,171 +940,171 @@ static int dpix_1_a(taito_f3_state *state, UINT32 s_pix) {if(s_pix) f3_alpha_ble
 static int dpix_2a_0(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2a_0(state, s_pix);
-	else	  state->dval = 0;
-	if(state->pdest_2a) {state->pval |= state->pdest_2a;return 0;}
+	else	  state->m_dval = 0;
+	if(state->m_pdest_2a) {state->m_pval |= state->m_pdest_2a;return 0;}
 	return 1;
 }
 static int dpix_2a_4(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2a_4(state, s_pix);
-	if(state->pdest_2a) {state->pval |= state->pdest_2a;return 0;}
+	if(state->m_pdest_2a) {state->m_pval |= state->m_pdest_2a;return 0;}
 	return 1;
 }
 static int dpix_2a_8(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2a_8(state, s_pix);
-	if(state->pdest_2a) {state->pval |= state->pdest_2a;return 0;}
+	if(state->m_pdest_2a) {state->m_pval |= state->m_pdest_2a;return 0;}
 	return 1;
 }
 
 static int dpix_3a_0(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3a_0(state, s_pix);
-	else	  state->dval = 0;
-	if(state->pdest_3a) {state->pval |= state->pdest_3a;return 0;}
+	else	  state->m_dval = 0;
+	if(state->m_pdest_3a) {state->m_pval |= state->m_pdest_3a;return 0;}
 	return 1;
 }
 static int dpix_3a_1(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3a_1(state, s_pix);
-	if(state->pdest_3a) {state->pval |= state->pdest_3a;return 0;}
+	if(state->m_pdest_3a) {state->m_pval |= state->m_pdest_3a;return 0;}
 	return 1;
 }
 static int dpix_3a_2(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3a_2(state, s_pix);
-	if(state->pdest_3a) {state->pval |= state->pdest_3a;return 0;}
+	if(state->m_pdest_3a) {state->m_pval |= state->m_pdest_3a;return 0;}
 	return 1;
 }
 
 static int dpix_2b_0(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2b_0(state, s_pix);
-	else	  state->dval = 0;
-	if(state->pdest_2b) {state->pval |= state->pdest_2b;return 0;}
+	else	  state->m_dval = 0;
+	if(state->m_pdest_2b) {state->m_pval |= state->m_pdest_2b;return 0;}
 	return 1;
 }
 static int dpix_2b_4(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2b_4(state, s_pix);
-	if(state->pdest_2b) {state->pval |= state->pdest_2b;return 0;}
+	if(state->m_pdest_2b) {state->m_pval |= state->m_pdest_2b;return 0;}
 	return 1;
 }
 static int dpix_2b_8(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_2b_8(state, s_pix);
-	if(state->pdest_2b) {state->pval |= state->pdest_2b;return 0;}
+	if(state->m_pdest_2b) {state->m_pval |= state->m_pdest_2b;return 0;}
 	return 1;
 }
 
 static int dpix_3b_0(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3b_0(state, s_pix);
-	else	  state->dval = 0;
-	if(state->pdest_3b) {state->pval |= state->pdest_3b;return 0;}
+	else	  state->m_dval = 0;
+	if(state->m_pdest_3b) {state->m_pval |= state->m_pdest_3b;return 0;}
 	return 1;
 }
 static int dpix_3b_1(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3b_1(state, s_pix);
-	if(state->pdest_3b) {state->pval |= state->pdest_3b;return 0;}
+	if(state->m_pdest_3b) {state->m_pval |= state->m_pdest_3b;return 0;}
 	return 1;
 }
 static int dpix_3b_2(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix) f3_alpha_blend_3b_2(state, s_pix);
-	if(state->pdest_3b) {state->pval |= state->pdest_3b;return 0;}
+	if(state->m_pdest_3b) {state->m_pval |= state->m_pdest_3b;return 0;}
 	return 1;
 }
 
 static int dpix_2_0(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_2b)		{f3_alpha_blend_2b_0(state, s_pix);if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{f3_alpha_blend_2a_0(state, s_pix);if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{f3_alpha_blend_2b_0(state, s_pix);if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{f3_alpha_blend_2a_0(state, s_pix);if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_2b)		{state->dval = 0;if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{state->dval = 0;if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{state->m_dval = 0;if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{state->m_dval = 0;if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	return 0;
 }
 static int dpix_2_4(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_2b)		{f3_alpha_blend_2b_4(state, s_pix);if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{f3_alpha_blend_2a_4(state, s_pix);if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{f3_alpha_blend_2b_4(state, s_pix);if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{f3_alpha_blend_2a_4(state, s_pix);if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_2b)		{if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	return 0;
 }
 static int dpix_2_8(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_2b)		{f3_alpha_blend_2b_8(state, s_pix);if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{f3_alpha_blend_2a_8(state, s_pix);if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{f3_alpha_blend_2b_8(state, s_pix);if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{f3_alpha_blend_2a_8(state, s_pix);if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_2b)		{if(state->pdest_2b) state->pval |= state->pdest_2b;else return 1;}
-		else if(tr2==state->tr_2a)	{if(state->pdest_2a) state->pval |= state->pdest_2a;else return 1;}
+		if(tr2==state->m_tr_2b)		{if(state->m_pdest_2b) state->m_pval |= state->m_pdest_2b;else return 1;}
+		else if(tr2==state->m_tr_2a)	{if(state->m_pdest_2a) state->m_pval |= state->m_pdest_2a;else return 1;}
 	}
 	return 0;
 }
 
 static int dpix_3_0(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_3b)		{f3_alpha_blend_3b_0(state, s_pix);if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{f3_alpha_blend_3a_0(state, s_pix);if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{f3_alpha_blend_3b_0(state, s_pix);if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{f3_alpha_blend_3a_0(state, s_pix);if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_3b)		{state->dval = 0;if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{state->dval = 0;if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{state->m_dval = 0;if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{state->m_dval = 0;if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	return 0;
 }
 static int dpix_3_1(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_3b)		{f3_alpha_blend_3b_1(state, s_pix);if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{f3_alpha_blend_3a_1(state, s_pix);if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{f3_alpha_blend_3b_1(state, s_pix);if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{f3_alpha_blend_3a_1(state, s_pix);if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_3b)		{if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	return 0;
 }
 static int dpix_3_2(taito_f3_state *state, UINT32 s_pix)
 {
-	UINT8 tr2=state->tval&1;
+	UINT8 tr2=state->m_tval&1;
 	if(s_pix)
 	{
-		if(tr2==state->tr_3b)		{f3_alpha_blend_3b_2(state, s_pix);if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{f3_alpha_blend_3a_2(state, s_pix);if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{f3_alpha_blend_3b_2(state, s_pix);if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{f3_alpha_blend_3a_2(state, s_pix);if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	else
 	{
-		if(tr2==state->tr_3b)		{if(state->pdest_3b) state->pval |= state->pdest_3b;else return 1;}
-		else if(tr2==state->tr_3a)	{if(state->pdest_3a) state->pval |= state->pdest_3a;else return 1;}
+		if(tr2==state->m_tr_3b)		{if(state->m_pdest_3b) state->m_pval |= state->m_pdest_3b;else return 1;}
+		else if(tr2==state->m_tr_3a)	{if(state->m_pdest_3a) state->m_pval |= state->m_pdest_3a;else return 1;}
 	}
 	return 0;
 }
@@ -1113,7 +1113,7 @@ INLINE void dpix_1_sprite(taito_f3_state *state, UINT32 s_pix)
 {
 	if(s_pix)
 	{
-		UINT8 p1 = state->pval&0xf0;
+		UINT8 p1 = state->m_pval&0xf0;
 		if     (p1==0x10)	f3_alpha_blend_1_1(state, s_pix);
 		else if(p1==0x20)	f3_alpha_blend_1_2(state, s_pix);
 		else if(p1==0x40)	f3_alpha_blend_1_4(state, s_pix);
@@ -1127,8 +1127,8 @@ INLINE void dpix_1_sprite(taito_f3_state *state, UINT32 s_pix)
 
 INLINE void dpix_bg(taito_f3_state *state, UINT32 bgcolor)
 {
-	UINT8 p1 = state->pval&0xf0;
-	if(!p1)			state->dval = bgcolor;
+	UINT8 p1 = state->m_pval&0xf0;
+	if(!p1)			state->m_dval = bgcolor;
 	else if(p1==0x10)	f3_alpha_blend_1_1(state, bgcolor);
 	else if(p1==0x20)	f3_alpha_blend_1_2(state, bgcolor);
 	else if(p1==0x40)	f3_alpha_blend_1_4(state, bgcolor);
@@ -1146,145 +1146,145 @@ static void init_alpha_blend_func(running_machine &machine)
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	int i,j;
 
-	state->dpix_n[0][0x0]=dpix_1_noalpha;
-	state->dpix_n[0][0x1]=dpix_1_noalpha;
-	state->dpix_n[0][0x2]=dpix_1_noalpha;
-	state->dpix_n[0][0x3]=dpix_1_noalpha;
-	state->dpix_n[0][0x4]=dpix_1_noalpha;
-	state->dpix_n[0][0x5]=dpix_1_noalpha;
-	state->dpix_n[0][0x6]=dpix_1_noalpha;
-	state->dpix_n[0][0x7]=dpix_1_noalpha;
-	state->dpix_n[0][0x8]=dpix_1_noalpha;
-	state->dpix_n[0][0x9]=dpix_1_noalpha;
-	state->dpix_n[0][0xa]=dpix_1_noalpha;
-	state->dpix_n[0][0xb]=dpix_1_noalpha;
-	state->dpix_n[0][0xc]=dpix_1_noalpha;
-	state->dpix_n[0][0xd]=dpix_1_noalpha;
-	state->dpix_n[0][0xe]=dpix_1_noalpha;
-	state->dpix_n[0][0xf]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x0]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x1]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x2]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x3]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x4]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x5]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x6]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x7]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x8]=dpix_1_noalpha;
+	state->m_dpix_n[0][0x9]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xa]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xb]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xc]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xd]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xe]=dpix_1_noalpha;
+	state->m_dpix_n[0][0xf]=dpix_1_noalpha;
 
-	state->dpix_n[1][0x0]=dpix_1_noalpha;
-	state->dpix_n[1][0x1]=dpix_1_1;
-	state->dpix_n[1][0x2]=dpix_1_2;
-	state->dpix_n[1][0x3]=dpix_ret1;
-	state->dpix_n[1][0x4]=dpix_1_4;
-	state->dpix_n[1][0x5]=dpix_1_5;
-	state->dpix_n[1][0x6]=dpix_1_6;
-	state->dpix_n[1][0x7]=dpix_ret1;
-	state->dpix_n[1][0x8]=dpix_1_8;
-	state->dpix_n[1][0x9]=dpix_1_9;
-	state->dpix_n[1][0xa]=dpix_1_a;
-	state->dpix_n[1][0xb]=dpix_ret1;
-	state->dpix_n[1][0xc]=dpix_ret1;
-	state->dpix_n[1][0xd]=dpix_ret1;
-	state->dpix_n[1][0xe]=dpix_ret1;
-	state->dpix_n[1][0xf]=dpix_ret1;
+	state->m_dpix_n[1][0x0]=dpix_1_noalpha;
+	state->m_dpix_n[1][0x1]=dpix_1_1;
+	state->m_dpix_n[1][0x2]=dpix_1_2;
+	state->m_dpix_n[1][0x3]=dpix_ret1;
+	state->m_dpix_n[1][0x4]=dpix_1_4;
+	state->m_dpix_n[1][0x5]=dpix_1_5;
+	state->m_dpix_n[1][0x6]=dpix_1_6;
+	state->m_dpix_n[1][0x7]=dpix_ret1;
+	state->m_dpix_n[1][0x8]=dpix_1_8;
+	state->m_dpix_n[1][0x9]=dpix_1_9;
+	state->m_dpix_n[1][0xa]=dpix_1_a;
+	state->m_dpix_n[1][0xb]=dpix_ret1;
+	state->m_dpix_n[1][0xc]=dpix_ret1;
+	state->m_dpix_n[1][0xd]=dpix_ret1;
+	state->m_dpix_n[1][0xe]=dpix_ret1;
+	state->m_dpix_n[1][0xf]=dpix_ret1;
 
-	state->dpix_n[2][0x0]=dpix_2a_0;
-	state->dpix_n[2][0x1]=dpix_ret0;
-	state->dpix_n[2][0x2]=dpix_ret0;
-	state->dpix_n[2][0x3]=dpix_ret0;
-	state->dpix_n[2][0x4]=dpix_2a_4;
-	state->dpix_n[2][0x5]=dpix_ret0;
-	state->dpix_n[2][0x6]=dpix_ret0;
-	state->dpix_n[2][0x7]=dpix_ret0;
-	state->dpix_n[2][0x8]=dpix_2a_8;
-	state->dpix_n[2][0x9]=dpix_ret0;
-	state->dpix_n[2][0xa]=dpix_ret0;
-	state->dpix_n[2][0xb]=dpix_ret0;
-	state->dpix_n[2][0xc]=dpix_ret0;
-	state->dpix_n[2][0xd]=dpix_ret0;
-	state->dpix_n[2][0xe]=dpix_ret0;
-	state->dpix_n[2][0xf]=dpix_ret0;
+	state->m_dpix_n[2][0x0]=dpix_2a_0;
+	state->m_dpix_n[2][0x1]=dpix_ret0;
+	state->m_dpix_n[2][0x2]=dpix_ret0;
+	state->m_dpix_n[2][0x3]=dpix_ret0;
+	state->m_dpix_n[2][0x4]=dpix_2a_4;
+	state->m_dpix_n[2][0x5]=dpix_ret0;
+	state->m_dpix_n[2][0x6]=dpix_ret0;
+	state->m_dpix_n[2][0x7]=dpix_ret0;
+	state->m_dpix_n[2][0x8]=dpix_2a_8;
+	state->m_dpix_n[2][0x9]=dpix_ret0;
+	state->m_dpix_n[2][0xa]=dpix_ret0;
+	state->m_dpix_n[2][0xb]=dpix_ret0;
+	state->m_dpix_n[2][0xc]=dpix_ret0;
+	state->m_dpix_n[2][0xd]=dpix_ret0;
+	state->m_dpix_n[2][0xe]=dpix_ret0;
+	state->m_dpix_n[2][0xf]=dpix_ret0;
 
-	state->dpix_n[3][0x0]=dpix_3a_0;
-	state->dpix_n[3][0x1]=dpix_3a_1;
-	state->dpix_n[3][0x2]=dpix_3a_2;
-	state->dpix_n[3][0x3]=dpix_ret0;
-	state->dpix_n[3][0x4]=dpix_ret0;
-	state->dpix_n[3][0x5]=dpix_ret0;
-	state->dpix_n[3][0x6]=dpix_ret0;
-	state->dpix_n[3][0x7]=dpix_ret0;
-	state->dpix_n[3][0x8]=dpix_ret0;
-	state->dpix_n[3][0x9]=dpix_ret0;
-	state->dpix_n[3][0xa]=dpix_ret0;
-	state->dpix_n[3][0xb]=dpix_ret0;
-	state->dpix_n[3][0xc]=dpix_ret0;
-	state->dpix_n[3][0xd]=dpix_ret0;
-	state->dpix_n[3][0xe]=dpix_ret0;
-	state->dpix_n[3][0xf]=dpix_ret0;
+	state->m_dpix_n[3][0x0]=dpix_3a_0;
+	state->m_dpix_n[3][0x1]=dpix_3a_1;
+	state->m_dpix_n[3][0x2]=dpix_3a_2;
+	state->m_dpix_n[3][0x3]=dpix_ret0;
+	state->m_dpix_n[3][0x4]=dpix_ret0;
+	state->m_dpix_n[3][0x5]=dpix_ret0;
+	state->m_dpix_n[3][0x6]=dpix_ret0;
+	state->m_dpix_n[3][0x7]=dpix_ret0;
+	state->m_dpix_n[3][0x8]=dpix_ret0;
+	state->m_dpix_n[3][0x9]=dpix_ret0;
+	state->m_dpix_n[3][0xa]=dpix_ret0;
+	state->m_dpix_n[3][0xb]=dpix_ret0;
+	state->m_dpix_n[3][0xc]=dpix_ret0;
+	state->m_dpix_n[3][0xd]=dpix_ret0;
+	state->m_dpix_n[3][0xe]=dpix_ret0;
+	state->m_dpix_n[3][0xf]=dpix_ret0;
 
-	state->dpix_n[4][0x0]=dpix_2b_0;
-	state->dpix_n[4][0x1]=dpix_ret0;
-	state->dpix_n[4][0x2]=dpix_ret0;
-	state->dpix_n[4][0x3]=dpix_ret0;
-	state->dpix_n[4][0x4]=dpix_2b_4;
-	state->dpix_n[4][0x5]=dpix_ret0;
-	state->dpix_n[4][0x6]=dpix_ret0;
-	state->dpix_n[4][0x7]=dpix_ret0;
-	state->dpix_n[4][0x8]=dpix_2b_8;
-	state->dpix_n[4][0x9]=dpix_ret0;
-	state->dpix_n[4][0xa]=dpix_ret0;
-	state->dpix_n[4][0xb]=dpix_ret0;
-	state->dpix_n[4][0xc]=dpix_ret0;
-	state->dpix_n[4][0xd]=dpix_ret0;
-	state->dpix_n[4][0xe]=dpix_ret0;
-	state->dpix_n[4][0xf]=dpix_ret0;
+	state->m_dpix_n[4][0x0]=dpix_2b_0;
+	state->m_dpix_n[4][0x1]=dpix_ret0;
+	state->m_dpix_n[4][0x2]=dpix_ret0;
+	state->m_dpix_n[4][0x3]=dpix_ret0;
+	state->m_dpix_n[4][0x4]=dpix_2b_4;
+	state->m_dpix_n[4][0x5]=dpix_ret0;
+	state->m_dpix_n[4][0x6]=dpix_ret0;
+	state->m_dpix_n[4][0x7]=dpix_ret0;
+	state->m_dpix_n[4][0x8]=dpix_2b_8;
+	state->m_dpix_n[4][0x9]=dpix_ret0;
+	state->m_dpix_n[4][0xa]=dpix_ret0;
+	state->m_dpix_n[4][0xb]=dpix_ret0;
+	state->m_dpix_n[4][0xc]=dpix_ret0;
+	state->m_dpix_n[4][0xd]=dpix_ret0;
+	state->m_dpix_n[4][0xe]=dpix_ret0;
+	state->m_dpix_n[4][0xf]=dpix_ret0;
 
-	state->dpix_n[5][0x0]=dpix_3b_0;
-	state->dpix_n[5][0x1]=dpix_3b_1;
-	state->dpix_n[5][0x2]=dpix_3b_2;
-	state->dpix_n[5][0x3]=dpix_ret0;
-	state->dpix_n[5][0x4]=dpix_ret0;
-	state->dpix_n[5][0x5]=dpix_ret0;
-	state->dpix_n[5][0x6]=dpix_ret0;
-	state->dpix_n[5][0x7]=dpix_ret0;
-	state->dpix_n[5][0x8]=dpix_ret0;
-	state->dpix_n[5][0x9]=dpix_ret0;
-	state->dpix_n[5][0xa]=dpix_ret0;
-	state->dpix_n[5][0xb]=dpix_ret0;
-	state->dpix_n[5][0xc]=dpix_ret0;
-	state->dpix_n[5][0xd]=dpix_ret0;
-	state->dpix_n[5][0xe]=dpix_ret0;
-	state->dpix_n[5][0xf]=dpix_ret0;
+	state->m_dpix_n[5][0x0]=dpix_3b_0;
+	state->m_dpix_n[5][0x1]=dpix_3b_1;
+	state->m_dpix_n[5][0x2]=dpix_3b_2;
+	state->m_dpix_n[5][0x3]=dpix_ret0;
+	state->m_dpix_n[5][0x4]=dpix_ret0;
+	state->m_dpix_n[5][0x5]=dpix_ret0;
+	state->m_dpix_n[5][0x6]=dpix_ret0;
+	state->m_dpix_n[5][0x7]=dpix_ret0;
+	state->m_dpix_n[5][0x8]=dpix_ret0;
+	state->m_dpix_n[5][0x9]=dpix_ret0;
+	state->m_dpix_n[5][0xa]=dpix_ret0;
+	state->m_dpix_n[5][0xb]=dpix_ret0;
+	state->m_dpix_n[5][0xc]=dpix_ret0;
+	state->m_dpix_n[5][0xd]=dpix_ret0;
+	state->m_dpix_n[5][0xe]=dpix_ret0;
+	state->m_dpix_n[5][0xf]=dpix_ret0;
 
-	state->dpix_n[6][0x0]=dpix_2_0;
-	state->dpix_n[6][0x1]=dpix_ret0;
-	state->dpix_n[6][0x2]=dpix_ret0;
-	state->dpix_n[6][0x3]=dpix_ret0;
-	state->dpix_n[6][0x4]=dpix_2_4;
-	state->dpix_n[6][0x5]=dpix_ret0;
-	state->dpix_n[6][0x6]=dpix_ret0;
-	state->dpix_n[6][0x7]=dpix_ret0;
-	state->dpix_n[6][0x8]=dpix_2_8;
-	state->dpix_n[6][0x9]=dpix_ret0;
-	state->dpix_n[6][0xa]=dpix_ret0;
-	state->dpix_n[6][0xb]=dpix_ret0;
-	state->dpix_n[6][0xc]=dpix_ret0;
-	state->dpix_n[6][0xd]=dpix_ret0;
-	state->dpix_n[6][0xe]=dpix_ret0;
-	state->dpix_n[6][0xf]=dpix_ret0;
+	state->m_dpix_n[6][0x0]=dpix_2_0;
+	state->m_dpix_n[6][0x1]=dpix_ret0;
+	state->m_dpix_n[6][0x2]=dpix_ret0;
+	state->m_dpix_n[6][0x3]=dpix_ret0;
+	state->m_dpix_n[6][0x4]=dpix_2_4;
+	state->m_dpix_n[6][0x5]=dpix_ret0;
+	state->m_dpix_n[6][0x6]=dpix_ret0;
+	state->m_dpix_n[6][0x7]=dpix_ret0;
+	state->m_dpix_n[6][0x8]=dpix_2_8;
+	state->m_dpix_n[6][0x9]=dpix_ret0;
+	state->m_dpix_n[6][0xa]=dpix_ret0;
+	state->m_dpix_n[6][0xb]=dpix_ret0;
+	state->m_dpix_n[6][0xc]=dpix_ret0;
+	state->m_dpix_n[6][0xd]=dpix_ret0;
+	state->m_dpix_n[6][0xe]=dpix_ret0;
+	state->m_dpix_n[6][0xf]=dpix_ret0;
 
-	state->dpix_n[7][0x0]=dpix_3_0;
-	state->dpix_n[7][0x1]=dpix_3_1;
-	state->dpix_n[7][0x2]=dpix_3_2;
-	state->dpix_n[7][0x3]=dpix_ret0;
-	state->dpix_n[7][0x4]=dpix_ret0;
-	state->dpix_n[7][0x5]=dpix_ret0;
-	state->dpix_n[7][0x6]=dpix_ret0;
-	state->dpix_n[7][0x7]=dpix_ret0;
-	state->dpix_n[7][0x8]=dpix_ret0;
-	state->dpix_n[7][0x9]=dpix_ret0;
-	state->dpix_n[7][0xa]=dpix_ret0;
-	state->dpix_n[7][0xb]=dpix_ret0;
-	state->dpix_n[7][0xc]=dpix_ret0;
-	state->dpix_n[7][0xd]=dpix_ret0;
-	state->dpix_n[7][0xe]=dpix_ret0;
-	state->dpix_n[7][0xf]=dpix_ret0;
+	state->m_dpix_n[7][0x0]=dpix_3_0;
+	state->m_dpix_n[7][0x1]=dpix_3_1;
+	state->m_dpix_n[7][0x2]=dpix_3_2;
+	state->m_dpix_n[7][0x3]=dpix_ret0;
+	state->m_dpix_n[7][0x4]=dpix_ret0;
+	state->m_dpix_n[7][0x5]=dpix_ret0;
+	state->m_dpix_n[7][0x6]=dpix_ret0;
+	state->m_dpix_n[7][0x7]=dpix_ret0;
+	state->m_dpix_n[7][0x8]=dpix_ret0;
+	state->m_dpix_n[7][0x9]=dpix_ret0;
+	state->m_dpix_n[7][0xa]=dpix_ret0;
+	state->m_dpix_n[7][0xb]=dpix_ret0;
+	state->m_dpix_n[7][0xc]=dpix_ret0;
+	state->m_dpix_n[7][0xd]=dpix_ret0;
+	state->m_dpix_n[7][0xe]=dpix_ret0;
+	state->m_dpix_n[7][0xf]=dpix_ret0;
 
 	for(i=0;i<256;i++)
 		for(j=0;j<256;j++)
-			state->add_sat[i][j] = (i + j < 256) ? i + j : 255;
+			state->m_add_sat[i][j] = (i + j < 256) ? i + j : 255;
 }
 
 /******************************************************************************/
@@ -1292,53 +1292,53 @@ static void init_alpha_blend_func(running_machine &machine)
 #define GET_PIXMAP_POINTER(pf_num) \
 { \
 	const struct f3_playfield_line_inf *line_tmp=line_t[pf_num]; \
-	state->src##pf_num=line_tmp->src[y]; \
-	state->src_s##pf_num=line_tmp->src_s[y]; \
-	state->src_e##pf_num=line_tmp->src_e[y]; \
-	state->tsrc##pf_num=line_tmp->tsrc[y]; \
-	state->tsrc_s##pf_num=line_tmp->tsrc_s[y]; \
-	state->x_count##pf_num=line_tmp->x_count[y]; \
-	state->x_zoom##pf_num=line_tmp->x_zoom[y]; \
-	state->clip_al##pf_num=line_tmp->clip0[y]&0xffff; \
-	state->clip_ar##pf_num=line_tmp->clip0[y]>>16; \
-	state->clip_bl##pf_num=line_tmp->clip1[y]&0xffff; \
-	state->clip_br##pf_num=line_tmp->clip1[y]>>16; \
+	state->m_src##pf_num=line_tmp->src[y]; \
+	state->m_src_s##pf_num=line_tmp->src_s[y]; \
+	state->m_src_e##pf_num=line_tmp->src_e[y]; \
+	state->m_tsrc##pf_num=line_tmp->tsrc[y]; \
+	state->m_tsrc_s##pf_num=line_tmp->tsrc_s[y]; \
+	state->m_x_count##pf_num=line_tmp->x_count[y]; \
+	state->m_x_zoom##pf_num=line_tmp->x_zoom[y]; \
+	state->m_clip_al##pf_num=line_tmp->clip0[y]&0xffff; \
+	state->m_clip_ar##pf_num=line_tmp->clip0[y]>>16; \
+	state->m_clip_bl##pf_num=line_tmp->clip1[y]&0xffff; \
+	state->m_clip_br##pf_num=line_tmp->clip1[y]>>16; \
 }
 
 #define CULC_PIXMAP_POINTER(pf_num) \
 { \
-	state->x_count##pf_num += state->x_zoom##pf_num; \
-	if(state->x_count##pf_num>>16) \
+	state->m_x_count##pf_num += state->m_x_zoom##pf_num; \
+	if(state->m_x_count##pf_num>>16) \
 	{ \
-		state->x_count##pf_num &= 0xffff; \
-		state->src##pf_num++; \
-		state->tsrc##pf_num++; \
-		if(state->src##pf_num==state->src_e##pf_num) {state->src##pf_num=state->src_s##pf_num; state->tsrc##pf_num=state->tsrc_s##pf_num;} \
+		state->m_x_count##pf_num &= 0xffff; \
+		state->m_src##pf_num++; \
+		state->m_tsrc##pf_num++; \
+		if(state->m_src##pf_num==state->m_src_e##pf_num) {state->m_src##pf_num=state->m_src_s##pf_num; state->m_tsrc##pf_num=state->m_tsrc_s##pf_num;} \
 	} \
 }
 
 #define UPDATE_PIXMAP_SP(pf_num) \
 	if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)) \
 	{ \
-		sprite_pri=sprite[pf_num]&state->pval; \
+		sprite_pri=sprite[pf_num]&state->m_pval; \
 		if(sprite_pri) \
 		{ \
 			if(sprite[pf_num]&0x100) break; \
-			if(!state->dpix_sp[sprite_pri]) \
+			if(!state->m_dpix_sp[sprite_pri]) \
 			{ \
-				if(!(state->pval&0xf0)) break; \
-				else {dpix_1_sprite(state, *dsti);*dsti=state->dval;break;} \
+				if(!(state->m_pval&0xf0)) break; \
+				else {dpix_1_sprite(state, *dsti);*dsti=state->m_dval;break;} \
 			} \
-			if(state->dpix_sp[sprite_pri][state->pval>>4](state, *dsti)) {*dsti=state->dval;break;} \
+			if(state->m_dpix_sp[sprite_pri][state->m_pval>>4](state, *dsti)) {*dsti=state->m_dval;break;} \
 		} \
 	}
 
 #define UPDATE_PIXMAP_LP(pf_num) \
-	if (cx>=state->clip_al##pf_num && cx<state->clip_ar##pf_num && !(cx>=state->clip_bl##pf_num && cx<state->clip_br##pf_num)) \
+	if (cx>=state->m_clip_al##pf_num && cx<state->m_clip_ar##pf_num && !(cx>=state->m_clip_bl##pf_num && cx<state->m_clip_br##pf_num)) \
 	{ \
-		state->tval=*state->tsrc##pf_num; \
-		if(state->tval&0xf0) \
-			if(state->dpix_lp[pf_num][state->pval>>4](state, clut[*state->src##pf_num])) {*dsti=state->dval;break;} \
+		state->m_tval=*state->m_tsrc##pf_num; \
+		if(state->m_tval&0xf0) \
+			if(state->m_dpix_lp[pf_num][state->m_pval>>4](state, clut[*state->m_src##pf_num])) {*dsti=state->m_dval;break;} \
 	}
 
 
@@ -1377,16 +1377,16 @@ INLINE void draw_scanlines(running_machine &machine,
 		yadv = -yadv;
 	}
 
-	dstp0 = BITMAP_ADDR8(state->pri_alp_bitmap, ty, x);
+	dstp0 = BITMAP_ADDR8(state->m_pri_alp_bitmap, ty, x);
 
-	state->pdest_2a = state->f3_alpha_level_2ad ? 0x10 : 0;
-	state->pdest_2b = state->f3_alpha_level_2bd ? 0x20 : 0;
-	state->tr_2a =(state->f3_alpha_level_2as==0 && state->f3_alpha_level_2ad==255) ? -1 : 0;
-	state->tr_2b =(state->f3_alpha_level_2bs==0 && state->f3_alpha_level_2bd==255) ? -1 : 1;
-	state->pdest_3a = state->f3_alpha_level_3ad ? 0x40 : 0;
-	state->pdest_3b = state->f3_alpha_level_3bd ? 0x80 : 0;
-	state->tr_3a =(state->f3_alpha_level_3as==0 && state->f3_alpha_level_3ad==255) ? -1 : 0;
-	state->tr_3b =(state->f3_alpha_level_3bs==0 && state->f3_alpha_level_3bd==255) ? -1 : 1;
+	state->m_pdest_2a = state->m_f3_alpha_level_2ad ? 0x10 : 0;
+	state->m_pdest_2b = state->m_f3_alpha_level_2bd ? 0x20 : 0;
+	state->m_tr_2a =(state->m_f3_alpha_level_2as==0 && state->m_f3_alpha_level_2ad==255) ? -1 : 0;
+	state->m_tr_2b =(state->m_f3_alpha_level_2bs==0 && state->m_f3_alpha_level_2bd==255) ? -1 : 1;
+	state->m_pdest_3a = state->m_f3_alpha_level_3ad ? 0x40 : 0;
+	state->m_pdest_3b = state->m_f3_alpha_level_3bd ? 0x80 : 0;
+	state->m_tr_3a =(state->m_f3_alpha_level_3as==0 && state->m_f3_alpha_level_3ad==255) ? -1 : 0;
+	state->m_tr_3b =(state->m_f3_alpha_level_3bs==0 && state->m_f3_alpha_level_3bd==255) ? -1 : 1;
 
 	{
 		UINT32 *dsti0,*dsti;
@@ -1395,10 +1395,10 @@ INLINE void draw_scanlines(running_machine &machine,
 		{
 			int cx=0;
 
-			clip_als=state->sa_line_inf[0].sprite_clip0[y]&0xffff;
-			clip_ars=state->sa_line_inf[0].sprite_clip0[y]>>16;
-			clip_bls=state->sa_line_inf[0].sprite_clip1[y]&0xffff;
-			clip_brs=state->sa_line_inf[0].sprite_clip1[y]>>16;
+			clip_als=state->m_sa_line_inf[0].sprite_clip0[y]&0xffff;
+			clip_ars=state->m_sa_line_inf[0].sprite_clip0[y]>>16;
+			clip_bls=state->m_sa_line_inf[0].sprite_clip1[y]&0xffff;
+			clip_brs=state->m_sa_line_inf[0].sprite_clip1[y]>>16;
 
 			length=xsize;
 			dsti = dsti0;
@@ -1415,8 +1415,8 @@ INLINE void draw_scanlines(running_machine &machine,
 
 			while (1)
 			{
-				state->pval=*dstp;
-				if (state->pval!=0xff)
+				state->m_pval=*dstp;
+				if (state->m_pval!=0xff)
 				{
 					UINT8 sprite_pri;
 					switch(skip_layer_num)
@@ -1427,9 +1427,9 @@ INLINE void draw_scanlines(running_machine &machine,
 						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3)
 						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4)
 						case 5: UPDATE_PIXMAP_SP(5)
-								if(!bgcolor) {if(!(state->pval&0xf0)) {*dsti=0;break;}}
+								if(!bgcolor) {if(!(state->m_pval&0xf0)) {*dsti=0;break;}}
 								else dpix_bg(state, bgcolor);
-								*dsti=state->dval;
+								*dsti=state->m_dval;
 					}
 				}
 
@@ -1494,12 +1494,12 @@ static void visible_tile_check(running_machine &machine,
 	tile_num=(((line_t->x_zoom[line]*320+(x_index_fx & 0xffff)+0xffff)>>16)+(tile_index%16)+15)/16;
 	tile_index/=16;
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
-		pf_base=f3_pf_data_n+((31-(y_index/16))<<state->twidth_mask_bit);
-		tile_index=(state->twidth_mask-tile_index)-tile_num+1;
+		pf_base=f3_pf_data_n+((31-(y_index/16))<<state->m_twidth_mask_bit);
+		tile_index=(state->m_twidth_mask-tile_index)-tile_num+1;
 	}
-	else pf_base=f3_pf_data_n+((y_index/16)<<state->twidth_mask_bit);
+	else pf_base=f3_pf_data_n+((y_index/16)<<state->m_twidth_mask_bit);
 
 
 	trans_all=1;
@@ -1507,14 +1507,14 @@ static void visible_tile_check(running_machine &machine,
 	alpha_type=0;
 	for(i=0;i<tile_num;i++)
 	{
-		UINT32 tile=pf_base[(tile_index)&state->twidth_mask];
+		UINT32 tile=pf_base[(tile_index)&state->m_twidth_mask];
 		UINT8  extra_planes = (tile>>(16+10)) & 3;
 		if(tile&0xffff)
 		{
 			trans_all=0;
 			if(opaque_all)
 			{
-				if(state->tile_opaque_pf[extra_planes][(tile&0xffff)%total_elements]!=1) opaque_all=0;
+				if(state->m_tile_opaque_pf[extra_planes][(tile&0xffff)%total_elements]!=1) opaque_all=0;
 			}
 
 			if(alpha_mode==1)
@@ -1551,7 +1551,7 @@ static void visible_tile_check(running_machine &machine,
 
 static void calculate_clip(taito_f3_state *state, int y, UINT16 pri, UINT32* clip0, UINT32* clip1, int* line_enable)
 {
-	const struct f3_spritealpha_line_inf *sa_line_t=&state->sa_line_inf[0];
+	const struct f3_spritealpha_line_inf *sa_line_t=&state->m_sa_line_inf[0];
 
 	switch (pri)
 	{
@@ -1655,7 +1655,7 @@ static void calculate_clip(taito_f3_state *state, int y, UINT16 pri, UINT32* cli
 
 static void get_spritealphaclip_info(taito_f3_state *state)
 {
-	struct f3_spritealpha_line_inf *line_t=&state->sa_line_inf[0];
+	struct f3_spritealpha_line_inf *line_t=&state->m_sa_line_inf[0];
 
 	int y,y_end,y_inc;
 
@@ -1667,7 +1667,7 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 	int alpha_level=0;
 	UINT16 sprite_alpha=0;
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
 		spri_base=0x77fe;
 		clip_base_low=0x51fe;
@@ -1694,39 +1694,39 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 		/* The zoom, column and row values can latch according to control ram */
 		if (y&1)
 		{
-			if (state->f3_line_ram[0x080+(y>>1)]&1)
-				clip0_low=(state->f3_line_ram[clip_base_low/4]>> 0)&0xffff;
-			if (state->f3_line_ram[0x000+(y>>1)]&4)
-				clip0_high=(state->f3_line_ram[clip_base_high/4]>> 0)&0xffff;
-			if (state->f3_line_ram[0x080+(y>>1)]&2)
-				clip1_low=(state->f3_line_ram[(clip_base_low+0x200)/4]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x080+(y>>1)]&1)
+				clip0_low=(state->m_f3_line_ram[clip_base_low/4]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x000+(y>>1)]&4)
+				clip0_high=(state->m_f3_line_ram[clip_base_high/4]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x080+(y>>1)]&2)
+				clip1_low=(state->m_f3_line_ram[(clip_base_low+0x200)/4]>> 0)&0xffff;
 
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x8)
-				spri=state->f3_line_ram[spri_base/4]&0xffff;
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x4)
-				sprite_clip=state->f3_line_ram[(spri_base-0x200)/4]&0xffff;
-			if (state->f3_line_ram[(0x0400/4)+(y>>1)]&0x1)
-				sprite_alpha=state->f3_line_ram[(spri_base-0x1600)/4]&0xffff;
-			if (state->f3_line_ram[(0x0400/4)+(y>>1)]&0x2)
-				alpha_level=state->f3_line_ram[(spri_base-0x1400)/4]&0xffff;
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x8)
+				spri=state->m_f3_line_ram[spri_base/4]&0xffff;
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x4)
+				sprite_clip=state->m_f3_line_ram[(spri_base-0x200)/4]&0xffff;
+			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x1)
+				sprite_alpha=state->m_f3_line_ram[(spri_base-0x1600)/4]&0xffff;
+			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x2)
+				alpha_level=state->m_f3_line_ram[(spri_base-0x1400)/4]&0xffff;
 		}
 		else
 		{
-			if (state->f3_line_ram[0x080+(y>>1)]&0x10000)
-				clip0_low=(state->f3_line_ram[clip_base_low/4]>>16)&0xffff;
-			if (state->f3_line_ram[0x000+(y>>1)]&0x40000)
-				clip0_high=(state->f3_line_ram[clip_base_high/4]>>16)&0xffff;
-			if (state->f3_line_ram[0x080+(y>>1)]&0x20000)
-				clip1_low=(state->f3_line_ram[(clip_base_low+0x200)/4]>>16)&0xffff;
+			if (state->m_f3_line_ram[0x080+(y>>1)]&0x10000)
+				clip0_low=(state->m_f3_line_ram[clip_base_low/4]>>16)&0xffff;
+			if (state->m_f3_line_ram[0x000+(y>>1)]&0x40000)
+				clip0_high=(state->m_f3_line_ram[clip_base_high/4]>>16)&0xffff;
+			if (state->m_f3_line_ram[0x080+(y>>1)]&0x20000)
+				clip1_low=(state->m_f3_line_ram[(clip_base_low+0x200)/4]>>16)&0xffff;
 
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x80000)
-				spri=state->f3_line_ram[spri_base/4]>>16;
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x40000)
-				sprite_clip=state->f3_line_ram[(spri_base-0x200)/4]>>16;
-			if (state->f3_line_ram[(0x0400/4)+(y>>1)]&0x10000)
-				sprite_alpha=state->f3_line_ram[(spri_base-0x1600)/4]>>16;
-			if (state->f3_line_ram[(0x0400/4)+(y>>1)]&0x20000)
-				alpha_level=state->f3_line_ram[(spri_base-0x1400)/4]>>16;
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x80000)
+				spri=state->m_f3_line_ram[spri_base/4]>>16;
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x40000)
+				sprite_clip=state->m_f3_line_ram[(spri_base-0x200)/4]>>16;
+			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x10000)
+				sprite_alpha=state->m_f3_line_ram[(spri_base-0x1600)/4]>>16;
+			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x20000)
+				alpha_level=state->m_f3_line_ram[(spri_base-0x1400)/4]>>16;
 		}
 
 		line_t->alpha_level[y]=alpha_level;
@@ -1771,7 +1771,7 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	struct f3_playfield_line_inf *line_t=&state->pf_line_inf[pos];
+	struct f3_playfield_line_inf *line_t=&state->m_pf_line_inf[pos];
 	const bitmap_t *srcbitmap;
 	const bitmap_t *flagsbitmap;
 
@@ -1791,7 +1791,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 
 	sx+=((46<<16));
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
 		line_base=0xa1fe + (pos*0x200);
 		zoom_base=0x81fe;// + (pos*0x200);
@@ -1802,7 +1802,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		y_end=-1;
 		y_inc=-1;
 
-		if (state->f3_game_config->extend)	sx=-sx+((188-512)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
+		if (state->m_f3_game_config->extend)	sx=-sx+((188-512)<<16); else sx=-sx+(188<<16); /* Adjust for flipped scroll position */
 		y_index_fx=-sy-(256<<16); /* Adjust for flipped scroll position */
 	}
 	else
@@ -1825,83 +1825,83 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		/* The zoom, column and row values can latch according to control ram */
 		if (y&1)
 		{
-			if (state->f3_line_ram[0x300+(y>>1)]&bit_select1)
-				x_offset=(state->f3_line_ram[line_base/4]&0xffff)<<10;
-			if (state->f3_line_ram[0x380+(y>>1)]&bit_select1)
-				pri=state->f3_line_ram[pri_base/4]&0xffff;
+			if (state->m_f3_line_ram[0x300+(y>>1)]&bit_select1)
+				x_offset=(state->m_f3_line_ram[line_base/4]&0xffff)<<10;
+			if (state->m_f3_line_ram[0x380+(y>>1)]&bit_select1)
+				pri=state->m_f3_line_ram[pri_base/4]&0xffff;
 
 			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
 			switch (pos)
 			{
 			case 0:
-				if (state->f3_line_ram[0x200+(y>>1)]&bit_select1)
-					line_zoom=state->f3_line_ram[(zoom_base+0x000)/4]&0xffff;
+				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select1)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x000)/4]&0xffff;
 				break;
 			case 1:
-				if (state->f3_line_ram[0x200+(y>>1)]&0x2)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
-				if (state->f3_line_ram[0x200+(y>>1)]&0x8)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x2)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x8)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
 				break;
 			case 2:
-				if (state->f3_line_ram[0x200+(y>>1)]&bit_select1)
-					line_zoom=state->f3_line_ram[(zoom_base+0x400)/4]&0xffff;
+				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select1)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x400)/4]&0xffff;
 				break;
 			case 3:
-				if (state->f3_line_ram[0x200+(y>>1)]&0x8)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
-				if (state->f3_line_ram[0x200+(y>>1)]&0x2)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x8)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x2)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
 				break;
 			default:
 				break;
 			}
 
 			// Column scroll only affects playfields 2 & 3
-			if (pos>=2 && state->f3_line_ram[0x000+(y>>1)]&bit_select1)
-				colscroll=(state->f3_line_ram[col_base/4]>> 0)&0x3ff;
+			if (pos>=2 && state->m_f3_line_ram[0x000+(y>>1)]&bit_select1)
+				colscroll=(state->m_f3_line_ram[col_base/4]>> 0)&0x3ff;
 		}
 		else
 		{
-			if (state->f3_line_ram[0x300+(y>>1)]&bit_select0)
-				x_offset=(state->f3_line_ram[line_base/4]&0xffff0000)>>6;
+			if (state->m_f3_line_ram[0x300+(y>>1)]&bit_select0)
+				x_offset=(state->m_f3_line_ram[line_base/4]&0xffff0000)>>6;
 
-			if (state->f3_line_ram[0x380+(y>>1)]&bit_select0)
-				pri=(state->f3_line_ram[pri_base/4]>>16)&0xffff;
+			if (state->m_f3_line_ram[0x380+(y>>1)]&bit_select0)
+				pri=(state->m_f3_line_ram[pri_base/4]>>16)&0xffff;
 
 			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
 			switch (pos)
 			{
 			case 0:
-				if (state->f3_line_ram[0x200+(y>>1)]&bit_select0)
-					line_zoom=state->f3_line_ram[(zoom_base+0x000)/4]>>16;
+				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select0)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x000)/4]>>16;
 				break;
 			case 1:
-				if (state->f3_line_ram[0x200+(y>>1)]&0x20000)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x200)/4]>>16)&0xff00) | (line_zoom&0x00ff);
-				if (state->f3_line_ram[0x200+(y>>1)]&0x80000)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x600)/4]>>16)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x20000)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]>>16)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x80000)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]>>16)&0x00ff) | (line_zoom&0xff00);
 				break;
 			case 2:
-				if (state->f3_line_ram[0x200+(y>>1)]&bit_select0)
-					line_zoom=state->f3_line_ram[(zoom_base+0x400)/4]>>16;
+				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select0)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x400)/4]>>16;
 				break;
 			case 3:
-				if (state->f3_line_ram[0x200+(y>>1)]&0x80000)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x600)/4]>>16)&0xff00) | (line_zoom&0x00ff);
-				if (state->f3_line_ram[0x200+(y>>1)]&0x20000)
-					line_zoom=((state->f3_line_ram[(zoom_base+0x200)/4]>>16)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x80000)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]>>16)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x200+(y>>1)]&0x20000)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]>>16)&0x00ff) | (line_zoom&0xff00);
 				break;
 			default:
 				break;
 			}
 
 			// Column scroll only affects playfields 2 & 3
-			if (pos>=2 && state->f3_line_ram[0x000+(y>>1)]&bit_select0)
-				colscroll=(state->f3_line_ram[col_base/4]>>16)&0x3ff;
+			if (pos>=2 && state->m_f3_line_ram[0x000+(y>>1)]&bit_select0)
+				colscroll=(state->m_f3_line_ram[col_base/4]>>16)&0x3ff;
 		}
 
-		if (!pri || (!state->flipscreen && y<24) || (state->flipscreen && y>231) ||
+		if (!pri || (!state->m_flipscreen && y<24) || (state->m_flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
 			line_enable=0;
 		else if(pri&0x4000)	//alpha1
@@ -1964,7 +1964,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 			UINT16 *src_s;
 			UINT8 *tsrc_s;
 
-			x_index_fx = (sx+_x_offset[y]-(10*0x10000)+(10*line_t->x_zoom[y]))&((state->width_mask<<16)|0xffff);
+			x_index_fx = (sx+_x_offset[y]-(10*0x10000)+(10*line_t->x_zoom[y]))&((state->m_width_mask<<16)|0xffff);
 			y_index = ((y_index_fx>>16)+_colscroll[y])&0x1ff;
 
 			/* check tile status */
@@ -1977,7 +1977,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 			/* set pixmap index */
 			line_t->x_count[y]=x_index_fx & 0xffff; // Fractional part
 			line_t->src_s[y]=src_s=BITMAP_ADDR16(srcbitmap, y_index, 0);
-			line_t->src_e[y]=&src_s[state->width_mask+1];
+			line_t->src_e[y]=&src_s[state->m_width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
 
 			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap, y_index, 0);
@@ -1992,8 +1992,8 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&state->sa_line_inf[0];
-	struct f3_playfield_line_inf *line_t=&state->pf_line_inf[4];
+	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&state->m_sa_line_inf[0];
+	struct f3_playfield_line_inf *line_t=&state->m_pf_line_inf[4];
 	const bitmap_t *srcbitmap_pixel, *srcbitmap_vram;
 	const bitmap_t *flagsbitmap_pixel, *flagsbitmap_vram;
 
@@ -2006,7 +2006,7 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 
 	const int vram_width_mask=0x1ff;
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
 		pri_base =0x73fe;
 		inc=-2;
@@ -2030,16 +2030,16 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 		/* The zoom, column and row values can latch according to control ram */
 		if (y&1)
 		{
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x2)
-				pri=(state->f3_line_ram[pri_base/4]&0xffff);
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x2)
+				pri=(state->m_f3_line_ram[pri_base/4]&0xffff);
 		}
 		else
 		{
-			if (state->f3_line_ram[(0x0600/4)+(y>>1)]&0x20000)
-				pri=(state->f3_line_ram[pri_base/4]&0xffff0000)>>16;
+			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x20000)
+				pri=(state->m_f3_line_ram[pri_base/4]&0xffff0000)>>16;
 		}
 
-		if (!pri || (!state->flipscreen && y<24) || (state->flipscreen && y>231) ||
+		if (!pri || (!state->m_flipscreen && y<24) || (state->m_flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
 			line_enable=0;
 		else if(pri&0x4000)	//alpha1
@@ -2128,7 +2128,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 
 	UINT32 rot=0;
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
 		rot=ORIENTATION_FLIP_Y;
 		ys=0;
@@ -2154,8 +2154,8 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 		int spri;
 		int alpha;
 		int layer_tmp[5];
-		struct f3_playfield_line_inf *pf_line_inf = state->pf_line_inf;
-		struct f3_spritealpha_line_inf *sa_line_inf = state->sa_line_inf;
+		struct f3_playfield_line_inf *pf_line_inf = state->m_pf_line_inf;
+		struct f3_spritealpha_line_inf *sa_line_inf = state->m_sa_line_inf;
 		int count_skip_layer=0;
 		int sprite[6]={0,0,0,0,0,0};
 		const struct f3_playfield_line_inf *line_t[5];
@@ -2230,7 +2230,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 			(sprite_alpha&0xff) != 0xff  )
 		{
 			/* set alpha level */
-			if(alpha_level!=state->alpha_level_last)
+			if(alpha_level!=state->m_alpha_level_last)
 			{
 				int al_s,al_d;
 				int a=alpha_level;
@@ -2244,44 +2244,44 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 				al_d = ( (15-b)*256) / 8;
 				if(al_s>255) al_s = 255;
 				if(al_d>255) al_d = 255;
-				state->f3_alpha_level_3as = al_s;
-				state->f3_alpha_level_3ad = al_d;
-				state->f3_alpha_level_2as = al_d;
-				state->f3_alpha_level_2ad = al_s;
+				state->m_f3_alpha_level_3as = al_s;
+				state->m_f3_alpha_level_3ad = al_d;
+				state->m_f3_alpha_level_2as = al_d;
+				state->m_f3_alpha_level_2ad = al_s;
 
 				al_s = ( (15-c)*256) / 8;
 				al_d = ( (15-a)*256) / 8;
 				if(al_s>255) al_s = 255;
 				if(al_d>255) al_d = 255;
-				state->f3_alpha_level_3bs = al_s;
-				state->f3_alpha_level_3bd = al_d;
-				state->f3_alpha_level_2bs = al_d;
-				state->f3_alpha_level_2bd = al_s;
+				state->m_f3_alpha_level_3bs = al_s;
+				state->m_f3_alpha_level_3bd = al_d;
+				state->m_f3_alpha_level_2bs = al_d;
+				state->m_f3_alpha_level_2bd = al_s;
 
 				f3_alpha_set_level(state);
-				state->alpha_level_last=alpha_level;
+				state->m_alpha_level_last=alpha_level;
 			}
 
 			/* set sprite alpha mode */
 			sprite_alpha_check=0;
 			sprite_alpha_all_2a=1;
-			state->dpix_sp[1]=0;
-			state->dpix_sp[2]=0;
-			state->dpix_sp[4]=0;
-			state->dpix_sp[8]=0;
+			state->m_dpix_sp[1]=0;
+			state->m_dpix_sp[2]=0;
+			state->m_dpix_sp[4]=0;
+			state->m_dpix_sp[8]=0;
 			for(i=0;i<4;i++)	/* i = sprite priority offset */
 			{
 				UINT8 sprite_alpha_mode=(sprite_alpha>>(i*2))&3;
 				UINT8 sftbit=1<<i;
-				if(state->sprite_pri_usage&sftbit)
+				if(state->m_sprite_pri_usage&sftbit)
 				{
 					if(sprite_alpha_mode==1)
 					{
-						if(state->f3_alpha_level_2as==0 && state->f3_alpha_level_2ad==255)
-							state->sprite_pri_usage&=~sftbit;  // Disable sprite priority block
+						if(state->m_f3_alpha_level_2as==0 && state->m_f3_alpha_level_2ad==255)
+							state->m_sprite_pri_usage&=~sftbit;  // Disable sprite priority block
 						else
 						{
-							state->dpix_sp[sftbit]=state->dpix_n[2];
+							state->m_dpix_sp[sftbit]=state->m_dpix_n[2];
 							sprite_alpha_check|=sftbit;
 						}
 					}
@@ -2289,20 +2289,20 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 					{
 						if(sprite_alpha&0xff00)
 						{
-							if(state->f3_alpha_level_3as==0 && state->f3_alpha_level_3ad==255) state->sprite_pri_usage&=~sftbit;
+							if(state->m_f3_alpha_level_3as==0 && state->m_f3_alpha_level_3ad==255) state->m_sprite_pri_usage&=~sftbit;
 							else
 							{
-								state->dpix_sp[sftbit]=state->dpix_n[3];
+								state->m_dpix_sp[sftbit]=state->m_dpix_n[3];
 								sprite_alpha_check|=sftbit;
 								sprite_alpha_all_2a=0;
 							}
 						}
 						else
 						{
-							if(state->f3_alpha_level_3bs==0 && state->f3_alpha_level_3bd==255) state->sprite_pri_usage&=~sftbit;
+							if(state->m_f3_alpha_level_3bs==0 && state->m_f3_alpha_level_3bd==255) state->m_sprite_pri_usage&=~sftbit;
 							else
 							{
-								state->dpix_sp[sftbit]=state->dpix_n[5];
+								state->m_dpix_sp[sftbit]=state->m_dpix_n[5];
 								sprite_alpha_check|=sftbit;
 								sprite_alpha_all_2a=0;
 							}
@@ -2321,45 +2321,45 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 				{
 					if(alpha_type==1)
 					{
-						/* if (state->f3_alpha_level_2as==0   && state->f3_alpha_level_2ad==255)
+						/* if (state->m_f3_alpha_level_2as==0   && state->m_f3_alpha_level_2ad==255)
                          *     alpha_mode[i]=3; alpha_mode_flag[i] |= 0x80;}
                          * will display continue screen in gseeker (mt 00026) */
-						if     (state->f3_alpha_level_2as==0   && state->f3_alpha_level_2ad==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_2as==255 && state->f3_alpha_level_2ad==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_2as==0   && state->m_f3_alpha_level_2ad==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_2as==255 && state->m_f3_alpha_level_2ad==0  ) alpha_mode[i]=1;
 					}
 					else if(alpha_type==2)
 					{
-						if     (state->f3_alpha_level_2bs==0   && state->f3_alpha_level_2bd==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_2as==255 && state->f3_alpha_level_2ad==0 &&
-								state->f3_alpha_level_2bs==255 && state->f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_2bs==0   && state->m_f3_alpha_level_2bd==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_2as==255 && state->m_f3_alpha_level_2ad==0 &&
+								state->m_f3_alpha_level_2bs==255 && state->m_f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
 					}
 					else if(alpha_type==3)
 					{
-						if     (state->f3_alpha_level_2as==0   && state->f3_alpha_level_2ad==255 &&
-								state->f3_alpha_level_2bs==0   && state->f3_alpha_level_2bd==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_2as==255 && state->f3_alpha_level_2ad==0   &&
-								state->f3_alpha_level_2bs==255 && state->f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_2as==0   && state->m_f3_alpha_level_2ad==255 &&
+								state->m_f3_alpha_level_2bs==0   && state->m_f3_alpha_level_2bd==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_2as==255 && state->m_f3_alpha_level_2ad==0   &&
+								state->m_f3_alpha_level_2bs==255 && state->m_f3_alpha_level_2bd==0  ) alpha_mode[i]=1;
 					}
 				}
 				else if(alpha_mode[i]==3)
 				{
 					if(alpha_type==1)
 					{
-						if     (state->f3_alpha_level_3as==0   && state->f3_alpha_level_3ad==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_3as==255 && state->f3_alpha_level_3ad==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_3as==0   && state->m_f3_alpha_level_3ad==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_3as==255 && state->m_f3_alpha_level_3ad==0  ) alpha_mode[i]=1;
 					}
 					else if(alpha_type==2)
 					{
-						if     (state->f3_alpha_level_3bs==0   && state->f3_alpha_level_3bd==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_3as==255 && state->f3_alpha_level_3ad==0 &&
-								state->f3_alpha_level_3bs==255 && state->f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_3bs==0   && state->m_f3_alpha_level_3bd==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_3as==255 && state->m_f3_alpha_level_3ad==0 &&
+								state->m_f3_alpha_level_3bs==255 && state->m_f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
 					}
 					else if(alpha_type==3)
 					{
-						if     (state->f3_alpha_level_3as==0   && state->f3_alpha_level_3ad==255 &&
-								state->f3_alpha_level_3bs==0   && state->f3_alpha_level_3bd==255) alpha_mode[i]=0;
-						else if(state->f3_alpha_level_3as==255 && state->f3_alpha_level_3ad==0   &&
-								state->f3_alpha_level_3bs==255 && state->f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
+						if     (state->m_f3_alpha_level_3as==0   && state->m_f3_alpha_level_3ad==255 &&
+								state->m_f3_alpha_level_3bs==0   && state->m_f3_alpha_level_3bd==255) alpha_mode[i]=0;
+						else if(state->m_f3_alpha_level_3as==255 && state->m_f3_alpha_level_3ad==0   &&
+								state->m_f3_alpha_level_3bs==255 && state->m_f3_alpha_level_3bd==0  ) alpha_mode[i]=1;
 					}
 				}
 			}
@@ -2372,9 +2372,9 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 					sprite_alpha_all_2a						)
 			{
 				int alpha_type = (alpha_mode_flag[0] | alpha_mode_flag[1] | alpha_mode_flag[2] | alpha_mode_flag[3])&0x30;
-				if(		(alpha_type==0x10 && state->f3_alpha_level_2as==255) ||
-						(alpha_type==0x20 && state->f3_alpha_level_2as==255 && state->f3_alpha_level_2bs==255) ||
-						(alpha_type==0x30 && state->f3_alpha_level_2as==255 && state->f3_alpha_level_2bs==255)	)
+				if(		(alpha_type==0x10 && state->m_f3_alpha_level_2as==255) ||
+						(alpha_type==0x20 && state->m_f3_alpha_level_2as==255 && state->m_f3_alpha_level_2bs==255) ||
+						(alpha_type==0x30 && state->m_f3_alpha_level_2as==255 && state->m_f3_alpha_level_2bs==255)	)
 				{
 					if(alpha_mode[0]>1) alpha_mode[0]=1;
 					if(alpha_mode[1]>1) alpha_mode[1]=1;
@@ -2382,20 +2382,20 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 					if(alpha_mode[3]>1) alpha_mode[3]=1;
 					if(alpha_mode[4]>1) alpha_mode[4]=1;
 					sprite_alpha_check=0;
-					state->dpix_sp[1]=0;
-					state->dpix_sp[2]=0;
-					state->dpix_sp[4]=0;
-					state->dpix_sp[8]=0;
+					state->m_dpix_sp[1]=0;
+					state->m_dpix_sp[2]=0;
+					state->m_dpix_sp[4]=0;
+					state->m_dpix_sp[8]=0;
 				}
 			}
 		}
 		else
 		{
 			sprite_alpha_check=0;
-			state->dpix_sp[1]=0;
-			state->dpix_sp[2]=0;
-			state->dpix_sp[4]=0;
-			state->dpix_sp[8]=0;
+			state->m_dpix_sp[1]=0;
+			state->m_dpix_sp[2]=0;
+			state->m_dpix_sp[4]=0;
+			state->m_dpix_sp[8]=0;
 		}
 
 
@@ -2466,7 +2466,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 			for(i=0;i<4;i++)	/* i = sprite priority offset */
 			{
 				int sp,sflg=1<<i;
-				if(!(state->sprite_pri_usage & sflg)) continue;
+				if(!(state->m_sprite_pri_usage & sflg)) continue;
 				sp=pri_sp[i];
 
 				/*
@@ -2476,8 +2476,8 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
                         DARIUSG (ZONE V' BOSS) ---> playfield
                 */
 
-				if (state->f3_game == BUBSYMPH ) sp++;		//BUBSYMPH (title)
-				if (state->f3_game == GSEEKER ) sp++;		//GSEEKER (plane leaving hangar)
+				if (state->m_f3_game == BUBSYMPH ) sp++;		//BUBSYMPH (title)
+				if (state->m_f3_game == GSEEKER ) sp++;		//GSEEKER (plane leaving hangar)
 
 					 if(		  sp>l0) sprite[0]|=sflg;
 				else if(sp<=l0 && sp>l1) sprite[1]|=sflg;
@@ -2502,13 +2502,13 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 			if(alpha_mode[pos]>1)
 			{
 				int alpha_type=(((alpha_mode_flag[pos]>>4)&3)-1)*2;
-				state->dpix_lp[i]=state->dpix_n[alpha_mode[pos]+alpha_type];
+				state->m_dpix_lp[i]=state->m_dpix_n[alpha_mode[pos]+alpha_type];
 				alpha=1;
 			}
 			else
 			{
-				if(alpha) state->dpix_lp[i]=state->dpix_n[1];
-				else	  state->dpix_lp[i]=state->dpix_n[0];
+				if(alpha) state->m_dpix_lp[i]=state->m_dpix_n[1];
+				else	  state->m_dpix_lp[i]=state->m_dpix_n[0];
 			}
 		}
 		if(sprite[5]&sprite_alpha_check) alpha=1;
@@ -2522,7 +2522,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 /******************************************************************************/
 
 #define PSET_T					\
-	c = *source & state->sprite_pen_mask;	\
+	c = *source & state->m_sprite_pen_mask;	\
 	if(c)						\
 	{							\
 		p=*pri;					\
@@ -2537,7 +2537,7 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 	p=*pri;						\
 	if(!p || p==0xff)			\
 	{							\
-		*dest = pal[*source & state->sprite_pen_mask];	\
+		*dest = pal[*source & state->m_sprite_pen_mask];	\
 		*pri = pri_dst;			\
 	}
 
@@ -2644,10 +2644,10 @@ INLINE void f3_drawgfx(
 //              if (dest_bmp->bpp == 32)
 				{
 					int y=ey-sy;
-					int x=(ex-sx-1)|(state->tile_opaque_sp[code % gfx->total_elements]<<4);
+					int x=(ex-sx-1)|(state->m_tile_opaque_sp[code % gfx->total_elements]<<4);
 					const UINT8 *source0 = code_base + y_index * 16 + x_index_base;
 					UINT32 *dest0 = BITMAP_ADDR32(dest_bmp, sy, sx);
-					UINT8 *pri0 = BITMAP_ADDR8(state->pri_alp_bitmap, sy, sx);
+					UINT8 *pri0 = BITMAP_ADDR8(state->m_pri_alp_bitmap, sy, sx);
 					int yadv = dest_bmp->rowpixels;
 					dy=dy*16;
 					while(1)
@@ -2813,12 +2813,12 @@ INLINE void f3_drawgfxzoom(
 					{
 						const UINT8 *source = code_base + (y_index>>16) * 16;
 						UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-						UINT8 *pri = BITMAP_ADDR8(state->pri_alp_bitmap, y, 0);
+						UINT8 *pri = BITMAP_ADDR8(state->m_pri_alp_bitmap, y, 0);
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16] & state->sprite_pen_mask;
+							int c = source[x_index>>16] & state->m_sprite_pen_mask;
 							if(c)
 							{
 								UINT8 p=pri[x];
@@ -2863,7 +2863,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 
 	int x_addition_left = 8, y_addition_left = 8;
 
-	struct tempsprite *sprite_ptr = state->spritelist;
+	struct tempsprite *sprite_ptr = state->m_spritelist;
 
 	int total_sprites=0;
 
@@ -2890,15 +2890,15 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 		/* Check if special command bit is set */
 		if (spriteram32_ptr[current_offs+1] & 0x8000) {
 			UINT32 cntrl=(spriteram32_ptr[current_offs+2])&0xffff;
-			state->flipscreen=cntrl&0x2000;
+			state->m_flipscreen=cntrl&0x2000;
 
 			/*  cntrl&0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
                 cntrl&0x0010 = ???
                 cntrl&0x0020 = ???
             */
 
-			state->sprite_extra_planes = (cntrl & 0x0300) >> 8;	// 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
-			state->sprite_pen_mask = (state->sprite_extra_planes << 4) | 0x0f;
+			state->m_sprite_extra_planes = (cntrl & 0x0300) >> 8;	// 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+			state->m_sprite_pen_mask = (state->m_sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
 			if (cntrl&1) {
@@ -2939,7 +2939,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 /* These games either don't set the XY control bits properly (68020 bug?), or
     have some different mode from the others */
 #ifdef DARIUSG_KLUDGE
-		if (state->f3_game==DARIUSG || state->f3_game==GEKIRIDO || state->f3_game==CLEOPATR || state->f3_game==RECALH)
+		if (state->m_f3_game==DARIUSG || state->m_f3_game==GEKIRIDO || state->m_f3_game==CLEOPATR || state->m_f3_game==RECALH)
 			multi=spritecont&0xf0;
 #endif
 
@@ -2950,7 +2950,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 			else color=(spriteram32_ptr[current_offs+2]>>16)&0xff;
 
 #ifdef DARIUSG_KLUDGE
-			if (state->f3_game==DARIUSG || state->f3_game==GEKIRIDO || state->f3_game==CLEOPATR || state->f3_game==RECALH) {
+			if (state->m_f3_game==DARIUSG || state->m_f3_game==GEKIRIDO || state->m_f3_game==CLEOPATR || state->m_f3_game==RECALH) {
 				/* Adjust X Position */
 				if ((spritecont & 0x40) == 0) {
 					if (spritecont & 0x4) {
@@ -3078,7 +3078,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 		if (!sprite) continue;
 		if (!x_addition || !y_addition) continue;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			int tx,ty;
 
@@ -3109,7 +3109,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 		sprite_ptr++;
 		total_sprites++;
 	}
-	state->sprite_end = sprite_ptr;
+	state->m_sprite_end = sprite_ptr;
 }
 #undef CALC_ZOOM
 
@@ -3120,25 +3120,25 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	const struct tempsprite *sprite_ptr;
 	const gfx_element *sprite_gfx = machine.gfx[2];
 
-	sprite_ptr = state->sprite_end;
-	state->sprite_pri_usage=0;
+	sprite_ptr = state->m_sprite_end;
+	state->m_sprite_pri_usage=0;
 
 	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
 	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
 
-	while (sprite_ptr != state->spritelist)
+	while (sprite_ptr != state->m_spritelist)
 	{
 		int pri;
 		sprite_ptr--;
 
 		pri=sprite_ptr->pri;
-		state->sprite_pri_usage|=1<<pri;
+		state->m_sprite_pri_usage|=1<<pri;
 
 		if(sprite_ptr->zoomx==16 && sprite_ptr->zoomy==16)
 			f3_drawgfx(
 					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & (~state->sprite_extra_planes),
+					sprite_ptr->color & (~state->m_sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					pri);
@@ -3146,7 +3146,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			f3_drawgfxzoom(
 					bitmap,cliprect,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & (~state->sprite_extra_planes),
+					sprite_ptr->color & (~state->m_sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					sprite_ptr->zoomx,sprite_ptr->zoomy,
@@ -3161,27 +3161,27 @@ SCREEN_UPDATE( f3 )
 	taito_f3_state *state = screen->machine().driver_data<taito_f3_state>();
 	UINT32 sy_fix[5],sx_fix[5];
 
-	state->f3_skip_this_frame=0;
-	tilemap_set_flip_all(screen->machine(),state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->m_f3_skip_this_frame=0;
+	tilemap_set_flip_all(screen->machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
-	sy_fix[0]=((state->f3_control_0[2]&0xffff0000)>> 7) + (1<<16);
-	sy_fix[1]=((state->f3_control_0[2]&0x0000ffff)<< 9) + (1<<16);
-	sy_fix[2]=((state->f3_control_0[3]&0xffff0000)>> 7) + (1<<16);
-	sy_fix[3]=((state->f3_control_0[3]&0x0000ffff)<< 9) + (1<<16);
-	sx_fix[0]=((state->f3_control_0[0]&0xffc00000)>> 6) - (6<<16);
-	sx_fix[1]=((state->f3_control_0[0]&0x0000ffc0)<<10) - (10<<16);
-	sx_fix[2]=((state->f3_control_0[1]&0xffc00000)>> 6) - (14<<16);
-	sx_fix[3]=((state->f3_control_0[1]&0x0000ffc0)<<10) - (18<<16);
-	sx_fix[4]=-(state->f3_control_1[2]>>16)+41;
-	sy_fix[4]=-(state->f3_control_1[2]&0x1ff);
+	sy_fix[0]=((state->m_f3_control_0[2]&0xffff0000)>> 7) + (1<<16);
+	sy_fix[1]=((state->m_f3_control_0[2]&0x0000ffff)<< 9) + (1<<16);
+	sy_fix[2]=((state->m_f3_control_0[3]&0xffff0000)>> 7) + (1<<16);
+	sy_fix[3]=((state->m_f3_control_0[3]&0x0000ffff)<< 9) + (1<<16);
+	sx_fix[0]=((state->m_f3_control_0[0]&0xffc00000)>> 6) - (6<<16);
+	sx_fix[1]=((state->m_f3_control_0[0]&0x0000ffc0)<<10) - (10<<16);
+	sx_fix[2]=((state->m_f3_control_0[1]&0xffc00000)>> 6) - (14<<16);
+	sx_fix[3]=((state->m_f3_control_0[1]&0x0000ffc0)<<10) - (18<<16);
+	sx_fix[4]=-(state->m_f3_control_1[2]>>16)+41;
+	sy_fix[4]=-(state->m_f3_control_1[2]&0x1ff);
 
-	sx_fix[0]-=((state->f3_control_0[0]&0x003f0000)>> 6)+0x0400-0x10000;
-	sx_fix[1]-=((state->f3_control_0[0]&0x0000003f)<<10)+0x0400-0x10000;
-	sx_fix[2]-=((state->f3_control_0[1]&0x003f0000)>> 6)+0x0400-0x10000;
-	sx_fix[3]-=((state->f3_control_0[1]&0x0000003f)<<10)+0x0400-0x10000;
+	sx_fix[0]-=((state->m_f3_control_0[0]&0x003f0000)>> 6)+0x0400-0x10000;
+	sx_fix[1]-=((state->m_f3_control_0[0]&0x0000003f)<<10)+0x0400-0x10000;
+	sx_fix[2]-=((state->m_f3_control_0[1]&0x003f0000)>> 6)+0x0400-0x10000;
+	sx_fix[3]-=((state->m_f3_control_0[1]&0x0000003f)<<10)+0x0400-0x10000;
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 	{
 		sy_fix[0]= 0x3000000-sy_fix[0];
 		sy_fix[1]= 0x3000000-sy_fix[1];
@@ -3195,11 +3195,11 @@ SCREEN_UPDATE( f3 )
 		sy_fix[4]=-sy_fix[4];
 	}
 
-	bitmap_fill(state->pri_alp_bitmap,cliprect,0);
+	bitmap_fill(state->m_pri_alp_bitmap,cliprect,0);
 
 	/* sprites */
-	if (state->sprite_lag==0)
-		get_sprite_info(screen->machine(), state->spriteram);
+	if (state->m_sprite_lag==0)
+		get_sprite_info(screen->machine(), state->m_spriteram);
 
 	/* Update sprite buffer */
 	draw_sprites(screen->machine(), bitmap,cliprect);
@@ -3208,11 +3208,11 @@ SCREEN_UPDATE( f3 )
 	get_spritealphaclip_info(state);
 
 	/* Parse playfield effects */
-	get_line_ram_info(screen->machine(), state->pf1_tilemap,sx_fix[0],sy_fix[0],0,state->f3_pf_data_1);
-	get_line_ram_info(screen->machine(), state->pf2_tilemap,sx_fix[1],sy_fix[1],1,state->f3_pf_data_2);
-	get_line_ram_info(screen->machine(), state->pf3_tilemap,sx_fix[2],sy_fix[2],2,state->f3_pf_data_3);
-	get_line_ram_info(screen->machine(), state->pf4_tilemap,sx_fix[3],sy_fix[3],3,state->f3_pf_data_4);
-	get_vram_info(screen->machine(), state->vram_layer,state->pixel_layer,sx_fix[4],sy_fix[4]);
+	get_line_ram_info(screen->machine(), state->m_pf1_tilemap,sx_fix[0],sy_fix[0],0,state->m_f3_pf_data_1);
+	get_line_ram_info(screen->machine(), state->m_pf2_tilemap,sx_fix[1],sy_fix[1],1,state->m_f3_pf_data_2);
+	get_line_ram_info(screen->machine(), state->m_pf3_tilemap,sx_fix[2],sy_fix[2],2,state->m_f3_pf_data_3);
+	get_line_ram_info(screen->machine(), state->m_pf4_tilemap,sx_fix[3],sy_fix[3],3,state->m_f3_pf_data_4);
+	get_vram_info(screen->machine(), state->m_vram_layer,state->m_pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
 	scanline_draw(screen->machine(), bitmap,cliprect);

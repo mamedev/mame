@@ -81,7 +81,7 @@ static WRITE32_HANDLER( gunbustr_palette_w )
 static CUSTOM_INPUT( coin_word_r )
 {
 	gunbustr_state *state = field->port->machine().driver_data<gunbustr_state>();
-	return state->coin_word;
+	return state->m_coin_word;
 }
 
 static WRITE32_HANDLER( gunbustr_input_w )
@@ -91,9 +91,9 @@ static WRITE32_HANDLER( gunbustr_input_w )
 #if 0
 {
 char t[64];
-COMBINE_DATA(&state->mem[offset]);
+COMBINE_DATA(&state->m_mem[offset]);
 
-sprintf(t,"%08x %08x",state->mem[0],state->mem[1]);
+sprintf(t,"%08x %08x",state->m_mem[0],state->m_mem[1]);
 popmessage(t);
 }
 #endif
@@ -129,7 +129,7 @@ popmessage(t);
 				coin_lockout_w(space->machine(), 1, data & 0x02000000);
 				coin_counter_w(space->machine(), 0, data & 0x04000000);
 				coin_counter_w(space->machine(), 1, data & 0x04000000);
-				state->coin_word = (data >> 16) &0xffff;
+				state->m_coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
 		}
@@ -193,8 +193,8 @@ static WRITE32_HANDLER( gunbustr_gun_w )
 
 static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(gunbustr_state, ram)										/* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_MEMBER(gunbustr_state, spriteram, spriteram_size)				/* Sprite ram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(gunbustr_state, m_ram)										/* main CPUA ram */
+	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_MEMBER(gunbustr_state, m_spriteram, m_spriteram_size)				/* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
 	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("f3_shared")										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
@@ -408,10 +408,10 @@ ROM_END
 static READ32_HANDLER( main_cycle_r )
 {
 	gunbustr_state *state = space->machine().driver_data<gunbustr_state>();
-	if (cpu_get_pc(&space->device())==0x55a && (state->ram[0x3acc/4]&0xff000000)==0)
+	if (cpu_get_pc(&space->device())==0x55a && (state->m_ram[0x3acc/4]&0xff000000)==0)
 		device_spin_until_interrupt(&space->device());
 
-	return state->ram[0x3acc/4];
+	return state->m_ram[0x3acc/4];
 }
 
 static DRIVER_INIT( gunbustr )

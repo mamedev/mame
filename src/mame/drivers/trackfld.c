@@ -238,15 +238,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
 	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
 	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_spriteram2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll)
 	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -267,15 +267,15 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
 	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_spriteram2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll)
 	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -293,16 +293,16 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9281, 0x9281) AM_READ_PORT("IN0")
 	AM_RANGE(0x9282, 0x9282) AM_READ_PORT("IN1")
 	AM_RANGE(0x9283, 0x9283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_spriteram2)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll)
 	AM_RANGE(0x9860, 0x9bff) AM_RAM
-	AM_RANGE(0x9c00, 0x9c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x9c00, 0x9c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x9c60, 0x9fff) AM_RAM
 	AM_RANGE(0xa800, 0xabff) AM_RAM
 	AM_RANGE(0xac00, 0xafff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, m_colorram)
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
@@ -326,16 +326,16 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
 //  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
 	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_spriteram2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll)
 	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -352,16 +352,16 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
 	AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1")
 	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_spriteram2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll)
 	AM_RANGE(0x1860, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, m_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, m_colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -866,20 +866,20 @@ static MACHINE_START( trackfld )
 	trackfld_state *state = machine.driver_data<trackfld_state>();
 
 	/* video */
-	state->save_item(NAME(state->bg_bank));
-	state->save_item(NAME(state->sprite_bank1));
-	state->save_item(NAME(state->sprite_bank2));
-	state->save_item(NAME(state->old_gfx_bank));
+	state->save_item(NAME(state->m_bg_bank));
+	state->save_item(NAME(state->m_sprite_bank1));
+	state->save_item(NAME(state->m_sprite_bank2));
+	state->save_item(NAME(state->m_old_gfx_bank));
 }
 
 static MACHINE_RESET( trackfld )
 {
 	trackfld_state *state = machine.driver_data<trackfld_state>();
 
-	state->bg_bank = 0;
-	state->sprite_bank1 = 0;
-	state->sprite_bank2 = 0;
-	state->old_gfx_bank = 0;
+	state->m_bg_bank = 0;
+	state->m_sprite_bank1 = 0;
+	state->m_sprite_bank2 = 0;
+	state->m_old_gfx_bank = 0;
 }
 
 static MACHINE_CONFIG_START( trackfld, trackfld_state )

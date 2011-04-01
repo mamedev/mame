@@ -97,12 +97,12 @@ static TILEMAP_MAPPER( tilemap_scan )
 static TILE_GET_INFO( get_tile_info )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	UINT8 attr = state->videoram[tile_index + 0x400];
+	UINT8 attr = state->m_videoram[tile_index + 0x400];
 	tileinfo->category = (attr & 0x40) >> 6;
 	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
-			state->videoram[tile_index] + ((attr & 0x80) << 1),
+			state->m_videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
 }
@@ -128,7 +128,7 @@ static TILE_GET_INFO( get_tile_info )
 static void starfield_init(running_machine &machine)
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	struct star *stars = state->stars;
+	struct star *stars = state->m_stars;
 	int generator = 0;
 	int x,y;
 	int set = 0;
@@ -136,7 +136,7 @@ static void starfield_init(running_machine &machine)
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->total_stars = 0;
+	state->m_total_stars = 0;
 
 	/* precalculate the star background */
 	/* this comes from the Galaxian hardware, Gaplus is probably different */
@@ -155,16 +155,16 @@ static void starfield_init(running_machine &machine)
 				int color;
 
 				color = (~(generator >> 8)) & 0x3f;
-				if ( color && state->total_stars < MAX_STARS ) {
-					stars[state->total_stars].x = x;
-					stars[state->total_stars].y = y;
-					stars[state->total_stars].col = color;
-					stars[state->total_stars].set = set++;
+				if ( color && state->m_total_stars < MAX_STARS ) {
+					stars[state->m_total_stars].x = x;
+					stars[state->m_total_stars].y = y;
+					stars[state->m_total_stars].col = color;
+					stars[state->m_total_stars].set = set++;
 
 					if ( set == 3 )
 						set = 0;
 
-					state->total_stars++;
+					state->m_total_stars++;
 				}
 			}
 		}
@@ -182,9 +182,9 @@ static void starfield_init(running_machine &machine)
 VIDEO_START( gaplus )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->bg_tilemap, machine.gfx[0], 0xff);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[0], 0xff);
 
 	starfield_init(machine);
 }
@@ -200,21 +200,21 @@ VIDEO_START( gaplus )
 READ8_HANDLER( gaplus_videoram_r )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	return state->videoram[offset];
+	return state->m_videoram[offset];
 }
 
 WRITE8_HANDLER( gaplus_videoram_w )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gaplus_starfield_control_w )
 {
 	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	offset &= 3;
-	state->starfield_control[offset] = data;
+	state->m_starfield_control[offset] = data;
 }
 
 
@@ -228,18 +228,18 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 static void starfield_render(running_machine &machine, bitmap_t *bitmap)
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	struct star *stars = state->stars;
+	struct star *stars = state->m_stars;
 	int i;
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
 	/* check if we're running */
-	if ( ( state->starfield_control[0] & 1 ) == 0 )
+	if ( ( state->m_starfield_control[0] & 1 ) == 0 )
 		return;
 
 	/* draw the starfields */
-	for ( i = 0; i < state->total_stars; i++ )
+	for ( i = 0; i < state->m_total_stars; i++ )
 	{
 		int x, y;
 
@@ -256,7 +256,7 @@ static void starfield_render(running_machine &machine, bitmap_t *bitmap)
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	UINT8 *spriteram = state->spriteram + 0x780;
+	UINT8 *spriteram = state->m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
@@ -311,20 +311,20 @@ SCREEN_UPDATE( gaplus )
 {
 	gaplus_state *state = screen->machine().driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen->machine(), state->spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen->machine(), state->m_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap_fill(bitmap, cliprect, 0);
 
 	starfield_render(screen->machine(), bitmap);
 
 	/* draw the low priority characters */
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,1,0);
 	return 0;
 }
 
@@ -332,19 +332,19 @@ SCREEN_UPDATE( gaplus )
 SCREEN_EOF( gaplus )	/* update starfields */
 {
 	gaplus_state *state = machine.driver_data<gaplus_state>();
-	struct star *stars = state->stars;
+	struct star *stars = state->m_stars;
 	int i;
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
 	/* check if we're running */
-	if ( ( state->starfield_control[0] & 1 ) == 0 )
+	if ( ( state->m_starfield_control[0] & 1 ) == 0 )
 		return;
 
 	/* update the starfields */
-	for ( i = 0; i < state->total_stars; i++ ) {
-		switch( state->starfield_control[stars[i].set + 1] ) {
+	for ( i = 0; i < state->m_total_stars; i++ ) {
+		switch( state->m_starfield_control[stars[i].set + 1] ) {
 			case 0x87:
 				/* stand still */
 			break;

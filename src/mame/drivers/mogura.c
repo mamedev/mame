@@ -12,16 +12,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *   tileram;
-	UINT8 *   gfxram;
+	UINT8 *   m_tileram;
+	UINT8 *   m_gfxram;
 
 	/* video-related */
-	tilemap_t *tilemap;
+	tilemap_t *m_tilemap;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *dac1;
-	device_t *dac2;
+	device_t *m_maincpu;
+	device_t *m_dac1;
+	device_t *m_dac2;
 };
 
 
@@ -60,8 +60,8 @@ static PALETTE_INIT( mogura )
 static TILE_GET_INFO( get_mogura_tile_info )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	int code = state->tileram[tile_index];
-	int attr = state->tileram[tile_index + 0x800];
+	int code = state->m_tileram[tile_index];
+	int attr = state->m_tileram[tile_index + 0x800];
 
 	SET_TILE_INFO(
 			0,
@@ -74,8 +74,8 @@ static TILE_GET_INFO( get_mogura_tile_info )
 static VIDEO_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
-	gfx_element_set_source(machine.gfx[0], state->gfxram);
-	state->tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	gfx_element_set_source(machine.gfx[0], state->m_gfxram);
+	state->m_tilemap = tilemap_create(machine, get_mogura_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE( mogura )
@@ -89,15 +89,15 @@ static SCREEN_UPDATE( mogura )
 	clip.max_x = 256 - 1;
 	clip.min_y = visarea.min_y;
 	clip.max_y = visarea.max_y;
-	tilemap_set_scrollx(state->tilemap, 0, 256);
-	tilemap_draw(bitmap, &clip, state->tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_tilemap, 0, 256);
+	tilemap_draw(bitmap, &clip, state->m_tilemap, 0, 0);
 
 	clip.min_x = 256;
 	clip.max_x = 512 - 1;
 	clip.min_y = visarea.min_y;
 	clip.max_y = visarea.max_y;
-	tilemap_set_scrollx(state->tilemap, 0, -128);
-	tilemap_draw(bitmap, &clip, state->tilemap, 0, 0);
+	tilemap_set_scrollx(state->m_tilemap, 0, -128);
+	tilemap_draw(bitmap, &clip, state->m_tilemap, 0, 0);
 
 	return 0;
 }
@@ -105,22 +105,22 @@ static SCREEN_UPDATE( mogura )
 static WRITE8_HANDLER( mogura_tileram_w )
 {
 	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->tileram[offset] = data;
-	tilemap_mark_tile_dirty(state->tilemap, offset & 0x7ff);
+	state->m_tileram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tilemap, offset & 0x7ff);
 }
 
 static WRITE8_HANDLER(mogura_dac_w)
 {
 	mogura_state *state = space->machine().driver_data<mogura_state>();
-	dac_data_w(state->dac1, data & 0xf0);	/* left */
-	dac_data_w(state->dac2, (data & 0x0f) << 4);	/* right */
+	dac_data_w(state->m_dac1, data & 0xf0);	/* left */
+	dac_data_w(state->m_dac2, (data & 0x0f) << 4);	/* right */
 }
 
 
 static WRITE8_HANDLER ( mogura_gfxram_w )
 {
 	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->gfxram[offset] = data ;
+	state->m_gfxram[offset] = data ;
 
 	gfx_element_mark_dirty(space->machine().gfx[0], offset / 16);
 }
@@ -129,8 +129,8 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE_MEMBER(mogura_state, gfxram) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE_MEMBER(mogura_state, tileram) // tilemap
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE_MEMBER(mogura_state, m_gfxram) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE_MEMBER(mogura_state, m_tileram) // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8 )
@@ -194,9 +194,9 @@ static MACHINE_START( mogura )
 {
 	mogura_state *state = machine.driver_data<mogura_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->dac1 = machine.device("dac1");
-	state->dac2 = machine.device("dac2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_dac1 = machine.device("dac1");
+	state->m_dac2 = machine.device("dac2");
 }
 
 static MACHINE_CONFIG_START( mogura, mogura_state )

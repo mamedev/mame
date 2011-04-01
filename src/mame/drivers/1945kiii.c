@@ -52,50 +52,50 @@ class k3_state : public driver_device
 public:
 	k3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki1(*this, "oki1"),
-		  oki2(*this, "oki2") { }
+		  m_oki1(*this, "oki1"),
+		  m_oki2(*this, "oki2") { }
 
 	/* memory pointers */
-	UINT16 *  spriteram_1;
-	UINT16 *  spriteram_2;
-	UINT16 *  bgram;
-//  UINT16 *  paletteram16; // currently this uses generic palette handling
+	UINT16 *  m_spriteram_1;
+	UINT16 *  m_spriteram_2;
+	UINT16 *  m_bgram;
+//  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* devices */
-	required_device<okim6295_device> oki1;
-	required_device<okim6295_device> oki2;
+	required_device<okim6295_device> m_oki1;
+	required_device<okim6295_device> m_oki2;
 };
 
 
 static WRITE16_HANDLER( k3_bgram_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	COMBINE_DATA(&state->bgram[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	COMBINE_DATA(&state->m_bgram[offset]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	int tileno = state->bgram[tile_index];
+	int tileno = state->m_bgram[tile_index];
 	SET_TILE_INFO(1, tileno, 0, 0);
 }
 
 static VIDEO_START(k3)
 {
 	k3_state *state = machine.driver_data<k3_state>();
-	state->bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 64);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	k3_state *state = machine.driver_data<k3_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->spriteram_1;
-	UINT16 *source2 = state->spriteram_2;
+	UINT16 *source = state->m_spriteram_1;
+	UINT16 *source2 = state->m_spriteram_2;
 	UINT16 *finish = source + 0x1000 / 2;
 
 	while (source < finish)
@@ -119,7 +119,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 static SCREEN_UPDATE(k3)
 {
 	k3_state *state = screen->machine().driver_data<k3_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
@@ -128,20 +128,20 @@ static SCREEN_UPDATE(k3)
 static WRITE16_HANDLER( k3_scrollx_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_scrolly_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	tilemap_set_scrolly(state->bg_tilemap, 0, data);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_soundbanks_w )
 {
 	k3_state *state = space->machine().driver_data<k3_state>();
-	state->oki1->set_bank_base((data & 4) ? 0x40000 : 0);
-	state->oki2->set_bank_base((data & 2) ? 0x40000 : 0);
+	state->m_oki1->set_bank_base((data & 4) ? 0x40000 : 0);
+	state->m_oki2->set_bank_base((data & 2) ? 0x40000 : 0);
 }
 
 static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16 )
@@ -151,9 +151,9 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	// palette
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE_MEMBER(k3_state, spriteram_1)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE_MEMBER(k3_state, spriteram_2)
-	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE_MEMBER(k3_state, bgram)
+	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE_MEMBER(k3_state, m_spriteram_1)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE_MEMBER(k3_state, m_spriteram_2)
+	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE_MEMBER(k3_state, m_bgram)
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)

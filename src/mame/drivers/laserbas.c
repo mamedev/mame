@@ -27,12 +27,12 @@ public:
 		: driver_device(machine, config) { }
 
 	/* misc */
-	int      count;
+	int      m_count;
 
 	/* video-related */
-	int      vrambank;
-	UINT8    vram1[0x8000];
-	UINT8    vram2[0x8000];
+	int      m_vrambank;
+	UINT8    m_vram1[0x8000];
+	UINT8    m_vram2[0x8000];
 };
 
 
@@ -40,8 +40,8 @@ static VIDEO_START(laserbas)
 {
 	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->save_item(NAME(state->vram1));
-	state->save_item(NAME(state->vram2));
+	state->save_item(NAME(state->m_vram1));
+	state->save_item(NAME(state->m_vram2));
 }
 
 static SCREEN_UPDATE(laserbas)
@@ -52,15 +52,15 @@ static SCREEN_UPDATE(laserbas)
 	for (y = 0; y < 256; y++)
 		for(x = 0; x < 128; x++)
 		{
-			if (state->vram2[y * 128 + x] & 0xf)
-				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->vram2[y * 128 + x] & 0xf) + 16;
+			if (state->m_vram2[y * 128 + x] & 0xf)
+				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram2[y * 128 + x] & 0xf) + 16;
 			else
-				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->vram1[y * 128 + x] & 0xf) + 16;
+				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->m_vram1[y * 128 + x] & 0xf) + 16;
 
-			if (state->vram2[y * 128 + x] >> 4)
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->vram2[y * 128 + x] >> 4) + 16;
+			if (state->m_vram2[y * 128 + x] >> 4)
+				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram2[y * 128 + x] >> 4) + 16;
 			else
-				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->vram1[y * 128 + x] >> 4) + 16;
+				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->m_vram1[y * 128 + x] >> 4) + 16;
 		}
 	return 0;
 }
@@ -69,28 +69,28 @@ static READ8_HANDLER(vram_r)
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if(!state->vrambank)
-		return state->vram1[offset];
+	if(!state->m_vrambank)
+		return state->m_vram1[offset];
 	else
-		return state->vram2[offset];
+		return state->m_vram2[offset];
 }
 
 static WRITE8_HANDLER(vram_w)
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if(!state->vrambank)
-		state->vram1[offset] = data;
+	if(!state->m_vrambank)
+		state->m_vram1[offset] = data;
 	else
-		state->vram2[offset] = data;
+		state->m_vram2[offset] = data;
 }
 
 static READ8_HANDLER( read_unk )
 {
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	state->count ^= 0x80;
-	return state->count | 0x7f;
+	state->m_count ^= 0x80;
+	return state->m_count | 0x7f;
 }
 
 static WRITE8_HANDLER(palette_w)
@@ -103,7 +103,7 @@ static WRITE8_HANDLER(vrambank_w)
 	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	if ((offset & 0xf1) == 0x10)
-		state->vrambank = data & 0x40;
+		state->m_vrambank = data & 0x40;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
@@ -156,16 +156,16 @@ static MACHINE_START( laserbas )
 {
 	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->save_item(NAME(state->vrambank));
-	state->save_item(NAME(state->count));
+	state->save_item(NAME(state->m_vrambank));
+	state->save_item(NAME(state->m_count));
 }
 
 static MACHINE_RESET( laserbas )
 {
 	laserbas_state *state = machine.driver_data<laserbas_state>();
 
-	state->vrambank = 0;
-	state->count = 0;
+	state->m_vrambank = 0;
+	state->m_count = 0;
 }
 
 static MACHINE_CONFIG_START( laserbas, laserbas_state )

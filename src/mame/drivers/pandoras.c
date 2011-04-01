@@ -39,7 +39,7 @@ static INTERRUPT_GEN( pandoras_master_interrupt )
 {
 	pandoras_state *state = device->machine().driver_data<pandoras_state>();
 
-	if (state->irq_enable_a)
+	if (state->m_irq_enable_a)
 		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -47,7 +47,7 @@ static INTERRUPT_GEN( pandoras_slave_interrupt )
 {
 	pandoras_state *state = device->machine().driver_data<pandoras_state>();
 
-	if (state->irq_enable_b)
+	if (state->m_irq_enable_b)
 		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -67,8 +67,8 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 	switch (offset)
 	{
 		case 0x00:	if (!data)
-					device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
-				state->irq_enable_a = data;
+					device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+				state->m_irq_enable_a = data;
 				break;
 		case 0x02:	coin_counter_w(space->machine(), 0,data & 0x01);
 				break;
@@ -77,10 +77,10 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 		case 0x05:	pandoras_flipscreen_w(space, 0, data);
 				break;
 		case 0x06:	if (!data)
-					device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
-				state->irq_enable_b = data;
+					device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+				state->m_irq_enable_b = data;
 				break;
-		case 0x07:	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		case 0x07:	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 
 		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(&space->device()), data, offset);
@@ -92,26 +92,26 @@ static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	if (!state->firq_old_data_a && data)
-		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	if (!state->m_firq_old_data_a && data)
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 
-	state->firq_old_data_a = data;
+	state->m_firq_old_data_a = data;
 }
 
 static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	if (!state->firq_old_data_b && data)
-		device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+	if (!state->m_firq_old_data_b && data)
+		device_set_input_line(state->m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 
-	state->firq_old_data_b = data;
+	state->m_firq_old_data_b = data;
 }
 
 static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
-	device_set_input_line(state->mcu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_mcu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
@@ -120,24 +120,24 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->mcu, 0, CLEAR_LINE);
+		device_set_input_line(state->m_mcu, 0, CLEAR_LINE);
 
 	/* bit 5 goes to 8910 port A */
-	state->i8039_status = (data & 0x20) >> 5;
+	state->m_i8039_status = (data & 0x20) >> 5;
 }
 
 static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 {
 	pandoras_state *state = space->machine().driver_data<pandoras_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 
 
 static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pandoras_state, spriteram)				/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("share2") AM_BASE_MEMBER(pandoras_state, colorram)	/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("share3") AM_BASE_MEMBER(pandoras_state, videoram)	/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pandoras_state, m_spriteram)				/* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("share2") AM_BASE_MEMBER(pandoras_state, m_colorram)	/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("share3") AM_BASE_MEMBER(pandoras_state, m_videoram)	/* Video RAM (shared with CPU B) */
 	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)									/* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
@@ -302,41 +302,41 @@ static MACHINE_START( pandoras )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->subcpu = machine.device<cpu_device>("sub");
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
-	state->mcu = machine.device<cpu_device>("mcu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_subcpu = machine.device<cpu_device>("sub");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_mcu = machine.device<cpu_device>("mcu");
 
-	state->save_item(NAME(state->firq_old_data_a));
-	state->save_item(NAME(state->firq_old_data_b));
-	state->save_item(NAME(state->irq_enable_a));
-	state->save_item(NAME(state->irq_enable_b));
-	state->save_item(NAME(state->i8039_status));
+	state->save_item(NAME(state->m_firq_old_data_a));
+	state->save_item(NAME(state->m_firq_old_data_b));
+	state->save_item(NAME(state->m_irq_enable_a));
+	state->save_item(NAME(state->m_irq_enable_b));
+	state->save_item(NAME(state->m_i8039_status));
 }
 
 static MACHINE_RESET( pandoras )
 {
 	pandoras_state *state = machine.driver_data<pandoras_state>();
 
-	state->firq_old_data_a = 0;
-	state->firq_old_data_b = 0;
-	state->irq_enable_a = 0;
-	state->irq_enable_b = 0;
-	state->i8039_status = 0;
+	state->m_firq_old_data_a = 0;
+	state->m_firq_old_data_b = 0;
+	state->m_irq_enable_a = 0;
+	state->m_irq_enable_b = 0;
+	state->m_i8039_status = 0;
 
-	state->flipscreen = 0;
+	state->m_flipscreen = 0;
 }
 
 static READ8_DEVICE_HANDLER( pandoras_portA_r )
 {
 	pandoras_state *state = device->machine().driver_data<pandoras_state>();
-	return state->i8039_status;
+	return state->m_i8039_status;
 }
 
 static READ8_DEVICE_HANDLER( pandoras_portB_r )
 {
 	pandoras_state *state = device->machine().driver_data<pandoras_state>();
-	return (state->audiocpu->total_cycles() / 512) & 0x0f;
+	return (state->m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
 static const ay8910_interface ay8910_config =

@@ -18,7 +18,7 @@ void rollerg_sprite_callback( running_machine &machine, int *code, int *color, i
 	if (input_code_pressed(machine, KEYCODE_R) && (*color & 0x10)) *color = rand();
 #endif
 	*priority_mask = (*color & 0x10) ? 0 : 0x02;
-	*color = state->sprite_colorbase + (*color & 0x0f);
+	*color = state->m_sprite_colorbase + (*color & 0x0f);
 }
 
 
@@ -33,7 +33,7 @@ void rollerg_zoom_callback( running_machine &machine, int *code, int *color, int
 	rollerg_state *state = machine.driver_data<rollerg_state>();
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
-	*color = state->zoom_colorbase + ((*color & 0x30) >> 4);
+	*color = state->m_zoom_colorbase + ((*color & 0x30) >> 4);
 }
 
 
@@ -47,8 +47,8 @@ void rollerg_zoom_callback( running_machine &machine, int *code, int *color, int
 VIDEO_START( rollerg )
 {
 	rollerg_state *state = machine.driver_data<rollerg_state>();
-	state->sprite_colorbase = 16;
-	state->zoom_colorbase = 0;
+	state->m_sprite_colorbase = 16;
+	state->m_zoom_colorbase = 0;
 }
 
 
@@ -66,7 +66,7 @@ SCREEN_UPDATE( rollerg )
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
-	k051316_zoom_draw(state->k051316, bitmap, cliprect, 0, 1);
-	k053245_sprites_draw(state->k053244, bitmap, cliprect);
+	k051316_zoom_draw(state->m_k051316, bitmap, cliprect, 0, 1);
+	k053245_sprites_draw(state->m_k053244, bitmap, cliprect);
 	return 0;
 }

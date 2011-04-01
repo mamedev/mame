@@ -70,7 +70,7 @@ static WRITE8_HANDLER( cop01_sound_command_w )
 {
 	cop01_state *state = space->machine().driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
@@ -79,15 +79,15 @@ static READ8_HANDLER( cop01_sound_command_r )
 	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
-	if ((state->audiocpu->total_cycles() / TIMER_RATE) & 1)
+	if ((state->m_audiocpu->total_cycles() / TIMER_RATE) & 1)
 	{
-		if (state->pulse == 0)
+		if (state->m_pulse == 0)
 			res |= 1;
 
-		state->pulse = 1;
+		state->m_pulse = 1;
 	}
 	else
-		state->pulse = 0;
+		state->m_pulse = 0;
 
 	return res;
 }
@@ -109,9 +109,9 @@ static CUSTOM_INPUT( mightguy_area_r )
 static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cop01_state, spriteram, spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, fgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, m_bgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cop01_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, m_fgvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
@@ -157,7 +157,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( kludge )
 {
 	cop01_state *state = space->machine().driver_data<cop01_state>();
-	return state->timer++;
+	return state->m_timer++;
 }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8 )
@@ -416,23 +416,23 @@ static MACHINE_START( cop01 )
 {
 	cop01_state *state = machine.driver_data<cop01_state>();
 
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->pulse));
-	state->save_item(NAME(state->timer));
-	state->save_item(NAME(state->vreg));
+	state->save_item(NAME(state->m_pulse));
+	state->save_item(NAME(state->m_timer));
+	state->save_item(NAME(state->m_vreg));
 }
 
 static MACHINE_RESET( cop01 )
 {
 	cop01_state *state = machine.driver_data<cop01_state>();
 
-	state->pulse = 0;
-	state->timer = 0;
-	state->vreg[0] = 0;
-	state->vreg[1] = 0;
-	state->vreg[2] = 0;
-	state->vreg[3] = 0;
+	state->m_pulse = 0;
+	state->m_timer = 0;
+	state->m_vreg[0] = 0;
+	state->m_vreg[1] = 0;
+	state->m_vreg[2] = 0;
+	state->m_vreg[3] = 0;
 }
 
 

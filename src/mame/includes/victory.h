@@ -35,25 +35,25 @@ public:
 	victory_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *charram;
-	UINT16 paletteram[0x40];
-	UINT8 *bgbitmap;
-	UINT8 *fgbitmap;
-	UINT8 *rram;
-	UINT8 *gram;
-	UINT8 *bram;
-	UINT8 vblank_irq;
-	UINT8 fgcoll;
-	UINT8 fgcollx;
-	UINT8 fgcolly;
-	UINT8 bgcoll;
-	UINT8 bgcollx;
-	UINT8 bgcolly;
-	UINT8 scrollx;
-	UINT8 scrolly;
-	UINT8 video_control;
-	struct micro_t micro;
+	UINT8 *m_videoram;
+	UINT8 *m_charram;
+	UINT16 m_paletteram[0x40];
+	UINT8 *m_bgbitmap;
+	UINT8 *m_fgbitmap;
+	UINT8 *m_rram;
+	UINT8 *m_gram;
+	UINT8 *m_bram;
+	UINT8 m_vblank_irq;
+	UINT8 m_fgcoll;
+	UINT8 m_fgcollx;
+	UINT8 m_fgcolly;
+	UINT8 m_bgcoll;
+	UINT8 m_bgcollx;
+	UINT8 m_bgcolly;
+	UINT8 m_scrollx;
+	UINT8 m_scrolly;
+	UINT8 m_video_control;
+	struct micro_t m_micro;
 };
 
 

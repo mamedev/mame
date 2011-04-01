@@ -96,12 +96,12 @@ public:
 	vcombat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* m68k_framebuffer[2];
-	UINT16* i860_framebuffer[2][2];
-	UINT16* framebuffer_ctrl;
-	UINT16* vid_0_shared_RAM;
-	UINT16* vid_1_shared_RAM;
-	int crtc_select;
+	UINT16* m_m68k_framebuffer[2];
+	UINT16* m_i860_framebuffer[2][2];
+	UINT16* m_framebuffer_ctrl;
+	UINT16* m_vid_0_shared_RAM;
+	UINT16* m_vid_1_shared_RAM;
+	int m_crtc_select;
 };
 
 
@@ -112,8 +112,8 @@ static SCREEN_UPDATE( vcombat )
 	const rgb_t *const pens = tlc34076_get_pens(screen->machine().device("tlc34076"));
 	device_t *aux = screen->machine().device("aux");
 
-	UINT16 *m68k_buf = state->m68k_framebuffer[(*state->framebuffer_ctrl & 0x20) ? 1 : 0];
-	UINT16 *i860_buf = state->i860_framebuffer[(screen == aux) ? 1 : 0][0];
+	UINT16 *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0];
+	UINT16 *i860_buf = state->m_i860_framebuffer[(screen == aux) ? 1 : 0][0];
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */
@@ -159,11 +159,11 @@ static SCREEN_UPDATE( vcombat )
 static WRITE16_HANDLER( main_video_write )
 {
 	vcombat_state *state = space->machine().driver_data<vcombat_state>();
-	int fb = (*state->framebuffer_ctrl & 0x20) ? 0 : 1;
-	UINT16 old_data = state->m68k_framebuffer[fb][offset];
+	int fb = (*state->m_framebuffer_ctrl & 0x20) ? 0 : 1;
+	UINT16 old_data = state->m_m68k_framebuffer[fb][offset];
 
 	/* Transparency mode? */
-	if (*state->framebuffer_ctrl & 0x40)
+	if (*state->m_framebuffer_ctrl & 0x40)
 	{
 		if (data == 0x0000)
 			return;
@@ -173,11 +173,11 @@ static WRITE16_HANDLER( main_video_write )
 		if ((data & 0xff00) == 0)
 			data = (data & 0x00ff) | (old_data & 0xff00);
 
-		COMBINE_DATA(&state->m68k_framebuffer[fb][offset]);
+		COMBINE_DATA(&state->m_m68k_framebuffer[fb][offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&state->m68k_framebuffer[fb][offset]);
+		COMBINE_DATA(&state->m_m68k_framebuffer[fb][offset]);
 	}
 }
 
@@ -253,7 +253,7 @@ static WRITE64_HANDLER( v0_fb_w )
 	vcombat_state *state = space->machine().driver_data<vcombat_state>();
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)(state->i860_framebuffer[0][0]);
+	char *p = (char *)(state->m_i860_framebuffer[0][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -277,7 +277,7 @@ static WRITE64_HANDLER( v1_fb_w )
 	vcombat_state *state = space->machine().driver_data<vcombat_state>();
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)(state->i860_framebuffer[1][0]);
+	char *p = (char *)(state->m_i860_framebuffer[1][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -302,12 +302,12 @@ static WRITE16_HANDLER( crtc_w )
 	if (crtc == NULL)
 		return;
 
-	if (state->crtc_select == 0)
+	if (state->m_crtc_select == 0)
 		mc6845_address_w(crtc, 0, data >> 8);
 	else
 		mc6845_register_w(crtc, 0, data >> 8);
 
-	state->crtc_select ^= 1;
+	state->m_crtc_select ^= 1;
 }
 
 static WRITE16_DEVICE_HANDLER( vcombat_dac_w )
@@ -321,12 +321,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE_MEMBER(vcombat_state, vid_0_shared_RAM) AM_SHARE("share2")	/* First i860 shared RAM */
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE_MEMBER(vcombat_state, m_vid_0_shared_RAM) AM_SHARE("share2")	/* First i860 shared RAM */
 	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE("share6")		/* M0->P0 i860 #1 com 1 */
 	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE("share7")		/* M0<-P0 i860 #1 com 2 */
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE(wiggle_i860p0_pins_w)	/* i860 #1 stop/start/reset */
 
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE_MEMBER(vcombat_state, vid_1_shared_RAM) AM_SHARE("share3")	/* Second i860 shared RAM */
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE_MEMBER(vcombat_state, m_vid_1_shared_RAM) AM_SHARE("share3")	/* Second i860 shared RAM */
 	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE("share8")		/* M0->P1 i860 #2 com 1 */
 	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE("share9")		/* M0<-P1 i860 #2 com 2 */
 	AM_RANGE(0x5c0000, 0x5c0003) AM_WRITE(wiggle_i860p1_pins_w)	/* i860 #2 stop/start/reset */
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x60001c, 0x60001d) AM_NOP
 
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(crtc_w)
-	AM_RANGE(0x600010, 0x600011) AM_RAM AM_BASE_MEMBER(vcombat_state, framebuffer_ctrl)
+	AM_RANGE(0x600010, 0x600011) AM_RAM AM_BASE_MEMBER(vcombat_state, m_framebuffer_ctrl)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)
@@ -390,7 +390,7 @@ static MACHINE_RESET( vcombat )
 	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 	i860_set_pin(machine.device("vid_1"), DEC_PIN_BUS_HOLD, 1);
 
-	state->crtc_select = 0;
+	state->m_crtc_select = 0;
 }
 
 static MACHINE_RESET( shadfgtr )
@@ -398,7 +398,7 @@ static MACHINE_RESET( shadfgtr )
 	vcombat_state *state = machine.driver_data<vcombat_state>();
 	i860_set_pin(machine.device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 
-	state->crtc_select = 0;
+	state->m_crtc_select = 0;
 }
 
 
@@ -407,7 +407,7 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_0_direct_handler )
 	vcombat_state *state = machine->driver_data<vcombat_state>();
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->vid_0_shared_RAM);
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_0_shared_RAM);
 		return ~0;
 	}
 	return address;
@@ -418,7 +418,7 @@ DIRECT_UPDATE_HANDLER( vcombat_vid_1_direct_handler )
 	vcombat_state *state = machine->driver_data<vcombat_state>();
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->vid_1_shared_RAM);
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, state->m_vid_1_shared_RAM);
 		return ~0;
 	}
 	return address;
@@ -438,16 +438,16 @@ static DRIVER_INIT( vcombat )
 	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_1_direct_handler, machine));
 
 	/* Allocate the 68000 framebuffers */
-	state->m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
 
 	/* First i860 */
-	state->i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
 
 	/* Second i860 */
-	state->i860_framebuffer[1][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->i860_framebuffer[1][1] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[1][0] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[1][1] = auto_alloc_array(machine, UINT16, 0x8000);
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
        I think what is happening here is that M0 snags the first time
@@ -469,14 +469,14 @@ static DRIVER_INIT( shadfgtr )
 {
 	vcombat_state *state = machine.driver_data<vcombat_state>();
 	/* Allocate th 68000 frame buffers */
-	state->m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_m68k_framebuffer[1] = auto_alloc_array(machine, UINT16, 0x8000);
 
 	/* Only one i860 */
-	state->i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
-	state->i860_framebuffer[1][0] = NULL;
-	state->i860_framebuffer[1][1] = NULL;
+	state->m_i860_framebuffer[0][0] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[0][1] = auto_alloc_array(machine, UINT16, 0x8000);
+	state->m_i860_framebuffer[1][0] = NULL;
+	state->m_i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
 	address_space *space = machine.device<i860_device>("vid_0")->space(AS_PROGRAM);

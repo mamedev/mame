@@ -4,20 +4,20 @@ public:
 	tehkanwc_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int track0[2];
-	int track1[2];
-	int msm_data_offs;
-	int toggle;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *videoram2;
-	UINT8 scroll_x[2];
-	UINT8 led0;
-	UINT8 led1;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	int m_track0[2];
+	int m_track1[2];
+	int m_msm_data_offs;
+	int m_toggle;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_videoram2;
+	UINT8 m_scroll_x[2];
+	UINT8 m_led0;
+	UINT8 m_led1;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

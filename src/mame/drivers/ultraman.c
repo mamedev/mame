@@ -28,7 +28,7 @@ static WRITE16_HANDLER( sound_irq_trigger_w )
 	ultraman_state *state = space->machine().driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -195,25 +195,25 @@ static MACHINE_START( ultraman )
 {
 	ultraman_state *state = machine.driver_data<ultraman_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k051960 = machine.device("k051960");
-	state->k051316_1 = machine.device("k051316_1");
-	state->k051316_2 = machine.device("k051316_2");
-	state->k051316_3 = machine.device("k051316_3");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k051316_1 = machine.device("k051316_1");
+	state->m_k051316_2 = machine.device("k051316_2");
+	state->m_k051316_3 = machine.device("k051316_3");
 
-	state->save_item(NAME(state->bank0));
-	state->save_item(NAME(state->bank1));
-	state->save_item(NAME(state->bank2));
+	state->save_item(NAME(state->m_bank0));
+	state->save_item(NAME(state->m_bank1));
+	state->save_item(NAME(state->m_bank2));
 }
 
 static MACHINE_RESET( ultraman )
 {
 	ultraman_state *state = machine.driver_data<ultraman_state>();
 
-	state->bank0 = -1;
-	state->bank1 = -1;
-	state->bank2 = -1;
+	state->m_bank0 = -1;
+	state->m_bank1 = -1;
+	state->m_bank2 = -1;
 }
 
 static MACHINE_CONFIG_START( ultraman, ultraman_state )

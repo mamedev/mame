@@ -69,8 +69,8 @@ public:
 	quakeat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t	*pic8259_1;
-	device_t	*pic8259_2;
+	device_t	*m_pic8259_1;
+	device_t	*m_pic8259_2;
 };
 
 
@@ -138,10 +138,10 @@ static IRQ_CALLBACK(irq_callback)
 {
 	quakeat_state *state = device->machine().driver_data<quakeat_state>();
 	int r = 0;
-	r = pic8259_acknowledge( state->pic8259_2);
+	r = pic8259_acknowledge( state->m_pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge( state->pic8259_1);
+		r = pic8259_acknowledge( state->m_pic8259_1);
 	}
 	return r;
 }
@@ -151,8 +151,8 @@ static MACHINE_START(quakeat)
 	quakeat_state *state = machine.driver_data<quakeat_state>();
 	device_set_irq_callback(machine.device("maincpu"), irq_callback);
 
-	state->pic8259_1 = machine.device( "pic8259_1" );
-	state->pic8259_2 = machine.device( "pic8259_2" );
+	state->m_pic8259_1 = machine.device( "pic8259_1" );
+	state->m_pic8259_2 = machine.device( "pic8259_2" );
 }
 /*************************************************************/
 

@@ -73,8 +73,8 @@ static TILEMAP_MAPPER( tx_tilemap_scan )
 static TILE_GET_INFO( tx_get_tile_info )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
-	int code = state->textram[tile_index];
-	int attr = state->textram[tile_index + 0x400];
+	int code = state->m_textram[tile_index];
+	int attr = state->m_textram[tile_index + 0x400];
 	tileinfo->category = code >> 4 & 0xf;
 
 	/* the hardware has two character sets, one normal and one flipped. When
@@ -92,8 +92,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 static TILE_GET_INFO( bg_get_tile_info )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
-	int code = state->videoram[tile_index];
-	int attr = state->videoram[tile_index+0x800];
+	int code = state->m_videoram[tile_index];
+	int attr = state->m_videoram[tile_index+0x800];
 
 	SET_TILE_INFO(
 			1,
@@ -113,14 +113,14 @@ static TILE_GET_INFO( bg_get_tile_info )
 VIDEO_START( skykid )
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
-	state->tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
-	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
 
-	tilemap_set_transparent_pen(state->tx_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
 
-	state_save_register_global(machine, state->priority);
-	state_save_register_global(machine, state->scroll_x);
-	state_save_register_global(machine, state->scroll_y);
+	state_save_register_global(machine, state->m_priority);
+	state_save_register_global(machine, state->m_scroll_x);
+	state_save_register_global(machine, state->m_scroll_y);
 }
 
 
@@ -134,45 +134,45 @@ VIDEO_START( skykid )
 READ8_HANDLER( skykid_videoram_r )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	return state->videoram[offset];
+	return state->m_videoram[offset];
 }
 
 WRITE8_HANDLER( skykid_videoram_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x7ff);
 }
 
 READ8_HANDLER( skykid_textram_r )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	return state->textram[offset];
+	return state->m_textram[offset];
 }
 
 WRITE8_HANDLER( skykid_textram_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->textram[offset] = data;
-	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x3ff);
+	state->m_textram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( skykid_scroll_x_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->scroll_x = offset;
+	state->m_scroll_x = offset;
 }
 
 WRITE8_HANDLER( skykid_scroll_y_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->scroll_y = offset;
+	state->m_scroll_y = offset;
 }
 
 WRITE8_HANDLER( skykid_flipscreen_priority_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	state->priority = data;
+	state->m_priority = data;
 	flip_screen_set(space->machine(), offset & 1);
 }
 
@@ -188,7 +188,7 @@ WRITE8_HANDLER( skykid_flipscreen_priority_w )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	skykid_state *state = machine.driver_data<skykid_state>();
-	UINT8 *spriteram = state->spriteram + 0x780;
+	UINT8 *spriteram = state->m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x0800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x0800;
 	int offs;
@@ -243,35 +243,35 @@ SCREEN_UPDATE( skykid )
 	skykid_state *state = screen->machine().driver_data<skykid_state>();
 	if (flip_screen_get(screen->machine()))
 	{
-		tilemap_set_scrollx(state->bg_tilemap, 0, 189 - (state->scroll_x ^ 1));
-		tilemap_set_scrolly(state->bg_tilemap, 0, 7 - state->scroll_y);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, 189 - (state->m_scroll_x ^ 1));
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, 7 - state->m_scroll_y);
 	}
 	else
 	{
-		tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x + 35);
-		tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y + 25);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_x + 35);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_y + 25);
 	}
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
-	if (state->priority & 0x04)
+	if (state->m_priority & 0x04)
 	{
 		// textlayer priority enabled?
-		int cat, pri = state->priority >> 4;
+		int cat, pri = state->m_priority >> 4;
 
 		// draw low priority tiles
-		tilemap_draw(bitmap, cliprect, state->tx_tilemap, pri, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, pri, 0);
 
 		draw_sprites(screen->machine(), bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
-			if (cat != pri) tilemap_draw(bitmap, cliprect, state->tx_tilemap, cat, 0);
+			if (cat != pri) tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, cat, 0);
 	}
 	else
 	{
 		draw_sprites(screen->machine(), bitmap, cliprect);
-		tilemap_draw(bitmap, cliprect, state->tx_tilemap, TILEMAP_DRAW_ALL_CATEGORIES, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 
 	return 0;

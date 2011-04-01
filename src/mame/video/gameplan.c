@@ -77,12 +77,12 @@ static SCREEN_UPDATE( gameplan )
 
 	gameplan_get_pens(pens);
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		*BITMAP_ADDR32(bitmap, y, x) = pens[state->videoram[offs] & 0x07];
+		*BITMAP_ADDR32(bitmap, y, x) = pens[state->m_videoram[offs] & 0x07];
 	}
 
 	return 0;
@@ -97,12 +97,12 @@ static SCREEN_UPDATE( leprechn )
 
 	leprechn_get_pens(pens);
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		UINT8 y = offs >> 8;
 		UINT8 x = offs & 0xff;
 
-		*BITMAP_ADDR32(bitmap, y, x) = pens[state->videoram[offs]];
+		*BITMAP_ADDR32(bitmap, y, x) = pens[state->m_videoram[offs]];
 	}
 
 	return 0;
@@ -120,7 +120,7 @@ static WRITE8_DEVICE_HANDLER( video_data_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	state->video_data = data;
+	state->m_video_data = data;
 }
 
 
@@ -128,7 +128,7 @@ static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	state->video_command = data & 0x07;
+	state->m_video_command = data & 0x07;
 }
 
 
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	state->video_command = (data >> 3) & 0x07;
+	state->m_video_command = (data >> 3) & 0x07;
 }
 
 
@@ -145,7 +145,7 @@ static TIMER_CALLBACK( clear_screen_done_callback )
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
 	/* indicate that the we are done clearing the screen */
-	state->via_0->write_ca1(0);
+	state->m_via_0->write_ca1(0);
 }
 
 
@@ -155,50 +155,50 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 
 	if (state == 0)
 	{
-		switch (driver_state->video_command)
+		switch (driver_state->m_video_command)
 		{
 		/* draw pixel */
 		case 0:
 			/* auto-adjust X? */
-			if (driver_state->video_data & 0x10)
+			if (driver_state->m_video_data & 0x10)
 			{
-				if (driver_state->video_data & 0x40)
-					driver_state->video_x = driver_state->video_x - 1;
+				if (driver_state->m_video_data & 0x40)
+					driver_state->m_video_x = driver_state->m_video_x - 1;
 				else
-					driver_state->video_x = driver_state->video_x + 1;
+					driver_state->m_video_x = driver_state->m_video_x + 1;
 			}
 
 			/* auto-adjust Y? */
-			if (driver_state->video_data & 0x20)
+			if (driver_state->m_video_data & 0x20)
 			{
-				if (driver_state->video_data & 0x80)
-					driver_state->video_y = driver_state->video_y - 1;
+				if (driver_state->m_video_data & 0x80)
+					driver_state->m_video_y = driver_state->m_video_y - 1;
 				else
-					driver_state->video_y = driver_state->video_y + 1;
+					driver_state->m_video_y = driver_state->m_video_y + 1;
 			}
 
-			driver_state->videoram[driver_state->video_y * (HBSTART - HBEND) + driver_state->video_x] = driver_state->video_data & 0x0f;
+			driver_state->m_videoram[driver_state->m_video_y * (HBSTART - HBEND) + driver_state->m_video_x] = driver_state->m_video_data & 0x0f;
 
 			break;
 
 		/* load X register */
 		case 1:
-			driver_state->video_x = driver_state->video_data;
+			driver_state->m_video_x = driver_state->m_video_data;
 			break;
 
 		/* load Y register */
 		case 2:
-			driver_state->video_y = driver_state->video_data;
+			driver_state->m_video_y = driver_state->m_video_data;
 			break;
 
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
 			{
-				driver_state->via_0->write_ca1(1);
+				driver_state->m_via_0->write_ca1(1);
 			}
 
-			memset(driver_state->videoram, driver_state->video_data & 0x0f, driver_state->videoram_size);
+			memset(driver_state->m_videoram, driver_state->m_video_data & 0x0f, driver_state->m_videoram_size);
 
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
@@ -214,7 +214,7 @@ static WRITE_LINE_DEVICE_HANDLER( video_command_trigger_w )
 static TIMER_CALLBACK( via_irq_delayed )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	device_set_input_line(state->maincpu, 0, param);
+	device_set_input_line(state->m_maincpu, 0, param);
 }
 
 
@@ -269,12 +269,12 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
 	/* !VBLANK is connected to CA1 */
-	state->via_0->write_ca1(param);
+	state->m_via_0->write_ca1(param);
 
 	if (param)
-		state->via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
+		state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
 	else
-		state->via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBEND), 1);
+		state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBEND), 1);
 }
 
 
@@ -288,13 +288,13 @@ static VIDEO_START( common )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	state->videoram = auto_alloc_array(machine, UINT8, state->videoram_size);
+	state->m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
+	state->m_videoram = auto_alloc_array(machine, UINT8, state->m_videoram_size);
 
-	state->via_0_ca1_timer = machine.scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
+	state->m_via_0_ca1_timer = machine.scheduler().timer_alloc(FUNC(via_0_ca1_timer_callback));
 
 	/* register for save states */
-	state->save_pointer(NAME(state->videoram), state->videoram_size);
+	state->save_pointer(NAME(state->m_videoram), state->m_videoram_size);
 }
 
 
@@ -326,7 +326,7 @@ static VIDEO_START( trvquest )
 static VIDEO_RESET( gameplan )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
+	state->m_via_0_ca1_timer->adjust(machine.primary_screen->time_until_pos(VBSTART));
 }
 
 

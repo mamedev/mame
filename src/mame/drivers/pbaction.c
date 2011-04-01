@@ -75,19 +75,19 @@ static WRITE8_HANDLER( pbaction_sh_command_w )
 {
 	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0x00);
 }
 
 
 static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(pbaction_state, work_ram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE_MEMBER(pbaction_state, videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE_MEMBER(pbaction_state, colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE_MEMBER(pbaction_state, videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_MEMBER(pbaction_state, colorram)
-	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(pbaction_state, spriteram, spriteram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(pbaction_state, m_work_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE_MEMBER(pbaction_state, m_videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE_MEMBER(pbaction_state, m_colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE_MEMBER(pbaction_state, m_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_MEMBER(pbaction_state, m_colorram)
+	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(pbaction_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
@@ -256,17 +256,17 @@ static MACHINE_START( pbaction )
 {
 	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_RESET( pbaction )
 {
 	pbaction_state *state = machine.driver_data<pbaction_state>();
 
-	state->scroll = 0;
+	state->m_scroll = 0;
 }
 
 static MACHINE_CONFIG_START( pbaction, pbaction_state )
@@ -466,7 +466,7 @@ static READ8_HANDLER( pbactio3_prot_kludge_r )
 	if (cpu_get_pc(&space->device()) == 0xab80)
 		return 0;
 
-	return state->work_ram[0];
+	return state->m_work_ram[0];
 }
 
 static DRIVER_INIT( pbactio3 )

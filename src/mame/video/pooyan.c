@@ -98,8 +98,8 @@ PALETTE_INIT( pooyan )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	pooyan_state *state = machine.driver_data<pooyan_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index];
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
@@ -117,7 +117,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( pooyan )
 {
 	pooyan_state *state = machine.driver_data<pooyan_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -131,16 +131,16 @@ VIDEO_START( pooyan )
 WRITE8_HANDLER( pooyan_videoram_w )
 {
 	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( pooyan_colorram_w )
 {
 	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
@@ -160,8 +160,8 @@ WRITE8_HANDLER( pooyan_flipscreen_w )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	pooyan_state *state = machine.driver_data<pooyan_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
 	for (offs = 0x10; offs < 0x40; offs += 2)
@@ -196,7 +196,7 @@ SCREEN_UPDATE( pooyan )
 {
 	pooyan_state *state = screen->machine().driver_data<pooyan_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

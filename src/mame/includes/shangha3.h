@@ -4,16 +4,16 @@ public:
 	shangha3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int prot_count;
-	UINT16 *ram;
-	size_t ram_size;
+	int m_prot_count;
+	UINT16 *m_ram;
+	size_t m_ram_size;
 
-	int do_shadows;
+	int m_do_shadows;
 
-	UINT16 gfxlist_addr;
-	bitmap_t *rawbitmap;
+	UINT16 m_gfxlist_addr;
+	bitmap_t *m_rawbitmap;
 
-	UINT8 drawmode_table[16];
+	UINT8 m_drawmode_table[16];
 };
 
 

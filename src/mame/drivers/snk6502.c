@@ -287,14 +287,14 @@ static TIMER_DEVICE_CALLBACK( sasuke_update_counter )
 {
 	snk6502_state *state = timer.machine().driver_data<snk6502_state>();
 
-	state->sasuke_counter += 0x10;
+	state->m_sasuke_counter += 0x10;
 }
 
 static void sasuke_start_counter(running_machine &machine)
 {
 	snk6502_state *state = machine.driver_data<snk6502_state>();
 
-	state->sasuke_counter = 0;
+	state->m_sasuke_counter = 0;
 }
 
 
@@ -313,7 +313,7 @@ static CUSTOM_INPUT( sasuke_count_r )
 {
 	snk6502_state *state = field->port->machine().driver_data<snk6502_state>();
 
-	return (state->sasuke_counter >> 4);
+	return (state->m_sasuke_counter >> 4);
 }
 
 
@@ -325,10 +325,10 @@ static CUSTOM_INPUT( sasuke_count_r )
 
 static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
@@ -344,10 +344,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
@@ -363,10 +363,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x3100, 0x3102) AM_WRITE(vanguard_sound_w)
@@ -384,10 +384,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x2100, 0x2103) AM_WRITE(fantasy_sound_w)
@@ -404,10 +404,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(snk6502_videoram2_w) AM_BASE_MEMBER(snk6502_state, m_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(snk6502_videoram_w) AM_BASE_MEMBER(snk6502_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(snk6502_colorram_w) AM_BASE_MEMBER(snk6502_state, m_colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(snk6502_charram_w) AM_BASE_MEMBER(snk6502_state, m_charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)

@@ -285,28 +285,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	int bank;
-	int line;
-	int idx;
-	int crt_access;
+	int m_bank;
+	int m_line;
+	int m_idx;
+	int m_crt_access;
 
 	/* i8275 */
-	int i8275Command;
-	int i8275HorizontalCharactersRow;
-	int i8275CommandSeqCnt;
-	int i8275SpacedRows;
-	int i8275VerticalRows;
-	int i8275VerticalRetraceRows;
-	int i8275Underline;
-	int i8275Lines;
-	int i8275LineCounterMode;
-	int i8275FieldAttributeMode;
-	int i8275CursorFormat;
-	int i8275HorizontalRetrace;
+	int m_i8275Command;
+	int m_i8275HorizontalCharactersRow;
+	int m_i8275CommandSeqCnt;
+	int m_i8275SpacedRows;
+	int m_i8275VerticalRows;
+	int m_i8275VerticalRetraceRows;
+	int m_i8275Underline;
+	int m_i8275Lines;
+	int m_i8275LineCounterMode;
+	int m_i8275FieldAttributeMode;
+	int m_i8275CursorFormat;
+	int m_i8275HorizontalRetrace;
 
 	/* memory */
-	UINT8    dw_ram[0x1000];
-	UINT8    videobuf[0x8000];
+	UINT8    m_dw_ram[0x1000];
+	UINT8    m_videobuf[0x8000];
 };
 
 
@@ -351,27 +351,27 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 {
 	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
-	switch (state->i8275Command)
+	switch (state->m_i8275Command)
 	{
 		case I8275_COMMAND_RESET:
 		{
-			switch (state->i8275CommandSeqCnt)
+			switch (state->m_i8275CommandSeqCnt)
 			{
 				case 4:
 				{
 					//screen byte comp byte 1
-					state->i8275SpacedRows = data >> 7;
-					state->i8275HorizontalCharactersRow = (data & 0x7f) + 1;
-					if (state->i8275HorizontalCharactersRow > 80)
+					state->m_i8275SpacedRows = data >> 7;
+					state->m_i8275HorizontalCharactersRow = (data & 0x7f) + 1;
+					if (state->m_i8275HorizontalCharactersRow > 80)
 					{
-						logerror("i8275 Undefined num of characters/Row! = %d\n", state->i8275HorizontalCharactersRow);
-						state->i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
+						logerror("i8275 Undefined num of characters/Row! = %d\n", state->m_i8275HorizontalCharactersRow);
+						state->m_i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
 					}
 					else
 					{
-						logerror("i8275 %d characters/row\n", state->i8275HorizontalCharactersRow);
+						logerror("i8275 %d characters/row\n", state->m_i8275HorizontalCharactersRow);
 					}
-					if (state->i8275SpacedRows & 1)
+					if (state->m_i8275SpacedRows & 1)
 					{
 						logerror("i8275 spaced rows\n");
 					}
@@ -379,44 +379,44 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 					{
 						logerror("i8275 normal rows\n");
 					}
-					state->i8275CommandSeqCnt--;
+					state->m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 3:
 				{
 					//screen byte comp byte 2
-					state->i8275VerticalRows = (data & 0x3f) + 1;
-					state->i8275VerticalRetraceRows = (data >> 6) + 1;
+					state->m_i8275VerticalRows = (data & 0x3f) + 1;
+					state->m_i8275VerticalRetraceRows = (data >> 6) + 1;
 
-					logerror("i8275 %d rows\n", state->i8275VerticalRows);
-					logerror("i8275 %d vertical retrace rows\n", state->i8275VerticalRetraceRows);
+					logerror("i8275 %d rows\n", state->m_i8275VerticalRows);
+					logerror("i8275 %d vertical retrace rows\n", state->m_i8275VerticalRetraceRows);
 
-					state->i8275CommandSeqCnt--;
+					state->m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 2:
 				{
 					//screen byte comp byte 3
-					state->i8275Underline = (data >> 4) + 1;
-					state->i8275Lines = (data & 0xf) + 1;
-					logerror("i8275 underline placement: %d\n", state->i8275Underline);
-					logerror("i8275 %d lines/row\n", state->i8275Lines);
+					state->m_i8275Underline = (data >> 4) + 1;
+					state->m_i8275Lines = (data & 0xf) + 1;
+					logerror("i8275 underline placement: %d\n", state->m_i8275Underline);
+					logerror("i8275 %d lines/row\n", state->m_i8275Lines);
 
-					state->i8275CommandSeqCnt--;
+					state->m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 1:
 				{
 					//screen byte comp byte 4
-					state->i8275LineCounterMode = data >> 7;
-					state->i8275FieldAttributeMode = (data >> 6) & 1;
-					state->i8275CursorFormat = (data >> 4) & 3;
-					state->i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
-					logerror("i8275 line counter mode: %d\n", state->i8275LineCounterMode);
-					if (state->i8275FieldAttributeMode)
+					state->m_i8275LineCounterMode = data >> 7;
+					state->m_i8275FieldAttributeMode = (data >> 6) & 1;
+					state->m_i8275CursorFormat = (data >> 4) & 3;
+					state->m_i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
+					logerror("i8275 line counter mode: %d\n", state->m_i8275LineCounterMode);
+					if (state->m_i8275FieldAttributeMode)
 					{
 						logerror("i8275 field attribute mode non-transparent\n");
 					}
@@ -425,7 +425,7 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						logerror("i8275 field attribute mode transparent\n");
 					}
 
-					switch (state->i8275CursorFormat)
+					switch (state->m_i8275CursorFormat)
 					{
 						case 0:	{logerror("i8275 cursor format - blinking reverse video block\n");}	break;
 						case 1:	{logerror("i8275 cursor format - blinking underline\n");}break;
@@ -433,8 +433,8 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						case 3:	{logerror("i8275 cursor format - nonblinking underline\n");}break;
 					}
 
-					logerror("i8275 %d chars for horizontal retrace\n",state->i8275HorizontalRetrace );
-					state->i8275CommandSeqCnt--;
+					logerror("i8275 %d chars for horizontal retrace\n",state->m_i8275HorizontalRetrace );
+					state->m_i8275CommandSeqCnt--;
 				}
 				break;
 
@@ -477,31 +477,31 @@ static WRITE8_HANDLER (i8275_creg_w) //comand reg
 		case 0:
 		{
 			/* reset */
-			state->i8275Command = I8275_COMMAND_RESET;
-			state->i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
+			state->m_i8275Command = I8275_COMMAND_RESET;
+			state->m_i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
 		}
 		break;
 
 		case 5:
 		{
 			/* enable interrupt */
-			state->i8275Command = I8275_COMMAND_EI;
-			state->i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
+			state->m_i8275Command = I8275_COMMAND_EI;
+			state->m_i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
 		}
 		break;
 
 		case 6:
 		{
 			/* disable interrupt */
-			state->i8275Command = I8275_COMMAND_DI;
-			state->i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
+			state->m_i8275Command = I8275_COMMAND_DI;
+			state->m_i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
 		}
 		break;
 
 		case 7:
 		{
 			/* preset counters */
-			state->i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
+			state->m_i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
 
 		}
 		break;
@@ -517,22 +517,22 @@ static READ8_HANDLER(dwarfd_ram_r)
 {
 	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
-	if (state->crt_access == 0)
+	if (state->m_crt_access == 0)
 	{
-		return state->dw_ram[offset];
+		return state->m_dw_ram[offset];
 	}
 	else
 	{
-		state->videobuf[state->line * 256 + state->idx] = state->dw_ram[offset];
-		state->idx++;
-		return state->dw_ram[offset];
+		state->m_videobuf[state->m_line * 256 + state->m_idx] = state->m_dw_ram[offset];
+		state->m_idx++;
+		return state->m_dw_ram[offset];
 	}
 }
 
 static WRITE8_HANDLER(dwarfd_ram_w)
 {
 	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
-	state->dw_ram[offset] = data;
+	state->m_dw_ram[offset] = data;
 }
 
 static WRITE8_HANDLER(output1_w)
@@ -701,7 +701,7 @@ static void drawCrt( running_machine &machine, bitmap_t *bitmap,const rectangle 
 			while (b == 0)
 			{
 				if (count < 0x8000)
-					tile = state->videobuf[count++];
+					tile = state->m_videobuf[count++];
 				else
 						return;
 
@@ -720,7 +720,7 @@ static void drawCrt( running_machine &machine, bitmap_t *bitmap,const rectangle 
 					}
 					if ((tile & 0xc0) == 0x80)
 					{
-						state->bank = (tile >> 2) & 3;
+						state->m_bank = (tile >> 2) & 3;
 					}
 					if ((tile & 0xc0) == 0xc0)
 					{
@@ -732,7 +732,7 @@ static void drawCrt( running_machine &machine, bitmap_t *bitmap,const rectangle 
 					b = 1;
 			}
 			drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-				tile + (state->bank + bank2) * 128,
+				tile + (state->m_bank + bank2) * 128,
 				0,
 				0, 0,
 				x*8,y*8,0);
@@ -751,7 +751,7 @@ static SCREEN_UPDATE( dwarfd )
 static WRITE_LINE_DEVICE_HANDLER( dwarfd_sod_callback )
 {
 	dwarfd_state *driver_state = device->machine().driver_data<dwarfd_state>();
-	driver_state->crt_access = state;
+	driver_state->m_crt_access = state;
 }
 
 
@@ -772,8 +772,8 @@ static INTERRUPT_GEN( dwarfd_interrupt )
 	if (cpu_getiloops(device) < NUM_LINES)
 	{
 		device_set_input_line(device, I8085_RST65_LINE, HOLD_LINE); // 34 - every 8th line
-		state->line = cpu_getiloops(device);
-		state->idx = 0;
+		state->m_line = cpu_getiloops(device);
+		state->m_idx = 0;
 	}
 	else
 	{
@@ -915,46 +915,46 @@ static MACHINE_START( dwarfd )
 {
 	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
-	state->save_item(NAME(state->bank));
-	state->save_item(NAME(state->line));
-	state->save_item(NAME(state->idx));
-	state->save_item(NAME(state->crt_access));
+	state->save_item(NAME(state->m_bank));
+	state->save_item(NAME(state->m_line));
+	state->save_item(NAME(state->m_idx));
+	state->save_item(NAME(state->m_crt_access));
 
 	/* i8275 */
-	state->save_item(NAME(state->i8275Command));
-	state->save_item(NAME(state->i8275HorizontalCharactersRow));
-	state->save_item(NAME(state->i8275CommandSeqCnt));
-	state->save_item(NAME(state->i8275SpacedRows));
-	state->save_item(NAME(state->i8275VerticalRows));
-	state->save_item(NAME(state->i8275VerticalRetraceRows));
-	state->save_item(NAME(state->i8275Underline));
-	state->save_item(NAME(state->i8275Lines));
-	state->save_item(NAME(state->i8275LineCounterMode));
-	state->save_item(NAME(state->i8275FieldAttributeMode));
-	state->save_item(NAME(state->i8275CursorFormat));
-	state->save_item(NAME(state->i8275HorizontalRetrace));
+	state->save_item(NAME(state->m_i8275Command));
+	state->save_item(NAME(state->m_i8275HorizontalCharactersRow));
+	state->save_item(NAME(state->m_i8275CommandSeqCnt));
+	state->save_item(NAME(state->m_i8275SpacedRows));
+	state->save_item(NAME(state->m_i8275VerticalRows));
+	state->save_item(NAME(state->m_i8275VerticalRetraceRows));
+	state->save_item(NAME(state->m_i8275Underline));
+	state->save_item(NAME(state->m_i8275Lines));
+	state->save_item(NAME(state->m_i8275LineCounterMode));
+	state->save_item(NAME(state->m_i8275FieldAttributeMode));
+	state->save_item(NAME(state->m_i8275CursorFormat));
+	state->save_item(NAME(state->m_i8275HorizontalRetrace));
 }
 
 static MACHINE_RESET( dwarfd )
 {
 	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 
-	state->bank = 0;
-	state->line = 0;
-	state->idx = 0;
-	state->crt_access = 0;
-	state->i8275Command = 0;
-	state->i8275HorizontalCharactersRow = 0;
-	state->i8275CommandSeqCnt = 0;
-	state->i8275SpacedRows = 0;
-	state->i8275VerticalRows = 0;
-	state->i8275VerticalRetraceRows = 0;
-	state->i8275Underline = 0;
-	state->i8275Lines = 0;
-	state->i8275LineCounterMode = 0;
-	state->i8275FieldAttributeMode = 0;
-	state->i8275CursorFormat = 0;
-	state->i8275HorizontalRetrace = 0;
+	state->m_bank = 0;
+	state->m_line = 0;
+	state->m_idx = 0;
+	state->m_crt_access = 0;
+	state->m_i8275Command = 0;
+	state->m_i8275HorizontalCharactersRow = 0;
+	state->m_i8275CommandSeqCnt = 0;
+	state->m_i8275SpacedRows = 0;
+	state->m_i8275VerticalRows = 0;
+	state->m_i8275VerticalRetraceRows = 0;
+	state->m_i8275Underline = 0;
+	state->m_i8275Lines = 0;
+	state->m_i8275LineCounterMode = 0;
+	state->m_i8275FieldAttributeMode = 0;
+	state->m_i8275CursorFormat = 0;
+	state->m_i8275HorizontalRetrace = 0;
 }
 
 static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
@@ -1173,11 +1173,11 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i] & 0xe0;
 	}
 
-	state->save_item(NAME(state->videobuf));
-	state->save_item(NAME(state->dw_ram));
+	state->save_item(NAME(state->m_videobuf));
+	state->save_item(NAME(state->m_dw_ram));
 
-	memset(state->videobuf, 0, sizeof(state->videobuf));
-	memset(state->dw_ram, 0, sizeof(state->dw_ram));
+	memset(state->m_videobuf, 0, sizeof(state->m_videobuf));
+	memset(state->m_dw_ram, 0, sizeof(state->m_dw_ram));
 
 }
 

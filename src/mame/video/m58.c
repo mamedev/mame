@@ -107,8 +107,8 @@ WRITE8_HANDLER( yard_videoram_w )
 {
 	m58_state *state = space->machine().driver_data<m58_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 
@@ -133,7 +133,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		*BITMAP_ADDR16(state->scroll_panel_bitmap, sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
+		*BITMAP_ADDR16(state->m_scroll_panel_bitmap, sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
 	}
 }
 
@@ -150,8 +150,8 @@ static TILE_GET_INFO( yard_get_bg_tile_info )
 	m58_state *state = machine.driver_data<m58_state>();
 
 	int offs = tile_index * 2;
-	int attr = state->videoram[offs + 1];
-	int code = state->videoram[offs] + ((attr & 0xc0) << 2);
+	int attr = state->m_videoram[offs + 1];
+	int code = state->m_videoram[offs] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
@@ -185,11 +185,11 @@ VIDEO_START( yard )
 	bitmap_format format = machine.primary_screen->format();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_scrolldx(state->bg_tilemap, visarea.min_x, width - (visarea.max_x + 1));
-	tilemap_set_scrolldy(state->bg_tilemap, visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
+	state->m_bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
+	tilemap_set_scrolldx(state->m_bg_tilemap, visarea.min_x, width - (visarea.max_x + 1));
+	tilemap_set_scrolldy(state->m_bg_tilemap, visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
 
-	state->scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
+	state->m_scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
 }
 
 
@@ -225,17 +225,17 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	int offs;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		int attr = state->spriteram[offs + 1];
+		int attr = state->m_spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;
-		int code1 = state->spriteram[offs + 2] & 0xbf;
+		int code1 = state->m_spriteram[offs + 2] & 0xbf;
 		int code2 = 0;
 		int color = attr & 0x1f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = state->spriteram[offs + 3];
-		int sy1 = 233 - state->spriteram[offs];
+		int sx = state->m_spriteram[offs + 3];
+		int sy1 = 233 - state->m_spriteram[offs];
 		int sy2 = 0;
 
 		if (flipy)
@@ -278,7 +278,7 @@ static void draw_panel( running_machine &machine, bitmap_t *bitmap, const rectan
 {
 	m58_state *state = machine.driver_data<m58_state>();
 
-	if (!*state->yard_score_panel_disabled)
+	if (!*state->m_yard_score_panel_disabled)
 	{
 		static const rectangle clippanel =
 		{
@@ -299,7 +299,7 @@ static void draw_panel( running_machine &machine, bitmap_t *bitmap, const rectan
 		clip.max_y += visarea.max_y + yoffs;
 		sect_rect(&clip, cliprect);
 
-		copybitmap(bitmap, state->scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
+		copybitmap(bitmap, state->m_scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
 				   sx, visarea.min_y + yoffs, &clip);
 	}
 }
@@ -316,10 +316,10 @@ SCREEN_UPDATE( yard )
 {
 	m58_state *state = screen->machine().driver_data<m58_state>();
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, (*state->yard_scroll_x_high * 0x100) + *state->yard_scroll_x_low);
-	tilemap_set_scrolly(state->bg_tilemap, 0, *state->yard_scroll_y_low);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, (*state->m_yard_scroll_x_high * 0x100) + *state->m_yard_scroll_x_low);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_yard_scroll_y_low);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	draw_panel(screen->machine(), bitmap, cliprect);
 	return 0;

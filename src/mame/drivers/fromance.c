@@ -56,15 +56,15 @@ Memo:
 static READ8_HANDLER( fromance_commanddata_r )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	return state->commanddata;
+	return state->m_commanddata;
 }
 
 
 static TIMER_CALLBACK( deferred_commanddata_w )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
-	state->commanddata = param;
-	state->directionflag = 1;
+	state->m_commanddata = param;
+	state->m_directionflag = 1;
 }
 
 
@@ -82,7 +82,7 @@ static READ8_HANDLER( fromance_busycheck_main_r )
 	/* set a timer to force synchronization after the read */
 	space->machine().scheduler().synchronize();
 
-	if (!state->directionflag)
+	if (!state->m_directionflag)
 		return 0x00;		// standby
 	else
 		return 0xff;		// busy
@@ -93,7 +93,7 @@ static READ8_HANDLER( fromance_busycheck_sub_r )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
 
-	if (state->directionflag)
+	if (state->m_directionflag)
 		return 0xff;		// standby
 	else
 		return 0x00;		// busy
@@ -103,7 +103,7 @@ static READ8_HANDLER( fromance_busycheck_sub_r )
 static WRITE8_HANDLER( fromance_busycheck_sub_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->directionflag = 0;
+	state->m_directionflag = 0;
 }
 
 
@@ -130,8 +130,8 @@ static WRITE8_HANDLER( fromance_rombank_w )
 static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 {
 	fromance_state *state = device->machine().driver_data<fromance_state>();
-	state->adpcm_reset = (data & 0x01);
-	state->vclk_left = 0;
+	state->m_adpcm_reset = (data & 0x01);
+	state->m_vclk_left = 0;
 
 	msm5205_reset_w(device, !(data & 0x01));
 }
@@ -140,8 +140,8 @@ static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 static WRITE8_HANDLER( fromance_adpcm_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->adpcm_data = data;
-	state->vclk_left = 2;
+	state->m_adpcm_data = data;
+	state->m_vclk_left = 2;
 }
 
 
@@ -150,20 +150,20 @@ static void fromance_adpcm_int( device_t *device )
 	fromance_state *state = device->machine().driver_data<fromance_state>();
 
 	/* skip if we're reset */
-	if (!state->adpcm_reset)
+	if (!state->m_adpcm_reset)
 		return;
 
 	/* clock the data through */
-	if (state->vclk_left)
+	if (state->m_vclk_left)
 	{
-		msm5205_data_w(device, (state->adpcm_data >> 4));
-		state->adpcm_data <<= 4;
-		state->vclk_left--;
+		msm5205_data_w(device, (state->m_adpcm_data >> 4));
+		state->m_adpcm_data <<= 4;
+		state->m_vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
-	if (!state->vclk_left)
-		device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->m_vclk_left)
+		device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -177,7 +177,7 @@ static void fromance_adpcm_int( device_t *device )
 static WRITE8_HANDLER( fromance_portselect_w )
 {
 	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->portselect = data;
+	state->m_portselect = data;
 }
 
 
@@ -186,15 +186,15 @@ static READ8_HANDLER( fromance_keymatrix_r )
 	fromance_state *state = space->machine().driver_data<fromance_state>();
 	int ret = 0xff;
 
-	if (state->portselect & 0x01)
+	if (state->m_portselect & 0x01)
 		ret &= input_port_read(space->machine(), "KEY1");
-	if (state->portselect & 0x02)
+	if (state->m_portselect & 0x02)
 		ret &= input_port_read(space->machine(), "KEY2");
-	if (state->portselect & 0x04)
+	if (state->m_portselect & 0x04)
 		ret &= input_port_read(space->machine(), "KEY3");
-	if (state->portselect & 0x08)
+	if (state->m_portselect & 0x08)
 		ret &= input_port_read(space->machine(), "KEY4");
-	if (state->portselect & 0x10)
+	if (state->m_portselect & 0x10)
 		ret &= input_port_read(space->machine(), "KEY5");
 
 	return ret;
@@ -965,15 +965,15 @@ static MACHINE_START( fromance )
 
 	memory_configure_bank(machine, "bank1", 0, 0x100, &ROM[0x10000], 0x4000);
 
-	state->subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->directionflag));
-	state->save_item(NAME(state->commanddata));
-	state->save_item(NAME(state->portselect));
+	state->save_item(NAME(state->m_directionflag));
+	state->save_item(NAME(state->m_commanddata));
+	state->save_item(NAME(state->m_portselect));
 
-	state->save_item(NAME(state->adpcm_reset));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->vclk_left));
+	state->save_item(NAME(state->m_adpcm_reset));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_vclk_left));
 
 	/* video-related elements are saved in VIDEO_START */
 }
@@ -983,29 +983,29 @@ static MACHINE_RESET( fromance )
 	fromance_state *state = machine.driver_data<fromance_state>();
 	int i;
 
-	state->directionflag = 0;
-	state->commanddata = 0;
-	state->portselect = 0;
+	state->m_directionflag = 0;
+	state->m_commanddata = 0;
+	state->m_portselect = 0;
 
-	state->adpcm_reset = 0;
-	state->adpcm_data = 0;
-	state->vclk_left = 0;
+	state->m_adpcm_reset = 0;
+	state->m_adpcm_data = 0;
+	state->m_vclk_left = 0;
 
-	state->flipscreen_old = -1;
-	state->scrollx_ofs = 0x159;
-	state->scrolly_ofs = 0x10;
+	state->m_flipscreen_old = -1;
+	state->m_scrollx_ofs = 0x159;
+	state->m_scrolly_ofs = 0x10;
 
-	state->selected_videoram = state->selected_paletteram = 0;
-	state->scrollx[0] = 0;
-	state->scrollx[1] = 0;
-	state->scrolly[0] = 0;
-	state->scrolly[1] = 0;
-	state->gfxreg = 0;
-	state->flipscreen = 0;
-	state->crtc_register = 0;
+	state->m_selected_videoram = state->m_selected_paletteram = 0;
+	state->m_scrollx[0] = 0;
+	state->m_scrollx[1] = 0;
+	state->m_scrolly[0] = 0;
+	state->m_scrolly[1] = 0;
+	state->m_gfxreg = 0;
+	state->m_flipscreen = 0;
+	state->m_crtc_register = 0;
 
 	for (i = 0; i < 0x10; i++)
-		state->crtc_data[i] = 0;
+		state->m_crtc_data[i] = 0;
 }
 
 static MACHINE_CONFIG_START( nekkyoku, fromance_state )

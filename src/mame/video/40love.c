@@ -64,8 +64,8 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	int tile_number = state->videoram[tile_index];
-	int tile_attrib = state->colorram[(tile_index / 64) * 2];
+	int tile_number = state->m_videoram[tile_index];
+	int tile_attrib = state->m_colorram[(tile_index / 64) * 2];
 	int tile_h_bank = (tile_attrib & 0x40) << 3;	/* 0x40->0x200 */
 	int tile_l_bank = (tile_attrib & 0x18) << 3;	/* 0x10->0x80, 0x08->0x40 */
 
@@ -89,8 +89,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static STATE_POSTLOAD( redraw_pixels )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	state->pix_redraw = 1;
-	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	state->m_pix_redraw = 1;
+	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 }
 
 
@@ -103,26 +103,26 @@ static STATE_POSTLOAD( redraw_pixels )
 VIDEO_START( fortyl )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	state->pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
-	state->pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
+	state->m_pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
+	state->m_pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
-	state->tmp_bitmap1 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
-	state->tmp_bitmap2 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_tmp_bitmap1 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
+	state->m_tmp_bitmap2 = auto_bitmap_alloc(machine, 256, 256, machine.primary_screen->format());
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	state->xoffset = 128;	// this never changes
+	state->m_xoffset = 128;	// this never changes
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 32);
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->pix_color));
-	state->save_pointer(NAME(state->pixram1), 0x4000);
-	state->save_pointer(NAME(state->pixram2), 0x4000);
-	state->save_item(NAME(*state->tmp_bitmap1));
-	state->save_item(NAME(*state->tmp_bitmap2));
-	state->save_item(NAME(state->pixram_sel));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_pix_color));
+	state->save_pointer(NAME(state->m_pixram1), 0x4000);
+	state->save_pointer(NAME(state->m_pixram2), 0x4000);
+	state->save_item(NAME(*state->m_tmp_bitmap1));
+	state->save_item(NAME(*state->m_tmp_bitmap2));
+	state->save_item(NAME(state->m_pixram_sel));
 	machine.state().register_postload(redraw_pixels, NULL);
 }
 
@@ -137,9 +137,9 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int i = offset & ~1;
-	int x = ((state->colorram[i] & 0x80) << 1) | state->colorram[i + 1];	/* 9 bits signed */
+	int x = ((state->m_colorram[i] & 0x80) << 1) | state->m_colorram[i + 1];	/* 9 bits signed */
 
-	if (state->flipscreen)
+	if (state->m_flipscreen)
 		x += 0x51;
 	else
 		x -= 0x50;
@@ -147,7 +147,7 @@ static void fortyl_set_scroll_x( running_machine &machine, int offset )
 	x &= 0x1ff;
 	if (x & 0x100) x -= 0x200;				/* sign extend */
 
-	tilemap_set_scrollx(state->bg_tilemap, offset / 2, x);
+	tilemap_set_scrollx(state->m_bg_tilemap, offset / 2, x);
 }
 
 WRITE8_HANDLER( fortyl_pixram_sel_w )
@@ -156,13 +156,13 @@ WRITE8_HANDLER( fortyl_pixram_sel_w )
 	int offs;
 	int f = data & 0x01;
 
-	state->pixram_sel = (data & 0x04) >> 2;
+	state->m_pixram_sel = (data & 0x04) >> 2;
 
-	if (state->flipscreen != f)
+	if (state->m_flipscreen != f)
 	{
-		state->flipscreen = f;
-		flip_screen_set(space->machine(), state->flipscreen);
-		state->pix_redraw = 1;
+		state->m_flipscreen = f;
+		flip_screen_set(space->machine(), state->m_flipscreen);
+		state->m_pix_redraw = 1;
 
 		for (offs = 0; offs < 32; offs++)
 			fortyl_set_scroll_x(space->machine(), offs * 2);
@@ -172,10 +172,10 @@ WRITE8_HANDLER( fortyl_pixram_sel_w )
 READ8_HANDLER( fortyl_pixram_r )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->pixram_sel)
-		return state->pixram2[offset];
+	if (state->m_pixram_sel)
+		return state->m_pixram2[offset];
 	else
-		return state->pixram1[offset];
+		return state->m_pixram1[offset];
 }
 
 static void fortyl_plot_pix( running_machine &machine, int offset )
@@ -186,34 +186,34 @@ static void fortyl_plot_pix( running_machine &machine, int offset )
 	x = (offset & 0x1f) * 8;
 	y = (offset >> 5) & 0xff;
 
-	if (state->pixram_sel)
+	if (state->m_pixram_sel)
 	{
-		d1 = state->pixram2[offset];
-		d2 = state->pixram2[offset + 0x2000];
+		d1 = state->m_pixram2[offset];
+		d2 = state->m_pixram2[offset + 0x2000];
 	}
 	else
 	{
-		d1 = state->pixram1[offset];
-		d2 = state->pixram1[offset + 0x2000];
+		d1 = state->m_pixram1[offset];
+		d2 = state->m_pixram1[offset + 0x2000];
 	}
 
 	for (i = 0; i < 8; i++)
 	{
 		c = ((d2 >> i) & 1) + ((d1 >> i) & 1) * 2;
-		if (state->pixram_sel)
-			*BITMAP_ADDR16(state->tmp_bitmap2, y, x + i) = state->pix_color[c];
+		if (state->m_pixram_sel)
+			*BITMAP_ADDR16(state->m_tmp_bitmap2, y, x + i) = state->m_pix_color[c];
 		else
-			*BITMAP_ADDR16(state->tmp_bitmap1, y, x + i) = state->pix_color[c];
+			*BITMAP_ADDR16(state->m_tmp_bitmap1, y, x + i) = state->m_pix_color[c];
 	}
 }
 
 WRITE8_HANDLER( fortyl_pixram_w )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->pixram_sel)
-		state->pixram2[offset] = data;
+	if (state->m_pixram_sel)
+		state->m_pixram2[offset] = data;
 	else
-		state->pixram1[offset] = data;
+		state->m_pixram1[offset] = data;
 
 	fortyl_plot_pix(space->machine(), offset & 0x1fff);
 }
@@ -222,26 +222,26 @@ WRITE8_HANDLER( fortyl_pixram_w )
 WRITE8_HANDLER( fortyl_bg_videoram_w )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 READ8_HANDLER( fortyl_bg_videoram_r )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	return state->videoram[offset];
+	return state->m_videoram[offset];
 }
 
 WRITE8_HANDLER( fortyl_bg_colorram_w )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	if (state->colorram[offset] != data)
+	if (state->m_colorram[offset] != data)
 	{
 		int i;
 
-		state->colorram[offset] = data;
+		state->m_colorram[offset] = data;
 		for (i = (offset / 2) * 64; i < (offset / 2) * 64 + 64; i++)
-			tilemap_mark_tile_dirty(state->bg_tilemap, i);
+			tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
 
 		fortyl_set_scroll_x(space->machine(), offset);
 	}
@@ -250,7 +250,7 @@ WRITE8_HANDLER( fortyl_bg_colorram_w )
 READ8_HANDLER( fortyl_bg_colorram_r )
 {
 	fortyl_state *state = space->machine().driver_data<fortyl_state>();
-	return state->colorram[offset];
+	return state->m_colorram[offset];
 }
 
 /***************************************************************************
@@ -277,26 +277,26 @@ spriteram format (4 bytes per sprite):
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
 	/* spriteram #1 */
-	for (offs = 0; offs < state->spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
 		sx = spriteram[offs + 3];
 		sy = spriteram[offs + 0] +1;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 			sx = 240 - sx;
 		else
 			sy = 242 - sy;
 
 		code = (spriteram[offs + 1] & 0x3f) + ((spriteram[offs + 2] & 0x18) << 3);
-		flipx = ((spriteram[offs + 1] & 0x40) >> 6) ^ state->flipscreen;
-		flipy = ((spriteram[offs + 1] & 0x80) >> 7) ^ state->flipscreen;
+		flipx = ((spriteram[offs + 1] & 0x40) >> 6) ^ state->m_flipscreen;
+		flipy = ((spriteram[offs + 1] & 0x80) >> 7) ^ state->m_flipscreen;
 		color = (spriteram[offs + 2] & 0x07) + 0x08;
 
 		if (spriteram[offs + 2] & 0xe0)
@@ -306,25 +306,25 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				code,
 				color,
 				flipx,flipy,
-				sx+state->xoffset,sy,0);
+				sx+state->m_xoffset,sy,0);
 	}
 
 	/* spriteram #2 */
-	for (offs = 0; offs < state->spriteram2_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram2_size; offs += 4)
 	{
 		int code, color, sx, sy, flipx, flipy;
 
 		sx = spriteram_2[offs + 3];
 		sy = spriteram_2[offs + 0] +1;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 			sx = 240 - sx;
 		else
 			sy = 242 - sy;
 
 		code = (spriteram_2[offs + 1] & 0x3f) + ((spriteram_2[offs + 2] & 0x18) << 3);
-		flipx = ((spriteram_2[offs + 1] & 0x40) >> 6) ^ state->flipscreen;
-		flipy = ((spriteram_2[offs + 1] & 0x80) >> 7) ^ state->flipscreen;
+		flipx = ((spriteram_2[offs + 1] & 0x40) >> 6) ^ state->m_flipscreen;
+		flipy = ((spriteram_2[offs + 1] & 0x80) >> 7) ^ state->m_flipscreen;
 		color = (spriteram_2[offs + 2] & 0x07) + 0x08;
 
 		if (spriteram_2[offs + 2] & 0xe0)
@@ -334,7 +334,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				code,
 				color,
 				flipx,flipy,
-				sx+state->xoffset,sy,0);
+				sx+state->m_xoffset,sy,0);
 	}
 }
 
@@ -342,20 +342,20 @@ static void draw_pixram( running_machine &machine, bitmap_t *bitmap, const recta
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	int offs;
-	int f = state->flipscreen ^ 1;
+	int f = state->m_flipscreen ^ 1;
 
-	if (state->pix_redraw)
+	if (state->m_pix_redraw)
 	{
-		state->pix_redraw = 0;
+		state->m_pix_redraw = 0;
 
 		for (offs = 0; offs < 0x2000; offs++)
 			fortyl_plot_pix(machine, offs);
 	}
 
-	if (state->pixram_sel)
-		copybitmap(bitmap, state->tmp_bitmap1, f, f, state->xoffset, 0, cliprect);
+	if (state->m_pixram_sel)
+		copybitmap(bitmap, state->m_tmp_bitmap1, f, f, state->m_xoffset, 0, cliprect);
 	else
-		copybitmap(bitmap, state->tmp_bitmap2, f, f, state->xoffset, 0, cliprect);
+		copybitmap(bitmap, state->m_tmp_bitmap2, f, f, state->m_xoffset, 0, cliprect);
 }
 
 SCREEN_UPDATE( fortyl )
@@ -363,8 +363,8 @@ SCREEN_UPDATE( fortyl )
 	fortyl_state *state = screen->machine().driver_data<fortyl_state>();
 	draw_pixram(screen->machine(), bitmap, cliprect);
 
-	tilemap_set_scrolldy(state->bg_tilemap, - state->video_ctrl[1] + 1, - state->video_ctrl[1] - 1 );
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_set_scrolldy(state->m_bg_tilemap, - state->m_video_ctrl[1] + 1, - state->m_video_ctrl[1] - 1 );
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;

@@ -78,7 +78,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(scanline), scanline);
 }
 
 
@@ -99,7 +99,7 @@ static void reset_bank(running_machine &machine)
 {
 	atetris_state *state = machine.driver_data<atetris_state>();
 
-	memcpy(state->slapstic_base, &state->slapstic_source[state->current_bank * 0x4000], 0x4000);
+	memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_current_bank * 0x4000], 0x4000);
 }
 
 
@@ -114,11 +114,11 @@ static MACHINE_START( atetris )
 	atetris_state *state = machine.driver_data<atetris_state>();
 
 	/* Allocate interrupt timer */
-	state->interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_gen));
+	state->m_interrupt_timer = machine.scheduler().timer_alloc(FUNC(interrupt_gen));
 
 	/* Set up save state */
-	state->save_item(NAME(state->current_bank));
-	state->save_item(NAME(state->nvram_write_enable));
+	state->save_item(NAME(state->m_current_bank));
+	state->save_item(NAME(state->m_nvram_write_enable));
 	machine.state().register_postload(atetris_postload, NULL);
 }
 
@@ -129,11 +129,11 @@ static MACHINE_RESET( atetris )
 
 	/* reset the slapstic */
 	slapstic_reset();
-	state->current_bank = slapstic_bank() & 1;
+	state->m_current_bank = slapstic_bank() & 1;
 	reset_bank(machine);
 
 	/* start interrupts going (32V clocked by 16V) */
-	state->interrupt_timer->adjust(machine.primary_screen->time_until_pos(48), 48);
+	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(48), 48);
 }
 
 
@@ -147,14 +147,14 @@ static MACHINE_RESET( atetris )
 static READ8_HANDLER( atetris_slapstic_r )
 {
 	atetris_state *state = space->machine().driver_data<atetris_state>();
-	int result = state->slapstic_base[0x2000 + offset];
+	int result = state->m_slapstic_base[0x2000 + offset];
 	int new_bank = slapstic_tweak(space, offset) & 1;
 
 	/* update for the new bank */
-	if (new_bank != state->current_bank)
+	if (new_bank != state->m_current_bank)
 	{
-		state->current_bank = new_bank;
-		memcpy(state->slapstic_base, &state->slapstic_source[state->current_bank * 0x4000], 0x4000);
+		state->m_current_bank = new_bank;
+		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_current_bank * 0x4000], 0x4000);
 	}
 	return result;
 }
@@ -185,9 +185,9 @@ static WRITE8_HANDLER( nvram_w )
 {
 	atetris_state *state = space->machine().driver_data<atetris_state>();
 
-	if (state->nvram_write_enable)
+	if (state->m_nvram_write_enable)
 		state->m_nvram[offset] = data;
-	state->nvram_write_enable = 0;
+	state->m_nvram_write_enable = 0;
 }
 
 
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 {
 	atetris_state *state = space->machine().driver_data<atetris_state>();
 
-	state->nvram_write_enable = 1;
+	state->m_nvram_write_enable = 1;
 }
 
 
@@ -209,7 +209,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_w)
@@ -500,8 +500,8 @@ static DRIVER_INIT( atetris )
 	UINT8 *rgn = machine.region("maincpu")->base();
 
 	slapstic_init(machine, 101);
-	state->slapstic_source = &rgn[0x10000];
-	state->slapstic_base = &rgn[0x04000];
+	state->m_slapstic_source = &rgn[0x10000];
+	state->m_slapstic_base = &rgn[0x04000];
 }
 
 

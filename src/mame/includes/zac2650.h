@@ -4,12 +4,12 @@ public:
 	zac2650_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *s2636_0_ram;
-	bitmap_t *spritebitmap;
-	int CollisionBackground;
-	int CollisionSprite;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_s2636_0_ram;
+	bitmap_t *m_spritebitmap;
+	int m_CollisionBackground;
+	int m_CollisionSprite;
+	tilemap_t *m_bg_tilemap;
 };
 
 

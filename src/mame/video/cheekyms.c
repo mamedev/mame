@@ -44,7 +44,7 @@ WRITE8_HANDLER( cheekyms_port_40_w )
 	cheekyms_state *state = space->machine().driver_data<cheekyms_state>();
 
 	/* the lower bits probably trigger sound samples */
-	dac_data_w(state->dac, data ? 0x80 : 0);
+	dac_data_w(state->m_dac, data ? 0x80 : 0);
 }
 
 
@@ -56,7 +56,7 @@ WRITE8_HANDLER( cheekyms_port_80_w )
 	/* d3-d5 - man scroll amount */
 	/* d6 - palette select (selects either 0 = PROM M9, 1 = PROM M8) */
 	/* d7 - screen flip */
-	*state->port_80 = data;
+	*state->m_port_80 = data;
 
 	/* d2 - interrupt enable */
 	interrupt_enable_w(space, offset, data & 0x04);
@@ -71,8 +71,8 @@ static TILE_GET_INFO( cheekyms_get_tile_info )
 
 	int x = tile_index & 0x1f;
 	int y = tile_index >> 5;
-	int code = state->videoram[tile_index];
-	int palette = (*state->port_80 >> 2) & 0x10;
+	int code = state->m_videoram[tile_index];
+	int palette = (*state->m_port_80 >> 2) & 0x10;
 
 	if (x >= 0x1e)
 	{
@@ -101,10 +101,10 @@ VIDEO_START( cheekyms )
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->bitmap_buffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_bitmap_buffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
-	state->cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->cm_tilemap, 0);
+	state->m_cm_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_cm_tilemap, 0);
 }
 
 
@@ -117,14 +117,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	{
 		int x, y, code, color;
 
-		if ((state->spriteram[offs + 3] & 0x08) == 0x00) continue;
+		if ((state->m_spriteram[offs + 3] & 0x08) == 0x00) continue;
 
-		x  = 256 - state->spriteram[offs + 2];
-		y  = state->spriteram[offs + 1];
-		code =  (~state->spriteram[offs + 0] & 0x0f) << 1;
-		color = (~state->spriteram[offs + 3] & 0x07);
+		x  = 256 - state->m_spriteram[offs + 2];
+		y  = state->m_spriteram[offs + 1];
+		code =  (~state->m_spriteram[offs + 0] & 0x0f) << 1;
+		color = (~state->m_spriteram[offs + 3] & 0x07);
 
-		if (state->spriteram[offs + 0] & 0x80)
+		if (state->m_spriteram[offs + 0] & 0x80)
 		{
 			if (!flip)
 				code++;
@@ -133,7 +133,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		}
 		else
 		{
-			if (state->spriteram[offs + 0] & 0x02)
+			if (state->m_spriteram[offs + 0] & 0x02)
 			{
 				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0,        x, y, 0);
 				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
@@ -152,20 +152,20 @@ SCREEN_UPDATE( cheekyms )
 {
 	cheekyms_state *state = screen->machine().driver_data<cheekyms_state>();
 	int y, x;
-	int scrolly = ((*state->port_80 >> 3) & 0x07);
-	int flip = *state->port_80 & 0x80;
+	int scrolly = ((*state->m_port_80 >> 3) & 0x07);
+	int flip = *state->m_port_80 & 0x80;
 
 	tilemap_mark_all_tiles_dirty_all(screen->machine());
 	tilemap_set_flip_all(screen->machine(), flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	bitmap_fill(bitmap, cliprect, 0);
-	bitmap_fill(state->bitmap_buffer, cliprect, 0);
+	bitmap_fill(state->m_bitmap_buffer, cliprect, 0);
 
 	/* sprites go under the playfield */
 	draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
-	tilemap_draw(state->bitmap_buffer, cliprect, state->cm_tilemap, 0, 0);
+	tilemap_draw(state->m_bitmap_buffer, cliprect, state->m_cm_tilemap, 0, 0);
 
 	/* draw the tilemap to the final bitmap applying the scroll to the man character */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -185,13 +185,13 @@ SCREEN_UPDATE( cheekyms )
 
 			if (in_man_area)
 			{
-				if ((y + scrolly) < 27 * 8 && *BITMAP_ADDR16(state->bitmap_buffer, y + scrolly, x) != 0)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->bitmap_buffer, y + scrolly, x);
+				if ((y + scrolly) < 27 * 8 && *BITMAP_ADDR16(state->m_bitmap_buffer, y + scrolly, x) != 0)
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_bitmap_buffer, y + scrolly, x);
 			}
 			else
 			{
-				if(*BITMAP_ADDR16(state->bitmap_buffer, y, x) != 0)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->bitmap_buffer, y, x);
+				if(*BITMAP_ADDR16(state->m_bitmap_buffer, y, x) != 0)
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(state->m_bitmap_buffer, y, x);
 			}
 		}
 	}

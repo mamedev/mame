@@ -50,7 +50,7 @@ SCREEN_UPDATE( xboard )
 
 	/* draw the low priority road layer */
 	segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_BACKGROUND);
-	if (state->road_priority == 0)
+	if (state->m_road_priority == 0)
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* draw background */
@@ -62,7 +62,7 @@ SCREEN_UPDATE( xboard )
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
 
 	/* draw the high priority road */
-	if (state->road_priority == 1)
+	if (state->m_road_priority == 1)
 		segaic16_road_draw(0, bitmap, cliprect, SEGAIC16_ROAD_FOREGROUND);
 
 	/* text layer */

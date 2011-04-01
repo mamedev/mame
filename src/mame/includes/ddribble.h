@@ -11,26 +11,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     sharedram;
-	UINT8 *     snd_sharedram;
-	UINT8 *     spriteram_1;
-	UINT8 *     spriteram_2;
-	UINT8 *     bg_videoram;
-	UINT8 *     fg_videoram;
-	UINT8 *     paletteram;
+	UINT8 *     m_sharedram;
+	UINT8 *     m_snd_sharedram;
+	UINT8 *     m_spriteram_1;
+	UINT8 *     m_spriteram_2;
+	UINT8 *     m_bg_videoram;
+	UINT8 *     m_fg_videoram;
+	UINT8 *     m_paletteram;
 
 	/* video-related */
-	tilemap_t     *fg_tilemap,*bg_tilemap;
-	int         vregs[2][5];
-	int         charbank[2];
+	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_bg_tilemap;
+	int         m_vregs[2][5];
+	int         m_charbank[2];
 
 	/* misc */
-	int         int_enable_0, int_enable_1;
+	int         m_int_enable_0;
+	int         m_int_enable_1;
 
 	/* devices */
-	device_t *filter1;
-	device_t *filter2;
-	device_t *filter3;
+	device_t *m_filter1;
+	device_t *m_filter2;
+	device_t *m_filter3;
 };
 
 /*----------- defined in video/ddribble.c -----------*/

@@ -4,17 +4,17 @@ public:
 	pacland_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *videoram2;
-	UINT8 *spriteram;
-	UINT8 palette_bank;
-	const UINT8 *color_prom;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	bitmap_t *fg_bitmap;
-	UINT32 *transmask[3];
-	UINT16 scroll0;
-	UINT16 scroll1;
+	UINT8 *m_videoram;
+	UINT8 *m_videoram2;
+	UINT8 *m_spriteram;
+	UINT8 m_palette_bank;
+	const UINT8 *m_color_prom;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	bitmap_t *m_fg_bitmap;
+	UINT32 *m_transmask[3];
+	UINT16 m_scroll0;
+	UINT16 m_scroll1;
 };
 
 

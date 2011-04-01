@@ -4,98 +4,100 @@ class segas1x_state : public driver_device
 public:
 	segas1x_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  interrupt_timer(*this, "int_timer") { }
+		  m_interrupt_timer(*this, "int_timer") { }
 
 	/* memory pointers */
-//  UINT16 *  workram;  // this is used in the nvram handler, hence it cannot be added here
-//  UINT16 *  paletteram;   // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  tileram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  textram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  spriteram_0;  // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  m_workram;  // this is used in the nvram handler, hence it cannot be added here
+//  UINT16 *  m_paletteram;   // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  m_tileram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  m_textram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+//  UINT16 *  m_spriteram_0;  // this is used in the segaic16 mapper, hence it cannot be added here (yet)
 
 	/* misc video */
-	UINT8 road_priority;		// segaxbd
-	bitmap_t *tmp_bitmap;		// segaybd & segas18
-	UINT8 grayscale_enable;		// segas18
-	UINT8 vdp_enable;			// segas18
-	UINT8 vdp_mixing;			// segas18
+	UINT8 m_road_priority;		// segaxbd
+	bitmap_t *m_tmp_bitmap;		// segaybd & segas18
+	UINT8 m_grayscale_enable;		// segas18
+	UINT8 m_vdp_enable;			// segas18
+	UINT8 m_vdp_mixing;			// segas18
 
 	/* misc common */
-	UINT8 rom_board;			// segas16b
-	UINT8 mj_input_num;		// segas16a & segas16b
-	UINT8 mj_last_val;		// segas16b
-	UINT8 adc_select;			// segahang & segaorun
-	UINT8 timer_irq_state;		// segaxbd & segaybd
-	UINT8 vblank_irq_state;		// segaorun, segaxbd & segaybd
-	UINT8 misc_io_data[0x10];	// system18 & segaybd
+	UINT8 m_rom_board;			// segas16b
+	UINT8 m_mj_input_num;		// segas16a & segas16b
+	UINT8 m_mj_last_val;		// segas16b
+	UINT8 m_adc_select;			// segahang & segaorun
+	UINT8 m_timer_irq_state;		// segaxbd & segaybd
+	UINT8 m_vblank_irq_state;		// segaorun, segaxbd & segaybd
+	UINT8 m_misc_io_data[0x10];	// system18 & segaybd
 
-	void (*i8751_vblank_hook)(running_machine &machine);
-	const UINT8 *i8751_initial_config;
+	void (*m_i8751_vblank_hook)(running_machine &machine);
+	const UINT8 *m_i8751_initial_config;
 
-	read16_space_func custom_io_r;
-	write16_space_func custom_io_w;
+	read16_space_func m_custom_io_r;
+	write16_space_func m_custom_io_w;
 
 	/* misc system 16b */
-	UINT8 atomicp_sound_divisor;
-	UINT8 atomicp_sound_count;
-	UINT8 disable_screen_blanking;
-	UINT8 hwc_input_value;
+	UINT8 m_atomicp_sound_divisor;
+	UINT8 m_atomicp_sound_count;
+	UINT8 m_disable_screen_blanking;
+	UINT8 m_hwc_input_value;
 
 
 	/* misc system 16a */
-	UINT8 video_control;
-	UINT8 mcu_control;
-	UINT8 n7751_command;
-	UINT32 n7751_rom_address;
-	UINT8 last_buttons1;
-	UINT8 last_buttons2;
-	int read_port;
+	UINT8 m_video_control;
+	UINT8 m_mcu_control;
+	UINT8 m_n7751_command;
+	UINT32 m_n7751_rom_address;
+	UINT8 m_last_buttons1;
+	UINT8 m_last_buttons2;
+	int m_read_port;
 
-	void (*lamp_changed_w)(running_machine &machine, UINT8 changed, UINT8 newval);
+	void (*m_lamp_changed_w)(running_machine &machine, UINT8 changed, UINT8 newval);
 
 	/* misc system 18 */
-	UINT8 mcu_data;
+	UINT8 m_mcu_data;
 
-	UINT8 wwally_last_x[3], wwally_last_y[3];
-	UINT8 lghost_value, lghost_select;
+	UINT8 m_wwally_last_x[3];
+	UINT8 m_wwally_last_y[3];
+	UINT8 m_lghost_value;
+	UINT8 m_lghost_select;
 
 	/* misc segaorun */
-	UINT8 irq2_state;
-	const UINT8 *custom_map;
+	UINT8 m_irq2_state;
+	const UINT8 *m_custom_map;
 
 	/* misc yboard */
-	UINT8 analog_data[4];
-	int irq2_scanline;
+	UINT8 m_analog_data[4];
+	int m_irq2_scanline;
 
 	/* misc xboard */
-	UINT8 iochip_regs[2][8];
-	UINT8 iochip_force_input;
+	UINT8 m_iochip_regs[2][8];
+	UINT8 m_iochip_force_input;
 
-	UINT8 (*iochip_custom_io_r[2])(offs_t offset, UINT8 portdata);	// currently unused
-	void (*iochip_custom_io_w[2])(offs_t offset, UINT8 data);	// currently unused
+	UINT8 (*m_iochip_custom_io_r[2])(offs_t offset, UINT8 portdata);	// currently unused
+	void (*m_iochip_custom_io_w[2])(offs_t offset, UINT8 data);	// currently unused
 
-	UINT8 adc_reverse[8];
+	UINT8 m_adc_reverse[8];
 
-	UINT8 gprider_hack;
-	UINT16 *loffire_sync;
+	UINT8 m_gprider_hack;
+	UINT16 *m_loffire_sync;
 
 
 	/* devices */
-	device_t *maincpu;
-	device_t *soundcpu;
-	device_t *subcpu;
-	device_t *subx;
-	device_t *suby;
-	device_t *mcu;
-	device_t *ymsnd;
-	device_t *ppi8255;
-	device_t *n7751;
-	device_t *ppi8255_1;
-	device_t *ppi8255_2;
-	optional_device<timer_device> interrupt_timer;
-	device_t *_315_5248_1;
-	device_t *_315_5250_1;
-	device_t *_315_5250_2;
+	device_t *m_maincpu;
+	device_t *m_soundcpu;
+	device_t *m_subcpu;
+	device_t *m_subx;
+	device_t *m_suby;
+	device_t *m_mcu;
+	device_t *m_ymsnd;
+	device_t *m_ppi8255;
+	device_t *m_n7751;
+	device_t *m_ppi8255_1;
+	device_t *m_ppi8255_2;
+	optional_device<timer_device> m_interrupt_timer;
+	device_t *m_315_5248_1;
+	device_t *m_315_5250_1;
+	device_t *m_315_5250_2;
 };
 
 

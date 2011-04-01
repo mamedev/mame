@@ -101,7 +101,7 @@ PALETTE_INIT( fcombat )
 VIDEO_START( fcombat )
 {
 	fcombat_state *state = machine.driver_data<fcombat_state>();
-	state->bgmap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32 * 8 * 2, 32);
+	state->m_bgmap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32 * 8 * 2, 32);
 }
 
 
@@ -117,18 +117,18 @@ WRITE8_HANDLER( fcombat_videoreg_w )
 	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexor */
-	state->cocktail_flip = data & 1;
+	state->m_cocktail_flip = data & 1;
 
 	/* bits 1-2 char lookup table bank */
-	state->char_palette = (data & 0x06) >> 1;
+	state->m_char_palette = (data & 0x06) >> 1;
 
 	/* bits 3 char bank */
-	state->char_bank = (data & 0x08) >> 3;
+	state->m_char_bank = (data & 0x08) >> 3;
 
 	/* bits 4-5 unused */
 
 	/* bits 6-7 sprite lookup table bank */
-	state->sprite_palette = 0;//(data & 0xc0) >> 6;
+	state->m_sprite_palette = 0;//(data & 0xc0) >> 6;
 	//popmessage("%08x",data);
 }
 
@@ -140,20 +140,20 @@ SCREEN_UPDATE( fcombat )
 	int sx, sy, offs, i;
 
 	/* draw background */
-	tilemap_set_scrolly(state->bgmap, 0, state->fcombat_sh);
-	tilemap_set_scrollx(state->bgmap, 0, state->fcombat_sv - 24);
+	tilemap_set_scrolly(state->m_bgmap, 0, state->m_fcombat_sh);
+	tilemap_set_scrollx(state->m_bgmap, 0, state->m_fcombat_sv - 24);
 
-	tilemap_mark_all_tiles_dirty(state->bgmap);
-	tilemap_draw(bitmap, cliprect, state->bgmap, 0, 0);
+	tilemap_mark_all_tiles_dirty(state->m_bgmap);
+	tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < state->spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram_size; i += 4)
 	{
-		int flags = state->spriteram[i + 0];
-		int y = state->spriteram[i + 1] ^ 255;
-		int code = state->spriteram[i + 2] + ((flags & 0x20) << 3);
-		int x = state->spriteram[i + 3] * 2 + 72;
+		int flags = state->m_spriteram[i + 0];
+		int y = state->m_spriteram[i + 1] ^ 255;
+		int code = state->m_spriteram[i + 2] + ((flags & 0x20) << 3);
+		int x = state->m_spriteram[i + 3] * 2 + 72;
 
 		int xflip = flags & 0x80;
 		int yflip = flags & 0x40;
@@ -161,10 +161,10 @@ SCREEN_UPDATE( fcombat )
 		int wide = flags & 0x08;
 		int code2 = code;
 
-		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->sprite_palette * 16);
+		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (state->m_sprite_palette * 16);
 				const gfx_element *gfx = screen->machine().gfx[1];
 
-		if (state->cocktail_flip)
+		if (state->m_cocktail_flip)
 		{
 			x = 64 * 8 - gfx->width - x;
 			y = 32 * 8 - gfx->height - y;
@@ -200,14 +200,14 @@ SCREEN_UPDATE( fcombat )
 	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
-			int x = state->cocktail_flip ? (63 * 8 - 8 * sx) : 8 * sx;
-			int y = state->cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
+			int x = state->m_cocktail_flip ? (63 * 8 - 8 * sx) : 8 * sx;
+			int y = state->m_cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;
 
 			offs = sx + sy * 64;
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
-				state->videoram[offs] + 256 * state->char_bank,
-				((state->videoram[offs] & 0xf0) >> 4) + state->char_palette * 16,
-				state->cocktail_flip, state->cocktail_flip, x, y, 0);
+				state->m_videoram[offs] + 256 * state->m_char_bank,
+				((state->m_videoram[offs] & 0xf0) >> 4) + state->m_char_palette * 16,
+				state->m_cocktail_flip, state->m_cocktail_flip, x, y, 0);
 		}
 	return 0;
 }

@@ -25,7 +25,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
 	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
@@ -52,11 +52,11 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0418, 0x0418) AM_READWRITE(hcastle_gfxbank_r, hcastle_gfxbank_w)
-	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_MEMBER(hcastle_state, paletteram)
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_MEMBER(hcastle_state, m_paletteram)
 	AM_RANGE(0x0700, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(hcastle_pf1_video_w) AM_BASE_MEMBER(hcastle_state, pf1_videoram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(hcastle_pf1_video_w) AM_BASE_MEMBER(hcastle_state, m_pf1_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(hcastle_pf2_video_w) AM_BASE_MEMBER(hcastle_state, pf2_videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(hcastle_pf2_video_w) AM_BASE_MEMBER(hcastle_state, m_pf2_videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -157,7 +157,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int linestate)
 {
 //  hcastle_state *state = device->machine().driver_data<hcastle_state>();
-//  cputag_set_input_line(state->audiocpu, 0, linestate);
+//  cputag_set_input_line(state->m_audiocpu, 0, linestate);
 }
 
 static void volume_callback(device_t *device, int v)
@@ -183,26 +183,26 @@ static MACHINE_START( hcastle )
 
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k007121_1 = machine.device("k007121_1");
-	state->k007121_2 = machine.device("k007121_2");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k007121_1 = machine.device("k007121_1");
+	state->m_k007121_2 = machine.device("k007121_2");
 
-	state->save_item(NAME(state->pf2_bankbase));
-	state->save_item(NAME(state->pf1_bankbase));
-	state->save_item(NAME(state->gfx_bank));
-	state->save_item(NAME(state->old_pf1));
-	state->save_item(NAME(state->old_pf2));
+	state->save_item(NAME(state->m_pf2_bankbase));
+	state->save_item(NAME(state->m_pf1_bankbase));
+	state->save_item(NAME(state->m_gfx_bank));
+	state->save_item(NAME(state->m_old_pf1));
+	state->save_item(NAME(state->m_old_pf2));
 }
 
 static MACHINE_RESET( hcastle )
 {
 	hcastle_state *state = machine.driver_data<hcastle_state>();
 
-	state->pf2_bankbase = 0;
-	state->pf1_bankbase = 0;
-	state->gfx_bank = 0;
-	state->old_pf1 = -1;
-	state->old_pf2 = -1;
+	state->m_pf2_bankbase = 0;
+	state->m_pf1_bankbase = 0;
+	state->m_gfx_bank = 0;
+	state->m_old_pf1 = -1;
+	state->m_old_pf2 = -1;
 }
 
 static MACHINE_CONFIG_START( hcastle, hcastle_state )

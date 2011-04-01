@@ -20,34 +20,34 @@ public:
 	megasys1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *spriteram;
-	UINT16 ip_select;
-	UINT16 ip_select_values[5];
-	UINT8 ignore_oki_status;
-	UINT16 protection_val;
-	int bank;
-	UINT16 *scrollram[3];
-	UINT16 *objectram;
-	UINT16 *vregs;
-	UINT16 *ram;
-	int scrollx[3];
-	int scrolly[3];
-	int active_layers;
-	int bits_per_color_code;
-	int scroll_flag[3];
-	int sprite_bank;
-	int screen_flag;
-	int sprite_flag;
-	int _8x8_scroll_factor[3];
-	int _16x16_scroll_factor[3];
-	tilemap_t *tmap[3];
-	tilemap_t *tilemap[3][2][4];
-	int hardware_type_z;
-	UINT16 *buffer_objectram;
-	UINT16 *buffer2_objectram;
-	UINT16 *buffer_spriteram16;
-	UINT16 *buffer2_spriteram16;
-	int layers_order[16];
+	UINT16 *m_spriteram;
+	UINT16 m_ip_select;
+	UINT16 m_ip_select_values[5];
+	UINT8 m_ignore_oki_status;
+	UINT16 m_protection_val;
+	int m_bank;
+	UINT16 *m_scrollram[3];
+	UINT16 *m_objectram;
+	UINT16 *m_vregs;
+	UINT16 *m_ram;
+	int m_scrollx[3];
+	int m_scrolly[3];
+	int m_active_layers;
+	int m_bits_per_color_code;
+	int m_scroll_flag[3];
+	int m_sprite_bank;
+	int m_screen_flag;
+	int m_sprite_flag;
+	int m_8x8_scroll_factor[3];
+	int m_16x16_scroll_factor[3];
+	tilemap_t *m_tmap[3];
+	tilemap_t *m_tilemap[3][2][4];
+	int m_hardware_type_z;
+	UINT16 *m_buffer_objectram;
+	UINT16 *m_buffer2_objectram;
+	UINT16 *m_buffer_spriteram16;
+	UINT16 *m_buffer2_spriteram16;
+	int m_layers_order[16];
 };
 
 

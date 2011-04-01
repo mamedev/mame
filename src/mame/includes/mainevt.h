@@ -11,21 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase;
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
 
 	/* misc */
-	int        nmi_enable;
+	int        m_nmi_enable;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *upd;
-	device_t *k007232;
-	device_t *k052109;
-	device_t *k051960;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_upd;
+	device_t *m_k007232;
+	device_t *m_k052109;
+	device_t *m_k051960;
 };
 
 /*----------- defined in video/mainevt.c -----------*/

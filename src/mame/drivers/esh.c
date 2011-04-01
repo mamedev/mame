@@ -34,10 +34,10 @@ public:
 	esh_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *laserdisc;
-	UINT8 *tile_ram;
-	UINT8 *tile_control_ram;
-	UINT8 ld_video_visible;
+	device_t *m_laserdisc;
+	UINT8 *m_tile_ram;
+	UINT8 *m_tile_control_ram;
+	UINT8 m_ld_video_visible;
 };
 
 
@@ -61,13 +61,13 @@ static SCREEN_UPDATE( esh )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			int palIndex  = (state->tile_control_ram[current_screen_character] & 0x0f);
-			int tileOffs  = (state->tile_control_ram[current_screen_character] & 0x10) >> 4;
-			//int blinkLine = (state->tile_control_ram[current_screen_character] & 0x40) >> 6;
-			//int blinkChar = (state->tile_control_ram[current_screen_character] & 0x80) >> 7;
+			int palIndex  = (state->m_tile_control_ram[current_screen_character] & 0x0f);
+			int tileOffs  = (state->m_tile_control_ram[current_screen_character] & 0x10) >> 4;
+			//int blinkLine = (state->m_tile_control_ram[current_screen_character] & 0x40) >> 6;
+			//int blinkChar = (state->m_tile_control_ram[current_screen_character] & 0x80) >> 7;
 
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
-					state->tile_ram[current_screen_character] + (0x100 * tileOffs),
+					state->m_tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
 		}
@@ -83,13 +83,13 @@ static SCREEN_UPDATE( esh )
 static READ8_HANDLER(ldp_read)
 {
 	esh_state *state = space->machine().driver_data<esh_state>();
-	return laserdisc_data_r(state->laserdisc);
+	return laserdisc_data_r(state->m_laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
 	esh_state *state = space->machine().driver_data<esh_state>();
-	laserdisc_data_w(state->laserdisc,data);
+	laserdisc_data_w(state->m_laserdisc,data);
 }
 
 static WRITE8_HANDLER(misc_write)
@@ -101,7 +101,7 @@ static WRITE8_HANDLER(misc_write)
 		logerror("BEEP!\n");
 
 	/* Bit 2 unknown */
-	state->ld_video_visible = !((data & 0x08) >> 3);
+	state->m_ld_video_visible = !((data & 0x08) >> 3);
 
 	/* Bits 4-7 unknown */
 	/* They cycle through a repeating pattern though */
@@ -154,8 +154,8 @@ static WRITE8_HANDLER(nmi_line_w)
 static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE_MEMBER(esh_state, tile_ram)
-	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE_MEMBER(esh_state, tile_control_ram)
+	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE_MEMBER(esh_state, m_tile_ram)
+	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE_MEMBER(esh_state, m_tile_control_ram)
 ADDRESS_MAP_END
 
 
@@ -284,7 +284,7 @@ static INTERRUPT_GEN( vblank_callback_esh )
 static MACHINE_START( esh )
 {
 	esh_state *state = machine.driver_data<esh_state>();
-	state->laserdisc = machine.device("laserdisc");
+	state->m_laserdisc = machine.device("laserdisc");
 }
 
 

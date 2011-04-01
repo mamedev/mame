@@ -560,7 +560,7 @@
 static VIDEO_START( norautp )
 {
 	norautp_state *state = machine.driver_data<norautp_state>();
-	state->np_vram = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_np_vram = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
 
@@ -580,8 +580,8 @@ static SCREEN_UPDATE( norautp )
 		{
 			for(x = 0; x < 16; x++)
 			{
-				int tile = state->np_vram[count] & 0x3f;
-				int colour = (state->np_vram[count] & 0xc0) >> 6;
+				int tile = state->m_np_vram[count] & 0x3f;
+				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
 
 				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[1], tile, colour, 0, 0, (x * 32) + 8, y * 32);
 
@@ -592,8 +592,8 @@ static SCREEN_UPDATE( norautp )
 		{
 			for(x = 0; x < 32; x++)
 			{
-				int tile = state->np_vram[count] & 0x3f;
-				int colour = (state->np_vram[count] & 0xc0) >> 6;
+				int tile = state->m_np_vram[count] & 0x3f;
+				int colour = (state->m_np_vram[count] & 0xc0) >> 6;
 
 				drawgfx_opaque(bitmap,cliprect, screen->machine().gfx[0], tile, colour, 0, 0, x * 16, y * 32);
 
@@ -726,14 +726,14 @@ static READ8_HANDLER( vram_data_r )
 //static READ8_DEVICE_HANDLER( vram_data_r )
 {
 	norautp_state *state = space->machine().driver_data<norautp_state>();
-	return state->np_vram[state->np_addr];
+	return state->m_np_vram[state->m_np_addr];
 }
 
 static WRITE8_HANDLER( vram_data_w )
 //static WRITE8_DEVICE_HANDLER( vram_data_w )
 {
 	norautp_state *state = space->machine().driver_data<norautp_state>();
-	state->np_vram[state->np_addr] = data & 0xff;
+	state->m_np_vram[state->m_np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
 //  i8255a_pc7_w(device->machine().device("ppi8255_2"), 0);
@@ -745,7 +745,7 @@ static WRITE8_HANDLER( vram_addr_w )
 //static WRITE8_DEVICE_HANDLER( vram_addr_w )
 {
 	norautp_state *state = space->machine().driver_data<norautp_state>();
-	state->np_addr = data;
+	state->m_np_addr = data;
 }
 
 /* game waits for bit 4 (0x10) to be reset.*/

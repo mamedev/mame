@@ -5,15 +5,15 @@
 WRITE8_HANDLER( exprraid_videoram_w )
 {
 	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( exprraid_colorram_w )
 {
 	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( exprraid_flipscreen_w )
@@ -28,23 +28,23 @@ WRITE8_HANDLER( exprraid_flipscreen_w )
 WRITE8_HANDLER( exprraid_bgselect_w )
 {
 	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	if (state->bg_index[offset] != data)
+	if (state->m_bg_index[offset] != data)
 	{
-		state->bg_index[offset] = data;
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_bg_index[offset] = data;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
 WRITE8_HANDLER( exprraid_scrollx_w )
 {
 	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	tilemap_set_scrollx(state->bg_tilemap, offset, data);
+	tilemap_set_scrollx(state->m_bg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( exprraid_scrolly_w )
 {
 	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	tilemap_set_scrolly(state->bg_tilemap, 0, data);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (sx >= 16) quadrant++;
 	if (sy >= 16) quadrant += 2;
 
-	offs = (sy % 16) * 16 + (sx % 16) + (state->bg_index[quadrant] & 0x3f) * 0x100;
+	offs = (sy % 16) * 16 + (sx % 16) + (state->m_bg_index[quadrant] & 0x3f) * 0x100;
 
 	data = tilerom[offs];
 	attr = tilerom[offs + 0x4000];
@@ -78,8 +78,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	exprraid_state *state = machine.driver_data<exprraid_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + ((attr & 0x07) << 8);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0x10) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -89,11 +89,11 @@ VIDEO_START( exprraid )
 {
 	exprraid_state *state = machine.driver_data<exprraid_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 2);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 2);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -101,15 +101,15 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	exprraid_state *state = machine.driver_data<exprraid_state>();
 	int offs;
 
-	for (offs = 0; offs < state->spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
-		int attr = state->spriteram[offs + 1];
-		int code = state->spriteram[offs + 3] + ((attr & 0xe0) << 3);
+		int attr = state->m_spriteram[offs + 1];
+		int code = state->m_spriteram[offs + 3] + ((attr & 0xe0) << 3);
 		int color = (attr & 0x03) + ((attr & 0x08) >> 1);
 		int flipx = (attr & 0x04);
 		int flipy = 0;
-		int sx = ((248 - state->spriteram[offs + 2]) & 0xff) - 8;
-		int sy = state->spriteram[offs];
+		int sx = ((248 - state->m_spriteram[offs + 2]) & 0xff) - 8;
+		int sy = state->m_spriteram[offs];
 
 		if (flip_screen_get(machine))
 		{
@@ -139,9 +139,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( exprraid )
 {
 	exprraid_state *state = screen->machine().driver_data<exprraid_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

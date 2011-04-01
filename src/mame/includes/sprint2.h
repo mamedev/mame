@@ -27,15 +27,15 @@ public:
 	sprint2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int attract;
-	int steering[2];
-	int gear[2];
-	int game;
-	UINT8 dial[2];
-	UINT8* video_ram;
-	tilemap_t* bg_tilemap;
-	bitmap_t* helper;
-	int collision[2];
+	int m_attract;
+	int m_steering[2];
+	int m_gear[2];
+	int m_game;
+	UINT8 m_dial[2];
+	UINT8* m_video_ram;
+	tilemap_t* m_bg_tilemap;
+	bitmap_t* m_helper;
+	int m_collision[2];
 };
 
 

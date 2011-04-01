@@ -7,25 +7,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
-	UINT8 *galaga_starcontrol;	// 6 addresses
-	emu_timer *cpu3_interrupt_timer;
-	UINT8 custom_mod;
+	UINT8 *m_galaga_ram1;
+	UINT8 *m_galaga_ram2;
+	UINT8 *m_galaga_ram3;
+	UINT8 *m_galaga_starcontrol;	// 6 addresses
+	emu_timer *m_cpu3_interrupt_timer;
+	UINT8 m_custom_mod;
 
 	/* machine state */
-	UINT32 stars_scrollx;
-	UINT32 stars_scrolly;
+	UINT32 m_stars_scrollx;
+	UINT32 m_stars_scrolly;
 
-	UINT32 galaga_gfxbank; // used by catsbee
+	UINT32 m_galaga_gfxbank; // used by catsbee
 
 	/* devices */
 
 	/* bank support */
 
 	/* shared */
-	UINT8 *videoram;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
 };
 
 class xevious_state : public galaga_state
@@ -34,15 +36,15 @@ public:
 	xevious_state(running_machine &machine, const driver_device_config_base &config)
 		: galaga_state(machine, config) { }
 
-	UINT8 *xevious_fg_videoram;
-	UINT8 *xevious_fg_colorram;
-	UINT8 *xevious_bg_videoram;
-	UINT8 *xevious_bg_colorram;
-	UINT8 *xevious_sr1;
-	UINT8 *xevious_sr2;
-	UINT8 *xevious_sr3;
+	UINT8 *m_xevious_fg_videoram;
+	UINT8 *m_xevious_fg_colorram;
+	UINT8 *m_xevious_bg_videoram;
+	UINT8 *m_xevious_bg_colorram;
+	UINT8 *m_xevious_sr1;
+	UINT8 *m_xevious_sr2;
+	UINT8 *m_xevious_sr3;
 
-	INT32 xevious_bs[2];
+	INT32 m_xevious_bs[2];
 };
 
 
@@ -52,13 +54,13 @@ public:
 	bosco_state(running_machine &machine, const driver_device_config_base &config)
 		: galaga_state(machine, config) { }
 
-	UINT8 *bosco_radarattr;
+	UINT8 *m_bosco_radarattr;
 
-	UINT8 *bosco_starcontrol;
-	UINT8 *bosco_starblink;
+	UINT8 *m_bosco_starcontrol;
+	UINT8 *m_bosco_starblink;
 
-	UINT8 *bosco_radarx;
-	UINT8 *bosco_radary;
+	UINT8 *m_bosco_radarx;
+	UINT8 *m_bosco_radary;
 };
 
 class digdug_state : public galaga_state
@@ -67,14 +69,14 @@ public:
 	digdug_state(running_machine &machine, const driver_device_config_base &config)
 		: galaga_state(machine, config) { }
 
-	UINT8 *digdug_objram;
-	UINT8 *digdug_posram;
-	UINT8 *digdug_flpram;
+	UINT8 *m_digdug_objram;
+	UINT8 *m_digdug_posram;
+	UINT8 *m_digdug_flpram;
 
-	UINT8 bg_select;
-	UINT8 tx_color_mode;
-	UINT8 bg_disable;
-	UINT8 bg_color_bank;
+	UINT8 m_bg_select;
+	UINT8 m_tx_color_mode;
+	UINT8 m_bg_disable;
+	UINT8 m_bg_color_bank;
 };
 
 

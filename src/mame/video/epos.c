@@ -68,7 +68,7 @@ WRITE8_HANDLER( epos_port_1_w )
 
 	coin_counter_w(space->machine(), 0, (data >> 2) & 0x01);
 
-	state->palette = (data >> 3) & 0x01;
+	state->m_palette = (data >> 3) & 0x01;
 }
 
 
@@ -80,15 +80,15 @@ SCREEN_UPDATE( epos )
 
 	get_pens(screen->machine(), pens);
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
-		UINT8 data = state->videoram[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
 
-		*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(state->palette << 4) | (data & 0x0f)];
-		*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(state->palette << 4) | (data >> 4)];
+		*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(state->m_palette << 4) | (data & 0x0f)];
+		*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(state->m_palette << 4) | (data >> 4)];
 	}
 
 	return 0;

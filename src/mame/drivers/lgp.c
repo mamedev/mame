@@ -75,10 +75,10 @@ public:
 	lgp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	device_t *laserdisc;
-	UINT8 *tile_ram;
-	UINT8 *tile_control_ram;
-	emu_timer *irq_timer;
+	device_t *m_laserdisc;
+	UINT8 *m_tile_ram;
+	UINT8 *m_tile_control_ram;
+	emu_timer *m_irq_timer;
 };
 
 
@@ -109,7 +109,7 @@ static SCREEN_UPDATE( lgp )
 			/* Somewhere there's a flag that offsets the tilemap by 0x100*x */
 			/* Palette is likely set somewhere as well (tile_control_ram?) */
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0],
-					state->tile_ram[current_screen_character],
+					state->m_tile_ram[current_screen_character],
 					0,
 					0, 0, charx*8, chary*8, 0);
 		}
@@ -124,13 +124,13 @@ static SCREEN_UPDATE( lgp )
 static READ8_HANDLER(ldp_read)
 {
 	lgp_state *state = space->machine().driver_data<lgp_state>();
-	return laserdisc_data_r(state->laserdisc);
+	return laserdisc_data_r(state->m_laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
 	lgp_state *state = space->machine().driver_data<lgp_state>();
-	laserdisc_data_w(state->laserdisc,data);
+	laserdisc_data_w(state->m_laserdisc,data);
 }
 
 
@@ -140,8 +140,8 @@ static WRITE8_HANDLER(ldp_write)
 /* PROGRAM MAPS */
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_ROM
-	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE_MEMBER(lgp_state, tile_ram)
-	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE_MEMBER(lgp_state, tile_control_ram)
+	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_ram)
+	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_control_ram)
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
 	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
@@ -339,15 +339,15 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 	// IRQ
 	device_set_input_line(device, 0, ASSERT_LINE);
-	state->irq_timer->adjust(attotime::from_usec(50));
+	state->m_irq_timer->adjust(attotime::from_usec(50));
 }
 
 
 static MACHINE_START( lgp )
 {
 	lgp_state *state = machine.driver_data<lgp_state>();
-	state->laserdisc = machine.device("laserdisc");
-	state->irq_timer = machine.scheduler().timer_alloc(FUNC(irq_stop));
+	state->m_laserdisc = machine.device("laserdisc");
+	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_stop));
 }
 
 

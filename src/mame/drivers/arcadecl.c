@@ -84,7 +84,7 @@
 static void update_interrupts(running_machine &machine)
 {
 	arcadecl_state *state = machine.driver_data<arcadecl_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( latch_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(arcadecl_state, bitmap)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(arcadecl_state, m_bitmap)
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM

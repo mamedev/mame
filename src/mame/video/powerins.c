@@ -58,10 +58,10 @@ WRITE16_HANDLER( powerins_tilebank_w )
 	powerins_state *state = space->machine().driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data != state->tile_bank)
+		if (data != state->m_tile_bank)
 		{
-			state->tile_bank = data;		// Tiles Bank (VRAM 0)
-			tilemap_mark_all_tiles_dirty(state->tilemap_0);
+			state->m_tile_bank = data;		// Tiles Bank (VRAM 0)
+			tilemap_mark_all_tiles_dirty(state->m_tilemap_0);
 		}
 	}
 }
@@ -122,10 +122,10 @@ Offset:
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 code = state->vram_0[tile_index];
+	UINT16 code = state->m_vram_0[tile_index];
 	SET_TILE_INFO(
 			0,
-			(code & 0x07ff) + (state->tile_bank*0x800),
+			(code & 0x07ff) + (state->m_tile_bank*0x800),
 			((code & 0xf000) >> (16-4)) + ((code & 0x0800) >> (11-4)),
 			0);
 }
@@ -133,8 +133,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 WRITE16_HANDLER( powerins_vram_0_w )
 {
 	powerins_state *state = space->machine().driver_data<powerins_state>();
-	COMBINE_DATA(&state->vram_0[offset]);
-	tilemap_mark_tile_dirty(state->tilemap_0, offset);
+	COMBINE_DATA(&state->m_vram_0[offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap_0, offset);
 }
 
 static TILEMAP_MAPPER( powerins_get_memory_offset_0 )
@@ -164,7 +164,7 @@ Offset:
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 code = state->vram_1[tile_index];
+	UINT16 code = state->m_vram_1[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0x0fff,
@@ -175,8 +175,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 WRITE16_HANDLER( powerins_vram_1_w )
 {
 	powerins_state *state = space->machine().driver_data<powerins_state>();
-	COMBINE_DATA(&state->vram_1[offset]);
-	tilemap_mark_tile_dirty(state->tilemap_1, offset);
+	COMBINE_DATA(&state->m_vram_1[offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap_1, offset);
 }
 
 
@@ -194,24 +194,24 @@ WRITE16_HANDLER( powerins_vram_1_w )
 VIDEO_START( powerins )
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
-	state->tilemap_0 = tilemap_create(	machine, get_tile_info_0,
+	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0,
 								powerins_get_memory_offset_0,
 
 								16,16,
 								DIM_NX_0, DIM_NY_0 );
 
-	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1,
+	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1,
 								tilemap_scan_cols,
 
 								8,8,
 								DIM_NX_1, DIM_NY_1 );
 
-		tilemap_set_scroll_rows(state->tilemap_0,1);
-		tilemap_set_scroll_cols(state->tilemap_0,1);
+		tilemap_set_scroll_rows(state->m_tilemap_0,1);
+		tilemap_set_scroll_cols(state->m_tilemap_0,1);
 
-		tilemap_set_scroll_rows(state->tilemap_1,1);
-		tilemap_set_scroll_cols(state->tilemap_1,1);
-		tilemap_set_transparent_pen(state->tilemap_1,15);
+		tilemap_set_scroll_rows(state->m_tilemap_1,1);
+		tilemap_set_scroll_cols(state->m_tilemap_1,1);
+		tilemap_set_transparent_pen(state->m_tilemap_1,15);
 }
 
 
@@ -266,8 +266,8 @@ Offset:     Format:                 Value:
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 *source = state->spriteram + 0x8000/2;
-	UINT16 *finish = state->spriteram + 0x9000/2;
+	UINT16 *source = state->m_spriteram + 0x8000/2;
+	UINT16 *finish = state->m_spriteram + 0x9000/2;
 
 	int screen_w = machine.primary_screen->width();
 	int screen_h = machine.primary_screen->height();
@@ -345,14 +345,14 @@ SCREEN_UPDATE( powerins )
 	powerins_state *state = screen->machine().driver_data<powerins_state>();
 	int layers_ctrl = -1;
 
-	int scrollx = (state->vctrl_0[2/2]&0xff) + (state->vctrl_0[0/2]&0xff)*256;
-	int scrolly = (state->vctrl_0[6/2]&0xff) + (state->vctrl_0[4/2]&0xff)*256;
+	int scrollx = (state->m_vctrl_0[2/2]&0xff) + (state->m_vctrl_0[0/2]&0xff)*256;
+	int scrolly = (state->m_vctrl_0[6/2]&0xff) + (state->m_vctrl_0[4/2]&0xff)*256;
 
-	tilemap_set_scrollx( state->tilemap_0, 0, scrollx - 0x20);
-	tilemap_set_scrolly( state->tilemap_0, 0, scrolly );
+	tilemap_set_scrollx( state->m_tilemap_0, 0, scrollx - 0x20);
+	tilemap_set_scrolly( state->m_tilemap_0, 0, scrolly );
 
-	tilemap_set_scrollx( state->tilemap_1, 0, -0x20);	// fixed offset
-	tilemap_set_scrolly( state->tilemap_1, 0,  0x00);
+	tilemap_set_scrollx( state->m_tilemap_1, 0, -0x20);	// fixed offset
+	tilemap_set_scrolly( state->m_tilemap_1, 0,  0x00);
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(screen->machine(), KEYCODE_Z))
@@ -367,9 +367,9 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->tilemap_0, 0, 0);
+	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, state->m_tilemap_0, 0, 0);
 	else					bitmap_fill(bitmap,cliprect,0);
 	if (layers_ctrl&8)		draw_sprites(screen->machine(),bitmap,cliprect);
-	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->tilemap_1, 0, 0);
+	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, state->m_tilemap_1, 0, 0);
 	return 0;
 }

@@ -4,12 +4,12 @@ public:
 	spcforce_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *scrollram;
-	UINT8 *videoram;
-	UINT8 *colorram;
+	UINT8 *m_scrollram;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
 
-	int sn76496_latch;
-	int sn76496_select;
+	int m_sn76496_latch;
+	int m_sn76496_select;
 };
 
 

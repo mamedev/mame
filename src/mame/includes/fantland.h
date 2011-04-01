@@ -7,26 +7,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    spriteram;   // currently directly used in a 16bit map...
-//  UINT8 *    spriteram_2; // currently directly used in a 16bit map...
-//  UINT8 *    paletteram;  // currently this uses generic palette handling
+//  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
+//  UINT8 *    m_spriteram_2; // currently directly used in a 16bit map...
+//  UINT8 *    m_paletteram;  // currently this uses generic palette handling
 
 	/* misc */
-	UINT8      nmi_enable;
-	int        old_x[2], old_y[2], old_f[2];
-	UINT8      input_ret[2];
-	int        adpcm_playing[4];
-	int        adpcm_addr[2][4];
-	int        adpcm_nibble[4];
+	UINT8      m_nmi_enable;
+	int        m_old_x[2];
+	int        m_old_y[2];
+	int        m_old_f[2];
+	UINT8      m_input_ret[2];
+	int        m_adpcm_playing[4];
+	int        m_adpcm_addr[2][4];
+	int        m_adpcm_nibble[4];
 
 	/* devices */
-	device_t *audio_cpu;
-	device_t *msm1;
-	device_t *msm2;
-	device_t *msm3;
-	device_t *msm4;
-	UINT8 *spriteram;
-	UINT8 *spriteram2;
+	device_t *m_audio_cpu;
+	device_t *m_msm1;
+	device_t *m_msm2;
+	device_t *m_msm3;
+	device_t *m_msm4;
+	UINT8 *m_spriteram;
+	UINT8 *m_spriteram2;
 };
 
 

@@ -30,28 +30,28 @@ public:
 	suprgolf_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *tilemap;
-	UINT8 *videoram;
-	UINT8 *paletteram;
-	UINT8 *bg_vram;
-	UINT16 *bg_fb;
-	UINT16 *fg_fb;
-	int rom_bank;
-	UINT8 bg_bank;
-	UINT8 vreg_bank;
-	UINT8 msm5205next;
-	UINT8 msm_nmi_mask;
-	UINT8 vreg_pen;
-	UINT8 palette_switch;
-	UINT8 bg_vreg_test;
-	int toggle;
+	tilemap_t *m_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_paletteram;
+	UINT8 *m_bg_vram;
+	UINT16 *m_bg_fb;
+	UINT16 *m_fg_fb;
+	int m_rom_bank;
+	UINT8 m_bg_bank;
+	UINT8 m_vreg_bank;
+	UINT8 m_msm5205next;
+	UINT8 m_msm_nmi_mask;
+	UINT8 m_vreg_pen;
+	UINT8 m_palette_switch;
+	UINT8 m_bg_vreg_test;
+	int m_toggle;
 };
 
 static TILE_GET_INFO( get_tile_info )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
-	int code = state->videoram[tile_index*2]+256*(state->videoram[tile_index*2+1]);
-	int color = state->videoram[tile_index*2+0x800] & 0x7f;
+	int code = state->m_videoram[tile_index*2]+256*(state->m_videoram[tile_index*2+1]);
+	int color = state->m_videoram[tile_index*2+0x800] & 0x7f;
 
 	SET_TILE_INFO(
 		0,
@@ -64,13 +64,13 @@ static VIDEO_START( suprgolf )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
-	state->paletteram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
-	state->bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
-	state->fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	state->m_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
+	state->m_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
+	state->m_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
 
-	tilemap_set_transparent_pen(state->tilemap,15);
+	tilemap_set_transparent_pen(state->m_tilemap,15);
 }
 
 static SCREEN_UPDATE( suprgolf )
@@ -86,7 +86,7 @@ static SCREEN_UPDATE( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = state->bg_fb[count];
+				color = state->m_bg_fb[count];
 
 				if(x <= cliprect->max_x && y <= cliprect->max_y)
 					*BITMAP_ADDR16(bitmap, y, x) = screen->machine().pens[(color & 0x7ff)];
@@ -103,9 +103,9 @@ static SCREEN_UPDATE( suprgolf )
 		{
 			for(x=0;x<512;x++)
 			{
-				color = state->fg_fb[count];
+				color = state->m_fg_fb[count];
 
-				if(((state->fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
+				if(((state->m_fg_fb[count] & 0x0f) != 0x0f) && (x <= cliprect->max_x && y <= cliprect->max_y))
 					*BITMAP_ADDR16(bitmap, y, x) = screen->machine().pens[(color & 0x7ff)];
 
 				count++;
@@ -113,7 +113,7 @@ static SCREEN_UPDATE( suprgolf )
 		}
 	}
 
-	tilemap_draw(bitmap,cliprect,state->tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tilemap,0,0);
 
 	return 0;
 }
@@ -122,22 +122,22 @@ static READ8_HANDLER( suprgolf_videoram_r )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	if (state->palette_switch)
-		return state->paletteram[offset];
+	if (state->m_palette_switch)
+		return state->m_paletteram[offset];
 	else
-		return state->videoram[offset];
+		return state->m_videoram[offset];
 }
 
 static WRITE8_HANDLER( suprgolf_videoram_w )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	if(state->palette_switch)
+	if(state->m_palette_switch)
 	{
 		int r,g,b,datax;
-		state->paletteram[offset] = data;
+		state->m_paletteram[offset] = data;
 		offset>>=1;
-		datax = state->paletteram[offset*2] + 256*state->paletteram[offset*2 + 1];
+		datax = state->m_paletteram[offset*2] + 256*state->m_paletteram[offset*2 + 1];
 
 		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
@@ -147,8 +147,8 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	}
 	else
 	{
-		state->videoram[offset] = data;
-		tilemap_mark_tile_dirty(state->tilemap, (offset & 0x7fe) >> 1);
+		state->m_videoram[offset] = data;
+		tilemap_mark_tile_dirty(state->m_tilemap, (offset & 0x7fe) >> 1);
 	}
 }
 
@@ -156,7 +156,7 @@ static READ8_HANDLER( suprgolf_vregs_r )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	return state->vreg_bank;
+	return state->m_vreg_bank;
 }
 
 static WRITE8_HANDLER( suprgolf_vregs_w )
@@ -164,11 +164,11 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
-	state->vreg_bank = data;
-	state->palette_switch = (data & 0x80);
-	state->bg_bank = (data & 0x1f);
+	state->m_vreg_bank = data;
+	state->m_palette_switch = (data & 0x80);
+	state->m_bg_bank = (data & 0x1f);
 
-	state->bg_vreg_test = data & 0x20;
+	state->m_bg_vreg_test = data & 0x20;
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
@@ -178,7 +178,7 @@ static READ8_HANDLER( suprgolf_bg_vram_r )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	return state->bg_vram[offset+state->bg_bank*0x2000];
+	return state->m_bg_vram[offset+state->m_bg_bank*0x2000];
 }
 
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
@@ -194,36 +194,36 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 
 	if(hi_nibble == 0xf0)
 	{
-		hi_nibble = state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0;
-		if(!(state->vreg_pen & 0x80) && (!(state->bg_bank & 0x10)))
+		hi_nibble = state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0;
+		if(!(state->m_vreg_pen & 0x80) && (!(state->m_bg_bank & 0x10)))
 			hi_dirty_dot = 0;
 	}
 
 	if(lo_nibble == 0x0f)
 	{
-		lo_nibble = state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f;
-		if(!(state->vreg_pen & 0x80) && (!(state->bg_bank & 0x10)))
+		lo_nibble = state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f;
+		if(!(state->m_vreg_pen & 0x80) && (!(state->m_bg_bank & 0x10)))
 			lo_dirty_dot = 0;
 	}
 
-	if(state->vreg_pen & 0x80 || state->bg_bank & 0x10)
-		state->bg_vram[offset+state->bg_bank*0x2000] = data;
+	if(state->m_vreg_pen & 0x80 || state->m_bg_bank & 0x10)
+		state->m_bg_vram[offset+state->m_bg_bank*0x2000] = data;
 	else
-		state->bg_vram[offset+state->bg_bank*0x2000] = hi_nibble|lo_nibble;
+		state->m_bg_vram[offset+state->m_bg_bank*0x2000] = hi_nibble|lo_nibble;
 
-	if(state->bg_bank & 0x10)
+	if(state->m_bg_bank & 0x10)
 	{
 		if(hi_dirty_dot)
-			state->fg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+1] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0)>>4);
+			state->m_fg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+1] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			state->fg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+0] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f)>>0);
+			state->m_fg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+0] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f)>>0);
 	}
 	else
 	{
 		if(hi_dirty_dot)
-			state->bg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+1] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0xf0)>>4);
+			state->m_bg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+1] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			state->bg_fb[(offset+(state->bg_bank & 0x0f)*0x2000)*2+0] = (state->vreg_pen & 0x7f)<<4 | ((state->bg_vram[offset+state->bg_bank*0x2000] & 0x0f)>>0);
+			state->m_bg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+0] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f)>>0);
 	}
 }
 
@@ -231,21 +231,21 @@ static WRITE8_HANDLER( suprgolf_pen_w )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	state->vreg_pen = data;
+	state->m_vreg_pen = data;
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	state->msm5205next = data;
+	state->m_msm5205next = data;
 }
 
 static READ8_HANDLER( rom_bank_select_r )
 {
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	return state->rom_bank;
+	return state->m_rom_bank;
 }
 
 static WRITE8_HANDLER( rom_bank_select_w )
@@ -253,14 +253,14 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 	UINT8 *region_base = space->machine().region("user1")->base();
 
-	state->rom_bank = data;
+	state->m_rom_bank = data;
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 //	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
 	memory_set_bankptr(space->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
-	state->msm_nmi_mask = data & 0x40;
+	state->m_msm_nmi_mask = data & 0x40;
 	flip_screen_set(space->machine(), data & 0x80);
 }
 
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_MEMBER(suprgolf_state,videoram) //foreground vram + paletteram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_MEMBER(suprgolf_state,m_videoram) //foreground vram + paletteram
 	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -440,15 +440,15 @@ static void adpcm_int(device_t *device)
 
 	{
 		msm5205_reset_w(device,0);
-		state->toggle ^= 1;
-		if(state->toggle)
+		state->m_toggle ^= 1;
+		if(state->m_toggle)
 		{
-			msm5205_data_w(device, (state->msm5205next & 0xf0) >> 4);
-			if(state->msm_nmi_mask) { cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
+			msm5205_data_w(device, (state->m_msm5205next & 0xf0) >> 4);
+			if(state->m_msm_nmi_mask) { cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); }
 		}
 		else
 		{
-			msm5205_data_w(device, (state->msm5205next & 0x0f) >> 0);
+			msm5205_data_w(device, (state->m_msm5205next & 0x0f) >> 0);
 		}
 	}
 }
@@ -478,7 +478,7 @@ static MACHINE_RESET( suprgolf )
 {
 	suprgolf_state *state = machine.driver_data<suprgolf_state>();
 
-	state->msm_nmi_mask = 0;
+	state->m_msm_nmi_mask = 0;
 }
 
 static MACHINE_CONFIG_START( suprgolf, suprgolf_state )

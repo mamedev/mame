@@ -23,12 +23,12 @@ VIDEO_START( yboard )
 	segaic16_palette_init(0x2000);
 
 	/* allocate a bitmap for the yboard layer */
-	state->tmp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* initialize the rotation layer */
 	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
 
-	state->save_item(NAME(*state->tmp_bitmap));
+	state->save_item(NAME(*state->m_tmp_bitmap));
 }
 
 
@@ -54,10 +54,10 @@ SCREEN_UPDATE( yboard )
 	/* draw the yboard sprites */
 	yboard_clip.min_x = yboard_clip.min_y = 0;
 	yboard_clip.max_x = yboard_clip.max_y = 511;
-	segaic16_sprites_draw(screen, state->tmp_bitmap, &yboard_clip, 1);
+	segaic16_sprites_draw(screen, state->m_tmp_bitmap, &yboard_clip, 1);
 
 	/* apply rotation */
-	segaic16_rotate_draw(screen->machine(), 0, bitmap, cliprect, state->tmp_bitmap);
+	segaic16_rotate_draw(screen->machine(), 0, bitmap, cliprect, state->m_tmp_bitmap);
 
 	/* draw the 16B sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);

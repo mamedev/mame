@@ -100,17 +100,17 @@ public:
 	spool99_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *main;
-	tilemap_t *sc0_tilemap;
-	UINT8 *cram;
-	UINT8 *vram;
+	UINT8 *m_main;
+	tilemap_t *m_sc0_tilemap;
+	UINT8 *m_cram;
+	UINT8 *m_vram;
 };
 
 static TILE_GET_INFO( get_spool99_tile_info )
 {
 	spool99_state *state = machine.driver_data<spool99_state>();
-	int code = ((state->vram[tile_index*2+1]<<8) | (state->vram[tile_index*2+0]));
-	int color = state->cram[tile_index*2+0];
+	int code = ((state->m_vram[tile_index*2+1]<<8) | (state->m_vram[tile_index*2+0]));
+	int color = state->m_cram[tile_index*2+0];
 
 	SET_TILE_INFO(
 			0,
@@ -123,14 +123,14 @@ static VIDEO_START(spool99)
 {
 	spool99_state *state = machine.driver_data<spool99_state>();
 
-	state->sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_sc0_tilemap = tilemap_create(machine, get_spool99_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static SCREEN_UPDATE(spool99)
 {
 	spool99_state *state = screen->machine().driver_data<spool99_state>();
 
-	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_sc0_tilemap,0,0);
 	return 0;
 }
 
@@ -138,16 +138,16 @@ static WRITE8_HANDLER( spool99_vram_w )
 {
 	spool99_state *state = space->machine().driver_data<spool99_state>();
 
-	state->vram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
+	state->m_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( spool99_cram_w )
 {
 	spool99_state *state = space->machine().driver_data<spool99_state>();
 
-	state->cram[offset] = data;
-	tilemap_mark_tile_dirty(state->sc0_tilemap,offset/2);
+	state->m_cram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_sc0_tilemap,offset/2);
 }
 
 
@@ -204,7 +204,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
@@ -215,8 +215,8 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( vcarn_io_r )
@@ -250,7 +250,7 @@ static READ8_HANDLER( vcarn_io_r )
 }
 
 static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
 	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
@@ -262,8 +262,8 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
 ADDRESS_MAP_END
 
 
@@ -414,7 +414,7 @@ static DRIVER_INIT( spool99 )
 
 	UINT8 *ROM = machine.region("maincpu")->base();
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->main, ROM, 0x100);
+	memcpy(state->m_main, ROM, 0x100);
 }
 
 

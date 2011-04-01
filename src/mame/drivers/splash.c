@@ -90,18 +90,18 @@ static WRITE16_HANDLER( splash_coin_w )
 
 static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)						/* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(splash_state, m_spriteram)						/* Sprite RAM */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -109,15 +109,15 @@ static WRITE8_HANDLER( splash_adpcm_data_w )
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
 
-	state->adpcm_data = data;
+	state->m_adpcm_data = data;
 }
 
 static void splash_msm5205_int(device_t *device)
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
 
-	msm5205_data_w(device, state->adpcm_data >> 4);
-	state->adpcm_data = (state->adpcm_data << 4) & 0xf0;
+	msm5205_data_w(device, state->m_adpcm_data >> 4);
+	state->m_adpcm_data = (state->m_adpcm_data << 4) & 0xf0;
 }
 
 static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8 )
@@ -136,8 +136,8 @@ static READ16_HANDLER( roldfrog_bombs_r )
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
 
-	state->ret ^= 0x100;
-	return state->ret;
+	state->m_ret ^= 0x100;
+	return state->m_ret;
 }
 
 static WRITE8_HANDLER(sound_bank_w)
@@ -149,14 +149,14 @@ static WRITE8_HANDLER(sound_bank_w)
 static void roldfrog_update_irq( running_machine &machine )
 {
 	splash_state * state = machine.driver_data<splash_state>();
-	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x18 : 0);
+	int irq = (state->m_sound_irq ? 0x08 : 0) | ((state->m_vblank_irq) ? 0x18 : 0);
 	device_set_input_line_and_vector(machine.device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
 static WRITE8_HANDLER( roldfrog_vblank_ack_w )
 {
 	splash_state * driver_state = space->machine().driver_data<splash_state>();
-	driver_state->vblank_irq = 0;
+	driver_state->m_vblank_irq = 0;
 	roldfrog_update_irq(space->machine());
 }
 
@@ -164,28 +164,28 @@ static WRITE8_HANDLER( roldfrog_vblank_ack_w )
 static void ym_irq(device_t *device, int state)
 {
 	splash_state * driver_state = device->machine().driver_data<splash_state>();
-	driver_state->sound_irq = state;
+	driver_state->m_sound_irq = state;
 	roldfrog_update_irq(device->machine());
 }
 
 static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE_MEMBER(splash_state, protdata)						/* Protection Data */
+	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE_MEMBER(splash_state, m_protdata)						/* Protection Data */
 	AM_RANGE(0x408000, 0x4087ff) AM_RAM 												/* Extra Ram */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)						/* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE_MEMBER(splash_state, bitmap_mode)			/* Bitmap Mode? */
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_MEMBER(splash_state, m_spriteram)						/* Sprite RAM */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE_MEMBER(splash_state, m_bitmap_mode)			/* Bitmap Mode? */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -215,14 +215,14 @@ ADDRESS_MAP_END
 static READ16_HANDLER(spr_read)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	return state->spriteram[offset]|0xff00;
+	return state->m_spriteram[offset]|0xff00;
 }
 
 static WRITE16_HANDLER(spr_write)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	COMBINE_DATA(&state->spriteram[offset]);
-	state->spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
+	COMBINE_DATA(&state->m_spriteram[offset]);
+	state->m_spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
 }
 
 static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
@@ -234,7 +234,7 @@ static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM													/* protection? RAM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
@@ -242,11 +242,11 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_BASE_MEMBER(splash_state, spriteram)		/* Sprite RAM */
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_BASE_MEMBER(splash_state, m_spriteram)		/* Sprite RAM */
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	 AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */				/* Work RAM */
 ADDRESS_MAP_END
 
@@ -259,35 +259,35 @@ ADDRESS_MAP_END
 static READ8_HANDLER(int_source_r)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	return ~state->msm_source;
+	return ~state->m_msm_source;
 }
 
 static WRITE8_HANDLER(msm1_data_w)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	state->msm_data1=data;
-	state->msm_source&=~1;
-	state->msm_toggle1=0;
+	state->m_msm_data1=data;
+	state->m_msm_source&=~1;
+	state->m_msm_toggle1=0;
 }
 
 static WRITE8_HANDLER(msm1_interrupt_w)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	state->snd_interrupt_enable1=~data;
+	state->m_snd_interrupt_enable1=~data;
 }
 
 static WRITE8_HANDLER(msm2_interrupt_w)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	state->snd_interrupt_enable2=~data;
+	state->m_snd_interrupt_enable2=~data;
 }
 
 static WRITE8_HANDLER(msm2_data_w)
 {
 	splash_state *state = space->machine().driver_data<splash_state>();
-	state->msm_data2=data;
-	state->msm_source&=~2;
-	state->msm_toggle2=0;
+	state->m_msm_data2=data;
+	state->m_msm_source&=~2;
+	state->m_msm_toggle2=0;
 }
 
 static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8 )
@@ -305,8 +305,8 @@ static MACHINE_RESET( funystrp )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->adpcm_data = 0;
-	state->ret = 0x100;
+	state->m_adpcm_data = 0;
+	state->m_ret = 0x100;
 }
 
 
@@ -499,8 +499,8 @@ static MACHINE_RESET( splash )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->adpcm_data = 0;
-	state->ret = 0x100;
+	state->m_adpcm_data = 0;
+	state->m_ret = 0x100;
 }
 
 static MACHINE_CONFIG_START( splash, splash_state )
@@ -556,7 +556,7 @@ static const ym2203_interface ym2203_config =
 static INTERRUPT_GEN(  roldfrog_interrupt )
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
-	state->vblank_irq = 1;
+	state->m_vblank_irq = 1;
 	roldfrog_update_irq(device->machine());
 }
 
@@ -604,14 +604,14 @@ MACHINE_CONFIG_END
 static void adpcm_int1( device_t *device )
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
-	if (state->snd_interrupt_enable1  || state->msm_toggle1 == 1)
+	if (state->m_snd_interrupt_enable1  || state->m_msm_toggle1 == 1)
 	{
-		msm5205_data_w(device, state->msm_data1 >> 4);
-		state->msm_data1 <<= 4;
-		state->msm_toggle1 ^= 1;
-		if (state->msm_toggle1 == 0)
+		msm5205_data_w(device, state->m_msm_data1 >> 4);
+		state->m_msm_data1 <<= 4;
+		state->m_msm_toggle1 ^= 1;
+		if (state->m_msm_toggle1 == 0)
 		{
-			state->msm_source|=1;
+			state->m_msm_source|=1;
 			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
 		}
 	}
@@ -620,14 +620,14 @@ static void adpcm_int1( device_t *device )
 static void adpcm_int2( device_t *device )
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
-	if (state->snd_interrupt_enable2 || state->msm_toggle2 == 1)
+	if (state->m_snd_interrupt_enable2 || state->m_msm_toggle2 == 1)
 	{
-		msm5205_data_w(device, state->msm_data2 >> 4);
-		state->msm_data2 <<= 4;
-		state->msm_toggle2 ^= 1;
-		if (state->msm_toggle2 == 0)
+		msm5205_data_w(device, state->m_msm_data2 >> 4);
+		state->m_msm_data2 <<= 4;
+		state->m_msm_toggle2 ^= 1;
+		if (state->m_msm_toggle2 == 0)
 		{
-			state->msm_source|=2;
+			state->m_msm_source|=2;
 			device_set_input_line_and_vector(device->machine().device("audiocpu"), 0, HOLD_LINE, 0x38);
 		}
 	}
@@ -1014,16 +1014,16 @@ static DRIVER_INIT( splash )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->bitmap_type = 0;
-	state->sprite_attr2_shift = 8;
+	state->m_bitmap_type = 0;
+	state->m_sprite_attr2_shift = 8;
 }
 
 static DRIVER_INIT( splash10 )
 {
 	splash_state *state = machine.driver_data<splash_state>();
 
-	state->bitmap_type = 0;
-	state->sprite_attr2_shift = 0;
+	state->m_bitmap_type = 0;
+	state->m_sprite_attr2_shift = 0;
 }
 
 static DRIVER_INIT( roldfrog )
@@ -1032,8 +1032,8 @@ static DRIVER_INIT( roldfrog )
 	UINT8 * ROM = (UINT8 *)machine.region("audiocpu")->base();
 	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x10000], 0x8000);
 
-	state->bitmap_type = 1;
-	state->sprite_attr2_shift = 8;
+	state->m_bitmap_type = 1;
+	state->m_sprite_attr2_shift = 8;
 }
 
 static DRIVER_INIT( rebus )
@@ -1041,8 +1041,8 @@ static DRIVER_INIT( rebus )
 	splash_state *state = machine.driver_data<splash_state>();
 	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 
-	state->bitmap_type = 1;
-	state->sprite_attr2_shift = 0;
+	state->m_bitmap_type = 1;
+	state->m_sprite_attr2_shift = 0;
 
 	//d1 clear , regs restore and rte - end of trap $b
 	ROM[0x196c0/2] = 0x7200;
@@ -1071,8 +1071,8 @@ static DRIVER_INIT( funystrp )
 	splash_state *state = machine.driver_data<splash_state>();
 	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
 
-	state->bitmap_type = 0;
-	state->sprite_attr2_shift = 0;
+	state->m_bitmap_type = 0;
+	state->m_sprite_attr2_shift = 0;
 
 	// initial protection checks, just after boot
 

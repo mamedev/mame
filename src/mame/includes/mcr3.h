@@ -4,24 +4,24 @@ public:
 	mcr3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	size_t spriteram_size;
-	UINT8 input_mux;
-	UINT8 latched_input;
-	UINT8 last_op4;
-	UINT8 maxrpm_adc_control;
-	UINT8 maxrpm_adc_select;
-	UINT8 maxrpm_last_shift;
-	INT8 maxrpm_p1_shift;
-	INT8 maxrpm_p2_shift;
-	UINT8 spyhunt_sprite_color_mask;
-	INT16 spyhunt_scroll_offset;
-	UINT8 *spyhunt_alpharam;
-	INT16 spyhunt_scrollx;
-	INT16 spyhunt_scrolly;
-	tilemap_t *bg_tilemap;
-	tilemap_t *alpha_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
+	UINT8 m_input_mux;
+	UINT8 m_latched_input;
+	UINT8 m_last_op4;
+	UINT8 m_maxrpm_adc_control;
+	UINT8 m_maxrpm_adc_select;
+	UINT8 m_maxrpm_last_shift;
+	INT8 m_maxrpm_p1_shift;
+	INT8 m_maxrpm_p2_shift;
+	UINT8 m_spyhunt_sprite_color_mask;
+	INT16 m_spyhunt_scroll_offset;
+	UINT8 *m_spyhunt_alpharam;
+	INT16 m_spyhunt_scrollx;
+	INT16 m_spyhunt_scrolly;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_alpha_tilemap;
 };
 
 

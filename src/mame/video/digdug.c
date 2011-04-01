@@ -92,24 +92,24 @@ static TILE_GET_INFO( bg_get_tile_info )
 	UINT8 *rom = machine.region("gfx4")->base();
 	digdug_state *state =  machine.driver_data<digdug_state>();
 
-	int code = rom[tile_index | (state->bg_select << 10)];
+	int code = rom[tile_index | (state->m_bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using
        a color code that makes all pixels black. There are pullups setting the
        code to 0xf, but also solder pads that optionally connect the lines with
        tilemap RAM, therefore allowing to pick some bits of the color code from
        the top 4 bits of alpha code. This feature is not used by Dig Dug. */
-	int color = state->bg_disable ? 0xf : (code >> 4);
+	int color = state->m_bg_disable ? 0xf : (code >> 4);
 	SET_TILE_INFO(
 			2,
 			code,
-			color | state->bg_color_bank,
+			color | state->m_bg_color_bank,
 			0);
 }
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
 	digdug_state *state =  machine.driver_data<digdug_state>();
-	UINT8 code = state->videoram[tile_index];
+	UINT8 code = state->m_videoram[tile_index];
 	int color;
 
 	/* the hardware has two ways to pick the color, either straight from the
@@ -117,7 +117,7 @@ static TILE_GET_INFO( tx_get_tile_info )
        formula. The former method isnot used by Dig Dug and seems kind of
        useless (I don't know what use they were thinking of when they added
        it), anyway here it is reproduced faithfully. */
-	if (state->tx_color_mode)
+	if (state->m_tx_color_mode)
 		color = code & 0x0f;
 	else
 		color = ((code >> 4) & 0x0e) | ((code >> 3) & 2);
@@ -146,15 +146,15 @@ VIDEO_START( digdug )
 {
 	digdug_state *state =  machine.driver_data<digdug_state>();
 
-	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,     8,8,36,28);
-	state->fg_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,     8,8,36,28);
+	state->m_fg_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan,8,8,36,28);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	state->save_item(NAME(state->bg_select));
-	state->save_item(NAME(state->tx_color_mode));
-	state->save_item(NAME(state->bg_disable));
-	state->save_item(NAME(state->bg_color_bank));
+	state->save_item(NAME(state->m_bg_select));
+	state->save_item(NAME(state->m_tx_color_mode));
+	state->save_item(NAME(state->m_bg_disable));
+	state->save_item(NAME(state->m_bg_color_bank));
 }
 
 
@@ -169,8 +169,8 @@ WRITE8_HANDLER( digdug_videoram_w )
 {
 	digdug_state *state =  space->machine().driver_data<digdug_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( digdug_PORT_w )
@@ -185,27 +185,27 @@ WRITE8_HANDLER( digdug_PORT_w )
 				int shift = offset;
 				int mask = 1 << shift;
 
-				if ((state->bg_select & mask) != ((data & 1) << shift))
+				if ((state->m_bg_select & mask) != ((data & 1) << shift))
 				{
-					state->bg_select = (state->bg_select & ~mask) | ((data & 1) << shift);
-					tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+					state->m_bg_select = (state->m_bg_select & ~mask) | ((data & 1) << shift);
+					tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 				}
 			}
 			break;
 
 		case 2:	/* select alpha layer color mode (see tx_get_tile_info) */
-			if (state->tx_color_mode != (data & 1))
+			if (state->m_tx_color_mode != (data & 1))
 			{
-				state->tx_color_mode = data & 1;
-				tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+				state->m_tx_color_mode = data & 1;
+				tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
 			}
 			break;
 
 		case 3:	/* "disable" background (see bg_get_tile_info) */
-			if (state->bg_disable != (data & 1))
+			if (state->m_bg_disable != (data & 1))
 			{
-				state->bg_disable = data & 1;
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+				state->m_bg_disable = data & 1;
+				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 			}
 			break;
 
@@ -215,10 +215,10 @@ WRITE8_HANDLER( digdug_PORT_w )
 				int shift = offset;
 				int mask = 1 << shift;
 
-				if ((state->bg_color_bank & mask) != ((data & 1) << shift))
+				if ((state->m_bg_color_bank & mask) != ((data & 1) << shift))
 				{
-					state->bg_color_bank = (state->bg_color_bank & ~mask) | ((data & 1) << shift);
-					tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+					state->m_bg_color_bank = (state->m_bg_color_bank & ~mask) | ((data & 1) << shift);
+					tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 				}
 			}
 			break;
@@ -249,9 +249,9 @@ static const rectangle spritevisiblearea =
 static void draw_sprites(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	digdug_state *state =  machine.driver_data<digdug_state>();
-	UINT8 *spriteram = state->digdug_objram + 0x380;
-	UINT8 *spriteram_2 = state->digdug_posram + 0x380;
-	UINT8 *spriteram_3 = state->digdug_flpram + 0x380;
+	UINT8 *spriteram = state->m_digdug_objram + 0x380;
+	UINT8 *spriteram_2 = state->m_digdug_posram + 0x380;
+	UINT8 *spriteram_3 = state->m_digdug_flpram + 0x380;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -309,8 +309,8 @@ SCREEN_UPDATE( digdug )
 {
 	digdug_state *state =  screen->machine().driver_data<digdug_state>();
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	draw_sprites(screen->machine(),bitmap,cliprect);
 	return 0;
 }

@@ -16,23 +16,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        major_obj_ram;
-	UINT8 *        minor_obj_ram;
-	UINT8 *        alpha_num_ram;
+	UINT8 *        m_major_obj_ram;
+	UINT8 *        m_minor_obj_ram;
+	UINT8 *        m_alpha_num_ram;
 
 	/* video-related */
-	int            cursor;
-	int            wavemod;
+	int            m_cursor;
+	int            m_wavemod;
 
 	/* misc */
-	int            potmask[2];
-	int            potsense[2];
-	int            attract;
-	int            motor_speed;
-	int            noise;
+	int            m_potmask[2];
+	int            m_potsense[2];
+	int            m_attract;
+	int            m_motor_speed;
+	int            m_noise;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 
@@ -46,8 +46,8 @@ static SCREEN_UPDATE( destroyr )
 	/* draw major objects */
 	for (i = 0; i < 16; i++)
 	{
-		int attr = state->major_obj_ram[2 * i + 0] ^ 0xff;
-		int horz = state->major_obj_ram[2 * i + 1];
+		int attr = state->m_major_obj_ram[2 * i + 0] ^ 0xff;
+		int horz = state->m_major_obj_ram[2 * i + 1];
 
 		int num = attr & 3;
 		int scan = attr & 4;
@@ -72,7 +72,7 @@ static SCREEN_UPDATE( destroyr )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			int num = state->alpha_num_ram[32 * i + j];
+			int num = state->m_alpha_num_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
 		}
@@ -81,9 +81,9 @@ static SCREEN_UPDATE( destroyr )
 	/* draw minor objects */
 	for (i = 0; i < 2; i++)
 	{
-		int num = i << 4 | (state->minor_obj_ram[i + 0] & 0xf);
-		int horz = 256 - state->minor_obj_ram[i + 2];
-		int vert = 256 - state->minor_obj_ram[i + 4];
+		int num = i << 4 | (state->m_minor_obj_ram[i + 0] & 0xf);
+		int horz = 256 - state->m_minor_obj_ram[i + 2];
+		int vert = 256 - state->m_minor_obj_ram[i + 4];
 
 		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[1], num, 0, 0, 0, horz, vert, 0);
 	}
@@ -91,14 +91,14 @@ static SCREEN_UPDATE( destroyr )
 	/* draw waves */
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], state->wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+		drawgfx_transpen(bitmap, cliprect, screen->machine().gfx[3], state->m_wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
 	}
 
 	/* draw cursor */
 	for (i = 0; i < 256; i++)
 	{
 		if (i & 4)
-			*BITMAP_ADDR16(bitmap, state->cursor ^ 0xff, i) = 7;
+			*BITMAP_ADDR16(bitmap, state->m_cursor ^ 0xff, i) = 7;
 	}
 	return 0;
 }
@@ -115,11 +115,11 @@ static TIMER_CALLBACK( destroyr_dial_callback )
        computer then reads the VSYNC data functions to tell where the
        cursor should be located. */
 
-	state->potsense[dial] = 1;
+	state->m_potsense[dial] = 1;
 
-	if (state->potmask[dial])
+	if (state->m_potmask[dial])
 	{
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -127,8 +127,8 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 static TIMER_CALLBACK( destroyr_frame_callback )
 {
 	destroyr_state *state = machine.driver_data<destroyr_state>();
-	state->potsense[0] = 0;
-	state->potsense[1] = 0;
+	state->m_potsense[0] = 0;
+	state->m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
@@ -142,15 +142,15 @@ static MACHINE_RESET( destroyr )
 
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 
-	state->cursor = 0;
-	state->wavemod = 0;
-	state->potmask[0] = 0;
-	state->potmask[1] = 0;
-	state->potsense[0] = 0;
-	state->potsense[1] = 0;
-	state->attract = 0;
-	state->motor_speed = 0;
-	state->noise = 0;
+	state->m_cursor = 0;
+	state->m_wavemod = 0;
+	state->m_potmask[0] = 0;
+	state->m_potmask[1] = 0;
+	state->m_potsense[0] = 0;
+	state->m_potsense[1] = 0;
+	state->m_attract = 0;
+	state->m_motor_speed = 0;
+	state->m_noise = 0;
 }
 
 
@@ -159,22 +159,22 @@ static WRITE8_HANDLER( destroyr_misc_w )
 	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	/* bits 0 to 2 connect to the sound circuits */
-	state->attract = data & 0x01;
-	state->noise = data & 0x02;
-	state->motor_speed = data & 0x04;
-	state->potmask[0] = data & 0x08;
-	state->wavemod = data & 0x10;
-	state->potmask[1] = data & 0x20;
+	state->m_attract = data & 0x01;
+	state->m_noise = data & 0x02;
+	state->m_motor_speed = data & 0x04;
+	state->m_potmask[0] = data & 0x08;
+	state->m_wavemod = data & 0x10;
+	state->m_potmask[1] = data & 0x20;
 
-	coin_lockout_w(space->machine(), 0, !state->attract);
-	coin_lockout_w(space->machine(), 1, !state->attract);
+	coin_lockout_w(space->machine(), 0, !state->m_attract);
+	coin_lockout_w(space->machine(), 1, !state->m_attract);
 }
 
 
 static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
 	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	state->cursor = data;
+	state->m_cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
 	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -233,9 +233,9 @@ static READ8_HANDLER( destroyr_input_r )
 	{
 		UINT8 ret = input_port_read(space->machine(), "IN0");
 
-		if (state->potsense[0] && state->potmask[0])
+		if (state->m_potsense[0] && state->m_potmask[0])
 			ret |= 4;
-		if (state->potsense[1] && state->potmask[1])
+		if (state->m_potsense[1] && state->m_potmask[1])
 			ret |= 8;
 
 		return ret;
@@ -254,11 +254,11 @@ static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, major_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_alpha_num_ram)
+	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_major_obj_ram)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(destroyr_cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, minor_obj_ram)
+	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_minor_obj_ram)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -424,15 +424,15 @@ static MACHINE_START( destroyr )
 {
 	destroyr_state *state = machine.driver_data<destroyr_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->cursor));
-	state->save_item(NAME(state->wavemod));
-	state->save_item(NAME(state->attract));
-	state->save_item(NAME(state->motor_speed));
-	state->save_item(NAME(state->noise));
-	state->save_item(NAME(state->potmask));
-	state->save_item(NAME(state->potsense));
+	state->save_item(NAME(state->m_cursor));
+	state->save_item(NAME(state->m_wavemod));
+	state->save_item(NAME(state->m_attract));
+	state->save_item(NAME(state->m_motor_speed));
+	state->save_item(NAME(state->m_noise));
+	state->save_item(NAME(state->m_potmask));
+	state->save_item(NAME(state->m_potsense));
 }
 
 static MACHINE_CONFIG_START( destroyr, destroyr_state )

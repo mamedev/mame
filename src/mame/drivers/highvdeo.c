@@ -96,10 +96,10 @@ public:
 	highvdeo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *blit_ram;
-	UINT16 vblank_bit;
-	UINT16 brasil_prot_latch;
-	struct { int r,g,b,offs,offs_internal; } pal;
+	UINT16 *m_blit_ram;
+	UINT16 m_vblank_bit;
+	UINT16 m_brasil_prot_latch;
+	struct { int r,g,b,offs,offs_internal; } m_pal;
 };
 
 
@@ -123,12 +123,12 @@ static SCREEN_UPDATE(tourvisn)
 		{
 			UINT32 color;
 
-			color = ((state->blit_ram[count]) & 0x00ff)>>0;
+			color = ((state->m_blit_ram[count]) & 0x00ff)>>0;
 
 			if((x*2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine().pens[color];
 
-			color = ((state->blit_ram[count]) & 0xff00)>>8;
+			color = ((state->m_blit_ram[count]) & 0xff00)>>8;
 
 			if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine().pens[color];
@@ -157,7 +157,7 @@ static SCREEN_UPDATE(brasil)
 			UINT32 g;
 			UINT32 r;
 
-			color = (state->blit_ram[count]) & 0xffff;
+			color = (state->m_blit_ram[count]) & 0xffff;
 
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
@@ -195,27 +195,27 @@ static WRITE16_HANDLER( tv_vcf_paletteram_w )
 	switch(offset*2)
 	{
 		case 0:
-			state->pal.offs = data;
+			state->m_pal.offs = data;
 			break;
 		case 2:
-			state->pal.offs_internal = 0;
+			state->m_pal.offs_internal = 0;
 			break;
 		case 4:
-			switch(state->pal.offs_internal)
+			switch(state->m_pal.offs_internal)
 			{
 				case 0:
-					state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->pal.offs_internal++;
+					state->m_pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
 					break;
 				case 1:
-					state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					state->pal.offs_internal++;
+					state->m_pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->m_pal.offs_internal++;
 					break;
 				case 2:
-					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine(), state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
-					state->pal.offs_internal = 0;
-					state->pal.offs++;
+					state->m_pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine(), state->m_pal.offs, MAKE_RGB(state->m_pal.r, state->m_pal.g, state->m_pal.b));
+					state->m_pal.offs_internal = 0;
+					state->m_pal.offs++;
 					break;
 			}
 
@@ -271,7 +271,7 @@ static WRITE16_HANDLER( write1_w )
 static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -310,7 +310,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
+	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -353,7 +353,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE_MEMBER(highvdeo_state, m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -387,13 +387,13 @@ static READ16_HANDLER( newmcard_status_r )
 static READ16_HANDLER( newmcard_vblank_r )
 {
 	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
-	return state->vblank_bit; //0x80
+	return state->m_vblank_bit; //0x80
 }
 
 static WRITE16_HANDLER( newmcard_vblank_w )
 {
 	highvdeo_state *state = space->machine().driver_data<highvdeo_state>();
-	state->vblank_bit = data;
+	state->m_vblank_bit = data;
 }
 
 static WRITE16_HANDLER( write2_w )
@@ -412,7 +412,7 @@ static WRITE16_HANDLER( write2_w )
 static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -449,7 +449,7 @@ static READ16_HANDLER( brasil_status_r )
 		resetpulse^=0x10;
 
 		return 3 | resetpulse;
-		case 2: return (state->brasil_prot_latch & 3); //and 0x3f
+		case 2: return (state->m_brasil_prot_latch & 3); //and 0x3f
 	}
 
 	return 0;
@@ -466,9 +466,9 @@ static WRITE16_HANDLER( brasil_status_w )
 
 	switch(data & 3) //data & 7?
 	{
-		case 0: state->brasil_prot_latch = 1; break;
-		case 1: state->brasil_prot_latch = 0; break;
-		case 2: state->brasil_prot_latch = 2; break;
+		case 0: state->m_brasil_prot_latch = 1; break;
+		case 1: state->m_brasil_prot_latch = 0; break;
+		case 2: state->m_brasil_prot_latch = 2; break;
 	}
 
 	bankaddress = (data & 0x07) * 0x40000;
@@ -481,7 +481,7 @@ static WRITE16_HANDLER( brasil_status_w )
 static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END

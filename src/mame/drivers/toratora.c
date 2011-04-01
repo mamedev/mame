@@ -30,19 +30,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	size_t     videoram_size;
+	UINT8 *    m_videoram;
+	size_t     m_videoram_size;
 
 	/* video-related */
-	int        timer;
-	UINT8      last;
-	UINT8      clear_tv;
+	int        m_timer;
+	UINT8      m_last;
+	UINT8      m_clear_tv;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *pia_u1;
-	device_t *pia_u2;
-	device_t *pia_u3;
+	device_t *m_maincpu;
+	device_t *m_pia_u1;
+	device_t *m_pia_u2;
+	device_t *m_pia_u3;
 };
 
 
@@ -70,13 +70,13 @@ static SCREEN_UPDATE( toratora )
 	toratora_state *state = screen->machine().driver_data<toratora_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
-		UINT8 data = state->videoram[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -88,11 +88,11 @@ static SCREEN_UPDATE( toratora )
 		}
 
 		/* the video system clears as it writes out the pixels */
-		if (state->clear_tv)
-			state->videoram[offs] = 0;
+		if (state->m_clear_tv)
+			state->m_videoram[offs] = 0;
 	}
 
-	state->clear_tv = 0;
+	state->m_clear_tv = 0;
 
 	return 0;
 }
@@ -101,7 +101,7 @@ static SCREEN_UPDATE( toratora )
 static WRITE8_HANDLER( clear_tv_w )
 {
 	toratora_state *state = space->machine().driver_data<toratora_state>();
-	state->clear_tv = 1;
+	state->m_clear_tv = 1;
 }
 
 
@@ -132,39 +132,39 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	logerror("GEN IRQ: %x\n", combined_state);
-	device_set_input_line(toratora->maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(toratora->m_maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( toratora_timer )
 {
 	toratora_state *state = device->machine().driver_data<toratora_state>();
-	state->timer++;	/* timer counting at 16 Hz */
+	state->m_timer++;	/* timer counting at 16 Hz */
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
-	if (state->timer & 0x100)
+	if (state->m_timer & 0x100)
 		popmessage("watchdog!");
 
-	if (state->last != (input_port_read(device->machine(), "INPUT") & 0x0f))
+	if (state->m_last != (input_port_read(device->machine(), "INPUT") & 0x0f))
 	{
-		state->last = input_port_read(device->machine(), "INPUT") & 0x0f;
+		state->m_last = input_port_read(device->machine(), "INPUT") & 0x0f;
 		generic_pulse_irq_line(device, 0);
 	}
-	pia6821_set_input_a(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x0f, 0);
-	pia6821_ca1_w(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x10);
-	pia6821_ca2_w(state->pia_u1, input_port_read(device->machine(), "INPUT") & 0x20);
+	pia6821_set_input_a(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x0f, 0);
+	pia6821_ca1_w(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x10);
+	pia6821_ca2_w(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )
 {
 	toratora_state *state = space->machine().driver_data<toratora_state>();
-	return state->timer;
+	return state->m_timer;
 }
 
 static WRITE8_HANDLER( clear_timer_w )
 {
 	toratora_state *state = space->machine().driver_data<toratora_state>();
-	state->timer = 0;
+	state->m_timer = 0;
 }
 
 
@@ -310,7 +310,7 @@ static const pia6821_interface pia_u3_intf =
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE_MEMBER(toratora_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE_MEMBER(toratora_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xa000, 0xf047) AM_NOP
 	AM_RANGE(0xf048, 0xf049) AM_NOP
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */
@@ -375,23 +375,23 @@ static MACHINE_START( toratora )
 {
 	toratora_state *state = machine.driver_data<toratora_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->pia_u1 = machine.device("pia_u1");
-	state->pia_u2 = machine.device("pia_u2");
-	state->pia_u3 = machine.device("pia_u3");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_pia_u1 = machine.device("pia_u1");
+	state->m_pia_u2 = machine.device("pia_u2");
+	state->m_pia_u3 = machine.device("pia_u3");
 
-	state->save_item(NAME(state->timer));
-	state->save_item(NAME(state->last));
-	state->save_item(NAME(state->clear_tv));
+	state->save_item(NAME(state->m_timer));
+	state->save_item(NAME(state->m_last));
+	state->save_item(NAME(state->m_clear_tv));
 }
 
 static MACHINE_RESET( toratora )
 {
 	toratora_state *state = machine.driver_data<toratora_state>();
 
-	state->timer = 0xff;
-	state->last = 0;
-	state->clear_tv = 0;
+	state->m_timer = 0xff;
+	state->m_last = 0;
+	state->m_clear_tv = 0;
 }
 
 static MACHINE_CONFIG_START( toratora, toratora_state )

@@ -14,10 +14,10 @@ subs_init_machine
 MACHINE_RESET( subs )
 {
 	subs_state *state = machine.driver_data<subs_state>();
-	state->steering_buf1 = 0;
-	state->steering_buf2 = 0;
-	state->steering_val1 = 0x00;
-	state->steering_val2 = 0x00;
+	state->m_steering_buf1 = 0;
+	state->m_steering_buf2 = 0;
+	state->m_steering_val1 = 0x00;
+	state->m_steering_val2 = 0x00;
 }
 
 /***************************************************************************
@@ -45,25 +45,25 @@ static int subs_steering_1(running_machine &machine)
 
 	this_val=input_port_read(machine, "DIAL2");
 
-	delta=this_val-state->last_val_1;
-	state->last_val_1=this_val;
+	delta=this_val-state->m_last_val_1;
+	state->m_last_val_1=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	state->steering_buf1+=(delta/4);
+	state->m_steering_buf1+=(delta/4);
 
-	if (state->steering_buf1>0)
+	if (state->m_steering_buf1>0)
 	{
-	      state->steering_buf1--;
-	      state->steering_val1=0xC0;
+	      state->m_steering_buf1--;
+	      state->m_steering_val1=0xC0;
 	}
-	else if (state->steering_buf1<0)
+	else if (state->m_steering_buf1<0)
 	{
-	      state->steering_buf1++;
-	      state->steering_val1=0x80;
+	      state->m_steering_buf1++;
+	      state->m_steering_val1=0x80;
 	}
 
-	return state->steering_val1;
+	return state->m_steering_val1;
 }
 
 static int subs_steering_2(running_machine &machine)
@@ -74,25 +74,25 @@ static int subs_steering_2(running_machine &machine)
 
 	this_val=input_port_read(machine, "DIAL1");
 
-	delta=this_val-state->last_val_2;
-	state->last_val_2=this_val;
+	delta=this_val-state->m_last_val_2;
+	state->m_last_val_2=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	state->steering_buf2+=(delta/4);
+	state->m_steering_buf2+=(delta/4);
 
-	if (state->steering_buf2>0)
+	if (state->m_steering_buf2>0)
 	{
-		state->steering_buf2--;
-		state->steering_val2=0xC0;
+		state->m_steering_buf2--;
+		state->m_steering_val2=0xC0;
 	}
-	else if (state->steering_buf2<0)
+	else if (state->m_steering_buf2<0)
 	{
-		state->steering_buf2++;
-		state->steering_val2=0x80;
+		state->m_steering_buf2++;
+		state->m_steering_val2=0x80;
 	}
 
-	return state->steering_val2;
+	return state->m_steering_val2;
 }
 
 /***************************************************************************
@@ -101,8 +101,8 @@ subs_steer_reset
 WRITE8_HANDLER( subs_steer_reset_w )
 {
 	subs_state *state = space->machine().driver_data<subs_state>();
-	state->steering_val1 = 0x00;
-	state->steering_val2 = 0x00;
+	state->m_steering_val1 = 0x00;
+	state->m_steering_val2 = 0x00;
 }
 
 /***************************************************************************

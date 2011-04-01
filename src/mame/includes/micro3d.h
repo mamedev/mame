@@ -18,60 +18,60 @@ public:
 	micro3d_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16				*shared_ram;
-	device_t			*duart68681;
-	UINT8				m68681_tx0;
+	UINT16				*m_shared_ram;
+	device_t			*m_duart68681;
+	UINT8				m_m68681_tx0;
 
 	/* Sound */
-	UINT8				sound_port_latch[4];
-	UINT8				dac_data;
+	UINT8				m_sound_port_latch[4];
+	UINT8				m_dac_data;
 
 	/* TI UART */
-	UINT8				ti_uart[9];
-	int					ti_uart_mode_cycle;
-	int					ti_uart_sync_cycle;
+	UINT8				m_ti_uart[9];
+	int					m_ti_uart_mode_cycle;
+	int					m_ti_uart_sync_cycle;
 
 	/* ADC */
-	UINT8				adc_val;
+	UINT8				m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
-	UINT8				botssa_latch;
+	UINT8				m_botssa_latch;
 
 	/* MAC */
-	UINT32				*mac_sram;
-	UINT32				sram_r_addr;
-	UINT32				sram_w_addr;
-	UINT32				vtx_addr;
-	UINT32				mrab11;
-	UINT32				mac_stat;
-	UINT32				mac_inst;
+	UINT32				*m_mac_sram;
+	UINT32				m_sram_r_addr;
+	UINT32				m_sram_w_addr;
+	UINT32				m_vtx_addr;
+	UINT32				m_mrab11;
+	UINT32				m_mac_stat;
+	UINT32				m_mac_inst;
 
 	/* 2D video */
-	UINT16				*micro3d_sprite_vram;
-	UINT16				creg;
-	UINT16				xfer3dk;
+	UINT16				*m_micro3d_sprite_vram;
+	UINT16				m_creg;
+	UINT16				m_xfer3dk;
 
 	/* 3D pipeline */
-	UINT32				pipe_data;
-	UINT32				pipeline_state;
-	INT32				vtx_fifo[512];
-	UINT32				fifo_idx;
-	UINT32				draw_cmd;
-	int					draw_state;
-	INT32				x_min;
-	INT32				x_max;
-	INT32				y_min;
-	INT32				y_max;
-	INT32				z_min;
-	INT32				z_max;
-	INT32				x_mid;
-	INT32				y_mid;
-	int					dpram_bank;
-	UINT32				draw_dpram[1024];
-	UINT16				*frame_buffers[2];
-	UINT16				*tmp_buffer;
-	int					drawing_buffer;
-	int					display_buffer;
+	UINT32				m_pipe_data;
+	UINT32				m_pipeline_state;
+	INT32				m_vtx_fifo[512];
+	UINT32				m_fifo_idx;
+	UINT32				m_draw_cmd;
+	int					m_draw_state;
+	INT32				m_x_min;
+	INT32				m_x_max;
+	INT32				m_y_min;
+	INT32				m_y_max;
+	INT32				m_z_min;
+	INT32				m_z_max;
+	INT32				m_x_mid;
+	INT32				m_y_mid;
+	int					m_dpram_bank;
+	UINT32				m_draw_dpram[1024];
+	UINT16				*m_frame_buffers[2];
+	UINT16				*m_tmp_buffer;
+	int					m_drawing_buffer;
+	int					m_display_buffer;
 };
 
 typedef struct _micro3d_vtx_

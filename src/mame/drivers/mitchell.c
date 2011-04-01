@@ -98,15 +98,15 @@ static NVRAM_HANDLER( mitchell )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	if (read_or_write)
 	{
-		if (state->nvram_size)	/* Super Pang, Block Block */
-			file->write(state->nvram,state->nvram_size);	/* NVRAM */
+		if (state->m_nvram_size)	/* Super Pang, Block Block */
+			file->write(state->m_nvram,state->m_nvram_size);	/* NVRAM */
 	}
 	else
 	{
 		if (file)
 		{
-			if (state->nvram_size)	/* Super Pang, Block Block */
-				file->read(state->nvram,state->nvram_size);	/* NVRAM */
+			if (state->m_nvram_size)	/* Super Pang, Block Block */
+				file->read(state->m_nvram,state->m_nvram_size);	/* NVRAM */
 		}
 	}
 }
@@ -166,26 +166,26 @@ static READ8_HANDLER( block_input_r )
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
 
-	if (state->dial_selected)
+	if (state->m_dial_selected)
 	{
-		int delta = (input_port_read(space->machine(), dialnames[offset]) - state->dial[offset]) & 0xff;
+		int delta = (input_port_read(space->machine(), dialnames[offset]) - state->m_dial[offset]) & 0xff;
 
 		if (delta & 0x80)
 		{
 			delta = (-delta) & 0xff;
-			if (state->dir[offset])
+			if (state->m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->dir[offset] = 0;
+				state->m_dir[offset] = 0;
 				delta = 0;
 			}
 		}
 		else if (delta > 0)
 		{
-			if (!state->dir[offset])
+			if (!state->m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->dir[offset] = 1;
+				state->m_dir[offset] = 1;
 				delta = 0;
 			}
 		}
@@ -198,7 +198,7 @@ static READ8_HANDLER( block_input_r )
 	{
 		int res = input_port_read(space->machine(), portnames[offset]) & 0xf7;
 
-		if (state->dir[offset])
+		if (state->m_dir[offset])
 			res |= 0x08;
 
 		return res;
@@ -212,13 +212,13 @@ static WRITE8_HANDLER( block_dial_control_w )
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		state->dial[0] = input_port_read(space->machine(), "DIAL1");
-		state->dial[1] = input_port_read(space->machine(), "DIAL2");
+		state->m_dial[0] = input_port_read(space->machine(), "DIAL1");
+		state->m_dial[1] = input_port_read(space->machine(), "DIAL2");
 	}
 	else if (data == 0x80)
-		state->dial_selected = 0;
+		state->m_dial_selected = 0;
 	else
-		state->dial_selected = 1;
+		state->m_dial_selected = 1;
 }
 
 
@@ -234,7 +234,7 @@ static READ8_HANDLER( mahjong_input_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (state->keymatrix & (0x80 >> i))
+		if (state->m_keymatrix & (0x80 >> i))
 			return input_port_read(space->machine(), keynames[offset][i]);
 	}
 
@@ -244,7 +244,7 @@ static READ8_HANDLER( mahjong_input_r )
 static WRITE8_HANDLER( mahjong_input_select_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->keymatrix = data;
+	state->m_keymatrix = data;
 }
 
 
@@ -253,7 +253,7 @@ static READ8_HANDLER( input_r )
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
-	switch (state->input_type)
+	switch (state->m_input_type)
 	{
 		case 0:
 		default:
@@ -280,7 +280,7 @@ static WRITE8_HANDLER( input_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-	switch (state->input_type)
+	switch (state->m_input_type)
 	{
 		case 0:
 		default:
@@ -306,8 +306,8 @@ static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_BASE_MEMBER(mitchell_state, colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size) /* char RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM	/* Work RAM */
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
@@ -316,8 +316,8 @@ static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE_MEMBER(mitchell_state, colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size)/* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size)/* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
@@ -342,8 +342,8 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE_MEMBER(mitchell_state, colorram)/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size) /* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE_MEMBER(mitchell_state, m_colorram)/* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
@@ -367,7 +367,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( spangbl_msm5205_data_w )
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->sample_buffer = data;
+	state->m_sample_buffer = data;
 }
 #endif
 
@@ -386,7 +386,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
 	mitchell_state *state = device->machine().driver_data<mitchell_state>();
-	state->oki->set_bank_base(0x40000 * (data & 3));
+	state->m_oki->set_bank_base(0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8 )
@@ -401,7 +401,7 @@ static WRITE8_HANDLER(mstworld_sound_w)
 {
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8 )
@@ -1078,12 +1078,12 @@ static MACHINE_START( mitchell )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 
-	state->save_item(NAME(state->sample_buffer));
-	state->save_item(NAME(state->sample_select));
-	state->save_item(NAME(state->dial_selected));
-	state->save_item(NAME(state->keymatrix));
-	state->save_item(NAME(state->dir));
-	state->save_item(NAME(state->dial));
+	state->save_item(NAME(state->m_sample_buffer));
+	state->save_item(NAME(state->m_sample_select));
+	state->save_item(NAME(state->m_dial_selected));
+	state->save_item(NAME(state->m_keymatrix));
+	state->save_item(NAME(state->m_dir));
+	state->save_item(NAME(state->m_dial));
 //  state_save_register_global(machine, init_eeprom_count);
 }
 
@@ -1091,14 +1091,14 @@ static MACHINE_RESET( mitchell )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 
-	state->sample_buffer = 0;
-	state->sample_select = 0;
-	state->dial_selected = 0;
-	state->dial[0] = 0;
-	state->dial[1] = 0;
-	state->dir[0] = 0;
-	state->dir[1] = 0;
-	state->keymatrix = 0;
+	state->m_sample_buffer = 0;
+	state->m_sample_select = 0;
+	state->m_dial_selected = 0;
+	state->m_dial[0] = 0;
+	state->m_dial[1] = 0;
+	state->m_dir[0] = 0;
+	state->m_dir[1] = 0;
+	state->m_keymatrix = 0;
 }
 
 static MACHINE_CONFIG_START( mgakuen, mitchell_state )
@@ -1199,11 +1199,11 @@ GFXDECODE_END
 static void spangbl_adpcm_int( device_t *device )
 {
 	mitchell_state *state = device->machine().driver_data<mitchell_state>();
-	msm5205_data_w(device, state->sample_buffer & 0x0f);
-	state->sample_buffer >>= 4;
-	state->sample_select ^= 1;
-	if(state->sample_select == 0)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	msm5205_data_w(device, state->m_sample_buffer & 0x0f);
+	state->m_sample_buffer >>= 4;
+	state->m_sample_select ^= 1;
+	if(state->m_sample_select == 0)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -2114,49 +2114,49 @@ static void configure_banks( running_machine &machine )
 static DRIVER_INIT( dokaben )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pang )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	pang_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pangb )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( cworld )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	cworld_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( hatena )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	hatena_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( spang )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 3;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_input_type = 3;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
 	spang_decode(machine);
 	configure_banks(machine);
 }
@@ -2164,9 +2164,9 @@ static DRIVER_INIT( spang )
 static DRIVER_INIT( spangbl )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 3;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_input_type = 3;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2174,41 +2174,41 @@ static DRIVER_INIT( spangbl )
 static DRIVER_INIT( spangj )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 3;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_input_type = 3;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( sbbros )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 3;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_input_type = 3;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( qtono1 )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	qtono1_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( qsangoku )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 0;
-	state->nvram_size = 0;
+	state->m_input_type = 0;
+	state->m_nvram_size = 0;
 	qsangoku_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( mgakuen )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 1;
+	state->m_input_type = 1;
 	configure_banks(machine);
 	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "DSW0");
 	machine.device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSW1");
@@ -2216,50 +2216,50 @@ static DRIVER_INIT( mgakuen )
 static DRIVER_INIT( mgakuen2 )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 1;
-	state->nvram_size = 0;
+	state->m_input_type = 1;
+	state->m_nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pkladies )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 1;
-	state->nvram_size = 0;
+	state->m_input_type = 1;
+	state->m_nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pkladiesbl )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 1;
-	state->nvram_size = 0;
+	state->m_input_type = 1;
+	state->m_nvram_size = 0;
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( marukin )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 1;
-	state->nvram_size = 0;
+	state->m_input_type = 1;
+	state->m_nvram_size = 0;
 	marukin_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( block )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 2;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->m_input_type = 2;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
 	block_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( blockbl )
 {
 	mitchell_state *state = machine.driver_data<mitchell_state>();
-	state->input_type = 2;
-	state->nvram_size = 0x80;
-	state->nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->m_input_type = 2;
+	state->m_nvram_size = 0x80;
+	state->m_nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }

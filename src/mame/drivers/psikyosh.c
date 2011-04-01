@@ -357,7 +357,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	if (!(data & 0x00c00000))
 	{
-		device_set_input_line(state->maincpu, 4, CLEAR_LINE);
+		device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
 	}
 }
 
@@ -365,11 +365,11 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
 	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 
-	b = ((state->paletteram[offset] & 0x0000ff00) >>8);
-	g = ((state->paletteram[offset] & 0x00ff0000) >>16);
-	r = ((state->paletteram[offset] & 0xff000000) >>24);
+	b = ((state->m_paletteram[offset] & 0x0000ff00) >>8);
+	g = ((state->m_paletteram[offset] & 0x00ff0000) >>16);
+	r = ((state->m_paletteram[offset] & 0xff000000) >>24);
 
 	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
@@ -377,12 +377,12 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 static WRITE32_HANDLER( psikyosh_vidregs_w )
 {
 	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
-	COMBINE_DATA(&state->vidregs[offset]);
+	COMBINE_DATA(&state->m_vidregs[offset]);
 
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			memory_set_bank(space->machine(), "bank2", state->vidregs[offset] & 0xfff);
+			memory_set_bank(space->machine(), "bank2", state->m_vidregs[offset] & 0xfff);
 	}
 }
 
@@ -391,7 +391,7 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	UINT8 *ROM = space->machine().region("ymf")->base();
 
-	return ROM[state->sample_offs++] << 16;
+	return ROM[state->m_sample_offs++] << 16;
 }
 
 /* Mahjong Panel */
@@ -524,11 +524,11 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 // video chip
 	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
-	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, paletteram) // palette..
-	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // sprite zoom lookup table
+	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
+	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram) // palette..
+	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, vidregs) //  video registers
+	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, m_vidregs) //  video registers
 	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
@@ -540,7 +540,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
 // ram
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram) // main RAM (1 meg)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_ram) // main RAM (1 meg)
 ADDRESS_MAP_END
 
 // ps5, ps5v2
@@ -556,16 +556,16 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 // video chip
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // video banks0-7 (sprites and sprite list)
-	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, paletteram)
-	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, zoomram) // sprite zoom lookup table
+	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
+	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram)
+	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, vidregs) // video registers
+	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, m_vidregs) // video registers
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
 // ram
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, ram)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_ram)
 ADDRESS_MAP_END
 
 
@@ -789,7 +789,7 @@ INPUT_PORTS_END
 static void irqhandler(device_t *device, int linestate)
 {
 	psikyosh_state *state = device->machine().driver_data<psikyosh_state>();
-	device_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -802,12 +802,12 @@ static MACHINE_START( psikyosh )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
 	memory_configure_bank(machine, "bank2", 0, 0x1000, machine.region("gfx1")->base(), 0x20000);
 
-	state->sample_offs = 0;
-	state->save_item(NAME(state->sample_offs));
+	state->m_sample_offs = 0;
+	state->save_item(NAME(state->m_sample_offs));
 }
 
 

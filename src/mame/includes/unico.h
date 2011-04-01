@@ -4,15 +4,15 @@ public:
 	unico_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vram;
-	UINT16 *scroll;
-	UINT32 *vram32;
-	UINT32 *scroll32;
-	tilemap_t *tilemap[3];
-	int sprites_scrolldx;
-	int sprites_scrolldy;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_vram;
+	UINT16 *m_scroll;
+	UINT32 *m_vram32;
+	UINT32 *m_scroll32;
+	tilemap_t *m_tilemap[3];
+	int m_sprites_scrolldx;
+	int m_sprites_scrolldy;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

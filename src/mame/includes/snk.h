@@ -10,38 +10,45 @@ public:
 	snk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int countryc_trackball;
-	int last_value[2];
-	int cp_count[2];
+	int m_countryc_trackball;
+	int m_last_value[2];
+	int m_cp_count[2];
 
-	int marvins_sound_busy_flag;
+	int m_marvins_sound_busy_flag;
 	// FIXME this should be initialised on machine reset
-	int sound_status;
+	int m_sound_status;
 
-	UINT8 *spriteram;
-	UINT8 *tx_videoram;
-	UINT8 *fg_videoram;
-	UINT8 *bg_videoram;
+	UINT8 *m_spriteram;
+	UINT8 *m_tx_videoram;
+	UINT8 *m_fg_videoram;
+	UINT8 *m_bg_videoram;
 
-	tilemap_t *tx_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	int fg_scrollx, fg_scrolly, bg_scrollx, bg_scrolly;
-	int sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
-	UINT8 sprite_split_point;
-	int num_sprites, yscroll_mask;
-	UINT32 bg_tile_offset;
-	UINT32 tx_tile_offset;
-	int is_psychos;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	int m_fg_scrollx;
+	int m_fg_scrolly;
+	int m_bg_scrollx;
+	int m_bg_scrolly;
+	int m_sp16_scrollx;
+	int m_sp16_scrolly;
+	int m_sp32_scrollx;
+	int m_sp32_scrolly;
+	UINT8 m_sprite_split_point;
+	int m_num_sprites;
+	int m_yscroll_mask;
+	UINT32 m_bg_tile_offset;
+	UINT32 m_tx_tile_offset;
+	int m_is_psychos;
 
-	UINT8 drawmode_table[16];
-	UINT8 empty_tile[16*16];
-	int hf_posy;
-	int hf_posx;
-	int tc16_posy;
-	int tc16_posx;
-	int tc32_posy;
-	int tc32_posx;
+	UINT8 m_drawmode_table[16];
+	UINT8 m_empty_tile[16*16];
+	int m_hf_posy;
+	int m_hf_posx;
+	int m_tc16_posy;
+	int m_tc16_posx;
+	int m_tc32_posy;
+	int m_tc32_posx;
 };
 
 

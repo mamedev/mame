@@ -15,13 +15,13 @@ PALETTE_INIT( buggychl )
 VIDEO_START( buggychl )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
-	state->tmp_bitmap1 = machine.primary_screen->alloc_compatible_bitmap();
-	state->tmp_bitmap2 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmp_bitmap1 = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_tmp_bitmap2 = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->save_item(NAME(*state->tmp_bitmap1));
-	state->save_item(NAME(*state->tmp_bitmap2));
+	state->save_item(NAME(*state->m_tmp_bitmap1));
+	state->save_item(NAME(*state->m_tmp_bitmap2));
 
-	gfx_element_set_source(machine.gfx[0], state->charram);
+	gfx_element_set_source(machine.gfx[0], state->m_charram);
 }
 
 
@@ -29,9 +29,9 @@ VIDEO_START( buggychl )
 WRITE8_HANDLER( buggychl_chargen_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	if (state->charram[offset] != data)
+	if (state->m_charram[offset] != data)
 	{
-		state->charram[offset] = data;
+		state->m_charram[offset] = data;
 		gfx_element_mark_dirty(space->machine().gfx[0], (offset / 8) & 0xff);
 	}
 }
@@ -39,13 +39,13 @@ WRITE8_HANDLER( buggychl_chargen_w )
 WRITE8_HANDLER( buggychl_sprite_lookup_bank_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->sl_bank = (data & 0x10) << 8;
+	state->m_sl_bank = (data & 0x10) << 8;
 }
 
 WRITE8_HANDLER( buggychl_sprite_lookup_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->sprite_lookup[offset + state->sl_bank] = data;
+	state->m_sprite_lookup[offset + state->m_sl_bank] = data;
 }
 
 WRITE8_HANDLER( buggychl_ctrl_w )
@@ -64,10 +64,10 @@ WRITE8_HANDLER( buggychl_ctrl_w )
 	flip_screen_y_set(space->machine(), data & 0x01);
 	flip_screen_x_set(space->machine(), data & 0x02);
 
-	state->bg_on = data & 0x04;
-	state->sky_on = data & 0x08;
+	state->m_bg_on = data & 0x04;
+	state->m_sky_on = data & 0x08;
 
-	state->sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
+	state->m_sprite_color_base = (data & 0x10) ? 1 * 16 : 3 * 16;
 
 	coin_lockout_global_w(space->machine(), (~data & 0x40) >> 6);
 	set_led_status(space->machine(), 0, ~data & 0x80);
@@ -76,7 +76,7 @@ WRITE8_HANDLER( buggychl_ctrl_w )
 WRITE8_HANDLER( buggychl_bg_scrollx_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->bg_scrollx = -(data - 0x12);
+	state->m_bg_scrollx = -(data - 0x12);
 }
 
 
@@ -103,7 +103,7 @@ static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle
 
 	for (offs = 0; offs < 0x400; offs++)
 	{
-		int code = state->videoram[0x400 + offs];
+		int code = state->m_videoram[0x400 + offs];
 
 		int sx = offs % 32;
 		int sy = offs / 32;
@@ -113,7 +113,7 @@ static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle
 		if (flip_screen_y_get(machine))
 			sy = 31 - sy;
 
-		drawgfx_opaque(state->tmp_bitmap1, NULL, machine.gfx[0],
+		drawgfx_opaque(state->m_tmp_bitmap1, NULL, machine.gfx[0],
 				code,
 				2,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
@@ -122,15 +122,15 @@ static void draw_bg( running_machine &machine, bitmap_t *bitmap, const rectangle
 
 	/* first copy to a temp bitmap doing column scroll */
 	for (offs = 0; offs < 256; offs++)
-		scroll[offs] = -state->scrollv[offs / 8];
+		scroll[offs] = -state->m_scrollv[offs / 8];
 
-	copyscrollbitmap(state->tmp_bitmap2, state->tmp_bitmap1, 1, &state->bg_scrollx, 256, scroll, NULL);
+	copyscrollbitmap(state->m_tmp_bitmap2, state->m_tmp_bitmap1, 1, &state->m_bg_scrollx, 256, scroll, NULL);
 
 	/* then copy to the screen doing row scroll */
 	for (offs = 0; offs < 256; offs++)
-		scroll[offs] = -state->scrollh[offs];
+		scroll[offs] = -state->m_scrollh[offs];
 
-	copyscrollbitmap_trans(bitmap, state->tmp_bitmap2, 256, scroll, 0, 0, &clip, 32);
+	copyscrollbitmap_trans(bitmap, state->m_tmp_bitmap2, 256, scroll, 0, 0, &clip, 32);
 }
 
 
@@ -146,7 +146,7 @@ static void draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle
 		int flipx = flip_screen_x_get(machine);
 		int flipy = flip_screen_y_get(machine);
 
-		int code = state->videoram[offs];
+		int code = state->m_videoram[offs];
 
 		if (flipx)
 			sx = 31 - sx;
@@ -166,14 +166,14 @@ static void draw_fg( running_machine &machine, bitmap_t *bitmap, const rectangle
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 	const UINT8 *gfx;
 
 	g_profiler.start(PROFILER_USER1);
 
 	gfx = machine.region("gfx2")->base();
-	for (offs = 0; offs < state->spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
 		int sx, sy, flipy, zoom, ch, x, px, y;
 		const UINT8 *lookup;
@@ -186,7 +186,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		zoomy_rom = gfx + (zoom << 6);
 		zoomx_rom = gfx + 0x2000 + (zoom << 3);
 
-		lookup = state->sprite_lookup + ((spriteram[offs + 2] & 0x7f) << 6);
+		lookup = state->m_sprite_lookup + ((spriteram[offs + 2] & 0x7f) << 6);
 
 		for (y = 0; y < 64; y++)
 		{
@@ -220,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 						{
 							int dx = flip_screen_x_get(machine) ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								*BITMAP_ADDR16(bitmap, dy, dx) = state->sprite_color_base + col;
+								*BITMAP_ADDR16(bitmap, dy, dx) = state->m_sprite_color_base + col;
 						}
 
 						/* the following line is almost certainly wrong */
@@ -240,12 +240,12 @@ SCREEN_UPDATE( buggychl )
 {
 	buggychl_state *state = screen->machine().driver_data<buggychl_state>();
 
-	if (state->sky_on)
+	if (state->m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	if (state->bg_on)
+	if (state->m_bg_on)
 		draw_bg(screen->machine(), bitmap, cliprect);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);

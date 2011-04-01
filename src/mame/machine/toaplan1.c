@@ -43,7 +43,7 @@ INTERRUPT_GEN( toaplan1_interrupt )
 {
 	toaplan1_state *state = device->machine().driver_data<toaplan1_state>();
 
-	if (state->intenable)
+	if (state->m_intenable)
 		device_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -52,7 +52,7 @@ WRITE16_HANDLER( toaplan1_intenable_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
-		state->intenable = data & 0xff;
+		state->m_intenable = data & 0xff;
 	}
 }
 
@@ -69,9 +69,9 @@ WRITE16_HANDLER( demonwld_dsp_addrsel_w )
 	/* Lower thirteen bits of this data is shifted left one position */
 	/*  to move it to an even address word boundary */
 
-	state->main_ram_seg = ((data & 0xe000) << 9);
-	state->dsp_addr_w   = ((data & 0x1fff) << 1);
-	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", cpu_get_previouspc(&space->device()), data, state->main_ram_seg + state->dsp_addr_w);
+	state->m_main_ram_seg = ((data & 0xe000) << 9);
+	state->m_dsp_addr_w   = ((data & 0x1fff) << 1);
+	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", cpu_get_previouspc(&space->device()), data, state->m_main_ram_seg + state->m_dsp_addr_w);
 }
 
 READ16_HANDLER( demonwld_dsp_r )
@@ -82,13 +82,13 @@ READ16_HANDLER( demonwld_dsp_r )
 	address_space *mainspace;
 	UINT16 input_data = 0;
 
-	switch (state->main_ram_seg) {
+	switch (state->m_main_ram_seg) {
 		case 0xc00000:	mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						input_data = mainspace->read_word(state->main_ram_seg + state->dsp_addr_w);
+						input_data = mainspace->read_word(state->m_main_ram_seg + state->m_dsp_addr_w);
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", cpu_get_previouspc(&space->device()), state->main_ram_seg + state->dsp_addr_w);
+		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", cpu_get_previouspc(&space->device()), state->m_main_ram_seg + state->m_dsp_addr_w);
 	}
-	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", cpu_get_previouspc(&space->device()), input_data, state->main_ram_seg + state->dsp_addr_w);
+	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", cpu_get_previouspc(&space->device()), input_data, state->m_main_ram_seg + state->m_dsp_addr_w);
 	return input_data;
 }
 
@@ -98,15 +98,15 @@ WRITE16_HANDLER( demonwld_dsp_w )
 	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
-	state->dsp_execute = 0;
-	switch (state->main_ram_seg) {
-		case 0xc00000:	if ((state->dsp_addr_w < 3) && (data == 0)) state->dsp_execute = 1;
+	state->m_dsp_execute = 0;
+	switch (state->m_main_ram_seg) {
+		case 0xc00000:	if ((state->m_dsp_addr_w < 3) && (data == 0)) state->m_dsp_execute = 1;
 						mainspace = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-						mainspace->write_word(state->main_ram_seg + state->dsp_addr_w, data);
+						mainspace->write_word(state->m_main_ram_seg + state->m_dsp_addr_w, data);
 						break;
-		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", cpu_get_previouspc(&space->device()), state->main_ram_seg + state->dsp_addr_w);
+		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", cpu_get_previouspc(&space->device()), state->m_main_ram_seg + state->m_dsp_addr_w);
 	}
-	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", cpu_get_previouspc(&space->device()), data, state->main_ram_seg + state->dsp_addr_w);
+	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", cpu_get_previouspc(&space->device()), data, state->m_main_ram_seg + state->m_dsp_addr_w);
 }
 
 WRITE16_HANDLER( demonwld_dsp_bio_w )
@@ -121,15 +121,15 @@ WRITE16_HANDLER( demonwld_dsp_bio_w )
 
 	logerror("DSP PC:%04x IO write %04x at port 3\n", cpu_get_previouspc(&space->device()), data);
 	if (data & 0x8000) {
-		state->dsp_BIO = CLEAR_LINE;
+		state->m_dsp_BIO = CLEAR_LINE;
 	}
 	if (data == 0) {
-		if (state->dsp_execute) {
+		if (state->m_dsp_execute) {
 			logerror("Turning 68000 on\n");
 			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-			state->dsp_execute = 0;
+			state->m_dsp_execute = 0;
 		}
-		state->dsp_BIO = ASSERT_LINE;
+		state->m_dsp_BIO = ASSERT_LINE;
 	}
 }
 
@@ -137,7 +137,7 @@ READ16_HANDLER ( demonwld_BIO_r )
 {
 	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
-	return state->dsp_BIO;
+	return state->m_dsp_BIO;
 }
 
 
@@ -145,7 +145,7 @@ static void demonwld_dsp(running_machine &machine, int enable)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->dsp_on = enable;
+	state->m_dsp_on = enable;
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
@@ -164,7 +164,7 @@ static void demonwld_dsp(running_machine &machine, int enable)
 static STATE_POSTLOAD( demonwld_restore_dsp )
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	demonwld_dsp(machine, state->dsp_on);
+	demonwld_dsp(machine, state->m_dsp_on);
 }
 
 WRITE16_HANDLER( demonwld_dsp_ctrl_w )
@@ -213,26 +213,26 @@ READ16_HANDLER ( vimana_system_port_r )
 	d = input_port_read(space->machine(), "DSWA");
 	r = input_port_read(space->machine(), "TJUMP");
 	p = input_port_read(space->machine(), "SYSTEM");
-	state->vimana_latch ^= p;
-	data = (state->vimana_latch & p);
+	state->m_vimana_latch ^= p;
+	data = (state->m_vimana_latch & p);
 
 	/* simulate the mcu keeping track of credits based on region and coinage settings */
 	/* latch so it doesn't add more than one coin per keypress */
 	if (d & 0x04)   /* "test mode" ON */
 	{
-		state->vimana_coins[0] = state->vimana_coins[1] = 0;
-		state->vimana_credits = 0;
+		state->m_vimana_coins[0] = state->m_vimana_coins[1] = 0;
+		state->m_vimana_credits = 0;
 	}
 	else            /* "test mode" OFF */
 	{
 		if (data & 0x02)      /* TILT */
 		{
-			state->vimana_coins[0] = state->vimana_coins[1] = 0;
-			state->vimana_credits = 0;
+			state->m_vimana_coins[0] = state->m_vimana_coins[1] = 0;
+			state->m_vimana_credits = 0;
 		}
 		if (data & 0x01)      /* SERVICE1 */
 		{
-			state->vimana_credits++ ;
+			state->m_vimana_credits++ ;
 		}
 		if (data & 0x08)      /* COIN1 */
 		{
@@ -247,23 +247,23 @@ READ16_HANDLER ( vimana_system_port_r )
 		{
 			reg = vimana_region[r];
 			dsw = (d & 0xf0) >> (4 + 2 * slot);
-			state->vimana_coins[slot]++;
-			if (state->vimana_coins[slot] >= toaplan1_coins_for_credit[reg][slot][dsw])
+			state->m_vimana_coins[slot]++;
+			if (state->m_vimana_coins[slot] >= toaplan1_coins_for_credit[reg][slot][dsw])
 			{
-				state->vimana_credits += toaplan1_credits_for_coin[reg][slot][dsw];
-				state->vimana_coins[slot] -= toaplan1_coins_for_credit[reg][slot][dsw];
+				state->m_vimana_credits += toaplan1_credits_for_coin[reg][slot][dsw];
+				state->m_vimana_coins[slot] -= toaplan1_coins_for_credit[reg][slot][dsw];
 			}
 			coin_counter_w(space->machine(), slot, 1);
 			coin_counter_w(space->machine(), slot, 0);
 		}
 
-		if (state->vimana_credits >= 9)
-			state->vimana_credits = 9;
+		if (state->m_vimana_credits >= 9)
+			state->m_vimana_credits = 9;
 	}
 
-	coin_lockout_global_w(space->machine(), (state->vimana_credits >= 9));
+	coin_lockout_global_w(space->machine(), (state->m_vimana_credits >= 9));
 
-	state->vimana_latch = p;
+	state->m_vimana_latch = p;
 
 	return p & 0xffff;
 }
@@ -278,7 +278,7 @@ READ16_HANDLER( vimana_mcu_r )
 		case 2:
 		{
 			toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
-			data = state->vimana_credits;
+			data = state->m_vimana_credits;
 			break;
 		}
 	}
@@ -295,8 +295,8 @@ WRITE16_HANDLER( vimana_mcu_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
-				state->vimana_credits = data & 0xff;
-				coin_lockout_global_w(space->machine(), (state->vimana_credits >= 9));
+				state->m_vimana_credits = data & 0xff;
+				coin_lockout_global_w(space->machine(), (state->m_vimana_credits >= 9));
 			}
 			break;
 	}
@@ -305,7 +305,7 @@ WRITE16_HANDLER( vimana_mcu_w )
 READ16_HANDLER( toaplan1_shared_r )
 {
 	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
-	return state->sharedram[offset] & 0xff;
+	return state->m_sharedram[offset] & 0xff;
 }
 
 WRITE16_HANDLER( toaplan1_shared_w )
@@ -313,7 +313,7 @@ WRITE16_HANDLER( toaplan1_shared_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
-		state->sharedram[offset] = data & 0xff;
+		state->m_sharedram[offset] = data & 0xff;
 	}
 }
 
@@ -338,14 +338,14 @@ WRITE8_HANDLER( rallybik_coin_w )
 	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	switch (data) {
-		case 0x08: if (state->coin_count) { coin_counter_w(space->machine(), 0, 1); coin_counter_w(space->machine(), 0, 0); } break;
-		case 0x09: if (state->coin_count) { coin_counter_w(space->machine(), 2, 1); coin_counter_w(space->machine(), 2, 0); } break;
-		case 0x0a: if (state->coin_count) { coin_counter_w(space->machine(), 1, 1); coin_counter_w(space->machine(), 1, 0); } break;
-		case 0x0b: if (state->coin_count) { coin_counter_w(space->machine(), 3, 1); coin_counter_w(space->machine(), 3, 0); } break;
+		case 0x08: if (state->m_coin_count) { coin_counter_w(space->machine(), 0, 1); coin_counter_w(space->machine(), 0, 0); } break;
+		case 0x09: if (state->m_coin_count) { coin_counter_w(space->machine(), 2, 1); coin_counter_w(space->machine(), 2, 0); } break;
+		case 0x0a: if (state->m_coin_count) { coin_counter_w(space->machine(), 1, 1); coin_counter_w(space->machine(), 1, 0); } break;
+		case 0x0b: if (state->m_coin_count) { coin_counter_w(space->machine(), 3, 1); coin_counter_w(space->machine(), 3, 0); } break;
 		case 0x0c: coin_lockout_w(space->machine(), 0, 1); coin_lockout_w(space->machine(), 2, 1); break;
 		case 0x0d: coin_lockout_w(space->machine(), 0, 0); coin_lockout_w(space->machine(), 2, 0); break;
 		case 0x0e: coin_lockout_w(space->machine(), 1, 1); coin_lockout_w(space->machine(), 3, 1); break;
-		case 0x0f: coin_lockout_w(space->machine(), 1, 0); coin_lockout_w(space->machine(), 3, 0); state->coin_count=1; break;
+		case 0x0f: coin_lockout_w(space->machine(), 1, 0); coin_lockout_w(space->machine(), 3, 0); state->m_coin_count=1; break;
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",cpu_get_previouspc(&space->device()),data); break;
 	}
 }
@@ -397,9 +397,9 @@ MACHINE_RESET( toaplan1 )
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->intenable = 0;
-	state->coin_count = 0;
-	state->unk_reset_port = 0;
+	state->m_intenable = 0;
+	state->m_coin_count = 0;
+	state->m_unk_reset_port = 0;
 	coin_lockout_global_w(machine, 0);
 }
 
@@ -407,9 +407,9 @@ void toaplan1_driver_savestate(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->intenable));
-	state->save_item(NAME(state->coin_count));
-	state->save_item(NAME(state->unk_reset_port));
+	state->save_item(NAME(state->m_intenable));
+	state->save_item(NAME(state->m_coin_count));
+	state->save_item(NAME(state->m_unk_reset_port));
 }
 
 MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver */
@@ -417,7 +417,7 @@ MACHINE_RESET( zerowing )	/* Hack for ZeroWing and OutZone. See the video driver
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
 	MACHINE_RESET_CALL(toaplan1);
-	state->unk_reset_port = 1;
+	state->m_unk_reset_port = 1;
 }
 
 MACHINE_RESET( demonwld )
@@ -425,20 +425,20 @@ MACHINE_RESET( demonwld )
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
 	MACHINE_RESET_CALL(toaplan1);
-	state->dsp_addr_w = 0;
-	state->main_ram_seg = 0;
-	state->dsp_execute = 0;
+	state->m_dsp_addr_w = 0;
+	state->m_main_ram_seg = 0;
+	state->m_dsp_execute = 0;
 }
 
 void demonwld_driver_savestate(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->dsp_on));
-	state->save_item(NAME(state->dsp_addr_w));
-	state->save_item(NAME(state->main_ram_seg));
-	state->save_item(NAME(state->dsp_BIO));
-	state->save_item(NAME(state->dsp_execute));
+	state->save_item(NAME(state->m_dsp_on));
+	state->save_item(NAME(state->m_dsp_addr_w));
+	state->save_item(NAME(state->m_main_ram_seg));
+	state->save_item(NAME(state->m_dsp_BIO));
+	state->save_item(NAME(state->m_dsp_execute));
 	machine.state().register_postload(demonwld_restore_dsp, NULL);
 }
 
@@ -447,17 +447,17 @@ MACHINE_RESET( vimana )
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
 	MACHINE_RESET_CALL(toaplan1);
-	state->vimana_coins[0] = state->vimana_coins[1] = 0;
-	state->vimana_credits = 0;
-	state->vimana_latch = 0;
+	state->m_vimana_coins[0] = state->m_vimana_coins[1] = 0;
+	state->m_vimana_credits = 0;
+	state->m_vimana_latch = 0;
 }
 
 void vimana_driver_savestate(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->vimana_coins[0]));
-	state->save_item(NAME(state->vimana_coins[1]));
-	state->save_item(NAME(state->vimana_credits));
-	state->save_item(NAME(state->vimana_latch));
+	state->save_item(NAME(state->m_vimana_coins[0]));
+	state->save_item(NAME(state->m_vimana_coins[1]));
+	state->save_item(NAME(state->m_vimana_credits));
+	state->save_item(NAME(state->m_vimana_latch));
 }

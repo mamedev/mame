@@ -64,11 +64,11 @@
 typedef struct _namco_53xx_state namco_53xx_state;
 struct _namco_53xx_state
 {
-	device_t *	cpu;
-	UINT8					portO;
-	devcb_resolved_read8	k;
-	devcb_resolved_read8	in[4];
-	devcb_resolved_write8	p;
+	device_t *	m_cpu;
+	UINT8					m_portO;
+	devcb_resolved_read8	m_k;
+	devcb_resolved_read8	m_in[4];
+	devcb_resolved_write8	m_p;
 };
 
 INLINE namco_53xx_state *get_safe_token(device_t *device)
@@ -84,13 +84,13 @@ INLINE namco_53xx_state *get_safe_token(device_t *device)
 static READ8_HANDLER( namco_53xx_K_r )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->k, 0);
+	return devcb_call_read8(&state->m_k, 0);
 }
 
 static READ8_HANDLER( namco_53xx_Rx_r )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->in[offset], 0);
+	return devcb_call_read8(&state->m_in[offset], 0);
 }
 
 static WRITE8_HANDLER( namco_53xx_O_w )
@@ -98,28 +98,28 @@ static WRITE8_HANDLER( namco_53xx_O_w )
 	namco_53xx_state *state = get_safe_token(space->device().owner());
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		state->portO = (state->portO & 0x0f) | (out << 4);
+		state->m_portO = (state->m_portO & 0x0f) | (out << 4);
 	else
-		state->portO = (state->portO & 0xf0) | (out);
+		state->m_portO = (state->m_portO & 0xf0) | (out);
 }
 
 static WRITE8_HANDLER( namco_53xx_P_w )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	devcb_call_write8(&state->p, 0, data);
+	devcb_call_write8(&state->m_p, 0, data);
 }
 
 
 static TIMER_CALLBACK( namco_53xx_irq_clear )
 {
 	namco_53xx_state *state = get_safe_token((device_t *)ptr);
-	device_set_input_line(state->cpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_cpu, 0, CLEAR_LINE);
 }
 
 void namco_53xx_read_request(device_t *device)
 {
 	namco_53xx_state *state = get_safe_token(device);
-	device_set_input_line(state->cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_cpu, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
@@ -132,7 +132,7 @@ void namco_53xx_read_request(device_t *device)
 READ8_DEVICE_HANDLER( namco_53xx_read )
 {
 	namco_53xx_state *state = get_safe_token(device);
-	UINT8 res = state->portO;
+	UINT8 res = state->m_portO;
 
 	namco_53xx_read_request(device);
 
@@ -177,18 +177,18 @@ static DEVICE_START( namco_53xx )
 	assert(config != NULL);
 
 	/* find our CPU */
-	state->cpu = device->subdevice("mcu");
-	assert(state->cpu != NULL);
+	state->m_cpu = device->subdevice("mcu");
+	assert(state->m_cpu != NULL);
 
 	/* resolve our read/write callbacks */
-	devcb_resolve_read8(&state->k, &config->k, device);
-	devcb_resolve_read8(&state->in[0], &config->in[0], device);
-	devcb_resolve_read8(&state->in[1], &config->in[1], device);
-	devcb_resolve_read8(&state->in[2], &config->in[2], device);
-	devcb_resolve_read8(&state->in[3], &config->in[3], device);
-	devcb_resolve_write8(&state->p, &config->p, device);
+	devcb_resolve_read8(&state->m_k, &config->k, device);
+	devcb_resolve_read8(&state->m_in[0], &config->in[0], device);
+	devcb_resolve_read8(&state->m_in[1], &config->in[1], device);
+	devcb_resolve_read8(&state->m_in[2], &config->in[2], device);
+	devcb_resolve_read8(&state->m_in[3], &config->in[3], device);
+	devcb_resolve_write8(&state->m_p, &config->p, device);
 
-	device->save_item(NAME(state->portO));
+	device->save_item(NAME(state->m_portO));
 }
 
 

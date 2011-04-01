@@ -165,20 +165,20 @@ static void idsoccer_adpcm_int( device_t *device )
 {
 	docastle_state *state = device->machine().driver_data<docastle_state>();
 
-	if (state->adpcm_pos >= device->machine().region("adpcm")->bytes())
+	if (state->m_adpcm_pos >= device->machine().region("adpcm")->bytes())
 	{
-		state->adpcm_idle = 1;
+		state->m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
 	}
-	else if (state->adpcm_data != -1)
+	else if (state->m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->adpcm_data & 0x0f);
-		state->adpcm_data = -1;
+		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
+		state->m_adpcm_data = -1;
 	}
 	else
 	{
-		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos++];
-		msm5205_data_w(device, state->adpcm_data >> 4);
+		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos++];
+		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
 }
 
@@ -187,8 +187,8 @@ static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 	docastle_state *state = device->machine().driver_data<docastle_state>();
 
 	// this is wrong, but the samples work anyway!!
-	state->adpcm_status ^= 0x80;
-	return state->adpcm_status;
+	state->m_adpcm_status ^= 0x80;
+	return state->m_adpcm_status;
 }
 
 static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
@@ -197,13 +197,13 @@ static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 
 	if (data & 0x80)
 	{
-		state->adpcm_idle = 1;
+		state->m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
 	}
 	else
 	{
-		state->adpcm_pos = (data & 0x7f) * 0x200;
-		state->adpcm_idle = 0;
+		state->m_adpcm_pos = (data & 0x7f) * 0x200;
+		state->m_adpcm_idle = 0;
 		msm5205_reset_w(device, 0);
 	}
 }
@@ -212,11 +212,11 @@ static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -255,12 +255,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -285,12 +285,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
+	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
@@ -568,28 +568,28 @@ static MACHINE_RESET( docastle )
 
 	for (i = 0; i < 9; i++)
 	{
-		state->buffer0[i] = 0;
-		state->buffer1[i] = 0;
+		state->m_buffer0[i] = 0;
+		state->m_buffer1[i] = 0;
 	}
 
-	state->adpcm_pos = state->adpcm_idle = 0;
-	state->adpcm_data = -1;
-	state->adpcm_status = 0;
+	state->m_adpcm_pos = state->m_adpcm_idle = 0;
+	state->m_adpcm_data = -1;
+	state->m_adpcm_status = 0;
 }
 
 static MACHINE_START( docastle )
 {
 	docastle_state *state = machine.driver_data<docastle_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->slave = machine.device<cpu_device>("slave");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_slave = machine.device<cpu_device>("slave");
 
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->adpcm_idle));
-	state->save_item(NAME(state->adpcm_status));
-	state->save_item(NAME(state->buffer0));
-	state->save_item(NAME(state->buffer1));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_adpcm_idle));
+	state->save_item(NAME(state->m_adpcm_status));
+	state->save_item(NAME(state->m_buffer0));
+	state->save_item(NAME(state->m_buffer1));
 }
 
 static MACHINE_CONFIG_START( docastle, docastle_state )

@@ -1993,7 +1993,7 @@ static DRIVER_INIT( cerberus )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = cerberus_bankswitch;
+	state->m_update_master_bank = cerberus_bankswitch;
 	memory_set_bankptr(machine, "bank1", machine.region("master")->base() + 0x2000);
 	memory_set_bankptr(machine, "bank2", machine.region("master")->base() + 0xa000);
 	memory_set_bankptr(machine, "bank3", machine.region("slave")->base() + 0x2000);
@@ -2011,7 +2011,7 @@ static DRIVER_INIT( mayhem )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = mayhem_bankswitch;
+	state->m_update_master_bank = mayhem_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2022,7 +2022,7 @@ static DRIVER_INIT( powrplay )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = mayhem_bankswitch;
+	state->m_update_master_bank = mayhem_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2033,7 +2033,7 @@ static DRIVER_INIT( wseries )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = mayhem_bankswitch;
+	state->m_update_master_bank = mayhem_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2044,7 +2044,7 @@ static DRIVER_INIT( alleymas )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = mayhem_bankswitch;
+	state->m_update_master_bank = mayhem_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2052,7 +2052,7 @@ static DRIVER_INIT( alleymas )
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	state->alleymas_kludge_mem = machine.device("master")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe0ca, 0xe0ca, FUNC(alleymas_joystick_kludge));
+	state->m_alleymas_kludge_mem = machine.device("master")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe0ca, 0xe0ca, FUNC(alleymas_joystick_kludge));
 }
 
 
@@ -2060,7 +2060,7 @@ static DRIVER_INIT( upyoural )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = mayhem_bankswitch;
+	state->m_update_master_bank = mayhem_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2071,7 +2071,7 @@ static DRIVER_INIT( dangerz )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = dangerz_bankswitch;
+	state->m_update_master_bank = dangerz_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);
@@ -2087,7 +2087,7 @@ static DRIVER_INIT( basebal2 )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = basebal2_bankswitch;
+	state->m_update_master_bank = basebal2_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0xc0);
@@ -2098,7 +2098,7 @@ static DRIVER_INIT( dblplay )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = basebal2_bankswitch;
+	state->m_update_master_bank = basebal2_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x80, 0x40);
@@ -2109,7 +2109,7 @@ static DRIVER_INIT( strkzone )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = basebal2_bankswitch;
+	state->m_update_master_bank = basebal2_bankswitch;
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x00, 0x40);
@@ -2120,7 +2120,7 @@ static DRIVER_INIT( redlin2p )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = redline_bankswitch;
+	state->m_update_master_bank = redline_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 
@@ -2139,7 +2139,7 @@ static DRIVER_INIT( quarterb )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 
@@ -2152,7 +2152,7 @@ static DRIVER_INIT( viper )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2172,7 +2172,7 @@ static DRIVER_INIT( teamqb )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2191,7 +2191,7 @@ static DRIVER_INIT( aafb )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2210,7 +2210,7 @@ static DRIVER_INIT( aafbb )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2229,7 +2229,7 @@ static DRIVER_INIT( aafbd2p )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = viper_bankswitch;
+	state->m_update_master_bank = viper_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2248,7 +2248,7 @@ static DRIVER_INIT( offroad )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = offroad_bankswitch;
+	state->m_update_master_bank = offroad_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2269,7 +2269,7 @@ static DRIVER_INIT( offroadt )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = offroad_bankswitch;
+	state->m_update_master_bank = offroad_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -2289,7 +2289,7 @@ static DRIVER_INIT( pigout )
 {
 	leland_state *state = machine.driver_data<leland_state>();
 	/* master CPU bankswitching */
-	state->update_master_bank = offroad_bankswitch;
+	state->m_update_master_bank = offroad_bankswitch;
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");

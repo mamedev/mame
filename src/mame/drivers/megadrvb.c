@@ -281,10 +281,10 @@ static READ16_HANDLER( aladmdb_r )
 	md_boot_state *state = space->machine().driver_data<md_boot_state>();
 	if (cpu_get_pc(&space->device())==0x1b2a56)
 	{
-		state->aladmdb_mcu_port = input_port_read(space->machine(), "MCU");
+		state->m_aladmdb_mcu_port = input_port_read(space->machine(), "MCU");
 
-		if (state->aladmdb_mcu_port & 0x100)
-			return ((state->aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
+		if (state->m_aladmdb_mcu_port & 0x100)
+			return ((state->m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
 		else
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}

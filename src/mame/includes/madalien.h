@@ -18,20 +18,20 @@ public:
 	madalien_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *shift_hi;
-	UINT8 *shift_lo;
-	UINT8 *videoram;
-	UINT8 *charram;
-	UINT8 *video_flags;
-	UINT8 *video_control;
-	UINT8 *scroll;
-	UINT8 *edge1_pos;
-	UINT8 *edge2_pos;
-	UINT8 *headlight_pos;
-	tilemap_t *tilemap_fg;
-	tilemap_t *tilemap_edge1[4];
-	tilemap_t *tilemap_edge2[4];
-	bitmap_t *headlight_bitmap;
+	UINT8 *m_shift_hi;
+	UINT8 *m_shift_lo;
+	UINT8 *m_videoram;
+	UINT8 *m_charram;
+	UINT8 *m_video_flags;
+	UINT8 *m_video_control;
+	UINT8 *m_scroll;
+	UINT8 *m_edge1_pos;
+	UINT8 *m_edge2_pos;
+	UINT8 *m_headlight_pos;
+	tilemap_t *m_tilemap_fg;
+	tilemap_t *m_tilemap_edge1[4];
+	tilemap_t *m_tilemap_edge2[4];
+	bitmap_t *m_headlight_bitmap;
 };
 
 

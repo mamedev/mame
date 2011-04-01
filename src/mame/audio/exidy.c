@@ -76,42 +76,42 @@ struct sh8253_timer_channel
 typedef struct _exidy_sound_state exidy_sound_state;
 struct _exidy_sound_state
 {
-	device_t *maincpu;
+	device_t *m_maincpu;
 
 	/* IRQ variable */
-	UINT8 riot_irq_state;
+	UINT8 m_riot_irq_state;
 
 	/* 6532 variables */
-	device_t *riot;
+	device_t *m_riot;
 
-	struct sh6840_timer_channel sh6840_timer[3];
-	INT16 sh6840_volume[3];
-	UINT8 sh6840_MSB_latch;
-	UINT8 sh6840_LSB_latch;
-	UINT8 sh6840_LFSR_oldxor;
-	UINT32 sh6840_LFSR_0;
-	UINT32 sh6840_LFSR_1;
-	UINT32 sh6840_LFSR_2;
-	UINT32 sh6840_LFSR_3;
-	UINT32 sh6840_clocks_per_sample;
-	UINT32 sh6840_clock_count;
+	struct sh6840_timer_channel m_sh6840_timer[3];
+	INT16 m_sh6840_volume[3];
+	UINT8 m_sh6840_MSB_latch;
+	UINT8 m_sh6840_LSB_latch;
+	UINT8 m_sh6840_LFSR_oldxor;
+	UINT32 m_sh6840_LFSR_0;
+	UINT32 m_sh6840_LFSR_1;
+	UINT32 m_sh6840_LFSR_2;
+	UINT32 m_sh6840_LFSR_3;
+	UINT32 m_sh6840_clocks_per_sample;
+	UINT32 m_sh6840_clock_count;
 
-	UINT8 sfxctrl;
+	UINT8 m_sfxctrl;
 
 	/* 8253 variables */
-	struct sh8253_timer_channel sh8253_timer[3];
-	int has_sh8253;
+	struct sh8253_timer_channel m_sh8253_timer[3];
+	int m_has_sh8253;
 
 	/* 5220/CVSD variables */
-	device_t *cvsd;
-	device_t *tms;
-	device_t *pia1;
+	device_t *m_cvsd;
+	device_t *m_tms;
+	device_t *m_pia1;
 
 	/* sound streaming variables */
-	sound_stream *stream;
-	double freq_to_step;
+	sound_stream *m_stream;
+	double m_freq_to_step;
 
-	UINT8 victory_sound_response_ack_clk;	/* 7474 @ F4 */
+	UINT8 m_victory_sound_response_ack_clk;	/* 7474 @ F4 */
 };
 
 
@@ -132,7 +132,7 @@ INLINE exidy_sound_state *get_safe_token(device_t *device)
 static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
-	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(sndstate->pia1) | sndstate->riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(sndstate->m_pia1) | sndstate->m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -212,19 +212,19 @@ INLINE int sh6840_update_noise(exidy_sound_state *state, int clocks)
         * first we grab new sample, then shift the high bits,
         * then the low ones; finally or in the result and see if we've
         * had a 0->1 transition */
-		newxor = (state->sh6840_LFSR_3 ^ state->sh6840_LFSR_2) >> 31; /* high bits of 3 and 2 xored is new xor */
-		state->sh6840_LFSR_3 <<= 1;
-		state->sh6840_LFSR_3 |= state->sh6840_LFSR_2 >> 31;
-		state->sh6840_LFSR_2 <<= 1;
-		state->sh6840_LFSR_2 |= state->sh6840_LFSR_1 >> 31;
-		state->sh6840_LFSR_1 <<= 1;
-		state->sh6840_LFSR_1 |= state->sh6840_LFSR_0 >> 31;
-		state->sh6840_LFSR_0 <<= 1;
-		state->sh6840_LFSR_0 |= newxor ^ state->sh6840_LFSR_oldxor;
-		state->sh6840_LFSR_oldxor = newxor;
+		newxor = (state->m_sh6840_LFSR_3 ^ state->m_sh6840_LFSR_2) >> 31; /* high bits of 3 and 2 xored is new xor */
+		state->m_sh6840_LFSR_3 <<= 1;
+		state->m_sh6840_LFSR_3 |= state->m_sh6840_LFSR_2 >> 31;
+		state->m_sh6840_LFSR_2 <<= 1;
+		state->m_sh6840_LFSR_2 |= state->m_sh6840_LFSR_1 >> 31;
+		state->m_sh6840_LFSR_1 <<= 1;
+		state->m_sh6840_LFSR_1 |= state->m_sh6840_LFSR_0 >> 31;
+		state->m_sh6840_LFSR_0 <<= 1;
+		state->m_sh6840_LFSR_0 |= newxor ^ state->m_sh6840_LFSR_oldxor;
+		state->m_sh6840_LFSR_oldxor = newxor;
 		/*printf("LFSR: %4x, %4x, %4x, %4x\n", sh6840_LFSR_3, sh6840_LFSR_2, sh6840_LFSR_1, sh6840_LFSR_0);*/
 		/* if we clocked 0->1, that will serve as an external clock */
-		if ((state->sh6840_LFSR_2 & 0x03) == 0x01) /* tap is at 96th bit */
+		if ((state->m_sh6840_LFSR_2 & 0x03) == 0x01) /* tap is at 96th bit */
 		{
 			noise_clocks++;
 		}
@@ -244,34 +244,34 @@ static void sh6840_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	device->save_item(NAME(state->sh6840_volume));
-	device->save_item(NAME(state->sh6840_MSB_latch));
-	device->save_item(NAME(state->sh6840_LSB_latch));
-	device->save_item(NAME(state->sh6840_LFSR_oldxor));
-	device->save_item(NAME(state->sh6840_LFSR_0));
-	device->save_item(NAME(state->sh6840_LFSR_1));
-	device->save_item(NAME(state->sh6840_LFSR_2));
-	device->save_item(NAME(state->sh6840_LFSR_3));
-	device->save_item(NAME(state->sh6840_clock_count));
-	device->save_item(NAME(state->sfxctrl));
-	device->save_item(NAME(state->sh6840_timer[0].cr));
-	device->save_item(NAME(state->sh6840_timer[0].state));
-	device->save_item(NAME(state->sh6840_timer[0].leftovers));
-	device->save_item(NAME(state->sh6840_timer[0].timer));
-	device->save_item(NAME(state->sh6840_timer[0].clocks));
-	device->save_item(NAME(state->sh6840_timer[0].counter.w));
-	device->save_item(NAME(state->sh6840_timer[1].cr));
-	device->save_item(NAME(state->sh6840_timer[1].state));
-	device->save_item(NAME(state->sh6840_timer[1].leftovers));
-	device->save_item(NAME(state->sh6840_timer[1].timer));
-	device->save_item(NAME(state->sh6840_timer[1].clocks));
-	device->save_item(NAME(state->sh6840_timer[1].counter.w));
-	device->save_item(NAME(state->sh6840_timer[2].cr));
-	device->save_item(NAME(state->sh6840_timer[2].state));
-	device->save_item(NAME(state->sh6840_timer[2].leftovers));
-	device->save_item(NAME(state->sh6840_timer[2].timer));
-	device->save_item(NAME(state->sh6840_timer[2].clocks));
-	device->save_item(NAME(state->sh6840_timer[2].counter.w));
+	device->save_item(NAME(state->m_sh6840_volume));
+	device->save_item(NAME(state->m_sh6840_MSB_latch));
+	device->save_item(NAME(state->m_sh6840_LSB_latch));
+	device->save_item(NAME(state->m_sh6840_LFSR_oldxor));
+	device->save_item(NAME(state->m_sh6840_LFSR_0));
+	device->save_item(NAME(state->m_sh6840_LFSR_1));
+	device->save_item(NAME(state->m_sh6840_LFSR_2));
+	device->save_item(NAME(state->m_sh6840_LFSR_3));
+	device->save_item(NAME(state->m_sh6840_clock_count));
+	device->save_item(NAME(state->m_sfxctrl));
+	device->save_item(NAME(state->m_sh6840_timer[0].cr));
+	device->save_item(NAME(state->m_sh6840_timer[0].state));
+	device->save_item(NAME(state->m_sh6840_timer[0].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[0].timer));
+	device->save_item(NAME(state->m_sh6840_timer[0].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[0].counter.w));
+	device->save_item(NAME(state->m_sh6840_timer[1].cr));
+	device->save_item(NAME(state->m_sh6840_timer[1].state));
+	device->save_item(NAME(state->m_sh6840_timer[1].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[1].timer));
+	device->save_item(NAME(state->m_sh6840_timer[1].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[1].counter.w));
+	device->save_item(NAME(state->m_sh6840_timer[2].cr));
+	device->save_item(NAME(state->m_sh6840_timer[2].state));
+	device->save_item(NAME(state->m_sh6840_timer[2].leftovers));
+	device->save_item(NAME(state->m_sh6840_timer[2].timer));
+	device->save_item(NAME(state->m_sh6840_timer[2].clocks));
+	device->save_item(NAME(state->m_sh6840_timer[2].counter.w));
 }
 
 
@@ -285,7 +285,7 @@ static void sh6840_register_state_globals(device_t *device)
 static STREAM_UPDATE( exidy_stream_update )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
+	struct sh6840_timer_channel *sh6840_timer = state->m_sh6840_timer;
 
 	/* hack to skip the expensive lfsr noise generation unless at least one of the 3 channels actually depends on it being generated */
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
@@ -301,9 +301,9 @@ static STREAM_UPDATE( exidy_stream_update )
 		INT16 sample = 0;
 
 		/* determine how many 6840 clocks this sample */
-		state->sh6840_clock_count += state->sh6840_clocks_per_sample;
-		clocks_this_sample = state->sh6840_clock_count >> 24;
-		state->sh6840_clock_count &= (1 << 24) - 1;
+		state->m_sh6840_clock_count += state->m_sh6840_clocks_per_sample;
+		clocks_this_sample = state->m_sh6840_clock_count >> 24;
+		state->m_sh6840_clock_count &= (1 << 24) - 1;
 
 		/* skip if nothing enabled */
 		if ((sh6840_timer[0].cr & 0x01) == 0)
@@ -312,7 +312,7 @@ static STREAM_UPDATE( exidy_stream_update )
 			UINT32 chan0_clocks;
 
 			/* generate E-clocked noise if configured to do so */
-			if (noisy && !(state->sfxctrl & 0x01))
+			if (noisy && !(state->m_sfxctrl & 0x01))
 				noise_clocks_this_sample = sh6840_update_noise(state, clocks_this_sample);
 
 			/* handle timer 0 if enabled */
@@ -320,11 +320,11 @@ static STREAM_UPDATE( exidy_stream_update )
 			chan0_clocks = t->clocks;
 			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
 			sh6840_apply_clock(t, clocks);
-			if (t->state && !(state->sfxctrl & 0x02) && (t->cr & 0x80))
-				sample += state->sh6840_volume[0];
+			if (t->state && !(state->m_sfxctrl & 0x02) && (t->cr & 0x80))
+				sample += state->m_sh6840_volume[0];
 
 			/* generate channel 0-clocked noise if configured to do so */
-			if (noisy && (state->sfxctrl & 0x01))
+			if (noisy && (state->m_sfxctrl & 0x01))
 				noise_clocks_this_sample = sh6840_update_noise(state, t->clocks - chan0_clocks);
 
 			/* handle timer 1 if enabled */
@@ -332,7 +332,7 @@ static STREAM_UPDATE( exidy_stream_update )
 			clocks = (t->cr & 0x02) ? clocks_this_sample : noise_clocks_this_sample;
 			sh6840_apply_clock(t, clocks);
 			if (t->state && (t->cr & 0x80))
-				sample += state->sh6840_volume[1];
+				sample += state->m_sh6840_volume[1];
 
 			/* handle timer 2 if enabled */
 			t = &sh6840_timer[2];
@@ -346,14 +346,14 @@ static STREAM_UPDATE( exidy_stream_update )
 			}
 			sh6840_apply_clock(t, clocks);
 			if (t->state && (t->cr & 0x80))
-				sample += state->sh6840_volume[2];
+				sample += state->m_sh6840_volume[2];
 		}
 
 		/* music (if present) */
-		if (state->has_sh8253)
+		if (state->m_has_sh8253)
 		{
 			/* music channel 0 */
-			c = &state->sh8253_timer[0];
+			c = &state->m_sh8253_timer[0];
 			if (c->enable)
 			{
 				c->fraction += c->step;
@@ -362,7 +362,7 @@ static STREAM_UPDATE( exidy_stream_update )
 			}
 
 			/* music channel 1 */
-			c = &state->sh8253_timer[1];
+			c = &state->m_sh8253_timer[1];
 			if (c->enable)
 			{
 				c->fraction += c->step;
@@ -371,7 +371,7 @@ static STREAM_UPDATE( exidy_stream_update )
 			}
 
 			/* music channel 2 */
-			c = &state->sh8253_timer[2];
+			c = &state->m_sh8253_timer[2];
 			if (c->enable)
 			{
 				c->fraction += c->step;
@@ -398,11 +398,11 @@ static DEVICE_START( common_sh_start )
 	exidy_sound_state *state = get_safe_token(device);
 	int sample_rate = SH8253_CLOCK;
 
-	state->sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
+	state->m_sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
-	state->maincpu = device->machine().device("maincpu");
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, NULL, exidy_stream_update);
+	state->m_maincpu = device->machine().device("maincpu");
 
 	sh6840_register_state_globals(device);
 }
@@ -412,9 +412,9 @@ static DEVICE_START( exidy_sound )
 	exidy_sound_state *state = get_safe_token(device);
 
 	/* indicate no additional hardware */
-	state->has_sh8253  = FALSE;
-	state->tms = NULL;
-	state->cvsd = NULL;
+	state->m_has_sh8253  = FALSE;
+	state->m_tms = NULL;
+	state->m_cvsd = NULL;
 
 	DEVICE_START_CALL(common_sh_start);
 }
@@ -432,21 +432,21 @@ static DEVICE_RESET( common_sh_reset )
 	exidy_sound_state *state = get_safe_token(device);
 
 	/* 6840 */
-	memset(state->sh6840_timer, 0, sizeof(state->sh6840_timer));
-	state->sh6840_MSB_latch = 0;
-	state->sh6840_LSB_latch = 0;
-	state->sh6840_volume[0] = 0;
-	state->sh6840_volume[1] = 0;
-	state->sh6840_volume[2] = 0;
-	state->sh6840_clock_count = 0;
-	state->sfxctrl = 0;
+	memset(state->m_sh6840_timer, 0, sizeof(state->m_sh6840_timer));
+	state->m_sh6840_MSB_latch = 0;
+	state->m_sh6840_LSB_latch = 0;
+	state->m_sh6840_volume[0] = 0;
+	state->m_sh6840_volume[1] = 0;
+	state->m_sh6840_volume[2] = 0;
+	state->m_sh6840_clock_count = 0;
+	state->m_sfxctrl = 0;
 
 	/* LFSR */
-	state->sh6840_LFSR_oldxor = 0;
-	state->sh6840_LFSR_0 = 0xffffffff;
-	state->sh6840_LFSR_1 = 0xffffffff;
-	state->sh6840_LFSR_2 = 0xffffffff;
-	state->sh6840_LFSR_3 = 0xffffffff;
+	state->m_sh6840_LFSR_oldxor = 0;
+	state->m_sh6840_LFSR_0 = 0xffffffff;
+	state->m_sh6840_LFSR_1 = 0xffffffff;
+	state->m_sh6840_LFSR_2 = 0xffffffff;
+	state->m_sh6840_LFSR_3 = 0xffffffff;
 }
 
 static DEVICE_RESET( exidy_sound )
@@ -482,7 +482,7 @@ DEVICE_GET_INFO( exidy_sound )
 static void r6532_irq(device_t *device, int state)
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
-	sndstate->riot_irq_state = (state == ASSERT_LINE) ? 1 : 0;
+	sndstate->m_riot_irq_state = (state == ASSERT_LINE) ? 1 : 0;
 	update_irq_state(device, 0);
 }
 
@@ -490,23 +490,23 @@ static void r6532_irq(device_t *device, int state)
 static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	if (state->cvsd != NULL)
+	if (state->m_cvsd != NULL)
 		cputag_set_input_line(device->machine(), "cvsdcpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
-	if (state->tms != NULL)
+	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), riot6532_porta_out_get(state->riot));
-		tms5220_data_w(state->tms, 0, data);
+		logerror("(%f)%s:TMS5220 data write = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), riot6532_porta_out_get(state->m_riot));
+		tms5220_data_w(state->m_tms, 0, data);
 	}
 }
 
 static READ8_DEVICE_HANDLER( r6532_porta_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	if (state->tms != NULL)
+	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->tms, 0));
-		return tms5220_status_r(state->tms, 0);
+		logerror("(%f)%s:TMS5220 status read = %02X\n", device->machine().time().as_double(), device->machine().describe_context(), tms5220_status_r(state->m_tms, 0));
+		return tms5220_status_r(state->m_tms, 0);
 	}
 	else
 		return 0xff;
@@ -515,10 +515,10 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 static WRITE8_DEVICE_HANDLER( r6532_portb_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	if (state->tms != NULL)
+	if (state->m_tms != NULL)
 	{
-		tms5220_rsq_w(state->tms, data & 0x01);
-		tms5220_wsq_w(state->tms, (data >> 1) & 0x01);
+		tms5220_rsq_w(state->m_tms, data & 0x01);
+		tms5220_wsq_w(state->m_tms, (data >> 1) & 0x01);
 	}
 }
 
@@ -526,12 +526,12 @@ static WRITE8_DEVICE_HANDLER( r6532_portb_w )
 static READ8_DEVICE_HANDLER( r6532_portb_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 newdata = riot6532_portb_in_get(state->riot);
-	if (state->tms != NULL)
+	UINT8 newdata = riot6532_portb_in_get(state->m_riot);
+	if (state->m_tms != NULL)
 	{
 		newdata &= ~0x0c;
-		if (tms5220_readyq_r(state->tms)) newdata |= 0x04;
-		if (tms5220_intq_r(state->tms)) newdata |= 0x08;
+		if (tms5220_readyq_r(state->m_tms)) newdata |= 0x04;
+		if (tms5220_intq_r(state->m_tms)) newdata |= 0x08;
 	}
 	return newdata;
 }
@@ -559,21 +559,21 @@ static void sh8253_register_state_globals(device_t *device)
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	device->save_item(NAME(state->sh8253_timer[0].clstate));
-	device->save_item(NAME(state->sh8253_timer[0].enable));
-	device->save_item(NAME(state->sh8253_timer[0].count));
-	device->save_item(NAME(state->sh8253_timer[0].step));
-	device->save_item(NAME(state->sh8253_timer[0].fraction));
-	device->save_item(NAME(state->sh8253_timer[1].clstate));
-	device->save_item(NAME(state->sh8253_timer[1].enable));
-	device->save_item(NAME(state->sh8253_timer[1].count));
-	device->save_item(NAME(state->sh8253_timer[1].step));
-	device->save_item(NAME(state->sh8253_timer[1].fraction));
-	device->save_item(NAME(state->sh8253_timer[2].clstate));
-	device->save_item(NAME(state->sh8253_timer[2].enable));
-	device->save_item(NAME(state->sh8253_timer[2].count));
-	device->save_item(NAME(state->sh8253_timer[2].step));
-	device->save_item(NAME(state->sh8253_timer[2].fraction));
+	device->save_item(NAME(state->m_sh8253_timer[0].clstate));
+	device->save_item(NAME(state->m_sh8253_timer[0].enable));
+	device->save_item(NAME(state->m_sh8253_timer[0].count));
+	device->save_item(NAME(state->m_sh8253_timer[0].step));
+	device->save_item(NAME(state->m_sh8253_timer[0].fraction));
+	device->save_item(NAME(state->m_sh8253_timer[1].clstate));
+	device->save_item(NAME(state->m_sh8253_timer[1].enable));
+	device->save_item(NAME(state->m_sh8253_timer[1].count));
+	device->save_item(NAME(state->m_sh8253_timer[1].step));
+	device->save_item(NAME(state->m_sh8253_timer[1].fraction));
+	device->save_item(NAME(state->m_sh8253_timer[2].clstate));
+	device->save_item(NAME(state->m_sh8253_timer[2].enable));
+	device->save_item(NAME(state->m_sh8253_timer[2].count));
+	device->save_item(NAME(state->m_sh8253_timer[2].step));
+	device->save_item(NAME(state->m_sh8253_timer[2].fraction));
 }
 
 /*************************************
@@ -587,7 +587,7 @@ static WRITE8_DEVICE_HANDLER( exidy_sh8253_w )
 	exidy_sound_state *state = get_safe_token(device);
 	int chan;
 
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
@@ -595,25 +595,25 @@ static WRITE8_DEVICE_HANDLER( exidy_sh8253_w )
 		case 1:
 		case 2:
 			chan = offset;
-			if (!state->sh8253_timer[chan].clstate)
+			if (!state->m_sh8253_timer[chan].clstate)
 			{
-				state->sh8253_timer[chan].clstate = 1;
-				state->sh8253_timer[chan].count = (state->sh8253_timer[chan].count & 0xff00) | (data & 0x00ff);
+				state->m_sh8253_timer[chan].clstate = 1;
+				state->m_sh8253_timer[chan].count = (state->m_sh8253_timer[chan].count & 0xff00) | (data & 0x00ff);
 			}
 			else
 			{
-				state->sh8253_timer[chan].clstate = 0;
-				state->sh8253_timer[chan].count = (state->sh8253_timer[chan].count & 0x00ff) | ((data << 8) & 0xff00);
-				if (state->sh8253_timer[chan].count)
-					state->sh8253_timer[chan].step = state->freq_to_step * (double)SH8253_CLOCK / (double)state->sh8253_timer[chan].count;
+				state->m_sh8253_timer[chan].clstate = 0;
+				state->m_sh8253_timer[chan].count = (state->m_sh8253_timer[chan].count & 0x00ff) | ((data << 8) & 0xff00);
+				if (state->m_sh8253_timer[chan].count)
+					state->m_sh8253_timer[chan].step = state->m_freq_to_step * (double)SH8253_CLOCK / (double)state->m_sh8253_timer[chan].count;
 				else
-					state->sh8253_timer[chan].step = 0;
+					state->m_sh8253_timer[chan].step = 0;
 			}
 			break;
 
 		case 3:
 			chan = (data & 0xc0) >> 6;
-			state->sh8253_timer[chan].enable = ((data & 0x0e) != 0);
+			state->m_sh8253_timer[chan].enable = ((data & 0x0e) != 0);
 			break;
 	}
 }
@@ -639,7 +639,7 @@ READ8_DEVICE_HANDLER( exidy_sh6840_r )
 	exidy_sound_state *state = get_safe_token(device);
 
 	/* force an update of the stream */
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
@@ -648,15 +648,15 @@ READ8_DEVICE_HANDLER( exidy_sh6840_r )
 		return 0;
 		/* offset 1 reads the status register: bits 2 1 0 correspond to ints on channels 2,1,0, and bit 7 is an 'OR' of bits 2,1,0 */
 		case 1:
-		logerror("%04X:exidy_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(state->maincpu));
+		logerror("%04X:exidy_sh6840_r - unexpected read, status register is TODO!\n", cpu_get_pc(state->m_maincpu));
 		return 0;
 		/* offsets 2,4,6 read channel 0,1,2 MSBs and latch the LSB*/
 		case 2: case 4: case 6:
-		state->sh6840_LSB_latch = state->sh6840_timer[((offset<<1)-1)].counter.b.l;
-		return state->sh6840_timer[((offset<<1)-1)].counter.b.h;
+		state->m_sh6840_LSB_latch = state->m_sh6840_timer[((offset<<1)-1)].counter.b.l;
+		return state->m_sh6840_timer[((offset<<1)-1)].counter.b.h;
 		/* offsets 3,5,7 read the LSB latch*/
 		default: /* case 3,5,7 */
-		return state->sh6840_LSB_latch;
+		return state->m_sh6840_LSB_latch;
 	}
 }
 
@@ -664,10 +664,10 @@ READ8_DEVICE_HANDLER( exidy_sh6840_r )
 WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	struct sh6840_timer_channel *sh6840_timer = state->sh6840_timer;
+	struct sh6840_timer_channel *sh6840_timer = state->m_sh6840_timer;
 
 	/* force an update of the stream */
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
@@ -696,7 +696,7 @@ WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 		case 2:
 		case 4:
 		case 6:
-			state->sh6840_MSB_latch = data;
+			state->m_sh6840_MSB_latch = data;
 			break;
 
 		/* offsets 3/5/7 write to the LSB controls */
@@ -706,7 +706,7 @@ WRITE8_DEVICE_HANDLER( exidy_sh6840_w )
 		{
 			/* latch the timer value */
 			int ch = (offset - 3) / 2;
-			sh6840_timer[ch].timer = (state->sh6840_MSB_latch << 8) | (data & 0xff);
+			sh6840_timer[ch].timer = (state->m_sh6840_MSB_latch << 8) | (data & 0xff);
 
 			/* if CR4 is clear, the value is loaded immediately */
 			if (!(sh6840_timer[ch].cr & 0x10))
@@ -728,18 +728,18 @@ WRITE8_DEVICE_HANDLER( exidy_sfxctrl_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	state->stream->update();
+	state->m_stream->update();
 
 	switch (offset)
 	{
 		case 0:
-			state->sfxctrl = data;
+			state->m_sfxctrl = data;
 			break;
 
 		case 1:
 		case 2:
 		case 3:
-			state->sh6840_volume[offset - 1] = ((data & 7) * BASE_VOLUME) / 7;
+			state->m_sh6840_volume[offset - 1] = ((data & 7) * BASE_VOLUME) / 7;
 			break;
 	}
 }
@@ -806,19 +806,19 @@ static DEVICE_START( venture_common_sh_start )
 
 	DEVICE_START_CALL(common_sh_start);
 
-	state->riot = machine.device("riot");
+	state->m_riot = machine.device("riot");
 
-	state->has_sh8253  = TRUE;
-	state->tms = NULL;
-	state->pia1 = device->machine().device("pia1");
+	state->m_has_sh8253  = TRUE;
+	state->m_tms = NULL;
+	state->m_pia1 = device->machine().device("pia1");
 
 	/* determine which sound hardware is installed */
-	state->cvsd = device->machine().device("cvsd");
+	state->m_cvsd = device->machine().device("cvsd");
 
 	/* 8253 */
-	state->freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
+	state->m_freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
 
-	device->save_item(NAME(state->riot_irq_state));
+	device->save_item(NAME(state->m_riot_irq_state));
 	sh8253_register_state_globals(device);
 }
 
@@ -840,10 +840,10 @@ static DEVICE_RESET( venture_sound )
 	devtag_reset(device->machine(), "pia1");
 
 	/* 6532 */
-	state->riot->reset();
+	state->m_riot->reset();
 
 	/* 8253 */
-	memset(state->sh8253_timer, 0, sizeof(state->sh8253_timer));
+	memset(state->m_sh8253_timer, 0, sizeof(state->m_sh8253_timer));
 }
 
 
@@ -908,10 +908,10 @@ static WRITE8_DEVICE_HANDLER( mtrap_voiceio_w )
 	exidy_sound_state *state = get_safe_token(device);
 
 	if (!(offset & 0x10))
-		hc55516_digit_w(state->cvsd, data & 1);
+		hc55516_digit_w(state->m_cvsd, data & 1);
 
 	if (!(offset & 0x20))
-		riot6532_portb_in_set(state->riot, data & 1, 0xff);
+		riot6532_portb_in_set(state->m_riot, data & 1, 0xff);
 }
 
 
@@ -921,7 +921,7 @@ static READ8_DEVICE_HANDLER( mtrap_voiceio_r )
 
 	if (!(offset & 0x80))
 	{
-		UINT8 porta = riot6532_porta_out_get(state->riot);
+		UINT8 porta = riot6532_porta_out_get(state->m_riot);
 		UINT8 data = (porta & 0x06) >> 1;
 		data |= (porta & 0x01) << 2;
 		data |= (porta & 0x08);
@@ -929,7 +929,7 @@ static READ8_DEVICE_HANDLER( mtrap_voiceio_r )
 	}
 
 	if (!(offset & 0x40))
-		return hc55516_clock_state_r(state->cvsd) << 7;
+		return hc55516_clock_state_r(state->m_cvsd) << 7;
 
 	return 0;
 }
@@ -974,11 +974,11 @@ MACHINE_CONFIG_END
 READ8_DEVICE_HANDLER( victory_sound_response_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 ret = pia6821_get_output_b(state->pia1);
+	UINT8 ret = pia6821_get_output_b(state->m_pia1);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(state->maincpu), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(state->m_maincpu), ret);
 
-	pia6821_cb1_w(state->pia1, 0);
+	pia6821_cb1_w(state->m_pia1, 0);
 
 	return ret;
 }
@@ -987,9 +987,9 @@ READ8_DEVICE_HANDLER( victory_sound_response_r )
 READ8_DEVICE_HANDLER( victory_sound_status_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 ret = (pia6821_ca1_r(state->pia1) << 7) | (pia6821_cb1_r(state->pia1) << 6);
+	UINT8 ret = (pia6821_ca1_r(state->m_pia1) << 7) | (pia6821_cb1_r(state->m_pia1) << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(state->maincpu), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(state->m_maincpu), ret);
 
 	return ret;
 }
@@ -1006,9 +1006,9 @@ WRITE8_DEVICE_HANDLER( victory_sound_command_w )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(state->maincpu), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(state->m_maincpu), data);
 
-	device->machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->pia1);
+	device->machine().scheduler().synchronize(FUNC(delayed_command_w), data, state->m_pia1);
 }
 
 
@@ -1018,7 +1018,7 @@ static WRITE8_DEVICE_HANDLER( victory_sound_irq_clear_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", device->machine().describe_context(), data);
 
-	if (!data) pia6821_ca1_w(state->pia1, 1);
+	if (!data) pia6821_ca1_w(state->m_pia1, 1);
 }
 
 
@@ -1028,10 +1028,10 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", device->machine().describe_context(), data);
 
-	if (state->victory_sound_response_ack_clk && !data)
-		pia6821_cb1_w(state->pia1, 1);
+	if (state->m_victory_sound_response_ack_clk && !data)
+		pia6821_cb1_w(state->m_pia1, 1);
 
-	state->victory_sound_response_ack_clk = data;
+	state->m_victory_sound_response_ack_clk = data;
 }
 
 
@@ -1057,25 +1057,25 @@ static DEVICE_START( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
 
-	device->save_item(NAME(state->victory_sound_response_ack_clk));
+	device->save_item(NAME(state->m_victory_sound_response_ack_clk));
 
 	DEVICE_START_CALL(venture_common_sh_start);
-	state->tms = device->machine().device("tms");
+	state->m_tms = device->machine().device("tms");
 }
 
 
 static DEVICE_RESET( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	device_t *pia1 = state->pia1;
+	device_t *pia1 = state->m_pia1;
 
 	DEVICE_RESET_CALL(common_sh_reset);
 	pia1->reset();
-	state->riot->reset();
-	memset(state->sh8253_timer, 0, sizeof(state->sh8253_timer));
+	state->m_riot->reset();
+	memset(state->m_sh8253_timer, 0, sizeof(state->m_sh8253_timer));
 
 	/* the flip-flop @ F4 is reset */
-	state->victory_sound_response_ack_clk = 0;
+	state->m_victory_sound_response_ack_clk = 0;
 	pia6821_cb1_w(pia1, 1);
 
 	/* these two lines shouldn't be needed, but it avoids the log entry

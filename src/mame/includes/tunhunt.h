@@ -4,11 +4,11 @@ public:
 	tunhunt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 control;
-	UINT8 *workram;
-	UINT8 *spriteram;
-	UINT8 *videoram;
-	tilemap_t *fg_tilemap;
+	UINT8 m_control;
+	UINT8 *m_workram;
+	UINT8 *m_spriteram;
+	UINT8 *m_videoram;
+	tilemap_t *m_fg_tilemap;
 };
 
 

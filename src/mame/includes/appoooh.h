@@ -7,24 +7,25 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  bg_videoram;
-	UINT8 *  bg_colorram;
-	UINT8 *  fg_videoram;
-	UINT8 *  fg_colorram;
-	UINT8 *  spriteram;
-	UINT8 *  spriteram_2;
+	UINT8 *  m_bg_videoram;
+	UINT8 *  m_bg_colorram;
+	UINT8 *  m_fg_videoram;
+	UINT8 *  m_fg_colorram;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_spriteram_2;
 
 	/* video-related */
-	tilemap_t  *fg_tilemap, *bg_tilemap;
-	int scroll_x;
-	int priority;
+	tilemap_t  *m_fg_tilemap;
+	tilemap_t  *m_bg_tilemap;
+	int m_scroll_x;
+	int m_priority;
 
 	/* sound-related */
-	UINT32   adpcm_data;
-	UINT32   adpcm_address;
+	UINT32   m_adpcm_data;
+	UINT32   m_adpcm_address;
 
 	/* devices */
-	device_t *adpcm;
+	device_t *m_adpcm;
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

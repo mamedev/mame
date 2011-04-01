@@ -41,27 +41,27 @@ static VIDEO_START( common )
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* allocate memory */
-	state->cmos_ram = auto_alloc_array(machine, UINT16, (0x2000 * 4)/2);
-	state->local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
-	state->pen_map = auto_alloc_array(machine, pen_t, 65536);
+	state->m_cmos_ram = auto_alloc_array(machine, UINT16, (0x2000 * 4)/2);
+	state->m_local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
+	state->m_pen_map = auto_alloc_array(machine, pen_t, 65536);
 
-	machine.device<nvram_device>("nvram")->set_base(state->cmos_ram, 0x2000 * 4);
+	machine.device<nvram_device>("nvram")->set_base(state->m_cmos_ram, 0x2000 * 4);
 
 	/* reset all the globals */
-	state->cmos_page = 0;
-	state->autoerase_enable = 0;
-	state->yawdim_dma = 0;
+	state->m_cmos_page = 0;
+	state->m_autoerase_enable = 0;
+	state->m_yawdim_dma = 0;
 
 	/* reset DMA state */
-	memset(state->dma_register, 0, sizeof(state->dma_register));
-	memset(&state->dma_state, 0, sizeof(state->dma_state));
+	memset(state->m_dma_register, 0, sizeof(state->m_dma_register));
+	memset(&state->m_dma_state, 0, sizeof(state->m_dma_state));
 
 	/* register for state saving */
-	state_save_register_global(machine, state->autoerase_enable);
-	state_save_register_global_pointer(machine, state->local_videoram, 0x80000/2);
-	state_save_register_global_pointer(machine, state->cmos_ram, (0x2000 * 4)/2);
-	state_save_register_global(machine, state->videobank_select);
-	state_save_register_global_array(machine, state->dma_register);
+	state_save_register_global(machine, state->m_autoerase_enable);
+	state_save_register_global_pointer(machine, state->m_local_videoram, 0x80000/2);
+	state_save_register_global_pointer(machine, state->m_cmos_ram, (0x2000 * 4)/2);
+	state_save_register_global(machine, state->m_videobank_select);
+	state_save_register_global_array(machine, state->m_dma_register);
 }
 
 
@@ -74,8 +74,8 @@ VIDEO_START( midyunit_4bit )
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
-		state->pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
-	state->palette_mask = 0x00ff;
+		state->m_pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
+	state->m_palette_mask = 0x00ff;
 }
 
 
@@ -88,8 +88,8 @@ VIDEO_START( midyunit_6bit )
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
-		state->pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
-	state->palette_mask = 0x0fff;
+		state->m_pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
+	state->m_palette_mask = 0x0fff;
 }
 
 
@@ -97,7 +97,7 @@ VIDEO_START( mkyawdim )
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
 	VIDEO_START_CALL(midyunit_6bit);
-	state->yawdim_dma = 1;
+	state->m_yawdim_dma = 1;
 }
 
 
@@ -110,8 +110,8 @@ VIDEO_START( midzunit )
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)
-		state->pen_map[i] = i & 0x1fff;
-	state->palette_mask = 0x1fff;
+		state->m_pen_map[i] = i & 0x1fff;
+	state->m_palette_mask = 0x1fff;
 }
 
 
@@ -126,11 +126,11 @@ READ16_HANDLER( midyunit_gfxrom_r )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
-	if (state->palette_mask == 0x00ff)
-		return state->gfx_rom[offset] | (state->gfx_rom[offset] << 4) |
-				(state->gfx_rom[offset + 1] << 8) | (state->gfx_rom[offset + 1] << 12);
+	if (state->m_palette_mask == 0x00ff)
+		return state->m_gfx_rom[offset] | (state->m_gfx_rom[offset] << 4) |
+				(state->m_gfx_rom[offset + 1] << 8) | (state->m_gfx_rom[offset + 1] << 12);
 	else
-		return state->gfx_rom[offset] | (state->gfx_rom[offset + 1] << 8);
+		return state->m_gfx_rom[offset] | (state->m_gfx_rom[offset + 1] << 8);
 }
 
 
@@ -145,19 +145,19 @@ WRITE16_HANDLER( midyunit_vram_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
-	if (state->videobank_select)
+	if (state->m_videobank_select)
 	{
 		if (ACCESSING_BITS_0_7)
-			state->local_videoram[offset] = (data & 0x00ff) | (state->dma_register[DMA_PALETTE] << 8);
+			state->m_local_videoram[offset] = (data & 0x00ff) | (state->m_dma_register[DMA_PALETTE] << 8);
 		if (ACCESSING_BITS_8_15)
-			state->local_videoram[offset + 1] = (data >> 8) | (state->dma_register[DMA_PALETTE] & 0xff00);
+			state->m_local_videoram[offset + 1] = (data >> 8) | (state->m_dma_register[DMA_PALETTE] & 0xff00);
 	}
 	else
 	{
 		if (ACCESSING_BITS_0_7)
-			state->local_videoram[offset] = (state->local_videoram[offset] & 0x00ff) | (data << 8);
+			state->m_local_videoram[offset] = (state->m_local_videoram[offset] & 0x00ff) | (data << 8);
 		if (ACCESSING_BITS_8_15)
-			state->local_videoram[offset + 1] = (state->local_videoram[offset + 1] & 0x00ff) | (data & 0xff00);
+			state->m_local_videoram[offset + 1] = (state->m_local_videoram[offset + 1] & 0x00ff) | (data & 0xff00);
 	}
 }
 
@@ -166,10 +166,10 @@ READ16_HANDLER( midyunit_vram_r )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	offset *= 2;
-	if (state->videobank_select)
-		return (state->local_videoram[offset] & 0x00ff) | (state->local_videoram[offset + 1] << 8);
+	if (state->m_videobank_select)
+		return (state->m_local_videoram[offset] & 0x00ff) | (state->m_local_videoram[offset + 1] << 8);
 	else
-		return (state->local_videoram[offset] >> 8) | (state->local_videoram[offset + 1] & 0xff00);
+		return (state->m_local_videoram[offset] >> 8) | (state->m_local_videoram[offset + 1] & 0xff00);
 }
 
 
@@ -183,14 +183,14 @@ READ16_HANDLER( midyunit_vram_r )
 void midyunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	memcpy(shiftreg, &state->local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
+	memcpy(shiftreg, &state->m_local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
 void midyunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	memcpy(&state->local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
+	memcpy(&state->m_local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }
 
 
@@ -221,13 +221,13 @@ WRITE16_HANDLER( midyunit_control_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* CMOS page is bits 6-7 */
-		state->cmos_page = ((data >> 6) & 3) * 0x1000;
+		state->m_cmos_page = ((data >> 6) & 3) * 0x1000;
 
 		/* video bank select is bit 5 */
-		state->videobank_select = (data >> 5) & 1;
+		state->m_videobank_select = (data >> 5) & 1;
 
 		/* handle autoerase disable (bit 4) */
-		state->autoerase_enable = ((data & 0x10) == 0);
+		state->m_autoerase_enable = ((data & 0x10) == 0);
 	}
 }
 
@@ -246,7 +246,7 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 
 	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
 	newword = space->machine().generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine(), offset & state->palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	palette_set_color_rgb(space->machine(), offset & state->m_palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 
@@ -260,11 +260,11 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 static void dma_draw(running_machine &machine, UINT16 command)
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
-	struct dma_state_t &dma_state = state->dma_state;
+	struct dma_state_t &dma_state = state->m_dma_state;
 	int dx = (command & 0x10) ? -1 : 1;
 	int height = dma_state.height;
 	int width = dma_state.width;
-	UINT8 *base = state->gfx_rom;
+	UINT8 *base = state->m_gfx_rom;
 	UINT32 offset = dma_state.offset >> 3;
 	UINT16 pal = dma_state.palette;
 	UINT16 color = pal | dma_state.color;
@@ -286,7 +286,7 @@ static void dma_draw(running_machine &machine, UINT16 command)
 		offset += dma_state.rowbytes;
 
 		/* determine destination pointer */
-		dest = &state->local_videoram[ty * 512];
+		dest = &state->m_local_videoram[ty * 512];
 
 		/* check for overruns if they are relevant */
 		if (o >= 0x06000000 && command < 0x0c)
@@ -372,7 +372,7 @@ static void dma_draw(running_machine &machine, UINT16 command)
 static TIMER_CALLBACK( dma_callback )
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
-	state->dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
+	state->m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
@@ -387,7 +387,7 @@ static TIMER_CALLBACK( dma_callback )
 READ16_HANDLER( midyunit_dma_r )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	return state->dma_register[offset];
+	return state->m_dma_register[offset];
 }
 
 
@@ -426,19 +426,19 @@ READ16_HANDLER( midyunit_dma_r )
 WRITE16_HANDLER( midyunit_dma_w )
 {
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
-	struct dma_state_t &dma_state = state->dma_state;
+	struct dma_state_t &dma_state = state->m_dma_state;
 	UINT32 gfxoffset;
 	int command;
 
 	/* blend with the current register contents */
-	COMBINE_DATA(&state->dma_register[offset]);
+	COMBINE_DATA(&state->m_dma_register[offset]);
 
 	/* only writes to DMA_COMMAND actually cause actions */
 	if (offset != DMA_COMMAND)
 		return;
 
 	/* high bit triggers action */
-	command = state->dma_register[DMA_COMMAND];
+	command = state->m_dma_register[DMA_COMMAND];
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
@@ -451,30 +451,30 @@ if (LOG_DMA)
 		logerror("DMA command %04X: (xflip=%d yflip=%d)\n",
 				command, (command >> 4) & 1, (command >> 5) & 1);
 		logerror("  offset=%08X pos=(%d,%d) w=%d h=%d rb=%d\n",
-				state->dma_register[DMA_OFFSETLO] | (state->dma_register[DMA_OFFSETHI] << 16),
-				(INT16)state->dma_register[DMA_XSTART], (INT16)state->dma_register[DMA_YSTART],
-				state->dma_register[DMA_WIDTH], state->dma_register[DMA_HEIGHT], (INT16)state->dma_register[DMA_ROWBYTES]);
+				state->m_dma_register[DMA_OFFSETLO] | (state->m_dma_register[DMA_OFFSETHI] << 16),
+				(INT16)state->m_dma_register[DMA_XSTART], (INT16)state->m_dma_register[DMA_YSTART],
+				state->m_dma_register[DMA_WIDTH], state->m_dma_register[DMA_HEIGHT], (INT16)state->m_dma_register[DMA_ROWBYTES]);
 		logerror("  palette=%04X color=%04X\n",
-				state->dma_register[DMA_PALETTE], state->dma_register[DMA_COLOR]);
+				state->m_dma_register[DMA_PALETTE], state->m_dma_register[DMA_COLOR]);
 	}
 }
 
 	g_profiler.start(PROFILER_USER1);
 
 	/* fill in the basic data */
-	dma_state.rowbytes = (INT16)state->dma_register[DMA_ROWBYTES];
-	dma_state.xpos = (INT16)state->dma_register[DMA_XSTART];
-	dma_state.ypos = (INT16)state->dma_register[DMA_YSTART];
-	dma_state.width = state->dma_register[DMA_WIDTH];
-	dma_state.height = state->dma_register[DMA_HEIGHT];
-	dma_state.palette = state->dma_register[DMA_PALETTE] << 8;
-	dma_state.color = state->dma_register[DMA_COLOR] & 0xff;
+	dma_state.rowbytes = (INT16)state->m_dma_register[DMA_ROWBYTES];
+	dma_state.xpos = (INT16)state->m_dma_register[DMA_XSTART];
+	dma_state.ypos = (INT16)state->m_dma_register[DMA_YSTART];
+	dma_state.width = state->m_dma_register[DMA_WIDTH];
+	dma_state.height = state->m_dma_register[DMA_HEIGHT];
+	dma_state.palette = state->m_dma_register[DMA_PALETTE] << 8;
+	dma_state.color = state->m_dma_register[DMA_COLOR] & 0xff;
 
 	/* determine the offset and adjust the rowbytes */
-	gfxoffset = state->dma_register[DMA_OFFSETLO] | (state->dma_register[DMA_OFFSETHI] << 16);
+	gfxoffset = state->m_dma_register[DMA_OFFSETLO] | (state->m_dma_register[DMA_OFFSETHI] << 16);
 	if (command & 0x10)
 	{
-		if (!state->yawdim_dma)
+		if (!state->m_yawdim_dma)
 		{
 			gfxoffset -= (dma_state.width - 1) * 8;
 			dma_state.rowbytes = (dma_state.rowbytes - dma_state.width + 3) & ~3;
@@ -547,22 +547,22 @@ static TIMER_CALLBACK( autoerase_line )
 	midyunit_state *state = machine.driver_data<midyunit_state>();
 	int scanline = param;
 
-	if (state->autoerase_enable && scanline >= 0 && scanline < 510)
-		memcpy(&state->local_videoram[512 * scanline], &state->local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
+	if (state->m_autoerase_enable && scanline >= 0 && scanline < 510)
+		memcpy(&state->m_local_videoram[512 * scanline], &state->m_local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
 }
 
 
 void midyunit_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	midyunit_state *state = screen.machine().driver_data<midyunit_state>();
-	UINT16 *src = &state->local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	UINT16 *src = &state->m_local_videoram[(params->rowaddr << 9) & 0x3fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	/* adjust the display address to account for ignored bits */
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = state->pen_map[src[coladdr++ & 0x1ff]];
+		dest[x] = state->m_pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
 	autoerase_line(screen.machine(), NULL, params->rowaddr - 1);

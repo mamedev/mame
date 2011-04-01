@@ -14,16 +14,16 @@ public:
 	undrfire_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 coin_word;
-	UINT16 port_sel;
-	int frame_counter;
-	UINT32 *ram;
-	UINT32 *shared_ram;
-	struct tempsprite *spritelist;
-	UINT16 rotate_ctrl[8];
-	UINT8 dislayer[6];
-	UINT32 *spriteram;
-	size_t spriteram_size;
+	UINT16 m_coin_word;
+	UINT16 m_port_sel;
+	int m_frame_counter;
+	UINT32 *m_ram;
+	UINT32 *m_shared_ram;
+	struct tempsprite *m_spritelist;
+	UINT16 m_rotate_ctrl[8];
+	UINT8 m_dislayer[6];
+	UINT32 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

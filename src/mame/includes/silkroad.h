@@ -4,14 +4,14 @@ public:
 	silkroad_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *vidram;
-	UINT32 *vidram2;
-	UINT32 *vidram3;
-	UINT32 *sprram;
-	UINT32 *regs;
-	tilemap_t *fg_tilemap;
-	tilemap_t *fg2_tilemap;
-	tilemap_t *fg3_tilemap;
+	UINT32 *m_vidram;
+	UINT32 *m_vidram2;
+	UINT32 *m_vidram3;
+	UINT32 *m_sprram;
+	UINT32 *m_regs;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_fg2_tilemap;
+	tilemap_t *m_fg3_tilemap;
 };
 
 

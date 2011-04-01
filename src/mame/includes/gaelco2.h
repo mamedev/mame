@@ -4,13 +4,13 @@ public:
 	gaelco2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *snowboar_protection;
-	UINT16 *vregs;
-	int clr_gun_int;
-	UINT8 analog_ports[2];
-	UINT16 *videoram;
-	tilemap_t *pant[2];
-	int dual_monitor;
+	UINT16 *m_snowboar_protection;
+	UINT16 *m_vregs;
+	int m_clr_gun_int;
+	UINT8 m_analog_ports[2];
+	UINT16 *m_videoram;
+	tilemap_t *m_pant[2];
+	int m_dual_monitor;
 };
 
 

@@ -36,35 +36,35 @@ WRITE16_HANDLER( jpmimpct_bt477_w )
 	{
 		case 0x0:
 		{
-			state->bt477.address = val;
-			state->bt477.addr_cnt = 0;
+			state->m_bt477.address = val;
+			state->m_bt477.addr_cnt = 0;
 			break;
 		}
 		case 0x1:
 		{
-			UINT8 *addr_cnt = &state->bt477.addr_cnt;
-			rgb_t *color = &state->bt477.color;
+			UINT8 *addr_cnt = &state->m_bt477.addr_cnt;
+			rgb_t *color = &state->m_bt477.color;
 
 			color[*addr_cnt] = val;
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(space->machine(), state->bt477.address, MAKE_RGB(color[0], color[1], color[2]));
+				palette_set_color(space->machine(), state->m_bt477.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
-				state->bt477.address++;
+				state->m_bt477.address++;
 			}
 			break;
 		}
 		case 0x2:
 		{
-			state->bt477.pixmask = val;
+			state->m_bt477.pixmask = val;
 			break;
 		}
 		case 0x6:
 		{
-			state->bt477.command = val;
+			state->m_bt477.command = val;
 			break;
 		}
 		default:
@@ -90,13 +90,13 @@ READ16_HANDLER( jpmimpct_bt477_r )
 void jpmimpct_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	memcpy(shiftreg, &state->vram[TOWORD(address)], 512 * sizeof(UINT16));
+	memcpy(shiftreg, &state->m_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
 void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	memcpy(&state->vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
+	memcpy(&state->m_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
 
 
@@ -109,7 +109,7 @@ void jpmimpct_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftr
 void jpmimpct_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	jpmimpct_state *state = screen.machine().driver_data<jpmimpct_state>();
-	UINT16 *vram = &state->vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *vram = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	int coladdr = params->coladdr;
 	int x;
@@ -132,11 +132,11 @@ void jpmimpct_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanl
 VIDEO_START( jpmimpct )
 {
 	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	memset(&state->bt477, 0, sizeof(state->bt477));
+	memset(&state->m_bt477, 0, sizeof(state->m_bt477));
 
-	state_save_register_global(machine, state->bt477.address);
-	state_save_register_global(machine, state->bt477.addr_cnt);
-	state_save_register_global(machine, state->bt477.pixmask);
-	state_save_register_global(machine, state->bt477.command);
-	state_save_register_global(machine, state->bt477.color);
+	state_save_register_global(machine, state->m_bt477.address);
+	state_save_register_global(machine, state->m_bt477.addr_cnt);
+	state_save_register_global(machine, state->m_bt477.pixmask);
+	state_save_register_global(machine, state->m_bt477.command);
+	state_save_register_global(machine, state->m_bt477.color);
 }

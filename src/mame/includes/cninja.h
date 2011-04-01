@@ -13,32 +13,33 @@ class cninja_state : public driver_device
 public:
 	cninja_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  audiocpu(*this, "audiocpu"),
-		  decocomn(*this, "deco_common"),
-		  deco_tilegen1(*this, "tilegen1"),
-		  deco_tilegen2(*this, "tilegen2"),
-		  raster_irq_timer(*this, "raster_timer"),
-		  oki2(*this, "oki2") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_audiocpu(*this, "audiocpu"),
+		  m_decocomn(*this, "deco_common"),
+		  m_deco_tilegen1(*this, "tilegen1"),
+		  m_deco_tilegen2(*this, "tilegen2"),
+		  m_raster_irq_timer(*this, "raster_timer"),
+		  m_oki2(*this, "oki2") { }
 
 	/* memory pointers */
-	UINT16 *   ram;
-	UINT16 *   pf1_rowscroll;
-	UINT16 *   pf2_rowscroll;
-	UINT16 *   pf3_rowscroll;
-	UINT16 *   pf4_rowscroll;
+	UINT16 *   m_ram;
+	UINT16 *   m_pf1_rowscroll;
+	UINT16 *   m_pf2_rowscroll;
+	UINT16 *   m_pf3_rowscroll;
+	UINT16 *   m_pf4_rowscroll;
 
 	/* misc */
-	int        scanline, irq_mask;
+	int        m_scanline;
+	int        m_irq_mask;
 
 	/* devices */
-	required_device<cpu_device> maincpu;
-	required_device<cpu_device> audiocpu;
-	required_device<decocomn_device> decocomn;
-	required_device<deco16ic_device> deco_tilegen1;
-	required_device<deco16ic_device> deco_tilegen2;
-	optional_device<timer_device> raster_irq_timer;
-	optional_device<okim6295_device> oki2;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<decocomn_device> m_decocomn;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen2;
+	optional_device<timer_device> m_raster_irq_timer;
+	optional_device<okim6295_device> m_oki2;
 };
 
 /*----------- defined in video/cninja.c -----------*/

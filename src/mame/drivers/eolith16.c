@@ -23,8 +23,8 @@ public:
 	eolith16_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vram;
-	int vbuffer;
+	UINT16 *m_vram;
+	int m_vbuffer;
 };
 
 
@@ -44,7 +44,7 @@ static const eeprom_interface eeprom_interface_93C66 =
 static WRITE16_HANDLER( eeprom_w )
 {
 	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	state->vbuffer = (data & 0x80) >> 7;
+	state->m_vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(space->machine(), 0, data & 1);
 
 	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
@@ -63,13 +63,13 @@ static READ16_HANDLER( eolith16_custom_r )
 static WRITE16_HANDLER( vram_w )
 {
 	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	COMBINE_DATA(&state->vram[offset + (0x10000/2) * state->vbuffer]);
+	COMBINE_DATA(&state->m_vram[offset + (0x10000/2) * state->m_vbuffer]);
 }
 
 static READ16_HANDLER( vram_r )
 {
 	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	return state->vram[offset + (0x10000/2) * state->vbuffer];
+	return state->m_vram[offset + (0x10000/2) * state->m_vbuffer];
 }
 
 static ADDRESS_MAP_START( eolith16_map, AS_PROGRAM, 16 )
@@ -119,7 +119,7 @@ INPUT_PORTS_END
 static VIDEO_START( eolith16 )
 {
 	eolith16_state *state = machine.driver_data<eolith16_state>();
-	state->vram = auto_alloc_array(machine, UINT16, 0x10000);
+	state->m_vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
 static SCREEN_UPDATE( eolith16 )
@@ -133,10 +133,10 @@ static SCREEN_UPDATE( eolith16 )
 	{
 		for (x=0;x < 320/2;x++)
 		{
-			color = state->vram[count + (0x10000/2) * (state->vbuffer ^ 1)] & 0xff;
+			color = state->m_vram[count + (0x10000/2) * (state->m_vbuffer ^ 1)] & 0xff;
 			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color;
 
-			color = (state->vram[count + (0x10000/2) * (state->vbuffer ^ 1)] & 0xff00) >> 8;
+			color = (state->m_vram[count + (0x10000/2) * (state->m_vbuffer ^ 1)] & 0xff00) >> 8;
 			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color;
 
 			count++;

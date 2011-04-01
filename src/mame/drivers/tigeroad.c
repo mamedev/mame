@@ -89,64 +89,64 @@ static void f1dream_protection_w(address_space *space)
 	if (prevpc == 0x244c)
 	{
 		/* Called once, when a race is started.*/
-		indx = state->ram16[0x3ff0/2];
-		state->ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
-		state->ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
-		state->ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
-		state->ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
+		indx = state->m_ram16[0x3ff0/2];
+		state->m_ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
+		state->m_ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
+		state->m_ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
+		state->m_ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
 	}
 	else if (prevpc == 0x613a)
 	{
 		/* Called for every sprite on-screen.*/
-		if (state->ram16[0x3ff6/2] < 15)
+		if (state->m_ram16[0x3ff6/2] < 15)
 		{
-			indx = f1dream_613ea_lookup[state->ram16[0x3ff6/2]] - state->ram16[0x3ff4/2];
+			indx = f1dream_613ea_lookup[state->m_ram16[0x3ff6/2]] - state->m_ram16[0x3ff4/2];
 			if (indx > 255)
 			{
 				indx <<= 4;
-				indx += state->ram16[0x3ff6/2] & 0x00ff;
+				indx += state->m_ram16[0x3ff6/2] & 0x00ff;
 				value = f1dream_613eb_lookup[indx];
 			}
 		}
 
-		state->ram16[0x3ff2/2] = value;
+		state->m_ram16[0x3ff2/2] = value;
 	}
 	else if (prevpc == 0x17b70)
 	{
 		/* Called only before a real race, not a time trial.*/
-		if (state->ram16[0x3ff0/2] >= 0x04) indx = 128;
-		else if (state->ram16[0x3ff0/2] > 0x02) indx = 96;
-		else if (state->ram16[0x3ff0/2] == 0x02) indx = 64;
-		else if (state->ram16[0x3ff0/2] == 0x01) indx = 32;
+		if (state->m_ram16[0x3ff0/2] >= 0x04) indx = 128;
+		else if (state->m_ram16[0x3ff0/2] > 0x02) indx = 96;
+		else if (state->m_ram16[0x3ff0/2] == 0x02) indx = 64;
+		else if (state->m_ram16[0x3ff0/2] == 0x01) indx = 32;
 		else indx = 0;
 
-		indx += state->ram16[0x3fee/2];
+		indx += state->m_ram16[0x3fee/2];
 		if (indx < 128)
 		{
-			state->ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
-			state->ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
-			state->ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
-			state->ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
+			state->m_ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
+			state->m_ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
+			state->m_ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
+			state->m_ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
 		}
 		else
 		{
-			state->ram16[0x3fe6/2] = 0x00ff;
-			state->ram16[0x3fe8/2] = 0x00ff;
-			state->ram16[0x3fea/2] = 0x00ff;
-			state->ram16[0x3fec/2] = 0x00ff;
+			state->m_ram16[0x3fe6/2] = 0x00ff;
+			state->m_ram16[0x3fe8/2] = 0x00ff;
+			state->m_ram16[0x3fea/2] = 0x00ff;
+			state->m_ram16[0x3fec/2] = 0x00ff;
 		}
 	}
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(space,2,state->ram16[0x3ffc/2]);
+		soundlatch_w(space,2,state->m_ram16[0x3ffc/2]);
 	}
 }
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
 	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space->device()), state->ram16[0x3fe0/2]);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space->device()), state->m_ram16[0x3fe0/2]);
 	f1dream_protection_w(space);
 }
 
@@ -175,11 +175,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 /*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE_MEMBER(tigeroad_state, videoram)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE_MEMBER(tigeroad_state, m_videoram)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(tigeroad_state, ram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(tigeroad_state, m_ram16)
 ADDRESS_MAP_END
 
 

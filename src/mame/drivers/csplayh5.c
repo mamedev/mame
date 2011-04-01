@@ -32,10 +32,10 @@ public:
 	csplayh5_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	bitmap_t *vdp0_bitmap;
-	UINT16 mux_data;
-	UINT8 pio_dir[5];
-	UINT8 pio_latch[5];
+	bitmap_t *m_vdp0_bitmap;
+	UINT16 m_mux_data;
+	UINT8 m_pio_dir[5];
+	UINT8 m_pio_latch[5];
 };
 
 
@@ -59,8 +59,8 @@ static void csplayh5_vdp0_interrupt(running_machine &machine, int i)
 static VIDEO_START( csplayh5 )
 {
 	csplayh5_state *state = machine.driver_data<csplayh5_state>();
-	state->vdp0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
-	v9938_init (machine, 0, *machine.primary_screen, state->vdp0_bitmap, MODEL_V9958, 0x20000, csplayh5_vdp0_interrupt);
+	state->m_vdp0_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	v9938_init (machine, 0, *machine.primary_screen, state->m_vdp0_bitmap, MODEL_V9958, 0x20000, csplayh5_vdp0_interrupt);
 	v9938_reset(0);
 }
 
@@ -69,7 +69,7 @@ static SCREEN_UPDATE( csplayh5 )
 	csplayh5_state *state = screen->machine().driver_data<csplayh5_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	copybitmap(bitmap, state->vdp0_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_vdp0_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -78,7 +78,7 @@ static SCREEN_UPDATE( csplayh5 )
 static READ16_HANDLER( csplayh5_mux_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 0x01: return input_port_read(space->machine(), "KEY0");
 		case 0x02: return input_port_read(space->machine(), "KEY1");
@@ -93,7 +93,7 @@ static READ16_HANDLER( csplayh5_mux_r )
 static WRITE16_HANDLER( csplayh5_mux_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->mux_data = (~data & 0x1f);
+	state->m_mux_data = (~data & 0x1f);
 }
 
 static WRITE16_HANDLER( csplayh5_sound_w )
@@ -235,65 +235,65 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 static READ8_HANDLER( tmpz84c011_0_pa_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,0) & ~state->pio_dir[0]) | (state->pio_latch[0] & state->pio_dir[0]);
+	return (tmpz84c011_pio_r(space,0) & ~state->m_pio_dir[0]) | (state->m_pio_latch[0] & state->m_pio_dir[0]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pb_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,1) & ~state->pio_dir[1]) | (state->pio_latch[1] & state->pio_dir[1]);
+	return (tmpz84c011_pio_r(space,1) & ~state->m_pio_dir[1]) | (state->m_pio_latch[1] & state->m_pio_dir[1]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pc_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,2) & ~state->pio_dir[2]) | (state->pio_latch[2] & state->pio_dir[2]);
+	return (tmpz84c011_pio_r(space,2) & ~state->m_pio_dir[2]) | (state->m_pio_latch[2] & state->m_pio_dir[2]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pd_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,3) & ~state->pio_dir[3]) | (state->pio_latch[3] & state->pio_dir[3]);
+	return (tmpz84c011_pio_r(space,3) & ~state->m_pio_dir[3]) | (state->m_pio_latch[3] & state->m_pio_dir[3]);
 }
 
 static READ8_HANDLER( tmpz84c011_0_pe_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,4) & ~state->pio_dir[4]) | (state->pio_latch[4] & state->pio_dir[4]);
+	return (tmpz84c011_pio_r(space,4) & ~state->m_pio_dir[4]) | (state->m_pio_latch[4] & state->m_pio_dir[4]);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pa_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_latch[0] = data;
+	state->m_pio_latch[0] = data;
 	tmpz84c011_pio_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pb_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_latch[1] = data;
+	state->m_pio_latch[1] = data;
 	tmpz84c011_pio_w(space, 1, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pc_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_latch[2] = data;
+	state->m_pio_latch[2] = data;
 	tmpz84c011_pio_w(space, 2, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pd_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_latch[3] = data;
+	state->m_pio_latch[3] = data;
 	tmpz84c011_pio_w(space, 3, data);
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_pe_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_latch[4] = data;
+	state->m_pio_latch[4] = data;
 	tmpz84c011_pio_w(space, 4, data);
 }
 
@@ -301,62 +301,62 @@ static WRITE8_HANDLER( tmpz84c011_0_pe_w )
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->pio_dir[0];
+	return state->m_pio_dir[0];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->pio_dir[1];
+	return state->m_pio_dir[1];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pc_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->pio_dir[2];
+	return state->m_pio_dir[2];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pd_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->pio_dir[3];
+	return state->m_pio_dir[3];
 }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pe_r )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->pio_dir[4];
+	return state->m_pio_dir[4];
 }
 
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pa_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_dir[0] = data;
+	state->m_pio_dir[0] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pb_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_dir[1] = data;
+	state->m_pio_dir[1] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pc_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_dir[2] = data;
+	state->m_pio_dir[2] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_dir[3] = data;
+	state->m_pio_dir[3] = data;
 }
 
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
 {
 	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->pio_dir[4] = data;
+	state->m_pio_dir[4] = data;
 }
 
 
@@ -593,7 +593,7 @@ static MACHINE_RESET( csplayh5 )
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < 5; i++)
 	{
-		state->pio_dir[i] = state->pio_latch[i] = 0;
+		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
 		tmpz84c011_pio_w(space, i, 0);
 	}
 }

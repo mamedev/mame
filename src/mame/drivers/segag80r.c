@@ -183,13 +183,13 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*state->decrypt)(pc, space->read_byte(pc + 1));
+	return (offset & 0xff00) | (*state->m_decrypt)(pc, space->read_byte(pc + 1));
 }
 
 static WRITE8_HANDLER( mainram_w )
 {
 	segag80r_state *state = space->machine().driver_data<segag80r_state>();
-	state->mainram[decrypt_offset(space, offset)] = data;
+	state->m_mainram[decrypt_offset(space, offset)] = data;
 }
 
 static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
@@ -344,8 +344,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80r_state, mainram)
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_MEMBER(segag80r_state, videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80r_state, m_mainram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_MEMBER(segag80r_state, m_videoram)
 ADDRESS_MAP_END
 
 
@@ -1441,10 +1441,10 @@ static DRIVER_INIT( astrob )
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 
 	/* configure the 315-0062 security chip */
-	state->decrypt = segag80_security(62);
+	state->m_decrypt = segag80_security(62);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_NONE;
+	state->m_background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
@@ -1460,10 +1460,10 @@ static DRIVER_INIT( 005 )
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 
 	/* configure the 315-0070 security chip */
-	state->decrypt = segag80_security(70);
+	state->m_decrypt = segag80_security(70);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_NONE;
+	state->m_background_pcb = G80_BACKGROUND_NONE;
 }
 
 
@@ -1472,10 +1472,10 @@ static DRIVER_INIT( spaceod )
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 
 	/* configure the 315-0063 security chip */
-	state->decrypt = segag80_security(63);
+	state->m_decrypt = segag80_security(63);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_SPACEOD;
+	state->m_background_pcb = G80_BACKGROUND_SPACEOD;
 
 	/* configure ports for the background board */
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x08, 0x0f, FUNC(spaceod_back_port_r), FUNC(spaceod_back_port_w));
@@ -1494,10 +1494,10 @@ static DRIVER_INIT( monsterb )
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 
 	/* configure the 315-0082 security chip */
-	state->decrypt = segag80_security(82);
+	state->m_decrypt = segag80_security(82);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_MONSTERB;
+	state->m_background_pcb = G80_BACKGROUND_MONSTERB;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1512,10 +1512,10 @@ static DRIVER_INIT( monster2 )
 
 	/* configure the 315-5006 security chip */
 	spatter_decode(machine, "maincpu");
-	state->decrypt = segag80_security(0);
+	state->m_decrypt = segag80_security(0);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_PIGNEWT;
+	state->m_background_pcb = G80_BACKGROUND_PIGNEWT;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1530,10 +1530,10 @@ static DRIVER_INIT( pignewt )
 	segag80r_state *state = machine.driver_data<segag80r_state>();
 
 	/* configure the 315-0063? security chip */
-	state->decrypt = segag80_security(63);
+	state->m_decrypt = segag80_security(63);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_PIGNEWT;
+	state->m_background_pcb = G80_BACKGROUND_PIGNEWT;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1553,10 +1553,10 @@ static DRIVER_INIT( sindbadm )
 
 	/* configure the encrypted Z80 */
 	sindbadm_decode(machine, "maincpu");
-	state->decrypt = segag80_security(0);
+	state->m_decrypt = segag80_security(0);
 
 	/* configure video */
-	state->background_pcb = G80_BACKGROUND_SINDBADM;
+	state->m_background_pcb = G80_BACKGROUND_SINDBADM;
 
 	/* install background board handlers */
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x40, 0x41, FUNC(sindbadm_back_port_w));

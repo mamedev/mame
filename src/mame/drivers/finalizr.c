@@ -27,12 +27,12 @@ static INTERRUPT_GEN( finalizr_interrupt )
 
 	if (cpu_getiloops(device) == 0)
 	{
-		if (state->irq_enable)
+		if (state->m_irq_enable)
 			device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (state->nmi_enable)
+		if (state->m_nmi_enable)
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -46,8 +46,8 @@ static WRITE8_HANDLER( finalizr_coin_w )
 static WRITE8_HANDLER( finalizr_flipscreen_w )
 {
 	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	state->nmi_enable = data & 0x01;
-	state->irq_enable = data & 0x02;
+	state->m_nmi_enable = data & 0x01;
+	state->m_irq_enable = data & 0x02;
 
 	flip_screen_set(space->machine(), ~data & 0x08);
 }
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( finalizr_flipscreen_w )
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
 	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	device_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_audio_cpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
+		device_set_input_line(state->m_audio_cpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )
@@ -85,9 +85,9 @@ static READ8_HANDLER( i8039_T1_r )
         based on the I8039 main xtal clock input frequency of 9.216MHz
     */
 
-	state->T1_line++;
-	state->T1_line %= 16;
-	return (!(state->T1_line % 3) && (state->T1_line > 0));
+	state->m_T1_line++;
+	state->m_T1_line %= 16;
+	return (!(state->m_T1_line % 3) && (state->m_T1_line > 0));
 }
 
 static WRITE8_HANDLER( i8039_T0_w )
@@ -101,10 +101,10 @@ static WRITE8_HANDLER( i8039_T0_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, scroll)
+	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, m_scroll)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
-//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, scroll)
+//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, m_scroll)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
@@ -117,13 +117,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, videoram, videoram_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram2)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, spriteram, spriteram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_colorram2)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_videoram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram_2)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_spriteram_2)
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -247,24 +247,24 @@ static MACHINE_START( finalizr )
 {
 	finalizr_state *state = machine.driver_data<finalizr_state>();
 
-	state->audio_cpu = machine.device("audiocpu");
+	state->m_audio_cpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->spriterambank));
-	state->save_item(NAME(state->charbank));
-	state->save_item(NAME(state->T1_line));
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->irq_enable));
+	state->save_item(NAME(state->m_spriterambank));
+	state->save_item(NAME(state->m_charbank));
+	state->save_item(NAME(state->m_T1_line));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_irq_enable));
 }
 
 static MACHINE_RESET( finalizr )
 {
 	finalizr_state *state = machine.driver_data<finalizr_state>();
 
-	state->spriterambank = 0;
-	state->charbank = 0;
-	state->T1_line = 0;
-	state->nmi_enable = 0;
-	state->irq_enable = 0;
+	state->m_spriterambank = 0;
+	state->m_charbank = 0;
+	state->m_T1_line = 0;
+	state->m_nmi_enable = 0;
+	state->m_irq_enable = 0;
 }
 
 static MACHINE_CONFIG_START( finalizr, finalizr_state )

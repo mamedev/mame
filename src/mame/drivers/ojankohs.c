@@ -50,27 +50,27 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 
 	memory_set_bank(space->machine(), "bank1", data & 0x1f);
 
-	state->adpcm_reset = BIT(data, 5);
-	if (!state->adpcm_reset)
-		state->vclk_left = 0;
+	state->m_adpcm_reset = BIT(data, 5);
+	if (!state->m_adpcm_reset)
+		state->m_vclk_left = 0;
 
-	msm5205_reset_w(state->msm, !state->adpcm_reset);
+	msm5205_reset_w(state->m_msm, !state->m_adpcm_reset);
 }
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 {
 	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
-	state->adpcm_reset = BIT(data, 0);
-	state->vclk_left = 0;
+	state->m_adpcm_reset = BIT(data, 0);
+	state->m_vclk_left = 0;
 
-	msm5205_reset_w(device, !state->adpcm_reset);
+	msm5205_reset_w(device, !state->m_adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
 {
 	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->adpcm_data = data;
-	state->vclk_left = 2;
+	state->m_adpcm_data = data;
+	state->m_vclk_left = 2;
 }
 
 static void ojankohs_adpcm_int( device_t *device )
@@ -78,20 +78,20 @@ static void ojankohs_adpcm_int( device_t *device )
 	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
 
 	/* skip if we're reset */
-	if (!state->adpcm_reset)
+	if (!state->m_adpcm_reset)
 		return;
 
 	/* clock the data through */
-	if (state->vclk_left)
+	if (state->m_vclk_left)
 	{
-		msm5205_data_w(device, (state->adpcm_data >> 4));
-		state->adpcm_data <<= 4;
-		state->vclk_left--;
+		msm5205_data_w(device, (state->m_adpcm_data >> 4));
+		state->m_adpcm_data <<= 4;
+		state->m_vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
-	if (!state->vclk_left)
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->m_vclk_left)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
@@ -100,15 +100,15 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
 
-	state->adpcm_reset = BIT(data, 4);
-	msm5205_reset_w(state->msm, !BIT(data, 4));
+	state->m_adpcm_reset = BIT(data, 4);
+	msm5205_reset_w(state->m_msm, !BIT(data, 4));
 	ojankoc_flipscreen(space, data);
 }
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
 {
 	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->portselect = data;
+	state->m_portselect = data;
 }
 
 static READ8_HANDLER( ojankohs_keymatrix_r )
@@ -116,7 +116,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int ret;
 
-	switch (state->portselect)
+	switch (state->m_portselect)
 	{
 		case 0x01:	ret = input_port_read(space->machine(), "KEY0");	break;
 		case 0x02:	ret = input_port_read(space->machine(), "KEY1"); break;
@@ -132,7 +132,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 					ret &= input_port_read(space->machine(), "KEY4");
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space->device()), state->portselect);
+					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space->device()), state->m_portselect);
 					break;
 	}
 
@@ -152,7 +152,7 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (!BIT(state->portselect, i))
+		if (!BIT(state->m_portselect, i))
 			ret |= input_port_read(space->machine(), keynames[offset][i]);
 	}
 
@@ -797,19 +797,19 @@ static MACHINE_START( common )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->msm = machine.device("msm");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_msm = machine.device("msm");
 
-	state->save_item(NAME(state->gfxreg));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->flipscreen_old));
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->screen_refresh));
-	state->save_item(NAME(state->portselect));
-	state->save_item(NAME(state->adpcm_reset));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->vclk_left));
+	state->save_item(NAME(state->m_gfxreg));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_flipscreen_old));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_screen_refresh));
+	state->save_item(NAME(state->m_portselect));
+	state->save_item(NAME(state->m_adpcm_reset));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_vclk_left));
 }
 
 static MACHINE_START( ojankohs )
@@ -843,18 +843,18 @@ static MACHINE_RESET( ojankohs )
 {
 	ojankohs_state *state = machine.driver_data<ojankohs_state>();
 
-	state->portselect = 0;
+	state->m_portselect = 0;
 
-	state->adpcm_reset = 0;
-	state->adpcm_data = 0;
-	state->vclk_left = 0;
+	state->m_adpcm_reset = 0;
+	state->m_adpcm_data = 0;
+	state->m_vclk_left = 0;
 
-	state->gfxreg = 0;
-	state->flipscreen = 0;
-	state->flipscreen_old = 0;
-	state->scrollx = 0;
-	state->scrolly = 0;
-	state->screen_refresh = 0;
+	state->m_gfxreg = 0;
+	state->m_flipscreen = 0;
+	state->m_flipscreen_old = 0;
+	state->m_scrollx = 0;
+	state->m_scrolly = 0;
+	state->m_screen_refresh = 0;
 }
 
 static MACHINE_CONFIG_START( ojankohs, ojankohs_state )

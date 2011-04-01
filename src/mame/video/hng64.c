@@ -12,27 +12,27 @@ static void hng64_mark_all_tiles_dirty( hng64_state *state, int tilemap )
 {
 	if (tilemap == 0)
 	{
-		tilemap_mark_all_tiles_dirty (state->tilemap0_8x8);
-		tilemap_mark_all_tiles_dirty (state->tilemap0_16x16);
-		tilemap_mark_all_tiles_dirty (state->tilemap0_16x16_alt);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap0_8x8);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap0_16x16);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap0_16x16_alt);
 	}
 	else if (tilemap == 1)
 	{
-		tilemap_mark_all_tiles_dirty (state->tilemap1_8x8);
-		tilemap_mark_all_tiles_dirty (state->tilemap1_16x16);
-		tilemap_mark_all_tiles_dirty (state->tilemap1_16x16_alt);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap1_8x8);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap1_16x16);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap1_16x16_alt);
 	}
 	else if (tilemap == 2)
 	{
-		tilemap_mark_all_tiles_dirty (state->tilemap2_8x8);
-		tilemap_mark_all_tiles_dirty (state->tilemap2_16x16);
-		tilemap_mark_all_tiles_dirty (state->tilemap2_16x16_alt);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap2_8x8);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap2_16x16);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap2_16x16_alt);
 	}
 	else if (tilemap == 3)
 	{
-		tilemap_mark_all_tiles_dirty (state->tilemap3_8x8);
-		tilemap_mark_all_tiles_dirty (state->tilemap3_16x16);
-		tilemap_mark_all_tiles_dirty (state->tilemap3_16x16_alt);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap3_8x8);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap3_16x16);
+		tilemap_mark_all_tiles_dirty (state->m_tilemap3_16x16_alt);
 	}
 }
 
@@ -40,27 +40,27 @@ static void hng64_mark_tile_dirty( hng64_state *state, int tilemap, int tile_ind
 {
 	if (tilemap == 0)
 	{
-		tilemap_mark_tile_dirty(state->tilemap0_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap0_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap0_16x16_alt, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap0_8x8, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap0_16x16, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap0_16x16_alt, tile_index);
 	}
 	else if (tilemap == 1)
 	{
-		tilemap_mark_tile_dirty(state->tilemap1_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap1_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap1_16x16_alt, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap1_8x8, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap1_16x16, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap1_16x16_alt, tile_index);
 	}
 	else if (tilemap == 2)
 	{
-		tilemap_mark_tile_dirty(state->tilemap2_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap2_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap2_16x16_alt, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap2_8x8, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap2_16x16, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap2_16x16_alt, tile_index);
 	}
 	else if (tilemap == 3)
 	{
-		tilemap_mark_tile_dirty(state->tilemap3_8x8, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap3_16x16, tile_index);
-		tilemap_mark_tile_dirty(state->tilemap3_16x16_alt, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap3_8x8, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap3_16x16, tile_index);
+		tilemap_mark_tile_dirty(state->m_tilemap3_16x16_alt, tile_index);
 	}
 }
 
@@ -211,16 +211,16 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
 	const gfx_element *gfx;
-	UINT32 *source = state->spriteram;
-	UINT32 *finish = state->spriteram + 0xc000/4;
+	UINT32 *source = state->m_spriteram;
+	UINT32 *finish = state->m_spriteram + 0xc000/4;
 
 	// global offsets in sprite regs
-	int spriteoffsx = (state->spriteregs[1]>>0)&0xffff;
-	int spriteoffsy = (state->spriteregs[1]>>16)&0xffff;
+	int spriteoffsx = (state->m_spriteregs[1]>>0)&0xffff;
+	int spriteoffsy = (state->m_spriteregs[1]>>16)&0xffff;
 
 #if 0
 	for (int iii = 0; iii < 0x0f; iii++)
-		mame_printf_debug("%.8x ", state->videoregs[iii]);
+		mame_printf_debug("%.8x ", state->m_videoregs[iii]);
 	mame_printf_debug("\n");
 #endif
 
@@ -284,7 +284,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			int zoom_factor;
 
 			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
-			zoom_factor = (state->spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+			zoom_factor = (state->m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
 			if(!zoomx) zoomx=zoom_factor;
 			if(!zoomy) zoomy=zoom_factor;
 
@@ -299,7 +299,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
 		}
 
-		if (state->spriteregs[0] & 0x00800000) //bpp switch
+		if (state->m_spriteregs[0] & 0x00800000) //bpp switch
 		{
 			gfx= machine.gfx[4];
 		}
@@ -365,7 +365,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					tileno=(source[4]&0x0007ffff);
 					pal =(source[3]&0x00ff0000)>>16;
 
-					if (state->spriteregs[0] & 0x00800000) //bpp switch
+					if (state->m_spriteregs[0] & 0x00800000) //bpp switch
 					{
 						gfx= machine.gfx[4];
 					}
@@ -434,7 +434,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static void transition_control(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	UINT32 *hng64_tcram = state->tcram;
+	UINT32 *hng64_tcram = state->m_tcram;
 	int i, j;
 
 //  float colorScaleR, colorScaleG, colorScaleB;
@@ -530,17 +530,17 @@ static void transition_control(running_machine &machine, bitmap_t *bitmap, const
 #define HNG64_GET_TILE_INFO                                                    \
 {                                                                              \
 	hng64_state *state = machine.driver_data<hng64_state>();                 \
-	UINT16 tilemapinfo = (state->videoregs[reg]>>shift)&0xffff;                 \
+	UINT16 tilemapinfo = (state->m_videoregs[reg]>>shift)&0xffff;                 \
 	int tileno,pal, flip;                                                      \
                                                                                \
-	tileno = state->videoram[tile_index+(offset/4)];                            \
+	tileno = state->m_videoram[tile_index+(offset/4)];                            \
                                                                                \
 	pal = (tileno&0xff000000)>>24;                                             \
 	flip =(tileno&0x00c00000)>>22;                                             \
                                                                                \
 	if (tileno&0x200000)                                                       \
 	{                                                                          \
-		tileno = (tileno & state->videoregs[0x0b]) | state->videoregs[0x0c];     \
+		tileno = (tileno & state->m_videoregs[0x0b]) | state->m_videoregs[0x0c];     \
 	}                                                                          \
                                                                                \
 	tileno &= 0x1fffff;                                                        \
@@ -656,7 +656,7 @@ WRITE32_HANDLER( hng64_videoram_w )
 	hng64_state *state = space->machine().driver_data<hng64_state>();
 	int realoff;
 
-	COMBINE_DATA(&state->videoram[offset]);
+	COMBINE_DATA(&state->m_videoram[offset]);
 
 	realoff = offset*4;
 
@@ -1008,8 +1008,8 @@ INLINE void hng64_tilemap_draw_roz(running_machine& machine, bitmap_t *dest, con
 static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	UINT32 *hng64_videoregs = state->videoregs;
-	UINT32 *hng64_videoram = state->videoram;
+	UINT32 *hng64_videoregs = state->m_videoregs;
+	UINT32 *hng64_videoram = state->m_videoram;
 	tilemap_t* tilemap = 0;
 	UINT32 scrollbase = 0;
 	UINT32 tileregs = 0;
@@ -1020,7 +1020,7 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 	int global_dimensions = (global_tileregs&0x03000000)>>24;
 
-	if ( (state->additive_tilemap_debug&(1 << tm)))
+	if ( (state->m_additive_tilemap_debug&(1 << tm)))
 		debug_blend_enabled = 1;
 
 	if ((global_dimensions != 0) && (global_dimensions != 3))
@@ -1033,13 +1033,13 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap0_16x16;
-			else tilemap = state->tilemap0_8x8;
+			if (tileregs&0x0200)	tilemap = state->m_tilemap0_16x16;
+			else tilemap = state->m_tilemap0_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap0_16x16_alt;
-			else tilemap = state->tilemap0_8x8; // _alt
+			if (tileregs&0x0200)	tilemap = state->m_tilemap0_16x16_alt;
+			else tilemap = state->m_tilemap0_8x8; // _alt
 		}
 	}
 	else if (tm==1)
@@ -1049,13 +1049,13 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap1_16x16;
-			else tilemap = state->tilemap1_8x8;
+			if (tileregs&0x0200)	tilemap = state->m_tilemap1_16x16;
+			else tilemap = state->m_tilemap1_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap1_16x16_alt;
-			else tilemap = state->tilemap1_8x8; // _alt
+			if (tileregs&0x0200)	tilemap = state->m_tilemap1_16x16_alt;
+			else tilemap = state->m_tilemap1_8x8; // _alt
 		}
 	}
 	else if (tm==2)
@@ -1065,13 +1065,13 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap2_16x16;
-			else tilemap = state->tilemap2_8x8;
+			if (tileregs&0x0200)	tilemap = state->m_tilemap2_16x16;
+			else tilemap = state->m_tilemap2_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap2_16x16_alt;
-			else tilemap = state->tilemap2_8x8; // _alt
+			if (tileregs&0x0200)	tilemap = state->m_tilemap2_16x16_alt;
+			else tilemap = state->m_tilemap2_8x8; // _alt
 		}
 	}
 	else if (tm==3)
@@ -1081,13 +1081,13 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 
 		if (global_dimensions==0)
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap3_16x16;
-			else tilemap = state->tilemap3_8x8;
+			if (tileregs&0x0200)	tilemap = state->m_tilemap3_16x16;
+			else tilemap = state->m_tilemap3_8x8;
 		}
 		else
 		{
-			if (tileregs&0x0200)	tilemap = state->tilemap3_16x16_alt;
-			else tilemap = state->tilemap3_8x8; // _alt
+			if (tileregs&0x0200)	tilemap = state->m_tilemap3_16x16_alt;
+			else tilemap = state->m_tilemap3_8x8; // _alt
 		}
 	}
 
@@ -1449,9 +1449,9 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_t *bitmap, const 
 SCREEN_UPDATE( hng64 )
 {
 	hng64_state *state = screen->machine().driver_data<hng64_state>();
-	UINT32 *hng64_videoregs = state->videoregs;
-	UINT32 *hng64_videoram = state->videoram;
-	UINT32 *hng64_tcram = state->tcram;
+	UINT32 *hng64_videoregs = state->m_videoregs;
+	UINT32 *hng64_videoram = state->m_videoram;
+	UINT32 *hng64_tcram = state->m_tcram;
 	UINT32 animmask;
 	UINT32 animbits;
 	UINT16 tileflags0, tileflags1;
@@ -1471,7 +1471,7 @@ SCREEN_UPDATE( hng64 )
 	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen->machine()) : screen->machine().pens[0]); //FIXME: Is the register correct? check with HW tests
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0x00);
 
-	if (state->screen_dis)
+	if (state->m_screen_dis)
 		return 0;
 
 	animmask = hng64_videoregs[0x0b];
@@ -1482,7 +1482,7 @@ SCREEN_UPDATE( hng64 )
 	tileflags3 = hng64_videoregs[0x03]&0xffff;
 
 	/* if the auto-animation mask or bits have changed search for tiles using them and mark as dirty */
-	if ((state->old_animmask != animmask) || (state->old_animbits != animbits))
+	if ((state->m_old_animmask != animmask) || (state->m_old_animbits != animbits))
 	{
 		int tile_index;
 		for (tile_index=0;tile_index<128*128;tile_index++)
@@ -1505,32 +1505,32 @@ SCREEN_UPDATE( hng64 )
 			}
 		}
 
-		state->old_animmask = animmask;
-		state->old_animbits = animbits;
+		state->m_old_animmask = animmask;
+		state->m_old_animbits = animbits;
 	}
 
-	if ((state->old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((state->m_old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty(state, 0);
-		state->old_tileflags0 = tileflags0;
+		state->m_old_tileflags0 = tileflags0;
 	}
 
-	if ((state->old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((state->m_old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty(state, 1);
-		state->old_tileflags1 = tileflags1;
+		state->m_old_tileflags1 = tileflags1;
 	}
 
-	if ((state->old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((state->m_old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty(state, 2);
-		state->old_tileflags2 = tileflags2;
+		state->m_old_tileflags2 = tileflags2;
 	}
 
-	if ((state->old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	if ((state->m_old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty(state, 3);
-		state->old_tileflags3 = tileflags3;
+		state->m_old_tileflags3 = tileflags3;
 	}
 
 	// mark all frames as dirty if for some reason we don't trust the above code
@@ -1553,7 +1553,7 @@ SCREEN_UPDATE( hng64 )
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT32 *src = &state->colorBuffer3d[y * (cliprect->max_x-cliprect->min_x)];
+			UINT32 *src = &state->m_colorBuffer3d[y * (cliprect->max_x-cliprect->min_x)];
 			UINT32 *dst = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -1573,7 +1573,7 @@ SCREEN_UPDATE( hng64 )
 		transition_control(screen->machine(), bitmap, cliprect);
 
 	if (0)
-		popmessage("%08x %08x %08x %08x %08x", state->spriteregs[0], state->spriteregs[1], state->spriteregs[2], state->spriteregs[3], state->spriteregs[4]);
+		popmessage("%08x %08x %08x %08x %08x", state->m_spriteregs[0], state->m_spriteregs[1], state->m_spriteregs[2], state->m_spriteregs[3], state->m_spriteregs[4]);
 
 	if (0)
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
@@ -1599,9 +1599,9 @@ SCREEN_UPDATE( hng64 )
 
 	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
-		state->_3dregs[0x00/4], state->_3dregs[0x04/4], state->_3dregs[0x08/4], state->_3dregs[0x0c/4],
-		state->_3dregs[0x10/4], state->_3dregs[0x14/4], state->_3dregs[0x18/4], state->_3dregs[0x1c/4],
-		state->_3dregs[0x20/4], state->_3dregs[0x24/4], state->_3dregs[0x28/4], state->_3dregs[0x2c/4]);
+		state->m_3dregs[0x00/4], state->m_3dregs[0x04/4], state->m_3dregs[0x08/4], state->m_3dregs[0x0c/4],
+		state->m_3dregs[0x10/4], state->m_3dregs[0x14/4], state->m_3dregs[0x18/4], state->m_3dregs[0x1c/4],
+		state->m_3dregs[0x20/4], state->m_3dregs[0x24/4], state->m_3dregs[0x28/4], state->m_3dregs[0x2c/4]);
 
 	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
@@ -1632,23 +1632,23 @@ SCREEN_UPDATE( hng64 )
 
 	if ( input_code_pressed_once(screen->machine(), KEYCODE_T) )
 	{
-		state->additive_tilemap_debug ^= 1;
-		popmessage("blend changed %02x", state->additive_tilemap_debug);
+		state->m_additive_tilemap_debug ^= 1;
+		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
 	if ( input_code_pressed_once(screen->machine(), KEYCODE_Y) )
 	{
-		state->additive_tilemap_debug ^= 2;
-		popmessage("blend changed %02x", state->additive_tilemap_debug);
+		state->m_additive_tilemap_debug ^= 2;
+		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
 	if ( input_code_pressed_once(screen->machine(), KEYCODE_U) )
 	{
-		state->additive_tilemap_debug ^= 4;
-		popmessage("blend changed %02x", state->additive_tilemap_debug);
+		state->m_additive_tilemap_debug ^= 4;
+		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
 	if ( input_code_pressed_once(screen->machine(), KEYCODE_I) )
 	{
-		state->additive_tilemap_debug ^= 8;
-		popmessage("blend changed %02x", state->additive_tilemap_debug);
+		state->m_additive_tilemap_debug ^= 8;
+		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
 
 	return 0;
@@ -1659,51 +1659,51 @@ VIDEO_START( hng64 )
 	hng64_state *state = machine.driver_data<hng64_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->old_animmask = -1;
-	state->old_animbits = -1;
-	state->old_tileflags0 = -1;
-	state->old_tileflags1 = -1;
-	state->old_tileflags2 = -1;
-	state->old_tileflags3 = -1;
+	state->m_old_animmask = -1;
+	state->m_old_animbits = -1;
+	state->m_old_tileflags0 = -1;
+	state->m_old_tileflags1 = -1;
+	state->m_old_tileflags2 = -1;
+	state->m_old_tileflags3 = -1;
 
-	state->tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	state->tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	state->tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   tilemap_scan_rows,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
+	state->m_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
 
-	tilemap_set_transparent_pen(state->tilemap0_8x8, 0);
-	tilemap_set_transparent_pen(state->tilemap0_16x16, 0);
-	tilemap_set_transparent_pen(state->tilemap0_16x16_alt, 0);
+	tilemap_set_transparent_pen(state->m_tilemap0_8x8, 0);
+	tilemap_set_transparent_pen(state->m_tilemap0_16x16, 0);
+	tilemap_set_transparent_pen(state->m_tilemap0_16x16_alt, 0);
 
-	tilemap_set_transparent_pen(state->tilemap1_8x8, 0);
-	tilemap_set_transparent_pen(state->tilemap1_16x16, 0);
-	tilemap_set_transparent_pen(state->tilemap1_16x16_alt, 0);
+	tilemap_set_transparent_pen(state->m_tilemap1_8x8, 0);
+	tilemap_set_transparent_pen(state->m_tilemap1_16x16, 0);
+	tilemap_set_transparent_pen(state->m_tilemap1_16x16_alt, 0);
 
-	tilemap_set_transparent_pen(state->tilemap2_8x8, 0);
-	tilemap_set_transparent_pen(state->tilemap2_16x16, 0);
-	tilemap_set_transparent_pen(state->tilemap2_16x16_alt, 0);
+	tilemap_set_transparent_pen(state->m_tilemap2_8x8, 0);
+	tilemap_set_transparent_pen(state->m_tilemap2_16x16, 0);
+	tilemap_set_transparent_pen(state->m_tilemap2_16x16_alt, 0);
 
-	tilemap_set_transparent_pen(state->tilemap3_8x8, 0);
-	tilemap_set_transparent_pen(state->tilemap3_16x16, 0);
-	tilemap_set_transparent_pen(state->tilemap3_16x16_alt, 0);
+	tilemap_set_transparent_pen(state->m_tilemap3_8x8, 0);
+	tilemap_set_transparent_pen(state->m_tilemap3_16x16, 0);
+	tilemap_set_transparent_pen(state->m_tilemap3_16x16_alt, 0);
 
 	// Debug switch, turn on / off additive blending on a per-tilemap basis
-	state->additive_tilemap_debug = 0;
+	state->m_additive_tilemap_debug = 0;
 
 	// 3d Buffer Allocation
-	state->depthBuffer3d = auto_alloc_array(machine, float,  (visarea.max_x)*(visarea.max_y));
-	state->colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea.max_x)*(visarea.max_y));
+	state->m_depthBuffer3d = auto_alloc_array(machine, float,  (visarea.max_x)*(visarea.max_y));
+	state->m_colorBuffer3d = auto_alloc_array(machine, UINT32, (visarea.max_x)*(visarea.max_y));
 }
 
 
@@ -1794,7 +1794,7 @@ static void printPacket(const UINT16* packet, int hex)
 // Camera transformation.
 static void setCameraTransformation(hng64_state *state, const UINT16* packet)
 {
-	float *cameraMatrix = state->cameraMatrix;
+	float *cameraMatrix = state->m_cameraMatrix;
 
 	/*//////////////
     // PACKET FORMAT
@@ -1841,7 +1841,7 @@ static void setCameraTransformation(hng64_state *state, const UINT16* packet)
 // Lighting information
 static void setLighting(hng64_state *state, const UINT16* packet)
 {
-	float *lightVector = state->lightVector;
+	float *lightVector = state->m_lightVector;
 
 	/*//////////////
     // PACKET FORMAT
@@ -1868,7 +1868,7 @@ static void setLighting(hng64_state *state, const UINT16* packet)
 	lightVector[0] = uToF(packet[3]);
 	lightVector[1] = uToF(packet[4]);
 	lightVector[2] = uToF(packet[5]);
-	state->lightStrength = uToF(packet[9]);
+	state->m_lightStrength = uToF(packet[9]);
 }
 
 // Operation 0011
@@ -1894,14 +1894,14 @@ static void set3dFlags(hng64_state *state, const UINT16* packet)
     // [14] - ???? ... ? ''  ''
     // [15] - ???? ... ? ''  ''
     ////////////*/
-	state->paletteState3d = (packet[8] & 0xff00) >> 8;
+	state->m_paletteState3d = (packet[8] & 0xff00) >> 8;
 }
 
 // Operation 0012
 // Projection Matrix.
 static void setCameraProjectionMatrix(hng64_state *state, const UINT16* packet)
 {
-	float *projectionMatrix = state->projectionMatrix;
+	float *projectionMatrix = state->m_projectionMatrix;
 
 	/*//////////////
     // PACKET FORMAT
@@ -2193,7 +2193,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			/* FIXME: This isn't correct.
                       Buriki & Xrally need this line.  Roads Edge needs it removed.
                       So instead we're looking for a bit that is on for XRally & Buriki, but noone else. */
-			if (state->_3dregs[0x00/4] & 0x2000)
+			if (state->m_3dregs[0x00/4] & 0x2000)
 			{
 				if (strcmp(machine.basename(), "roadedge"))
 					polys[*numPolys].palOffset += 0x800;
@@ -2209,7 +2209,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
 			if ((packet[1] & 0x0100))
 			{
-				explicitPaletteValue1 = state->paletteState3d * 0x80;
+				explicitPaletteValue1 = state->m_paletteState3d * 0x80;
 				explicitPaletteValue2 = 0;      // This is probably hiding somewhere in operation 0011
 			}
 
@@ -2403,31 +2403,31 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 			////////////////////////////////////
 			// Perform the world transformations...
 			// !! Can eliminate this step with a matrix stack (maybe necessary?) !!
-			setIdentity(state->modelViewMatrix);
-			if (state->mcu_type != SAMSHO_MCU)
+			setIdentity(state->m_modelViewMatrix);
+			if (state->m_mcu_type != SAMSHO_MCU)
 			{
 				// The sams64 games transform the geometry in front of a stationary camera.
 				// This is fine in sams64_2, since it never calls the 'camera transformation' function
 				// (thus using the identity matrix for this transform), but sams64 calls the
 				// camera transformation function with rotation values.
 				// It remains to be seen what those might do...
-				matmul4(state->modelViewMatrix, state->modelViewMatrix, state->cameraMatrix);
+				matmul4(state->m_modelViewMatrix, state->m_modelViewMatrix, state->m_cameraMatrix);
 			}
-			matmul4(state->modelViewMatrix, state->modelViewMatrix, objectMatrix);
+			matmul4(state->m_modelViewMatrix, state->m_modelViewMatrix, objectMatrix);
 
 			// LIGHTING
-			if (packet[1] & 0x0008 && state->lightStrength > 0.0f)
+			if (packet[1] & 0x0008 && state->m_lightStrength > 0.0f)
 			{
 				for (int v = 0; v < 3; v++)
 				{
 					float transformedNormal[4];
 					vecmatmul4(transformedNormal, objectMatrix, polys[*numPolys].vert[v].normal);
 					normalize(transformedNormal);
-					normalize(state->lightVector);
+					normalize(state->m_lightVector);
 
-					float intensity = vecDotProduct(transformedNormal, state->lightVector) * -1.0f;
+					float intensity = vecDotProduct(transformedNormal, state->m_lightVector) * -1.0f;
 					intensity = (intensity <= 0.0f) ? (0.0f) : (intensity);
-					intensity *= state->lightStrength * 128.0f;    // Turns 0x0100 into 1.0
+					intensity *= state->m_lightStrength * 128.0f;    // Turns 0x0100 into 1.0
 					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
@@ -2470,7 +2470,7 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 
 
 			// BEHIND-THE-CAMERA CULL //
-			vecmatmul4(cullRay, state->modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
+			vecmatmul4(cullRay, state->m_modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
 			if (cullRay[2] > 0.0f)				// Camera is pointing down -Z
 			{
 				polys[*numPolys].visible = 0;
@@ -2483,8 +2483,8 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
 				for (int m = 0; m < polys[*numPolys].n; m++)
 				{
 					// Transform and project the vertex into pre-divided homogeneous coordinates...
-					vecmatmul4(eyeCoords, state->modelViewMatrix, polys[*numPolys].vert[m].worldCoords);
-					vecmatmul4(polys[*numPolys].vert[m].clipCoords, state->projectionMatrix, eyeCoords);
+					vecmatmul4(eyeCoords, state->m_modelViewMatrix, polys[*numPolys].vert[m].worldCoords);
+					vecmatmul4(polys[*numPolys].vert[m].clipCoords, state->m_projectionMatrix, eyeCoords);
 				}
 
 				if (polys[*numPolys].visible)
@@ -2560,7 +2560,7 @@ void hng64_command3d(running_machine& machine, const UINT16* packet)
 	case 0x0100:
 	case 0x0101:	// Geometry with full transformations
 		// HACK.  Masks out a piece of geo bbust2's drawShaded() crashes on.
-		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && state->mcu_type == SHOOT_MCU)
+		if (packet[2] == 0x0003 && packet[3] == 0x8f37 && state->m_mcu_type == SHOOT_MCU)
 			break;
 
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
@@ -2629,21 +2629,21 @@ static void clear3d(running_machine &machine)
 	// Clear each of the display list buffers after drawing - todo: kill!
 	for (i = 0; i < 0x81; i++)
 	{
-		state->dls[0][i] = 0;
-		state->dls[1][i] = 0;
+		state->m_dls[0][i] = 0;
+		state->m_dls[1][i] = 0;
 	}
 
 	// Reset the buffers...
 	for (i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
 	{
-		state->depthBuffer3d[i] = 100.0f;
-		state->colorBuffer3d[i] = MAKE_ARGB(0, 0, 0, 0);
+		state->m_depthBuffer3d[i] = 100.0f;
+		state->m_colorBuffer3d[i] = MAKE_ARGB(0, 0, 0, 0);
 	}
 
 	// Set some matrices to the identity...
-	setIdentity(state->projectionMatrix);
-	setIdentity(state->modelViewMatrix);
-	setIdentity(state->cameraMatrix);
+	setIdentity(state->m_projectionMatrix);
+	setIdentity(state->m_modelViewMatrix);
+	setIdentity(state->m_cameraMatrix);
 }
 
 /* 3D/framebuffer video registers
@@ -3018,8 +3018,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 										  float s_start, float s_delta, float t_start, float t_delta)
 {
 	hng64_state *state = machine.driver_data<hng64_state>();
-	float*  db = &(state->depthBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
-	UINT32* cb = &(state->colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
+	float*  db = &(state->m_depthBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
+	UINT32* cb = &(state->m_colorBuffer3d[(y * machine.primary_screen->visible_area().max_x) + x_start]);
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;

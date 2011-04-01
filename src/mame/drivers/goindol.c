@@ -30,9 +30,9 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 
 	memory_set_bank(space->machine(), "bank1", data & 0x03);
 
-	if (state->char_bank != ((data & 0x10) >> 4))
+	if (state->m_char_bank != ((data & 0x10) >> 4))
 	{
-		state->char_bank = (data & 0x10) >> 4;
+		state->m_char_bank = (data & 0x10) >> 4;
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
@@ -46,9 +46,9 @@ static READ8_HANDLER( prot_f422_r )
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	/* bit 7 = vblank? */
-	state->prot_toggle ^= 0x80;
+	state->m_prot_toggle ^= 0x80;
 
-	return state->prot_toggle;
+	return state->m_prot_toggle;
 }
 
 
@@ -57,9 +57,9 @@ static WRITE8_HANDLER( prot_fc44_w )
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->ram[0x0419] = 0x5b;
-	state->ram[0x041a] = 0x3f;
-	state->ram[0x041b] = 0x6d;
+	state->m_ram[0x0419] = 0x5b;
+	state->m_ram[0x041a] = 0x3f;
+	state->m_ram[0x041b] = 0x6d;
 }
 
 static WRITE8_HANDLER( prot_fd99_w )
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( prot_fd99_w )
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->ram[0x0421] = 0x3f;
+	state->m_ram[0x0421] = 0x3f;
 }
 
 static WRITE8_HANDLER( prot_fc66_w )
@@ -75,7 +75,7 @@ static WRITE8_HANDLER( prot_fc66_w )
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->ram[0x0423] = 0x06;
+	state->m_ram[0x0423] = 0x06;
 }
 
 static WRITE8_HANDLER( prot_fcb0_w )
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( prot_fcb0_w )
 	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->ram[0x0425] = 0x06;
+	state->m_ram[0x0425] = 0x06;
 }
 
 
@@ -91,20 +91,20 @@ static WRITE8_HANDLER( prot_fcb0_w )
 static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(goindol_state, ram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(goindol_state, m_ram)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_w) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, fg_scrolly)
+	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, m_fg_scrolly)
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, fg_scrollx)
+	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, m_fg_scrollx)
 	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_MEMBER(goindol_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_MEMBER(goindol_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, bg_videoram, bg_videoram_size)
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_MEMBER(goindol_state, spriteram2)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, m_bg_videoram, m_bg_videoram_size)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_MEMBER(goindol_state, m_spriteram2)
 	AM_RANGE(0xe040, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, fg_videoram, fg_videoram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, m_fg_videoram, m_fg_videoram_size)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
@@ -231,16 +231,16 @@ static MACHINE_START( goindol )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->char_bank));
-	state->save_item(NAME(state->prot_toggle));
+	state->save_item(NAME(state->m_char_bank));
+	state->save_item(NAME(state->m_prot_toggle));
 }
 
 static MACHINE_RESET( goindol )
 {
 	goindol_state *state = machine.driver_data<goindol_state>();
 
-	state->char_bank = 0;
-	state->prot_toggle = 0;
+	state->m_char_bank = 0;
+	state->m_prot_toggle = 0;
 }
 
 static MACHINE_CONFIG_START( goindol, goindol_state )

@@ -22,9 +22,9 @@ static int nitedrvr_steering( running_machine &machine )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 	int this_val = input_port_read(machine, "STEER");
-	int delta = this_val - state->last_steering_val;
+	int delta = this_val - state->m_last_steering_val;
 
-	state->last_steering_val = this_val;
+	state->m_last_steering_val = this_val;
 
 	if (delta > 128)
 		delta -= 256;
@@ -32,24 +32,24 @@ static int nitedrvr_steering( running_machine &machine )
 		delta += 256;
 
 	/* Divide by four to make our steering less sensitive */
-	state->steering_buf += (delta / 4);
+	state->m_steering_buf += (delta / 4);
 
-	if (state->steering_buf > 0)
+	if (state->m_steering_buf > 0)
 	{
-		state->steering_buf--;
-		state->steering_val = 0xc0;
+		state->m_steering_buf--;
+		state->m_steering_val = 0xc0;
 	}
-	else if (state->steering_buf < 0)
+	else if (state->m_steering_buf < 0)
 	{
-		state->steering_buf++;
-		state->steering_val = 0x80;
+		state->m_steering_buf++;
+		state->m_steering_val = 0x80;
 	}
 	else
 	{
-		state->steering_val = 0x00;
+		state->m_steering_val = 0x00;
 	}
 
-	return state->steering_val;
+	return state->m_steering_val;
 }
 
 /***************************************************************************
@@ -59,14 +59,14 @@ nitedrvr_steering_reset
 READ8_HANDLER( nitedrvr_steering_reset_r )
 {
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	state->steering_val = 0;
+	state->m_steering_val = 0;
 	return 0;
 }
 
 WRITE8_HANDLER( nitedrvr_steering_reset_w )
 {
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
-	state->steering_val = 0;
+	state->m_steering_val = 0;
 }
 
 
@@ -103,10 +103,10 @@ READ8_HANDLER( nitedrvr_in0_r )
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 	int gear = input_port_read(space->machine(), "GEARS");
 
-	if (gear & 0x10)				state->gear = 1;
-	else if (gear & 0x20)			state->gear = 2;
-	else if (gear & 0x40)			state->gear = 3;
-	else if (gear & 0x80)			state->gear = 4;
+	if (gear & 0x10)				state->m_gear = 1;
+	else if (gear & 0x20)			state->m_gear = 2;
+	else if (gear & 0x40)			state->m_gear = 3;
+	else if (gear & 0x80)			state->m_gear = 4;
 
 	switch (offset & 0x03)
 	{
@@ -115,11 +115,11 @@ READ8_HANDLER( nitedrvr_in0_r )
 		case 0x01:						/* No remapping necessary */
 			return input_port_read(space->machine(), "DSW1");
 		case 0x02:						/* Remap our gear shift */
-			if (state->gear == 1)
+			if (state->m_gear == 1)
 				return 0xe0;
-			else if (state->gear == 2)
+			else if (state->m_gear == 2)
 				return 0xd0;
-			else if (state->gear == 3)
+			else if (state->m_gear == 3)
 				return 0xb0;
 			else
 				return 0x70;
@@ -167,11 +167,11 @@ READ8_HANDLER( nitedrvr_in1_r )
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 	int port = input_port_read(space->machine(), "IN0");
 
-	state->ac_line = (state->ac_line + 1) % 3;
+	state->m_ac_line = (state->m_ac_line + 1) % 3;
 
-	if (port & 0x10)				state->track = 0;
-	else if (port & 0x20)			state->track = 1;
-	else if (port & 0x40)			state->track = 2;
+	if (port & 0x10)				state->m_track = 0;
+	else if (port & 0x20)			state->m_track = 1;
+	else if (port & 0x40)			state->m_track = 2;
 
 	switch (offset & 0x07)
 	{
@@ -184,12 +184,12 @@ READ8_HANDLER( nitedrvr_in1_r )
 		case 0x03:
 			return ((port & 0x08) << 4);
 		case 0x04:
-			if (state->track == 1) return 0x80; else return 0x00;
+			if (state->m_track == 1) return 0x80; else return 0x00;
 		case 0x05:
-			if (state->track == 0) return 0x80; else return 0x00;
+			if (state->m_track == 0) return 0x80; else return 0x00;
 		case 0x06:
 			/* TODO: fix alternating signal? */
-			if (state->ac_line==0) return 0x80; else return 0x00;
+			if (state->m_ac_line==0) return 0x80; else return 0x00;
 		case 0x07:
 			return 0x00;
 		default:
@@ -214,9 +214,9 @@ WRITE8_HANDLER( nitedrvr_out0_w )
 {
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	discrete_sound_w(state->discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
-	discrete_sound_w(state->discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
-	discrete_sound_w(state->discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
+	discrete_sound_w(state->m_discrete, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
+	discrete_sound_w(state->m_discrete, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
+	discrete_sound_w(state->m_discrete, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
 }
 
 /***************************************************************************
@@ -236,21 +236,21 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 
 	set_led_status(space->machine(), 0, data & 0x10);
 
-	state->crash_en = data & 0x01;
+	state->m_crash_en = data & 0x01;
 
-	discrete_sound_w(state->discrete, NITEDRVR_CRASH_EN, state->crash_en);	// Crash enable
-	discrete_sound_w(state->discrete, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
+	discrete_sound_w(state->m_discrete, NITEDRVR_CRASH_EN, state->m_crash_en);	// Crash enable
+	discrete_sound_w(state->m_discrete, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
 
-	if (!state->crash_en)
+	if (!state->m_crash_en)
 	{
 		/* Crash reset, set counter high and enable output */
-		state->crash_data_en = 1;
-		state->crash_data = 0x0f;
+		state->m_crash_data_en = 1;
+		state->m_crash_data = 0x0f;
 		/* Invert video */
 		palette_set_color(space->machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
 		palette_set_color(space->machine(), 0, MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
-	discrete_sound_w(state->discrete, NITEDRVR_BANG_DATA, state->crash_data_en ? state->crash_data : 0);	// Crash Volume
+	discrete_sound_w(state->m_discrete, NITEDRVR_BANG_DATA, state->m_crash_data_en ? state->m_crash_data : 0);	// Crash Volume
 }
 
 
@@ -258,14 +258,14 @@ TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 {
 	nitedrvr_state *state = timer.machine().driver_data<nitedrvr_state>();
 
-	if (state->crash_en && state->crash_data_en)
+	if (state->m_crash_en && state->m_crash_data_en)
 	{
-		state->crash_data--;
-		discrete_sound_w(state->discrete, NITEDRVR_BANG_DATA, state->crash_data);	// Crash Volume
-		if (!state->crash_data)
-			state->crash_data_en = 0;	// Done counting?
+		state->m_crash_data--;
+		discrete_sound_w(state->m_discrete, NITEDRVR_BANG_DATA, state->m_crash_data);	// Crash Volume
+		if (!state->m_crash_data)
+			state->m_crash_data_en = 0;	// Done counting?
 
-		if (state->crash_data & 0x01)
+		if (state->m_crash_data & 0x01)
 		{
 			/* Invert video */
 			palette_set_color(timer.machine(), 1, MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
@@ -284,31 +284,31 @@ MACHINE_START( nitedrvr )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->discrete = machine.device("discrete");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_discrete = machine.device("discrete");
 
-	state->save_item(NAME(state->gear));
-	state->save_item(NAME(state->track));
-	state->save_item(NAME(state->steering_buf));
-	state->save_item(NAME(state->steering_val));
-	state->save_item(NAME(state->crash_en));
-	state->save_item(NAME(state->crash_data));
-	state->save_item(NAME(state->crash_data_en));
-	state->save_item(NAME(state->ac_line));
-	state->save_item(NAME(state->last_steering_val));
+	state->save_item(NAME(state->m_gear));
+	state->save_item(NAME(state->m_track));
+	state->save_item(NAME(state->m_steering_buf));
+	state->save_item(NAME(state->m_steering_val));
+	state->save_item(NAME(state->m_crash_en));
+	state->save_item(NAME(state->m_crash_data));
+	state->save_item(NAME(state->m_crash_data_en));
+	state->save_item(NAME(state->m_ac_line));
+	state->save_item(NAME(state->m_last_steering_val));
 }
 
 MACHINE_RESET( nitedrvr )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 
-	state->gear = 1;
-	state->track = 0;
-	state->steering_buf = 0;
-	state->steering_val = 0;
-	state->crash_en = 0;
-	state->crash_data = 0x0f;
-	state->crash_data_en = 0;
-	state->ac_line = 0;
-	state->last_steering_val = 0;
+	state->m_gear = 1;
+	state->m_track = 0;
+	state->m_steering_buf = 0;
+	state->m_steering_val = 0;
+	state->m_crash_en = 0;
+	state->m_crash_data = 0x0f;
+	state->m_crash_data_en = 0;
+	state->m_ac_line = 0;
+	state->m_last_steering_val = 0;
 }

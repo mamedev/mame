@@ -111,10 +111,10 @@ public:
 	supertnk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram[3];
-	UINT8 rom_bank;
-	UINT8 bitplane_select;
-	pen_t pens[NUM_PENS];
+	UINT8 *m_videoram[3];
+	UINT8 m_rom_bank;
+	UINT8 m_bitplane_select;
+	pen_t m_pens[NUM_PENS];
 };
 
 
@@ -130,9 +130,9 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
-	state->rom_bank = (state->rom_bank & 0x02) | ((data << 0) & 0x01);
+	state->m_rom_bank = (state->m_rom_bank & 0x02) | ((data << 0) & 0x01);
 
-	bank_address = 0x10000 + (state->rom_bank * 0x1000);
+	bank_address = 0x10000 + (state->m_rom_bank * 0x1000);
 
 	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
 }
@@ -143,9 +143,9 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
-	state->rom_bank = (state->rom_bank & 0x01) | ((data << 1) & 0x02);
+	state->m_rom_bank = (state->m_rom_bank & 0x01) | ((data << 1) & 0x02);
 
-	bank_address = 0x10000 + (state->rom_bank * 0x1000);
+	bank_address = 0x10000 + (state->m_rom_bank * 0x1000);
 
 	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
 }
@@ -188,12 +188,12 @@ static VIDEO_START( supertnk )
 	{
 		UINT8 data = prom[i];
 
-		state->pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
+		state->m_pens[i] = MAKE_RGB(pal1bit(data >> 2), pal1bit(data >> 5), pal1bit(data >> 6));
 	}
 
-	state->videoram[0] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->videoram[1] = auto_alloc_array(machine, UINT8, 0x2000);
-	state->videoram[2] = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_videoram[0] = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_videoram[1] = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_videoram[2] = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
 
@@ -201,15 +201,15 @@ static WRITE8_HANDLER( supertnk_videoram_w )
 {
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	if (state->bitplane_select > 2)
+	if (state->m_bitplane_select > 2)
 	{
-		state->videoram[0][offset] = 0;
-		state->videoram[1][offset] = 0;
-		state->videoram[2][offset] = 0;
+		state->m_videoram[0][offset] = 0;
+		state->m_videoram[1][offset] = 0;
+		state->m_videoram[2][offset] = 0;
 	}
 	else
 	{
-		state->videoram[state->bitplane_select][offset] = data;
+		state->m_videoram[state->m_bitplane_select][offset] = data;
 	}
 }
 
@@ -219,8 +219,8 @@ static READ8_HANDLER( supertnk_videoram_r )
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	UINT8 ret = 0x00;
 
-	if (state->bitplane_select < 3)
-		ret = state->videoram[state->bitplane_select][offset];
+	if (state->m_bitplane_select < 3)
+		ret = state->m_videoram[state->m_bitplane_select][offset];
 
 	return ret;
 }
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_0_w )
 {
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	state->bitplane_select = (state->bitplane_select & 0x02) | ((data << 0) & 0x01);
+	state->m_bitplane_select = (state->m_bitplane_select & 0x02) | ((data << 0) & 0x01);
 }
 
 
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
 {
 	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	state->bitplane_select = (state->bitplane_select & 0x01) | ((data << 1) & 0x02);
+	state->m_bitplane_select = (state->m_bitplane_select & 0x01) | ((data << 1) & 0x02);
 }
 
 
@@ -254,14 +254,14 @@ static SCREEN_UPDATE( supertnk )
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data0 = state->videoram[0][offs];
-		UINT8 data1 = state->videoram[1][offs];
-		UINT8 data2 = state->videoram[2][offs];
+		UINT8 data0 = state->m_videoram[0][offs];
+		UINT8 data1 = state->m_videoram[1][offs];
+		UINT8 data2 = state->m_videoram[2][offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color = ((data0 & 0x80) >> 5) | ((data1 & 0x80) >> 6) | ((data2 & 0x80) >> 7);
-			*BITMAP_ADDR32(bitmap, y, x) = state->pens[color];
+			*BITMAP_ADDR32(bitmap, y, x) = state->m_pens[color];
 
 			data0 = data0 << 1;
 			data1 = data1 << 1;

@@ -81,8 +81,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
-	code = state->fgvideoram[tile_index];
-	color = state->fgvideoram[tile_index + 0x400];
+	code = state->m_fgvideoram[tile_index];
+	color = state->m_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			code + ((color & 0x80) << 1),
@@ -96,12 +96,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 	vulgus_state *state = machine.driver_data<vulgus_state>();
 	int code, color;
 
-	code = state->bgvideoram[tile_index];
-	color = state->bgvideoram[tile_index + 0x400];
+	code = state->m_bgvideoram[tile_index];
+	color = state->m_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
 			code + ((color & 0x80) << 1),
-			(color & 0x1f) + (0x20 * state->palette_bank),
+			(color & 0x1f) + (0x20 * state->m_palette_bank),
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
@@ -115,10 +115,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( vulgus )
 {
 	vulgus_state *state = machine.driver_data<vulgus_state>();
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,32,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,32,32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 47);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 47);
 }
 
 
@@ -131,15 +131,15 @@ VIDEO_START( vulgus )
 WRITE8_HANDLER( vulgus_fgvideoram_w )
 {
 	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
+	state->m_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( vulgus_bgvideoram_w )
 {
 	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 
@@ -157,10 +157,10 @@ WRITE8_HANDLER( vulgus_c804_w )
 WRITE8_HANDLER( vulgus_palette_bank_w )
 {
 	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	if (state->palette_bank != (data & 3))
+	if (state->m_palette_bank != (data & 3))
 	{
-		state->palette_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_palette_bank = data & 3;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
@@ -174,11 +174,11 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	vulgus_state *state = machine.driver_data<vulgus_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 
-	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int code,i,col,sx,sy,dir;
 
@@ -220,11 +220,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( vulgus )
 {
 	vulgus_state *state = screen->machine().driver_data<vulgus_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_low[1] + 256 * state->scroll_high[1]);
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_low[0] + 256 * state->scroll_high[0]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scroll_low[1] + 256 * state->m_scroll_high[1]);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scroll_low[0] + 256 * state->m_scroll_high[0]);
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen->machine(), bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }

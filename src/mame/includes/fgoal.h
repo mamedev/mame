@@ -7,21 +7,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    video_ram;
+	UINT8 *    m_video_ram;
 
 	/* video-related */
-	bitmap_t   *bgbitmap, *fgbitmap;
-	UINT8      xpos, ypos;
-	int        current_color;
+	bitmap_t   *m_bgbitmap;
+	bitmap_t   *m_fgbitmap;
+	UINT8      m_xpos;
+	UINT8      m_ypos;
+	int        m_current_color;
 
 	/* misc */
-	int        fgoal_player;
-	UINT8      row, col;
-	int        prev_coin;
+	int        m_fgoal_player;
+	UINT8      m_row;
+	UINT8      m_col;
+	int        m_prev_coin;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *mb14241;
+	device_t *m_maincpu;
+	device_t *m_mb14241;
 };
 
 

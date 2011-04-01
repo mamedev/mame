@@ -28,9 +28,9 @@ public:
 	tattack_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *tmap;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_tmap;
 };
 
 
@@ -38,8 +38,8 @@ public:
 static TILE_GET_INFO( get_tile_info )
 {
 	tattack_state *state = machine.driver_data<tattack_state>();
-	int code = state->videoram[tile_index];
-	int color = state->colorram[tile_index];
+	int code = state->m_videoram[tile_index];
+	int color = state->m_colorram[tile_index];
 
 	if((color&1 ) || (color>15) )
 		logerror("COLOR %i\n",color);
@@ -56,22 +56,22 @@ static TILE_GET_INFO( get_tile_info )
 static SCREEN_UPDATE( tattack )
 {
 	tattack_state *state = screen->machine().driver_data<tattack_state>();
-	tilemap_mark_all_tiles_dirty(state->tmap);
-	tilemap_draw(bitmap,cliprect,state->tmap, 0,0);
+	tilemap_mark_all_tiles_dirty(state->m_tmap);
+	tilemap_draw(bitmap,cliprect,state->m_tmap, 0,0);
 	return 0;
 }
 
 static VIDEO_START( tattack )
 {
 	tattack_state *state = machine.driver_data<tattack_state>();
-		state->tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+		state->m_tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(tattack_state, videoram)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(tattack_state, colorram)	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(tattack_state, m_videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(tattack_state, m_colorram)	// color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP

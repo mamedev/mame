@@ -70,7 +70,7 @@ public:
 	big10_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 mux_data;
+	UINT8 m_mux_data;
 };
 
 
@@ -118,20 +118,20 @@ static MACHINE_RESET(big10)
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
 	big10_state *state = device->machine().driver_data<big10_state>();
-	state->mux_data = ~data;
+	state->m_mux_data = ~data;
 }
 
 static READ8_HANDLER( mux_r )
 {
 	big10_state *state = space->machine().driver_data<big10_state>();
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 1: return input_port_read(space->machine(), "IN1");
 		case 2: return input_port_read(space->machine(), "IN2");
 		case 4: return input_port_read(space->machine(), "IN3");
 	}
 
-	return state->mux_data;
+	return state->m_mux_data;
 }
 
 

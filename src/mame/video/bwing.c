@@ -58,14 +58,14 @@ const gfx_layout bwing_tilelayout =
 WRITE8_HANDLER( bwing_spriteram_w )
 {
 	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->spriteram[offset] = data;
+	state->m_spriteram[offset] = data;
 }
 
 WRITE8_HANDLER( bwing_videoram_w )
 {
 	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->charmap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_charmap, offset);
 }
 
 
@@ -74,12 +74,12 @@ READ8_HANDLER ( bwing_scrollram_r )
 	bwing_state *state = space->machine().driver_data<bwing_state>();
 	int offs;
 
-	if (!state->srbank)
-		offs = state->srxlat[offset];
+	if (!state->m_srbank)
+		offs = state->m_srxlat[offset];
 	else
 		offs = offset;
 
-	return ((state->srbase[state->srbank])[offs]);
+	return ((state->m_srbase[state->m_srbank])[offs]);
 }
 
 
@@ -88,13 +88,13 @@ WRITE8_HANDLER( bwing_scrollram_w )
 	bwing_state *state = space->machine().driver_data<bwing_state>();
 	int offs;
 
-	if (!state->srbank)
+	if (!state->m_srbank)
 	{
-		offs = state->srxlat[offset];
+		offs = state->m_srxlat[offset];
 		if (offs >> 12)
-			tilemap_mark_tile_dirty(state->bgmap, offs & 0xfff);
+			tilemap_mark_tile_dirty(state->m_bgmap, offs & 0xfff);
 		else
-			tilemap_mark_tile_dirty(state->fgmap, offs & 0xfff);
+			tilemap_mark_tile_dirty(state->m_fgmap, offs & 0xfff);
 	}
 	else
 	{
@@ -105,23 +105,23 @@ WRITE8_HANDLER( bwing_scrollram_w )
 			gfx_element_mark_dirty(space->machine().gfx[3], offset / 32);
 	}
 
-	(state->srbase[state->srbank])[offs] = data;
+	(state->m_srbase[state->m_srbank])[offs] = data;
 }
 
 
 WRITE8_HANDLER( bwing_scrollreg_w )
 {
 	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->sreg[offset] = data;
+	state->m_sreg[offset] = data;
 
 	switch (offset)
 	{
-		case 6: state->palatch = data; break; // one of the palette components is latched through I/O(yike)
+		case 6: state->m_palatch = data; break; // one of the palette components is latched through I/O(yike)
 
 		case 7:
 			// tile graphics are decoded in RAM on the fly and tile codes are banked + interleaved(ouch)
-			state->mapmask = data;
-			state->srbank = data >> 6;
+			state->m_mapmask = data;
+			state->m_srbank = data >> 6;
 
 			#if BW_DEBUG
 				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->device().tag, cpu_get_pc(&space->device()), data, 0x1b00 + offset, space->machine().primary_screen->frame_number());
@@ -146,11 +146,11 @@ WRITE8_HANDLER( bwing_paletteram_w )
 	};
 	int r, g, b, i;
 
-	state->paletteram[offset] = data;
+	state->m_paletteram[offset] = data;
 
 	r = ~data & 7;
 	g = ~(data >> 4) & 7;
-	b = ~state->palatch & 7;
+	b = ~state->m_palatch & 7;
 
 	r = ((r << 5) + (r << 2) + (r >> 1));
 	g = ((g << 5) + (g << 2) + (g >> 1));
@@ -169,7 +169,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 
 	#if BW_DEBUG
-		state->paletteram[offset + 0x40] = state->palatch;
+		state->m_paletteram[offset + 0x40] = state->m_palatch;
 	#endif
 }
 
@@ -179,21 +179,21 @@ WRITE8_HANDLER( bwing_paletteram_w )
 static TILE_GET_INFO( get_fgtileinfo )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo->pen_data = gfx_element_get_data(machine.gfx[2], state->fgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo->palette_base = machine.gfx[2]->color_base + ((state->fgdata[tile_index] >> 7) << 3);
+	tileinfo->pen_data = gfx_element_get_data(machine.gfx[2], state->m_fgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo->palette_base = machine.gfx[2]->color_base + ((state->m_fgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_bgtileinfo )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	tileinfo->pen_data = gfx_element_get_data(machine.gfx[3], state->bgdata[tile_index] & (BW_NTILES - 1));
-	tileinfo->palette_base = machine.gfx[3]->color_base + ((state->bgdata[tile_index] >> 7) << 3);
+	tileinfo->pen_data = gfx_element_get_data(machine.gfx[3], state->m_bgdata[tile_index] & (BW_NTILES - 1));
+	tileinfo->palette_base = machine.gfx[3]->color_base + ((state->m_bgdata[tile_index] >> 7) << 3);
 }
 
 static TILE_GET_INFO( get_charinfo )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	SET_TILE_INFO(0, state->videoram[tile_index], 0, 0);
+	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
 }
 
 static TILEMAP_MAPPER( bwing_scan_cols )
@@ -208,32 +208,32 @@ VIDEO_START( bwing )
 	UINT32 *dwptr;
 	int i;
 
-	state->charmap = tilemap_create(machine, get_charinfo, tilemap_scan_cols, 8, 8, 32, 32);
-	state->fgmap = tilemap_create(machine, get_fgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
-	state->bgmap = tilemap_create(machine, get_bgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
+	state->m_charmap = tilemap_create(machine, get_charinfo, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fgmap = tilemap_create(machine, get_fgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
+	state->m_bgmap = tilemap_create(machine, get_bgtileinfo, bwing_scan_cols, 16, 16, 64, 64);
 
-	tilemap_set_transparent_pen(state->charmap, 0);
-	tilemap_set_transparent_pen(state->fgmap, 0);
+	tilemap_set_transparent_pen(state->m_charmap, 0);
+	tilemap_set_transparent_pen(state->m_fgmap, 0);
 
-	state->srxlat = auto_alloc_array(machine, int, 0x2000);
-	state->save_pointer(NAME(state->srxlat), 0x2000);
+	state->m_srxlat = auto_alloc_array(machine, int, 0x2000);
+	state->save_pointer(NAME(state->m_srxlat), 0x2000);
 
-	fill_srxlat(state->srxlat);
+	fill_srxlat(state->m_srxlat);
 
-	state->fgdata = machine.region("gpu")->base();
-	state->bgdata = state->fgdata + 0x1000;
+	state->m_fgdata = machine.region("gpu")->base();
+	state->m_bgdata = state->m_fgdata + 0x1000;
 
 	for (i = 0; i < 4; i++)
-		state->srbase[i] = state->fgdata + i * 0x2000;
+		state->m_srbase[i] = state->m_fgdata + i * 0x2000;
 
 	for (i = 0; i < 8; i++)
-		state->sreg[i] = 0;
+		state->m_sreg[i] = 0;
 
-//  state->fgfx = machine.gfx[2];
-	gfx_element_set_source(machine.gfx[2], state->srbase[1]);
+//  state->m_fgfx = machine.gfx[2];
+	gfx_element_set_source(machine.gfx[2], state->m_srbase[1]);
 
-//  state->bgfx = machine.gfx[3];
-	gfx_element_set_source(machine.gfx[3], state->srbase[1] + 0x1000);
+//  state->m_bgfx = machine.gfx[3];
+	gfx_element_set_source(machine.gfx[3], state->m_srbase[1] + 0x1000);
 
 	dwptr = machine.gfx[2]->pen_usage;
 	if (dwptr)
@@ -272,7 +272,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bmp, const rectang
 		fy = ~attrib & 0x02;
 
 		// normal/cocktail
-		if (state->mapmask & 0x20)
+		if (state->m_mapmask & 0x20)
 		{
 			fx = !fx;
 			fy = !fy;
@@ -294,52 +294,52 @@ SCREEN_UPDATE( bwing )
 	bwing_state *state = screen->machine().driver_data<bwing_state>();
 	unsigned x, y, shiftx;
 
-	if (state->mapmask & 0x20)
+	if (state->m_mapmask & 0x20)
 	{
-		state->mapflip = TILEMAP_FLIPX;
+		state->m_mapflip = TILEMAP_FLIPX;
 		shiftx = -8;
 	}
 	else
 	{
-		state->mapflip = TILEMAP_FLIPY;
+		state->m_mapflip = TILEMAP_FLIPY;
 		shiftx = 8;
 	}
 
 	// draw background
-	if (!(state->mapmask & 1))
+	if (!(state->m_mapmask & 1))
 	{
-		tilemap_set_flip(state->bgmap, state->mapflip);
-		x = ((state->sreg[1]<<2 & 0x300) + state->sreg[2] + shiftx) & 0x3ff;
-		tilemap_set_scrollx(state->bgmap, 0, x);
-		y = (state->sreg[1]<<4 & 0x300) + state->sreg[3];
-		tilemap_set_scrolly(state->bgmap, 0, y);
-		tilemap_draw(bitmap, cliprect, state->bgmap, 0, 0);
+		tilemap_set_flip(state->m_bgmap, state->m_mapflip);
+		x = ((state->m_sreg[1]<<2 & 0x300) + state->m_sreg[2] + shiftx) & 0x3ff;
+		tilemap_set_scrollx(state->m_bgmap, 0, x);
+		y = (state->m_sreg[1]<<4 & 0x300) + state->m_sreg[3];
+		tilemap_set_scrolly(state->m_bgmap, 0, y);
+		tilemap_draw(bitmap, cliprect, state->m_bgmap, 0, 0);
 	}
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	// draw low priority sprites
-	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, 0);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0);
 
 	// draw foreground
-	if (!(state->mapmask & 2))
+	if (!(state->m_mapmask & 2))
 	{
-		tilemap_set_flip(state->fgmap, state->mapflip);
-		x = ((state->sreg[1] << 6 & 0x300) + state->sreg[4] + shiftx) & 0x3ff;
-		tilemap_set_scrollx(state->fgmap, 0, x);
-		y = (state->sreg[1] << 8 & 0x300) + state->sreg[5];
-		tilemap_set_scrolly(state->fgmap, 0, y);
-		tilemap_draw(bitmap, cliprect, state->fgmap, 0, 0);
+		tilemap_set_flip(state->m_fgmap, state->m_mapflip);
+		x = ((state->m_sreg[1] << 6 & 0x300) + state->m_sreg[4] + shiftx) & 0x3ff;
+		tilemap_set_scrollx(state->m_fgmap, 0, x);
+		y = (state->m_sreg[1] << 8 & 0x300) + state->m_sreg[5];
+		tilemap_set_scrolly(state->m_fgmap, 0, y);
+		tilemap_draw(bitmap, cliprect, state->m_fgmap, 0, 0);
 	}
 
 	// draw high priority sprites
-	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, 1);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 1);
 
 	// draw text layer
-//  if (state->mapmask & 4)
+//  if (state->m_mapmask & 4)
 	{
-		tilemap_set_flip(state->charmap, state->mapflip);
-		tilemap_draw(bitmap, cliprect, state->charmap, 0, 0);
+		tilemap_set_flip(state->m_charmap, state->m_mapflip);
+		tilemap_draw(bitmap, cliprect, state->m_charmap, 0, 0);
 	}
 	return 0;
 }

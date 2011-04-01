@@ -59,8 +59,8 @@ public:
 	blackt96_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16* tilemapram;
-	UINT16* tilemapram2;
+	UINT16* m_tilemapram;
+	UINT16* m_tilemapram2;
 };
 
 
@@ -80,9 +80,9 @@ static void draw_strip(running_machine &machine, bitmap_t *bitmap, const rectang
 
 	for (y=0;y<32;y++)
 	{
-		UINT16 tile = (state->tilemapram2[count*2 + (base/2)+1]&0x3fff);
-		UINT16 flipx = (state->tilemapram2[count*2 + (base/2)+1]&0x4000);
-		UINT16 colour = (state->tilemapram2[count*2 + (base/2)]&0x00ff);
+		UINT16 tile = (state->m_tilemapram2[count*2 + (base/2)+1]&0x3fff);
+		UINT16 flipx = (state->m_tilemapram2[count*2 + (base/2)+1]&0x4000);
+		UINT16 colour = (state->m_tilemapram2[count*2 + (base/2)]&0x00ff);
 
 		if (tile&0x2000)
 		{
@@ -111,8 +111,8 @@ static void draw_main(running_machine &machine, bitmap_t *bitmap, const rectangl
 		int yy;
 		int s = 0;
 
-		xx=  ((state->tilemapram2[x+0]&0x001f)<<4) | (state->tilemapram2[x+1]&0xf000)>>12;
-		yy = ((state->tilemapram2[x+1]&0x1ff));
+		xx=  ((state->m_tilemapram2[x+0]&0x001f)<<4) | (state->m_tilemapram2[x+1]&0xf000)>>12;
+		yy = ((state->m_tilemapram2[x+1]&0x1ff));
 
 		if (xx&0x100) xx-=0x200;
 		yy = 0x1ff-yy;
@@ -146,7 +146,7 @@ static SCREEN_UPDATE( blackt96 )
 	{
 		for (y=0;y<32;y++)
 		{
-			UINT16 tile = (state->tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
+			UINT16 tile = (state->m_tilemapram[count*2]&0x7ff)+0x800; // +0xc00 for korean text
 			drawgfx_transpen(bitmap,cliprect,gfx,tile,0,0,0,x*8,-16+y*8,0);
 			count++;
 		}
@@ -177,8 +177,8 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(blackt96_state, tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blackt96_state, tilemapram2)// sprite list + sprite tilemaps
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(blackt96_state, m_tilemapram) // text tilemap
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blackt96_state, m_tilemapram2)// sprite list + sprite tilemaps
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 

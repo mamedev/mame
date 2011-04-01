@@ -119,7 +119,7 @@ PALETTE_INIT( naughtyb )
 VIDEO_START( naughtyb )
 {
 	naughtyb_state *state = machine.driver_data<naughtyb_state>();
-	state->palreg = state->bankreg = 0;
+	state->m_palreg = state->m_bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
 	machine.generic.tmpbitmap = auto_bitmap_alloc(machine,68*8,28*8,machine.primary_screen->format());
@@ -134,11 +134,11 @@ WRITE8_HANDLER( naughtyb_videoreg_w )
 	// bits 4+5 control the sound circuit
 	pleiads_sound_control_c_w(space->machine().device("cust"),offset,data);
 
-	state->cocktail =
+	state->m_cocktail =
 		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
-	state->bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
+	state->m_palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	state->m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
 }
 
 WRITE8_HANDLER( popflame_videoreg_w )
@@ -147,11 +147,11 @@ WRITE8_HANDLER( popflame_videoreg_w )
 	// bits 4+5 control the sound circuit
 	pleiads_sound_control_c_w(space->machine().device("cust"),offset,data);
 
-	state->cocktail =
+	state->m_cocktail =
 		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
-	state->bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
+	state->m_palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	state->m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
 }
 
 
@@ -203,7 +203,7 @@ WRITE8_HANDLER( popflame_videoreg_w )
 SCREEN_UPDATE( naughtyb )
 {
 	naughtyb_state *state = screen->machine().driver_data<naughtyb_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int offs;
 
 	// for every character in the Video RAM
@@ -212,7 +212,7 @@ SCREEN_UPDATE( naughtyb )
 	{
 		int sx,sy;
 
-		if ( state->cocktail )
+		if ( state->m_cocktail )
 		{
 			if (offs < 0x700)
 			{
@@ -240,15 +240,15 @@ SCREEN_UPDATE( naughtyb )
 		}
 
 		drawgfx_opaque(screen->machine().generic.tmpbitmap,0,screen->machine().gfx[0],
-				state->videoram2[offs] + 256 * state->bankreg,
-				(state->videoram2[offs] >> 5) + 8 * state->palreg,
-				state->cocktail,state->cocktail,
+				state->m_videoram2[offs] + 256 * state->m_bankreg,
+				(state->m_videoram2[offs] >> 5) + 8 * state->m_palreg,
+				state->m_cocktail,state->m_cocktail,
 				8*sx,8*sy);
 
 		drawgfx_transpen(screen->machine().generic.tmpbitmap,0,screen->machine().gfx[1],
-				videoram[offs] + 256*state->bankreg,
-				(videoram[offs] >> 5) + 8 * state->palreg,
-				state->cocktail,state->cocktail,
+				videoram[offs] + 256*state->m_bankreg,
+				(videoram[offs] >> 5) + 8 * state->m_palreg,
+				state->m_cocktail,state->m_cocktail,
 				8*sx,8*sy,0);
 	}
 
@@ -259,7 +259,7 @@ SCREEN_UPDATE( naughtyb )
 		copybitmap(bitmap,screen->machine().generic.tmpbitmap,0,0,-66*8,0,&leftvisiblearea);
 		copybitmap(bitmap,screen->machine().generic.tmpbitmap,0,0,-30*8,0,&rightvisiblearea);
 
-		scrollx = ( state->cocktail ) ? *state->scrollreg - 239 : -*state->scrollreg + 16;
+		scrollx = ( state->m_cocktail ) ? *state->m_scrollreg - 239 : -*state->m_scrollreg + 16;
 		copyscrollbitmap(bitmap,screen->machine().generic.tmpbitmap,1,&scrollx,0,0,&scrollvisiblearea);
 	}
 	return 0;

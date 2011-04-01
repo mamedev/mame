@@ -19,16 +19,16 @@ public:
 	namconb1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *nvmem32;
-	UINT16 *namconb_shareram;
-	UINT8 namconb_cpureg[32];
-	int vblank_irq_active;
-	int pos_irq_active;
-	UINT16 count;
-	UINT8 nbx_port6;
-	UINT32 *spritebank32;
-	UINT32 *tilebank32;
-	UINT32 tilemap_tile_bank[4];
+	UINT32 *m_nvmem32;
+	UINT16 *m_namconb_shareram;
+	UINT8 m_namconb_cpureg[32];
+	int m_vblank_irq_active;
+	int m_pos_irq_active;
+	UINT16 m_count;
+	UINT8 m_nbx_port6;
+	UINT32 *m_spritebank32;
+	UINT32 *m_tilebank32;
+	UINT32 m_tilemap_tile_bank[4];
 };
 
 

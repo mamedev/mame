@@ -16,19 +16,19 @@ public:
 	snk6502_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 sasuke_counter;
+	UINT8 m_sasuke_counter;
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *videoram2;
-	UINT8 *charram;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_videoram2;
+	UINT8 *m_charram;
 
-	int charbank;
-	int backcolor;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	int m_charbank;
+	int m_backcolor;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 
-	rgb_t palette[64];
+	rgb_t m_palette[64];
 };
 
 

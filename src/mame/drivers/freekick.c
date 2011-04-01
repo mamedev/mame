@@ -59,13 +59,13 @@ static WRITE8_HANDLER( coin_w )
 static WRITE8_HANDLER( spinner_select_w )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	state->spinner = data & 1;
+	state->m_spinner = data & 1;
 }
 
 static READ8_HANDLER( spinner_r )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	return input_port_read(space->machine(), state->spinner ? "IN3" : "IN2");
+	return input_port_read(space->machine(), state->m_spinner ? "IN3" : "IN2");
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
@@ -76,13 +76,13 @@ static WRITE8_HANDLER( pbillrd_bankswitch_w )
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	state->nmi_en = data & 1;
+	state->m_nmi_en = data & 1;
 }
 
 static INTERRUPT_GEN( freekick_irqgen )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
-	if (state->nmi_en)
+	if (state->m_nmi_en)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -90,49 +90,49 @@ static WRITE8_HANDLER( oigas_5_w )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
 	if (data > 0xc0 && data < 0xe0)
-		state->cnt = 1;
+		state->m_cnt = 1;
 
-	switch (state->cnt)
+	switch (state->m_cnt)
 	{
-		case 1: state->inval = data << 8  ; break;
-		case 2: state->inval |= data      ; break;
+		case 1: state->m_inval = data << 8  ; break;
+		case 2: state->m_inval |= data      ; break;
 	}
 }
 
 static READ8_HANDLER( oigas_3_r )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	switch (++state->cnt)
+	switch (++state->m_cnt)
 	{
-	case 2: return ~(state->inval >> 8);
-	case 3: return ~(state->inval & 0xff);
+	case 2: return ~(state->m_inval >> 8);
+	case 3: return ~(state->m_inval & 0xff);
 	case 4:
-		switch (state->inval)
+		switch (state->m_inval)
 		{
-		case 0xc500: state->outval = 0x17ef; break;
+		case 0xc500: state->m_outval = 0x17ef; break;
 		case 0xc520:
-		case 0xc540: state->outval = 0x19c1; break;
-		case 0xc560: state->outval = 0x1afc; break;
+		case 0xc540: state->m_outval = 0x19c1; break;
+		case 0xc560: state->m_outval = 0x1afc; break;
 		case 0xc580:
 		case 0xc5a0:
-		case 0xc5c0: state->outval = 0x1f28; break;
-		case 0xc680: state->outval = 0x2e8a; break;
+		case 0xc5c0: state->m_outval = 0x1f28; break;
+		case 0xc680: state->m_outval = 0x2e8a; break;
 		case 0xc5e0:
 		case 0xc600:
 		case 0xc620:
 		case 0xc640:
-		case 0xc660: state->outval = 0x25cc; break;
+		case 0xc660: state->m_outval = 0x25cc; break;
 		case 0xc6c0:
-		case 0xc6e0: state->outval = 0x09d7; break;
-		case 0xc6a0: state->outval = 0x3168; break;
-		case 0xc720: state->outval = 0x2207; break;
-		case 0xc700: state->outval = 0x0e34; break;
-		case 0xc710: state->outval = 0x0fdd; break;
-		case 0xc4f0: state->outval = 0x05b6; break;
-		case 0xc4e0: state->outval = 0xae1e; break;
+		case 0xc6e0: state->m_outval = 0x09d7; break;
+		case 0xc6a0: state->m_outval = 0x3168; break;
+		case 0xc720: state->m_outval = 0x2207; break;
+		case 0xc700: state->m_outval = 0x0e34; break;
+		case 0xc710: state->m_outval = 0x0fdd; break;
+		case 0xc4f0: state->m_outval = 0x05b6; break;
+		case 0xc4e0: state->m_outval = 0xae1e; break;
 		}
-		return state->outval>>8;
-	case 5: state->cnt=0;return state->outval&0xff;
+		return state->m_outval>>8;
+	case 5: state->m_cnt=0;return state->m_outval&0xff;
 	}
 	return 0;
 }
@@ -145,13 +145,13 @@ static READ8_HANDLER( oigas_2_r )
 static READ8_HANDLER( freekick_ff_r )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	return state->ff_data;
+	return state->m_ff_data;
 }
 
 static WRITE8_HANDLER( freekick_ff_w )
 {
 	freekick_state *state = space->machine().driver_data<freekick_state>();
-	state->ff_data = data;
+	state->m_ff_data = data;
 }
 
 
@@ -166,8 +166,8 @@ static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, m_videoram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(flipscreen_w)
@@ -185,8 +185,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)	// tilemap
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)	// sprites
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, m_videoram)	// tilemap
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, m_spriteram, m_spriteram_size)	// sprites
 	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
@@ -205,8 +205,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, m_videoram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITENOP // probably not flipscreen
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
@@ -514,19 +514,19 @@ INPUT_PORTS_END
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_l_w )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
-	state->romaddr = (state->romaddr & 0xff00) | data;
+	state->m_romaddr = (state->m_romaddr & 0xff00) | data;
 }
 
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
-	state->romaddr = (state->romaddr & 0x00ff) | (data << 8);
+	state->m_romaddr = (state->m_romaddr & 0x00ff) | (data << 8);
 }
 
 static READ8_DEVICE_HANDLER( snd_rom_r )
 {
 	freekick_state *state = device->machine().driver_data<freekick_state>();
-	return device->machine().region("user1")->base()[state->romaddr & 0x7fff];
+	return device->machine().region("user1")->base()[state->m_romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -598,20 +598,20 @@ static MACHINE_START( freekick )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->save_item(NAME(state->romaddr));
-	state->save_item(NAME(state->spinner));
-	state->save_item(NAME(state->nmi_en));
-	state->save_item(NAME(state->ff_data));
+	state->save_item(NAME(state->m_romaddr));
+	state->save_item(NAME(state->m_spinner));
+	state->save_item(NAME(state->m_nmi_en));
+	state->save_item(NAME(state->m_ff_data));
 }
 
 static MACHINE_RESET( freekick )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->romaddr = 0;
-	state->spinner = 0;
-	state->nmi_en = 0;
-	state->ff_data = 0;
+	state->m_romaddr = 0;
+	state->m_spinner = 0;
+	state->m_nmi_en = 0;
+	state->m_ff_data = 0;
 }
 
 static MACHINE_START( pbillrd )
@@ -625,9 +625,9 @@ static MACHINE_START( oigas )
 {
 	freekick_state *state = machine.driver_data<freekick_state>();
 
-	state->save_item(NAME(state->inval));
-	state->save_item(NAME(state->outval));
-	state->save_item(NAME(state->cnt));
+	state->save_item(NAME(state->m_inval));
+	state->save_item(NAME(state->m_outval));
+	state->save_item(NAME(state->m_cnt));
 
 	MACHINE_START_CALL(freekick);
 }
@@ -638,9 +638,9 @@ static MACHINE_RESET( oigas )
 
 	MACHINE_RESET_CALL(freekick);
 
-	state->inval = 0;
-	state->outval = 0;
-	state->cnt = 0;
+	state->m_inval = 0;
+	state->m_outval = 0;
+	state->m_cnt = 0;
 }
 
 static MACHINE_CONFIG_START( base, freekick_state )

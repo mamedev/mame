@@ -47,14 +47,14 @@ static MACHINE_RESET( starwars )
 {
 	starwars_state *state = machine.driver_data<starwars_state>();
 	/* ESB-specific */
-	if (state->is_esb)
+	if (state->m_is_esb)
 	{
 		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
-		state->slapstic_current_bank = slapstic_bank();
-		memcpy(state->slapstic_base, &state->slapstic_source[state->slapstic_current_bank * 0x2000], 0x2000);
+		state->m_slapstic_current_bank = slapstic_bank();
+		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
 		starwars_out_w(space, 4, 0);
@@ -91,10 +91,10 @@ static void esb_slapstic_tweak(address_space *space, offs_t offset)
 	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
-	if (new_bank != state->slapstic_current_bank)
+	if (new_bank != state->m_slapstic_current_bank)
 	{
-		state->slapstic_current_bank = new_bank;
-		memcpy(state->slapstic_base, &state->slapstic_source[state->slapstic_current_bank * 0x2000], 0x2000);
+		state->m_slapstic_current_bank = new_bank;
+		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_slapstic_current_bank * 0x2000], 0x2000);
 	}
 }
 
@@ -102,7 +102,7 @@ static void esb_slapstic_tweak(address_space *space, offs_t offset)
 static READ8_HANDLER( esb_slapstic_r )
 {
 	starwars_state *state = space->machine().driver_data<starwars_state>();
-	int result = state->slapstic_base[offset];
+	int result = state->m_slapstic_base[offset];
 	esb_slapstic_tweak(space, offset);
 	return result;
 }
@@ -134,10 +134,10 @@ DIRECT_UPDATE_HANDLER( esb_setdirect )
             1. Because we have read/write handlers backing the current address
             2. Because the CPU core executed a jump to a new address
         */
-		if (pc != state->slapstic_last_pc || address != state->slapstic_last_address)
+		if (pc != state->m_slapstic_last_pc || address != state->m_slapstic_last_address)
 		{
-			state->slapstic_last_pc = pc;
-			state->slapstic_last_address = address;
+			state->m_slapstic_last_pc = pc;
+			state->m_slapstic_last_address = address;
 			esb_slapstic_tweak(&direct.space(), address & 0x1fff);
 		}
 		return ~0;
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
 	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(starwars_state, mathram)	/* CPU and Math RAM */
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(starwars_state, m_mathram)	/* CPU and Math RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* rest of main_rom */
 ADDRESS_MAP_END
@@ -500,7 +500,7 @@ static DRIVER_INIT( starwars )
 {
 	starwars_state *state = machine.driver_data<starwars_state>();
 	/* prepare the mathbox */
-	state->is_esb = 0;
+	state->m_is_esb = 0;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
@@ -516,8 +516,8 @@ static DRIVER_INIT( esb )
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);
-	state->slapstic_source = &rom[0x14000];
-	state->slapstic_base = &rom[0x08000];
+	state->m_slapstic_source = &rom[0x14000];
+	state->m_slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
 	address_space *space = machine.device<m6809_device>("maincpu")->space(AS_PROGRAM);
@@ -530,7 +530,7 @@ static DRIVER_INIT( esb )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
 
 	/* prepare the matrix processor */
-	state->is_esb = 1;
+	state->m_is_esb = 1;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
@@ -540,9 +540,9 @@ static DRIVER_INIT( esb )
 	memory_set_bank(machine, "bank2", 0);
 
 	/* additional globals for state saving */
-	state->save_item(NAME(state->slapstic_current_bank));
-	state->save_item(NAME(state->slapstic_last_pc));
-	state->save_item(NAME(state->slapstic_last_address));
+	state->save_item(NAME(state->m_slapstic_current_bank));
+	state->save_item(NAME(state->m_slapstic_last_pc));
+	state->save_item(NAME(state->m_slapstic_last_address));
 }
 
 

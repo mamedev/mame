@@ -57,31 +57,31 @@ Notes:
 static READ8_HANDLER( from_snd_r )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->snd_flag = 0;
-	return state->snd_data;
+	state->m_snd_flag = 0;
+	return state->m_snd_data;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->snd_data = data;
-	state->snd_flag = 2;
+	state->m_snd_data = data;
+	state->m_snd_flag = 2;
 }
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	if (state->sound_nmi_enable)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_sound_nmi_enable)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->pending_nmi = 1;
+		state->m_pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -93,18 +93,18 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( nmi_disable_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->sound_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
-	state->sound_nmi_enable = 1;
-	if (state->pending_nmi)
+	state->m_sound_nmi_enable = 1;
+	if (state->m_pending_nmi)
 	{
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->pending_nmi = 0;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_pending_nmi = 0;
 	}
 }
 
@@ -131,13 +131,13 @@ static const msm5232_interface msm5232_config =
 static READ8_HANDLER( snd_flag_r )
 {
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	return state->snd_flag | 0xfd;
+	return state->m_snd_flag | 0xfd;
 }
 
 static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE_MEMBER(ladyfrog_state, videoram, videoram_size)
+	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE_MEMBER(ladyfrog_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(ladyfrog_gfxctrl2_w)
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE_MEMBER(ladyfrog_state, scrlram)
+	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE_MEMBER(ladyfrog_state, m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(ladyfrog_palette_r, ladyfrog_palette_w)
 	AM_RANGE(0xd0d0, 0xd0d0) AM_READNOP /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
@@ -287,26 +287,26 @@ static MACHINE_START( ladyfrog )
 {
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->tilebank));
-	state->save_item(NAME(state->palette_bank));
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->snd_flag));
-	state->save_item(NAME(state->snd_data));
+	state->save_item(NAME(state->m_tilebank));
+	state->save_item(NAME(state->m_palette_bank));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_snd_flag));
+	state->save_item(NAME(state->m_snd_data));
 }
 
 static MACHINE_RESET( ladyfrog )
 {
 	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 
-	state->tilebank = 0;
-	state->palette_bank = 0;
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->snd_flag = 0;
-	state->snd_data = 0;
+	state->m_tilebank = 0;
+	state->m_palette_bank = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_snd_flag = 0;
+	state->m_snd_data = 0;
 }
 
 static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )

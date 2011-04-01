@@ -4,23 +4,23 @@ public:
 	wolfpack_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int collision;
-	UINT8* alpha_num_ram;
-	unsigned current_index;
-	UINT8 video_invert;
-	UINT8 ship_reflect;
-	UINT8 pt_pos_select;
-	UINT8 pt_horz;
-	UINT8 pt_pic;
-	UINT8 ship_h;
-	UINT8 torpedo_pic;
-	UINT8 ship_size;
-	UINT8 ship_h_precess;
-	UINT8 ship_pic;
-	UINT8 torpedo_h;
-	UINT8 torpedo_v;
-	UINT8* LFSR;
-	bitmap_t* helper;
+	int m_collision;
+	UINT8* m_alpha_num_ram;
+	unsigned m_current_index;
+	UINT8 m_video_invert;
+	UINT8 m_ship_reflect;
+	UINT8 m_pt_pos_select;
+	UINT8 m_pt_horz;
+	UINT8 m_pt_pic;
+	UINT8 m_ship_h;
+	UINT8 m_torpedo_pic;
+	UINT8 m_ship_size;
+	UINT8 m_ship_h_precess;
+	UINT8 m_ship_pic;
+	UINT8 m_torpedo_h;
+	UINT8 m_torpedo_v;
+	UINT8* m_LFSR;
+	bitmap_t* m_helper;
 };
 
 

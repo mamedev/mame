@@ -242,8 +242,8 @@ static MACHINE_START( taitoo )
 {
 	taitoo_state *state = machine.driver_data<taitoo_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->tc0080vco = machine.device("tc0080vco");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_tc0080vco = machine.device("tc0080vco");
 }
 
 static MACHINE_CONFIG_START( parentj, taitoo_state )

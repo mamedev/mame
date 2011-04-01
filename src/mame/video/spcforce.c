@@ -28,11 +28,11 @@ SCREEN_UPDATE( spcforce )
 	{
 		int code,sx,sy,col;
 
-		sy = 8 * (offs / 32) -  (state->scrollram[offs]       & 0x0f);
-		sx = 8 * (offs % 32) + ((state->scrollram[offs] >> 4) & 0x0f);
+		sy = 8 * (offs / 32) -  (state->m_scrollram[offs]       & 0x0f);
+		sx = 8 * (offs % 32) + ((state->m_scrollram[offs] >> 4) & 0x0f);
 
-		code = state->videoram[offs] + ((state->colorram[offs] & 0x01) << 8);
-		col  = (~state->colorram[offs] >> 4) & 0x07;
+		code = state->m_videoram[offs] + ((state->m_colorram[offs] & 0x01) << 8);
+		col  = (~state->m_colorram[offs] >> 4) & 0x07;
 
 		if (flip)
 		{

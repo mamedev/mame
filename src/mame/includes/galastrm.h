@@ -16,25 +16,25 @@ public:
 	galastrm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 coin_word;
-	UINT16 frame_counter;
-	UINT32 *ram;
-	int tc0110pcr_addr;
-	int tc0610_0_addr;
-	int tc0610_1_addr;
-	UINT32 mem[2];
-	INT16 tc0610_ctrl_reg[2][8];
-	struct tempsprite *spritelist;
-	struct tempsprite *sprite_ptr_pre;
-	bitmap_t *tmpbitmaps;
-	bitmap_t *polybitmap;
-	poly_manager *poly;
-	int rsxb;
-	int rsyb;
-	int rsxoffs;
-	int rsyoffs;
-	UINT32 *spriteram;
-	size_t spriteram_size;
+	UINT16 m_coin_word;
+	UINT16 m_frame_counter;
+	UINT32 *m_ram;
+	int m_tc0110pcr_addr;
+	int m_tc0610_0_addr;
+	int m_tc0610_1_addr;
+	UINT32 m_mem[2];
+	INT16 m_tc0610_ctrl_reg[2][8];
+	struct tempsprite *m_spritelist;
+	struct tempsprite *m_sprite_ptr_pre;
+	bitmap_t *m_tmpbitmaps;
+	bitmap_t *m_polybitmap;
+	poly_manager *m_poly;
+	int m_rsxb;
+	int m_rsyb;
+	int m_rsxoffs;
+	int m_rsyoffs;
+	UINT32 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

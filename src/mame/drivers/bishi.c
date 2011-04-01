@@ -93,27 +93,27 @@ Notes:
 static READ16_HANDLER( control_r )
 {
 	bishi_state *state = space->machine().driver_data<bishi_state>();
-	return state->cur_control;
+	return state->m_cur_control;
 }
 
 static WRITE16_HANDLER( control_w )
 {
 	// bit 8 = interrupt gate
 	bishi_state *state = space->machine().driver_data<bishi_state>();
-	COMBINE_DATA(&state->cur_control);
+	COMBINE_DATA(&state->m_cur_control);
 }
 
 static WRITE16_HANDLER( control2_w )
 {
 	// bit 12 = part of the banking calculation for the K056832 ROM readback
 	bishi_state *state = space->machine().driver_data<bishi_state>();
-	COMBINE_DATA(&state->cur_control2);
+	COMBINE_DATA(&state->m_cur_control2);
 }
 
 static INTERRUPT_GEN(bishi_interrupt)
 {
 	bishi_state *state = device->machine().driver_data<bishi_state>();
-	if (state->cur_control & 0x800)
+	if (state->m_cur_control & 0x800)
 	{
 		switch (cpu_getiloops(device))
 		{
@@ -143,10 +143,10 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 	if (offset & 1)
 		ouroffs++;
 
-	if (state->cur_control2 & 0x1000)
+	if (state->m_cur_control2 & 0x1000)
 		ouroffs += 4;
 
-	return k056832_bishi_rom_word_r(state->k056832, ouroffs, mem_mask);
+	return k056832_bishi_rom_word_r(state->m_k056832, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
@@ -371,9 +371,9 @@ static void sound_irq_gen(device_t *device, int state)
 {
 	bishi_state *bishi = device->machine().driver_data<bishi_state>();
 	if (state)
-		device_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
+		device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 	else
-		device_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -402,20 +402,20 @@ static MACHINE_START( bishi )
 {
 	bishi_state *state = machine.driver_data<bishi_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->k056832 = machine.device("k056832");
-	state->k054338 = machine.device("k054338");
-	state->k055555 = machine.device("k055555");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_k056832 = machine.device("k056832");
+	state->m_k054338 = machine.device("k054338");
+	state->m_k055555 = machine.device("k055555");
 
-	state->save_item(NAME(state->cur_control));
-	state->save_item(NAME(state->cur_control2));
+	state->save_item(NAME(state->m_cur_control));
+	state->save_item(NAME(state->m_cur_control2));
 }
 
 static MACHINE_RESET( bishi )
 {
 	bishi_state *state = machine.driver_data<bishi_state>();
-	state->cur_control = 0;
-	state->cur_control2 = 0;
+	state->m_cur_control = 0;
+	state->m_cur_control2 = 0;
 }
 
 static MACHINE_CONFIG_START( bishi, bishi_state )

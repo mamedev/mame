@@ -184,7 +184,7 @@ static MACHINE_START( kangaroo_mcu )
 
 	MACHINE_START_CALL(kangaroo);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xef00, 0xefff, FUNC(mcu_sim_r), FUNC(mcu_sim_w));
-	state->save_item(NAME(state->clock));
+	state->save_item(NAME(state->m_clock));
 }
 
 
@@ -205,7 +205,7 @@ static MACHINE_RESET( kangaroo )
 	/* properly starts. */
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	state->clock = 0;
+	state->m_clock = 0;
 }
 
 
@@ -223,7 +223,7 @@ static MACHINE_RESET( kangaroo )
 static READ8_HANDLER( mcu_sim_r )
 {
 	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	return ++state->clock & 0x0f;
+	return ++state->m_clock & 0x0f;
 }
 
 static WRITE8_HANDLER( mcu_sim_w )
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_BASE_MEMBER(kangaroo_state, video_control)
+	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_BASE_MEMBER(kangaroo_state, m_video_control)
 	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_WRITE(soundlatch_w)
 	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
 	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")

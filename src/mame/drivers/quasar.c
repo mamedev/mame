@@ -77,25 +77,25 @@ Sound Board 1b11107
 static WRITE8_HANDLER( video_page_select_w )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->page = offset & 0x03;
+	state->m_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( io_page_select_w )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->io_page = offset & 0x03;
+	state->m_io_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
 
-	switch (state->page)
+	switch (state->m_page)
 	{
-	case 0:  state->video_ram[offset] = data; break;
-	case 1:  state->color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
-	case 2:  state->effectram[offset] = data; break;
-	case 3:  state->effectcontrol = data; break;
+	case 0:  state->m_video_ram[offset] = data; break;
+	case 1:  state->m_color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
+	case 2:  state->m_effectram[offset] = data; break;
+	case 3:  state->m_effectcontrol = data; break;
 	}
 }
 
@@ -104,7 +104,7 @@ static READ8_HANDLER( quasar_IO_r )
 	quasar_state *state = space->machine().driver_data<quasar_state>();
 	UINT8 ans = 0;
 
-	switch (state->io_page)
+	switch (state->m_io_page)
 	{
 	case 0:  ans = input_port_read(space->machine(), "IN0"); break;
 	case 1:  ans = input_port_read(space->machine(), "IN1"); break;
@@ -118,7 +118,7 @@ static READ8_HANDLER( quasar_IO_r )
 static WRITE8_HANDLER( quasar_bullet_w )
 {
 	quasar_state *state = space->machine().driver_data<quasar_state>();
-	state->bullet_ram[offset] = (data ^ 0xff);
+	state->m_bullet_ram[offset] = (data ^ 0xff);
 }
 
 static WRITE8_HANDLER( quasar_sh_command_w )
@@ -146,11 +146,11 @@ static READ8_HANDLER( audio_t1_r )
 
 static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE_MEMBER(quasar_state, bullet_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE_MEMBER(quasar_state, m_bullet_ram)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE_MEMBER(quasar_state, video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE_MEMBER(quasar_state, m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( quasar_io, AS_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
 	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE_MEMBER(quasar_state, fo_state)
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE_MEMBER(quasar_state, m_fo_state)
 ADDRESS_MAP_END
 
 /*************************************
@@ -343,9 +343,9 @@ static MACHINE_START( quasar )
 	MACHINE_START_CALL(cvs);
 
 	/* register state save */
-	state->save_item(NAME(state->effectcontrol));
-	state->save_item(NAME(state->page));
-	state->save_item(NAME(state->io_page));
+	state->save_item(NAME(state->m_effectcontrol));
+	state->save_item(NAME(state->m_page));
+	state->save_item(NAME(state->m_io_page));
 }
 
 static MACHINE_RESET( quasar )
@@ -354,9 +354,9 @@ static MACHINE_RESET( quasar )
 
 	MACHINE_RESET_CALL(cvs);
 
-	state->effectcontrol = 0;
-	state->page = 0;
-	state->io_page = 8;
+	state->m_effectcontrol = 0;
+	state->m_page = 0;
+	state->m_io_page = 8;
 }
 
 static MACHINE_CONFIG_START( quasar, quasar_state )

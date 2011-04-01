@@ -138,8 +138,8 @@ public:
 	sigmab52_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int latch;
-	unsigned int acrtc_data;
+	int m_latch;
+	unsigned int m_acrtc_data;
 };
 
 
@@ -242,25 +242,25 @@ static WRITE8_HANDLER(acrtc_w)
 	{
 		//address select
 		hd63484_address_w(hd63484, 0, data, 0x00ff);
-		state->latch = 0;
+		state->m_latch = 0;
 	}
 	else
 	{
-		if(!state->latch)
+		if(!state->m_latch)
 		{
-			state->acrtc_data = data;
+			state->m_acrtc_data = data;
 
 		}
 
 		else
 		{
-			state->acrtc_data <<= 8;
-			state->acrtc_data |= data;
+			state->m_acrtc_data <<= 8;
+			state->m_acrtc_data |= data;
 
-			hd63484_data_w(hd63484, 0, state->acrtc_data, 0xffff);
+			hd63484_data_w(hd63484, 0, state->m_acrtc_data, 0xffff);
 		}
 
-		state->latch ^= 1;
+		state->m_latch ^= 1;
 	}
 }
 

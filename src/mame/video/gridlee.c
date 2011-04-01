@@ -40,13 +40,13 @@ PALETTE_INIT( gridlee )
 static STATE_POSTLOAD( expand_pixels )
 {
 	gridlee_state *state = machine.driver_data<gridlee_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
     int offset = 0;
 
     for(offset = 0; offset < 0x77ff; offset++)
     {
-        state->local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
-        state->local_videoram[offset * 2 + 1] = videoram[offset] & 15;
+        state->m_local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
+        state->m_local_videoram[offset * 2 + 1] = videoram[offset] & 15;
     }
 }
 
@@ -62,13 +62,13 @@ VIDEO_START( gridlee )
 {
 	gridlee_state *state = machine.driver_data<gridlee_state>();
 	/* allocate a local copy of video RAM */
-	state->local_videoram = auto_alloc_array_clear(machine, UINT8, 256 * 256);
+	state->m_local_videoram = auto_alloc_array_clear(machine, UINT8, 256 * 256);
 
 	/* reset the palette */
-	state->palettebank_vis = 0;
+	state->m_palettebank_vis = 0;
 
-    state_save_register_global(machine, state->cocktail_flip);
-    state_save_register_global(machine, state->palettebank_vis);
+    state_save_register_global(machine, state->m_cocktail_flip);
+    state_save_register_global(machine, state->m_palettebank_vis);
     machine.state().register_postload(expand_pixels, NULL);
 }
 
@@ -83,7 +83,7 @@ VIDEO_START( gridlee )
 WRITE8_HANDLER( gridlee_cocktail_flip_w )
 {
 	gridlee_state *state = space->machine().driver_data<gridlee_state>();
-	state->cocktail_flip = data & 1;
+	state->m_cocktail_flip = data & 1;
 }
 
 
@@ -97,12 +97,12 @@ WRITE8_HANDLER( gridlee_cocktail_flip_w )
 WRITE8_HANDLER( gridlee_videoram_w )
 {
 	gridlee_state *state = space->machine().driver_data<gridlee_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
 
 	/* expand the two pixel values into two bytes */
-	state->local_videoram[offset * 2 + 0] = data >> 4;
-	state->local_videoram[offset * 2 + 1] = data & 15;
+	state->m_local_videoram[offset * 2 + 0] = data >> 4;
+	state->m_local_videoram[offset * 2 + 1] = data & 15;
 }
 
 
@@ -118,7 +118,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 	gridlee_state *state = space->machine().driver_data<gridlee_state>();
 	/* update the scanline palette */
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + GRIDLEE_VBEND);
-	state->palettebank_vis = data & 0x3f;
+	state->m_palettebank_vis = data & 0x3f;
 }
 
 
@@ -135,7 +135,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 SCREEN_UPDATE( gridlee )
 {
 	gridlee_state *state = screen->machine().driver_data<gridlee_state>();
-	const pen_t *pens = &screen->machine().pens[state->palettebank_vis * 32];
+	const pen_t *pens = &screen->machine().pens[state->m_palettebank_vis * 32];
 	UINT8 *gfx;
 	int x, y, i;
 
@@ -143,8 +143,8 @@ SCREEN_UPDATE( gridlee )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		/* non-flipped: draw directly from the bitmap */
-		if (!state->cocktail_flip)
-			draw_scanline8(bitmap, 0, y, 256, &state->local_videoram[(y - GRIDLEE_VBEND) * 256], pens + 16);
+		if (!state->m_cocktail_flip)
+			draw_scanline8(bitmap, 0, y, 256, &state->m_local_videoram[(y - GRIDLEE_VBEND) * 256], pens + 16);
 
 		/* flipped: x-flip the scanline into a temp buffer and draw that */
 		else
@@ -154,7 +154,7 @@ SCREEN_UPDATE( gridlee )
 			int xx;
 
 			for (xx = 0; xx < 256; xx++)
-				temp[xx] = state->local_videoram[srcy * 256 + 255 - xx];
+				temp[xx] = state->m_local_videoram[srcy * 256 + 255 - xx];
 			draw_scanline8(bitmap, 0, y, 256, temp, pens + 16);
 		}
 	}
@@ -163,7 +163,7 @@ SCREEN_UPDATE( gridlee )
 	gfx = screen->machine().region("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 *sprite = state->spriteram + i * 4;
+		UINT8 *sprite = state->m_spriteram + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;
@@ -178,7 +178,7 @@ SCREEN_UPDATE( gridlee )
 			int currxor = 0;
 
 			/* adjust for flip */
-			if (state->cocktail_flip)
+			if (state->m_cocktail_flip)
 			{
 				ypos = 271 - ypos;
 				currxor = 0xff;
@@ -210,7 +210,7 @@ SCREEN_UPDATE( gridlee )
 				src += 4;
 
 			/* de-adjust for flip */
-			if (state->cocktail_flip)
+			if (state->m_cocktail_flip)
 				ypos = 271 - ypos;
 		}
 	}

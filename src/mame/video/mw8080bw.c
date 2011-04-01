@@ -51,7 +51,7 @@ SCREEN_UPDATE( mw8080bw )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->main_ram[offs];
+			video_data = state->m_main_ram[offs];
 		}
 	}
 
@@ -86,9 +86,9 @@ SCREEN_UPDATE( spcenctr )
 	UINT8 draw_line = 0;
 	UINT8 draw_trench = 0;
 	UINT8 draw_floor = 0;
-	UINT8 width = state->spcenctr_trench_width;
+	UINT8 width = state->m_spcenctr_trench_width;
 	UINT8 floor_width = width;
-	UINT8 center = state->spcenctr_trench_center;
+	UINT8 center = state->m_spcenctr_trench_center;
 
 	memset(line_buf, 0, 256);
 
@@ -150,7 +150,7 @@ SCREEN_UPDATE( spcenctr )
 
 			/* update the trench control for the next line */
 			offs = ((offs_t)y << 5) | 0x1f;
-			trench_control = state->main_ram[offs];
+			trench_control = state->m_main_ram[offs];
 
 			if (trench_control & 0x40)
 				draw_trench = 1;
@@ -168,11 +168,11 @@ SCREEN_UPDATE( spcenctr )
 
 			/* add the lower 2 bits stored in the slope array to width */
 			if (draw_trench)
-				width = width + (state->spcenctr_trench_slope[y & 0x0f] & 0x03);
+				width = width + (state->m_spcenctr_trench_slope[y & 0x0f] & 0x03);
 
 			/* add the higher 2 bits stored in the slope array to floor width */
 			if (draw_floor)
-				floor_width = floor_width + ((state->spcenctr_trench_slope[y & 0x0f] & 0x0c) >> 2);
+				floor_width = floor_width + ((state->m_spcenctr_trench_slope[y & 0x0f] & 0x0c) >> 2);
 
 			/* next row, video_data is now 0, so the next line will start
                with 4 blank pixels */
@@ -186,7 +186,7 @@ SCREEN_UPDATE( spcenctr )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->main_ram[offs];
+			video_data = state->m_main_ram[offs];
 		}
 	}
 
@@ -227,7 +227,7 @@ SCREEN_UPDATE( phantom2 )
 	UINT8 video_data = 0;
 	UINT8 cloud_data = 0;
 
-	UINT16 cloud_counter = state->phantom2_cloud_counter;
+	UINT16 cloud_counter = state->m_phantom2_cloud_counter;
 
 	UINT8 *cloud_region = screen->machine().region("proms")->base();
 
@@ -303,7 +303,7 @@ SCREEN_UPDATE( phantom2 )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->main_ram[offs];
+			video_data = state->m_main_ram[offs];
 		}
 	}
 
@@ -315,10 +315,10 @@ SCREEN_EOF( phantom2 )
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
-	state->phantom2_cloud_counter += MW8080BW_VTOTAL;
+	state->m_phantom2_cloud_counter += MW8080BW_VTOTAL;
 
-	if (state->phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
-		state->phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (state->phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
+	if (state->m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
+		state->m_phantom2_cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (state->m_phantom2_cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
 }
 
 
@@ -337,7 +337,7 @@ SCREEN_UPDATE( invaders )
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
-	UINT8 flip = state->invaders_flip_screen;
+	UINT8 flip = state->m_invaders_flip_screen;
 
 	while (1)
 	{
@@ -383,7 +383,7 @@ SCREEN_UPDATE( invaders )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = state->main_ram[offs];
+			video_data = state->m_main_ram[offs];
 		}
 	}
 

@@ -42,43 +42,44 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  bg_tilemapram;
-	UINT16 *  fg_tilemapram;
-	UINT16 *  sprites;
-//  UINT16 *  paletteram;   // currently this uses generic palette handling
+	UINT16 *  m_bg_tilemapram;
+	UINT16 *  m_fg_tilemapram;
+	UINT16 *  m_sprites;
+//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*fg_tilemap;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
 };
 
 
 static WRITE16_HANDLER( fg_tilemapram_w )
 {
 	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->fg_tilemapram[offset]);
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
+	COMBINE_DATA(&state->m_fg_tilemapram[offset]);
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->fg_tilemapram[tile_index * 2];
-	int attr = state->fg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_fg_tilemapram[tile_index * 2];
+	int attr = state->m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
 static WRITE16_HANDLER( bg_tilemapram_w )
 {
 	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->bg_tilemapram[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	COMBINE_DATA(&state->m_bg_tilemapram[offset]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	good_state *state = machine.driver_data<good_state>();
-	int tileno = state->bg_tilemapram[tile_index * 2];
-	int attr = state->bg_tilemapram[tile_index * 2 + 1] & 0xf;
+	int tileno = state->m_bg_tilemapram[tile_index * 2];
+	int attr = state->m_bg_tilemapram[tile_index * 2 + 1] & 0xf;
 	SET_TILE_INFO(1, tileno, attr, 0);
 }
 
@@ -87,16 +88,16 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( good )
 {
 	good_state *state = machine.driver_data<good_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0xf);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xf);
 }
 
 static SCREEN_UPDATE( good )
 {
 	good_state *state = screen->machine().driver_data<good_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -112,8 +113,8 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE_MEMBER(good_state, fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE_MEMBER(good_state, bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE_MEMBER(good_state, m_fg_tilemapram)
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE_MEMBER(good_state, m_bg_tilemapram)
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

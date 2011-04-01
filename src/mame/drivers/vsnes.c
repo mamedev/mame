@@ -165,7 +165,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 {
 	vsnes_state *state = space->machine().driver_data<vsnes_state>();
 	coin_counter_w( space->machine(), 0, data & 0x01 );
-	state->coin = data;
+	state->m_coin = data;
 
 	 //"bnglngby" and "cluclu"
 	if( data & 0xfe )
@@ -178,7 +178,7 @@ static READ8_HANDLER( vsnes_coin_counter_r )
 {
 	vsnes_state *state = space->machine().driver_data<vsnes_state>();
 	//only for platoon
-	return state->coin;
+	return state->m_coin;
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_1_w )
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 }
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, work_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, m_work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes1", nes_psg_r, nes_psg_w)
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, work_ram_1)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, m_work_ram_1)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes2", nes_psg_r, nes_psg_w)

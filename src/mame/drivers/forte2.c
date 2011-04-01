@@ -32,7 +32,7 @@ public:
 	forte2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 input_mask;
+	UINT8 m_input_mask;
 };
 
 
@@ -72,14 +72,14 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
 {
 	forte2_state *state = device->machine().driver_data<forte2_state>();
-	return input_port_read(device->machine(), "IN0") | (state->input_mask&0x3f);
+	return input_port_read(device->machine(), "IN0") | (state->m_input_mask&0x3f);
 }
 
 static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )
 {
 	forte2_state *state = device->machine().driver_data<forte2_state>();
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
-	state->input_mask = data;
+	state->m_input_mask = data;
 }
 
 static const ay8910_interface forte2_ay8910_interface =
@@ -116,10 +116,10 @@ static MACHINE_START( forte2 )
 	forte2_state *state = machine.driver_data<forte2_state>();
 	TMS9928A_configure(&tms9928a_interface);
 
-	state->input_mask = 0xff;
+	state->m_input_mask = 0xff;
 
 	/* register for save states */
-	state_save_register_global(machine, state->input_mask);
+	state_save_register_global(machine, state->m_input_mask);
 	machine.state().register_postload(forte2, NULL);
 }
 

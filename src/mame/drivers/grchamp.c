@@ -94,7 +94,7 @@ static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 {
 	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
-	if (state->cpu0_out[0] & 0x01)
+	if (state->m_cpu0_out[0] & 0x01)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -103,7 +103,7 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 {
 	grchamp_state *state = device->machine().driver_data<grchamp_state>();
 
-	if (state->cpu1_out[4] & 0x01)
+	if (state->m_cpu1_out[4] & 0x01)
 		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
@@ -118,8 +118,8 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 static WRITE8_HANDLER( cpu0_outputs_w )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	UINT8 diff = data ^ state->cpu0_out[offset];
-	state->cpu0_out[offset] = data;
+	UINT8 diff = data ^ state->m_cpu0_out[offset];
+	state->m_cpu0_out[offset] = data;
 
 	switch (offset)
 	{
@@ -134,12 +134,12 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			if ((diff & 0x01) && !(data & 0x01))
 				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
-				state->collide = state->collmode = 0;
+				state->m_collide = state->m_collmode = 0;
 			break;
 
 		case 0x01:	/* OUT1 */
 			/* connects to pc3259, pin 23 (read collision data?) */
-			state->collmode++;
+			state->m_collmode++;
 			break;
 
 		case 0x02:	/* OUT2 */
@@ -206,20 +206,20 @@ static WRITE8_HANDLER( led_board_w )
 	switch (offset)
 	{
 		case 0x00:
-			state->ledlatch = (state->ledlatch & 0xff00) | (data << 0);
+			state->m_ledlatch = (state->m_ledlatch & 0xff00) | (data << 0);
 			break;
 
 		case 0x04:
-			state->ledlatch = (state->ledlatch & 0x00ff) | (data << 8);
+			state->m_ledlatch = (state->m_ledlatch & 0x00ff) | (data << 8);
 			break;
 
 		case 0x08:
-			state->ledaddr = data & 0x0f;
+			state->m_ledaddr = data & 0x0f;
 			break;
 
 		case 0x0c:
-			state->ledram[state->ledaddr & 0x07] = state->ledlatch;
-			output_set_digit_value(state->ledaddr & 0x07, ls247_map[state->ledram[state->ledaddr & 0x07] & 0x0f]);
+			state->m_ledram[state->m_ledaddr & 0x07] = state->m_ledlatch;
+			output_set_digit_value(state->m_ledaddr & 0x07, ls247_map[state->m_ledram[state->m_ledaddr & 0x07] & 0x0f]);
 			/*
                 ledram[0] & 0x0f = score LSD
                 ledram[1] & 0x0f = score
@@ -246,8 +246,8 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 {
 	device_t *discrete = space->machine().device("discrete");
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	UINT8 diff = data ^ state->cpu1_out[offset];
-	state->cpu1_out[offset] = data;
+	UINT8 diff = data ^ state->m_cpu1_out[offset];
+	state->m_cpu1_out[offset] = data;
 
 	switch (offset)
 	{
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 
 		case 0x08:	/* OUT8 */
 			/* bit 0-7: latches data to main CPU input port 2 */
-			state->comm_latch = data;
+			state->m_comm_latch = data;
 			break;
 
 		case 0x09:	/* OUT9 */
@@ -345,7 +345,7 @@ INLINE UINT8 get_pc3259_bits(running_machine &machine, grchamp_state *state, int
 	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 
 	/* get the relevant 4 bits */
-	bits = (state->collide >> (offs*4)) & 0x0f;
+	bits = (state->m_collide >> (offs*4)) & 0x0f;
 
 	/* replicate to both nibbles */
 	return bits | (bits << 4);
@@ -390,7 +390,7 @@ static READ8_HANDLER( pc3259_3_r )
 static READ8_HANDLER( sub_to_main_comm_r )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return state->comm_latch;
+	return state->m_comm_latch;
 }
 
 
@@ -398,7 +398,7 @@ static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 {
 	grchamp_state *state = machine.driver_data<grchamp_state>();
 	int offset = param >> 8;
-	state->comm_latch2[offset & 3] = param;
+	state->m_comm_latch2[offset & 3] = param;
 }
 
 
@@ -411,7 +411,7 @@ static WRITE8_HANDLER( main_to_sub_comm_w )
 static READ8_HANDLER( main_to_sub_comm_r )
 {
 	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return state->comm_latch2[offset];
+	return state->m_comm_latch2[offset];
 }
 
 
@@ -520,9 +520,9 @@ GFXDECODE_END
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(grchamp_state, radarram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(grchamp_state, videoram)
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(grchamp_state, spriteram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(grchamp_state, m_radarram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(grchamp_state, m_videoram)
+	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(grchamp_state, m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -547,9 +547,9 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(grchamp_left_w) AM_BASE_MEMBER(grchamp_state, leftram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(grchamp_right_w) AM_BASE_MEMBER(grchamp_state, rightram)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(grchamp_center_w) AM_BASE_MEMBER(grchamp_state, centerram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(grchamp_left_w) AM_BASE_MEMBER(grchamp_state, m_leftram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(grchamp_right_w) AM_BASE_MEMBER(grchamp_state, m_rightram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(grchamp_center_w) AM_BASE_MEMBER(grchamp_state, m_centerram)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END

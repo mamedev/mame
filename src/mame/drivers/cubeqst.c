@@ -31,12 +31,12 @@ public:
 	cubeqst_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *depth_buffer;
-	int video_field;
-	UINT8 io_latch;
-	UINT8 reset_latch;
-	device_t *laserdisc;
-	rgb_t *colormap;
+	UINT8 *m_depth_buffer;
+	int m_video_field;
+	UINT8 m_io_latch;
+	UINT8 m_reset_latch;
+	device_t *m_laserdisc;
+	rgb_t *m_colormap;
 };
 
 
@@ -63,8 +63,8 @@ static const rectangle overlay_clip = { 0, 320-1, 0, 256-8 };
 static VIDEO_START( cubeqst )
 {
 	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->video_field = 0;
-	state->depth_buffer = auto_alloc_array(machine, UINT8, 512);
+	state->m_video_field = 0;
+	state->m_depth_buffer = auto_alloc_array(machine, UINT8, 512);
 }
 
 /* TODO: Use resistor values */
@@ -73,7 +73,7 @@ static PALETTE_INIT( cubeqst )
 	cubeqst_state *state = machine.driver_data<cubeqst_state>();
 	int i;
 
-	state->colormap = auto_alloc_array(machine, rgb_t, 65536);
+	state->m_colormap = auto_alloc_array(machine, rgb_t, 65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;
@@ -84,7 +84,7 @@ static PALETTE_INIT( cubeqst )
 		r = (i >> 8) & 7;
 		y = ((i >> 12) & 0xf) * 2;
 
-		state->colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
+		state->m_colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
 	}
 }
 
@@ -106,7 +106,7 @@ static SCREEN_UPDATE( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	bitmap_fill(bitmap, cliprect, state->colormap[255]);
+	bitmap_fill(bitmap, cliprect, state->m_colormap[255]);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -118,7 +118,7 @@ static SCREEN_UPDATE( cubeqst )
 		UINT32 pen;
 
 		/* Zap the depth buffer */
-		memset(state->depth_buffer, 0xff, 512);
+		memset(state->m_depth_buffer, 0xff, 512);
 
 		/* Process all the spans on this scanline */
 		if (y < 256)
@@ -155,13 +155,13 @@ static SCREEN_UPDATE( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = state->colormap[screen->machine().generic.paletteram.u16[color]];
+				pen = state->m_colormap[screen->machine().generic.paletteram.u16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
-					if (!(state->depth_buffer[x] < depth))
+					if (!(state->m_depth_buffer[x] < depth))
 					{
 						dest[x] = pen;
-						state->depth_buffer[x] = depth;
+						state->m_depth_buffer[x] = depth;
 					}
 				}
 			}
@@ -180,12 +180,12 @@ static READ16_HANDLER( line_r )
 static INTERRUPT_GEN( vblank )
 {
 	cubeqst_state *state = device->machine().driver_data<cubeqst_state>();
-	int int_level = state->video_field == 0 ? 5 : 6;
+	int int_level = state->m_video_field == 0 ? 5 : 6;
 
 	device_set_input_line(device, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
-	state->video_field ^= 1;
+	state->m_video_field ^= 1;
 }
 
 
@@ -198,7 +198,7 @@ static INTERRUPT_GEN( vblank )
 static WRITE16_HANDLER( laserdisc_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	laserdisc_data_w(state->laserdisc, data & 0xff);
+	laserdisc_data_w(state->m_laserdisc, data & 0xff);
 }
 
 /*
@@ -208,8 +208,8 @@ static WRITE16_HANDLER( laserdisc_w )
 static READ16_HANDLER( laserdisc_r )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	int ldp_command_flag = (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
-	int ldp_seek_status = (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
+	int ldp_command_flag = (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
+	int ldp_seek_status = (laserdisc_line_r(state->m_laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
 
 	return (ldp_seek_status << 1) | ldp_command_flag;
 }
@@ -219,7 +219,7 @@ static READ16_HANDLER( laserdisc_r )
 static WRITE16_HANDLER( ldaud_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	simutrek_set_audio_squelch(state->laserdisc, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	simutrek_set_audio_squelch(state->m_laserdisc, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -235,7 +235,7 @@ static WRITE16_HANDLER( ldaud_w )
 static WRITE16_HANDLER( control_w )
 {
 	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	laserdisc_video_enable(state->laserdisc, data & 1);
+	laserdisc_video_enable(state->m_laserdisc, data & 1);
 }
 
 
@@ -277,13 +277,13 @@ static WRITE16_HANDLER( reset_w )
 	cputag_set_input_line(space->machine(), "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
-	if (!BIT(state->reset_latch, 0) && BIT(data, 0))
+	if (!BIT(state->m_reset_latch, 0) && BIT(data, 0))
 		swap_linecpu_banks(space->machine());
 
 	if (!BIT(data, 2))
-		state->laserdisc->reset();
+		state->m_laserdisc->reset();
 
-	state->reset_latch = data & 0xff;
+	state->m_reset_latch = data & 0xff;
 }
 
 
@@ -308,7 +308,7 @@ static WRITE16_HANDLER( io_w )
     */
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
-	if ( !BIT(state->io_latch, 7) && BIT(data, 7) )
+	if ( !BIT(state->m_io_latch, 7) && BIT(data, 7) )
 	{
 		/*
             0: Battery failure
@@ -317,7 +317,7 @@ static WRITE16_HANDLER( io_w )
         */
 	}
 
-	state->io_latch = data;
+	state->m_io_latch = data;
 }
 
 static READ16_HANDLER( io_r )
@@ -334,7 +334,7 @@ static READ16_HANDLER( io_r )
          10: Spare  / Trackball V data
     */
 
-	if ( !BIT(state->io_latch, 7) )
+	if ( !BIT(state->m_io_latch, 7) )
 		return port_data;
 	else
 		/* Return zeroes for the trackball signals for now */
@@ -438,13 +438,13 @@ ADDRESS_MAP_END
 static MACHINE_START( cubeqst )
 {
 	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->laserdisc = machine.device("laserdisc");
+	state->m_laserdisc = machine.device("laserdisc");
 }
 
 static MACHINE_RESET( cubeqst )
 {
 	cubeqst_state *state = machine.driver_data<cubeqst_state>();
-	state->reset_latch = 0;
+	state->m_reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
 	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, ASSERT_LINE);

@@ -10,33 +10,33 @@ public:
 	m72_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *protection_ram;
-	emu_timer *scanline_timer;
-	UINT8 irq_base;
-	UINT8 mcu_snd_cmd_latch;
-	UINT8 mcu_sample_latch;
-	UINT32 mcu_sample_addr;
-	const UINT8 *protection_code;
-	const UINT8 *protection_crc;
-	UINT8 *soundram;
-	int prev[4];
-	int diff[4];
-	UINT16 *videoram1;
-	UINT16 *videoram2;
-	UINT16 *majtitle_rowscrollram;
-	UINT32 raster_irq_position;
-	UINT16 *spriteram;
-	UINT16 *spriteram2;
-	UINT16 *buffered_spriteram;
-	size_t spriteram_size;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	INT32 scrollx1;
-	INT32 scrolly1;
-	INT32 scrollx2;
-	INT32 scrolly2;
-	INT32 video_off;
-	int majtitle_rowscroll;
+	UINT16 *m_protection_ram;
+	emu_timer *m_scanline_timer;
+	UINT8 m_irq_base;
+	UINT8 m_mcu_snd_cmd_latch;
+	UINT8 m_mcu_sample_latch;
+	UINT32 m_mcu_sample_addr;
+	const UINT8 *m_protection_code;
+	const UINT8 *m_protection_crc;
+	UINT8 *m_soundram;
+	int m_prev[4];
+	int m_diff[4];
+	UINT16 *m_videoram1;
+	UINT16 *m_videoram2;
+	UINT16 *m_majtitle_rowscrollram;
+	UINT32 m_raster_irq_position;
+	UINT16 *m_spriteram;
+	UINT16 *m_spriteram2;
+	UINT16 *m_buffered_spriteram;
+	size_t m_spriteram_size;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	INT32 m_scrollx1;
+	INT32 m_scrolly1;
+	INT32 m_scrollx2;
+	INT32 m_scrolly2;
+	INT32 m_video_off;
+	int m_majtitle_rowscroll;
 };
 
 

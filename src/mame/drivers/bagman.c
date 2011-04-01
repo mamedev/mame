@@ -73,25 +73,25 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
-	if (state->ls259_buf[offset] != (data&1) )
+	if (state->m_ls259_buf[offset] != (data&1) )
 	{
-		state->ls259_buf[offset] = data&1;
+		state->m_ls259_buf[offset] = data&1;
 
 		switch (offset)
 		{
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, 0, 7 - ((state->ls259_buf[0]<<2) | (state->ls259_buf[1]<<1) | (state->ls259_buf[2]<<0)));
+			tmsprom_bit_w(device, 0, 7 - ((state->m_ls259_buf[0]<<2) | (state->m_ls259_buf[1]<<1) | (state->m_ls259_buf[2]<<0)));
 			break;
 		case 3:
-			tmsprom_enable_w(device, state->ls259_buf[offset]);
+			tmsprom_enable_w(device, state->m_ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom_rom_csq_w(device, 0, state->ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 0, state->m_ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom_rom_csq_w(device, 1, state->ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 1, state->m_ls259_buf[offset]);
 			break;
 		}
 	}
@@ -113,16 +113,16 @@ static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, m_colorram)
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("maincpu", bagman_interrupt_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, spriteram, spriteram_size)	/* hidden portion of color RAM */
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, m_spriteram, m_spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
@@ -142,15 +142,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, colorram)
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, spriteram, spriteram_size)	/* hidden portion of color RAM */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, m_colorram)
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, m_spriteram, m_spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
@@ -383,18 +383,18 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 
 	dial_val = input_port_read(device->machine(), "DIAL_P1");
 
-	if(state->p1_res != 0x60)
-		state->p1_res = 0x60;
-	else if(dial_val > state->p1_old_val)
-		state->p1_res = 0x40;
-	else if(dial_val < state->p1_old_val)
-		state->p1_res = 0x20;
+	if(state->m_p1_res != 0x60)
+		state->m_p1_res = 0x60;
+	else if(dial_val > state->m_p1_old_val)
+		state->m_p1_res = 0x40;
+	else if(dial_val < state->m_p1_old_val)
+		state->m_p1_res = 0x20;
 	else
-		state->p1_res = 0x60;
+		state->m_p1_res = 0x60;
 
-	state->p1_old_val = dial_val;
+	state->m_p1_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P1") & 0x9f) | (state->p1_res);
+	return (input_port_read(device->machine(), "P1") & 0x9f) | (state->m_p1_res);
 }
 
 static READ8_DEVICE_HANDLER( dial_input_p2_r )
@@ -404,18 +404,18 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 
 	dial_val = input_port_read(device->machine(), "DIAL_P2");
 
-	if(state->p2_res != 0x60)
-		state->p2_res = 0x60;
-	else if(dial_val > state->p2_old_val)
-		state->p2_res = 0x40;
-	else if(dial_val < state->p2_old_val)
-		state->p2_res = 0x20;
+	if(state->m_p2_res != 0x60)
+		state->m_p2_res = 0x60;
+	else if(dial_val > state->m_p2_old_val)
+		state->m_p2_res = 0x40;
+	else if(dial_val < state->m_p2_old_val)
+		state->m_p2_res = 0x20;
 	else
-		state->p2_res = 0x60;
+		state->m_p2_res = 0x60;
 
-	state->p2_old_val = dial_val;
+	state->m_p2_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P2") & 0x9f) | (state->p2_res);
+	return (input_port_read(device->machine(), "P2") & 0x9f) | (state->m_p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =
@@ -935,7 +935,7 @@ static DRIVER_INIT( bagman )
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa003, 0xa003);
-	*state->video_enable = 1;
+	*state->m_video_enable = 1;
 }
 
 

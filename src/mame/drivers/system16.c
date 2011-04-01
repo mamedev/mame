@@ -115,7 +115,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -123,9 +123,9 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
-	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, textram)
-	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg0_tileram)
-	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg1_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
+	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
+	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_nmi_w)
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 	}
 }
 
@@ -164,12 +164,12 @@ static WRITE16_HANDLER( sys16_coinctrl_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->coinctrl = data & 0xff;
-		state->refreshenable = state->coinctrl & 0x20;
-		set_led_status(space->machine(), 1, state->coinctrl & 0x08);
-		set_led_status(space->machine(), 0, state->coinctrl & 0x04);
-		coin_counter_w(space->machine(), 1, state->coinctrl & 0x02);
-		coin_counter_w(space->machine(), 0, state->coinctrl & 0x01);
+		state->m_coinctrl = data & 0xff;
+		state->m_refreshenable = state->m_coinctrl & 0x20;
+		set_led_status(space->machine(), 1, state->m_coinctrl & 0x08);
+		set_led_status(space->machine(), 0, state->m_coinctrl & 0x04);
+		coin_counter_w(space->machine(), 1, state->m_coinctrl & 0x02);
+		coin_counter_w(space->machine(), 0, state->m_coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
            tturf has it normally 1 but 0 after coin insertion) */
 		/* eswat sets bit 4 */
@@ -180,9 +180,9 @@ static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg0_tileram)
-	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg1_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
@@ -214,30 +214,30 @@ static READ16_HANDLER( passht4b_service_r )
 	if(!(input_port_read(space->machine(), "P3") & 0x40)) val &= 0xbf;
 	if(!(input_port_read(space->machine(), "P4") & 0x40)) val &= 0x7f;
 
-	state->passht4b_io3_val = (input_port_read(space->machine(), "P1") << 4) | (input_port_read(space->machine(), "P3") & 0xf);
-	state->passht4b_io2_val = (input_port_read(space->machine(), "P2") << 4) | (input_port_read(space->machine(), "P4") & 0xf);
+	state->m_passht4b_io3_val = (input_port_read(space->machine(), "P1") << 4) | (input_port_read(space->machine(), "P3") & 0xf);
+	state->m_passht4b_io2_val = (input_port_read(space->machine(), "P2") << 4) | (input_port_read(space->machine(), "P4") & 0xf);
 
-	state->passht4b_io1_val = 0xff;
+	state->m_passht4b_io1_val = 0xff;
 
 	// player 1 buttons
-	if(!(input_port_read(space->machine(), "P1") & 0x10)) state->passht4b_io1_val &= 0xfe;
-	if(!(input_port_read(space->machine(), "P1") & 0x20)) state->passht4b_io1_val &= 0xfd;
-	if(!(input_port_read(space->machine(), "P1") & 0x80)) state->passht4b_io1_val &= 0xfc;
+	if(!(input_port_read(space->machine(), "P1") & 0x10)) state->m_passht4b_io1_val &= 0xfe;
+	if(!(input_port_read(space->machine(), "P1") & 0x20)) state->m_passht4b_io1_val &= 0xfd;
+	if(!(input_port_read(space->machine(), "P1") & 0x80)) state->m_passht4b_io1_val &= 0xfc;
 
 	// player 2 buttons
-	if(!(input_port_read(space->machine(), "P2") & 0x10)) state->passht4b_io1_val &= 0xfb;
-	if(!(input_port_read(space->machine(), "P2") & 0x20)) state->passht4b_io1_val &= 0xf7;
-	if(!(input_port_read(space->machine(), "P2") & 0x80)) state->passht4b_io1_val &= 0xf3;
+	if(!(input_port_read(space->machine(), "P2") & 0x10)) state->m_passht4b_io1_val &= 0xfb;
+	if(!(input_port_read(space->machine(), "P2") & 0x20)) state->m_passht4b_io1_val &= 0xf7;
+	if(!(input_port_read(space->machine(), "P2") & 0x80)) state->m_passht4b_io1_val &= 0xf3;
 
 	// player 3 buttons
-	if(!(input_port_read(space->machine(), "P3") & 0x10)) state->passht4b_io1_val &= 0xef;
-	if(!(input_port_read(space->machine(), "P3") & 0x20)) state->passht4b_io1_val &= 0xdf;
-	if(!(input_port_read(space->machine(), "P3") & 0x80)) state->passht4b_io1_val &= 0xcf;
+	if(!(input_port_read(space->machine(), "P3") & 0x10)) state->m_passht4b_io1_val &= 0xef;
+	if(!(input_port_read(space->machine(), "P3") & 0x20)) state->m_passht4b_io1_val &= 0xdf;
+	if(!(input_port_read(space->machine(), "P3") & 0x80)) state->m_passht4b_io1_val &= 0xcf;
 
 	// player 4 buttons
-	if(!(input_port_read(space->machine(), "P4") & 0x10)) state->passht4b_io1_val &= 0xbf;
-	if(!(input_port_read(space->machine(), "P4") & 0x20)) state->passht4b_io1_val &= 0x7f;
-	if(!(input_port_read(space->machine(), "P4") & 0x80)) state->passht4b_io1_val &= 0x3f;
+	if(!(input_port_read(space->machine(), "P4") & 0x10)) state->m_passht4b_io1_val &= 0xbf;
+	if(!(input_port_read(space->machine(), "P4") & 0x20)) state->m_passht4b_io1_val &= 0x7f;
+	if(!(input_port_read(space->machine(), "P4") & 0x80)) state->m_passht4b_io1_val &= 0x3f;
 
 	return val;
 }
@@ -245,27 +245,27 @@ static READ16_HANDLER( passht4b_service_r )
 static READ16_HANDLER( passht4b_io1_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	return state->passht4b_io1_val;
+	return state->m_passht4b_io1_val;
 }
 
 static READ16_HANDLER( passht4b_io2_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	return state->passht4b_io2_val;
+	return state->m_passht4b_io2_val;
 }
 
 static READ16_HANDLER( passht4b_io3_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	return state->passht4b_io3_val;
+	return state->m_passht4b_io3_val;
 }
 
 static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg0_tileram)
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg1_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ(passht4b_service_r)
@@ -300,10 +300,10 @@ static WRITE16_HANDLER( sys16_tilebank_w )
 		switch (offset & 1)
 		{
 			case 0:
-				state->tile_bank0 = data & 0x0f;
+				state->m_tile_bank0 = data & 0x0f;
 				break;
 			case 1:
-				state->tile_bank1 = data & 0x0f;
+				state->m_tile_bank1 = data & 0x0f;
 				break;
 		}
 	}
@@ -313,9 +313,9 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg0_tileram)
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, bg1_tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
+	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
@@ -367,18 +367,18 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->sample_buffer = data;
+	state->m_sample_buffer = data;
 }
 
 static void tturfbl_msm5205_callback( device_t *device )
 {
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-	msm5205_data_w(device, (state->sample_buffer >> 4) & 0x0f);
+	msm5205_data_w(device, (state->m_sample_buffer >> 4) & 0x0f);
 
-	state->sample_buffer <<=  4;
-	state->sample_select ^=  1;
-	if(state->sample_select == 0)
-		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_sample_buffer <<=  4;
+	state->m_sample_select ^=  1;
+	if(state->m_sample_select == 0)
+		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface  =
@@ -392,8 +392,8 @@ static READ8_HANDLER( tturfbl_soundbank_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	if (state->soundbank_ptr)
-		return state->soundbank_ptr[offset & 0x3fff];
+	if (state->m_soundbank_ptr)
+		return state->m_soundbank_ptr[offset & 0x3fff];
 	return 0x80;
 }
 
@@ -405,25 +405,25 @@ static WRITE8_HANDLER( tturfbl_soundbank_w )
 	switch(data)
 	{
 		case 0:
-			state->soundbank_ptr = &mem[0x18000]; /* tt014d68 8000-bfff */
+			state->m_soundbank_ptr = &mem[0x18000]; /* tt014d68 8000-bfff */
 			break;
 		case 1:
-			state->soundbank_ptr = &mem[0x1c000]; /* tt014d68 c000-ffff */
+			state->m_soundbank_ptr = &mem[0x1c000]; /* tt014d68 c000-ffff */
 			break;
 		case 2:
-			state->soundbank_ptr = &mem[0x20000]; /* tt0246ff 0000-3fff */
+			state->m_soundbank_ptr = &mem[0x20000]; /* tt0246ff 0000-3fff */
 			break;
 		case 3:
-			state->soundbank_ptr = &mem[0x24000]; /* tt0246ff 4000-7fff */
+			state->m_soundbank_ptr = &mem[0x24000]; /* tt0246ff 4000-7fff */
 			break;
 		case 4:
-			state->soundbank_ptr = &mem[0x28000]; /* tt0246ff 8000-bfff */
+			state->m_soundbank_ptr = &mem[0x28000]; /* tt0246ff 8000-bfff */
 			break;
 		case 8:
-			state->soundbank_ptr = mem;
+			state->m_soundbank_ptr = mem;
 			break;
 		default:
-			state->soundbank_ptr = NULL;
+			state->m_soundbank_ptr = NULL;
 			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(&space->device()));
 			break;
 	}
@@ -493,26 +493,26 @@ ADDRESS_MAP_END
 static void set_tile_bank( running_machine &machine, int data )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->tile_bank0 = (data >> 4) & 0x0f;
-	state->tile_bank1 = data & 0x0f;
+	state->m_tile_bank0 = (data >> 4) & 0x0f;
+	state->m_tile_bank1 = data & 0x0f;
 }
 
 static void set_fg_page( running_machine &machine, int data )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->fg_page[0] = data >> 12;
-	state->fg_page[1] = (data >> 8) & 0x0f;
-	state->fg_page[2] = (data >> 4) & 0x0f;
-	state->fg_page[3] = data & 0x0f;
+	state->m_fg_page[0] = data >> 12;
+	state->m_fg_page[1] = (data >> 8) & 0x0f;
+	state->m_fg_page[2] = (data >> 4) & 0x0f;
+	state->m_fg_page[3] = data & 0x0f;
 }
 
 static void set_bg_page( running_machine &machine, int data )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->bg_page[0] = data >> 12;
-	state->bg_page[1] = (data >> 8) & 0x0f;
-	state->bg_page[2] = (data >> 4) & 0x0f;
-	state->bg_page[3] = data & 0x0f;
+	state->m_bg_page[0] = data >> 12;
+	state->m_bg_page[1] = (data >> 8) & 0x0f;
+	state->m_bg_page[2] = (data >> 4) & 0x0f;
+	state->m_bg_page[3] = data & 0x0f;
 }
 
 #ifdef UNUSED_CODE
@@ -521,8 +521,8 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
@@ -569,7 +569,7 @@ static WRITE16_HANDLER( s16bl_fgscrollx_bank_w )
 	set_tile_bank(space->machine(), bank);
 
 	scroll += 3; // so that the character portraits in attract mode are properly aligned (alighnment on character select no longer matches original tho?)
-	state->fg_scrollx = -scroll;
+	state->m_fg_scrollx = -scroll;
 }
 
 static WRITE16_HANDLER( s16bl_fgscrollx_w )
@@ -580,7 +580,7 @@ static WRITE16_HANDLER( s16bl_fgscrollx_w )
 	scroll += 0x200;
 	scroll += 3;
 
-	state->fg_scrollx = -scroll;
+	state->m_fg_scrollx = -scroll;
 }
 
 
@@ -589,7 +589,7 @@ static WRITE16_HANDLER( s16bl_fgscrolly_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
-	state->fg_scrolly = scroll;
+	state->m_fg_scrolly = scroll;
 }
 
 static WRITE16_HANDLER( s16bl_bgscrollx_w )
@@ -599,7 +599,7 @@ static WRITE16_HANDLER( s16bl_bgscrollx_w )
 
 	scroll+= 0x200;
 	scroll+= 1; // so that the background fo the select screen is properly aligned
-	state->bg_scrollx = -scroll;
+	state->m_bg_scrollx = -scroll;
 }
 
 static WRITE16_HANDLER( s16bl_bgscrolly_w )
@@ -607,14 +607,14 @@ static WRITE16_HANDLER( s16bl_bgscrolly_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	int scroll = data & 0xff;
 
-	state->bg_scrolly = scroll;
+	state->m_bg_scrolly = scroll;
 }
 
 
 static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x118000, 0x118001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x118008, 0x118009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x118010, 0x118011) AM_WRITE(s16bl_bgscrolly_w)
@@ -640,8 +640,8 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x718008, 0x718009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x718010, 0x718011) AM_WRITE(s16bl_bgscrolly_w)
@@ -661,18 +661,18 @@ static void datsu_set_pages( running_machine &machine )
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
-	page = ((state->datsu_page[0] & 0x00f0) >>0) |
-		   ((state->datsu_page[1] & 0x00f0) >>4) |
-		   ((state->datsu_page[2] & 0x00f0) <<8) |
-		   ((state->datsu_page[3] & 0x00f0) <<4);
+	page = ((state->m_datsu_page[0] & 0x00f0) >>0) |
+		   ((state->m_datsu_page[1] & 0x00f0) >>4) |
+		   ((state->m_datsu_page[2] & 0x00f0) <<8) |
+		   ((state->m_datsu_page[3] & 0x00f0) <<4);
 
 
 	set_fg_page(machine, page);
 
-	page = ((state->datsu_page[0] & 0x000f) <<4) |
-		   ((state->datsu_page[1] & 0x000f) <<0) |
-		   ((state->datsu_page[2] & 0x000f) <<12) |
-		   ((state->datsu_page[3] & 0x000f) <<8);
+	page = ((state->m_datsu_page[0] & 0x000f) <<4) |
+		   ((state->m_datsu_page[1] & 0x000f) <<0) |
+		   ((state->m_datsu_page[2] & 0x000f) <<12) |
+		   ((state->m_datsu_page[3] & 0x000f) <<8);
 
 	set_bg_page(machine, page);
 }
@@ -681,7 +681,7 @@ static WRITE16_HANDLER( datsu_page0_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->datsu_page[0]);
+	COMBINE_DATA(&state->m_datsu_page[0]);
 	datsu_set_pages(space->machine());
 }
 
@@ -689,7 +689,7 @@ static WRITE16_HANDLER( datsu_page1_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->datsu_page[1]);
+	COMBINE_DATA(&state->m_datsu_page[1]);
 	datsu_set_pages(space->machine());
 }
 
@@ -697,7 +697,7 @@ static WRITE16_HANDLER( datsu_page2_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->datsu_page[2]);
+	COMBINE_DATA(&state->m_datsu_page[2]);
 	datsu_set_pages(space->machine());
 }
 
@@ -705,7 +705,7 @@ static WRITE16_HANDLER( datsu_page3_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	COMBINE_DATA(&state->datsu_page[3]);
+	COMBINE_DATA(&state->m_datsu_page[3]);
 	datsu_set_pages(space->machine());
 }
 
@@ -713,8 +713,8 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x718008, 0x718009) AM_WRITE(s16bl_fgscrollx_bank_w) // and tile bank
 	AM_RANGE(0x718010, 0x718011) AM_WRITE(s16bl_bgscrolly_w)
@@ -736,8 +736,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
@@ -769,7 +769,7 @@ static WRITE16_HANDLER( goldnaxeb2_fgscrollx_w )
 	set_tile_bank(space->machine(),  bank);
 	scroll += 0x1f6;
 	scroll &= 0x3ff;
-	state->fg_scrollx = -scroll;
+	state->m_fg_scrollx = -scroll;
 }
 
 static WRITE16_HANDLER( goldnaxeb2_bgscrollx_w )
@@ -779,7 +779,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgscrollx_w )
 
 	scroll += 0x1f4;
 	scroll &= 0x3ff;
-	state->bg_scrollx = -scroll;
+	state->m_bg_scrollx = -scroll;
 }
 
 
@@ -789,7 +789,7 @@ static WRITE16_HANDLER( goldnaxeb2_fgscrolly_w )
 	int scroll = data & 0xff;
 
 	scroll += 0x1;
-	state->fg_scrolly = scroll;
+	state->m_fg_scrolly = scroll;
 }
 
 static WRITE16_HANDLER( goldnaxeb2_bgscrolly_w )
@@ -798,7 +798,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgscrolly_w )
 	int scroll = data & 0xff;
 
 	scroll += 0x1;
-	state->bg_scrolly = scroll;
+	state->m_bg_scrolly = scroll;
 }
 
 static WRITE16_HANDLER( goldnaxeb2_fgpage_w )
@@ -806,12 +806,12 @@ static WRITE16_HANDLER( goldnaxeb2_fgpage_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
-	COMBINE_DATA(&state->goldnaxeb2_fgpage[offset]);
+	COMBINE_DATA(&state->m_goldnaxeb2_fgpage[offset]);
 
-	page = ((state->goldnaxeb2_fgpage[1] & 0xf) << 0) |
-		   ((state->goldnaxeb2_fgpage[0] & 0xf) << 4) |
-		   ((state->goldnaxeb2_fgpage[3] & 0xf) << 8) |
-		   ((state->goldnaxeb2_fgpage[2] & 0xf) << 12);
+	page = ((state->m_goldnaxeb2_fgpage[1] & 0xf) << 0) |
+		   ((state->m_goldnaxeb2_fgpage[0] & 0xf) << 4) |
+		   ((state->m_goldnaxeb2_fgpage[3] & 0xf) << 8) |
+		   ((state->m_goldnaxeb2_fgpage[2] & 0xf) << 12);
 
 	set_fg_page(space->machine(), page ^ 0xffff);
 
@@ -822,20 +822,20 @@ static WRITE16_HANDLER( goldnaxeb2_bgpage_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
-	COMBINE_DATA(&state->goldnaxeb2_bgpage[offset]);
+	COMBINE_DATA(&state->m_goldnaxeb2_bgpage[offset]);
 
-	page = ((state->goldnaxeb2_bgpage[1] & 0xf) << 0) |
-		   ((state->goldnaxeb2_bgpage[0] & 0xf) << 4) |
-		   ((state->goldnaxeb2_bgpage[3] & 0xf) << 8) |
-		   ((state->goldnaxeb2_bgpage[2] & 0xf) << 12);
+	page = ((state->m_goldnaxeb2_bgpage[1] & 0xf) << 0) |
+		   ((state->m_goldnaxeb2_bgpage[0] & 0xf) << 4) |
+		   ((state->m_goldnaxeb2_bgpage[3] & 0xf) << 8) |
+		   ((state->m_goldnaxeb2_bgpage[2] & 0xf) << 12);
 
 	set_bg_page(space->machine(), page ^ 0xffff);
 }
 
 static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITENOP
@@ -848,8 +848,8 @@ static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc44008, 0xc44009) AM_WRITE(goldnaxeb2_fgscrollx_w) // and tile bank
 	AM_RANGE(0xc44010, 0xc44011) AM_WRITE(goldnaxeb2_bgscrolly_w)
 	AM_RANGE(0xc44018, 0xc44019) AM_WRITE(goldnaxeb2_bgscrollx_w)
-	AM_RANGE(0xc44020, 0xc44027) AM_WRITE(goldnaxeb2_bgpage_w) AM_BASE_MEMBER(segas1x_bootleg_state, goldnaxeb2_bgpage)
-	AM_RANGE(0xc44060, 0xc44067) AM_WRITE(goldnaxeb2_fgpage_w) AM_BASE_MEMBER(segas1x_bootleg_state, goldnaxeb2_fgpage)
+	AM_RANGE(0xc44020, 0xc44027) AM_WRITE(goldnaxeb2_bgpage_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_goldnaxeb2_bgpage)
+	AM_RANGE(0xc44060, 0xc44067) AM_WRITE(goldnaxeb2_fgpage_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_goldnaxeb2_fgpage)
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITENOP
 	AM_RANGE(0xc43034, 0xc43035) AM_WRITENOP
 	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITENOP
@@ -863,8 +863,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
@@ -897,7 +897,7 @@ static WRITE16_HANDLER( eswat_tilebank0_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->eswat_tilebank0 = data & 0xff;
+		state->m_eswat_tilebank0 = data & 0xff;
 	}
 }
 
@@ -906,8 +906,8 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x3e2000, 0x3e2001) AM_WRITE(eswat_tilebank0_w) // external tile bank ( > 0x4000 tiles )
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_bgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_bgscrollx_w) // and tile bank
 	AM_RANGE(0x418010, 0x418011) AM_WRITE(s16bl_fgscrolly_w)
@@ -932,8 +932,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_fgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_fgscrollx_w)
@@ -961,9 +961,9 @@ static READ16_HANDLER( beautyb_unkx_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	state->beautyb_unkx++;
-	state->beautyb_unkx &= 0x7f;
-	return state->beautyb_unkx;
+	state->m_beautyb_unkx++;
+	state->m_beautyb_unkx &= 0x7f;
+	return state->m_beautyb_unkx;
 }
 
 static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16 )
@@ -973,8 +973,8 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unkx_r)
 	AM_RANGE(0x0280D8, 0x0280D9) AM_READ(beautyb_unkx_r)
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x413fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 
 	AM_RANGE(0x418000, 0x418001) AM_WRITE(s16bl_bgscrolly_w)
 	AM_RANGE(0x418008, 0x418009) AM_WRITE(s16bl_bgscrollx_w)
@@ -1001,8 +1001,8 @@ static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
@@ -1033,7 +1033,7 @@ static WRITE16_HANDLER( sys18_refreshenable_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->refreshenable = data & 0x02;
+		state->m_refreshenable = data & 0x02;
 	}
 }
 
@@ -1043,8 +1043,8 @@ static WRITE16_HANDLER( sys18_tilebank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->tile_bank0 = (data >> 0) & 0x0f;
-		state->tile_bank1 = (data >> 4) & 0x0f;
+		state->m_tile_bank0 = (data >> 0) & 0x0f;
+		state->m_tile_bank1 = (data >> 4) & 0x0f;
 	}
 }
 
@@ -1052,8 +1052,8 @@ static READ8_HANDLER( system18_bank_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	if (state->sound_bank != NULL)
-		return state->sound_bank[offset];
+	if (state->m_sound_bank != NULL)
+		return state->m_sound_bank[offset];
 
 	return 0xff;
 }
@@ -1074,13 +1074,13 @@ static WRITE8_HANDLER( sys18_soundbank_w )
 	UINT8 *mem = space->machine().region("soundcpu")->base();
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
-	int mask = state->sound_info[rom * 2 + 0];
-	int offs = state->sound_info[rom * 2 + 1];
+	int mask = state->m_sound_info[rom * 2 + 0];
+	int offs = state->m_sound_info[rom * 2 + 1];
 
 	if (mask)
-		state->sound_bank = &mem[0x10000 + offs + ((bank & mask) << 13)];
+		state->m_sound_bank = &mem[0x10000 + offs + ((bank & mask) << 13)];
 	else
-		state->sound_bank = NULL;
+		state->m_sound_bank = NULL;
 }
 
 static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8 )
@@ -1141,14 +1141,14 @@ static WRITE16_HANDLER( sound_command_irq_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 	}
 }
 
 static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_NOP
@@ -1207,18 +1207,18 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
-	state->sample_buffer = data;
+	state->m_sample_buffer = data;
 }
 
 static void shdancbl_msm5205_callback(device_t *device)
 {
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-	msm5205_data_w(device, state->sample_buffer & 0x0f);
+	msm5205_data_w(device, state->m_sample_buffer & 0x0f);
 
-	state->sample_buffer >>=  4;
-	state->sample_select ^=  1;
-	if (state->sample_select == 0)
-		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_sample_buffer >>=  4;
+	state->m_sample_select ^=  1;
+	if (state->m_sample_select == 0)
+		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface  =
@@ -1231,8 +1231,8 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 {
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 
-	if (state->soundbank_ptr)
-		return state->soundbank_ptr[offset & 0x3fff];
+	if (state->m_soundbank_ptr)
+		return state->m_soundbank_ptr[offset & 0x3fff];
 	return 0xff;
 }
 
@@ -1244,19 +1244,19 @@ static WRITE8_HANDLER( shdancbl_bankctrl_w )
 	switch (data)
 	{
 		case 0:
-			state->soundbank_ptr = &mem[0x18000]; /* IC45 8000-BFFF */
+			state->m_soundbank_ptr = &mem[0x18000]; /* IC45 8000-BFFF */
 			break;
 		case 1:
-			state->soundbank_ptr = &mem[0x1C000]; /* IC45 C000-FFFF */
+			state->m_soundbank_ptr = &mem[0x1C000]; /* IC45 C000-FFFF */
 			break;
 		case 2:
-			state->soundbank_ptr = &mem[0x20000]; /* IC46 0000-3FFF */
+			state->m_soundbank_ptr = &mem[0x20000]; /* IC46 0000-3FFF */
 			break;
 		case 3:
-			state->soundbank_ptr = &mem[0x24000]; /* IC46 4000-7FFF */
+			state->m_soundbank_ptr = &mem[0x24000]; /* IC46 4000-7FFF */
 			break;
 		default:
-			state->soundbank_ptr = NULL;
+			state->m_soundbank_ptr = NULL;
 			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(&space->device()));
 			break;
 	}
@@ -1291,8 +1291,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 
@@ -1333,8 +1333,8 @@ ADDRESS_MAP_END
 /* bootleg doesn't have real vdp or i/o */
 static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, tileram)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, textram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")
@@ -2084,7 +2084,7 @@ static void sound_cause_nmi( device_t *device, int chip )
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 
 	/* upd7759 callback */
-	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3329,26 +3329,26 @@ static DRIVER_INIT( common )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
-	state->bg1_trans = 0;
-	state->splittab_bg_x = 0;
-	state->splittab_bg_y = 0;
-	state->splittab_fg_x = 0;
-	state->splittab_fg_y = 0;
+	state->m_bg1_trans = 0;
+	state->m_splittab_bg_x = 0;
+	state->m_splittab_bg_y = 0;
+	state->m_splittab_fg_x = 0;
+	state->m_splittab_fg_y = 0;
 
-	state->spritebank_type = 0;
-	state->back_yscroll = 0;
-	state->fore_yscroll = 0;
-	state->text_yscroll = 0;
+	state->m_spritebank_type = 0;
+	state->m_back_yscroll = 0;
+	state->m_fore_yscroll = 0;
+	state->m_text_yscroll = 0;
 
-	state->sample_buffer = 0;
-	state->sample_select = 0;
+	state->m_sample_buffer = 0;
+	state->m_sample_select = 0;
 
-	state->soundbank_ptr = NULL;
+	state->m_soundbank_ptr = NULL;
 
-	state->beautyb_unkx = 0;
+	state->m_beautyb_unkx = 0;
 
-	state->maincpu = machine.device("maincpu");
-	state->soundcpu = machine.device("soundcpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_soundcpu = machine.device("soundcpu");
 }
 
 /* Sys16A */
@@ -3358,7 +3358,7 @@ static DRIVER_INIT( shinobl )
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
+	state->m_spritebank_type = 1;
 }
 
 static DRIVER_INIT( passsht )
@@ -3367,8 +3367,8 @@ static DRIVER_INIT( passsht )
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
-	state->back_yscroll = 3;
+	state->m_spritebank_type = 1;
+	state->m_back_yscroll = 3;
 }
 
 static DRIVER_INIT( wb3bbl )
@@ -3377,9 +3377,9 @@ static DRIVER_INIT( wb3bbl )
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
-	state->back_yscroll = 2;
-	state->fore_yscroll = 2;
+	state->m_spritebank_type = 1;
+	state->m_back_yscroll = 2;
+	state->m_fore_yscroll = 2;
 }
 
 
@@ -3401,19 +3401,19 @@ static DRIVER_INIT( goldnaxeb1 )
 		data[(i * 2) + 1] = ((KEY[i] & 0x08) << 3) | ((KEY[i] & 0x04) << 2) | ((KEY[i] & 0x02) << 1) | ((KEY[i] & 0x01) << 0);
 	}
 
-	state->decrypted_region = auto_alloc_array(machine, UINT8, 0xc0000);
-	memcpy(state->decrypted_region, ROM, 0xc0000);
+	state->m_decrypted_region = auto_alloc_array(machine, UINT8, 0xc0000);
+	memcpy(state->m_decrypted_region, ROM, 0xc0000);
 
 	for (i = 0; i < 0x40000; i++)
 	{
-		state->decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
+		state->m_decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
 	}
 
-	space->set_decrypted_region(0x00000, 0xbffff, state->decrypted_region);
+	space->set_decrypted_region(0x00000, 0xbffff, state->m_decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
+	state->m_spritebank_type = 1;
 }
 
 
@@ -3433,7 +3433,7 @@ static DRIVER_INIT( bayrouteb1 )
 	DRIVER_INIT_CALL( goldnaxeb1 );
 
 	ROM2 = (UINT16*)machine.region("maincpu")->base();
-	decrypted_region2 = (UINT16*)state->decrypted_region;
+	decrypted_region2 = (UINT16*)state->m_decrypted_region;
 
 	// patch interrupt vector
 	ROM2[0x0070/2] = 0x000b;
@@ -3460,7 +3460,7 @@ static DRIVER_INIT( goldnaxeb2 )
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
+	state->m_spritebank_type = 1;
 }
 
 static DRIVER_INIT( tturfbl )
@@ -3482,9 +3482,9 @@ static DRIVER_INIT( eswatbl )
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 
 	DRIVER_INIT_CALL(common);
-	//state->splittab_fg_x = &sys16_textram[0x0f80];
+	//state->m_splittab_fg_x = &sys16_textram[0x0f80];
 
-	state->spritebank_type = 1;
+	state->m_spritebank_type = 1;
 }
 
 static DRIVER_INIT( fpointbl )
@@ -3494,8 +3494,8 @@ static DRIVER_INIT( fpointbl )
 	DRIVER_INIT_CALL(common);
 	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 
-	state->back_yscroll = 2;
-	state->fore_yscroll = 2;
+	state->m_back_yscroll = 2;
+	state->m_fore_yscroll = 2;
 }
 
 /* Tetris-based */
@@ -3527,9 +3527,9 @@ static DRIVER_INIT( shdancbl )
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
-	state->splittab_fg_x = &state->textram[0x0f80/2];
-	state->splittab_bg_x = &state->textram[0x0fc0/2];
+	state->m_spritebank_type = 1;
+	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
+	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
 }
 
 static DRIVER_INIT( mwalkbl )
@@ -3544,14 +3544,14 @@ static DRIVER_INIT( mwalkbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	memcpy(state->sound_info, mwalk_sound_info, sizeof(state->sound_info));
+	memcpy(state->m_sound_info, mwalk_sound_info, sizeof(state->m_sound_info));
 	memcpy(RAM, &RAM[0x10000], 0xa000);
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
-	state->splittab_fg_x = &state->textram[0x0f80/2];
-	state->splittab_bg_x = &state->textram[0x0fc0/2];
+	state->m_spritebank_type = 1;
+	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
+	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
 }
 
 static DRIVER_INIT( astormbl )
@@ -3566,14 +3566,14 @@ static DRIVER_INIT( astormbl )
 		0x1f, 0xA0000  // ROM #4 = 256K
 	};
 
-	memcpy(state->sound_info, astormbl_sound_info, sizeof(state->sound_info));
+	memcpy(state->m_sound_info, astormbl_sound_info, sizeof(state->m_sound_info));
 	memcpy(RAM, &RAM[0x10000], 0xa000);
 
 	DRIVER_INIT_CALL(common);
 
-	state->spritebank_type = 1;
-	state->splittab_fg_x = &state->textram[0x0f80/2];
-	state->splittab_bg_x = &state->textram[0x0fc0/2];
+	state->m_spritebank_type = 1;
+	state->m_splittab_fg_x = &state->m_textram[0x0f80/2];
+	state->m_splittab_bg_x = &state->m_textram[0x0fc0/2];
 }
 
 /*************************************

@@ -4,13 +4,13 @@ public:
 	mappy_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	tilemap_t *bg_tilemap;
-	bitmap_t *sprite_bitmap;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_bg_tilemap;
+	bitmap_t *m_sprite_bitmap;
 
-	UINT8 scroll;
-	int mux;
+	UINT8 m_scroll;
+	int m_mux;
 };
 
 

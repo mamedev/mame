@@ -106,9 +106,9 @@ static const struct prot_data tkdensha_data =
 static void tecmosys_prot_reset(running_machine &machine)
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	state->device_read_ptr = 0;
-	state->device_status = DS_IDLE;
-	state->device_value = 0xff;
+	state->m_device_read_ptr = 0;
+	state->m_device_status = DS_IDLE;
+	state->m_device_value = 0xff;
 }
 
 void tecmosys_prot_init(running_machine &machine, int which)
@@ -116,9 +116,9 @@ void tecmosys_prot_init(running_machine &machine, int which)
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	switch (which)
 	{
-	case 0:	state->device_data = &deroon_data; break;
-	case 1: state->device_data = &tkdensho_data; break;
-	case 2: state->device_data = &tkdensha_data; break;
+	case 0:	state->m_device_data = &deroon_data; break;
+	case 1: state->m_device_data = &tkdensho_data; break;
+	case 2: state->m_device_data = &tkdensha_data; break;
 	}
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, tecmosys_prot_reset);
@@ -147,8 +147,8 @@ READ16_HANDLER(tecmosys_prot_data_r)
 	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
 	// prot appears to be read-ready for two consecutive reads
 	// but returns 0xff for subsequent reads.
-	UINT8 ret = state->device_value;
-	state->device_value = 0xff;
+	UINT8 ret = state->m_device_value;
+	state->m_device_value = 0xff;
 	//logerror("- prot_r = 0x%02x\n", ret );
 	return ret << 8;
 }
@@ -162,61 +162,61 @@ WRITE16_HANDLER(tecmosys_prot_data_w)
 
 	//logerror("+ prot_w( 0x%02x )\n", data );
 
-	switch( state->device_status )
+	switch( state->m_device_status )
 	{
 		case DS_IDLE:
 			if( data == 0x13 )
 			{
-				state->device_status = DS_LOGIN;
-				state->device_value = state->device_data->passwd_len;
-				state->device_read_ptr = 0;
+				state->m_device_status = DS_LOGIN;
+				state->m_device_value = state->m_device_data->passwd_len;
+				state->m_device_read_ptr = 0;
 				break;
 			}
 			break;
 
 		case DS_LOGIN:
-			if( state->device_read_ptr >= state->device_data->passwd_len)
+			if( state->m_device_read_ptr >= state->m_device_data->passwd_len)
 			{
-				state->device_status = DS_SEND_CODE;
-				state->device_value = state->device_data->code[0];
-				state->device_read_ptr = 1;
+				state->m_device_status = DS_SEND_CODE;
+				state->m_device_value = state->m_device_data->code[0];
+				state->m_device_read_ptr = 1;
 			}
 			else
-				state->device_value = state->device_data->passwd[state->device_read_ptr++] == data ? 0 : 0xff;
+				state->m_device_value = state->m_device_data->passwd[state->m_device_read_ptr++] == data ? 0 : 0xff;
 			break;
 
 		case DS_SEND_CODE:
-			if( state->device_read_ptr >= state->device_data->code[0]+2 ) // + code_len + trailer
+			if( state->m_device_read_ptr >= state->m_device_data->code[0]+2 ) // + code_len + trailer
 			{
-				state->device_status = DS_SEND_ADRS;
-				state->device_value = state->device_data->checksum_ranges[0];
-				state->device_read_ptr = 1;
+				state->m_device_status = DS_SEND_ADRS;
+				state->m_device_value = state->m_device_data->checksum_ranges[0];
+				state->m_device_read_ptr = 1;
 			}
 			else
-				state->device_value = data == state->device_data->code[state->device_read_ptr-1] ? state->device_data->code[state->device_read_ptr++] : 0xff;
+				state->m_device_value = data == state->m_device_data->code[state->m_device_read_ptr-1] ? state->m_device_data->code[state->m_device_read_ptr++] : 0xff;
 			break;
 
 		case DS_SEND_ADRS:
-			if( state->device_read_ptr >= 16+1 ) //+ trailer
+			if( state->m_device_read_ptr >= 16+1 ) //+ trailer
 			{
-				state->device_status = DS_SEND_CHKSUMS;
-				state->device_value = 0;
-				state->device_read_ptr = 0;
+				state->m_device_status = DS_SEND_CHKSUMS;
+				state->m_device_value = 0;
+				state->m_device_read_ptr = 0;
 			}
 			else
 			{
-				state->device_value = data == state->device_data->checksum_ranges[state->device_read_ptr-1] ? state->device_data->checksum_ranges[state->device_read_ptr++] : 0xff;
+				state->m_device_value = data == state->m_device_data->checksum_ranges[state->m_device_read_ptr-1] ? state->m_device_data->checksum_ranges[state->m_device_read_ptr++] : 0xff;
 			}
 			break;
 
 		case DS_SEND_CHKSUMS:
-			if( state->device_read_ptr >= 5 )
+			if( state->m_device_read_ptr >= 5 )
 			{
-				state->device_status = DS_DONE;
-				state->device_value = 0;
+				state->m_device_status = DS_DONE;
+				state->m_device_value = 0;
 			}
 			else
-				state->device_value = data == state->device_data->checksums[state->device_read_ptr] ? state->device_data->checksums[state->device_read_ptr++] : 0xff;
+				state->m_device_value = data == state->m_device_data->checksums[state->m_device_read_ptr] ? state->m_device_data->checksums[state->m_device_read_ptr++] : 0xff;
 			break;
 
 		case DS_DONE:

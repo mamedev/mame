@@ -4,22 +4,22 @@ public:
 	stfight_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *text_char_ram;
-	UINT8 *text_attr_ram;
-	UINT8 *vh_latch_ram;
-	UINT8 *sprite_ram;
-	UINT8 *decrypt;
-	int adpcm_data_offs;
-	int adpcm_data_end;
-	int toggle;
-	UINT8 fm_data;
-	int coin_mech_latch[2];
-	int coin_mech_query_active;
-	int coin_mech_query;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	tilemap_t *tx_tilemap;
-	int sprite_base;
+	UINT8 *m_text_char_ram;
+	UINT8 *m_text_attr_ram;
+	UINT8 *m_vh_latch_ram;
+	UINT8 *m_sprite_ram;
+	UINT8 *m_decrypt;
+	int m_adpcm_data_offs;
+	int m_adpcm_data_end;
+	int m_toggle;
+	UINT8 m_fm_data;
+	int m_coin_mech_latch[2];
+	int m_coin_mech_query_active;
+	int m_coin_mech_query;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	int m_sprite_base;
 };
 
 

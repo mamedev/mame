@@ -63,7 +63,7 @@ public:
 	goodejan_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 mux_data;
+	UINT16 m_mux_data;
 };
 
 
@@ -84,7 +84,7 @@ static READ16_HANDLER( mahjong_panel_r )
 	UINT16 ret;
 	ret = 0xffff;
 
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 1:    ret = input_port_read(space->machine(), "KEY0"); break;
 		case 2:    ret = input_port_read(space->machine(), "KEY1"); break;
@@ -99,7 +99,7 @@ static READ16_HANDLER( mahjong_panel_r )
 static WRITE16_HANDLER( mahjong_panel_w )
 {
 	goodejan_state *state = space->machine().driver_data<goodejan_state>();
-	state->mux_data = data;
+	state->m_mux_data = data;
 }
 
 static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16 )

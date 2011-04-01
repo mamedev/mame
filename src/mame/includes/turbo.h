@@ -29,42 +29,56 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *		videoram;
-	UINT8 *		spriteram;
-	UINT8 *		sprite_position;
-	UINT8 *		buckrog_bitmap_ram;
+	UINT8 *		m_videoram;
+	UINT8 *		m_spriteram;
+	UINT8 *		m_sprite_position;
+	UINT8 *		m_buckrog_bitmap_ram;
 
 	/* machine states */
-	i8279_state	i8279;
+	i8279_state	m_i8279;
 
 	/* sound state */
-	UINT8		turbo_osel, turbo_bsel;
-	UINT8		sound_state[3];
+	UINT8		m_turbo_osel;
+	UINT8		m_turbo_bsel;
+	UINT8		m_sound_state[3];
 
 	/* video state */
-	tilemap_t *	fg_tilemap;
+	tilemap_t *	m_fg_tilemap;
 
 	/* Turbo-specific states */
-	UINT8		turbo_opa, turbo_opb, turbo_opc;
-	UINT8		turbo_ipa, turbo_ipb, turbo_ipc;
-	UINT8		turbo_fbpla, turbo_fbcol;
-	UINT8		turbo_speed;
-	UINT8		turbo_collision;
-	UINT8		turbo_last_analog;
-	UINT8		turbo_accel;
+	UINT8		m_turbo_opa;
+	UINT8		m_turbo_opb;
+	UINT8 		m_turbo_opc;
+	UINT8		m_turbo_ipa;
+	UINT8		m_turbo_ipb;
+	UINT8		m_turbo_ipc;
+	UINT8		m_turbo_fbpla;
+	UINT8		m_turbo_fbcol;
+	UINT8		m_turbo_speed;
+	UINT8		m_turbo_collision;
+	UINT8		m_turbo_last_analog;
+	UINT8		m_turbo_accel;
 
 	/* Subroc-specific states */
-	UINT8		subroc3d_col, subroc3d_ply, subroc3d_flip;
-	UINT8		subroc3d_mdis, subroc3d_mdir;
-	UINT8		subroc3d_tdis, subroc3d_tdir;
-	UINT8		subroc3d_fdis, subroc3d_fdir;
-	UINT8		subroc3d_hdis, subroc3d_hdir;
+	UINT8		m_subroc3d_col;
+	UINT8		m_subroc3d_ply;
+	UINT8		m_subroc3d_flip;
+	UINT8		m_subroc3d_mdis;
+	UINT8		m_subroc3d_mdir;
+	UINT8		m_subroc3d_tdis;
+	UINT8		m_subroc3d_tdir;
+	UINT8		m_subroc3d_fdis;
+	UINT8		m_subroc3d_fdir;
+	UINT8		m_subroc3d_hdis;
+	UINT8		m_subroc3d_hdir;
 
 	/* Buck Rogers-specific states */
-	UINT8		buckrog_fchg, buckrog_mov, buckrog_obch;
-	UINT8		buckrog_command;
-	UINT8		buckrog_myship;
-	int last_sound_a;
+	UINT8		m_buckrog_fchg;
+	UINT8		m_buckrog_mov;
+	UINT8		m_buckrog_obch;
+	UINT8		m_buckrog_command;
+	UINT8		m_buckrog_myship;
+	int m_last_sound_a;
 };
 
 

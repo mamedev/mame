@@ -29,7 +29,7 @@ static TIMER_CALLBACK( reset_yscroll_callback );
 static TILE_GET_INFO( get_alpha_tile_info )
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT16 data = state->alpha[tile_index];
+	UINT16 data = state->m_alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO(2, code, color, 0);
@@ -39,8 +39,8 @@ static TILE_GET_INFO( get_alpha_tile_info )
 static TILE_GET_INFO( get_playfield_tile_info )
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	UINT16 data = state->playfield[tile_index];
-	int code = state->playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
+	UINT16 data = state->m_playfield[tile_index];
+	int code = state->m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO(0, code, color, 0);
 	tileinfo->category = (~data >> 14) & 3;
@@ -95,28 +95,28 @@ VIDEO_START( atarisy2 )
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
 
 	/* initialize banked memory */
-	state->alpha = &state->vram[0x0000];
-	atarimo_0_spriteram = &state->vram[0x0c00];
-	state->playfield = &state->vram[0x2000];
+	state->m_alpha = &state->m_vram[0x0000];
+	atarimo_0_spriteram = &state->m_vram[0x0c00];
+	state->m_playfield = &state->m_vram[0x2000];
 
 	/* initialize the playfield */
-	state->playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
+	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	state->alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
-	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
+	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
+	tilemap_set_transparent_pen(state->m_alpha_tilemap, 0);
 
 	/* reset the statics */
-	state->yscroll_reset_timer = machine.scheduler().timer_alloc(FUNC(reset_yscroll_callback));
-	state->videobank = 0;
+	state->m_yscroll_reset_timer = machine.scheduler().timer_alloc(FUNC(reset_yscroll_callback));
+	state->m_videobank = 0;
 
 	/* save states */
-	state->save_item(NAME(state->playfield_tile_bank));
-	state->save_item(NAME(state->videobank));
-	state->save_item(NAME(state->vram));
+	state->save_item(NAME(state->m_playfield_tile_bank));
+	state->save_item(NAME(state->m_videobank));
+	state->save_item(NAME(state->m_vram));
 }
 
 
@@ -130,7 +130,7 @@ VIDEO_START( atarisy2 )
 WRITE16_HANDLER( atarisy2_xscroll_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	UINT16 oldscroll = *state->xscroll;
+	UINT16 oldscroll = *state->m_xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -139,31 +139,31 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	tilemap_set_scrollx(state->playfield_tilemap, 0, newscroll >> 6);
+	tilemap_set_scrollx(state->m_playfield_tilemap, 0, newscroll >> 6);
 
 	/* update the playfield banking */
-	if (state->playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
+	if (state->m_playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
 	{
-		state->playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
+		state->m_playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
+		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
 	}
 
 	/* update the data */
-	*state->xscroll = newscroll;
+	*state->m_xscroll = newscroll;
 }
 
 
 static TIMER_CALLBACK( reset_yscroll_callback )
 {
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();
-	tilemap_set_scrolly(state->playfield_tilemap, 0, param);
+	tilemap_set_scrolly(state->m_playfield_tilemap, 0, param);
 }
 
 
 WRITE16_HANDLER( atarisy2_yscroll_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	UINT16 oldscroll = *state->yscroll;
+	UINT16 oldscroll = *state->m_yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -173,19 +173,19 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(state->playfield_tilemap, 0, (newscroll >> 6) - space->machine().primary_screen->vpos());
+		tilemap_set_scrolly(state->m_playfield_tilemap, 0, (newscroll >> 6) - space->machine().primary_screen->vpos());
 	else
-		state->yscroll_reset_timer->adjust(space->machine().primary_screen->time_until_pos(0), newscroll >> 6);
+		state->m_yscroll_reset_timer->adjust(space->machine().primary_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
-	if (state->playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
+	if (state->m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
 	{
-		state->playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(state->playfield_tilemap);
+		state->m_playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
+		tilemap_mark_all_tiles_dirty(state->m_playfield_tilemap);
 	}
 
 	/* update the data */
-	*state->yscroll = newscroll;
+	*state->m_yscroll = newscroll;
 }
 
 
@@ -234,11 +234,11 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 READ16_HANDLER( atarisy2_slapstic_r )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	int result = state->slapstic_base[offset];
+	int result = state->m_slapstic_base[offset];
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	state->videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	state->m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 	return result;
 }
 
@@ -250,7 +250,7 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	state->videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	state->m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 }
 
 
@@ -264,20 +264,20 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
 READ16_HANDLER( atarisy2_videoram_r )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	return state->vram[offset | state->videobank];
+	return state->m_vram[offset | state->m_videobank];
 }
 
 
 WRITE16_HANDLER( atarisy2_videoram_w )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	int offs = offset | state->videobank;
+	int offs = offset | state->m_videobank;
 
 	/* alpharam? */
 	if (offs < 0x0c00)
 	{
-		COMBINE_DATA(&state->alpha[offs]);
-		tilemap_mark_tile_dirty(state->alpha_tilemap, offs);
+		COMBINE_DATA(&state->m_alpha[offs]);
+		tilemap_mark_tile_dirty(state->m_alpha_tilemap, offs);
 	}
 
 	/* spriteram? */
@@ -293,14 +293,14 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	else if (offs >= 0x2000)
 	{
 		offs -= 0x2000;
-		COMBINE_DATA(&state->playfield[offs]);
-		tilemap_mark_tile_dirty(state->playfield_tilemap, offs);
+		COMBINE_DATA(&state->m_playfield[offs]);
+		tilemap_mark_tile_dirty(state->m_playfield_tilemap, offs);
 	}
 
 	/* generic case */
 	else
 	{
-		COMBINE_DATA(&state->vram[offs]);
+		COMBINE_DATA(&state->m_vram[offs]);
 	}
 }
 
@@ -322,10 +322,10 @@ SCREEN_UPDATE( atarisy2 )
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, 3, 3);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 1, 1);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 2, 2);
+	tilemap_draw(bitmap, cliprect, state->m_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -358,6 +358,6 @@ SCREEN_UPDATE( atarisy2 )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_alpha_tilemap, 0, 0);
 	return 0;
 }

@@ -38,7 +38,7 @@ MACHINE_RESET( skydiver )
 static TILE_GET_INFO( get_tile_info )
 {
 	skydiver_state *state = machine.driver_data<skydiver_state>();
-	UINT8 code = state->videoram[tile_index];
+	UINT8 code = state->m_videoram[tile_index];
 	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0);
 }
 
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( skydiver )
 {
 	skydiver_state *state = machine.driver_data<skydiver_state>();
-	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 
@@ -66,28 +66,28 @@ VIDEO_START( skydiver )
 WRITE8_HANDLER( skydiver_videoram_w )
 {
 	skydiver_state *state = space->machine().driver_data<skydiver_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 
 READ8_HANDLER( skydiver_wram_r )
 {
 	skydiver_state *state = space->machine().driver_data<skydiver_state>();
-	return state->videoram[offset | 0x380];
+	return state->m_videoram[offset | 0x380];
 }
 
 WRITE8_HANDLER( skydiver_wram_w )
 {
 	skydiver_state *state = space->machine().driver_data<skydiver_state>();
-	state->videoram[offset | 0x0380] = data;
+	state->m_videoram[offset | 0x0380] = data;
 }
 
 
 WRITE8_HANDLER( skydiver_width_w )
 {
 	skydiver_state *state = space->machine().driver_data<skydiver_state>();
-	state->width = offset;
+	state->m_width = offset;
 }
 
 
@@ -184,12 +184,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		int color;
 		int wide;
 
-		sx = 29*8 - state->videoram[pic + 0x0390];
-		sy = 30*8 - state->videoram[pic*2 + 0x0398];
-		charcode = state->videoram[pic*2 + 0x0399];
+		sx = 29*8 - state->m_videoram[pic + 0x0390];
+		sy = 30*8 - state->m_videoram[pic*2 + 0x0398];
+		charcode = state->m_videoram[pic*2 + 0x0399];
 		xflip = charcode & 0x10;
 		yflip = charcode & 0x08;
-		wide = (~pic & 0x02) && state->width;
+		wide = (~pic & 0x02) && state->m_width;
 		charcode = (charcode & 0x07) | ((charcode & 0x60) >> 2);
 		color = pic & 0x01;
 
@@ -209,7 +209,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( skydiver )
 {
 	skydiver_state *state = screen->machine().driver_data<skydiver_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;

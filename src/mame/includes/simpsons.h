@@ -6,27 +6,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    ram;
-	UINT8 *    xtraram;
-	UINT16 *   spriteram;
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+	UINT8 *    m_ram;
+	UINT8 *    m_xtraram;
+	UINT16 *   m_spriteram;
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        sprite_colorbase, layer_colorbase[3];
-	int        layerpri[3];
+	int        m_sprite_colorbase;
+	int        m_layer_colorbase[3];
+	int        m_layerpri[3];
 
 	/* misc */
-	int        firq_enabled;
-	int        video_bank;
-	//int        nmi_enabled;
+	int        m_firq_enabled;
+	int        m_video_bank;
+	//int        m_nmi_enabled;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k053260;
-	device_t *k052109;
-	device_t *k053246;
-	device_t *k053251;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k053260;
+	device_t *m_k052109;
+	device_t *m_k053246;
+	device_t *m_k053251;
 };
 
 /*----------- defined in machine/simpsons.c -----------*/

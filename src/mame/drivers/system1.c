@@ -352,12 +352,12 @@ static MACHINE_START( system1 )
 
 	z80_set_cycle_tables(machine.device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
-	state->mute_xor = 0x00;
+	state->m_mute_xor = 0x00;
 
-	state_save_register_global(machine, state->dakkochn_mux_data);
-	state_save_register_global(machine, state->videomode_prev);
-	state_save_register_global(machine, state->mcu_control);
-	state_save_register_global(machine, state->nob_maincpu_latch);
+	state_save_register_global(machine, state->m_dakkochn_mux_data);
+	state_save_register_global(machine, state->m_videomode_prev);
+	state_save_register_global(machine, state->m_mcu_control);
+	state_save_register_global(machine, state->m_nob_maincpu_latch);
 }
 
 
@@ -365,14 +365,14 @@ static MACHINE_START( system2 )
 {
 	system1_state *state = machine.driver_data<system1_state>();
 	MACHINE_START_CALL(system1);
-	state->mute_xor = 0x01;
+	state->m_mute_xor = 0x01;
 }
 
 
 static MACHINE_RESET( system1 )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	state->dakkochn_mux_data = 0;
+	state->m_dakkochn_mux_data = 0;
 }
 
 
@@ -407,9 +407,9 @@ static WRITE8_HANDLER( videomode_w )
 		device_set_input_line(i8751, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* handle any custom banking or other stuff */
-	if (state->videomode_custom != NULL)
-		(*state->videomode_custom)(space->machine(), data, state->videomode_prev);
-	state->videomode_prev = data;
+	if (state->m_videomode_custom != NULL)
+		(*state->m_videomode_custom)(space->machine(), data, state->m_videomode_prev);
+	state->m_videomode_prev = data;
 
 	/* bit 0 is for the coin counters */
 	coin_counter_w(space->machine(), 0, data & 1);
@@ -430,7 +430,7 @@ static CUSTOM_INPUT( dakkochn_mux_data_r )
 {
 	system1_state *state = field->port->machine().driver_data<system1_state>();
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	return input_port_read(field->port->machine(), ports[state->dakkochn_mux_data]);
+	return input_port_read(field->port->machine(), ports[state->m_dakkochn_mux_data]);
 }
 
 
@@ -438,7 +438,7 @@ static CUSTOM_INPUT( dakkochn_mux_status_r )
 {
 	system1_state *state = field->port->machine().driver_data<system1_state>();
 	/* reads from here indicate which mux port is selected */
-	return 1 << (state->dakkochn_mux_data);
+	return 1 << (state->m_dakkochn_mux_data);
 }
 
 
@@ -447,7 +447,7 @@ static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevda
 	system1_state *state = machine.driver_data<system1_state>();
 	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
 	if ((data & 0x02) && !(prevdata & 0x02))
-		state->dakkochn_mux_data = (state->dakkochn_mux_data + 1) % 7;
+		state->m_dakkochn_mux_data = (state->m_dakkochn_mux_data + 1) % 7;
 
 	/* remaining stuff acts like bank0c */
 	bank0c_custom_w(machine, data, prevdata);
@@ -465,7 +465,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	system1_state *state = device->machine().driver_data<system1_state>();
 	/* bit 0 = MUTE (inverted sense on System 2) */
-	device->machine().sound().system_mute((data ^ state->mute_xor) & 1);
+	device->machine().sound().system_mute((data ^ state->m_mute_xor) & 1);
 
 	/* bit 6 = feedback from sound board that read occurrred */
 
@@ -539,7 +539,7 @@ static WRITE8_HANDLER( mcu_control_w )
         Bit 1 -> n/c
         Bit 0 -> Directly connected to Z80 /INT line
     */
-	state->mcu_control = data;
+	state->m_mcu_control = data;
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(space->machine(), "maincpu", 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -548,7 +548,7 @@ static WRITE8_HANDLER( mcu_control_w )
 static WRITE8_HANDLER( mcu_io_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-	switch ((state->mcu_control >> 3) & 3)
+	switch ((state->m_mcu_control >> 3) & 3)
 	{
 		case 0:
 			space->machine().device<z80_device>("maincpu")->space(AS_PROGRAM)->write_byte(offset, data);
@@ -560,7 +560,7 @@ static WRITE8_HANDLER( mcu_io_w )
 
 		default:
 			logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n",
-					 cpu_get_pc(&space->device()), state->mcu_control, offset, data);
+					 cpu_get_pc(&space->device()), state->m_mcu_control, offset, data);
 			break;
 	}
 }
@@ -569,7 +569,7 @@ static WRITE8_HANDLER( mcu_io_w )
 static READ8_HANDLER( mcu_io_r )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-	switch ((state->mcu_control >> 3) & 3)
+	switch ((state->m_mcu_control >> 3) & 3)
 	{
 		case 0:
 			return space->machine().device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
@@ -582,7 +582,7 @@ static READ8_HANDLER( mcu_io_r )
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
-					 cpu_get_pc(&space->device()), state->mcu_control, offset);
+					 cpu_get_pc(&space->device()), state->m_mcu_control, offset);
 			return 0xff;
 	}
 }
@@ -622,38 +622,38 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
 	/* bit 0 triggers a read from MCU port 0 */
-	if (((state->mcu_control ^ data) & 0x01) && !(data & 0x01))
-		*state->nob_mcu_latch = state->nob_maincpu_latch;
+	if (((state->m_mcu_control ^ data) & 0x01) && !(data & 0x01))
+		*state->m_nob_mcu_latch = state->m_nob_maincpu_latch;
 
 	/* bit 1 triggers a write from MCU port 0 */
-	if (((state->mcu_control ^ data) & 0x02) && !(data & 0x02))
-		state->nob_maincpu_latch = *state->nob_mcu_latch;
+	if (((state->m_mcu_control ^ data) & 0x02) && !(data & 0x02))
+		state->m_nob_maincpu_latch = *state->m_nob_mcu_latch;
 
 	/* bit 2 is toggled once near the end of an IRQ */
-	if (((state->mcu_control ^ data) & 0x04) && !(data & 0x04))
+	if (((state->m_mcu_control ^ data) & 0x04) && !(data & 0x04))
 		device_set_input_line(&space->device(), MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
-	if (((state->mcu_control ^ data) & 0x08) && !(data & 0x08))
+	if (((state->m_mcu_control ^ data) & 0x08) && !(data & 0x08))
 	{
 		//logerror("MCU IRQ(8) toggle\n");
 	}
 
-	state->mcu_control = data;
+	state->m_mcu_control = data;
 }
 
 
 static READ8_HANDLER( nob_maincpu_latch_r )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-	return state->nob_maincpu_latch;
+	return state->m_nob_maincpu_latch;
 }
 
 
 static WRITE8_HANDLER( nob_maincpu_latch_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-	state->nob_maincpu_latch = data;
+	state->m_nob_maincpu_latch = data;
 	cputag_set_input_line(space->machine(), "mcu", MCS51_INT0_LINE, ASSERT_LINE);
 	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
@@ -662,7 +662,7 @@ static WRITE8_HANDLER( nob_maincpu_latch_w )
 static READ8_HANDLER( nob_mcu_status_r )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-	return *state->nob_mcu_status;
+	return *state->m_nob_mcu_status;
 }
 
 
@@ -690,15 +690,15 @@ static READ8_HANDLER( nobb_inport22_r )
 static READ8_HANDLER( nobb_inport23_r )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(&space->device()),state->nobb_inport23_step);
-	return(state->nobb_inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(&space->device()),state->m_nobb_inport23_step);
+	return(state->m_nobb_inport23_step);
 }
 
 static WRITE8_HANDLER( nobb_outport24_w )
 {
 	system1_state *state = space->machine().driver_data<system1_state>();
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(&space->device()),data);
-	state->nobb_inport23_step = data;
+	state->m_nobb_inport23_step = data;
 }
 
 
@@ -713,8 +713,8 @@ static WRITE8_HANDLER( nobb_outport24_w )
 static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(system1_state, ram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, spriteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(system1_state, m_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, m_spriteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
@@ -731,10 +731,10 @@ static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, spriteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, m_spriteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(system1_state, ram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(system1_state, m_ram)
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
@@ -794,8 +794,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE_MEMBER(system1_state, nob_mcu_latch)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE_MEMBER(system1_state, nob_mcu_status)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE_MEMBER(system1_state, m_nob_mcu_latch)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE_MEMBER(system1_state, m_nob_mcu_status)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
 ADDRESS_MAP_END
 
@@ -4497,18 +4497,18 @@ ROM_END
 static DRIVER_INIT( bank00 )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	state->videomode_custom = NULL;
+	state->m_videomode_custom = NULL;
 }
 static DRIVER_INIT( bank44 )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	state->videomode_custom = bank44_custom_w;
+	state->m_videomode_custom = bank44_custom_w;
 }
 
 static DRIVER_INIT( bank0c )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	state->videomode_custom = bank0c_custom_w;
+	state->m_videomode_custom = bank0c_custom_w;
 }
 
 static DRIVER_INIT( regulus )	{ DRIVER_INIT_CALL(bank00); regulus_decode(machine, "maincpu"); }
@@ -4542,7 +4542,7 @@ static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); sega_315_5177_decode(
 static DRIVER_INIT( dakkochn )
 {
 	system1_state *state = machine.driver_data<system1_state>();
-	state->videomode_custom = dakkochn_custom_w;
+	state->m_videomode_custom = dakkochn_custom_w;
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 

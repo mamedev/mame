@@ -4,16 +4,16 @@ public:
 	deadang_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *video_data;
-	UINT16 *scroll_ram;
-	tilemap_t *pf3_layer;
-	tilemap_t *pf2_layer;
-	tilemap_t *pf1_layer;
-	tilemap_t *text_layer;
-	int deadangle_tilebank;
-	int deadangle_oldtilebank;
-	UINT16 *spriteram;
+	UINT16 *m_videoram;
+	UINT16 *m_video_data;
+	UINT16 *m_scroll_ram;
+	tilemap_t *m_pf3_layer;
+	tilemap_t *m_pf2_layer;
+	tilemap_t *m_pf1_layer;
+	tilemap_t *m_text_layer;
+	int m_deadangle_tilebank;
+	int m_deadangle_oldtilebank;
+	UINT16 *m_spriteram;
 };
 
 

@@ -80,10 +80,10 @@ static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8 )
 
 	// The next three entires need to be looked at.  It's ugly.
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, m_colorram)
 
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -93,10 +93,10 @@ static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8 )
 	// The next three entires need to be looked at.  It's ugly.
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd800, 0xd81f) AM_WRITE(ninjemak_videoreg_w)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, m_colorram)
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -406,11 +406,11 @@ static MACHINE_START( galivan )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->write_layers));
-	state->save_item(NAME(state->layers));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_write_layers));
+	state->save_item(NAME(state->m_layers));
 }
 
 static MACHINE_START( ninjemak )
@@ -423,10 +423,10 @@ static MACHINE_START( ninjemak )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->ninjemak_dispdisable));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_ninjemak_dispdisable));
 }
 
 static MACHINE_RESET( galivan )
@@ -435,12 +435,12 @@ static MACHINE_RESET( galivan )
 
 	machine.device("maincpu")->reset();
 
-//  state->layers = 0x60;
-	state->layers = 0;
-	state->write_layers = 0;
-	state->scrollx[0] = state->scrollx[1] = 0;
-	state->scrolly[0] = state->scrolly[1] = 0;
-	state->flipscreen = 0;
+//  state->m_layers = 0x60;
+	state->m_layers = 0;
+	state->m_write_layers = 0;
+	state->m_scrollx[0] = state->m_scrollx[1] = 0;
+	state->m_scrolly[0] = state->m_scrolly[1] = 0;
+	state->m_flipscreen = 0;
 }
 
 static MACHINE_RESET( ninjemak )
@@ -449,10 +449,10 @@ static MACHINE_RESET( ninjemak )
 
 	machine.device("maincpu")->reset();
 
-	state->scrollx[0] = state->scrollx[1] = 0;
-	state->scrolly[0] = state->scrolly[1] = 0;
-	state->flipscreen = 0;
-	state->ninjemak_dispdisable = 0;
+	state->m_scrollx[0] = state->m_scrollx[1] = 0;
+	state->m_scrolly[0] = state->m_scrolly[1] = 0;
+	state->m_flipscreen = 0;
+	state->m_ninjemak_dispdisable = 0;
 }
 
 static MACHINE_CONFIG_START( galivan, galivan_state )

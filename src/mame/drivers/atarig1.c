@@ -35,8 +35,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	atarig1_state *state = machine.driver_data<atarig1_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -44,7 +44,7 @@ static MACHINE_START( atarig1 )
 {
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 	atarigen_init(machine);
-	state->save_item(NAME(state->which_input));
+	state->save_item(NAME(state->m_which_input));
 }
 
 
@@ -72,7 +72,7 @@ static WRITE16_HANDLER( mo_control_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		atarig1_state *state = space->machine().driver_data<atarig1_state>();
-		atarirle_control_w(state->rle, data & 7);
+		atarirle_control_w(state->m_rle, data & 7);
 	}
 }
 
@@ -80,8 +80,8 @@ static WRITE16_HANDLER( mo_control_w )
 static WRITE16_HANDLER( mo_command_w )
 {
 	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	COMBINE_DATA(state->mo_command);
-	atarirle_command_w(state->rle, (data == 0 && state->is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	COMBINE_DATA(state->m_mo_command);
+	atarirle_command_w(state->m_rle, (data == 0 && state->m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -96,7 +96,7 @@ static READ16_HANDLER( special_port0_r )
 {
 	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 	int temp = input_port_read(space->machine(), "IN0");
-	if (state->cpu_to_sound_ready) temp ^= 0x1000;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
 }
@@ -105,7 +105,7 @@ static READ16_HANDLER( special_port0_r )
 static WRITE16_HANDLER( a2d_select_w )
 {
 	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	state->which_input = offset;
+	state->m_which_input = offset;
 }
 
 
@@ -115,12 +115,12 @@ static READ16_HANDLER( a2d_data_r )
 	atarig1_state *state = space->machine().driver_data<atarig1_state>();
 
 	/* Pit Fighter has no A2D, just another input port */
-	if (state->is_pitfight)
+	if (state->m_is_pitfight)
 		return input_port_read(space->machine(), "ADC0");
 
 	/* otherwise, assume it's hydra */
-	if (state->which_input < 3)
-		return input_port_read(space->machine(), adcnames[state->which_input]) << 8;
+	if (state->m_which_input < 3)
+		return input_port_read(space->machine(), adcnames[state->m_which_input]) << 8;
 
 	return 0;
 }
@@ -136,16 +136,16 @@ static READ16_HANDLER( a2d_data_r )
 INLINE void update_bank(atarig1_state *state, int bank)
 {
 	/* if the bank has changed, copy the memory; Pit Fighter needs this */
-	if (bank != state->bslapstic_bank)
+	if (bank != state->m_bslapstic_bank)
 	{
 		/* bank 0 comes from the copy we made earlier */
 		if (bank == 0)
-			memcpy(state->bslapstic_base, state->bslapstic_bank0, 0x2000);
+			memcpy(state->m_bslapstic_base, state->m_bslapstic_bank0, 0x2000);
 		else
-			memcpy(state->bslapstic_base, &state->bslapstic_base[bank * 0x1000], 0x2000);
+			memcpy(state->m_bslapstic_base, &state->m_bslapstic_base[bank * 0x1000], 0x2000);
 
 		/* remember the current bank */
-		state->bslapstic_bank = bank;
+		state->m_bslapstic_bank = bank;
 	}
 }
 
@@ -153,8 +153,8 @@ INLINE void update_bank(atarig1_state *state, int bank)
 static STATE_POSTLOAD( pitfightb_state_postload )
 {
 	atarig1_state *state = machine.driver_data<atarig1_state>();
-	int bank = state->bslapstic_bank;
-	state->bslapstic_bank = -1;
+	int bank = state->m_bslapstic_bank;
+	state->m_bslapstic_bank = -1;
 	update_bank(state, bank);
 }
 
@@ -162,26 +162,26 @@ static STATE_POSTLOAD( pitfightb_state_postload )
 static READ16_HANDLER( pitfightb_cheap_slapstic_r )
 {
 	atarig1_state *state = space->machine().driver_data<atarig1_state>();
-	int result = state->bslapstic_base[offset & 0xfff];
+	int result = state->m_bslapstic_base[offset & 0xfff];
 
 	/* the cheap replacement slapstic just triggers on the simple banking */
 	/* addresses; a software patch ensure that this is good enough */
 
 	/* offset 0 primes the chip */
 	if (offset == 0)
-		state->bslapstic_primed = TRUE;
+		state->m_bslapstic_primed = TRUE;
 
 	/* one of 4 bankswitchers produces the result */
-	else if (state->bslapstic_primed)
+	else if (state->m_bslapstic_primed)
 	{
 		if (offset == 0x42)
-			update_bank(state, 0), state->bslapstic_primed = FALSE;
+			update_bank(state, 0), state->m_bslapstic_primed = FALSE;
 		else if (offset == 0x52)
-			update_bank(state, 1), state->bslapstic_primed = FALSE;
+			update_bank(state, 1), state->m_bslapstic_primed = FALSE;
 		else if (offset == 0x62)
-			update_bank(state, 2), state->bslapstic_primed = FALSE;
+			update_bank(state, 2), state->m_bslapstic_primed = FALSE;
 		else if (offset == 0x72)
-			update_bank(state, 3), state->bslapstic_primed = FALSE;
+			update_bank(state, 3), state->m_bslapstic_primed = FALSE;
 	}
 	return result;
 }
@@ -192,14 +192,14 @@ static void pitfightb_cheap_slapstic_init(running_machine &machine)
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 
 	/* install a read handler */
-	state->bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x038000, 0x03ffff, FUNC(pitfightb_cheap_slapstic_r));
+	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x038000, 0x03ffff, FUNC(pitfightb_cheap_slapstic_r));
 
 	/* allocate memory for a copy of bank 0 */
-	state->bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->bslapstic_bank0, state->bslapstic_base, 0x2000);
+	state->m_bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
+	memcpy(state->m_bslapstic_bank0, state->m_bslapstic_base, 0x2000);
 
 	/* not primed by default */
-	state->bslapstic_primed = FALSE;
+	state->m_bslapstic_primed = FALSE;
 }
 
 
@@ -228,9 +228,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
 	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff0fff) AM_DEVREADWRITE("rle", atarirle_spriteram_r, atarirle_spriteram_w)
-	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarig1_state, mo_command)
-	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig1_state, playfield)
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarig1_state, alpha)
+	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarig1_state, m_mo_command)
+	AM_RANGE(0xff4000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig1_state, m_playfield)
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarig1_state, m_alpha)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1222,19 +1222,19 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 {
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 
-	state->eeprom_default = NULL;
+	state->m_eeprom_default = NULL;
 	if (slapstic == -1)
 	{
 		pitfightb_cheap_slapstic_init(machine);
-		state->save_item(NAME(state->bslapstic_bank));
-		state->save_item(NAME(state->bslapstic_primed));
+		state->save_item(NAME(state->m_bslapstic_bank));
+		state->save_item(NAME(state->m_bslapstic_primed));
 		machine.state().register_postload(pitfightb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(machine.device("maincpu"), slapstic_base, 0, slapstic);
 	atarijsa_init(machine, "IN0", 0x4000);
 
-	state->is_pitfight = is_pitfight;
+	state->m_is_pitfight = is_pitfight;
 }
 
 static DRIVER_INIT( hydra )    { init_g1_common(machine, 0x078000, 116, 0); }

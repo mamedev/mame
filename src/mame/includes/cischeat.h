@@ -4,33 +4,34 @@ public:
 	cischeat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *scrollram[3];
-	UINT16 *objectram;
-	UINT16 *vregs;
-	UINT16 *ram;
-	tilemap_t *tmap[3];
-	tilemap_t *tilemap[3][2][4];
-	int scrollx[3], scrolly[3];
-	int active_layers;
-	int bits_per_color_code;
-	int scroll_flag[3];
+	UINT16 *m_scrollram[3];
+	UINT16 *m_objectram;
+	UINT16 *m_vregs;
+	UINT16 *m_ram;
+	tilemap_t *m_tmap[3];
+	tilemap_t *m_tilemap[3][2][4];
+	int m_scrollx[3];
+	int m_scrolly[3];
+	int m_active_layers;
+	int m_bits_per_color_code;
+	int m_scroll_flag[3];
 
-	UINT16 *rom_1;
-	UINT16 *rom_2;
-	UINT16 *rom_3;
-	UINT16 *sharedram1;
-	UINT16 *sharedram2;
-	int prev;
-	int armold;
-	UINT16 scudhamm_motor_command;
-	UINT16 *roadram[2];
-	UINT16 *f1gpstr2_ioready;
-	int ip_select;
-	int shift_ret;
-	UINT8 drawmode_table[16];
-	int debugsprites;
-	int show_unknown;
-	UINT16 *spriteram;
+	UINT16 *m_rom_1;
+	UINT16 *m_rom_2;
+	UINT16 *m_rom_3;
+	UINT16 *m_sharedram1;
+	UINT16 *m_sharedram2;
+	int m_prev;
+	int m_armold;
+	UINT16 m_scudhamm_motor_command;
+	UINT16 *m_roadram[2];
+	UINT16 *m_f1gpstr2_ioready;
+	int m_ip_select;
+	int m_shift_ret;
+	UINT8 m_drawmode_table[16];
+	int m_debugsprites;
+	int m_show_unknown;
+	UINT16 *m_spriteram;
 };
 
 

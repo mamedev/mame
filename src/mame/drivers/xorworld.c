@@ -77,8 +77,8 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE("eeprom", eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE("eeprom", eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE("eeprom", eeprom_data_w)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_MEMBER(xorworld_state, videoram)
-	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_MEMBER(xorworld_state, spriteram)
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_MEMBER(xorworld_state, m_videoram)
+	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_MEMBER(xorworld_state, m_spriteram)
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITENOP
 	AM_RANGE(0xffc882, 0xffc883) AM_WRITENOP
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM

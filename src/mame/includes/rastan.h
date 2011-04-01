@@ -14,18 +14,18 @@ public:
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
 
 	/* video-related */
-	UINT16      sprite_ctrl;
-	UINT16      sprites_flipscreen;
+	UINT16      m_sprite_ctrl;
+	UINT16      m_sprites_flipscreen;
 
 	/* misc */
-	int         adpcm_pos;
-	int         adpcm_data;
+	int         m_adpcm_pos;
+	int         m_adpcm_data;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *pc090oj;
-	device_t *pc080sn;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_pc090oj;
+	device_t *m_pc080sn;
 };
 
 

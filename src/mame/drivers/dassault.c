@@ -172,7 +172,7 @@ static WRITE16_HANDLER( dassault_sound_w )
 {
 	dassault_state *state = space->machine().driver_data<dassault_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
@@ -181,10 +181,10 @@ static READ16_HANDLER( dassault_irq_r )
 	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
-	case 1: device_set_input_line(state->subcpu, 6, CLEAR_LINE); break;
+	case 0: device_set_input_line(state->m_maincpu, 5, CLEAR_LINE); break;
+	case 1: device_set_input_line(state->m_subcpu, 6, CLEAR_LINE); break;
 	}
-	return state->shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
+	return state->m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
 
 static WRITE16_HANDLER( dassault_irq_w )
@@ -192,23 +192,23 @@ static WRITE16_HANDLER( dassault_irq_w )
 	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
-	case 1: device_set_input_line(state->subcpu, 6, ASSERT_LINE); break;
+	case 0: device_set_input_line(state->m_maincpu, 5, ASSERT_LINE); break;
+	case 1: device_set_input_line(state->m_subcpu, 6, ASSERT_LINE); break;
 	}
 
-	COMBINE_DATA(&state->shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
+	COMBINE_DATA(&state->m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
 static WRITE16_HANDLER( shared_ram_w )
 {
 	dassault_state *state = space->machine().driver_data<dassault_state>();
-	COMBINE_DATA(&state->shared_ram[offset]);
+	COMBINE_DATA(&state->m_shared_ram[offset]);
 }
 
 static READ16_HANDLER( shared_ram_r )
 {
 	dassault_state *state = space->machine().driver_data<dassault_state>();
-	return state->shared_ram[offset];
+	return state->m_shared_ram[offset];
 }
 
 /**********************************************************************************/
@@ -228,18 +228,18 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf2_rowscroll)
+	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, m_pf2_rowscroll)
 	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 
 	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf4_rowscroll)
+	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, m_pf4_rowscroll)
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, ram) /* Main ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, shared_ram) /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, m_shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, ram2) /* Sub cpu ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram2) /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -514,7 +514,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dassault_state *driver_state = device->machine().driver_data<dassault_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state);
+	device_set_input_line(driver_state->m_audiocpu, 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -522,7 +522,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 	dassault_state *state = device->machine().driver_data<dassault_state>();
 
 	/* the second OKIM6295 ROM is bank switched */
-	state->oki2->set_bank_base((data & 1) * 0x40000);
+	state->m_oki2->set_bank_base((data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -829,7 +829,7 @@ ROM_END
 static READ16_HANDLER( dassault_main_skip )
 {
 	dassault_state *state = space->machine().driver_data<dassault_state>();
-	int ret = state->ram[0];
+	int ret = state->m_ram[0];
 
 	if (cpu_get_previouspc(&space->device()) == 0x1170 && ret & 0x8000)
 		device_spin_until_interrupt(&space->device());
@@ -840,7 +840,7 @@ static READ16_HANDLER( dassault_main_skip )
 static READ16_HANDLER( thndzone_main_skip )
 {
 	dassault_state *state = space->machine().driver_data<dassault_state>();
-	int ret = state->ram[0];
+	int ret = state->m_ram[0];
 
 	if (cpu_get_pc(&space->device()) == 0x114c && ret & 0x8000)
 		device_spin_until_interrupt(&space->device());

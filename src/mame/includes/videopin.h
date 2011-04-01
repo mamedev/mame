@@ -21,14 +21,14 @@ public:
 	videopin_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	attotime time_pushed;
-	attotime time_released;
-	UINT8 prev;
-	UINT8 mask;
-	UINT8* video_ram;
-	int ball_x;
-	int ball_y;
-	tilemap_t* bg_tilemap;
+	attotime m_time_pushed;
+	attotime m_time_released;
+	UINT8 m_prev;
+	UINT8 m_mask;
+	UINT8* m_video_ram;
+	int m_ball_x;
+	int m_ball_y;
+	tilemap_t* m_bg_tilemap;
 };
 
 

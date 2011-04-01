@@ -11,19 +11,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    bg_videoram;
-	UINT8 *    fg_videoram;
-	UINT8 *    rambase;
-	UINT8 *    paletteram;
+	UINT8 *    m_bg_videoram;
+	UINT8 *    m_fg_videoram;
+	UINT8 *    m_rambase;
+	UINT8 *    m_paletteram;
 
 	/* video-related */
-	tilemap_t    *bg_tilemap;
-	tilemap_t    *fg_tilemap;
-	int        flipscreen;
-	UINT8      scroll[4];
+	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap;
+	int        m_flipscreen;
+	UINT8      m_scroll[4];
 
 	/* misc */
-	int        input_ports_hack;
+	int        m_input_ports_hack;
 };
 
 

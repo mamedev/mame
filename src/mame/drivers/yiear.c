@@ -114,7 +114,7 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 	yiear_state *state = device->machine().driver_data<yiear_state>();
 
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
-	if (state->yiear_nmi_enable)
+	if (state->m_yiear_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -133,9 +133,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
 	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x4f00, 0x4f00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_MEMBER(yiear_state, spriteram, spriteram_size)
-	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_MEMBER(yiear_state, spriteram2)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_MEMBER(yiear_state, videoram)
+	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_MEMBER(yiear_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_MEMBER(yiear_state, m_spriteram2)
+	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_MEMBER(yiear_state, m_videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -246,14 +246,14 @@ static MACHINE_START( yiear )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
 
-	state->save_item(NAME(state->yiear_nmi_enable));
+	state->save_item(NAME(state->m_yiear_nmi_enable));
 }
 
 static MACHINE_RESET( yiear )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
 
-	state->yiear_nmi_enable = 0;
+	state->m_yiear_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( yiear, yiear_state )

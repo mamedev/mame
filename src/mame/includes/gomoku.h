@@ -6,13 +6,13 @@ public:
 	gomoku_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *bgram;
-	int flipscreen;
-	int bg_dispsw;
-	tilemap_t *fg_tilemap;
-	bitmap_t *bg_bitmap;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_bgram;
+	int m_flipscreen;
+	int m_bg_dispsw;
+	tilemap_t *m_fg_tilemap;
+	bitmap_t *m_bg_bitmap;
 };
 
 

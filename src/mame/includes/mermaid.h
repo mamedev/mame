@@ -11,35 +11,41 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    colorram;
-	UINT8 *    videoram2;
-	UINT8 *    spriteram;
-	UINT8 *    bg_scrollram;
-	UINT8 *    fg_scrollram;
-	UINT8 *    ay8910_enable;
-	size_t     spriteram_size;
+	UINT8 *    m_videoram;
+	UINT8 *    m_colorram;
+	UINT8 *    m_videoram2;
+	UINT8 *    m_spriteram;
+	UINT8 *    m_bg_scrollram;
+	UINT8 *    m_fg_scrollram;
+	UINT8 *    m_ay8910_enable;
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	tilemap_t *bg_tilemap, *fg_tilemap;
-	bitmap_t* helper;
-	bitmap_t* helper2;
-	int coll_bit0, coll_bit1, coll_bit2, coll_bit3, coll_bit6;
-	int rougien_gfxbank1, rougien_gfxbank2;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	bitmap_t* m_helper;
+	bitmap_t* m_helper2;
+	int m_coll_bit0;
+	int m_coll_bit1;
+	int m_coll_bit2;
+	int m_coll_bit3;
+	int m_coll_bit6;
+	int m_rougien_gfxbank1;
+	int m_rougien_gfxbank2;
 
 	/* sound-related */
-	UINT32   adpcm_pos;
-	UINT32   adpcm_end;
-	UINT8    adpcm_idle;
-	int      adpcm_data;
-	UINT8    adpcm_trigger;
-	UINT8    adpcm_rom_sel;
-	UINT8    adpcm_play_reg;
+	UINT32   m_adpcm_pos;
+	UINT32   m_adpcm_end;
+	UINT8    m_adpcm_idle;
+	int      m_adpcm_data;
+	UINT8    m_adpcm_trigger;
+	UINT8    m_adpcm_rom_sel;
+	UINT8    m_adpcm_play_reg;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *ay1;
-	device_t *ay2;
+	device_t *m_maincpu;
+	device_t *m_ay1;
+	device_t *m_ay2;
 };
 
 

@@ -6,33 +6,36 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    pf1_data;
-	UINT16 *    pf2_data;
-	UINT16 *    mainram;
-	UINT16 *    spriteram;
-	UINT16 *    control;
-	size_t      spriteram_size;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
+	UINT16 *    m_pf1_data;
+	UINT16 *    m_pf2_data;
+	UINT16 *    m_mainram;
+	UINT16 *    m_spriteram;
+	UINT16 *    m_control;
+	size_t      m_spriteram_size;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* misc */
-	int         music_command;
-	int         music_bank;
-	int         music_is_playing;
+	int         m_music_command;
+	int         m_music_bank;
+	int         m_music_is_playing;
 
 	/* video-related */
-	tilemap_t   *pf1_tilemap,*pf1_alt_tilemap,*pf2_tilemap,*pf2_alt_tilemap;
-	UINT16      control_0[8];
-	int         flipscreen;
-	UINT16      tilebank;
-	int         sprite_xoffset;
-	int         sprite_yoffset;
+	tilemap_t   *m_pf1_tilemap;
+	tilemap_t   *m_pf1_alt_tilemap;
+	tilemap_t   *m_pf2_tilemap;
+	tilemap_t   *m_pf2_alt_tilemap;
+	UINT16      m_control_0[8];
+	int         m_flipscreen;
+	UINT16      m_tilebank;
+	int         m_sprite_xoffset;
+	int         m_sprite_yoffset;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *oki;
-	UINT8 semicom_prot_offset;
-	UINT16 protbase;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_oki;
+	UINT8 m_semicom_prot_offset;
+	UINT16 m_protbase;
 };
 
 /*----------- defined in video/tumbleb.c -----------*/

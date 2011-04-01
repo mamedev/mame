@@ -448,17 +448,17 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8* tileram;
-	UINT8* vram;
-	UINT8* colram;
-	UINT8* workram;
-	UINT8 bank;
-	int irq0_ack;
-	int backupram_enabled;
-	int m5205_next;
-	int m5205_part;
-	int m5205_sambit0;
-	int m5205_sambit1;
+	UINT8* m_tileram;
+	UINT8* m_vram;
+	UINT8* m_colram;
+	UINT8* m_workram;
+	UINT8 m_bank;
+	int m_irq0_ack;
+	int m_backupram_enabled;
+	int m_m5205_next;
+	int m_m5205_part;
+	int m_m5205_sambit0;
+	int m_m5205_sambit1;
 };
 
 
@@ -467,7 +467,7 @@ public:
 static VIDEO_START(mastboy)
 {
 	mastboy_state *state = machine.driver_data<mastboy_state>();
-	gfx_element_set_source(machine.gfx[0], state->vram);
+	gfx_element_set_source(machine.gfx[0], state->m_vram);
 }
 
 static SCREEN_UPDATE(mastboy)
@@ -478,7 +478,7 @@ static SCREEN_UPDATE(mastboy)
 
 	for (i=0;i<0x200;i+=2)
 	{
-		int coldat = state->colram[i+1] |  (state->colram[i+0]<<8);
+		int coldat = state->m_colram[i+1] |  (state->m_colram[i+0]<<8);
 
 		palette_set_color_rgb(screen->machine(),i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
@@ -488,8 +488,8 @@ static SCREEN_UPDATE(mastboy)
 		for (x=0;x<32;x++)
 		{
 			/* bytes 0 and 3 seem to be unused for rendering , they appear to contain data the game uses internally */
-			int tileno = (state->tileram[count+1]|(state->tileram[count+2]<<8))&0xfff;
-			int attr = (state->tileram[count+2]&0xf0)>>4;
+			int tileno = (state->m_tileram[count+1]|(state->m_tileram[count+2]<<8))&0xfff;
+			int attr = (state->m_tileram[count+2]&0xf0)>>4;
 			gfx_element *gfx;
 
 			if (tileno&0x800)
@@ -520,11 +520,11 @@ static SCREEN_UPDATE(mastboy)
 static READ8_HANDLER(banked_ram_r)
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
-	if ((state->bank&0x80) == 0x00)
+	if ((state->m_bank&0x80) == 0x00)
 	{
 		int bank;
-		bank = state->bank & 0x07;
-		//if (state->bank&0xf8) printf("invalid bank bits in vram/vrom read\n");
+		bank = state->m_bank & 0x07;
+		//if (state->m_bank&0xf8) printf("invalid bank bits in vram/vrom read\n");
 
 		if (bank>0x3) // ROM access
 		{
@@ -536,14 +536,14 @@ static READ8_HANDLER(banked_ram_r)
 		{
 			bank &=0x3;
 			/* we have to invert the data for the GFX decode */
-			return state->vram[offset+(bank*0x4000)]^0xff;
+			return state->m_vram[offset+(bank*0x4000)]^0xff;
 		}
 	}
 	else
 	{
 		UINT8 *src;
 		int bank;
-		bank = state->bank & 0x7f;
+		bank = state->m_bank & 0x7f;
 		src = space->machine().region       ( "user1" )->base() + bank * 0x4000;
 		return src[offset];
 	}
@@ -552,10 +552,10 @@ static READ8_HANDLER(banked_ram_r)
 static WRITE8_HANDLER( banked_ram_w )
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
-	if ((state->bank&0x80) == 0x00)
+	if ((state->m_bank&0x80) == 0x00)
 	{
 		int bank;
-		bank = state->bank & 0x07;
+		bank = state->m_bank & 0x07;
 		//if (data&0xf8) printf("invalid bank bits in vram/vrom write\n");
 
 		if (bank>0x3) // ROM access
@@ -571,7 +571,7 @@ static WRITE8_HANDLER( banked_ram_w )
 			offs = offset+(bank*0x4000);
 
 			/* we have to invert the data for the GFX decode */
-			state->vram[offs] = data^0xff;
+			state->m_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
 			gfx_element_mark_dirty(space->machine().gfx[0], offs/32);
@@ -587,7 +587,7 @@ static WRITE8_HANDLER( mastboy_bank_w )
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
 	// controls access to banked ram / rom
-	state->bank = data;
+	state->m_bank = data;
 }
 
 /* Backup RAM access */
@@ -601,7 +601,7 @@ static READ8_HANDLER( mastboy_backupram_r )
 static WRITE8_HANDLER( mastboy_backupram_w )
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
-//  if (state->backupram_enabled)
+//  if (state->m_backupram_enabled)
 //  {
 		state->m_nvram[offset] = data;
 //  }
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( backupram_enable_w )
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
 	/* This is some kind of enable / disable control for backup ram (see Charles's notes) but I'm not
        sure how it works in practice, if we use it then it writes a lot of data with it disabled */
-	state->backupram_enabled = data&1;
+	state->m_backupram_enabled = data&1;
 }
 
 /* MSM5205 Related */
@@ -626,8 +626,8 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
 	device_t *adpcm = space->machine().device("msm");
 
-	state->m5205_sambit0 = data & 1;
-	msm5205_playmode_w(adpcm,  (1 << 2) | (state->m5205_sambit1 << 1) | (state->m5205_sambit0) );
+	state->m_m5205_sambit0 = data & 1;
+	msm5205_playmode_w(adpcm,  (1 << 2) | (state->m_m5205_sambit1 << 1) | (state->m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
@@ -637,9 +637,9 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
 	device_t *adpcm = space->machine().device("msm");
 
-	state->m5205_sambit1 = data & 1;
+	state->m_m5205_sambit1 = data & 1;
 
-	msm5205_playmode_w(adpcm,  (1 << 2) | (state->m5205_sambit1 << 1) | (state->m5205_sambit0) );
+	msm5205_playmode_w(adpcm,  (1 << 2) | (state->m_m5205_sambit1 << 1) | (state->m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
@@ -647,24 +647,24 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 static WRITE8_DEVICE_HANDLER( mastboy_msm5205_reset_w )
 {
 	mastboy_state *state = device->machine().driver_data<mastboy_state>();
-	state->m5205_part = 0;
+	state->m_m5205_part = 0;
 	msm5205_reset_w(device,data&1);
 }
 
 static WRITE8_HANDLER( mastboy_msm5205_data_w )
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
-	state->m5205_next = data;
+	state->m_m5205_next = data;
 }
 
 static void mastboy_adpcm_int(device_t *device)
 {
 	mastboy_state *state = device->machine().driver_data<mastboy_state>();
-	msm5205_data_w(device, state->m5205_next);
-	state->m5205_next >>= 4;
+	msm5205_data_w(device, state->m_m5205_next);
+	state->m_m5205_next >>= 4;
 
-	state->m5205_part ^= 1;
-	if(!state->m5205_part)
+	state->m_m5205_part ^= 1;
+	if(!state->m_m5205_part)
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -680,7 +680,7 @@ static const msm5205_interface msm5205_config =
 static WRITE8_HANDLER( mastboy_irq0_ack_w )
 {
 	mastboy_state *state = space->machine().driver_data<mastboy_state>();
-	state->irq0_ack = data;
+	state->m_irq0_ack = data;
 	if ((data & 1) == 1)
 		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
@@ -688,7 +688,7 @@ static WRITE8_HANDLER( mastboy_irq0_ack_w )
 static INTERRUPT_GEN( mastboy_interrupt )
 {
 	mastboy_state *state = device->machine().driver_data<mastboy_state>();
-	if ((state->irq0_ack & 1) == 1)
+	if ((state->m_irq0_ack & 1) == 1)
 	{
 		device_set_input_line(device, 0, ASSERT_LINE);
 	}
@@ -700,9 +700,9 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_MEMBER(mastboy_state, workram)// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE_MEMBER(mastboy_state, tileram)// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(mastboy_state, colram) AM_MIRROR(0x0e00)  // colour ram
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_workram)// work ram
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_tileram)// tilemap ram
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_colram) AM_MIRROR(0x0e00)  // colour ram
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
@@ -865,14 +865,14 @@ static MACHINE_RESET( mastboy )
 {
 	mastboy_state *state = machine.driver_data<mastboy_state>();
 	/* clear some ram */
-	memset( state->workram,   0x00, 0x01000);
-	memset( state->tileram,   0x00, 0x01000);
-	memset( state->colram,    0x00, 0x00200);
-	memset( state->vram, 0x00, 0x10000);
+	memset( state->m_workram,   0x00, 0x01000);
+	memset( state->m_tileram,   0x00, 0x01000);
+	memset( state->m_colram,    0x00, 0x00200);
+	memset( state->m_vram, 0x00, 0x10000);
 
-	state->m5205_part = 0;
+	state->m_m5205_part = 0;
 	msm5205_reset_w(machine.device("msm"),1);
-	state->irq0_ack = 0;
+	state->m_irq0_ack = 0;
 }
 
 
@@ -993,7 +993,7 @@ ROM_END
 static DRIVER_INIT( mastboy )
 {
 	mastboy_state *state = machine.driver_data<mastboy_state>();
-	state->vram = machine.region( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
+	state->m_vram = machine.region( "gfx1" )->base(); // makes decoding the RAM based tiles easier this way
 }
 
 GAME( 1991, mastboy,  0,          mastboy, mastboy, mastboy, ROT0, "Gaelco", "Master Boy (Spanish, PCB Rev A)", 0 )

@@ -12,8 +12,8 @@
 
 struct vram_state_data
 {
-	UINT16	addr;
-	UINT8	latch[2];
+	UINT16	m_addr;
+	UINT8	m_latch[2];
 };
 
 
@@ -24,45 +24,45 @@ public:
 	leland_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 dac_control;
-	UINT8 *alleymas_kludge_mem;
-	UINT8 *ataxx_qram;
-	UINT8 gfx_control;
-	UINT8 wcol_enable;
-	emu_timer *master_int_timer;
-	UINT8 *master_base;
-	UINT8 *slave_base;
-	UINT8 *xrom_base;
-	UINT32 master_length;
-	UINT32 slave_length;
-	UINT32 xrom_length;
-	int dangerz_x;
-	int dangerz_y;
-	UINT8 analog_result;
-	UINT8 dial_last_input[4];
-	UINT8 dial_last_result[4];
-	UINT8 keycard_shift;
-	UINT8 keycard_bit;
-	UINT8 keycard_state;
-	UINT8 keycard_clock;
-	UINT8 keycard_command[3];
-	UINT8 top_board_bank;
-	UINT8 sound_port_bank;
-	UINT8 alternate_bank;
-	UINT8 master_bank;
-	void (*update_master_bank)(running_machine &machine);
-	UINT32 xrom1_addr;
-	UINT32 xrom2_addr;
-	UINT8 battery_ram_enable;
-	UINT8 *battery_ram;
-	UINT8 *extra_tram;
-	UINT8 *video_ram;
-	struct vram_state_data vram_state[2];
-	UINT16 xscroll;
-	UINT16 yscroll;
-	UINT8 gfxbank;
-	UINT16 last_scanline;
-	emu_timer *scanline_timer;
+	UINT8 m_dac_control;
+	UINT8 *m_alleymas_kludge_mem;
+	UINT8 *m_ataxx_qram;
+	UINT8 m_gfx_control;
+	UINT8 m_wcol_enable;
+	emu_timer *m_master_int_timer;
+	UINT8 *m_master_base;
+	UINT8 *m_slave_base;
+	UINT8 *m_xrom_base;
+	UINT32 m_master_length;
+	UINT32 m_slave_length;
+	UINT32 m_xrom_length;
+	int m_dangerz_x;
+	int m_dangerz_y;
+	UINT8 m_analog_result;
+	UINT8 m_dial_last_input[4];
+	UINT8 m_dial_last_result[4];
+	UINT8 m_keycard_shift;
+	UINT8 m_keycard_bit;
+	UINT8 m_keycard_state;
+	UINT8 m_keycard_clock;
+	UINT8 m_keycard_command[3];
+	UINT8 m_top_board_bank;
+	UINT8 m_sound_port_bank;
+	UINT8 m_alternate_bank;
+	UINT8 m_master_bank;
+	void (*m_update_master_bank)(running_machine &machine);
+	UINT32 m_xrom1_addr;
+	UINT32 m_xrom2_addr;
+	UINT8 m_battery_ram_enable;
+	UINT8 *m_battery_ram;
+	UINT8 *m_extra_tram;
+	UINT8 *m_video_ram;
+	struct vram_state_data m_vram_state[2];
+	UINT16 m_xscroll;
+	UINT16 m_yscroll;
+	UINT8 m_gfxbank;
+	UINT16 m_last_scanline;
+	emu_timer *m_scanline_timer;
 };
 
 

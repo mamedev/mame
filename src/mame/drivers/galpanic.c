@@ -215,8 +215,8 @@ static WRITE16_HANDLER( galpanic_bgvideoram_mirror_w )
 static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)	/* + work RAM */
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
@@ -249,10 +249,10 @@ static READ8_DEVICE_HANDLER( comad_okim6295_r )
 
 static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)	/* + work RAM */
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
@@ -268,10 +268,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)	/* + work RAM */
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
@@ -286,13 +286,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-    AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)
+    AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x600800, 0x600fff) AM_RAM	// writes only 1?
 	AM_RANGE(0x680000, 0x68001f) AM_RAM	// regs?
-	AM_RANGE(0x700000, 0x700fff) AM_RAM	AM_BASE_SIZE_MEMBER(galpanic_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM	AM_BASE_SIZE_MEMBER(galpanic_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x780000, 0x78001f) AM_RAM	// regs?
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
@@ -312,12 +312,12 @@ READ16_HANDLER( zipzap_random_read )
 
 static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)
 	AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x701000, 0x71ffff) AM_RAM
 	AM_RANGE(0x780000, 0x78001f) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
@@ -333,12 +333,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, m_fgvideoram) AM_SIZE_MEMBER(galpanic_state, m_fgvideoram_size)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, m_bgvideoram)
 //  AM_RANGE(0x580000, 0x583fff) AM_RAM_WRITE(galpanic_bgvideoram_mirror_w) // can't be right, causes half the display to vanish at times!
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
 	AM_RANGE(0x680000, 0x68001f) AM_RAM
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, spriteram, spriteram_size)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(galpanic_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x780000, 0x78001f) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")

@@ -52,7 +52,7 @@ static void get_tile_info( running_machine &machine, tile_data *tileinfo, tilema
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	SET_TILE_INFO(0, state->videoram[tile_index], state->colorram[tile_index] & 0x07, 0);
+	SET_TILE_INFO(0, state->m_videoram[tile_index], state->m_colorram[tile_index] & 0x07, 0);
 }
 
 
@@ -60,10 +60,10 @@ WRITE8_HANDLER( m10_colorram_w )
 {
 	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->colorram[offset] != data)
+	if (state->m_colorram[offset] != data)
 	{
-		tilemap_mark_tile_dirty(state->tx_tilemap, offset);
-		state->colorram[offset] = data;
+		tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+		state->m_colorram[offset] = data;
 	}
 }
 
@@ -72,10 +72,10 @@ WRITE8_HANDLER( m10_chargen_w )
 {
 	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->chargen[offset] != data)
+	if (state->m_chargen[offset] != data)
 	{
-		state->chargen[offset] = data;
-		gfx_element_mark_dirty(state->back_gfx, offset >> (3 + 5));
+		state->m_chargen[offset] = data;
+		gfx_element_mark_dirty(state->m_back_gfx, offset >> (3 + 5));
 	}
 }
 
@@ -84,9 +84,9 @@ WRITE8_HANDLER( m15_chargen_w )
 {
 	m10_state *state = space->machine().driver_data<m10_state>();
 
-	if (state->chargen[offset] != data)
+	if (state->m_chargen[offset] != data)
 	{
-		state->chargen[offset] = data;
+		state->m_chargen[offset] = data;
 		gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
 	}
 }
@@ -96,7 +96,7 @@ INLINE void plot_pixel_m10( running_machine &machine, bitmap_t *bm, int x, int y
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	if (!state->flip)
+	if (!state->m_flip)
 		*BITMAP_ADDR16(bm, y, x) = col;
 	else
 		*BITMAP_ADDR16(bm, (IREMM10_VBSTART - 1) - (y - IREMM10_VBEND) + 6,
@@ -107,14 +107,14 @@ VIDEO_START( m10 )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	state->tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->tx_tilemap, 0);
-	tilemap_set_scrolldx(state->tx_tilemap, 0, 62);
-	tilemap_set_scrolldy(state->tx_tilemap, 0, 0);
+	state->m_tx_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_tx_tilemap, 0);
+	tilemap_set_scrolldx(state->m_tx_tilemap, 0, 62);
+	tilemap_set_scrolldy(state->m_tx_tilemap, 0, 0);
 
-	state->back_gfx = gfx_element_alloc(machine, &backlayout, state->chargen, 8, 0);
+	state->m_back_gfx = gfx_element_alloc(machine, &backlayout, state->m_chargen, 8, 0);
 
-	machine.gfx[1] = state->back_gfx;
+	machine.gfx[1] = state->m_back_gfx;
 	return ;
 }
 
@@ -122,11 +122,11 @@ VIDEO_START( m15 )
 {
 	m10_state *state = machine.driver_data<m10_state>();
 
-	machine.gfx[0] = gfx_element_alloc(machine, &charlayout, state->chargen, 8, 0);
+	machine.gfx[0] = gfx_element_alloc(machine, &charlayout, state->m_chargen, 8, 0);
 
-	state->tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan, 8, 8, 32, 32);
-	tilemap_set_scrolldx(state->tx_tilemap, 0, 116);
-	tilemap_set_scrolldy(state->tx_tilemap, 0, 0);
+	state->m_tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan, 8, 8, 32, 32);
+	tilemap_set_scrolldx(state->m_tx_tilemap, 0, 116);
+	tilemap_set_scrolldy(state->m_tx_tilemap, 0, 0);
 
 	return ;
 }
@@ -148,12 +148,12 @@ SCREEN_UPDATE( m10 )
 	bitmap_fill(bitmap, cliprect, 0);
 
 	for (i = 0; i < 4; i++)
-		if (state->flip)
-			drawgfx_opaque(bitmap, cliprect, state->back_gfx, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
+		if (state->m_flip)
+			drawgfx_opaque(bitmap, cliprect, state->m_back_gfx, i, color[i], 1, 1, 31 * 8 - xpos[i], 6);
 		else
-			drawgfx_opaque(bitmap, cliprect, state->back_gfx, i, color[i], 0, 0, xpos[i], 0);
+			drawgfx_opaque(bitmap, cliprect, state->m_back_gfx, i, color[i], 0, 0, xpos[i], 0);
 
-	if (state->bottomline)
+	if (state->m_bottomline)
 	{
 		int y;
 
@@ -161,11 +161,11 @@ SCREEN_UPDATE( m10 )
 			plot_pixel_m10(screen->machine(), bitmap, 16, y, 1);
 	}
 
-	for (offs = state->videoram_size - 1; offs >= 0; offs--)
-		tilemap_mark_tile_dirty(state->tx_tilemap, offs);
+	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+		tilemap_mark_tile_dirty(state->m_tx_tilemap, offs);
 
-	tilemap_set_flip(state->tx_tilemap, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	tilemap_set_flip(state->m_tx_tilemap, state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	return 0;
 }
@@ -182,12 +182,12 @@ SCREEN_UPDATE( m15 )
 	m10_state *state = screen->machine().driver_data<m10_state>();
 	int offs;
 
-	for (offs = state->videoram_size - 1; offs >= 0; offs--)
-		tilemap_mark_tile_dirty(state->tx_tilemap, offs);
+	for (offs = state->m_videoram_size - 1; offs >= 0; offs--)
+		tilemap_mark_tile_dirty(state->m_tx_tilemap, offs);
 
-	//tilemap_mark_all_tiles_dirty(state->tx_tilemap);
-	tilemap_set_flip(state->tx_tilemap, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+	//tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+	tilemap_set_flip(state->m_tx_tilemap, state->m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	return 0;
 }

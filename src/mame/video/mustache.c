@@ -46,9 +46,9 @@ PALETTE_INIT(mustache)
 WRITE8_HANDLER( mustache_videoram_w )
 {
 	mustache_state *state = space->machine().driver_data<mustache_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER (mustache_video_control_w)
@@ -62,9 +62,9 @@ WRITE8_HANDLER (mustache_video_control_w)
 
 	/* tile bank */
 
-	if ((state->control_byte ^ data) & 0x08)
+	if ((state->m_control_byte ^ data) & 0x08)
 	{
-		state->control_byte = data;
+		state->m_control_byte = data;
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
@@ -72,18 +72,18 @@ WRITE8_HANDLER (mustache_video_control_w)
 WRITE8_HANDLER( mustache_scroll_w )
 {
 	mustache_state *state = space->machine().driver_data<mustache_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, 0x100 - data);
-	tilemap_set_scrollx(state->bg_tilemap, 1, 0x100 - data);
-	tilemap_set_scrollx(state->bg_tilemap, 2, 0x100 - data);
-	tilemap_set_scrollx(state->bg_tilemap, 3, 0x100);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, 0x100 - data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 1, 0x100 - data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 2, 0x100 - data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 3, 0x100);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int attr = videoram[2 * tile_index + 1];
-	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((state->control_byte & 0x08) << 7);
+	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((state->m_control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
@@ -94,10 +94,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( mustache )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_x,
 		 8, 8, 64, 32);
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 4);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 4);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -106,10 +106,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine.gfx[1];
 	const rectangle &visarea = machine.primary_screen->visible_area();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
 	{
 		int sy = 240-spriteram[offs];
 		int sx = 240-spriteram[offs+3];
@@ -121,7 +121,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		code+=(attr&0x0c)<<6;
 
-		if ((state->control_byte & 0xa))
+		if ((state->m_control_byte & 0xa))
 			clip.max_y = visarea.max_y;
 		else
 			if (flip_screen_get(machine))
@@ -146,7 +146,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( mustache )
 {
 	mustache_state *state = screen->machine().driver_data<mustache_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

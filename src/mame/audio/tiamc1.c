@@ -56,11 +56,11 @@ struct timer8253struct {
 typedef struct _tiamc1_sound_state tiamc1_sound_state;
 struct _tiamc1_sound_state
 {
-	sound_stream *channel;
-	int timer1_divider;
+	sound_stream *m_channel;
+	int m_timer1_divider;
 
-	struct timer8253struct timer0;
-	struct timer8253struct timer1;
+	struct timer8253struct m_timer0;
+	struct timer8253struct m_timer1;
 };
 
 
@@ -242,21 +242,21 @@ static char timer8253_get_output(struct timer8253struct *t, int chn)
 WRITE8_DEVICE_HANDLER( tiamc1_timer0_w )
 {
 	tiamc1_sound_state *state = get_safe_token(device);
-	timer8253_wr(&state->timer0, offset, data);
+	timer8253_wr(&state->m_timer0, offset, data);
 }
 
 WRITE8_DEVICE_HANDLER( tiamc1_timer1_w )
 {
 	tiamc1_sound_state *state = get_safe_token(device);
-	timer8253_wr(&state->timer1, offset, data);
+	timer8253_wr(&state->m_timer1, offset, data);
 }
 
 WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w )
 {
 	tiamc1_sound_state *state = get_safe_token(device);
-	timer8253_set_gate(&state->timer1, 0, (data & 1) ? 1 : 0);
-	timer8253_set_gate(&state->timer1, 1, (data & 2) ? 1 : 0);
-	timer8253_set_gate(&state->timer1, 2, (data & 4) ? 1 : 0);
+	timer8253_set_gate(&state->m_timer1, 0, (data & 1) ? 1 : 0);
+	timer8253_set_gate(&state->m_timer1, 1, (data & 2) ? 1 : 0);
+	timer8253_set_gate(&state->m_timer1, 2, (data & 4) ? 1 : 0);
 }
 
 
@@ -268,25 +268,25 @@ static STREAM_UPDATE( tiamc1_sound_update )
 	len = samples * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++) {
-		state->timer1_divider++;
-		if (state->timer1_divider == 228) {
-			state->timer1_divider = 0;
-			timer8253_tick(&state->timer1, 0);
-			timer8253_tick(&state->timer1, 1);
-			timer8253_tick(&state->timer1, 2);
+		state->m_timer1_divider++;
+		if (state->m_timer1_divider == 228) {
+			state->m_timer1_divider = 0;
+			timer8253_tick(&state->m_timer1, 0);
+			timer8253_tick(&state->m_timer1, 1);
+			timer8253_tick(&state->m_timer1, 2);
 
-			timer8253_set_gate(&state->timer0, 0, timer8253_get_output(&state->timer1, 0));
-			timer8253_set_gate(&state->timer0, 1, timer8253_get_output(&state->timer1, 1));
-			timer8253_set_gate(&state->timer0, 2, timer8253_get_output(&state->timer1, 2));
+			timer8253_set_gate(&state->m_timer0, 0, timer8253_get_output(&state->m_timer1, 0));
+			timer8253_set_gate(&state->m_timer0, 1, timer8253_get_output(&state->m_timer1, 1));
+			timer8253_set_gate(&state->m_timer0, 2, timer8253_get_output(&state->m_timer1, 2));
 		}
 
-		timer8253_tick(&state->timer0, 0);
-		timer8253_tick(&state->timer0, 1);
-		timer8253_tick(&state->timer0, 2);
+		timer8253_tick(&state->m_timer0, 0);
+		timer8253_tick(&state->m_timer0, 1);
+		timer8253_tick(&state->m_timer0, 2);
 
-		o0 = timer8253_get_output(&state->timer0, 0) ? 1 : 0;
-		o1 = timer8253_get_output(&state->timer0, 1) ? 1 : 0;
-		o2 = timer8253_get_output(&state->timer0, 2) ? 1 : 0;
+		o0 = timer8253_get_output(&state->m_timer0, 0) ? 1 : 0;
+		o1 = timer8253_get_output(&state->m_timer0, 1) ? 1 : 0;
+		o2 = timer8253_get_output(&state->m_timer0, 2) ? 1 : 0;
 
 		orval = (orval << 1) | (((o0 | o1) ^ 0xff) & o2);
 
@@ -303,15 +303,15 @@ static DEVICE_START( tiamc1_sound )
 	running_machine &machine = device->machine();
 	int i, j;
 
-	timer8253_reset(&state->timer0);
-	timer8253_reset(&state->timer1);
+	timer8253_reset(&state->m_timer0);
+	timer8253_reset(&state->m_timer1);
 
-	state->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	state->m_channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
-	state->timer1_divider = 0;
+	state->m_timer1_divider = 0;
 
 	for (i = 0; i < 2; i++) {
-		struct timer8253struct *t = (i ? &state->timer1 : &state->timer0);
+		struct timer8253struct *t = (i ? &state->m_timer1 : &state->m_timer0);
 
 		for (j = 0; j < 3; j++) {
 			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].count);
@@ -326,7 +326,7 @@ static DEVICE_START( tiamc1_sound )
 		}
 	}
 
-	device->save_item(NAME(state->timer1_divider));
+	device->save_item(NAME(state->m_timer1_divider));
 }
 
 

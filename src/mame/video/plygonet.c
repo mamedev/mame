@@ -18,11 +18,11 @@ static TILE_GET_INFO( ttl_get_tile_info )
 	polygonet_state *state = machine.driver_data<polygonet_state>();
 	int attr, code;
 
-	code = state->ttl_vram[tile_index]&0xfff;
+	code = state->m_ttl_vram[tile_index]&0xfff;
 
-	attr = state->ttl_vram[tile_index]>>12;	/* palette in all 4 bits? */
+	attr = state->m_ttl_vram[tile_index]>>12;	/* palette in all 4 bits? */
 
-	SET_TILE_INFO(state->ttl_gfx_index, code, attr, 0);
+	SET_TILE_INFO(state->m_ttl_gfx_index, code, attr, 0);
 }
 
 static TILE_GET_INFO( roz_get_tile_info )
@@ -30,8 +30,8 @@ static TILE_GET_INFO( roz_get_tile_info )
 	polygonet_state *state = machine.driver_data<polygonet_state>();
 	int attr, code;
 
-	attr = (state->roz_vram[tile_index] >> 12) + 16;	/* roz base palette is palette 16 */
-	code = state->roz_vram[tile_index] & 0x3ff;
+	attr = (state->m_roz_vram[tile_index] >> 12) + 16;	/* roz base palette is palette 16 */
+	code = state->m_roz_vram[tile_index] & 0x3ff;
 
 	SET_TILE_INFO(0, code, attr, 0);
 }
@@ -39,7 +39,7 @@ static TILE_GET_INFO( roz_get_tile_info )
 READ32_HANDLER( polygonet_ttl_ram_r )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->ttl_vram;
+	UINT32 *vram = (UINT32 *)state->m_ttl_vram;
 
 	return vram[offset];
 }
@@ -47,18 +47,18 @@ READ32_HANDLER( polygonet_ttl_ram_r )
 WRITE32_HANDLER( polygonet_ttl_ram_w )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->ttl_vram;
+	UINT32 *vram = (UINT32 *)state->m_ttl_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
-	tilemap_mark_tile_dirty(state->ttl_tilemap, offset*2);
-	tilemap_mark_tile_dirty(state->ttl_tilemap, offset*2+1);
+	tilemap_mark_tile_dirty(state->m_ttl_tilemap, offset*2);
+	tilemap_mark_tile_dirty(state->m_ttl_tilemap, offset*2+1);
 }
 
 READ32_HANDLER( polygonet_roz_ram_r )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->roz_vram;
+	UINT32 *vram = (UINT32 *)state->m_roz_vram;
 
 	return vram[offset];
 }
@@ -66,12 +66,12 @@ READ32_HANDLER( polygonet_roz_ram_r )
 WRITE32_HANDLER( polygonet_roz_ram_w )
 {
 	polygonet_state *state = space->machine().driver_data<polygonet_state>();
-	UINT32 *vram = (UINT32 *)state->roz_vram;
+	UINT32 *vram = (UINT32 *)state->m_roz_vram;
 
 	COMBINE_DATA(&vram[offset]);
 
-	tilemap_mark_tile_dirty(state->roz_tilemap, offset*2);
-	tilemap_mark_tile_dirty(state->roz_tilemap, offset*2+1);
+	tilemap_mark_tile_dirty(state->m_roz_tilemap, offset*2);
+	tilemap_mark_tile_dirty(state->m_roz_tilemap, offset*2+1);
 }
 
 static TILEMAP_MAPPER( plygonet_scan )
@@ -99,28 +99,28 @@ VIDEO_START( polygonet )
 	};
 
 	/* find first empty slot to decode gfx */
-	for (state->ttl_gfx_index = 0; state->ttl_gfx_index < MAX_GFX_ELEMENTS; state->ttl_gfx_index++)
-		if (machine.gfx[state->ttl_gfx_index] == 0)
+	for (state->m_ttl_gfx_index = 0; state->m_ttl_gfx_index < MAX_GFX_ELEMENTS; state->m_ttl_gfx_index++)
+		if (machine.gfx[state->m_ttl_gfx_index] == 0)
 			break;
 
-	assert(state->ttl_gfx_index != MAX_GFX_ELEMENTS);
+	assert(state->m_ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine.gfx[state->ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx1")->base(), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_ttl_gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx1")->base(), machine.total_colors() / 16, 0);
 
 	/* create the tilemap */
-	state->ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
+	state->m_ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->ttl_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_ttl_tilemap, 0);
 
 	/* set up the roz t-map too */
-	state->roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64);
-	tilemap_set_transparent_pen(state->roz_tilemap, 0);
+	state->m_roz_tilemap = tilemap_create(machine, roz_get_tile_info, plygonet_scan_cols, 16, 16, 32, 64);
+	tilemap_set_transparent_pen(state->m_roz_tilemap, 0);
 
 	/* save states */
-	state->save_item(NAME(state->ttl_gfx_index));
-	state->save_item(NAME(state->ttl_vram));
-	state->save_item(NAME(state->roz_vram));
+	state->save_item(NAME(state->m_ttl_gfx_index));
+	state->save_item(NAME(state->m_ttl_vram));
+	state->save_item(NAME(state->m_roz_vram));
 }
 
 SCREEN_UPDATE( polygonet )
@@ -130,9 +130,9 @@ SCREEN_UPDATE( polygonet )
 	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	k053936_zoom_draw(k053936, bitmap, cliprect, state->roz_tilemap, 0, 0, 0);
+	k053936_zoom_draw(k053936, bitmap, cliprect, state->m_roz_tilemap, 0, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->ttl_tilemap, 0, 1<<0);
+	tilemap_draw(bitmap, cliprect, state->m_ttl_tilemap, 0, 1<<0);
 	return 0;
 }
 

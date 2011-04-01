@@ -11,25 +11,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    ram;
-	UINT8      pmcram[0x800];
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+	UINT8 *    m_ram;
+	UINT8      m_pmcram[0x800];
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase;
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
 
 	/* misc */
-	int        rambank, pmcbank;
-	int        video_enable;
-	int        old_3f90;
+	int        m_rambank;
+	int        m_pmcbank;
+	int        m_video_enable;
+	int        m_old_3f90;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k007232_1;
-	device_t *k007232_2;
-	device_t *k052109;
-	device_t *k051960;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k007232_1;
+	device_t *m_k007232_2;
+	device_t *m_k052109;
+	device_t *m_k051960;
 };
 
 

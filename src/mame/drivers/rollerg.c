@@ -31,10 +31,10 @@ static WRITE8_HANDLER( rollerg_0010_w )
 	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 2 enables 051316 ROM reading */
-	state->readzoomroms = data & 0x04;
+	state->m_readzoomroms = data & 0x04;
 
 	/* bit 5 enables 051316 wraparound */
-	k051316_wraparound_enable(state->k051316, data & 0x20);
+	k051316_wraparound_enable(state->m_k051316, data & 0x20);
 
 	/* other bits unknown */
 }
@@ -43,10 +43,10 @@ static READ8_HANDLER( rollerg_k051316_r )
 {
 	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 
-	if (state->readzoomroms)
-		return k051316_rom_r(state->k051316, offset);
+	if (state->m_readzoomroms)
+		return k051316_rom_r(state->m_k051316, offset);
 	else
-		return k051316_r(state->k051316, offset);
+		return k051316_r(state->m_k051316, offset);
 }
 
 static READ8_DEVICE_HANDLER( rollerg_sound_r )
@@ -59,19 +59,19 @@ static READ8_DEVICE_HANDLER( rollerg_sound_r )
 static WRITE8_HANDLER( soundirq_w )
 {
 	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
 	rollerg_state *state = machine.driver_data<rollerg_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -243,13 +243,13 @@ static MACHINE_START( rollerg )
 	memory_configure_bank(machine, "bank1", 6, 2, &ROM[0x10000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k053244 = machine.device("k053244");
-	state->k051316 = machine.device("k051316");
-	state->k053260 = machine.device("k053260");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k053244 = machine.device("k053244");
+	state->m_k051316 = machine.device("k051316");
+	state->m_k053260 = machine.device("k053260");
 
-	state->save_item(NAME(state->readzoomroms));
+	state->save_item(NAME(state->m_readzoomroms));
 }
 
 static MACHINE_RESET( rollerg )
@@ -258,7 +258,7 @@ static MACHINE_RESET( rollerg )
 
 	konami_configure_set_lines(machine.device("maincpu"), rollerg_banking);
 
-	state->readzoomroms = 0;
+	state->m_readzoomroms = 0;
 }
 
 static MACHINE_CONFIG_START( rollerg, rollerg_state )

@@ -142,12 +142,12 @@ public:
 	kinst_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *rambase;
-	UINT32 *rambase2;
-	UINT32 *rombase;
-	UINT32 *video_base;
-	UINT32 *control;
-	const UINT8 *control_map;
+	UINT32 *m_rambase;
+	UINT32 *m_rambase2;
+	UINT32 *m_rombase;
+	UINT32 *m_video_base;
+	UINT32 *m_control;
+	const UINT8 *m_control_map;
 };
 
 
@@ -202,9 +202,9 @@ static MACHINE_START( kinst )
 	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->rambase2);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->rambase);
-	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->rombase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x08000000, 0x087fffff, FALSE, state->m_rambase2);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x00000000, 0x0007ffff, FALSE, state->m_rambase);
+	mips3drc_add_fastram(machine.device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->m_rombase);
 }
 
 
@@ -219,7 +219,7 @@ static MACHINE_RESET( kinst )
 {
 	kinst_state *state = machine.driver_data<kinst_state>();
 	/* set a safe base location for video */
-	state->video_base = &state->rambase[0x30000/4];
+	state->m_video_base = &state->m_rambase[0x30000/4];
 }
 
 
@@ -238,7 +238,7 @@ static SCREEN_UPDATE( kinst )
 	/* loop over rows and copy to the destination */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT32 *src = &state->video_base[640/4 * y];
+		UINT32 *src = &state->m_video_base[640/4 * y];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 		int x;
 
@@ -327,8 +327,8 @@ static READ32_HANDLER( kinst_control_r )
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
 	/* apply shuffling */
-	offset = state->control_map[offset / 2];
-	result = state->control[offset];
+	offset = state->m_control_map[offset / 2];
+	result = state->m_control[offset];
 
 	switch (offset)
 	{
@@ -362,17 +362,17 @@ static WRITE32_HANDLER( kinst_control_w )
 	UINT32 olddata;
 
 	/* apply shuffling */
-	offset = state->control_map[offset / 2];
-	olddata = state->control[offset];
-	COMBINE_DATA(&state->control[offset]);
+	offset = state->m_control_map[offset / 2];
+	olddata = state->m_control[offset];
+	COMBINE_DATA(&state->m_control[offset]);
 
 	switch (offset)
 	{
 		case 0:		/* $80 - VRAM buffer control */
 			if (data & 4)
-				state->video_base = &state->rambase[0x58000/4];
+				state->m_video_base = &state->m_rambase[0x58000/4];
 			else
-				state->video_base = &state->rambase[0x30000/4];
+				state->m_video_base = &state->m_rambase[0x30000/4];
 			break;
 
 		case 1:		/* $88 - sound reset */
@@ -380,8 +380,8 @@ static WRITE32_HANDLER( kinst_control_w )
 			break;
 
 		case 2:		/* $90 - sound control */
-			if (!(olddata & 0x02) && (state->control[offset] & 0x02))
-				dcs_data_w(state->control[3]);
+			if (!(olddata & 0x02) && (state->m_control[offset] & 0x02))
+				dcs_data_w(state->m_control[3]);
 			break;
 
 		case 3:		/* $98 - sound data */
@@ -399,12 +399,12 @@ static WRITE32_HANDLER( kinst_control_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(kinst_state, rambase)
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE_MEMBER(kinst_state, rambase2)
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE_MEMBER(kinst_state, control)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(kinst_state, m_rambase)
+	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE_MEMBER(kinst_state, m_rambase2)
+	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE_MEMBER(kinst_state, m_control)
 	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE("ide", kinst_ide_r, kinst_ide_w)
 	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE("ide", kinst_ide_extra_r, kinst_ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(kinst_state, rombase)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(kinst_state, m_rombase)
 ADDRESS_MAP_END
 
 
@@ -893,7 +893,7 @@ static DRIVER_INIT( kinst )
 	dcs_init(machine);
 
 	/* set up the control register mapping */
-	state->control_map = kinst_control_map;
+	state->m_control_map = kinst_control_map;
 }
 
 
@@ -912,7 +912,7 @@ static DRIVER_INIT( kinst2 )
 	dcs_init(machine);
 
 	/* set up the control register mapping */
-	state->control_map = kinst2_control_map;
+	state->m_control_map = kinst2_control_map;
 }
 
 

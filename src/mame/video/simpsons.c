@@ -12,7 +12,7 @@ void simpsons_tile_callback( running_machine &machine, int layer, int bank, int 
 {
 	simpsons_state *state = machine.driver_data<simpsons_state>();
 	*code |= ((*color & 0x3f) << 8) | (bank << 14);
-	*color = state->layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = state->m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -27,16 +27,16 @@ void simpsons_sprite_callback( running_machine &machine, int *code, int *color, 
 	simpsons_state *state = machine.driver_data<simpsons_state>();
 	int pri = (*color & 0x0f80) >> 6;	/* ??????? */
 
-	if (pri <= state->layerpri[2])
+	if (pri <= state->m_layerpri[2])
 		*priority_mask = 0;
-	else if (pri > state->layerpri[2] && pri <= state->layerpri[1])
+	else if (pri > state->m_layerpri[2] && pri <= state->m_layerpri[1])
 		*priority_mask = 0xf0;
-	else if (pri > state->layerpri[1] && pri <= state->layerpri[0])
+	else if (pri > state->m_layerpri[1] && pri <= state->m_layerpri[0])
 		*priority_mask = 0xf0 | 0xcc;
 	else
 		*priority_mask = 0xf0 | 0xcc | 0xaa;
 
-	*color = state->sprite_colorbase + (*color & 0x001f);
+	*color = state->m_sprite_colorbase + (*color & 0x001f);
 }
 
 
@@ -49,13 +49,13 @@ void simpsons_sprite_callback( running_machine &machine, int *code, int *color, 
 static READ8_HANDLER( simpsons_k052109_r )
 {
 	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	return k052109_r(state->k052109, offset + 0x2000);
+	return k052109_r(state->m_k052109, offset + 0x2000);
 }
 
 static WRITE8_HANDLER( simpsons_k052109_w )
 {
 	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	k052109_w(state->k052109, offset + 0x2000, data);
+	k052109_w(state->m_k052109, offset + 0x2000, data);
 }
 
 static READ8_HANDLER( simpsons_k053247_r )
@@ -68,12 +68,12 @@ static READ8_HANDLER( simpsons_k053247_r )
 		offs = offset >> 1;
 
 		if (offset & 1)
-			return(state->spriteram[offs] & 0xff);
+			return(state->m_spriteram[offs] & 0xff);
 		else
-			return(state->spriteram[offs] >> 8);
+			return(state->m_spriteram[offs] >> 8);
 	}
 	else
-		return state->xtraram[offset - 0x1000];
+		return state->m_xtraram[offset - 0x1000];
 }
 
 static WRITE8_HANDLER( simpsons_k053247_w )
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 
 	if (offset < 0x1000)
 	{
-		UINT16 *spriteram = state->spriteram;
+		UINT16 *spriteram = state->m_spriteram;
 		offs = offset >> 1;
 
 		if (offset & 1)
@@ -91,7 +91,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 		else
 			spriteram[offs] = (spriteram[offs] & 0x00ff) | (data << 8);
 	}
-	else state->xtraram[offset - 0x1000] = data;
+	else state->m_xtraram[offset - 0x1000] = data;
 }
 
 void simpsons_video_banking( running_machine &machine, int bank )
@@ -106,7 +106,7 @@ void simpsons_video_banking( running_machine &machine, int bank )
 		memory_set_bankptr(machine, "bank5", machine.generic.paletteram.v);
 	}
 	else
-		space->install_legacy_readwrite_handler(*state->k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
+		space->install_legacy_readwrite_handler(*state->m_k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
 
 	if (bank & 2)
 		space->install_legacy_readwrite_handler(0x2000, 0x3fff, FUNC(simpsons_k053247_r), FUNC(simpsons_k053247_w));
@@ -127,29 +127,29 @@ SCREEN_UPDATE( simpsons )
 	simpsons_state *state = screen->machine().driver_data<simpsons_state>();
 	int layer[3], bg_colorbase;
 
-	bg_colorbase = k053251_get_palette_index(state->k053251, K053251_CI0);
-	state->sprite_colorbase = k053251_get_palette_index(state->k053251, K053251_CI1);
-	state->layer_colorbase[0] = k053251_get_palette_index(state->k053251, K053251_CI2);
-	state->layer_colorbase[1] = k053251_get_palette_index(state->k053251, K053251_CI3);
-	state->layer_colorbase[2] = k053251_get_palette_index(state->k053251, K053251_CI4);
+	bg_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI0);
+	state->m_sprite_colorbase = k053251_get_palette_index(state->m_k053251, K053251_CI1);
+	state->m_layer_colorbase[0] = k053251_get_palette_index(state->m_k053251, K053251_CI2);
+	state->m_layer_colorbase[1] = k053251_get_palette_index(state->m_k053251, K053251_CI3);
+	state->m_layer_colorbase[2] = k053251_get_palette_index(state->m_k053251, K053251_CI4);
 
-	k052109_tilemap_update(state->k052109);
+	k052109_tilemap_update(state->m_k052109);
 
 	layer[0] = 0;
-	state->layerpri[0] = k053251_get_priority(state->k053251, K053251_CI2);
+	state->m_layerpri[0] = k053251_get_priority(state->m_k053251, K053251_CI2);
 	layer[1] = 1;
-	state->layerpri[1] = k053251_get_priority(state->k053251, K053251_CI3);
+	state->m_layerpri[1] = k053251_get_priority(state->m_k053251, K053251_CI3);
 	layer[2] = 2;
-	state->layerpri[2] = k053251_get_priority(state->k053251, K053251_CI4);
+	state->m_layerpri[2] = k053251_get_priority(state->m_k053251, K053251_CI4);
 
-	konami_sortlayers3(layer, state->layerpri);
+	konami_sortlayers3(layer, state->m_layerpri);
 
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, 16 * bg_colorbase);
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, layer[0], 0, 1);
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, layer[1], 0, 2);
-	k052109_tilemap_draw(state->k052109, bitmap, cliprect, layer[2], 0, 4);
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[0], 0, 1);
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[1], 0, 2);
+	k052109_tilemap_draw(state->m_k052109, bitmap, cliprect, layer[2], 0, 4);
 
-	k053247_sprites_draw(state->k053246, bitmap, cliprect);
+	k053247_sprites_draw(state->m_k053246, bitmap, cliprect);
 	return 0;
 }

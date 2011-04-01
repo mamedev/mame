@@ -11,16 +11,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 * videoram;
-	UINT16 * frontvideoram;
-	UINT16 * paletteram;
+	UINT16 * m_videoram;
+	UINT16 * m_frontvideoram;
+	UINT16 * m_paletteram;
 
 	/* video-related */
-	bitmap_t *tmpbitmap;
-	UINT16   color;
+	bitmap_t *m_tmpbitmap;
+	UINT16   m_color;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

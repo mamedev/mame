@@ -16,14 +16,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * videoram;
-	UINT8 * colorram;
-	UINT8 * videoram2;
-	UINT8 * colorram2;
+	UINT8 * m_videoram;
+	UINT8 * m_colorram;
+	UINT8 * m_videoram2;
+	UINT8 * m_colorram2;
 
 	/* video-related */
-	tilemap_t *bg_tilemap, *fg_tilemap;
-	int     scroll_x, priority;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	int     m_scroll_x;
+	int     m_priority;
 };
 
 

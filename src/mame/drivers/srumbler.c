@@ -72,7 +72,7 @@ Ignore the warnings about writing to unmapped memory.
 static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_BASE_MEMBER(srumbler_state, backgroundram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_BASE_MEMBER(srumbler_state, m_backgroundram)
 	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(srumbler_bankswitch_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE(srumbler_4009_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("P2")
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x400c, 0x400c) AM_READ_PORT("DSW2")
 	AM_RANGE(0x400a, 0x400d) AM_WRITE(srumbler_scroll_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000")	AM_WRITE(srumbler_foreground_w) AM_BASE_MEMBER(srumbler_state, foregroundram) /* Banked ROM */
+	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000")	AM_WRITE(srumbler_foreground_w) AM_BASE_MEMBER(srumbler_state, m_foregroundram) /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000")	/* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP	/* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000")	/* Banked ROM */

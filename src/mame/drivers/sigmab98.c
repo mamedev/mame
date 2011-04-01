@@ -103,8 +103,8 @@ public:
 	sigmab98_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 
@@ -153,8 +153,8 @@ public:
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
-	UINT8 *end		=	state->spriteram - 0x10;
-	UINT8 *s		=	end + state->spriteram_size;
+	UINT8 *end		=	state->m_spriteram - 0x10;
+	UINT8 *s		=	end + state->m_spriteram_size;
 
 	for ( ; s != end; s -= 0x10 )
 	{
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE_MEMBER(sigmab98_state, spriteram, spriteram_size)
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE_MEMBER(sigmab98_state, m_spriteram, m_spriteram_size)
 
 	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_BASE_GENERIC(paletteram)
 
@@ -841,7 +841,7 @@ static READ8_HANDLER( haekaka_b000_r )
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
-				return state->spriteram[offset];
+				return state->m_spriteram[offset];
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
@@ -863,7 +863,7 @@ static WRITE8_HANDLER( haekaka_b000_w )
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				state->spriteram[offset] = data;
+				state->m_spriteram[offset] = data;
 				return;
 			}
 			break;
@@ -961,8 +961,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x11:	// 3800 IS ROM
 					memory_set_bankptr(space->machine(), "rombank0", rom + 0x4c00);
 					memory_set_bankptr(space->machine(), "rombank1", rom + 0x5c00);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -977,8 +977,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x14:	// 3800 IS ROM
 					memory_set_bankptr(space->machine(), "rombank0", rom + 0x8000);
 					memory_set_bankptr(space->machine(), "rombank1", rom + 0x9000);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -993,31 +993,31 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x0f:	// 3800 IS ROM
 					memory_set_bankptr(space->machine(), "rombank0", rom + 0x3400);
 					memory_set_bankptr(space->machine(), "rombank1", rom + 0x4400);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				case 0x12:	// 3800 IS ROM
 					memory_set_bankptr(space->machine(), "rombank0", rom + 0x6400);
 					memory_set_bankptr(space->machine(), "rombank1", rom + 0x7400);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				// used in test mode:
 //              case 0x5c:  memory_set_bankptr(space->machine(), "rombank", rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:	// 3800 IS RAM! (1404 bytes)
-					memory_set_bankptr(space->machine(), "rombank0", state->spriteram + 0x1000*1);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*1);
-					memory_set_bankptr(space->machine(), "rombank1", state->spriteram + 0x1000*2);
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*2);
+					memory_set_bankptr(space->machine(), "rombank0", state->m_spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine(), "rombank1", state->m_spriteram + 0x1000*2);
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*2);
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					memory_set_bankptr(space->machine(), "rombank0", state->spriteram);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram);
-//                  memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);    // scratch
+					memory_set_bankptr(space->machine(), "rombank0", state->m_spriteram);
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram);
+//                  memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);    // scratch
 					break;
 
 				default:
@@ -1032,8 +1032,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x14:	// 3800 IS ROM
 					memory_set_bankptr(space->machine(), "rombank0", rom + 0x8800);
 					memory_set_bankptr(space->machine(), "rombank1", rom + 0x9800);
-					memory_set_bankptr(space->machine(), "sprbank0", state->spriteram + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine(), "sprbank1", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank0", state->m_spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine(), "sprbank1", state->m_spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -1319,7 +1319,7 @@ static READ8_HANDLER( tdoboon_c000_r )
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
-				return state->spriteram[offset];
+				return state->m_spriteram[offset];
 			break;
 
 		case 0x66:	// PALETTERAM + TABLE?
@@ -1345,7 +1345,7 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				state->spriteram[offset] = data;
+				state->m_spriteram[offset] = data;
 				return;
 			}
 			break;
@@ -1923,10 +1923,10 @@ static DRIVER_INIT( animalc )
 	memory_configure_bank(machine, "rambank", 1, 4, bankedram, 0x1000);
 	memory_set_bank(machine, "rambank", 0);
 
-	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->spriteram, 0, 0x1000 * 5);
-	state->spriteram_size = 0x1000;
-	memory_configure_bank(machine, "sprbank", 0, 5, state->spriteram, 0x1000);
+	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	memset(state->m_spriteram, 0, 0x1000 * 5);
+	state->m_spriteram_size = 0x1000;
+	memory_configure_bank(machine, "sprbank", 0, 5, state->m_spriteram, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
 }
 
@@ -1967,11 +1967,11 @@ static DRIVER_INIT( itazuram )
 	memory_set_bankptr(machine, "palbank", machine.generic.paletteram.u8);
 	rambank = 0x64;
 
-	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(state->spriteram, 0, 0x1000 * 5);
-	state->spriteram_size = 0x1000;
-	memory_set_bankptr(machine, "sprbank0",  state->spriteram + 0x1000*4);	// scratch
-	memory_set_bankptr(machine, "sprbank1",  state->spriteram + 0x1000*4);	// scratch
+	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	memset(state->m_spriteram, 0, 0x1000 * 5);
+	state->m_spriteram_size = 0x1000;
+	memory_set_bankptr(machine, "sprbank0",  state->m_spriteram + 0x1000*4);	// scratch
+	memory_set_bankptr(machine, "sprbank1",  state->m_spriteram + 0x1000*4);	// scratch
 }
 
 /***************************************************************************
@@ -2075,9 +2075,9 @@ static DRIVER_INIT( haekaka )
 	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
 	memset(machine.generic.paletteram.u8, 0, 0x200);
 
-	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(state->spriteram, 0, 0x1000);
-	state->spriteram_size = 0x1000;
+	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	memset(state->m_spriteram, 0, 0x1000);
+	state->m_spriteram_size = 0x1000;
 
 	rombank = 0x65;
 	rambank = 0x53;

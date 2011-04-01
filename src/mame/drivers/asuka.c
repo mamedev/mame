@@ -233,7 +233,7 @@ DIP locations verified for:
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
-	device_set_input_line(state->maincpu, 5, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
@@ -263,23 +263,23 @@ static void asuka_msm5205_vck( device_t *device )
 {
 	asuka_state *state = device->machine().driver_data<asuka_state>();
 
-	if (state->adpcm_data != -1)
+	if (state->m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->adpcm_data & 0x0f);
-		state->adpcm_data = -1;
+		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
+		state->m_adpcm_data = -1;
 	}
 	else
 	{
-		state->adpcm_data = device->machine().region("ymsnd")->base()[state->adpcm_pos];
-		state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(device, state->adpcm_data >> 4);
+		state->m_adpcm_data = device->machine().region("ymsnd")->base()[state->m_adpcm_pos];
+		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
+		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
 }
 
 static WRITE8_HANDLER( asuka_msm5205_address_w )
 {
 	asuka_state *state = space->machine().driver_data<asuka_state>();
-	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
+	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
@@ -291,7 +291,7 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 {
 	asuka_state *state = device->machine().driver_data<asuka_state>();
 	msm5205_reset_w(device, 1);
-	state->adpcm_pos &= 0xff00;
+	state->m_adpcm_pos &= 0xff00;
 }
 
 static UINT8 *cadash_shared_ram;
@@ -837,47 +837,47 @@ static MACHINE_START( asuka )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->pc090oj = machine.device("pc090oj");
-	state->tc0100scn = machine.device("tc0100scn");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_pc090oj = machine.device("pc090oj");
+	state->m_tc0100scn = machine.device("tc0100scn");
 
 	/* configure the banks */
 	memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
 	memory_configure_bank(machine, "bank1", 1, 3, machine.region("audiocpu")->base() + 0x10000, 0x04000);
 
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_data));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_data));
 
-	state->save_item(NAME(state->current_round));
-	state->save_item(NAME(state->current_bank));
-	state->save_item(NAME(state->video_ctrl));
-	state->save_item(NAME(state->video_mask));
-	state->save_item(NAME(state->cc_port));
-	state->save_item(NAME(state->restart_status));
-	state->save_item(NAME(state->cval));
+	state->save_item(NAME(state->m_current_round));
+	state->save_item(NAME(state->m_current_bank));
+	state->save_item(NAME(state->m_video_ctrl));
+	state->save_item(NAME(state->m_video_mask));
+	state->save_item(NAME(state->m_cc_port));
+	state->save_item(NAME(state->m_restart_status));
+	state->save_item(NAME(state->m_cval));
 }
 
 static MACHINE_RESET( asuka )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
 
-	state->adpcm_pos = 0;
-	state->adpcm_data = -1;
-	state->current_round = 0;
-	state->current_bank = 0;
-	state->video_ctrl = 0;
-	state->video_mask = 0;
-	state->cc_port = 0;
-	state->restart_status = 0;
+	state->m_adpcm_pos = 0;
+	state->m_adpcm_data = -1;
+	state->m_current_round = 0;
+	state->m_current_bank = 0;
+	state->m_video_ctrl = 0;
+	state->m_video_mask = 0;
+	state->m_cc_port = 0;
+	state->m_restart_status = 0;
 
-	memset(state->cval, 0, 26);
+	memset(state->m_cval, 0, 26);
 }
 
 static SCREEN_EOF( asuka )
 {
 	asuka_state *state = machine.driver_data<asuka_state>();
-	pc090oj_eof_callback(state->pc090oj);
+	pc090oj_eof_callback(state->m_pc090oj);
 }
 
 static const tc0220ioc_interface asuka_io_intf =

@@ -11,24 +11,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase, zoom_colorbase;
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
+	int        m_zoom_colorbase;
 
 	/* misc */
-	int        video_enable;
-	int        zoomreadroms, k052109_selected;
-	int        nmienable;
+	int        m_video_enable;
+	int        m_zoomreadroms;
+	int        m_k052109_selected;
+	int        m_nmienable;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k007232_1;
-	device_t *k007232_2;
-	device_t *k052109;
-	device_t *k051960;
-	device_t *k051316;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k007232_1;
+	device_t *m_k007232_2;
+	device_t *m_k052109;
+	device_t *m_k051960;
+	device_t *m_k051316;
 };
 
 /*----------- defined in video/bottom9.c -----------*/

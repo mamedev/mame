@@ -123,7 +123,7 @@ static INTERRUPT_GEN( irq4_gen )
 static WRITE32_HANDLER( control_w )
 {
 	policetr_state *state = space->machine().driver_data<policetr_state>();
-	UINT32 old = state->control_data;
+	UINT32 old = state->m_control_data;
 
 	// bit $80000000 = BSMT access/ROM read
 	// bit $20000000 = toggled every 64 IRQ4's
@@ -132,7 +132,7 @@ static WRITE32_HANDLER( control_w )
 	// bit $00400000 = EEPROM clock
 	// bit $00200000 = EEPROM enable (on 1)
 
-	COMBINE_DATA(&state->control_data);
+	COMBINE_DATA(&state->m_control_data);
 
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
@@ -144,7 +144,7 @@ static WRITE32_HANDLER( control_w )
 	}
 
 	/* toggling BSMT off then on causes a reset */
-	if (!(old & 0x80000000) && (state->control_data & 0x80000000))
+	if (!(old & 0x80000000) && (state->m_control_data & 0x80000000))
 	{
 		bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
 		bsmt->reset();
@@ -166,10 +166,10 @@ static WRITE32_HANDLER( control_w )
 static WRITE32_HANDLER( policetr_bsmt2000_reg_w )
 {
 	policetr_state *state = space->machine().driver_data<policetr_state>();
-	if (state->control_data & 0x80000000)
+	if (state->m_control_data & 0x80000000)
 		space->machine().device<bsmt2000_device>("bsmt")->write_data(data);
 	else
-		COMBINE_DATA(&state->bsmt_data_offset);
+		COMBINE_DATA(&state->m_bsmt_data_offset);
 }
 
 
@@ -177,7 +177,7 @@ static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 {
 	policetr_state *state = space->machine().driver_data<policetr_state>();
 	space->machine().device<bsmt2000_device>("bsmt")->write_reg(data);
-	COMBINE_DATA(&state->bsmt_data_bank);
+	COMBINE_DATA(&state->m_bsmt_data_bank);
 }
 
 
@@ -190,7 +190,7 @@ static CUSTOM_INPUT( bsmt_status_r )
 static READ32_HANDLER( bsmt2000_data_r )
 {
 	policetr_state *state = space->machine().driver_data<policetr_state>();
-	return space->machine().region("bsmt")->base()[state->bsmt_data_bank * 0x10000 + state->bsmt_data_offset] << 8;
+	return space->machine().region("bsmt")->base()[state->m_bsmt_data_bank * 0x10000 + state->m_bsmt_data_offset] << 8;
 }
 
 
@@ -204,26 +204,26 @@ static READ32_HANDLER( bsmt2000_data_r )
 static WRITE32_HANDLER( speedup_w )
 {
 	policetr_state *state = space->machine().driver_data<policetr_state>();
-	COMBINE_DATA(state->speedup_data);
+	COMBINE_DATA(state->m_speedup_data);
 
 	/* see if the PC matches */
-	if ((cpu_get_previouspc(&space->device()) & 0x1fffffff) == state->speedup_pc)
+	if ((cpu_get_previouspc(&space->device()) & 0x1fffffff) == state->m_speedup_pc)
 	{
 		UINT64 curr_cycles = space->machine().firstcpu->total_cycles();
 
 		/* if less than 50 cycles from the last time, count it */
-		if (curr_cycles - state->last_cycles < 50)
+		if (curr_cycles - state->m_last_cycles < 50)
 		{
-			state->loop_count++;
+			state->m_loop_count++;
 
 			/* more than 2 in a row and we spin */
-			if (state->loop_count > 2)
+			if (state->m_loop_count > 2)
 				device_spin_until_interrupt(&space->device());
 		}
 		else
-			state->loop_count = 0;
+			state->m_loop_count = 0;
 
-		state->last_cycles = curr_cycles;
+		state->m_last_cycles = curr_cycles;
 	}
 }
 
@@ -255,7 +255,7 @@ static const eeprom_interface eeprom_interface_policetr =
  *************************************/
 
 static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, m_rambase)
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, m_rambase)
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE(policetr_palette_offset_w)
 	AM_RANGE(0x00320000, 0x00320003) AM_WRITE(policetr_palette_data_w)
@@ -679,30 +679,30 @@ ROM_END
 static DRIVER_INIT( policetr )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
-	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
-	state->speedup_pc = 0x1fc028ac;
+	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
+	state->m_speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
-	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
-	state->speedup_pc = 0x1fc028bc;
+	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
+	state->m_speedup_pc = 0x1fc028bc;
 }
 
 
 static DRIVER_INIT( sshooter )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
-	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
-	state->speedup_pc = 0x1fc03470;
+	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
+	state->m_speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
 	policetr_state *state = machine.driver_data<policetr_state>();
-	state->speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
-	state->speedup_pc = 0x1fc033e0;
+	state->m_speedup_data = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
+	state->m_speedup_pc = 0x1fc033e0;
 }
 
 

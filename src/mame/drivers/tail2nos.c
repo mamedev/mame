@@ -24,7 +24,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -41,9 +41,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_r, k051316_w, 0x00ff)
 	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
-	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_MEMBER(tail2nos_state, spriteram, spriteram_size)
+	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_MEMBER(tail2nos_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE_MEMBER(tail2nos_state, bgvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE_MEMBER(tail2nos_state, m_bgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
@@ -181,7 +181,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	tail2nos_state *state = device->machine().driver_data<tail2nos_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -214,13 +214,13 @@ static MACHINE_START( tail2nos )
 	memory_configure_bank(machine, "bank3", 0, 2, &ROM[0x10000], 0x8000);
 	memory_set_bank(machine, "bank3", 0);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k051316 = machine.device("k051316");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k051316 = machine.device("k051316");
 
-	state->save_item(NAME(state->charbank));
-	state->save_item(NAME(state->charpalette));
-	state->save_item(NAME(state->video_enable));
+	state->save_item(NAME(state->m_charbank));
+	state->save_item(NAME(state->m_charpalette));
+	state->save_item(NAME(state->m_video_enable));
 }
 
 static MACHINE_RESET( tail2nos )
@@ -231,9 +231,9 @@ static MACHINE_RESET( tail2nos )
 	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
 	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
 
-	state->charbank = 0;
-	state->charpalette = 0;
-	state->video_enable = 0;
+	state->m_charbank = 0;
+	state->m_charpalette = 0;
+	state->m_video_enable = 0;
 }
 
 static MACHINE_CONFIG_START( tail2nos, tail2nos_state )

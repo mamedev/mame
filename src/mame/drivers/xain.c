@@ -202,18 +202,18 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 	/* VBLANK input bit is held high from scanlines 248-255 */
 	if (vcount >= 248-1)	// -1 is a hack - see notes above
 	{
-		state->vblank = 1;
+		state->m_vblank = 1;
 	}
 	else
 	{
-		state->vblank = 0;
+		state->m_vblank = 0;
 	}
 }
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->pri = data & 0x7;
+	state->m_pri = data & 0x7;
 	memory_set_bank(space->machine(), "bank1", (data >> 3) & 1);
 }
 
@@ -260,15 +260,15 @@ static WRITE8_HANDLER( xain_irqB_clear_w )
 static READ8_HANDLER( xain_68705_r )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->_mcu_ready = 1;
-	return state->from_mcu;
+	state->m_mcu_ready = 1;
+	return state->m_from_mcu;
 }
 
 static WRITE8_HANDLER( xain_68705_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->from_main = data;
-	state->_mcu_accept = 0;
+	state->m_from_main = data;
+	state->m_mcu_accept = 0;
 
 	if (space->machine().device("mcu") != NULL)
 		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( xain_68705_w )
 static CUSTOM_INPUT( xain_vblank_r )
 {
 	xain_state *state = field->port->machine().driver_data<xain_state>();
-	return state->vblank;
+	return state->m_vblank;
 }
 
 
@@ -290,80 +290,80 @@ static CUSTOM_INPUT( xain_vblank_r )
 READ8_HANDLER( xain_68705_port_a_r )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
+	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
 }
 
 WRITE8_HANDLER( xain_68705_port_a_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->port_a_out = data;
+	state->m_port_a_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_a_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->ddr_a = data;
+	state->m_ddr_a = data;
 }
 
 READ8_HANDLER( xain_68705_port_b_r )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
+	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
 }
 
 WRITE8_HANDLER( xain_68705_port_b_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	if ((state->ddr_b & 0x02) && (~data & 0x02))
+	if ((state->m_ddr_b & 0x02) && (~data & 0x02))
 	{
-		state->port_a_in = state->from_main;
+		state->m_port_a_in = state->m_from_main;
 	}
 	/* Rising edge of PB1 */
-	else if ((state->ddr_b & 0x02) && (~state->port_b_out & 0x02) && (data & 0x02))
+	else if ((state->m_ddr_b & 0x02) && (~state->m_port_b_out & 0x02) && (data & 0x02))
 	{
-		state->_mcu_accept = 1;
+		state->m_mcu_accept = 1;
 		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
 	}
 
 	/* Rising edge of PB2 */
-	if ((state->ddr_b & 0x04) && (~state->port_b_out & 0x04) && (data & 0x04))
+	if ((state->m_ddr_b & 0x04) && (~state->m_port_b_out & 0x04) && (data & 0x04))
 	{
-		state->_mcu_ready = 0;
-		state->from_mcu = state->port_a_out;
+		state->m_mcu_ready = 0;
+		state->m_from_mcu = state->m_port_a_out;
 	}
 
-	state->port_b_out = data;
+	state->m_port_b_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_b_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->ddr_b = data;
+	state->m_ddr_b = data;
 }
 
 READ8_HANDLER( xain_68705_port_c_r )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->port_c_in = 0;
+	state->m_port_c_in = 0;
 
-	if (!state->_mcu_accept)
-		state->port_c_in |= 0x01;
-	if (state->_mcu_ready)
-		state->port_c_in |= 0x02;
+	if (!state->m_mcu_accept)
+		state->m_port_c_in |= 0x01;
+	if (state->m_mcu_ready)
+		state->m_port_c_in |= 0x02;
 
-	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
+	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
 }
 
 WRITE8_HANDLER( xain_68705_port_c_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->port_c_out = data;
+	state->m_port_c_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_c_w )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->ddr_c = data;
+	state->m_ddr_c = data;
 }
 
 static CUSTOM_INPUT( mcu_status_r )
@@ -373,9 +373,9 @@ static CUSTOM_INPUT( mcu_status_r )
 
 	if (field->port->machine().device("mcu") != NULL)
 	{
-		if (state->_mcu_ready == 1)
+		if (state->m_mcu_ready == 1)
 			res |= 0x01;
-		if (state->_mcu_accept == 1)
+		if (state->m_mcu_accept == 1)
 			res |= 0x02;
 	}
 	else
@@ -389,8 +389,8 @@ static CUSTOM_INPUT( mcu_status_r )
 READ8_HANDLER( mcu_comm_reset_r )
 {
 	xain_state *state = space->machine().driver_data<xain_state>();
-	state->_mcu_ready = 1;
-	state->_mcu_accept = 1;
+	state->m_mcu_ready = 1;
+	state->m_mcu_accept = 1;
 
 	if (space->machine().device("mcu") != NULL)
 		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
@@ -401,10 +401,10 @@ READ8_HANDLER( mcu_comm_reset_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE_MEMBER(xain_state, charram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE_MEMBER(xain_state, bgram1)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE_MEMBER(xain_state, bgram0)
-	AM_RANGE(0x3800, 0x397f) AM_RAM AM_BASE_SIZE_MEMBER(xain_state, spriteram, spriteram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE_MEMBER(xain_state, m_charram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE_MEMBER(xain_state, m_bgram1)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE_MEMBER(xain_state, m_bgram0)
+	AM_RANGE(0x3800, 0x397f) AM_RAM AM_BASE_SIZE_MEMBER(xain_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("P1")
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(xain_scrollxP1_w)
 	AM_RANGE(0x3a01, 0x3a01) AM_READ_PORT("P2")

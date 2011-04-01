@@ -96,11 +96,11 @@ static TILEMAP_MAPPER( tilemap_scan )
 static TILE_GET_INFO( get_tile_info )
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
-	UINT8 attr = state->videoram[tile_index + 0x400];
+	UINT8 attr = state->m_videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
-			state->videoram[tile_index],
-			(attr & 0x3f) + 0x40 * state->palettebank,
+			state->m_videoram[tile_index],
+			(attr & 0x3f) + 0x40 * state->m_palettebank,
 			0);
 }
 
@@ -115,9 +115,9 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( toypop )
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
-	state->bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
+	state->m_bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
 
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
 
@@ -131,16 +131,16 @@ VIDEO_START( toypop )
 WRITE8_HANDLER( toypop_videoram_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	if (state->palettebank != (offset & 1))
+	if (state->m_palettebank != (offset & 1))
 	{
-		state->palettebank = offset & 1;
+		state->m_palettebank = offset & 1;
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 }
@@ -148,7 +148,7 @@ WRITE8_HANDLER( toypop_palettebank_w )
 WRITE16_HANDLER( toypop_flipscreen_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->bitmapflip = offset & 1;
+	state->m_bitmapflip = offset & 1;
 }
 
 READ16_HANDLER( toypop_merged_background_r )
@@ -157,8 +157,8 @@ READ16_HANDLER( toypop_merged_background_r )
 	int data1, data2;
 
 	// 0x0a0b0c0d is read as 0xabcd
-	data1 = state->bg_image[2*offset];
-	data2 = state->bg_image[2*offset + 1];
+	data1 = state->m_bg_image[2*offset];
+	data2 = state->m_bg_image[2*offset + 1];
 	return ((data1 & 0xf00) << 4) | ((data1 & 0xf) << 8) | ((data2 & 0xf00) >> 4) | (data2 & 0xf);
 }
 
@@ -168,20 +168,20 @@ WRITE16_HANDLER( toypop_merged_background_w )
 
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
-		state->bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
+		state->m_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
 
 	if (ACCESSING_BITS_0_7)
-		state->bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
+		state->m_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
 static void draw_background(running_machine &machine, bitmap_t *bitmap)
 {
 	toypop_state *state = machine.driver_data<toypop_state>();
 	int offs, x, y;
-	pen_t pen_base = 0x300 + 0x10*state->palettebank;
+	pen_t pen_base = 0x300 + 0x10*state->m_palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
-	if (state->bitmapflip)
+	if (state->m_bitmapflip)
 	{
 		offs = 0xFDFE/2;
 		for (y = 0; y < 224; y++)
@@ -189,7 +189,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
-				UINT16 data = state->bg_image[offs];
+				UINT16 data = state->m_bg_image[offs];
 				scanline[x]   = pen_base | (data & 0x0f);
 				scanline[x+1] = pen_base | (data >> 8);
 				offs--;
@@ -204,7 +204,7 @@ static void draw_background(running_machine &machine, bitmap_t *bitmap)
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
-				UINT16 data = state->bg_image[offs];
+				UINT16 data = state->m_bg_image[offs];
 				scanline[x]   = pen_base | (data >> 8);
 				scanline[x+1] = pen_base | (data & 0x0f);
 				offs++;
@@ -284,7 +284,7 @@ SCREEN_UPDATE( toypop )
 {
 	toypop_state *state = screen->machine().driver_data<toypop_state>();
 	draw_background(screen->machine(), bitmap);
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram);
 	return 0;
 }

@@ -28,31 +28,31 @@ class deco156_state : public driver_device
 public:
 	deco156_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu"),
-		  deco_tilegen1(*this, "tilegen1"),
-		  oki2(*this, "oki2") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_deco_tilegen1(*this, "tilegen1"),
+		  m_oki2(*this, "oki2") { }
 
 	/* devices */
-	required_device<arm_device> maincpu;
-	required_device<deco16ic_device> deco_tilegen1;
-	optional_device<okim6295_device> oki2;
+	required_device<arm_device> m_maincpu;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	optional_device<okim6295_device> m_oki2;
 
 	/* memory */
-	UINT16   pf1_rowscroll[0x800/2];
-	UINT16   pf2_rowscroll[0x800/2];
-	UINT16* spriteram;
+	UINT16   m_pf1_rowscroll[0x800/2];
+	UINT16   m_pf2_rowscroll[0x800/2];
+	UINT16* m_spriteram;
 };
 
 
 static VIDEO_START( wcvol95 )
 {
 	deco156_state *state = machine.driver_data<deco156_state>();
-	state->spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
+	state->m_spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
-	state->save_item(NAME(state->pf1_rowscroll));
-	state->save_item(NAME(state->pf2_rowscroll));
-	state->save_pointer(NAME(state->spriteram), 0x2000/2);
+	state->save_item(NAME(state->m_pf1_rowscroll));
+	state->save_item(NAME(state->m_pf2_rowscroll));
+	state->save_pointer(NAME(state->m_spriteram), 0x2000/2);
 }
 
 
@@ -66,11 +66,11 @@ static SCREEN_UPDATE( wcvol95 )
 	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, NULL, 0);
 
-	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 
-	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, 0x800);
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, 0x800);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -81,7 +81,7 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 	deco156_state *state = space->machine().driver_data<deco156_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->oki2->set_bank_base(0x40000 * (data & 0x7));
+		state->m_oki2->set_bank_base(0x40000 * (data & 0x7));
 		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
 	}
 }
@@ -112,12 +112,12 @@ static WRITE32_HANDLER( deco156_nonbuffered_palette_w )
 	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>();	return state->pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->spriteram[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->spriteram[offset]); }
+static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->m_pf1_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>();	return state->m_pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->m_spriteram[offset] ^ 0xffff0000; }
+static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->m_spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32 )

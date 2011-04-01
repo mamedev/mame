@@ -95,13 +95,13 @@ public:
 	cshooter_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* txram;
-	tilemap_t *txtilemap;
-	UINT8 *mainram;
-	int coin_stat;
-	int counter;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8* m_txram;
+	tilemap_t *m_txtilemap;
+	UINT8 *m_mainram;
+	int m_coin_stat;
+	int m_counter;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 
@@ -114,21 +114,21 @@ static void ar_coin_hack(running_machine &machine)
 	cshooter_state *state = machine.driver_data<cshooter_state>();
 	if(input_port_read(machine, "COIN") & 1)
 	{
-		if(state->coin_stat==0)
+		if(state->m_coin_stat==0)
 		{
-			state->coin_stat=1;
-			if(state->mainram[0]==0)
+			state->m_coin_stat=1;
+			if(state->m_mainram[0]==0)
 			{
-				state->mainram[0]=0x80;
+				state->m_mainram[0]=0x80;
 			}
 
-			state->mainram[0x234]++;
+			state->m_mainram[0x234]++;
 
 		}
 	}
 	else
 	{
-		state->coin_stat=0;
+		state->m_coin_stat=0;
 	}
 }
 #endif
@@ -136,8 +136,8 @@ static void ar_coin_hack(running_machine &machine)
 static TILE_GET_INFO( get_cstx_tile_info )
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	int code = (state->txram[tile_index*2]);
-	int attr = (state->txram[tile_index*2+1]);
+	int code = (state->m_txram[tile_index*2]);
+	int attr = (state->m_txram[tile_index*2+1]);
 	int rg;
 	rg=0;
 	if (attr & 0x20) rg = 1;
@@ -153,28 +153,28 @@ static TILE_GET_INFO( get_cstx_tile_info )
 static WRITE8_HANDLER(cshooter_txram_w)
 {
 	cshooter_state *state = space->machine().driver_data<cshooter_state>();
-	state->txram[offset] = data;
-	tilemap_mark_tile_dirty(state->txtilemap,offset/2);
+	state->m_txram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_txtilemap,offset/2);
 }
 
 static VIDEO_START(cshooter)
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	state->txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
-	tilemap_set_transparent_pen(state->txtilemap, 3);
+	state->m_txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
+	tilemap_set_transparent_pen(state->m_txtilemap, 3);
 }
 
 static SCREEN_UPDATE(cshooter)
 {
 	cshooter_state *state = screen->machine().driver_data<cshooter_state>();
 	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine())*/);
-	tilemap_mark_all_tiles_dirty(state->txtilemap);
+	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
 
 	//sprites
 	{
-		UINT8 *spriteram = state->spriteram;
+		UINT8 *spriteram = state->m_spriteram;
 		int i;
-		for(i=0;i<state->spriteram_size;i+=4)
+		for(i=0;i<state->m_spriteram_size;i+=4)
 		{
 			if(spriteram[i+3]!=0)
 			{
@@ -207,8 +207,8 @@ static SCREEN_UPDATE(cshooter)
 		}
 	}
 
-	tilemap_mark_all_tiles_dirty(state->txtilemap);
-	tilemap_draw(bitmap,cliprect,state->txtilemap,0,0);
+	tilemap_mark_all_tiles_dirty(state->m_txtilemap);
+	tilemap_draw(bitmap,cliprect,state->m_txtilemap,0,0);
 	return 0;
 }
 
@@ -223,7 +223,7 @@ static INTERRUPT_GEN( cshooter_interrupt )
 	else
       device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
-//  if(state->mainram!=NULL)
+//  if(state->m_mainram!=NULL)
 //      ar_coin_hack(device->machine());
 }
 
@@ -232,7 +232,7 @@ static INTERRUPT_GEN( cshooter_interrupt )
 static MACHINE_RESET( cshooter )
 {
 	cshooter_state *state = machine.driver_data<cshooter_state>();
-	state->counter = 0;
+	state->m_counter = 0;
 }
 
 static MACHINE_RESET( airraid )
@@ -246,7 +246,7 @@ static READ8_HANDLER ( cshooter_coin_r )
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (state->counter++ & 1) ? 0xff : input_port_read(space->machine(), "COIN") );
+	return ( (state->m_counter++ & 1) ? 0xff : input_port_read(space->machine(), "COIN") );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, m_txram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -326,13 +326,13 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, m_txram)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE_MEMBER(cshooter_state, mainram)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cshooter_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE_MEMBER(cshooter_state, m_mainram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cshooter_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 

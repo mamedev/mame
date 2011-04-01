@@ -74,22 +74,33 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	bitmap_t *bitmap[2];
-	int clr_offset;
-	int dest;
-	int hi, sx, sx1, dsx, sy, sy1, dsy, sp, sr;
-	int x, y, w, h;
-	unsigned base;
-	int view_roms;
+	bitmap_t *m_bitmap[2];
+	int m_clr_offset;
+	int m_dest;
+	int m_hi;
+	int m_sx;
+	int m_sx1;
+	int m_dsx;
+	int m_sy;
+	int m_sy1;
+	int m_dsy;
+	int m_sp;
+	int m_sr;
+	int m_x;
+	int m_y;
+	int m_w;
+	int m_h;
+	unsigned m_base;
+	int m_view_roms;
 
 	/* misc */
-	UINT16 c00006;
+	UINT16 m_c00006;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 
 	/* memory */
-	UINT8   colorram[256 * 3];
+	UINT8   m_colorram[256 * 3];
 };
 
 
@@ -102,11 +113,11 @@ static VIDEO_START( lastfght )
 	lastfght_state *state = machine.driver_data<lastfght_state>();
 	int i;
 	for (i = 0; i < 2; i++)
-		state->bitmap[i] = machine.primary_screen->alloc_compatible_bitmap();
+		state->m_bitmap[i] = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->save_item(NAME(*state->bitmap[0]));
-	state->save_item(NAME(*state->bitmap[1]));
-	state->save_item(NAME(state->colorram));
+	state->save_item(NAME(*state->m_bitmap[0]));
+	state->save_item(NAME(*state->m_bitmap[1]));
+	state->save_item(NAME(state->m_colorram));
 }
 
 
@@ -121,14 +132,14 @@ static SCREEN_UPDATE( lastfght )
 	UINT8 *gfxdata = screen->machine().region("gfx1")->base();
 	UINT8 data;
 
-	if (input_code_pressed_once(screen->machine(), KEYCODE_ENTER))	state->view_roms ^= 1;
-	if (state->view_roms)
+	if (input_code_pressed_once(screen->machine(), KEYCODE_ENTER))	state->m_view_roms ^= 1;
+	if (state->m_view_roms)
 	{
-		if (input_code_pressed_once(screen->machine(), KEYCODE_PGDN))	state->base += 512 * 256;
-		if (input_code_pressed_once(screen->machine(), KEYCODE_PGUP))	state->base -= 512 * 256;
-		state->base %= screen->machine().region("gfx1")->bytes();
+		if (input_code_pressed_once(screen->machine(), KEYCODE_PGDN))	state->m_base += 512 * 256;
+		if (input_code_pressed_once(screen->machine(), KEYCODE_PGUP))	state->m_base -= 512 * 256;
+		state->m_base %= screen->machine().region("gfx1")->bytes();
 
-		count = state->base;
+		count = state->m_base;
 
 		bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine()));
 		for (y = 0 ; y < 256; y++)
@@ -140,13 +151,13 @@ static SCREEN_UPDATE( lastfght )
 				count++;
 			}
 		}
-		popmessage("%x", state->base);
+		popmessage("%x", state->m_base);
 		return 0;
 	}
 #endif
 #endif
 
-	copybitmap(bitmap, state->bitmap[state->dest ^ 1], 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_bitmap[state->m_dest ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -159,17 +170,17 @@ static WRITE16_HANDLER( colordac_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->colorram[state->clr_offset] = data;
-		palette_set_color_rgb(space->machine(), state->clr_offset / 3,
-			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 0]),
-			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 1]),
-			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 2])
+		state->m_colorram[state->m_clr_offset] = data;
+		palette_set_color_rgb(space->machine(), state->m_clr_offset / 3,
+			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 0]),
+			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 1]),
+			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 2])
 		);
-		state->clr_offset = (state->clr_offset + 1) % (256 * 3);
+		state->m_clr_offset = (state->m_clr_offset + 1) % (256 * 3);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		state->clr_offset = (data >> 8) * 3;
+		state->m_clr_offset = (data >> 8) * 3;
 	}
 }
 
@@ -184,7 +195,7 @@ static WRITE16_HANDLER( lastfght_hi_w )
 		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		state->hi = data << 8;
+		state->m_hi = data << 8;
 		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -198,7 +209,7 @@ static WRITE16_HANDLER( lastfght_x_w )
 		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		state->x = state->hi | data;
+		state->m_x = state->m_hi | data;
 		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(&space->device()),data);
 	}
 }
@@ -210,12 +221,12 @@ static WRITE16_HANDLER( lastfght_yw_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->y = state->hi | (data >> 8);
+		state->m_y = state->m_hi | (data >> 8);
 		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->w = state->hi | data;
+		state->m_w = state->m_hi | data;
 		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -227,7 +238,7 @@ static WRITE16_HANDLER( lastfght_h_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->h = state->hi | (data >> 8);
+		state->m_h = state->m_hi | (data >> 8);
 		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
@@ -241,12 +252,12 @@ static WRITE16_HANDLER( lastfght_sx_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->dsx = state->hi | (data >> 8);
+		state->m_dsx = state->m_hi | (data >> 8);
 		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->sx = state->hi | data;
+		state->m_sx = state->m_hi | data;
 		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -258,12 +269,12 @@ static WRITE16_HANDLER( lastfght_sy_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->sy = state->hi | (data >> 8);
+		state->m_sy = state->m_hi | (data >> 8);
 		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->sy1 = state->hi | data;
+		state->m_sy1 = state->m_hi | data;
 		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -275,12 +286,12 @@ static WRITE16_HANDLER( lastfght_sr_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->sp = (state->hi >> 8) >> 4;
+		state->m_sp = (state->m_hi >> 8) >> 4;
 		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->sr = data;
+		state->m_sr = data;
 		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -292,12 +303,12 @@ static WRITE16_HANDLER( lastfght_sd_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->sx1 = state->hi | (data >> 8);
+		state->m_sx1 = state->m_hi | (data >> 8);
 		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(&space->device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->dsy = state->hi | data;
+		state->m_dsy = state->m_hi | data;
 		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(&space->device()), data);
 	}
 }
@@ -311,29 +322,29 @@ static WRITE16_HANDLER( lastfght_blit_w )
 	{
 		int x, y, addr;
 		UINT8 *gfxdata = space->machine().region( "gfx1" )->base();
-		bitmap_t *dest = state->bitmap[state->dest];
+		bitmap_t *dest = state->m_bitmap[state->m_dest];
 
 #if 0
 		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(&space->device()),
-				state->x, state->y, state->w + 1, state->h + 1,
-				state->sx >> 6, state->sx & 0x3f, state->sx1 >> 6, state->dsx & 0x3f, state->sx1 >> 6, state->sx1 & 0x3f,
-				state->sy >> 6, state->sy & 0x3f, state->sy1 >> 6, state->dsy & 0x3f, state->sy1 >> 6, state->sy1 & 0x3f,
-				state->sp, state->sr,
+				state->m_x, state->m_y, state->m_w + 1, state->m_h + 1,
+				state->m_sx >> 6, state->m_sx & 0x3f, state->m_sx1 >> 6, state->m_dsx & 0x3f, state->m_sx1 >> 6, state->m_sx1 & 0x3f,
+				state->m_sy >> 6, state->m_sy & 0x3f, state->m_sy1 >> 6, state->m_dsy & 0x3f, state->m_sy1 >> 6, state->m_sy1 & 0x3f,
+				state->m_sp, state->m_sr,
 				data >> 8);
 #endif
 
-		for (y = 0; y <= state->h; y++)
+		for (y = 0; y <= state->m_h; y++)
 		{
-			for (x = 0; x <= state->w; x++)
+			for (x = 0; x <= state->m_w; x++)
 			{
-				addr = (((state->sx + state->sx1 + state->dsx * x) >> 6) & 0x1ff) +
-							(((state->sy + state->sy1 + state->dsy * y) >> 6) & 0xff) * 0x200 +
-							state->sp * 0x200 * 0x100 + state->sr * 0x200000;
+				addr = (((state->m_sx + state->m_sx1 + state->m_dsx * x) >> 6) & 0x1ff) +
+							(((state->m_sy + state->m_sy1 + state->m_dsy * y) >> 6) & 0xff) * 0x200 +
+							state->m_sp * 0x200 * 0x100 + state->m_sr * 0x200000;
 
 				data = gfxdata[addr];
 
-				if (data && (state->x + x >= 0) && (state->x + x < 512) && (state->y + y >= 0) && (state->y + y < 256))
-					*BITMAP_ADDR16(dest, state->y + y, state->x + x) = data;
+				if (data && (state->m_x + x >= 0) && (state->m_x + x < 512) && (state->m_y + y >= 0) && (state->m_y + y < 256))
+					*BITMAP_ADDR16(dest, state->m_y + y, state->m_x + x) = data;
 			}
 		}
 	}
@@ -347,7 +358,7 @@ static WRITE16_HANDLER( lastfght_dest_w )
 	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->dest ^= 1;
+		state->m_dest ^= 1;
 }
 
 static READ16_HANDLER( lastfght_c00000_r )
@@ -382,8 +393,8 @@ static READ16_HANDLER( lastfght_c00006_r )
 static WRITE16_HANDLER( lastfght_c00006_w )
 {
 	lastfght_state *state = space->machine().driver_data<lastfght_state>();
-	COMBINE_DATA(&state->c00006);
-	//  popmessage("%04x", state->c00006);
+	COMBINE_DATA(&state->m_c00006);
+	//  popmessage("%04x", state->m_c00006);
 }
 
 static READ16_HANDLER( lastfght_sound_r )
@@ -515,7 +526,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 			generic_pulse_irq_line(device, 0);
 			break;
 		default:
-			device_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+			device_set_input_line(state->m_maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
@@ -524,46 +535,46 @@ static MACHINE_START( lastfght )
 {
 	lastfght_state *state = machine.driver_data<lastfght_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->clr_offset));
-	state->save_item(NAME(state->dest));
-	state->save_item(NAME(state->hi));
-	state->save_item(NAME(state->sx));
-	state->save_item(NAME(state->sx1));
-	state->save_item(NAME(state->dsx));
-	state->save_item(NAME(state->sy));
-	state->save_item(NAME(state->sy1));
-	state->save_item(NAME(state->dsy));
-	state->save_item(NAME(state->sp));
-	state->save_item(NAME(state->sr));
-	state->save_item(NAME(state->x));
-	state->save_item(NAME(state->y));
-	state->save_item(NAME(state->w));
-	state->save_item(NAME(state->h));
-	state->save_item(NAME(state->c00006));
+	state->save_item(NAME(state->m_clr_offset));
+	state->save_item(NAME(state->m_dest));
+	state->save_item(NAME(state->m_hi));
+	state->save_item(NAME(state->m_sx));
+	state->save_item(NAME(state->m_sx1));
+	state->save_item(NAME(state->m_dsx));
+	state->save_item(NAME(state->m_sy));
+	state->save_item(NAME(state->m_sy1));
+	state->save_item(NAME(state->m_dsy));
+	state->save_item(NAME(state->m_sp));
+	state->save_item(NAME(state->m_sr));
+	state->save_item(NAME(state->m_x));
+	state->save_item(NAME(state->m_y));
+	state->save_item(NAME(state->m_w));
+	state->save_item(NAME(state->m_h));
+	state->save_item(NAME(state->m_c00006));
 }
 
 static MACHINE_RESET( lastfght )
 {
 	lastfght_state *state = machine.driver_data<lastfght_state>();
 
-	state->clr_offset = 0;
-	state->dest = 0;
-	state->hi = 0;
-	state->sx = 0;
-	state->sx1 = 0;
-	state->dsx = 0;
-	state->sy = 0;
-	state->sy1 = 0;
-	state->dsy = 0;
-	state->sp = 0;
-	state->sr = 0;
-	state->x = 0;
-	state->y = 0;
-	state->w = 0;
-	state->h = 0;
-	state->c00006 = 0;
+	state->m_clr_offset = 0;
+	state->m_dest = 0;
+	state->m_hi = 0;
+	state->m_sx = 0;
+	state->m_sx1 = 0;
+	state->m_dsx = 0;
+	state->m_sy = 0;
+	state->m_sy1 = 0;
+	state->m_dsy = 0;
+	state->m_sp = 0;
+	state->m_sr = 0;
+	state->m_x = 0;
+	state->m_y = 0;
+	state->m_w = 0;
+	state->m_h = 0;
+	state->m_c00006 = 0;
 }
 
 static MACHINE_CONFIG_START( lastfght, lastfght_state )

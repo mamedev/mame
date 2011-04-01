@@ -11,31 +11,31 @@ public:
 	cinemat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 sound_control;
-	void (*sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
-	UINT32 current_shift;
-	UINT32 last_shift;
-	UINT32 last_shift2;
-	UINT32 current_pitch;
-	UINT32 last_frame;
-	UINT8 sound_fifo[16];
-	UINT8 sound_fifo_in;
-	UINT8 sound_fifo_out;
-	UINT8 last_portb_write;
-	float target_volume;
-	float current_volume;
-	UINT16 *rambase;
-	UINT8 coin_detected;
-	UINT8 coin_last_reset;
-	UINT8 mux_select;
-	int gear;
-	int color_mode;
-	rgb_t vector_color;
-	INT16 lastx;
-	INT16 lasty;
-	UINT8 last_control;
-	int qb3_lastx;
-	int qb3_lasty;
+	UINT8 m_sound_control;
+	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
+	UINT32 m_current_shift;
+	UINT32 m_last_shift;
+	UINT32 m_last_shift2;
+	UINT32 m_current_pitch;
+	UINT32 m_last_frame;
+	UINT8 m_sound_fifo[16];
+	UINT8 m_sound_fifo_in;
+	UINT8 m_sound_fifo_out;
+	UINT8 m_last_portb_write;
+	float m_target_volume;
+	float m_current_volume;
+	UINT16 *m_rambase;
+	UINT8 m_coin_detected;
+	UINT8 m_coin_last_reset;
+	UINT8 m_mux_select;
+	int m_gear;
+	int m_color_mode;
+	rgb_t m_vector_color;
+	INT16 m_lastx;
+	INT16 m_lasty;
+	UINT8 m_last_control;
+	int m_qb3_lastx;
+	int m_qb3_lasty;
 };
 
 

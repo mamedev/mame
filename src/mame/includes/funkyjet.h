@@ -11,16 +11,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  pf1_rowscroll;
-	UINT16 *  pf2_rowscroll;
-	UINT16 *  spriteram;
+	UINT16 *  m_pf1_rowscroll;
+	UINT16 *  m_pf2_rowscroll;
+	UINT16 *  m_spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
-	size_t    spriteram_size;
+	size_t    m_spriteram_size;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *deco_tilegen1;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_deco_tilegen1;
 };
 
 

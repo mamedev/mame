@@ -14,11 +14,11 @@ Atari Sprint 8 driver
 void sprint8_set_collision(running_machine &machine, int n)
 {
 	sprint8_state *state = machine.driver_data<sprint8_state>();
-	if (state->collision_reset == 0)
+	if (state->m_collision_reset == 0)
 	{
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
-		state->collision_index = n;
+		state->m_collision_index = n;
 	}
 }
 
@@ -34,20 +34,20 @@ static TIMER_DEVICE_CALLBACK( input_callback )
 	{
 		UINT8 val = input_port_read(timer.machine(), dialnames[i]) >> 4;
 
-		signed char delta = (val - state->dial[i]) & 15;
+		signed char delta = (val - state->m_dial[i]) & 15;
 
 		if (delta & 8)
 			delta |= 0xf0; /* extend sign to 8 bits */
 
-		state->steer_flag[i] = (delta != 0);
+		state->m_steer_flag[i] = (delta != 0);
 
 		if (delta > 0)
-			state->steer_dir[i] = 0;
+			state->m_steer_dir[i] = 0;
 
 		if (delta < 0)
-			state->steer_dir[i] = 1;
+			state->m_steer_dir[i] = 1;
 
-		state->dial[i] = val;
+		state->m_dial[i] = val;
 	}
 }
 
@@ -55,15 +55,15 @@ static TIMER_DEVICE_CALLBACK( input_callback )
 static MACHINE_RESET( sprint8 )
 {
 	sprint8_state *state = machine.driver_data<sprint8_state>();
-	state->collision_reset = 0;
-	state->collision_index = 0;
+	state->m_collision_reset = 0;
+	state->m_collision_index = 0;
 }
 
 
 static READ8_HANDLER( sprint8_collision_r )
 {
 	sprint8_state *state = space->machine().driver_data<sprint8_state>();
-	return state->collision_index;
+	return state->m_collision_index;
 }
 
 
@@ -73,11 +73,11 @@ static READ8_HANDLER( sprint8_input_r )
 	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
 	UINT8 val = input_port_read(space->machine(), portnames[offset]);
 
-	if (state->steer_dir[offset])
+	if (state->m_steer_dir[offset])
 	{
 		val |= 0x02;
 	}
-	if (state->steer_flag[offset])
+	if (state->m_steer_flag[offset])
 	{
 		val |= 0x04;
 	}
@@ -95,31 +95,31 @@ static WRITE8_HANDLER( sprint8_lockout_w )
 static WRITE8_HANDLER( sprint8_int_reset_w )
 {
 	sprint8_state *state = space->machine().driver_data<sprint8_state>();
-	state->collision_reset = !(data & 1);
+	state->m_collision_reset = !(data & 1);
 
-	if (state->collision_reset)
+	if (state->m_collision_reset)
 		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
 static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_BASE_MEMBER(sprint8_state, video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_BASE_MEMBER(sprint8_state, m_video_ram)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(sprint8_collision_r)
 	AM_RANGE(0x1c01, 0x1c08) AM_READ(sprint8_input_r)
 	AM_RANGE(0x1c09, 0x1c09) AM_READ_PORT("IN0")
 	AM_RANGE(0x1c0a, 0x1c0a) AM_READ_PORT("IN1")
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, pos_h_ram)
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, pos_v_ram)
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, pos_d_ram)
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, m_pos_h_ram)
+	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, m_pos_v_ram)
+	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, m_pos_d_ram)
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(sprint8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(sprint8_int_reset_w)
 	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE("discrete", sprint8_crash_w)
 	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE("discrete", sprint8_screech_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITENOP
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITENOP
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, team)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_BASE_MEMBER(sprint8_state, m_team)
 	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE("discrete", sprint8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("discrete", sprint8_motor_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */

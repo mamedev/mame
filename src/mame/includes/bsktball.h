@@ -20,20 +20,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  motion;
+	UINT8 *  m_videoram;
+	UINT8 *  m_motion;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	UINT32   nmi_on;
-	int      i256v;
+	UINT32   m_nmi_on;
+	int      m_i256v;
 
 	/* input-related */
-	int ld1, ld2;
-	int dir0, dir1, dir2, dir3;
-	int last_p1_horiz, last_p1_vert, last_p2_horiz, last_p2_vert;
+	int m_ld1;
+	int m_ld2;
+	int m_dir0;
+	int m_dir1;
+	int m_dir2;
+	int m_dir3;
+	int m_last_p1_horiz;
+	int m_last_p1_vert;
+	int m_last_p2_horiz;
+	int m_last_p2_vert;
 };
 
 

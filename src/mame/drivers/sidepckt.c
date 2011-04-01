@@ -30,7 +30,7 @@ static WRITE8_HANDLER( sound_cpu_command_w )
 static READ8_HANDLER( sidepckt_i8751_r )
 {
 	sidepckt_state *state = space->machine().driver_data<sidepckt_state>();
-	return state->i8751_return;
+	return state->m_i8751_return;
 }
 
 static WRITE8_HANDLER( sidepckt_i8751_w )
@@ -43,33 +43,33 @@ static WRITE8_HANDLER( sidepckt_i8751_w )
 	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
-	if (state->in_math==1) {
-		state->in_math=2;
-		state->i8751_return=state->math_param=data;
+	if (state->m_in_math==1) {
+		state->m_in_math=2;
+		state->m_i8751_return=state->m_math_param=data;
 	}
-	else if (state->in_math==2) {
-		state->in_math=0;
-		state->i8751_return=state->math_param/data;
+	else if (state->m_in_math==2) {
+		state->m_in_math=0;
+		state->m_i8751_return=state->m_math_param/data;
 	}
 	else switch (data) {
 		case 1: /* ID Check */
-			state->current_table=1; state->current_ptr=0; state->i8751_return=table_1[state->current_ptr++]; break;
+			state->m_current_table=1; state->m_current_ptr=0; state->m_i8751_return=table_1[state->m_current_ptr++]; break;
 
 		case 2: /* Protection data (executable code) */
-			state->current_table=2; state->current_ptr=0; state->i8751_return=table_2[state->current_ptr++]; break;
+			state->m_current_table=2; state->m_current_ptr=0; state->m_i8751_return=table_2[state->m_current_ptr++]; break;
 
 		case 3: /* Protection data (executable code) */
-			state->current_table=3; state->current_ptr=0; state->i8751_return=table_3[state->current_ptr++]; break;
+			state->m_current_table=3; state->m_current_ptr=0; state->m_i8751_return=table_3[state->m_current_ptr++]; break;
 
 		case 4: /* Divide function - multiple parameters */
-			state->in_math=1;
-			state->i8751_return=4;
+			state->m_in_math=1;
+			state->m_i8751_return=4;
 			break;
 
 		case 6: /* Read table data */
-			if (state->current_table==1) state->i8751_return=table_1[state->current_ptr++];
-			if (state->current_table==2) state->i8751_return=table_2[state->current_ptr++];
-			if (state->current_table==3) state->i8751_return=table_3[state->current_ptr++];
+			if (state->m_current_table==1) state->m_i8751_return=table_1[state->m_current_ptr++];
+			if (state->m_current_table==2) state->m_i8751_return=table_2[state->m_current_ptr++];
+			if (state->m_current_table==3) state->m_i8751_return=table_3[state->m_current_ptr++];
 			break;
 	}
 }
@@ -84,33 +84,33 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 	cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
-	if (state->in_math==1) {
-		state->in_math=2;
-		state->i8751_return=state->math_param=data;
+	if (state->m_in_math==1) {
+		state->m_in_math=2;
+		state->m_i8751_return=state->m_math_param=data;
 	}
-	else if (state->in_math==2) {
-		state->in_math=0;
-		state->i8751_return=state->math_param/data;
+	else if (state->m_in_math==2) {
+		state->m_in_math=0;
+		state->m_i8751_return=state->m_math_param/data;
 	}
 	else switch (data) {
 		case 1: /* ID Check */
-			state->current_table=1; state->current_ptr=0; state->i8751_return=table_1[state->current_ptr++]; break;
+			state->m_current_table=1; state->m_current_ptr=0; state->m_i8751_return=table_1[state->m_current_ptr++]; break;
 
 		case 2: /* Protection data */
-			state->current_table=2; state->current_ptr=0; state->i8751_return=table_2[state->current_ptr++]; break;
+			state->m_current_table=2; state->m_current_ptr=0; state->m_i8751_return=table_2[state->m_current_ptr++]; break;
 
 		case 3: /* Protection data (executable code) */
-			state->current_table=3; state->current_ptr=0; state->i8751_return=table_3[state->current_ptr++]; break;
+			state->m_current_table=3; state->m_current_ptr=0; state->m_i8751_return=table_3[state->m_current_ptr++]; break;
 
 		case 4: /* Divide function - multiple parameters */
-			state->in_math=1;
-			state->i8751_return=4;
+			state->m_in_math=1;
+			state->m_i8751_return=4;
 			break;
 
 		case 6: /* Read table data */
-			if (state->current_table==1) state->i8751_return=table_1[state->current_ptr++];
-			if (state->current_table==2) state->i8751_return=table_2[state->current_ptr++];
-			if (state->current_table==3) state->i8751_return=table_3[state->current_ptr++];
+			if (state->m_current_table==1) state->m_i8751_return=table_1[state->m_current_ptr++];
+			if (state->m_current_table==2) state->m_i8751_return=table_2[state->m_current_ptr++];
+			if (state->m_current_table==3) state->m_i8751_return=table_3[state->m_current_ptr++];
 			break;
 	}
 }
@@ -119,11 +119,11 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,videoram) AM_SIZE_MEMBER(sidepckt_state,videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,m_videoram) AM_SIZE_MEMBER(sidepckt_state,m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE_MEMBER(sidepckt_state,colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE_MEMBER(sidepckt_state,m_colorram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_MEMBER(sidepckt_state,spriteram) AM_SIZE_MEMBER(sidepckt_state,spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_MEMBER(sidepckt_state,m_spriteram) AM_SIZE_MEMBER(sidepckt_state,m_spriteram_size)
 	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")

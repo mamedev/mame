@@ -4,15 +4,15 @@ public:
 	cabal_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *spriteram;
-	UINT16 *colorram;
-	UINT16 *videoram;
-	size_t spriteram_size;
-	tilemap_t *background_layer;
-	tilemap_t *text_layer;
-	int sound_command1;
-	int sound_command2;
-	int last[4];
+	UINT16 *m_spriteram;
+	UINT16 *m_colorram;
+	UINT16 *m_videoram;
+	size_t m_spriteram_size;
+	tilemap_t *m_background_layer;
+	tilemap_t *m_text_layer;
+	int m_sound_command1;
+	int m_sound_command2;
+	int m_last[4];
 };
 
 

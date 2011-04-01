@@ -24,12 +24,12 @@
 static TILE_GET_INFO( get_tile_info )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
-	UINT8 code = state->videoram[tile_index];
+	UINT8 code = state->m_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
-			code + (state->charbank << 8),
-			state->tilecolor[code],
-			(state->tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
+			code + (state->m_charbank << 8),
+			state->m_tilecolor[code],
+			(state->m_tilecolor[code] >= 0x33) ? 0 : TILE_FORCE_LAYER0);
 }
 // transparency should only affect tiles with color 0x33 or higher
 
@@ -44,27 +44,27 @@ VIDEO_START( aeroboto )
 {
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
-	tilemap_set_scroll_rows(state->bg_tilemap, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 64);
 
-	state->save_item(NAME(state->charbank));
-	state->save_item(NAME(state->starsoff));
-	state->save_item(NAME(state->sx));
-	state->save_item(NAME(state->sy));
-	state->save_item(NAME(state->ox));
-	state->save_item(NAME(state->oy));
+	state->save_item(NAME(state->m_charbank));
+	state->save_item(NAME(state->m_starsoff));
+	state->save_item(NAME(state->m_sx));
+	state->save_item(NAME(state->m_sy));
+	state->save_item(NAME(state->m_ox));
+	state->save_item(NAME(state->m_oy));
 
 	#if STARS_LAYOUT
 	{
 		UINT8 *temp;
 		int i;
 
-		temp = auto_alloc_array(machine, UINT8, state->stars_length);
-		memcpy(temp, state->stars_rom, state->stars_length);
+		temp = auto_alloc_array(machine, UINT8, state->m_stars_length);
+		memcpy(temp, state->m_stars_rom, state->m_stars_length);
 
-		for (i = 0; i < state->stars_length; i++)
-			state->stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
+		for (i = 0; i < state->m_stars_length; i++)
+			state->m_stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
 
 		auto_free(machine, temp);
 	}
@@ -92,32 +92,32 @@ WRITE8_HANDLER( aeroboto_3000_w )
 	flip_screen_set(space->machine(), data & 0x01);
 
 	/* bit 1 = char bank select */
-	if (state->charbank != ((data & 0x02) >> 1))
+	if (state->m_charbank != ((data & 0x02) >> 1))
 	{
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
-		state->charbank = (data & 0x02) >> 1;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_charbank = (data & 0x02) >> 1;
 	}
 
 	/* bit 2 = disable star field? */
-	state->starsoff = data & 0x4;
+	state->m_starsoff = data & 0x4;
 }
 
 WRITE8_HANDLER( aeroboto_videoram_w )
 {
 	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( aeroboto_tilecolor_w )
 {
 	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	if (state->tilecolor[offset] != data)
+	if (state->m_tilecolor[offset] != data)
 	{
-		state->tilecolor[offset] = data;
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_tilecolor[offset] = data;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
@@ -134,10 +134,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
 
-	for (offs = 0; offs < state->spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
-		int x = state->spriteram[offs + 3];
-		int y = 240 - state->spriteram[offs];
+		int x = state->m_spriteram[offs + 3];
+		int y = 240 - state->m_spriteram[offs];
 
 		if (flip_screen_get(machine))
 		{
@@ -146,8 +146,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		}
 
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
-				state->spriteram[offs + 1],
-				state->spriteram[offs + 2] & 0x07,
+				state->m_spriteram[offs + 1],
+				state->m_spriteram[offs + 2] & 0x07,
 				flip_screen_get(machine), flip_screen_get(machine),
 				((x + 8) & 0xff) - 8, y, 0);
 	}
@@ -163,10 +163,10 @@ SCREEN_UPDATE( aeroboto )
 	UINT8 *src_base, *src_colptr, *src_rowptr;
 	int src_offsx, src_colmask, sky_color, star_color, x, y, i, j, pen;
 
-	sky_color = star_color = *state->bgcolor << 2;
+	sky_color = star_color = *state->m_bgcolor << 2;
 
 	// the star field is supposed to be seen through tile pen 0 when active
-	if (!state->starsoff)
+	if (!state->m_starsoff)
 	{
 		if (star_color < 0xd0)
 		{
@@ -179,16 +179,16 @@ SCREEN_UPDATE( aeroboto )
 		bitmap_fill(bitmap, cliprect, sky_color);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
-		state->sx += (char)(*state->starx - state->ox);
-		state->ox = *state->starx;
-		x = state->sx / SCROLL_SPEED;
+		state->m_sx += (char)(*state->m_starx - state->m_ox);
+		state->m_ox = *state->m_starx;
+		x = state->m_sx / SCROLL_SPEED;
 
-		if (*state->vscroll != 0xff)
-			state->sy += (char)(*state->stary - state->oy);
-		state->oy = *state->stary;
-		y = state->sy / SCROLL_SPEED;
+		if (*state->m_vscroll != 0xff)
+			state->m_sy += (char)(*state->m_stary - state->m_oy);
+		state->m_oy = *state->m_stary;
+		y = state->m_sy / SCROLL_SPEED;
 
-		src_base = state->stars_rom;
+		src_base = state->m_stars_rom;
 
 		for (i = 0; i < 256; i++)
 		{
@@ -208,22 +208,22 @@ SCREEN_UPDATE( aeroboto )
 	}
 	else
 	{
-		state->sx = state->ox = *state->starx;
-		state->sy = state->oy = *state->stary;
+		state->m_sx = state->m_ox = *state->m_starx;
+		state->m_sy = state->m_oy = *state->m_stary;
 		bitmap_fill(bitmap, cliprect, sky_color);
 	}
 
 	for (y = 0; y < 64; y++)
-		tilemap_set_scrollx(state->bg_tilemap, y, state->hscroll[y]);
+		tilemap_set_scrollx(state->m_bg_tilemap, y, state->m_hscroll[y]);
 
 	// the playfield is part of a splitscreen and should not overlap with status display
-	tilemap_set_scrolly(state->bg_tilemap, 0, *state->vscroll);
-	tilemap_draw(bitmap, &splitrect2, state->bg_tilemap, 0, 0);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_vscroll);
+	tilemap_draw(bitmap, &splitrect2, state->m_bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
-	tilemap_set_scrolly(state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &splitrect1, state->bg_tilemap, 0, 0);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &splitrect1, state->m_bg_tilemap, 0, 0);
 	return 0;
 }

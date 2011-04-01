@@ -70,21 +70,21 @@
 static TIMER_CALLBACK( clear_coin_status )
 {
 	vicdual_state *state = machine.driver_data<vicdual_state>();
-	state->coin_status = 0;
+	state->m_coin_status = 0;
 }
 
 
 static void assert_coin_status(running_machine &machine)
 {
 	vicdual_state *state = machine.driver_data<vicdual_state>();
-	state->coin_status = 1;
+	state->m_coin_status = 1;
 }
 
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
 	vicdual_state *state = field->port->machine().driver_data<vicdual_state>();
-	return state->coin_status;
+	return state->m_coin_status;
 }
 
 
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( vicdual_videoram_w )
 {
 	vicdual_state *state = space->machine().driver_data<vicdual_state>();
 	space->machine().primary_screen->update_now();
-	state->videoram[offset] = data;
+	state->m_videoram[offset] = data;
 }
 
 
@@ -203,7 +203,7 @@ static WRITE8_HANDLER( vicdual_characterram_w )
 {
 	vicdual_state *state = space->machine().driver_data<vicdual_state>();
 	space->machine().primary_screen->update_now();
-	state->characterram[offset] = data;
+	state->m_characterram[offset] = data;
 }
 
 
@@ -253,9 +253,9 @@ static WRITE8_HANDLER( depthch_io_w )
 
 static ADDRESS_MAP_START( depthch_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -337,9 +337,9 @@ static ADDRESS_MAP_START( safari_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x4000, 0x7fff) AM_NOP	/* unused */
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -419,9 +419,9 @@ static WRITE8_HANDLER( frogs_io_w )
 
 static ADDRESS_MAP_START( frogs_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -541,9 +541,9 @@ static WRITE8_HANDLER( headon_io_w )
 static ADDRESS_MAP_START( headon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -761,9 +761,9 @@ static WRITE8_HANDLER( digger_io_w )
 static ADDRESS_MAP_START( headon2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
  /* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -1040,9 +1040,9 @@ static WRITE8_HANDLER( alphaho_io_w )
 
 static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2047,7 +2047,7 @@ MACHINE_CONFIG_END
 static WRITE8_HANDLER( samurai_protection_w )
 {
 	vicdual_state *state = space->machine().driver_data<vicdual_state>();
-	state->samurai_protection_data = data;
+	state->m_samurai_protection_data = data;
 }
 
 
@@ -2057,9 +2057,9 @@ static CUSTOM_INPUT( samurai_protection_r )
 	int offset = (FPTR)param;
 	UINT32 answer = 0;
 
-	if (state->samurai_protection_data == 0xab)
+	if (state->m_samurai_protection_data == 0xab)
 		answer = 0x02;
-	else if (state->samurai_protection_data == 0x1d)
+	else if (state->m_samurai_protection_data == 0x1d)
 		answer = 0x0c;
 
 	return (answer >> offset) & 0x01;
@@ -2077,9 +2077,9 @@ static WRITE8_HANDLER( samurai_io_w )
 /* dual game hardware */
 static ADDRESS_MAP_START( samurai_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2191,9 +2191,9 @@ static WRITE8_HANDLER( nsub_io_w )
 static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2287,9 +2287,9 @@ static WRITE8_HANDLER( invinco_io_w )
 static ADDRESS_MAP_START( invinco_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
 ADDRESS_MAP_END
 
 

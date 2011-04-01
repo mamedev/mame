@@ -4,27 +4,27 @@ public:
 	tecmo16_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 *colorram;
-	UINT16 *videoram2;
-	UINT16 *colorram2;
-	UINT16 *charram;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	tilemap_t *tx_tilemap;
-	bitmap_t *sprite_bitmap;
-	bitmap_t *tile_bitmap_bg;
-	bitmap_t *tile_bitmap_fg;
-	int flipscreen;
-	int game_is_riot;
-	UINT16 scroll_x_w;
-	UINT16 scroll_y_w;
-	UINT16 scroll2_x_w;
-	UINT16 scroll2_y_w;
-	UINT16 scroll_char_x_w;
-	UINT16 scroll_char_y_w;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_videoram;
+	UINT16 *m_colorram;
+	UINT16 *m_videoram2;
+	UINT16 *m_colorram2;
+	UINT16 *m_charram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	bitmap_t *m_sprite_bitmap;
+	bitmap_t *m_tile_bitmap_bg;
+	bitmap_t *m_tile_bitmap_fg;
+	int m_flipscreen;
+	int m_game_is_riot;
+	UINT16 m_scroll_x_w;
+	UINT16 m_scroll_y_w;
+	UINT16 m_scroll2_x_w;
+	UINT16 m_scroll2_y_w;
+	UINT16 m_scroll_char_x_w;
+	UINT16 m_scroll_char_y_w;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

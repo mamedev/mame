@@ -4,19 +4,19 @@ public:
 	rollrace_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	int ra_charbank[2];
-	int ra_bkgpage;
-	int ra_bkgflip;
-	int ra_chrbank;
-	int ra_bkgpen;
-	int ra_bkgcol;
-	int ra_flipy;
-	int ra_flipx;
-	int ra_spritebank;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	int m_ra_charbank[2];
+	int m_ra_bkgpage;
+	int m_ra_bkgflip;
+	int m_ra_chrbank;
+	int m_ra_bkgpen;
+	int m_ra_bkgcol;
+	int m_ra_flipy;
+	int m_ra_flipx;
+	int m_ra_spritebank;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

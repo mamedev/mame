@@ -29,11 +29,11 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 	switch (offset & 7)
 	{
 	case 0:
-		state->attract = data;
+		state->m_attract = data;
 		discrete_sound_w(device, STARSHP1_ATTRACT, data);
 		break;
 	case 1:
-		state->phasor = data;
+		state->m_phasor = data;
 		discrete_sound_w(device, STARSHP1_PHASOR_ON, data);
 		break;
 	case 2:
@@ -53,15 +53,15 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 		break;
 	}
 
-	coin_lockout_w(device->machine(), 0, !state->attract);
-	coin_lockout_w(device->machine(), 1, !state->attract);
+	coin_lockout_w(device->machine(), 0, !state->m_attract);
+	coin_lockout_w(device->machine(), 1, !state->m_attract);
 }
 
 
 static WRITE8_HANDLER( starshp1_collision_reset_w )
 {
 	starshp1_state *state = space->machine().driver_data<starshp1_state>();
-	state->collision_latch = 0;
+	state->m_collision_latch = 0;
 }
 
 
@@ -70,7 +70,7 @@ static CUSTOM_INPUT( starshp1_analog_r )
 	starshp1_state *state = field->port->machine().driver_data<starshp1_state>();
 	int val = 0;
 
-	switch (state->analog_in_select)
+	switch (state->m_analog_in_select)
 	{
 	case 0:
 		val = input_port_read(field->port->machine(), "STICKY");
@@ -93,14 +93,14 @@ static CUSTOM_INPUT( starshp1_analog_r )
 static CUSTOM_INPUT( collision_latch_r )
 {
 	starshp1_state *state = field->port->machine().driver_data<starshp1_state>();
-	return state->collision_latch & 0x0f;
+	return state->m_collision_latch & 0x0f;
 }
 
 
 static WRITE8_HANDLER( starshp1_analog_in_w )
 {
 	starshp1_state *state = space->machine().driver_data<starshp1_state>();
-	state->analog_in_select = offset & 3;
+	state->m_analog_in_select = offset & 3;
 }
 
 
@@ -110,7 +110,7 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 	switch (offset & 7)
 	{
 	case 1:
-		state->ship_size = data;
+		state->m_ship_size = data;
 		break;
 	case 2:
 		discrete_sound_w(device, STARSHP1_NOISE_AMPLITUDE, data);
@@ -122,13 +122,13 @@ static WRITE8_DEVICE_HANDLER( starshp1_analog_out_w )
 		discrete_sound_w(device, STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
-		state->circle_hpos = data;
+		state->m_circle_hpos = data;
 		break;
 	case 6:
-		state->circle_vpos = data;
+		state->m_circle_vpos = data;
 		break;
 	case 7:
-		state->circle_size = data;
+		state->m_circle_size = data;
 		break;
 	}
 }
@@ -142,25 +142,25 @@ static WRITE8_HANDLER( starshp1_misc_w )
 	switch (offset & 7)
 	{
 	case 0:
-		state->ship_explode = data;
+		state->m_ship_explode = data;
 		break;
 	case 1:
-		state->circle_mod = data;
+		state->m_circle_mod = data;
 		break;
 	case 2:
-		state->circle_kill = !data;
+		state->m_circle_kill = !data;
 		break;
 	case 3:
-		state->starfield_kill = data;
+		state->m_starfield_kill = data;
 		break;
 	case 4:
-		state->inverse = data;
+		state->m_inverse = data;
 		break;
 	case 5:
 		/* BLACK HOLE, not used */
 		break;
 	case 6:
-		state->mux = data;
+		state->m_mux = data;
 		break;
 	case 7:
 		set_led_status(space->machine(), 0, !data);
@@ -177,10 +177,10 @@ static ADDRESS_MAP_START( starshp1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc300, 0xc3ff) AM_WRITE(starshp1_sspic_w) /* spaceship picture */
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(starshp1_ssadd_w) /* spaceship address */
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE_MEMBER(starshp1_state, playfield_ram)
-	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, hpos_ram)
-	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, vpos_ram)
-	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, obj_ram)
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE_MEMBER(starshp1_state, m_playfield_ram)
+	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, m_hpos_ram)
+	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, m_vpos_ram)
+	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE_MEMBER(starshp1_state, m_obj_ram)
 	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
 	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_WRITE(starshp1_misc_w)

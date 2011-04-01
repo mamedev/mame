@@ -10,45 +10,45 @@ public:
 
 	optional_device<upd96050_device> m_dsp;
 
-	UINT16 *scroll;
-	UINT16 *paletteram;
-	UINT16 *spriteram;
-	UINT16 *spriteram2;
+	UINT16 *m_scroll;
+	UINT16 *m_paletteram;
+	UINT16 *m_spriteram;
+	UINT16 *m_spriteram2;
 
-	int tile_code[16];
+	int m_tile_code[16];
 
-	int enable_video;
-	int shadow_pen_mask;
-	int shadow_pen_shift;
+	int m_enable_video;
+	int m_shadow_pen_mask;
+	int m_shadow_pen_shift;
 
-	UINT8 requested_int;
-	UINT16 *irq_vectors;
-	UINT16 irq_enable;
-	UINT16 *mainram;
+	UINT8 m_requested_int;
+	UINT16 *m_irq_vectors;
+	UINT16 m_irq_enable;
+	UINT16 *m_mainram;
 
-	UINT16 *dsp_ram;
+	UINT16 *m_dsp_ram;
 
-	UINT16 *eaglshot_gfxram;
-	UINT16 *gdfs_tmapram;
-	UINT16 *gdfs_tmapscroll;
+	UINT16 *m_eaglshot_gfxram;
+	UINT16 *m_gdfs_tmapram;
+	UINT16 *m_gdfs_tmapscroll;
 
-	tilemap_t *gdfs_tmap;
+	tilemap_t *m_gdfs_tmap;
 
-	int interrupt_ultrax;
+	int m_interrupt_ultrax;
 
-	UINT16 *input_sel;
-	int gdfs_gfxram_bank;
-	int gdfs_lightgun_select;
-	UINT16 *gdfs_blitram;
+	UINT16 *m_input_sel;
+	int m_gdfs_gfxram_bank;
+	int m_gdfs_lightgun_select;
+	UINT16 *m_gdfs_blitram;
 
-	UINT16 sxyreact_serial;
-	int sxyreact_dial;
-	UINT16 gdfs_eeprom_old;
+	UINT16 m_sxyreact_serial;
+	int m_sxyreact_dial;
+	UINT16 m_gdfs_eeprom_old;
 
-	UINT32 latches[8];
+	UINT32 m_latches[8];
 
-	UINT8 trackball_select;
-	UINT8 gfxrom_select;
+	UINT8 m_trackball_select;
+	UINT8 m_gfxrom_select;
 };
 
 /*----------- defined in video/ssv.c -----------*/

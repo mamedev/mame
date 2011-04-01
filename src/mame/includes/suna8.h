@@ -8,31 +8,31 @@ public:
 	suna8_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 rombank;
-	UINT8 spritebank;
-	UINT8 palettebank;
-	UINT8 unknown;
+	UINT8 m_rombank;
+	UINT8 m_spritebank;
+	UINT8 m_palettebank;
+	UINT8 m_unknown;
 
-	UINT8 protection_val;
-	UINT8 nmi_enable;
-	UINT8 spritebank_latch;
-	UINT8 trash_prot;
+	UINT8 m_protection_val;
+	UINT8 m_nmi_enable;
+	UINT8 m_spritebank_latch;
+	UINT8 m_trash_prot;
 
-	UINT8 *hardhead_ip;
-	UINT8 *wram;
-	UINT8 *spriteram;
+	UINT8 *m_hardhead_ip;
+	UINT8 *m_wram;
+	UINT8 *m_spriteram;
 
-	int text_dim; /* specifies format of text layer */
+	int m_text_dim; /* specifies format of text layer */
 
 #if TILEMAPS
-	tilemap_t *bg_tilemap;
-	int tiles;
-	int trombank;
-	int page;
+	tilemap_t *m_bg_tilemap;
+	int m_tiles;
+	int m_trombank;
+	int m_page;
 #endif
 
-	INT16 *samplebuf;
-	int sample;
+	INT16 *m_samplebuf;
+	int m_sample;
 };
 
 

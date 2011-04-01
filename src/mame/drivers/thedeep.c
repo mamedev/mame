@@ -41,7 +41,7 @@ Notes:
 static WRITE8_HANDLER( thedeep_nmi_w )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	state->nmi_enable = data;
+	state->m_nmi_enable = data;
 }
 
 static WRITE8_HANDLER( thedeep_sound_w )
@@ -55,21 +55,21 @@ static MACHINE_RESET( thedeep )
 {
 	thedeep_state *state = machine.driver_data<thedeep_state>();
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000 + 0 * 0x4000);
-	state->scroll[0] = 0;
-	state->scroll[1] = 0;
-	state->scroll[2] = 0;
-	state->scroll[3] = 0;
-	state->protection_command = 0;
-	state->protection_index = -1;
-	state->protection_irq = 0;
-	state->rombank = -1;
+	state->m_scroll[0] = 0;
+	state->m_scroll[1] = 0;
+	state->m_scroll[2] = 0;
+	state->m_scroll[3] = 0;
+	state->m_protection_command = 0;
+	state->m_protection_index = -1;
+	state->m_protection_irq = 0;
+	state->m_rombank = -1;
 }
 
 static WRITE8_HANDLER( thedeep_protection_w )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	state->protection_command = data;
-	switch (state->protection_command)
+	state->m_protection_command = data;
+	switch (state->m_protection_command)
 	{
 		case 0x11:
 			flip_screen_set(space->machine(), 1);
@@ -85,23 +85,23 @@ static WRITE8_HANDLER( thedeep_protection_w )
 		case 0x33:
 		{
 			UINT8 *rom;
-			int new_rombank = state->protection_command & 3;
-			if (state->rombank == new_rombank)	break;
-			state->rombank = new_rombank;
+			int new_rombank = state->m_protection_command & 3;
+			if (state->m_rombank == new_rombank)	break;
+			state->m_rombank = new_rombank;
 			rom = space->machine().region("maincpu")->base();
-			memory_set_bankptr(space->machine(), "bank1", rom + 0x10000 + state->rombank * 0x4000);
+			memory_set_bankptr(space->machine(), "bank1", rom + 0x10000 + state->m_rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
-			memcpy(rom + 0x08000, rom + 0x10000 + state->rombank * 0x4000, 0x4000);
+			memcpy(rom + 0x08000, rom + 0x10000 + state->m_rombank * 0x4000, 0x4000);
 		}
 		break;
 
 		case 0x59:
 		{
-			if (state->protection_index < 0)
-				state->protection_index = 0;
+			if (state->m_protection_index < 0)
+				state->m_protection_index = 0;
 
-			if ( state->protection_index < 0x19b )
+			if ( state->m_protection_index < 0x19b )
 // d000-d00c:   hl += a * b
 // d00d-d029:   input a (e.g. $39) output hl (e.g. h=$03 l=$09).
 //              Replace trainling 0's with space ($10). 00 -> '  '
@@ -118,30 +118,30 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				state->protection_data = space->machine().region("cpu3")->base()[0x185+state->protection_index++];
+				state->m_protection_data = space->machine().region("cpu3")->base()[0x185+state->m_protection_index++];
 			else
-				state->protection_data = 0xc9;
+				state->m_protection_data = 0xc9;
 
-			state->protection_irq  = 1;
+			state->m_protection_irq  = 1;
 		}
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(&space->device()),state->protection_command);
+			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(&space->device()),state->m_protection_command);
 	}
 }
 
 static READ8_HANDLER( thedeep_e004_r )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	return state->protection_irq ? 1 : 0;
+	return state->m_protection_irq ? 1 : 0;
 }
 
 static READ8_HANDLER( thedeep_protection_r )
 {
 	thedeep_state *state = space->machine().driver_data<thedeep_state>();
-	state->protection_irq = 0;
-	return state->protection_data;
+	state->m_protection_irq = 0;
+	return state->m_protection_data;
 }
 
 static WRITE8_HANDLER( thedeep_e100_w )
@@ -163,11 +163,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE_MEMBER(thedeep_state, scroll				)	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(thedeep_state, spriteram, spriteram_size)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE_MEMBER(thedeep_state, vram_1		)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE_MEMBER(thedeep_state, vram_0		)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE_MEMBER(thedeep_state, scroll2				)	// Column Scroll
+	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE_MEMBER(thedeep_state, m_scroll				)	// Scroll
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(thedeep_state, m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE_MEMBER(thedeep_state, m_vram_1		)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE_MEMBER(thedeep_state, m_vram_0		)	// Background Layer
+	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE_MEMBER(thedeep_state, m_scroll2				)	// Column Scroll
 	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -327,23 +327,23 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	thedeep_state *state = device->machine().driver_data<thedeep_state>();
 	if (cpu_getiloops(device))
 	{
-		if (state->protection_command != 0x59)
+		if (state->m_protection_command != 0x59)
 		{
 			int coins = input_port_read(device->machine(), "MCU");
-			if		(coins & 1)	state->protection_data = 1;
-			else if	(coins & 2)	state->protection_data = 2;
-			else if	(coins & 4)	state->protection_data = 3;
-			else				state->protection_data = 0;
+			if		(coins & 1)	state->m_protection_data = 1;
+			else if	(coins & 2)	state->m_protection_data = 2;
+			else if	(coins & 4)	state->m_protection_data = 3;
+			else				state->m_protection_data = 0;
 
-			if (state->protection_data)
-				state->protection_irq = 1;
+			if (state->m_protection_data)
+				state->m_protection_irq = 1;
 		}
-		if (state->protection_irq)
+		if (state->m_protection_irq)
 			device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
-		if (state->nmi_enable)
+		if (state->m_nmi_enable)
 		{
 			device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 			device_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);

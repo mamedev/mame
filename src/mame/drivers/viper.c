@@ -52,11 +52,11 @@ public:
 	viper_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 mpc8240_regs[256/4];
-	UINT32 epic_iack;
-	int cf_card_ide;
-	int unk1_bit;
-	UINT32 voodoo3_pci_reg[0x100];
+	UINT32 m_mpc8240_regs[256/4];
+	UINT32 m_epic_iack;
+	int m_cf_card_ide;
+	int m_unk1_bit;
+	UINT32 m_voodoo3_pci_reg[0x100];
 };
 
 
@@ -82,7 +82,7 @@ static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function,
 	{
 	}
 
-	return state->mpc8240_regs[reg/4];
+	return state->m_mpc8240_regs[reg/4];
 }
 
 static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
@@ -92,7 +92,7 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 	printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	#endif
 
-	COMBINE_DATA(state->mpc8240_regs + (reg/4));
+	COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
 }
 
 
@@ -137,7 +137,7 @@ static READ32_HANDLER( epic_r )
 			switch (reg & 0xffff)
 			{
 				case 0x00a0:			// IACK
-					return state->epic_iack;
+					return state->m_epic_iack;
 
 			}
 			break;
@@ -165,7 +165,7 @@ static WRITE32_HANDLER( epic_w )
 			switch (reg & 0xffff)
 			{
 				case 0x00b0:			// EOI
-					state->epic_iack = 0xff;
+					state->m_epic_iack = 0xff;
 					break;
 			}
 			break;
@@ -247,7 +247,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 	if (ACCESSING_BITS_16_31)
 	{
-		if (state->cf_card_ide)
+		if (state->m_cf_card_ide)
 		{
 			switch (offset & 0xf)
 			{
@@ -359,7 +359,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 				{
 					if ((data >> 16) & 0x80)
 					{
-						state->cf_card_ide = 1;
+						state->m_cf_card_ide = 1;
 
 						// soft reset
 						// sector count register is set to 0x01
@@ -385,7 +385,7 @@ static WRITE64_HANDLER(unk2_w)
 	viper_state *state = space->machine().driver_data<viper_state>();
 	if (ACCESSING_BITS_56_63)
 	{
-		state->cf_card_ide = 0;
+		state->m_cf_card_ide = 0;
 	}
 }
 
@@ -424,7 +424,7 @@ static READ64_HANDLER(unk1_r)
 
 	if (ACCESSING_BITS_40_47)
 	{
-		r |= (UINT64)(state->unk1_bit << 5) << 40;
+		r |= (UINT64)(state->m_unk1_bit << 5) << 40;
 	}
 
 	return r;
@@ -435,7 +435,7 @@ static WRITE64_HANDLER(unk1a_w)
 	viper_state *state = space->machine().driver_data<viper_state>();
 	if (ACCESSING_BITS_56_63)
 	{
-		state->unk1_bit = 1;
+		state->m_unk1_bit = 1;
 	}
 }
 
@@ -444,7 +444,7 @@ static WRITE64_HANDLER(unk1b_w)
 	viper_state *state = space->machine().driver_data<viper_state>();
 	if (ACCESSING_BITS_56_63)
 	{
-		state->unk1_bit = 0;
+		state->m_unk1_bit = 0;
 	}
 }
 
@@ -463,23 +463,23 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 		}
 		case 0x10:		// memBaseAddr0
 		{
-			return state->voodoo3_pci_reg[0x10/4];
+			return state->m_voodoo3_pci_reg[0x10/4];
 		}
 		case 0x14:		// memBaseAddr1
 		{
-			return state->voodoo3_pci_reg[0x14/4];
+			return state->m_voodoo3_pci_reg[0x14/4];
 		}
 		case 0x18:		// memBaseAddr1
 		{
-			return state->voodoo3_pci_reg[0x18/4];
+			return state->m_voodoo3_pci_reg[0x18/4];
 		}
 		case 0x40:		// fabId
 		{
-			return state->voodoo3_pci_reg[0x40/4];
+			return state->m_voodoo3_pci_reg[0x40/4];
 		}
 		case 0x50:		// cfgScratch
 		{
-			return state->voodoo3_pci_reg[0x50/4];
+			return state->m_voodoo3_pci_reg[0x50/4];
 		}
 
 		default:
@@ -497,18 +497,18 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 	{
 		case 0x04:		// Command register
 		{
-			state->voodoo3_pci_reg[0x04/4] = data;
+			state->m_voodoo3_pci_reg[0x04/4] = data;
 			break;
 		}
 		case 0x10:		// memBaseAddr0
 		{
 			if (data == 0xffffffff)
 			{
-				state->voodoo3_pci_reg[0x10/4] = 0xfe000000;
+				state->m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
 			}
 			else
 			{
-				state->voodoo3_pci_reg[0x10/4] = data;
+				state->m_voodoo3_pci_reg[0x10/4] = data;
 			}
 			break;
 		}
@@ -516,11 +516,11 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data == 0xffffffff)
 			{
-				state->voodoo3_pci_reg[0x14/4] = 0xfe000008;
+				state->m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
 			}
 			else
 			{
-				state->voodoo3_pci_reg[0x14/4] = data;
+				state->m_voodoo3_pci_reg[0x14/4] = data;
 			}
 			break;
 		}
@@ -528,11 +528,11 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data == 0xffffffff)
 			{
-				state->voodoo3_pci_reg[0x18/4] = 0xffffff01;
+				state->m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
 			}
 			else
 			{
-				state->voodoo3_pci_reg[0x18/4] = data;
+				state->m_voodoo3_pci_reg[0x18/4] = data;
 			}
 			break;
 		}
@@ -542,12 +542,12 @@ static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, i
 		}
 		case 0x40:		// fabId
 		{
-			state->voodoo3_pci_reg[0x40/4] = data;
+			state->m_voodoo3_pci_reg[0x40/4] = data;
 			break;
 		}
 		case 0x50:		// cfgScratch
 		{
-			state->voodoo3_pci_reg[0x50/4] = data;
+			state->m_voodoo3_pci_reg[0x50/4] = data;
 			break;
 		}
 

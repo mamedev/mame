@@ -4,16 +4,16 @@ public:
 	timelimt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int nmi_enabled;
-	UINT8 *bg_videoram;
-	size_t bg_videoram_size;
-	int scrollx;
-	int scrolly;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	int m_nmi_enabled;
+	UINT8 *m_bg_videoram;
+	size_t m_bg_videoram_size;
+	int m_scrollx;
+	int m_scrolly;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

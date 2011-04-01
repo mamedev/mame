@@ -4,14 +4,14 @@ public:
 	sprcros2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 s_port3;
+	UINT8 m_s_port3;
 	UINT8 m_port7;
-	tilemap_t *bgtilemap;
-	tilemap_t *fgtilemap;
-	UINT8 *fgvideoram;
-	UINT8 *bgvideoram;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	tilemap_t *m_bgtilemap;
+	tilemap_t *m_fgtilemap;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

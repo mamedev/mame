@@ -29,24 +29,26 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    spriteram;
-	size_t     videoram_size;
-	size_t     spriteram_size;
+	UINT8 *    m_videoram;
+	UINT8 *    m_spriteram;
+	size_t     m_videoram_size;
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	tilemap_t    *bgmap;
-	UINT8      cocktail_flip;
-	UINT8      char_palette, sprite_palette;
-	UINT8      char_bank;
+	tilemap_t    *m_bgmap;
+	UINT8      m_cocktail_flip;
+	UINT8      m_char_palette;
+	UINT8      m_sprite_palette;
+	UINT8      m_char_bank;
 
 	/* misc */
-	int        fcombat_sh;
-	int        fcombat_sv;
-	int        tx, ty;
+	int        m_fcombat_sh;
+	int        m_fcombat_sv;
+	int        m_tx;
+	int        m_ty;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 

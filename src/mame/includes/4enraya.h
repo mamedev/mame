@@ -11,15 +11,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	size_t     videoram_size;
+	UINT8 *    m_videoram;
+	size_t     m_videoram_size;
 
 	/* video-related */
-	tilemap_t    *bg_tilemap;
+	tilemap_t    *m_bg_tilemap;
 
 	/* sound-related */
-	int        soundlatch;
-	int        last_snd_ctrl;
+	int        m_soundlatch;
+	int        m_last_snd_ctrl;
 };
 
 

@@ -224,36 +224,36 @@ static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 static WRITE8_HANDLER( yamato_p0_w )
 {
 	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->yamato_p0 = data;
+	state->m_yamato_p0 = data;
 }
 
 static WRITE8_HANDLER( yamato_p1_w )
 {
 	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->yamato_p1 = data;
+	state->m_yamato_p1 = data;
 }
 
 static READ8_HANDLER( yamato_p0_r )
 {
 	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	return state->yamato_p0;
+	return state->m_yamato_p0;
 }
 
 static READ8_HANDLER( yamato_p1_r )
 {
 	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	return state->yamato_p1;
+	return state->m_yamato_p1;
 }
 
 
 static WRITE8_HANDLER(toprollr_rombank_w)
 {
 	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->toprollr_rombank &= ~(1 << offset);
-	state->toprollr_rombank |= (data & 1) << offset;
+	state->m_toprollr_rombank &= ~(1 << offset);
+	state->m_toprollr_rombank |= (data & 1) << offset;
 
-	if (state->toprollr_rombank < 3)
-		memory_set_bank(space->machine(), "bank1", state->toprollr_rombank);
+	if (state->m_toprollr_rombank < 3)
+		memory_set_bank(space->machine(), "bank1", state->m_toprollr_rombank);
 }
 
 
@@ -272,7 +272,7 @@ static MACHINE_RESET( cclimber )
 	/* otherwise, the reset process will override our changes */
 	machine.scheduler().synchronize(FUNC(disable_interrupts));
 
-	state->toprollr_rombank = 0;
+	state->m_toprollr_rombank = 0;
 }
 
 
@@ -284,18 +284,18 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM				/* Crazy Kong only */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_videoram)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
 	AM_RANGE(0x8900, 0x8bff) AM_RAM				/* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, m_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, spriteram)
-	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_control)
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(interrupt_enable_w) //used by Crazy Kong Bootleg with alt levels and speed up
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)
@@ -308,18 +308,18 @@ static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
+	AM_RANGE(0x8800, 0x88ff) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
 //  AM_RANGE(0x8900, 0x8bff) AM_WRITEONLY  /* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, m_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, spriteram)
-	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_control)
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_BASE_MEMBER(cclimber_state, flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(cclimber_sample_volume_w)
@@ -329,19 +329,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_videoram)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, videoram)
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, spriteram)
-	AM_RANGE(0x98fc, 0x98ff) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, bigsprite_control)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, colorram)
+	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, m_videoram)
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_spriteram)
+	AM_RANGE(0x98fc, 0x98ff) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, flip_screen)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, swimmer_side_background_enabled)
-	AM_RANGE(0xa004, 0xa004) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, swimmer_palettebank)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_swimmer_side_background_enabled)
+	AM_RANGE(0xa004, 0xa004) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_swimmer_palettebank)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1") AM_WRITE(swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, swimmer_background_color)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_swimmer_background_color)
 	AM_RANGE(0xb880, 0xb880) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					/* ??? used by Guzzler */
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */
@@ -351,18 +351,18 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
-	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_videoram)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
 	AM_RANGE(0x8900, 0x8bff) AM_RAM				/* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(cclimber_state, m_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, spriteram)
-	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_control)
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE(cclimber_colorram_w) AM_BASE_MEMBER(cclimber_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("COIN")
@@ -372,16 +372,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_videoram)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM AM_BASE_MEMBER(cclimber_state, toprollr_bg_videoram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(cclimber_state, videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM AM_BASE_MEMBER(cclimber_state, toprollr_bg_coloram)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_toprollr_bg_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_toprollr_bg_coloram)
 	AM_RANGE(0x9800, 0x987f) AM_RAM /* unused ? */
-	AM_RANGE(0x9880, 0x995f) AM_RAM AM_BASE_MEMBER(cclimber_state, spriteram)
-	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE_MEMBER(cclimber_state, bigsprite_control)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(cclimber_state, colorram)
+	AM_RANGE(0x9880, 0x995f) AM_RAM AM_BASE_MEMBER(cclimber_state, m_spriteram)
+	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_control)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE_MEMBER(cclimber_state, m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE(cclimber_sample_rate_w)

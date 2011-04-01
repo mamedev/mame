@@ -38,8 +38,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "extra", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "extra", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -48,12 +48,12 @@ static MACHINE_START( cyberbal )
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 	atarigen_init(machine);
 
-	state->save_item(NAME(state->fast_68k_int));
-	state->save_item(NAME(state->io_68k_int));
-	state->save_item(NAME(state->sound_data_from_68k));
-	state->save_item(NAME(state->sound_data_from_6502));
-	state->save_item(NAME(state->sound_data_from_68k_ready));
-	state->save_item(NAME(state->sound_data_from_6502_ready));
+	state->save_item(NAME(state->m_fast_68k_int));
+	state->save_item(NAME(state->m_io_68k_int));
+	state->save_item(NAME(state->m_sound_data_from_68k));
+	state->save_item(NAME(state->m_sound_data_from_6502));
+	state->save_item(NAME(state->m_sound_data_from_68k_ready));
+	state->save_item(NAME(state->m_sound_data_from_6502_ready));
 }
 
 
@@ -77,8 +77,8 @@ static MACHINE_RESET( cyberbal )
 static void cyberbal2p_update_interrupts(running_machine &machine)
 {
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
-	cputag_set_input_line(machine, "maincpu", 1, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -104,7 +104,7 @@ static READ16_HANDLER( special_port0_r )
 {
 	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	int temp = input_port_read(space->machine(), "IN0");
-	if (state->cpu_to_sound_ready) temp ^= 0x0080;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
 
@@ -113,7 +113,7 @@ static READ16_HANDLER( special_port2_r )
 {
 	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	int temp = input_port_read(space->machine(), "IN2");
-	if (state->cpu_to_sound_ready) temp ^= 0x2000;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }
 
@@ -122,7 +122,7 @@ static READ16_HANDLER( sound_state_r )
 {
 	cyberbal_state *state = space->machine().driver_data<cyberbal_state>();
 	int temp = 0xffff;
-	if (state->cpu_to_sound_ready) temp ^= 0xffff;
+	if (state->m_cpu_to_sound_ready) temp ^= 0xffff;
 	return temp;
 }
 
@@ -158,14 +158,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfd8000, 0xfd9fff) AM_WRITE(atarigen_sound_upper_w)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(cyberbal_paletteram_1_w) AM_SHARE("share1") AM_BASE_MEMBER(cyberbal_state, paletteram_1)
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(cyberbal_paletteram_0_w) AM_SHARE("share2") AM_BASE_MEMBER(cyberbal_state, paletteram_0)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield2_w)   AM_SHARE("share3") AM_BASE_MEMBER(cyberbal_state, playfield2)
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha2_w)       AM_SHARE("share4") AM_BASE_MEMBER(cyberbal_state, alpha2)
+	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(cyberbal_paletteram_1_w) AM_SHARE("share1") AM_BASE_MEMBER(cyberbal_state, m_paletteram_1)
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(cyberbal_paletteram_0_w) AM_SHARE("share2") AM_BASE_MEMBER(cyberbal_state, m_paletteram_0)
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield2_w)   AM_SHARE("share3") AM_BASE_MEMBER(cyberbal_state, m_playfield2)
+	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha2_w)       AM_SHARE("share4") AM_BASE_MEMBER(cyberbal_state, m_alpha2)
 	AM_RANGE(0xff3000, 0xff37ff) AM_RAM_WRITE(atarimo_1_spriteram_w)   AM_SHARE("share5") AM_BASE(&atarimo_1_spriteram)
 	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE("share6")
-	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(atarigen_playfield_w)    AM_SHARE("share7") AM_BASE_MEMBER(cyberbal_state, playfield)
-	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(atarigen_alpha_w)        AM_SHARE("share8") AM_BASE_MEMBER(cyberbal_state, alpha)
+	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(atarigen_playfield_w)    AM_SHARE("share7") AM_BASE_MEMBER(cyberbal_state, m_playfield)
+	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(atarigen_alpha_w)        AM_SHARE("share8") AM_BASE_MEMBER(cyberbal_state, m_alpha)
 	AM_RANGE(0xff7000, 0xff77ff) AM_RAM_WRITE(atarimo_0_spriteram_w)   AM_SHARE("share9") AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE("share10")
 	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP               AM_SHARE("share11")
@@ -261,8 +261,8 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfd6000, 0xfd6003) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xfd8000, 0xfd8003) AM_WRITE(atarigen_sound_upper_w)
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(cyberbal_state, playfield)
-	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(cyberbal_state, alpha)
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(cyberbal_state, m_playfield)
+	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(cyberbal_state, m_alpha)
 	AM_RANGE(0xff3000, 0xff37ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xff3800, 0xffffff) AM_RAM
 ADDRESS_MAP_END

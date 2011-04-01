@@ -118,12 +118,12 @@ public:
 	sub_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* vid;
-	UINT8* attr;
-	UINT8* scrolly;
-	UINT8* spriteram;
-	UINT8* spriteram2;
-	UINT8 nmi_en;
+	UINT8* m_vid;
+	UINT8* m_attr;
+	UINT8* m_scrolly;
+	UINT8* m_spriteram;
+	UINT8* m_spriteram2;
+	UINT8 m_nmi_en;
 };
 
 static VIDEO_START(sub)
@@ -142,12 +142,12 @@ static SCREEN_UPDATE(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->vid[count];
+			UINT16 tile = state->m_vid[count];
 			UINT8 col;
-			UINT8 y_offs = state->scrolly[x];
+			UINT8 y_offs = state->m_scrolly[x];
 
-			tile += (state->attr[count]&0xe0)<<3;
-			col = (state->attr[count]&0x1f);
+			tile += (state->m_attr[count]&0xe0)<<3;
+			col = (state->m_attr[count]&0x1f);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
@@ -168,8 +168,8 @@ static SCREEN_UPDATE(sub)
     1 --cc cccc color
     */
 	{
-		UINT8 *spriteram = state->spriteram;
-		UINT8 *spriteram_2 = state->spriteram2;
+		UINT8 *spriteram = state->m_spriteram;
+		UINT8 *spriteram_2 = state->m_spriteram2;
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -193,12 +193,12 @@ static SCREEN_UPDATE(sub)
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = state->vid[count];
+			UINT16 tile = state->m_vid[count];
 			UINT8 col;
-			UINT8 y_offs = state->scrolly[x];
+			UINT8 y_offs = state->m_scrolly[x];
 
-			tile += (state->attr[count]&0xe0)<<3;
-			col = (state->attr[count]&0x1f);
+			tile += (state->m_attr[count]&0xe0)<<3;
+			col = (state->m_attr[count]&0x1f);
 
 			if(x >= 28)
 			{
@@ -216,11 +216,11 @@ static SCREEN_UPDATE(sub)
 static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_MEMBER(sub_state,attr)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(sub_state,vid)
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_MEMBER(sub_state,spriteram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE_MEMBER(sub_state,spriteram2)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(sub_state,scrolly)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_MEMBER(sub_state,m_attr)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(sub_state,m_vid)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_MEMBER(sub_state,m_spriteram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE_MEMBER(sub_state,m_spriteram2)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(sub_state,m_scrolly)
 
 	AM_RANGE(0xe000, 0xe000) AM_NOP
 	AM_RANGE(0xe800, 0xe800) AM_NOP
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 {
 	sub_state *state = space->machine().driver_data<sub_state>();
 
-	state->nmi_en = data & 1;
+	state->m_nmi_en = data & 1;
 }
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8 )
@@ -413,7 +413,7 @@ static INTERRUPT_GEN( subm_sound_irq )
 {
 	sub_state *state = device->machine().driver_data<sub_state>();
 
-	if(state->nmi_en)
+	if(state->m_nmi_en)
 		cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 

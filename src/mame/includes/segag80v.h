@@ -12,18 +12,18 @@ public:
 	segag80v_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *mainram;
-	UINT8 has_usb;
-	UINT8 mult_data[2];
-	UINT16 mult_result;
-	UINT8 spinner_select;
-	UINT8 spinner_sign;
-	UINT8 spinner_count;
-	segag80_decrypt_func decrypt;
-	UINT8 *vectorram;
-	size_t vectorram_size;
-	int min_x;
-	int min_y;
+	UINT8 *m_mainram;
+	UINT8 m_has_usb;
+	UINT8 m_mult_data[2];
+	UINT16 m_mult_result;
+	UINT8 m_spinner_select;
+	UINT8 m_spinner_sign;
+	UINT8 m_spinner_count;
+	segag80_decrypt_func m_decrypt;
+	UINT8 *m_vectorram;
+	size_t m_vectorram_size;
+	int m_min_x;
+	int m_min_y;
 };
 
 

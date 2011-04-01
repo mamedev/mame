@@ -11,7 +11,7 @@ Atari Triple Hunt video emulation
 static TILE_GET_INFO( get_tile_info )
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	int code = state->playfield_ram[tile_index] & 0x3f;
+	int code = state->m_playfield_ram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(2, code, code == 0x3f ? 1 : 0, 0);
 }
@@ -20,9 +20,9 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( triplhnt )
 {
 	triplhnt_state *state = machine.driver_data<triplhnt_state>();
-	state->helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 
@@ -44,20 +44,20 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 	{
 		rectangle rect;
 
-		int j = (state->orga_ram[i] & 15) ^ 15;
+		int j = (state->m_orga_ram[i] & 15) ^ 15;
 
 		/* software sorts sprites by x and stores order in orga RAM */
 
-		int hpos = state->hpos_ram[j] ^ 255;
-		int vpos = state->vpos_ram[j] ^ 255;
-		int code = state->code_ram[j] ^ 255;
+		int hpos = state->m_hpos_ram[j] ^ 255;
+		int vpos = state->m_vpos_ram[j] ^ 255;
+		int code = state->m_code_ram[j] ^ 255;
 
 		if (hpos == 255)
 			continue;
 
 		/* sprite placement might be wrong */
 
-		if (state->sprite_zoom)
+		if (state->m_sprite_zoom)
 		{
 			rect.min_x = hpos - 16;
 			rect.min_y = 196 - vpos;
@@ -74,8 +74,8 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx_opaque(state->helper, cliprect, machine.gfx[state->sprite_zoom],
-			2 * code + state->sprite_bank, 0, code & 8, 0,
+		drawgfx_opaque(state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
+			2 * code + state->m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
 		if (rect.min_x < cliprect->min_x)
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 			{
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
-					pen_t a = *BITMAP_ADDR16(state->helper, y, x);
+					pen_t a = *BITMAP_ADDR16(state->m_helper, y, x);
 					pen_t b = *BITMAP_ADDR16(bitmap, y, x);
 
 					if (a == 2 && b == 7)
@@ -123,13 +123,13 @@ SCREEN_UPDATE( triplhnt )
 	triplhnt_state *state = screen->machine().driver_data<triplhnt_state>();
 	device_t *discrete = screen->machine().device("discrete");
 
-	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
-	discrete_sound_w(discrete, TRIPLHNT_BEAR_ROAR_DATA, state->playfield_ram[0xfa] & 15);
-	discrete_sound_w(discrete, TRIPLHNT_SHOT_DATA, state->playfield_ram[0xfc] & 15);
+	discrete_sound_w(discrete, TRIPLHNT_BEAR_ROAR_DATA, state->m_playfield_ram[0xfa] & 15);
+	discrete_sound_w(discrete, TRIPLHNT_SHOT_DATA, state->m_playfield_ram[0xfc] & 15);
 	return 0;
 }

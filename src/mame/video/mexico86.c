@@ -11,7 +11,7 @@ WRITE8_HANDLER( mexico86_bankswitch_w )
 
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 
-	state->charbank = BIT(data, 5);
+	state->m_charbank = BIT(data, 5);
 }
 
 
@@ -32,24 +32,24 @@ SCREEN_UPDATE( mexico86 )
 	sx = 0;
 
 	/* the score display seems to be outside of the main objectram. */
-	for (offs = 0; offs < state->objectram_size + 0x200; offs += 4)
+	for (offs = 0; offs < state->m_objectram_size + 0x200; offs += 4)
 	{
 		int height;
 
-		if (offs >= state->objectram_size && offs < state->objectram_size + 0x180)
+		if (offs >= state->m_objectram_size && offs < state->m_objectram_size + 0x180)
 			continue;
 
-		if (offs >= state->objectram_size + 0x1c0)
+		if (offs >= state->m_objectram_size + 0x1c0)
 			continue;
 
 		/* skip empty sprites */
 		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
 		/* on any architecture */
-		if (*(UINT32 *)(&state->objectram[offs]) == 0)
+		if (*(UINT32 *)(&state->m_objectram[offs]) == 0)
 			continue;
 
-		gfx_num = state->objectram[offs + 1];
-		gfx_attr = state->objectram[offs + 3];
+		gfx_num = state->m_objectram[offs + 1];
+		gfx_attr = state->m_objectram[offs + 3];
 
 		if (!BIT(gfx_num, 7))  /* 16x16 sprites */
 		{
@@ -66,10 +66,10 @@ SCREEN_UPDATE( mexico86 )
 			sx += 16;
 		else
 		{
-			sx = state->objectram[offs + 2];
+			sx = state->m_objectram[offs + 2];
 			//if (gfx_attr & 0x40) sx -= 256;
 		}
-		sy = 256 - height * 8 - (state->objectram[offs + 0]);
+		sy = 256 - height * 8 - (state->m_objectram[offs + 0]);
 
 		for (xc = 0; xc < 2; xc++)
 		{
@@ -78,10 +78,10 @@ SCREEN_UPDATE( mexico86 )
 				int goffs, code, color, flipx, flipy, x, y;
 
 				goffs = gfx_offs + xc * 0x40 + yc * 0x02;
-				code = state->videoram[goffs] + ((state->videoram[goffs + 1] & 0x07) << 8)
-						+ ((state->videoram[goffs + 1] & 0x80) << 4) + (state->charbank << 12);
-				color = ((state->videoram[goffs + 1] & 0x38) >> 3) + ((gfx_attr & 0x02) << 2);
-				flipx = state->videoram[goffs + 1] & 0x40;
+				code = state->m_videoram[goffs] + ((state->m_videoram[goffs + 1] & 0x07) << 8)
+						+ ((state->m_videoram[goffs + 1] & 0x80) << 4) + (state->m_charbank << 12);
+				color = ((state->m_videoram[goffs + 1] & 0x38) >> 3) + ((gfx_attr & 0x02) << 2);
+				flipx = state->m_videoram[goffs + 1] & 0x40;
 				flipy = 0;
 
 				//x = sx + xc * 8;
@@ -111,15 +111,15 @@ SCREEN_UPDATE( kikikai )
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	sx = 0;
-	for (offs = 0; offs < state->objectram_size; offs += 4)
+	for (offs = 0; offs < state->m_objectram_size; offs += 4)
 	{
-		if (*(UINT32*)(state->objectram + offs) == 0)
+		if (*(UINT32*)(state->m_objectram + offs) == 0)
 			continue;
 
-		ty = state->objectram[offs];
-		gfx_num = state->objectram[offs + 1];
-		tx = state->objectram[offs + 2];
-		//gfx_attr = state->objectram[offs + 3];
+		ty = state->m_objectram[offs];
+		gfx_num = state->m_objectram[offs + 1];
+		tx = state->m_objectram[offs + 2];
+		//gfx_attr = state->m_objectram[offs + 3];
 
 		if (gfx_num & 0x80)
 		{
@@ -143,8 +143,8 @@ SCREEN_UPDATE( kikikai )
 		{
 			y = (sy + (yc << 2)) & 0xff;
 			goffs = gfx_offs + yc;
-			code = state->videoram[goffs] + ((state->videoram[goffs + 1] & 0x1f) << 8);
-			color = (state->videoram[goffs + 1] & 0xe0) >> 5;
+			code = state->m_videoram[goffs] + ((state->m_videoram[goffs + 1] & 0x1f) << 8);
+			color = (state->m_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
@@ -153,8 +153,8 @@ SCREEN_UPDATE( kikikai )
 					0,0,
 					sx&0xff,y,15);
 
-			code = state->videoram[goffs] + ((state->videoram[goffs + 1] & 0x1f) << 8);
-			color = (state->videoram[goffs + 1] & 0xe0) >> 5;
+			code = state->m_videoram[goffs] + ((state->m_videoram[goffs + 1] & 0x1f) << 8);
+			color = (state->m_videoram[goffs + 1] & 0xe0) >> 5;
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
 					code,

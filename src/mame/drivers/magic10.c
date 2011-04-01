@@ -91,15 +91,15 @@ public:
 	magic10_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *layer0_tilemap;
-	tilemap_t *layer1_tilemap;
-	tilemap_t *layer2_tilemap;
-	UINT16 *layer0_videoram;
-	UINT16 *layer1_videoram;
-	UINT16 *layer2_videoram;
-	int layer2_offset[2];
-	UINT16 *vregs;
-	UINT16 magic102_ret;
+	tilemap_t *m_layer0_tilemap;
+	tilemap_t *m_layer1_tilemap;
+	tilemap_t *m_layer2_tilemap;
+	UINT16 *m_layer0_videoram;
+	UINT16 *m_layer1_videoram;
+	UINT16 *m_layer2_videoram;
+	int m_layer2_offset[2];
+	UINT16 *m_vregs;
+	UINT16 m_magic102_ret;
 };
 
 
@@ -110,22 +110,22 @@ public:
 static WRITE16_HANDLER( layer0_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
-	COMBINE_DATA(&state->layer0_videoram[offset]);
-	tilemap_mark_tile_dirty( state->layer0_tilemap, offset >> 1);
+	COMBINE_DATA(&state->m_layer0_videoram[offset]);
+	tilemap_mark_tile_dirty( state->m_layer0_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( layer1_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
-	COMBINE_DATA(&state->layer1_videoram[offset]);
-	tilemap_mark_tile_dirty( state->layer1_tilemap, offset >> 1);
+	COMBINE_DATA(&state->m_layer1_videoram[offset]);
+	tilemap_mark_tile_dirty( state->m_layer1_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( layer2_videoram_w )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
-	COMBINE_DATA(&state->layer2_videoram[offset]);
-	tilemap_mark_tile_dirty( state->layer2_tilemap, offset >> 1);
+	COMBINE_DATA(&state->m_layer2_videoram[offset]);
+	tilemap_mark_tile_dirty( state->m_layer2_tilemap, offset >> 1);
 }
 
 static WRITE16_HANDLER( paletteram_w )
@@ -141,9 +141,9 @@ static TILE_GET_INFO( get_layer0_tile_info )
 	SET_TILE_INFO
 	(
 		1,
-		state->layer0_videoram[tile_index * 2],
-		state->layer0_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		state->m_layer0_videoram[tile_index * 2],
+		state->m_layer0_videoram[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((state->m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
@@ -153,9 +153,9 @@ static TILE_GET_INFO( get_layer1_tile_info )
 	SET_TILE_INFO
 	(
 		1,
-		state->layer1_videoram[tile_index * 2],
-		state->layer1_videoram[tile_index * 2 + 1] & 0x0f,
-		TILE_FLIPYX((state->layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
+		state->m_layer1_videoram[tile_index * 2],
+		state->m_layer1_videoram[tile_index * 2 + 1] & 0x0f,
+		TILE_FLIPYX((state->m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6)
 	);
 }
 
@@ -165,8 +165,8 @@ static TILE_GET_INFO( get_layer2_tile_info )
 	SET_TILE_INFO
 	(
 		0,
-		state->layer2_videoram[tile_index * 2],
-		state->layer2_videoram[tile_index * 2 + 1] & 0x0f,
+		state->m_layer2_videoram[tile_index * 2],
+		state->m_layer2_videoram[tile_index * 2 + 1] & 0x0f,
 		0
 	);
 }
@@ -175,31 +175,31 @@ static TILE_GET_INFO( get_layer2_tile_info )
 static VIDEO_START( magic10 )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	state->layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->m_layer0_tilemap = tilemap_create(machine, get_layer0_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_layer1_tilemap = tilemap_create(machine, get_layer1_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->m_layer2_tilemap = tilemap_create(machine, get_layer2_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
 
-	tilemap_set_transparent_pen(state->layer1_tilemap, 0);
-	tilemap_set_transparent_pen(state->layer2_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_layer1_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_layer2_tilemap, 0);
 }
 
 static SCREEN_UPDATE( magic10 )
 {
 	magic10_state *state = screen->machine().driver_data<magic10_state>();
 	/*TODO: understand where this comes from. */
-	tilemap_set_scrollx(state->layer2_tilemap, 0, state->layer2_offset[0]);
-	tilemap_set_scrolly(state->layer2_tilemap, 0, state->layer2_offset[1]);
+	tilemap_set_scrollx(state->m_layer2_tilemap, 0, state->m_layer2_offset[0]);
+	tilemap_set_scrolly(state->m_layer2_tilemap, 0, state->m_layer2_offset[1]);
 
 	/*
     4 and 6 are y/x global register writes.
     0 and 2 are y/x writes for the scrolling layer.
     */
-	tilemap_set_scrolly(state->layer1_tilemap, 0, (state->vregs[0/2] - state->vregs[4/2])+0);
-	tilemap_set_scrollx(state->layer1_tilemap, 0, (state->vregs[2/2] - state->vregs[6/2])+4);
+	tilemap_set_scrolly(state->m_layer1_tilemap, 0, (state->m_vregs[0/2] - state->m_vregs[4/2])+0);
+	tilemap_set_scrollx(state->m_layer1_tilemap, 0, (state->m_vregs[2/2] - state->m_vregs[6/2])+4);
 
-	tilemap_draw(bitmap, cliprect, state->layer0_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->layer1_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->layer2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_layer0_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_layer1_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_layer2_tilemap, 0, 0);
 
 	return 0;
 }
@@ -212,8 +212,8 @@ static SCREEN_UPDATE( magic10 )
 static READ16_HANDLER( magic102_r )
 {
 	magic10_state *state = space->machine().driver_data<magic10_state>();
-	state->magic102_ret ^= 0x20;
-	return state->magic102_ret;
+	state->m_magic102_ret ^= 0x20;
+	return state->m_magic102_ret;
 }
 
 static READ16_HANDLER( hotslot_copro_r )
@@ -284,9 +284,9 @@ static WRITE16_HANDLER( magic10_out_w )
 
 static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
@@ -294,15 +294,15 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x40000a, 0x40000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
-	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)
+	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE_MEMBER(magic10_state, m_vregs)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
@@ -310,15 +310,15 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE_MEMBER(magic10_state, m_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
@@ -330,14 +330,14 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)	// video registers?
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, m_vregs)	// video registers?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w)	// copro comm
@@ -349,21 +349,21 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x70000a, 0x70000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, m_vregs)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE_MEMBER(magic10_state, m_layer2_videoram)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE_MEMBER(magic10_state, m_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 /*
@@ -1205,22 +1205,22 @@ ROM_END
 static DRIVER_INIT( magic10 )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->layer2_offset[0] = 32;
-	state->layer2_offset[1] = 2;
+	state->m_layer2_offset[0] = 32;
+	state->m_layer2_offset[1] = 2;
 }
 
 static DRIVER_INIT( magic102 )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->layer2_offset[0] = 8;
-	state->layer2_offset[1] = 20;
+	state->m_layer2_offset[0] = 8;
+	state->m_layer2_offset[1] = 20;
 }
 
 static DRIVER_INIT( suprpool )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->layer2_offset[0] = 8;
-	state->layer2_offset[1] = 16;
+	state->m_layer2_offset[0] = 8;
+	state->m_layer2_offset[1] = 16;
 }
 
 static DRIVER_INIT( hotslot )
@@ -1229,15 +1229,15 @@ static DRIVER_INIT( hotslot )
 /*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
 */
-	state->layer2_offset[0] = -56;	// X offset.
-	state->layer2_offset[1] = 0;	// Y offset.
+	state->m_layer2_offset[0] = -56;	// X offset.
+	state->m_layer2_offset[1] = 0;	// Y offset.
 }
 
 static DRIVER_INIT( sgsafari )
 {
 	magic10_state *state = machine.driver_data<magic10_state>();
-	state->layer2_offset[0] = 16;
-	state->layer2_offset[1] = 20;
+	state->m_layer2_offset[0] = 16;
+	state->m_layer2_offset[1] = 20;
 }
 
 

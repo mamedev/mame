@@ -30,7 +30,7 @@ static INTERRUPT_GEN( spy_interrupt )
 {
 	spy_state *state = device->machine().driver_data<spy_state>();
 
-	if (k052109_is_irq_enabled(state->k052109))
+	if (k052109_is_irq_enabled(state->m_k052109))
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -38,16 +38,16 @@ static READ8_HANDLER( spy_bankedram1_r )
 {
 	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (state->rambank & 1)
+	if (state->m_rambank & 1)
 	{
 		return space->machine().generic.paletteram.u8[offset];
 	}
-	else if (state->rambank & 2)
+	else if (state->m_rambank & 2)
 	{
-		if (state->pmcbank)
+		if (state->m_pmcbank)
 		{
 			//logerror("%04x read pmcram %04x\n", cpu_get_pc(&space->device()), offset);
-			return state->pmcram[offset];
+			return state->m_pmcram[offset];
 		}
 		else
 		{
@@ -56,29 +56,29 @@ static READ8_HANDLER( spy_bankedram1_r )
 		}
 	}
 	else
-		return state->ram[offset];
+		return state->m_ram[offset];
 }
 
 static WRITE8_HANDLER( spy_bankedram1_w )
 {
 	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (state->rambank & 1)
+	if (state->m_rambank & 1)
 	{
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
-	else if (state->rambank & 2)
+	else if (state->m_rambank & 2)
 	{
-		if (state->pmcbank)
+		if (state->m_pmcbank)
 		{
 			//logerror("%04x pmcram %04x = %02x\n", cpu_get_pc(&space->device()), offset, data);
-			state->pmcram[offset] = data;
+			state->m_pmcram[offset] = data;
 		}
 		//else
 			//logerror("%04x pmc internal ram %04x = %02x\n", cpu_get_pc(&space->device()), offset, data);
 	}
 	else
-		state->ram[offset] = data;
+		state->m_ram[offset] = data;
 }
 
 /*
@@ -178,28 +178,28 @@ static void spy_collision( running_machine &machine )
 	int op2, x2, w2, z2, d2, y2, h2;
 	int mode, i, loopend, nearplane;
 
-	mode = state->pmcram[0x1];
-	op1 = state->pmcram[0x2];
+	mode = state->m_pmcram[0x1];
+	op1 = state->m_pmcram[0x2];
 	if (op1 == 1)
 	{
-		x1 = (state->pmcram[0x3] << 8) + state->pmcram[0x4];
-		w1 = (state->pmcram[0x5] << 8) + state->pmcram[0x6];
-		z1 = (state->pmcram[0x7] << 8) + state->pmcram[0x8];
-		d1 = (state->pmcram[0x9] << 8) + state->pmcram[0xa];
-		y1 = (state->pmcram[0xb] << 8) + state->pmcram[0xc];
-		h1 = (state->pmcram[0xd] << 8) + state->pmcram[0xe];
+		x1 = (state->m_pmcram[0x3] << 8) + state->m_pmcram[0x4];
+		w1 = (state->m_pmcram[0x5] << 8) + state->m_pmcram[0x6];
+		z1 = (state->m_pmcram[0x7] << 8) + state->m_pmcram[0x8];
+		d1 = (state->m_pmcram[0x9] << 8) + state->m_pmcram[0xa];
+		y1 = (state->m_pmcram[0xb] << 8) + state->m_pmcram[0xc];
+		h1 = (state->m_pmcram[0xd] << 8) + state->m_pmcram[0xe];
 
 		for (i = 16; i < 14 * MAX_SPRITES + 2; i += 14)
 		{
-			op2 = state->pmcram[i];
+			op2 = state->m_pmcram[i];
 			if (op2 || mode == 0x0c)
 			{
-				x2 = (state->pmcram[i + 0x1] << 8) + state->pmcram[i + 0x2];
-				w2 = (state->pmcram[i + 0x3] << 8) + state->pmcram[i + 0x4];
-				z2 = (state->pmcram[i + 0x5] << 8) + state->pmcram[i + 0x6];
-				d2 = (state->pmcram[i + 0x7] << 8) + state->pmcram[i + 0x8];
-				y2 = (state->pmcram[i + 0x9] << 8) + state->pmcram[i + 0xa];
-				h2 = (state->pmcram[i + 0xb] << 8) + state->pmcram[i + 0xc];
+				x2 = (state->m_pmcram[i + 0x1] << 8) + state->m_pmcram[i + 0x2];
+				w2 = (state->m_pmcram[i + 0x3] << 8) + state->m_pmcram[i + 0x4];
+				z2 = (state->m_pmcram[i + 0x5] << 8) + state->m_pmcram[i + 0x6];
+				d2 = (state->m_pmcram[i + 0x7] << 8) + state->m_pmcram[i + 0x8];
+				y2 = (state->m_pmcram[i + 0x9] << 8) + state->m_pmcram[i + 0xa];
+				h2 = (state->m_pmcram[i + 0xb] << 8) + state->m_pmcram[i + 0xc];
 /*
     The mad scientist's laser truck has both a high sprite center and a small height value.
     It has to be measured from the ground to detect correctly.
@@ -210,11 +210,11 @@ static void spy_collision( running_machine &machine )
 				// what other sprites fall into:
 				if ((abs(x1 - x2) < w1 + w2) && (abs(z1 - z2) < d1 + d2) && (abs(y1 - y2) < h1 + h2))
 				{
-					state->pmcram[0xf] = 0;
-					state->pmcram[i + 0xd] = 0;
+					state->m_pmcram[0xf] = 0;
+					state->m_pmcram[i + 0xd] = 0;
 				}
 				else
-					state->pmcram[i + 0xd] = 1;
+					state->m_pmcram[i + 0xd] = 1;
 			}
 		}
 	}
@@ -225,8 +225,8 @@ static void spy_collision( running_machine &machine )
     the scale factors from the PMCU code. Plugging 0 and 0x100 to the far and near planes seems
     to do the trick though.
 */
-		loopend = (state->pmcram[0] << 8) + state->pmcram[1];
-		nearplane = (state->pmcram[2] << 8) + state->pmcram[3];
+		loopend = (state->m_pmcram[0] << 8) + state->m_pmcram[1];
+		nearplane = (state->m_pmcram[2] << 8) + state->m_pmcram[3];
 
 		// fail safe
 		if (loopend > MAX_SPRITES)
@@ -238,13 +238,13 @@ static void spy_collision( running_machine &machine )
 
 		for (i = 4; i < loopend; i += 2)
 		{
-			op2 = (state->pmcram[i] << 8) + state->pmcram[i + 1];
+			op2 = (state->m_pmcram[i] << 8) + state->m_pmcram[i + 1];
 			op2 = (op2 * (NEAR_PLANE_ZOOM - FAR_PLANE_ZOOM)) / nearplane + FAR_PLANE_ZOOM;
-			state->pmcram[i] = op2 >> 8;
-			state->pmcram[i + 1] = op2 & 0xff;
+			state->m_pmcram[i] = op2 >> 8;
+			state->m_pmcram[i + 1] = op2 & 0xff;
 		}
 
-		memset(state->pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
+		memset(state->m_pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
 	}
 }
 
@@ -296,20 +296,20 @@ static WRITE8_HANDLER( spy_3f90_w )
 	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->m_k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
-	state->video_enable = ~(data & 0x08);
+	state->m_video_enable = ~(data & 0x08);
 
 	/* bit 4 = read RAM at 0000 (if set) else read color palette RAM */
 	/* bit 5 = PMCBK */
-	state->rambank = (data & 0x30) >> 4;
+	state->m_rambank = (data & 0x30) >> 4;
 	/* bit 7 = PMC-BK */
-	state->pmcbank = (data & 0x80) >> 7;
+	state->m_pmcbank = (data & 0x80) >> 7;
 
 //logerror("%04x: 3f90_w %02x\n", cpu_get_pc(&space->device()), data);
 	/* bit 6 = PMC-START */
-	if ((data & 0x40) && !(state->old_3f90 & 0x40))
+	if ((data & 0x40) && !(state->m_old_3f90 & 0x40))
 	{
 		/* we should handle collision here */
 //AT
@@ -320,24 +320,24 @@ static WRITE8_HANDLER( spy_3f90_w )
 			logerror("collision test:\n");
 			for (i = 0; i < 0xfe; i++)
 			{
-				logerror("%02x ", state->pmcram[i]);
+				logerror("%02x ", state->m_pmcram[i]);
 				if (i == 0x0f || (i > 0x10 && (i - 0x10) % 14 == 13))
 				logerror("\n");
 			}
 		}
 		spy_collision(space->machine());
 //ZT
-		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	state->old_3f90 = data;
+	state->m_old_3f90 = data;
 }
 
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
 	spy_state *state = space->machine().driver_data<spy_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )
@@ -347,11 +347,11 @@ static WRITE8_HANDLER( sound_bank_w )
 
 	bank_A = (data >> 0) & 0x03;
 	bank_B = (data >> 2) & 0x03;
-	k007232_set_bank(state->k007232_1, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
 
 	bank_A = (data >> 4) & 0x03;
 	bank_B = (data >> 6) & 0x03;
-	k007232_set_bank(state->k007232_2, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
 }
 
 
@@ -359,17 +359,17 @@ static READ8_HANDLER( k052109_051960_r )
 {
 	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->k051960, offset - 0x3800);
+			return k051937_r(state->m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->k052109, offset);
+			return k052109_r(state->m_k052109, offset);
 		else
-			return k051960_r(state->k051960, offset - 0x3c00);
+			return k051960_r(state->m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->k052109, offset);
+		return k052109_r(state->m_k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
@@ -377,15 +377,15 @@ static WRITE8_HANDLER( k052109_051960_w )
 	spy_state *state = space->machine().driver_data<spy_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->k051960, offset - 0x3800, data);
+		k051937_w(state->m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->k052109, offset, data);
+		k052109_w(state->m_k052109, offset, data);
 	else
-		k051960_w(state->k051960, offset - 0x3c00, data);
+		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
 static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_BASE_MEMBER(spy_state, ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_BASE_MEMBER(spy_state, m_ram)
 	AM_RANGE(0x0800, 0x1aff) AM_RAM
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
@@ -481,7 +481,7 @@ static const k007232_interface spy_k007232_interface =
 static void irqhandler( device_t *device, int linestate )
 {
 	spy_state *state = device->machine().driver_data<spy_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, linestate);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -514,31 +514,31 @@ static MACHINE_START( spy )
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 
 	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
-	memset(state->pmcram, 0, sizeof(state->pmcram));
+	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k052109 = machine.device("k052109");
-	state->k051960 = machine.device("k051960");
-	state->k007232_1 = machine.device("k007232_1");
-	state->k007232_2 = machine.device("k007232_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k052109 = machine.device("k052109");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k007232_1 = machine.device("k007232_1");
+	state->m_k007232_2 = machine.device("k007232_2");
 
-	state->save_item(NAME(state->rambank));
-	state->save_item(NAME(state->pmcbank));
-	state->save_item(NAME(state->video_enable));
-	state->save_item(NAME(state->old_3f90));
+	state->save_item(NAME(state->m_rambank));
+	state->save_item(NAME(state->m_pmcbank));
+	state->save_item(NAME(state->m_video_enable));
+	state->save_item(NAME(state->m_old_3f90));
 	state->save_pointer(NAME(machine.generic.paletteram.u8), 0x800);
-	state->save_item(NAME(state->pmcram));
+	state->save_item(NAME(state->m_pmcram));
 }
 
 static MACHINE_RESET( spy )
 {
 	spy_state *state = machine.driver_data<spy_state>();
 
-	state->rambank = 0;
-	state->pmcbank = 0;
-	state->video_enable = 0;
-	state->old_3f90 = -1;
+	state->m_rambank = 0;
+	state->m_pmcbank = 0;
+	state->m_video_enable = 0;
+	state->m_old_3f90 = -1;
 }
 
 static MACHINE_CONFIG_START( spy, spy_state )

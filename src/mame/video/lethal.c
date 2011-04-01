@@ -44,7 +44,7 @@ void lethalen_sprite_callback( running_machine &machine, int *code, int *color, 
 void lethalen_tile_callback( running_machine &machine, int layer, int *code, int *color, int *flags )
 {
 	lethal_state *state = machine.driver_data<lethal_state>();
-	*color = state->layer_colorbase[layer] + ((*color & 0x3c) << 2);
+	*color = state->m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
 }
 
 VIDEO_START(lethalen)
@@ -52,28 +52,28 @@ VIDEO_START(lethalen)
 	lethal_state *state = machine.driver_data<lethal_state>();
 
 	// this game uses external linescroll RAM
-	k056832_SetExtLinescroll(state->k056832);
+	k056832_SetExtLinescroll(state->m_k056832);
 
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine.system().name, "lethalenj"))
 	{
-		k056832_set_layer_offs(state->k056832, 0, -196, 0);
-		k056832_set_layer_offs(state->k056832, 1, -194, 0);
-		k056832_set_layer_offs(state->k056832, 2, -192, 0);
-		k056832_set_layer_offs(state->k056832, 3, -190, 0);
+		k056832_set_layer_offs(state->m_k056832, 0, -196, 0);
+		k056832_set_layer_offs(state->m_k056832, 1, -194, 0);
+		k056832_set_layer_offs(state->m_k056832, 2, -192, 0);
+		k056832_set_layer_offs(state->m_k056832, 3, -190, 0);
 	}
 	else
 	{ /* fixme */
-		k056832_set_layer_offs(state->k056832, 0, 188, 0);
-		k056832_set_layer_offs(state->k056832, 1, 190, 0);
-		k056832_set_layer_offs(state->k056832, 2, 192, 0);
-		k056832_set_layer_offs(state->k056832, 3, 194, 0);
+		k056832_set_layer_offs(state->m_k056832, 0, 188, 0);
+		k056832_set_layer_offs(state->m_k056832, 1, 190, 0);
+		k056832_set_layer_offs(state->m_k056832, 2, 192, 0);
+		k056832_set_layer_offs(state->m_k056832, 3, 194, 0);
 	}
 
-	state->layer_colorbase[0] = 0x00;
-	state->layer_colorbase[1] = 0x40;
-	state->layer_colorbase[2] = 0x80;
-	state->layer_colorbase[3] = 0xc0;
+	state->m_layer_colorbase[0] = 0x00;
+	state->m_layer_colorbase[1] = 0x40;
+	state->m_layer_colorbase[2] = 0x80;
+	state->m_layer_colorbase[3] = 0xc0;
 }
 
 WRITE8_HANDLER(lethalen_palette_control)
@@ -83,21 +83,21 @@ WRITE8_HANDLER(lethalen_palette_control)
 	switch (offset)
 	{
 		case 0:	// 40c8 - PCU1 from schematics
-			state->layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
-			state->layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(state->k056832, 0);
-			k056832_mark_plane_dirty(state->k056832, 1);
+			state->m_layer_colorbase[0] = ((data & 0x7) - 1) * 0x40;
+			state->m_layer_colorbase[1] = (((data >> 4) & 0x7) - 1) * 0x40;
+			k056832_mark_plane_dirty(state->m_k056832, 0);
+			k056832_mark_plane_dirty(state->m_k056832, 1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
-			state->layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
-			state->layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
-			k056832_mark_plane_dirty(state->k056832, 2);
-			k056832_mark_plane_dirty(state->k056832, 3);
+			state->m_layer_colorbase[2] = ((data & 0x7) - 1) * 0x40;
+			state->m_layer_colorbase[3] = (((data >> 4) & 0x7) - 1) * 0x40;
+			k056832_mark_plane_dirty(state->m_k056832, 2);
+			k056832_mark_plane_dirty(state->m_k056832, 3);
 			break;
 
 		case 8:	// 40d0 - PCU3 from schematics
-			state->sprite_colorbase = ((data & 0x7) - 1) * 0x40;
+			state->m_sprite_colorbase = ((data & 0x7) - 1) * 0x40;
 			break;
 	}
 }
@@ -109,14 +109,14 @@ SCREEN_UPDATE(lethalen)
 	bitmap_fill(bitmap, cliprect, 7168);
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
-	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 3, 0, 1);
-	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 2, 0, 2);
-	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 1, 0, 4);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 3, 0, 1);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 2, 0, 2);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 1, 0, 4);
 
-	k053245_sprites_draw_lethal(state->k053244, bitmap, cliprect);
+	k053245_sprites_draw_lethal(state->m_k053244, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	k056832_tilemap_draw(state->k056832, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(state->m_k056832, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }

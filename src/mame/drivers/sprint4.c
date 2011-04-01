@@ -22,7 +22,7 @@ static CUSTOM_INPUT( get_lever )
 	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return 4 * state->gear[n] > state->da_latch;
+	return 4 * state->m_gear[n] > state->m_da_latch;
 }
 
 
@@ -31,7 +31,7 @@ static CUSTOM_INPUT( get_wheel )
 	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return 8 * state->steer_FF1[n] + 8 * state->steer_FF2[n] > state->da_latch;
+	return 8 * state->m_steer_FF1[n] + 8 * state->m_steer_FF2[n] > state->m_da_latch;
 }
 
 
@@ -40,7 +40,7 @@ static CUSTOM_INPUT( get_collision )
 	sprint4_state *state = field->port->machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
-	return state->collision[n];
+	return state->m_collision[n];
 }
 
 
@@ -72,25 +72,25 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	for (i = 0; i < 4; i++)
 	{
-		signed char delta = wheel[i] - state->last_wheel[i];
+		signed char delta = wheel[i] - state->m_last_wheel[i];
 
 		if (delta < 0)
 		{
-			state->steer_FF2[i] = 0;
+			state->m_steer_FF2[i] = 0;
 		}
 		if (delta > 0)
 		{
-			state->steer_FF2[i] = 1;
+			state->m_steer_FF2[i] = 1;
 		}
 
-		state->steer_FF1[i] = (wheel[i] >> 4) & 1;
+		state->m_steer_FF1[i] = (wheel[i] >> 4) & 1;
 
-		if (lever[i] & 1) { state->gear[i] = 1; }
-		if (lever[i] & 2) { state->gear[i] = 2; }
-		if (lever[i] & 4) { state->gear[i] = 3; }
-		if (lever[i] & 8) { state->gear[i] = 4; }
+		if (lever[i] & 1) { state->m_gear[i] = 1; }
+		if (lever[i] & 2) { state->m_gear[i] = 2; }
+		if (lever[i] & 4) { state->m_gear[i] = 3; }
+		if (lever[i] & 8) { state->m_gear[i] = 4; }
 
-		state->last_wheel[i] = wheel[i];
+		state->m_last_wheel[i] = wheel[i];
 	}
 
 	scanline += 64;
@@ -116,22 +116,22 @@ static MACHINE_RESET( sprint4 )
 	sprint4_state *state = machine.driver_data<sprint4_state>();
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(32), FUNC(nmi_callback), 32);
 
-	memset(state->steer_FF1, 0, sizeof state->steer_FF1);
-	memset(state->steer_FF2, 0, sizeof state->steer_FF2);
+	memset(state->m_steer_FF1, 0, sizeof state->m_steer_FF1);
+	memset(state->m_steer_FF2, 0, sizeof state->m_steer_FF2);
 
-	state->gear[0] = 1;
-	state->gear[1] = 1;
-	state->gear[2] = 1;
-	state->gear[3] = 1;
+	state->m_gear[0] = 1;
+	state->m_gear[1] = 1;
+	state->m_gear[2] = 1;
+	state->m_gear[3] = 1;
 
-	state->da_latch = 0;
+	state->m_da_latch = 0;
 }
 
 
 static READ8_HANDLER( sprint4_wram_r )
 {
 	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	return videoram[0x380 + offset];
 }
 
@@ -159,7 +159,7 @@ static READ8_HANDLER( sprint4_options_r )
 static WRITE8_HANDLER( sprint4_wram_w )
 {
 	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
@@ -167,14 +167,14 @@ static WRITE8_HANDLER( sprint4_wram_w )
 static WRITE8_HANDLER( sprint4_collision_reset_w )
 {
 	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	state->collision[(offset >> 1) & 3] = 0;
+	state->m_collision[(offset >> 1) & 3] = 0;
 }
 
 
 static WRITE8_HANDLER( sprint4_da_latch_w )
 {
 	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	state->da_latch = data & 15;
+	state->m_da_latch = data & 15;
 }
 
 
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( sprint4_cpu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(sprint4_wram_r, sprint4_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_MEMBER(sprint4_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_MEMBER(sprint4_state, m_videoram)
 
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(sprint4_analog_r)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(sprint4_coin_r)

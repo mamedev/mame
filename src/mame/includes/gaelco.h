@@ -11,17 +11,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *     videoram;
-	UINT16 *     spriteram;
-	UINT16 *     vregs;
-	UINT16 *     screen;
+	UINT16 *     m_videoram;
+	UINT16 *     m_spriteram;
+	UINT16 *     m_vregs;
+	UINT16 *     m_screen;
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t      *tilemap[2];
+	tilemap_t      *m_tilemap[2];
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

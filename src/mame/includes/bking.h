@@ -5,36 +5,47 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     playfield_ram;
+	UINT8 *     m_playfield_ram;
 
 	/* video-related */
-	bitmap_t    *tmp_bitmap1, *tmp_bitmap2;
-	tilemap_t     *bg_tilemap;
-	int         pc3259_output[4];
-	int         pc3259_mask;
-	UINT8       xld1, xld2, xld3;
-	UINT8       yld1, yld2, yld3;
-	int         ball1_pic, ball2_pic;
-	int         crow_pic, crow_flip;
-	int         palette_bank, controller, hit;
+	bitmap_t    *m_tmp_bitmap1;
+	bitmap_t    *m_tmp_bitmap2;
+	tilemap_t     *m_bg_tilemap;
+	int         m_pc3259_output[4];
+	int         m_pc3259_mask;
+	UINT8       m_xld1;
+	UINT8		m_xld2;
+	UINT8		m_xld3;
+	UINT8       m_yld1;
+	UINT8		m_yld2;
+	UINT8		m_yld3;
+	int         m_ball1_pic;
+	int			m_ball2_pic;
+	int         m_crow_pic;
+	int			m_crow_flip;
+	int         m_palette_bank;
+	int			m_controller;
+	int			m_hit;
 
 	/* sound-related */
-	int         sound_nmi_enable, pending_nmi;
+	int         m_sound_nmi_enable;
+	int			m_pending_nmi;
 
 	/* misc */
-	int         addr_h, addr_l;
+	int         m_addr_h;
+	int			m_addr_l;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 
 #if 0
 	/* 68705 */
-	UINT8 port_a_in;
-	UINT8 port_a_out;
-	UINT8 ddr_a;
-	UINT8 port_b_in;
-	UINT8 port_b_out;
-	UINT8 ddr_b;
+	UINT8 m_port_a_in;
+	UINT8 m_port_a_out;
+	UINT8 m_ddr_a;
+	UINT8 m_port_b_in;
+	UINT8 m_port_b_out;
+	UINT8 m_ddr_b;
 #endif
 };
 

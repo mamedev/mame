@@ -36,22 +36,22 @@ PALETTE_INIT( compgolf )
 WRITE8_HANDLER( compgolf_video_w )
 {
 	compgolf_state *state = space->machine().driver_data<compgolf_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->text_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_text_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( compgolf_back_w )
 {
 	compgolf_state *state = space->machine().driver_data<compgolf_state>();
-	state->bg_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_bg_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_text_info )
 {
 	compgolf_state *state = machine.driver_data<compgolf_state>();
 	tile_index <<= 1;
-	SET_TILE_INFO(2, state->videoram[tile_index + 1] | (state->videoram[tile_index] << 8), state->videoram[tile_index] >> 2, 0);
+	SET_TILE_INFO(2, state->m_videoram[tile_index + 1] | (state->m_videoram[tile_index] << 8), state->m_videoram[tile_index] >> 2, 0);
 }
 
 static TILEMAP_MAPPER( back_scan )
@@ -63,8 +63,8 @@ static TILEMAP_MAPPER( back_scan )
 static TILE_GET_INFO( get_back_info )
 {
 	compgolf_state *state = machine.driver_data<compgolf_state>();
-	int attr = state->bg_ram[tile_index * 2];
-	int code = state->bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);
+	int attr = state->m_bg_ram[tile_index * 2];
+	int code = state->m_bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);
 	int color = (attr & 0x3e) >> 1;
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -73,10 +73,10 @@ static TILE_GET_INFO( get_back_info )
 VIDEO_START( compgolf )
 {
 	compgolf_state *state = machine.driver_data<compgolf_state>();
-	state->bg_tilemap = tilemap_create(machine, get_back_info, back_scan, 16, 16, 32, 32);
-	state->text_tilemap = tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_back_info, back_scan, 16, 16, 32, 32);
+	state->m_text_tilemap = tilemap_create(machine, get_text_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->text_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_text_tilemap, 0);
 }
 
 /*
@@ -97,11 +97,11 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (offs = 0; offs < 0x60; offs += 4)
 	{
-		sprite = state->spriteram[offs + 1] + (((state->spriteram[offs] & 0xc0) >> 6) * 0x100);
-		x = 240 - state->spriteram[offs + 3];
-		y = state->spriteram[offs + 2];
-		color = (state->spriteram[offs] & 8)>>3;
-		fx = state->spriteram[offs] & 4;
+		sprite = state->m_spriteram[offs + 1] + (((state->m_spriteram[offs] & 0xc0) >> 6) * 0x100);
+		x = 240 - state->m_spriteram[offs + 3];
+		y = state->m_spriteram[offs + 2];
+		color = (state->m_spriteram[offs] & 8)>>3;
+		fx = state->m_spriteram[offs] & 4;
 		fy = 0; /* ? */
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
@@ -109,7 +109,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				color,fx,fy,x,y,0);
 
 		/* Double Height */
-		if(state->spriteram[offs] & 0x10)
+		if(state->m_spriteram[offs] & 0x10)
 		{
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				sprite + 1,
@@ -121,14 +121,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( compgolf )
 {
 	compgolf_state *state = screen->machine().driver_data<compgolf_state>();
-	int scrollx = state->scrollx_hi + state->scrollx_lo;
-	int scrolly = state->scrolly_hi + state->scrolly_lo;
+	int scrollx = state->m_scrollx_hi + state->m_scrollx_lo;
+	int scrolly = state->m_scrolly_hi + state->m_scrolly_lo;
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, scrollx);
-	tilemap_set_scrolly(state->bg_tilemap, 0, scrolly);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, scrollx);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, scrolly);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->text_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_text_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

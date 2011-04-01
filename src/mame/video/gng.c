@@ -19,10 +19,10 @@
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	gng_state *state = machine.driver_data<gng_state>();
-	UINT8 attr = state->fgvideoram[tile_index + 0x400];
+	UINT8 attr = state->m_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
-			state->fgvideoram[tile_index] + ((attr & 0xc0) << 2),
+			state->m_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x30) >> 4));
 }
@@ -30,10 +30,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	gng_state *state = machine.driver_data<gng_state>();
-	UINT8 attr = state->bgvideoram[tile_index + 0x400];
+	UINT8 attr = state->m_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
-			state->bgvideoram[tile_index] + ((attr & 0xc0) << 2),
+			state->m_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x07,
 			TILE_FLIPYX((attr & 0x30) >> 4));
 	tileinfo->group = (attr & 0x08) >> 3;
@@ -50,12 +50,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( gng )
 {
 	gng_state *state = machine.driver_data<gng_state>();
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 3);
-	tilemap_set_transmask(state->bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->bg_tilemap, 1, 0x41, 0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 3);
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x41, 0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
 }
 
 
@@ -68,30 +68,30 @@ VIDEO_START( gng )
 WRITE8_HANDLER( gng_fgvideoram_w )
 {
 	gng_state *state = space->machine().driver_data<gng_state>();
-	state->fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
+	state->m_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gng_bgvideoram_w )
 {
 	gng_state *state = space->machine().driver_data<gng_state>();
-	state->bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
+	state->m_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
 }
 
 
 WRITE8_HANDLER( gng_bgscrollx_w )
 {
 	gng_state *state = space->machine().driver_data<gng_state>();
-	state->scrollx[offset] = data;
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
+	state->m_scrollx[offset] = data;
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
 }
 
 WRITE8_HANDLER( gng_bgscrolly_w )
 {
 	gng_state *state = space->machine().driver_data<gng_state>();
-	state->scrolly[offset] = data;
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0] + 256 * state->scrolly[1]);
+	state->m_scrolly[offset] = data;
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0] + 256 * state->m_scrolly[1]);
 }
 
 
@@ -143,10 +143,10 @@ SCREEN_UPDATE( gng )
 {
 	gng_state *state = screen->machine().driver_data<gng_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }
 

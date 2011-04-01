@@ -7,88 +7,97 @@ public:
 	segas1x_bootleg_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *    bg0_tileram;
-	UINT16 *    bg1_tileram;
-	UINT16 *    textram;
-	UINT16 *    tileram;
+	UINT16 *    m_bg0_tileram;
+	UINT16 *    m_bg1_tileram;
+	UINT16 *    m_textram;
+	UINT16 *    m_tileram;
 
-	UINT16 coinctrl;
+	UINT16 m_coinctrl;
 
 	/* game specific */
-	int passht4b_io1_val;
-	int passht4b_io2_val;
-	int passht4b_io3_val;
+	int m_passht4b_io1_val;
+	int m_passht4b_io2_val;
+	int m_passht4b_io3_val;
 
-	int beautyb_unkx;
+	int m_beautyb_unkx;
 
-	int shinobl_kludge;
+	int m_shinobl_kludge;
 
-	UINT16* goldnaxeb2_fgpage;
-	UINT16* goldnaxeb2_bgpage;
+	UINT16* m_goldnaxeb2_fgpage;
+	UINT16* m_goldnaxeb2_bgpage;
 
-	int eswat_tilebank0;
+	int m_eswat_tilebank0;
 
 
 	/* video-related */
-	tilemap_t *background, *foreground, *text_layer;
-	tilemap_t *background2, *foreground2;
-	tilemap_t *bg_tilemaps[2];
-	tilemap_t *text_tilemap;
-	double weights[2][3][6];
+	tilemap_t *m_background;
+	tilemap_t *m_foreground;
+	tilemap_t *m_text_layer;
+	tilemap_t *m_background2;
+	tilemap_t *m_foreground2;
+	tilemap_t *m_bg_tilemaps[2];
+	tilemap_t *m_text_tilemap;
+	double m_weights[2][3][6];
 
-	int spritebank_type;
-	int back_yscroll;
-	int fore_yscroll;
-	int text_yscroll;
+	int m_spritebank_type;
+	int m_back_yscroll;
+	int m_fore_yscroll;
+	int m_text_yscroll;
 
-	int bg1_trans; // alien syn + sys18
+	int m_bg1_trans; // alien syn + sys18
 
-	int tile_bank1;
-	int tile_bank0;
-	int bg_page[4];
-	int fg_page[4];
+	int m_tile_bank1;
+	int m_tile_bank0;
+	int m_bg_page[4];
+	int m_fg_page[4];
 
-	UINT16 datsu_page[4];
+	UINT16 m_datsu_page[4];
 
-	int bg2_page[4];
-	int fg2_page[4];
+	int m_bg2_page[4];
+	int m_fg2_page[4];
 
-	int old_bg_page[4],old_fg_page[4], old_tile_bank1, old_tile_bank0;
-	int old_bg2_page[4], old_fg2_page[4];
+	int m_old_bg_page[4];
+	int m_old_fg_page[4];
+	int m_old_tile_bank1;
+	int m_old_tile_bank0;
+	int m_old_bg2_page[4];
+	int m_old_fg2_page[4];
 
-	int bg_scrollx, bg_scrolly;
-	int fg_scrollx, fg_scrolly;
-	UINT16 tilemapselect;
+	int m_bg_scrollx;
+	int m_bg_scrolly;
+	int m_fg_scrollx;
+	int m_fg_scrolly;
+	UINT16 m_tilemapselect;
 
-	int textlayer_lo_min;
-	int textlayer_lo_max;
-	int textlayer_hi_min;
-	int textlayer_hi_max;
+	int m_textlayer_lo_min;
+	int m_textlayer_lo_max;
+	int m_textlayer_hi_min;
+	int m_textlayer_hi_max;
 
-	int tilebank_switch;
+	int m_tilebank_switch;
 
 
 	/* sound-related */
-	int sample_buffer;
-	int sample_select;
+	int m_sample_buffer;
+	int m_sample_select;
 
-	UINT8 *soundbank_ptr;		/* Pointer to currently selected portion of ROM */
+	UINT8 *m_soundbank_ptr;		/* Pointer to currently selected portion of ROM */
 
 	/* sys18 */
-	UINT8 *sound_bank;
-	UINT16 *splittab_bg_x;
-	UINT16 *splittab_bg_y;
-	UINT16 *splittab_fg_x;
-	UINT16 *splittab_fg_y;
-	int     sound_info[4*2];
-	int     refreshenable;
-	int     system18;
+	UINT8 *m_sound_bank;
+	UINT16 *m_splittab_bg_x;
+	UINT16 *m_splittab_bg_y;
+	UINT16 *m_splittab_fg_x;
+	UINT16 *m_splittab_fg_y;
+	int     m_sound_info[4*2];
+	int     m_refreshenable;
+	int     m_system18;
 
-	UINT8 *decrypted_region;	// goldnaxeb1 & bayrouteb1
+	UINT8 *m_decrypted_region;	// goldnaxeb1 & bayrouteb1
 
 	/* devices */
-	device_t *maincpu;
-	device_t *soundcpu;
+	device_t *m_maincpu;
+	device_t *m_soundcpu;
 };
 
 /*----------- defined in video/system16.c -----------*/

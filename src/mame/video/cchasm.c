@@ -41,7 +41,7 @@ static void cchasm_refresh (running_machine &machine)
 
 	while (!done)
 	{
-        data = state->ram[pc];
+        data = state->m_ram[pc];
 		opcode = data >> 12;
         data &= 0xfff;
         if ((opcode > COLOR) && (data & 0x800))
@@ -66,14 +66,14 @@ static void cchasm_refresh (running_machine &machine)
             break;
         case POSY:
             move = 1;
-            currenty = state->ycenter + (data << 16);
+            currenty = state->m_ycenter + (data << 16);
             break;
         case SCALEX:
             scalex = data << 5;
             break;
         case POSX:
             move = 1;
-            currentx = state->xcenter - (data << 16);
+            currentx = state->m_xcenter - (data << 16);
             break;
         case LENGTH:
             if (move)
@@ -124,8 +124,8 @@ VIDEO_START( cchasm )
 	cchasm_state *state = machine.driver_data<cchasm_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->xcenter=((visarea.max_x + visarea.min_x)/2) << 16;
-	state->ycenter=((visarea.max_y + visarea.min_y)/2) << 16;
+	state->m_xcenter=((visarea.max_x + visarea.min_x)/2) << 16;
+	state->m_ycenter=((visarea.max_y + visarea.min_y)/2) << 16;
 
 	VIDEO_START_CALL(vector);
 }

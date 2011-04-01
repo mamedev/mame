@@ -4,17 +4,17 @@ public:
 	bigstrkb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *tilemap;
-	tilemap_t *tilemap2;
-	tilemap_t *tilemap3;
+	tilemap_t *m_tilemap;
+	tilemap_t *m_tilemap2;
+	tilemap_t *m_tilemap3;
 
-	UINT16 *videoram;
-	UINT16 *videoram2;
-	UINT16 *videoram3;
+	UINT16 *m_videoram;
+	UINT16 *m_videoram2;
+	UINT16 *m_videoram3;
 
-	UINT16 *vidreg1;
-	UINT16 *vidreg2;
-	UINT16 *spriteram;
+	UINT16 *m_vidreg1;
+	UINT16 *m_vidreg2;
+	UINT16 *m_spriteram;
 };
 
 

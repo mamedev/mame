@@ -71,10 +71,10 @@ public:
 	supdrapo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *char_bank;
-	UINT8 *col_line;
-	UINT8 *videoram;
-	UINT8 wdog;
+	UINT8 *m_char_bank;
+	UINT8 *m_col_line;
+	UINT8 *m_videoram;
+	UINT8 m_wdog;
 };
 
 
@@ -100,9 +100,9 @@ static SCREEN_UPDATE( supdrapo )
 	{
 		for(x = 0; x < 32; x++)
 		{
-			int tile = state->videoram[count] + state->char_bank[count] * 0x100;
+			int tile = state->m_videoram[count] + state->m_char_bank[count] * 0x100;
 			/* Global Column Coloring, GUESS! */
-			color = state->col_line[(x*2) + 1] ? (state->col_line[(x*2) + 1] - 1) & 7 : 0;
+			color = state->m_col_line[(x*2) + 1] ? (state->m_col_line[(x*2) + 1] - 1) & 7 : 0;
 
 			drawgfx_opaque(bitmap, cliprect, screen->machine().gfx[0], tile,color, 0, 0, x*8, y*8);
 
@@ -181,12 +181,12 @@ static WRITE8_HANDLER( wdog8000_w )
 */
 	supdrapo_state *state = space->machine().driver_data<supdrapo_state>();
 
-	if (state->wdog == data)
+	if (state->m_wdog == data)
 	{
 		watchdog_reset_w(space, 0, 0);	/* Reset */
 	}
 
-	state->wdog = data;
+	state->m_wdog = data;
 //  logerror("Watchdog: %02X\n", data);
 }
 
@@ -233,7 +233,7 @@ static MACHINE_START( supdrapo )
 static MACHINE_RESET( supdrapo )
 {
 	supdrapo_state *state = machine.driver_data<supdrapo_state>();
-	state->wdog = 1;
+	state->m_wdog = 1;
 }
 
 
@@ -245,10 +245,10 @@ static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(supdrapo_state,col_line)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(supdrapo_state,m_col_line)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_MEMBER(supdrapo_state,videoram)
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE_MEMBER(supdrapo_state,char_bank)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_MEMBER(supdrapo_state,m_videoram)
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE_MEMBER(supdrapo_state,m_char_bank)
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
 	AM_RANGE(0x7c00, 0x7c00) AM_WRITE(debug7c00_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITE(wdog8000_w)

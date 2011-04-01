@@ -11,35 +11,38 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    spritemap;
-	UINT16 *    spriteram;
-	UINT16 *    pivram;
-	UINT16 *    piv_ctrlram;
-	UINT16 *    sharedram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-	size_t      sharedram_size;
-	size_t      spritemap_size;
-	size_t      spriteram_size;
+	UINT16 *    m_spritemap;
+	UINT16 *    m_spriteram;
+	UINT16 *    m_pivram;
+	UINT16 *    m_piv_ctrlram;
+	UINT16 *    m_sharedram;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
+	size_t      m_sharedram_size;
+	size_t      m_spritemap_size;
+	size_t      m_spriteram_size;
 
 	/* video-related */
-	tilemap_t   *piv_tilemap[3];
-	UINT16      piv_ctrl_reg;
-	UINT16      piv_zoom[3], piv_scrollx[3], piv_scrolly[3];
-	UINT16      rotate_ctrl[8];
-	int         piv_xoffs, piv_yoffs;
-	UINT8       dislayer[4];
+	tilemap_t   *m_piv_tilemap[3];
+	UINT16      m_piv_ctrl_reg;
+	UINT16      m_piv_zoom[3];
+	UINT16      m_piv_scrollx[3];
+	UINT16      m_piv_scrolly[3];
+	UINT16      m_rotate_ctrl[8];
+	int         m_piv_xoffs;
+	int         m_piv_yoffs;
+	UINT8       m_dislayer[4];
 
 	/* misc */
-	UINT16      cpua_ctrl;
-	UINT16      port_sel;
-	INT32       banknum;
+	UINT16      m_cpua_ctrl;
+	UINT16      m_port_sel;
+	INT32       m_banknum;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *tc0100scn;
-	device_t *tc0140syt;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_tc0100scn;
+	device_t *m_tc0140syt;
 };
 
 

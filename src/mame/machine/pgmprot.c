@@ -114,8 +114,8 @@ READ16_HANDLER( pstars_protram_r )
 		return input_port_read(space->machine(), "Region");
 	else if (offset >= 0x10)  //timer
 	{
-		logerror("PSTARS ACCESS COUNTER %6X\n", state->pstar_ram[offset - 0x10]);
-		return state->pstar_ram[offset - 0x10]--;
+		logerror("PSTARS ACCESS COUNTER %6X\n", state->m_pstar_ram[offset - 0x10]);
+		return state->m_pstar_ram[offset - 0x10]--;
 	}
 	return 0x0000;
 }
@@ -126,18 +126,18 @@ READ16_HANDLER( pstars_r )
 
 	if (offset == 0)
 	{
-		UINT16 d = state->pstars_val & 0xffff;
-		UINT16 realkey = state->pstars_key >> 8;
-		realkey |= state->pstars_key;
+		UINT16 d = state->m_pstars_val & 0xffff;
+		UINT16 realkey = state->m_pstars_key >> 8;
+		realkey |= state->m_pstars_key;
 		d ^= realkey;
-//      logerror("PSTARS A27 R  %6X\n", state->pstars_val);
+//      logerror("PSTARS A27 R  %6X\n", state->m_pstars_val);
 		return d;
 	}
 	else if (offset == 1)
 	{
-		UINT16 d = state->pstars_val >> 16;
-		UINT16 realkey = state->pstars_key >> 8;
-		realkey |= state->pstars_key;
+		UINT16 d = state->m_pstars_val >> 16;
+		UINT16 realkey = state->m_pstars_key >> 8;
+		realkey |= state->m_pstars_key;
 		d ^= realkey;
 		return d;
 
@@ -151,7 +151,7 @@ WRITE16_HANDLER( pstars_w )
 
 	if (offset == 0)
 	{
-		state->pstars_int[0] = data;
+		state->m_pstars_int[0] = data;
 		return;
 	}
 
@@ -159,113 +159,113 @@ WRITE16_HANDLER( pstars_w )
 	{
 		UINT16 realkey;
 		if ((data >> 8) == 0xff)
-			state->pstars_key = 0xff00;
-		realkey = state->pstars_key >> 8;
-		realkey |= state->pstars_key;
+			state->m_pstars_key = 0xff00;
+		realkey = state->m_pstars_key >> 8;
+		realkey |= state->m_pstars_key;
 		{
-			state->pstars_key += 0x100;
-			state->pstars_key &= 0xff00;
-			if (state->pstars_key == 0xff00)
-				state->pstars_key = 0x100;
+			state->m_pstars_key += 0x100;
+			state->m_pstars_key &= 0xff00;
+			if (state->m_pstars_key == 0xff00)
+				state->m_pstars_key = 0x100;
 		}
 		data ^= realkey;
-		state->pstars_int[1] = data;
-		state->pstars_int[0] ^= realkey;
+		state->m_pstars_int[1] = data;
+		state->m_pstars_int[0] ^= realkey;
 
-		switch (state->pstars_int[1] & 0xff)
+		switch (state->m_pstars_int[1] & 0xff)
 		{
 		case 0x99:
-			state->pstars_key = 0x100;
-			state->pstars_val = 0x880000;
+			state->m_pstars_key = 0x100;
+			state->m_pstars_val = 0x880000;
 			break;
 
 		case 0xe0:
-			state->pstars_val = 0xa00000 + (state->pstars_int[0] << 6);
+			state->m_pstars_val = 0xa00000 + (state->m_pstars_int[0] << 6);
 			break;
 
 		case 0xdc:
-			state->pstars_val = 0xa00800 + (state->pstars_int[0] << 6);
+			state->m_pstars_val = 0xa00800 + (state->m_pstars_int[0] << 6);
 			break;
 
 		case 0xd0:
-			state->pstars_val = 0xa01000 + (state->pstars_int[0] << 5);
+			state->m_pstars_val = 0xa01000 + (state->m_pstars_int[0] << 5);
 			break;
 
 		case 0xb1:
-			state->pstar_b1 = state->pstars_int[0];
-			state->pstars_val = 0x890000;
+			state->m_pstar_b1 = state->m_pstars_int[0];
+			state->m_pstars_val = 0x890000;
 			break;
 
 		case 0xbf:
-			state->pstars_val = state->pstar_b1 * state->pstars_int[0];
+			state->m_pstars_val = state->m_pstar_b1 * state->m_pstars_int[0];
 			break;
 
 		case 0xc1: //TODO:TIMER  0,1,2,FIX TO 0 should be OK?
-			state->pstars_val = 0;
+			state->m_pstars_val = 0;
 			break;
 
 		case 0xce: //TODO:TIMER  0,1,2
-			state->pstar_ce = state->pstars_int[0];
-			state->pstars_val=0x890000;
+			state->m_pstar_ce = state->m_pstars_int[0];
+			state->m_pstars_val=0x890000;
 			break;
 
 		case 0xcf: //TODO:TIMER  0,1,2
-			state->pstar_ram[state->pstar_ce] = state->pstars_int[0];
-			state->pstars_val = 0x890000;
+			state->m_pstar_ram[state->m_pstar_ce] = state->m_pstars_int[0];
+			state->m_pstars_val = 0x890000;
 			break;
 
 		case 0xe7:
-			state->pstar_e7 = (state->pstars_int[0] >> 12) & 0xf;
-			state->pstars_regs[state->pstar_e7] &= 0xffff;
-			state->pstars_regs[state->pstar_e7] |= (state->pstars_int[0] & 0xff) << 16;
-			state->pstars_val = 0x890000;
+			state->m_pstar_e7 = (state->m_pstars_int[0] >> 12) & 0xf;
+			state->m_pstars_regs[state->m_pstar_e7] &= 0xffff;
+			state->m_pstars_regs[state->m_pstar_e7] |= (state->m_pstars_int[0] & 0xff) << 16;
+			state->m_pstars_val = 0x890000;
 			break;
 
 		case 0xe5:
-			state->pstars_regs[state->pstar_e7] &= 0xff0000;
-			state->pstars_regs[state->pstar_e7] |= state->pstars_int[0];
-			state->pstars_val = 0x890000;
+			state->m_pstars_regs[state->m_pstar_e7] &= 0xff0000;
+			state->m_pstars_regs[state->m_pstar_e7] |= state->m_pstars_int[0];
+			state->m_pstars_val = 0x890000;
 			break;
 
 		case 0xf8: //@73C
-			state->pstars_val = state->pstars_regs[state->pstars_int[0] & 0xf] & 0xffffff;
+			state->m_pstars_val = state->m_pstars_regs[state->m_pstars_int[0] & 0xf] & 0xffffff;
 			break;
 
 		case 0xba:
-			state->pstars_val = pstar_ba[state->pstars_int[0]];
+			state->m_pstars_val = pstar_ba[state->m_pstars_int[0]];
 			break;
 
 		case 0xb0:
-			state->pstars_val = pstar_b0[state->pstars_int[0]];
+			state->m_pstars_val = pstar_b0[state->m_pstars_int[0]];
 			break;
 
 		case 0xae:
-			state->pstars_val = pstar_ae[state->pstars_int[0]];
+			state->m_pstars_val = pstar_ae[state->m_pstars_int[0]];
 			break;
 
 		case 0xa0:
-			state->pstars_val = pstar_a0[state->pstars_int[0]];
+			state->m_pstars_val = pstar_a0[state->m_pstars_int[0]];
 			break;
 
 		case 0x9d:
-			state->pstars_val = pstar_9d[state->pstars_int[0]];
+			state->m_pstars_val = pstar_9d[state->m_pstars_int[0]];
 			break;
 
 		case 0x90:
-			state->pstars_val = pstar_90[state->pstars_int[0]];
+			state->m_pstars_val = pstar_90[state->m_pstars_int[0]];
 			break;
 
 		case 0x8c:
-			state->pstars_val = pstar_8c[state->pstars_int[0]];
+			state->m_pstars_val = pstar_8c[state->m_pstars_int[0]];
 			break;
 
 		case 0x80:
-			state->pstars_val = pstar_80[state->pstars_int[0]];
+			state->m_pstars_val = pstar_80[state->m_pstars_int[0]];
 			break;
 
 		default:
-			state->pstars_val = 0x890000;
-			logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n", cpu_get_pc(&space->device()), state->pstars_int[1], state->pstars_int[0]);
+			state->m_pstars_val = 0x890000;
+			logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n", cpu_get_pc(&space->device()), state->m_pstars_int[1], state->m_pstars_int[0]);
 
 		}
 
@@ -285,28 +285,28 @@ static void asic3_compute_hold(running_machine &machine)
 	switch (mode)
 	{
 	case 1:
-		state->asic3_hold =
-			(state->asic3_hold << 1)
+		state->m_asic3_hold =
+			(state->m_asic3_hold << 1)
 			 ^ 0x2bad
-			 ^ BIT(state->asic3_hold, 15) ^ BIT(state->asic3_hold, 10) ^ BIT(state->asic3_hold, 8) ^ BIT(state->asic3_hold, 5)
-			 ^ BIT(state->asic3_z, state->asic3_y)
-			 ^ (BIT(state->asic3_x, 0) << 1) ^ (BIT(state->asic3_x, 1) << 6) ^ (BIT(state->asic3_x, 2) << 10) ^ (BIT(state->asic3_x, 3) << 14);
+			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
+			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
+			 ^ (BIT(state->m_asic3_x, 0) << 1) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 14);
 		break;
 	case 2:
-		state->asic3_hold =
-			(state->asic3_hold << 1)
+		state->m_asic3_hold =
+			(state->m_asic3_hold << 1)
 			 ^ 0x2bad
-			 ^ BIT(state->asic3_hold, 15) ^ BIT(state->asic3_hold, 7) ^ BIT(state->asic3_hold, 6) ^ BIT(state->asic3_hold, 5)
-			 ^ BIT(state->asic3_z, state->asic3_y)
-			 ^ (BIT(state->asic3_x, 0) << 4) ^ (BIT(state->asic3_x, 1) << 6) ^ (BIT(state->asic3_x, 2) << 10) ^ (BIT(state->asic3_x, 3) << 12);
+			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 7) ^ BIT(state->m_asic3_hold, 6) ^ BIT(state->m_asic3_hold, 5)
+			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
+			 ^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
 		break;
 	case 3:
-		state->asic3_hold =
-			(state->asic3_hold << 1)
+		state->m_asic3_hold =
+			(state->m_asic3_hold << 1)
 			 ^ 0x2bad
-			 ^ BIT(state->asic3_hold, 15) ^ BIT(state->asic3_hold, 10) ^ BIT(state->asic3_hold, 8) ^ BIT(state->asic3_hold, 5)
-			 ^ BIT(state->asic3_z, state->asic3_y)
-			 ^ (BIT(state->asic3_x, 0) << 4) ^ (BIT(state->asic3_x, 1) << 6) ^ (BIT(state->asic3_x, 2) << 10) ^ (BIT(state->asic3_x, 3) << 12);
+			 ^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
+			 ^ BIT(state->m_asic3_z, state->m_asic3_y)
+			 ^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
 		break;
 	}
 }
@@ -317,20 +317,20 @@ READ16_HANDLER( pgm_asic3_r )
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
-	switch (state->asic3_reg)
+	switch (state->m_asic3_reg)
 	{
-	case 0x00: res = (state->asic3_latch[0] & 0xf7) | ((input_port_read(space->machine(), "Region") << 3) & 0x08); break;
-	case 0x01: res = state->asic3_latch[1]; break;
-	case 0x02: res = (state->asic3_latch[2] & 0x7f) | ((input_port_read(space->machine(), "Region") << 6) & 0x80); break;
+	case 0x00: res = (state->m_asic3_latch[0] & 0xf7) | ((input_port_read(space->machine(), "Region") << 3) & 0x08); break;
+	case 0x01: res = state->m_asic3_latch[1]; break;
+	case 0x02: res = (state->m_asic3_latch[2] & 0x7f) | ((input_port_read(space->machine(), "Region") << 6) & 0x80); break;
 	case 0x03:
-		res = (BIT(state->asic3_hold, 15) << 0)
-			| (BIT(state->asic3_hold, 12) << 1)
-			| (BIT(state->asic3_hold, 13) << 2)
-			| (BIT(state->asic3_hold, 10) << 3)
-			| (BIT(state->asic3_hold, 7) << 4)
-			| (BIT(state->asic3_hold, 9) << 5)
-			| (BIT(state->asic3_hold, 2) << 6)
-			| (BIT(state->asic3_hold, 5) << 7);
+		res = (BIT(state->m_asic3_hold, 15) << 0)
+			| (BIT(state->m_asic3_hold, 12) << 1)
+			| (BIT(state->m_asic3_hold, 13) << 2)
+			| (BIT(state->m_asic3_hold, 10) << 3)
+			| (BIT(state->m_asic3_hold, 7) << 4)
+			| (BIT(state->m_asic3_hold, 9) << 5)
+			| (BIT(state->m_asic3_hold, 2) << 6)
+			| (BIT(state->m_asic3_hold, 5) << 7);
 		break;
 	case 0x20: res = 0x49; break;
 	case 0x21: res = 0x47; break;
@@ -361,31 +361,31 @@ WRITE16_HANDLER( pgm_asic3_w )
 
 	if(ACCESSING_BITS_0_7)
 	{
-		if (state->asic3_reg < 3)
-			state->asic3_latch[state->asic3_reg] = data << 1;
-		else if (state->asic3_reg == 0xa0)
-			state->asic3_hold = 0;
-		else if (state->asic3_reg == 0x40)
+		if (state->m_asic3_reg < 3)
+			state->m_asic3_latch[state->m_asic3_reg] = data << 1;
+		else if (state->m_asic3_reg == 0xa0)
+			state->m_asic3_hold = 0;
+		else if (state->m_asic3_reg == 0x40)
 		{
-			state->asic3_h2 = state->asic3_h1;
-			state->asic3_h1 = data;
+			state->m_asic3_h2 = state->m_asic3_h1;
+			state->m_asic3_h1 = data;
 		}
-		else if (state->asic3_reg == 0x48)
+		else if (state->m_asic3_reg == 0x48)
 		{
-			state->asic3_x = 0;
-			if (!(state->asic3_h2 & 0x0a))
-				state->asic3_x |= 8;
-			if (!(state->asic3_h2 & 0x90))
-				state->asic3_x |= 4;
-			if (!(state->asic3_h1 & 0x06))
-				state->asic3_x |= 2;
-			if (!(state->asic3_h1 & 0x90))
-				state->asic3_x |= 1;
+			state->m_asic3_x = 0;
+			if (!(state->m_asic3_h2 & 0x0a))
+				state->m_asic3_x |= 8;
+			if (!(state->m_asic3_h2 & 0x90))
+				state->m_asic3_x |= 4;
+			if (!(state->m_asic3_h1 & 0x06))
+				state->m_asic3_x |= 2;
+			if (!(state->m_asic3_h1 & 0x90))
+				state->m_asic3_x |= 1;
 		}
-		else if(state->asic3_reg >= 0x80 && state->asic3_reg <= 0x87)
+		else if(state->m_asic3_reg >= 0x80 && state->m_asic3_reg <= 0x87)
 		{
-			state->asic3_y = state->asic3_reg & 7;
-			state->asic3_z = data;
+			state->m_asic3_y = state->m_asic3_reg & 7;
+			state->m_asic3_z = data;
 			asic3_compute_hold(space->machine());
 		}
 	}
@@ -396,7 +396,7 @@ WRITE16_HANDLER( pgm_asic3_reg_w )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
-		state->asic3_reg = data & 0xff;
+		state->m_asic3_reg = data & 0xff;
 }
 
 /*** Knights of Valour / Sango / PhotoY2k Protection (from ElSemi) (ASIC28) ***/
@@ -458,44 +458,44 @@ READ16_HANDLER( sango_protram_r )
 READ16_HANDLER( asic28_r )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT32 val = (state->asic28_regs[1] << 16) | (state->asic28_regs[0]);
+	UINT32 val = (state->m_asic28_regs[1] << 16) | (state->m_asic28_regs[0]);
 
-	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(&space->device()), state->asic28_regs[1]);
+	//logerror("Asic28 Read PC = %06x Command = %02x ??\n", cpu_get_pc(&space->device()), state->m_asic28_regs[1]);
 
-	switch (state->asic28_regs[1] & 0xff)
+	switch (state->m_asic28_regs[1] & 0xff)
 	{
 		case 0x99:
 			val = 0x880000;
 			break;
 
 		case 0x9d:	// spr palette
-			val = 0xa00000 + ((state->asic28_regs[0] & 0x1f) << 6);
+			val = 0xa00000 + ((state->m_asic28_regs[0] & 0x1f) << 6);
 			break;
 
 		case 0xb0:
-			val = B0TABLE[state->asic28_regs[0] & 0xf];
+			val = B0TABLE[state->m_asic28_regs[0] & 0xf];
 			break;
 
 		case 0xb4:
 			{
-				//UINT16 tmp = state->eoregs[v2];
-				int v2 = state->asic28_regs[0] & 0x0f;
-				int v1 = (state->asic28_regs[0] & 0x0f00) >> 8;
-				//state->eoregs[v2] = state->eoregs[v1];
-				//state->eoregs[v1] = tmp;
-				if (state->asic28_regs[0] == 0x102)
-					state->eoregs[1] = state->eoregs[0];
+				//UINT16 tmp = state->m_eoregs[v2];
+				int v2 = state->m_asic28_regs[0] & 0x0f;
+				int v1 = (state->m_asic28_regs[0] & 0x0f00) >> 8;
+				//state->m_eoregs[v2] = state->m_eoregs[v1];
+				//state->m_eoregs[v1] = tmp;
+				if (state->m_asic28_regs[0] == 0x102)
+					state->m_eoregs[1] = state->m_eoregs[0];
 				else
-					state->eoregs[v1] = state->eoregs[v2];
+					state->m_eoregs[v1] = state->m_eoregs[v2];
 
 				val = 0x880000;
 			}
 			break;
 
 		case 0xba:
-			val = BATABLE[state->asic28_regs[0] & 0x3f];
-			if (state->asic28_regs[0] > 0x2f)
-				popmessage("Unmapped BA com %02x, contact ElSemi / MameDev", state->asic28_regs[0]);
+			val = BATABLE[state->m_asic28_regs[0] & 0x3f];
+			if (state->m_asic28_regs[0] > 0x2f)
+				popmessage("Unmapped BA com %02x, contact ElSemi / MameDev", state->m_asic28_regs[0]);
 			break;
 
 		case 0xc0:
@@ -503,7 +503,7 @@ READ16_HANDLER( asic28_r )
 			break;
 
 		case 0xc3:	//TXT tile position Uses C0 to select column
-			val = 0x904000 + (state->asic_params[0xc0] + state->asic_params[0xc3] * 64) * 4;
+			val = 0x904000 + (state->m_asic_params[0xc0] + state->m_asic_params[0xc3] * 64) * 4;
 			break;
 
 		case 0xcb:
@@ -512,33 +512,33 @@ READ16_HANDLER( asic28_r )
 
 		case 0xcc: //BG
 			{
-			int y = state->asic_params[0xcc];
+			int y = state->m_asic_params[0xcc];
 			if (y & 0x400)    //y is signed (probably x too and it also applies to TXT, but I've never seen it used)
 				y =- (0x400 - (y & 0x3ff));
-			val = 0x900000 + (((state->asic_params[0xcb] + (y) * 64) * 4) /*&0x1fff*/);
+			val = 0x900000 + (((state->m_asic_params[0xcb] + (y) * 64) * 4) /*&0x1fff*/);
 			}
 			break;
 
 		case 0xd0:	//txt palette
-			val = 0xa01000 + (state->asic28_regs[0] << 5);
+			val = 0xa01000 + (state->m_asic28_regs[0] << 5);
 			break;
 
 		case 0xd6:	//???? check it
 			{
-				int v2 = state->asic28_regs[0] & 0xf;
-				//int v1 = (state->asic28_regs[0] & 0xf0) >> 4;
-				state->eoregs[0] = state->eoregs[v2];
-				//state->eoregs[v2] = 0;
+				int v2 = state->m_asic28_regs[0] & 0xf;
+				//int v1 = (state->m_asic28_regs[0] & 0xf0) >> 4;
+				state->m_eoregs[0] = state->m_eoregs[v2];
+				//state->m_eoregs[v2] = 0;
 				val = 0x880000;
 			}
 			break;
 
 		case 0xdc:	//bg palette
-			val = 0xa00800 + (state->asic28_regs[0] << 6);
+			val = 0xa00800 + (state->m_asic28_regs[0] << 6);
 			break;
 
 		case 0xe0:	//spr palette
-			val = 0xa00000 + ((state->asic28_regs[0] & 0x1f) << 6);
+			val = 0xa00000 + ((state->m_asic28_regs[0] & 0x1f) << 6);
 			break;
 
 		case 0xe5:
@@ -554,12 +554,12 @@ READ16_HANDLER( asic28_r )
 			break;
 
 		case 0xf8:
-			val = state->eoregs[state->asic28_regs[0] & 0xf] & 0xffffff;
+			val = state->m_eoregs[state->m_asic28_regs[0] & 0xf] & 0xffffff;
 			break;
 
 		case 0xfc:	//Adjust damage level to char experience level
 			{
-			val = (state->asic_params[0xfc] * state->asic_params[0xfe]) >> 6;
+			val = (state->m_asic_params[0xfc] * state->m_asic_params[0xfe]) >> 6;
 			break;
 			}
 
@@ -575,22 +575,22 @@ READ16_HANDLER( asic28_r )
 	if(offset == 0)
 	{
 		UINT16 d = val & 0xffff;
-		UINT16 realkey = state->asic28_key >> 8;
-		realkey |= state->asic28_key;
+		UINT16 realkey = state->m_asic28_key >> 8;
+		realkey |= state->m_asic28_key;
 		d ^= realkey;
 		return d;
 	}
 	else if (offset == 1)
 	{
 		UINT16 d = val >> 16;
-		UINT16 realkey = state->asic28_key >> 8;
-		realkey |= state->asic28_key;
+		UINT16 realkey = state->m_asic28_key >> 8;
+		realkey |= state->m_asic28_key;
 		d ^= realkey;
-		state->asic28_rcnt++;
-		if (!(state->asic28_rcnt & 0xf))
+		state->m_asic28_rcnt++;
+		if (!(state->m_asic28_rcnt & 0xf))
 		{
-			state->asic28_key += 0x100;
-			state->asic28_key &= 0xff00;
+			state->m_asic28_key += 0x100;
+			state->m_asic28_key &= 0xff00;
 		}
 		return d;
 	}
@@ -603,38 +603,38 @@ WRITE16_HANDLER( asic28_w )
 
 	if (offset == 0)
 	{
-		UINT16 realkey =state->asic28_key >> 8;
-		realkey |= state->asic28_key;
+		UINT16 realkey =state->m_asic28_key >> 8;
+		realkey |= state->m_asic28_key;
 		data ^= realkey;
-		state->asic28_regs[0] = data;
+		state->m_asic28_regs[0] = data;
 		return;
 	}
 	if (offset == 1)
 	{
 		UINT16 realkey;
 
-		state->asic28_key = data & 0xff00;
+		state->m_asic28_key = data & 0xff00;
 
-		realkey = state->asic28_key >> 8;
-		realkey |= state->asic28_key;
+		realkey = state->m_asic28_key >> 8;
+		realkey |= state->m_asic28_key;
 		data ^= realkey;
-		state->asic28_regs[1] = data;
-		logerror("ASIC28 CMD %04x  PARAM %04x\n", state->asic28_regs[1], state->asic28_regs[0]);
+		state->m_asic28_regs[1] = data;
+		logerror("ASIC28 CMD %04x  PARAM %04x\n", state->m_asic28_regs[1], state->m_asic28_regs[0]);
 
-		state->asic_params[state->asic28_regs[1] & 0xff] = state->asic28_regs[0];
-		if (state->asic28_regs[1] == 0xE7)
+		state->m_asic_params[state->m_asic28_regs[1] & 0xff] = state->m_asic28_regs[0];
+		if (state->m_asic28_regs[1] == 0xE7)
 		{
-			UINT32 E0R = (state->asic_params[0xe7] >> 12) & 0xf;
-			state->eoregs[E0R] &= 0xffff;
-			state->eoregs[E0R] |= state->asic28_regs[0] << 16;
+			UINT32 E0R = (state->m_asic_params[0xe7] >> 12) & 0xf;
+			state->m_eoregs[E0R] &= 0xffff;
+			state->m_eoregs[E0R] |= state->m_asic28_regs[0] << 16;
 		}
-		if (state->asic28_regs[1]==0xE5)
+		if (state->m_asic28_regs[1]==0xE5)
 		{
-			UINT32 E0R = (state->asic_params[0xe7] >> 12) & 0xf;
-			state->eoregs[E0R] &= 0xff0000;
-			state->eoregs[E0R] |= state->asic28_regs[0];
+			UINT32 E0R = (state->m_asic_params[0xe7] >> 12) & 0xf;
+			state->m_eoregs[E0R] &= 0xff0000;
+			state->m_eoregs[E0R] |= state->m_asic28_regs[0];
 		}
-		state->asic28_rcnt = 0;
+		state->m_asic28_rcnt = 0;
 	}
 }
 

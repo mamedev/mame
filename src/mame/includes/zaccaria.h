@@ -4,17 +4,17 @@ public:
 	zaccaria_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int dsw;
-	int active_8910;
-	int port0a;
-	int acs;
-	int last_port0b;
-	int toggle;
-	UINT8 *videoram;
-	UINT8 *attributesram;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	UINT8 *spriteram2;
+	int m_dsw;
+	int m_active_8910;
+	int m_port0a;
+	int m_acs;
+	int m_last_port0b;
+	int m_toggle;
+	UINT8 *m_videoram;
+	UINT8 *m_attributesram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	UINT8 *m_spriteram2;
 };
 
 

@@ -74,7 +74,7 @@ static WRITE8_HANDLER( tunhunt_control_w )
     */
 	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
-	state->control = data;
+	state->m_control = data;
 	coin_counter_w( space->machine(), 0,data&0x01 );
 	coin_counter_w( space->machine(), 1,data&0x02 );
 	set_led_status( space->machine(), 0, data&0x40 ); /* start */
@@ -133,7 +133,7 @@ static READ8_DEVICE_HANDLER( dsw2_4r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tunhunt_state,workram) /* Work RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tunhunt_state,m_workram) /* Work RAM */
 	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
 	AM_RANGE(0x1200, 0x12ff) AM_WRITEONLY
 	AM_RANGE(0x1400, 0x14ff) AM_WRITEONLY
@@ -141,12 +141,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY	/* SHEL0H */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY	/* SHEL1H */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY	/* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE_MEMBER(tunhunt_state,videoram)	/* ALPHA */
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE_MEMBER(tunhunt_state,m_videoram)	/* ALPHA */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP	/* watchdog */
 	AM_RANGE(0x2000, 0x2007) AM_READ(tunhunt_button_r)
 	AM_RANGE(0x2400, 0x2400) AM_WRITENOP	/* INT ACK */
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(tunhunt_control_w)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_BASE_MEMBER(tunhunt_state,spriteram)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_BASE_MEMBER(tunhunt_state,m_spriteram)
 	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM

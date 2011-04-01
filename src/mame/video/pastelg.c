@@ -50,7 +50,7 @@ PALETTE_INIT( pastelg )
 WRITE8_HANDLER( pastelg_clut_w )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	state->clut[offset] = data;
+	state->m_clut[offset] = data;
 }
 
 /******************************************************************************
@@ -60,7 +60,7 @@ WRITE8_HANDLER( pastelg_clut_w )
 int pastelg_blitter_src_addr_r(address_space *space)
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	return state->blitter_src_addr;
+	return state->m_blitter_src_addr;
 }
 
 WRITE8_HANDLER( pastelg_blitter_w )
@@ -68,19 +68,19 @@ WRITE8_HANDLER( pastelg_blitter_w )
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
 	switch (offset)
 	{
-		case 0: state->blitter_src_addr = (state->blitter_src_addr & 0xff00) | data; break;
-		case 1: state->blitter_src_addr = (state->blitter_src_addr & 0x00ff) | (data << 8); break;
-		case 2: state->blitter_destx = data; break;
-		case 3: state->blitter_desty = data; break;
-		case 4: state->blitter_sizex = data; break;
-		case 5: state->blitter_sizey = data;
+		case 0: state->m_blitter_src_addr = (state->m_blitter_src_addr & 0xff00) | data; break;
+		case 1: state->m_blitter_src_addr = (state->m_blitter_src_addr & 0x00ff) | (data << 8); break;
+		case 2: state->m_blitter_destx = data; break;
+		case 3: state->m_blitter_desty = data; break;
+		case 4: state->m_blitter_sizex = data; break;
+		case 5: state->m_blitter_sizey = data;
 				/* writing here also starts the blit */
 				pastelg_gfxdraw(space->machine());
 				break;
-		case 6:	state->blitter_direction_x = (data & 0x01) ? 1 : 0;
-				state->blitter_direction_y = (data & 0x02) ? 1 : 0;
-				state->flipscreen = (data & 0x04) ? 0 : 1;
-				state->dispflag = (data & 0x08) ? 0 : 1;
+		case 6:	state->m_blitter_direction_x = (data & 0x01) ? 1 : 0;
+				state->m_blitter_direction_y = (data & 0x02) ? 1 : 0;
+				state->m_flipscreen = (data & 0x04) ? 0 : 1;
+				state->m_dispflag = (data & 0x08) ? 0 : 1;
 				pastelg_vramflip(space->machine());
 				break;
 	}
@@ -91,13 +91,13 @@ WRITE8_HANDLER( threeds_romsel_w )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
 	if (data&0xfc) printf("%02x\n",data);
-	state->gfxrom = (data & 0x3);
+	state->m_gfxrom = (data & 0x3);
 }
 
 WRITE8_HANDLER( threeds_output_w )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	state->palbank = ((data & 0x10) >> 4);
+	state->m_palbank = ((data & 0x10) >> 4);
 
 }
 
@@ -106,7 +106,7 @@ READ8_HANDLER( threeds_rom_readback_r )
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
 	UINT8 *GFX = space->machine().region("gfx1")->base();
 
-	return GFX[(state->blitter_src_addr | (state->gfxrom << 16)) & 0x3ffff];
+	return GFX[(state->m_blitter_src_addr | (state->m_gfxrom << 16)) & 0x3ffff];
 }
 
 
@@ -114,16 +114,16 @@ WRITE8_HANDLER( pastelg_romsel_w )
 {
 	pastelg_state *state = space->machine().driver_data<pastelg_state>();
 	int gfxlen = space->machine().region("gfx1")->bytes();
-	state->gfxrom = ((data & 0xc0) >> 6);
-	state->palbank = ((data & 0x10) >> 4);
+	state->m_gfxrom = ((data & 0xc0) >> 6);
+	state->m_palbank = ((data & 0x10) >> 4);
 	nb1413m3_sndrombank1_w(space, 0, data);
 
-	if ((state->gfxrom << 16) > (gfxlen - 1))
+	if ((state->m_gfxrom << 16) > (gfxlen - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		state->gfxrom &= (gfxlen / 0x20000 - 1);
+		state->m_gfxrom &= (gfxlen / 0x20000 - 1);
 	}
 }
 
@@ -139,20 +139,20 @@ static void pastelg_vramflip(running_machine &machine)
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	if (state->flipscreen == state->flipscreen_old) return;
+	if (state->m_flipscreen == state->m_flipscreen_old) return;
 
 	for (y = 0; y < height; y++)
 	{
 		for (x = 0; x < width; x++)
 		{
-			color1 = state->videoram[(y * width) + x];
-			color2 = state->videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
-			state->videoram[(y * width) + x] = color2;
-			state->videoram[((y ^ 0xff) * width) + (x ^ 0xff)] = color1;
+			color1 = state->m_videoram[(y * width) + x];
+			color2 = state->m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
+			state->m_videoram[(y * width) + x] = color2;
+			state->m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)] = color1;
 		}
 	}
 
-	state->flipscreen_old = state->flipscreen;
+	state->m_flipscreen_old = state->m_flipscreen;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
@@ -179,36 +179,36 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 	nb1413m3_busyctr = 0;
 
-	startx = state->blitter_destx + state->blitter_sizex;
-	starty = state->blitter_desty + state->blitter_sizey;
+	startx = state->m_blitter_destx + state->m_blitter_sizex;
+	starty = state->m_blitter_desty + state->m_blitter_sizey;
 
 
-	if (state->blitter_direction_x)
+	if (state->m_blitter_direction_x)
 	{
-		if (state->blitter_sizex&0x80) sizex = 0xff-state->blitter_sizex;
-		else sizex=state->blitter_sizex;
+		if (state->m_blitter_sizex&0x80) sizex = 0xff-state->m_blitter_sizex;
+		else sizex=state->m_blitter_sizex;
 		incx = 1;
 	}
 	else
 	{
-		sizex = state->blitter_sizex;
+		sizex = state->m_blitter_sizex;
 		incx = -1;
 	}
 
-	if (state->blitter_direction_y)
+	if (state->m_blitter_direction_y)
 	{
-		if (state->blitter_sizey&0x80) sizey = 0xff-state->blitter_sizey;
-		else sizey=state->blitter_sizey;
+		if (state->m_blitter_sizey&0x80) sizey = 0xff-state->m_blitter_sizey;
+		else sizey=state->m_blitter_sizey;
 		incy = 1;
 	}
 	else
 	{
-		sizey = state->blitter_sizey;
+		sizey = state->m_blitter_sizey;
 		incy = -1;
 	}
 
 	gfxlen = machine.region("gfx1")->bytes();
-	gfxaddr = (state->gfxrom << 16) + state->blitter_src_addr;
+	gfxaddr = (state->m_gfxrom << 16) + state->m_blitter_src_addr;
 
 	readflag = 0;
 
@@ -221,7 +221,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 		for (ctrx = sizex; ctrx >= 0; ctrx--)
 		{
-			gfxaddr = (state->gfxrom << 16) + ((state->blitter_src_addr + count));
+			gfxaddr = (state->m_gfxrom << 16) + ((state->m_blitter_src_addr + count));
 
 			if ((gfxaddr > (gfxlen - 1)))
 			{
@@ -236,7 +236,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 			dx = x & 0xff;
 			dy = y & 0xff;
 
-			if (state->flipscreen)
+			if (state->m_flipscreen)
 			{
 				dx ^= 0xff;
 				dy ^= 0xff;
@@ -256,20 +256,20 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 			readflag ^= 1;
 
-			if (state->clut[color] & 0xf0)
+			if (state->m_clut[color] & 0xf0)
 			{
 				if (color)
 				{
-					color = ((state->palbank * 0x10) + color);
-					state->videoram[(dy * width) + dx] = color;
+					color = ((state->m_palbank * 0x10) + color);
+					state->m_videoram[(dy * width) + dx] = color;
 				}
 			}
 			else
 			{
-				if(state->clut[color] != 0)
+				if(state->m_clut[color] != 0)
 				{
-					color = ((state->palbank * 0x10) + state->clut[color]);
-					state->videoram[(dy * width) + dx] = color;
+					color = ((state->m_palbank * 0x10) + state->m_clut[color]);
+					state->m_videoram[(dy * width) + dx] = color;
 				}
 			}
 
@@ -294,8 +294,8 @@ VIDEO_START( pastelg )
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 
-	state->videoram = auto_alloc_array_clear(machine, UINT8, width * height);
-	state->clut = auto_alloc_array(machine, UINT8, 0x10);
+	state->m_videoram = auto_alloc_array_clear(machine, UINT8, width * height);
+	state->m_clut = auto_alloc_array(machine, UINT8, 0x10);
 }
 
 /******************************************************************************
@@ -305,7 +305,7 @@ VIDEO_START( pastelg )
 SCREEN_UPDATE( pastelg )
 {
 	pastelg_state *state = screen->machine().driver_data<pastelg_state>();
-	if (state->dispflag)
+	if (state->m_dispflag)
 	{
 		int x, y;
 		int width = screen->width();
@@ -313,7 +313,7 @@ SCREEN_UPDATE( pastelg )
 
 		for (y = 0; y < height; y++)
 			for (x = 0; x < width; x++)
-				*BITMAP_ADDR16(bitmap, y, x) = state->videoram[(y * width) + x];
+				*BITMAP_ADDR16(bitmap, y, x) = state->m_videoram[(y * width) + x];
 	}
 	else
 		bitmap_fill(bitmap, cliprect, 0);

@@ -11,26 +11,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int         sprite_colorbase;
-	int         layer_colorbase[4], layerpri[3];
-	UINT16      spritebank;
-	int         tilebanks[4];
-	int         spritebanks[4];
+	int         m_sprite_colorbase;
+	int         m_layer_colorbase[4];
+	int         m_layerpri[3];
+	UINT16      m_spritebank;
+	int         m_tilebanks[4];
+	int         m_spritebanks[4];
 
 	/* misc */
-	UINT8       cur_control2;
-	UINT16      prot[2];
+	UINT8       m_cur_control2;
+	UINT16      m_prot[2];
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k053260;
-	device_t *k056832;
-	device_t *k053244;
-	device_t *k053251;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k053260;
+	device_t *m_k056832;
+	device_t *m_k053244;
+	device_t *m_k053251;
 };
 
 

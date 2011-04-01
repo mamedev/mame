@@ -4,27 +4,27 @@ public:
 	system1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	void (*videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
-	UINT8 mute_xor;
-	UINT8 *ram;
-	UINT8 dakkochn_mux_data;
-	UINT8 videomode_prev;
-	UINT8 mcu_control;
-	UINT8 *nob_mcu_status;
-	UINT8 *nob_mcu_latch;
-	UINT8 nob_maincpu_latch;
-	int nobb_inport23_step;
-	UINT8 *mix_collide;
-	UINT8 mix_collide_summary;
-	UINT8 *sprite_collide;
-	UINT8 sprite_collide_summary;
-	bitmap_t *sprite_bitmap;
-	UINT8 video_mode;
-	UINT8 videoram_bank;
-	tilemap_t *tilemap_page[8];
-	UINT8 tilemap_pages;
-	UINT8 *spriteram;
+	UINT8 *m_videoram;
+	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
+	UINT8 m_mute_xor;
+	UINT8 *m_ram;
+	UINT8 m_dakkochn_mux_data;
+	UINT8 m_videomode_prev;
+	UINT8 m_mcu_control;
+	UINT8 *m_nob_mcu_status;
+	UINT8 *m_nob_mcu_latch;
+	UINT8 m_nob_maincpu_latch;
+	int m_nobb_inport23_step;
+	UINT8 *m_mix_collide;
+	UINT8 m_mix_collide_summary;
+	UINT8 *m_sprite_collide;
+	UINT8 m_sprite_collide_summary;
+	bitmap_t *m_sprite_bitmap;
+	UINT8 m_video_mode;
+	UINT8 m_videoram_bank;
+	tilemap_t *m_tilemap_page[8];
+	UINT8 m_tilemap_pages;
+	UINT8 *m_spriteram;
 };
 
 

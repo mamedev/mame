@@ -4,20 +4,20 @@ public:
 	thedeep_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *spriteram;
-	size_t spriteram_size;
-	int nmi_enable;
-	UINT8 protection_command;
-	UINT8 protection_data;
-	int protection_index;
-	int protection_irq;
-	int rombank;
-	UINT8 *vram_0;
-	UINT8 *vram_1;
-	UINT8 *scroll;
-	UINT8 *scroll2;
-	tilemap_t *tilemap_0;
-	tilemap_t *tilemap_1;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
+	int m_nmi_enable;
+	UINT8 m_protection_command;
+	UINT8 m_protection_data;
+	int m_protection_index;
+	int m_protection_irq;
+	int m_rombank;
+	UINT8 *m_vram_0;
+	UINT8 *m_vram_1;
+	UINT8 *m_scroll;
+	UINT8 *m_scroll2;
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;
 };
 
 

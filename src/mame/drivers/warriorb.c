@@ -167,14 +167,14 @@ static MACHINE_RESET( taito_dualscreen );
 static void reset_sound_region( running_machine &machine )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
-	memory_set_bank(machine, "bank10", state->banknum);
+	memory_set_bank(machine, "bank10", state->m_banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
-	state->banknum = data & 7;
+	state->m_banknum = data & 7;
 	reset_sound_region(space->machine());
 }
 
@@ -183,9 +183,9 @@ static WRITE16_HANDLER( warriorb_sound_w )
 	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	if (offset == 0)
-		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
 }
 
 static READ16_HANDLER( warriorb_sound_r )
@@ -193,7 +193,7 @@ static READ16_HANDLER( warriorb_sound_r )
 	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff));
 	else
 		return 0;
 }
@@ -207,15 +207,15 @@ static WRITE8_HANDLER( warriorb_pancontrol )
 
 	switch (offset)
 	{
-		case 0: flt = state->_2610_1l; break;
-		case 1: flt = state->_2610_1r; break;
-		case 2: flt = state->_2610_2l; break;
-		case 3: flt = state->_2610_2r; break;
+		case 0: flt = state->m_2610_1l; break;
+		case 1: flt = state->m_2610_1r; break;
+		case 2: flt = state->m_2610_2l; break;
+		case 3: flt = state->m_2610_2r; break;
 	}
 
-	state->pandata[offset] = (data << 1) + data;   /* original volume*3 */
-	//popmessage(" pan %02x %02x %02x %02x", state->pandata[0], state->pandata[1], state->pandata[2], state->pandata[3] );
-	flt_volume_set_volume(flt, state->pandata[offset] / 100.0);
+	state->m_pandata[offset] = (data << 1) + data;   /* original volume*3 */
+	//popmessage(" pan %02x %02x %02x %02x", state->m_pandata[0], state->m_pandata[1], state->m_pandata[2], state->m_pandata[3] );
+	flt_volume_set_volume(flt, state->m_pandata[offset] / 100.0);
 }
 
 
@@ -223,8 +223,8 @@ static WRITE16_HANDLER( tc0100scn_dual_screen_w )
 {
 	warriorb_state *state = space->machine().driver_data<warriorb_state>();
 
-	tc0100scn_word_w(state->tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(state->tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(state->m_tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(state->m_tc0100scn_2, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( darius2d_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, spriteram, spriteram_size)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( warriorb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x36000f) AM_DEVREADWRITE("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_DEVREADWRITE("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, spriteram, spriteram_size)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_MEMBER(warriorb_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_halfword_r, tc0510nio_halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
@@ -420,7 +420,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	warriorb_state *state = device->machine().driver_data<warriorb_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -542,22 +542,22 @@ static MACHINE_START( warriorb )
 
 	memory_configure_bank(machine, "bank10", 0, 8, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->tc0140syt = machine.device("tc0140syt");
-	state->tc0100scn_1 = machine.device("tc0100scn_1");
-	state->tc0100scn_2 = machine.device("tc0100scn_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_tc0140syt = machine.device("tc0140syt");
+	state->m_tc0100scn_1 = machine.device("tc0100scn_1");
+	state->m_tc0100scn_2 = machine.device("tc0100scn_2");
 
-	state->lscreen = machine.device("lscreen");
-	state->rscreen = machine.device("rscreen");
+	state->m_lscreen = machine.device("lscreen");
+	state->m_rscreen = machine.device("rscreen");
 
-	state->_2610_1l = machine.device("2610.1.l");
-	state->_2610_1r = machine.device("2610.1.r");
-	state->_2610_2l = machine.device("2610.2.l");
-	state->_2610_2r = machine.device("2610.2.r");
+	state->m_2610_1l = machine.device("2610.1.l");
+	state->m_2610_1r = machine.device("2610.1.r");
+	state->m_2610_2l = machine.device("2610.2.l");
+	state->m_2610_2r = machine.device("2610.2.r");
 
-	state->save_item(NAME(state->banknum));
-	state->save_item(NAME(state->pandata));
+	state->save_item(NAME(state->m_banknum));
+	state->save_item(NAME(state->m_pandata));
 	machine.state().register_postload(warriorb_postload, NULL);
 }
 
@@ -565,7 +565,7 @@ static MACHINE_RESET( taito_dualscreen )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
 
-	state->banknum = 0;
+	state->m_banknum = 0;
 
 	/**** mixer control enable ****/
 	machine.sound().system_enable(true);	/* mixer enabled */

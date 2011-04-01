@@ -572,8 +572,8 @@ static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")		/* 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(arkanoid_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, m_videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(arkanoid_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
@@ -587,8 +587,8 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(arkanoid_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, m_videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(arkanoid_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
@@ -601,7 +601,7 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
 	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w)	/* or IRQ acknowledge, or both */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_SIZE_MEMBER(arkanoid_state, videoram, videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_SIZE_MEMBER(arkanoid_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
@@ -916,45 +916,45 @@ static MACHINE_START( arkanoid )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->mcu = machine.device("mcu");
+	state->m_mcu = machine.device("mcu");
 
-	state->save_item(NAME(state->bootleg_cmd));
+	state->save_item(NAME(state->m_bootleg_cmd));
 
-	state->save_item(NAME(state->paddle_select));
-	state->save_item(NAME(state->z80write));
-	state->save_item(NAME(state->fromz80));
-	state->save_item(NAME(state->m68705write));
-	state->save_item(NAME(state->toz80));
+	state->save_item(NAME(state->m_paddle_select));
+	state->save_item(NAME(state->m_z80write));
+	state->save_item(NAME(state->m_fromz80));
+	state->save_item(NAME(state->m_m68705write));
+	state->save_item(NAME(state->m_toz80));
 
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
 
-	state->save_item(NAME(state->port_c_out));
-	state->save_item(NAME(state->ddr_c));
+	state->save_item(NAME(state->m_port_c_out));
+	state->save_item(NAME(state->m_ddr_c));
 
-	state->save_item(NAME(state->gfxbank));
-	state->save_item(NAME(state->palettebank));
+	state->save_item(NAME(state->m_gfxbank));
+	state->save_item(NAME(state->m_palettebank));
 }
 
 static MACHINE_RESET( arkanoid )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->z80write = 0;
-	state->m68705write = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_z80write = 0;
+	state->m_m68705write = 0;
 
-	state->bootleg_cmd = 0;
-	state->paddle_select = 0;
-	state->fromz80 = 0;
-	state->toz80 = 0;
-	state->ddr_a = 0;
-	state->ddr_c = 0;
-	state->port_c_out = 0;
-	state->gfxbank = 0;
-	state->palettebank = 0;
+	state->m_bootleg_cmd = 0;
+	state->m_paddle_select = 0;
+	state->m_fromz80 = 0;
+	state->m_toz80 = 0;
+	state->m_ddr_a = 0;
+	state->m_ddr_c = 0;
+	state->m_port_c_out = 0;
+	state->m_gfxbank = 0;
+	state->m_palettebank = 0;
 }
 
 static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
@@ -1455,14 +1455,14 @@ static void arkanoid_bootleg_init( running_machine &machine )
 static DRIVER_INIT( arkangc )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = ARKANGC;
+	state->m_bootleg_id = ARKANGC;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = ARKANGC2;
+	state->m_bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init(machine);
 }
 
@@ -1498,35 +1498,35 @@ static DRIVER_INIT( block2 )
 
 	auto_free(machine, buffer);
 
-	state->bootleg_id = BLOCK2;
+	state->m_bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkblock )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = ARKBLOCK;
+	state->m_bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = ARKBLOC2;
+	state->m_bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = ARKGCBL;
+	state->m_bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
 	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	state->bootleg_id = PADDLE2;
+	state->m_bootleg_id = PADDLE2;
 	arkanoid_bootleg_init(machine);
 }
 

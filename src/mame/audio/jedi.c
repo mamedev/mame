@@ -25,9 +25,9 @@ static SOUND_START( jedi )
 	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* set up save state */
-	state->save_item(NAME(state->audio_latch));
-	state->save_item(NAME(state->audio_ack_latch));
-	state->save_item(NAME(state->speech_strobe_state));
+	state->save_item(NAME(state->m_audio_latch));
+	state->save_item(NAME(state->m_audio_ack_latch));
+	state->save_item(NAME(state->m_speech_strobe_state));
 }
 
 
@@ -43,11 +43,11 @@ static SOUND_RESET( jedi )
 	jedi_state *state = machine.driver_data<jedi_state>();
 
 	/* init globals */
-	state->audio_latch = 0;
-	state->audio_ack_latch = 0;
-	*state->audio_comm_stat = 0;
-	*state->speech_data = 0;
-	state->speech_strobe_state = 0;
+	state->m_audio_latch = 0;
+	state->m_audio_ack_latch = 0;
+	*state->m_audio_comm_stat = 0;
+	*state->m_speech_data = 0;
+	state->m_speech_strobe_state = 0;
 }
 
 
@@ -81,8 +81,8 @@ static TIMER_CALLBACK( delayed_audio_latch_w )
 {
 	jedi_state *state = machine.driver_data<jedi_state>();
 
-	state->audio_latch = param;
-	*state->audio_comm_stat |= 0x80;
+	state->m_audio_latch = param;
+	*state->m_audio_comm_stat |= 0x80;
 }
 
 
@@ -96,15 +96,15 @@ static READ8_HANDLER( audio_latch_r )
 {
 	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	*state->audio_comm_stat &= ~0x80;
-	return state->audio_latch;
+	*state->m_audio_comm_stat &= ~0x80;
+	return state->m_audio_latch;
 }
 
 
 CUSTOM_INPUT( jedi_audio_comm_stat_r )
 {
 	jedi_state *state = field->port->machine().driver_data<jedi_state>();
-	return *state->audio_comm_stat >> 6;
+	return *state->m_audio_comm_stat >> 6;
 }
 
 
@@ -119,8 +119,8 @@ READ8_HANDLER( jedi_audio_ack_latch_r )
 {
 	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	*state->audio_comm_stat &= ~0x40;
-	return state->audio_ack_latch;
+	*state->m_audio_comm_stat &= ~0x40;
+	return state->m_audio_ack_latch;
 }
 
 
@@ -128,8 +128,8 @@ static WRITE8_HANDLER( audio_ack_latch_w )
 {
 	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	state->audio_ack_latch = data;
-	*state->audio_comm_stat |= 0x40;
+	state->m_audio_ack_latch = data;
+	*state->m_audio_comm_stat |= 0x40;
 }
 
 
@@ -145,12 +145,12 @@ static WRITE8_HANDLER( speech_strobe_w )
 	jedi_state *state = space->machine().driver_data<jedi_state>();
 	int new_speech_strobe_state = (~offset >> 8) & 1;
 
-	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
+	if ((new_speech_strobe_state != state->m_speech_strobe_state) && new_speech_strobe_state)
 	{
 		device_t *tms = space->machine().device("tms");
-		tms5220_data_w(tms, 0, *state->speech_data);
+		tms5220_data_w(tms, 0, *state->m_speech_data);
 	}
-	state->speech_strobe_state = new_speech_strobe_state;
+	state->m_speech_strobe_state = new_speech_strobe_state;
 }
 
 
@@ -180,14 +180,14 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0820, 0x082f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey3", pokey_r, pokey_w)
 	AM_RANGE(0x0830, 0x083f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey4", pokey_r, pokey_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(jedi_state, speech_data)
+	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(jedi_state, m_speech_data)
 	AM_RANGE(0x1200, 0x13ff) AM_READNOP AM_WRITE(speech_strobe_w)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(audio_ack_latch_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x00ff) AM_READNOP AM_WRITE(speech_reset_w)
 	AM_RANGE(0x1600, 0x17ff) AM_NOP
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ(audio_latch_r) AM_WRITENOP
 	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03fe) AM_READ(speech_ready_r) AM_WRITENOP
-	AM_RANGE(0x1c01, 0x1c01) AM_MIRROR(0x03fe) AM_READONLY AM_WRITENOP AM_BASE_MEMBER(jedi_state, audio_comm_stat)
+	AM_RANGE(0x1c01, 0x1c01) AM_MIRROR(0x03fe) AM_READONLY AM_WRITENOP AM_BASE_MEMBER(jedi_state, m_audio_comm_stat)
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

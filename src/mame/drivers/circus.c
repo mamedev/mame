@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE_MEMBER(circus_state, videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE_MEMBER(circus_state, m_videoram)
 	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
@@ -266,22 +266,22 @@ static MACHINE_START( circus )
 {
 	circus_state *state = machine.driver_data<circus_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->samples = machine.device("samples");
-	state->discrete = machine.device("discrete");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_samples = machine.device("samples");
+	state->m_discrete = machine.device("discrete");
 
-	state->save_item(NAME(state->clown_x));
-	state->save_item(NAME(state->clown_y));
-	state->save_item(NAME(state->clown_z));
+	state->save_item(NAME(state->m_clown_x));
+	state->save_item(NAME(state->m_clown_y));
+	state->save_item(NAME(state->m_clown_z));
 }
 
 static MACHINE_RESET( circus )
 {
 	circus_state *state = machine.driver_data<circus_state>();
 
-	state->clown_x = 0;
-	state->clown_y = 0;
-	state->clown_z = 0;
+	state->m_clown_x = 0;
+	state->m_clown_y = 0;
+	state->m_clown_z = 0;
 }
 
 
@@ -574,23 +574,23 @@ ROM_END
 static DRIVER_INIT( circus )
 {
 	circus_state *state = machine.driver_data<circus_state>();
-	state->game_id = 1;
+	state->m_game_id = 1;
 }
 
 static DRIVER_INIT( robotbwl )
 {
 	circus_state *state = machine.driver_data<circus_state>();
-	state->game_id = 2;
+	state->m_game_id = 2;
 }
 static DRIVER_INIT( crash )
 {
 	circus_state *state = machine.driver_data<circus_state>();
-	state->game_id = 3;
+	state->m_game_id = 3;
 }
 static DRIVER_INIT( ripcord )
 {
 	circus_state *state = machine.driver_data<circus_state>();
-	state->game_id = 4;
+	state->m_game_id = 4;
 }
 
 

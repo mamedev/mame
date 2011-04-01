@@ -88,7 +88,7 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -108,13 +108,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, frontvideoram)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, m_frontvideoram)
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, paletteram)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, m_paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
@@ -238,7 +238,7 @@ INPUT_PORTS_END
 static void blockout_irq_handler(device_t *device, int irq)
 {
 	blockout_state *state = device->machine().driver_data<blockout_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2151_interface ym2151_config =
@@ -257,16 +257,16 @@ static MACHINE_START( blockout )
 {
 	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->color));
+	state->save_item(NAME(state->m_color));
 }
 
 static MACHINE_RESET( blockout )
 {
 	blockout_state *state = machine.driver_data<blockout_state>();
 
-	state->color = 0;
+	state->m_color = 0;
 }
 
 static MACHINE_CONFIG_START( blockout, blockout_state )

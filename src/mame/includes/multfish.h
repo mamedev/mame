@@ -12,20 +12,20 @@ public:
 
 	/* Video related */
 
-	UINT8* vid;
+	UINT8* m_vid;
 
-	int disp_enable;
-	int xor_paltype;
-	int xor_palette;
+	int m_disp_enable;
+	int m_xor_paltype;
+	int m_xor_palette;
 
-	tilemap_t *tilemap;
-	tilemap_t *reel_tilemap;
+	tilemap_t *m_tilemap;
+	tilemap_t *m_reel_tilemap;
 
 	/* Misc related */
 
-	UINT8 rambk;
+	UINT8 m_rambk;
 
-	UINT8 hopper_motor;
-	UINT8 hopper;
+	UINT8 m_hopper_motor;
+	UINT8 m_hopper;
 
 };

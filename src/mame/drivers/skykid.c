@@ -24,7 +24,7 @@ static WRITE8_HANDLER( inputport_select_w )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
 	if ((data & 0xe0) == 0x60)
-		state->inputport_selected = data & 0x07;
+		state->m_inputport_selected = data & 0x07;
 	else if ((data & 0xe0) == 0xc0)
 	{
 		coin_lockout_global_w(space->machine(), ~data & 1);
@@ -36,7 +36,7 @@ static WRITE8_HANDLER( inputport_select_w )
 static READ8_HANDLER( inputport_r )
 {
 	skykid_state *state = space->machine().driver_data<skykid_state>();
-	switch (state->inputport_selected)
+	switch (state->m_inputport_selected)
 	{
 		case 0x00:	/* DSW B (bits 0-4) */
 			return (input_port_read(space->machine(), "DSWB") & 0xf8) >> 3;
@@ -96,16 +96,16 @@ static MACHINE_START( skykid )
 	/* configure the banks */
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x2000);
 
-	state_save_register_global(machine, state->inputport_selected);
+	state_save_register_global(machine, state->m_inputport_selected);
 }
 
 
 
 static ADDRESS_MAP_START( skykid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")				/* banked ROM */
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(skykid_videoram_r,skykid_videoram_w) AM_BASE_MEMBER(skykid_state, videoram)/* Video RAM (background) */
-	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(skykid_textram_r,skykid_textram_w) AM_BASE_MEMBER(skykid_state, textram)	/* video RAM (text layer) */
-	AM_RANGE(0x4800, 0x5fff) AM_RAM AM_BASE_MEMBER(skykid_state, spriteram)	/* RAM + Sprite RAM */
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(skykid_videoram_r,skykid_videoram_w) AM_BASE_MEMBER(skykid_state, m_videoram)/* Video RAM (background) */
+	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(skykid_textram_r,skykid_textram_w) AM_BASE_MEMBER(skykid_state, m_textram)	/* video RAM (text layer) */
+	AM_RANGE(0x4800, 0x5fff) AM_RAM AM_BASE_MEMBER(skykid_state, m_spriteram)	/* RAM + Sprite RAM */
 	AM_RANGE(0x6000, 0x60ff) AM_WRITE(skykid_scroll_y_w)		/* Y scroll register map */
 	AM_RANGE(0x6200, 0x63ff) AM_WRITE(skykid_scroll_x_w)		/* X scroll register map */
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */

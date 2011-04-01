@@ -5,14 +5,14 @@ public:
 		: driver_device(machine, config) { }
 
 
-	UINT16 *spriteram;
-	UINT16 *videoram;
-	UINT16 *bg_videoram16;
-	UINT16 invert_controls;
+	UINT16 *m_spriteram;
+	UINT16 *m_videoram;
+	UINT16 *m_bg_videoram16;
+	UINT16 m_invert_controls;
 
-	tilemap_t *bg2_tilemap;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	tilemap_t *m_bg2_tilemap;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
 

@@ -4,26 +4,26 @@ public:
 	wc90_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *fgvideoram;
-	UINT8 *bgvideoram;
-	UINT8 *txvideoram;
-	UINT8 *scroll0xlo;
-	UINT8 *scroll0xhi;
-	UINT8 *scroll1xlo;
-	UINT8 *scroll1xhi;
-	UINT8 *scroll2xlo;
-	UINT8 *scroll2xhi;
-	UINT8 *scroll0ylo;
-	UINT8 *scroll0yhi;
-	UINT8 *scroll1ylo;
-	UINT8 *scroll1yhi;
-	UINT8 *scroll2ylo;
-	UINT8 *scroll2yhi;
-	tilemap_t *tx_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_txvideoram;
+	UINT8 *m_scroll0xlo;
+	UINT8 *m_scroll0xhi;
+	UINT8 *m_scroll1xlo;
+	UINT8 *m_scroll1xhi;
+	UINT8 *m_scroll2xlo;
+	UINT8 *m_scroll2xhi;
+	UINT8 *m_scroll0ylo;
+	UINT8 *m_scroll0yhi;
+	UINT8 *m_scroll1ylo;
+	UINT8 *m_scroll1yhi;
+	UINT8 *m_scroll2ylo;
+	UINT8 *m_scroll2yhi;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

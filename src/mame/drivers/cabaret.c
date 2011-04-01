@@ -32,14 +32,14 @@ public:
 	cabaret_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *bg_tile_ram;
-	tilemap_t *bg_tilemap;
-	UINT8 *bg_scroll;
-	UINT8 *fg_tile_ram;
-	UINT8 *fg_color_ram;
-	tilemap_t *fg_tilemap;
-	int nmi_enable;
-	UINT8 out[3];
+	UINT8 *m_bg_tile_ram;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_bg_scroll;
+	UINT8 *m_fg_tile_ram;
+	UINT8 *m_fg_color_ram;
+	tilemap_t *m_fg_tilemap;
+	int m_nmi_enable;
+	UINT8 m_out[3];
 };
 
 
@@ -54,28 +54,28 @@ public:
 static WRITE8_HANDLER( bg_scroll_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->bg_scroll[offset] = data;
-	tilemap_set_scrolly(state->bg_tilemap,offset,data);
+	state->m_bg_scroll[offset] = data;
+	tilemap_set_scrolly(state->m_bg_tilemap,offset,data);
 }
 
 static WRITE8_HANDLER( bg_tile_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->bg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
+	state->m_bg_tile_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	int code = state->bg_tile_ram[tile_index];
+	int code = state->m_bg_tile_ram[tile_index];
 	SET_TILE_INFO(1, code & 0xff, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	int code = state->fg_tile_ram[tile_index] | (state->fg_color_ram[tile_index] << 8);
+	int code = state->m_fg_tile_ram[tile_index] | (state->m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
@@ -83,24 +83,24 @@ static TILE_GET_INFO( get_fg_tile_info )
 static WRITE8_HANDLER( fg_tile_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->fg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fg_tile_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( fg_color_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->fg_color_ram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fg_color_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 static VIDEO_START(cabaret)
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scroll_cols(state->bg_tilemap, 64);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scroll_cols(state->m_bg_tilemap, 64);
 }
 
 
@@ -109,9 +109,9 @@ static SCREEN_UPDATE(cabaret)
 	cabaret_state *state = screen->machine().driver_data<cabaret_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -125,14 +125,14 @@ static SCREEN_UPDATE(cabaret)
 static void show_out(cabaret_state *state)
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x %02x", state->out[0], state->out[1], state->out[2]);
+	popmessage("%02x %02x %02x", state->m_out[0], state->m_out[1], state->m_out[2]);
 #endif
 }
 
 static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 {
 	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	if ((state->nmi_enable ^ data) & (~0xdd))
+	if ((state->m_nmi_enable ^ data) & (~0xdd))
 	{
 		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space->device()),data);
 //      popmessage("%02x",data);
@@ -141,13 +141,13 @@ static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
 	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
 	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->out mech
+	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->m_out mech
 
-	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin state->out / hopper active
+	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin state->m_out / hopper active
 
-	state->nmi_enable = data;	//  data & 0x80     // nmi enable?
+	state->m_nmi_enable = data;	//  data & 0x80     // nmi enable?
 
-	state->out[0] = data;
+	state->m_out[0] = data;
 	show_out(state);
 }
 
@@ -173,15 +173,15 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8 )
 
 	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(cabaret_state, fg_tile_ram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(cabaret_state, fg_color_ram )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(cabaret_state, m_fg_tile_ram )
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(cabaret_state, m_fg_color_ram )
 
 	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
-	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE( bg_scroll_w ) AM_BASE_MEMBER(cabaret_state, bg_scroll )
+	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE( bg_scroll_w ) AM_BASE_MEMBER(cabaret_state, m_bg_scroll )
 
-	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE( bg_tile_w )  AM_BASE_MEMBER(cabaret_state, bg_tile_ram )
+	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE( bg_tile_w )  AM_BASE_MEMBER(cabaret_state, m_bg_tile_ram )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("gfx3", 0)
 ADDRESS_MAP_END
 
@@ -315,13 +315,13 @@ GFXDECODE_END
 static MACHINE_RESET( cabaret )
 {
 	cabaret_state *state = machine.driver_data<cabaret_state>();
-	state->nmi_enable		=	0;
+	state->m_nmi_enable		=	0;
 }
 
 static INTERRUPT_GEN( cabaret_interrupt )
 {
 	cabaret_state *state = device->machine().driver_data<cabaret_state>();
-	 if (state->nmi_enable & 0x80)
+	 if (state->m_nmi_enable & 0x80)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

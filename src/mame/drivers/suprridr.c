@@ -94,14 +94,14 @@
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->nmi_enable = data;
+	state->m_nmi_enable = data;
 }
 
 
 static INTERRUPT_GEN( main_nmi_gen )
 {
 	suprridr_state *state = device->machine().driver_data<suprridr_state>();
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -116,7 +116,7 @@ static INTERRUPT_GEN( main_nmi_gen )
 static TIMER_CALLBACK( delayed_sound_w )
 {
 	suprridr_state *state = machine.driver_data<suprridr_state>();
-	state->sound_data = param;
+	state->m_sound_data = param;
 	cputag_set_input_line(machine, "audiocpu", 0, ASSERT_LINE);
 }
 
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( sound_data_w )
 static READ8_DEVICE_HANDLER( sound_data_r )
 {
 	suprridr_state *state = device->machine().driver_data<suprridr_state>();
-	return state->sound_data;
+	return state->m_sound_data;
 }
 
 
@@ -164,10 +164,10 @@ static WRITE8_HANDLER( coin_lock_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_BASE_MEMBER(suprridr_state, bgram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_BASE_MEMBER(suprridr_state, fgram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_BASE_MEMBER(suprridr_state, m_bgram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_BASE_MEMBER(suprridr_state, m_fgram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(suprridr_state, spriteram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(suprridr_state, m_spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")

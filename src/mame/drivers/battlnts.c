@@ -28,14 +28,14 @@
 static INTERRUPT_GEN( battlnts_interrupt )
 {
 	battlnts_state *state = device->machine().driver_data<battlnts_state>();
-	if (k007342_is_int_enabled(state->k007342))
+	if (k007342_is_int_enabled(state->m_k007342))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
 	battlnts_state *state = space->machine().driver_data<battlnts_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
@@ -225,21 +225,21 @@ static MACHINE_START( battlnts )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k007342 = machine.device("k007342");
-	state->k007420 = machine.device("k007420");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k007342 = machine.device("k007342");
+	state->m_k007420 = machine.device("k007420");
 
-	state->save_item(NAME(state->spritebank));
-	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->m_spritebank));
+	state->save_item(NAME(state->m_layer_colorbase));
 }
 
 static MACHINE_RESET( battlnts )
 {
 	battlnts_state *state = machine.driver_data<battlnts_state>();
 
-	state->layer_colorbase[0] = 0;
-	state->layer_colorbase[1] = 0;
-	state->spritebank = 0;
+	state->m_layer_colorbase[0] = 0;
+	state->m_layer_colorbase[1] = 0;
+	state->m_spritebank = 0;
 }
 
 static MACHINE_CONFIG_START( battlnts, battlnts_state )

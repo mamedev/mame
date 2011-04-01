@@ -169,10 +169,10 @@ static WRITE8_HANDLER( meadows_audio_w )
 	switch (offset)
 	{
 		case 0:
-			if (state->_0c00 == data)
+			if (state->m_0c00 == data)
 				break;
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
-			state->_0c00 = data;
+			state->m_0c00 = data;
             break;
 
 		case 1:
@@ -214,8 +214,8 @@ static INTERRUPT_GEN( meadows_interrupt )
 {
 	meadows_state *state = device->machine().driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
-	state->main_sense_state ^= 1;
-	device_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_main_sense_state ^= 1;
+	device_set_input_line(device, 1, state->m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -229,8 +229,8 @@ static INTERRUPT_GEN( meadows_interrupt )
 static INTERRUPT_GEN( minferno_interrupt )
 {
 	meadows_state *state = device->machine().driver_data<meadows_state>();
-	state->main_sense_state++;
-	device_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	state->m_main_sense_state++;
+	device_set_input_line(device, 1, (state->m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -251,26 +251,26 @@ static WRITE8_HANDLER( audio_hardware_w )
             break;
 
 		case 1: /* counter clk 5 MHz / 256 */
-			if (data == state->_0c01)
+			if (data == state->m_0c01)
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
-			state->_0c01 = data;
+			state->m_0c01 = data;
 			meadows_sh_update(space->machine());
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
-			if (data == state->_0c02)
+			if (data == state->m_0c02)
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
-			state->_0c02 = data;
+			state->m_0c02 = data;
 			meadows_sh_update(space->machine());
             break;
 
 		case 3: /* audio enable */
-			if (data == state->_0c03)
+			if (data == state->m_0c03)
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
-			state->_0c03 = data;
+			state->m_0c03 = data;
 			meadows_sh_update(space->machine());
             break;
 	}
@@ -292,7 +292,7 @@ static READ8_HANDLER( audio_hardware_r )
 	switch (offset)
 	{
 		case 0:
-			data = state->_0c00;
+			data = state->m_0c00;
             break;
 
 		case 1: break;
@@ -314,8 +314,8 @@ static INTERRUPT_GEN( audio_interrupt )
 {
 	meadows_state *state = device->machine().driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
-	state->audio_sense_state ^= 1;
-	device_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audio_sense_state ^= 1;
+	device_set_input_line(device, 1, state->m_audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -346,10 +346,10 @@ static ADDRESS_MAP_START( meadows_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, spriteram)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8 )
@@ -359,15 +359,15 @@ static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, spriteram)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
+	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
 	AM_RANGE(0x1f00, 0x1f00) AM_READ_PORT("JOY1")
 	AM_RANGE(0x1f01, 0x1f01) AM_READ_PORT("JOY2")
 	AM_RANGE(0x1f02, 0x1f02) AM_READ_PORT("BUTTONS")

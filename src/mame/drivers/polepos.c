@@ -251,14 +251,14 @@ static READ16_HANDLER( polepos2_ic25_r )
 	offset = offset & 0x1ff;
 	if (offset < 0x100)
 	{
-		state->last_signed = offset & 0xff;
-		result = state->last_result & 0xff;
+		state->m_last_signed = offset & 0xff;
+		result = state->m_last_result & 0xff;
 	}
 	else
 	{
-		state->last_unsigned = offset & 0xff;
-		result = (state->last_result >> 8) & 0xff;
-		state->last_result = (INT8)state->last_signed * (UINT8)state->last_unsigned;
+		state->m_last_unsigned = offset & 0xff;
+		result = (state->m_last_result >> 8) & 0xff;
+		state->m_last_result = (INT8)state->m_last_signed * (UINT8)state->m_last_unsigned;
 	}
 
 //  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space->device()), offset, result);
@@ -274,7 +274,7 @@ static READ16_HANDLER( polepos2_ic25_r )
 static READ8_HANDLER( polepos_adc_r )
 {
 	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return input_port_read(space->machine(), state->adc_input ? "ACCEL" : "BRAKE");
+	return input_port_read(space->machine(), state->m_adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
@@ -317,7 +317,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x03:	/* GASEL */
-			state->adc_input = bit;
+			state->m_adc_input = bit;
 			break;
 
 		case 0x04:	/* RESB */
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x06:	/* SB0 */
-			state->auto_start_mask = !bit;
+			state->m_auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
@@ -353,7 +353,7 @@ static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine(
 static CUSTOM_INPUT( auto_start_r )
 {
 	polepos_state *state = field->port->machine().driver_data<polepos_state>();
-	return state->auto_start_mask;
+	return state->m_auto_start_mask;
 }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
@@ -419,28 +419,28 @@ static READ8_DEVICE_HANDLER( steering_changed_r )
 	polepos_state *state = device->machine().driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
 	UINT8 steer_new = input_port_read(device->machine(), "STEER");
-	state->steer_accum += (INT8)(steer_new - state->steer_last) * 2;
-	state->steer_last = steer_new;
+	state->m_steer_accum += (INT8)(steer_new - state->m_steer_last) * 2;
+	state->m_steer_last = steer_new;
 
 	/* if we have delta, clock things */
-	if (state->steer_accum < 0)
+	if (state->m_steer_accum < 0)
 	{
-		state->steer_delta = 0;
-		state->steer_accum++;
+		state->m_steer_delta = 0;
+		state->m_steer_accum++;
 	}
-	else if (state->steer_accum > 0)
+	else if (state->m_steer_accum > 0)
 	{
-		state->steer_delta = 1;
-		state->steer_accum--;
+		state->m_steer_delta = 1;
+		state->m_steer_accum--;
 	}
 
-	return state->steer_accum & 1;
+	return state->m_steer_accum & 1;
 }
 
 static READ8_DEVICE_HANDLER( steering_delta_r )
 {
 	polepos_state *state = device->machine().driver_data<polepos_state>();
-	return state->steer_delta;
+	return state->m_steer_delta;
 }
 
 static const namco_53xx_interface namco_53xx_intf =
@@ -507,10 +507,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, sprite16_memory)	/* Motion Object */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE_MEMBER(polepos_state, road16_memory)		/* Road Memory */
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE_MEMBER(polepos_state, alpha16_memory)	/* Alphanumeric (char ram) */
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE_MEMBER(polepos_state, view16_memory)		/* Background memory */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, m_sprite16_memory)	/* Motion Object */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE_MEMBER(polepos_state, m_road16_memory)		/* Road Memory */
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE_MEMBER(polepos_state, m_alpha16_memory)	/* Alphanumeric (char ram) */
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE_MEMBER(polepos_state, m_view16_memory)		/* Background memory */
 	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END

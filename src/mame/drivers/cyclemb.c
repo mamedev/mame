@@ -81,11 +81,11 @@ public:
 	cyclemb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram;
-	UINT8 *cram;
-	UINT8 *obj1_ram;
-	UINT8 *obj2_ram;
-	UINT8 *obj3_ram;
+	UINT8 *m_vram;
+	UINT8 *m_cram;
+	UINT8 *m_obj1_ram;
+	UINT8 *m_obj2_ram;
+	UINT8 *m_obj3_ram;
 };
 
 
@@ -134,12 +134,12 @@ static SCREEN_UPDATE( cyclemb )
 	{
 		for (x=0;x<64;x++)
 		{
-			int attr = state->cram[count];
-			int tile = (state->vram[count]) | ((attr & 3)<<8);
+			int attr = state->m_cram[count];
+			int tile = (state->m_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
 //          int sx_offs = flip_screen ? 512 : 0
-			int scrollx = ((state->vram[(y/2)+odd_line]) + (state->cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
+			int scrollx = ((state->m_vram[(y/2)+odd_line]) + (state->m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(flip_screen)
 			{
@@ -184,24 +184,24 @@ static SCREEN_UPDATE( cyclemb )
 
 		for(i=0;i<0x40;i+=2)
 		{
-			y = 0xf1 - state->obj2_ram[i];
-			x = state->obj2_ram[i+1] - 56;
-			spr_offs = (state->obj1_ram[i+0]);
-			col = (state->obj1_ram[i+1] & 0x3f);
-			region = ((state->obj3_ram[i] & 0x10) >> 4) + 1;
+			y = 0xf1 - state->m_obj2_ram[i];
+			x = state->m_obj2_ram[i+1] - 56;
+			spr_offs = (state->m_obj1_ram[i+0]);
+			col = (state->m_obj1_ram[i+1] & 0x3f);
+			region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
 			if(region == 2)
 			{
 				spr_offs >>= 2;
-				spr_offs += ((state->obj3_ram[i+0] & 3) << 5);
+				spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
 				y-=16;
 			}
 
-			if(state->obj3_ram[i+1] & 1)
+			if(state->m_obj3_ram[i+1] & 1)
 				x+=256;
-			//if(state->obj3_ram[i+1] & 2)
+			//if(state->m_obj3_ram[i+1] & 2)
 //              x-=256;
-			fx = (state->obj3_ram[i+0] & 4) >> 2;
-			fy = (state->obj3_ram[i+0] & 8) >> 3;
+			fx = (state->m_obj3_ram[i+0] & 4) >> 2;
+			fy = (state->m_obj3_ram[i+0] & 8) >> 3;
 
 			if(flip_screen)
 			{
@@ -252,11 +252,11 @@ static WRITE8_HANDLER( cyclemb_flip_w )
 static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, vram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(cyclemb_state, cram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, obj1_ram) //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE_MEMBER(cyclemb_state, obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_vram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_cram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj1_ram) //ORAM1 (only a000-a3ff tested)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj2_ram) //ORAM2 (only a800-abff tested)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj3_ram) //ORAM3 (only b000-b3ff tested)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 

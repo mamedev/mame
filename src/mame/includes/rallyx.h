@@ -12,26 +12,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  spriteram;
-	UINT8 *  spriteram2;
-	UINT8 *  radarattr;
-	UINT8 *  radarx;
-	UINT8 *  radary;
+	UINT8 *  m_videoram;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_spriteram2;
+	UINT8 *  m_radarattr;
+	UINT8 *  m_radarx;
+	UINT8 *  m_radary;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
-	tilemap_t  *fg_tilemap;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
 
 	/* misc */
-	int      last_bang;
-	int      spriteram_base, stars_enable, total_stars;
-	UINT8    drawmode_table[4];
-	struct jungler_star stars[JUNGLER_MAX_STARS];
+	int      m_last_bang;
+	int      m_spriteram_base;
+	int      m_stars_enable;
+	int      m_total_stars;
+	UINT8    m_drawmode_table[4];
+	struct jungler_star m_stars[JUNGLER_MAX_STARS];
 
 	/* devices */
-	cpu_device *maincpu;
-	device_t *samples;
+	cpu_device *m_maincpu;
+	device_t *m_samples;
 };
 
 

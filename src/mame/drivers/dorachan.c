@@ -23,14 +23,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	size_t   videoram_size;
+	UINT8 *  m_videoram;
+	size_t   m_videoram_size;
 
 	/* video-related */
-	UINT8    flip_screen;
+	UINT8    m_flip_screen;
 
 	/* devices */
-	device_t *main_cpu;
+	device_t *m_main_cpu;
 };
 
 
@@ -45,14 +45,14 @@ static CUSTOM_INPUT( dorachan_protection_r )
 	dorachan_state *state = field->port->machine().driver_data<dorachan_state>();
 	UINT8 ret = 0;
 
-	switch (cpu_get_previouspc(state->main_cpu))
+	switch (cpu_get_previouspc(state->m_main_cpu))
 	{
 	case 0x70ce: ret = 0xf2; break;
 	case 0x72a2: ret = 0xd5; break;
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(state->main_cpu));
+		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(state->m_main_cpu));
 		break;
 	}
 
@@ -89,7 +89,7 @@ static SCREEN_UPDATE( dorachan )
 
 	color_map_base = screen->machine().region("proms")->base();
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -100,9 +100,9 @@ static SCREEN_UPDATE( dorachan )
 		/* the need for +1 is extremely unusual, but definetely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = state->videoram[offs];
+		UINT8 data = state->m_videoram[offs];
 
-		if (state->flip_screen)
+		if (state->m_flip_screen)
 			fore_color = (color_map_base[color_address] >> 3) & 0x07;
 		else
 			fore_color = (color_map_base[color_address] >> 0) & 0x07;
@@ -124,7 +124,7 @@ static SCREEN_UPDATE( dorachan )
 static WRITE8_HANDLER(dorachan_ctrl_w)
 {
 	dorachan_state *state = space->machine().driver_data<dorachan_state>();
-	state->flip_screen = (data >> 6) & 0x01;
+	state->m_flip_screen = (data >> 6) & 0x01;
 }
 
 
@@ -133,7 +133,7 @@ static CUSTOM_INPUT( dorachan_v128_r )
 	dorachan_state *state = field->port->machine().driver_data<dorachan_state>();
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
-	return ((field->port->machine().primary_screen->vpos() >> 7) & 0x01) ^ state->flip_screen;
+	return ((field->port->machine().primary_screen->vpos() >> 7) & 0x01) ^ state->m_flip_screen;
 }
 
 
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("V128")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(dorachan_state, videoram, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(dorachan_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -226,16 +226,16 @@ static MACHINE_START( dorachan )
 {
 	dorachan_state *state = machine.driver_data<dorachan_state>();
 
-	state->main_cpu = machine.device("maincpu");
+	state->m_main_cpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->flip_screen));
+	state->save_item(NAME(state->m_flip_screen));
 }
 
 static MACHINE_RESET( dorachan )
 {
 	dorachan_state *state = machine.driver_data<dorachan_state>();
 
-	state->flip_screen = 0;
+	state->m_flip_screen = 0;
 }
 
 static MACHINE_CONFIG_START( dorachan, dorachan_state )

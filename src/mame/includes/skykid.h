@@ -4,15 +4,15 @@ public:
 	skykid_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 inputport_selected;
-	UINT8 *textram;
-	UINT8 *videoram;
-	UINT8 *spriteram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *tx_tilemap;
-	UINT8 priority;
-	UINT16 scroll_x;
-	UINT16 scroll_y;
+	UINT8 m_inputport_selected;
+	UINT8 *m_textram;
+	UINT8 *m_videoram;
+	UINT8 *m_spriteram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	UINT8 m_priority;
+	UINT16 m_scroll_x;
+	UINT16 m_scroll_y;
 };
 
 

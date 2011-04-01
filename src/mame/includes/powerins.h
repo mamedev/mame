@@ -4,15 +4,15 @@ public:
 	powerins_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int oki_bank;
-	UINT16 *vram_0;
-	UINT16 *vctrl_0;
-	UINT16 *vram_1;
-	UINT16 *vctrl_1;
-	tilemap_t *tilemap_0;
-	tilemap_t *tilemap_1;
-	int tile_bank;
-	UINT16 *spriteram;
+	int m_oki_bank;
+	UINT16 *m_vram_0;
+	UINT16 *m_vctrl_0;
+	UINT16 *m_vram_1;
+	UINT16 *m_vctrl_1;
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;
+	int m_tile_bank;
+	UINT16 *m_spriteram;
 };
 
 

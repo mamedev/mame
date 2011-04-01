@@ -12,20 +12,20 @@ public:
 	cyberbal_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16 *		paletteram_0;
-	UINT16 *		paletteram_1;
-	UINT16			current_slip[2];
-	UINT8			playfield_palette_bank[2];
-	UINT16			playfield_xscroll[2];
-	UINT16			playfield_yscroll[2];
+	UINT16 *		m_paletteram_0;
+	UINT16 *		m_paletteram_1;
+	UINT16			m_current_slip[2];
+	UINT8			m_playfield_palette_bank[2];
+	UINT16			m_playfield_xscroll[2];
+	UINT16			m_playfield_yscroll[2];
 
-	UINT8 *			bank_base;
-	UINT8			fast_68k_int;
-	UINT8			io_68k_int;
-	UINT8			sound_data_from_68k;
-	UINT8			sound_data_from_6502;
-	UINT8			sound_data_from_68k_ready;
-	UINT8			sound_data_from_6502_ready;
+	UINT8 *			m_bank_base;
+	UINT8			m_fast_68k_int;
+	UINT8			m_io_68k_int;
+	UINT8			m_sound_data_from_68k;
+	UINT8			m_sound_data_from_6502;
+	UINT8			m_sound_data_from_68k_ready;
+	UINT8			m_sound_data_from_6502_ready;
 };
 
 

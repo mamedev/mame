@@ -79,8 +79,8 @@ WRITE8_HANDLER( ninjakun_paletteram_w )
 static TILE_GET_INFO( nova2001_get_bg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int code = state->bg_videoram[tile_index];
-	int color = state->bg_videoram[tile_index + 0x400] & 0x0f;
+	int code = state->m_bg_videoram[tile_index];
+	int color = state->m_bg_videoram[tile_index + 0x400] & 0x0f;
 
 	SET_TILE_INFO(2, code, color, 0);
 }
@@ -88,8 +88,8 @@ static TILE_GET_INFO( nova2001_get_bg_tile_info )
 static TILE_GET_INFO( nova2001_get_fg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->fg_videoram[tile_index + 0x400];
-	int code = state->fg_videoram[tile_index];
+	int attr = state->m_fg_videoram[tile_index + 0x400];
+	int code = state->m_fg_videoram[tile_index];
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -100,8 +100,8 @@ static TILE_GET_INFO( nova2001_get_fg_tile_info )
 static TILE_GET_INFO( ninjakun_get_bg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr  = state->bg_videoram[tile_index+0x400];
-	int code = state->bg_videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr  = state->m_bg_videoram[tile_index+0x400];
+	int code = state->m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(2, code, color, 0);
@@ -110,8 +110,8 @@ static TILE_GET_INFO( ninjakun_get_bg_tile_info )
 static TILE_GET_INFO( ninjakun_get_fg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->fg_videoram[tile_index+0x400];
-	int code = state->fg_videoram[tile_index] + ((attr & 0x20) << 3);
+	int attr = state->m_fg_videoram[tile_index+0x400];
+	int code = state->m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -122,8 +122,8 @@ static TILE_GET_INFO( ninjakun_get_fg_tile_info )
 static TILE_GET_INFO( pkunwar_get_bg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->bg_videoram[tile_index + 0x400];
-	int code = state->bg_videoram[tile_index] + ((attr & 0x07) << 8);
+	int attr = state->m_bg_videoram[tile_index + 0x400];
+	int code = state->m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
 	int color = (attr & 0xf0) >> 4;
 
 	SET_TILE_INFO(1, code, color, 0);
@@ -134,8 +134,8 @@ static TILE_GET_INFO( pkunwar_get_bg_tile_info )
 static TILE_GET_INFO( raiders5_get_bg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int attr = state->bg_videoram[tile_index+0x400];
-	int code = state->bg_videoram[tile_index] + ((attr & 0x01) << 8);
+	int attr = state->m_bg_videoram[tile_index+0x400];
+	int code = state->m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
 	int color = (attr & 0xf0) >> 4;
 
 	SET_TILE_INFO(2, code, color, 0);
@@ -144,8 +144,8 @@ static TILE_GET_INFO( raiders5_get_bg_tile_info )
 static TILE_GET_INFO( raiders5_get_fg_tile_info )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	int code = state->fg_videoram[tile_index];
-	int color = (state->fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
+	int code = state->m_fg_videoram[tile_index];
+	int color = (state->m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
 
 	SET_TILE_INFO(1, code, color, 0);
 }
@@ -161,35 +161,35 @@ static TILE_GET_INFO( raiders5_get_fg_tile_info )
 VIDEO_START( nova2001 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->bg_tilemap = tilemap_create(machine, nova2001_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, nova2001_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scrolldx(state->bg_tilemap, 0, -7);
+	state->m_bg_tilemap = tilemap_create(machine, nova2001_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, nova2001_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scrolldx(state->m_bg_tilemap, 0, -7);
 }
 
 VIDEO_START( pkunwar )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->bg_tilemap = tilemap_create(machine, pkunwar_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	state->m_bg_tilemap = tilemap_create(machine, pkunwar_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
 VIDEO_START( ninjakun )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->bg_tilemap = tilemap_create(machine, ninjakun_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, ninjakun_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scrolldx(state->bg_tilemap, 7, 0);
+	state->m_bg_tilemap = tilemap_create(machine, ninjakun_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, ninjakun_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scrolldx(state->m_bg_tilemap, 7, 0);
 }
 
 VIDEO_START( raiders5 )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	state->bg_tilemap = tilemap_create(machine, raiders5_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, raiders5_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scrolldx(state->bg_tilemap, 7, 0);
+	state->m_bg_tilemap = tilemap_create(machine, raiders5_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, raiders5_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scrolldx(state->m_bg_tilemap, 7, 0);
 }
 
 
@@ -203,52 +203,52 @@ VIDEO_START( raiders5 )
 WRITE8_HANDLER( nova2001_fg_videoram_w )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
+	state->m_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( nova2001_bg_videoram_w )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	state->bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( ninjakun_bg_videoram_w )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	int x = tilemap_get_scrollx(state->bg_tilemap, 0) >> 3;
-	int y = tilemap_get_scrolly(state->bg_tilemap, 0) >> 3;
+	int x = tilemap_get_scrollx(state->m_bg_tilemap, 0) >> 3;
+	int y = tilemap_get_scrolly(state->m_bg_tilemap, 0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
 
-	state->bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+	state->m_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 }
 
 READ8_HANDLER( ninjakun_bg_videoram_r )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	int x = tilemap_get_scrollx(state->bg_tilemap, 0) >> 3;
-	int y = tilemap_get_scrolly(state->bg_tilemap, 0) >> 3;
+	int x = tilemap_get_scrollx(state->m_bg_tilemap, 0) >> 3;
+	int y = tilemap_get_scrolly(state->m_bg_tilemap, 0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
 
-	return state->bg_videoram[offset];
+	return state->m_bg_videoram[offset];
 }
 
 WRITE8_HANDLER( nova2001_scroll_x_w )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	tilemap_set_scrollx(state->bg_tilemap, 0, data);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( nova2001_scroll_y_w )
 {
 	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	tilemap_set_scrolly(state->bg_tilemap, 0, data);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( nova2001_flipscreen_w )
@@ -273,7 +273,7 @@ WRITE8_HANDLER( pkunwar_flipscreen_w )
 static void nova2001_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[0];
 	int offs;
 
@@ -311,7 +311,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_t *bitmap, co
 static void pkunwar_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	nova2001_state *state = machine.driver_data<nova2001_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	const gfx_element *gfx = machine.gfx[0];
 	int offs;
 
@@ -358,14 +358,14 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 SCREEN_UPDATE( nova2001 )
 {
 	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	nova2001_draw_sprites(screen->machine(), bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
 
 	return 0;
 }
@@ -373,11 +373,11 @@ SCREEN_UPDATE( nova2001 )
 SCREEN_UPDATE( pkunwar )
 {
 	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	pkunwar_draw_sprites(screen->machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 1, 0);
 
 	return 0;
 }
@@ -385,13 +385,13 @@ SCREEN_UPDATE( pkunwar )
 SCREEN_UPDATE( ninjakun )
 {
 	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);
 
 	nova2001_draw_sprites(screen->machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -399,11 +399,11 @@ SCREEN_UPDATE( ninjakun )
 SCREEN_UPDATE( raiders5 )
 {
 	nova2001_state *state = screen->machine().driver_data<nova2001_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	pkunwar_draw_sprites(screen->machine(), bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }

@@ -76,125 +76,127 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *           video_ram;
-	UINT8 *           sprite_ram;
-	size_t            sprite_ram_size;
+	UINT8 *           m_video_ram;
+	UINT8 *           m_sprite_ram;
+	size_t            m_sprite_ram_size;
 
 	/* devices */
-	device_t *dev_n2a03a;
-	device_t *dev_n2a03b;
-	device_t *dev_vp2;		/* virtual port 2 */
-	device_t *dev_6h;
+	device_t *m_dev_n2a03a;
+	device_t *m_dev_n2a03b;
+	device_t *m_dev_vp2;		/* virtual port 2 */
+	device_t *m_dev_6h;
 
 #if 0
 	/* machine states */
-	UINT8	hardware_type;
+	UINT8	m_hardware_type;
 
 	/* sound state */
-	const UINT8 *			snd_rom;
+	const UINT8 *			m_snd_rom;
 
 	/* video state */
-	tilemap_t *bg_tilemap;
+	tilemap_t *m_bg_tilemap;
 
-	bitmap_t *		bg_bits;
-	const UINT8 *	color_codes;
-	emu_timer *		scanline_timer;
-	INT8			vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+	bitmap_t *		m_bg_bits;
+	const UINT8 *	m_color_codes;
+	emu_timer *		m_scanline_timer;
+	INT8			m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
 
 	/* radar scope */
 
-	UINT8 *			gfx4;
-	UINT8 *			gfx3;
-	int				gfx3_len;
+	UINT8 *			m_gfx4;
+	UINT8 *			m_gfx3;
+	int				m_gfx3_len;
 
-	UINT8	sig30Hz;
-	UINT8	grid_sig;
-	UINT8	rflip_sig;
-	UINT8	star_ff;
-	UINT8	blue_level;
-	double	cd4049_a;
-	double	cd4049_b;
+	UINT8	m_sig30Hz;
+	UINT8	m_grid_sig;
+	UINT8	m_rflip_sig;
+	UINT8	m_star_ff;
+	UINT8	m_blue_level;
+	double	m_cd4049_a;
+	double	m_cd4049_b;
 
 	/* Specific states */
-	INT8 decrypt_counter;
+	INT8 m_decrypt_counter;
 
 	/* 2650 protection */
-	UINT8 protect_type;
-	UINT8 hunchloopback;
-	UINT8 prot_cnt;
-	UINT8 main_fo;
+	UINT8 m_protect_type;
+	UINT8 m_hunchloopback;
+	UINT8 m_prot_cnt;
+	UINT8 m_main_fo;
 
 	/* Save state relevant */
-	UINT8	gfx_bank, palette_bank;
-	UINT8	grid_on;
-	UINT16	grid_col;
-	UINT8	sprite_bank;
-	UINT8	dma_latch;
-	UINT8	flip;
+	UINT8	m_gfx_bank;
+	UINT8   m_palette_bank;
+	UINT8	m_grid_on;
+	UINT16	m_grid_col;
+	UINT8	m_sprite_bank;
+	UINT8	m_dma_latch;
+	UINT8	m_flip;
 
 	/* reverse address lookup map - hunchbkd */
-	INT16 rev_map[0x200];
+	INT16 m_rev_map[0x200];
 #endif
 	/* machine states */
-	UINT8	            hardware_type;
+	UINT8	            m_hardware_type;
 
 	/* sound state */
-	const UINT8       *snd_rom;
+	const UINT8       *m_snd_rom;
 
 	/* video state */
-	tilemap_t           *bg_tilemap;
+	tilemap_t           *m_bg_tilemap;
 
-	bitmap_t          *bg_bits;
-	const UINT8 *     color_codes;
-	emu_timer *       scanline_timer;
-	INT8              vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+	bitmap_t          *m_bg_bits;
+	const UINT8 *     m_color_codes;
+	emu_timer *       m_scanline_timer;
+	INT8              m_vidhw;			/* Selected video hardware RS Conversion / TKG04 */
 
 	/* radar scope */
 
-	UINT8 *           gfx4;
-	UINT8 *           gfx3;
-	int               gfx3_len;
+	UINT8 *           m_gfx4;
+	UINT8 *           m_gfx3;
+	int               m_gfx3_len;
 
-	UINT8             sig30Hz;
-	UINT8             grid_sig;
-	UINT8             rflip_sig;
-	UINT8             star_ff;
-	UINT8             blue_level;
-	double            cd4049_a;
-	double            cd4049_b;
+	UINT8             m_sig30Hz;
+	UINT8             m_grid_sig;
+	UINT8             m_rflip_sig;
+	UINT8             m_star_ff;
+	UINT8             m_blue_level;
+	double            m_cd4049_a;
+	double            m_cd4049_b;
 
 	/* Specific states */
-	INT8              decrypt_counter;
+	INT8              m_decrypt_counter;
 
 	/* 2650 protection */
-	UINT8             protect_type;
-	UINT8             hunchloopback;
-	UINT8             prot_cnt;
-	UINT8             main_fo;
+	UINT8             m_protect_type;
+	UINT8             m_hunchloopback;
+	UINT8             m_prot_cnt;
+	UINT8             m_main_fo;
 
 	/* Save state relevant */
-	UINT8             gfx_bank, palette_bank;
-	UINT8             grid_on;
-	UINT16	      grid_col;
-	UINT8             sprite_bank;
-	UINT8             dma_latch;
-	UINT8             flip;
+	UINT8             m_gfx_bank;
+	UINT8             m_palette_bank;
+	UINT8             m_grid_on;
+	UINT16	      m_grid_col;
+	UINT8             m_sprite_bank;
+	UINT8             m_dma_latch;
+	UINT8             m_flip;
 
 	/* radarscp_step */
-	double cv1;
-	double cv2;
-	double vg1;
-	double vg2;
-	double vg3;
-	double cv3;
-	double cv4;
-	int pixelcnt;
+	double m_cv1;
+	double m_cv2;
+	double m_vg1;
+	double m_vg2;
+	double m_vg3;
+	double m_cv3;
+	double m_cv4;
+	int m_pixelcnt;
 
 	/* radarscp_scanline */
-	int counter;
+	int m_counter;
 
 	/* reverse address lookup map - hunchbkd */
-	INT16             rev_map[0x200];
+	INT16             m_rev_map[0x200];
 };
 
 /*----------- defined in video/dkong.c -----------*/

@@ -6,7 +6,7 @@ public:
 	skns_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	sknsspr_device* spritegen;
+	sknsspr_device* m_spritegen;
 };
 
 extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;

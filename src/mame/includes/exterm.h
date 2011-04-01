@@ -10,15 +10,15 @@ public:
 	exterm_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 aimpos[2];
-	UINT8 trackball_old[2];
-	UINT8 master_sound_latch;
-	UINT8 slave_sound_latch;
-	UINT8 sound_control;
-	UINT8 dac_value[2];
-	UINT16 last;
-	UINT16 *master_videoram;
-	UINT16 *slave_videoram;
+	UINT8 m_aimpos[2];
+	UINT8 m_trackball_old[2];
+	UINT8 m_master_sound_latch;
+	UINT8 m_slave_sound_latch;
+	UINT8 m_sound_control;
+	UINT8 m_dac_value[2];
+	UINT16 m_last;
+	UINT16 *m_master_videoram;
+	UINT16 *m_slave_videoram;
 };
 
 

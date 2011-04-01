@@ -132,13 +132,14 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
 typedef struct _seibu_adpcm_state seibu_adpcm_state;
 struct _seibu_adpcm_state
 {
-	adpcm_state adpcm;
-	sound_stream *stream;
-	UINT32 current, end;
-	UINT8 nibble;
-	UINT8 playing;
-	UINT8 allocated;
-	UINT8 *base;
+	adpcm_state m_adpcm;
+	sound_stream *m_stream;
+	UINT32 m_current;
+	UINT32 m_end;
+	UINT8 m_nibble;
+	UINT8 m_playing;
+	UINT8 m_allocated;
+	UINT8 *m_base;
 };
 
 static STREAM_UPDATE( seibu_adpcm_callback )
@@ -146,19 +147,19 @@ static STREAM_UPDATE( seibu_adpcm_callback )
 	seibu_adpcm_state *state = (seibu_adpcm_state *)param;
 	stream_sample_t *dest = outputs[0];
 
-	while (state->playing && samples > 0)
+	while (state->m_playing && samples > 0)
 	{
-		int val = (state->base[state->current] >> state->nibble) & 15;
+		int val = (state->m_base[state->m_current] >> state->m_nibble) & 15;
 
-		state->nibble ^= 4;
-		if (state->nibble == 4)
+		state->m_nibble ^= 4;
+		if (state->m_nibble == 4)
 		{
-			state->current++;
-			if (state->current >= state->end)
-				state->playing = 0;
+			state->m_current++;
+			if (state->m_current >= state->m_end)
+				state->m_playing = 0;
 		}
 
-		*dest++ = state->adpcm.clock(val) << 4;
+		*dest++ = state->m_adpcm.clock(val) << 4;
 		samples--;
 	}
 	while (samples > 0)
@@ -173,15 +174,15 @@ static DEVICE_START( seibu_adpcm )
 	running_machine &machine = device->machine();
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
-	state->playing = 0;
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->base = machine.region("adpcm")->base();
+	state->m_playing = 0;
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
+	state->m_base = machine.region("adpcm")->base();
 
 	// because legacy device tokens are just allocated as a blob, the constructor for adpcm_state
 	// is not called, so use placement new to force it to set up; when this is converted to a
 	// modern device, we can remove this grossness
-	new(&state->adpcm) adpcm_state;
-	state->adpcm.reset();
+	new(&state->m_adpcm) adpcm_state;
+	state->m_adpcm.reset();
 }
 
 DEVICE_GET_INFO( seibu_adpcm )
@@ -221,16 +222,16 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 {
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
-	if (state->stream)
-		state->stream->update();
+	if (state->m_stream)
+		state->m_stream->update();
 	if (offset)
 	{
-		state->end = data<<8;
+		state->m_end = data<<8;
 	}
 	else
 	{
-		state->current = data<<8;
-		state->nibble = 4;
+		state->m_current = data<<8;
+		state->m_nibble = 4;
 	}
 }
 
@@ -239,17 +240,17 @@ WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
 
 	// sequence is 00 02 01 each time.
-	if (state->stream)
-		state->stream->update();
+	if (state->m_stream)
+		state->m_stream->update();
 	switch (data)
 	{
 		case 0:
-			state->playing = 0;
+			state->m_playing = 0;
 			break;
 		case 2:
 			break;
 		case 1:
-			state->playing = 1;
+			state->m_playing = 1;
 			break;
 
 	}

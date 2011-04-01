@@ -413,10 +413,10 @@ static TILE_GET_INFO( get_tile_info )
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
 	galaga_state *state =  machine.driver_data<galaga_state>();
-    int color = state->videoram[tile_index + 0x400] & 0x3f;
+    int color = state->m_videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
-			(state->videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (state->galaga_gfxbank << 8),
+			(state->m_videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (state->m_galaga_gfxbank << 8),
 			color,
 			flip_screen_get(machine) ? TILE_FLIPX : 0);
 	tileinfo->group = color;
@@ -433,14 +433,14 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( galaga )
 {
 	galaga_state *state =  machine.driver_data<galaga_state>();
-	state->fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
-	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 0x1f);
+	state->m_fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0x1f);
 
-	state->galaga_gfxbank = 0;
+	state->m_galaga_gfxbank = 0;
 
-	state->save_item(NAME(state->stars_scrollx));
-	state->save_item(NAME(state->stars_scrolly));
-	state->save_item(NAME(state->galaga_gfxbank));
+	state->save_item(NAME(state->m_stars_scrollx));
+	state->save_item(NAME(state->m_stars_scrolly));
+	state->save_item(NAME(state->m_galaga_gfxbank));
 }
 
 
@@ -456,16 +456,16 @@ WRITE8_HANDLER( galaga_videoram_w )
 {
 	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER ( gatsbee_bank_w )
 {
 	galaga_state *state =  space->machine().driver_data<galaga_state>();
 
-	state->galaga_gfxbank = data & 0x1;
-	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+	state->m_galaga_gfxbank = data & 0x1;
+	tilemap_mark_all_tiles_dirty(state->m_fg_tilemap);
 }
 
 
@@ -480,9 +480,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 {
 	galaga_state *state =  machine.driver_data<galaga_state>();
 
-	UINT8 *spriteram = state->galaga_ram1 + 0x380;
-	UINT8 *spriteram_2 = state->galaga_ram2 + 0x380;
-	UINT8 *spriteram_3 = state->galaga_ram3 + 0x380;
+	UINT8 *spriteram = state->m_galaga_ram1 + 0x380;
+	UINT8 *spriteram_2 = state->m_galaga_ram2 + 0x380;
+	UINT8 *spriteram_3 = state->m_galaga_ram3 + 0x380;
 	int offs;
 
 
@@ -537,15 +537,15 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 	/* $a005 controls the stars ON/OFF */
 
 
-	if ( (state->galaga_starcontrol[5] & 1) == 1 )
+	if ( (state->m_galaga_starcontrol[5] & 1) == 1 )
 	{
 		int star_cntr;
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
 
-		set_a = (state->galaga_starcontrol[3] & 1);
-		set_b = (state->galaga_starcontrol[4] & 1) | 0x2;
+		set_a = (state->m_galaga_starcontrol[3] & 1);
+		set_b = (state->m_galaga_starcontrol[4] & 1) | 0x2;
 
 
 		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
@@ -554,8 +554,8 @@ static void draw_stars(running_machine &machine, bitmap_t *bitmap, const rectang
 
 			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
 			{
-				x = (star_seed_tab[star_cntr].x + state->stars_scrollx) % 256 + 16;
-				y = (112 + star_seed_tab[star_cntr].y + state->stars_scrolly) % 256;
+				x = (star_seed_tab[star_cntr].x + state->m_stars_scrollx) % 256 + 16;
+				y = (112 + star_seed_tab[star_cntr].y + state->m_stars_scrolly) % 256;
 			   /* 112 is a tweak to get alignment about perfect */
 
 				if (y >= cliprect->min_y && y <= cliprect->max_y)
@@ -573,7 +573,7 @@ SCREEN_UPDATE( galaga )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	draw_stars(screen->machine(),bitmap,cliprect);
 	draw_sprites(screen->machine(),bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }
 
@@ -587,11 +587,11 @@ SCREEN_EOF( galaga )
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
 
-	s0 = (state->galaga_starcontrol[0] & 1);
-	s1 = (state->galaga_starcontrol[1] & 1);
-	s2 = (state->galaga_starcontrol[2] & 1);
+	s0 = (state->m_galaga_starcontrol[0] & 1);
+	s1 = (state->m_galaga_starcontrol[1] & 1);
+	s2 = (state->m_galaga_starcontrol[2] & 1);
 
-	state->stars_scrollx += speeds[s0 + s1*2 + s2*4];
+	state->m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
 }
 
 

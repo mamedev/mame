@@ -121,36 +121,36 @@ enum {
 void vertigo_vproc_init(running_machine &machine)
 {
 	vertigo_state *state = machine.driver_data<vertigo_state>();
-	state_save_register_item_array(machine, "vector_proc", NULL, 0, state->vs.sram);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.ramlatch);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.rom_adr);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.pc);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vs.ret);
+	state_save_register_item_array(machine, "vector_proc", NULL, 0, state->m_vs.sram);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vs.ramlatch);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vs.rom_adr);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vs.pc);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vs.ret);
 
-	state_save_register_item_array(machine, "vector_proc", NULL, 0, state->bsp.ram);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->bsp.d);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->bsp.q);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->bsp.f);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->bsp.y);
+	state_save_register_item_array(machine, "vector_proc", NULL, 0, state->m_bsp.ram);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_bsp.d);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_bsp.q);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_bsp.f);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_bsp.y);
 
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.sreg);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.l1);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.l2);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.c_v);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.c_h);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.c_l);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.adder_s);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.adder_a);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.color);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.intensity);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.brez);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.vfin);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.hud1);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.hud2);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.vud1);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.vud2);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.hc1);
-	state_save_register_item(machine, "vector_proc", NULL, 0, state->vgen.ven);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.sreg);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.l1);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.l2);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.c_v);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.c_h);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.c_l);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.adder_s);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.adder_a);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.color);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.intensity);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.brez);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.vfin);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.hud1);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.hud2);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.vud1);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.vud2);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.hc1);
+	state_save_register_item(machine, "vector_proc", NULL, 0, state->m_vgen.ven);
 }
 
 
@@ -160,34 +160,34 @@ void vertigo_vproc_reset(running_machine &machine)
 	int i;
 	UINT64 *mcode;
 
-	state->vectorrom = (UINT16 *)machine.region("user1")->base();
+	state->m_vectorrom = (UINT16 *)machine.region("user1")->base();
 	mcode = (UINT64 *)machine.region("proms")->base();
 
 	/* Decode microcode */
 	for (i = 0; i < MC_LENGTH; i++)
 	{
-		state->mc[i].x = (mcode[i] >> 44) & 0x3f;
-		state->mc[i].a = (mcode[i] >> 40) & 0xf;
-		state->mc[i].b = (mcode[i] >> 36) & 0xf;
-		state->mc[i].inst = (mcode[i] >> 27) & 077;
-		state->mc[i].dest = (mcode[i] >> 33) & 07;
-		state->mc[i].cn = (mcode[i] >> 26) & 0x1;
-		state->mc[i].mreq = (mcode[i] >> 25) & 0x1;
-		state->mc[i].rwrite = (mcode[i] >> 23) & 0x1;
-		state->mc[i].rsel = state->mc[i].rwrite & ((mcode[i] >> 24) & 0x1);
-		state->mc[i].of =  (mcode[i] >> 20) & 0x7;
-		state->mc[i].iif = (mcode[i] >> 18) & 0x3;
-		state->mc[i].oa = (mcode[i] >> 16) & 0x3;
-		state->mc[i].jpos = (mcode[i] >> 14) & 0x1;
-		state->mc[i].jmp = (mcode[i] >> 12) & 0x3;
-		state->mc[i].jcon = (mcode[i] >> 9) & 0x7;
-		state->mc[i].ma = mcode[i] & 0x1ff;
+		state->m_mc[i].x = (mcode[i] >> 44) & 0x3f;
+		state->m_mc[i].a = (mcode[i] >> 40) & 0xf;
+		state->m_mc[i].b = (mcode[i] >> 36) & 0xf;
+		state->m_mc[i].inst = (mcode[i] >> 27) & 077;
+		state->m_mc[i].dest = (mcode[i] >> 33) & 07;
+		state->m_mc[i].cn = (mcode[i] >> 26) & 0x1;
+		state->m_mc[i].mreq = (mcode[i] >> 25) & 0x1;
+		state->m_mc[i].rwrite = (mcode[i] >> 23) & 0x1;
+		state->m_mc[i].rsel = state->m_mc[i].rwrite & ((mcode[i] >> 24) & 0x1);
+		state->m_mc[i].of =  (mcode[i] >> 20) & 0x7;
+		state->m_mc[i].iif = (mcode[i] >> 18) & 0x3;
+		state->m_mc[i].oa = (mcode[i] >> 16) & 0x3;
+		state->m_mc[i].jpos = (mcode[i] >> 14) & 0x1;
+		state->m_mc[i].jmp = (mcode[i] >> 12) & 0x3;
+		state->m_mc[i].jcon = (mcode[i] >> 9) & 0x7;
+		state->m_mc[i].ma = mcode[i] & 0x1ff;
 	}
 
-	memset(&state->vs, 0, sizeof(state->vs));
-	memset(&state->bsp, 0, sizeof(state->bsp));
-	memset(&state->vgen, 0, sizeof(state->vgen));
-	state->vgen.m_machine = &machine;
+	memset(&state->m_vs, 0, sizeof(state->m_vs));
+	memset(&state->m_bsp, 0, sizeof(state->m_bsp));
+	memset(&state->m_vgen, 0, sizeof(state->m_vgen));
+	state->m_vgen.m_machine = &machine;
 }
 
 
@@ -397,22 +397,22 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 	while (cycles--)
 	{
 		/* Microcode at current PC */
-		cmc = &state->mc[state->vs.pc];
+		cmc = &state->m_mc[state->m_vs.pc];
 
 		/* Load data */
 		if (cmc->iif == S_RAMDE)
 		{
-			state->bsp.d = state->vs.ramlatch;
+			state->m_bsp.d = state->m_vs.ramlatch;
 		}
 		else if (cmc->iif == S_ROMDE)
 		{
-			if (state->vs.rom_adr < 0x2000)
+			if (state->m_vs.rom_adr < 0x2000)
 			{
-				state->bsp.d = state->vectorram[state->vs.rom_adr & 0xfff];
+				state->m_bsp.d = state->m_vectorram[state->m_vs.rom_adr & 0xfff];
 			}
 			else
 			{
-				state->bsp.d = state->vectorrom[state->vs.rom_adr & 0x7fff];
+				state->m_bsp.d = state->m_vectorrom[state->m_vs.rom_adr & 0x7fff];
 			}
 		}
 
@@ -421,32 +421,32 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 		{
 			if (cmc->rwrite)
 			{
-				state->bsp.d = state->vs.sram[cmc->x];
+				state->m_bsp.d = state->m_vs.sram[cmc->x];
 			}
 			else
 			{
 				/* Data can be transferred between vector ROM/RAM
                    and SRAM without going through the 2901 */
-				state->vs.sram[cmc->x] = state->bsp.d;
+				state->m_vs.sram[cmc->x] = state->m_bsp.d;
 			}
 		}
 
-		am2901x4 (&state->bsp, cmc);
+		am2901x4 (&state->m_bsp, cmc);
 
 		/* Store data */
 		switch (cmc->oa)
 		{
 		case S_RAMD:
-			state->vs.ramlatch = state->bsp.y;
+			state->m_vs.ramlatch = state->m_bsp.y;
 			if (cmc->iif==S_RAMDE && (cmc->rsel == 0) && (cmc->rwrite == 0))
-				state->vs.sram[cmc->x] = state->vs.ramlatch;
+				state->m_vs.sram[cmc->x] = state->m_vs.ramlatch;
 			break;
 		case S_ROMA:
-			state->vs.rom_adr = state->bsp.y;
+			state->m_vs.rom_adr = state->m_bsp.y;
 			break;
 		case S_SREG:
 			/* FPOS is shifted into sreg */
-			state->vgen.sreg = (state->vgen.sreg >> 1) | ((state->bsp.f >> 9) & 4);
+			state->m_vgen.sreg = (state->m_vgen.sreg >> 1) | ((state->m_bsp.f >> 9) & 4);
 			break;
 		default:
 			break;
@@ -456,66 +456,66 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 		switch (cmc->of)
 		{
 		case 0:
-			state->vgen.color = state->bsp.y & 0xfff;
+			state->m_vgen.color = state->m_bsp.y & 0xfff;
 			break;
 		case 1:
-			state->vgen.intensity = state->bsp.y & 0xff;
+			state->m_vgen.intensity = state->m_bsp.y & 0xff;
 			break;
 		case 2:
-			state->vgen.l1 = state->bsp.y & 0xfff;
-			state->vgen.adder_s = 0;
-			state->vgen.adder_a = state->vgen.l2;
-			state->vgen.hud1 = state->vgen.sreg & 1;
-			state->vgen.vud1 = state->vgen.sreg & 2;
-			state->vgen.hc1  = state->vgen.sreg & 4;
-			state->vgen.brez = 1;
+			state->m_vgen.l1 = state->m_bsp.y & 0xfff;
+			state->m_vgen.adder_s = 0;
+			state->m_vgen.adder_a = state->m_vgen.l2;
+			state->m_vgen.hud1 = state->m_vgen.sreg & 1;
+			state->m_vgen.vud1 = state->m_vgen.sreg & 2;
+			state->m_vgen.hc1  = state->m_vgen.sreg & 4;
+			state->m_vgen.brez = 1;
 			break;
 		case 3:
-			state->vgen.l2 = state->bsp.y & 0xfff;
-			state->vgen.adder_s = (state->vgen.adder_s + state->vgen.adder_a) & 0xfff;
-			if (state->vgen.adder_s & 0x800)
-				state->vgen.adder_a = state->vgen.l1;
+			state->m_vgen.l2 = state->m_bsp.y & 0xfff;
+			state->m_vgen.adder_s = (state->m_vgen.adder_s + state->m_vgen.adder_a) & 0xfff;
+			if (state->m_vgen.adder_s & 0x800)
+				state->m_vgen.adder_a = state->m_vgen.l1;
 			else
-				state->vgen.adder_a = state->vgen.l2;
-			state->vgen.hud2 = state->vgen.sreg & 1;
-			state->vgen.vud2 = state->vgen.sreg & 2;
+				state->m_vgen.adder_a = state->m_vgen.l2;
+			state->m_vgen.hud2 = state->m_vgen.sreg & 1;
+			state->m_vgen.vud2 = state->m_vgen.sreg & 2;
 			break;
 		case 4:
-			state->vgen.c_v = state->bsp.y & 0xfff;
+			state->m_vgen.c_v = state->m_bsp.y & 0xfff;
 			break;
 		case 5:
-			state->vgen.c_h = state->bsp.y & 0xfff;
+			state->m_vgen.c_h = state->m_bsp.y & 0xfff;
 			break;
 		case 6:
 			/* Loading the c_l counter starts
              * the vector counters if MSB is set
              */
-			state->vgen.c_l = state->bsp.y & 0xfff;
+			state->m_vgen.c_l = state->m_bsp.y & 0xfff;
 			break;
 		}
 
-		vertigo_vgen (&state->vgen);
+		vertigo_vgen (&state->m_vgen);
 
 		/* Microcode program flow */
 		switch (cmc->jcon)
 		{
 		case S_MSB:
 			/* ALU most significant bit */
-			jcond = (state->bsp.f >> 15) & 1;
+			jcond = (state->m_bsp.f >> 15) & 1;
 			break;
 		case S_FEQ0:
 			/* ALU is 0 */
-			jcond = (state->bsp.f == 0)? 1 : 0;
+			jcond = (state->m_bsp.f == 0)? 1 : 0;
 			break;
 		case S_Y10:
-			jcond = (state->bsp.y >> 10) & 1;
+			jcond = (state->m_bsp.y >> 10) & 1;
 			break;
 		case S_VFIN:
-			jcond = state->vgen.vfin;
+			jcond = state->m_vgen.vfin;
 			break;
 		case S_FPOS:
 			/* FPOS is bit 11 */
-			jcond = (state->bsp.f >> 11) & 1;
+			jcond = (state->m_bsp.f >> 11) & 1;
 			break;
 		case S_INTL4:
 			jcond = irq4;
@@ -543,28 +543,28 @@ void vertigo_vproc(running_machine &machine, int cycles, int irq4)
 			{
 			case S_JBK:
 				/* JBK is the only jump where MA8 is used */
-				state->vs.pc = cmc->ma;
+				state->m_vs.pc = cmc->ma;
 				break;
 			case S_CALL:
 				/* call and store return address */
-				state->vs.ret = (state->vs.pc + 1) & 0xff;
-				state->vs.pc = (state->vs.pc & 0x100) | (cmc->ma & 0xff);
+				state->m_vs.ret = (state->m_vs.pc + 1) & 0xff;
+				state->m_vs.pc = (state->m_vs.pc & 0x100) | (cmc->ma & 0xff);
 				break;
 			case S_OPT:
 				/* OPT is used for microcode jump tables. The first
                    four address bits are defined by bits 12-15
                    of 2901 input (D) */
-				state->vs.pc = (state->vs.pc & 0x100) | (cmc->ma & 0xf0) | ((state->bsp.d >> 12) & 0xf);
+				state->m_vs.pc = (state->m_vs.pc & 0x100) | (cmc->ma & 0xf0) | ((state->m_bsp.d >> 12) & 0xf);
 				break;
 			case S_RETURN:
 				/* return from call */
-				state->vs.pc = (state->vs.pc & 0x100) | state->vs.ret;
+				state->m_vs.pc = (state->m_vs.pc & 0x100) | state->m_vs.ret;
 				break;
 			}
 		}
 		else
 		{
-			state->vs.pc = (state->vs.pc & 0x100) | ((state->vs.pc + 1) & 0xff);
+			state->m_vs.pc = (state->m_vs.pc & 0x100) | ((state->m_vs.pc + 1) & 0xff);
 		}
 	}
 

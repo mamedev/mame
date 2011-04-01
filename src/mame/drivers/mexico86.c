@@ -85,10 +85,10 @@ static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
-	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(mexico86_state, objectram, objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(mexico86_state, protection_ram)  /* shared with mcu */
+	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(mexico86_state, m_objectram, m_objectram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_protection_ram)  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE_MEMBER(mexico86_state, videoram)
+	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_videoram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)	/* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
@@ -426,25 +426,25 @@ static MACHINE_START( mexico86 )
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->subcpu = machine.device("sub");
-	state->mcu = machine.device("mcu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_mcu = machine.device("mcu");
 
-	state->save_item(NAME(state->port_a_in));
-	state->save_item(NAME(state->port_a_out));
-	state->save_item(NAME(state->ddr_a));
-	state->save_item(NAME(state->port_b_in));
-	state->save_item(NAME(state->port_b_out));
-	state->save_item(NAME(state->ddr_b));
-	state->save_item(NAME(state->address));
-	state->save_item(NAME(state->latch));
+	state->save_item(NAME(state->m_port_a_in));
+	state->save_item(NAME(state->m_port_a_out));
+	state->save_item(NAME(state->m_ddr_a));
+	state->save_item(NAME(state->m_port_b_in));
+	state->save_item(NAME(state->m_port_b_out));
+	state->save_item(NAME(state->m_ddr_b));
+	state->save_item(NAME(state->m_address));
+	state->save_item(NAME(state->m_latch));
 
-	state->save_item(NAME(state->mcu_running));
-	state->save_item(NAME(state->mcu_initialised));
-	state->save_item(NAME(state->coin_last));
+	state->save_item(NAME(state->m_mcu_running));
+	state->save_item(NAME(state->m_mcu_initialised));
+	state->save_item(NAME(state->m_coin_last));
 
-	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->m_charbank));
 }
 
 static MACHINE_RESET( mexico86 )
@@ -455,20 +455,20 @@ static MACHINE_RESET( mexico86 )
 	if (machine.device("sub") != NULL)
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->address = 0;
-	state->latch = 0;
+	state->m_port_a_in = 0;
+	state->m_port_a_out = 0;
+	state->m_ddr_a = 0;
+	state->m_port_b_in = 0;
+	state->m_port_b_out = 0;
+	state->m_ddr_b = 0;
+	state->m_address = 0;
+	state->m_latch = 0;
 
-	state->mcu_running = 0;
-	state->mcu_initialised = 0;
-	state->coin_last = 0;
+	state->m_mcu_running = 0;
+	state->m_mcu_initialised = 0;
+	state->m_coin_last = 0;
 
-	state->charbank = 0;
+	state->m_charbank = 0;
 }
 
 static MACHINE_CONFIG_START( mexico86, mexico86_state )

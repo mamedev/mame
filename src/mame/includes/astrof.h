@@ -11,30 +11,30 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	UINT8 *    videoram;
-	size_t     videoram_size;
+	UINT8 *    m_videoram;
+	size_t     m_videoram_size;
 
-	UINT8 *    colorram;
-	UINT8 *    tomahawk_protection;
+	UINT8 *    m_colorram;
+	UINT8 *    m_tomahawk_protection;
 
-	UINT8 *    astrof_color;
-	UINT8      astrof_palette_bank;
-	UINT8      red_on;
-	UINT8      flipscreen;
-	UINT8      screen_off;
-	UINT16     abattle_count;
+	UINT8 *    m_astrof_color;
+	UINT8      m_astrof_palette_bank;
+	UINT8      m_red_on;
+	UINT8      m_flipscreen;
+	UINT8      m_screen_off;
+	UINT16     m_abattle_count;
 
 	/* sound-related */
-	UINT8      port_1_last;
-	UINT8      port_2_last;
-	UINT8      astrof_start_explosion;
-	UINT8      astrof_death_playing;
-	UINT8      astrof_bosskill_playing;
+	UINT8      m_port_1_last;
+	UINT8      m_port_2_last;
+	UINT8      m_astrof_start_explosion;
+	UINT8      m_astrof_death_playing;
+	UINT8      m_astrof_bosskill_playing;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *samples;	// astrof & abattle
-	device_t *sn;	// tomahawk
+	device_t *m_maincpu;
+	device_t *m_samples;	// astrof & abattle
+	device_t *m_sn;	// tomahawk
 };
 
 /*----------- defined in audio/astrof.c -----------*/

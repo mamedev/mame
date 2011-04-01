@@ -45,7 +45,7 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 	coin_counter_w(space->machine(), 1, data & 0x40);
 
 	/* priority */
-	state->priority = data & 0x08;
+	state->m_priority = data & 0x08;
 
 	/* bank # (ROMS N11 and N12) */
 	bank += (data & 0x07);
@@ -143,12 +143,12 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 			if (offset)
 				watchdog_reset_w(space, 0, data);
 			else{
-				if (state->firq_enable)	/* Cause interrupt on slave CPU */
-					device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+				if (state->m_firq_enable)	/* Cause interrupt on slave CPU */
+					device_set_input_line(state->m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+			device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
 			soundlatch_w(space, offset, data);
@@ -185,13 +185,13 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 	ajax_state *state = space->machine().driver_data<ajax_state>();
 
 	/* enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 5 enables 051316 wraparound */
-	k051316_wraparound_enable(state->k051316, data & 0x20);
+	k051316_wraparound_enable(state->m_k051316, data & 0x20);
 
 	/* FIRQ control */
-	state->firq_enable = data & 0x10;
+	state->m_firq_enable = data & 0x10;
 
 	/* bank # (ROMS G16 and I16) */
 	memory_set_bank(space->machine(), "bank1", data & 0x0f);
@@ -209,31 +209,31 @@ MACHINE_START( ajax )
 	memory_set_bank(machine, "bank1", 0);
 	memory_set_bank(machine, "bank2", 0);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->subcpu = machine.device("sub");
-	state->k007232_1 = machine.device("k007232_1");
-	state->k007232_2 = machine.device("k007232_2");
-	state->k052109 = machine.device("k052109");
-	state->k051960 = machine.device("k051960");
-	state->k051316 = machine.device("k051316");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_k007232_1 = machine.device("k007232_1");
+	state->m_k007232_2 = machine.device("k007232_2");
+	state->m_k052109 = machine.device("k052109");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k051316 = machine.device("k051316");
 
-	state->save_item(NAME(state->priority));
-	state->save_item(NAME(state->firq_enable));
+	state->save_item(NAME(state->m_priority));
+	state->save_item(NAME(state->m_firq_enable));
 }
 
 MACHINE_RESET( ajax )
 {
 	ajax_state *state = machine.driver_data<ajax_state>();
 
-	state->priority = 0;
-	state->firq_enable = 0;
+	state->m_priority = 0;
+	state->m_firq_enable = 0;
 }
 
 INTERRUPT_GEN( ajax_interrupt )
 {
 	ajax_state *state = device->machine().driver_data<ajax_state>();
 
-	if (k051960_is_irq_enabled(state->k051960))
+	if (k051960_is_irq_enabled(state->m_k051960))
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }

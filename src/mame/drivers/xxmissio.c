@@ -24,7 +24,7 @@ static CUSTOM_INPUT( xxmissio_status_r )
 {
 	xxmissio_state *state = field->port->machine().driver_data<xxmissio_state>();
 	int bit_mask = (FPTR)param;
-	return (state->status & bit_mask) ? 1 : 0;
+	return (state->m_status & bit_mask) ? 1 : 0;
 }
 
 static WRITE8_HANDLER ( xxmissio_status_m_w )
@@ -33,16 +33,16 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 	switch (data)
 	{
 		case 0x00:
-			state->status |= 0x20;
+			state->m_status |= 0x20;
 			break;
 
 		case 0x40:
-			state->status &= ~0x08;
+			state->m_status &= ~0x08;
 			cputag_set_input_line_and_vector(space->machine(), "sub", 0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
-			state->status |= 0x04;
+			state->m_status |= 0x04;
 			break;
 	}
 }
@@ -53,15 +53,15 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 	switch (data)
 	{
 		case 0x00:
-			state->status |= 0x10;
+			state->m_status |= 0x10;
 			break;
 
 		case 0x40:
-			state->status |= 0x08;
+			state->m_status |= 0x08;
 			break;
 
 		case 0x80:
-			state->status &= ~0x04;
+			state->m_status &= ~0x04;
 			cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, 0x10);
 			break;
 	}
@@ -70,14 +70,14 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
-	state->status &= ~0x20;
+	state->m_status &= ~0x20;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_state *state = device->machine().driver_data<xxmissio_state>();
-	state->status &= ~0x10;
+	state->m_status &= ~0x10;
 	device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -101,9 +101,9 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE_MEMBER(xxmissio_state, fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE_MEMBER(xxmissio_state, bgram)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE_MEMBER(xxmissio_state, spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE_MEMBER(xxmissio_state, m_fgram)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE_MEMBER(xxmissio_state, m_bgram)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE_MEMBER(xxmissio_state, m_spriteram)
 
 	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
 

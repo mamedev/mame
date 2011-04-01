@@ -4,27 +4,27 @@ public:
 	tceptor_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 m6809_irq_enable;
-	UINT8 m68k_irq_enable;
-	UINT8 mcu_irq_enable;
-	UINT8 *m68k_shared_ram;
-	UINT8 *tile_ram;
-	UINT8 *tile_attr;
-	UINT8 *bg_ram;
-	UINT16 *sprite_ram;
-	int sprite16;
-	int sprite32;
-	int bg;
-	tilemap_t *tx_tilemap;
-	tilemap_t *bg1_tilemap;
-	tilemap_t *bg2_tilemap;
-	INT32 bg1_scroll_x;
-	INT32 bg1_scroll_y;
-	INT32 bg2_scroll_x;
-	INT32 bg2_scroll_y;
-	bitmap_t *temp_bitmap;
-	UINT16 *sprite_ram_buffered;
-	int is_mask_spr[1024/16];
+	UINT8 m_m6809_irq_enable;
+	UINT8 m_m68k_irq_enable;
+	UINT8 m_mcu_irq_enable;
+	UINT8 *m_m68k_shared_ram;
+	UINT8 *m_tile_ram;
+	UINT8 *m_tile_attr;
+	UINT8 *m_bg_ram;
+	UINT16 *m_sprite_ram;
+	int m_sprite16;
+	int m_sprite32;
+	int m_bg;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg1_tilemap;
+	tilemap_t *m_bg2_tilemap;
+	INT32 m_bg1_scroll_x;
+	INT32 m_bg1_scroll_y;
+	INT32 m_bg2_scroll_x;
+	INT32 m_bg2_scroll_y;
+	bitmap_t *m_temp_bitmap;
+	UINT16 *m_sprite_ram_buffered;
+	int m_is_mask_spr[1024/16];
 };
 
 

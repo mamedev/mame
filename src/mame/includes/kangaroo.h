@@ -13,13 +13,13 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      video_control;
+	UINT8 *      m_video_control;
 
 	/* video-related */
-	UINT32       *videoram;
+	UINT32       *m_videoram;
 
 	/* misc */
-	UINT8        clock;
+	UINT8        m_clock;
 };
 
 

@@ -23,8 +23,8 @@ public:
 	ultrsprt_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *vram;
-	UINT32 *workram;
+	UINT32 *m_vram;
+	UINT32 *m_workram;
 };
 
 
@@ -35,7 +35,7 @@ static SCREEN_UPDATE( ultrsprt )
 	ultrsprt_state *state = screen->machine().driver_data<ultrsprt_state>();
 	int i, j;
 
-	UINT8 *ram = (UINT8 *)state->vram;
+	UINT8 *ram = (UINT8 *)state->m_vram;
 
 	for (j=0; j < 400; j++)
 	{
@@ -98,21 +98,21 @@ static MACHINE_START( ultrsprt )
 	ppcdrc_set_options(machine.device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->vram);
-	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->workram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0x80000000, 0x8007ffff, FALSE, state->m_vram);
+	ppcdrc_add_fastram(machine.device("maincpu"), 0xff000000, 0xff01ffff, FALSE, state->m_workram);
 }
 
 
 
 static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, vram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, m_vram)
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
 	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, workram)
+	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE_MEMBER(ultrsprt_state, m_workram)
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

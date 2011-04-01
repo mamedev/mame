@@ -58,18 +58,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  videoram2;
-	UINT8 *  colorram;
-	UINT8 *  colorram2;
-	UINT8 *  spriteram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_videoram2;
+	UINT8 *  m_colorram;
+	UINT8 *  m_colorram2;
+	UINT8 *  m_spriteram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*bg2_tilemap;
-	UINT8    scroll, scrollhi;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_bg2_tilemap;
+	UINT8    m_scroll;
+	UINT8    m_scrollhi;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 
@@ -91,40 +93,40 @@ static WRITE8_HANDLER( chanbara_videoram_w )
 {
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( chanbara_colorram_w )
 {
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( chanbara_videoram2_w )
 {
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg2_tilemap, offset);
+	state->m_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
 }
 
 static WRITE8_HANDLER( chanbara_colorram2_w )
 {
 	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg2_tilemap, offset);
+	state->m_colorram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg2_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 1) << 8);
-	int color = (state->colorram[tile_index] >> 1) & 0x1f;
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 1) << 8);
+	int color = (state->m_colorram[tile_index] >> 1) & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -132,8 +134,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_bg2_tile_info )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	int code = state->videoram2[tile_index];
-	int color = (state->colorram2[tile_index] >> 1) & 0x1f;
+	int code = state->m_videoram2[tile_index];
+	int color = (state->m_colorram2[tile_index] >> 1) & 0x1f;
 
 	SET_TILE_INFO(2, code, color, 0);
 }
@@ -141,9 +143,9 @@ static TILE_GET_INFO( get_bg2_tile_info )
 static VIDEO_START(chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
-	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
+	state->m_bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -153,21 +155,21 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		if (state->spriteram[offs + 0x80] & 0x80)
+		if (state->m_spriteram[offs + 0x80] & 0x80)
 		{
-			int attr = state->spriteram[offs + 0];
-			int code = state->spriteram[offs + 1];
-			int color = state->spriteram[offs + 0x80] & 0x1f;
+			int attr = state->m_spriteram[offs + 0];
+			int code = state->m_spriteram[offs + 1];
+			int color = state->m_spriteram[offs + 0x80] & 0x1f;
 			int flipx = 0;
 			int flipy = attr & 2;
-			int sx = 240 - state->spriteram[offs + 3];
-			int sy = 232 - state->spriteram[offs + 2];
+			int sx = 240 - state->m_spriteram[offs + 3];
+			int sy = 232 - state->m_spriteram[offs + 2];
 
 			sy+=16;
 
-			if (state->spriteram[offs + 0x80] & 0x10) code += 0x200;
-			if (state->spriteram[offs + 0x80] & 0x20) code += 0x400;
-			if (state->spriteram[offs + 0x80] & 0x40) code += 0x100;
+			if (state->m_spriteram[offs + 0x80] & 0x10) code += 0x200;
+			if (state->m_spriteram[offs + 0x80] & 0x20) code += 0x400;
+			if (state->m_spriteram[offs + 0x80] & 0x40) code += 0x100;
 
 			if (attr & 0x10)
 			{
@@ -194,20 +196,20 @@ static SCREEN_UPDATE( chanbara )
 {
 	chanbara_state *state = screen->machine().driver_data<chanbara_state>();
 
-	tilemap_set_scrolly(state->bg2_tilemap, 0, state->scroll | (state->scrollhi << 8));
-	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_set_scrolly(state->m_bg2_tilemap, 0, state->m_scroll | (state->m_scrollhi << 8));
+	tilemap_draw(bitmap, cliprect, state->m_bg2_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	return 0;
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE_MEMBER(chanbara_state, videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE_MEMBER(chanbara_state, colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(chanbara_state, spriteram)
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_BASE_MEMBER(chanbara_state, videoram2)
-	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_BASE_MEMBER(chanbara_state, colorram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE_MEMBER(chanbara_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE_MEMBER(chanbara_state, m_colorram)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(chanbara_state, m_spriteram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_BASE_MEMBER(chanbara_state, m_videoram2)
+	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_BASE_MEMBER(chanbara_state, m_colorram2)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("JOY")
@@ -328,7 +330,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_0_w )
 	chanbara_state *state = device->machine().driver_data<chanbara_state>();
 	//printf("chanbara_ay_out_0_w %02x\n",data);
 
-	state->scroll = data;
+	state->m_scroll = data;
 }
 
 static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
@@ -336,7 +338,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 	chanbara_state *state = device->machine().driver_data<chanbara_state>();
 	//printf("chanbara_ay_out_1_w %02x\n",data);
 
-	state->scrollhi = data & 0x03;
+	state->m_scrollhi = data & 0x03;
 
 	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
 
@@ -346,7 +348,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 static void sound_irq( device_t *device, int linestate )
 {
 	chanbara_state *state = device->machine().driver_data<chanbara_state>();
-	device_set_input_line(state->maincpu, 0, linestate);
+	device_set_input_line(state->m_maincpu, 0, linestate);
 }
 
 
@@ -368,18 +370,18 @@ static MACHINE_START( chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->scroll));
-	state->save_item(NAME(state->scrollhi));
+	state->save_item(NAME(state->m_scroll));
+	state->save_item(NAME(state->m_scrollhi));
 }
 
 static MACHINE_RESET( chanbara )
 {
 	chanbara_state *state = machine.driver_data<chanbara_state>();
 
-	state->scroll = 0;
-	state->scrollhi = 0;
+	state->m_scroll = 0;
+	state->m_scrollhi = 0;
 }
 
 static MACHINE_CONFIG_START( chanbara, chanbara_state )

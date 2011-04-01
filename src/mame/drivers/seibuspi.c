@@ -745,19 +745,19 @@ static UINT8 z80_fifoout_pop(address_space *space)
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r;
-	if (state->fifoout_wpos == state->fifoout_rpos)
+	if (state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
 		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(&space->device()));
 	}
-	r = state->fifoout_data[state->fifoout_rpos++];
-	if(state->fifoout_rpos == FIFO_SIZE)
+	r = state->m_fifoout_data[state->m_fifoout_rpos++];
+	if(state->m_fifoout_rpos == FIFO_SIZE)
 	{
-		state->fifoout_rpos = 0;
+		state->m_fifoout_rpos = 0;
 	}
 
-	if (state->fifoout_wpos == state->fifoout_rpos)
+	if (state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
-		state->fifoout_read_request = 0;
+		state->m_fifoout_read_request = 0;
 	}
 
 	return r;
@@ -766,36 +766,36 @@ static UINT8 z80_fifoout_pop(address_space *space)
 static void z80_fifoout_push(address_space *space, UINT8 data)
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	state->fifoout_data[state->fifoout_wpos++] = data;
-	if (state->fifoout_wpos == FIFO_SIZE)
+	state->m_fifoout_data[state->m_fifoout_wpos++] = data;
+	if (state->m_fifoout_wpos == FIFO_SIZE)
 	{
-		state->fifoout_wpos = 0;
+		state->m_fifoout_wpos = 0;
 	}
-	if(state->fifoout_wpos == state->fifoout_rpos)
+	if(state->m_fifoout_wpos == state->m_fifoout_rpos)
 	{
 		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(&space->device()));
 	}
 
-	state->fifoout_read_request = 1;
+	state->m_fifoout_read_request = 1;
 }
 
 static UINT8 z80_fifoin_pop(address_space *space)
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r;
-	if (state->fifoin_wpos == state->fifoin_rpos)
+	if (state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
 		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(&space->device()));
 	}
-	r = state->fifoin_data[state->fifoin_rpos++];
-	if(state->fifoin_rpos == FIFO_SIZE)
+	r = state->m_fifoin_data[state->m_fifoin_rpos++];
+	if(state->m_fifoin_rpos == FIFO_SIZE)
 	{
-		state->fifoin_rpos = 0;
+		state->m_fifoin_rpos = 0;
 	}
 
-	if (state->fifoin_wpos == state->fifoin_rpos)
+	if (state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
-		state->fifoin_read_request = 0;
+		state->m_fifoin_read_request = 0;
 	}
 
 	return r;
@@ -804,25 +804,25 @@ static UINT8 z80_fifoin_pop(address_space *space)
 static void z80_fifoin_push(address_space *space, UINT8 data)
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	state->fifoin_data[state->fifoin_wpos++] = data;
-	if(state->fifoin_wpos == FIFO_SIZE)
+	state->m_fifoin_data[state->m_fifoin_wpos++] = data;
+	if(state->m_fifoin_wpos == FIFO_SIZE)
 	{
-		state->fifoin_wpos = 0;
+		state->m_fifoin_wpos = 0;
 	}
-	if(state->fifoin_wpos == state->fifoin_rpos)
+	if(state->m_fifoin_wpos == state->m_fifoin_rpos)
 	{
 		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(&space->device()));
 	}
 
-	state->fifoin_read_request = 1;
+	state->m_fifoin_read_request = 1;
 }
 
 static READ32_HANDLER( sb_coin_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	UINT8 r = state->sb_coin_latch;
+	UINT8 r = state->m_sb_coin_latch;
 
-	state->sb_coin_latch = 0;
+	state->m_sb_coin_latch = 0;
 	return r;
 }
 
@@ -830,9 +830,9 @@ static WRITE8_HANDLER( sb_coin_w )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (data)
-		state->sb_coin_latch = 0xa0 | data;
+		state->m_sb_coin_latch = 0xa0 | data;
 	else
-		state->sb_coin_latch = 0;
+		state->m_sb_coin_latch = 0;
 }
 
 static READ32_HANDLER( sound_fifo_r )
@@ -853,7 +853,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT32 r = 0;
-	if (state->fifoout_read_request)
+	if (state->m_fifoout_read_request)
 	{
 		r |= 2;
 	}
@@ -892,8 +892,8 @@ static WRITE32_HANDLER( z80_prg_fifo_w )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if( ACCESSING_BITS_0_7 ) {
-		if (state->z80_prg_fifo_pos<0x40000) state->z80_rom[state->z80_prg_fifo_pos] = data & 0xff;
-		state->z80_prg_fifo_pos++;
+		if (state->m_z80_prg_fifo_pos<0x40000) state->m_z80_rom[state->m_z80_prg_fifo_pos] = data & 0xff;
+		state->m_z80_prg_fifo_pos++;
 	}
 }
 
@@ -908,7 +908,7 @@ static WRITE32_HANDLER( z80_enable_w )
 logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
-			state->z80_prg_fifo_pos = 0;
+			state->m_z80_prg_fifo_pos = 0;
 			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
 			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
@@ -937,7 +937,7 @@ static READ32_HANDLER( spi_controls2_r )
 static CUSTOM_INPUT( ejsakura_keyboard_r )
 {
 	seibuspi_state *state = field->port->machine().driver_data<seibuspi_state>();
-	switch(state->ejsakura_input_port)
+	switch(state->m_ejsakura_input_port)
 	{
 		case 0x01:
 			return input_port_read(field->port->machine(), "INPUT01");
@@ -972,7 +972,7 @@ static READ8_HANDLER( z80_soundfifo_status_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	UINT8 r = 0;
-	if (state->fifoin_read_request)
+	if (state->m_fifoin_read_request)
 	{
 		r |= 2;
 	}
@@ -982,10 +982,10 @@ static READ8_HANDLER( z80_soundfifo_status_r )
 static WRITE8_HANDLER( z80_bank_w )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	if ((data & 7) != state->z80_lastbank)
+	if ((data & 7) != state->m_z80_lastbank)
 	{
-		state->z80_lastbank = (data & 7);
-		memory_set_bankptr(space->machine(), "bank4", state->z80_rom + (0x8000 * state->z80_lastbank));
+		state->m_z80_lastbank = (data & 7);
+		memory_set_bankptr(space->machine(), "bank4", state->m_z80_rom + (0x8000 * state->m_z80_lastbank));
 	}
 }
 
@@ -1035,7 +1035,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
 	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, spi_scrollram)
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spi_scrollram)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1053,7 +1053,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_data_w, 0x000000ff)
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, spimainram)
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x00a00000, 0x013fffff) AM_READ(soundrom_r)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
@@ -1080,11 +1080,11 @@ static READ8_DEVICE_HANDLER( flashrom_read )
 	logerror("Flash Read: %08X\n", offset);
 	if( offset < 0x100000 )
 	{
-		return state->flash[0]->read(offset);
+		return state->m_flash[0]->read(offset);
 	}
 	else if( offset < 0x200000 )
 	{
-		return state->flash[1]->read(offset - 0x100000 );
+		return state->m_flash[1]->read(offset - 0x100000 );
 	}
 	return 0;
 }
@@ -1095,11 +1095,11 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	logerror("Flash Write: %08X, %02X\n", offset, data);
 	if( offset < 0x100000 )
 	{
-		state->flash[0]->write(offset + 1, data);
+		state->m_flash[0]->write(offset + 1, data);
 	}
 	else if( offset < 0x200000 )
 	{
-		state->flash[1]->write(offset - 0x100000 + 1, data);
+		state->m_flash[1]->write(offset - 0x100000 + 1, data);
 	}
 }
 
@@ -1132,7 +1132,7 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
 	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, spi_scrollram)
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spi_scrollram)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
@@ -1143,7 +1143,7 @@ static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
 	AM_RANGE(0x0000068c, 0x0000068f) AM_DEVWRITE("eeprom", eeprom_w)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, spimainram)
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)
@@ -1153,7 +1153,7 @@ ADDRESS_MAP_END
 static WRITE32_HANDLER(input_select_w)
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-	state->ejsakura_input_port = data;
+	state->m_ejsakura_input_port = data;
 }
 
 static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32 )
@@ -1171,7 +1171,7 @@ static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_r, 0x000000ff)
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls1_r)	/* Player controls */
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, spimainram)
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
@@ -1811,7 +1811,7 @@ static IRQ_CALLBACK(spi_irq_callback)
 static MACHINE_START( spi )
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+	state->m_z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 }
 
 static MACHINE_RESET( spi )
@@ -1830,24 +1830,24 @@ static MACHINE_RESET( spi )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000688, 0x0000068b, FUNC(z80_prg_fifo_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000068c, 0x0000068f, FUNC(z80_enable_w));
 
-	memory_set_bankptr(machine, "bank4", state->z80_rom);
-	memory_set_bankptr(machine, "bank5", state->z80_rom);
+	memory_set_bankptr(machine, "bank4", state->m_z80_rom);
+	memory_set_bankptr(machine, "bank5", state->m_z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
-	state->flash[0]->write(0, 0xff);
-	state->flash[0]->write(0, 0x10);
-	state->flash[0]->write(0, flash_data);			/* country code */
+	state->m_flash[0]->write(0, 0xff);
+	state->m_flash[0]->write(0, 0x10);
+	state->m_flash[0]->write(0, flash_data);			/* country code */
 
 	for (i=0; i < 0x100000; i++)
 	{
-		state->flash[0]->write(0, 0xff);
-		sound[i] = state->flash[0]->read(i);
+		state->m_flash[0]->write(0, 0xff);
+		sound[i] = state->m_flash[0]->read(i);
 	}
 	for (i=0; i < 0x100000; i++)
 	{
-		state->flash[1]->write(0, 0xff);
-		sound[0x100000+i] = state->flash[1]->read(i);
+		state->m_flash[1]->write(0, 0xff);
+		sound[0x100000+i] = state->m_flash[1]->read(i);
 	}
 }
 
@@ -1898,7 +1898,7 @@ MACHINE_CONFIG_END
 static MACHINE_START( sxx2f )
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+	state->m_z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 }
 
 static MACHINE_RESET( sxx2f )
@@ -1906,17 +1906,17 @@ static MACHINE_RESET( sxx2f )
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
 	UINT8 *rom = machine.region("soundcpu")->base();
 
-	memory_set_bankptr(machine, "bank4", state->z80_rom);
-	memory_set_bankptr(machine, "bank5", state->z80_rom);
+	memory_set_bankptr(machine, "bank4", state->m_z80_rom);
+	memory_set_bankptr(machine, "bank5", state->m_z80_rom);
 
-	memcpy(state->z80_rom, rom, 0x40000);
+	memcpy(state->m_z80_rom, rom, 0x40000);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*machine.device("eeprom"), 0x0000068c, 0x0000068f, FUNC(eeprom_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sb_coin_r));
 
 	device_set_irq_callback(machine.device("maincpu"), spi_irq_callback);
 
-	state->sb_coin_latch = 0;
+	state->m_sb_coin_latch = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( sxx2f, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
@@ -1955,14 +1955,14 @@ static READ32_HANDLER ( senkyu_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (cpu_get_pc(&space->device())==0x00305bb2) device_spin_until_interrupt(&space->device()); // idle
-	return state->spimainram[(0x0018cb4-0x800)/4];
+	return state->m_spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 	if (cpu_get_pc(&space->device())== 0x30582e) device_spin_until_interrupt(&space->device()); // idle
-	return state->spimainram[(0x0018c9c-0x800)/4];
+	return state->m_spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
@@ -1976,7 +1976,7 @@ static READ32_HANDLER ( batlball_speedup_r )
 	/* batlball */
 	if (cpu_get_pc(&space->device())==0x003058aa) device_spin_until_interrupt(&space->device()); // idle
 
-	return state->spimainram[(0x0018db4-0x800)/4];
+	return state->m_spimainram[(0x0018db4-0x800)/4];
 }
 
 static READ32_HANDLER ( rdft_speedup_r )
@@ -1999,7 +1999,7 @@ static READ32_HANDLER ( rdft_speedup_r )
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
-	return state->spimainram[(0x00298d0-0x800)/4];
+	return state->m_spimainram[(0x00298d0-0x800)/4];
 }
 
 static READ32_HANDLER ( viprp1_speedup_r )
@@ -2016,7 +2016,7 @@ static READ32_HANDLER ( viprp1_speedup_r )
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
-	return state->spimainram[(0x001e2e0-0x800)/4];
+	return state->m_spimainram[(0x001e2e0-0x800)/4];
 }
 
 static READ32_HANDLER ( viprp1o_speedup_r )
@@ -2025,7 +2025,7 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 	/* viperp1o */
 	if (cpu_get_pc(&space->device())==0x0201f99) device_spin_until_interrupt(&space->device()); // idle
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
-	return state->spimainram[(0x001d49c-0x800)/4];
+	return state->m_spimainram[(0x001d49c-0x800)/4];
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2035,7 +2035,7 @@ READ32_HANDLER ( ejanhs_speedup_r )
 	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
 // mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
  if (cpu_get_pc(&space->device())==0x03032c7) device_spin_until_interrupt(&space->device()); // idle
- return state->spimainram[(0x002d224-0x800)/4];
+ return state->m_spimainram[(0x002d224-0x800)/4];
 }
 #endif
 
@@ -2057,7 +2057,7 @@ static READ32_HANDLER ( rf2_speedup_r )
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
-	return state->spimainram[(0x0282AC-0x800)/4];
+	return state->m_spimainram[(0x0282AC-0x800)/4];
 }
 
 static READ32_HANDLER ( rfjet_speedup_r )
@@ -2072,7 +2072,7 @@ static READ32_HANDLER ( rfjet_speedup_r )
 		UINT32 r;
 		device_spin_until_interrupt(&space->device()); // idle
 		// Hack to enter test mode
-		r = state->spimainram[(0x002894c-0x800)/4] & (~0x400);
+		r = state->m_spimainram[(0x002894c-0x800)/4] & (~0x400);
 		return r | (((input_port_read(space->machine(), "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
@@ -2082,14 +2082,14 @@ static READ32_HANDLER ( rfjet_speedup_r )
 //  mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
 
 
-	return state->spimainram[(0x002894c-0x800)/4];
+	return state->m_spimainram[(0x002894c-0x800)/4];
 }
 
 static void init_spi(running_machine &machine)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
+	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	seibuspi_text_decrypt(machine.region("gfx1")->base());
 	seibuspi_bg_decrypt(machine.region("gfx2")->base(), machine.region("gfx2")->bytes());
@@ -2151,8 +2151,8 @@ static DRIVER_INIT( viprp1o )
 static void init_rf2(running_machine &machine)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
+	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0282AC, 0x0282AF, FUNC(rf2_speedup_r) );
 	seibuspi_rise10_text_decrypt(machine.region("gfx1")->base());
@@ -2176,8 +2176,8 @@ static DRIVER_INIT( rdft2us )
 static void init_rfjet(running_machine &machine)
 {
 	seibuspi_state *state = machine.driver_data<seibuspi_state>();
-	state->flash[0] = machine.device<intel_e28f008sa_device>("flash0");
-	state->flash[1] = machine.device<intel_e28f008sa_device>("flash1");
+	state->m_flash[0] = machine.device<intel_e28f008sa_device>("flash0");
+	state->m_flash[1] = machine.device<intel_e28f008sa_device>("flash1");
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002894c, 0x002894f, FUNC(rfjet_speedup_r) );
 	seibuspi_rise11_text_decrypt(machine.region("gfx1")->base());

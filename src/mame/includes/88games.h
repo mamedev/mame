@@ -11,26 +11,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *      ram;
-	UINT8 *      banked_rom;
-//  UINT8 *      paletteram_1000;   // this currently uses generic palette handling
-//  UINT8 *      nvram; // this currently uses generic nvram handling
-	UINT8 *paletteram_1000;
+	UINT8 *      m_ram;
+	UINT8 *      m_banked_rom;
+//  UINT8 *      m_paletteram_1000;   // this currently uses generic palette handling
+//  UINT8 *      m_nvram; // this currently uses generic nvram handling
+	UINT8 *m_paletteram_1000;
 
 	/* video-related */
-	int          k88games_priority;
-	int          layer_colorbase[3], sprite_colorbase, zoom_colorbase;
-	int          videobank;
-	int          zoomreadroms;
-	int          speech_chip;
+	int          m_k88games_priority;
+	int          m_layer_colorbase[3];
+	int          m_sprite_colorbase;
+	int          m_zoom_colorbase;
+	int          m_videobank;
+	int          m_zoomreadroms;
+	int          m_speech_chip;
 
 	/* devices */
-	device_t *audiocpu;
-	device_t *k052109;
-	device_t *k051960;
-	device_t *k051316;
-	device_t *upd_1;
-	device_t *upd_2;
+	device_t *m_audiocpu;
+	device_t *m_k052109;
+	device_t *m_k051960;
+	device_t *m_k051316;
+	device_t *m_upd_1;
+	device_t *m_upd_2;
 };
 
 

@@ -5,44 +5,54 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     videoram;
-	UINT8 *     colorram;
-	UINT8 *     spriteram;
-	UINT8 *     spriteram2;
-	UINT8 *     video_ctrl;
-	size_t      spriteram_size;
-	size_t      spriteram2_size;
+	UINT8 *     m_videoram;
+	UINT8 *     m_colorram;
+	UINT8 *     m_spriteram;
+	UINT8 *     m_spriteram2;
+	UINT8 *     m_video_ctrl;
+	size_t      m_spriteram_size;
+	size_t      m_spriteram2_size;
 
 	/* video-related */
-	bitmap_t    *tmp_bitmap1, *tmp_bitmap2;
-	tilemap_t     *bg_tilemap;
-	UINT8       flipscreen, pix_redraw;
-	UINT8       xoffset;
-	UINT8       *pixram1;
-	UINT8       *pixram2;
-	bitmap_t    *pixel_bitmap1;
-	bitmap_t    *pixel_bitmap2;
-	int         pixram_sel;
+	bitmap_t    *m_tmp_bitmap1;
+	bitmap_t    *m_tmp_bitmap2;
+	tilemap_t     *m_bg_tilemap;
+	UINT8       m_flipscreen;
+	UINT8		m_pix_redraw;
+	UINT8       m_xoffset;
+	UINT8       *m_pixram1;
+	UINT8       *m_pixram2;
+	bitmap_t    *m_pixel_bitmap1;
+	bitmap_t    *m_pixel_bitmap2;
+	int         m_pixram_sel;
 
 	/* sound-related */
-	int         sound_nmi_enable, pending_nmi;
+	int         m_sound_nmi_enable;
+	int			m_pending_nmi;
 
 	/* fake mcu */
-	UINT8 *     mcu_ram;
-	UINT8       from_mcu;
-	int         mcu_sent, main_sent;
-	UINT8       mcu_in[2][16], mcu_out[2][16];
-	int         mcu_cmd;
+	UINT8 *     m_mcu_ram;
+	UINT8       m_from_mcu;
+	int         m_mcu_sent;
+	int			m_main_sent;
+	UINT8       m_mcu_in[2][16];
+	UINT8		m_mcu_out[2][16];
+	int         m_mcu_cmd;
 
 	/* misc */
-	int         pix_color[4];
-	UINT8       pix1, pix2[2];
-	UINT8       snd_data, snd_flag;
-	int         vol_ctrl[16];
-	UINT8       snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3;
+	int         m_pix_color[4];
+	UINT8       m_pix1;
+	UINT8		m_pix2[2];
+	UINT8       m_snd_data;
+	UINT8		m_snd_flag;
+	int         m_vol_ctrl[16];
+	UINT8       m_snd_ctrl0;
+	UINT8		m_snd_ctrl1;
+	UINT8		m_snd_ctrl2;
+	UINT8		m_snd_ctrl3;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

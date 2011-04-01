@@ -142,10 +142,10 @@ public:
 	ppmast93_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 *fgram;
-	UINT8 *bgram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_fgram;
+	UINT8 *m_bgram;
 };
 
 
@@ -154,15 +154,15 @@ public:
 static WRITE8_HANDLER( ppmast93_fgram_w )
 {
 	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
-	state->fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset/2);
+	state->m_fgram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_bgram_w )
 {
 	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
-	state->bgram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
+	state->m_bgram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( ppmast93_port4_w )
@@ -180,9 +180,9 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE_MEMBER(ppmast93_state, bgram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE_MEMBER(ppmast93_state, m_bgram) AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_BASE_MEMBER(ppmast93_state, fgram) AM_SHARE("share2")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_BASE_MEMBER(ppmast93_state, m_fgram) AM_SHARE("share2")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -321,7 +321,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->bgram[tile_index*2+1] << 8) | state->bgram[tile_index*2];
+	int code = (state->m_bgram[tile_index*2+1] << 8) | state->m_bgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			code & 0x0fff,
@@ -332,7 +332,7 @@ static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	int code = (state->fgram[tile_index*2+1] << 8) | state->fgram[tile_index*2];
+	int code = (state->m_fgram[tile_index*2+1] << 8) | state->m_fgram[tile_index*2];
 	SET_TILE_INFO(
 			0,
 			(code & 0x0fff)+0x1000,
@@ -343,17 +343,17 @@ static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 static VIDEO_START( ppmast93 )
 {
 	ppmast93_state *state = machine.driver_data<ppmast93_state>();
-	state->bg_tilemap = tilemap_create(machine, get_ppmast93_bg_tile_info,tilemap_scan_rows,8,8,32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_ppmast93_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_ppmast93_bg_tile_info,tilemap_scan_rows,8,8,32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_ppmast93_fg_tile_info,tilemap_scan_rows,8,8,32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap,0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 }
 
 static SCREEN_UPDATE( ppmast93 )
 {
 	ppmast93_state *state = screen->machine().driver_data<ppmast93_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }
 

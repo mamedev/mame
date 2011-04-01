@@ -12,9 +12,9 @@ static TILE_GET_INFO( get_tile_info )
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 
-	int attr = state->videoram[tile_index + 0x800];
-	int code = state->videoram[tile_index] + ((attr & 0x1f) << 8);
-	int color = state->videoram[tile_index + 0x1000];
+	int attr = state->m_videoram[tile_index + 0x800];
+	int code = state->m_videoram[tile_index] + ((attr & 0x1f) << 8);
+	int color = state->m_videoram[tile_index + 0x1000];
 	SET_TILE_INFO(0,code,color >> 3,0);
 }
 
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( mjkjidai )
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 
@@ -44,8 +44,8 @@ WRITE8_HANDLER( mjkjidai_videoram_w )
 {
 	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )
@@ -62,7 +62,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	flip_screen_set(space->machine(), data & 0x02);
 
 	/* bit 2 =display enable */
-	state->display_enable = data & 0x04;
+	state->m_display_enable = data & 0x04;
 
 	/* bit 5 = coin counter */
 	coin_counter_w(space->machine(), 0,data & 0x20);
@@ -90,9 +90,9 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-	UINT8 *spriteram = state->spriteram1;
-	UINT8 *spriteram_2 = state->spriteram2;
-	UINT8 *spriteram_3 = state->spriteram3;
+	UINT8 *spriteram = state->m_spriteram1;
+	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram_3 = state->m_spriteram3;
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)
@@ -132,11 +132,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( mjkjidai )
 {
 	mjkjidai_state *state = screen->machine().driver_data<mjkjidai_state>();
-	if (!state->display_enable)
+	if (!state->m_display_enable)
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 	else
 	{
-		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 		draw_sprites(screen->machine(), bitmap,cliprect);
 	}
 	return 0;

@@ -5,17 +5,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  scroll;
-	UINT8 *  scroll2;
-	UINT8 *  spriteram;
-	UINT8 *  spriteram2;
-	size_t   spriteram_size;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_scroll;
+	UINT8 *  m_scroll2;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_spriteram2;
+	size_t   m_spriteram_size;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
-	int		 sprites_gfx_banked;
+	tilemap_t  *m_bg_tilemap;
+	int		 m_sprites_gfx_banked;
 };
 
 /*----------- defined in video/hyperspt.c -----------*/

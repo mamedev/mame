@@ -19,56 +19,56 @@ Functions to emulate the video hardware of the machine.
 READ8_HANDLER ( exzisus_videoram_0_r )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->videoram0[offset];
+	return state->m_videoram0[offset];
 }
 
 
 READ8_HANDLER ( exzisus_videoram_1_r )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->videoram1[offset];
+	return state->m_videoram1[offset];
 }
 
 
 READ8_HANDLER ( exzisus_objectram_0_r )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->objectram0[offset];
+	return state->m_objectram0[offset];
 }
 
 
 READ8_HANDLER ( exzisus_objectram_1_r )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->objectram1[offset];
+	return state->m_objectram1[offset];
 }
 
 
 WRITE8_HANDLER( exzisus_videoram_0_w )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->videoram0[offset] = data;
+	state->m_videoram0[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_videoram_1_w )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->videoram1[offset] = data;
+	state->m_videoram1[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_objectram_0_w )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->objectram0[offset] = data;
+	state->m_objectram0[offset] = data;
 }
 
 
 WRITE8_HANDLER( exzisus_objectram_1_w )
 {
 	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->objectram1[offset] = data;
+	state->m_objectram1[offset] = data;
 }
 
 
@@ -88,25 +88,25 @@ SCREEN_UPDATE( exzisus )
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->objectram_size0 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram_size0 ; offs += 4)
     {
 		int height;
 
 		/* Skip empty sprites. */
-		if ( !(*(UINT32 *)(&state->objectram0[offs])) )
+		if ( !(*(UINT32 *)(&state->m_objectram0[offs])) )
 		{
 			continue;
 		}
 
-		gfx_num = state->objectram0[offs + 1];
-		gfx_attr = state->objectram0[offs + 3];
+		gfx_num = state->m_objectram0[offs + 1];
+		gfx_attr = state->m_objectram0[offs + 3];
 
 		if ((gfx_num & 0x80) == 0)	/* 16x16 sprites */
 		{
 			gfx_offs = ((gfx_num & 0x7f) << 3);
 			height = 2;
 
-			sx = state->objectram0[offs + 2];
+			sx = state->m_objectram0[offs + 2];
 			sx |= (gfx_attr & 0x40) << 2;
 		}
 		else	/* tilemaps (each sprite is a 16x256 column) */
@@ -120,12 +120,12 @@ SCREEN_UPDATE( exzisus )
 			}
 			else
 			{
-				sx = state->objectram0[offs + 2];
+				sx = state->m_objectram0[offs + 2];
 				sx |= (gfx_attr & 0x40) << 2;
 			}
 		}
 
-		sy = 256 - (height << 3) - (state->objectram0[offs]);
+		sy = 256 - (height << 3) - (state->m_objectram0[offs]);
 
 		for (xc = 0 ; xc < 2 ; xc++)
 		{
@@ -134,8 +134,8 @@ SCREEN_UPDATE( exzisus )
 			{
 				int code, color, x, y;
 
-				code  = (state->videoram0[goffs + 1] << 8) | state->videoram0[goffs];
-				color = (state->videoram0[goffs + 1] >> 6) | (gfx_attr & 0x0f);
+				code  = (state->m_videoram0[goffs + 1] << 8) | state->m_videoram0[goffs];
+				color = (state->m_videoram0[goffs + 1] >> 6) | (gfx_attr & 0x0f);
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
@@ -158,25 +158,25 @@ SCREEN_UPDATE( exzisus )
 
 	/* ---------- 2nd TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->objectram_size1 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram_size1 ; offs += 4)
     {
 		int height;
 
 		/* Skip empty sprites. */
-		if ( !(*(UINT32 *)(&state->objectram1[offs])) )
+		if ( !(*(UINT32 *)(&state->m_objectram1[offs])) )
 		{
 			continue;
 		}
 
-		gfx_num = state->objectram1[offs + 1];
-		gfx_attr = state->objectram1[offs + 3];
+		gfx_num = state->m_objectram1[offs + 1];
+		gfx_attr = state->m_objectram1[offs + 3];
 
 		if ((gfx_num & 0x80) == 0)	/* 16x16 sprites */
 		{
 			gfx_offs = ((gfx_num & 0x7f) << 3);
 			height = 2;
 
-			sx = state->objectram1[offs + 2];
+			sx = state->m_objectram1[offs + 2];
 			sx |= (gfx_attr & 0x40) << 2;
 		}
 		else	/* tilemaps (each sprite is a 16x256 column) */
@@ -190,11 +190,11 @@ SCREEN_UPDATE( exzisus )
 			}
 			else
 			{
-				sx = state->objectram1[offs + 2];
+				sx = state->m_objectram1[offs + 2];
 				sx |= (gfx_attr & 0x40) << 2;
 			}
 		}
-		sy = 256 - (height << 3) - (state->objectram1[offs]);
+		sy = 256 - (height << 3) - (state->m_objectram1[offs]);
 
 		for (xc = 0 ; xc < 2 ; xc++)
 		{
@@ -203,8 +203,8 @@ SCREEN_UPDATE( exzisus )
 			{
 				int code, color, x, y;
 
-				code  = (state->videoram1[goffs + 1] << 8) | state->videoram1[goffs];
-				color = (state->videoram1[goffs + 1] >> 6) | (gfx_attr & 0x0f);
+				code  = (state->m_videoram1[goffs + 1] << 8) | state->m_videoram1[goffs];
+				color = (state->m_videoram1[goffs + 1] >> 6) | (gfx_attr & 0x0f);
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 

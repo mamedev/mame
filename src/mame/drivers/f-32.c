@@ -22,11 +22,11 @@ class mosaicf2_state : public driver_device
 public:
 	mosaicf2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(*this, "maincpu") { }
+		  m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	required_device<e132xn_device>	maincpu;
-	UINT32 *  videoram;
+	required_device<e132xn_device>	m_maincpu;
+	UINT32 *  m_videoram;
 };
 
 
@@ -42,8 +42,8 @@ static SCREEN_UPDATE( mosaicf2 )
 
 		if ((x < 0xa0) && (y < 0xe0))
 		{
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (state->videoram[offs] >> 16) & 0x7fff;
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (state->videoram[offs] >>  0) & 0x7fff;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (state->m_videoram[offs] >> 16) & 0x7fff;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (state->m_videoram[offs] >>  0) & 0x7fff;
 		}
 	}
 
@@ -54,7 +54,7 @@ static SCREEN_UPDATE( mosaicf2 )
 
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE_MEMBER(mosaicf2_state, videoram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE_MEMBER(mosaicf2_state, m_videoram)
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -63,9 +63,9 @@ static READ32_HANDLER( f32_input_port_1_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	mosaicf2_state *state = space->machine().driver_data<mosaicf2_state>();
-	offs_t pc = state->maincpu->pc();
+	offs_t pc = state->m_maincpu->pc();
 	if ((pc == 0x000379de) || (pc == 0x000379cc) )
-		state->maincpu->eat_cycles(100);
+		state->m_maincpu->eat_cycles(100);
 	//else printf("PC %08x\n", pc );
 	return input_port_read(space->machine(), "SYSTEM_P2");
 }

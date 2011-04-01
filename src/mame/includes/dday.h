@@ -12,21 +12,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        bgvideoram;
-	UINT8 *        fgvideoram;
-	UINT8 *        textvideoram;
-	UINT8 *        colorram;
+	UINT8 *        m_bgvideoram;
+	UINT8 *        m_fgvideoram;
+	UINT8 *        m_textvideoram;
+	UINT8 *        m_colorram;
 
 	/* video-related */
-	tilemap_t        *fg_tilemap, *bg_tilemap, *text_tilemap, *sl_tilemap;
-	bitmap_t       *main_bitmap;
-	int            control;
-	int            sl_image;
-	int            sl_enable;
-	int            timer_value;
+	tilemap_t        *m_fg_tilemap;
+	tilemap_t        *m_bg_tilemap;
+	tilemap_t        *m_text_tilemap;
+	tilemap_t        *m_sl_tilemap;
+	bitmap_t       *m_main_bitmap;
+	int            m_control;
+	int            m_sl_image;
+	int            m_sl_enable;
+	int            m_timer_value;
 
 	/* devices */
-	device_t *ay1;
+	device_t *m_ay1;
 };
 
 

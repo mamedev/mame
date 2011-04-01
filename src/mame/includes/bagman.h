@@ -5,27 +5,27 @@ public:
 	bagman_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 ls259_buf[8];
-	UINT8 p1_res;
-	UINT8 p1_old_val;
-	UINT8 p2_res;
-	UINT8 p2_old_val;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *video_enable;
+	UINT8 m_ls259_buf[8];
+	UINT8 m_p1_res;
+	UINT8 m_p1_old_val;
+	UINT8 m_p2_res;
+	UINT8 m_p2_old_val;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_video_enable;
 
 	/*table holds outputs of all ANDs (after AND map)*/
-	UINT8 andmap[64];
+	UINT8 m_andmap[64];
 
 	/*table holds inputs (ie. not x, x, not q, q) to the AND map*/
-	UINT8 columnvalue[32];
+	UINT8 m_columnvalue[32];
 
 	/*8 output pins (actually 6 output and 2 input/output)*/
-	UINT8 outvalue[8];
+	UINT8 m_outvalue[8];
 
-	tilemap_t *bg_tilemap;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	tilemap_t *m_bg_tilemap;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

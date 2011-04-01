@@ -23,7 +23,7 @@
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
 #define I8035_T_R(M,N) ((soundlatch2_r(M,0) >> (N)) & 1)
-#define I8035_T_W_AH(M,N,D) do { state->portT = ACTIVEHIGH_PORT_BIT(state->portT,N,D); soundlatch2_w(M, 0, state->portT); } while (0)
+#define I8035_T_W_AH(M,N,D) do { state->m_portT = ACTIVEHIGH_PORT_BIT(state->m_portT,N,D); soundlatch2_w(M, 0, state->m_portT); } while (0)
 
 #define I8035_P1_R(M) (soundlatch3_r(M,0))
 #define I8035_P2_R(M) (soundlatch4_r(M,0))
@@ -401,8 +401,8 @@ static void set_ea(address_space *space, int ea)
 	mario_state	*state = space->machine().driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
-	if (state->eabank != NULL)
-		memory_set_bank(space->machine(), state->eabank, ea);
+	if (state->m_eabank != NULL)
+		memory_set_bank(space->machine(), state->m_eabank, ea);
 }
 
 /****************************************************************
@@ -421,17 +421,17 @@ static SOUND_START( mario )
 	SND[0x1001] = 0x01;
 #endif
 
-	state->eabank = NULL;
+	state->m_eabank = NULL;
 	if (audiocpu != NULL && audiocpu->type() != Z80)
 	{
-		state->eabank = "bank1";
+		state->m_eabank = "bank1";
 		audiocpu->memory().space(AS_PROGRAM)->install_read_bank(0x000, 0x7ff, "bank1");
 		memory_configure_bank(machine, "bank1", 0, 1, machine.region("audiocpu")->base(), 0);
 	    memory_configure_bank(machine, "bank1", 1, 1, machine.region("audiocpu")->base() + 0x1000, 0x800);
 	}
 
-    state->save_item(NAME(state->last));
-	state->save_item(NAME(state->portT));
+    state->save_item(NAME(state->m_last));
+	state->save_item(NAME(state->m_portT));
 }
 
 static SOUND_RESET( mario )
@@ -451,7 +451,7 @@ static SOUND_RESET( mario )
 	I8035_P1_W(space, 0x00); /* Input port */
 	I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 
-	state->last = 0;
+	state->m_last = 0;
 }
 
 /****************************************************************
@@ -517,13 +517,13 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 {
 	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->last == 1 && data == 0)
+	if (state->m_last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
 		cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);
 	}
 
-	state->last = data;
+	state->m_last = data;
 }
 
 WRITE8_HANDLER( mario_sh_tuneselect_w )

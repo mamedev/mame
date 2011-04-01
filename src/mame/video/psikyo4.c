@@ -54,13 +54,13 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	UINT32 *source = state->spriteram;
-	UINT16 *list = (UINT16 *)state->spriteram + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
+	UINT32 *source = state->m_spriteram;
+	UINT16 *list = (UINT16 *)state->m_spriteram + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen = (0xc00/2 - 0x04/2), listcntr = 0;
 	int flipscreen1, flipscreen2;
 
-	flipscreen1 = (((state->vidregs[1] >> 30) & 2) == 2) ? 1 : 0;
-	flipscreen2 = (((state->vidregs[1] >> 22) & 2) == 2) ? 1 : 0;
+	flipscreen1 = (((state->m_vidregs[1] >> 30) & 2) == 2) ? 1 : 0;
+	flipscreen2 = (((state->m_vidregs[1] >> 22) & 2) == 2) ? 1 : 0;
 
 	while (listcntr < listlen)
 	{

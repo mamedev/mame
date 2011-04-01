@@ -55,14 +55,14 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
-	if ( state->cur_dac_address != dac_address )
+	if ( state->m_cur_dac_address != dac_address )
 	{
-		state->cur_dac_address_index = 0;
-		state->cur_dac_address = dac_address;
+		state->m_cur_dac_address_index = 0;
+		state->m_cur_dac_address = dac_address;
 	}
 	else
 	{
-		state->cur_dac_address_index++;
+		state->m_cur_dac_address_index++;
 	}
 
 	if ( sel & 1 )
@@ -73,15 +73,15 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 	dac_address += 0x10000;
 
-	dac_data_w( device, rom[dac_address+state->cur_dac_address_index] );
+	dac_data_w( device, rom[dac_address+state->m_cur_dac_address_index] );
 
 	device->machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, m_videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, m_colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
@@ -182,8 +182,8 @@ ROM_END
 static DRIVER_INIT( trucocl )
 {
 	trucocl_state *state = machine.driver_data<trucocl_state>();
-	state->cur_dac_address = -1;
-	state->cur_dac_address_index = 0;
+	state->m_cur_dac_address = -1;
+	state->m_cur_dac_address_index = 0;
 }
 
 

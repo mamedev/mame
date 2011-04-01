@@ -11,15 +11,15 @@ WRITE8_HANDLER( nitedrvr_videoram_w )
 {
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( nitedrvr_hvc_w )
 {
 	nitedrvr_state *state = space->machine().driver_data<nitedrvr_state>();
 
-	state->hvc[offset & 0x3f] = data;
+	state->m_hvc[offset & 0x3f] = data;
 
 	if ((offset & 0x30) == 0x30)
 		watchdog_reset_w(space, 0, 0);
@@ -28,7 +28,7 @@ WRITE8_HANDLER( nitedrvr_hvc_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	int code = state->videoram[tile_index] & 0x3f;
+	int code = state->m_videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( nitedrvr )
 {
 	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_box( bitmap_t *bitmap, int bx, int by, int ex, int ey )
@@ -64,10 +64,10 @@ static void draw_roadway( running_machine &machine, bitmap_t *bitmap )
 	{
 		int bx, by, ex, ey;
 
-		bx = state->hvc[roadway];
-		by = state->hvc[roadway + 16];
-		ex = bx + ((state->hvc[roadway + 32] & 0xf0) >> 4);
-		ey = by + (16 - (state->hvc[roadway + 32] & 0x0f));
+		bx = state->m_hvc[roadway];
+		by = state->m_hvc[roadway + 16];
+		ex = bx + ((state->m_hvc[roadway + 32] & 0xf0) >> 4);
+		ey = by + (16 - (state->m_hvc[roadway + 32] & 0x0f));
 
 		draw_box(bitmap, bx, by, ex, ey);
 	}
@@ -77,7 +77,7 @@ SCREEN_UPDATE( nitedrvr )
 {
 	nitedrvr_state *state = screen->machine().driver_data<nitedrvr_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_roadway(screen->machine(), bitmap);
 	return 0;
 }

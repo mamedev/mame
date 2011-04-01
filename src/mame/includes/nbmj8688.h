@@ -4,28 +4,28 @@ public:
 	nbmj8688_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int mjsikaku_scrolly;
-	int blitter_destx;
-	int blitter_desty;
-	int blitter_sizex;
-	int blitter_sizey;
-	int blitter_direction_x;
-	int blitter_direction_y;
-	int blitter_src_addr;
-	int mjsikaku_gfxrom;
-	int mjsikaku_dispflag;
-	int mjsikaku_gfxflag2;
-	int mjsikaku_gfxflag3;
-	int mjsikaku_flipscreen;
-	int mjsikaku_screen_refresh;
-	int mjsikaku_gfxmode;
-	bitmap_t *mjsikaku_tmpbitmap;
-	UINT16 *mjsikaku_videoram;
-	UINT8 *clut;
-	UINT8 *HD61830B_ram[2];
-	int HD61830B_instr[2];
-	int HD61830B_addr[2];
-	int mjsikaku_flipscreen_old;
+	int m_mjsikaku_scrolly;
+	int m_blitter_destx;
+	int m_blitter_desty;
+	int m_blitter_sizex;
+	int m_blitter_sizey;
+	int m_blitter_direction_x;
+	int m_blitter_direction_y;
+	int m_blitter_src_addr;
+	int m_mjsikaku_gfxrom;
+	int m_mjsikaku_dispflag;
+	int m_mjsikaku_gfxflag2;
+	int m_mjsikaku_gfxflag3;
+	int m_mjsikaku_flipscreen;
+	int m_mjsikaku_screen_refresh;
+	int m_mjsikaku_gfxmode;
+	bitmap_t *m_mjsikaku_tmpbitmap;
+	UINT16 *m_mjsikaku_videoram;
+	UINT8 *m_clut;
+	UINT8 *m_HD61830B_ram[2];
+	int m_HD61830B_instr[2];
+	int m_HD61830B_addr[2];
+	int m_mjsikaku_flipscreen_old;
 };
 
 

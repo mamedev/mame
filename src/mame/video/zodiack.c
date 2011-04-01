@@ -13,34 +13,34 @@ WRITE8_HANDLER( zodiack_videoram_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( zodiack_videoram2_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 
-	state->videoram_2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram_2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( zodiack_attributes_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 
-	if ((offset & 1) && state->attributeram[offset] != data)
+	if ((offset & 1) && state->m_attributeram[offset] != data)
 	{
 		int i;
 
-		for (i = offset / 2; i < state->videoram_size; i += 32)
+		for (i = offset / 2; i < state->m_videoram_size; i += 32)
 		{
-			tilemap_mark_tile_dirty(state->bg_tilemap, i);
-			tilemap_mark_tile_dirty(state->fg_tilemap, i);
+			tilemap_mark_tile_dirty(state->m_bg_tilemap, i);
+			tilemap_mark_tile_dirty(state->m_fg_tilemap, i);
 		}
 	}
 
-	state->attributeram[offset] = data;
+	state->m_attributeram[offset] = data;
 }
 
 WRITE8_HANDLER( zodiack_flipscreen_w )
@@ -108,8 +108,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	int code = state->videoram_2[tile_index];
-	int color = (state->attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
+	int code = state->m_videoram_2[tile_index];
+	int color = (state->m_attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -118,8 +118,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	int code = state->videoram[tile_index];
-	int color = state->attributeram[2 * (tile_index % 32) + 1] & 0x07;
+	int code = state->m_videoram[tile_index];
+	int color = state->m_attributeram[2 * (tile_index % 32) + 1] & 0x07;
 
 	SET_TILE_INFO(3, code, color, 0);
 }
@@ -128,11 +128,11 @@ VIDEO_START( zodiack )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scroll_cols(state->fg_tilemap, 32);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scroll_cols(state->m_fg_tilemap, 32);
 
 	/* FIXME: flip_screen_x should not be written. */
 	flip_screen_set_no_update(machine, 0);
@@ -143,14 +143,14 @@ static void draw_bullets( running_machine &machine, bitmap_t *bitmap, const rect
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 	int offs;
 
-	for (offs = 0; offs < state->bulletsram_size; offs += 4)
+	for (offs = 0; offs < state->m_bulletsram_size; offs += 4)
 	{
 		int x, y;
 
-		x = state->bulletsram[offs + 3] + 7;
-		y = 255 - state->bulletsram[offs + 1];
+		x = state->m_bulletsram[offs + 3] + 7;
+		y = 255 - state->m_bulletsram[offs + 1];
 
-		if (flip_screen_get(machine) && state->percuss_hardware)
+		if (flip_screen_get(machine) && state->m_percuss_hardware)
 		{
 			y = 255 - y;
 		}
@@ -170,17 +170,17 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 	int offs;
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int flipx, flipy, sx, sy, spritecode;
 
-		sx = 240 - state->spriteram[offs + 3];
-		sy = 240 - state->spriteram[offs];
-		flipx = !(state->spriteram[offs + 1] & 0x40);
-		flipy = state->spriteram[offs + 1] & 0x80;
-		spritecode = state->spriteram[offs + 1] & 0x3f;
+		sx = 240 - state->m_spriteram[offs + 3];
+		sy = 240 - state->m_spriteram[offs];
+		flipx = !(state->m_spriteram[offs + 1] & 0x40);
+		flipy = state->m_spriteram[offs + 1] & 0x80;
+		spritecode = state->m_spriteram[offs + 1] & 0x3f;
 
-		if (flip_screen_get(machine) && state->percuss_hardware)
+		if (flip_screen_get(machine) && state->m_percuss_hardware)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -188,7 +188,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 			spritecode,
-			state->spriteram[offs + 2] & 0x07,
+			state->m_spriteram[offs + 2] & 0x07,
 			flipx, flipy,
 			sx, sy,
 			0);
@@ -201,10 +201,10 @@ SCREEN_UPDATE( zodiack )
 	int i;
 
 	for (i = 0; i < 32; i++)
-		tilemap_set_scrolly(state->fg_tilemap, i, state->attributeram[i * 2]);
+		tilemap_set_scrolly(state->m_fg_tilemap, i, state->m_attributeram[i * 2]);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	draw_bullets(screen->machine(), bitmap, cliprect);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;

@@ -212,16 +212,16 @@ static WRITE8_HANDLER( control2_w )
 	/* bit 7 is "SHD1" (ditto) */
 	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	state->cur_control2 = data;
+	state->m_cur_control2 = data;
 
-	input_port_write(space->machine(), "EEPROMOUT", state->cur_control2, 0xff);
+	input_port_write(space->machine(), "EEPROMOUT", state->m_cur_control2, 0xff);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
 	lethal_state *state = device->machine().driver_data<lethal_state>();
 
-	if (k056832_is_irq_enabled(state->k056832, 0))
+	if (k056832_is_irq_enabled(state->m_k056832, 0))
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 static WRITE8_HANDLER( sound_irq_w )
 {
 	lethal_state *state = space->machine().driver_data<lethal_state>();
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -244,7 +244,7 @@ static READ8_HANDLER( sound_status_r )
 static void sound_nmi( device_t *device )
 {
 	lethal_state *state = device->machine().driver_data<lethal_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )
@@ -256,7 +256,7 @@ static READ8_HANDLER( le_4800_r )
 {
 	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	if (state->cur_control2 & 0x10)	// RAM enable
+	if (state->m_cur_control2 & 0x10)	// RAM enable
 	{
 		return space->machine().generic.paletteram.u8[offset];
 	}
@@ -282,7 +282,7 @@ static READ8_HANDLER( le_4800_r )
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					return k053244_r(state->k053244, offset - 0x40);
+					return k053244_r(state->m_k053244, offset - 0x40);
 
 				case 0x80:
 				case 0x81:
@@ -316,22 +316,22 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return k054000_r(state->k054000, offset - 0x80);
+					return k054000_r(state->m_k054000, offset - 0x80);
 
 				case 0xca:
 					return sound_status_r(space, 0);
 			}
 		}
 		else if (offset < 0x1800)
-			return k053245_r(state->k053244, (offset - 0x0800) & 0x07ff);
+			return k053245_r(state->m_k053244, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return k056832_ram_code_lo_r(state->k056832, offset - 0x1800);
+			return k056832_ram_code_lo_r(state->m_k056832, offset - 0x1800);
 		else if (offset < 0x2800)
-			return k056832_ram_code_hi_r(state->k056832, offset - 0x2000);
+			return k056832_ram_code_hi_r(state->m_k056832, offset - 0x2000);
 		else if (offset < 0x3000)
-			return k056832_ram_attr_lo_r(state->k056832, offset - 0x2800);
+			return k056832_ram_attr_lo_r(state->m_k056832, offset - 0x2800);
 		else // (offset < 0x3800)
-			return k056832_ram_attr_hi_r(state->k056832, offset - 0x3000);
+			return k056832_ram_attr_hi_r(state->m_k056832, offset - 0x3000);
 	}
 
 	return 0;
@@ -341,7 +341,7 @@ static WRITE8_HANDLER( le_4800_w )
 {
 	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	if (state->cur_control2 & 0x10)	// RAM enable
+	if (state->m_cur_control2 & 0x10)	// RAM enable
 	{
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	}
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					k053244_w(state->k053244, offset - 0x40, data);
+					k053244_w(state->m_k053244, offset - 0x40, data);
 					break;
 
 				case 0x80:
@@ -410,7 +410,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					k054000_w(state->k054000, offset - 0x80, data);
+					k054000_w(state->m_k054000, offset - 0x80, data);
 					break;
 
 				default:
@@ -419,15 +419,15 @@ static WRITE8_HANDLER( le_4800_w )
 			}
 		}
 		else if (offset < 0x1800)
-			k053245_w(state->k053244, (offset - 0x0800) & 0x07ff, data);
+			k053245_w(state->m_k053244, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
-			k056832_ram_code_lo_w(state->k056832, offset - 0x1800, data);
+			k056832_ram_code_lo_w(state->m_k056832, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			k056832_ram_code_hi_w(state->k056832, offset - 0x2000, data);
+			k056832_ram_code_hi_w(state->m_k056832, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			k056832_ram_attr_lo_w(state->k056832, offset - 0x2800, data);
+			k056832_ram_attr_lo_w(state->m_k056832, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			k056832_ram_attr_hi_w(state->k056832, offset - 0x3000, data);
+			k056832_ram_attr_hi_w(state->m_k056832, offset - 0x3000, data);
 	}
 }
 
@@ -603,16 +603,16 @@ static MACHINE_START( lethalen )
 
 	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3800 + 0x02);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("soundcpu");
-	state->k054539 = machine.device("k054539");
-	state->k053244 = machine.device("k053244");
-	state->k056832 = machine.device("k056832");
-	state->k054000 = machine.device("k054000");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("soundcpu");
+	state->m_k054539 = machine.device("k054539");
+	state->m_k053244 = machine.device("k053244");
+	state->m_k056832 = machine.device("k056832");
+	state->m_k054000 = machine.device("k054000");
 
-	state->save_item(NAME(state->cur_control2));
-	state->save_item(NAME(state->sprite_colorbase));
-	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->m_cur_control2));
+	state->save_item(NAME(state->m_sprite_colorbase));
+	state->save_item(NAME(state->m_layer_colorbase));
 
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x3800 + 0x02);
 }
@@ -628,10 +628,10 @@ static MACHINE_RESET( lethalen )
 	machine.device("maincpu")->reset();
 
 	for (i = 0; i < 4; i++)
-		state->layer_colorbase[i] = 0;
+		state->m_layer_colorbase[i] = 0;
 
-	state->sprite_colorbase = 0;
-	state->cur_control2 = 0;
+	state->m_sprite_colorbase = 0;
+	state->m_cur_control2 = 0;
 }
 
 static const k056832_interface lethalen_k056832_intf =

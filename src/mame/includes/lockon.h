@@ -22,57 +22,57 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16	*char_ram;
-	UINT16	*hud_ram;
-	UINT16	*scene_ram;
-	UINT16	*ground_ram;
-	UINT16	*object_ram;
+	UINT16	*m_char_ram;
+	UINT16	*m_hud_ram;
+	UINT16	*m_scene_ram;
+	UINT16	*m_ground_ram;
+	UINT16	*m_object_ram;
 
-	size_t	hudram_size;
-	size_t	objectram_size;
-	size_t	groundram_size;
+	size_t	m_hudram_size;
+	size_t	m_objectram_size;
+	size_t	m_groundram_size;
 
 	/* video-related */
-	tilemap_t   *tilemap;
-	UINT8	      ground_ctrl;
-	UINT16      scroll_h;
-	UINT16      scroll_v;
-	bitmap_t    *front_buffer;
-	bitmap_t    *back_buffer;
-	emu_timer   *bufend_timer;
-	emu_timer   *cursor_timer;
+	tilemap_t   *m_tilemap;
+	UINT8	      m_ground_ctrl;
+	UINT16      m_scroll_h;
+	UINT16      m_scroll_v;
+	bitmap_t    *m_front_buffer;
+	bitmap_t    *m_back_buffer;
+	emu_timer   *m_bufend_timer;
+	emu_timer   *m_cursor_timer;
 
 	/* Rotation Control */
-	UINT16      xsal;
-	UINT16      x0ll;
-	UINT16      dx0ll;
-	UINT16      dxll;
-	UINT16      ysal;
-	UINT16      y0ll;
-	UINT16      dy0ll;
-	UINT16      dyll;
+	UINT16      m_xsal;
+	UINT16      m_x0ll;
+	UINT16      m_dx0ll;
+	UINT16      m_dxll;
+	UINT16      m_ysal;
+	UINT16      m_y0ll;
+	UINT16      m_dy0ll;
+	UINT16      m_dyll;
 
 	/* Object palette RAM control */
-	UINT32      iden;
-	UINT8	*     obj_pal_ram;
-	UINT32      obj_pal_latch;
-	UINT32      obj_pal_addr;
+	UINT32      m_iden;
+	UINT8	*     m_obj_pal_ram;
+	UINT32      m_obj_pal_latch;
+	UINT32      m_obj_pal_addr;
 
 	/* misc */
-	UINT8       ctrl_reg;
-	UINT32      main_inten;
+	UINT8       m_ctrl_reg;
+	UINT32      m_main_inten;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *ground;
-	device_t *object;
-	device_t *f2203_1l;
-	device_t *f2203_2l;
-	device_t *f2203_3l;
-	device_t *f2203_1r;
-	device_t *f2203_2r;
-	device_t *f2203_3r;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_ground;
+	device_t *m_object;
+	device_t *m_f2203_1l;
+	device_t *m_f2203_2l;
+	device_t *m_f2203_3l;
+	device_t *m_f2203_1r;
+	device_t *m_f2203_2r;
+	device_t *m_f2203_3r;
 };
 
 

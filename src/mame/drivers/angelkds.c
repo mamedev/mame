@@ -197,11 +197,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE_MEMBER(angelkds_state, bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE_MEMBER(angelkds_state, bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE_MEMBER(angelkds_state, txvideoram)
-	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE_MEMBER(angelkds_state, spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE_MEMBER(angelkds_state, paletteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE_MEMBER(angelkds_state, m_bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE_MEMBER(angelkds_state, m_bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE_MEMBER(angelkds_state, m_txvideoram)
+	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE_MEMBER(angelkds_state, m_spriteram)
+	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE_MEMBER(angelkds_state, m_paletteram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -490,32 +490,32 @@ sound related ?
 static WRITE8_HANDLER( angelkds_main_sound_w )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->sound[offset] = data;
+	state->m_sound[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_main_sound_r )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->sound2[offset];
+	return state->m_sound2[offset];
 }
 
 static WRITE8_HANDLER( angelkds_sub_sound_w )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->sound2[offset] = data;
+	state->m_sound2[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_sub_sound_r )
 {
 	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->sound[offset];
+	return state->m_sound[offset];
 }
 
 
 static void irqhandler( device_t *device, int irq )
 {
 	angelkds_state *state = device->machine().driver_data<angelkds_state>();
-	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -577,14 +577,14 @@ static MACHINE_START( angelkds )
 {
 	angelkds_state *state = machine.driver_data<angelkds_state>();
 
-	state->subcpu = machine.device("sub");
+	state->m_subcpu = machine.device("sub");
 
-	state->save_item(NAME(state->layer_ctrl));
-	state->save_item(NAME(state->txbank));
-	state->save_item(NAME(state->bgbotbank));
-	state->save_item(NAME(state->bgtopbank));
-	state->save_item(NAME(state->sound));
-	state->save_item(NAME(state->sound2));
+	state->save_item(NAME(state->m_layer_ctrl));
+	state->save_item(NAME(state->m_txbank));
+	state->save_item(NAME(state->m_bgbotbank));
+	state->save_item(NAME(state->m_bgtopbank));
+	state->save_item(NAME(state->m_sound));
+	state->save_item(NAME(state->m_sound2));
 }
 
 static MACHINE_RESET( angelkds )
@@ -594,14 +594,14 @@ static MACHINE_RESET( angelkds )
 
 	for (i = 0; i < 4; i++)
 	{
-		state->sound[i] = 0;
-		state->sound2[i] = 0;
+		state->m_sound[i] = 0;
+		state->m_sound2[i] = 0;
 	}
 
-	state->layer_ctrl = 0;
-	state->txbank = 0;
-	state->bgbotbank = 0;
-	state->bgtopbank = 0;
+	state->m_layer_ctrl = 0;
+	state->m_txbank = 0;
+	state->m_bgbotbank = 0;
+	state->m_bgtopbank = 0;
 }
 
 static MACHINE_CONFIG_START( angelkds, angelkds_state )

@@ -6,33 +6,39 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  bg1videoram;
-	UINT16 *  bg2videoram;
-	UINT16 *  rasterram;
-	UINT16 *  bitmapram;
-	UINT16 *  spriteram1;
-	UINT16 *  spriteram2;
-	UINT16 *  spriteram3;
-	UINT16 *  tx_tilemap_ram;
-//  UINT16 *  paletteram;   // currently this uses generic palette handling
-	size_t    spriteram1_size;
-	size_t    spriteram2_size;
-	size_t    spriteram3_size;
+	UINT16 *  m_bg1videoram;
+	UINT16 *  m_bg2videoram;
+	UINT16 *  m_rasterram;
+	UINT16 *  m_bitmapram;
+	UINT16 *  m_spriteram1;
+	UINT16 *  m_spriteram2;
+	UINT16 *  m_spriteram3;
+	UINT16 *  m_tx_tilemap_ram;
+//  UINT16 *  m_paletteram;   // currently this uses generic palette handling
+	size_t    m_spriteram1_size;
+	size_t    m_spriteram2_size;
+	size_t    m_spriteram3_size;
 
 	/* video-related */
-	tilemap_t   *bg1_tilemap, *bg2_tilemap;
-	UINT8     gfxbank[8];
-	UINT16    bank[4];
-	UINT16    bg1scrollx, bg1scrolly, bg2scrollx, bg2scrolly, wbbc97_bitmap_enable;
-	int       charpalettebank, spritepalettebank;
-	int       sprite_gfx;
-	int       spikes91_lookup;
+	tilemap_t   *m_bg1_tilemap;
+	tilemap_t   *m_bg2_tilemap;
+	UINT8     m_gfxbank[8];
+	UINT16    m_bank[4];
+	UINT16    m_bg1scrollx;
+	UINT16    m_bg1scrolly;
+	UINT16    m_bg2scrollx;
+	UINT16    m_bg2scrolly;
+	UINT16    m_wbbc97_bitmap_enable;
+	int       m_charpalettebank;
+	int       m_spritepalettebank;
+	int       m_sprite_gfx;
+	int       m_spikes91_lookup;
 
 	/* misc */
-	int       pending_command;
+	int       m_pending_command;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

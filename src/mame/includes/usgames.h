@@ -4,9 +4,9 @@ public:
 	usgames_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *charram;
-	tilemap_t *tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_charram;
+	tilemap_t *m_tilemap;
 };
 
 

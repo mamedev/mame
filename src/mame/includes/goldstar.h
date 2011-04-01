@@ -4,38 +4,38 @@ public:
 	goldstar_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int dataoffset;
+	int m_dataoffset;
 
-	UINT8 *atrram;
-	UINT8 *fg_atrram;
-	UINT8 *fg_vidram;
+	UINT8 *m_atrram;
+	UINT8 *m_fg_atrram;
+	UINT8 *m_fg_vidram;
 
-	UINT8 *reel1_scroll;
-	UINT8 *reel2_scroll;
-	UINT8 *reel3_scroll;
+	UINT8 *m_reel1_scroll;
+	UINT8 *m_reel2_scroll;
+	UINT8 *m_reel3_scroll;
 
-	UINT8 *reel1_ram;
-	UINT8 *reel2_ram;
-	UINT8 *reel3_ram;
+	UINT8 *m_reel1_ram;
+	UINT8 *m_reel2_ram;
+	UINT8 *m_reel3_ram;
 
 	/* reelx_attrram for unkch sets */
-	UINT8 *reel1_attrram;
-	UINT8 *reel2_attrram;
-	UINT8 *reel3_attrram;
-	UINT8 unkch_vidreg;
+	UINT8 *m_reel1_attrram;
+	UINT8 *m_reel2_attrram;
+	UINT8 *m_reel3_attrram;
+	UINT8 m_unkch_vidreg;
 
-	tilemap_t *reel1_tilemap;
-	tilemap_t *reel2_tilemap;
-	tilemap_t *reel3_tilemap;
+	tilemap_t *m_reel1_tilemap;
+	tilemap_t *m_reel2_tilemap;
+	tilemap_t *m_reel3_tilemap;
 
-	int bgcolor;
-	tilemap_t *fg_tilemap;
-	UINT8 cmaster_girl_num;
-	UINT8 cmaster_girl_pal;
-	UINT8 cm_enable_reg;
-	UINT8 cm_girl_scroll;
-	UINT8 lucky8_nmi_enable;
-	int tile_bank;
+	int m_bgcolor;
+	tilemap_t *m_fg_tilemap;
+	UINT8 m_cmaster_girl_num;
+	UINT8 m_cmaster_girl_pal;
+	UINT8 m_cm_enable_reg;
+	UINT8 m_cm_girl_scroll;
+	UINT8 m_lucky8_nmi_enable;
+	int m_tile_bank;
 
 };
 

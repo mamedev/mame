@@ -69,13 +69,13 @@ SCREEN_UPDATE( lazercmd )
 		sy *= VERT_CHR;
 
 		drawgfx_opaque(bitmap, cliprect,screen->machine().gfx[0],
-				state->videoram[i], video_inverted ? 1 : 0,
+				state->m_videoram[i], video_inverted ? 1 : 0,
 				0,0,
 				sx,sy);
 	}
 
-	x = state->marker_x - 1;             /* normal video lags marker by 1 pixel */
-	y = vert_scale(state->marker_y) - VERT_CHR; /* first line used as scratch pad */
+	x = state->m_marker_x - 1;             /* normal video lags marker by 1 pixel */
+	y = vert_scale(state->m_marker_y) - VERT_CHR; /* first line used as scratch pad */
 	plot_pattern(screen->machine(), bitmap, x, y);
 
 	return 0;

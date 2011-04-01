@@ -123,21 +123,21 @@ public:
 	tmaster_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int okibank;
-	UINT8 rtc_ram[8];
-	bitmap_t *bitmap[2][2];
-	UINT16 *regs;
-	UINT16 color;
-	UINT16 addr;
-	UINT32 gfx_offs;
-	UINT32 gfx_size;
-	int (*compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	UINT16 *galgames_ram;
-	UINT16 galgames_cart;
-	UINT32 palette_offset;
-	UINT8 palette_index;
-	UINT8 palette_data[3];
-	device_t *duart68681;
+	int m_okibank;
+	UINT8 m_rtc_ram[8];
+	bitmap_t *m_bitmap[2][2];
+	UINT16 *m_regs;
+	UINT16 m_color;
+	UINT16 m_addr;
+	UINT32 m_gfx_offs;
+	UINT32 m_gfx_size;
+	int (*m_compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
+	UINT16 *m_galgames_ram;
+	UINT16 m_galgames_cart;
+	UINT32 m_palette_offset;
+	UINT8 m_palette_index;
+	UINT8 m_palette_data[3];
+	device_t *m_duart68681;
 };
 
 
@@ -153,8 +153,8 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		// data & 0x0800?
-		state->okibank = ((data >> 8) & 3);
-		downcast<okim6295_device *>(device)->set_bank_base(state->okibank * 0x40000);
+		state->m_okibank = ((data >> 8) & 3);
+		downcast<okim6295_device *>(device)->set_bank_base(state->m_okibank * 0x40000);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -185,7 +185,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 static void microtouch_tx(running_machine &machine, UINT8 data)
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	duart68681_rx_data(state->duart68681, 0, data);
+	duart68681_rx_data(state->m_duart68681, 0, data);
 }
 
 
@@ -209,15 +209,15 @@ static READ16_HANDLER(rtc_r)
 	system_time systime;
 
 	space->machine().current_datetime(systime);
-	state->rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
-	state->rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
-	state->rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
-	state->rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
-	state->rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
-	state->rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
-	state->rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
+	state->m_rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
+	state->m_rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
+	state->m_rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
+	state->m_rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
+	state->m_rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
+	state->m_rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
+	state->m_rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
 
-	return state->rtc_ram[offset];
+	return state->m_rtc_ram[offset];
 }
 
 static WRITE16_HANDLER(rtc_w)
@@ -225,7 +225,7 @@ static WRITE16_HANDLER(rtc_w)
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if ( offset == 0 )
 	{
-		state->rtc_ram[0x0] = data & 0xff;
+		state->m_rtc_ram[0x0] = data & 0xff;
 	}
 }
 
@@ -296,19 +296,19 @@ static VIDEO_START( tmaster )
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			state->bitmap[layer][buffer] = machine.primary_screen->alloc_compatible_bitmap();
-			bitmap_fill(state->bitmap[layer][buffer], NULL, 0xff);
+			state->m_bitmap[layer][buffer] = machine.primary_screen->alloc_compatible_bitmap();
+			bitmap_fill(state->m_bitmap[layer][buffer], NULL, 0xff);
 		}
 	}
 
-	state->compute_addr = tmaster_compute_addr;
+	state->m_compute_addr = tmaster_compute_addr;
 }
 
 static VIDEO_START( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	VIDEO_START_CALL( tmaster );
-	state->compute_addr = galgames_compute_addr;
+	state->m_compute_addr = galgames_compute_addr;
 }
 
 static SCREEN_UPDATE( tmaster )
@@ -329,8 +329,8 @@ static SCREEN_UPDATE( tmaster )
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
-	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->bitmap[0][(state->regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->bitmap[1][(state->regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 1)	copybitmap_trans(bitmap, state->m_bitmap[0][(state->m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
+	if (layers_ctrl & 2)	copybitmap_trans(bitmap, state->m_bitmap[1][(state->m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }
@@ -338,13 +338,13 @@ static SCREEN_UPDATE( tmaster )
 static WRITE16_HANDLER( tmaster_color_w )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( &state->color );
+	COMBINE_DATA( &state->m_color );
 }
 
 static WRITE16_HANDLER( tmaster_addr_w )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( &state->addr );
+	COMBINE_DATA( &state->m_addr );
 }
 
 static void tmaster_draw(running_machine &machine)
@@ -352,32 +352,32 @@ static void tmaster_draw(running_machine &machine)
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	machine.region( "blitter" )->base() + state->gfx_offs;
+	UINT8 *gfxdata	=	machine.region( "blitter" )->base() + state->m_gfx_offs;
 
 	UINT16 pen;
 
 	bitmap_t *bitmap;
 
-	buffer	=	(state->regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
-	sw		=	 state->regs[0x04/2];
-	sx		=	 state->regs[0x06/2];
-	sh		=	 state->regs[0x08/2] + 1;
-	sy		=	 state->regs[0x0a/2];
-	addr	=	(*state->compute_addr)(
-				 state->regs[0x0c/2],
-				 state->regs[0x0e/2], state->addr);
-	mode	=	 state->regs[0x10/2];
+	buffer	=	(state->m_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
+	sw		=	 state->m_regs[0x04/2];
+	sx		=	 state->m_regs[0x06/2];
+	sh		=	 state->m_regs[0x08/2] + 1;
+	sy		=	 state->m_regs[0x0a/2];
+	addr	=	(*state->m_compute_addr)(
+				 state->m_regs[0x0c/2],
+				 state->m_regs[0x0e/2], state->m_addr);
+	mode	=	 state->m_regs[0x10/2];
 
 	layer	=	(mode >> 7) & 1;	// layer to draw to
 	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed
-	bitmap	=	state->bitmap[layer][buffer];
+	bitmap	=	state->m_bitmap[layer][buffer];
 
 	addr <<= 1;
 
 #ifdef MAME_DEBUG
 #if 0
 	logerror("%s: blit w %03x, h %02x, x %03x, y %02x, src %06x, fill/addr %04x, repl/color %04x, mode %02x\n", machine.describe_context(),
-			sw,sh,sx,sy, addr, state->addr, state->color, mode
+			sw,sh,sx,sy, addr, state->m_addr, state->m_color, mode
 	);
 #endif
 #endif
@@ -394,23 +394,23 @@ static void tmaster_draw(running_machine &machine)
 	sx = (sx & 0x7fff) - (sx & 0x8000);
 	sy = (sy & 0x7fff) - (sy & 0x8000);
 
-	color = (state->color & 0x0f) << 8;
+	color = (state->m_color & 0x0f) << 8;
 
 	switch (mode & 0x20)
 	{
 		case 0x00:							// blit with transparency
-			if (addr > state->gfx_size - sw*sh)
+			if (addr > state->m_gfx_size - sw*sh)
 			{
 				logerror("%s: blit error, addr %06x out of bounds\n", machine.describe_context(),addr);
-				addr = state->gfx_size - sw*sh;
+				addr = state->m_gfx_size - sw*sh;
 			}
 
 			if ( mode & 0x200 )
 			{
 				// copy from ROM, replacing occurrences of src pen with dst pen
 
-				UINT8 dst_pen = (state->color >> 8) & 0xff;
-				UINT8 src_pen = (state->color >> 0) & 0xff;
+				UINT8 dst_pen = (state->m_color >> 8) & 0xff;
+				UINT8 src_pen = (state->m_color >> 0) & 0xff;
 
 				for (y = y0; y != y1; y += dy)
 				{
@@ -444,7 +444,7 @@ static void tmaster_draw(running_machine &machine)
 			break;
 
 		case 0x20:							// solid fill
-			pen = ((state->addr >> 8) & 0xff) + color;
+			pen = ((state->m_addr >> 8) & 0xff) + color;
 
 			if ((pen & 0xff) == 0xff)
 				pen = 0xff;
@@ -465,7 +465,7 @@ static void tmaster_draw(running_machine &machine)
 static WRITE16_HANDLER( tmaster_blitter_w )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( state->regs + offset );
+	COMBINE_DATA( state->m_regs + offset );
 	switch (offset*2)
 	{
 		case 0x0e:
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16 )
 
 	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE( tmaster_addr_w )
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, regs )
+	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
 	AM_RANGE( 0x500010, 0x500011 ) AM_READ ( tmaster_blitter_r )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
@@ -567,7 +567,7 @@ static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALG
 static READ16_HANDLER( galgames_eeprom_r )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	device_t *eeprom = space->machine().device(galgames_eeprom_names[state->galgames_cart]);
+	device_t *eeprom = space->machine().device(galgames_eeprom_names[state->m_galgames_cart]);
 
 	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
 }
@@ -580,7 +580,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		device_t *eeprom = space->machine().device(galgames_eeprom_names[state->galgames_cart]);
+		device_t *eeprom = space->machine().device(galgames_eeprom_names[state->m_galgames_cart]);
 
 		// latch the bit
 		eeprom_write_bit(eeprom, data & 0x0001);
@@ -597,8 +597,8 @@ static WRITE16_HANDLER( galgames_palette_offset_w )
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->palette_offset = data & 0xff;
-		state->palette_index = 0;
+		state->m_palette_offset = data & 0xff;
+		state->m_palette_index = 0;
 	}
 }
 static WRITE16_HANDLER( galgames_palette_data_w )
@@ -606,14 +606,14 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->palette_data[state->palette_index] = data & 0xff;
-		if (++state->palette_index == 3)
+		state->m_palette_data[state->m_palette_index] = data & 0xff;
+		if (++state->m_palette_index == 3)
 		{
 			int palette_base;
 			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				palette_set_color(space->machine(), state->palette_offset + palette_base, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
-			state->palette_index = 0;
-			state->palette_offset++;
+				palette_set_color(space->machine(), state->m_palette_offset + palette_base, MAKE_RGB(state->m_palette_data[0], state->m_palette_data[1], state->m_palette_data[2]));
+			state->m_palette_index = 0;
+			state->m_palette_offset++;
 		}
 	}
 }
@@ -634,14 +634,14 @@ static WRITE16_HANDLER( galgames_okiram_w )
 static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	state->galgames_cart = cart;
+	state->m_galgames_cart = cart;
 
-	state->gfx_offs = 0x200000 * cart;
+	state->m_gfx_offs = 0x200000 * cart;
 
 	if (memory_get_bank(machine, GALGAMES_BANK_000000_R) == GALGAMES_RAM)
-		memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0 + state->galgames_cart);	// rom
+		memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 
-	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0 + state->galgames_cart);	// rom
+	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 }
 
 static WRITE16_HANDLER( galgames_cart_sel_w )
@@ -693,7 +693,7 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		if ((data & 0xf7) == 0x05)
 		{
 			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
-			galgames_update_rombank(space->machine(), state->galgames_cart);
+			galgames_update_rombank(space->machine(), state->m_galgames_cart);
 			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space->device()), data);
 		}
 		else
@@ -721,12 +721,12 @@ static READ16_HANDLER( dummy_read_01 )
 
 static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16 )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, galgames_ram )
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, m_galgames_ram )
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
 	AM_RANGE( 0x200000, 0x23ffff ) AM_READ_BANK(GALGAMES_BANK_200000_R) AM_WRITE_BANK(GALGAMES_BANK_200000_W)
 	AM_RANGE( 0x240000, 0x3fffff ) AM_READ_BANK(GALGAMES_BANK_240000_R)
 
-	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, regs )
+	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
 	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE( tmaster_addr_w )
 	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE( tmaster_color_w )
 	AM_RANGE( 0x400020, 0x400021 ) AM_READ ( tmaster_blitter_r )
@@ -870,10 +870,10 @@ static MACHINE_START( tmaster )
 static MACHINE_RESET( tmaster )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	state->gfx_offs = 0;
-	state->gfx_size = machine.region("blitter")->bytes();
+	state->m_gfx_offs = 0;
+	state->m_gfx_size = machine.region("blitter")->bytes();
 
-	state->duart68681 = machine.device( "duart68681" );
+	state->m_duart68681 = machine.device( "duart68681" );
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )
@@ -946,8 +946,8 @@ static INTERRUPT_GEN( galgames_interrupt )
 static MACHINE_RESET( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	state->gfx_offs = 0;
-	state->gfx_size = 0x200000;
+	state->m_gfx_offs = 0;
+	state->m_gfx_size = 0x200000;
 
 	memory_set_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
 	memory_set_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM);		// ram
@@ -1839,15 +1839,15 @@ static DRIVER_INIT( galgames )
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
 	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_RAM,  1, state->galgames_ram, 0x40000);
+	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
 	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM,  1, state->galgames_ram, 0x40000);
+	memory_configure_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM,  1, state->galgames_ram, 0x40000);
+	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
 	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM,  1, state->galgames_ram, 0x40000);
+	memory_configure_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
 
 	memory_configure_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0, 1, ROM+0x040000, 0x1c0000);
 

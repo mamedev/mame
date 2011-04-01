@@ -57,7 +57,7 @@ WRITE8_HANDLER( mouser_flip_screen_y_w )
 SCREEN_UPDATE( mouser )
 {
 	mouser_state *state = screen->machine().driver_data<mouser_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
@@ -91,8 +91,8 @@ SCREEN_UPDATE( mouser )
 		color_offs = offs % 32 + ((256 + 8 * (offs / 32) - spriteram[offs % 32] )% 256) / 8 * 32;
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],
-				state->videoram[offs] | (state->colorram[color_offs] >> 5) * 256 | ((state->colorram[color_offs] >> 4) & 1) * 512,
-				state->colorram[color_offs]%16,
+				state->m_videoram[offs] | (state->m_colorram[color_offs] >> 5) * 256 | ((state->m_colorram[color_offs] >> 4) & 1) * 512,
+				state->m_colorram[color_offs]%16,
 				flip_screen_x_get(screen->machine()),flip_screen_y_get(screen->machine()),
 				8*sx,scrolled_y_position);
 	}

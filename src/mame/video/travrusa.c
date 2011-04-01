@@ -198,14 +198,14 @@ PALETTE_INIT( shtrider )
 static TILE_GET_INFO( get_tile_info )
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
-	UINT8 attr = state->videoram[2 * tile_index + 1];
+	UINT8 attr = state->m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
 	tileinfo->group = ((attr & 0x0f) == 0x0f) ? 1 : 0;	/* tunnels */
 
 	SET_TILE_INFO(
 			0,
-			state->videoram[2 * tile_index] + ((attr & 0xc0) << 2),
+			state->m_videoram[2 * tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
 			flags);
 }
@@ -222,14 +222,14 @@ VIDEO_START( travrusa )
 {
 	travrusa_state *state = machine.driver_data<travrusa_state>();
 
-	state->save_item(NAME(state->scrollx));
+	state->save_item(NAME(state->m_scrollx));
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transmask(state->bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(state->bg_tilemap, 1, 0x3f, 0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x3f, 0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 4);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 4);
 }
 
 
@@ -243,8 +243,8 @@ VIDEO_START( travrusa )
 WRITE8_HANDLER( travrusa_videoram_w )
 {
 	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 
@@ -254,22 +254,22 @@ static void set_scroll( running_machine &machine )
 	int i;
 
 	for (i = 0; i <= 2; i++)
-		tilemap_set_scrollx(state->bg_tilemap, i, state->scrollx[0] + 256 * state->scrollx[1]);
+		tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_scrollx[0] + 256 * state->m_scrollx[1]);
 
-	tilemap_set_scrollx(state->bg_tilemap, 3, 0);
+	tilemap_set_scrollx(state->m_bg_tilemap, 3, 0);
 }
 
 WRITE8_HANDLER( travrusa_scroll_x_low_w )
 {
 	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->scrollx[0] = data;
+	state->m_scrollx[0] = data;
 	set_scroll(space->machine());
 }
 
 WRITE8_HANDLER( travrusa_scroll_x_high_w )
 {
 	travrusa_state *state = space->machine().driver_data<travrusa_state>();
-	state->scrollx[1] = data;
+	state->m_scrollx[1] = data;
 	set_scroll(space->machine());
 }
 
@@ -314,12 +314,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 		sect_rect(&clip, &spritevisiblearea);
 
 
-	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		int sx = ((state->spriteram[offs + 3] + 8) & 0xff) - 8;
-		int sy = 240 - state->spriteram[offs];
-		int code = state->spriteram[offs + 2];
-		int attr = state->spriteram[offs + 1];
+		int sx = ((state->m_spriteram[offs + 3] + 8) & 0xff) - 8;
+		int sy = 240 - state->m_spriteram[offs];
+		int code = state->m_spriteram[offs + 2];
+		int attr = state->m_spriteram[offs + 1];
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 
@@ -343,8 +343,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( travrusa )
 {
 	travrusa_state *state = screen->machine().driver_data<travrusa_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine(), bitmap,cliprect);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

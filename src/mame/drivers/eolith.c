@@ -92,8 +92,8 @@ static READ32_HANDLER( eolith_custom_r )
 static WRITE32_HANDLER( systemcontrol_w )
 {
 	eolith_state *state = space->machine().driver_data<eolith_state>();
-	state->buffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine(), 0, data & state->coin_counter_bit);
+	state->m_buffer = (data & 0x80) >> 7;
+	coin_counter_w(space->machine(), 0, data & state->m_coin_counter_bit);
 	set_led_status(space->machine(), 0, data & 1);
 
 	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
@@ -1111,7 +1111,7 @@ static DRIVER_INIT( eolith )
 static DRIVER_INIT( landbrk )
 {
 	eolith_state *state = machine.driver_data<eolith_state>();
-	state->coin_counter_bit = 0x1000;
+	state->m_coin_counter_bit = 0x1000;
 	init_eolith_speedup(machine);
 }
 
@@ -1124,7 +1124,7 @@ static DRIVER_INIT( landbrka )
 	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
-	state->coin_counter_bit = 0x2000;
+	state->m_coin_counter_bit = 0x2000;
 	init_eolith_speedup(machine);
 }
 

@@ -67,12 +67,12 @@ public:
 	cham24_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* nt_ram;
-	UINT8* nt_page[4];
-	UINT32 in_0;
-	UINT32 in_1;
-	UINT32 in_0_shift;
-	UINT32 in_1_shift;
+	UINT8* m_nt_ram;
+	UINT8* m_nt_page[4];
+	UINT32 m_in_0;
+	UINT32 m_in_1;
+	UINT32 m_in_0_shift;
+	UINT32 m_in_1_shift;
 };
 
 
@@ -83,29 +83,29 @@ static void cham24_set_mirroring( running_machine &machine, int mirroring )
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram;
+		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram;
 		break;
 	case PPU_MIRROR_HIGH:
-		state->nt_page[0] = state->nt_page[1] = state->nt_page[2] = state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram;
-		state->nt_page[2] = state->nt_ram + 0x400;
-		state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram;
+		state->m_nt_page[2] = state->m_nt_ram + 0x400;
+		state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram + 0x400;
-		state->nt_page[2] = state->nt_ram;
-		state->nt_page[3] = state->nt_ram + 0x400;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram + 0x400;
+		state->m_nt_page[2] = state->m_nt_ram;
+		state->m_nt_page[3] = state->m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		state->nt_page[0] = state->nt_ram;
-		state->nt_page[1] = state->nt_ram + 0x400;
-		state->nt_page[2] = state->nt_ram + 0x800;
-		state->nt_page[3] = state->nt_ram + 0xc00;
+		state->m_nt_page[0] = state->m_nt_ram;
+		state->m_nt_page[1] = state->m_nt_ram + 0x400;
+		state->m_nt_page[2] = state->m_nt_ram + 0x800;
+		state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 		break;
 	}
 }
@@ -114,14 +114,14 @@ static WRITE8_HANDLER( nt_w )
 {
 	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	state->nt_page[page][offset & 0x3ff] = data;
+	state->m_nt_page[page][offset & 0x3ff] = data;
 }
 
 static READ8_HANDLER( nt_r )
 {
 	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	return state->nt_page[page][offset & 0x3ff];
+	return state->m_nt_page[page][offset & 0x3ff];
 
 }
 
@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static READ8_HANDLER( cham24_IN0_r )
 {
 	cham24_state *state = space->machine().driver_data<cham24_state>();
-	return ((state->in_0 >> state->in_0_shift++) & 0x01) | 0x40;
+	return ((state->m_in_0 >> state->m_in_0_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( cham24_IN0_w )
@@ -166,18 +166,18 @@ static WRITE8_HANDLER( cham24_IN0_w )
 		return;
 	}
 
-	state->in_0_shift = 0;
-	state->in_1_shift = 0;
+	state->m_in_0_shift = 0;
+	state->m_in_1_shift = 0;
 
-	state->in_0 = input_port_read(space->machine(), "P1");
-	state->in_1 = input_port_read(space->machine(), "P2");
+	state->m_in_0 = input_port_read(space->machine(), "P1");
+	state->m_in_1 = input_port_read(space->machine(), "P2");
 
 }
 
 static READ8_HANDLER( cham24_IN1_r )
 {
 	cham24_state *state = space->machine().driver_data<cham24_state>();
-	return ((state->in_1 >> state->in_1_shift++) & 0x01) | 0x40;
+	return ((state->m_in_1 >> state->m_in_1_shift++) & 0x01) | 0x40;
 }
 
 static WRITE8_HANDLER( cham24_mapper_w )
@@ -308,11 +308,11 @@ static MACHINE_START( cham24 )
 	memory_set_bankptr(machine, "bank1", machine.region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
-	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->nt_page[0] = state->nt_ram;
-	state->nt_page[1] = state->nt_ram + 0x400;
-	state->nt_page[2] = state->nt_ram + 0x800;
-	state->nt_page[3] = state->nt_ram + 0xc00;
+	state->m_nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_nt_page[0] = state->m_nt_ram;
+	state->m_nt_page[1] = state->m_nt_ram + 0x400;
+	state->m_nt_page[2] = state->m_nt_ram + 0x800;
+	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
 	/* and read/write handlers */
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nt_r), FUNC(nt_w));

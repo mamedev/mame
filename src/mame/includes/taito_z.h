@@ -12,38 +12,38 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    spriteram;
+	UINT16 *    m_spriteram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
-	offs_t      spriteram_size;
+	offs_t      m_spriteram_size;
 
 	/* video-related */
-	int         sci_spriteframe;
-	int         road_palbank;
+	int         m_sci_spriteframe;
+	int         m_road_palbank;
 
 	/* misc */
-	int         chasehq_lamps;
-	INT32       banknum;
-	UINT16      cpua_ctrl;
-	INT32       sci_int6;
-	INT32       dblaxle_int6;
-	INT32       ioc220_port;
-	UINT16      eep_latch;
+	int         m_chasehq_lamps;
+	INT32       m_banknum;
+	UINT16      m_cpua_ctrl;
+	INT32       m_sci_int6;
+	INT32       m_dblaxle_int6;
+	INT32       m_ioc220_port;
+	UINT16      m_eep_latch;
 
 //  UINT8       pandata[4];
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
-	device_t *eeprom;
-	device_t *tc0480scp;
-	device_t *tc0150rod;
-	device_t *tc0100scn;
-	device_t *tc0220ioc;
-	device_t *tc0140syt;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
+	device_t *m_eeprom;
+	device_t *m_tc0480scp;
+	device_t *m_tc0150rod;
+	device_t *m_tc0100scn;
+	device_t *m_tc0220ioc;
+	device_t *m_tc0140syt;
 
 	/* dblaxle motor flag */
-	int	    dblaxle_vibration;
+	int	    m_dblaxle_vibration;
 };
 
 /*----------- defined in video/taito_z.c -----------*/

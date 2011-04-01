@@ -79,9 +79,9 @@ static TILE_GET_INFO( get_bg_tile_info )
         ---- --xx xxxx xxxx = Code
     */
 
-	int code = (state->videoram[tile_index * 2] | ((state->videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
+	int code = (state->m_videoram[tile_index * 2] | ((state->m_videoram[tile_index * 2 + 1]) << 8)) & 0x3ff;
 	int region = 1 + (code >> 7);
-	int colour = state->bgbasecolor + ((state->videoram[tile_index * 2 + 1] & 0x04) >> 2);
+	int colour = state->m_bgbasecolor + ((state->m_videoram[tile_index * 2 + 1] & 0x04) >> 2);
 
 	SET_TILE_INFO(region, code & 0x7f, colour,0);
 }
@@ -90,15 +90,15 @@ WRITE8_HANDLER( brkthru_bgram_w )
 {
 	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	brkthru_state *state = machine.driver_data<brkthru_state>();
-	UINT8 code = state->fg_videoram[tile_index];
+	UINT8 code = state->m_fg_videoram[tile_index];
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -106,19 +106,19 @@ WRITE8_HANDLER( brkthru_fgram_w )
 {
 	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
-	state->fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
+	state->m_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap,offset);
 }
 
 VIDEO_START( brkthru )
 {
 	brkthru_state *state = machine.driver_data<brkthru_state>();
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 }
 
 
@@ -127,30 +127,30 @@ WRITE8_HANDLER( brkthru_1800_w )
 	brkthru_state *state = space->machine().driver_data<brkthru_state>();
 
 	if (offset == 0)	/* low 8 bits of scroll */
-		state->bgscroll = (state->bgscroll & 0x100) | data;
+		state->m_bgscroll = (state->m_bgscroll & 0x100) | data;
 	else if (offset == 1)
 	{
 		/* bit 0-2 = ROM bank select */
 		memory_set_bank(space->machine(), "bank1", data & 0x07);
 
 		/* bit 3-5 = background tiles color code */
-		if (((data & 0x38) >> 2) != state->bgbasecolor)
+		if (((data & 0x38) >> 2) != state->m_bgbasecolor)
 		{
-			state->bgbasecolor = (data & 0x38) >> 2;
-			tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+			state->m_bgbasecolor = (data & 0x38) >> 2;
+			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 		}
 
 		/* bit 6 = screen flip */
-		if (state->flipscreen != (data & 0x40))
+		if (state->m_flipscreen != (data & 0x40))
 		{
-			state->flipscreen = data & 0x40;
-			tilemap_set_flip(state->bg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			tilemap_set_flip(state->fg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			state->m_flipscreen = data & 0x40;
+			tilemap_set_flip(state->m_bg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			tilemap_set_flip(state->m_fg_tilemap, state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		}
 
 		/* bit 7 = high bit of scroll */
-		state->bgscroll = (state->bgscroll & 0xff) | ((data & 0x80) << 1);
+		state->m_bgscroll = (state->m_bgscroll & 0xff) | ((data & 0x80) << 1);
 	}
 }
 
@@ -185,48 +185,48 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
         ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
     */
 
-	for (offs = 0;offs < state->spriteram_size; offs += 4)
+	for (offs = 0;offs < state->m_spriteram_size; offs += 4)
 	{
-		if ((state->spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
+		if ((state->m_spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
 		{
 			int sx, sy, code, color;
 
-			sx = 240 - state->spriteram[offs + 3];
+			sx = 240 - state->m_spriteram[offs + 3];
 			if (sx < -7)
 				sx += 256;
 
-			sy = 240 - state->spriteram[offs + 2];
-			code = state->spriteram[offs + 1] + 128 * (state->spriteram[offs] & 0x06);
-			color = (state->spriteram[offs] & 0xe0) >> 5;
-			if (state->flipscreen)
+			sy = 240 - state->m_spriteram[offs + 2];
+			code = state->m_spriteram[offs + 1] + 128 * (state->m_spriteram[offs] & 0x06);
+			color = (state->m_spriteram[offs] & 0xe0) >> 5;
+			if (state->m_flipscreen)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
 			}
 
-			if (state->spriteram[offs] & 0x10)	/* double height */
+			if (state->m_spriteram[offs] & 0x10)	/* double height */
 			{
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code & ~1,
 						color,
-						state->flipscreen, state->flipscreen,
-						sx, state->flipscreen ? sy + 16 : sy - 16,0);
+						state->m_flipscreen, state->m_flipscreen,
+						sx, state->m_flipscreen ? sy + 16 : sy - 16,0);
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code | 1,
 						color,
-						state->flipscreen, state->flipscreen,
+						state->m_flipscreen, state->m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code & ~1,
 						color,
-						state->flipscreen, state->flipscreen,
-						sx,(state->flipscreen ? sy + 16 : sy - 16) + 256,0);
+						state->m_flipscreen, state->m_flipscreen,
+						sx,(state->m_flipscreen ? sy + 16 : sy - 16) + 256,0);
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code | 1,
 						color,
-						state->flipscreen, state->flipscreen,
+						state->m_flipscreen, state->m_flipscreen,
 						sx,sy + 256,0);
 
 			}
@@ -235,14 +235,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code,
 						color,
-						state->flipscreen, state->flipscreen,
+						state->m_flipscreen, state->m_flipscreen,
 						sx,sy,0);
 
 				/* redraw with wraparound */
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[9],
 						code,
 						color,
-						state->flipscreen, state->flipscreen,
+						state->m_flipscreen, state->m_flipscreen,
 						sx,sy + 256,0);
 
 			}
@@ -254,22 +254,22 @@ SCREEN_UPDATE( brkthru )
 {
 	brkthru_state *state = screen->machine().driver_data<brkthru_state>();
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, state->bgscroll);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_bgscroll);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* low priority sprites */
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x01);
 
 	/* draw background over low priority sprites */
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	/* high priority sprites */
 	draw_sprites(screen->machine(), bitmap, cliprect, 0x09);
 
 	/* fg layer */
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
-/*  show_register(bitmap, 8, 8, (UINT32)state->flipscreen); */
+/*  show_register(bitmap, 8, 8, (UINT32)state->m_flipscreen); */
 
 	return 0;
 }

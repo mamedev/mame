@@ -4,27 +4,28 @@ public:
 	zodiack_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *   videoram;
-	UINT8 *   attributeram;
-	UINT8 *   spriteram;
-	UINT8 *   videoram_2;
-	UINT8 *   bulletsram;
-	size_t    videoram_size;
-	size_t    spriteram_size;
-	size_t    bulletsram_size;
+	UINT8 *   m_videoram;
+	UINT8 *   m_attributeram;
+	UINT8 *   m_spriteram;
+	UINT8 *   m_videoram_2;
+	UINT8 *   m_bulletsram;
+	size_t    m_videoram_size;
+	size_t    m_spriteram_size;
+	size_t    m_bulletsram_size;
 
 	/* video-related */
-	tilemap_t   *bg_tilemap, *fg_tilemap;
+	tilemap_t   *m_bg_tilemap;
+	tilemap_t   *m_fg_tilemap;
 
 	/* sound-related */
-	UINT8     sound_nmi_enabled;
+	UINT8     m_sound_nmi_enabled;
 
 	/* misc */
-	int       percuss_hardware;
+	int       m_percuss_hardware;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/zodiack.c -----------*/

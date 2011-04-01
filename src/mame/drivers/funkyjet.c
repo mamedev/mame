@@ -104,15 +104,15 @@ static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(funkyjet_state, spriteram, spriteram_size)
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(funkyjet_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(deco16_146_funkyjet_prot_r, deco16_146_funkyjet_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x184000, 0x184001) AM_WRITENOP
 	AM_RANGE(0x188000, 0x188001) AM_WRITENOP
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, pf1_rowscroll)
-	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, pf2_rowscroll)
+	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, m_pf1_rowscroll)
+	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_BASE_MEMBER(funkyjet_state, m_pf2_rowscroll)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -278,7 +278,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	funkyjet_state *driver_state = device->machine().driver_data<funkyjet_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -301,9 +301,9 @@ static MACHINE_START( funkyjet )
 {
 	funkyjet_state *state = machine.driver_data<funkyjet_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( funkyjet, funkyjet_state )

@@ -4,15 +4,15 @@ public:
 	bloodbro_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *bgvideoram;
-	UINT16 *fgvideoram;
-	UINT16 *txvideoram;
-	UINT16 *scroll;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *tx_tilemap;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_bgvideoram;
+	UINT16 *m_fgvideoram;
+	UINT16 *m_txvideoram;
+	UINT16 *m_scroll;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

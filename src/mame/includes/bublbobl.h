@@ -6,38 +6,55 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  mcu_sharedram;
-	UINT8 *  videoram;
-	UINT8 *  objectram;
+	UINT8 *  m_mcu_sharedram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_objectram;
 //  UINT8 *  paletteram;    // currently this uses generic palette handling
-	size_t   videoram_size;
-	size_t   objectram_size;
+	size_t   m_videoram_size;
+	size_t   m_objectram_size;
 
 	/* video-related */
-	int      video_enable;
+	int      m_video_enable;
 
 	/* sound-related */
-	int      sound_nmi_enable, pending_nmi, sound_status;
+	int      m_sound_nmi_enable;
+	int		 m_pending_nmi;
+	int		 m_sound_status;
 
 	/* mcu-related */
 	/* Tokio*/
-	int      tokio_prot_count;
+	int      m_tokio_prot_count;
 	/* Bubble Bobble MCU */
-	UINT8    ddr1, ddr2, ddr3, ddr4;
-	UINT8    port1_in, port2_in, port3_in, port4_in;
-	UINT8    port1_out, port2_out, port3_out, port4_out;
+	UINT8    m_ddr1;
+	UINT8	 m_ddr2;
+	UINT8	 m_ddr3;
+	UINT8	 m_ddr4;
+	UINT8    m_port1_in;
+	UINT8	 m_port2_in;
+	UINT8	 m_port3_in;
+	UINT8	 m_port4_in;
+	UINT8    m_port1_out;
+	UINT8	 m_port2_out;
+	UINT8    m_port3_out;
+	UINT8    m_port4_out;
 	/* Bubble Bobble 68705 */
-	UINT8    port_a_in, port_a_out, ddr_a;
-	UINT8    port_b_in, port_b_out, ddr_b;
-	int      address, latch;
+	UINT8    m_port_a_in;
+	UINT8    m_port_a_out;
+	UINT8    m_ddr_a;
+	UINT8    m_port_b_in;
+	UINT8    m_port_b_out;
+	UINT8    m_ddr_b;
+	int      m_address;
+	int      m_latch;
 	/* Bobble Bobble */
-	int      ic43_a, ic43_b;
+	int      m_ic43_a;
+	int      m_ic43_b;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *mcu;
-	device_t *audiocpu;
-	device_t *slave;
+	device_t *m_maincpu;
+	device_t *m_mcu;
+	device_t *m_audiocpu;
+	device_t *m_slave;
 };
 
 

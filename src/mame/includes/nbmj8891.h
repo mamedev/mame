@@ -4,30 +4,30 @@ public:
 	nbmj8891_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int scrolly;
-	int blitter_destx;
-	int blitter_desty;
-	int blitter_sizex;
-	int blitter_sizey;
-	int blitter_src_addr;
-	int blitter_direction_x;
-	int blitter_direction_y;
-	int vram;
-	int gfxrom;
-	int dispflag;
-	int flipscreen;
-	int clutsel;
-	int screen_refresh;
-	int gfxdraw_mode;
-	bitmap_t *tmpbitmap0;
-	bitmap_t *tmpbitmap1;
-	UINT8 *videoram0;
-	UINT8 *videoram1;
-	UINT8 *palette;
-	UINT8 *clut;
-	int param_old[0x10];
-	int param_cnt;
-	int flipscreen_old;
+	int m_scrolly;
+	int m_blitter_destx;
+	int m_blitter_desty;
+	int m_blitter_sizex;
+	int m_blitter_sizey;
+	int m_blitter_src_addr;
+	int m_blitter_direction_x;
+	int m_blitter_direction_y;
+	int m_vram;
+	int m_gfxrom;
+	int m_dispflag;
+	int m_flipscreen;
+	int m_clutsel;
+	int m_screen_refresh;
+	int m_gfxdraw_mode;
+	bitmap_t *m_tmpbitmap0;
+	bitmap_t *m_tmpbitmap1;
+	UINT8 *m_videoram0;
+	UINT8 *m_videoram1;
+	UINT8 *m_palette;
+	UINT8 *m_clut;
+	int m_param_old[0x10];
+	int m_param_cnt;
+	int m_flipscreen_old;
 };
 
 

@@ -16,12 +16,12 @@ Video hardware
 WRITE8_HANDLER( drmicro_videoram_w )
 {
 	drmicro_state *state = space->machine().driver_data<drmicro_state>();
-	state->videoram[offset] = data;
+	state->m_videoram[offset] = data;
 
 	if (offset < 0x800)
-		tilemap_mark_tile_dirty(state->bg2, (offset & 0x3ff));
+		tilemap_mark_tile_dirty(state->m_bg2, (offset & 0x3ff));
 	else
-		tilemap_mark_tile_dirty(state->bg1, (offset & 0x3ff));
+		tilemap_mark_tile_dirty(state->m_bg1, (offset & 0x3ff));
 }
 
 
@@ -32,8 +32,8 @@ static TILE_GET_INFO( get_bg1_tile_info )
 	drmicro_state *state = machine.driver_data<drmicro_state>();
 	int code, col, flags;
 
-	code = state->videoram[tile_index + 0x0800];
-	col = state->videoram[tile_index + 0x0c00];
+	code = state->m_videoram[tile_index + 0x0800];
+	col = state->m_videoram[tile_index + 0x0c00];
 
 	code += (col & 0xc0) << 2;
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
@@ -47,8 +47,8 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	drmicro_state *state = machine.driver_data<drmicro_state>();
 	int code, col, flags;
 
-	code = state->videoram[tile_index + 0x0000];
-	col = state->videoram[tile_index + 0x0400];
+	code = state->m_videoram[tile_index + 0x0000];
+	col = state->m_videoram[tile_index + 0x0400];
 
 	code += (col & 0xc0) << 2;
 	flags = ((col & 0x20) ? TILEMAP_FLIPY : 0) | ((col & 0x10) ? TILEMAP_FLIPX : 0);
@@ -107,13 +107,13 @@ VIDEO_START( drmicro)
 {
 	drmicro_state *state = machine.driver_data<drmicro_state>();
 
-	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
-	state->save_pointer(NAME(state->videoram), 0x1000);
+	state->m_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->save_pointer(NAME(state->m_videoram), 0x1000);
 
-	state->bg1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->bg2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg2, 0);
+	tilemap_set_transparent_pen(state->m_bg2, 0);
 }
 
 SCREEN_UPDATE( drmicro )
@@ -123,8 +123,8 @@ SCREEN_UPDATE( drmicro )
 	int chr, col, attr;
 	int x, y, fx, fy;
 
-	tilemap_draw(bitmap, cliprect, state->bg1, 0, 0);
-	tilemap_draw(bitmap, cliprect, state->bg2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg1, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg2, 0, 0);
 
 	/* draw sprites */
 	for (g = 0; g < 2; g++)
@@ -133,19 +133,19 @@ SCREEN_UPDATE( drmicro )
 
 		for (offs = 0x00; offs < 0x20; offs += 4)
 		{
-			x = state->videoram[offs + adr + 3];
-			y = state->videoram[offs + adr + 0];
-			attr = state->videoram[offs + adr + 2];
-			chr = state->videoram[offs + adr + 1];
+			x = state->m_videoram[offs + adr + 3];
+			y = state->m_videoram[offs + adr + 0];
+			attr = state->m_videoram[offs + adr + 2];
+			chr = state->m_videoram[offs + adr + 1];
 
-			fx = (chr & 0x01) ^ state->flipscreen;
-			fy = ((chr & 0x02) >> 1) ^ state->flipscreen;
+			fx = (chr & 0x01) ^ state->m_flipscreen;
+			fy = ((chr & 0x02) >> 1) ^ state->m_flipscreen;
 
 			chr = (chr >> 2) | (attr & 0xc0);
 
 			col = (attr & 0x0f) + 0x00;
 
-			if (!state->flipscreen)
+			if (!state->m_flipscreen)
 				y = (240 - y) & 0xff;
 			else
 				x = (240 - x) & 0xff;

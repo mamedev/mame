@@ -17,32 +17,32 @@ public:
 	lordgun_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 old;
-	UINT8 aliencha_dip_sel;
-	UINT16 *priority_ram;
-	UINT16 priority;
-	UINT16 *vram_0;
-	UINT16 *scroll_x_0;
-	UINT16 *scroll_y_0;
-	UINT16 *vram_1;
-	UINT16 *scroll_x_1;
-	UINT16 *scroll_y_1;
-	UINT16 *vram_2;
-	UINT16 *scroll_x_2;
-	UINT16 *scroll_y_2;
-	UINT16 *vram_3;
-	UINT16 *scroll_x_3;
-	UINT16 *scroll_y_3;
-	UINT16 *scrollram;
-	int whitescreen;
-	lordgun_gun_data gun[2];
-	tilemap_t *tilemap_0;
-	tilemap_t *tilemap_1;
-	tilemap_t *tilemap_2;
-	tilemap_t *tilemap_3;
-	bitmap_t *bitmaps[5];
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT8 m_old;
+	UINT8 m_aliencha_dip_sel;
+	UINT16 *m_priority_ram;
+	UINT16 m_priority;
+	UINT16 *m_vram_0;
+	UINT16 *m_scroll_x_0;
+	UINT16 *m_scroll_y_0;
+	UINT16 *m_vram_1;
+	UINT16 *m_scroll_x_1;
+	UINT16 *m_scroll_y_1;
+	UINT16 *m_vram_2;
+	UINT16 *m_scroll_x_2;
+	UINT16 *m_scroll_y_2;
+	UINT16 *m_vram_3;
+	UINT16 *m_scroll_x_3;
+	UINT16 *m_scroll_y_3;
+	UINT16 *m_scrollram;
+	int m_whitescreen;
+	lordgun_gun_data m_gun[2];
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;
+	tilemap_t *m_tilemap_2;
+	tilemap_t *m_tilemap_3;
+	bitmap_t *m_bitmaps[5];
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

@@ -4,14 +4,14 @@ public:
 	shaolins_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	size_t spriteram_size;
-	UINT8 *spriteram;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	int palettebank;
+	size_t m_spriteram_size;
+	UINT8 *m_spriteram;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	int m_palettebank;
 
-	tilemap_t *bg_tilemap;
-	UINT8 nmi_enable;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_nmi_enable;
 };
 
 

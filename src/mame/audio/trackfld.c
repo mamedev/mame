@@ -13,12 +13,12 @@ typedef struct _trackfld_audio_state trackfld_audio_state;
 struct _trackfld_audio_state
 {
 	/* sound-related */
-	int      SN76496_latch;
-	int      last_addr;
-	int      last_irq;
+	int      m_SN76496_latch;
+	int      m_last_addr;
+	int      m_last_irq;
 
-	cpu_device *audiocpu;
-	device_t *vlm;
+	cpu_device *m_audiocpu;
+	device_t *m_vlm;
 };
 
 
@@ -42,22 +42,22 @@ static DEVICE_START( trackfld_audio )
 {
 	trackfld_audio_state *state = get_safe_token(device);
 
-	state->audiocpu = device->machine().device<cpu_device>("audiocpu");
-	state->vlm = device->machine().device("vlm");
+	state->m_audiocpu = device->machine().device<cpu_device>("audiocpu");
+	state->m_vlm = device->machine().device("vlm");
 
 	/* sound */
-	device->save_item(NAME(state->SN76496_latch));
-	device->save_item(NAME(state->last_addr));
-	device->save_item(NAME(state->last_irq));
+	device->save_item(NAME(state->m_SN76496_latch));
+	device->save_item(NAME(state->m_last_addr));
+	device->save_item(NAME(state->m_last_irq));
 }
 
 static DEVICE_RESET( trackfld_audio )
 {
 	trackfld_audio_state *state = get_safe_token(device);
 
-	state->SN76496_latch = 0;
-	state->last_addr = 0;
-	state->last_irq = 0;
+	state->m_SN76496_latch = 0;
+	state->m_last_addr = 0;
+	state->m_last_irq = 0;
 }
 
 
@@ -89,7 +89,7 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
 	device_t *audio = device->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	int changes = offset ^ state->last_addr;
+	int changes = offset ^ state->m_last_addr;
 
 	/* A7 = data enable for VLM5030 (don't care )          */
 	/* A8 = STA pin (1->0 data data  , 0->1 start speech   */
@@ -103,17 +103,17 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 	if (changes & 0x200)
 		vlm5030_rst(device, offset & 0x200);
 
-	state->last_addr = offset;
+	state->m_last_addr = offset;
 }
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
 	device_t *audio = space->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
+	UINT32 clock = state->m_audiocpu->total_cycles() / TIMER_RATE;
 
-	if (state->vlm != NULL)
-		return (clock & 0x3) | (vlm5030_bsy(state->vlm) ? 0x04 : 0);
+	if (state->m_vlm != NULL)
+		return (clock & 0x3) | (vlm5030_bsy(state->m_vlm) ? 0x04 : 0);
 	else
 		return (clock & 0x3);
 }
@@ -122,7 +122,7 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
 	device_t *audio = device->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	int changes = offset ^ state->last_addr;
+	int changes = offset ^ state->m_last_addr;
 
 	/* A3 = data enable for VLM5030 (don't care )          */
 	/* A4 = STA pin (1->0 data data  , 0->1 start speech   */
@@ -139,7 +139,7 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 	if( changes & 0x20 )
 		vlm5030_rst(device, offset & 0x20);
 
-	state->last_addr = offset;
+	state->m_last_addr = offset;
 }
 
 
@@ -148,13 +148,13 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
 {
 	device_t *audio = space->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	if (state->last_irq == 0 && data)
+	if (state->m_last_irq == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 
-	state->last_irq = data;
+	state->m_last_irq = data;
 }
 
 
@@ -162,7 +162,7 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 {
 	device_t *audio = space->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	state->SN76496_latch = data;
+	state->m_SN76496_latch = data;
 }
 
 
@@ -170,7 +170,7 @@ WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
 	device_t *audio = device->machine().device("trackfld_audio");
 	trackfld_audio_state *state = get_safe_token(audio);
-	sn76496_w(device, offset, state->SN76496_latch);
+	sn76496_w(device, offset, state->m_SN76496_latch);
 }
 
 /*****************************************************************************

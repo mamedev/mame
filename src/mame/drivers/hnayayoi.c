@@ -49,7 +49,7 @@ static READ8_HANDLER( keyboard_0_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (~state->keyb & (1 << i))
+		if (~state->m_keyb & (1 << i))
 			res &= input_port_read(space->machine(), keynames[i]);
 	}
 
@@ -65,7 +65,7 @@ static READ8_HANDLER( keyboard_1_r )
 static WRITE8_HANDLER( keyboard_w )
 {
 	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
-	state->keyb = data;
+	state->m_keyb = data;
 }
 
 
@@ -532,11 +532,11 @@ static MACHINE_START( hnayayoi )
 {
 	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 
-	state->save_item(NAME(state->palbank));
-	state->save_item(NAME(state->blit_layer));
-	state->save_item(NAME(state->blit_dest));
-	state->save_item(NAME(state->blit_src));
-	state->save_item(NAME(state->keyb));
+	state->save_item(NAME(state->m_palbank));
+	state->save_item(NAME(state->m_blit_layer));
+	state->save_item(NAME(state->m_blit_dest));
+	state->save_item(NAME(state->m_blit_src));
+	state->save_item(NAME(state->m_keyb));
 }
 
 static MACHINE_RESET( hnayayoi )
@@ -546,11 +546,11 @@ static MACHINE_RESET( hnayayoi )
 	/* start with the MSM5205 reset */
 	msm5205_reset_w(machine.device("msm"), 1);
 
-	state->palbank = 0;
-	state->blit_layer = 0;
-	state->blit_dest = 0;
-	state->blit_src = 0;
-	state->keyb = 0;
+	state->m_palbank = 0;
+	state->m_blit_layer = 0;
+	state->m_blit_dest = 0;
+	state->m_blit_src = 0;
+	state->m_keyb = 0;
 }
 
 

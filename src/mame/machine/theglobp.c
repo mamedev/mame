@@ -213,21 +213,21 @@ READ8_HANDLER( theglobp_decrypt_rom )
 	pacman_state *state = space->machine().driver_data<pacman_state>();
 	if (offset & 0x01)
 	{
-		state->counter = (state->counter - 1) & 0x0F;
+		state->m_counter = (state->m_counter - 1) & 0x0F;
 	}
 	else
 	{
-		state->counter = (state->counter + 1) & 0x0F;
+		state->m_counter = (state->m_counter + 1) & 0x0F;
 	}
 
-	switch(state->counter)
+	switch(state->m_counter)
 	{
 		case 0x08:	memory_set_bank (space->machine(), "bank1", 0);		break;
 		case 0x09:	memory_set_bank (space->machine(), "bank1", 1);		break;
 		case 0x0A:	memory_set_bank (space->machine(), "bank1", 2);		break;
 		case 0x0B:	memory_set_bank (space->machine(), "bank1", 3);		break;
 		default:
-			logerror("Invalid counter = %02X\n",state->counter);
+			logerror("Invalid counter = %02X\n",state->m_counter);
 			break;
 	}
 
@@ -250,7 +250,7 @@ MACHINE_START( theglobp )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
 
-	state_save_register_global(machine, state->counter);
+	state_save_register_global(machine, state->m_counter);
 }
 
 
@@ -258,6 +258,6 @@ MACHINE_RESET( theglobp )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
 	/* The initial state of the counter is 0x0A */
-	state->counter = 0x0A;
+	state->m_counter = 0x0A;
 	memory_set_bank(machine, "bank1", 2);
 }

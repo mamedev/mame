@@ -26,7 +26,7 @@ static INTERRUPT_GEN( k88games_interrupt )
 {
 	_88games_state *state = device->machine().driver_data<_88games_state>();
 
-	if (k052109_is_irq_enabled(state->k052109))
+	if (k052109_is_irq_enabled(state->m_k052109))
 		irq0_line_hold(device);
 }
 
@@ -34,14 +34,14 @@ static READ8_HANDLER( bankedram_r )
 {
 	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (state->videobank)
-		return state->ram[offset];
+	if (state->m_videobank)
+		return state->m_ram[offset];
 	else
 	{
-		if (state->zoomreadroms)
-			return k051316_rom_r(state->k051316, offset);
+		if (state->m_zoomreadroms)
+			return k051316_rom_r(state->m_k051316, offset);
 		else
-			return k051316_r(state->k051316, offset);
+			return k051316_r(state->m_k051316, offset);
 	}
 }
 
@@ -49,10 +49,10 @@ static WRITE8_HANDLER( bankedram_w )
 {
 	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (state->videobank)
-		state->ram[offset] = data;
+	if (state->m_videobank)
+		state->m_ram[offset] = data;
 	else
-		k051316_w(state->k051316, offset, data);
+		k051316_w(state->m_k051316, offset, data);
 }
 
 static WRITE8_HANDLER( k88games_5f84_w )
@@ -65,7 +65,7 @@ static WRITE8_HANDLER( k88games_5f84_w )
 
 	/* bit 2 enables ROM reading from the 051316 */
 	/* also 5fce == 2 read roms, == 3 read ram */
-	state->zoomreadroms = data & 0x04;
+	state->m_zoomreadroms = data & 0x04;
 
 	if (data & 0xf8)
 		popmessage("5f84 = %02x", data);
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( k88games_5f84_w )
 static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 {
 	_88games_state *state = space->machine().driver_data<_88games_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 
@@ -83,8 +83,8 @@ static WRITE8_HANDLER( speech_control_w )
 	_88games_state *state = space->machine().driver_data<_88games_state>();
 	device_t *upd;
 
-	state->speech_chip = (data & 4) ? 1 : 0;
-	upd = state->speech_chip ? state->upd_2 : state->upd_1;
+	state->m_speech_chip = (data & 4) ? 1 : 0;
+	upd = state->m_speech_chip ? state->m_upd_2 : state->m_upd_1;
 
 	upd7759_reset_w(upd, data & 2);
 	upd7759_start_w(upd, data & 1);
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( speech_control_w )
 static WRITE8_HANDLER( speech_msg_w )
 {
 	_88games_state *state = space->machine().driver_data<_88games_state>();
-	device_t *upd = state->speech_chip ? state->upd_2 : state->upd_1;
+	device_t *upd = state->m_speech_chip ? state->m_upd_2 : state->m_upd_1;
 
 	upd7759_port_w(upd, 0, data);
 }
@@ -103,17 +103,17 @@ static READ8_HANDLER( k052109_051960_r )
 {
 	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->k051960, offset - 0x3800);
+			return k051937_r(state->m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->k052109, offset);
+			return k052109_r(state->m_k052109, offset);
 		else
-			return k051960_r(state->k051960, offset - 0x3c00);
+			return k051960_r(state->m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->k052109, offset);
+		return k052109_r(state->m_k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
@@ -121,11 +121,11 @@ static WRITE8_HANDLER( k052109_051960_w )
 	_88games_state *state = space->machine().driver_data<_88games_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->k051960, offset - 0x3800, data);
+		k051937_w(state->m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->k052109, offset, data);
+		k052109_w(state->m_k052109, offset, data);
 	else
-		k051960_w(state->k051960, offset - 0x3c00, data);
+		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
 /*************************************
@@ -135,11 +135,11 @@ static WRITE8_HANDLER( k052109_051960_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(_88games_state, banked_rom) /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_MEMBER(_88games_state, paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(_88games_state, m_banked_rom) /* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_MEMBER(_88games_state, m_paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(_88games_state, ram)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(_88games_state, m_ram)
 	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
@@ -283,13 +283,13 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 	/* bit 3: when 1, palette RAM at 1000-1fff */
 	/* bit 4: when 0, 051316 RAM at 3800-3fff; when 1, work RAM at 2000-3fff (NVRAM 3370-37ff) */
 	offs = 0x10000 + (lines & 0x07) * 0x2000;
-	memcpy(state->banked_rom, &RAM[offs], 0x1000);
+	memcpy(state->m_banked_rom, &RAM[offs], 0x1000);
 	if (lines & 0x08)
 	{
-		if (device->machine().generic.paletteram.u8 != state->paletteram_1000)
+		if (device->machine().generic.paletteram.u8 != state->m_paletteram_1000)
 		{
-			memcpy(state->paletteram_1000, device->machine().generic.paletteram.u8, 0x1000);
-			device->machine().generic.paletteram.u8 = state->paletteram_1000;
+			memcpy(state->m_paletteram_1000, device->machine().generic.paletteram.u8, 0x1000);
+			device->machine().generic.paletteram.u8 = state->m_paletteram_1000;
 		}
 	}
 	else
@@ -299,38 +299,38 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 			memcpy(&RAM[0x20000], device->machine().generic.paletteram.u8, 0x1000);
 			device->machine().generic.paletteram.u8 = &RAM[0x20000];
 		}
-		memcpy(state->paletteram_1000, &RAM[offs+0x1000], 0x1000);
+		memcpy(state->m_paletteram_1000, &RAM[offs+0x1000], 0x1000);
 	}
 
-	state->videobank = lines & 0x10;
+	state->m_videobank = lines & 0x10;
 
 	/* bit 5 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->k052109, (lines & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->m_k052109, (lines & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 is unknown, 1 most of the time */
 
 	/* bit 7 controls layer priority */
-	state->k88games_priority = lines & 0x80;
+	state->m_k88games_priority = lines & 0x80;
 }
 
 static MACHINE_START( 88games )
 {
 	_88games_state *state = machine.driver_data<_88games_state>();
 
-	state->audiocpu = machine.device("audiocpu");
-	state->k052109 = machine.device("k052109");
-	state->k051960 = machine.device("k051960");
-	state->k051316 = machine.device("k051316");
-	state->upd_1 = machine.device("upd1");
-	state->upd_2 = machine.device("upd2");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k052109 = machine.device("k052109");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k051316 = machine.device("k051316");
+	state->m_upd_1 = machine.device("upd1");
+	state->m_upd_2 = machine.device("upd2");
 
-	state->save_item(NAME(state->videobank));
-	state->save_item(NAME(state->zoomreadroms));
-	state->save_item(NAME(state->speech_chip));
-	state->save_item(NAME(state->layer_colorbase));
-	state->save_item(NAME(state->k88games_priority));
-	state->save_item(NAME(state->sprite_colorbase));
-	state->save_item(NAME(state->zoom_colorbase));
+	state->save_item(NAME(state->m_videobank));
+	state->save_item(NAME(state->m_zoomreadroms));
+	state->save_item(NAME(state->m_speech_chip));
+	state->save_item(NAME(state->m_layer_colorbase));
+	state->save_item(NAME(state->m_k88games_priority));
+	state->save_item(NAME(state->m_sprite_colorbase));
+	state->save_item(NAME(state->m_zoom_colorbase));
 }
 
 static MACHINE_RESET( 88games )
@@ -340,15 +340,15 @@ static MACHINE_RESET( 88games )
 	konami_configure_set_lines(machine.device("maincpu"), k88games_banking);
 	machine.generic.paletteram.u8 = &machine.region("maincpu")->base()[0x20000];
 
-	state->videobank = 0;
-	state->zoomreadroms = 0;
-	state->speech_chip = 0;
-	state->k88games_priority = 0;
-	state->layer_colorbase[0] = 64;
-	state->layer_colorbase[1] = 0;
-	state->layer_colorbase[2] = 16;
-	state->sprite_colorbase = 32;
-	state->zoom_colorbase = 48;
+	state->m_videobank = 0;
+	state->m_zoomreadroms = 0;
+	state->m_speech_chip = 0;
+	state->m_k88games_priority = 0;
+	state->m_layer_colorbase[0] = 64;
+	state->m_layer_colorbase[1] = 0;
+	state->m_layer_colorbase[2] = 16;
+	state->m_sprite_colorbase = 32;
+	state->m_zoom_colorbase = 48;
 }
 
 static const k052109_interface _88games_k052109_intf =

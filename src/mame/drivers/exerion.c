@@ -134,7 +134,7 @@ static CUSTOM_INPUT( exerion_controls_r )
 {
 	static const char *const inname[2] = { "P1", "P2" };
 	exerion_state *state = field->port->machine().driver_data<exerion_state>();
-	return input_port_read(field->port->machine(), inname[state->cocktail_flip]) & 0x3f;
+	return input_port_read(field->port->machine(), inname[state->m_cocktail_flip]) & 0x3f;
 }
 
 
@@ -142,7 +142,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	exerion_state *state = field->port->machine().driver_data<exerion_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -158,8 +158,8 @@ static INPUT_CHANGED( coin_inserted )
 static READ8_DEVICE_HANDLER( exerion_porta_r )
 {
 	exerion_state *state = device->machine().driver_data<exerion_state>();
-	state->porta ^= 0x40;
-	return state->porta;
+	state->m_porta ^= 0x40;
+	return state->m_porta;
 }
 
 
@@ -167,8 +167,8 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
 	exerion_state *state = device->machine().driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
-	state->porta = device->machine().region("maincpu")->base()[0x5f76];
-	state->portb = data;
+	state->m_porta = device->machine().region("maincpu")->base()[0x5f76];
+	state->m_portb = data;
 
 	logerror("Port B = %02X\n", data);
 }
@@ -178,9 +178,9 @@ static READ8_HANDLER( exerion_protection_r )
 {
 	exerion_state *state = space->machine().driver_data<exerion_state>();
 	if (cpu_get_pc(&space->device()) == 0x4143)
-		return space->machine().region("maincpu")->base()[0x33c0 + (state->main_ram[0xd] << 2) + offset];
+		return space->machine().region("maincpu")->base()[0x33c0 + (state->m_main_ram[0xd] << 2) + offset];
 	else
-		return state->main_ram[0x8 + offset];
+		return state->m_main_ram[0x8 + offset];
 }
 
 
@@ -194,9 +194,9 @@ static READ8_HANDLER( exerion_protection_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, main_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, videoram, videoram_size)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, spriteram, spriteram_size)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, m_main_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
@@ -386,15 +386,15 @@ static MACHINE_START( exerion )
 {
 	exerion_state *state = machine.driver_data<exerion_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->porta));
-	state->save_item(NAME(state->portb));
-	state->save_item(NAME(state->cocktail_flip));
-	state->save_item(NAME(state->char_palette));
-	state->save_item(NAME(state->sprite_palette));
-	state->save_item(NAME(state->char_bank));
-	state->save_item(NAME(state->background_latches));
+	state->save_item(NAME(state->m_porta));
+	state->save_item(NAME(state->m_portb));
+	state->save_item(NAME(state->m_cocktail_flip));
+	state->save_item(NAME(state->m_char_palette));
+	state->save_item(NAME(state->m_sprite_palette));
+	state->save_item(NAME(state->m_char_bank));
+	state->save_item(NAME(state->m_background_latches));
 }
 
 static MACHINE_RESET( exerion )
@@ -402,15 +402,15 @@ static MACHINE_RESET( exerion )
 	exerion_state *state = machine.driver_data<exerion_state>();
 	int i;
 
-	state->porta = 0;
-	state->portb = 0;
-	state->cocktail_flip = 0;
-	state->char_palette = 0;
-	state->sprite_palette = 0;
-	state->char_bank = 0;
+	state->m_porta = 0;
+	state->m_portb = 0;
+	state->m_cocktail_flip = 0;
+	state->m_char_palette = 0;
+	state->m_sprite_palette = 0;
+	state->m_char_bank = 0;
 
 	for (i = 0; i < 13; i++)
-		state->background_latches[i] = 0;
+		state->m_background_latches[i] = 0;
 }
 
 static MACHINE_CONFIG_START( exerion, exerion_state )

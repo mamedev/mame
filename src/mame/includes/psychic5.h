@@ -4,28 +4,28 @@ public:
 	psychic5_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 bank_latch;
-	UINT8 ps5_vram_page;
-	UINT8 bg_clip_mode;
-	UINT8 title_screen;
-	UINT8 bg_status;
-	UINT8 *ps5_pagedram[2];
-	UINT8 *bg_videoram;
-	UINT8 *ps5_dummy_bg_ram;
-	UINT8 *ps5_io_ram;
-	UINT8 *ps5_palette_ram;
-	UINT8 *fg_videoram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	int bg_palette_ram_base;
-	int bg_palette_base;
-	UINT16 palette_intensity;
-	UINT8 bombsa_unknown;
-	int sx1;
-	int sy1;
-	int sy2;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 m_bank_latch;
+	UINT8 m_ps5_vram_page;
+	UINT8 m_bg_clip_mode;
+	UINT8 m_title_screen;
+	UINT8 m_bg_status;
+	UINT8 *m_ps5_pagedram[2];
+	UINT8 *m_bg_videoram;
+	UINT8 *m_ps5_dummy_bg_ram;
+	UINT8 *m_ps5_io_ram;
+	UINT8 *m_ps5_palette_ram;
+	UINT8 *m_fg_videoram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	int m_bg_palette_ram_base;
+	int m_bg_palette_base;
+	UINT16 m_palette_intensity;
+	UINT8 m_bombsa_unknown;
+	int m_sx1;
+	int m_sy1;
+	int m_sy2;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

@@ -99,9 +99,9 @@ static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1942_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(c1942_palette_bank_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_SIZE_MEMBER(_1942_state, spriteram, spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_BASE_MEMBER(_1942_state, fg_videoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_BASE_MEMBER(_1942_state, bg_videoram)
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_SIZE_MEMBER(_1942_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_BASE_MEMBER(_1942_state, m_fg_videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_BASE_MEMBER(_1942_state, m_bg_videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -240,19 +240,19 @@ static MACHINE_START( 1942 )
 {
 	_1942_state *state = machine.driver_data<_1942_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->palette_bank));
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_palette_bank));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_RESET( 1942 )
 {
 	_1942_state *state = machine.driver_data<_1942_state>();
 
-	state->palette_bank = 0;
-	state->scroll[0] = 0;
-	state->scroll[1] = 0;
+	state->m_palette_bank = 0;
+	state->m_scroll[0] = 0;
+	state->m_scroll[1] = 0;
 }
 
 static MACHINE_CONFIG_START( 1942, _1942_state )

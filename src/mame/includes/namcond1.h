@@ -12,9 +12,9 @@ public:
 	namcond1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 h8_irq5_enabled;
-	UINT16 *shared_ram;
-	int p8;
+	UINT8 m_h8_irq5_enabled;
+	UINT16 *m_shared_ram;
+	int m_p8;
 };
 
 

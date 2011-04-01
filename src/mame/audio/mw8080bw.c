@@ -22,8 +22,8 @@ static SOUND_START( samples )
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 
 	/* setup for save states */
-	state->save_item(NAME(state->port_1_last));
-	state->save_item(NAME(state->port_2_last));
+	state->save_item(NAME(state->m_port_1_last));
+	state->save_item(NAME(state->m_port_2_last));
 }
 
 
@@ -166,28 +166,28 @@ MACHINE_CONFIG_END
 WRITE8_HANDLER( seawolf_audio_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_1_last;
+	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
-	if (rising_bits & 0x01) sample_start(state->samples, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable TORPEDO sound */
-	if (rising_bits & 0x02) sample_start(state->samples, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(state->m_samples, 1, 1, 0);
 
 	/* if (data & 0x04)  enable DIVE sound */
-	if (rising_bits & 0x04) sample_start(state->samples, 2, 2, 0);
+	if (rising_bits & 0x04) sample_start(state->m_samples, 2, 2, 0);
 
 	/* if (data & 0x08)  enable SONAR sound */
-	if (rising_bits & 0x08) sample_start(state->samples, 3, 3, 0);
+	if (rising_bits & 0x08) sample_start(state->m_samples, 3, 3, 0);
 
 	/* if (data & 0x10)  enable MINE HIT sound */
-	if (rising_bits & 0x10) sample_start(state->samples, 4, 4, 0);
+	if (rising_bits & 0x10) sample_start(state->m_samples, 4, 4, 0);
 
 	coin_counter_w(space->machine(), 0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
-	state->port_1_last = data;
+	state->m_port_1_last = data;
 }
 
 
@@ -245,22 +245,22 @@ WRITE8_HANDLER( gunfight_audio_w )
 
 	case 0x01:
 		/* enable LEFT SHOOT sound (left speaker) */
-		sample_start(state->samples1, 0, 0, 0);
+		sample_start(state->m_samples1, 0, 0, 0);
 		break;
 
 	case 0x02:
 		/* enable RIGHT SHOOT sound (right speaker) */
-		sample_start(state->samples2, 0, 0, 0);
+		sample_start(state->m_samples2, 0, 0, 0);
 		break;
 
 	case 0x03:
 		/* enable LEFT HIT sound (left speaker) */
-		sample_start(state->samples1, 0, 1, 0);
+		sample_start(state->m_samples1, 0, 1, 0);
 		break;
 
 	case 0x04:
 		/* enable RIGHT HIT sound (right speaker) */
-		sample_start(state->samples2, 0, 1, 0);
+		sample_start(state->m_samples2, 0, 1, 0);
 		break;
 
 	default:
@@ -1292,7 +1292,7 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
 
 	output_set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
 
-	state->desertgun_controller_select = (data >> 3) & 0x01;
+	state->m_desertgun_controller_select = (data >> 3) & 0x01;
 
 	/* D4-D7 are not connected */
 }
@@ -1594,7 +1594,7 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        ours is right */
 
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_1_last;
+	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1603,20 +1603,20 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 	space->machine().sound().system_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
-	if (rising_bits & 0x10) sample_start(state->samples2, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(state->m_samples2, 0, 0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
 	output_set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
-	if (rising_bits & 0x20) sample_start(state->samples1, 0, 1, 0);
+	if (rising_bits & 0x20) sample_start(state->m_samples1, 0, 1, 0);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(state->samples1, 0, 0, 0);
+	if (rising_bits & 0x40) sample_start(state->m_samples1, 0, 0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
 	output_set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
-	if (rising_bits & 0x80) sample_start(state->samples2, 0, 1, 0);
+	if (rising_bits & 0x80) sample_start(state->m_samples2, 0, 1, 0);
 
-	state->port_1_last = data;
+	state->m_port_1_last = data;
 }
 
 
@@ -1689,7 +1689,7 @@ MACHINE_CONFIG_END
 WRITE8_HANDLER( m4_audio_1_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_1_last;
+	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1698,31 +1698,31 @@ WRITE8_HANDLER( m4_audio_1_w )
 	space->machine().sound().system_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
-	if (rising_bits & 0x10) sample_start(state->samples1, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(state->m_samples1, 0, 0, 0);
 
 	/* if (data & 0x20)  enable RIGHT PLAYER SHOT sound (goes to right speaker) */
-	if (rising_bits & 0x20) sample_start(state->samples2, 0, 0, 0);
+	if (rising_bits & 0x20) sample_start(state->m_samples2, 0, 0, 0);
 
 	/* if (data & 0x40)  enable LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(state->samples1, 1, 1, 0);
+	if (rising_bits & 0x40) sample_start(state->m_samples1, 1, 1, 0);
 
 	/* if (data & 0x80)  enable RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker) */
-	if (rising_bits & 0x80) sample_start(state->samples2, 1, 1, 0);
+	if (rising_bits & 0x80) sample_start(state->m_samples2, 1, 1, 0);
 
-	state->port_1_last = data;
+	state->m_port_1_last = data;
 }
 
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_2_last;
+	UINT8 rising_bits = data & ~state->m_port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
-	if (rising_bits & 0x01) sample_start(state->samples1, 1, 1, 0);
+	if (rising_bits & 0x01) sample_start(state->m_samples1, 1, 1, 0);
 
 	/* if (data & 0x02)  enable RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker) */
-	if (rising_bits & 0x02) sample_start(state->samples2, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(state->m_samples2, 1, 1, 0);
 
 	/* if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker) */
 
@@ -1736,7 +1736,7 @@ WRITE8_HANDLER( m4_audio_2_w )
 
 	/* D6 and D7 are not connected */
 
-	state->port_2_last = data;
+	state->m_port_2_last = data;
 }
 
 
@@ -1953,7 +1953,7 @@ WRITE8_HANDLER( clowns_audio_1_w )
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 	coin_counter_w(space->machine(), 0, (data >> 0) & 0x01);
 
-	state->clowns_controller_select = (data >> 1) & 0x01;
+	state->m_clowns_controller_select = (data >> 1) & 0x01;
 
 	/* D2-D7 are not connected */
 }
@@ -1962,7 +1962,7 @@ WRITE8_HANDLER( clowns_audio_1_w )
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
 	mw8080bw_state *state = device->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_2_last;
+	UINT8 rising_bits = data & ~state->m_port_2_last;
 
 	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
 
@@ -1974,11 +1974,11 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 
 	discrete_sound_w(device, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
-	if (rising_bits & 0x20) sample_start(state->samples, 0, 0, 0);  /* springboard miss */
+	if (rising_bits & 0x20) sample_start(state->m_samples, 0, 0, 0);  /* springboard miss */
 
 	/* D6 and D7 are not connected */
 
-	state->port_2_last = data;
+	state->m_port_2_last = data;
 }
 
 
@@ -2321,7 +2321,7 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w )
 
 	coin_counter_w(device->machine(), 0, (data >> 0) & 0x01);
 
-	state->clowns_controller_select = (data >> 1) & 0x01;
+	state->m_clowns_controller_select = (data >> 1) & 0x01;
 
 	device->machine().sound().system_enable((data >> 2) & 0x01);
 
@@ -3175,7 +3175,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 	/* D6 and D7 are not connected */
 
-	state->port_2_last = data;
+	state->m_port_2_last = data;
 }
 
 
@@ -3187,13 +3187,13 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 
 	discrete_sound_w(device, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
 
-	state->spcenctr_strobe_state = (data >> 2) & 0x01;
+	state->m_spcenctr_strobe_state = (data >> 2) & 0x01;
 
 	output_set_value("LAMP", (data >> 3) & 0x01);
 
 	discrete_sound_w(device, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
-	sn76477_enable_w(state->sn, (data >> 5) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->m_sn, (data >> 5) & 0x01);	/* saucer sound */
 
 	/* D6 and D7 are not connected */
 }
@@ -3235,10 +3235,10 @@ MACHINE_CONFIG_END
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_1_last;
+	UINT8 rising_bits = data & ~state->m_port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
-	if (rising_bits & 0x01) sample_start(state->samples, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(state->m_samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable ENEMY SHOT sound */
 
@@ -3251,25 +3251,25 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 	/* D5-D7 are not connected */
 
-	state->port_1_last = data;
+	state->m_port_1_last = data;
 }
 
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
 	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 rising_bits = data & ~state->port_2_last;
+	UINT8 rising_bits = data & ~state->m_port_2_last;
 
 	/* D0-D2 are not connected */
 
 	/* if (data & 0x08)  enable EXPLOSION sound */
-	if (rising_bits & 0x08) sample_start(state->samples, 1, 1, 0);
+	if (rising_bits & 0x08) sample_start(state->m_samples, 1, 1, 0);
 
 	output_set_value("EXPLAMP", (data >> 4) & 0x01);
 
 	/* set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound */
 
-	state->port_2_last = data;
+	state->m_port_2_last = data;
 }
 
 
@@ -4090,7 +4090,7 @@ WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
 	mw8080bw_state *state = device->machine().driver_data<mw8080bw_state>();
 
-	sn76477_enable_w(state->sn, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->m_sn, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4113,7 +4113,7 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 	/* the flip screen line is only connected on the cocktail PCB */
 	if (invaders_is_cabinet_cocktail(device->machine()))
 	{
-		state->invaders_flip_screen = (data >> 5) & 0x01;
+		state->m_invaders_flip_screen = (data >> 5) & 0x01;
 	}
 
 	/* D6 and D7 are not connected */
@@ -4723,7 +4723,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
 	mw8080bw_state *state = device->machine().driver_data<mw8080bw_state>();
 
-	sn76477_enable_w(state->sn1, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->m_sn1, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4749,7 +4749,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
 	mw8080bw_state *state = device->machine().driver_data<mw8080bw_state>();
 
-	sn76477_enable_w(state->sn2, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->m_sn2, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);

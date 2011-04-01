@@ -5,15 +5,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  scroll;
-	UINT8 *  spriteram;
-	UINT8 *  palettebank;
-	UINT8 *  spriteram_select;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_scroll;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_palettebank;
+	UINT8 *  m_spriteram_select;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 };
 
 /*----------- defined in video/sbasketb.c -----------*/

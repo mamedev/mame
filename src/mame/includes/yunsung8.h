@@ -11,20 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	tilemap_t     *tilemap_0, *tilemap_1;
-	UINT8       *videoram_0, *videoram_1;
-	int         layers_ctrl;
-	int         videobank;
+	tilemap_t     *m_tilemap_0;
+	tilemap_t     *m_tilemap_1;
+	UINT8       *m_videoram_0;
+	UINT8       *m_videoram_1;
+	int         m_layers_ctrl;
+	int         m_videobank;
 
 	/* misc */
-	int         adpcm;
-	int         toggle;
+	int         m_adpcm;
+	int         m_toggle;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 
 	/* memory */
-	UINT8      videoram[0x4000];
+	UINT8      m_videoram[0x4000];
 };
 
 

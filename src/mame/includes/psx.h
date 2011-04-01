@@ -48,11 +48,11 @@ public:
 	psx_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	psx_machine *p_psx;
-	psx_gpu *p_psxgpu;
+	psx_machine *m_p_psx;
+	psx_gpu *m_p_psxgpu;
 
-	UINT32 *p_n_psxram;
-	size_t n_psxramsize;
+	UINT32 *m_p_n_psxram;
+	size_t m_n_psxramsize;
 };
 
 

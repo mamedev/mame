@@ -77,7 +77,7 @@ C004      76489 #4 trigger
 static MACHINE_START( tp84 )
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 }
 
 
@@ -88,7 +88,7 @@ static READ8_HANDLER( tp84_sh_timer_r )
 	/* divided by 2048 to get this timer */
 	/* (divide by (2048/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	return (state->audiocpu->total_cycles() / (2048/2)) & 0x0f;
+	return (state->m_audiocpu->total_cycles() / (2048/2)) & 0x0f;
 }
 
 
@@ -128,43 +128,43 @@ static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 
 static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_BASE_MEMBER(tp84_state, palette_bank)
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_palette_bank)
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
 	AM_RANGE(0x2840, 0x2840) AM_READ_PORT("P2")
 	AM_RANGE(0x2860, 0x2860) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2") AM_WRITEONLY
-	AM_RANGE(0x3004, 0x3004) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, flipscreen_x)
-	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, flipscreen_y)
+	AM_RANGE(0x3004, 0x3004) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_flipscreen_x)
+	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_flipscreen_y)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, scroll_x)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, scroll_y)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(tp84_state, bg_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE_MEMBER(tp84_state, fg_videoram)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_BASE_MEMBER(tp84_state, bg_colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM AM_BASE_MEMBER(tp84_state, fg_colorram)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_scroll_x)
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_scroll_y)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_fg_videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM AM_BASE_MEMBER(tp84_state, m_fg_colorram)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tp84_state, bg_videoram)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE_MEMBER(tp84_state, fg_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(tp84_state, bg_colorram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_MEMBER(tp84_state, fg_colorram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_fg_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_colorram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_MEMBER(tp84_state, m_fg_colorram)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_BASE_MEMBER(tp84_state, palette_bank)
+	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_palette_bank)
 	AM_RANGE(0x1a20, 0x1a20) AM_READ_PORT("P1")
 	AM_RANGE(0x1a40, 0x1a40) AM_READ_PORT("P2")
 	AM_RANGE(0x1a60, 0x1a60) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2") AM_WRITENOP
-	AM_RANGE(0x1c04, 0x1c04) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, flipscreen_x)
-	AM_RANGE(0x1c05, 0x1c05) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, flipscreen_y)
+	AM_RANGE(0x1c04, 0x1c04) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_flipscreen_x)
+	AM_RANGE(0x1c05, 0x1c05) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_flipscreen_y)
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x1e80, 0x1e80) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, scroll_x)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, scroll_y)
+	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_scroll_x)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_scroll_y)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x6000, 0x679f) AM_RAM
-	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_BASE_MEMBER(tp84_state, spriteram)
+	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_BASE_MEMBER(tp84_state, m_spriteram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

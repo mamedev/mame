@@ -58,8 +58,8 @@ static CUSTOM_INPUT( get_motor_not_ready )
 	stactics_state *state = field->port->machine().driver_data<stactics_state>();
 
 	/* if the motor is self-centering, but not centered yet */
-    return ((*state->motor_on & 0x01) == 0) &&
-    	   ((state->horiz_pos != 0) || (state->vert_pos != 0));
+    return ((*state->m_motor_on & 0x01) == 0) &&
+    	   ((state->m_horiz_pos != 0) || (state->m_vert_pos != 0));
 }
 
 
@@ -67,7 +67,7 @@ static READ8_HANDLER( vert_pos_r )
 {
 	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-    return 0x70 - state->vert_pos;
+    return 0x70 - state->m_vert_pos;
 }
 
 
@@ -75,47 +75,47 @@ static READ8_HANDLER( horiz_pos_r )
 {
 	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-    return state->horiz_pos + 0x88;
+    return state->m_horiz_pos + 0x88;
 }
 
 
 static void move_motor(running_machine &machine, stactics_state *state)
 {
 	 /* monitor motor under joystick control */
-    if (*state->motor_on & 0x01)
+    if (*state->m_motor_on & 0x01)
     {
 		int ip3 = input_port_read(machine, "IN3");
 		int ip4 = input_port_read(machine, "FAKE");
 
 		/* up */
-		if (((ip4 & 0x01) == 0) && (state->vert_pos > -128))
-			state->vert_pos--;
+		if (((ip4 & 0x01) == 0) && (state->m_vert_pos > -128))
+			state->m_vert_pos--;
 
 		/* down */
-		if (((ip4 & 0x02) == 0) && (state->vert_pos < 127))
-			state->vert_pos++;
+		if (((ip4 & 0x02) == 0) && (state->m_vert_pos < 127))
+			state->m_vert_pos++;
 
 		/* left */
-		if (((ip3 & 0x20) == 0) && (state->horiz_pos < 127))
-			state->horiz_pos++;
+		if (((ip3 & 0x20) == 0) && (state->m_horiz_pos < 127))
+			state->m_horiz_pos++;
 
 		/* right */
-		if (((ip3 & 0x40) == 0) && (state->horiz_pos > -128))
-			state->horiz_pos--;
+		if (((ip3 & 0x40) == 0) && (state->m_horiz_pos > -128))
+			state->m_horiz_pos--;
     }
 
 	 /* monitor motor under self-centering control */
     else
     {
-        if (state->horiz_pos > 0)
-            state->horiz_pos--;
-        else if (state->horiz_pos < 0)
-            state->horiz_pos++;
+        if (state->m_horiz_pos > 0)
+            state->m_horiz_pos--;
+        else if (state->m_horiz_pos < 0)
+            state->m_horiz_pos++;
 
-        if (state->vert_pos > 0)
-            state->vert_pos--;
-        else if (state->vert_pos < 0)
-            state->vert_pos++;
+        if (state->m_vert_pos > 0)
+            state->m_vert_pos--;
+        else if (state->m_vert_pos < 0)
+            state->m_vert_pos++;
     }
 }
 
@@ -178,14 +178,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
     AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
     AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITENOP
-    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, palette)
+    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, m_palette)
  /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE(stactics_sound_w) */
-    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, motor_on)  /* Note: This overlaps rocket sound */
-    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, lamps)
+    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, m_motor_on)  /* Note: This overlaps rocket sound */
+    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, m_lamps)
     AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
     AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
     AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
-    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, display_buffer)
+    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(stactics_state, m_display_buffer)
     AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITENOP
  /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(stactics_sound2_w) */
     AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITENOP
@@ -194,11 +194,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
     AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
     AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
     AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
-    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_b)
+    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_MEMBER(stactics_state, m_videoram_b)
     AM_RANGE(0xc000, 0xcfff) AM_NOP
-    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_d)
-    AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_e)
-    AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_f)
+    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(stactics_state, m_videoram_d)
+    AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(stactics_state, m_videoram_e)
+    AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(stactics_state, m_videoram_f)
 ADDRESS_MAP_END
 
 
@@ -289,9 +289,9 @@ static MACHINE_START( stactics )
 {
 	stactics_state *state = machine.driver_data<stactics_state>();
 
-	state->vert_pos = 0;
-	state->horiz_pos = 0;
-	*state->motor_on = 0;
+	state->m_vert_pos = 0;
+	state->m_horiz_pos = 0;
+	*state->m_motor_on = 0;
 }
 
 

@@ -66,7 +66,7 @@ VIDEO_START( arcadecl )
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -12);
 	atarimo_set_yscroll(0, 0x110);
-	state->has_mo = (machine.gfx[0]->total_elements > 10);
+	state->m_has_mo = (machine.gfx[0]->total_elements > 10);
 }
 
 
@@ -85,7 +85,7 @@ SCREEN_UPDATE( arcadecl )
 	arcadecl_bitmap_render(screen->machine(), bitmap, cliprect);
 
 	/* draw and merge the MO */
-	if (state->has_mo)
+	if (state->m_has_mo)
 	{
 		atarimo_rect_list rectlist;
 		bitmap_t *mobitmap;
@@ -128,7 +128,7 @@ static void arcadecl_bitmap_render(running_machine &machine, bitmap_t *bitmap, c
 	/* update any dirty scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *src = &state->bitmap[256 * y];
+		const UINT16 *src = &state->m_bitmap[256 * y];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* regenerate the line */

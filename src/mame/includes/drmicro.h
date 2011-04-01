@@ -12,18 +12,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        videoram;
+	UINT8 *        m_videoram;
 
 	/* video-related */
-	tilemap_t        *bg1, *bg2;
-	int            flipscreen;
+	tilemap_t        *m_bg1;
+	tilemap_t        *m_bg2;
+	int            m_flipscreen;
 
 	/* misc */
-	int            nmi_enable;
-	int            pcm_adr;
+	int            m_nmi_enable;
+	int            m_pcm_adr;
 
 	/* devices */
-	device_t *msm;
+	device_t *m_msm;
 };
 
 

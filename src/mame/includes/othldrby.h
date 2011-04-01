@@ -13,17 +13,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *     vram;
-	UINT16 *     buf_spriteram;
-	UINT16 *     buf_spriteram2;
+	UINT16 *     m_vram;
+	UINT16 *     m_buf_spriteram;
+	UINT16 *     m_buf_spriteram2;
 
 	/* video-related */
-	tilemap_t    *bg_tilemap[3];
-	UINT16       vreg[OTHLDRBY_VREG_SIZE];
-	UINT32       vram_addr, vreg_addr;
+	tilemap_t    *m_bg_tilemap[3];
+	UINT16       m_vreg[OTHLDRBY_VREG_SIZE];
+	UINT32       m_vram_addr;
+	UINT32       m_vreg_addr;
 
 	/* misc */
-	int          toggle;
+	int          m_toggle;
 };
 
 

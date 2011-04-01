@@ -57,8 +57,8 @@ it as ASCII text.
 
 static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, videoram, videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
@@ -73,8 +73,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, videoram, videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
@@ -204,26 +204,26 @@ static MACHINE_START( scregg )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = NULL;
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = NULL;
 
-	state->save_item(NAME(state->btime_palette));
-	state->save_item(NAME(state->bnj_scroll1));
-	state->save_item(NAME(state->bnj_scroll2));
-	state->save_item(NAME(state->btime_tilemap));
+	state->save_item(NAME(state->m_btime_palette));
+	state->save_item(NAME(state->m_bnj_scroll1));
+	state->save_item(NAME(state->m_bnj_scroll2));
+	state->save_item(NAME(state->m_btime_tilemap));
 }
 
 static MACHINE_RESET( scregg )
 {
 	btime_state *state = machine.driver_data<btime_state>();
 
-	state->btime_palette = 0;
-	state->bnj_scroll1 = 0;
-	state->bnj_scroll2 = 0;
-	state->btime_tilemap[0] = 0;
-	state->btime_tilemap[1] = 0;
-	state->btime_tilemap[2] = 0;
-	state->btime_tilemap[3] = 0;
+	state->m_btime_palette = 0;
+	state->m_bnj_scroll1 = 0;
+	state->m_bnj_scroll2 = 0;
+	state->m_btime_tilemap[0] = 0;
+	state->m_btime_tilemap[1] = 0;
+	state->m_btime_tilemap[2] = 0;
+	state->m_btime_tilemap[3] = 0;
 }
 
 static MACHINE_CONFIG_START( dommy, btime_state )

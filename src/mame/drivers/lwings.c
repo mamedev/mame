@@ -63,13 +63,13 @@ Notes:
 static WRITE8_HANDLER( avengers_adpcm_w )
 {
 	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->adpcm = data;
+	state->m_adpcm = data;
 }
 
 static READ8_HANDLER( avengers_adpcm_r )
 {
 	lwings_state *state = space->machine().driver_data<lwings_state>();
-	return state->adpcm;
+	return state->m_adpcm;
 }
 
 static WRITE8_HANDLER( lwings_bankswitch_w )
@@ -102,23 +102,23 @@ static WRITE8_HANDLER( avengers_protection_w )
 
 	if (pc == 0x2eeb)
 	{
-		state->param[0] = data;
+		state->m_param[0] = data;
 	}
 	else if (pc == 0x2f09)
 	{
-		state->param[1] = data;
+		state->m_param[1] = data;
 	}
 	else if(pc == 0x2f26)
 	{
-		state->param[2] = data;
+		state->m_param[2] = data;
 	}
 	else if (pc == 0x2f43)
 	{
-		state->param[3] = data;
+		state->m_param[3] = data;
 	}
 	else if (pc == 0x0445)
 	{
-		state->soundstate = 0x80;
+		state->m_soundstate = 0x80;
 		soundlatch_w(space, 0, data);
 	}
 }
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( avengers_protection_w )
 static WRITE8_HANDLER( avengers_prot_bank_w )
 {
 	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->palette_pen = data * 64;
+	state->m_palette_pen = data * 64;
 }
 
 static int avengers_fetch_paldata( running_machine &machine )
@@ -194,8 +194,8 @@ static int avengers_fetch_paldata( running_machine &machine )
 	"0000000000000000" "6474667676660100" "7696657575650423" "88A8647474645473"
 	"0000000000000000" "0001070701050004" "0003060603040303" "0005050505040302";
 
-	int bank = state->palette_pen / 64;
-	int offs = state->palette_pen % 64;
+	int bank = state->m_palette_pen / 64;
+	int offs = state->m_palette_pen % 64;
 	int page = bank / 4;					/* 0..7 */
 	int base = (3 - (bank & 3));			/* 0..3 */
 	int row = offs & 0xf;					/* 0..15 */
@@ -216,8 +216,8 @@ static int avengers_fetch_paldata( running_machine &machine )
 
 	result = digit0 * 16 + digit1;
 
-	if ((state->palette_pen & 0x3f) != 0x3f)
-		state->palette_pen++;
+	if ((state->m_palette_pen & 0x3f) != 0x3f)
+		state->m_palette_pen++;
 
 	return result;
 }
@@ -243,8 +243,8 @@ static READ8_HANDLER( avengers_protection_r )
         Input: two cartesian points
         Output: direction code (north,northeast,east,...)
      */
-	x = state->param[0] - state->param[2];
-	y = state->param[1] - state->param[3];
+	x = state->m_param[0] - state->m_param[2];
+	y = state->m_param[1] - state->m_param[3];
 	for (dir = 0; dir < 8; dir++)
 	{
 		dx = xpos[dir] - x;
@@ -262,8 +262,8 @@ static READ8_HANDLER( avengers_protection_r )
 static READ8_HANDLER( avengers_soundlatch2_r )
 {
 	lwings_state *state = space->machine().driver_data<lwings_state>();
-	UINT8 data = *state->soundlatch2 | state->soundstate;
-	state->soundstate = 0;
+	UINT8 data = *state->m_soundlatch2 | state->m_soundstate;
+	state->m_soundstate = 0;
 	return(data);
 }
 
@@ -281,8 +281,8 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, bg1videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(lwings_bg1_scrollx_w)
@@ -304,8 +304,8 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, bg1videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
 
@@ -326,8 +326,8 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, bg1videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
 
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("2203a", ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("2203b", ym2203_w)
 	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
-	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_BASE_MEMBER(lwings_state, soundlatch2)
+	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_BASE_MEMBER(lwings_state, m_soundlatch2)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
@@ -747,31 +747,31 @@ static MACHINE_START( lwings )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
-	state->save_item(NAME(state->bg2_image));
-	state->save_item(NAME(state->scroll_x));
-	state->save_item(NAME(state->scroll_y));
-	state->save_item(NAME(state->param));
-	state->save_item(NAME(state->palette_pen));
-	state->save_item(NAME(state->soundstate));
-	state->save_item(NAME(state->adpcm));
+	state->save_item(NAME(state->m_bg2_image));
+	state->save_item(NAME(state->m_scroll_x));
+	state->save_item(NAME(state->m_scroll_y));
+	state->save_item(NAME(state->m_param));
+	state->save_item(NAME(state->m_palette_pen));
+	state->save_item(NAME(state->m_soundstate));
+	state->save_item(NAME(state->m_adpcm));
 }
 
 static MACHINE_RESET( lwings )
 {
 	lwings_state *state = machine.driver_data<lwings_state>();
 
-	state->bg2_image = 0;
-	state->scroll_x[0] = 0;
-	state->scroll_x[1] = 0;
-	state->scroll_y[0] = 0;
-	state->scroll_y[1] = 0;
-	state->param[0] = 0;
-	state->param[1] = 0;
-	state->param[2] = 0;
-	state->param[3] = 0;
-	state->palette_pen = 0;
-	state->soundstate = 0;
-	state->adpcm = 0;
+	state->m_bg2_image = 0;
+	state->m_scroll_x[0] = 0;
+	state->m_scroll_x[1] = 0;
+	state->m_scroll_y[0] = 0;
+	state->m_scroll_y[1] = 0;
+	state->m_param[0] = 0;
+	state->m_param[1] = 0;
+	state->m_param[2] = 0;
+	state->m_param[3] = 0;
+	state->m_palette_pen = 0;
+	state->m_soundstate = 0;
+	state->m_adpcm = 0;
 }
 
 static MACHINE_CONFIG_START( lwings, lwings_state )

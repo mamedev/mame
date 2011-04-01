@@ -11,19 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *     videoram;
-	UINT8 *     colorram;
-	UINT8 *     spriteram;
-	UINT8 *     spriteram2;
-	UINT8 *     scrollram;
-	size_t      spriteram_size;
+	UINT8 *     m_videoram;
+	UINT8 *     m_colorram;
+	UINT8 *     m_spriteram;
+	UINT8 *     m_spriteram2;
+	UINT8 *     m_scrollram;
+	size_t      m_spriteram_size;
 
 	/* video-related */
-	tilemap_t     *bg_tilemap;
-	UINT8       spritebank;
+	tilemap_t     *m_bg_tilemap;
+	UINT8       m_spritebank;
 
 	/* misc */
-	UINT8       nmi_enable, irq_enable;
+	UINT8       m_nmi_enable;
+	UINT8       m_irq_enable;
 };
 
 

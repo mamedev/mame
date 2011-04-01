@@ -40,7 +40,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE8_HANDLER( yunsung8_videobank_w )
 {
 	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
-	state->videobank = data;
+	state->m_videobank = data;
 }
 
 
@@ -53,14 +53,14 @@ READ8_HANDLER( yunsung8_videoram_r )
         area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
 	if (offset < 0x0800)
-		bank = state->videobank & 2;
+		bank = state->m_videobank & 2;
 	else
-		bank = state->videobank & 1;
+		bank = state->m_videobank & 1;
 
 	if (bank)
-		return state->videoram_0[offset];
+		return state->m_videoram_0[offset];
 	else
-		return state->videoram_1[offset];
+		return state->m_videoram_1[offset];
 }
 
 
@@ -70,14 +70,14 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 
 	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
 	{
-		int bank = state->videobank & 2;
+		int bank = state->m_videobank & 2;
 		UINT8 *RAM;
 		int color;
 
 		if (bank)
-			RAM = state->videoram_0;
+			RAM = state->m_videoram_0;
 		else
-			RAM = state->videoram_1;
+			RAM = state->m_videoram_1;
 
 		RAM[offset] = data;
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
@@ -88,7 +88,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 	else
 	{
 		int tile;
-		int bank = state->videobank & 1;
+		int bank = state->m_videobank & 1;
 
 		if (offset < 0x1000)
 			tile = (offset - 0x0800);		// c800-cfff: Banked Color RAM
@@ -97,13 +97,13 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 
 		if (bank)
 		{
-			state->videoram_0[offset] = data;
-			tilemap_mark_tile_dirty(state->tilemap_0, tile);
+			state->m_videoram_0[offset] = data;
+			tilemap_mark_tile_dirty(state->m_tilemap_0, tile);
 		}
 		else
 		{
-			state->videoram_1[offset] = data;
-			tilemap_mark_tile_dirty(state->tilemap_1, tile);
+			state->m_videoram_1[offset] = data;
+			tilemap_mark_tile_dirty(state->m_tilemap_1, tile);
 		}
 	}
 }
@@ -137,8 +137,8 @@ WRITE8_HANDLER( yunsung8_flipscreen_w )
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	int code  =  state->videoram_0[0x1000 + tile_index * 2 + 0] + state->videoram_0[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  state->videoram_0[0x0800 + tile_index] & 0x07;
+	int code  =  state->m_videoram_0[0x1000 + tile_index * 2 + 0] + state->m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  state->m_videoram_0[0x0800 + tile_index] & 0x07;
 	SET_TILE_INFO(
 			0,
 			code,
@@ -154,8 +154,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
-	int code  =  state->videoram_1[0x1000 + tile_index * 2 + 0] + state->videoram_1[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  state->videoram_1[0x0800 + tile_index] & 0x3f;
+	int code  =  state->m_videoram_1[0x1000 + tile_index * 2 + 0] + state->m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  state->m_videoram_1[0x0800 + tile_index] & 0x3f;
 	SET_TILE_INFO(
 			1,
 			code,
@@ -178,10 +178,10 @@ VIDEO_START( yunsung8 )
 {
 	yunsung8_state *state = machine.driver_data<yunsung8_state>();
 
-	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, DIM_NX_0, DIM_NY_0 );
-	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, DIM_NX_1, DIM_NY_1 );
+	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, DIM_NX_0, DIM_NY_0 );
+	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, DIM_NX_1, DIM_NY_1 );
 
-	tilemap_set_transparent_pen(state->tilemap_1, 0);
+	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
 }
 
 
@@ -197,7 +197,7 @@ VIDEO_START( yunsung8 )
 SCREEN_UPDATE( yunsung8 )
 {
 	yunsung8_state *state = screen->machine().driver_data<yunsung8_state>();
-	int layers_ctrl = (~state->layers_ctrl) >> 4;
+	int layers_ctrl = (~state->m_layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(screen->machine(), KEYCODE_Z))
@@ -210,12 +210,12 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 #endif
 
 	if (layers_ctrl & 1)
-		tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tilemap_0, 0, 0);
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
 	if (layers_ctrl & 2)
-		tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_tilemap_1, 0, 0);
 
 	return 0;
 }

@@ -4,21 +4,21 @@ public:
 	gsword_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int coins;
-	int fake8910_0;
-	int fake8910_1;
-	int nmi_enable;
-	UINT8 *cpu2_ram;
-	int protect_hack;
-	size_t spritexy_size;
-	UINT8 *spritexy_ram;
-	UINT8 *spritetile_ram;
-	UINT8 *spriteattrib_ram;
-	int charbank;
-	int charpalbank;
-	int flipscreen;
-	tilemap_t *bg_tilemap;
+	UINT8 *m_videoram;
+	int m_coins;
+	int m_fake8910_0;
+	int m_fake8910_1;
+	int m_nmi_enable;
+	UINT8 *m_cpu2_ram;
+	int m_protect_hack;
+	size_t m_spritexy_size;
+	UINT8 *m_spritexy_ram;
+	UINT8 *m_spritetile_ram;
+	UINT8 *m_spriteattrib_ram;
+	int m_charbank;
+	int m_charpalbank;
+	int m_flipscreen;
+	tilemap_t *m_bg_tilemap;
 };
 
 

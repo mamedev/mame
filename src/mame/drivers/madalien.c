@@ -33,14 +33,14 @@ INLINE UINT8 shift_common(running_machine &machine, UINT8 hi, UINT8 lo)
 static READ8_HANDLER( shift_r )
 {
 	madalien_state *state = space->machine().driver_data<madalien_state>();
-	return shift_common(space->machine(), *state->shift_hi, *state->shift_lo);
+	return shift_common(space->machine(), *state->m_shift_hi, *state->m_shift_lo);
 }
 
 static READ8_HANDLER( shift_rev_r )
 {
 	madalien_state *state = space->machine().driver_data<madalien_state>();
-	UINT8 hi = *state->shift_hi ^ 0x07;
-	UINT8 lo = BITSWAP8(*state->shift_lo,0,1,2,3,4,5,6,7);
+	UINT8 hi = *state->m_shift_hi ^ 0x07;
+	UINT8 lo = BITSWAP8(*state->m_shift_lo,0,1,2,3,4,5,6,7);
 
 	UINT8 ret = shift_common(space->machine(), hi, lo);
 
@@ -81,22 +81,22 @@ static WRITE8_DEVICE_HANDLER( madalien_portB_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(madalien_videoram_w) AM_BASE_MEMBER(madalien_state, videoram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(madalien_videoram_w) AM_BASE_MEMBER(madalien_state, m_videoram)
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x7fff) AM_RAM_WRITE(madalien_charram_w) AM_BASE_MEMBER(madalien_state, charram)
+	AM_RANGE(0x6800, 0x7fff) AM_RAM_WRITE(madalien_charram_w) AM_BASE_MEMBER(madalien_state, m_charram)
 
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, video_control)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_video_control)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)
-	AM_RANGE(0x8008, 0x8008) AM_MIRROR(0x07f0) AM_RAM_READ(shift_r) AM_BASE_MEMBER(madalien_state, shift_hi)
-	AM_RANGE(0x8009, 0x8009) AM_MIRROR(0x07f0) AM_RAM_READ(shift_rev_r) AM_BASE_MEMBER(madalien_state, shift_lo)
-	AM_RANGE(0x800b, 0x800b) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, video_flags)
-	AM_RANGE(0x800c, 0x800c) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, headlight_pos)
-	AM_RANGE(0x800d, 0x800d) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, edge1_pos)
-	AM_RANGE(0x800e, 0x800e) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, edge2_pos)
-	AM_RANGE(0x800f, 0x800f) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, scroll)
+	AM_RANGE(0x8008, 0x8008) AM_MIRROR(0x07f0) AM_RAM_READ(shift_r) AM_BASE_MEMBER(madalien_state, m_shift_hi)
+	AM_RANGE(0x8009, 0x8009) AM_MIRROR(0x07f0) AM_RAM_READ(shift_rev_r) AM_BASE_MEMBER(madalien_state, m_shift_lo)
+	AM_RANGE(0x800b, 0x800b) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_video_flags)
+	AM_RANGE(0x800c, 0x800c) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_headlight_pos)
+	AM_RANGE(0x800d, 0x800d) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_edge1_pos)
+	AM_RANGE(0x800e, 0x800e) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_edge2_pos)
+	AM_RANGE(0x800f, 0x800f) AM_MIRROR(0x07f0) AM_WRITEONLY AM_BASE_MEMBER(madalien_state, m_scroll)
 
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ff0) AM_READ_PORT("PLAYER1")
 	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ff0) AM_READ_PORT("DSW")

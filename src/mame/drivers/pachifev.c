@@ -93,16 +93,16 @@ public:
 		: driver_device(machine, config) { }
 
 	/* controls related */
-	int power;
-	int max_power;
-	int input_power;
-	int previous_power;
-	int cnt;
+	int m_power;
+	int m_max_power;
+	int m_input_power;
+	int m_previous_power;
+	int m_cnt;
 
-	UINT32 adpcm_pos;
-	UINT8 adpcm_idle;
-	UINT8 trigger;
-	UINT8 adpcm_data;
+	UINT32 m_adpcm_pos;
+	UINT8 m_adpcm_idle;
+	UINT8 m_trigger;
+	UINT8 m_adpcm_data;
 };
 
 static WRITE8_HANDLER(controls_w)
@@ -112,12 +112,12 @@ static WRITE8_HANDLER(controls_w)
         pachifev_state *state = space->machine().driver_data<pachifev_state>();
 
         /*end of input read*/
-        state->power=0;
-        state->max_power=state->input_power;
-        if(--state->cnt <= 0) /* why to do it N times? no idea.. someone should fix it */
+        state->m_power=0;
+        state->m_max_power=state->m_input_power;
+        if(--state->m_cnt <= 0) /* why to do it N times? no idea.. someone should fix it */
         {
-            state->cnt=0;
-            state->input_power=0;
+            state->m_cnt=0;
+            state->m_input_power=0;
         }
     }
 }
@@ -125,8 +125,8 @@ static WRITE8_HANDLER(controls_w)
 static READ8_HANDLER(controls_r)
 {
     pachifev_state *state = space->machine().driver_data<pachifev_state>();
-    int output_bit=(state->power < state->max_power)?0:1;
-    ++state->power;
+    int output_bit=(state->m_power < state->m_max_power)?0:1;
+    ++state->m_power;
     return output_bit;
 }
 
@@ -252,24 +252,24 @@ static void pf_adpcm_int(device_t *device)
 {
 	pachifev_state *state = device->machine().driver_data<pachifev_state>();
 
-    if (state->adpcm_pos >= 0x4000 || state->adpcm_idle)
+    if (state->m_adpcm_pos >= 0x4000 || state->m_adpcm_idle)
     {
-        state->adpcm_idle = 1;
+        state->m_adpcm_idle = 1;
         msm5205_reset_w(device,1);
-        state->trigger = 0;
+        state->m_trigger = 0;
     }
     else
     {
         UINT8 *ROM = device->machine().region("adpcm")->base();
 
-        state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0)>>4) );
-        msm5205_data_w(device,state->adpcm_data & 0xf);
-        state->trigger^=1;
-        if(state->trigger == 0)
+        state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0)>>4) );
+        msm5205_data_w(device,state->m_adpcm_data & 0xf);
+        state->m_trigger^=1;
+        if(state->m_trigger == 0)
         {
-            state->adpcm_pos++;
-            if((ROM[state->adpcm_pos] & 0xff) == 0xff)
-              state->adpcm_idle = 1;
+            state->m_adpcm_pos++;
+            if((ROM[state->m_adpcm_pos] & 0xff) == 0xff)
+              state->m_adpcm_idle = 1;
         }
     }
 }
@@ -286,14 +286,14 @@ static MACHINE_RESET( pachifev )
 {
     pachifev_state *state = machine.driver_data<pachifev_state>();
 
-    state->power=0;
-    state->max_power=0;
-    state->input_power=0;
-    state->previous_power=0;
-    state->cnt=0;
+    state->m_power=0;
+    state->m_max_power=0;
+    state->m_input_power=0;
+    state->m_previous_power=0;
+    state->m_cnt=0;
 
 #if USE_MSM
-    state->adpcm_pos = 0;
+    state->m_adpcm_pos = 0;
 #endif
 }
 
@@ -316,18 +316,18 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 			player = 1;
 
         int current_power=input_port_read(device->machine(), inname[player]) & 0x3f;
-        if(current_power != state->previous_power)
+        if(current_power != state->m_previous_power)
         {
             popmessage    ("%d%%", (current_power * 100) / 0x3f);
         }
 
-        if( (!current_power) && (state->previous_power) )
+        if( (!current_power) && (state->m_previous_power) )
         {
-            state->input_power=state->previous_power;
-            state->cnt=NUM_PLUNGER_REPEATS;
+            state->m_input_power=state->m_previous_power;
+            state->m_cnt=NUM_PLUNGER_REPEATS;
         }
 
-        state->previous_power=current_power;
+        state->m_previous_power=current_power;
     }
 
 }
@@ -347,11 +347,11 @@ static MACHINE_START( pachifev)
     {
         pachifev_state *state = machine.driver_data<pachifev_state>();
 
-        state->save_item(NAME(state->power));
-        state->save_item(NAME(state->max_power));
-        state->save_item(NAME(state->input_power));
-        state->save_item(NAME(state->previous_power));
-        state->save_item(NAME(state->cnt));
+        state->save_item(NAME(state->m_power));
+        state->save_item(NAME(state->m_max_power));
+        state->save_item(NAME(state->m_input_power));
+        state->save_item(NAME(state->m_previous_power));
+        state->save_item(NAME(state->m_cnt));
     }
 }
 

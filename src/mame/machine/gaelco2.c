@@ -180,13 +180,13 @@ WRITE16_HANDLER( touchgo_coin_w )
 DRIVER_INIT( bang )
 {
 	gaelco2_state *state = machine.driver_data<gaelco2_state>();
-	state->clr_gun_int = 0;
+	state->m_clr_gun_int = 0;
 }
 
 WRITE16_HANDLER( bang_clr_gun_int_w )
 {
 	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
-	state->clr_gun_int = 1;
+	state->m_clr_gun_int = 1;
 }
 
 INTERRUPT_GEN( bang_interrupt )
@@ -195,10 +195,10 @@ INTERRUPT_GEN( bang_interrupt )
 	if (cpu_getiloops(device) == 0){
 		device_set_input_line(device, 2, HOLD_LINE);
 
-		state->clr_gun_int = 0;
+		state->m_clr_gun_int = 0;
 	}
 	else if (cpu_getiloops(device) % 2){
-		if (state->clr_gun_int){
+		if (state->m_clr_gun_int){
 			device_set_input_line(device, 4, HOLD_LINE);
 		}
 	}
@@ -225,7 +225,7 @@ CUSTOM_INPUT( wrally2_analog_bit_r )
 {
 	gaelco2_state *state = field->port->machine().driver_data<gaelco2_state>();
 	int which = (FPTR)param;
-	return (state->analog_ports[which] >> 7) & 0x01;
+	return (state->m_analog_ports[which] >> 7) & 0x01;
 }
 
 
@@ -237,8 +237,8 @@ WRITE16_HANDLER( wrally2_adc_clk )
 	{
 		if (!(data & 0xff))
 		{
-			state->analog_ports[0] <<= 1;
-			state->analog_ports[1] <<= 1;
+			state->m_analog_ports[0] <<= 1;
+			state->m_analog_ports[1] <<= 1;
 		}
 	}
 	else
@@ -254,8 +254,8 @@ WRITE16_HANDLER( wrally2_adc_cs )
 	{
 		if (!(data & 0xff))
 		{
-			state->analog_ports[0] = input_port_read_safe(space->machine(), "ANALOG0", 0);
-			state->analog_ports[1] = input_port_read_safe(space->machine(), "ANALOG1", 0);
+			state->m_analog_ports[0] = input_port_read_safe(space->machine(), "ANALOG0", 0);
+			state->m_analog_ports[1] = input_port_read_safe(space->machine(), "ANALOG1", 0);
 		}
 	}
 	else
@@ -311,7 +311,7 @@ READ16_HANDLER( snowboar_protection_r )
 WRITE16_HANDLER( snowboar_protection_w )
 {
 	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
-	COMBINE_DATA(&state->snowboar_protection[offset]);
+	COMBINE_DATA(&state->m_snowboar_protection[offset]);
 	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(&space->device()), data, offset*2);
 
 }

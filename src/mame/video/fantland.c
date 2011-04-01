@@ -64,10 +64,10 @@
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	fantland_state *state = machine.driver_data<fantland_state>();
-	UINT8 *spriteram_2 = state->spriteram2;
-	UINT8	*indx_ram	=	state->spriteram + 0x2000,	// this ram contains indexes into offs_ram
-			*offs_ram	=	state->spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
-			*ram		=	state->spriteram,			// current sprite pointer in spriteram
+	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8	*indx_ram	=	state->m_spriteram + 0x2000,	// this ram contains indexes into offs_ram
+			*offs_ram	=	state->m_spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
+			*ram		=	state->m_spriteram,			// current sprite pointer in spriteram
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area

@@ -5,8 +5,8 @@
 WRITE8_HANDLER(ksayakyu_videoram_w)
 {
 	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->videoram[offset]=data;
-	tilemap_mark_tile_dirty(state->textmap, offset >> 1);
+	state->m_videoram[offset]=data;
+	tilemap_mark_tile_dirty(state->m_textmap, offset >> 1);
 }
 
 WRITE8_HANDLER(ksayakyu_videoctrl_w)
@@ -21,15 +21,15 @@ WRITE8_HANDLER(ksayakyu_videoctrl_w)
 
      */
 	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->video_ctrl = data;
+	state->m_video_ctrl = data;
 
-	state->flipscreen = data & 4;
-	flip_screen_set(space->machine(), state->flipscreen);
-	tilemap_set_scrolly(state->tilemap, 0, (data & 0xe0) << 3);
-	if(state->flipscreen)
-		tilemap_set_flip(state->tilemap, (data & 2) ? TILEMAP_FLIPY : TILEMAP_FLIPX | TILEMAP_FLIPY);
+	state->m_flipscreen = data & 4;
+	flip_screen_set(space->machine(), state->m_flipscreen);
+	tilemap_set_scrolly(state->m_tilemap, 0, (data & 0xe0) << 3);
+	if(state->m_flipscreen)
+		tilemap_set_flip(state->m_tilemap, (data & 2) ? TILEMAP_FLIPY : TILEMAP_FLIPX | TILEMAP_FLIPY);
 	else
-		tilemap_set_flip(state->tilemap, (data & 2) ? TILEMAP_FLIPX : 0);
+		tilemap_set_flip(state->m_tilemap, (data & 2) ? TILEMAP_FLIPX : 0);
 }
 
 PALETTE_INIT( ksayakyu )
@@ -63,8 +63,8 @@ xy-- ---- flip bits
 static TILE_GET_INFO( get_text_tile_info )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	int code = state->videoram[tile_index * 2 + 1];
-	int attr = state->videoram[tile_index * 2];
+	int code = state->m_videoram[tile_index * 2 + 1];
+	int attr = state->m_videoram[tile_index * 2];
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 	int color = (attr & 0x3c) >> 2;
 
@@ -84,8 +84,8 @@ static TILE_GET_INFO( get_text_tile_info )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	const UINT8 *source = state->spriteram + state->spriteram_size - 4;
-	const UINT8 *finish = state->spriteram;
+	const UINT8 *source = state->m_spriteram + state->m_spriteram_size - 4;
+	const UINT8 *finish = state->m_spriteram;
 
 	while (source>=finish) /* is order correct ? */
 	{
@@ -98,7 +98,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 		gfx_element *gfx = machine.gfx[2];
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -119,9 +119,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 VIDEO_START(ksayakyu)
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	state->tilemap = tilemap_create(machine, get_ksayakyu_tile_info, tilemap_scan_rows, 8, 8, 32, 32 * 8);
-	state->textmap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transparent_pen(state->textmap, 0);
+	state->m_tilemap = tilemap_create(machine, get_ksayakyu_tile_info, tilemap_scan_rows, 8, 8, 32, 32 * 8);
+	state->m_textmap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->m_textmap, 0);
 }
 
 SCREEN_UPDATE(ksayakyu)
@@ -130,10 +130,10 @@ SCREEN_UPDATE(ksayakyu)
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (state->video_ctrl & 1)
-		tilemap_draw(bitmap, cliprect,state->tilemap, 0, 0);
+	if (state->m_video_ctrl & 1)
+		tilemap_draw(bitmap, cliprect,state->m_tilemap, 0, 0);
 
-	tilemap_draw(bitmap, cliprect, state->textmap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_textmap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

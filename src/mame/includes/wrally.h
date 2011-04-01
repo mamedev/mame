@@ -4,11 +4,11 @@ public:
 	wrally_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *shareram;
-	tilemap_t *pant[2];
-	UINT16 *vregs;
-	UINT16 *videoram;
-	UINT16 *spriteram;
+	UINT16 *m_shareram;
+	tilemap_t *m_pant[2];
+	UINT16 *m_vregs;
+	UINT16 *m_videoram;
+	UINT16 *m_spriteram;
 };
 
 

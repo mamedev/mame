@@ -24,14 +24,14 @@ static WRITE8_HANDLER( mouser_nmi_enable_w )
 {
 	mouser_state *state = space->machine().driver_data<mouser_state>();
 	//logerror("nmi_enable %02x\n", data);
-	state->nmi_enable = data;
+	state->m_nmi_enable = data;
 }
 
 static INTERRUPT_GEN( mouser_nmi_interrupt )
 {
 	mouser_state *state = device->machine().driver_data<mouser_state>();
 
-	if (BIT(state->nmi_enable, 0))
+	if (BIT(state->m_nmi_enable, 0))
 		nmi_line_pulse(device);
 }
 
@@ -41,28 +41,28 @@ static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_state *state = space->machine().driver_data<mouser_state>();
 	//logerror("int %02x\n", data);
-	state->sound_byte = data;
-	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+	state->m_sound_byte = data;
+	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )
 {
 	mouser_state *state = space->machine().driver_data<mouser_state>();
 	//logerror("sound r\n");
-	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
-	return state->sound_byte;
+	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
+	return state->m_sound_byte;
 }
 
 static WRITE8_HANDLER( mouser_sound_nmi_clear_w )
 {
 	mouser_state *state = space->machine().driver_data<mouser_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mouser_sound_nmi_assert )
 {
 	mouser_state *state = device->machine().driver_data<mouser_state>();
-	if (BIT(state->nmi_enable, 0))
+	if (BIT(state->m_nmi_enable, 0))
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -70,9 +70,9 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(mouser_state, videoram)
-	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE_MEMBER(mouser_state, spriteram, spriteram_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(mouser_state, colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(mouser_state, m_videoram)
+	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE_MEMBER(mouser_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(mouser_state, m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(mouser_flip_screen_x_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(mouser_flip_screen_y_w)
@@ -192,19 +192,19 @@ static MACHINE_START( mouser )
 {
 	mouser_state *state = machine.driver_data<mouser_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->sound_byte));
-	state->save_item(NAME(state->nmi_enable));
+	state->save_item(NAME(state->m_sound_byte));
+	state->save_item(NAME(state->m_nmi_enable));
 }
 
 static MACHINE_RESET( mouser )
 {
 	mouser_state *state = machine.driver_data<mouser_state>();
 
-	state->sound_byte = 0;
-	state->nmi_enable = 0;
+	state->m_sound_byte = 0;
+	state->m_nmi_enable = 0;
 }
 
 static MACHINE_CONFIG_START( mouser, mouser_state )

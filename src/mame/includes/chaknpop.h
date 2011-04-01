@@ -10,23 +10,27 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  mcu_ram;
-	UINT8 *  tx_ram;
-	UINT8 *  spr_ram;
-	UINT8 *  attr_ram;
-	size_t   spr_ram_size;
+	UINT8 *  m_mcu_ram;
+	UINT8 *  m_tx_ram;
+	UINT8 *  m_spr_ram;
+	UINT8 *  m_attr_ram;
+	size_t   m_spr_ram_size;
 
 	/* mcu-related */
-	UINT8 mcu_seed;
-	UINT8 mcu_select;
-	UINT8 mcu_result;
+	UINT8 m_mcu_seed;
+	UINT8 m_mcu_select;
+	UINT8 m_mcu_result;
 
 
 	/* video-related */
-	tilemap_t  *tx_tilemap;
-	UINT8    *vram1, *vram2, *vram3, *vram4;
-	UINT8    gfxmode;
-	UINT8    flip_x, flip_y;
+	tilemap_t  *m_tx_tilemap;
+	UINT8    *m_vram1;
+	UINT8    *m_vram2;
+	UINT8    *m_vram3;
+	UINT8    *m_vram4;
+	UINT8    m_gfxmode;
+	UINT8    m_flip_x;
+	UINT8    m_flip_y;
 };
 
 

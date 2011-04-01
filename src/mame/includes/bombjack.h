@@ -11,18 +11,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    colorram;
-	UINT8 *    spriteram;
-//  UINT8 *    paletteram;  // currently this uses generic palette handling
-	size_t     spriteram_size;
+	UINT8 *    m_videoram;
+	UINT8 *    m_colorram;
+	UINT8 *    m_spriteram;
+//  UINT8 *    m_paletteram;  // currently this uses generic palette handling
+	size_t     m_spriteram_size;
 
 	/* video-related */
-	tilemap_t    *fg_tilemap, *bg_tilemap;
-	UINT8      background_image;
+	tilemap_t    *m_fg_tilemap;
+	tilemap_t    *m_bg_tilemap;
+	UINT8      m_background_image;
 
 	/* sound-related */
-	UINT8      latch;
+	UINT8      m_latch;
 };
 
 

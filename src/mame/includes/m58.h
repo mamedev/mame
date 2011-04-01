@@ -5,18 +5,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *              videoram;
-	UINT8 *              spriteram;
-	size_t               spriteram_size;
+	UINT8 *              m_videoram;
+	UINT8 *              m_spriteram;
+	size_t               m_spriteram_size;
 
 	/* video-related */
-	tilemap_t*             bg_tilemap;
+	tilemap_t*             m_bg_tilemap;
 
-	UINT8                *yard_scroll_x_low;
-	UINT8                *yard_scroll_x_high;
-	UINT8                *yard_scroll_y_low;
-	UINT8                *yard_score_panel_disabled;
-	bitmap_t             *scroll_panel_bitmap;
+	UINT8                *m_yard_scroll_x_low;
+	UINT8                *m_yard_scroll_x_high;
+	UINT8                *m_yard_scroll_y_low;
+	UINT8                *m_yard_score_panel_disabled;
+	bitmap_t             *m_scroll_panel_bitmap;
 };
 
 /*----------- defined in video/m58.c -----------*/

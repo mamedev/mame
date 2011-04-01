@@ -4,13 +4,13 @@ public:
 	hexion_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram[2];
-	UINT8 *unkram;
-	int bankctrl;
-	int rambank;
-	int pmcbank;
-	int gfxrom_select;
-	tilemap_t *bg_tilemap[2];
+	UINT8 *m_vram[2];
+	UINT8 *m_unkram;
+	int m_bankctrl;
+	int m_rambank;
+	int m_pmcbank;
+	int m_gfxrom_select;
+	tilemap_t *m_bg_tilemap[2];
 };
 
 

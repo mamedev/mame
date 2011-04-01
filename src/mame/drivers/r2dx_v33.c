@@ -31,7 +31,7 @@ public:
 	r2dx_v33_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *spriteram;
+	UINT16 *m_spriteram;
 };
 
 
@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
 	int dx,dy,ax,ay;
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)

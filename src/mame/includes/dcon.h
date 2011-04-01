@@ -4,20 +4,20 @@ public:
 	dcon_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *back_data;
-	UINT16 *fore_data;
-	UINT16 *mid_data;
-	UINT16 *scroll_ram;
-	UINT16 *textram;
-	tilemap_t *background_layer;
-	tilemap_t *foreground_layer;
-	tilemap_t *midground_layer;
-	tilemap_t *text_layer;
-	UINT16 enable;
-	int gfx_bank_select;
-	int last_gfx_bank;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	UINT16 *m_back_data;
+	UINT16 *m_fore_data;
+	UINT16 *m_mid_data;
+	UINT16 *m_scroll_ram;
+	UINT16 *m_textram;
+	tilemap_t *m_background_layer;
+	tilemap_t *m_foreground_layer;
+	tilemap_t *m_midground_layer;
+	tilemap_t *m_text_layer;
+	UINT16 m_enable;
+	int m_gfx_bank_select;
+	int m_last_gfx_bank;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

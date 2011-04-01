@@ -30,16 +30,16 @@ public:
 	segald_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 nmi_enable;
+	UINT8 m_nmi_enable;
 
-	UINT8* obj_RAM;
-	UINT8* color_RAM;
-	UINT8* fix_RAM;
-	UINT8* out_RAM;
+	UINT8* m_obj_RAM;
+	UINT8* m_color_RAM;
+	UINT8* m_fix_RAM;
+	UINT8* m_out_RAM;
 
-	device_t *laserdisc;
-	UINT8 ldv1000_input_latch;
-	UINT8 ldv1000_output_latch;
+	device_t *m_laserdisc;
+	UINT8 m_ldv1000_input_latch;
+	UINT8 m_ldv1000_output_latch;
 
 };
 
@@ -54,7 +54,7 @@ static void astron_draw_characters(running_machine &machine, bitmap_t *bitmap,co
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->fix_RAM[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_RAM[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
@@ -80,8 +80,8 @@ static void astron_draw_sprites(running_machine &machine, bitmap_t *bitmap, cons
 	for (spr_number = 0; spr_number < 32; spr_number++)
 	{
 		spr_base = 0x10 * spr_number;
-		sy = state->obj_RAM[spr_base + SPR_Y_TOP];
-		sx = state->obj_RAM[spr_base + SPR_X_LO];
+		sy = state->m_obj_RAM[spr_base + SPR_Y_TOP];
+		sx = state->m_obj_RAM[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -107,36 +107,36 @@ static READ8_HANDLER( astron_DISC_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	if (state->nmi_enable)
-		state->ldv1000_input_latch = laserdisc_data_r(state->laserdisc);
+	if (state->m_nmi_enable)
+		state->m_ldv1000_input_latch = laserdisc_data_r(state->m_laserdisc);
 
-	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", state->ldv1000_input_latch, offset, cpu_get_pc(&space->device()));
+	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", state->m_ldv1000_input_latch, offset, cpu_get_pc(&space->device()));
 
-	return state->ldv1000_input_latch;
+	return state->m_ldv1000_input_latch;
 }
 
 static READ8_HANDLER( astron_OUT_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", state->out_RAM[offset], offset, cpu_get_pc(&space->device()));
-	return state->out_RAM[offset];
+	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", state->m_out_RAM[offset], offset, cpu_get_pc(&space->device()));
+	return state->m_out_RAM[offset];
 }
 
 static READ8_HANDLER( astron_OBJ_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", state->obj_RAM[offset], offset, cpu_get_pc(&space->device()));
-	return state->obj_RAM[offset];
+	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", state->m_obj_RAM[offset], offset, cpu_get_pc(&space->device()));
+	return state->m_obj_RAM[offset];
 }
 
 static READ8_HANDLER( astron_COLOR_read )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", state->color_RAM[offset], offset, cpu_get_pc(&space->device()));
-	return state->color_RAM[offset];
+	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", state->m_color_RAM[offset], offset, cpu_get_pc(&space->device()));
+	return state->m_color_RAM[offset];
 }
 
 
@@ -147,10 +147,10 @@ static WRITE8_HANDLER( astron_DISC_write )
 
 	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 
-	state->ldv1000_output_latch = data;
+	state->m_ldv1000_output_latch = data;
 
-	if (state->nmi_enable)
-		laserdisc_data_w(state->laserdisc, state->ldv1000_output_latch);
+	if (state->m_nmi_enable)
+		laserdisc_data_w(state->m_laserdisc, state->m_ldv1000_output_latch);
 }
 
 static WRITE8_HANDLER( astron_OUT_write )
@@ -175,7 +175,7 @@ static WRITE8_HANDLER( astron_OUT_write )
 			/* data & 0x10 = Continue Lamp */
 
 			/* data & 0x20 = CHC           */
-			state->nmi_enable = data & 0x40;      /* NMIE */
+			state->m_nmi_enable = data & 0x40;      /* NMIE */
 			/* data & 0x80 = CN0 Pin 19    */
 			break;
 
@@ -188,14 +188,14 @@ static WRITE8_HANDLER( astron_OUT_write )
 			break;
 	}
 
-	state->out_RAM[offset] = data;
+	state->m_out_RAM[offset] = data;
 }
 
 static WRITE8_HANDLER( astron_OBJ_write )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	state->obj_RAM[offset] = data;
+	state->m_obj_RAM[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device()));
 }
 
@@ -207,11 +207,11 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	const UINT8 palIndex = offset >> 1;
 
 	/* Combine */
-	state->color_RAM[offset] = data;
+	state->m_color_RAM[offset] = data;
 
 	/* Easy access */
-	highBits = state->color_RAM[(palIndex<<1)+1] & 0x0f;
-	lowBits  = state->color_RAM[(palIndex<<1)];
+	highBits = state->m_color_RAM[(palIndex<<1)+1] & 0x0f;
+	lowBits  = state->m_color_RAM[(palIndex<<1)];
 
 	/* 4-bit RGB */
 	r = (lowBits  & 0x0f);
@@ -227,7 +227,7 @@ static WRITE8_HANDLER( astron_FIX_write )
 {
 	segald_state *state = space->machine().driver_data<segald_state>();
 
-	state->fix_RAM[offset] = data;
+	state->m_fix_RAM[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(&space->device())); */
 }
 
@@ -245,15 +245,15 @@ static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_BASE_MEMBER(segald_state, obj_RAM)	/* OBJ according to the schematics (sprite) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_BASE_MEMBER(segald_state, m_obj_RAM)	/* OBJ according to the schematics (sprite) */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read, astron_DISC_write)					/* DISC interface according to schematics */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")								/* SW bank 2 (DIPs) */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")								/* SW bank 3 (DIPs) */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")								/* SW bank 0 (IO) */
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")								/* SW bank 1 (IO) */
-	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_BASE_MEMBER(segald_state, out_RAM)	/* OUT according to schematics (output port) */
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_BASE_MEMBER(segald_state, color_RAM) /* COLOR according to the schematics */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_BASE_MEMBER(segald_state, fix_RAM)						/* FIX according to schematics (characters) */
+	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_BASE_MEMBER(segald_state, m_out_RAM)	/* OUT according to schematics (output port) */
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_BASE_MEMBER(segald_state, m_color_RAM) /* COLOR according to the schematics */
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_BASE_MEMBER(segald_state, m_fix_RAM)						/* FIX according to schematics (characters) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM																/* RAM according to schematics */
 ADDRESS_MAP_END
 
@@ -358,7 +358,7 @@ static MACHINE_START( astron )
 {
 	segald_state *state = machine.driver_data<segald_state>();
 
-	state->laserdisc = machine.device("laserdisc");
+	state->m_laserdisc = machine.device("laserdisc");
 }
 
 

@@ -11,14 +11,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    spriteram;
-	UINT8 *    colorram;
-	UINT8 *    scrollram;
-	UINT8 *    colorbank;
+	UINT8 *    m_videoram;
+	UINT8 *    m_spriteram;
+	UINT8 *    m_colorram;
+	UINT8 *    m_scrollram;
+	UINT8 *    m_colorbank;
 
-	size_t     videoram_size;
-	size_t     spriteram_size;
+	size_t     m_videoram_size;
+	size_t     m_spriteram_size;
 };
 
 

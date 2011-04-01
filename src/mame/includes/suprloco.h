@@ -4,12 +4,12 @@ public:
 	suprloco_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 *scrollram;
-	tilemap_t *bg_tilemap;
-	int control;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	UINT8 *m_scrollram;
+	tilemap_t *m_bg_tilemap;
+	int m_control;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

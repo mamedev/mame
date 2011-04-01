@@ -27,7 +27,7 @@ static INTERRUPT_GEN( drmicro_interrupt )
 {
 	drmicro_state *state = device->machine().driver_data<drmicro_state>();
 
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		 device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -35,8 +35,8 @@ static WRITE8_HANDLER( nmi_enable_w )
 {
 	drmicro_state *state = space->machine().driver_data<drmicro_state>();
 
-	state->nmi_enable = data & 1;
-	state->flipscreen = (data & 2) ? 1 : 0;
+	state->m_nmi_enable = data & 1;
+	state->m_flipscreen = (data & 2) ? 1 : 0;
 	flip_screen_set(space->machine(), data & 2);
 
 	// bit2,3 unknown
@@ -48,17 +48,17 @@ static void pcm_w(device_t *device)
 	drmicro_state *state = device->machine().driver_data<drmicro_state>();
 	UINT8 *PCM = device->machine().region("adpcm")->base();
 
-	int data = PCM[state->pcm_adr / 2];
+	int data = PCM[state->m_pcm_adr / 2];
 
 	if (data != 0x70) // ??
 	{
-		if (~state->pcm_adr & 1)
+		if (~state->m_pcm_adr & 1)
 			data >>= 4;
 
 		msm5205_data_w(device, data & 0x0f);
 		msm5205_reset_w(device, 0);
 
-		state->pcm_adr = (state->pcm_adr + 1) & 0x7fff;
+		state->m_pcm_adr = (state->m_pcm_adr + 1) & 0x7fff;
 	}
 	else
 		msm5205_reset_w(device, 1);
@@ -67,8 +67,8 @@ static void pcm_w(device_t *device)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	drmicro_state *state = space->machine().driver_data<drmicro_state>();
-	state->pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(state->msm);
+	state->m_pcm_adr = ((data & 0x3f) << 9);
+	pcm_w(state->m_msm);
 }
 
 /*************************************
@@ -230,20 +230,20 @@ static MACHINE_START( drmicro )
 {
 	drmicro_state *state = machine.driver_data<drmicro_state>();
 
-	state->msm = machine.device("msm");
+	state->m_msm = machine.device("msm");
 
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->pcm_adr));
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_pcm_adr));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_RESET( drmicro )
 {
 	drmicro_state *state = machine.driver_data<drmicro_state>();
 
-	state->nmi_enable = 0;
-	state->pcm_adr = 0;
-	state->flipscreen = 0;
+	state->m_nmi_enable = 0;
+	state->m_pcm_adr = 0;
+	state->m_flipscreen = 0;
 }
 
 

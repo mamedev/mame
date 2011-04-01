@@ -62,8 +62,8 @@ PALETTE_INIT( yiear )
 WRITE8_HANDLER( yiear_videoram_w )
 {
 	yiear_state *state = space->machine().driver_data<yiear_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( yiear_control_w )
@@ -77,7 +77,7 @@ WRITE8_HANDLER( yiear_control_w )
 	}
 
 	/* bit 1 is NMI enable */
-	state->yiear_nmi_enable = data & 0x02;
+	state->m_yiear_nmi_enable = data & 0x02;
 
 	/* bit 2 is IRQ enable */
 	interrupt_enable_w(space, 0, data & 0x04);
@@ -91,8 +91,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
 	int offs = tile_index * 2;
-	int attr = state->videoram[offs];
-	int code = state->videoram[offs + 1] | ((attr & 0x10) << 4);
+	int attr = state->m_videoram[offs];
+	int code = state->m_videoram[offs + 1] | ((attr & 0x10) << 4);
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
@@ -102,17 +102,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( yiear )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	yiear_state *state = machine.driver_data<yiear_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram[offs];
 		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);
@@ -145,7 +145,7 @@ SCREEN_UPDATE( yiear )
 {
 	yiear_state *state = screen->machine().driver_data<yiear_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

@@ -96,10 +96,10 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	buggychl_state *state = machine.driver_data<buggychl_state>();
 
-	if (state->sound_nmi_enable)
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->m_sound_nmi_enable)
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		state->pending_nmi = 1;
+		state->m_pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -111,17 +111,17 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( nmi_disable_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->sound_nmi_enable = 0;
+	state->m_sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->sound_nmi_enable = 1;
-	if (state->pending_nmi)
+	state->m_sound_nmi_enable = 1;
+	if (state->m_pending_nmi)
 	{
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->pending_nmi = 0;
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->m_pending_nmi = 0;
 	}
 }
 
@@ -138,15 +138,15 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_BASE_MEMBER(buggychl_state, charram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, videoram, videoram_size)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_BASE_MEMBER(buggychl_state, m_charram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", buggychl_mcu_status_r)
-	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)
+	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(buggychl_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, scrollv)
-	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, scrollh)
+	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, m_scrollv)
+	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, m_scrollh)
 	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
 	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
 ADDRESS_MAP_END
@@ -366,16 +366,16 @@ static MACHINE_START( buggychl )
 
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->sound_nmi_enable));
-	state->save_item(NAME(state->pending_nmi));
-	state->save_item(NAME(state->sprite_lookup));
-	state->save_item(NAME(state->sl_bank));
-	state->save_item(NAME(state->bg_on));
-	state->save_item(NAME(state->sky_on));
-	state->save_item(NAME(state->sprite_color_base));
-	state->save_item(NAME(state->bg_scrollx));
+	state->save_item(NAME(state->m_sound_nmi_enable));
+	state->save_item(NAME(state->m_pending_nmi));
+	state->save_item(NAME(state->m_sprite_lookup));
+	state->save_item(NAME(state->m_sl_bank));
+	state->save_item(NAME(state->m_bg_on));
+	state->save_item(NAME(state->m_sky_on));
+	state->save_item(NAME(state->m_sprite_color_base));
+	state->save_item(NAME(state->m_bg_scrollx));
 }
 
 static MACHINE_RESET( buggychl )
@@ -384,13 +384,13 @@ static MACHINE_RESET( buggychl )
 
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 
-	state->sound_nmi_enable = 0;
-	state->pending_nmi = 0;
-	state->sl_bank = 0;
-	state->bg_on = 0;
-	state->sky_on = 0;
-	state->sprite_color_base = 0;
-	state->bg_scrollx = 0;
+	state->m_sound_nmi_enable = 0;
+	state->m_pending_nmi = 0;
+	state->m_sl_bank = 0;
+	state->m_bg_on = 0;
+	state->m_sky_on = 0;
+	state->m_sprite_color_base = 0;
+	state->m_bg_scrollx = 0;
 }
 
 static MACHINE_CONFIG_START( buggychl, buggychl_state )

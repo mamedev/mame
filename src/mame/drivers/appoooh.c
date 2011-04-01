@@ -173,25 +173,25 @@ static void appoooh_adpcm_int(device_t *device)
 {
 	appoooh_state *state = device->machine().driver_data<appoooh_state>();
 
-	if (state->adpcm_address != 0xffffffff)
+	if (state->m_adpcm_address != 0xffffffff)
 	{
-		if (state->adpcm_data == 0xffffffff)
+		if (state->m_adpcm_data == 0xffffffff)
 		{
 			UINT8 *RAM = device->machine().region("adpcm")->base();
 
-			state->adpcm_data = RAM[state->adpcm_address++];
-			msm5205_data_w(device, state->adpcm_data >> 4);
+			state->m_adpcm_data = RAM[state->m_adpcm_address++];
+			msm5205_data_w(device, state->m_adpcm_data >> 4);
 
-			if (state->adpcm_data == 0x70)
+			if (state->m_adpcm_data == 0x70)
 			{
-				state->adpcm_address = 0xffffffff;
+				state->m_adpcm_address = 0xffffffff;
 				msm5205_reset_w(device, 1);
 			}
 		}
 		else
 		{
-			msm5205_data_w(device, state->adpcm_data & 0x0f );
-			state->adpcm_data = -1;
+			msm5205_data_w(device, state->m_adpcm_data & 0x0f );
+			state->m_adpcm_data = -1;
 		}
 	}
 }
@@ -201,9 +201,9 @@ static WRITE8_HANDLER( appoooh_adpcm_w )
 {
 	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 
-	state->adpcm_address = data << 8;
-	msm5205_reset_w(state->adpcm, 0);
-	state->adpcm_data = 0xffffffff;
+	state->m_adpcm_address = data << 8;
+	msm5205_reset_w(state->m_adpcm, 0);
+	state->m_adpcm_data = 0xffffffff;
 }
 
 
@@ -220,12 +220,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 
-	AM_RANGE(0xf000, 0xf01f) AM_BASE_MEMBER(appoooh_state, spriteram)
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(appoooh_fg_videoram_w) AM_BASE_MEMBER(appoooh_state, fg_videoram)
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(appoooh_fg_colorram_w) AM_BASE_MEMBER(appoooh_state, fg_colorram)
-	AM_RANGE(0xf800, 0xf81f) AM_BASE_MEMBER(appoooh_state, spriteram_2)
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE(appoooh_bg_videoram_w) AM_BASE_MEMBER(appoooh_state, bg_videoram)
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE(appoooh_bg_colorram_w) AM_BASE_MEMBER(appoooh_state, bg_colorram)
+	AM_RANGE(0xf000, 0xf01f) AM_BASE_MEMBER(appoooh_state, m_spriteram)
+	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(appoooh_fg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_fg_videoram)
+	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(appoooh_fg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_fg_colorram)
+	AM_RANGE(0xf800, 0xf81f) AM_BASE_MEMBER(appoooh_state, m_spriteram_2)
+	AM_RANGE(0xf820, 0xfbff) AM_WRITE(appoooh_bg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_bg_videoram)
+	AM_RANGE(0xfc20, 0xffff) AM_WRITE(appoooh_bg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_bg_colorram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -404,10 +404,10 @@ static MACHINE_START( appoooh )
 {
 	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->adpcm = machine.device("msm");
+	state->m_adpcm = machine.device("msm");
 
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->adpcm_address));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_adpcm_address));
 }
 
 
@@ -415,10 +415,10 @@ static MACHINE_RESET( appoooh )
 {
 	appoooh_state *state = machine.driver_data<appoooh_state>();
 
-	state->adpcm_address = 0xffffffff;
-	state->adpcm_data = 0;
-	state->scroll_x = 0;
-	state->priority = 0;
+	state->m_adpcm_address = 0xffffffff;
+	state->m_adpcm_data = 0;
+	state->m_scroll_x = 0;
+	state->m_priority = 0;
 }
 
 static MACHINE_CONFIG_START( appoooh_common, appoooh_state )

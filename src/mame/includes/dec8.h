@@ -6,36 +6,44 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  bg_data;
-	UINT8 *  pf1_data;
-	UINT8 *  row;
-//  UINT8 *  paletteram;    // currently this uses generic palette handling
-//  UINT8 *  paletteram_2;  // currently this uses generic palette handling
-//  UINT8 *  spriteram; // currently this uses buffered_spriteram in some games
-	size_t   videoram_size;
-	UINT16   buffered_spriteram16[0x800/2]; // for the mxc06 sprite chip emulation (oscar, cobra)
+	UINT8 *  m_videoram;
+	UINT8 *  m_bg_data;
+	UINT8 *  m_pf1_data;
+	UINT8 *  m_row;
+//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
+//  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
+//  UINT8 *  m_spriteram; // currently this uses buffered_spriteram in some games
+	size_t   m_videoram_size;
+	UINT16   m_buffered_spriteram16[0x800/2]; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	/* video-related */
-	tilemap_t  *bg_tilemap, *pf1_tilemap, *fix_tilemap;
-	//int      scroll1[4];
-	int      scroll2[4];
-	int      bg_control[0x20], pf1_control[0x20];
-	int      game_uses_priority;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_pf1_tilemap;
+	tilemap_t  *m_fix_tilemap;
+	//int      m_scroll1[4];
+	int      m_scroll2[4];
+	int      m_bg_control[0x20];
+	int      m_pf1_control[0x20];
+	int      m_game_uses_priority;
 
 	/* misc */
-	int      i8751_port0, i8751_port1;
-	int      nmi_enable;
-	int      i8751_return, i8751_value;
-	int      coin1, coin2, latch, snd;
-	int      msm5205next;
-	int      toggle;
+	int      m_i8751_port0;
+	int      m_i8751_port1;
+	int      m_nmi_enable;
+	int      m_i8751_return;
+	int      m_i8751_value;
+	int      m_coin1;
+	int      m_coin2;
+	int      m_latch;
+	int      m_snd;
+	int      m_msm5205next;
+	int      m_toggle;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *subcpu;
-	device_t *audiocpu;
-	device_t *mcu;
+	device_t *m_maincpu;
+	device_t *m_subcpu;
+	device_t *m_audiocpu;
+	device_t *m_mcu;
 };
 
 /*----------- defined in video/dec8.c -----------*/

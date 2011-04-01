@@ -6,34 +6,35 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-//  UINT16 *   paletteram;    // currently this uses generic palette handling
+//  UINT16 *   m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[3], sprite_colorbase;
-	int        layerpri[3];
+	int        m_layer_colorbase[3];
+	int        m_sprite_colorbase;
+	int        m_layerpri[3];
 
 	/* for xmen6p */
-	bitmap_t   *screen_right;
-	bitmap_t   *screen_left;
-	UINT16 *   xmen6p_spriteramleft;
-	UINT16 *   xmen6p_spriteramright;
-	UINT16 *   xmen6p_tilemapleft;
-	UINT16 *   xmen6p_tilemapright;
-	UINT16 *   k053247_ram;
-	UINT16     current_frame;
+	bitmap_t   *m_screen_right;
+	bitmap_t   *m_screen_left;
+	UINT16 *   m_xmen6p_spriteramleft;
+	UINT16 *   m_xmen6p_spriteramright;
+	UINT16 *   m_xmen6p_tilemapleft;
+	UINT16 *   m_xmen6p_tilemapright;
+	UINT16 *   m_k053247_ram;
+	UINT16     m_current_frame;
 
 	/* misc */
-	UINT8       sound_curbank;
+	UINT8       m_sound_curbank;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k054539;
-	device_t *k052109;
-	device_t *k053246;
-	device_t *k053251;
-	device_t *lscreen;
-	device_t *rscreen;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k054539;
+	device_t *m_k052109;
+	device_t *m_k053246;
+	device_t *m_k053251;
+	device_t *m_lscreen;
+	device_t *m_rscreen;
 };
 
 /*----------- defined in video/xmen.c -----------*/

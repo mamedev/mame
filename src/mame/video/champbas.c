@@ -130,8 +130,8 @@ PALETTE_INIT( exctsccr )
 static TILE_GET_INFO( champbas_get_bg_tile_info )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	int code = state->bg_videoram[tile_index] | (state->gfx_bank << 8);
-	int color = (state->bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
+	int code = state->m_bg_videoram[tile_index] | (state->m_gfx_bank << 8);
+	int color = (state->m_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -139,8 +139,8 @@ static TILE_GET_INFO( champbas_get_bg_tile_info )
 static TILE_GET_INFO( exctsccr_get_bg_tile_info )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	int code = state->bg_videoram[tile_index] | (state->gfx_bank << 8);
-	int color = state->bg_videoram[tile_index + 0x400] & 0x0f;
+	int code = state->m_bg_videoram[tile_index] | (state->m_gfx_bank << 8);
+	int color = state->m_bg_videoram[tile_index + 0x400] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -150,13 +150,13 @@ static TILE_GET_INFO( exctsccr_get_bg_tile_info )
 VIDEO_START( champbas )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 VIDEO_START( exctsccr )
 {
 	champbas_state *state = machine.driver_data<champbas_state>();
-	state->bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -164,26 +164,26 @@ VIDEO_START( exctsccr )
 WRITE8_HANDLER( champbas_bg_videoram_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
+	state->m_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( champbas_gfxbank_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
 	data &= 1;
-	if (state->gfx_bank != data)
+	if (state->m_gfx_bank != data)
 	{
-		state->gfx_bank = data;
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		state->m_gfx_bank = data;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
 WRITE8_HANDLER( champbas_palette_bank_w )
 {
 	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->palette_bank = data & 1;
-	tilemap_set_palette_offset(state->bg_tilemap, state->palette_bank << 8);
+	state->m_palette_bank = data & 1;
+	tilemap_set_palette_offset(state->m_bg_tilemap, state->m_palette_bank << 8);
 }
 
 WRITE8_HANDLER( champbas_flipscreen_w )
@@ -199,14 +199,14 @@ static void champbas_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	int offs;
 	const gfx_element* const gfx = machine.gfx[1];
 
-	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
 	{
-		int code = (state->spriteram[offs] >> 2) | (state->gfx_bank << 6);
-		int color = (state->spriteram[offs + 1] & 0x1f) | (state->palette_bank << 6);
-		int flipx = ~state->spriteram[offs] & 0x01;
-		int flipy = ~state->spriteram[offs] & 0x02;
-		int sx = state->spriteram_2[offs + 1] - 16;
-		int sy = 255 - state->spriteram_2[offs];
+		int code = (state->m_spriteram[offs] >> 2) | (state->m_gfx_bank << 6);
+		int color = (state->m_spriteram[offs + 1] & 0x1f) | (state->m_palette_bank << 6);
+		int flipx = ~state->m_spriteram[offs] & 0x01;
+		int flipy = ~state->m_spriteram[offs] & 0x02;
+		int sx = state->m_spriteram_2[offs + 1] - 16;
+		int sy = 255 - state->m_spriteram_2[offs];
 
 		drawgfx_transmask(bitmap, cliprect,
 				gfx,
@@ -231,8 +231,8 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	int offs;
 	UINT8 *obj1, *obj2;
 
-	obj1 = state->bg_videoram;
-	obj2 = &(state->spriteram[0x20]);
+	obj1 = state->m_bg_videoram;
+	obj2 = &(state->m_spriteram[0x20]);
 
 	for (offs = 0x0e; offs >= 0; offs -= 2)
 	{
@@ -255,8 +255,8 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 				sx,sy,0);
 	}
 
-	obj1 = state->spriteram_2;
-	obj2 = state->spriteram;
+	obj1 = state->m_spriteram_2;
+	obj2 = state->m_spriteram;
 
 	for (offs = 0x0e; offs >= 0; offs -= 2)
 	{
@@ -285,7 +285,7 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 SCREEN_UPDATE( champbas )
 {
 	champbas_state *state = screen->machine().driver_data<champbas_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	champbas_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
@@ -293,7 +293,7 @@ SCREEN_UPDATE( champbas )
 SCREEN_UPDATE( exctsccr )
 {
 	champbas_state *state = screen->machine().driver_data<champbas_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	exctsccr_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

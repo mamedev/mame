@@ -12,17 +12,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        videoram;
-	UINT8 *        spriteram;
-	UINT8 *        port_80;
+	UINT8 *        m_videoram;
+	UINT8 *        m_spriteram;
+	UINT8 *        m_port_80;
 
 	/* video-related */
-	tilemap_t        *cm_tilemap;
-	bitmap_t       *bitmap_buffer;
+	tilemap_t        *m_cm_tilemap;
+	bitmap_t       *m_bitmap_buffer;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *dac;
+	device_t *m_maincpu;
+	device_t *m_dac;
 };
 
 

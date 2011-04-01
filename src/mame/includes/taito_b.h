@@ -6,31 +6,32 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *      spriteram;
-	UINT16 *      pixelram;
-//  UINT16 *      paletteram;   // this currently uses generic palette handlers
+	UINT16 *      m_spriteram;
+	UINT16 *      m_pixelram;
+//  UINT16 *      m_paletteram;   // this currently uses generic palette handlers
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	bitmap_t      *framebuffer[2], *pixel_bitmap;
+	bitmap_t      *m_framebuffer[2];
+	bitmap_t      *m_pixel_bitmap;
 
-	UINT16        pixel_scroll[2];
+	UINT16        m_pixel_scroll[2];
 
-	int           b_fg_color_base;
-	int           b_sp_color_base;
+	int           m_b_fg_color_base;
+	int           m_b_sp_color_base;
 
 	/* misc */
-	UINT16        eep_latch;
-	UINT16        coin_word;
+	UINT16        m_eep_latch;
+	UINT16        m_coin_word;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *mb87078;
-	device_t *ym;
-	device_t *tc0180vcu;
-	device_t *tc0640fio;
-	device_t *tc0220ioc;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_mb87078;
+	device_t *m_ym;
+	device_t *m_tc0180vcu;
+	device_t *m_tc0640fio;
+	device_t *m_tc0220ioc;
 };
 
 

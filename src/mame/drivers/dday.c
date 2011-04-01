@@ -58,10 +58,10 @@ write:
 static ADDRESS_MAP_START( dday_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE_MEMBER(dday_state, textvideoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE_MEMBER(dday_state, fgvideoram)
-	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE_MEMBER(dday_state, bgvideoram)
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE_MEMBER(dday_state, colorram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE_MEMBER(dday_state, m_textvideoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE_MEMBER(dday_state, m_fgvideoram)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE_MEMBER(dday_state, m_bgvideoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE_MEMBER(dday_state, m_colorram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -224,21 +224,21 @@ static MACHINE_START( dday )
 {
 	dday_state *state = machine.driver_data<dday_state>();
 
-	state->ay1 = machine.device("ay1");
+	state->m_ay1 = machine.device("ay1");
 
-	state->save_item(NAME(state->control));
-	state->save_item(NAME(state->sl_enable));
-	state->save_item(NAME(state->sl_image));
-	state->save_item(NAME(state->timer_value));
+	state->save_item(NAME(state->m_control));
+	state->save_item(NAME(state->m_sl_enable));
+	state->save_item(NAME(state->m_sl_image));
+	state->save_item(NAME(state->m_timer_value));
 }
 
 static MACHINE_RESET( dday )
 {
 	dday_state *state = machine.driver_data<dday_state>();
 
-	state->control = 0;
-	state->sl_enable = 0;
-	state->sl_image = 0;
+	state->m_control = 0;
+	state->m_sl_enable = 0;
+	state->m_sl_image = 0;
 }
 
 

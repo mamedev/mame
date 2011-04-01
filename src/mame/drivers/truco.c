@@ -26,8 +26,8 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM										/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_MEMBER(truco_state, videoram)					/* video ram */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(truco_state, battery_ram)				/* battery backed ram */
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_MEMBER(truco_state, m_videoram)					/* video ram */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(truco_state, m_battery_ram)				/* battery backed ram */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1") AM_WRITENOP				/* controls (and irq ack?) */
 	AM_RANGE(0x8001, 0x8001) AM_NOP				/* unknown */
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("DSW") AM_DEVWRITE("dac", dac_w)	/* dipswitches */
@@ -91,27 +91,27 @@ static MACHINE_RESET( truco )
 	/* Setup the data on the battery backed RAM */
 
 	/* IRQ check */
-	state->battery_ram[0x002] = 0x51;
-	state->battery_ram[0x024] = 0x49;
-	state->battery_ram[0x089] = 0x04;
-	state->battery_ram[0x170] = 0x12;
-	state->battery_ram[0x1a8] = 0xd5;
+	state->m_battery_ram[0x002] = 0x51;
+	state->m_battery_ram[0x024] = 0x49;
+	state->m_battery_ram[0x089] = 0x04;
+	state->m_battery_ram[0x170] = 0x12;
+	state->m_battery_ram[0x1a8] = 0xd5;
 
 	/* Mainloop check */
-	state->battery_ram[0x005] = 0x04;
-	state->battery_ram[0x22B] = 0x46;
-	state->battery_ram[0x236] = 0xfb;
-	state->battery_ram[0x2fe] = 0x1D;
-	state->battery_ram[0x359] = 0x5A;
+	state->m_battery_ram[0x005] = 0x04;
+	state->m_battery_ram[0x22B] = 0x46;
+	state->m_battery_ram[0x236] = 0xfb;
+	state->m_battery_ram[0x2fe] = 0x1D;
+	state->m_battery_ram[0x359] = 0x5A;
 
 	/* Boot check */
-	a = ( state->battery_ram[0x000] << 8 ) | state->battery_ram[0x001];
+	a = ( state->m_battery_ram[0x000] << 8 ) | state->m_battery_ram[0x001];
 
 	a += 0x4d2;
 
-	state->battery_ram[0x01d] = ( a >> 8 ) & 0xff;
-	state->battery_ram[0x01e] = a & 0xff;
-	state->battery_ram[0x020] = state->battery_ram[0x011];
+	state->m_battery_ram[0x01d] = ( a >> 8 ) & 0xff;
+	state->m_battery_ram[0x01e] = a & 0xff;
+	state->m_battery_ram[0x020] = state->m_battery_ram[0x011];
 }
 
 static INTERRUPT_GEN( truco_interrupt )
@@ -121,13 +121,13 @@ static INTERRUPT_GEN( truco_interrupt )
 
 	if ( input_port_read(device->machine(),  "COIN") & 1 )
 	{
-		if ( state->trigger == 0 )
+		if ( state->m_trigger == 0 )
 		{
 			generic_pulse_irq_line(device, M6809_IRQ_LINE);
-			state->trigger++;
+			state->m_trigger++;
 		}
 	} else
-		state->trigger = 0;
+		state->m_trigger = 0;
 }
 
 

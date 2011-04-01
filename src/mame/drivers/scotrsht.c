@@ -43,7 +43,7 @@ static WRITE8_HANDLER( ctrl_w )
 {
 	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	state->irq_enable = data & 0x02;
+	state->m_irq_enable = data & 0x02;
 	flip_screen_set(space->machine(), data & 0x08);
 }
 
@@ -51,7 +51,7 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 {
 	scotrsht_state *state = device->machine().driver_data<scotrsht_state>();
 
-	if (state->irq_enable)
+	if (state->m_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -62,11 +62,11 @@ static WRITE8_HANDLER( scotrsht_soundlatch_w )
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE_MEMBER(scotrsht_state, colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE_MEMBER(scotrsht_state, videoram)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(scotrsht_state, spriteram, spriteram_size) /* sprites */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE_MEMBER(scotrsht_state, m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE_MEMBER(scotrsht_state, m_videoram)
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(scotrsht_state, m_spriteram, m_spriteram_size) /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE_MEMBER(scotrsht_state, scroll) /* scroll registers */
+	AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE_MEMBER(scotrsht_state, m_scroll) /* scroll registers */
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
 	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */

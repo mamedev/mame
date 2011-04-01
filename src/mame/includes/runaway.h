@@ -4,11 +4,11 @@ public:
 	runaway_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *interrupt_timer;
-	UINT8* video_ram;
-	UINT8* sprite_ram;
-	tilemap_t *bg_tilemap;
-	int tile_bank;
+	emu_timer *m_interrupt_timer;
+	UINT8* m_video_ram;
+	UINT8* m_sprite_ram;
+	tilemap_t *m_bg_tilemap;
+	int m_tile_bank;
 };
 
 

@@ -240,12 +240,12 @@ static MACHINE_START( gottlieb )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* register for save states */
-	state_save_register_global(machine, state->joystick_select);
-	state_save_register_global_array(machine, state->track);
+	state_save_register_global(machine, state->m_joystick_select);
+	state_save_register_global_array(machine, state->m_track);
 
 	/* see if we have a laserdisc */
-	state->laserdisc = machine.m_devicelist.first(LASERDISC);
-	if (state->laserdisc != NULL)
+	state->m_laserdisc = machine.m_devicelist.first(LASERDISC);
+	if (state->m_laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x05805, 0x05807, 0, 0x07f8, FUNC(laserdisc_status_r));
@@ -253,26 +253,26 @@ static MACHINE_START( gottlieb )
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05806, 0x05806, 0, 0x07f8, FUNC(laserdisc_select_w));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		state->laserdisc_bit_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
-		state->laserdisc_philips_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
+		state->m_laserdisc_bit_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
+		state->m_laserdisc_philips_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_philips_callback));
 
 		/* create some audio RAM */
-		state->laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
-		state->laserdisc_status = 0x38;
+		state->m_laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
+		state->m_laserdisc_status = 0x38;
 
 		/* more save state registration */
-		state_save_register_global(machine, state->laserdisc_select);
-		state_save_register_global(machine, state->laserdisc_status);
-		state_save_register_global(machine, state->laserdisc_philips_code);
+		state_save_register_global(machine, state->m_laserdisc_select);
+		state_save_register_global(machine, state->m_laserdisc_status);
+		state_save_register_global(machine, state->m_laserdisc_philips_code);
 
-		state_save_register_global_pointer(machine, state->laserdisc_audio_buffer, AUDIORAM_SIZE);
-		state_save_register_global(machine, state->laserdisc_audio_address);
-		state_save_register_global_array(machine, state->laserdisc_last_samples);
-		state_save_register_global(machine, state->laserdisc_last_time);
-		state_save_register_global(machine, state->laserdisc_last_clock);
-		state_save_register_global(machine, state->laserdisc_zero_seen);
-		state_save_register_global(machine, state->laserdisc_audio_bits);
-		state_save_register_global(machine, state->laserdisc_audio_bit_count);
+		state_save_register_global_pointer(machine, state->m_laserdisc_audio_buffer, AUDIORAM_SIZE);
+		state_save_register_global(machine, state->m_laserdisc_audio_address);
+		state_save_register_global_array(machine, state->m_laserdisc_last_samples);
+		state_save_register_global(machine, state->m_laserdisc_last_time);
+		state_save_register_global(machine, state->m_laserdisc_last_clock);
+		state_save_register_global(machine, state->m_laserdisc_zero_seen);
+		state_save_register_global(machine, state->m_laserdisc_audio_bits);
+		state_save_register_global(machine, state->m_laserdisc_audio_bit_count);
 	}
 }
 
@@ -281,8 +281,8 @@ static MACHINE_RESET( gottlieb )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
-	if (state->laserdisc != NULL)
-		state->laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
+	if (state->m_laserdisc != NULL)
+		state->m_laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(17), 17);
 }
 
 
@@ -299,7 +299,7 @@ static CUSTOM_INPUT( analog_delta_r )
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(field->port->machine(), &string[1]) - state->track[which];
+	return input_port_read(field->port->machine(), &string[1]) - state->m_track[which];
 }
 
 
@@ -307,8 +307,8 @@ static WRITE8_HANDLER( gottlieb_analog_reset_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* reset the trackball counters */
-	state->track[0] = input_port_read_safe(space->machine(), "TRACKX", 0);
-	state->track[1] = input_port_read_safe(space->machine(), "TRACKY", 0);
+	state->m_track[0] = input_port_read_safe(space->machine(), "TRACKX", 0);
+	state->m_track[1] = input_port_read_safe(space->machine(), "TRACKY", 0);
 }
 
 
@@ -316,7 +316,7 @@ static CUSTOM_INPUT( stooges_joystick_r )
 {
 	gottlieb_state *state = field->port->machine().driver_data<gottlieb_state>();
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[state->joystick_select & 3] != NULL) ? input_port_read(field->port->machine(), joyport[state->joystick_select & 3]) : 0xff;
+	return (joyport[state->m_joystick_select & 3] != NULL) ? input_port_read(field->port->machine(), joyport[state->m_joystick_select & 3]) : 0xff;
 }
 
 
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( general_output_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* bits 0-3 control video features, and are different for laserdisc games */
-	if (state->laserdisc == NULL)
+	if (state->m_laserdisc == NULL)
 		gottlieb_video_control_w(space, offset, data);
 	else
 		gottlieb_laserdisc_video_control_w(space, offset, data);
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( stooges_output_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	general_output_w(space, offset, data & ~0x60);
-	state->joystick_select = (data >> 5) & 0x03;
+	state->m_joystick_select = (data >> 5) & 0x03;
 }
 
 
@@ -377,14 +377,14 @@ static READ8_HANDLER( laserdisc_status_r )
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* IP5 reads low 8 bits of philips code */
 	if (offset == 0)
-		return state->laserdisc_philips_code;
+		return state->m_laserdisc_philips_code;
 
 	/* IP6 reads middle 8 bits of philips code */
 	if (offset == 1)
-		return state->laserdisc_philips_code >> 8;
+		return state->m_laserdisc_philips_code >> 8;
 
 	/* IP7 reads either status or audio detect, depending on the select */
-	if (state->laserdisc_select)
+	if (state->m_laserdisc_select)
 	{
 		/* bits 0-2 frame number MSN */
 		/* bit 3 audio buffer ready */
@@ -392,12 +392,12 @@ static READ8_HANDLER( laserdisc_status_r )
 		/* bit 5 disc ready */
 		/* bit 6 break in audio trasmission */
 		/* bit 7 missing audio clock */
-		return state->laserdisc_status;
+		return state->m_laserdisc_status;
 	}
 	else
 	{
-		UINT8 result = state->laserdisc_audio_buffer[state->laserdisc_audio_address++];
-		state->laserdisc_audio_address %= AUDIORAM_SIZE;
+		UINT8 result = state->m_laserdisc_audio_buffer[state->m_laserdisc_audio_address++];
+		state->m_laserdisc_audio_address %= AUDIORAM_SIZE;
 		return result;
 	}
 	return 0;
@@ -408,7 +408,7 @@ static WRITE8_HANDLER( laserdisc_select_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* selects between reading audio data and reading status */
-	state->laserdisc_select = data & 1;
+	state->m_laserdisc_select = data & 1;
 }
 
 
@@ -419,10 +419,10 @@ static WRITE8_HANDLER( laserdisc_command_w )
        a sequence of events that sends serial data to the player */
 
 	/* set a timer to clock the bits through; a total of 12 bits are clocked */
-	state->laserdisc_bit_timer->adjust(LASERDISC_CLOCK * 10, (12 << 16) | data);
+	state->m_laserdisc_bit_timer->adjust(LASERDISC_CLOCK * 10, (12 << 16) | data);
 
 	/* it also clears bit 4 of the status (will be set when transmission is complete) */
-	state->laserdisc_status &= ~0x10;
+	state->m_laserdisc_status &= ~0x10;
 }
 
 
@@ -436,7 +436,7 @@ static WRITE8_HANDLER( laserdisc_command_w )
 static TIMER_CALLBACK( laserdisc_philips_callback )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	int newcode = laserdisc_get_field_code(state->laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
+	int newcode = laserdisc_get_field_code(state->m_laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, TRUE);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
        board receives notification and latches the most recent frame number */
@@ -444,13 +444,13 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 	/* the logic detects a valid code when the top 4 bits are all 1s */
 	if ((newcode & 0xf00000) == 0xf00000)
 	{
-		state->laserdisc_philips_code = newcode;
-		state->laserdisc_status = (state->laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
+		state->m_laserdisc_philips_code = newcode;
+		state->m_laserdisc_status = (state->m_laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
 	}
 
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
-	state->laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
+	state->m_laserdisc_philips_timer->adjust(machine.primary_screen->time_until_pos(param * 2), param);
 }
 
 
@@ -458,7 +458,7 @@ static TIMER_CALLBACK( laserdisc_bit_off_callback )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
 	/* deassert the control line */
-	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
+	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
 }
 
 
@@ -470,7 +470,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 	attotime duration;
 
 	/* assert the line and set a timer for deassertion */
-	laserdisc_line_w(state->laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+	laserdisc_line_w(state->m_laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
 	machine.scheduler().timer_set(LASERDISC_CLOCK * 10, FUNC(laserdisc_bit_off_callback));
 
 	/* determine how long for the next command; there is a 555 timer with a
@@ -483,9 +483,9 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
 	if (bitsleft-- != 0)
-		state->laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
+		state->m_laserdisc_bit_timer->adjust(duration, (bitsleft << 16) | data);
 	else
-		state->laserdisc_status |= 0x10;
+		state->m_laserdisc_status |= 0x10;
 }
 
 
@@ -500,49 +500,49 @@ INLINE void audio_end_state(gottlieb_state *state)
 {
 	/* this occurs either when the "break in transmission" condition is hit (no zero crossings
        for 400usec) or when the entire audio buffer is full */
-	state->laserdisc_status |= 0x08;
-	state->laserdisc_audio_bit_count = 0;
-	state->laserdisc_audio_address = 0;
-	if (state->laserdisc_audio_address != 0)
-		printf("Got %d bytes\n", state->laserdisc_audio_address);
+	state->m_laserdisc_status |= 0x08;
+	state->m_laserdisc_audio_bit_count = 0;
+	state->m_laserdisc_audio_address = 0;
+	if (state->m_laserdisc_audio_address != 0)
+		printf("Got %d bytes\n", state->m_laserdisc_audio_address);
 }
 
 
 static void audio_process_clock(gottlieb_state *state, int logit)
 {
 	/* clock the bit through the shift register */
-	state->laserdisc_audio_bits >>= 1;
-	if (state->laserdisc_zero_seen)
-		state->laserdisc_audio_bits |= 0x80;
-	state->laserdisc_zero_seen = 0;
+	state->m_laserdisc_audio_bits >>= 1;
+	if (state->m_laserdisc_zero_seen)
+		state->m_laserdisc_audio_bits |= 0x80;
+	state->m_laserdisc_zero_seen = 0;
 
 	/* if the buffer ready flag is set, then we are looking for the magic $67 pattern */
-	if (state->laserdisc_status & 0x08)
+	if (state->m_laserdisc_status & 0x08)
 	{
-		if (state->laserdisc_audio_bits == 0x67)
+		if (state->m_laserdisc_audio_bits == 0x67)
 		{
 			if (logit)
 				logerror(" -- got 0x67");
-			state->laserdisc_status &= ~0x08;
-			state->laserdisc_audio_address = 0;
+			state->m_laserdisc_status &= ~0x08;
+			state->m_laserdisc_audio_address = 0;
 		}
 	}
 
 	/* otherwise, we keep clocking bytes into the audio buffer */
 	else
 	{
-		state->laserdisc_audio_bit_count++;
+		state->m_laserdisc_audio_bit_count++;
 
 		/* if we collect 8 bits, add to the buffer */
-		if (state->laserdisc_audio_bit_count == 8)
+		if (state->m_laserdisc_audio_bit_count == 8)
 		{
 			if (logit)
-				logerror(" -- got new byte %02X", state->laserdisc_audio_bits);
-			state->laserdisc_audio_bit_count = 0;
-			state->laserdisc_audio_buffer[state->laserdisc_audio_address++] = state->laserdisc_audio_bits;
+				logerror(" -- got new byte %02X", state->m_laserdisc_audio_bits);
+			state->m_laserdisc_audio_bit_count = 0;
+			state->m_laserdisc_audio_buffer[state->m_laserdisc_audio_address++] = state->m_laserdisc_audio_bits;
 
 			/* if we collect a full buffer, signal */
-			if (state->laserdisc_audio_address >= AUDIORAM_SIZE)
+			if (state->m_laserdisc_audio_address >= AUDIORAM_SIZE)
 				audio_end_state(state);
 		}
 	}
@@ -552,7 +552,7 @@ static void audio_process_clock(gottlieb_state *state, int logit)
 static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime, int logit)
 {
 	/* compute time from last clock */
-	attotime deltaclock = zerotime - state->laserdisc_last_clock;
+	attotime deltaclock = zerotime - state->m_laserdisc_last_clock;
 	if (logit)
 		logerror(" -- zero @ %s (delta=%s)", zerotime.as_string(6), deltaclock.as_string(6));
 
@@ -561,7 +561,7 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 	{
 		if (logit)
 			logerror(" -- count as bit");
-		state->laserdisc_zero_seen++;
+		state->m_laserdisc_zero_seen++;
 		return;
 	}
 
@@ -569,8 +569,8 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 	else if (deltaclock < attotime::from_usec(215))
 	{
 		if (logit)
-			logerror(" -- clock, bit=%d", state->laserdisc_zero_seen);
-		state->laserdisc_last_clock = zerotime;
+			logerror(" -- clock, bit=%d", state->m_laserdisc_zero_seen);
+		state->m_laserdisc_last_clock = zerotime;
 	}
 
 	/* if we are outside of 215usec, we are technically a missing clock
@@ -580,7 +580,7 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 	{
 		if (logit)
 			logerror(" -- skewed clock, correcting");
-		state->laserdisc_last_clock += attotime::from_usec(200);
+		state->m_laserdisc_last_clock += attotime::from_usec(200);
 	}
 
 	/* we'll count anything more than 275us as an actual missing clock */
@@ -588,7 +588,7 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 	{
 		if (logit)
 			logerror(" -- missing clock");
-		state->laserdisc_last_clock = zerotime;
+		state->m_laserdisc_last_clock = zerotime;
 	}
 
 	/* we have a clock, process it */
@@ -601,7 +601,7 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
 	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine(), KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
-	attotime curtime = state->laserdisc_last_time;
+	attotime curtime = state->m_laserdisc_last_time;
 	int cursamp;
 
 	if (logit)
@@ -610,7 +610,7 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 	/* if no data, reset it all */
 	if (ch1 == NULL)
 	{
-		state->laserdisc_last_time = curtime + time_per_sample * samples;
+		state->m_laserdisc_last_time = curtime + time_per_sample * samples;
 		return;
 	}
 
@@ -624,18 +624,18 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 			logerror("%s: %d", (curtime + time_per_sample + time_per_sample).as_string(6), sample);
 
 		/* if we are past the "break in transmission" time, reset everything */
-		if ((curtime - state->laserdisc_last_clock) > attotime::from_usec(400))
+		if ((curtime - state->m_laserdisc_last_clock) > attotime::from_usec(400))
 			audio_end_state(state);
 
 		/* if this sample reinforces that the previous one ended a zero crossing, count it */
-		if ((sample >= 256 && state->laserdisc_last_samples[1] >= 0 && state->laserdisc_last_samples[0] < 0) ||
-			(sample <= -256 && state->laserdisc_last_samples[1] <= 0 && state->laserdisc_last_samples[0] > 0))
+		if ((sample >= 256 && state->m_laserdisc_last_samples[1] >= 0 && state->m_laserdisc_last_samples[0] < 0) ||
+			(sample <= -256 && state->m_laserdisc_last_samples[1] <= 0 && state->m_laserdisc_last_samples[0] > 0))
 		{
 			attotime zerotime;
 			int fractime;
 
 			/* compute the fractional position of the 0-crossing, between the two samples involved */
-			fractime = (-state->laserdisc_last_samples[0] * 1000) / (state->laserdisc_last_samples[1] - state->laserdisc_last_samples[0]);
+			fractime = (-state->m_laserdisc_last_samples[0] * 1000) / (state->m_laserdisc_last_samples[1] - state->m_laserdisc_last_samples[0]);
 
 			/* use this fraction to compute the approximate actual zero crossing time */
 			zerotime = curtime + time_per_sample * fractime / 1000;
@@ -647,13 +647,13 @@ static void laserdisc_audio_process(device_t *device, int samplerate, int sample
 			logerror(" \n");
 
 		/* update our sample tracking and advance time */
-		state->laserdisc_last_samples[0] = state->laserdisc_last_samples[1];
-		state->laserdisc_last_samples[1] = sample;
+		state->m_laserdisc_last_samples[0] = state->m_laserdisc_last_samples[1];
+		state->m_laserdisc_last_samples[1] = sample;
 		curtime += time_per_sample;
 	}
 
 	/* remember the last time */
-	state->laserdisc_last_time = curtime;
+	state->m_laserdisc_last_time = curtime;
 }
 
 
@@ -678,15 +678,15 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */
-	if (state->laserdisc != NULL)
+	if (state->m_laserdisc != NULL)
 	{
 		bitmap_t *dummy;
 
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
-		if (!laserdisc_get_video(state->laserdisc, &dummy))
-			state->laserdisc_status &= ~0x20;
+		if (!laserdisc_get_video(state->m_laserdisc, &dummy))
+			state->m_laserdisc_status &= ~0x20;
 		else
-			state->laserdisc_status |= 0x20;
+			state->m_laserdisc_status |= 0x20;
 	}
 }
 
@@ -701,9 +701,9 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, spriteram)							/* FRSEL */
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, charram)				/* BOJRSEL1 */
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_spriteram)							/* FRSEL */
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, m_videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, m_charram)				/* BOJRSEL1 */
 /*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */																/* BOJRSEL2 */
 	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_BASE_GENERIC(paletteram)		/* COLSEL */
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
@@ -724,9 +724,9 @@ static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)	/* or ROM */
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, spriteram)							/* FRSEL */
-	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, charram)				/* BOJRSEL1 */
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_spriteram)							/* FRSEL */
+	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, m_videoram)		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, m_charram)				/* BOJRSEL1 */
 	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_BASE_GENERIC(paletteram)		/* COLSEL */
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
@@ -2599,14 +2599,14 @@ ROM_END
 static DRIVER_INIT( ramtiles )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->gfxcharlo = state->gfxcharhi = 0;
+	state->m_gfxcharlo = state->m_gfxcharhi = 0;
 }
 
 
 static DRIVER_INIT( romtiles )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->gfxcharlo = state->gfxcharhi = 1;
+	state->m_gfxcharlo = state->m_gfxcharhi = 1;
 }
 
 
@@ -2620,16 +2620,16 @@ static DRIVER_INIT( stooges )
 static DRIVER_INIT( screwloo )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->gfxcharlo = 0;
-	state->gfxcharhi = 1;
+	state->m_gfxcharlo = 0;
+	state->m_gfxcharhi = 1;
 }
 
 
 static DRIVER_INIT( vidvince )
 {
 	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	state->gfxcharlo = 1;
-	state->gfxcharhi = 0;
+	state->m_gfxcharlo = 1;
+	state->m_gfxcharhi = 0;
 }
 
 

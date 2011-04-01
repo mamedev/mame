@@ -52,9 +52,9 @@
 static MACHINE_START( cinemat )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state_save_register_global(machine, state->coin_detected);
-	state_save_register_global(machine, state->coin_last_reset);
-	state_save_register_global(machine, state->mux_select);
+	state_save_register_global(machine, state->m_coin_detected);
+	state_save_register_global(machine, state->m_coin_last_reset);
+	state_save_register_global(machine, state->m_mux_select);
 }
 
 
@@ -62,11 +62,11 @@ MACHINE_RESET( cinemat )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* reset the coin states */
-	state->coin_detected = 0;
-	state->coin_last_reset = 0;
+	state->m_coin_detected = 0;
+	state->m_coin_last_reset = 0;
 
 	/* reset mux select */
-	state->mux_select = 0;
+	state->m_mux_select = 0;
 }
 
 
@@ -102,14 +102,14 @@ static INPUT_CHANGED( coin_inserted )
 	cinemat_state *state = field->port->machine().driver_data<cinemat_state>();
 	/* on the falling edge of a new coin, set the coin_detected flag */
 	if (newval == 0)
-		state->coin_detected = 1;
+		state->m_coin_detected = 1;
 }
 
 
 static READ8_HANDLER( coin_input_r )
 {
 	cinemat_state *state = space->machine().driver_data<cinemat_state>();
-	return !state->coin_detected;
+	return !state->m_coin_detected;
 }
 
 
@@ -124,16 +124,16 @@ static WRITE8_HANDLER( coin_reset_w )
 {
 	cinemat_state *state = space->machine().driver_data<cinemat_state>();
 	/* on the rising edge of a coin reset, clear the coin_detected flag */
-	if (state->coin_last_reset != data && data != 0)
-		state->coin_detected = 0;
-	state->coin_last_reset = data;
+	if (state->m_coin_last_reset != data && data != 0)
+		state->m_coin_detected = 0;
+	state->m_coin_last_reset = data;
 }
 
 
 static WRITE8_HANDLER( mux_select_w )
 {
 	cinemat_state *state = space->machine().driver_data<cinemat_state>();
-	state->mux_select = data;
+	state->m_mux_select = data;
 	cinemat_sound_control_w(space, 0x07, data);
 }
 
@@ -153,7 +153,7 @@ static UINT8 joystick_read(device_t *device)
 	else
 	{
 		int xval = (INT16)(cpu_get_reg(device, CCPU_X) << 4) >> 4;
-		return (input_port_read_safe(device->machine(), state->mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
+		return (input_port_read_safe(device->machine(), state->m_mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
 	}
 }
 
@@ -188,13 +188,13 @@ static READ8_HANDLER( speedfrk_gear_r )
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
-        state->gear = gearval & 0x0f;
+        state->m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
 	if (!(input_port_read(space->machine(), "INPUTS") & 0x80))
-        state->gear &= ~0x08;
+        state->m_gear &= ~0x08;
 
-	return (state->gear >> offset) & 1;
+	return (state->m_gear >> offset) & 1;
 }
 
 
@@ -254,7 +254,7 @@ static READ8_HANDLER( boxingb_dial_r )
 {
 	cinemat_state *state = space->machine().driver_data<cinemat_state>();
 	int value = input_port_read(space->machine(), "DIAL");
-	if (!state->mux_select) offset += 4;
+	if (!state->m_mux_select) offset += 4;
 	return (value >> offset) & 1;
 }
 
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( data_map, AS_DATA, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(cinemat_state, rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(cinemat_state, m_rambase)
 ADDRESS_MAP_END
 
 
@@ -1459,7 +1459,7 @@ ROM_END
 static DRIVER_INIT( speedfrk )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->gear = 0xe;
+	state->m_gear = 0xe;
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(speedfrk_wheel_r));
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x06, FUNC(speedfrk_gear_r));
 }
@@ -1490,7 +1490,7 @@ static DRIVER_INIT( qb3 )
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0f, 0x0f, FUNC(qb3_frame_r));
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x00, 0x00, FUNC(qb3_ram_bank_w));
 
-	memory_configure_bank(machine, "bank1", 0, 4, state->rambase, 0x100*2);
+	memory_configure_bank(machine, "bank1", 0, 4, state->m_rambase, 0x100*2);
 }
 
 

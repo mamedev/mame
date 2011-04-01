@@ -31,11 +31,11 @@ static READ8_DEVICE_HANDLER( megazone_port_a_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = state->audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = state->m_audiocpu->total_cycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
-	return (timer << 4) | state->i8039_status;
+	return (timer << 4) | state->m_i8039_status;
 }
 
 static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
@@ -59,7 +59,7 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
 	megazone_state *state = space->machine().driver_data<megazone_state>();
-	device_set_input_line(state->daccpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_daccpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
@@ -67,8 +67,8 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	megazone_state *state = space->machine().driver_data<megazone_state>();
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->daccpu, 0, CLEAR_LINE);
-	state->i8039_status = (data & 0x70) >> 4;
+		device_set_input_line(state->m_daccpu, 0, CLEAR_LINE);
+	state->m_i8039_status = (data & 0x70) >> 4;
 }
 
 static WRITE8_HANDLER( megazone_coin_counter_w )
@@ -83,13 +83,13 @@ static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, scrolly)
-	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, scrollx)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, videoram, videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, videoram2, videoram2_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(megazone_state, colorram)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(megazone_state, colorram2)
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, spriteram, spriteram_size)
+	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrolly)
+	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrollx)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_videoram2, m_videoram2_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(megazone_state, m_colorram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(megazone_state, m_colorram2)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
@@ -228,20 +228,20 @@ static MACHINE_START( megazone )
 {
 	megazone_state *state = machine.driver_data<megazone_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
-	state->daccpu = machine.device<cpu_device>("daccpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_daccpu = machine.device<cpu_device>("daccpu");
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->i8039_status));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_i8039_status));
 }
 
 static MACHINE_RESET( megazone )
 {
 	megazone_state *state = machine.driver_data<megazone_state>();
 
-	state->flipscreen = 0;
-	state->i8039_status = 0;
+	state->m_flipscreen = 0;
+	state->m_i8039_status = 0;
 }
 
 static MACHINE_CONFIG_START( megazone, megazone_state )

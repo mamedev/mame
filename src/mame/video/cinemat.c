@@ -50,15 +50,15 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 		intensity = 0x1ff * shift / 8;
 
 	/* move to the starting position if we're not there already */
-	if (sx != state->lastx || sy != state->lasty)
+	if (sx != state->m_lastx || sy != state->m_lasty)
 		vector_add_point(device->machine(), sx << 16, sy << 16, 0, 0);
 
 	/* draw the vector */
-	vector_add_point(device->machine(), ex << 16, ey << 16, state->vector_color, intensity);
+	vector_add_point(device->machine(), ex << 16, ey << 16, state->m_vector_color, intensity);
 
 	/* remember the last point */
-	state->lastx = ex;
-	state->lasty = ey;
+	state->m_lastx = ex;
+	state->m_lasty = ey;
 }
 
 
@@ -75,40 +75,40 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 	int r, g, b, i;
 	cpu_device *cpu = space->machine().device<cpu_device>("maincpu");
 
-	switch (state->color_mode)
+	switch (state->m_color_mode)
 	{
 		case COLOR_BILEVEL:
 			/* color is either bright or dim, selected by the value sent to the port */
-			state->vector_color = (data & 1) ? MAKE_RGB(0x80,0x80,0x80) : MAKE_RGB(0xff,0xff,0xff);
+			state->m_vector_color = (data & 1) ? MAKE_RGB(0x80,0x80,0x80) : MAKE_RGB(0xff,0xff,0xff);
 			break;
 
 		case COLOR_16LEVEL:
 			/* on the rising edge of the data value, latch bits 0-3 of the */
 			/* X register as the intensity */
-			if (data != state->last_control && data)
+			if (data != state->m_last_control && data)
 			{
 				int xval = cpu->state(CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
-				state->vector_color = MAKE_RGB(i,i,i);
+				state->m_vector_color = MAKE_RGB(i,i,i);
 			}
 			break;
 
 		case COLOR_64LEVEL:
 			/* on the rising edge of the data value, latch bits 2-7 of the */
 			/* X register as the intensity */
-			if (data != state->last_control && data)
+			if (data != state->m_last_control && data)
 			{
 				int xval = cpu->state(CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
 				i = (xval + 1) * 255 / 64;
-				state->vector_color = MAKE_RGB(i,i,i);
+				state->m_vector_color = MAKE_RGB(i,i,i);
 			}
 			break;
 
 		case COLOR_RGB:
 			/* on the rising edge of the data value, latch the X register */
 			/* as 4-4-4 BGR values */
-			if (data != state->last_control && data)
+			if (data != state->m_last_control && data)
 			{
 				int xval = cpu->state(CCPU_X);
 				r = (~xval >> 0) & 0x0f;
@@ -117,7 +117,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 				g = g * 255 / 15;
 				b = (~xval >> 8) & 0x0f;
 				b = b * 255 / 15;
-				state->vector_color = MAKE_RGB(r,g,b);
+				state->m_vector_color = MAKE_RGB(r,g,b);
 			}
 			break;
 
@@ -127,15 +127,15 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 				/* they will be restored on the rising edge; this is to simulate the fact */
 				/* that the Rockola color hardware did not overwrite the beam X,Y position */
 				/* on an IV instruction if data == 0 here */
-				if (data != state->last_control && !data)
+				if (data != state->m_last_control && !data)
 				{
-					state->qb3_lastx = cpu->state(CCPU_X);
-					state->qb3_lasty = cpu->state(CCPU_Y);
+					state->m_qb3_lastx = cpu->state(CCPU_X);
+					state->m_qb3_lasty = cpu->state(CCPU_Y);
 				}
 
 				/* on the rising edge of the data value, latch the Y register */
 				/* as 2-3-3 BGR values */
-				if (data != state->last_control && data)
+				if (data != state->m_last_control && data)
 				{
 					int yval = cpu->state(CCPU_Y);
 					r = (~yval >> 0) & 0x07;
@@ -144,18 +144,18 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 					g = g * 255 / 7;
 					b = (~yval >> 6) & 0x03;
 					b = b * 255 / 3;
-					state->vector_color = MAKE_RGB(r,g,b);
+					state->m_vector_color = MAKE_RGB(r,g,b);
 
 					/* restore the original X,Y values */
-					cpu->set_state(CCPU_X, state->qb3_lastx);
-					cpu->set_state(CCPU_Y, state->qb3_lasty);
+					cpu->set_state(CCPU_X, state->m_qb3_lastx);
+					cpu->set_state(CCPU_Y, state->m_qb3_lasty);
 				}
 			}
 			break;
 	}
 
 	/* remember the last value */
-	state->last_control = data;
+	state->m_last_control = data;
 }
 
 
@@ -169,7 +169,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 VIDEO_START( cinemat_bilevel )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->color_mode = COLOR_BILEVEL;
+	state->m_color_mode = COLOR_BILEVEL;
 	VIDEO_START_CALL(vector);
 }
 
@@ -177,7 +177,7 @@ VIDEO_START( cinemat_bilevel )
 VIDEO_START( cinemat_16level )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->color_mode = COLOR_16LEVEL;
+	state->m_color_mode = COLOR_16LEVEL;
 	VIDEO_START_CALL(vector);
 }
 
@@ -185,7 +185,7 @@ VIDEO_START( cinemat_16level )
 VIDEO_START( cinemat_64level )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->color_mode = COLOR_64LEVEL;
+	state->m_color_mode = COLOR_64LEVEL;
 	VIDEO_START_CALL(vector);
 }
 
@@ -193,7 +193,7 @@ VIDEO_START( cinemat_64level )
 VIDEO_START( cinemat_color )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->color_mode = COLOR_RGB;
+	state->m_color_mode = COLOR_RGB;
 	VIDEO_START_CALL(vector);
 }
 
@@ -201,7 +201,7 @@ VIDEO_START( cinemat_color )
 VIDEO_START( cinemat_qb3color )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
-	state->color_mode = COLOR_QB3;
+	state->m_color_mode = COLOR_QB3;
 	VIDEO_START_CALL(vector);
 }
 

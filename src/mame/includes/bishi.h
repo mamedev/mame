@@ -14,22 +14,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    ram;
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+	UINT8 *    m_ram;
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        layer_colorbase[4];
+	int        m_layer_colorbase[4];
 
 	/* misc */
-	UINT16     cur_control, cur_control2;
+	UINT16     m_cur_control;
+	UINT16     m_cur_control2;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k007232;
-	device_t *k056832;
-	device_t *k054338;
-	device_t *k055555;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k007232;
+	device_t *m_k056832;
+	device_t *m_k054338;
+	device_t *m_k055555;
 };
 
 /*----------- defined in video/bishi.c -----------*/

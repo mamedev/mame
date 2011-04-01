@@ -14,15 +14,15 @@ WRITE16_HANDLER( rohga_buffer_spriteram16_w )
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)
 	rohga_state *state = space->machine().driver_data<rohga_state>();
-	memcpy(state->spriteram, space->machine().generic.buffered_spriteram.u16, 0x800);
+	memcpy(state->m_spriteram, space->machine().generic.buffered_spriteram.u16, 0x800);
 	memcpy(space->machine().generic.buffered_spriteram.u16, space->machine().generic.spriteram.u16, 0x800);
 }
 
 VIDEO_START( rohga )
 {
 	rohga_state *state = machine.driver_data<rohga_state>();
-	state->spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
-	state->save_pointer(NAME(state->spriteram), 0x800/2);
+	state->m_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
+	state->save_pointer(NAME(state->m_spriteram), 0x800/2);
 }
 
 /******************************************************************************/
@@ -215,7 +215,7 @@ static void nitrobal_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 {
 	rohga_state *state = machine.driver_data<rohga_state>();
 	int offs, end, inc;
-	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	/*
         Alternate format from most 16 bit games - same as Captain America and Mutant Fighter
@@ -403,7 +403,7 @@ sprite 2:
 			for (y = 0; y < h; y++)
 			{
 				decocomn_pdrawgfx(
-						state->decocomn,
+						state->m_decocomn,
 						bitmap,cliprect,machine.gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
@@ -422,13 +422,13 @@ sprite 2:
 static void update_rohga( device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr )
 {
 	rohga_state *state = screen->machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	/* Update playfields */
 	flip_screen_set(screen->machine(), BIT(flip, 7));
-	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields */
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
@@ -440,30 +440,30 @@ static void update_rohga( device_t *screen, bitmap_t *bitmap, const rectangle *c
 		if (priority & 4)
 		{
 			// Draw as 1 8BPP layer
-			deco16ic_tilemap_12_combine_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
+			deco16ic_tilemap_12_combine_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
 		}
 		else
 		{
 			// Draw as 2 4BPP layers
-			deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+			deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
 		}
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 		break;
 	case 1:
-		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		break;
 	case 2:
-		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 4);
 		break;
 	}
 
-	rohga_draw_sprites(screen->machine(), bitmap, cliprect, state->spriteram, is_schmeisr);
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	rohga_draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram, is_schmeisr);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 }
 
 SCREEN_UPDATE( rohga )
@@ -483,58 +483,58 @@ SCREEN_UPDATE( schmeisr )
 SCREEN_UPDATE( wizdfire )
 {
 	rohga_state *state = screen->machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
-	UINT16 priority = decocomn_priority_r(state->decocomn, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
+	UINT16 priority = decocomn_priority_r(state->m_decocomn, 0, 0xffff);
 
 	/* Update playfields */
 	flip_screen_set(screen->machine(), BIT(flip, 7));
-	deco16ic_pf_update(state->deco_tilegen1, 0, 0);
-	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, 0, 0);
+	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[512]);
 
-	deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	wizdfire_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 4, 3);
-	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	wizdfire_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 3, 3);
 
 	if ((priority & 0x1f) == 0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
-		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
 	/* See notes in wizdfire_draw_sprites about this */
 	wizdfire_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16,  0, 3);
 	wizdfire_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram2.u16, 2, 4);
 	wizdfire_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram2.u16, 1, 4);
 
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 SCREEN_UPDATE( nitrobal )
 {
 	rohga_state *state = screen->machine().driver_data<rohga_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
 	/* Update playfields */
 	flip_screen_set(screen->machine(), BIT(flip, 7));
-	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
+	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[512]);
 	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
-	decocomn_clear_sprite_priority_bitmap(state->decocomn);
+	decocomn_clear_sprite_priority_bitmap(state->m_decocomn);
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */
-	deco16ic_tilemap_12_combine_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_12_combine_draw(state->m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 16);
+	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 16);
 	nitrobal_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 3);
 	nitrobal_draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram2.u16, 4);
 
-	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

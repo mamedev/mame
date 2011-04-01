@@ -42,25 +42,25 @@ dip: 6.7 7.7
 static READ8_HANDLER( shared1_r )
 {
 	wiping_state *state = space->machine().driver_data<wiping_state>();
-	return state->sharedram1[offset];
+	return state->m_sharedram1[offset];
 }
 
 static READ8_HANDLER( shared2_r )
 {
 	wiping_state *state = space->machine().driver_data<wiping_state>();
-	return state->sharedram2[offset];
+	return state->m_sharedram2[offset];
 }
 
 static WRITE8_HANDLER( shared1_w )
 {
 	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->sharedram1[offset] = data;
+	state->m_sharedram1[offset] = data;
 }
 
 static WRITE8_HANDLER( shared2_w )
 {
 	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->sharedram2[offset] = data;
+	state->m_sharedram2[offset] = data;
 }
 
 
@@ -88,12 +88,12 @@ static WRITE8_HANDLER( subcpu_reset_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_MEMBER(wiping_state, spriteram, spriteram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, m_videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, m_colorram)
+	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_MEMBER(wiping_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE_MEMBER(wiping_state, sharedram1)
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE_MEMBER(wiping_state, sharedram2)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE_MEMBER(wiping_state, m_sharedram1)
+	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE_MEMBER(wiping_state, m_sharedram2)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)

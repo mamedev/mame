@@ -63,16 +63,16 @@ WRITE8_HANDLER( sprcros2_fgvideoram_w )
 {
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	state->fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fgtilemap, offset&0x3ff);
+	state->m_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fgtilemap, offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgvideoram_w )
 {
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	state->bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bgtilemap, offset&0x3ff);
+	state->m_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bgtilemap, offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgscrollx_w )
@@ -80,23 +80,23 @@ WRITE8_HANDLER( sprcros2_bgscrollx_w )
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
 	if(state->m_port7&0x02)
-		tilemap_set_scrollx(state->bgtilemap, 0, 0x100-data);
+		tilemap_set_scrollx(state->m_bgtilemap, 0, 0x100-data);
 	else
-		tilemap_set_scrollx(state->bgtilemap, 0, data);
+		tilemap_set_scrollx(state->m_bgtilemap, 0, data);
 }
 
 WRITE8_HANDLER( sprcros2_bgscrolly_w )
 {
 	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	tilemap_set_scrolly(state->bgtilemap, 0, data);
+	tilemap_set_scrolly(state->m_bgtilemap, 0, data);
 }
 
 static TILE_GET_INFO( get_sprcros2_bgtile_info )
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
-	UINT32 tile_number = state->bgvideoram[tile_index];
-	UINT8 attr = state->bgvideoram[tile_index + 0x400];
+	UINT32 tile_number = state->m_bgvideoram[tile_index];
+	UINT8 attr = state->m_bgvideoram[tile_index + 0x400];
 
 	//attr
 	//76543210
@@ -116,8 +116,8 @@ static TILE_GET_INFO( get_sprcros2_bgtile_info )
 static TILE_GET_INFO( get_sprcros2_fgtile_info )
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
-	UINT32 tile_number = state->fgvideoram[tile_index];
-	UINT8 attr = state->fgvideoram[tile_index + 0x400];
+	UINT32 tile_number = state->m_fgvideoram[tile_index];
+	UINT8 attr = state->m_fgvideoram[tile_index + 0x400];
 	int color = (attr&0xfc)>>2;
 
 	tileinfo->group = color;
@@ -140,10 +140,10 @@ VIDEO_START( sprcros2 )
 {
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 
-	state->bgtilemap = tilemap_create(machine, get_sprcros2_bgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->fgtilemap = tilemap_create(machine, get_sprcros2_fgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bgtilemap = tilemap_create(machine, get_sprcros2_bgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fgtilemap = tilemap_create(machine, get_sprcros2_fgtile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->fgtilemap, machine.gfx[2], 0);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_fgtilemap, machine.gfx[2], 0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
@@ -151,9 +151,9 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 	int offs,sx,sy,color,flipx,flipy;
 
-	for (offs = state->spriteram_size-4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram_size-4; offs >= 0; offs -= 4)
 	{
-		if (state->spriteram[offs])
+		if (state->m_spriteram[offs])
 		{
 
 			//offs
@@ -170,10 +170,10 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 			//offs+2   y pos
 			//offs+3   x pos
 
-			sx = ((state->spriteram[offs+3]+0x10)%0x100)-0x10;
-			sy = 225-(((state->spriteram[offs+2]+0x10)%0x100)-0x10);
-			color = (state->spriteram[offs+1]&0x38)>>3;
-			flipx = state->spriteram[offs+1]&0x02;
+			sx = ((state->m_spriteram[offs+3]+0x10)%0x100)-0x10;
+			sy = 225-(((state->m_spriteram[offs+2]+0x10)%0x100)-0x10);
+			color = (state->m_spriteram[offs+1]&0x38)>>3;
+			flipx = state->m_spriteram[offs+1]&0x02;
 			flipy = 0;
 
 			if (state->m_port7&0x02)
@@ -185,7 +185,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectan
 			}
 
 			drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
-				state->spriteram[offs],
+				state->m_spriteram[offs],
 				color,
 				flipx,flipy,
 				sx,sy,
@@ -198,8 +198,8 @@ SCREEN_UPDATE( sprcros2 )
 {
 	sprcros2_state *state = screen->machine().driver_data<sprcros2_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bgtilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bgtilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->fgtilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fgtilemap, 0, 0);
 	return 0;
 }

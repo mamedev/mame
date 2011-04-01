@@ -242,35 +242,35 @@ public:
 	bfcobra_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 bank_data[4];
-	UINT8 *work_ram;
-	UINT8 *video_ram;
-	UINT8 h_scroll;
-	UINT8 v_scroll;
-	UINT8 flip_8;
-	UINT8 flip_22;
-	UINT8 videomode;
-	UINT8 z80_m6809_line;
-	UINT8 m6809_z80_line;
-	UINT8 data_r;
-	UINT8 data_t;
-	int irq_state;
-	int acia_irq;
-	int vblank_irq;
-	int blitter_irq;
-	UINT8 z80_int;
-	UINT8 z80_inten;
-	UINT32 meter_latch;
-	UINT32 mux_input;
-	UINT32 mux_outputlatch;
-	UINT8 col4bit[16];
-	UINT8 col3bit[16];
-	UINT8 col8bit[256];
-	UINT8 col7bit[256];
-	UINT8 col6bit[256];
-	struct blitter_t blitter;
-	struct ramdac_t ramdac;
-	struct fdc_t fdc;
+	UINT8 m_bank_data[4];
+	UINT8 *m_work_ram;
+	UINT8 *m_video_ram;
+	UINT8 m_h_scroll;
+	UINT8 m_v_scroll;
+	UINT8 m_flip_8;
+	UINT8 m_flip_22;
+	UINT8 m_videomode;
+	UINT8 m_z80_m6809_line;
+	UINT8 m_m6809_z80_line;
+	UINT8 m_data_r;
+	UINT8 m_data_t;
+	int m_irq_state;
+	int m_acia_irq;
+	int m_vblank_irq;
+	int m_blitter_irq;
+	UINT8 m_z80_int;
+	UINT8 m_z80_inten;
+	UINT32 m_meter_latch;
+	UINT32 m_mux_input;
+	UINT32 m_mux_outputlatch;
+	UINT8 m_col4bit[16];
+	UINT8 m_col3bit[16];
+	UINT8 m_col8bit[256];
+	UINT8 m_col7bit[256];
+	UINT8 m_col6bit[256];
+	struct blitter_t m_blitter;
+	struct ramdac_t m_ramdac;
+	struct fdc_t m_fdc;
 };
 
 
@@ -322,20 +322,20 @@ static VIDEO_START( bfcobra )
 	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	int i;
 
-	memcpy(state->col4bit, col4bit_default, sizeof(state->col4bit));
-	memcpy(state->col3bit, col3bit_default, sizeof(state->col3bit));
+	memcpy(state->m_col4bit, col4bit_default, sizeof(state->m_col4bit));
+	memcpy(state->m_col3bit, col3bit_default, sizeof(state->m_col3bit));
 	for (i = 0; i < 256; ++i)
 	{
 		UINT8 col;
 
-		state->col8bit[i] = i;
+		state->m_col8bit[i] = i;
 		col = i & 0x7f;
 		col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
-		state->col7bit[i] = col;
+		state->m_col7bit[i] = col;
 
 		col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
 			  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
-		state->col6bit[i] = col;
+		state->m_col6bit[i] = col;
 	}
 }
 
@@ -351,39 +351,39 @@ static SCREEN_UPDATE( bfcobra )
 
 	/* Select screen has to be programmed into two registers */
 	/* No idea what happens if the registers are different */
-	if (state->flip_8 & 0x40 && state->flip_22 & 0x40)
+	if (state->m_flip_8 & 0x40 && state->m_flip_22 & 0x40)
 		offset = 0x10000;
 	else
 		offset = 0;
 
-	if(state->videomode & 0x20)
+	if(state->m_videomode & 0x20)
 	{
-		hirescol = state->col3bit;
-		lorescol = state->col7bit;
+		hirescol = state->m_col3bit;
+		lorescol = state->m_col7bit;
 	}
-	else if(state->videomode & 0x40)
+	else if(state->m_videomode & 0x40)
 	{
-		hirescol = state->col4bit;
-		lorescol = state->col6bit;
+		hirescol = state->m_col4bit;
+		lorescol = state->m_col6bit;
 	}
 	else
 	{
-		hirescol = state->col4bit;
-		lorescol = state->col8bit;
+		hirescol = state->m_col4bit;
+		lorescol = state->m_col8bit;
 	}
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
-		UINT16 y_offset = (y + state->v_scroll) * 256;
-		src = &state->video_ram[offset + y_offset];
+		UINT16 y_offset = (y + state->m_v_scroll) * 256;
+		src = &state->m_video_ram[offset + y_offset];
 		dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x / 2; ++x)
 		{
-			UINT8 x_offset = x + state->h_scroll;
+			UINT8 x_offset = x + state->m_h_scroll;
 			UINT8 pen = *(src + x_offset);
 
-			if ( ( state->videomode & 0x81 ) == 1 || (state->videomode & 0x80 && pen & 0x80) )
+			if ( ( state->m_videomode & 0x81 ) == 1 || (state->m_videomode & 0x80 && pen & 0x80) )
 			{
 				*dest++ = screen->machine().pens[hirescol[pen & 0x0f]];
 				*dest++ = screen->machine().pens[hirescol[(pen >> 4) & 0x0f]];
@@ -410,17 +410,17 @@ INLINE UINT8* blitter_get_addr(running_machine &machine, UINT32 addr)
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
-		addr += (state->bank_data[0] & 1) ? 0x10000 : 0;
+		addr += (state->m_bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(machine.region("user1")->base() + addr + ((state->bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(machine.region("user1")->base() + addr + ((state->m_bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
-		return (UINT8*)&state->video_ram[addr - 0x20000];
+		return (UINT8*)&state->m_video_ram[addr - 0x20000];
 	}
 	else
 	{
-		return (UINT8*)&state->work_ram[addr - 0x40000];
+		return (UINT8*)&state->m_work_ram[addr - 0x40000];
 	}
 }
 
@@ -435,7 +435,7 @@ static void RunBlit(address_space *space)
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space->machine(), blitter.program.addr++))
 
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	struct blitter_t &blitter = state->blitter;
+	struct blitter_t &blitter = state->m_blitter;
 	int cycles_used = 0;
 
 
@@ -721,7 +721,7 @@ static void RunBlit(address_space *space)
 static READ8_HANDLER( ramdac_r )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	struct ramdac_t &ramdac = state->ramdac;
+	struct ramdac_t &ramdac = state->m_ramdac;
 	UINT8 val = 0xff;
 
 	switch (offset & 3)
@@ -764,7 +764,7 @@ static READ8_HANDLER( ramdac_r )
 static WRITE8_HANDLER( ramdac_w )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	struct ramdac_t &ramdac = state->ramdac;
+	struct ramdac_t &ramdac = state->m_ramdac;
 
 	switch (offset & 3)
 	{
@@ -850,12 +850,12 @@ static WRITE8_HANDLER( ramdac_w )
 static void update_irqs(running_machine &machine)
 {
 	bfcobra_state *state = machine.driver_data<bfcobra_state>();
-	int newstate = state->blitter_irq || state->vblank_irq || state->acia_irq;
+	int newstate = state->m_blitter_irq || state->m_vblank_irq || state->m_acia_irq;
 
-	if (newstate != state->irq_state)
+	if (newstate != state->m_irq_state)
 	{
-		state->irq_state = newstate;
-		cputag_set_input_line(machine, "maincpu", 0, state->irq_state ? ASSERT_LINE : CLEAR_LINE);
+		state->m_irq_state = newstate;
+		cputag_set_input_line(machine, "maincpu", 0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -870,18 +870,18 @@ static READ8_HANDLER( chipset_r )
 		case 2:
 		case 3:
 		{
-			val = state->bank_data[offset];
+			val = state->m_bank_data[offset];
 			break;
 		}
 		case 6:
 		{
 			/* TODO */
-			val = state->vblank_irq << 4;
+			val = state->m_vblank_irq << 4;
 			break;
 		}
 		case 7:
 		{
-			state->vblank_irq = 0;
+			state->m_vblank_irq = 0;
 			val = 0x1;
 
 			/* TODO */
@@ -897,7 +897,7 @@ static READ8_HANDLER( chipset_r )
 		case 0x20:
 		{
 			/* Seems correct - used during RLE pic decoding */
-			val = state->blitter.dest.addr0;
+			val = state->m_blitter.dest.addr0;
 			break;
 		}
 		case 0x22:
@@ -927,62 +927,62 @@ static WRITE8_HANDLER( chipset_w )
 				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(&space->device()), data);
 
 			data &= 0x3f;
-			state->bank_data[offset] = data;
+			state->m_bank_data[offset] = data;
 			z80_bank(space->machine(), offset, data);
 			break;
 		}
 
 		case 0x08:
 		{
-			state->flip_8 = data;
+			state->m_flip_8 = data;
 			break;
 		}
 		case 9:
-			state->videomode = data;
+			state->m_videomode = data;
 			break;
 
 		case 0x0B:
 		{
-			state->h_scroll = data;
+			state->m_h_scroll = data;
 			break;
 		}
 		case 0x0C:
 		{
-			state->v_scroll = data;
+			state->m_v_scroll = data;
 			break;
 		}
 		case 0x0E:
 		{
-			state->col4bit[5] = data;
-			state->col3bit[5] = data;
-			state->col3bit[5 + 8] = data;
+			state->m_col4bit[5] = data;
+			state->m_col3bit[5] = data;
+			state->m_col3bit[5 + 8] = data;
 			break;
 		}
 		case 0x0f:
 		{
-			state->col4bit[6] = data;
-			state->col3bit[6] = data;
-			state->col3bit[6 + 8] = data;
+			state->m_col4bit[6] = data;
+			state->m_col3bit[6] = data;
+			state->m_col3bit[6 + 8] = data;
 			break;
 		}
 		case 0x18:
 		{
-			state->blitter.program.addr0 = data;
+			state->m_blitter.program.addr0 = data;
 			break;
 		}
 		case 0x19:
 		{
-			state->blitter.program.addr1 = data;
+			state->m_blitter.program.addr1 = data;
 			break;
 		}
 		case 0x1A:
 		{
-			state->blitter.program.addr2 = data;
+			state->m_blitter.program.addr2 = data;
 			break;
 		}
 		case 0x20:
 		{
-			state->blitter.command = data;
+			state->m_blitter.command = data;
 
 			if (data & CMD_RUN)
 				RunBlit(space);
@@ -993,7 +993,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		case 0x22:
 		{
-			state->flip_22 = data;
+			state->m_flip_22 = data;
 			break;
 		}
 		default:
@@ -1010,27 +1010,27 @@ INLINE void z80_bank(running_machine &machine, int num, int data)
 
 	if (data < 0x08)
 	{
-		UINT32 offset = ((state->bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((state->bank_data[0] & 1) ? 0 : 0x10000));
+		UINT32 offset = ((state->m_bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((state->m_bank_data[0] & 1) ? 0 : 0x10000));
 
 		memory_set_bankptr(machine, bank_names[num - 1], machine.region("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(machine, bank_names[num - 1], &state->video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &state->m_video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(machine, bank_names[num - 1], &state->work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &state->m_work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
 static WRITE8_HANDLER( rombank_w )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	state->bank_data[0] = data;
-	z80_bank(space->machine(), 1, state->bank_data[1]);
-	z80_bank(space->machine(), 2, state->bank_data[2]);
-	z80_bank(space->machine(), 3, state->bank_data[3]);
+	state->m_bank_data[0] = data;
+	z80_bank(space->machine(), 1, state->m_bank_data[1]);
+	z80_bank(space->machine(), 2, state->m_bank_data[2]);
+	z80_bank(space->machine(), 3, state->m_bank_data[3]);
 }
 
 
@@ -1082,10 +1082,10 @@ enum command
 static void reset_fdc(running_machine &machine)
 {
 	bfcobra_state *state = machine.driver_data<bfcobra_state>();
-	memset(&state->fdc, 0, sizeof(state->fdc));
+	memset(&state->m_fdc, 0, sizeof(state->m_fdc));
 
-	state->fdc.MSR = 0x80;
-	state->fdc.phase = COMMAND;
+	state->m_fdc.MSR = 0x80;
+	state->m_fdc.phase = COMMAND;
 }
 
 static READ8_HANDLER( fdctrl_r )
@@ -1093,7 +1093,7 @@ static READ8_HANDLER( fdctrl_r )
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
 	UINT8 val = 0;
 
-	val = state->fdc.MSR;
+	val = state->m_fdc.MSR;
 
 	return val;
 }
@@ -1101,7 +1101,7 @@ static READ8_HANDLER( fdctrl_r )
 static READ8_HANDLER( fddata_r )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	struct fdc_t &fdc = state->fdc;
+	struct fdc_t &fdc = state->m_fdc;
 	#define	BPS		1024
 	#define SPT		10
 	#define BPT		1024*10
@@ -1175,7 +1175,7 @@ static READ8_HANDLER( fddata_r )
 static WRITE8_HANDLER( fdctrl_w )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	struct fdc_t &fdc = state->fdc;
+	struct fdc_t &fdc = state->m_fdc;
 	switch (fdc.phase)
 	{
 		case COMMAND:
@@ -1312,11 +1312,11 @@ static MACHINE_RESET( bfcobra )
 		palette_set_color_rgb(machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	state->bank_data[0] = 1;
-	memset(&state->ramdac, 0, sizeof(state->ramdac));
+	state->m_bank_data[0] = 1;
+	memset(&state->m_ramdac, 0, sizeof(state->m_ramdac));
 	reset_fdc(machine);
 
-	state->irq_state = state->blitter_irq = state->vblank_irq = state->acia_irq = 0;
+	state->m_irq_state = state->m_blitter_irq = state->m_vblank_irq = state->m_acia_irq = 0;
 }
 
 /***************************************************************************
@@ -1377,7 +1377,7 @@ static READ8_HANDLER( int_latch_r )
 static READ8_HANDLER( meter_r )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	return state->meter_latch;
+	return state->m_meter_latch;
 }
 
 /* TODO: This is borrowed from Scorpion 1 */
@@ -1385,9 +1385,9 @@ static WRITE8_HANDLER( meter_w )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
 	int i;
-	int  changed = state->meter_latch ^ data;
+	int  changed = state->m_meter_latch ^ data;
 
-	state->meter_latch = data;
+	state->m_meter_latch = data;
 
 	/*
         When a meter is triggered, the current drawn is sensed. If a meter
@@ -1407,7 +1407,7 @@ static WRITE8_HANDLER( meter_w )
 static READ8_HANDLER( latch_r )
 {
 	bfcobra_state *state = space->machine().driver_data<bfcobra_state>();
-	return state->mux_input;
+	return state->m_mux_input;
 }
 
 static WRITE8_HANDLER( latch_w )
@@ -1418,10 +1418,10 @@ static WRITE8_HANDLER( latch_w )
 	{
 		case 0:
 		{
-			int changed = state->mux_outputlatch ^ data;
+			int changed = state->m_mux_outputlatch ^ data;
 			static const char *const port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
 
-			state->mux_outputlatch = data;
+			state->m_mux_outputlatch = data;
 
 			/* Clock has changed */
 			if (changed & 0x08)
@@ -1430,7 +1430,7 @@ static WRITE8_HANDLER( latch_w )
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					state->mux_input = input_port_read(space->machine(), port[input_strobe]);
+					state->m_mux_input = input_port_read(space->machine(), port[input_strobe]);
 			}
 			break;
 		}
@@ -1591,10 +1591,10 @@ static void init_ram(running_machine &machine)
 {
 	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	/* 768kB work RAM */
-	state->work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
+	state->m_work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
 
 	/* 128kB video RAM */
-	state->video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
+	state->m_video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
 }
 
 /*
@@ -1604,19 +1604,19 @@ static void init_ram(running_machine &machine)
 static READ_LINE_DEVICE_HANDLER( z80_acia_rx_r )
 {
 	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->m6809_z80_line;
+	return state->m_m6809_z80_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( z80_acia_tx_w )
 {
 	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->z80_m6809_line = state;
+	drvstate->m_z80_m6809_line = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( z80_acia_irq )
 {
 	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
+	drvstate->m_acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
 	update_irqs(device->machine());
 }
 
@@ -1635,13 +1635,13 @@ static ACIA6850_INTERFACE( z80_acia_if )
 static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
 {
 	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->z80_m6809_line;
+	return state->m_z80_m6809_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
 {
 	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	drvstate->m6809_z80_line = state;
+	drvstate->m_m6809_z80_line = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
@@ -1664,13 +1664,13 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 static READ_LINE_DEVICE_HANDLER( data_acia_rx_r )
 {
 	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	return state->data_r;
+	return state->m_data_r;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( data_acia_tx_w )
 {
 	bfcobra_state *drvstate = device->machine().driver_data<bfcobra_state>();
-	 drvstate->data_t = state;
+	 drvstate->m_data_t = state;
 }
 
 
@@ -1726,31 +1726,31 @@ static DRIVER_INIT( bfcobra )
 
 	init_ram(machine);
 
-	state->bank_data[0] = 1;
-	state->bank_data[1] = 0;
-	state->bank_data[2] = 0;
-	state->bank_data[3] = 0;
+	state->m_bank_data[0] = 1;
+	state->m_bank_data[1] = 0;
+	state->m_bank_data[2] = 0;
+	state->m_bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
 	memory_set_bankptr(machine, "bank4", machine.region("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
-	state->data_r = 1;
+	state->m_data_r = 1;
 
 	/* Finish this */
-	state_save_register_global(machine, state->z80_m6809_line);
-	state_save_register_global(machine, state->m6809_z80_line);
-	state_save_register_global(machine, state->data_r);
-	state_save_register_global(machine, state->data_t);
-	state_save_register_global(machine, state->h_scroll);
-	state_save_register_global(machine, state->v_scroll);
-	state_save_register_global(machine, state->flip_8);
-	state_save_register_global(machine, state->flip_22);
-	state_save_register_global(machine, state->z80_int);
-	state_save_register_global(machine, state->z80_inten);
-	state_save_register_global_array(machine, state->bank_data);
-	state_save_register_global_pointer(machine, state->work_ram, 0xc0000);
-	state_save_register_global_pointer(machine, state->video_ram, 0x20000);
+	state_save_register_global(machine, state->m_z80_m6809_line);
+	state_save_register_global(machine, state->m_m6809_z80_line);
+	state_save_register_global(machine, state->m_data_r);
+	state_save_register_global(machine, state->m_data_t);
+	state_save_register_global(machine, state->m_h_scroll);
+	state_save_register_global(machine, state->m_v_scroll);
+	state_save_register_global(machine, state->m_flip_8);
+	state_save_register_global(machine, state->m_flip_22);
+	state_save_register_global(machine, state->m_z80_int);
+	state_save_register_global(machine, state->m_z80_inten);
+	state_save_register_global_array(machine, state->m_bank_data);
+	state_save_register_global_pointer(machine, state->m_work_ram, 0xc0000);
+	state_save_register_global_pointer(machine, state->m_video_ram, 0x20000);
 }
 
 /* TODO */
@@ -1763,7 +1763,7 @@ static INTERRUPT_GEN( timer_irq )
 static INTERRUPT_GEN( vblank_gen )
 {
 	bfcobra_state *state = device->machine().driver_data<bfcobra_state>();
-	state->vblank_irq = 1;
+	state->m_vblank_irq = 1;
 	update_irqs(device->machine());
 }
 

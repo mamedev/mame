@@ -511,8 +511,8 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 			return;
 	}
 
-    dmadac_set_frequency(&state->dmadac[0], 2, m_audio_sample_freq);
-	dmadac_enable(&state->dmadac[0], 2, 1);
+    dmadac_set_frequency(&state->m_dmadac[0], 2, m_audio_sample_freq);
+	dmadac_enable(&state->m_dmadac[0], 2, 1);
 
 	switch(channels)
 	{
@@ -559,7 +559,7 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 			break;
 	}
 
-    dmadac_transfer(&state->dmadac[0], 2, 1, 2, 18*28*2*m_audio_sample_size, samples);
+    dmadac_transfer(&state->m_dmadac[0], 2, 1, 2, 18*28*2*m_audio_sample_size, samples);
 }
 
 // After an appropriate delay for decoding to take place...
@@ -1084,12 +1084,12 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 
 		case 0x3ff8/2:
 		{
-			scc68070_regs_t *scc68070 = &state->scc68070_regs;
+			scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 			UINT32 start = scc68070->dma.channel[0].memory_address_counter;
 			UINT32 count = scc68070->dma.channel[0].transfer_counter;
 			UINT32 index = 0;
 			UINT32 device_index = (data & 0x3fff) >> 1;
-			UINT16 *memory = state->planea;
+			UINT16 *memory = state->m_planea;
             verboselog(m_machine, 0, "memory address counter: %08x\n", scc68070->dma.channel[0].memory_address_counter);
             verboselog(m_machine, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
             verboselog(m_machine, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
@@ -1097,7 +1097,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 			if((start & 0x00f00000) == 0x00200000)
 			{
 				start -= 0x00200000;
-				memory = state->planeb;
+				memory = state->m_planeb;
 			}
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
@@ -1151,7 +1151,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 					case 0x2e: // Abort
 					{
                         m_interrupt_timer->adjust(attotime::never);
-						dmadac_enable(&state->dmadac[0], 2, 0);
+						dmadac_enable(&state->m_dmadac[0], 2, 0);
                         //m_data_buffer &= 0xbfff;
 						break;
 					}

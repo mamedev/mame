@@ -116,7 +116,7 @@ static void rampart_bitmap_render(running_machine &machine, bitmap_t *bitmap, co
 	/* update any dirty scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *src = &state->bitmap[256 * y];
+		const UINT16 *src = &state->m_bitmap[256 * y];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* regenerate the line */

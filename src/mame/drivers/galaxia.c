@@ -35,8 +35,8 @@ public:
 	galaxia_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *video;
-	UINT8 *color;
+	UINT8 *m_video;
+	UINT8 *m_color;
 };
 
 
@@ -60,7 +60,7 @@ static SCREEN_UPDATE( galaxia )
 	{
 		for (x=0;x<256/8;x++)
 		{
-			int tile = state->video[count];
+			int tile = state->m_video[count];
 			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tile,0,0,0,x*8,y*8);
 			count++;
 		}
@@ -103,18 +103,18 @@ static WRITE8_HANDLER(galaxia_video_w)
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	if (cpu_get_reg(&space->device(), S2650_FO))
 	{
-		state->video[offset]=data;
+		state->m_video[offset]=data;
 	}
 	else
 	{
-		state->color[offset]=data;
+		state->m_color[offset]=data;
 	}
 }
 
 static READ8_HANDLER(galaxia_video_r)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	return state->video[offset];
+	return state->m_video[offset];
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, video)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( astrowar_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, video)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
@@ -358,7 +358,7 @@ ROM_END
 static DRIVER_INIT(galaxia)
 {
 	galaxia_state *state = machine.driver_data<galaxia_state>();
-	state->color=auto_alloc_array(machine, UINT8, 0x400);
+	state->m_color=auto_alloc_array(machine, UINT8, 0x400);
 }
 
 GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING )

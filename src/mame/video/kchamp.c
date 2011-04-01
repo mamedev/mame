@@ -27,15 +27,15 @@ PALETTE_INIT( kchamp )
 WRITE8_HANDLER( kchamp_videoram_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kchamp_colorram_w )
 {
 	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kchamp_flipscreen_w )
@@ -46,8 +46,8 @@ WRITE8_HANDLER( kchamp_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 7) << 8);
-	int color = (state->colorram[tile_index] >> 3) & 0x1f;
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 7) << 8);
+	int color = (state->m_colorram[tile_index] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( kchamp )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 /*
@@ -71,7 +71,7 @@ VIDEO_START( kchamp )
 static void kchamp_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -100,7 +100,7 @@ static void kchamp_draw_sprites( running_machine &machine, bitmap_t *bitmap, con
 static void kchampvs_draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	kchamp_state *state = machine.driver_data<kchamp_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -131,7 +131,7 @@ SCREEN_UPDATE( kchamp )
 {
 	kchamp_state *state = screen->machine().driver_data<kchamp_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	kchamp_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }
@@ -140,7 +140,7 @@ SCREEN_UPDATE( kchampvs )
 {
 	kchamp_state *state = screen->machine().driver_data<kchamp_state>();
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	kchampvs_draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

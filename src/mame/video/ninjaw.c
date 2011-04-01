@@ -9,7 +9,7 @@ VIDEO_START( ninjaw )
 	ninjaw_state *state = machine.driver_data<ninjaw_state>();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
-	tc0100scn_set_colbanks(state->tc0100scn_1, 0x0, 0x100, 0x200);
+	tc0100scn_set_colbanks(state->m_tc0100scn_1, 0x0, 0x100, 0x200);
 }
 
 /************************************************************
@@ -19,7 +19,7 @@ VIDEO_START( ninjaw )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int x_offs, int y_offs )
 {
 	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	UINT16 *spriteram = state->spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int code;
@@ -28,7 +28,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	int unknown = 0;
 #endif
 
-	for (offs = (state->spriteram_size / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram_size / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 2];
 		tilenum = data & 0x7fff;
@@ -104,20 +104,20 @@ SCREEN_UPDATE( ninjaw )
 	UINT8 layer[3], nodraw;
 	device_t *tc0100scn = NULL;
 
-	if (screen == state->lscreen)
+	if (screen == state->m_lscreen)
 	{
 		xoffs = 36 * 8 * 0;
-		tc0100scn = state->tc0100scn_1;
+		tc0100scn = state->m_tc0100scn_1;
 	}
-	else if (screen == state->mscreen)
+	else if (screen == state->m_mscreen)
 	{
 		xoffs = 36 * 8 * 1;
-		tc0100scn = state->tc0100scn_2;
+		tc0100scn = state->m_tc0100scn_2;
 	}
-	else if (screen == state->rscreen)
+	else if (screen == state->m_rscreen)
 	{
 		xoffs = 36 * 8 * 2;
-		tc0100scn = state->tc0100scn_3;
+		tc0100scn = state->m_tc0100scn_3;
 	}
 
 	tc0100scn_tilemap_update(tc0100scn);

@@ -104,18 +104,19 @@ public:
 		: driver_device(machine, config) { }
 
 	/* sound-related */
-	UINT32   adpcm_pos;
-	UINT8    adpcm_idle;
-	int      adpcm_data;
-	UINT8    adpcm_trigger;
+	UINT32   m_adpcm_pos;
+	UINT8    m_adpcm_idle;
+	int      m_adpcm_data;
+	UINT8    m_adpcm_trigger;
 
 	/* misc */
-	UINT8    mux_data;
+	UINT8    m_mux_data;
 
 	/* video-related */
-	UINT8    vram_bank, col_bank;
-	UINT8    display_on;
-	UINT8    bitmap[0x8000];
+	UINT8    m_vram_bank;
+	UINT8    m_col_bank;
+	UINT8    m_display_on;
+	UINT8    m_bitmap[0x8000];
 };
 
 
@@ -129,7 +130,7 @@ static VIDEO_START(jantotsu)
 {
 	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
-	state->save_item(NAME(state->bitmap));
+	state->save_item(NAME(state->m_bitmap));
 }
 
 static SCREEN_UPDATE(jantotsu)
@@ -138,7 +139,7 @@ static SCREEN_UPDATE(jantotsu)
 	int x, y, i;
 	int count = 0;
 
-	if(!state->display_on)
+	if(!state->m_display_on)
 		return 0;
 
 	for (y = 0; y < 256; y++)
@@ -149,16 +150,16 @@ static SCREEN_UPDATE(jantotsu)
 
 			for (i = 0; i < 8; i++)
 			{
-				pen[0] = (state->bitmap[count + 0x0000]) >> (7 - i);
-				pen[1] = (state->bitmap[count + 0x2000]) >> (7 - i);
-				pen[2] = (state->bitmap[count + 0x4000]) >> (7 - i);
-				pen[3] = (state->bitmap[count + 0x6000]) >> (7 - i);
+				pen[0] = (state->m_bitmap[count + 0x0000]) >> (7 - i);
+				pen[1] = (state->m_bitmap[count + 0x2000]) >> (7 - i);
+				pen[2] = (state->m_bitmap[count + 0x4000]) >> (7 - i);
+				pen[3] = (state->m_bitmap[count + 0x6000]) >> (7 - i);
 
 				color  = ((pen[0] & 1) << 0);
 				color |= ((pen[1] & 1) << 1);
 				color |= ((pen[2] & 1) << 2);
 				color |= ((pen[3] & 1) << 3);
-				color |= state->col_bank;
+				color |= state->m_col_bank;
 
 				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine().pens[color];
@@ -175,22 +176,22 @@ static SCREEN_UPDATE(jantotsu)
 static READ8_HANDLER( jantotsu_bitmap_r )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	return state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)];
+	return state->m_bitmap[offset + ((state->m_vram_bank & 3) * 0x2000)];
 }
 
 static WRITE8_HANDLER( jantotsu_bitmap_w )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	state->bitmap[offset + ((state->vram_bank & 3) * 0x2000)] = data;
+	state->m_bitmap[offset + ((state->m_vram_bank & 3) * 0x2000)] = data;
 }
 
 static WRITE8_HANDLER( bankaddr_w )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 
-	state->vram_bank = ((data & 0xc0) >> 6);
+	state->m_vram_bank = ((data & 0xc0) >> 6);
 
-	state->display_on = (data & 2);
+	state->m_display_on = (data & 2);
 
 	/* bit 0 is unknown */
 	if(data & 0x3c)
@@ -234,9 +235,9 @@ static READ8_HANDLER( jantotsu_mux_r )
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 	UINT8 coin_port = input_port_read(space->machine(), "COINS");
 
-	//  printf("%02x\n", state->mux_data);
+	//  printf("%02x\n", state->m_mux_data);
 
-	switch (state->mux_data)
+	switch (state->m_mux_data)
 	{
 		case 0x01: return input_port_read(space->machine(), "PL1_1") | coin_port;
 		case 0x02: return input_port_read(space->machine(), "PL1_2") | coin_port;
@@ -254,7 +255,7 @@ static READ8_HANDLER( jantotsu_mux_r )
 static WRITE8_HANDLER( jantotsu_mux_w )
 {
 	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	state->mux_data = ~data;
+	state->m_mux_data = ~data;
 }
 
 /*If bits 6 & 7 doesn't return 0x80,the game hangs until this bit is set,
@@ -273,8 +274,8 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 	switch (offset)
 	{
 		case 0:
-			state->adpcm_pos = (data & 0xff) * 0x100;
-			state->adpcm_idle = 0;
+			state->m_adpcm_pos = (data & 0xff) * 0x100;
+			state->m_adpcm_idle = 0;
 			msm5205_reset_w(device, 0);
 			/* I don't think that this will ever happen, it's there just to be sure
                (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
@@ -284,7 +285,7 @@ static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 			break;
 		/*same write as port 2? MSM sample ack? */
 		case 1:
-//          state->adpcm_idle = 1;
+//          state->m_adpcm_idle = 1;
 //          msm5205_reset_w(device, 1);
 //          printf("%02x 1\n", data);
 			break;
@@ -295,24 +296,24 @@ static void jan_adpcm_int( device_t *device )
 {
 	jantotsu_state *state = device->machine().driver_data<jantotsu_state>();
 
-	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
+	if (state->m_adpcm_pos >= 0x10000 || state->m_adpcm_idle)
 	{
-		//state->adpcm_idle = 1;
+		//state->m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
-		state->adpcm_trigger = 0;
+		state->m_adpcm_trigger = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("adpcm")->base();
 
-		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(device, state->adpcm_data & 0xf);
-		state->adpcm_trigger ^= 1;
-		if (state->adpcm_trigger == 0)
+		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(device, state->m_adpcm_data & 0xf);
+		state->m_adpcm_trigger ^= 1;
+		if (state->m_adpcm_trigger == 0)
 		{
-			state->adpcm_pos++;
-			if ((ROM[state->adpcm_pos] & 0xff) == 0x70)
-				state->adpcm_idle = 1;
+			state->m_adpcm_pos++;
+			if ((ROM[state->m_adpcm_pos] & 0xff) == 0x70)
+				state->m_adpcm_idle = 1;
 		}
 	}
 }
@@ -480,12 +481,12 @@ static MACHINE_START( jantotsu )
 {
 	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
-	state->save_item(NAME(state->vram_bank));
-	state->save_item(NAME(state->mux_data));
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_idle));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->adpcm_trigger));
+	state->save_item(NAME(state->m_vram_bank));
+	state->save_item(NAME(state->m_mux_data));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_idle));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_adpcm_trigger));
 }
 
 static MACHINE_RESET( jantotsu )
@@ -493,14 +494,14 @@ static MACHINE_RESET( jantotsu )
 	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
-	state->col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;
+	state->m_col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;
 
-	state->vram_bank = 0;
-	state->mux_data = 0;
-	state->adpcm_pos = 0;
-	state->adpcm_idle = 1;
-	state->adpcm_data = 0;
-	state->adpcm_trigger = 0;
+	state->m_vram_bank = 0;
+	state->m_mux_data = 0;
+	state->m_adpcm_pos = 0;
+	state->m_adpcm_idle = 1;
+	state->m_adpcm_data = 0;
+	state->m_adpcm_trigger = 0;
 }
 
 static MACHINE_CONFIG_START( jantotsu, jantotsu_state )

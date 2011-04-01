@@ -49,18 +49,18 @@ static void pcktgal_adpcm_int(device_t *device)
 {
 	pcktgal_state *state = device->machine().driver_data<pcktgal_state>();
 
-	msm5205_data_w(device,state->msm5205next >> 4);
-	state->msm5205next<<=4;
+	msm5205_data_w(device,state->m_msm5205next >> 4);
+	state->m_msm5205next<<=4;
 
-	state->toggle = 1 - state->toggle;
-	if (state->toggle)
+	state->m_toggle = 1 - state->m_toggle;
+	if (state->m_toggle)
 		cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )
 {
 	pcktgal_state *state = space->machine().driver_data<pcktgal_state>();
-	state->msm5205next=data;
+	state->m_msm5205next=data;
 }
 
 static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
@@ -74,7 +74,7 @@ static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 static ADDRESS_MAP_START( pcktgal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pcktgal_state, spriteram, spriteram_size)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pcktgal_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)

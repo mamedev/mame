@@ -11,30 +11,31 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    workram;
-	UINT16 *    spriteram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
+	UINT16 *    m_workram;
+	UINT16 *    m_spriteram;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int         sprite_colorbase;
-	int         layer_colorbase[4], layerpri[3];
-	int         alpha_enabled;
+	int         m_sprite_colorbase;
+	int         m_layer_colorbase[4];
+	int         m_layerpri[3];
+	int         m_alpha_enabled;
 
 	/* misc */
-	int         game_type;
-	UINT16      protram[16];
-	UINT16      cur_control2;
+	int         m_game_type;
+	UINT16      m_protram[16];
+	UINT16      m_cur_control2;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k054539;
-	device_t *k053246;
-	device_t *k053251;
-	device_t *k056832;
-	device_t *k054338;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k054539;
+	device_t *m_k053246;
+	device_t *m_k053251;
+	device_t *m_k056832;
+	device_t *m_k054338;
 
-    emu_timer *dmaend_timer;
+    emu_timer *m_dmaend_timer;
 };
 
 

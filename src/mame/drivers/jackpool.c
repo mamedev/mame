@@ -27,9 +27,9 @@ public:
 	jackpool_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *vram;
-	UINT8 map_vreg;
-	UINT16 *io;
+	UINT16 *m_vram;
+	UINT8 m_map_vreg;
+	UINT16 *m_io;
 };
 
 
@@ -46,30 +46,30 @@ static SCREEN_UPDATE(jackpool)
 	int y,x;
 
 	{
-		count = state->map_vreg*(0x4000/2);
+		count = state->m_map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->vram[count+(0x2000/2)] & 0x7fff);
-				int attr = (state->vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
+				int tile = (state->m_vram[count+(0x2000/2)] & 0x7fff);
+				int attr = (state->m_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
 
-		count = state->map_vreg*(0x4000/2);
+		count = state->m_map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (state->vram[count] & 0x7fff);
+				int tile = (state->m_vram[count] & 0x7fff);
 
 				if(tile != 0)
 				{
-					int attr = (state->vram[count+0x800] & 0x1f00)>>8;
-					int t_pen = (state->vram[count+0x800] & 0x1000);
+					int attr = (state->m_vram[count+0x800] & 0x1f00)>>8;
+					int t_pen = (state->m_vram[count+0x800] & 0x1000);
 
 					drawgfx_transpen(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
@@ -115,13 +115,13 @@ static READ16_HANDLER( jackpool_io_r )
 	}
 
 //  printf("R %02x\n",offset*2);
-	return state->io[offset];
+	return state->m_io[offset];
 }
 
 static WRITE16_HANDLER( jackpool_io_w )
 {
 	jackpool_state *state = space->machine().driver_data<jackpool_state>();
-	COMBINE_DATA(&state->io[offset]);
+	COMBINE_DATA(&state->m_io[offset]);
 
 	switch(offset*2)
 	{
@@ -137,7 +137,7 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x46: /* ---- ---x coin counter */break;
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
-		case 0x4e: state->map_vreg = data & 1;        break;
+		case 0x4e: state->m_map_vreg = data & 1;        break;
 		case 0x50: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x52: eeprom_set_clock_line(space->machine().device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
 		case 0x54: eeprom_write_bit(space->machine().device("eeprom"), data & 1); break;
@@ -170,11 +170,11 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM
-	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_BASE_MEMBER(jackpool_state, vram)
+	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_BASE_MEMBER(jackpool_state, m_vram)
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
 	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE_MEMBER(jackpool_state, io)//AM_READ(jackpool_io_r)
+	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE_MEMBER(jackpool_state, m_io)//AM_READ(jackpool_io_r)
 
 	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)

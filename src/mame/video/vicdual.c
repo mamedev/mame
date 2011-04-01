@@ -25,7 +25,7 @@ WRITE8_HANDLER( vicdual_palette_bank_w )
 {
 	vicdual_state *state = space->machine().driver_data<vicdual_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->palette_bank = data & 3;
+	state->m_palette_bank = data & 3;
 }
 
 
@@ -47,11 +47,11 @@ SCREEN_UPDATE( vicdual_bw )
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
-			char_code = state->videoram[offs];
+			char_code = state->m_videoram[offs];
 
 			/* read the appropriate line of the character ram */
 			offs = (char_code << 3) | (y & 0x07);
-			video_data = state->characterram[offs];
+			video_data = state->m_characterram[offs];
 		}
 
 		/* plot the current pixel */
@@ -101,14 +101,14 @@ SCREEN_UPDATE( vicdual_color )
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
-			char_code = state->videoram[offs];
+			char_code = state->m_videoram[offs];
 
 			/* read the appropriate line of the character ram */
 			offs = (char_code << 3) | (y & 0x07);
-			video_data = state->characterram[offs];
+			video_data = state->m_characterram[offs];
 
 			/* get the foreground and background colors from the PROM */
-			offs = (char_code >> 5) | (state->palette_bank << 3);
+			offs = (char_code >> 5) | (state->m_palette_bank << 3);
 			back_pen = pens_from_color_prom[(color_prom[offs] >> 1) & 0x07];
 			fore_pen = pens_from_color_prom[(color_prom[offs] >> 5) & 0x07];
 		}

@@ -29,37 +29,37 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 *videoram;
-	UINT8 vg_clear;
-	UINT8 bufsel;
-	UINT8 alphamap;
-	UINT8 *combase;
-	UINT8 irvg_vblank;
-	UINT8 irvg_running;
-	UINT8 irmb_running;
+	UINT8 *m_videoram;
+	UINT8 m_vg_clear;
+	UINT8 m_bufsel;
+	UINT8 m_alphamap;
+	UINT8 *m_combase;
+	UINT8 m_irvg_vblank;
+	UINT8 m_irvg_running;
+	UINT8 m_irmb_running;
 #if IR_TIMING
-	timer_device *irvg_timer;
-	timer_device *irmb_timer;
+	timer_device *m_irvg_timer;
+	timer_device *m_irmb_timer;
 #endif
-	UINT8 *comRAM[2];
-	UINT8 *mbRAM;
-	UINT8 *mbROM;
-	UINT8 control_num;
-	UINT8 statwr;
-	UINT8 out0;
-	UINT8 outx;
-	UINT8 mpage;
-	UINT8 *combase_mb;
-	irmb_ops *mbops;
-	const irmb_ops *irmb_stack[16];
-	UINT32 irmb_regs[16];
-	UINT32 irmb_latch;
-	UINT8 *polybitmap1;
-	UINT8 *polybitmap2;
-	int ir_xmin;
-	int ir_ymin;
-	int ir_xmax;
-	int ir_ymax;
+	UINT8 *m_comRAM[2];
+	UINT8 *m_mbRAM;
+	UINT8 *m_mbROM;
+	UINT8 m_control_num;
+	UINT8 m_statwr;
+	UINT8 m_out0;
+	UINT8 m_outx;
+	UINT8 m_mpage;
+	UINT8 *m_combase_mb;
+	irmb_ops *m_mbops;
+	const irmb_ops *m_irmb_stack[16];
+	UINT32 m_irmb_regs[16];
+	UINT32 m_irmb_latch;
+	UINT8 *m_polybitmap1;
+	UINT8 *m_polybitmap2;
+	int m_ir_xmin;
+	int m_ir_ymin;
+	int m_ir_xmax;
+	int m_ir_ymax;
 };
 
 /*----------- defined in machine/irobot.c -----------*/

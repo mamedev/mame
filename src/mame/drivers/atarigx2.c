@@ -36,8 +36,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	atarigx2_state *state = machine.driver_data<atarigx2_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -69,8 +69,8 @@ static READ32_HANDLER( special_port2_r )
 {
 	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 	int temp = input_port_read(space->machine(), "SERVICE");
-	if (state->cpu_to_sound_ready) temp ^= 0x0020;
-	if (state->sound_to_cpu_ready) temp ^= 0x0010;
+	if (state->m_cpu_to_sound_ready) temp ^= 0x0020;
+	if (state->m_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
@@ -120,7 +120,7 @@ static WRITE32_HANDLER( latch_w )
 		atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(state->rle, (data >> 27) & 7);
+		atarirle_control_w(state->m_rle, (data >> 27) & 7);
 	}
 
 	/* lower byte */
@@ -132,9 +132,9 @@ static WRITE32_HANDLER( latch_w )
 static WRITE32_HANDLER( mo_command_w )
 {
 	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
-	COMBINE_DATA(state->mo_command);
+	COMBINE_DATA(state->m_mo_command);
 	if (ACCESSING_BITS_0_15)
-		atarirle_command_w(state->rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+		atarirle_command_w(state->m_rle, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
 
@@ -160,17 +160,17 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4 + 2, data);
 	}
 
-	COMBINE_DATA(&state->protection_base[offset]);
+	COMBINE_DATA(&state->m_protection_base[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		state->last_write = state->protection_base[offset] >> 16;
-		state->last_write_offset = offset*2;
+		state->m_last_write = state->m_protection_base[offset] >> 16;
+		state->m_last_write_offset = offset*2;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		state->last_write = state->protection_base[offset] & 0xffff;
-		state->last_write_offset = offset*2+1;
+		state->m_last_write = state->m_protection_base[offset] & 0xffff;
+		state->m_last_write_offset = offset*2+1;
 	}
 }
 
@@ -1106,13 +1106,13 @@ static READ32_HANDLER( atarigx2_protection_r )
 	};
 
 	atarigx2_state *state = space->machine().driver_data<atarigx2_state>();
-	UINT32 result = state->protection_base[offset];
+	UINT32 result = state->m_protection_base[offset];
 
 	if (offset == 0x300)
 		result |= 0x80000000;
 	if (offset == 0x3f0)
 	{
-		UINT32 tag = (state->last_write_offset << 17) | state->last_write;
+		UINT32 tag = (state->m_last_write_offset << 17) | state->m_last_write;
 		int i = 0;
 
 		while (lookup_table[i][0] != 0xffffffff)
@@ -1127,7 +1127,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 
 		if (lookup_table[i][0] == 0xffffffff)
 		{
-			if (state->last_write_offset*2 >= 0x700 && state->last_write_offset*2 < 0x720)
+			if (state->m_last_write_offset*2 >= 0x700 && state->m_last_write_offset*2 < 0x720)
 				result = space->machine().rand() << 16;
 			else
 				result = 0xffff << 16;
@@ -1153,14 +1153,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
-	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE(atarigx2_protection_r, atarigx2_protection_w) AM_BASE_MEMBER(atarigx2_state, protection_base)
+	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE(atarigx2_protection_r, atarigx2_protection_w) AM_BASE_MEMBER(atarigx2_state, m_protection_base)
 	AM_RANGE(0xd00000, 0xd1ffff) AM_READ(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_WRITE(atarigen_666_paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigx2_state, playfield32)
-	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigx2_state, alpha32)
+	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE(atarigen_playfield32_w) AM_BASE_MEMBER(atarigx2_state, m_playfield32)
+	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE(atarigen_alpha32_w) AM_BASE_MEMBER(atarigx2_state, m_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigx2_state, mo_command)
+	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarigx2_state, m_mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE(atarigen_eeprom_enable32_w)
 	AM_RANGE(0xe06000, 0xe06003) AM_WRITE(atarigen_sound_upper32_w)
@@ -2198,7 +2198,7 @@ static DRIVER_INIT( spclords )
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
-	state->playfield_base = 0x000;
+	state->m_playfield_base = 0x000;
 }
 
 
@@ -2208,7 +2208,7 @@ static DRIVER_INIT( motofren )
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
-	state->playfield_base = 0x400;
+	state->m_playfield_base = 0x400;
 /*
 L/W=!68.A23*!E.A22*!E.A21                                       = 000x xxxx = 000000-1fffff
    +68.A23*E.A22*E.A21*68.A20*68.A19*68.A18*68.A17              = 1111 111x = fe0000-ffffff
@@ -2244,7 +2244,7 @@ static DRIVER_INIT( rrreveng )
 
 	atarijsa_init(machine, "SERVICE", 0x0040);
 
-	state->playfield_base = 0x000;
+	state->m_playfield_base = 0x000;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca0fc0, 0xca0fc3, FUNC(rrreveng_prot_r));
 }

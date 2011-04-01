@@ -27,15 +27,15 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * tile_ram;
-	UINT8 * sprite_ram;
+	UINT8 * m_tile_ram;
+	UINT8 * m_sprite_ram;
 
 	/* misc */
-	UINT8 pot_state;
-	UINT8 pot_latch;
+	UINT8 m_pot_state;
+	UINT8 m_pot_latch;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 /*************************************
@@ -49,10 +49,10 @@ static TIMER_CALLBACK( pot_interrupt )
 	boxer_state *state = machine.driver_data<boxer_state>();
 	int mask = param;
 
-	if (state->pot_latch & mask)
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	if (state->m_pot_latch & mask)
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
-	state->pot_state |= mask;
+	state->m_pot_state |= mask;
 }
 
 
@@ -61,7 +61,7 @@ static TIMER_CALLBACK( periodic_callback )
 	boxer_state *state = machine.driver_data<boxer_state>();
 	int scanline = param;
 
-	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -82,7 +82,7 @@ static TIMER_CALLBACK( periodic_callback )
 			if (mask[i] != 0)
 				machine.scheduler().timer_set(machine.primary_screen->time_until_pos(i), FUNC(pot_interrupt), mask[i]);
 
-		state->pot_state = 0;
+		state->m_pot_state = 0;
 	}
 
 	scanline += 64;
@@ -120,11 +120,11 @@ static void draw_boxer( running_machine &machine, bitmap_t* bitmap, const rectan
 
 		int i, j;
 
-		int x = 196 - state->sprite_ram[0 + 2 * n];
-		int y = 192 - state->sprite_ram[1 + 2 * n];
+		int x = 196 - state->m_sprite_ram[0 + 2 * n];
+		int y = 192 - state->m_sprite_ram[1 + 2 * n];
 
-		int l = state->sprite_ram[4 + 2 * n] & 15;
-		int r = state->sprite_ram[5 + 2 * n] & 15;
+		int l = state->m_sprite_ram[4 + 2 * n] & 15;
+		int r = state->m_sprite_ram[5 + 2 * n] & 15;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -168,7 +168,7 @@ static SCREEN_UPDATE( boxer )
 	{
 		for (j = 0; j < 32; j++)
 		{
-			UINT8 code = state->tile_ram[32 * i + j];
+			UINT8 code = state->m_tile_ram[32 * i + j];
 
 			drawgfx_transpen(bitmap, cliprect,
 				screen->machine().gfx[2],
@@ -210,7 +210,7 @@ static READ8_HANDLER( boxer_misc_r )
 	switch (offset & 3)
 	{
 	case 0:
-		val = state->pot_state & state->pot_latch;
+		val = state->m_pot_state & state->m_pot_latch;
 		break;
 
 	case 1:
@@ -252,16 +252,16 @@ static WRITE8_HANDLER( boxer_pot_w )
 	/* BIT4 => VPOT2 */
 	/* BIT5 => RPOT2 */
 
-	state->pot_latch = data & 0x3f;
+	state->m_pot_latch = data & 0x3f;
 
-	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
 	boxer_state *state = space->machine().driver_data<boxer_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -292,7 +292,7 @@ static WRITE8_HANDLER( boxer_led_w )
 static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, tile_ram)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, m_tile_ram)
 	AM_RANGE(0x0800, 0x08ff) AM_READ(boxer_input_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(boxer_misc_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(boxer_pot_w)
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(boxer_crowd_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE_MEMBER(boxer_state, sprite_ram)
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE_MEMBER(boxer_state, m_sprite_ram)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -419,10 +419,10 @@ static MACHINE_START( boxer )
 {
 	boxer_state *state = machine.driver_data<boxer_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->pot_state));
-	state->save_item(NAME(state->pot_latch));
+	state->save_item(NAME(state->m_pot_state));
+	state->save_item(NAME(state->m_pot_latch));
 }
 
 static MACHINE_RESET( boxer )
@@ -430,8 +430,8 @@ static MACHINE_RESET( boxer )
 	boxer_state *state = machine.driver_data<boxer_state>();
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(periodic_callback));
 
-	state->pot_state = 0;
-	state->pot_latch = 0;
+	state->m_pot_state = 0;
+	state->m_pot_latch = 0;
 }
 
 

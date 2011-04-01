@@ -106,13 +106,13 @@ SCREEN_UPDATE( namcofl )
 WRITE32_HANDLER(namcofl_spritebank_w)
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	COMBINE_DATA(&state->sprbank);
+	COMBINE_DATA(&state->m_sprbank);
 }
 
 static int FLobjcode2tile( running_machine &machine, int code )
 {
 	namcofl_state *state = machine.driver_data<namcofl_state>();
-	if ((code & 0x2000) && (state->sprbank & 2)) { code += 0x4000; }
+	if ((code & 0x2000) && (state->m_sprbank & 2)) { code += 0x4000; }
 
 	return code;
 }

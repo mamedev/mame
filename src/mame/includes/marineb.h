@@ -4,20 +4,22 @@ public:
 	marineb_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *   videoram;
-	UINT8 *   colorram;
-	UINT8 *   spriteram;
+	UINT8 *   m_videoram;
+	UINT8 *   m_colorram;
+	UINT8 *   m_spriteram;
 
 	/* video-related */
-	tilemap_t   *bg_tilemap, *fg_tilemap;
-	UINT8     palette_bank;
-	UINT8     column_scroll;
-	UINT8     flipscreen_x, flipscreen_y;
-	UINT8     marineb_active_low_flipscreen;
+	tilemap_t   *m_bg_tilemap;
+	tilemap_t   *m_fg_tilemap;
+	UINT8     m_palette_bank;
+	UINT8     m_column_scroll;
+	UINT8     m_flipscreen_x;
+	UINT8     m_flipscreen_y;
+	UINT8     m_marineb_active_low_flipscreen;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

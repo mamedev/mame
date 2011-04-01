@@ -690,7 +690,7 @@ WRITE8_HANDLER( copsnrob_misc_w )
 {
 	device_t *device = space->machine().device("discrete");
 	copsnrob_state *state = space->machine().driver_data<copsnrob_state>();
-	UINT8 latched_data = state->ic_h3_data;
+	UINT8 latched_data = state->m_ic_h3_data;
 	UINT8 special_data = data & 0x01;
 
 	/* ignore if no change */
@@ -740,5 +740,5 @@ WRITE8_HANDLER( copsnrob_misc_w )
 
 	}
 
-	state->ic_h3_data = latched_data;
+	state->m_ic_h3_data = latched_data;
 }

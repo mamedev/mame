@@ -1026,11 +1026,11 @@ static void sound_w(running_machine &machine, UINT8 data)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	if (state->soundcpu != NULL)
+	if (state->m_soundcpu != NULL)
 	{
-		address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+		address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
+		device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 	}
 }
 
@@ -1039,28 +1039,28 @@ static void system16b_common_init(running_machine& machine, int _rom_board)
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	/* set the ROM board */
-	state->rom_board = _rom_board;
+	state->m_rom_board = _rom_board;
 
 	/* reset the custom handlers and other pointers */
-	state->custom_io_r = NULL;
-	state->custom_io_w = NULL;
-	state->i8751_vblank_hook = NULL;
-	state->i8751_initial_config = NULL;
-	state->disable_screen_blanking = 0;
+	state->m_custom_io_r = NULL;
+	state->m_custom_io_w = NULL;
+	state->m_i8751_vblank_hook = NULL;
+	state->m_i8751_initial_config = NULL;
+	state->m_disable_screen_blanking = 0;
 
-	state->maincpu = machine.device("maincpu");
-	state->soundcpu = machine.device("soundcpu");
-	state->mcu = machine.device("mcu");
-	state->ymsnd = machine.device("ymsnd");
-	state->_315_5248_1 = machine.device("315_5248");
-	state->_315_5250_1 = machine.device("315_5250_1");
-	state->_315_5250_2 = machine.device("315_5250_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_soundcpu = machine.device("soundcpu");
+	state->m_mcu = machine.device("mcu");
+	state->m_ymsnd = machine.device("ymsnd");
+	state->m_315_5248_1 = machine.device("315_5248");
+	state->m_315_5250_1 = machine.device("315_5250_1");
+	state->m_315_5250_2 = machine.device("315_5250_2");
 
-	state->save_item(NAME(state->disable_screen_blanking));
-	state->save_item(NAME(state->mj_input_num));
-	state->save_item(NAME(state->mj_last_val));
-	state->save_item(NAME(state->hwc_input_value));
-	state->save_item(NAME(state->atomicp_sound_divisor));
+	state->save_item(NAME(state->m_disable_screen_blanking));
+	state->save_item(NAME(state->m_mj_input_num));
+	state->save_item(NAME(state->m_mj_last_val));
+	state->save_item(NAME(state->m_hwc_input_value));
+	state->save_item(NAME(state->m_atomicp_sound_divisor));
 
 }
 
@@ -1079,7 +1079,7 @@ static void system16b_generic_init(running_machine &machine, int _rom_board)
 	workram              = auto_alloc_array(machine, UINT16, 0x04000 / 2);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(machine.device("maincpu"), region_info_list[state->rom_board], sound_w, NULL);
+	segaic16_memory_mapper_init(machine.device("maincpu"), region_info_list[state->m_rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
@@ -1097,7 +1097,7 @@ static void system16b_generic_init(running_machine &machine, int _rom_board)
 static TIMER_CALLBACK( suspend_i8751 )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	device_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
+	device_suspend(state->m_mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -1122,21 +1122,21 @@ static MACHINE_RESET( system16b )
 	int i;
 
 	segaic16_memory_mapper_reset(machine);
-	if (state->i8751_initial_config != NULL)
-		segaic16_memory_mapper_config(machine, state->i8751_initial_config);
+	if (state->m_i8751_initial_config != NULL)
+		segaic16_memory_mapper_config(machine, state->m_i8751_initial_config);
 	segaic16_tilemap_reset(machine, 0);
 
 	fd1094_machine_init(machine.device("maincpu"));
 
 	/* if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave */
-	if (state->i8751_vblank_hook != NULL)
+	if (state->m_i8751_vblank_hook != NULL)
 		machine.scheduler().synchronize(FUNC(suspend_i8751));
 	else
 		machine.scheduler().synchronize(FUNC(boost_interleave));
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
-		segaic16_sprites_set_bank(machine, 0, i, (state->rom_board == ROM_BOARD_171_5358 || state->rom_board == ROM_BOARD_171_5358_SMALL) ? alternate_banklist[i] : default_banklist[i]);
+		segaic16_sprites_set_bank(machine, 0, i, (state->m_rom_board == ROM_BOARD_171_5358 || state->m_rom_board == ROM_BOARD_171_5358_SMALL) ? alternate_banklist[i] : default_banklist[i]);
 }
 
 
@@ -1144,10 +1144,10 @@ static TIMER_DEVICE_CALLBACK( atomicp_sound_irq )
 {
 	segas1x_state *state = timer.machine().driver_data<segas1x_state>();
 
-	if (++state->atomicp_sound_count >= state->atomicp_sound_divisor)
+	if (++state->m_atomicp_sound_count >= state->m_atomicp_sound_divisor)
 	{
-		device_set_input_line(state->maincpu, 2, HOLD_LINE);
-		state->atomicp_sound_count = 0;
+		device_set_input_line(state->m_maincpu, 2, HOLD_LINE);
+		state->m_atomicp_sound_count = 0;
 	}
 }
 
@@ -1198,7 +1198,7 @@ static WRITE16_HANDLER( standard_io_w )
             */
 			segaic16_tilemap_set_flip(space->machine(), 0, data & 0x40);
 			segaic16_sprites_set_flip(space->machine(), 0, data & 0x40);
-			if (!state->disable_screen_blanking)
+			if (!state->m_disable_screen_blanking)
 				segaic16_set_display_enable(space->machine(), data & 0x20);
 			set_led_status(space->machine(), 1, data & 0x08);
 			set_led_status(space->machine(), 0, data & 0x04);
@@ -1214,8 +1214,8 @@ static READ16_HANDLER( misc_io_r )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
-	if (state->custom_io_r)
-		return (*state->custom_io_r)(space, offset, mem_mask);
+	if (state->m_custom_io_r)
+		return (*state->m_custom_io_r)(space, offset, mem_mask);
 	else
 		return standard_io_r(space, offset, mem_mask);
 }
@@ -1225,8 +1225,8 @@ static WRITE16_HANDLER( misc_io_w )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
-	if (state->custom_io_w)
-		(*state->custom_io_w)(space, offset, data, mem_mask);
+	if (state->m_custom_io_w)
+		(*state->m_custom_io_w)(space, offset, data, mem_mask);
 	else
 		standard_io_w(space, offset, data, mem_mask);
 }
@@ -1255,11 +1255,11 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			return segaic16_multiply_r(state->_315_5248_1, offset & 3, mem_mask);
+			return segaic16_multiply_r(state->m_315_5248_1, offset & 3, mem_mask);
 
 		case 0x1000/2:
 			/* compare registers */
-			return segaic16_compare_timer_r(state->_315_5250_1, offset & 7, mem_mask);
+			return segaic16_compare_timer_r(state->m_315_5250_1, offset & 7, mem_mask);
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -1274,12 +1274,12 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			segaic16_multiply_w(state->_315_5248_1, offset & 3, data, mem_mask);
+			segaic16_multiply_w(state->m_315_5248_1, offset & 3, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			/* compare registers */
-			segaic16_compare_timer_w(state->_315_5250_1, offset & 7, data, mem_mask);
+			segaic16_compare_timer_w(state->m_315_5250_1, offset & 7, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1295,7 +1295,7 @@ static READ16_HANDLER( unknown_rgn2_r )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return segaic16_compare_timer_r(state->_315_5250_2, offset & 7, mem_mask);
+	return segaic16_compare_timer_r(state->m_315_5250_2, offset & 7, mem_mask);
 }
 
 
@@ -1304,7 +1304,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	segaic16_compare_timer_w(state->_315_5250_2, offset & 7, data, mem_mask);
+	segaic16_compare_timer_w(state->m_315_5250_2, offset & 7, data, mem_mask);
 }
 
 
@@ -1329,7 +1329,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 		upd7759_reset_w(device, data & 0x40);
 
 		/* banking depends on the ROM board */
-		switch (state->rom_board)
+		switch (state->m_rom_board)
 		{
 			case ROM_BOARD_171_5358:
 			case ROM_BOARD_171_5358_SMALL:
@@ -1391,7 +1391,7 @@ static void upd7759_generate_nmi(device_t *device, int state)
 	segas1x_state *driver = device->machine().driver_data<segas1x_state>();
 
 	if (state)
-		device_set_input_line(driver->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(driver->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1399,8 +1399,8 @@ static void upd7759_generate_nmi(device_t *device, int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
-	state->mcu_data = data;
-	generic_pulse_irq_line(state->mcu, 1);
+	state->m_mcu_data = data;
+	generic_pulse_irq_line(state->m_mcu, 1);
 }
 #endif
 
@@ -1416,8 +1416,8 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 
 	/* if we have a fake 8751 handler, call it on VBLANK */
-	if (state->i8751_vblank_hook != NULL)
-		(*state->i8751_vblank_hook)(device->machine());
+	if (state->m_i8751_vblank_hook != NULL)
+		(*state->m_i8751_vblank_hook)(device->machine());
 }
 
 
@@ -1431,11 +1431,11 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 static void altbeast_common_i8751_sim(running_machine &machine, offs_t soundoffs, offs_t inputoffs)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* set tile banks */
 	rom_5704_bank_w(space, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
@@ -1471,11 +1471,11 @@ static void altbeast_i8751_sim(running_machine &machine)
 static void ddux_i8751_sim(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0bd0/2];
@@ -1495,13 +1495,13 @@ static void goldnaxe_i8751_init(running_machine &machine)
 	static const UINT8 memory_control_5797[0x10] =
 		{ 0x02,0x00, 0x00,0x1f, 0x00,0x1e, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
 
-	switch (state->rom_board)
+	switch (state->m_rom_board)
 	{
 		case ROM_BOARD_171_5704:
-			state->i8751_initial_config = memory_control_5704;
+			state->m_i8751_initial_config = memory_control_5704;
 			break;
 		case ROM_BOARD_171_5797:
-			state->i8751_initial_config = memory_control_5797;
+			state->m_i8751_initial_config = memory_control_5797;
 			break;
 	}
 }
@@ -1509,11 +1509,11 @@ static void goldnaxe_i8751_init(running_machine &machine)
 static void goldnaxe_i8751_sim(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* they periodically clear the data at 2cd8,2cda,2cdc,2cde and expect the MCU to fill it in */
 	if (workram[0x2cd8/2] == 0 && workram[0x2cda/2] == 0 && workram[0x2cdc/2] == 0 && workram[0x2cde/2] == 0)
@@ -1541,11 +1541,11 @@ static void goldnaxe_i8751_sim(running_machine &machine)
 static void tturf_i8751_sim(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x01d0/2];
@@ -1565,11 +1565,11 @@ static void tturf_i8751_sim(running_machine &machine)
 static void wb3_i8751_sim(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
+	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0008/2];
@@ -1591,14 +1591,14 @@ static void wb3_i8751_sim(running_machine &machine)
 static MACHINE_START( atomicp )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	state->save_item(NAME(state->atomicp_sound_count));
+	state->save_item(NAME(state->m_atomicp_sound_count));
 }
 
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
-	ym2413_w(state->ymsnd, offset, data >> 8);
+	ym2413_w(state->m_ymsnd, offset, data >> 8);
 }
 
 
@@ -1649,8 +1649,8 @@ static READ16_HANDLER( hwchamp_custom_io_r )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					result = (state->hwc_input_value & 0x80) >> 7;
-					state->hwc_input_value <<= 1;
+					result = (state->m_hwc_input_value & 0x80) >> 7;
+					state->m_hwc_input_value <<= 1;
 					return result;
 			}
 			break;
@@ -1669,7 +1669,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					state->hwc_input_value = input_port_read_safe(space->machine(), portname[offset & 3], 0xff);
+					state->m_hwc_input_value = input_port_read_safe(space->machine(), portname[offset & 3], 0xff);
 					break;
 
 				case 0x30/2:
@@ -1755,12 +1755,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(space->machine(), portname[state->mj_input_num], 0xff) != 0xff)
-						return 0xff & ~(1 << state->mj_input_num);
+					if (input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff) != 0xff)
+						return 0xff & ~(1 << state->m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(space->machine(), portname[state->mj_input_num], 0xff);
+					return input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff);
 			}
 			break;
 	}
@@ -1775,10 +1775,10 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			if (((state->mj_last_val ^ data) & 4) && (data & 4))
-				state->mj_input_num = (state->mj_input_num + 1) % 6;
+			if (((state->m_mj_last_val ^ data) & 4) && (data & 4))
+				state->m_mj_input_num = (state->m_mj_input_num + 1) % 6;
 
-			state->mj_last_val = data;
+			state->m_mj_last_val = data;
 			break;
 	}
 	standard_io_w(space, offset, data, mem_mask);
@@ -6371,7 +6371,7 @@ static DRIVER_INIT( altbeast_5521 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
-	state->i8751_vblank_hook = altbeast_i8751_sim;
+	state->m_i8751_vblank_hook = altbeast_i8751_sim;
 }
 
 
@@ -6380,7 +6380,7 @@ static DRIVER_INIT( altbeasj_5521 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
-	state->i8751_vblank_hook = altbeasj_i8751_sim;
+	state->m_i8751_vblank_hook = altbeasj_i8751_sim;
 }
 
 
@@ -6389,7 +6389,7 @@ static DRIVER_INIT( altbeas5_5521 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
-	state->i8751_vblank_hook = altbeas5_i8751_sim;
+	state->m_i8751_vblank_hook = altbeas5_i8751_sim;
 }
 
 
@@ -6419,7 +6419,7 @@ static DRIVER_INIT( ddux_5704 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
-	state->i8751_vblank_hook = ddux_i8751_sim;
+	state->m_i8751_vblank_hook = ddux_i8751_sim;
 }
 
 
@@ -6429,7 +6429,7 @@ static DRIVER_INIT( dunkshot_5358 )
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089a_decrypt(machine);
-	state->custom_io_r = dunkshot_custom_io_r;
+	state->m_custom_io_r = dunkshot_custom_io_r;
 }
 
 
@@ -6438,7 +6438,7 @@ static DRIVER_INIT( exctleag_5358 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
-	state->custom_io_r = sdi_custom_io_r;
+	state->m_custom_io_r = sdi_custom_io_r;
 }
 
 
@@ -6448,7 +6448,7 @@ static DRIVER_INIT( goldnaxe_5704 )
 
 	DRIVER_INIT_CALL(generic_5704);
 	goldnaxe_i8751_init(machine);
-	state->i8751_vblank_hook = goldnaxe_i8751_sim;
+	state->m_i8751_vblank_hook = goldnaxe_i8751_sim;
 }
 
 
@@ -6458,7 +6458,7 @@ static DRIVER_INIT( goldnaxe_5797 )
 
 	DRIVER_INIT_CALL(generic_5797);
 	goldnaxe_i8751_init(machine);
-	state->i8751_vblank_hook = goldnaxe_i8751_sim;
+	state->m_i8751_vblank_hook = goldnaxe_i8751_sim;
 }
 
 
@@ -6467,8 +6467,8 @@ static DRIVER_INIT( hwchamp_5521 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5521);
-	state->custom_io_r = hwchamp_custom_io_r;
-	state->custom_io_w = hwchamp_custom_io_w;
+	state->m_custom_io_r = hwchamp_custom_io_r;
+	state->m_custom_io_w = hwchamp_custom_io_w;
 }
 
 
@@ -6477,7 +6477,7 @@ static DRIVER_INIT( sdi_5358 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
-	state->custom_io_r = sdi_custom_io_r;
+	state->m_custom_io_r = sdi_custom_io_r;
 }
 
 static DRIVER_INIT( defense_5358 )
@@ -6486,7 +6486,7 @@ static DRIVER_INIT( defense_5358 )
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089a_decrypt(machine);
-	state->custom_io_r = sdi_custom_io_r;
+	state->m_custom_io_r = sdi_custom_io_r;
 }
 
 
@@ -6510,8 +6510,8 @@ static DRIVER_INIT( sjryuko_5358 )
 
 	DRIVER_INIT_CALL(generic_5358);
 	fd1089b_decrypt(machine);
-	state->custom_io_r = sjryuko_custom_io_r;
-	state->custom_io_w = sjryuko_custom_io_w;
+	state->m_custom_io_r = sjryuko_custom_io_r;
+	state->m_custom_io_w = sjryuko_custom_io_w;
 }
 
 
@@ -6520,7 +6520,7 @@ static DRIVER_INIT( passshtj_5358 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5358);
-	state->custom_io_r = passshtj_custom_io_r;
+	state->m_custom_io_r = passshtj_custom_io_r;
 }
 
 
@@ -6529,7 +6529,7 @@ static DRIVER_INIT( tturf_5704 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
-	state->i8751_vblank_hook = tturf_i8751_sim;
+	state->m_i8751_vblank_hook = tturf_i8751_sim;
 }
 
 
@@ -6538,7 +6538,7 @@ static DRIVER_INIT( wb3_5704 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	DRIVER_INIT_CALL(generic_5704);
-	state->i8751_vblank_hook = wb3_i8751_sim;
+	state->m_i8751_vblank_hook = wb3_i8751_sim;
 }
 
 
@@ -6547,8 +6547,8 @@ static DRIVER_INIT( atomicp )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
-	state->disable_screen_blanking = 1;
-	state->atomicp_sound_divisor = 1;
+	state->m_disable_screen_blanking = 1;
+	state->m_atomicp_sound_divisor = 1;
 
 	segaic16_display_enable = 1;
 }
@@ -6559,8 +6559,8 @@ static DRIVER_INIT( snapper )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
-	state->disable_screen_blanking = 1;
-	state->atomicp_sound_divisor = 4;
+	state->m_disable_screen_blanking = 1;
+	state->m_atomicp_sound_divisor = 4;
 
 	segaic16_display_enable = 1;
 }

@@ -24,27 +24,27 @@ public:
 	required_shared_ptr<UINT8> m_nvram;
 
 	/* machine state */
-	UINT8  a2d_select;
-	UINT8  nvram_enabled;
-	emu_timer *interrupt_timer;
+	UINT8  m_a2d_select;
+	UINT8  m_nvram_enabled;
+	emu_timer *m_interrupt_timer;
 
 	/* video state */
-	UINT8 *foregroundram;
-	UINT8 *backgroundram;
-	UINT8 *spriteram;
-	UINT8 *paletteram;
-	UINT8 *foreground_bank;
-	UINT8 *video_off;
-	UINT8 *smoothing_table;
-	UINT32 vscroll;
-	UINT32 hscroll;
+	UINT8 *m_foregroundram;
+	UINT8 *m_backgroundram;
+	UINT8 *m_spriteram;
+	UINT8 *m_paletteram;
+	UINT8 *m_foreground_bank;
+	UINT8 *m_video_off;
+	UINT8 *m_smoothing_table;
+	UINT32 m_vscroll;
+	UINT32 m_hscroll;
 
 	/* audio state */
-	UINT8  audio_latch;
-	UINT8  audio_ack_latch;
-	UINT8 *audio_comm_stat;
-	UINT8 *speech_data;
-	UINT8  speech_strobe_state;
+	UINT8  m_audio_latch;
+	UINT8  m_audio_ack_latch;
+	UINT8 *m_audio_comm_stat;
+	UINT8 *m_speech_data;
+	UINT8  m_speech_strobe_state;
 };
 
 

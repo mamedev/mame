@@ -96,22 +96,22 @@ PALETTE_INIT( pingpong )
 WRITE8_HANDLER( pingpong_videoram_w )
 {
 	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( pingpong_colorram_w )
 {
 	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	pingpong_state *state = machine.driver_data<pingpong_state>();
-	int attr = state->colorram[tile_index];
-	int code = state->videoram[tile_index] + ((attr & 0x20) << 3);
+	int attr = state->m_colorram[tile_index];
+	int code = state->m_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x1f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
@@ -121,16 +121,16 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( pingpong )
 {
 	pingpong_state *state = machine.driver_data<pingpong_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	pingpong_state *state = machine.driver_data<pingpong_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy,color,schar;
 
@@ -155,7 +155,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( pingpong )
 {
 	pingpong_state *state = screen->machine().driver_data<pingpong_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

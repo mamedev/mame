@@ -54,7 +54,7 @@ static WRITE16_HANDLER( sound_w )
 {
 	supbtime_state *state = space->machine().driver_data<supbtime_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP /* Nothing there */
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, spriteram, spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP /* Nothing there */
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
@@ -72,14 +72,14 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll)
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll)
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, m_pf1_rowscroll)
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, m_pf2_rowscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sound_w)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, spriteram, spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
@@ -87,8 +87,8 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll) // unused
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, m_pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, m_pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -312,7 +312,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	supbtime_state *driver_state = device->machine().driver_data<supbtime_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -335,9 +335,9 @@ static MACHINE_START( supbtime )
 {
 	supbtime_state *state = machine.driver_data<supbtime_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( supbtime, supbtime_state )

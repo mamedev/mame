@@ -12,9 +12,9 @@ public:
 	batman_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT16			latch_data;
+	UINT16			m_latch_data;
 
-	UINT8			alpha_tile_bank;
+	UINT8			m_alpha_tile_bank;
 };
 
 

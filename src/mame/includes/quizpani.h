@@ -4,13 +4,13 @@ public:
 	quizpani_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *bg_videoram;
-	UINT16 *txt_videoram;
-	UINT16 *scrollreg;
-	tilemap_t *bg_tilemap;
-	tilemap_t *txt_tilemap;
-	int bgbank;
-	int txtbank;
+	UINT16 *m_bg_videoram;
+	UINT16 *m_txt_videoram;
+	UINT16 *m_scrollreg;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_txt_tilemap;
+	int m_bgbank;
+	int m_txtbank;
 };
 
 

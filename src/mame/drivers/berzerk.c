@@ -23,20 +23,20 @@ public:
 	berzerk_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	size_t videoram_size;
-	UINT8 *colorram;
-	UINT8 magicram_control;
-	UINT8 last_shift_data;
-	UINT8 intercept;
-	emu_timer *irq_timer;
-	emu_timer *nmi_timer;
-	UINT8 irq_enabled;
-	UINT8 nmi_enabled;
-	int p1_counter_74ls161;
-	int p1_direction;
-	int p2_counter_74ls161;
-	int p2_direction;
+	UINT8 *m_videoram;
+	size_t m_videoram_size;
+	UINT8 *m_colorram;
+	UINT8 m_magicram_control;
+	UINT8 m_last_shift_data;
+	UINT8 m_intercept;
+	emu_timer *m_irq_timer;
+	emu_timer *m_nmi_timer;
+	UINT8 m_irq_enabled;
+	UINT8 m_nmi_enabled;
+	int m_p1_counter_74ls161;
+	int m_p1_direction;
+	int m_p2_counter_74ls161;
+	int m_p2_direction;
 };
 
 
@@ -156,7 +156,7 @@ static int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
 static WRITE8_HANDLER( irq_enable_w )
 {
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
-	state->irq_enabled = data & 0x01;
+	state->m_irq_enabled = data & 0x01;
 }
 
 
@@ -170,7 +170,7 @@ static TIMER_CALLBACK( irq_callback )
 	int next_irq_number;
 
 	/* set the IRQ line if enabled */
-	if (state->irq_enabled)
+	if (state->m_irq_enabled)
 		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
@@ -179,14 +179,14 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	state->irq_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_irq_number);
+	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_irq_number);
 }
 
 
 static void create_irq_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->irq_timer = machine.scheduler().timer_alloc(FUNC(irq_callback));
+	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(irq_callback));
 }
 
 
@@ -194,7 +194,7 @@ static void start_irq_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	state->irq_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(vpos));
 }
 
 
@@ -215,21 +215,21 @@ static void start_irq_timer(running_machine &machine)
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
-	state->nmi_enabled = 1;
+	state->m_nmi_enabled = 1;
 }
 
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
-	state->nmi_enabled = 0;
+	state->m_nmi_enabled = 0;
 }
 
 
 static READ8_HANDLER( nmi_enable_r )
 {
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
-	state->nmi_enabled = 1;
+	state->m_nmi_enabled = 1;
 
 	return 0;
 }
@@ -238,7 +238,7 @@ static READ8_HANDLER( nmi_enable_r )
 static READ8_HANDLER( nmi_disable_r )
 {
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
-	state->nmi_enabled = 0;
+	state->m_nmi_enabled = 0;
 
 	return 0;
 }
@@ -254,7 +254,7 @@ static TIMER_CALLBACK( nmi_callback )
 	int next_nmi_number;
 
 	/* pulse the NMI line if enabled */
-	if (state->nmi_enabled)
+	if (state->m_nmi_enabled)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
@@ -263,14 +263,14 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	state->nmi_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_nmi_number);
+	state->m_nmi_timer->adjust(machine.primary_screen->time_until_pos(next_vpos), next_nmi_number);
 }
 
 
 static void create_nmi_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->nmi_timer = machine.scheduler().timer_alloc(FUNC(nmi_callback));
+	state->m_nmi_timer = machine.scheduler().timer_alloc(FUNC(nmi_callback));
 }
 
 
@@ -278,7 +278,7 @@ static void start_nmi_timer(running_machine &machine)
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	state->nmi_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	state->m_nmi_timer->adjust(machine.primary_screen->time_until_pos(vpos));
 }
 
 
@@ -296,11 +296,11 @@ static MACHINE_START( berzerk )
 	create_nmi_timer(machine);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->magicram_control);
-	state_save_register_global(machine, state->last_shift_data);
-	state_save_register_global(machine, state->intercept);
-	state_save_register_global(machine, state->irq_enabled);
-	state_save_register_global(machine, state->nmi_enabled);
+	state_save_register_global(machine, state->m_magicram_control);
+	state_save_register_global(machine, state->m_last_shift_data);
+	state_save_register_global(machine, state->m_intercept);
+	state_save_register_global(machine, state->m_irq_enabled);
+	state_save_register_global(machine, state->m_nmi_enabled);
 }
 
 
@@ -314,10 +314,10 @@ static MACHINE_START( berzerk )
 static MACHINE_RESET( berzerk )
 {
 	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->irq_enabled = 0;
-	state->nmi_enabled = 0;
+	state->m_irq_enabled = 0;
+	state->m_nmi_enabled = 0;
 	set_led_status(machine, 0, 0);
-	state->magicram_control = 0;
+	state->m_magicram_control = 0;
 
 	start_irq_timer(machine);
 	start_nmi_timer(machine);
@@ -352,37 +352,37 @@ static WRITE8_HANDLER( magicram_w )
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
 	UINT8 alu_output;
 
-	UINT8 current_video_data = state->videoram[offset];
+	UINT8 current_video_data = state->m_videoram[offset];
 
 	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
        The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
        followed by 4 more 153's at 11B, 10B, 9B and 8B, which optionally
        reverse the order of the resulting bits */
-	UINT8 shift_flop_output = (((UINT16)state->last_shift_data << 8) | data) >> (state->magicram_control & 0x07);
+	UINT8 shift_flop_output = (((UINT16)state->m_last_shift_data << 8) | data) >> (state->m_magicram_control & 0x07);
 
-	if (state->magicram_control & 0x08)
+	if (state->m_magicram_control & 0x08)
 		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	/* collision detection - AND gate output goes to the K pin of the flip-flop,
        while J is LO, therefore, it only resets, never sets */
 	if (shift_flop_output & current_video_data)
-		state->intercept = 0;
+		state->m_intercept = 0;
 
 	/* perform ALU step */
 	TTL74181_write(LS181_12C, TTL74181_INPUT_A0, 4, shift_flop_output & 0x0f);
 	TTL74181_write(LS181_10C, TTL74181_INPUT_A0, 4, shift_flop_output >> 4);
 	TTL74181_write(LS181_12C, TTL74181_INPUT_B0, 4, current_video_data & 0x0f);
 	TTL74181_write(LS181_10C, TTL74181_INPUT_B0, 4, current_video_data >> 4);
-	TTL74181_write(LS181_12C, TTL74181_INPUT_S0, 4, state->magicram_control >> 4);
-	TTL74181_write(LS181_10C, TTL74181_INPUT_S0, 4, state->magicram_control >> 4);
+	TTL74181_write(LS181_12C, TTL74181_INPUT_S0, 4, state->m_magicram_control >> 4);
+	TTL74181_write(LS181_10C, TTL74181_INPUT_S0, 4, state->m_magicram_control >> 4);
 
 	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
 				 (TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
 
-	state->videoram[offset] = alu_output ^ 0xff;
+	state->m_videoram[offset] = alu_output ^ 0xff;
 
 	/* save data for next time */
-	state->last_shift_data = data & 0x7f;
+	state->m_last_shift_data = data & 0x7f;
 }
 
 
@@ -391,9 +391,9 @@ static WRITE8_HANDLER( magicram_control_w )
 	berzerk_state *state = space->machine().driver_data<berzerk_state>();
 	/* save the control byte, clear the shift data latch,
        and set the intercept flip-flop */
-	state->magicram_control = data;
-	state->last_shift_data = 0;
-	state->intercept = 1;
+	state->m_magicram_control = data;
+	state->m_last_shift_data = 0;
+	state->m_intercept = 1;
 }
 
 
@@ -405,7 +405,7 @@ static READ8_HANDLER( intercept_v256_r )
 
 	vpos_to_vsync_chain_counter(space->machine().primary_screen->vpos(), &counter, &v256);
 
-	return (!state->intercept << 7) | v256;
+	return (!state->m_intercept << 7) | v256;
 }
 
 
@@ -452,12 +452,12 @@ static SCREEN_UPDATE( berzerk )
 
 	get_pens(screen->machine(), pens);
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		int i;
 
-		UINT8 data = state->videoram[offs];
-		UINT8 color = state->colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
+		UINT8 data = state->m_videoram[offs];
+		UINT8 color = state->m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -588,18 +588,18 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, videoram) AM_SIZE_MEMBER(berzerk_state, videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, m_videoram) AM_SIZE_MEMBER(berzerk_state, m_videoram_size) AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE_MEMBER(berzerk_state, colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE_MEMBER(berzerk_state, m_colorram)
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, videoram) AM_SIZE_MEMBER(berzerk_state, videoram_size) AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, m_videoram) AM_SIZE_MEMBER(berzerk_state, m_videoram_size) AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE_MEMBER(berzerk_state, colorram)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE_MEMBER(berzerk_state, m_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -897,12 +897,12 @@ static READ8_HANDLER( moonwarp_p1_r )
 	signed char dialread = input_port_read(space->machine(),"P1_DIAL");
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine(),"P1")&0xe0);
-	if (dialread < 0) state->p1_direction = 0;
-	else if (dialread > 0) state->p1_direction = 0x10;
-	state->p1_counter_74ls161 += abs(dialread);
-	state->p1_counter_74ls161 &= 0xf;
-	ret = state->p1_counter_74ls161 | state->p1_direction | buttons;
-	//fprintf(stderr, "dialread1: %02x, p1_counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->p1_counter_74ls161, ret);
+	if (dialread < 0) state->m_p1_direction = 0;
+	else if (dialread > 0) state->m_p1_direction = 0x10;
+	state->m_p1_counter_74ls161 += abs(dialread);
+	state->m_p1_counter_74ls161 &= 0xf;
+	ret = state->m_p1_counter_74ls161 | state->m_p1_direction | buttons;
+	//fprintf(stderr, "dialread1: %02x, p1_counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->m_p1_counter_74ls161, ret);
 	return ret;
 }
 
@@ -913,12 +913,12 @@ static READ8_HANDLER( moonwarp_p2_r )
 	signed char dialread = input_port_read(space->machine(),"P2_DIAL");
 	UINT8 ret;
 	UINT8 buttons = (input_port_read(space->machine(),"P2")&0xe0);
-	if (dialread < 0) state->p2_direction = 0;
-	else if (dialread > 0) state->p2_direction = 0x10;
-	state->p2_counter_74ls161 += abs(dialread);
-	state->p2_counter_74ls161 &= 0xf;
-	ret = state->p2_counter_74ls161 | state->p2_direction | buttons;
-	//fprintf(stderr, "dialread2: %02x, p2_counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->p2_counter_74ls161, ret);
+	if (dialread < 0) state->m_p2_direction = 0;
+	else if (dialread > 0) state->m_p2_direction = 0x10;
+	state->m_p2_counter_74ls161 += abs(dialread);
+	state->m_p2_counter_74ls161 &= 0xf;
+	ret = state->m_p2_counter_74ls161 | state->m_p2_direction | buttons;
+	//fprintf(stderr, "dialread2: %02x, p2_counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->m_p2_counter_74ls161, ret);
 	return ret;
 }
 

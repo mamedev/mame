@@ -14,12 +14,12 @@ public:
 	gunbustr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 coin_word;
-	UINT32 *ram;
-	struct tempsprite *spritelist;
-	UINT32 mem[2];
-	UINT32 *spriteram;
-	size_t spriteram_size;
+	UINT16 m_coin_word;
+	UINT32 *m_ram;
+	struct tempsprite *m_spritelist;
+	UINT32 m_mem[2];
+	UINT32 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

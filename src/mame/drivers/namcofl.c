@@ -189,13 +189,13 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			memory_set_bankptr(space->machine(),  "bank1", state->workram );
+			memory_set_bankptr(space->machine(),  "bank1", state->m_workram );
 			memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
 			memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() );
-			memory_set_bankptr(space->machine(),  "bank2", state->workram );
+			memory_set_bankptr(space->machine(),  "bank2", state->m_workram );
 		}
 	}
 }
@@ -210,23 +210,23 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = space->machine().generic.paletteram.u32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		state->raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(triggerscanline));
+		state->m_raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(triggerscanline));
 	}
 }
 
 static READ32_HANDLER( namcofl_share_r )
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	return (state->shareram[offset*2+1] << 16) | state->shareram[offset*2];
+	return (state->m_shareram[offset*2+1] << 16) | state->m_shareram[offset*2];
 }
 
 static WRITE32_HANDLER( namcofl_share_w )
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	COMBINE_DATA(state->shareram+offset*2);
+	COMBINE_DATA(state->m_shareram+offset*2);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->shareram+offset*2+1);
+	COMBINE_DATA(state->m_shareram+offset*2+1);
 }
 
 static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32 )
@@ -263,7 +263,7 @@ static WRITE16_HANDLER( mcu_shared_w )
 	}
 #endif
 
-	COMBINE_DATA(&state->shareram[offset]);
+	COMBINE_DATA(&state->m_shareram[offset]);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
@@ -276,19 +276,19 @@ static WRITE16_HANDLER( mcu_shared_w )
 static READ8_HANDLER( port6_r )
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	return state->mcu_port6;
+	return state->m_mcu_port6;
 }
 
 static WRITE8_HANDLER( port6_w )
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	state->mcu_port6 = data;
+	state->m_mcu_port6 = data;
 }
 
 static READ8_HANDLER( port7_r )
 {
 	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	switch (state->mcu_port6 & 0xf0)
+	switch (state->m_mcu_port6 & 0xf0)
 	{
 		case 0x00:
 			return input_port_read(space->machine(), "IN0");
@@ -332,7 +332,7 @@ static READ8_HANDLER(dac0_r) { return 0xff; }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_BASE_MEMBER(namcofl_state, shareram)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_BASE_MEMBER(namcofl_state, m_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
@@ -551,7 +551,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 	namcofl_state *state = machine.driver_data<namcofl_state>();
 	machine.primary_screen->update_partial(machine.primary_screen->vpos());
 	cputag_set_input_line(machine, "maincpu", I960_IRQ1, ASSERT_LINE);
-	state->raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
+	state->m_raster_interrupt_timer->adjust(machine.primary_screen->frame_period());
 }
 
 static INTERRUPT_GEN( mcu_interrupt )
@@ -573,7 +573,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 static MACHINE_START( namcofl )
 {
 	namcofl_state *state = machine.driver_data<namcofl_state>();
-	state->raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
+	state->m_raster_interrupt_timer = machine.scheduler().timer_alloc(FUNC(raster_interrupt_callback));
 }
 
 
@@ -584,9 +584,9 @@ static MACHINE_RESET( namcofl )
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
 
 	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
-	memory_set_bankptr(machine,  "bank2", state->workram );
+	memory_set_bankptr(machine,  "bank2", state->m_workram );
 
-	memset(state->workram, 0x00, 0x100000);
+	memset(state->m_workram, 0x00, 0x100000);
 }
 
 
@@ -810,10 +810,10 @@ ROM_END
 static void namcofl_common_init(running_machine &machine)
 {
 	namcofl_state *state = machine.driver_data<namcofl_state>();
-	state->workram = auto_alloc_array(machine, UINT32, 0x100000/4);
+	state->m_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
 	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
-	memory_set_bankptr(machine,  "bank2", state->workram );
+	memory_set_bankptr(machine,  "bank2", state->m_workram );
 }
 
 static DRIVER_INIT(speedrcr)

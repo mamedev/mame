@@ -52,14 +52,14 @@ WRITE8_HANDLER( tunhunt_videoram_w )
 {
 	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	int attr = state->videoram[tile_index];
+	int attr = state->m_videoram[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
@@ -78,10 +78,10 @@ VIDEO_START( tunhunt )
 
 	machine.generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, machine.primary_screen->format());
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
-	tilemap_set_scrollx(state->fg_tilemap, 0, 64);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
+	tilemap_set_scrollx(state->m_fg_tilemap, 0, 64);
 }
 
 PALETTE_INIT( tunhunt )
@@ -215,8 +215,8 @@ static void draw_motion_object(running_machine &machine, bitmap_t *bitmap, const
 
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	bitmap_t *tmpbitmap = machine.generic.tmpbitmap;
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *tunhunt_ram = state->workram;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *tunhunt_ram = state->m_workram;
 	//int skip = tunhunt_ram[MOBST];
 	int x0 = 255-tunhunt_ram[MOBJV];
 	int y0 = 255-tunhunt_ram[MOBJH];
@@ -293,7 +293,7 @@ static void draw_box(running_machine &machine, bitmap_t *bitmap, const rectangle
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
 	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	UINT8 *tunhunt_ram = state->workram;
+	UINT8 *tunhunt_ram = state->m_workram;
 	int span,x,y;
 	int color;
 //  rectangle bbox;
@@ -386,21 +386,21 @@ SCREEN_UPDATE( tunhunt )
 	draw_motion_object(screen->machine(), bitmap, cliprect);
 
 	draw_shell(screen->machine(), bitmap, cliprect,
-		state->workram[SHL0PC],	/* picture code */
-		state->workram[SHEL0H],	/* hposition */
-		state->workram[SHL0V],	/* vstart */
-		state->workram[SHL0VS],	/* vstop */
-		state->workram[SHL0ST],	/* vstretch */
-		state->control&0x08 ); /* hstretch */
+		state->m_workram[SHL0PC],	/* picture code */
+		state->m_workram[SHEL0H],	/* hposition */
+		state->m_workram[SHL0V],	/* vstart */
+		state->m_workram[SHL0VS],	/* vstop */
+		state->m_workram[SHL0ST],	/* vstretch */
+		state->m_control&0x08 ); /* hstretch */
 
 	draw_shell(screen->machine(), bitmap, cliprect,
-		state->workram[SHL1PC],	/* picture code */
-		state->workram[SHEL1H],	/* hposition */
-		state->workram[SHL1V],	/* vstart */
-		state->workram[SHL1VS],	/* vstop */
-		state->workram[SHL1ST],	/* vstretch */
-		state->control&0x10 ); /* hstretch */
+		state->m_workram[SHL1PC],	/* picture code */
+		state->m_workram[SHEL1H],	/* hposition */
+		state->m_workram[SHL1V],	/* vstart */
+		state->m_workram[SHL1VS],	/* vstop */
+		state->m_workram[SHL1ST],	/* vstretch */
+		state->m_control&0x10 ); /* hstretch */
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	return 0;
 }

@@ -29,7 +29,7 @@ static WRITE16_HANDLER( lemmings_control_w )
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
 		return; /* Watchdog or IRQ ack */
-	COMBINE_DATA(&state->control_data[offset]);
+	COMBINE_DATA(&state->m_control_data[offset]);
 }
 
 static READ16_HANDLER( lemmings_trackball_r )
@@ -67,13 +67,13 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int r, g, b;
 
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 	if (offset & 1)
 		offset--;
 
-	b = (state->paletteram[offset] >> 0) & 0xff;
-	g = (state->paletteram[offset + 1] >> 8) & 0xff;
-	r = (state->paletteram[offset + 1] >> 0) & 0xff;
+	b = (state->m_paletteram[offset] >> 0) & 0xff;
+	g = (state->m_paletteram[offset + 1] >> 8) & 0xff;
+	r = (state->m_paletteram[offset + 1] >> 0) & 0xff;
 
 	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
@@ -82,13 +82,13 @@ static WRITE16_HANDLER( lemmings_sound_w )
 {
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, 1, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
 	lemmings_state *state = space->machine().driver_data<lemmings_state>();
-	device_set_input_line(state->audiocpu, 1, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 1, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -98,17 +98,17 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE_MEMBER(lemmings_state, paletteram)
-	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_BASE_MEMBER(lemmings_state, control_data)
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE_MEMBER(lemmings_state, m_paletteram)
+	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_BASE_MEMBER(lemmings_state, m_control_data)
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)
 	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(buffer_spriteram16_w) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w) /* 1 written once a frame */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_BASE_MEMBER(lemmings_state, vram_data)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_BASE_MEMBER(lemmings_state, m_vram_data)
 	AM_RANGE(0x202000, 0x202fff) AM_RAM
-	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE(lemmings_pixel_0_w) AM_BASE_MEMBER(lemmings_state, pixel_0_data)
-	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE(lemmings_pixel_1_w) AM_BASE_MEMBER(lemmings_state, pixel_1_data)
+	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE(lemmings_pixel_0_w) AM_BASE_MEMBER(lemmings_state, m_pixel_0_data)
+	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE(lemmings_pixel_1_w) AM_BASE_MEMBER(lemmings_state, m_pixel_1_data)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -247,7 +247,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	lemmings_state *lemmings = device->machine().driver_data<lemmings_state>();
-	device_set_input_line(lemmings->audiocpu, 0, state);
+	device_set_input_line(lemmings->m_audiocpu, 0, state);
 }
 
 static const ym2151_interface ym2151_config =
@@ -259,7 +259,7 @@ static MACHINE_START( lemmings )
 {
 	lemmings_state *state = machine.driver_data<lemmings_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( lemmings, lemmings_state )

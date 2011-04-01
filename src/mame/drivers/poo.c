@@ -52,10 +52,10 @@ public:
 	poo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *vram;
-	UINT8 *scrolly;
-	UINT8 *sprites;
-	UINT8 vram_colbank;
+	UINT8 *m_vram;
+	UINT8 *m_scrolly;
+	UINT8 *m_sprites;
+	UINT8 m_vram_colbank;
 };
 
 
@@ -76,12 +76,12 @@ static SCREEN_UPDATE(unclepoo)
 	{
 		for (y=0;y<32;y++)
 		{
-			int tile = state->vram[count+0x000] | ((state->vram[count+0x400] & 3) <<8);
-			int color = (state->vram[count+0x400] & 0x38) >> 3;
-			int scrolly = (state->scrolly[x*4]);
+			int tile = state->m_vram[count+0x000] | ((state->m_vram[count+0x400] & 3) <<8);
+			int color = (state->m_vram[count+0x400] & 0x38) >> 3;
+			int scrolly = (state->m_scrolly[x*4]);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->vram_colbank,0,0,x*8,256-(y*8)+scrolly);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->vram_colbank,0,0,x*8,0-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,256-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->m_vram_colbank,0,0,x*8,0-(y*8)+scrolly);
 
 			count++;
 		}
@@ -92,10 +92,10 @@ static SCREEN_UPDATE(unclepoo)
 
 		for(i=0;i<0x80;i+=4)
 		{
-			spr_offs = state->sprites[i+2] | (state->sprites[i+3] & 3) << 8;
-			y = state->sprites[i+0]+8;
-			x = state->sprites[i+1];
-			col = (state->sprites[i+3] & 0xf8) >> 3;
+			spr_offs = state->m_sprites[i+2] | (state->m_sprites[i+3] & 3) << 8;
+			y = state->m_sprites[i+0]+8;
+			x = state->m_sprites[i+1];
+			col = (state->m_sprites[i+3] & 0xf8) >> 3;
 			fx = 0;
 			fy = 0;
 
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( poo_vregs_w )
 {
 	poo_state *state = space->machine().driver_data<poo_state>();
 	// bit 2 used, unknown purpose
-	state->vram_colbank = data & 0x18;
+	state->m_vram_colbank = data & 0x18;
 }
 
 static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
@@ -152,8 +152,8 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE( unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_MEMBER(poo_state, sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE_MEMBER(poo_state, scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_MEMBER(poo_state, m_sprites)
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE_MEMBER(poo_state, m_scrolly)
 
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(poo_state, vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(poo_state, m_vram)
 
 ADDRESS_MAP_END
 

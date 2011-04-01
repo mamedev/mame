@@ -26,14 +26,14 @@
 static READ16_HANDLER( m68k_shared_word_r )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	return state->m68k_shared_ram[offset];
+	return state->m_m68k_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( m68k_shared_word_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m68k_shared_ram[offset] = data & 0xff;
+		state->m_m68k_shared_ram[offset] = data & 0xff;
 }
 
 
@@ -42,58 +42,58 @@ static WRITE16_HANDLER( m68k_shared_word_w )
 static INTERRUPT_GEN( m6809_vb_interrupt )
 {
 	tceptor_state *state = device->machine().driver_data<tceptor_state>();
-	if (state->m6809_irq_enable)
+	if (state->m_m6809_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
-		state->m6809_irq_enable = 1;
+		state->m_m6809_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( m6809_irq_enable_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m6809_irq_enable = 1;
+	state->m_m6809_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( m6809_irq_disable_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m6809_irq_enable = 0;
+	state->m_m6809_irq_enable = 0;
 }
 
 
 static INTERRUPT_GEN( m68k_vb_interrupt )
 {
 	tceptor_state *state = device->machine().driver_data<tceptor_state>();
-	if (state->m68k_irq_enable)
+	if (state->m_m68k_irq_enable)
 		device_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m68k_irq_enable = data;
+	state->m_m68k_irq_enable = data;
 }
 
 
 static INTERRUPT_GEN( mcu_vb_interrupt )
 {
 	tceptor_state *state = device->machine().driver_data<tceptor_state>();
-	if (state->mcu_irq_enable)
+	if (state->m_mcu_irq_enable)
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
-		state->mcu_irq_enable = 1;
+		state->m_mcu_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( mcu_irq_enable_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->mcu_irq_enable = 1;
+	state->m_mcu_irq_enable = 1;
 }
 
 static WRITE8_HANDLER( mcu_irq_disable_w )
 {
 	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->mcu_irq_enable = 0;
+	state->m_mcu_irq_enable = 0;
 }
 
 
@@ -165,9 +165,9 @@ static READ8_HANDLER( readFF )
 
 static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_BASE_MEMBER(tceptor_state, tile_ram)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE_MEMBER(tceptor_state, tile_attr)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_BASE_MEMBER(tceptor_state, bg_ram)	// background (VIEW RAM)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_BASE_MEMBER(tceptor_state, m_tile_ram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE_MEMBER(tceptor_state, m_tile_attr)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_BASE_MEMBER(tceptor_state, m_bg_ram)	// background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITENOP				// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READNOP				// unknown
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")			// analog input (up/down)
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(tceptor_state, m68k_shared_ram) // COM RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(tceptor_state, m_m68k_shared_ram) // COM RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(m6809_irq_enable_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM			// not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
 	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
-	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE_MEMBER(tceptor_state, sprite_ram)
+	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE_MEMBER(tceptor_state, m_sprite_ram)
 	AM_RANGE(0x500000, 0x51ffff) AM_WRITE(namco_road16_w)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)	// not sure
 	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("share1")
@@ -349,9 +349,9 @@ static const namco_interface namco_config =
 static MACHINE_START( tceptor )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	state_save_register_global(machine, state->m6809_irq_enable);
-	state_save_register_global(machine, state->m68k_irq_enable);
-	state_save_register_global(machine, state->mcu_irq_enable);
+	state_save_register_global(machine, state->m_m6809_irq_enable);
+	state_save_register_global(machine, state->m_m68k_irq_enable);
+	state_save_register_global(machine, state->m_mcu_irq_enable);
 }
 
 
@@ -360,9 +360,9 @@ static MACHINE_START( tceptor )
 static MACHINE_RESET( tceptor )
 {
 	tceptor_state *state = machine.driver_data<tceptor_state>();
-	state->m6809_irq_enable = 0;
-	state->m68k_irq_enable = 0;
-	state->mcu_irq_enable = 0;
+	state->m_m6809_irq_enable = 0;
+	state->m_m68k_irq_enable = 0;
+	state->m_mcu_irq_enable = 0;
 }
 
 /*******************************************************************/

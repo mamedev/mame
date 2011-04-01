@@ -6,38 +6,38 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * videoram;
-	UINT8 * colorram;	// for helifire
+	UINT8 * m_videoram;
+	UINT8 * m_colorram;	// for helifire
 
 	/* video-related */
-	emu_timer* cannon_timer;
-	int spacefev_red_screen;
-	int spacefev_red_cannon;
-	int sheriff_color_mode;
-	int sheriff_color_data;
-	int helifire_flash;
-	UINT8 helifire_LSFR[63];
-	unsigned helifire_mv;
-	unsigned helifire_sc; /* IC56 */
+	emu_timer* m_cannon_timer;
+	int m_spacefev_red_screen;
+	int m_spacefev_red_cannon;
+	int m_sheriff_color_mode;
+	int m_sheriff_color_data;
+	int m_helifire_flash;
+	UINT8 m_helifire_LSFR[63];
+	unsigned m_helifire_mv;
+	unsigned m_helifire_sc; /* IC56 */
 
 	/* sound-related */
-	int n8080_hardware;
-	emu_timer* sound_timer[3];
-	int helifire_dac_phase;
-	double helifire_dac_volume;
-	double helifire_dac_timing;
-	UINT16 prev_sound_pins;
-	UINT16 curr_sound_pins;
-	int mono_flop[3];
-	UINT8 prev_snd_data;
+	int m_n8080_hardware;
+	emu_timer* m_sound_timer[3];
+	int m_helifire_dac_phase;
+	double m_helifire_dac_volume;
+	double m_helifire_dac_timing;
+	UINT16 m_prev_sound_pins;
+	UINT16 m_curr_sound_pins;
+	int m_mono_flop[3];
+	UINT8 m_prev_snd_data;
 
 	/* other */
-	unsigned shift_data;
-	unsigned shift_bits;
-	int inte;
+	unsigned m_shift_data;
+	unsigned m_shift_bits;
+	int m_inte;
 
 	/* devices */
-	device_t *maincpu;
+	device_t *m_maincpu;
 };
 
 

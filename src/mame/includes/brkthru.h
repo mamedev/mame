@@ -11,23 +11,24 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 * videoram;
-	UINT8 * spriteram;
-	UINT8 * fg_videoram;
-	size_t  videoram_size;
-	size_t  spriteram_size;
-	size_t  fg_videoram_size;
+	UINT8 * m_videoram;
+	UINT8 * m_spriteram;
+	UINT8 * m_fg_videoram;
+	size_t  m_videoram_size;
+	size_t  m_spriteram_size;
+	size_t  m_fg_videoram_size;
 
 	/* video-related */
-	tilemap_t *fg_tilemap, *bg_tilemap;
-	int     bgscroll;
-	int     bgbasecolor;
-	int     flipscreen;
-	//UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	int     m_bgscroll;
+	int     m_bgbasecolor;
+	int     m_flipscreen;
+	//UINT8 *m_brkthru_nmi_enable; /* needs to be tracked down */
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

@@ -16,8 +16,8 @@ Video hardware
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	quizdna_state *state = machine.driver_data<quizdna_state>();
-	int code = state->bg_ram[tile_index*2] + state->bg_ram[tile_index*2+1]*0x100 ;
-	int col = state->bg_ram[tile_index*2+0x1000] & 0x7f;
+	int code = state->m_bg_ram[tile_index*2] + state->m_bg_ram[tile_index*2+1]*0x100 ;
+	int col = state->m_bg_ram[tile_index*2+0x1000] & 0x7f;
 
 	if (code>0x7fff)
 		code &= 0x83ff;
@@ -37,8 +37,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	y >>= 1;
 
-	col = state->fg_ram[x*2 + y*0x40 + 1];
-	code += (state->fg_ram[x*2 + y*0x40] + (col & 0x1f) * 0x100) * 2;
+	col = state->m_fg_ram[x*2 + y*0x40 + 1];
+	code += (state->m_fg_ram[x*2 + y*0x40] + (col & 0x1f) * 0x100) * 2;
 	col >>= 5;
 	col = (col & 3) | ((col & 4) << 1);
 
@@ -49,28 +49,28 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( quizdna )
 {
 	quizdna_state *state = machine.driver_data<quizdna_state>();
-	state->flipscreen = -1;
-	state->video_enable = 0;
-	state->bg_xscroll[0] = 0;
-	state->bg_xscroll[1] = 0;
+	state->m_flipscreen = -1;
+	state->m_video_enable = 0;
+	state->m_bg_xscroll[0] = 0;
+	state->m_bg_xscroll[1] = 0;
 
-	state->bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
-	state->fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	state->m_fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	state->bg_tilemap = tilemap_create( machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32 );
-	state->fg_tilemap = tilemap_create( machine, get_fg_tile_info,tilemap_scan_rows,16,8,32,32 );
+	state->m_bg_tilemap = tilemap_create( machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32 );
+	state->m_fg_tilemap = tilemap_create( machine, get_fg_tile_info,tilemap_scan_rows,16,8,32,32 );
 
-	tilemap_set_transparent_pen( state->fg_tilemap,0 );
+	tilemap_set_transparent_pen( state->m_fg_tilemap,0 );
 }
 
 WRITE8_HANDLER( quizdna_bg_ram_w )
 {
 	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	UINT8 *RAM = space->machine().region("maincpu")->base();
-	state->bg_ram[offset] = data;
+	state->m_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
-	tilemap_mark_tile_dirty(state->bg_tilemap, (offset & 0xfff) / 2 );
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, (offset & 0xfff) / 2 );
 }
 
 WRITE8_HANDLER( quizdna_fg_ram_w )
@@ -82,43 +82,43 @@ WRITE8_HANDLER( quizdna_fg_ram_w )
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */
-	state->fg_ram[offs] = data;
+	state->m_fg_ram[offs] = data;
 
 	for (i=0; i<32; i++)
-		tilemap_mark_tile_dirty(state->fg_tilemap, ((offs/2) & 0x1f) + i*0x20 );
+		tilemap_mark_tile_dirty(state->m_fg_tilemap, ((offs/2) & 0x1f) + i*0x20 );
 }
 
 WRITE8_HANDLER( quizdna_bg_yscroll_w )
 {
 	quizdna_state *state = space->machine().driver_data<quizdna_state>();
-	tilemap_set_scrolldy( state->bg_tilemap, 255-data, 255-data+1 );
+	tilemap_set_scrolldy( state->m_bg_tilemap, 255-data, 255-data+1 );
 }
 
 WRITE8_HANDLER( quizdna_bg_xscroll_w )
 {
 	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	int x;
-	state->bg_xscroll[offset] = data;
-	x = ~(state->bg_xscroll[0] + state->bg_xscroll[1]*0x100) & 0x1ff;
+	state->m_bg_xscroll[offset] = data;
+	x = ~(state->m_bg_xscroll[0] + state->m_bg_xscroll[1]*0x100) & 0x1ff;
 
-	tilemap_set_scrolldx( state->bg_tilemap, x+64, x-64+10 );
+	tilemap_set_scrolldx( state->m_bg_tilemap, x+64, x-64+10 );
 }
 
 WRITE8_HANDLER( quizdna_screen_ctrl_w )
 {
 	quizdna_state *state = space->machine().driver_data<quizdna_state>();
 	int tmp = (data & 0x10) >> 4;
-	state->video_enable = data & 0x20;
+	state->m_video_enable = data & 0x20;
 
 	coin_counter_w(space->machine(), 0, data & 1);
 
-	if (state->flipscreen == tmp)
+	if (state->m_flipscreen == tmp)
 		return;
 
-	state->flipscreen = tmp;
+	state->m_flipscreen = tmp;
 
 	flip_screen_set(space->machine(), tmp);
-	tilemap_set_scrolldx( state->fg_tilemap, 64, -64 +16);
+	tilemap_set_scrolldx( state->m_fg_tilemap, 64, -64 +16);
 }
 
 WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
@@ -141,10 +141,10 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	quizdna_state *state = machine.driver_data<quizdna_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs<state->spriteram_size; offs+=8)
+	for (offs = 0; offs<state->m_spriteram_size; offs+=8)
 	{
 		int i;
 
@@ -158,7 +158,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 		int dy = 0x10;
 		col &= 0x1f;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			x -= 7;
 			y += 1;
@@ -195,11 +195,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 SCREEN_UPDATE( quizdna )
 {
 	quizdna_state *state = screen->machine().driver_data<quizdna_state>();
-	if (state->video_enable)
+	if (state->m_video_enable)
 	{
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 		draw_sprites(screen->machine(), bitmap, cliprect);
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 	}
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));

@@ -15,63 +15,63 @@
 WRITE8_HANDLER ( momoko_fg_scrollx_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->fg_scrollx = data;
+	state->m_fg_scrollx = data;
 }
 
 WRITE8_HANDLER ( momoko_fg_scrolly_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->fg_scrolly = data;
+	state->m_fg_scrolly = data;
 }
 
 WRITE8_HANDLER ( momoko_fg_select_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->fg_select = data & 0x0f;
-	state->fg_mask = data & 0x10;
+	state->m_fg_select = data & 0x0f;
+	state->m_fg_mask = data & 0x10;
 }
 
 WRITE8_HANDLER ( momoko_text_scrolly_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->text_scrolly = data;
+	state->m_text_scrolly = data;
 }
 
 WRITE8_HANDLER ( momoko_text_mode_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->text_mode = data;
+	state->m_text_mode = data;
 }
 
 WRITE8_HANDLER ( momoko_bg_scrollx_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->bg_scrollx[offset] = data;
+	state->m_bg_scrollx[offset] = data;
 }
 
 WRITE8_HANDLER ( momoko_bg_scrolly_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->bg_scrolly[offset] = data;
+	state->m_bg_scrolly[offset] = data;
 }
 
 WRITE8_HANDLER( momoko_bg_select_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->bg_select = data & 0x0f;
-	state->bg_mask = data & 0x10;
+	state->m_bg_select = data & 0x0f;
+	state->m_bg_mask = data & 0x10;
 }
 
 WRITE8_HANDLER( momoko_bg_priority_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->bg_priority = data & 0x01;
+	state->m_bg_priority = data & 0x01;
 }
 
 WRITE8_HANDLER( momoko_flipscreen_w )
 {
 	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->flipscreen = data & 0x01;
+	state->m_flipscreen = data & 0x01;
 }
 
 /****************************************************************************/
@@ -115,7 +115,7 @@ SCREEN_UPDATE( momoko )
 {
 	momoko_state *state = screen->machine().driver_data<momoko_state>();
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 
 	UINT8 *BG_MAP     = screen->machine().region("user1")->base();
 	UINT8 *BG_COL_MAP = screen->machine().region("user2")->base();
@@ -123,15 +123,15 @@ SCREEN_UPDATE( momoko )
 	UINT8 *TEXT_COLOR = screen->machine().region("proms")->base();
 
 
-	flip = state->flipscreen ^ (input_port_read(screen->machine(), "FAKE") & 0x01);
+	flip = state->m_flipscreen ^ (input_port_read(screen->machine(), "FAKE") & 0x01);
 
 	/* draw BG layer */
-	dx = (7 - state->bg_scrollx[0]) & 7;
-	dy = (7 - state->bg_scrolly[0]) & 7;
-	rx = (state->bg_scrollx[0] + state->bg_scrollx[1] * 256) >> 3;
-	ry = (state->bg_scrolly[0] + state->bg_scrolly[1] * 256) >> 3;
+	dx = (7 - state->m_bg_scrollx[0]) & 7;
+	dy = (7 - state->m_bg_scrolly[0]) & 7;
+	rx = (state->m_bg_scrollx[0] + state->m_bg_scrollx[1] * 256) >> 3;
+	ry = (state->m_bg_scrolly[0] + state->m_bg_scrolly[1] * 256) >> 3;
 
-	if (state->bg_mask == 0)
+	if (state->m_bg_mask == 0)
 	{
 		for (y = 0; y < 29; y++)
 		{
@@ -139,8 +139,8 @@ SCREEN_UPDATE( momoko )
 			{
 				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f);
 				chr = BG_MAP[radr];
-				col = BG_COL_MAP[chr + state->bg_select * 512 + state->bg_priority * 256] & 0x0f;
-				chr = chr + state->bg_select * 512;
+				col = BG_COL_MAP[chr + state->m_bg_select * 512 + state->m_bg_priority * 256] & 0x0f;
+				chr = chr + state->m_bg_select * 512;
 
 				if (flip == 0)
 				{
@@ -196,7 +196,7 @@ SCREEN_UPDATE( momoko )
 
 
 	/* draw BG layer */
-	if (state->bg_mask ==0)
+	if (state->m_bg_mask ==0)
 	{
 		for (y = 0; y < 29; y++)
 		{
@@ -204,7 +204,7 @@ SCREEN_UPDATE( momoko )
 			{
 				radr = ((ry + y + 2) & 0x3ff) * 128 + ((rx + x) & 0x7f) ;
 				chr = BG_MAP[radr] ;
-				col = BG_COL_MAP[chr + state->bg_select * 512 + state->bg_priority * 256];
+				col = BG_COL_MAP[chr + state->m_bg_select * 512 + state->m_bg_priority * 256];
 				pri = (col & 0x10) >> 1;
 
 				if (flip == 0)
@@ -220,7 +220,7 @@ SCREEN_UPDATE( momoko )
 				if (pri != 0)
 				{
 					col = col & 0x0f;
-					chr = chr + state->bg_select * 512;
+					chr = chr + state->m_bg_select * 512;
 					momoko_draw_bg_pri(screen->machine(), bitmap, chr, col, flip, flip, px, py, pri);
 				}
 			}
@@ -229,7 +229,7 @@ SCREEN_UPDATE( momoko )
 
 
 	/* draw sprites (others) */
-	for (offs = 9 * 4; offs < state->spriteram_size; offs += 4)
+	for (offs = 9 * 4; offs < state->m_spriteram_size; offs += 4)
 	{
 		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);
@@ -263,12 +263,12 @@ SCREEN_UPDATE( momoko )
 		for (x = 0; x < 32; x++)
 		{
 			sy = y;
-			if (state->text_mode == 0)
+			if (state->m_text_mode == 0)
 				col = TEXT_COLOR[(sy >> 3) + 0x100] & 0x0f;
 			else
 			{
 				if (TEXT_COLOR[y] < 0x08)
-					sy += state->text_scrolly;
+					sy += state->m_text_scrolly;
 				col = (TEXT_COLOR[y] & 0x07) + 0x10;
 			}
 			dy = sy & 7;
@@ -283,7 +283,7 @@ SCREEN_UPDATE( momoko )
 				py = 255 - y;
 			}
 			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[0],
-				state->videoram[(sy >> 3) * 32 + x] * 8 + dy,
+				state->m_videoram[(sy >> 3) * 32 + x] * 8 + dy,
 				col,
 				flip,0,
 				px,py,0);
@@ -292,18 +292,18 @@ SCREEN_UPDATE( momoko )
 
 
 	/* draw FG layer */
-	if (state->fg_mask == 0)
+	if (state->m_fg_mask == 0)
 	{
-		dx = (7 - state->fg_scrollx) & 7;
-		dy = (7 - state->fg_scrolly) & 7;
-		rx = state->fg_scrollx >> 3;
-		ry = state->fg_scrolly >> 3;
+		dx = (7 - state->m_fg_scrollx) & 7;
+		dy = (7 - state->m_fg_scrolly) & 7;
+		rx = state->m_fg_scrollx >> 3;
+		ry = state->m_fg_scrolly >> 3;
 
 		for (y = 0; y < 29; y++)
 		{
 			for (x = 0; x < 32; x++)
 			{
-				radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (state->fg_select & 3) * 0x800;
+				radr = ((ry + y + 34) & 0x3f) * 0x20 + ((rx + x) & 0x1f) + (state->m_fg_select & 3) * 0x800;
 				chr = FG_MAP[radr] ;
 				if (flip == 0)
 				{

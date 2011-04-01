@@ -11,28 +11,34 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    videoram2;
-	UINT8 *    colorram;
-	UINT8 *    colorram2;
-	UINT8 *    paletteram;
-	UINT8 *    devram;
+	UINT8 *    m_videoram;
+	UINT8 *    m_videoram2;
+	UINT8 *    m_colorram;
+	UINT8 *    m_colorram2;
+	UINT8 *    m_paletteram;
+	UINT8 *    m_devram;
 
 	/* video-related */
-	tilemap_t    *bg_tilemap, *fg_tilemap;
-	bitmap_t   *sprites_bitmap;
-	int        bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly, highbits;
+	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap;
+	bitmap_t   *m_sprites_bitmap;
+	int        m_bg_scrollx;
+	int        m_bg_scrolly;
+	int        m_fg_scrollx;
+	int        m_fg_scrolly;
+	int        m_highbits;
 
 	/* misc */
-	int        soundlatch_status, soundlatch2_status;
-	int        master_addr;
-	int        slave_addr;
+	int        m_soundlatch_status;
+	int        m_soundlatch2_status;
+	int        m_master_addr;
+	int        m_slave_addr;
 
 	/* devices */
-	device_t *master;
-	device_t *slave;
-	device_t *audiocpu;
-	device_t *pandora;
+	device_t *m_master;
+	device_t *m_slave;
+	device_t *m_audiocpu;
+	device_t *m_pandora;
 };
 
 

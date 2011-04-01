@@ -4,11 +4,11 @@ public:
 	trucocl_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int cur_dac_address;
-	int cur_dac_address_index;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
+	int m_cur_dac_address;
+	int m_cur_dac_address_index;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
 };
 
 

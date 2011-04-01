@@ -4,23 +4,23 @@ public:
 	dec0_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 automat_adpcm_byte;
-	int automat_msm5205_vclk_toggle;
-	UINT16 *ram;
-	UINT8 *robocop_shared_ram;
+	UINT8 m_automat_adpcm_byte;
+	int m_automat_msm5205_vclk_toggle;
+	UINT16 *m_ram;
+	UINT8 *m_robocop_shared_ram;
 
-	int GAME;
-	int i8751_return;
-	int i8751_command;
-	int slyspy_state;
-	int share[0xff];
-	int hippodrm_msb;
-	int hippodrm_lsb;
-	UINT8 i8751_ports[4];
+	int m_GAME;
+	int m_i8751_return;
+	int m_i8751_command;
+	int m_slyspy_state;
+	int m_share[0xff];
+	int m_hippodrm_msb;
+	int m_hippodrm_lsb;
+	UINT8 m_i8751_ports[4];
 
-	UINT16 *spriteram;
-	UINT16 *buffered_spriteram;
-	UINT16 pri;
+	UINT16 *m_spriteram;
+	UINT16 *m_buffered_spriteram;
+	UINT16 m_pri;
 };
 
 

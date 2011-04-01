@@ -180,7 +180,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static WRITE8_HANDLER( firetrap_nmi_disable_w )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->nmi_enable = ~data & 1;
+	state->m_nmi_enable = ~data & 1;
 }
 
 static WRITE8_HANDLER( firetrap_bankselect_w )
@@ -198,7 +198,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	UINT8 port = input_port_read(space->machine(), "IN2") & 0x70;
 
 	if (cpu_get_pc(&space->device()) == 0x1188)
-		return ~state->coin_command_pending;
+		return ~state->m_coin_command_pending;
 
 	if (port != 0x70)
 	{
@@ -208,7 +208,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 			coin = 2;
 		if (!(port & 0x10)) /* SERVICE1 */
 			coin = 3;
-		state->coin_command_pending = coin;
+		state->m_coin_command_pending = coin;
 		return 0xff;
 	}
 
@@ -219,7 +219,7 @@ static READ8_HANDLER( firetrap_8751_r )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	//logerror("PC:%04x read from 8751\n",cpu_get_pc(&space->device()));
-	return state->i8751_return;
+	return state->m_i8751_return;
 }
 
 static WRITE8_HANDLER( firetrap_8751_w )
@@ -249,75 +249,75 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	/* End of command - important to note, as coin input is supressed while commands are pending */
 	if (data == 0x26)
 	{
-		state->i8751_current_command = 0;
-		state->i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
+		state->m_i8751_current_command = 0;
+		state->m_i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
+		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
 		return;
 	}
 
 	/* Init sequence command (0x13 : US - 0xf5 : Japan) */
 	else if ((data == 0x13) || (data == 0xf5))
 	{
-		if (!state->i8751_current_command)
-			state->i8751_init_ptr = 0;
-		state->i8751_return = i8751_init_data[state->i8751_init_ptr++];
+		if (!state->m_i8751_current_command)
+			state->m_i8751_init_ptr = 0;
+		state->m_i8751_return = i8751_init_data[state->m_i8751_init_ptr++];
 	}
 
 	/* Used to calculate a jump address when coins are inserted */
 	else if (data == 0xbd)
 	{
-		if (!state->i8751_current_command)
-			state->i8751_init_ptr = 0;
-		state->i8751_return = i8751_coin_data[state->i8751_init_ptr++];
+		if (!state->m_i8751_current_command)
+			state->m_i8751_init_ptr = 0;
+		state->m_i8751_return = i8751_coin_data[state->m_i8751_init_ptr++];
 	}
 
 	else if (data == 0x36)
 	{
-		if (!state->i8751_current_command)
-			state->i8751_init_ptr = 0;
-		state->i8751_return = i8751_36_data[state->i8751_init_ptr++];
+		if (!state->m_i8751_current_command)
+			state->m_i8751_init_ptr = 0;
+		state->m_i8751_return = i8751_36_data[state->m_i8751_init_ptr++];
 	}
 
 	/* Static value commands */
 	else if (data == 0x14)
-		state->i8751_return = 1;
+		state->m_i8751_return = 1;
 	else if (data == 0x02)
-		state->i8751_return = 0;
+		state->m_i8751_return = 0;
 	else if (data == 0x72)
-		state->i8751_return = 3;
+		state->m_i8751_return = 3;
 	else if (data == 0x69)
-		state->i8751_return = 2;
+		state->m_i8751_return = 2;
 	else if (data == 0xcb)
-		state->i8751_return = 0;
+		state->m_i8751_return = 0;
 	else if (data == 0x49)
-		state->i8751_return = 1;
+		state->m_i8751_return = 1;
 	else if (data == 0x17)
-		state->i8751_return = 2;
+		state->m_i8751_return = 2;
 	else if (data == 0x88)
-		state->i8751_return = 3;
+		state->m_i8751_return = 3;
 	else
 	{
-		state->i8751_return = 0xff;
+		state->m_i8751_return = 0xff;
 		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(&space->device()),data);
 	}
 
 	/* Signal main cpu task is complete */
-	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
-	state->i8751_current_command=data;
+	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
+	state->m_i8751_current_command=data;
 }
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	msm5205_reset_w(state->msm, ~data & 0x01);
-	state->irq_enable = data & 0x02;
+	msm5205_reset_w(state->m_msm, ~data & 0x01);
+	state->m_irq_enable = data & 0x02;
 }
 
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
@@ -329,18 +329,18 @@ static void firetrap_adpcm_int( device_t *device )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
-	msm5205_data_w(device, state->msm5205next >> 4);
-	state->msm5205next <<= 4;
+	msm5205_data_w(device, state->m_msm5205next >> 4);
+	state->m_msm5205next <<= 4;
 
-	state->adpcm_toggle ^= 1;
-	if (state->irq_enable && state->adpcm_toggle)
-		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+	state->m_adpcm_toggle ^= 1;
+	if (state->m_irq_enable && state->m_adpcm_toggle)
+		device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
 {
 	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->msm5205next = data;
+	state->m_msm5205next = data;
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -353,10 +353,10 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, bg1videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, bg2videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE_MEMBER(firetrap_state, fgvideoram)
-	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE_MEMBER(firetrap_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, m_bg1videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, m_bg2videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE_MEMBER(firetrap_state, m_fgvideoram)
+	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE_MEMBER(firetrap_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
@@ -379,10 +379,10 @@ static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, bg1videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, bg2videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE_MEMBER(firetrap_state, fgvideoram)
-	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE_MEMBER(firetrap_state, spriteram, spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, m_bg1videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, m_bg2videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE_MEMBER(firetrap_state, m_fgvideoram)
+	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE_MEMBER(firetrap_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
@@ -583,7 +583,7 @@ static INTERRUPT_GEN( firetrap )
 	/* Check for coin IRQ */
 	if (cpu_getiloops(device))
 	{
-		if (port != 0x07 && !state->int_latch)
+		if (port != 0x07 && !state->m_int_latch)
 		{
 			if (!(port & 0x01)) /* COIN1 */
 				coin = 1;
@@ -591,23 +591,23 @@ static INTERRUPT_GEN( firetrap )
 				coin = 2;
 			if (!(port & 0x04)) /* SERVICE1 */
 				coin = 3;
-			state->coin_command_pending = coin;
-			state->int_latch = 1;
+			state->m_coin_command_pending = coin;
+			state->m_int_latch = 1;
 		}
 		if (port == 0x07)
-			state->int_latch = 0;
+			state->m_int_latch = 0;
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
             definitely doesn't expect them as it locks out the coin routine */
-		if (state->coin_command_pending && !state->i8751_current_command)
+		if (state->m_coin_command_pending && !state->m_i8751_current_command)
 		{
-			state->i8751_return = state->coin_command_pending;
+			state->m_i8751_return = state->m_coin_command_pending;
 			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
-			state->coin_command_pending = 0;
+			state->m_coin_command_pending = 0;
 		}
 	}
 
-	if (state->nmi_enable && !cpu_getiloops(device))
+	if (state->m_nmi_enable && !cpu_getiloops(device))
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -615,7 +615,7 @@ static INTERRUPT_GEN( bootleg )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
-	if (state->nmi_enable)
+	if (state->m_nmi_enable)
 		device_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -626,26 +626,26 @@ static MACHINE_START( firetrap )
 	UINT8 *MAIN = machine.region("maincpu")->base();
 	UINT8 *SOUND = machine.region("audiocpu")->base();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->msm = machine.device("msm");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_msm = machine.device("msm");
 
 	memory_configure_bank(machine, "bank1", 0, 4, &MAIN[0x10000], 0x4000);
 	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);
 
-	state->save_item(NAME(state->i8751_current_command));
-	state->save_item(NAME(state->irq_enable));
-	state->save_item(NAME(state->nmi_enable));
-	state->save_item(NAME(state->i8751_return));
-	state->save_item(NAME(state->i8751_init_ptr));
-	state->save_item(NAME(state->msm5205next));
-	state->save_item(NAME(state->adpcm_toggle));
-	state->save_item(NAME(state->int_latch));
-	state->save_item(NAME(state->coin_command_pending));
-	state->save_item(NAME(state->scroll1_x));
-	state->save_item(NAME(state->scroll1_y));
-	state->save_item(NAME(state->scroll2_x));
-	state->save_item(NAME(state->scroll2_y));
+	state->save_item(NAME(state->m_i8751_current_command));
+	state->save_item(NAME(state->m_irq_enable));
+	state->save_item(NAME(state->m_nmi_enable));
+	state->save_item(NAME(state->m_i8751_return));
+	state->save_item(NAME(state->m_i8751_init_ptr));
+	state->save_item(NAME(state->m_msm5205next));
+	state->save_item(NAME(state->m_adpcm_toggle));
+	state->save_item(NAME(state->m_int_latch));
+	state->save_item(NAME(state->m_coin_command_pending));
+	state->save_item(NAME(state->m_scroll1_x));
+	state->save_item(NAME(state->m_scroll1_y));
+	state->save_item(NAME(state->m_scroll2_x));
+	state->save_item(NAME(state->m_scroll2_y));
 }
 
 static MACHINE_RESET( firetrap )
@@ -655,21 +655,21 @@ static MACHINE_RESET( firetrap )
 
 	for (i = 0; i < 2; i++)
 	{
-		state->scroll1_x[i] = 0;
-		state->scroll1_y[i] = 0;
-		state->scroll2_x[i] = 0;
-		state->scroll2_y[i] = 0;
+		state->m_scroll1_x[i] = 0;
+		state->m_scroll1_y[i] = 0;
+		state->m_scroll2_x[i] = 0;
+		state->m_scroll2_y[i] = 0;
 	}
 
-	state->i8751_current_command = 0;
-	state->irq_enable = 0;
-	state->nmi_enable = 0;
-	state->i8751_return = 0;
-	state->i8751_init_ptr = 0;
-	state->msm5205next = 0xff;
-	state->adpcm_toggle = 0;
-	state->int_latch = 0;
-	state->coin_command_pending = 0;
+	state->m_i8751_current_command = 0;
+	state->m_irq_enable = 0;
+	state->m_nmi_enable = 0;
+	state->m_i8751_return = 0;
+	state->m_i8751_init_ptr = 0;
+	state->m_msm5205next = 0xff;
+	state->m_adpcm_toggle = 0;
+	state->m_int_latch = 0;
+	state->m_coin_command_pending = 0;
 }
 
 static MACHINE_CONFIG_START( firetrap, firetrap_state )

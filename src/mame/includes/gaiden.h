@@ -11,27 +11,38 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    videoram;
-	UINT16 *    videoram2;
-	UINT16 *    videoram3;
-	UINT16 *    spriteram;
-	size_t      spriteram_size;
+	UINT16 *    m_videoram;
+	UINT16 *    m_videoram2;
+	UINT16 *    m_videoram3;
+	UINT16 *    m_spriteram;
+	size_t      m_spriteram_size;
 
 	/* video-related */
-	tilemap_t   *text_layer,*foreground,*background;
-	bitmap_t    *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
-	UINT16      tx_scroll_x, tx_scroll_y;
-	UINT16      bg_scroll_x, bg_scroll_y;
-	UINT16      fg_scroll_x, fg_scroll_y;
-	INT8		tx_offset_y, bg_offset_y, fg_offset_y, spr_offset_y;
+	tilemap_t   *m_text_layer;
+	tilemap_t   *m_foreground;
+	tilemap_t   *m_background;
+	bitmap_t    *m_sprite_bitmap;
+	bitmap_t    *m_tile_bitmap_bg;
+	bitmap_t    *m_tile_bitmap_fg;
+	UINT16      m_tx_scroll_x;
+	UINT16      m_tx_scroll_y;
+	UINT16      m_bg_scroll_x;
+	UINT16      m_bg_scroll_y;
+	UINT16      m_fg_scroll_x;
+	UINT16      m_fg_scroll_y;
+	INT8		m_tx_offset_y;
+	INT8        m_bg_offset_y;
+	INT8        m_fg_offset_y;
+	INT8        m_spr_offset_y;
 
 	/* misc */
-	int         sprite_sizey;
-	int         prot, jumpcode;
-	const int   *raiga_jumppoints;
+	int         m_sprite_sizey;
+	int         m_prot;
+	int         m_jumpcode;
+	const int   *m_raiga_jumppoints;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

@@ -4,20 +4,20 @@ public:
 	tecmo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int adpcm_pos;
-	int adpcm_end;
-	int adpcm_data;
-	int video_type;
-	UINT8 *txvideoram;
-	UINT8 *fgvideoram;
-	UINT8 *bgvideoram;
-	tilemap_t *tx_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 fgscroll[3];
-	UINT8 bgscroll[3];
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	int m_adpcm_pos;
+	int m_adpcm_end;
+	int m_adpcm_data;
+	int m_video_type;
+	UINT8 *m_txvideoram;
+	UINT8 *m_fgvideoram;
+	UINT8 *m_bgvideoram;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_fgscroll[3];
+	UINT8 m_bgscroll[3];
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

@@ -12,12 +12,12 @@ public:
 	badlands_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT8			pedal_value[2];
+	UINT8			m_pedal_value[2];
 
-	UINT8 *			bank_base;
-	UINT8 *			bank_source_data;
+	UINT8 *			m_bank_base;
+	UINT8 *			m_bank_source_data;
 
-	UINT8			playfield_tile_bank;
+	UINT8			m_playfield_tile_bank;
 };
 
 

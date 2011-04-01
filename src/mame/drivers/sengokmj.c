@@ -65,8 +65,8 @@ public:
 	sengokmj_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 sengokumj_mux_data;
-	UINT8 hopper_io;
+	UINT16 m_sengokumj_mux_data;
+	UINT8 m_hopper_io;
 };
 
 
@@ -75,7 +75,7 @@ public:
 static READ16_HANDLER( mahjong_panel_r )
 {
 	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	switch(state->sengokumj_mux_data)
+	switch(state->m_sengokumj_mux_data)
 	{
 		case 0x0100: return input_port_read(space->machine(), "KEY0");
 		case 0x0200: return input_port_read(space->machine(), "KEY1");
@@ -91,7 +91,7 @@ static READ16_HANDLER( mahjong_panel_r )
 static WRITE16_HANDLER( mahjong_panel_w )
 {
 	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	state->sengokumj_mux_data = data;
+	state->m_sengokumj_mux_data = data;
 }
 
 static WRITE16_HANDLER( sengokmj_out_w )
@@ -104,14 +104,14 @@ static WRITE16_HANDLER( sengokmj_out_w )
 	coin_lockout_w(space->machine(), 0,~data & 2);
 	coin_lockout_w(space->machine(), 1,~data & 2);
 	coin_counter_w(space->machine(), 0,data & 4);
-	state->hopper_io = ((data & 1)<<6);
-//  popmessage("%02x",state->hopper_io);
+	state->m_hopper_io = ((data & 1)<<6);
+//  popmessage("%02x",state->m_hopper_io);
 }
 
 static READ16_HANDLER( sengokmj_system_r )
 {
 	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	return (input_port_read(space->machine(), "SYSTEM") & 0xffbf) | state->hopper_io;
+	return (input_port_read(space->machine(), "SYSTEM") & 0xffbf) | state->m_hopper_io;
 }
 
 static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16 )

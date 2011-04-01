@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(gotcha_state, spriteram, spriteram_size)
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(gotcha_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
 //  { 0x30000c, 0x30000d,
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE_MEMBER(gotcha_state, fgvideoram)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE_MEMBER(gotcha_state, bgvideoram)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_fgvideoram)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_bgvideoram)
 ADDRESS_MAP_END
 
 
@@ -239,7 +239,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	gotcha_state *state = device->machine().driver_data<gotcha_state>();
-	device_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->m_audiocpu, 0, linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -252,11 +252,11 @@ static MACHINE_START( gotcha )
 {
 	gotcha_state *state = machine.driver_data<gotcha_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->banksel));
-	state->save_item(NAME(state->gfxbank));
-	state->save_item(NAME(state->scroll));
+	state->save_item(NAME(state->m_banksel));
+	state->save_item(NAME(state->m_gfxbank));
+	state->save_item(NAME(state->m_scroll));
 }
 
 static MACHINE_RESET( gotcha )
@@ -266,11 +266,11 @@ static MACHINE_RESET( gotcha )
 
 	for (i = 0; i < 4; i++)
 	{
-		state->gfxbank[i] = 0;
-		state->scroll[i] = 0;
+		state->m_gfxbank[i] = 0;
+		state->m_scroll[i] = 0;
 	}
 
-	state->banksel = 0;
+	state->m_banksel = 0;
 }
 
 static MACHINE_CONFIG_START( gotcha, gotcha_state )

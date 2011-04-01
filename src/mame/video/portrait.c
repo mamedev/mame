@@ -12,15 +12,15 @@
 WRITE8_HANDLER( portrait_bgvideo_write )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	tilemap_mark_tile_dirty(state->background,offset/2);
-	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_background,offset/2);
+	state->m_bgvideoram[offset] = data;
 }
 
 WRITE8_HANDLER( portrait_fgvideo_write )
 {
 	portrait_state *state = space->machine().driver_data<portrait_state>();
-	tilemap_mark_tile_dirty(state->foreground,offset/2);
-	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_foreground,offset/2);
+	state->m_fgvideoram[offset] = data;
 }
 
 INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
@@ -57,22 +57,22 @@ INLINE void get_tile_info( running_machine &machine, tile_data *tileinfo, int ti
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	get_tile_info( machine, tileinfo, tile_index, state->bgvideoram );
+	get_tile_info( machine, tileinfo, tile_index, state->m_bgvideoram );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	get_tile_info( machine, tileinfo, tile_index, state->fgvideoram );
+	get_tile_info( machine, tileinfo, tile_index, state->m_fgvideoram );
 }
 
 VIDEO_START( portrait )
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	state->background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
-	state->foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
+	state->m_background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
+	state->m_foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
 
-	tilemap_set_transparent_pen( state->foreground, 7 );
+	tilemap_set_transparent_pen( state->m_foreground, 7 );
 }
 
 
@@ -132,7 +132,7 @@ PALETTE_INIT( portrait )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	portrait_state *state = machine.driver_data<portrait_state>();
-	UINT8 *source = state->spriteram;
+	UINT8 *source = state->m_spriteram;
 	UINT8 *finish = source + 0x200;
 
 	while( source < finish )
@@ -155,7 +155,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 		if(attr & 0x08) sy |= 0x100;
 
-		sx += (source - state->spriteram) - 8;
+		sx += (source - state->m_spriteram) - 8;
 		sx &= 0x1ff;
 
 		sy = (512 - 64) - sy;
@@ -167,11 +167,11 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			break;
 
 		case 0x40:
-			sy -= state->scroll;
+			sy -= state->m_scroll;
 			break;
 
 		case 0x80:
-			sy -= state->scroll;
+			sy -= state->m_scroll;
 			break;
 
 		case 0xc0:
@@ -198,15 +198,15 @@ SCREEN_UPDATE( portrait )
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
-	tilemap_set_scrolly(state->background, 0, 0);
-	tilemap_set_scrolly(state->foreground, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, state->background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, state->foreground, 0, 0);
+	tilemap_set_scrolly(state->m_background, 0, 0);
+	tilemap_set_scrolly(state->m_foreground, 0, 0);
+	tilemap_draw(bitmap, &cliprect_no_scroll, state->m_background, 0, 0);
+	tilemap_draw(bitmap, &cliprect_no_scroll, state->m_foreground, 0, 0);
 
-	tilemap_set_scrolly(state->background, 0, state->scroll);
-	tilemap_set_scrolly(state->foreground, 0, state->scroll);
-	tilemap_draw(bitmap, &cliprect_scroll, state->background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_scroll, state->foreground, 0, 0);
+	tilemap_set_scrolly(state->m_background, 0, state->m_scroll);
+	tilemap_set_scrolly(state->m_foreground, 0, state->m_scroll);
+	tilemap_draw(bitmap, &cliprect_scroll, state->m_background, 0, 0);
+	tilemap_draw(bitmap, &cliprect_scroll, state->m_foreground, 0, 0);
 
 	draw_sprites(screen->machine(), bitmap,cliprect);
 	return 0;

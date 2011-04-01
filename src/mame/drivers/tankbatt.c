@@ -94,8 +94,8 @@ static READ8_HANDLER( tankbatt_dsw_r )
 static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->nmi_enable = !data;
-	state->sound_enable = !data;
+	state->m_nmi_enable = !data;
+	state->m_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
 	if (data) sample_stop (space->machine().device("samples"), 2);
@@ -105,14 +105,14 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->nmi_enable = data;
+	state->m_nmi_enable = data;
 //  interrupt_enable_w (offset, data);
 }
 
 static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->sound_enable)
+	if (state->m_sound_enable)
 	{
 		device_t *samples = space->machine().device("samples");
 		sample_start (samples, 1, 3, 0);
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
 	device_t *samples = space->machine().device("samples");
-	if (state->sound_enable)
+	if (state->m_sound_enable)
 	{
 		if (data)
 			sample_start (samples, 2, 2, 1);
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( tankbatt_sh_engine_w )
 static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
 	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->sound_enable)
+	if (state->m_sound_enable)
 	{
 		device_t *samples = space->machine().device("samples");
 		sample_start (samples, 0, 0, 0);
@@ -162,10 +162,10 @@ static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_MEMBER(tankbatt_state, bulletsram) AM_SIZE_MEMBER(tankbatt_state, bulletsram_size)
+	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_MEMBER(tankbatt_state, m_bulletsram) AM_SIZE_MEMBER(tankbatt_state, m_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_MEMBER(tankbatt_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_MEMBER(tankbatt_state, m_videoram)
 	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
 	tankbatt_state *state = device->machine().driver_data<tankbatt_state>();
-	if (state->nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+	if (state->m_nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )

@@ -10,26 +10,26 @@ public:
 	policetr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 control_data;
-	UINT32 bsmt_data_bank;
-	UINT32 bsmt_data_offset;
-	UINT32 *speedup_data;
-	UINT64 last_cycles;
-	UINT32 loop_count;
-	offs_t speedup_pc;
-	UINT32 *	rambase;
-	UINT32 palette_offset;
-	UINT8 palette_index;
-	UINT8 palette_data[3];
-	rectangle render_clip;
-	UINT8 *srcbitmap;
-	UINT8 *dstbitmap;
-	UINT16 src_xoffs;
-	UINT16 src_yoffs;
-	UINT16 dst_xoffs;
-	UINT16 dst_yoffs;
-	UINT8 video_latch;
-	UINT32 srcbitmap_height_mask;
+	UINT32 m_control_data;
+	UINT32 m_bsmt_data_bank;
+	UINT32 m_bsmt_data_offset;
+	UINT32 *m_speedup_data;
+	UINT64 m_last_cycles;
+	UINT32 m_loop_count;
+	offs_t m_speedup_pc;
+	UINT32 *	m_rambase;
+	UINT32 m_palette_offset;
+	UINT8 m_palette_index;
+	UINT8 m_palette_data[3];
+	rectangle m_render_clip;
+	UINT8 *m_srcbitmap;
+	UINT8 *m_dstbitmap;
+	UINT16 m_src_xoffs;
+	UINT16 m_src_yoffs;
+	UINT16 m_dst_xoffs;
+	UINT16 m_dst_yoffs;
+	UINT8 m_video_latch;
+	UINT32 m_srcbitmap_height_mask;
 };
 
 

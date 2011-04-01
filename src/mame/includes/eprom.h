@@ -12,10 +12,10 @@ public:
 	eprom_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	int 			screen_intensity;
-	int 			video_disable;
-	UINT16 *		sync_data;
-	int			last_offset;
+	int 			m_screen_intensity;
+	int 			m_video_disable;
+	UINT16 *		m_sync_data;
+	int			m_last_offset;
 };
 
 

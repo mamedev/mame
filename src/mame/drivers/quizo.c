@@ -34,7 +34,7 @@ public:
 	quizo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
+	UINT8 *m_videoram;
 };
 
 
@@ -77,7 +77,7 @@ static PALETTE_INIT(quizo)
 static SCREEN_UPDATE( quizo )
 {
 	quizo_state *state = screen->machine().driver_data<quizo_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int x,y;
 	for(y=0;y<200;y++)
 	{
@@ -109,7 +109,7 @@ static SCREEN_UPDATE( quizo )
 static WRITE8_HANDLER(vram_w)
 {
 	quizo_state *state = space->machine().driver_data<quizo_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int bank=(port70&8)?1:0;
 	videoram[offset+bank*0x4000]=data;
 }
@@ -259,7 +259,7 @@ ROM_END
 static DRIVER_INIT(quizo)
 {
 	quizo_state *state = machine.driver_data<quizo_state>();
-	state->videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
+	state->m_videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

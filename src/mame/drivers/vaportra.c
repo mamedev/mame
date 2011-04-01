@@ -27,7 +27,7 @@ static WRITE16_HANDLER( vaportra_sound_w )
 	/* Force synchronisation between CPUs with fake timer */
 	space->machine().scheduler().synchronize();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
 }
 
 static READ16_HANDLER( vaportra_control_r )
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( vaportra_soundlatch_r )
 {
 	vaportra_state *state = space->machine().driver_data<vaportra_state>();
-	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -204,7 +204,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	vaportra_state *driver_state = device->machine().driver_data<vaportra_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -247,20 +247,20 @@ static MACHINE_START( vaportra )
 {
 	vaportra_state *state = machine.driver_data<vaportra_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
-	state->deco_tilegen2 = machine.device("tilegen2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
+	state->m_deco_tilegen2 = machine.device("tilegen2");
 
-	state->save_item(NAME(state->priority));
+	state->save_item(NAME(state->m_priority));
 }
 
 static MACHINE_RESET( vaportra )
 {
 	vaportra_state *state = machine.driver_data<vaportra_state>();
 
-	state->priority[0] = 0;
-	state->priority[1] = 0;
+	state->m_priority[0] = 0;
+	state->m_priority[1] = 0;
 }
 
 static MACHINE_CONFIG_START( vaportra, vaportra_state )

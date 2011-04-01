@@ -16,30 +16,30 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	optional_shared_ptr<UINT32>	m_nvram;
-	UINT32 *ram_base;
-	UINT32 *fastram_base;
-	UINT8 cmos_protected;
-	UINT16 control_data;
-	UINT8 adc_data;
-	UINT8 adc_shift;
-	UINT16 last_port0;
-	UINT8 shifter_state;
-	timer_device *timer[2];
-	double timer_rate;
-	UINT32 *tms32031_control;
-	UINT32 *midvplus_misc;
-	UINT16 bit_index;
-	int lastval;
-	UINT32 *generic_speedup;
-	UINT16 *videoram;
-	UINT32 *textureram;
-	UINT16 video_regs[16];
-	UINT16 dma_data[16];
-	UINT8 dma_data_index;
-	UINT16 page_control;
-	UINT8 video_changed;
-	emu_timer *scanline_timer;
-	poly_manager *poly;
+	UINT32 *m_ram_base;
+	UINT32 *m_fastram_base;
+	UINT8 m_cmos_protected;
+	UINT16 m_control_data;
+	UINT8 m_adc_data;
+	UINT8 m_adc_shift;
+	UINT16 m_last_port0;
+	UINT8 m_shifter_state;
+	timer_device *m_timer[2];
+	double m_timer_rate;
+	UINT32 *m_tms32031_control;
+	UINT32 *m_midvplus_misc;
+	UINT16 m_bit_index;
+	int m_lastval;
+	UINT32 *m_generic_speedup;
+	UINT16 *m_videoram;
+	UINT32 *m_textureram;
+	UINT16 m_video_regs[16];
+	UINT16 m_dma_data[16];
+	UINT8 m_dma_data_index;
+	UINT16 m_page_control;
+	UINT8 m_video_changed;
+	emu_timer *m_scanline_timer;
+	poly_manager *m_poly;
 };
 
 

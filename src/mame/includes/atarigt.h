@@ -19,33 +19,33 @@ public:
 	atarigt_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT8			is_primrage;
-	UINT16 *		colorram;
+	UINT8			m_is_primrage;
+	UINT16 *		m_colorram;
 
-	bitmap_t *		pf_bitmap;
-	bitmap_t *		an_bitmap;
+	bitmap_t *		m_pf_bitmap;
+	bitmap_t *		m_an_bitmap;
 
-	UINT8			playfield_tile_bank;
-	UINT8			playfield_color_bank;
-	UINT16			playfield_xscroll;
-	UINT16			playfield_yscroll;
+	UINT8			m_playfield_tile_bank;
+	UINT8			m_playfield_color_bank;
+	UINT16			m_playfield_xscroll;
+	UINT16			m_playfield_yscroll;
 
-	UINT32			tram_checksum;
+	UINT32			m_tram_checksum;
 
-	UINT32			expanded_mram[MRAM_ENTRIES * 3];
+	UINT32			m_expanded_mram[MRAM_ENTRIES * 3];
 
-	UINT32 *		mo_command;
+	UINT32 *		m_mo_command;
 
-	void			(*protection_w)(address_space *space, offs_t offset, UINT16 data);
-	void			(*protection_r)(address_space *space, offs_t offset, UINT16 *data);
+	void			(*m_protection_w)(address_space *space, offs_t offset, UINT16 data);
+	void			(*m_protection_r)(address_space *space, offs_t offset, UINT16 *data);
 
-	UINT8			ignore_writes;
-	offs_t			protaddr[ADDRSEQ_COUNT];
-	UINT8			protmode;
-	UINT16			protresult;
-	UINT8			protdata[0x800];
+	UINT8			m_ignore_writes;
+	offs_t			m_protaddr[ADDRSEQ_COUNT];
+	UINT8			m_protmode;
+	UINT16			m_protresult;
+	UINT8			m_protdata[0x800];
 
-	device_t *		rle;
+	device_t *		m_rle;
 };
 
 

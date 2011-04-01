@@ -56,7 +56,7 @@ static const UINT8 state_table[16][8] =
 static void sn_multiply(running_machine &machine)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	sn74s516_t &SN74S516 = state->sn74s516;
+	sn74s516_t &SN74S516 = state->m_sn74s516;
 
 	switch (SN74S516.code)
 	{
@@ -128,7 +128,7 @@ static void sn_multiply(running_machine &machine)
 static void sn_divide(running_machine &machine)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	sn74s516_t &SN74S516 = state->sn74s516;
+	sn74s516_t &SN74S516 = state->m_sn74s516;
 	INT32 Z = 0;
 	INT32 W = 0;
 
@@ -179,7 +179,7 @@ static void sn_divide(running_machine &machine)
 static void sn74s516_update(running_machine &machine, int ins)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	sn74s516_t &SN74S516 = state->sn74s516;
+	sn74s516_t &SN74S516 = state->m_sn74s516;
 	SN74S516.state = state_table[SN74S516.state][ins];
 
 	if (SN74S516.state == 4)
@@ -197,8 +197,8 @@ static void sn74s516_update(running_machine &machine, int ins)
 static void kick_sn74s516(running_machine &machine, UINT16 *data, const int ins)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	sn74s516_t &SN74S516 = state->sn74s516;
-	math_t &math = state->math;
+	sn74s516_t &SN74S516 = state->m_sn74s516;
+	math_t &math = state->m_math;
 
 #define LOAD_X		(SN74S516.X = *data)
 #define LOAD_Y		(SN74S516.Y = *data)
@@ -420,7 +420,7 @@ static void tx1_update_state(running_machine &machine)
 #define GO_EN(a)	!(a & 0x4000)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
@@ -600,7 +600,7 @@ static void tx1_update_state(running_machine &machine)
 READ16_HANDLER( tx1_math_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	offset = offset << 1;
 
 	/* /MLPCS */
@@ -717,7 +717,7 @@ READ16_HANDLER( tx1_math_r )
 WRITE16_HANDLER( tx1_math_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	math.cpulatch = data;
 	offset <<= 1;
 
@@ -806,7 +806,7 @@ WRITE16_HANDLER( tx1_math_w )
 READ16_HANDLER( tx1_spcs_rom_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	math.cpulatch = *(UINT16*)((UINT8*)space->machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == TX1_SEL_ILDEN)
@@ -870,8 +870,8 @@ READ16_HANDLER( tx1_spcs_rom_r )
 READ16_HANDLER( tx1_spcs_ram_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
-	math.cpulatch = state->math_ram[offset];
+	math_t &math = state->m_math;
+	math.cpulatch = state->m_math_ram[offset];
 
 	offset <<= 1;
 
@@ -935,7 +935,7 @@ WRITE16_HANDLER( tx1_spcs_ram_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
 	mame_printf_debug("Write to /SPCS RAM?");
-	COMBINE_DATA(&state->math_ram[offset]);
+	COMBINE_DATA(&state->m_math_ram[offset]);
 }
 
 
@@ -988,7 +988,7 @@ static void buggyboy_update_state(running_machine &machine)
 #define GO_EN(a)	!(a & 0x4000)
 
 	tx1_state *state = machine.driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	const UINT16 *prom = (UINT16*)machine.region("au_data")->base() + (0x8000 >> 1);
 
 	for (;;)
@@ -1106,7 +1106,7 @@ static void buggyboy_update_state(running_machine &machine)
 READ16_HANDLER( buggyboy_math_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	offset = offset << 1;
 
 	/* /MLPCS */
@@ -1184,7 +1184,7 @@ READ16_HANDLER( buggyboy_math_r )
 WRITE16_HANDLER( buggyboy_math_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	math.cpulatch = data;
 
 	offset <<= 1;
@@ -1273,7 +1273,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
+	math_t &math = state->m_math;
 	math.cpulatch = *(UINT16*)((UINT8*)space->machine().region("math_cpu")->base() + 0xfc000 + 0x1000 + offset*2);
 
 	if (math.mux == BB_MUX_ILDEN)
@@ -1336,14 +1336,14 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 WRITE16_HANDLER( buggyboy_spcs_ram_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	COMBINE_DATA(&state->math_ram[offset]);
+	COMBINE_DATA(&state->m_math_ram[offset]);
 }
 
 READ16_HANDLER( buggyboy_spcs_ram_r )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
-	math_t &math = state->math;
-	math.cpulatch = state->math_ram[offset];
+	math_t &math = state->m_math;
+	math.cpulatch = state->m_math_ram[offset];
 
 	offset <<= 1;
 
@@ -1415,11 +1415,11 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 MACHINE_RESET( buggyboy )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	memset(&state->math, 0, sizeof(state->math));
+	memset(&state->m_math, 0, sizeof(state->m_math));
 }
 
 MACHINE_RESET( tx1 )
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	memset(&state->math, 0, sizeof(state->math));
+	memset(&state->m_math, 0, sizeof(state->m_math));
 }

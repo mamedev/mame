@@ -53,14 +53,14 @@ static READ16_HANDLER( sound_status_r )
 {
 	snk68_state *state = space->machine().driver_data<snk68_state>();
 
-	return (state->sound_status << 8);
+	return (state->m_sound_status << 8);
 }
 
 static WRITE8_HANDLER( sound_status_w )
 {
 	snk68_state *state = space->machine().driver_data<snk68_state>();
 
-	state->sound_status = data;
+	state->m_sound_status = data;
 }
 
 static READ16_HANDLER( control_1_r )
@@ -94,7 +94,7 @@ static READ16_HANDLER( protcontrols_r )
 	snk68_state *state = space->machine().driver_data<snk68_state>();
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 
-	return input_port_read(space->machine(), portnames[offset]) ^ state->invert_controls;
+	return input_port_read(space->machine(), portnames[offset]) ^ state->m_invert_controls;
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -104,7 +104,7 @@ static WRITE16_HANDLER( protection_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		snk68_state *state = space->machine().driver_data<snk68_state>();
-		state->invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
+		state->m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
 	}
 }
 
@@ -131,9 +131,9 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, pow_fg_videoram)	// 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, spriteram)	// only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, paletteram)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, m_pow_fg_videoram)	// 8-bit
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, m_spriteram)	// only partially populated
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, m_paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16 )
@@ -152,10 +152,10 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, spriteram)	// only partially populated
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, pow_fg_videoram) /* Mirror is used by Ikari 3 */
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, m_spriteram)	// only partially populated
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, m_pow_fg_videoram) /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK("bank1") /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, paletteram)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, m_paletteram)
 ADDRESS_MAP_END
 
 /******************************************************************************/

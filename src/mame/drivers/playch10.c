@@ -310,25 +310,25 @@ Notes & Todo:
 static WRITE8_HANDLER( up8w_w )
 {
 	playch10_state *state = space->machine().driver_data<playch10_state>();
-	state->up_8w = data & 1;
+	state->m_up_8w = data & 1;
 }
 
 static READ8_HANDLER( ram_8w_r )
 {
 	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->up_8w )
-		return state->ram_8w[offset];
+	if ( offset >= 0x400 && state->m_up_8w )
+		return state->m_ram_8w[offset];
 
-	return state->ram_8w[offset & 0x3ff];
+	return state->m_ram_8w[offset & 0x3ff];
 }
 
 static WRITE8_HANDLER( ram_8w_w )
 {
 	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->up_8w )
-		state->ram_8w[offset] = data;
+	if ( offset >= 0x400 && state->m_up_8w )
+		state->m_ram_8w[offset] = data;
 	else
-		state->ram_8w[offset & 0x3ff] = data;
+		state->m_ram_8w[offset & 0x3ff] = data;
 }
 
 static WRITE8_HANDLER( sprite_dma_w )
@@ -345,9 +345,9 @@ static WRITE8_HANDLER( time_w )
 	if(data == 0xf)
 		data = 0;
 
-	state->timedata[offset] = data;
+	state->m_timedata[offset] = data;
 
-	popmessage("Time: %d%d%d%d",state->timedata[3],state->timedata[2],state->timedata[1],state->timedata[0]);
+	popmessage("Time: %d%d%d%d",state->m_timedata[3],state->m_timedata[2],state->m_timedata[1],state->m_timedata[0]);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -371,8 +371,8 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE_MEMBER(playch10_state, ram_8w)	// 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE_MEMBER(playch10_state, videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE_MEMBER(playch10_state, m_ram_8w)	// 8W
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE_MEMBER(playch10_state, m_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
@@ -391,11 +391,11 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(pc10_PPURES_w)
 	AM_RANGE(0x0b, 0x0e) AM_WRITE(pc10_CARTSEL_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(up8w_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE_MEMBER(playch10_state, timedata)
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE_MEMBER(playch10_state, m_timedata)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE_MEMBER(playch10_state, work_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE_MEMBER(playch10_state, m_work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)
@@ -660,11 +660,11 @@ static INTERRUPT_GEN( playch10_interrupt ) {
 	playch10_state *state = device->machine().driver_data<playch10_state>();
 
 	/* LS161A, Sheet 1 - bottom left of Z80 */
-	if ( !state->pc10_dog_di && !state->pc10_nmi_enable ) {
+	if ( !state->m_pc10_dog_di && !state->m_pc10_nmi_enable ) {
 		device_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE );
 	}
 
-	else if ( state->pc10_nmi_enable )
+	else if ( state->m_pc10_nmi_enable )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

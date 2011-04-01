@@ -16,20 +16,20 @@ public:
 	starfire_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-    read8_space_func input_read;
+    read8_space_func m_input_read;
 
-	UINT8 fireone_select;
+	UINT8 m_fireone_select;
 
-    UINT8 starfire_vidctrl;
-    UINT8 starfire_vidctrl1;
-    UINT8 starfire_color;
-    UINT16 starfire_colors[STARFIRE_NUM_PENS];
+    UINT8 m_starfire_vidctrl;
+    UINT8 m_starfire_vidctrl1;
+    UINT8 m_starfire_color;
+    UINT16 m_starfire_colors[STARFIRE_NUM_PENS];
 
-    UINT8 *starfire_videoram;
-    UINT8 *starfire_colorram;
+    UINT8 *m_starfire_videoram;
+    UINT8 *m_starfire_colorram;
 
-    emu_timer* scanline_timer;
-    bitmap_t *starfire_screen;
+    emu_timer* m_scanline_timer;
+    bitmap_t *m_starfire_screen;
 };
 
 /*----------- defined in video/starfire.c -----------*/

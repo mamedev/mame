@@ -5,9 +5,9 @@
 WRITE16_HANDLER( tigeroad_videoram_w )
 {
 	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( tigeroad_videoctrl_w )
@@ -31,10 +31,10 @@ WRITE16_HANDLER( tigeroad_videoctrl_w )
 
 		bank = (data & 0x04) >> 2;
 
-		if (state->bgcharbank != bank)
+		if (state->m_bgcharbank != bank)
 		{
-			state->bgcharbank = bank;
-			tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+			state->m_bgcharbank = bank;
+			tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 		}
 
 		/* bits 4-5 are coin lockouts */
@@ -59,10 +59,10 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 	switch (offset)
 	{
 	case 0:
-		tilemap_set_scrollx(state->bg_tilemap, 0, scroll);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, scroll);
 		break;
 	case 1:
-		tilemap_set_scrolly(state->bg_tilemap, 0, -scroll - 32 * 8);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, -scroll - 32 * 8);
 		break;
 	}
 }
@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	int data = tilerom[tile_index];
 	int attr = tilerom[tile_index + 1];
-	int code = data + ((attr & 0xc0) << 2) + (state->bgcharbank << 10);
+	int code = data + ((attr & 0xc0) << 2) + (state->m_bgcharbank << 10);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
@@ -148,26 +148,26 @@ static TILEMAP_MAPPER( tigeroad_tilemap_scan )
 VIDEO_START( tigeroad )
 {
 	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tigeroad_tilemap_scan,
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tigeroad_tilemap_scan,
 		 32, 32, 128, 128);
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0);
-	tilemap_set_transmask(state->bg_tilemap, 1, 0x1ff, 0xfe00);
+	tilemap_set_transmask(state->m_bg_tilemap, 0, 0xffff, 0);
+	tilemap_set_transmask(state->m_bg_tilemap, 1, 0x1ff, 0xfe00);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 3);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 3);
 }
 
 SCREEN_UPDATE( tigeroad )
 {
 	tigeroad_state *state = screen->machine().driver_data<tigeroad_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 1);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_LAYER0, 1);
 	//draw_sprites(screen->machine(), bitmap, cliprect, 1); draw priority sprites?
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 2);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 2);
 	return 0;
 }
 

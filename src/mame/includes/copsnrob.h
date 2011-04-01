@@ -14,17 +14,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        videoram;
-	UINT8 *        trucky;
-	UINT8 *        truckram;
-	UINT8 *        bulletsram;
-	UINT8 *        cary;
-	UINT8 *        carimage;
-	size_t         videoram_size;
+	UINT8 *        m_videoram;
+	UINT8 *        m_trucky;
+	UINT8 *        m_truckram;
+	UINT8 *        m_bulletsram;
+	UINT8 *        m_cary;
+	UINT8 *        m_carimage;
+	size_t         m_videoram_size;
 
 	/* misc */
-	UINT8          misc;
-	UINT8          ic_h3_data;
+	UINT8          m_misc;
+	UINT8          m_ic_h3_data;
 };
 
 

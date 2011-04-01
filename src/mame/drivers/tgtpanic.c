@@ -19,8 +19,8 @@ public:
 	tgtpanic_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 color;
+	UINT8 *m_ram;
+	UINT8 m_color;
 };
 
 
@@ -39,12 +39,12 @@ static SCREEN_UPDATE( tgtpanic )
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
-	colors[2] = MAKE_RGB(pal1bit(state->color >> 2), pal1bit(state->color >> 1), pal1bit(state->color >> 0));
-	colors[3] = MAKE_RGB(pal1bit(state->color >> 6), pal1bit(state->color >> 5), pal1bit(state->color >> 4));
+	colors[2] = MAKE_RGB(pal1bit(state->m_color >> 2), pal1bit(state->m_color >> 1), pal1bit(state->m_color >> 0));
+	colors[3] = MAKE_RGB(pal1bit(state->m_color >> 6), pal1bit(state->m_color >> 5), pal1bit(state->m_color >> 4));
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
-		UINT8 val = state->ram[offs];
+		UINT8 val = state->m_ram[offs];
 
 		y = (offs & 0x7f) << 1;
 		x = (offs >> 7) << 2;
@@ -70,7 +70,7 @@ static WRITE8_HANDLER( color_w )
 {
 	tgtpanic_state *state = space->machine().driver_data<tgtpanic_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->color = data;
+	state->m_color = data;
 }
 
 
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( color_w )
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_MEMBER(tgtpanic_state, ram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_MEMBER(tgtpanic_state, m_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )

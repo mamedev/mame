@@ -21,8 +21,8 @@ VIDEO_START( kangaroo )
 	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
-	state->videoram = auto_alloc_array(machine, UINT32, 256 * 64);
-	state->save_pointer(NAME(state->videoram), 256 * 64);
+	state->m_videoram = auto_alloc_array(machine, UINT32, 256 * 64);
+	state->save_pointer(NAME(state->m_videoram), 256 * 64);
 }
 
 
@@ -57,14 +57,14 @@ static void videoram_write( running_machine &machine, UINT16 offset, UINT8 data,
 	if (mask & 0x01) layermask |= 0x0c0c0c0c;
 
 	/* update layers */
-	state->videoram[offset] = (state->videoram[offset] & ~layermask) | (expdata & layermask);
+	state->m_videoram[offset] = (state->m_videoram[offset] & ~layermask) | (expdata & layermask);
 }
 
 
 WRITE8_HANDLER( kangaroo_videoram_w )
 {
 	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	videoram_write(space->machine(), offset, data, state->video_control[8]);
+	videoram_write(space->machine(), offset, data, state->m_video_control[8]);
 }
 
 
@@ -78,7 +78,7 @@ WRITE8_HANDLER( kangaroo_videoram_w )
 WRITE8_HANDLER( kangaroo_video_control_w )
 {
 	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	state->video_control[offset] = data;
+	state->m_video_control[offset] = data;
 
 	switch (offset)
 	{
@@ -105,11 +105,11 @@ static void blitter_execute( running_machine &machine )
 	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 	UINT32 gfxhalfsize = machine.region("gfx1")->bytes() / 2;
 	const UINT8 *gfxbase = machine.region("gfx1")->base();
-	UINT16 src = state->video_control[0] + 256 * state->video_control[1];
-	UINT16 dst = state->video_control[2] + 256 * state->video_control[3];
-	UINT8 height = state->video_control[5];
-	UINT8 width = state->video_control[4];
-	UINT8 mask = state->video_control[8];
+	UINT16 src = state->m_video_control[0] + 256 * state->m_video_control[1];
+	UINT16 dst = state->m_video_control[2] + 256 * state->m_video_control[3];
+	UINT8 height = state->m_video_control[5];
+	UINT8 width = state->m_video_control[4];
+	UINT8 mask = state->m_video_control[8];
 	int x, y;
 
 	/* during DMA operations, the top 2 bits are ORed together, as well as the bottom 2 bits */
@@ -139,16 +139,16 @@ static void blitter_execute( running_machine &machine )
 SCREEN_UPDATE( kangaroo )
 {
 	kangaroo_state *state = screen->machine().driver_data<kangaroo_state>();
-	UINT8 scrolly = state->video_control[6];
-	UINT8 scrollx = state->video_control[7];
-	UINT8 maska = (state->video_control[10] & 0x28) >> 3;
-	UINT8 maskb = (state->video_control[10] & 0x07) >> 0;
-	UINT8 xora = (state->video_control[9] & 0x20) ? 0xff : 0x00;
-	UINT8 xorb = (state->video_control[9] & 0x10) ? 0xff : 0x00;
-	UINT8 enaa = (state->video_control[9] & 0x08);
-	UINT8 enab = (state->video_control[9] & 0x04);
-	UINT8 pria = (~state->video_control[9] & 0x02);
-	UINT8 prib = (~state->video_control[9] & 0x01);
+	UINT8 scrolly = state->m_video_control[6];
+	UINT8 scrollx = state->m_video_control[7];
+	UINT8 maska = (state->m_video_control[10] & 0x28) >> 3;
+	UINT8 maskb = (state->m_video_control[10] & 0x07) >> 0;
+	UINT8 xora = (state->m_video_control[9] & 0x20) ? 0xff : 0x00;
+	UINT8 xorb = (state->m_video_control[9] & 0x10) ? 0xff : 0x00;
+	UINT8 enaa = (state->m_video_control[9] & 0x08);
+	UINT8 enab = (state->m_video_control[9] & 0x04);
+	UINT8 pria = (~state->m_video_control[9] & 0x02);
+	UINT8 prib = (~state->m_video_control[9] & 0x01);
 	rgb_t pens[8];
 	int x, y;
 
@@ -167,8 +167,8 @@ SCREEN_UPDATE( kangaroo )
 			UINT8 effya = scrolly + (y ^ xora);
 			UINT8 effxb = (x / 2) ^ xorb;
 			UINT8 effyb = y ^ xorb;
-			UINT8 pixa = (state->videoram[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
-			UINT8 pixb = (state->videoram[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
+			UINT8 pixa = (state->m_videoram[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
+			UINT8 pixb = (state->m_videoram[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
 			UINT8 finalpens;
 
 			/* for each layer, contribute bits if (a) enabled, and (b) either has priority or the opposite plane is 0 */

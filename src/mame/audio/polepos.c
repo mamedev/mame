@@ -22,12 +22,12 @@
 typedef struct _polepos_sound_state polepos_sound_state;
 struct _polepos_sound_state
 {
-	UINT32 current_position;
-	int sample_msb;
-	int sample_lsb;
-	int sample_enable;
-	sound_stream *stream;
-	filter2_context filter_engine[3];
+	UINT32 m_current_position;
+	int m_sample_msb;
+	int m_sample_lsb;
+	int m_sample_enable;
+	sound_stream *m_stream;
+	filter2_context m_filter_engine[3];
 };
 
 
@@ -67,43 +67,43 @@ static STREAM_UPDATE( engine_sound_update )
 	int loop;
 
 	/* if we're not enabled, just fill with 0 */
-	if (!state->sample_enable)
+	if (!state->m_sample_enable)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* determine the effective clock rate */
-	clock = (device->machine().device("maincpu")->unscaled_clock() / 16) * ((state->sample_msb + 1) * 64 + state->sample_lsb + 1) / (64*64);
+	clock = (device->machine().device("maincpu")->unscaled_clock() / 16) * ((state->m_sample_msb + 1) * 64 + state->m_sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
-	slot = (state->sample_msb >> 3) & 7;
+	slot = (state->m_sample_msb >> 3) & 7;
 	volume = volume_table[slot];
 	base = &device->machine().region("engine")->base()[slot * 0x800];
 
 	/* fill in the sample */
 	while (samples--)
 	{
-		state->filter_engine[0].x0 = (3.4 / 255 * base[(state->current_position >> 12) & 0x7ff] - 2) * volume;
-		state->filter_engine[1].x0 = state->filter_engine[0].x0;
-		state->filter_engine[2].x0 = state->filter_engine[0].x0;
+		state->m_filter_engine[0].x0 = (3.4 / 255 * base[(state->m_current_position >> 12) & 0x7ff] - 2) * volume;
+		state->m_filter_engine[1].x0 = state->m_filter_engine[0].x0;
+		state->m_filter_engine[2].x0 = state->m_filter_engine[0].x0;
 
 		i_total = 0;
 		for (loop = 0; loop < 3; loop++)
 		{
-			filter2_step(&state->filter_engine[loop]);
+			filter2_step(&state->m_filter_engine[loop]);
 			/* The op-amp powered @ 5V will clip to 0V & 3.5V.
              * Adjusted to vRef of 2V, we will clip as follows: */
-			if (state->filter_engine[loop].y0 > 1.5) state->filter_engine[loop].y0 = 1.5;
-			if (state->filter_engine[loop].y0 < -2)  state->filter_engine[loop].y0 = -2;
+			if (state->m_filter_engine[loop].y0 > 1.5) state->m_filter_engine[loop].y0 = 1.5;
+			if (state->m_filter_engine[loop].y0 < -2)  state->m_filter_engine[loop].y0 = -2;
 
-			i_total += state->filter_engine[loop].y0 / r_filt_out[loop];
+			i_total += state->m_filter_engine[loop].y0 / r_filt_out[loop];
 		}
 		i_total *= r_filt_total * 32000/2;	/* now contains voltage adjusted by final gain */
 
 		*buffer++ = (int)i_total;
-		state->current_position += step;
+		state->m_current_position += step;
 	}
 }
 
@@ -113,19 +113,19 @@ static STREAM_UPDATE( engine_sound_update )
 static DEVICE_START( polepos_sound )
 {
 	polepos_sound_state *state = get_safe_token(device);
-	state->stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
-	state->sample_msb = state->sample_lsb = 0;
-	state->sample_enable = 0;
+	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
+	state->m_sample_msb = state->m_sample_lsb = 0;
+	state->m_sample_enable = 0;
 
 	/* setup the filters */
 	filter_opamp_m_bandpass_setup(device, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
-									&state->filter_engine[0]);
+									&state->m_filter_engine[0]);
 	filter_opamp_m_bandpass_setup(device, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
-									&state->filter_engine[1]);
+									&state->m_filter_engine[1]);
 	/* Filter 3 is a little different.  Because of the input capacitor, it is
      * a high pass filter. */
 	filter2_setup(device, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
-									&state->filter_engine[2]);
+									&state->m_filter_engine[2]);
 }
 
 /************************************/
@@ -136,7 +136,7 @@ static DEVICE_RESET( polepos_sound )
 	polepos_sound_state *state = get_safe_token(device);
 	int loop;
 	for (loop = 0; loop < 3; loop++)
-		filter2_reset(&state->filter_engine[loop]);
+		filter2_reset(&state->m_filter_engine[loop]);
 }
 
 DEVICE_GET_INFO( polepos_sound )
@@ -164,9 +164,9 @@ WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w )
 {
 	polepos_sound_state *state = get_safe_token(device);
 	/* Update stream first so all samples at old frequency are updated. */
-	state->stream->update();
-	state->sample_lsb = data & 62;
-	state->sample_enable = data & 1;
+	state->m_stream->update();
+	state->m_sample_lsb = data & 62;
+	state->m_sample_enable = data & 1;
 }
 
 /************************************/
@@ -175,8 +175,8 @@ WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w )
 WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w )
 {
 	polepos_sound_state *state = get_safe_token(device);
-	state->stream->update();
-	state->sample_msb = data & 63;
+	state->m_stream->update();
+	state->m_sample_msb = data & 63;
 }
 
 

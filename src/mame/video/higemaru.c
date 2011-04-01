@@ -4,15 +4,15 @@
 WRITE8_HANDLER( higemaru_videoram_w )
 {
 	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( higemaru_colorram_w )
 {
 	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 /***************************************************************************
@@ -87,15 +87,15 @@ WRITE8_HANDLER( higemaru_c800_w )
 	if (flip_screen_get(space->machine()) != (data & 0x80))
 	{
 		flip_screen_set(space->machine(), data & 0x80);
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	higemaru_state *state = machine.driver_data<higemaru_state>();
-	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1);
-	int color = state->colorram[tile_index] & 0x1f;
+	int code = state->m_videoram[tile_index] + ((state->m_colorram[tile_index] & 0x80) << 1);
+	int color = state->m_colorram[tile_index] & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -103,16 +103,16 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( higemaru )
 {
 	higemaru_state *state = machine.driver_data<higemaru_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	higemaru_state *state = machine.driver_data<higemaru_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->spriteram_size - 16; offs >= 0; offs -= 16)
+	for (offs = state->m_spriteram_size - 16; offs >= 0; offs -= 16)
 	{
 		int code,col,sx,sy,flipx,flipy;
 
@@ -148,7 +148,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( higemaru )
 {
 	higemaru_state *state = screen->machine().driver_data<higemaru_state>();
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

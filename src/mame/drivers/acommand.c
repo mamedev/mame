@@ -66,18 +66,18 @@ public:
 	acommand_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	tilemap_t *tx_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT16 *ac_txvram;
-	UINT16 *ac_bgvram;
-	UINT16 *ac_vregs;
-	UINT16 led0;
-	UINT16 led1;
-	UINT16 *ac_devram;
-	UINT16 ufo_sw1;
-	UINT16 ufo_sw2;
-	UINT16 *spriteram;
-	size_t spriteram_size;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT16 *m_ac_txvram;
+	UINT16 *m_ac_bgvram;
+	UINT16 *m_ac_vregs;
+	UINT16 m_led0;
+	UINT16 m_led1;
+	UINT16 *m_ac_devram;
+	UINT16 m_ufo_sw1;
+	UINT16 m_ufo_sw2;
+	UINT16 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 
@@ -91,7 +91,7 @@ static TILEMAP_MAPPER( bg_scan )
 static TILE_GET_INFO( ac_get_bg_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->ac_bgvram[tile_index];
+	int code = state->m_ac_bgvram[tile_index];
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
@@ -102,7 +102,7 @@ static TILE_GET_INFO( ac_get_bg_tile_info )
 static TILE_GET_INFO( ac_get_tx_tile_info )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	int code = state->ac_txvram[tile_index];
+	int code = state->m_ac_txvram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -113,10 +113,10 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->spriteram_size/2;offs += 8)
+	for (offs = 0;offs < state->m_spriteram_size/2;offs += 8)
 	{
 		if (!(spriteram16[offs+0] & 0x1000))
 		{
@@ -172,12 +172,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 static VIDEO_START( acommand )
 {
 	acommand_state *state = machine.driver_data<acommand_state>();
-	state->tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,tilemap_scan_cols,8,8,512,32);
-	state->bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
+	state->m_tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,tilemap_scan_cols,8,8,512,32);
+	state->m_bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
 
-	state->ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
+	state->m_ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
 
-	tilemap_set_transparent_pen(state->tx_tilemap,15);
+	tilemap_set_transparent_pen(state->m_tx_tilemap,15);
 }
 
 
@@ -241,18 +241,18 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 static SCREEN_UPDATE( acommand )
 {
 	acommand_state *state = screen->machine().driver_data<acommand_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
 	draw_sprites(screen->machine(),bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
 
 	/*Order might be wrong,but these for sure are the led numbers tested*/
-	draw_led(bitmap,  0, 20, (state->led0 & 0x0f00) >> 8);
-	draw_led(bitmap,  6, 20, (state->led0 & 0x00f0) >> 4);
-	draw_led(bitmap, 12, 20, (state->led0 & 0x000f));
+	draw_led(bitmap,  0, 20, (state->m_led0 & 0x0f00) >> 8);
+	draw_led(bitmap,  6, 20, (state->m_led0 & 0x00f0) >> 4);
+	draw_led(bitmap, 12, 20, (state->m_led0 & 0x000f));
 
-	draw_led(bitmap, 256-18,20,(state->led0 & 0xf000) >> 12);
-	draw_led(bitmap, 256-12,20,(state->led1 & 0xf0) >> 4);
-	draw_led(bitmap, 256-6,20, (state->led1 & 0xf));
+	draw_led(bitmap, 256-18,20,(state->m_led0 & 0xf000) >> 12);
+	draw_led(bitmap, 256-12,20,(state->m_led1 & 0xf0) >> 4);
+	draw_led(bitmap, 256-6,20, (state->m_led1 & 0xf));
 	return 0;
 }
 
@@ -260,15 +260,15 @@ static SCREEN_UPDATE( acommand )
 static WRITE16_HANDLER( ac_bgvram_w )
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->ac_bgvram[offset]);
-	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
+	COMBINE_DATA(&state->m_ac_bgvram[offset]);
+	tilemap_mark_tile_dirty(state->m_bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( ac_txvram_w )
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->ac_txvram[offset]);
-	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
+	COMBINE_DATA(&state->m_ac_txvram[offset]);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER(ac_bgscroll_w)
@@ -276,8 +276,8 @@ static WRITE16_HANDLER(ac_bgscroll_w)
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: tilemap_set_scrollx(state->bg_tilemap,0,data); break;
-		case 1: tilemap_set_scrolly(state->bg_tilemap,0,data); break;
+		case 0: tilemap_set_scrollx(state->m_bg_tilemap,0,data); break;
+		case 1: tilemap_set_scrolly(state->m_bg_tilemap,0,data); break;
 		case 2: /*BG_TILEMAP priority?*/ break;
 	}
 }
@@ -287,8 +287,8 @@ static WRITE16_HANDLER(ac_txscroll_w)
 	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: tilemap_set_scrollx(state->tx_tilemap,0,data); break;
-		case 1: tilemap_set_scrolly(state->tx_tilemap,0,data); break;
+		case 0: tilemap_set_scrollx(state->m_tx_tilemap,0,data); break;
+		case 1: tilemap_set_scrolly(state->m_tx_tilemap,0,data); break;
 		case 2: /*TX_TILEMAP priority?*/ break;
 	}
 }
@@ -340,26 +340,26 @@ static READ16_HANDLER(ac_devices_r)
             */
         //22dc8
 		{
-			state->ufo_sw1 = state->ac_devram[offset] & 3;
-			if(state->ac_devram[offset] & 0x10)
-				state->ufo_sw1|= 0x10;
-			if(state->ac_devram[offset] & 0x40)
-				state->ufo_sw1|= 0x20;
-			if(state->ac_devram[offset] & 0x100)
-				state->ufo_sw1|=0x100;
-			if(state->ac_devram[offset] & 0x400)
-				state->ufo_sw1|=0x200;
-			if(state->ac_devram[offset] & 0x1000)
-				state->ufo_sw1|=0x1000;
-			if(state->ac_devram[offset] & 0x4000)
-				state->ufo_sw1|=0x2000;
-//          if(state->ac_devram[0x0048/2] & 0x0001)
-//              state->ufo_sw1|=0x0040;
-//          if(state->ac_devram[0x0048/2] & 0x0004)
-//              state->ufo_sw1|=0x0400;
-//          if(state->ac_devram[0x0048/2] & 0x0100)
-//              state->ufo_sw1|=0x4000;
-			return state->ufo_sw1;
+			state->m_ufo_sw1 = state->m_ac_devram[offset] & 3;
+			if(state->m_ac_devram[offset] & 0x10)
+				state->m_ufo_sw1|= 0x10;
+			if(state->m_ac_devram[offset] & 0x40)
+				state->m_ufo_sw1|= 0x20;
+			if(state->m_ac_devram[offset] & 0x100)
+				state->m_ufo_sw1|=0x100;
+			if(state->m_ac_devram[offset] & 0x400)
+				state->m_ufo_sw1|=0x200;
+			if(state->m_ac_devram[offset] & 0x1000)
+				state->m_ufo_sw1|=0x1000;
+			if(state->m_ac_devram[offset] & 0x4000)
+				state->m_ufo_sw1|=0x2000;
+//          if(state->m_ac_devram[0x0048/2] & 0x0001)
+//              state->m_ufo_sw1|=0x0040;
+//          if(state->m_ac_devram[0x0048/2] & 0x0004)
+//              state->m_ufo_sw1|=0x0400;
+//          if(state->m_ac_devram[0x0048/2] & 0x0100)
+//              state->m_ufo_sw1|=0x4000;
+			return state->m_ufo_sw1;
 		}
 		case 0x0044/2:
 			/*
@@ -369,19 +369,19 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- ---x Upper Switch - 4 (active low)
             */
 		{
-			state->ufo_sw2 = 0;
-			if(state->ac_devram[offset] & 0x01)
-				state->ufo_sw2|= 1;
-			if(state->ac_devram[offset] & 0x04)
-				state->ufo_sw2|= 2;
-			if(state->ac_devram[offset] & 0x10)
-				state->ufo_sw2|=0x10;
-			if(state->ac_devram[offset] & 0x40)
-				state->ufo_sw2|=0x20;
-			return state->ufo_sw2;
+			state->m_ufo_sw2 = 0;
+			if(state->m_ac_devram[offset] & 0x01)
+				state->m_ufo_sw2|= 1;
+			if(state->m_ac_devram[offset] & 0x04)
+				state->m_ufo_sw2|= 2;
+			if(state->m_ac_devram[offset] & 0x10)
+				state->m_ufo_sw2|=0x10;
+			if(state->m_ac_devram[offset] & 0x40)
+				state->m_ufo_sw2|=0x20;
+			return state->m_ufo_sw2;
 		}
 		case 0x0048/2:
-			return state->ac_devram[offset];
+			return state->m_ac_devram[offset];
 		case 0x005c/2:
 			/*
                 xxxx xxxx ---- ---- DIPSW4
@@ -389,13 +389,13 @@ static READ16_HANDLER(ac_devices_r)
             */
 			return input_port_read(space->machine(), "IN1");
 	}
-	return state->ac_devram[offset];
+	return state->m_ac_devram[offset];
 }
 
 static WRITE16_HANDLER(ac_devices_w)
 {
 	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->ac_devram[offset]);
+	COMBINE_DATA(&state->m_ac_devram[offset]);
 	switch(offset)
 	{
 		case 0x00/2:
@@ -433,12 +433,12 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x48/2:
 			break;
 		case 0x50/2:
-			state->led0 = state->ac_devram[offset];
-			//popmessage("%04x",state->led0);
+			state->m_led0 = state->m_ac_devram[offset];
+			//popmessage("%04x",state->m_led0);
 			break;
 		case 0x54/2:
-			state->led1 = state->ac_devram[offset];
-			//popmessage("%04x",state->led0);
+			state->m_led1 = state->m_ac_devram[offset];
+			//popmessage("%04x",state->m_led0);
 			break;
 	}
 }
@@ -455,13 +455,13 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_WRITE(ac_txscroll_w)
 	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_BASE_MEMBER(acommand_state, ac_bgvram)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_BASE_MEMBER(acommand_state, ac_txvram)
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_BASE_MEMBER(acommand_state, m_ac_bgvram)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_BASE_MEMBER(acommand_state, m_ac_txvram)
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE_MEMBER(acommand_state, spriteram, spriteram_size)
+	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE_MEMBER(acommand_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE_MEMBER(acommand_state, ac_devram)
+	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE_MEMBER(acommand_state, m_ac_devram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )

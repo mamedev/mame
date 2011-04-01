@@ -30,16 +30,16 @@ if it was a small shared buffer. The order of operations is:
 READ8_HANDLER( docastle_shared0_r )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
-	if (offset == 8) logerror("CPU #0 shared0r  clock = %d\n", (UINT32)state->maincpu->total_cycles());
-	return state->buffer0[offset];
+	if (offset == 8) logerror("CPU #0 shared0r  clock = %d\n", (UINT32)state->m_maincpu->total_cycles());
+	return state->m_buffer0[offset];
 }
 
 
 READ8_HANDLER( docastle_shared1_r )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
-	if (offset == 8) logerror("CPU #1 shared1r  clock = %d\n", (UINT32)state->slave->total_cycles());
-	return state->buffer1[offset];
+	if (offset == 8) logerror("CPU #1 shared1r  clock = %d\n", (UINT32)state->m_slave->total_cycles());
+	return state->m_buffer1[offset];
 }
 
 
@@ -47,11 +47,11 @@ WRITE8_HANDLER( docastle_shared0_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
 	if (offset == 8) logerror("CPU #1 shared0w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
-		state->buffer0[0], state->buffer0[1], state->buffer0[2], state->buffer0[3],
-		state->buffer0[4], state->buffer0[5], state->buffer0[6], state->buffer0[7],
-		data, (UINT32)state->slave->total_cycles());
+		state->m_buffer0[0], state->m_buffer0[1], state->m_buffer0[2], state->m_buffer0[3],
+		state->m_buffer0[4], state->m_buffer0[5], state->m_buffer0[6], state->m_buffer0[7],
+		data, (UINT32)state->m_slave->total_cycles());
 
-	state->buffer0[offset] = data;
+	state->m_buffer0[offset] = data;
 
 	if (offset == 8)
 		/* awake the master CPU */
@@ -62,14 +62,14 @@ WRITE8_HANDLER( docastle_shared0_w )
 WRITE8_HANDLER( docastle_shared1_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
-	state->buffer1[offset] = data;
+	state->m_buffer1[offset] = data;
 
 	if (offset == 8)
 	{
 		logerror("CPU #0 shared1w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
-				state->buffer1[0], state->buffer1[1], state->buffer1[2], state->buffer1[3],
-				state->buffer1[4], state->buffer1[5], state->buffer1[6], state->buffer1[7],
-				data, (UINT32)state->maincpu->total_cycles());
+				state->m_buffer1[0], state->m_buffer1[1], state->m_buffer1[2], state->m_buffer1[3],
+				state->m_buffer1[4], state->m_buffer1[5], state->m_buffer1[6], state->m_buffer1[7],
+				data, (UINT32)state->m_maincpu->total_cycles());
 
 		/* freeze execution of the master CPU until the slave has used the shared memory */
 		device_spin_until_trigger(&space->device(), 500);
@@ -81,5 +81,5 @@ WRITE8_HANDLER( docastle_shared1_w )
 WRITE8_HANDLER( docastle_nmitrigger_w )
 {
 	docastle_state *state = space->machine().driver_data<docastle_state>();
-	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }

@@ -10,14 +10,14 @@ Atari Starship 1 video emulation
 
 static void set_pens(starshp1_state *state, colortable_t *colortable)
 {
-	colortable_palette_set_color(colortable, state->inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
-	colortable_palette_set_color(colortable, state->inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
-	colortable_palette_set_color(colortable, state->inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
-	colortable_palette_set_color(colortable, state->inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
-	colortable_palette_set_color(colortable, state->inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
-	colortable_palette_set_color(colortable, state->inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
-	colortable_palette_set_color(colortable, state->inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
-	colortable_palette_set_color(colortable, state->inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
+	colortable_palette_set_color(colortable, state->m_inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(colortable, state->m_inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
+	colortable_palette_set_color(colortable, state->m_inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
+	colortable_palette_set_color(colortable, state->m_inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
+	colortable_palette_set_color(colortable, state->m_inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
+	colortable_palette_set_color(colortable, state->m_inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
+	colortable_palette_set_color(colortable, state->m_inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
+	colortable_palette_set_color(colortable, state->m_inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 
@@ -48,7 +48,7 @@ PALETTE_INIT( starshp1 )
 static TILE_GET_INFO( get_tile_info )
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
-	UINT8 code = state->playfield_ram[tile_index];
+	UINT8 code = state->m_playfield_ram[tile_index];
 
 	SET_TILE_INFO(0, code & 0x3f, 0, 0);
 }
@@ -61,13 +61,13 @@ VIDEO_START( starshp1 )
 
 	int i;
 
-	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, -8);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, -8);
 
-	state->LSFR = auto_alloc_array(machine, UINT16, 0x10000);
+	state->m_LSFR = auto_alloc_array(machine, UINT16, 0x10000);
 
 	for (i = 0; i < 0x10000; i++)
 	{
@@ -76,12 +76,12 @@ VIDEO_START( starshp1 )
 				  (val >> 0x7) ^
 				  (val >> 0x1) ^ 1;
 
-		state->LSFR[i] = val;
+		state->m_LSFR[i] = val;
 
 		val = (val << 1) | (bit & 1);
 	}
 
-	state->helper = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_helper = machine.primary_screen->alloc_compatible_bitmap();
 }
 
 
@@ -100,7 +100,7 @@ READ8_HANDLER( starshp1_rng_r )
 	if (y > height - 1)
 		y = height - 1;
 
-	return state->LSFR[x + (UINT16) (512 * y)];
+	return state->m_LSFR[x + (UINT16) (512 * y)];
 }
 
 
@@ -116,8 +116,8 @@ WRITE8_HANDLER( starshp1_ssadd_w )
      * practice they work like offsets in zoomed pixels.
      */
 
-	state->ship_voffset = ((offset & 0xf0) >> 4);
-	state->ship_hoffset = ((offset & 0x0f) << 2) | (data & 3);
+	state->m_ship_voffset = ((offset & 0xf0) >> 4);
+	state->m_ship_hoffset = ((offset & 0x0f) << 2) | (data & 3);
 }
 
 
@@ -131,18 +131,18 @@ WRITE8_HANDLER( starshp1_sspic_w )
      */
 
 	if (data != 0x87)
-		state->ship_picture = data;
+		state->m_ship_picture = data;
 }
 
 
 WRITE8_HANDLER( starshp1_playfield_w )
 {
 	starshp1_state *state = space->machine().driver_data<starshp1_state>();
-	if (state->mux != 0)
+	if (state->m_mux != 0)
 	{
 		offset ^= 0x1f;
-		state->playfield_ram[offset] = data;
-		tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+		state->m_playfield_ram[offset] = data;
+		tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 	}
 }
 
@@ -160,7 +160,7 @@ static void draw_starfield(starshp1_state *state, bitmap_t* bitmap)
 
 	for (y = 0; y < bitmap->height; y++)
 	{
-		const UINT16* p = state->LSFR + (UINT16) (512 * y);
+		const UINT16* p = state->m_LSFR + (UINT16) (512 * y);
 
 		UINT16* pLine = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -173,11 +173,11 @@ static void draw_starfield(starshp1_state *state, bitmap_t* bitmap)
 
 static int get_sprite_hpos(starshp1_state *state, int i)
 {
-	return 2 * (state->hpos_ram[i] ^ 0xff);
+	return 2 * (state->m_hpos_ram[i] ^ 0xff);
 }
 static int get_sprite_vpos(starshp1_state *state, int i)
 {
-	return 1 * (state->vpos_ram[i] - 0x07);
+	return 1 * (state->m_vpos_ram[i] - 0x07);
 }
 
 
@@ -188,7 +188,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 
 	for (i = 0; i < 14; i++)
 	{
-		int code = (state->obj_ram[i] & 0xf) ^ 0xf;
+		int code = (state->m_obj_ram[i] & 0xf) ^ 0xf;
 
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 			code % 8,
@@ -203,7 +203,7 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 static void draw_spaceship(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	starshp1_state *state = machine.driver_data<starshp1_state>();
-	double scaler = -5 * log(1 - state->ship_size / 256.0); /* ? */
+	double scaler = -5 * log(1 - state->m_ship_size / 256.0); /* ? */
 
 	unsigned xzoom = 2 * 0x10000 * scaler;
 	unsigned yzoom = 1 * 0x10000 * scaler;
@@ -212,15 +212,15 @@ static void draw_spaceship(running_machine &machine, bitmap_t* bitmap, const rec
 	int y = get_sprite_vpos(state, 14);
 
 	if (x <= 0)
-		x -= (xzoom * state->ship_hoffset) >> 16;
+		x -= (xzoom * state->m_ship_hoffset) >> 16;
 
 	if (y <= 0)
-		y -= (yzoom * state->ship_voffset) >> 16;
+		y -= (yzoom * state->m_ship_voffset) >> 16;
 
 	drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[2],
-		state->ship_picture & 0x03,
-		state->ship_explode,
-		state->ship_picture & 0x80, 0,
+		state->m_ship_picture & 0x03,
+		state->m_ship_explode,
+		state->m_ship_picture & 0x80, 0,
 		x, y,
 		xzoom, yzoom, 0);
 }
@@ -243,15 +243,15 @@ static void draw_phasor(starshp1_state *state, bitmap_t* bitmap)
 
 static int get_radius(starshp1_state *state)
 {
-	return 6 * sqrt((double)state->circle_size);  /* size calibrated by hand */
+	return 6 * sqrt((double)state->m_circle_size);  /* size calibrated by hand */
 }
 static int get_circle_hpos(starshp1_state *state)
 {
-	return 2 * (3 * state->circle_hpos / 2 - 64);
+	return 2 * (3 * state->m_circle_hpos / 2 - 64);
 }
 static int get_circle_vpos(starshp1_state *state)
 {
-	return 1 * (3 * state->circle_vpos / 2 - 64);
+	return 1 * (3 * state->m_circle_vpos / 2 - 64);
 }
 
 
@@ -260,7 +260,7 @@ static void draw_circle_line(running_machine &machine, bitmap_t *bitmap, int x, 
 	starshp1_state *state = machine.driver_data<starshp1_state>();
 	if (y >= 0 && y <= bitmap->height - 1)
 	{
-		const UINT16* p = state->LSFR + (UINT16) (512 * y);
+		const UINT16* p = state->m_LSFR + (UINT16) (512 * y);
 
 		UINT16* pLine = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -273,7 +273,7 @@ static void draw_circle_line(running_machine &machine, bitmap_t *bitmap, int x, 
 			h2 = bitmap->width - 1;
 
 		for (x = h1; x <= h2; x++)
-			if (state->circle_mod)
+			if (state->m_circle_mod)
 			{
 				if (p[x] & 1)
 					pLine[x] = 0x11;
@@ -322,7 +322,7 @@ static int spaceship_collision(running_machine &machine, bitmap_t *bitmap, const
 
 	for (y = rect->min_y; y <= rect->max_y; y++)
 	{
-		const UINT16* pLine = BITMAP_ADDR16(state->helper, y, 0);
+		const UINT16* pLine = BITMAP_ADDR16(state->m_helper, y, 0);
 
 		for (x = rect->min_x; x <= rect->max_x; x++)
 			if (pLine[x] != 0)
@@ -363,23 +363,23 @@ SCREEN_UPDATE( starshp1 )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (state->starfield_kill == 0)
+	if (state->m_starfield_kill == 0)
 		draw_starfield(state, bitmap);
 
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
-	if (state->circle_kill == 0 && state->circle_mod != 0)
+	if (state->m_circle_kill == 0 && state->m_circle_mod != 0)
 		draw_circle(screen->machine(), bitmap);
 
-	if (state->attract == 0)
+	if (state->m_attract == 0)
 		draw_spaceship(screen->machine(), bitmap, cliprect);
 
-	if (state->circle_kill == 0 && state->circle_mod == 0)
+	if (state->m_circle_kill == 0 && state->m_circle_mod == 0)
 		draw_circle(screen->machine(), bitmap);
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
-	if (state->phasor != 0)
+	if (state->m_phasor != 0)
 		draw_phasor(state, bitmap);
 
 	return 0;
@@ -401,25 +401,25 @@ SCREEN_EOF( starshp1 )
 		rect.min_x = 0;
 	if (rect.min_y < 0)
 		rect.min_y = 0;
-	if (rect.max_x > state->helper->width - 1)
-		rect.max_x = state->helper->width - 1;
-	if (rect.max_y > state->helper->height - 1)
-		rect.max_y = state->helper->height - 1;
+	if (rect.max_x > state->m_helper->width - 1)
+		rect.max_x = state->m_helper->width - 1;
+	if (rect.max_y > state->m_helper->height - 1)
+		rect.max_y = state->m_helper->height - 1;
 
-	bitmap_fill(state->helper, &visarea, 0);
+	bitmap_fill(state->m_helper, &visarea, 0);
 
-	if (state->attract == 0)
-		draw_spaceship(machine, state->helper, &visarea);
+	if (state->m_attract == 0)
+		draw_spaceship(machine, state->m_helper, &visarea);
 
 	if (circle_collision(state, &visarea))
-		state->collision_latch |= 1;
+		state->m_collision_latch |= 1;
 
 	if (circle_collision(state, &rect))
-		state->collision_latch |= 2;
+		state->m_collision_latch |= 2;
 
-	if (spaceship_collision(machine, state->helper, &rect))
-		state->collision_latch |= 4;
+	if (spaceship_collision(machine, state->m_helper, &rect))
+		state->m_collision_latch |= 4;
 
-	if (spaceship_collision(machine, state->helper, &visarea))
-		state->collision_latch |= 8;
+	if (spaceship_collision(machine, state->m_helper, &visarea))
+		state->m_collision_latch |= 8;
 }

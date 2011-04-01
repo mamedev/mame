@@ -28,14 +28,14 @@ TODO:
 static WRITE8_HANDLER( irqack_w )
 {
 	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
@@ -81,7 +81,7 @@ static INPUT_CHANGED( left_coin_inserted )
 	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	if(newval)
-		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
@@ -89,7 +89,7 @@ static INPUT_CHANGED( right_coin_inserted )
 	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
 
 	if(newval)
-		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )
@@ -330,28 +330,28 @@ static MACHINE_START( redclash )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
-	state->save_item(NAME(state->star_speed));
-	state->save_item(NAME(state->gfxbank));
-	state->save_item(NAME(state->stars_enable));
-	state->save_item(NAME(state->stars_speed));
-	state->save_item(NAME(state->stars_state));
-	state->save_item(NAME(state->stars_offset));
-	state->save_item(NAME(state->stars_count));
+	state->save_item(NAME(state->m_star_speed));
+	state->save_item(NAME(state->m_gfxbank));
+	state->save_item(NAME(state->m_stars_enable));
+	state->save_item(NAME(state->m_stars_speed));
+	state->save_item(NAME(state->m_stars_state));
+	state->save_item(NAME(state->m_stars_offset));
+	state->save_item(NAME(state->m_stars_count));
 }
 
 static MACHINE_RESET( redclash )
 {
 	ladybug_state *state = machine.driver_data<ladybug_state>();
 
-	state->star_speed = 0;
-	state->gfxbank = 0;
-	state->stars_enable = 0;
-	state->stars_speed = 0;
-	state->stars_state = 0;
-	state->stars_offset = 0;
-	state->stars_count = 0;
+	state->m_star_speed = 0;
+	state->m_gfxbank = 0;
+	state->m_stars_enable = 0;
+	state->m_stars_speed = 0;
+	state->m_stars_state = 0;
+	state->m_stars_offset = 0;
+	state->m_stars_count = 0;
 }
 
 static MACHINE_CONFIG_START( zerohour, ladybug_state )

@@ -79,24 +79,24 @@ public:
 	gei_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 drawctrl[3];
-	UINT8 color[8];
-	int prevoffset;
-	int yadd;
-	int signature_answer;
-	int signature_pos;
+	UINT8 m_drawctrl[3];
+	UINT8 m_color[8];
+	int m_prevoffset;
+	int m_yadd;
+	int m_signature_answer;
+	int m_signature_pos;
 };
 
 
 static WRITE8_HANDLER( gei_drawctrl_w )
 {
 	gei_state *state = space->machine().driver_data<gei_state>();
-	state->drawctrl[offset] = data;
+	state->m_drawctrl[offset] = data;
 	if (offset == 2)
 	{
 		int i;
 		for (i = 0; i < 8; i++)
-			if (BIT(state->drawctrl[1],i)) state->color[i] = state->drawctrl[0] & 7;
+			if (BIT(state->m_drawctrl[1],i)) state->m_color[i] = state->m_drawctrl[0] & 7;
 	}
 }
 
@@ -106,16 +106,16 @@ static WRITE8_HANDLER( gei_bitmap_w )
 	int sx,sy;
 	int i;
 
-	state->yadd = (offset==state->prevoffset) ? (state->yadd+1):0;
-	state->prevoffset = offset;
+	state->m_yadd = (offset==state->m_prevoffset) ? (state->m_yadd+1):0;
+	state->m_prevoffset = offset;
 
 	sx = 8 * (offset % 64);
 	sy = offset / 64;
-	sy = (sy + state->yadd) & 0xff;
+	sy = (sy + state->m_yadd) & 0xff;
 
 
 	for (i = 0; i < 8; i++)
-		*BITMAP_ADDR16(space->machine().generic.tmpbitmap, sy, sx+i) = state->color[8-i-1];
+		*BITMAP_ADDR16(space->machine().generic.tmpbitmap, sy, sx+i) = state->m_color[8-i-1];
 }
 
 static PALETTE_INIT(gei)
@@ -350,34 +350,34 @@ static READ8_HANDLER(banksel_5_r)
 static READ8_HANDLER( signature_r )
 {
 	gei_state *state = space->machine().driver_data<gei_state>();
-	return state->signature_answer;
+	return state->m_signature_answer;
 }
 
 static WRITE8_HANDLER( signature_w )
 {
 	gei_state *state = space->machine().driver_data<gei_state>();
-	if (data == 0) state->signature_pos = 0;
+	if (data == 0) state->m_signature_pos = 0;
 	else
 	{
 		static const UINT8 signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
 
-		state->signature_answer = signature[state->signature_pos++];
+		state->m_signature_answer = signature[state->m_signature_pos++];
 
-		state->signature_pos &= 7;	/* safety; shouldn't happen */
+		state->m_signature_pos &= 7;	/* safety; shouldn't happen */
 	}
 }
 
 static WRITE8_HANDLER( signature2_w )
 {
 	gei_state *state = space->machine().driver_data<gei_state>();
-	if (data == 0) state->signature_pos = 0;
+	if (data == 0) state->m_signature_pos = 0;
 	else
 	{
 		static const UINT8 signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
 
-		state->signature_answer = signature[state->signature_pos++];
+		state->m_signature_answer = signature[state->m_signature_pos++];
 
-		state->signature_pos &= 7;	/* safety; shouldn't happen */
+		state->m_signature_pos &= 7;	/* safety; shouldn't happen */
 	}
 }
 

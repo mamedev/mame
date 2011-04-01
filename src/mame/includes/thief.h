@@ -11,12 +11,12 @@ public:
 	thief_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 input_select;
-	UINT8 read_mask;
-	UINT8 write_mask;
-	UINT8 video_control;
-	coprocessor_t coprocessor;
+	UINT8 *m_videoram;
+	UINT8 m_input_select;
+	UINT8 m_read_mask;
+	UINT8 m_write_mask;
+	UINT8 m_video_control;
+	coprocessor_t m_coprocessor;
 };
 
 

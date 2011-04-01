@@ -11,20 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        main_ram;
-//  UINT8 *        spriteram;   // currently this uses buffered_spriteram
-//  UINT8 *        paletteram;  // currently this uses generic palette handling
-	UINT16 spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code		
+	UINT8 *        m_main_ram;
+//  UINT8 *        m_spriteram;   // currently this uses buffered_spriteram
+//  UINT8 *        m_paletteram;  // currently this uses generic palette handling
+	UINT16 m_spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code		
 
 	/* video-related */
-	int            flipscreen;
+	int            m_flipscreen;
 
 	/* misc */
-	int            trio_control_select;
+	int            m_trio_control_select;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

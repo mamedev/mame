@@ -4,19 +4,19 @@ public:
 	tankbust_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int latch;
-	UINT32 timer1;
-	int e0xx_data[8];
-	UINT8 variable_data;
-	UINT8 *txtram;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *txt_tilemap;
-	UINT8 xscroll[2];
-	UINT8 yscroll[2];
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	int m_latch;
+	UINT32 m_timer1;
+	int m_e0xx_data[8];
+	UINT8 m_variable_data;
+	UINT8 *m_txtram;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_txt_tilemap;
+	UINT8 m_xscroll[2];
+	UINT8 m_yscroll[2];
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

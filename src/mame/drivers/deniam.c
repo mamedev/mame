@@ -54,7 +54,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset, (data >> 8) & 0xff);
-		device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -80,10 +80,10 @@ static WRITE16_HANDLER( deniam_irq_ack_w )
 
 static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, spriteram, spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, m_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
@@ -111,10 +111,10 @@ ADDRESS_MAP_END
 /* identical to 16b, but handles sound directly */
 static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, spriteram, spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, m_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
@@ -226,8 +226,8 @@ static void irqhandler( device_t *device, int linestate )
 	deniam_state *state = device->machine().driver_data<deniam_state>();
 
 	/* system 16c doesn't have the sound CPU */
-	if (state->audio_cpu != NULL)
-		device_set_input_line(state->audio_cpu, 0, linestate);
+	if (state->m_audio_cpu != NULL)
+		device_set_input_line(state->m_audio_cpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -241,23 +241,23 @@ static MACHINE_START( deniam )
 {
 	deniam_state *state = machine.driver_data<deniam_state>();
 
-	state->audio_cpu = machine.device("audiocpu");
+	state->m_audio_cpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->display_enable));
-	state->save_item(NAME(state->coinctrl));
+	state->save_item(NAME(state->m_display_enable));
+	state->save_item(NAME(state->m_coinctrl));
 
-	state->save_item(NAME(state->bg_scrollx_offs));
-	state->save_item(NAME(state->bg_scrolly_offs));
-	state->save_item(NAME(state->fg_scrollx_offs));
-	state->save_item(NAME(state->fg_scrolly_offs));
-	state->save_item(NAME(state->bg_scrollx_reg));
-	state->save_item(NAME(state->bg_scrolly_reg));
-	state->save_item(NAME(state->fg_scrollx_reg));
-	state->save_item(NAME(state->fg_scrolly_reg));
-	state->save_item(NAME(state->bg_page_reg));
-	state->save_item(NAME(state->fg_page_reg));
-	state->save_item(NAME(state->bg_page));
-	state->save_item(NAME(state->fg_page));
+	state->save_item(NAME(state->m_bg_scrollx_offs));
+	state->save_item(NAME(state->m_bg_scrolly_offs));
+	state->save_item(NAME(state->m_fg_scrollx_offs));
+	state->save_item(NAME(state->m_fg_scrolly_offs));
+	state->save_item(NAME(state->m_bg_scrollx_reg));
+	state->save_item(NAME(state->m_bg_scrolly_reg));
+	state->save_item(NAME(state->m_fg_scrollx_reg));
+	state->save_item(NAME(state->m_fg_scrolly_reg));
+	state->save_item(NAME(state->m_bg_page_reg));
+	state->save_item(NAME(state->m_fg_page_reg));
+	state->save_item(NAME(state->m_bg_page));
+	state->save_item(NAME(state->m_fg_page));
 }
 
 

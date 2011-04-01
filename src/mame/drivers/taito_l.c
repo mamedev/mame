@@ -88,7 +88,7 @@ static const struct
 static void palette_notifier(running_machine &machine, int addr)
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
-	UINT8 *p = state->palette_ram + (addr & ~1);
+	UINT8 *p = state->m_palette_ram + (addr & ~1);
 	UINT8 byte0 = *p++;
 	UINT8 byte1 = *p;
 
@@ -111,44 +111,44 @@ static void state_register( running_machine &machine )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 
-	state->save_item(NAME(state->irq_adr_table));
-	state->save_item(NAME(state->irq_enable));
-	state->save_item(NAME(state->cur_rambank));
-	state->save_item(NAME(state->cur_rombank));
-	state->save_item(NAME(state->cur_rombank2));
+	state->save_item(NAME(state->m_irq_adr_table));
+	state->save_item(NAME(state->m_irq_enable));
+	state->save_item(NAME(state->m_cur_rambank));
+	state->save_item(NAME(state->m_cur_rombank));
+	state->save_item(NAME(state->m_cur_rombank2));
 
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->trackx));
-	state->save_item(NAME(state->tracky));
-	state->save_item(NAME(state->mux_ctrl));
-	state->save_item(NAME(state->extport));
-	state->save_item(NAME(state->last_irq_level));
-	state->save_item(NAME(state->high));
-	state->save_item(NAME(state->high2));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_trackx));
+	state->save_item(NAME(state->m_tracky));
+	state->save_item(NAME(state->m_mux_ctrl));
+	state->save_item(NAME(state->m_extport));
+	state->save_item(NAME(state->m_last_irq_level));
+	state->save_item(NAME(state->m_high));
+	state->save_item(NAME(state->m_high2));
 
-	state->save_item(NAME(state->mcu_pos));
-	state->save_item(NAME(state->mcu_reply_len));
-	state->save_item(NAME(state->last_data_adr));
-	state->save_item(NAME(state->last_data));
-	state->save_item(NAME(state->cur_bank));
+	state->save_item(NAME(state->m_mcu_pos));
+	state->save_item(NAME(state->m_mcu_reply_len));
+	state->save_item(NAME(state->m_last_data_adr));
+	state->save_item(NAME(state->m_last_data));
+	state->save_item(NAME(state->m_cur_bank));
 
-	state->save_item(NAME(state->bankc));
-	state->save_item(NAME(state->horshoes_gfxbank));
-	state->save_item(NAME(state->cur_ctrl));
-	state->save_item(NAME(state->flipscreen));
+	state->save_item(NAME(state->m_bankc));
+	state->save_item(NAME(state->m_horshoes_gfxbank));
+	state->save_item(NAME(state->m_cur_ctrl));
+	state->save_item(NAME(state->m_flipscreen));
 }
 
 static MACHINE_START( taito_l )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->rambanks));
-	state->save_item(NAME(state->palette_ram));
-	state->save_item(NAME(state->empty_ram));
+	state->save_item(NAME(state->m_rambanks));
+	state->save_item(NAME(state->m_palette_ram));
+	state->save_item(NAME(state->m_empty_ram));
 
 	state_register(machine);
 }
@@ -159,43 +159,43 @@ static void machine_reset(running_machine &machine)
 	int i;
 
 	for (i = 0; i < 3; i++)
-		state->irq_adr_table[i] = 0;
+		state->m_irq_adr_table[i] = 0;
 
-	state->irq_enable = 0;
+	state->m_irq_enable = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->cur_rambank[i] = 0x80;
-		state->current_notifier[i] = palette_notifier;
-		state->current_base[i] = state->palette_ram;
-		memory_set_bankptr(machine, bankname[i], state->current_base[i]);
+		state->m_cur_rambank[i] = 0x80;
+		state->m_current_notifier[i] = palette_notifier;
+		state->m_current_base[i] = state->m_palette_ram;
+		memory_set_bankptr(machine, bankname[i], state->m_current_base[i]);
 	}
 
-	state->cur_rombank = state->cur_rombank2 = 0;
+	state->m_cur_rombank = state->m_cur_rombank2 = 0;
 	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x10000);
 
-	gfx_element_set_source(machine.gfx[2], state->rambanks);
+	gfx_element_set_source(machine.gfx[2], state->m_rambanks);
 
-	state->adpcm_pos = 0;
-	state->adpcm_data = -1;
-	state->trackx = state->tracky = 0;
-	state->mux_ctrl = 0;
-	state->extport = 0;
-	state->last_irq_level = 0;
-	state->high = 0;
-	state->high2 = 0;
+	state->m_adpcm_pos = 0;
+	state->m_adpcm_data = -1;
+	state->m_trackx = state->m_tracky = 0;
+	state->m_mux_ctrl = 0;
+	state->m_extport = 0;
+	state->m_last_irq_level = 0;
+	state->m_high = 0;
+	state->m_high2 = 0;
 
-	state->mcu_reply = puzznic_mcu_reply;
+	state->m_mcu_reply = puzznic_mcu_reply;
 
-	state->mcu_pos = state->mcu_reply_len = 0;
-	state->last_data_adr = state->last_data = 0;
-	state->cur_bank = 1;
+	state->m_mcu_pos = state->m_mcu_reply_len = 0;
+	state->m_last_data_adr = state->m_last_data = 0;
+	state->m_cur_bank = 1;
 
 	/* video related */
-	state->bankc[0] = state->bankc[1] = state->bankc[2] = state->bankc[3] = 0;
-	state->horshoes_gfxbank = 0;
-	state->cur_ctrl = 0;
-	state->flipscreen = 0;
+	state->m_bankc[0] = state->m_bankc[1] = state->m_bankc[2] = state->m_bankc[3] = 0;
+	state->m_horshoes_gfxbank = 0;
+	state->m_cur_ctrl = 0;
+	state->m_flipscreen = 0;
 }
 
 
@@ -203,30 +203,30 @@ static MACHINE_RESET( fhawk )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = NULL;
-	state->porte1_tag = NULL;
-	state->portf0_tag = NULL;
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = NULL;
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = NULL;
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( raimais )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = NULL;
-	state->porte1_tag = NULL;
-	state->portf0_tag = NULL;
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = NULL;
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = NULL;
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( champwr )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = NULL;
-	state->porte1_tag = NULL;
-	state->portf0_tag = NULL;
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = NULL;
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = NULL;
+	state->m_portf1_tag = NULL;
 }
 
 
@@ -234,77 +234,77 @@ static MACHINE_RESET( kurikint )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = NULL;
-	state->porte1_tag = NULL;
-	state->portf0_tag = NULL;
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = NULL;
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = NULL;
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( evilston )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = NULL;
-	state->porte1_tag = NULL;
-	state->portf0_tag = NULL;
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = NULL;
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = NULL;
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( puzznic )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = "DSWA";
-	state->porte1_tag = "DSWB";
-	state->portf0_tag = "IN0";
-	state->portf1_tag = "IN1";
+	state->m_porte0_tag = "DSWA";
+	state->m_porte1_tag = "DSWB";
+	state->m_portf0_tag = "IN0";
+	state->m_portf1_tag = "IN1";
 }
 
 static MACHINE_RESET( plotting )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = "DSWA";
-	state->porte1_tag = "DSWB";
-	state->portf0_tag = "IN0";
-	state->portf1_tag = "IN1";
+	state->m_porte0_tag = "DSWA";
+	state->m_porte1_tag = "DSWB";
+	state->m_portf0_tag = "IN0";
+	state->m_portf1_tag = "IN1";
 }
 
 static MACHINE_RESET( palamed )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = "DSWA";
-	state->porte1_tag = NULL;
-	state->portf0_tag = "DSWB";
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = "DSWA";
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = "DSWB";
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( cachat )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = "DSWA";
-	state->porte1_tag = NULL;
-	state->portf0_tag = "DSWB";
-	state->portf1_tag = NULL;
+	state->m_porte0_tag = "DSWA";
+	state->m_porte1_tag = NULL;
+	state->m_portf0_tag = "DSWB";
+	state->m_portf1_tag = NULL;
 }
 
 static MACHINE_RESET( horshoes )
 {
 	taitol_state *state = machine.driver_data<taitol_state>();
 	machine_reset(machine);
-	state->porte0_tag = "DSWA";
-	state->porte1_tag = "DSWB";
-	state->portf0_tag = "IN0";
-	state->portf1_tag = "IN1";
+	state->m_porte0_tag = "DSWA";
+	state->m_porte1_tag = "DSWB";
+	state->m_portf0_tag = "IN0";
+	state->m_portf1_tag = "IN1";
 }
 
 
 static IRQ_CALLBACK( irq_callback )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return state->irq_adr_table[state->last_irq_level];
+	return state->m_irq_adr_table[state->m_last_irq_level];
 }
 
 static INTERRUPT_GEN( vbl_interrupt )
@@ -318,19 +318,19 @@ static INTERRUPT_GEN( vbl_interrupt )
 
 	// What is really generating interrupts 0 and 1 is still to be found
 
-	if (cpu_getiloops(device) == 1 && (state->irq_enable & 1))
+	if (cpu_getiloops(device) == 1 && (state->m_irq_enable & 1))
 	{
-		state->last_irq_level = 0;
+		state->m_last_irq_level = 0;
 		device_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) == 2 && (state->irq_enable & 2))
+	else if (cpu_getiloops(device) == 2 && (state->m_irq_enable & 2))
 	{
-		state->last_irq_level = 1;
+		state->m_last_irq_level = 1;
 		device_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) == 0 && (state->irq_enable & 4))
+	else if (cpu_getiloops(device) == 0 && (state->m_irq_enable & 4))
 	{
-		state->last_irq_level = 2;
+		state->m_last_irq_level = 2;
 		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
@@ -339,30 +339,30 @@ static WRITE8_HANDLER( irq_adr_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 	//logerror("irq_adr_table[%d] = %02x\n", offset, data);
-	state->irq_adr_table[offset] = data;
+	state->m_irq_adr_table[offset] = data;
 }
 
 static READ8_HANDLER( irq_adr_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->irq_adr_table[offset];
+	return state->m_irq_adr_table[offset];
 }
 
 static WRITE8_HANDLER( irq_enable_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 	//logerror("irq_enable = %02x\n",data);
-	state->irq_enable = data;
+	state->m_irq_enable = data;
 
 	// fix Plotting test mode
-	if ((state->irq_enable & (1 << state->last_irq_level)) == 0)
-		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	if ((state->m_irq_enable & (1 << state->m_last_irq_level)) == 0)
+		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->irq_enable;
+	return state->m_irq_enable;
 }
 
 
@@ -370,17 +370,17 @@ static WRITE8_HANDLER( rombankswitch_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->cur_rombank != data)
+	if (state->m_cur_rombank != data)
 	{
-		if (data > state->high)
+		if (data > state->m_high)
 		{
-			state->high = data;
-			logerror("New rom size : %x\n", (state->high + 1) * 0x2000);
+			state->m_high = data;
+			logerror("New rom size : %x\n", (state->m_high + 1) * 0x2000);
 		}
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
-		state->cur_rombank = data;
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000 + 0x2000 * state->cur_rombank);
+		state->m_cur_rombank = data;
+		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000 + 0x2000 * state->m_cur_rombank);
 	}
 }
 
@@ -390,77 +390,77 @@ static WRITE8_HANDLER( rombank2switch_w )
 
 	data &= 0xf;
 
-	if (state->cur_rombank2 != data)
+	if (state->m_cur_rombank2 != data)
 	{
-		if (data > state->high2)
+		if (data > state->m_high2)
 		{
-			state->high2 = data;
-			logerror("New rom2 size : %x\n", (state->high2 + 1) * 0x4000);
+			state->m_high2 = data;
+			logerror("New rom2 size : %x\n", (state->m_high2 + 1) * 0x4000);
 		}
 
 		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 
-		state->cur_rombank2 = data;
-		memory_set_bankptr(space->machine(), "bank6", space->machine().region("slave")->base() + 0x10000 + 0x4000 * state->cur_rombank2);
+		state->m_cur_rombank2 = data;
+		memory_set_bankptr(space->machine(), "bank6", space->machine().region("slave")->base() + 0x10000 + 0x4000 * state->m_cur_rombank2);
 	}
 }
 
 static READ8_HANDLER( rombankswitch_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->cur_rombank;
+	return state->m_cur_rombank;
 }
 
 static READ8_HANDLER( rombank2switch_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->cur_rombank2;
+	return state->m_cur_rombank2;
 }
 
 static WRITE8_HANDLER( rambankswitch_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->cur_rambank[offset] != data)
+	if (state->m_cur_rambank[offset] != data)
 	{
-		state->cur_rambank[offset] = data;
+		state->m_cur_rambank[offset] = data;
 //logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
-			state->current_notifier[offset] = rambank_modify_notifiers[data].notifier;
-			state->current_base[offset] = state->rambanks + rambank_modify_notifiers[data].offset;
+			state->m_current_notifier[offset] = rambank_modify_notifiers[data].notifier;
+			state->m_current_base[offset] = state->m_rambanks + rambank_modify_notifiers[data].offset;
 		}
 		else if (data == 0x80)
 		{
-			state->current_notifier[offset] = palette_notifier;
-			state->current_base[offset] = state->palette_ram;
+			state->m_current_notifier[offset] = palette_notifier;
+			state->m_current_base[offset] = state->m_palette_ram;
 		}
 		else
 		{
 			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
-			state->current_notifier[offset] = 0;
-			state->current_base[offset] = state->empty_ram;
+			state->m_current_notifier[offset] = 0;
+			state->m_current_base[offset] = state->m_empty_ram;
 		}
-		memory_set_bankptr(space->machine(), bankname[offset], state->current_base[offset]);
+		memory_set_bankptr(space->machine(), bankname[offset], state->m_current_base[offset]);
 	}
 }
 
 static READ8_HANDLER( rambankswitch_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->cur_rambank[offset];
+	return state->m_cur_rambank[offset];
 }
 
 static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->current_base[banknum][offset] != data)
+	if (state->m_current_base[banknum][offset] != data)
 	{
-		state->current_base[banknum][offset] = data;
-		if (state->current_notifier[banknum])
-			state->current_notifier[banknum](space->machine(), offset);
+		state->m_current_base[banknum][offset] = data;
+		if (state->m_current_notifier[banknum])
+			state->m_current_notifier[banknum](space->machine(), offset);
 	}
 }
 
@@ -495,33 +495,33 @@ static WRITE8_HANDLER( control2_w )
 static READ8_DEVICE_HANDLER( portA_r )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return input_port_read(device->machine(), (state->extport == 0) ? state->porte0_tag : state->porte1_tag);
+	return input_port_read(device->machine(), (state->m_extport == 0) ? state->m_porte0_tag : state->m_porte1_tag);
 }
 
 static READ8_DEVICE_HANDLER( portB_r )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return input_port_read(device->machine(), (state->extport == 0) ? state->portf0_tag : state->portf1_tag);
+	return input_port_read(device->machine(), (state->m_extport == 0) ? state->m_portf0_tag : state->m_portf1_tag);
 }
 
 static READ8_DEVICE_HANDLER( extport_select_and_ym2203_r )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	state->extport = (offset >> 1) & 1;
+	state->m_extport = (offset >> 1) & 1;
 	return ym2203_r(device, offset & 1);
 }
 
 static WRITE8_HANDLER( mcu_data_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->last_data = data;
-	state->last_data_adr = cpu_get_pc(&space->device());
+	state->m_last_data = data;
+	state->m_last_data_adr = cpu_get_pc(&space->device());
 //  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(&space->device()));
 	switch (data)
 	{
 	case 0x43:
-		state->mcu_pos = 0;
-		state->mcu_reply_len = ARRAY_LENGTH(puzznic_mcu_reply);
+		state->m_mcu_pos = 0;
+		state->m_mcu_reply_len = ARRAY_LENGTH(puzznic_mcu_reply);
 		break;
 	}
 }
@@ -536,10 +536,10 @@ static READ8_HANDLER( mcu_data_r )
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 //  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(&space->device()), last_data, last_data_adr);
-	if (state->mcu_pos == state->mcu_reply_len)
+	if (state->m_mcu_pos == state->m_mcu_reply_len)
 		return 0;
 
-	return state->mcu_reply[state->mcu_pos++];
+	return state->m_mcu_reply[state->m_mcu_pos++];
 }
 
 static READ8_HANDLER( mcu_control_r )
@@ -558,20 +558,20 @@ static WRITE8_HANDLER( sound_w )
 static READ8_HANDLER( shared_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->shared_ram[offset];
+	return state->m_shared_ram[offset];
 }
 
 static WRITE8_HANDLER( shared_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->shared_ram[offset] = data;
+	state->m_shared_ram[offset] = data;
 }
 
 static READ8_HANDLER( mux_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	switch (state->mux_ctrl)
+	switch (state->m_mux_ctrl)
 	{
 	case 0:
 		return input_port_read(space->machine(), "DSWA");
@@ -584,7 +584,7 @@ static READ8_HANDLER( mux_r )
 	case 7:
 		return input_port_read(space->machine(), "IN2");
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", state->mux_ctrl, cpu_get_pc(&space->device()));
+		logerror("Mux read from unknown port %d (%04x)\n", state->m_mux_ctrl, cpu_get_pc(&space->device()));
 		return 0xff;
 	}
 }
@@ -593,20 +593,20 @@ static WRITE8_HANDLER( mux_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	switch (state->mux_ctrl)
+	switch (state->m_mux_ctrl)
 	{
 	case 4:
 		control2_w(space, 0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", state->mux_ctrl, data, cpu_get_pc(&space->device()));
+		logerror("Mux write to unknown port %d, %02x (%04x)\n", state->m_mux_ctrl, data, cpu_get_pc(&space->device()));
 	}
 }
 
 static WRITE8_HANDLER( mux_ctrl_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->mux_ctrl = data;
+	state->m_mux_ctrl = data;
 }
 
 
@@ -614,29 +614,29 @@ static void champwr_msm5205_vck( device_t *device )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
 
-	if (state->adpcm_data != -1)
+	if (state->m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->adpcm_data & 0x0f);
-		state->adpcm_data = -1;
+		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
+		state->m_adpcm_data = -1;
 	}
 	else
 	{
-		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos];
-		state->adpcm_pos = (state->adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(device, state->adpcm_data >> 4);
+		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
+		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
 }
 
 static WRITE8_HANDLER( champwr_msm5205_lo_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->adpcm_pos = (state->adpcm_pos & 0xff00ff) | (data << 8);
+	state->m_adpcm_pos = (state->m_adpcm_pos & 0xff00ff) | (data << 8);
 }
 
 static WRITE8_HANDLER( champwr_msm5205_hi_w )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->adpcm_pos = ((state->adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
+	state->m_adpcm_pos = ((state->m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
 static WRITE8_DEVICE_HANDLER( champwr_msm5205_start_w )
@@ -649,7 +649,7 @@ static WRITE8_DEVICE_HANDLER( champwr_msm5205_stop_w )
 	taitol_state *state = device->machine().driver_data<taitol_state>();
 
 	msm5205_reset_w(device, 1);
-	state->adpcm_pos &= 0x1ff00;
+	state->m_adpcm_pos &= 0x1ff00;
 }
 
 static WRITE8_DEVICE_HANDLER( champwr_msm5205_volume_w )
@@ -664,7 +664,7 @@ static READ8_HANDLER( horshoes_tracky_reset_r )
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 	/* reset the trackball counter */
-	state->tracky = input_port_read(space->machine(), "AN0");
+	state->m_tracky = input_port_read(space->machine(), "AN0");
 	return 0;
 }
 
@@ -673,32 +673,32 @@ static READ8_HANDLER( horshoes_trackx_reset_r )
 	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 	/* reset the trackball counter */
-	state->trackx = input_port_read(space->machine(), "AN1");
+	state->m_trackx = input_port_read(space->machine(), "AN1");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_tracky_lo_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN0") - state->tracky) & 0xff;
+	return (input_port_read(space->machine(), "AN0") - state->m_tracky) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_tracky_hi_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN0") - state->tracky) >> 8;
+	return (input_port_read(space->machine(), "AN0") - state->m_tracky) >> 8;
 }
 
 static READ8_HANDLER( horshoes_trackx_lo_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN1") - state->trackx) & 0xff;
+	return (input_port_read(space->machine(), "AN1") - state->m_trackx) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_trackx_hi_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN1") - state->trackx) >> 8;
+	return (input_port_read(space->machine(), "AN1") - state->m_trackx) >> 8;
 }
 
 
@@ -724,7 +724,7 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -756,7 +756,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
@@ -797,7 +797,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8 )
@@ -834,7 +834,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -929,14 +929,14 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER (evilston_snd_w)
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->shared_ram[0x7fe] = data & 0x7f;
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->m_shared_ram[0x7fe] = data & 0x7f;
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, shared_ram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP	//watchdog ?
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
@@ -1941,22 +1941,22 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( portA_w )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
 
-	if (state->cur_bank != (data & 0x03))
+	if (state->m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
 		UINT8 *RAM = device->machine().region("audiocpu")->base();
 
-		state->cur_bank = data & 0x03;
-		bankaddress = 0x10000 + (state->cur_bank - 1) * 0x4000;
+		state->m_cur_bank = data & 0x03;
+		bankaddress = 0x10000 + (state->m_cur_bank - 1) * 0x4000;
 		memory_set_bankptr(device->machine(), "bank7", &RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->cur_bank, cpu_get_pc(&space->device()) );
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", state->m_cur_bank, cpu_get_pc(&space->device()) );
 	}
 }
 

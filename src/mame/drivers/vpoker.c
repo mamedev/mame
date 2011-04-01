@@ -118,21 +118,21 @@ public:
 	vpoker_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	UINT8 blit_ram[8];
+	UINT8 *m_videoram;
+	UINT8 m_blit_ram[8];
 };
 
 
 static VIDEO_START( vpoker )
 {
 	vpoker_state *state = machine.driver_data<vpoker_state>();
-	state->videoram = auto_alloc_array(machine, UINT8, 0x200);
+	state->m_videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 static SCREEN_UPDATE( vpoker )
 {
 	vpoker_state *state = screen->machine().driver_data<vpoker_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	const gfx_element *gfx = screen->machine().gfx[0];
 	int count = 0x0000;
 
@@ -164,18 +164,18 @@ static READ8_HANDLER( blitter_r )
 static WRITE8_HANDLER( blitter_w )
 {
 	vpoker_state *state = space->machine().driver_data<vpoker_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 
-	state->blit_ram[offset] = data;
+	state->m_blit_ram[offset] = data;
 
 	if(offset == 2)
 	{
 		int blit_offs;
 
-		blit_offs = (state->blit_ram[1] & 0x01)<<8|(state->blit_ram[2] & 0xff);
+		blit_offs = (state->m_blit_ram[1] & 0x01)<<8|(state->m_blit_ram[2] & 0xff);
 
-		videoram[blit_offs] = state->blit_ram[0];
-//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",state->blit_ram[0],state->blit_ram[1],state->blit_ram[2],state->blit_ram[3],state->blit_ram[4],state->blit_ram[5],state->blit_ram[6],state->blit_ram[7]);
+		videoram[blit_offs] = state->m_blit_ram[0];
+//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",state->m_blit_ram[0],state->m_blit_ram[1],state->m_blit_ram[2],state->m_blit_ram[3],state->m_blit_ram[4],state->m_blit_ram[5],state->m_blit_ram[6],state->m_blit_ram[7]);
 	}
 }
 

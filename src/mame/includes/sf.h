@@ -11,19 +11,22 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    videoram;
-	UINT16 *    objectram;
-//  UINT16 *    paletteram;    // currently this uses generic palette handling
-	size_t      videoram_size;
+	UINT16 *    m_videoram;
+	UINT16 *    m_objectram;
+//  UINT16 *    m_paletteram;    // currently this uses generic palette handling
+	size_t      m_videoram_size;
 
 	/* video-related */
-	tilemap_t     *bg_tilemap, *fg_tilemap, *tx_tilemap;
-	int         sf_active;
-	UINT16      bgscroll, fgscroll;
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_tx_tilemap;
+	int         m_sf_active;
+	UINT16      m_bgscroll;
+	UINT16      m_fgscroll;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 

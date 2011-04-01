@@ -12,14 +12,14 @@ VIDEO_START( skyraid )
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
 
-	state->helper = auto_bitmap_alloc(machine, 128, 240, machine.primary_screen->format());
+	state->m_helper = auto_bitmap_alloc(machine, 128, 240, machine.primary_screen->format());
 }
 
 
 static void draw_text(running_machine &machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	skyraid_state *state = machine.driver_data<skyraid_state>();
-	const UINT8* p = state->alpha_num_ram;
+	const UINT8* p = state->m_alpha_num_ram;
 
 	int i;
 
@@ -46,7 +46,7 @@ static void draw_terrain(running_machine &machine, bitmap_t* bitmap, const recta
 
 	for (y = 0; y < bitmap->height; y++)
 	{
-		int offset = (16 * state->scroll + 16 * ((y + 1) / 2)) & 0x7FF;
+		int offset = (16 * state->m_scroll + 16 * ((y + 1) / 2)) & 0x7FF;
 
 		x = 0;
 
@@ -79,10 +79,10 @@ static void draw_sprites(running_machine &machine, bitmap_t* bitmap, const recta
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = state->obj_ram[8 + 2 * i + 0] & 15;
-		int flag = state->obj_ram[8 + 2 * i + 1] & 15;
-		int vert = state->pos_ram[8 + 2 * i + 0];
-		int horz = state->pos_ram[8 + 2 * i + 1];
+		int code = state->m_obj_ram[8 + 2 * i + 0] & 15;
+		int flag = state->m_obj_ram[8 + 2 * i + 1] & 15;
+		int vert = state->m_pos_ram[8 + 2 * i + 0];
+		int horz = state->m_pos_ram[8 + 2 * i + 1];
 
 		vert -= 31;
 
@@ -103,9 +103,9 @@ static void draw_missiles(running_machine &machine, bitmap_t* bitmap, const rect
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = state->obj_ram[2 * i + 0] & 15;
-		int vert = state->pos_ram[2 * i + 0];
-		int horz = state->pos_ram[2 * i + 1];
+		int code = state->m_obj_ram[2 * i + 0] & 15;
+		int vert = state->m_pos_ram[2 * i + 0];
+		int horz = state->m_pos_ram[2 * i + 1];
 
 		vert -= 15;
 		horz -= 31;
@@ -144,10 +144,10 @@ SCREEN_UPDATE( skyraid )
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_terrain(screen->machine(), state->helper, NULL);
-	draw_sprites(screen->machine(), state->helper, NULL);
-	draw_missiles(screen->machine(), state->helper, NULL);
-	draw_trapezoid(screen->machine(), bitmap, state->helper);
+	draw_terrain(screen->machine(), state->m_helper, NULL);
+	draw_sprites(screen->machine(), state->m_helper, NULL);
+	draw_missiles(screen->machine(), state->m_helper, NULL);
+	draw_trapezoid(screen->machine(), bitmap, state->m_helper);
 	draw_text(screen->machine(), bitmap, cliprect);
 	return 0;
 }

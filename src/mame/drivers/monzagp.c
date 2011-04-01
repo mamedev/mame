@@ -42,11 +42,11 @@ public:
 	monzagp_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int coordx;
-	int coordy;
-	UINT8 *vram;
-	int screenw;
-	int bank;
+	int m_coordx;
+	int m_coordy;
+	UINT8 *m_vram;
+	int m_screenw;
+	int m_bank;
 };
 
 
@@ -58,8 +58,8 @@ static PALETTE_INIT(monzagp)
 static VIDEO_START(monzagp)
 {
 	monzagp_state *state = machine.driver_data<monzagp_state>();
-	state->screenw = 80;
-	state->vram = auto_alloc_array(machine, UINT8, 0x10000);
+	state->m_screenw = 80;
+	state->m_vram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 static SCREEN_UPDATE(monzagp)
@@ -68,27 +68,27 @@ static SCREEN_UPDATE(monzagp)
 	int x,y;
 
 	if(input_code_pressed_once(screen->machine(),KEYCODE_Z))
-		state->bank--;
+		state->m_bank--;
 
 	if(input_code_pressed_once(screen->machine(),KEYCODE_X))
-		state->bank++;
+		state->m_bank++;
 
 	if(input_code_pressed_once(screen->machine(),KEYCODE_Q))
 	{
-		state->screenw--;
-		printf("%x\n",state->screenw);
+		state->m_screenw--;
+		printf("%x\n",state->m_screenw);
 	}
 
 	if(input_code_pressed_once(screen->machine(),KEYCODE_W))
 	{
-		state->screenw++;
-		printf("%x\n",state->screenw);
+		state->m_screenw++;
+		printf("%x\n",state->m_screenw);
 	}
 
 	if(input_code_pressed_once(screen->machine(),KEYCODE_A))
 	{
 		FILE * p=fopen("vram.bin","wb");
-		fwrite(&state->vram[0],1,0x10000,p);
+		fwrite(&state->m_vram[0],1,0x10000,p);
 		fclose(p);
 	}
 
@@ -97,9 +97,9 @@ static SCREEN_UPDATE(monzagp)
 	{
 		for(x=0;x<256;x++)
 		{
-			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[state->bank&1],
-				state->vram[y*state->screenw+x],
-				//(state->vram[y*state->screenw+x]&0x3f)+(state->bank>>1)*64,
+			drawgfx_transpen(bitmap,cliprect,screen->machine().gfx[state->m_bank&1],
+				state->m_vram[y*state->m_screenw+x],
+				//(state->m_vram[y*state->m_screenw+x]&0x3f)+(state->m_bank>>1)*64,
 				0,
 				0, 0,
 				x*8,y*8,
@@ -123,14 +123,14 @@ static READ8_HANDLER(rng_r)
 static WRITE8_HANDLER(port_w)
 {
 	monzagp_state *state = space->machine().driver_data<monzagp_state>();
-	state->coordx=offset;//-0xc0;
-	//state->vram[state->coordy*state->screenw+state->coordx]=data;
+	state->m_coordx=offset;//-0xc0;
+	//state->m_vram[state->m_coordy*state->m_screenw+state->m_coordx]=data;
 	//if(output==0xfe)
 	{
 	//  if(data>='A' && data <='Z')
-	//      printf("%.2x %.2x %c %c\n",state->coordy, offset,data, znaki[data-'A']);
-		//state->vram[state->coordy*state->screenw+state->coordx]=data;
-		state->vram[(state->coordx*256+state->coordy)&0x7ff]=data;
+	//      printf("%.2x %.2x %c %c\n",state->m_coordy, offset,data, znaki[data-'A']);
+		//state->m_vram[state->m_coordy*state->m_screenw+state->m_coordx]=data;
+		state->m_vram[(state->m_coordx*256+state->m_coordy)&0x7ff]=data;
 	}
 }
 /*
@@ -186,7 +186,7 @@ static WRITE8_HANDLER(port2_w)
 {
 	monzagp_state *state = space->machine().driver_data<monzagp_state>();
 //  printf("P2 %x = %x\n",cpu_get_pc(&space->device()),data);
-	state->coordy=data;
+	state->m_coordy=data;
 }
 
 #if 0

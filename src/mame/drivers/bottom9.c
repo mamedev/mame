@@ -25,7 +25,7 @@ static INTERRUPT_GEN( bottom9_interrupt )
 {
 	bottom9_state *state = device->machine().driver_data<bottom9_state>();
 
-	if (k052109_is_irq_enabled(state->k052109))
+	if (k052109_is_irq_enabled(state->m_k052109))
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -33,17 +33,17 @@ static READ8_HANDLER( k052109_051960_r )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
-	if (k052109_get_rmrd_line(state->k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->k051960, offset - 0x3800);
+			return k051937_r(state->m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->k052109, offset);
+			return k052109_r(state->m_k052109, offset);
 		else
-			return k051960_r(state->k051960, offset - 0x3c00);
+			return k051960_r(state->m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->k052109, offset);
+		return k052109_r(state->m_k052109, offset);
 }
 
 static WRITE8_HANDLER( k052109_051960_w )
@@ -51,25 +51,25 @@ static WRITE8_HANDLER( k052109_051960_w )
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->k051960, offset - 0x3800, data);
+		k051937_w(state->m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->k052109, offset, data);
+		k052109_w(state->m_k052109, offset, data);
 	else
-		k051960_w(state->k051960, offset - 0x3c00, data);
+		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
 static READ8_HANDLER( bottom9_bankedram1_r )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
-	if (state->k052109_selected)
+	if (state->m_k052109_selected)
 		return k052109_051960_r(space, offset);
 	else
 	{
-		if (state->zoomreadroms)
-			return k051316_rom_r(state->k051316, offset);
+		if (state->m_zoomreadroms)
+			return k051316_rom_r(state->m_k051316, offset);
 		else
-			return k051316_r(state->k051316, offset);
+			return k051316_r(state->m_k051316, offset);
 	}
 }
 
@@ -77,17 +77,17 @@ static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
-	if (state->k052109_selected)
+	if (state->m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		k051316_w(state->k051316, offset, data);
+		k051316_w(state->m_k051316, offset, data);
 }
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
-	if (state->k052109_selected)
+	if (state->m_k052109_selected)
 		return k052109_051960_r(space, offset + 0x2000);
 	else
 		return space->machine().generic.paletteram.u8[offset];
@@ -97,7 +97,7 @@ static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
 
-	if (state->k052109_selected)
+	if (state->m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
@@ -129,35 +129,35 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 	coin_counter_w(space->machine(), 1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(state->m_k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
-	state->video_enable = ~data & 0x08;
+	state->m_video_enable = ~data & 0x08;
 
 	/* bit 4 = enable 051316 ROM reading */
-	state->zoomreadroms = data & 0x10;
+	state->m_zoomreadroms = data & 0x10;
 
 	/* bit 5 = RAM bank */
-	state->k052109_selected = data & 0x20;
+	state->m_k052109_selected = data & 0x20;
 }
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
-	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
 	bottom9_state *state = device->machine().driver_data<bottom9_state>();
-	if (state->nmienable)
+	if (state->m_nmienable)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	bottom9_state *state = space->machine().driver_data<bottom9_state>();
-	state->nmienable = data;
+	state->m_nmienable = data;
 }
 
 static WRITE8_HANDLER( sound_bank_w )
@@ -167,11 +167,11 @@ static WRITE8_HANDLER( sound_bank_w )
 
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(state->k007232_1, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
 
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank(state->k007232_2, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
 }
 
 
@@ -337,28 +337,28 @@ static MACHINE_START( bottom9 )
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k052109 = machine.device("k052109");
-	state->k051960 = machine.device("k051960");
-	state->k051316 = machine.device("k051316");
-	state->k007232_1 = machine.device("k007232_1");
-	state->k007232_2 = machine.device("k007232_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k052109 = machine.device("k052109");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k051316 = machine.device("k051316");
+	state->m_k007232_1 = machine.device("k007232_1");
+	state->m_k007232_2 = machine.device("k007232_2");
 
-	state->save_item(NAME(state->video_enable));
-	state->save_item(NAME(state->zoomreadroms));
-	state->save_item(NAME(state->k052109_selected));
-	state->save_item(NAME(state->nmienable));
+	state->save_item(NAME(state->m_video_enable));
+	state->save_item(NAME(state->m_zoomreadroms));
+	state->save_item(NAME(state->m_k052109_selected));
+	state->save_item(NAME(state->m_nmienable));
 }
 
 static MACHINE_RESET( bottom9 )
 {
 	bottom9_state *state = machine.driver_data<bottom9_state>();
 
-	state->video_enable = 0;
-	state->zoomreadroms = 0;
-	state->k052109_selected = 0;
-	state->nmienable = 0;
+	state->m_video_enable = 0;
+	state->m_zoomreadroms = 0;
+	state->m_k052109_selected = 0;
+	state->m_nmienable = 0;
 }
 
 static MACHINE_CONFIG_START( bottom9, bottom9_state )

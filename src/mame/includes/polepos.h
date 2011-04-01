@@ -14,24 +14,24 @@ public:
 	polepos_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 steer_last;
-	UINT8 steer_delta;
-	INT16 steer_accum;
-	INT16 last_result;
-	INT8 last_signed;
-	UINT8 last_unsigned;
-	int adc_input;
-	int auto_start_mask;
-	UINT16 *view16_memory;
-	UINT16 *road16_memory;
-	UINT16 *alpha16_memory;
-	UINT16 *sprite16_memory;
-	UINT16 vertical_position_modifier[256];
-	UINT16 road16_vscroll;
-	tilemap_t *bg_tilemap;
-	tilemap_t *tx_tilemap;
-	int chacl;
-	UINT16 scroll;
+	UINT8 m_steer_last;
+	UINT8 m_steer_delta;
+	INT16 m_steer_accum;
+	INT16 m_last_result;
+	INT8 m_last_signed;
+	UINT8 m_last_unsigned;
+	int m_adc_input;
+	int m_auto_start_mask;
+	UINT16 *m_view16_memory;
+	UINT16 *m_road16_memory;
+	UINT16 *m_alpha16_memory;
+	UINT16 *m_sprite16_memory;
+	UINT16 m_vertical_position_modifier[256];
+	UINT16 m_road16_vscroll;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	int m_chacl;
+	UINT16 m_scroll;
 };
 
 

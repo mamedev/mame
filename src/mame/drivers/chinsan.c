@@ -54,13 +54,14 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  video;
+	UINT8 *  m_video;
 
 	/* misc */
-	UINT8    port_select;
-	UINT32   adpcm_pos;
-	UINT8    adpcm_idle, adpcm_data;
-	UINT8    trigger;
+	UINT8    m_port_select;
+	UINT32   m_adpcm_pos;
+	UINT8    m_adpcm_idle;
+	UINT8	 m_adpcm_data;
+	UINT8    m_trigger;
 };
 
 
@@ -93,8 +94,8 @@ static SCREEN_UPDATE( chinsan )
 		for (x = 0; x < 64; x++)
 		{
 			int tileno, colour;
-			tileno = state->video[count] | (state->video[count + 0x800] << 8);
-			colour = state->video[count + 0x1000] >> 3;
+			tileno = state->m_video[count] | (state->m_video[count + 0x800] << 8);
+			colour = state->m_video[count + 0x1000] >> 3;
 			drawgfx_opaque(bitmap,cliprect,screen->machine().gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
@@ -144,7 +145,7 @@ static WRITE8_HANDLER( chinsan_port00_w )
 {
 	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	state->port_select = data;
+	state->m_port_select = data;
 
 	if (
 	   (data != 0x40) &&
@@ -164,7 +165,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
-	switch (state->port_select)
+	switch (state->m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
@@ -187,7 +188,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 			return input_port_read(space->machine(), "MAHJONG_P2_6");
 	}
 
-	printf("chinsan_input_port_0_r unk_r %02x\n", state->port_select);
+	printf("chinsan_input_port_0_r unk_r %02x\n", state->m_port_select);
 	return space->machine().rand();
 }
 
@@ -195,7 +196,7 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 {
 	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	switch (state->port_select)
+	switch (state->m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
@@ -218,15 +219,15 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 			return input_port_read(space->machine(), "MAHJONG_P1_6");
 	}
 
-	printf("chinsan_input_port_1_r unk_r %02x\n", state->port_select);
+	printf("chinsan_input_port_1_r unk_r %02x\n", state->m_port_select);
 	return space->machine().rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
 {
 	chinsan_state *state = device->machine().driver_data<chinsan_state>();
-	state->adpcm_pos = (data & 0xff) * 0x100;
-	state->adpcm_idle = 0;
+	state->m_adpcm_pos = (data & 0xff) * 0x100;
+	state->m_adpcm_idle = 0;
 	msm5205_reset_w(device, 0);
 }
 
@@ -240,7 +241,7 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, video)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, m_video)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8 )
@@ -530,24 +531,24 @@ static void chin_adpcm_int( device_t *device )
 {
 	chinsan_state *state = device->machine().driver_data<chinsan_state>();
 
-	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
+	if (state->m_adpcm_pos >= 0x10000 || state->m_adpcm_idle)
 	{
-		//state->adpcm_idle = 1;
+		//state->m_adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
-		state->trigger = 0;
+		state->m_trigger = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("adpcm")->base();
 
-		state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(device, state->adpcm_data & 0xf);
-		state->trigger ^= 1;
-		if(state->trigger == 0)
+		state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(device, state->m_adpcm_data & 0xf);
+		state->m_trigger ^= 1;
+		if(state->m_trigger == 0)
 		{
-			state->adpcm_pos++;
-			if ((ROM[state->adpcm_pos] & 0xff) == 0x70)
-				state->adpcm_idle = 1;
+			state->m_adpcm_pos++;
+			if ((ROM[state->m_adpcm_pos] & 0xff) == 0x70)
+				state->m_adpcm_idle = 1;
 		}
 	}
 }
@@ -570,22 +571,22 @@ static MACHINE_START( chinsan )
 
 	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
-	state->save_item(NAME(state->adpcm_idle));
-	state->save_item(NAME(state->port_select));
-	state->save_item(NAME(state->adpcm_pos));
-	state->save_item(NAME(state->adpcm_data));
-	state->save_item(NAME(state->trigger));
+	state->save_item(NAME(state->m_adpcm_idle));
+	state->save_item(NAME(state->m_port_select));
+	state->save_item(NAME(state->m_adpcm_pos));
+	state->save_item(NAME(state->m_adpcm_data));
+	state->save_item(NAME(state->m_trigger));
 }
 
 static MACHINE_RESET( chinsan )
 {
 	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	state->adpcm_idle = 1;
-	state->port_select = 0;
-	state->adpcm_pos = 0;
-	state->adpcm_data = 0;
-	state->trigger = 0;
+	state->m_adpcm_idle = 1;
+	state->m_port_select = 0;
+	state->m_adpcm_pos = 0;
+	state->m_adpcm_data = 0;
+	state->m_trigger = 0;
 }
 
 

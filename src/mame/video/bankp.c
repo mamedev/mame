@@ -84,39 +84,39 @@ WRITE8_HANDLER( bankp_scroll_w )
 {
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->scroll_x = data;
+	state->m_scroll_x = data;
 }
 
 WRITE8_HANDLER( bankp_videoram_w )
 {
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bankp_colorram_w )
 {
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bankp_videoram2_w )
 {
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bankp_colorram2_w )
 {
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->colorram2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_colorram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bankp_out_w )
@@ -124,7 +124,7 @@ WRITE8_HANDLER( bankp_out_w )
 	bankp_state *state = space->machine().driver_data<bankp_state>();
 	/* bits 0-1 are playfield priority */
 	/* TODO: understand how this works */
-	state->priority = data & 0x03;
+	state->m_priority = data & 0x03;
 
 	/* bits 2-3 unknown (2 is used) */
 
@@ -140,9 +140,9 @@ WRITE8_HANDLER( bankp_out_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bankp_state *state = machine.driver_data<bankp_state>();
-	int code = state->videoram2[tile_index] + 256 * (state->colorram2[tile_index] & 0x07);
-	int color = state->colorram2[tile_index] >> 4;
-	int flags = (state->colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
+	int code = state->m_videoram2[tile_index] + 256 * (state->m_colorram2[tile_index] & 0x07);
+	int color = state->m_colorram2[tile_index] >> 4;
+	int flags = (state->m_colorram2[tile_index] & 0x08) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
 	tileinfo->group = color;
@@ -151,9 +151,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	bankp_state *state = machine.driver_data<bankp_state>();
-	int code = state->videoram[tile_index] + 256 * ((state->colorram[tile_index] & 3) >> 0);
-	int color = state->colorram[tile_index] >> 3;
-	int flags = (state->colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
+	int code = state->m_videoram[tile_index] + 256 * ((state->m_colorram[tile_index] & 3) >> 0);
+	int color = state->m_colorram[tile_index] >> 3;
+	int flags = (state->m_colorram[tile_index] & 0x04) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(0, code, color, flags);
 	tileinfo->group = color;
@@ -163,14 +163,14 @@ VIDEO_START( bankp )
 {
 	bankp_state *state = machine.driver_data<bankp_state>();
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(machine.colortable, state->bg_tilemap, machine.gfx[1], 0);
-	colortable_configure_tilemap_groups(machine.colortable, state->fg_tilemap, machine.gfx[0], 0);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_bg_tilemap, machine.gfx[1], 0);
+	colortable_configure_tilemap_groups(machine.colortable, state->m_fg_tilemap, machine.gfx[0], 0);
 
-	state->save_item(NAME(state->scroll_x));
-	state->save_item(NAME(state->priority));
+	state->save_item(NAME(state->m_scroll_x));
+	state->save_item(NAME(state->m_priority));
 }
 
 SCREEN_UPDATE( bankp )
@@ -179,34 +179,34 @@ SCREEN_UPDATE( bankp )
 
 	if (flip_screen_get(screen->machine()))
 	{
-		tilemap_set_scrollx(state->fg_tilemap, 0, -state->scroll_x);
-		tilemap_set_scrollx(state->bg_tilemap, 0, 0);
+		tilemap_set_scrollx(state->m_fg_tilemap, 0, -state->m_scroll_x);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
 	}
 	else
 	{
-		tilemap_set_scrollx(state->fg_tilemap, 0, state->scroll_x);
-		tilemap_set_scrollx(state->bg_tilemap, 0, 0);
+		tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_scroll_x);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, 0);
 	}
 
 
 	// only one bit matters?
-	switch (state->priority)
+	switch (state->m_priority)
 	{
 	case 0: // combat hawk uses this
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 		break;
 	case 1:
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 		break;
 	case 2:
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 		break;
 	case 3:
-		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_OPAQUE, 0); // just a guess
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, TILEMAP_DRAW_OPAQUE, 0); // just a guess
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 		break;
 	}
 	return 0;

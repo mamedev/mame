@@ -406,13 +406,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 static READ16_HANDLER( sharedram_r )
 {
 	wgp_state *state = space->machine().driver_data<wgp_state>();
-	return state->sharedram[offset];
+	return state->m_sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
 	wgp_state *state = space->machine().driver_data<wgp_state>();
-	COMBINE_DATA(&state->sharedram[offset]);
+	COMBINE_DATA(&state->m_sharedram[offset]);
 }
 
 static void parse_control(running_machine &machine)
@@ -421,7 +421,7 @@ static void parse_control(running_machine &machine)
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
 }
@@ -432,7 +432,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;	/* for Wgp */
-	state->cpua_ctrl = data;
+	state->m_cpua_ctrl = data;
 
 	parse_control(space->machine());
 
@@ -450,14 +450,14 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 #endif
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -465,7 +465,7 @@ static TIMER_CALLBACK( wgp_interrupt6 )
 static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	device_set_input_line(state->subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -518,13 +518,13 @@ static WRITE16_HANDLER( rotate_port_w )
 		{
 //logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",cpu_get_pc(&space->device()),port_sel,data);
 
-			state->rotate_ctrl[state->port_sel] = data;
+			state->m_rotate_ctrl[state->m_port_sel] = data;
 			return;
 		}
 
 		case 0x01:
 		{
-			state->port_sel = data & 0x7;
+			state->m_port_sel = data & 0x7;
 		}
 	}
 }
@@ -612,13 +612,13 @@ static WRITE16_HANDLER( wgp_adinput_w )
 static void reset_sound_region( running_machine &machine )	/* assumes Z80 sandwiched between the 68Ks */
 {
 	wgp_state *state = machine.driver_data<wgp_state>();
-	memory_set_bank(machine, "bank10", state->banknum);
+	memory_set_bank(machine, "bank10", state->m_banknum);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	wgp_state *state = space->machine().driver_data<wgp_state>();
-	state->banknum = data & 7;
+	state->m_banknum = data & 7;
 	reset_sound_region(space->machine());
 }
 
@@ -627,9 +627,9 @@ static WRITE16_HANDLER( wgp_sound_w )
 	wgp_state *state = space->machine().driver_data<wgp_state>();
 
 	if (offset == 0)
-		tc0140syt_port_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
 }
 
 static READ16_HANDLER( wgp_sound_r )
@@ -637,7 +637,7 @@ static READ16_HANDLER( wgp_sound_r )
 	wgp_state *state = space->machine().driver_data<wgp_state>();
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(state->tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff));
 	else
 		return 0;
 }
@@ -650,18 +650,18 @@ static READ16_HANDLER( wgp_sound_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main CPUA ram */
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, sharedram, sharedram_size)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, m_sharedram, m_sharedram_size)
 	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)			/* tilemaps */
 	AM_RANGE(0x320000, 0x32000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, spritemap, spritemap_size)	/* sprite tilemaps */
-	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, spriteram, spriteram_size)	/* sprite ram */
+	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, m_spritemap, m_spritemap_size)	/* sprite tilemaps */
+	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITENOP	/* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
 	AM_RANGE(0x500000, 0x501fff) AM_RAM					/* unknown/unused */
-	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r, wgp_pivram_word_w) AM_BASE_MEMBER(wgp_state, pivram) /* piv tilemaps */
-	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r, wgp_piv_ctrl_word_w) AM_BASE_MEMBER(wgp_state, piv_ctrlram)
+	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r, wgp_pivram_word_w) AM_BASE_MEMBER(wgp_state, m_pivram) /* piv tilemaps */
+	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r, wgp_piv_ctrl_word_w) AM_BASE_MEMBER(wgp_state, m_piv_ctrlram)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)	/* rotation control ? */
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -906,7 +906,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )	// assumes Z80 sandwiched between 68Ks
 {
 	wgp_state *state = device->machine().driver_data<wgp_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -934,19 +934,19 @@ static MACHINE_RESET( wgp )
 	wgp_state *state = machine.driver_data<wgp_state>();
 	int i;
 
-	state->banknum = 0;
-	state->cpua_ctrl = 0xff;
-	state->port_sel = 0;
-	state->piv_ctrl_reg = 0;
+	state->m_banknum = 0;
+	state->m_cpua_ctrl = 0xff;
+	state->m_port_sel = 0;
+	state->m_piv_ctrl_reg = 0;
 
 	for (i = 0; i < 3; i++)
 	{
-		state->piv_zoom[i] = 0;
-		state->piv_scrollx[i] = 0;
-		state->piv_scrolly[i] = 0;
+		state->m_piv_zoom[i] = 0;
+		state->m_piv_scrollx[i] = 0;
+		state->m_piv_scrolly[i] = 0;
 	}
 
-	memset(state->rotate_ctrl, 0, 8);
+	memset(state->m_rotate_ctrl, 0, 8);
 }
 
 static MACHINE_START( wgp )
@@ -955,15 +955,15 @@ static MACHINE_START( wgp )
 
 	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->subcpu = machine.device("sub");
-	state->tc0140syt = machine.device("tc0140syt");
-	state->tc0100scn = machine.device("tc0100scn");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_tc0140syt = machine.device("tc0140syt");
+	state->m_tc0100scn = machine.device("tc0100scn");
 
-	state->save_item(NAME(state->cpua_ctrl));
-	state->save_item(NAME(state->banknum));
-	state->save_item(NAME(state->port_sel));
+	state->save_item(NAME(state->m_cpua_ctrl));
+	state->save_item(NAME(state->m_banknum));
+	state->save_item(NAME(state->m_port_sel));
 	machine.state().register_postload(wgp_postload, NULL);
 }
 

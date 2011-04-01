@@ -75,7 +75,7 @@
 static READ8_HANDLER( fake_VRLE_r )
 {
 	malzak_state *state = space->machine().driver_data<malzak_state>();
-	return (s2636_work_ram_r(state->s2636_0, 0xcb) & 0x3f) + (space->machine().primary_screen->vblank() * 0x40);
+	return (s2636_work_ram_r(state->m_s2636_0, 0xcb) & 0x3f) + (space->machine().primary_screen->vblank() * 0x40);
 }
 
 static READ8_HANDLER( s2636_portA_r )
@@ -160,14 +160,14 @@ static WRITE8_HANDLER( port40_w )
 static WRITE8_HANDLER( port60_w )
 {
 	malzak_state *state = space->machine().driver_data<malzak_state>();
-	state->malzak_x = data;
+	state->m_malzak_x = data;
 	//  logerror("I/O: port 0x60 write 0x%02x\n", data);
 }
 
 static WRITE8_HANDLER( portc0_w )
 {
 	malzak_state *state = space->machine().driver_data<malzak_state>();
-	state->malzak_y = data;
+	state->m_malzak_y = data;
 	//  logerror("I/O: port 0xc0 write 0x%02x\n", data);
 }
 
@@ -176,11 +176,11 @@ static READ8_HANDLER( collision_r )
 	malzak_state *state = space->machine().driver_data<malzak_state>();
 
 	// High 4 bits seem to refer to the row affected.
-	if(++state->collision_counter > 15)
-		state->collision_counter = 0;
+	if(++state->m_collision_counter > 15)
+		state->m_collision_counter = 0;
 
 	//  logerror("I/O port 0x00 read\n");
-	return 0xd0 + state->collision_counter;
+	return 0xd0 + state->m_collision_counter;
 }
 
 static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8 )
@@ -376,23 +376,23 @@ static MACHINE_START( malzak )
 
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("user2")->base(), 0x400);
 
-	state->s2636_0 = machine.device("s2636_0");
-	state->s2636_1 = machine.device("s2636_1");
-	state->saa5050 = machine.device("saa5050");
+	state->m_s2636_0 = machine.device("s2636_0");
+	state->m_s2636_1 = machine.device("s2636_1");
+	state->m_saa5050 = machine.device("saa5050");
 
-	state->save_item(NAME(state->playfield_code));
-	state->save_item(NAME(state->malzak_x));
-	state->save_item(NAME(state->malzak_y));
+	state->save_item(NAME(state->m_playfield_code));
+	state->save_item(NAME(state->m_malzak_x));
+	state->save_item(NAME(state->m_malzak_y));
 }
 
 static MACHINE_RESET( malzak )
 {
 	malzak_state *state = machine.driver_data<malzak_state>();
 
-	memset(state->playfield_code, 0, 256);
+	memset(state->m_playfield_code, 0, 256);
 
-	state->malzak_x = 0;
-	state->malzak_y = 0;
+	state->m_malzak_x = 0;
+	state->m_malzak_y = 0;
 }
 
 static MACHINE_CONFIG_START( malzak, malzak_state )

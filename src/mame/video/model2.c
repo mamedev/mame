@@ -332,9 +332,9 @@ static void model2_3d_init( running_machine &machine, UINT16 *texture_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
 
-	state->raster = auto_alloc_clear( machine, raster_state );
+	state->m_raster = auto_alloc_clear( machine, raster_state );
 
-	state->raster->texture_rom = texture_rom;
+	state->m_raster->texture_rom = texture_rom;
 }
 
 /*******************************************
@@ -346,7 +346,7 @@ static void model2_3d_init( running_machine &machine, UINT16 *texture_rom )
 void model2_3d_set_zclip( running_machine &machine, UINT8 clip )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->raster->master_z_clip = clip;
+	state->m_raster->master_z_clip = clip;
 }
 
 /*******************************************
@@ -925,7 +925,7 @@ static const poly_draw_scanline_func render_funcs[8] =
 
 static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *tri, const rectangle *cliprect )
 {
-	poly_manager *poly = state->poly;
+	poly_manager *poly = state->m_poly;
 	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	UINT8		renderer;
 	rectangle	vp;
@@ -956,7 +956,7 @@ static void model2_3d_render( model2_state *state, bitmap_t *bitmap, triangle *t
 		extra->texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
 		extra->texmirrorx = (tri->texheader[0] >> 9) & 1;
 		extra->texmirrory = (tri->texheader[0] >> 8) & 1;
-		extra->texsheet = (tri->texheader[2] & 0x1000) ? state->textureram1 : state->textureram0;
+		extra->texsheet = (tri->texheader[2] & 0x1000) ? state->m_textureram1 : state->m_textureram0;
 
 		tri->v[0].pz = 1.0f / (1.0f + tri->v[0].pz);
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
@@ -1009,7 +1009,7 @@ static void model2_3d_project( triangle *tri )
 /* 3D Rasterizer frame start: Resets frame variables */
 static void model2_3d_frame_start( model2_state *state )
 {
-	raster_state *raster = state->raster;
+	raster_state *raster = state->m_raster;
 
 	/* reset the triangle list index */
 	raster->tri_list_index = 0;
@@ -1024,7 +1024,7 @@ static void model2_3d_frame_start( model2_state *state )
 
 static void model2_3d_frame_end( model2_state *state, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	raster_state *raster = state->raster;
+	raster_state *raster = state->m_raster;
 	INT32		z;
 
 	/* if we have nothing to render, bail */
@@ -1090,7 +1090,7 @@ static void model2_3d_frame_end( model2_state *state, bitmap_t *bitmap, const re
 			}
 		}
 	}
-	poly_wait(state->poly, "End of frame");
+	poly_wait(state->m_poly, "End of frame");
 }
 
 /* 3D Rasterizer main data input port */
@@ -1316,10 +1316,10 @@ struct _geo_state
 static void geo_init( running_machine &machine, UINT32 *polygon_rom )
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	state->geo = auto_alloc_clear(machine, geo_state);
+	state->m_geo = auto_alloc_clear(machine, geo_state);
 
-	state->geo->raster = state->raster;
-	state->geo->polygon_rom = polygon_rom;
+	state->m_geo->raster = state->m_raster;
+	state->m_geo->polygon_rom = polygon_rom;
 }
 
 /*******************************************
@@ -2669,11 +2669,11 @@ static UINT32 * geo_process_command( geo_state *geo, UINT32 opcode, UINT32 *inpu
 
 static void geo_parse( model2_state *state )
 {
-	UINT32	address = (state->geo_read_start_address/4);
-	UINT32 *input = &state->bufferram[address];
+	UINT32	address = (state->m_geo_read_start_address/4);
+	UINT32 *input = &state->m_bufferram[address];
 	UINT32	opcode;
 
-	while( input != NULL && (input - state->bufferram) < 0x20000  )
+	while( input != NULL && (input - state->m_bufferram) < 0x20000  )
 	{
 		/* read in the opcode */
 		opcode = *input++;
@@ -2685,14 +2685,14 @@ static void geo_parse( model2_state *state )
 			address = (opcode & 0x7FFFF) / 4;
 
 			/* update our pointer */
-			input = &state->bufferram[address];
+			input = &state->m_bufferram[address];
 
 			/* go again */
 			continue;
 		}
 
 		/* process it */
-		input = geo_process_command( state->geo, opcode, input );
+		input = geo_process_command( state->m_geo, opcode, input );
 	}
 }
 
@@ -2702,7 +2702,7 @@ static void geo_parse( model2_state *state )
 static void model2_exit(running_machine &machine)
 {
 	model2_state *state = machine.driver_data<model2_state>();
-	poly_free(state->poly);
+	poly_free(state->m_poly);
 }
 
 VIDEO_START(model2)
@@ -2713,9 +2713,9 @@ VIDEO_START(model2)
 	int	height = visarea.max_y - visarea.min_y;
 
 	sys24_tile_vh_start(machine, 0x3fff);
-	state->sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
+	state->m_sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
 
-	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
+	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, model2_exit);
 
 	/* initialize the hardware rasterizer */
@@ -2748,14 +2748,14 @@ SCREEN_UPDATE(model2)
 	logerror("--- frame ---\n");
 
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
-	bitmap_fill(state->sys24_bitmap, cliprect, 0);
+	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
 
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 4, 0, 0);
 
-	convert_bitmap(screen->machine(), bitmap, state->sys24_bitmap, cliprect);
+	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
 
 	/* tell the rasterizer we're starting a frame */
 	model2_3d_frame_start(state);
@@ -2766,13 +2766,13 @@ SCREEN_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( state, bitmap, cliprect );
 
-	bitmap_fill(state->sys24_bitmap, cliprect, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(screen->machine(), state->sys24_bitmap, cliprect, 0, 0, 0);
+	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 0, 0, 0);
 
-	convert_bitmap(screen->machine(), bitmap, state->sys24_bitmap, cliprect);
+	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
 
 	return 0;
 }

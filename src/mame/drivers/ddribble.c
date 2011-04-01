@@ -21,14 +21,14 @@
 static INTERRUPT_GEN( ddribble_interrupt_0 )
 {
 	ddribble_state *state = device->machine().driver_data<ddribble_state>();
-	if (state->int_enable_0)
+	if (state->m_int_enable_0)
 		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddribble_interrupt_1 )
 {
 	ddribble_state *state = device->machine().driver_data<ddribble_state>();
-	if (state->int_enable_1)
+	if (state->m_int_enable_1)
 		device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -42,25 +42,25 @@ static WRITE8_HANDLER( ddribble_bankswitch_w )
 static READ8_HANDLER( ddribble_sharedram_r )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	return state->sharedram[offset];
+	return state->m_sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_sharedram_w )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->sharedram[offset] = data;
+	state->m_sharedram[offset] = data;
 }
 
 static READ8_HANDLER( ddribble_snd_sharedram_r )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	return state->snd_sharedram[offset];
+	return state->m_snd_sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddribble_snd_sharedram_w )
 {
 	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->snd_sharedram[offset] = data;
+	state->m_snd_sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( ddribble_coin_counter_w )
@@ -103,25 +103,25 @@ static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 
 	/* b2 : SSG-C rc filter enable */
-	filter_rc_set_RC(state->filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	filter_rc_set_RC(state->m_filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	/* b1 : SSG-B rc filter enable */
-	filter_rc_set_RC(state->filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	filter_rc_set_RC(state->m_filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	/* b0 : SSG-A rc filter enable */
-	filter_rc_set_RC(state->filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	filter_rc_set_RC(state->m_filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
 static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)												/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)												/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_MEMBER(ddribble_state, paletteram)										/* palette */
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddribble_fg_videoram_w) AM_BASE_MEMBER(ddribble_state, fg_videoram)	/* Video RAM 1 */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(ddribble_state, spriteram_1)								/* Object RAM 1 */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(ddribble_state, sharedram)									/* shared RAM with CPU #1 */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddribble_bg_videoram_w) AM_BASE_MEMBER(ddribble_state, bg_videoram)	/* Video RAM 2 */
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE_MEMBER(ddribble_state, spriteram_2)								/* Object RAM 2 */
+	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_MEMBER(ddribble_state, m_paletteram)										/* palette */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddribble_fg_videoram_w) AM_BASE_MEMBER(ddribble_state, m_fg_videoram)	/* Video RAM 1 */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(ddribble_state, m_spriteram_1)								/* Object RAM 1 */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(ddribble_state, m_sharedram)									/* shared RAM with CPU #1 */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddribble_bg_videoram_w) AM_BASE_MEMBER(ddribble_state, m_bg_videoram)	/* Video RAM 2 */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE_MEMBER(ddribble_state, m_spriteram_2)								/* Object RAM 2 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddribble_bankswitch_w)										/* bankswitch control */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")														/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(ddribble_state, snd_sharedram)		/* shared RAM with CPU #1 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(ddribble_state, m_snd_sharedram)		/* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)			/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM */
@@ -254,15 +254,15 @@ static MACHINE_START( ddribble )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x10000], 0x2000);
 
-	state->filter1 = machine.device("filter1");
-	state->filter2 = machine.device("filter2");
-	state->filter3 = machine.device("filter3");
+	state->m_filter1 = machine.device("filter1");
+	state->m_filter2 = machine.device("filter2");
+	state->m_filter3 = machine.device("filter3");
 
-	state->save_item(NAME(state->int_enable_0));
-	state->save_item(NAME(state->int_enable_1));
-	state->save_item(NAME(state->vregs[0]));
-	state->save_item(NAME(state->vregs[1]));
-	state->save_item(NAME(state->charbank));
+	state->save_item(NAME(state->m_int_enable_0));
+	state->save_item(NAME(state->m_int_enable_1));
+	state->save_item(NAME(state->m_vregs[0]));
+	state->save_item(NAME(state->m_vregs[1]));
+	state->save_item(NAME(state->m_charbank));
 }
 
 static MACHINE_RESET( ddribble )
@@ -272,14 +272,14 @@ static MACHINE_RESET( ddribble )
 
 	for (i = 0; i < 5; i++)
 	{
-		state->vregs[0][i] = 0;
-		state->vregs[1][i] = 0;
+		state->m_vregs[0][i] = 0;
+		state->m_vregs[1][i] = 0;
 	}
 
-	state->int_enable_0 = 0;
-	state->int_enable_1 = 0;
-	state->charbank[0] = 0;
-	state->charbank[1] = 0;
+	state->m_int_enable_0 = 0;
+	state->m_int_enable_1 = 0;
+	state->m_charbank[0] = 0;
+	state->m_charbank[1] = 0;
 }
 
 static MACHINE_CONFIG_START( ddribble, ddribble_state )

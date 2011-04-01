@@ -5,19 +5,19 @@ class darkseal_state : public driver_device
 public:
 	darkseal_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-	      deco_tilegen1(*this, "tilegen1"),
-		  deco_tilegen2(*this, "tilegen2") { }
+	      m_deco_tilegen1(*this, "tilegen1"),
+		  m_deco_tilegen2(*this, "tilegen2") { }
 
-	UINT16 *ram;
-	UINT16 *pf1_rowscroll;
-	//UINT16 *pf2_rowscroll;
-	UINT16 *pf3_rowscroll;
-	//UINT16 *pf4_rowscroll;
+	UINT16 *m_ram;
+	UINT16 *m_pf1_rowscroll;
+	//UINT16 *m_pf2_rowscroll;
+	UINT16 *m_pf3_rowscroll;
+	//UINT16 *m_pf4_rowscroll;
 
-	required_device<deco16ic_device> deco_tilegen1;
-	required_device<deco16ic_device> deco_tilegen2;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen2;
 
-	int flipscreen;
+	int m_flipscreen;
 };
 
 

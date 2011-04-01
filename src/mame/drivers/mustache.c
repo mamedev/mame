@@ -45,7 +45,7 @@ YM2151:
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE_MEMBER(mustache_state, videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE_MEMBER(mustache_state, m_videoram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(mustache_scroll_w)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(mustache_video_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(mustache_state, spriteram, spriteram_size)
+	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(mustache_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ static INTERRUPT_GEN( assert_irq )
 {
 	mustache_state *state = device->machine().driver_data<mustache_state>();
 	device_set_input_line(device, 0, ASSERT_LINE);
-    state->clear_irq_timer->adjust(downcast<cpu_device *>(device)->cycles_to_attotime(14288));
+    state->m_clear_irq_timer->adjust(downcast<cpu_device *>(device)->cycles_to_attotime(14288));
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.
       6000000 / 56.747 = 105732.4616 cycles per frame, we'll call it A
@@ -181,7 +181,7 @@ static INTERRUPT_GEN( assert_irq )
 static MACHINE_START( mustache )
 {
 	mustache_state *state = machine.driver_data<mustache_state>();
-	state->clear_irq_timer = machine.scheduler().timer_alloc(FUNC(clear_irq_cb));
+	state->m_clear_irq_timer = machine.scheduler().timer_alloc(FUNC(clear_irq_cb));
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )

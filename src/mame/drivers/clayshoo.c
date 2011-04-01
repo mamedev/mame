@@ -24,13 +24,13 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *   videoram;
-	size_t    videoram_size;
+	UINT8 *   m_videoram;
+	size_t    m_videoram_size;
 
 	/* misc */
-	emu_timer *analog_timer_1, *analog_timer_2;
-	UINT8 input_port_select;
-	UINT8 analog_port_val;
+	emu_timer *m_analog_timer_1, *m_analog_timer_2;
+	UINT8 m_input_port_select;
+	UINT8 m_analog_port_val;
 };
 
 
@@ -43,7 +43,7 @@ public:
 static WRITE8_DEVICE_HANDLER( input_port_select_w )
 {
 	clayshoo_state *state = device->machine().driver_data<clayshoo_state>();
-	state->input_port_select = data;
+	state->m_input_port_select = data;
 }
 
 
@@ -70,7 +70,7 @@ static READ8_DEVICE_HANDLER( input_port_r )
 	clayshoo_state *state = device->machine().driver_data<clayshoo_state>();
 	UINT8 ret = 0;
 
-	switch (state->input_port_select)
+	switch (state->m_input_port_select)
 	{
 	case 0x01:	ret = input_port_read(device->machine(), "IN0"); break;
 	case 0x02:	ret = input_port_read(device->machine(), "IN1"); break;
@@ -79,7 +79,7 @@ static READ8_DEVICE_HANDLER( input_port_r )
 	case 0x08:	ret = input_port_read(device->machine(), "IN3"); break;
 	case 0x10:
 	case 0x20:	break;	/* these two are not really used */
-	default: logerror("Unexpected port read: %02X\n", state->input_port_select);
+	default: logerror("Unexpected port read: %02X\n", state->m_input_port_select);
 	}
 	return ret;
 }
@@ -95,7 +95,7 @@ static READ8_DEVICE_HANDLER( input_port_r )
 static TIMER_CALLBACK( reset_analog_bit )
 {
 	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	state->analog_port_val &= ~param;
+	state->m_analog_port_val &= ~param;
 }
 
 
@@ -115,25 +115,25 @@ static WRITE8_HANDLER( analog_reset_w )
        off in a short period proportional to the position of the
        analog control and set the appropriate bit. */
 
-	state->analog_port_val = 0xff;
+	state->m_analog_port_val = 0xff;
 
-	state->analog_timer_1->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN1")), 0x02);
-	state->analog_timer_2->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN2")), 0x01);
+	state->m_analog_timer_1->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN1")), 0x02);
+	state->m_analog_timer_2->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN2")), 0x01);
 }
 
 
 static READ8_HANDLER( analog_r )
 {
 	clayshoo_state *state = space->machine().driver_data<clayshoo_state>();
-	return state->analog_port_val;
+	return state->m_analog_port_val;
 }
 
 
 static void create_analog_timers( running_machine &machine )
 {
 	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	state->analog_timer_1 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
-	state->analog_timer_2 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
+	state->m_analog_timer_1 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
+	state->m_analog_timer_2 = machine.scheduler().timer_alloc(FUNC(reset_analog_bit));
 }
 
 
@@ -171,8 +171,8 @@ static MACHINE_START( clayshoo )
 	create_analog_timers(machine);
 
 	/* register for state saving */
-	state->save_item(NAME(state->input_port_select));
-	state->save_item(NAME(state->analog_port_val));
+	state->save_item(NAME(state->m_input_port_select));
+	state->save_item(NAME(state->m_analog_port_val));
 }
 
 
@@ -188,12 +188,12 @@ static SCREEN_UPDATE( clayshoo )
 	clayshoo_state *state = screen->machine().driver_data<clayshoo_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram_size; offs++)
 	{
 		int i;
 		UINT8 x = offs << 3;
 		UINT8 y = ~(offs >> 5);
-		UINT8 data = state->videoram[offs];
+		UINT8 data = state->m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE_MEMBER(clayshoo_state, videoram, videoram_size)	/* 6k of video ram according to readme */
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE_MEMBER(clayshoo_state, m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
 	AM_RANGE(0x9800, 0xa800) AM_WRITENOP	  /* not really mapped, but cleared */
 	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
 ADDRESS_MAP_END
@@ -317,8 +317,8 @@ static MACHINE_RESET( clayshoo )
 {
 	clayshoo_state *state = machine.driver_data<clayshoo_state>();
 
-	state->input_port_select = 0;
-	state->analog_port_val = 0;
+	state->m_input_port_select = 0;
+	state->m_analog_port_val = 0;
 }
 
 static MACHINE_CONFIG_START( clayshoo, clayshoo_state )

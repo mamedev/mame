@@ -36,30 +36,30 @@ public:
 	starshp1_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int analog_in_select;
-	int attract;
-	UINT8 *playfield_ram;
-	UINT8 *hpos_ram;
-	UINT8 *vpos_ram;
-	UINT8 *obj_ram;
-	int ship_explode;
-	int ship_picture;
-	int ship_hoffset;
-	int ship_voffset;
-	int ship_size;
-	int circle_hpos;
-	int circle_vpos;
-	int circle_size;
-	int circle_mod;
-	int circle_kill;
-	int phasor;
-	int collision_latch;
-	int starfield_kill;
-	int mux;
-	int inverse;
-	UINT16 *LSFR;
-	bitmap_t *helper;
-	tilemap_t *bg_tilemap;
+	int m_analog_in_select;
+	int m_attract;
+	UINT8 *m_playfield_ram;
+	UINT8 *m_hpos_ram;
+	UINT8 *m_vpos_ram;
+	UINT8 *m_obj_ram;
+	int m_ship_explode;
+	int m_ship_picture;
+	int m_ship_hoffset;
+	int m_ship_voffset;
+	int m_ship_size;
+	int m_circle_hpos;
+	int m_circle_vpos;
+	int m_circle_size;
+	int m_circle_mod;
+	int m_circle_kill;
+	int m_phasor;
+	int m_collision_latch;
+	int m_starfield_kill;
+	int m_mux;
+	int m_inverse;
+	UINT16 *m_LSFR;
+	bitmap_t *m_helper;
+	tilemap_t *m_bg_tilemap;
 };
 
 

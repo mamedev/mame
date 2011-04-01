@@ -51,7 +51,7 @@ $305.b invincibility
 static INTERRUPT_GEN( galastrm_interrupt )
 {
 	galastrm_state *state = device->machine().driver_data<galastrm_state>();
-	state->frame_counter ^= 1;
+	state->m_frame_counter ^= 1;
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
@@ -66,40 +66,40 @@ static WRITE32_HANDLER( galastrm_palette_w )
 {
 	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->tc0110pcr_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->tc0110pcr_addr < 4096))
-		palette_set_color_rgb(space->machine(), state->tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		state->m_tc0110pcr_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->m_tc0110pcr_addr < 4096))
+		palette_set_color_rgb(space->machine(), state->m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_0_w )
 {
 	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->tc0610_0_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->tc0610_0_addr < 8))
-		state->tc0610_ctrl_reg[0][state->tc0610_0_addr] = data;
+		state->m_tc0610_0_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->m_tc0610_0_addr < 8))
+		state->m_tc0610_ctrl_reg[0][state->m_tc0610_0_addr] = data;
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_1_w )
 {
 	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->tc0610_1_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->tc0610_1_addr < 8))
-		state->tc0610_ctrl_reg[1][state->tc0610_1_addr] = data;
+		state->m_tc0610_1_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (state->m_tc0610_1_addr < 8))
+		state->m_tc0610_ctrl_reg[1][state->m_tc0610_1_addr] = data;
 }
 
 
 static CUSTOM_INPUT( frame_counter_r )
 {
 	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
-	return state->frame_counter;
+	return state->m_frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
 	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
-	return state->coin_word;
+	return state->m_coin_word;
 }
 
 static WRITE32_HANDLER( galastrm_input_w )
@@ -109,9 +109,9 @@ static WRITE32_HANDLER( galastrm_input_w )
 #if 0
 {
 char t[64];
-COMBINE_DATA(&state->mem[offset]);
+COMBINE_DATA(&state->m_mem[offset]);
 
-sprintf(t,"%08x %08x",state->mem[0],state->mem[1]);
+sprintf(t,"%08x %08x",state->m_mem[0],state->m_mem[1]);
 popmessage(t);
 }
 #endif
@@ -144,7 +144,7 @@ popmessage(t);
 				coin_lockout_w(space->machine(), 1, ~data & 0x02000000);
 				coin_counter_w(space->machine(), 0, data & 0x04000000);
 				coin_counter_w(space->machine(), 1, data & 0x04000000);
-				state->coin_word = (data >> 16) &0xffff;
+				state->m_coin_word = (data >> 16) &0xffff;
 			}
 //logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
 		}
@@ -174,8 +174,8 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 
 static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(galastrm_state, ram)								/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(galastrm_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(galastrm_state, m_ram)								/* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(galastrm_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)									/* eerom etc. */

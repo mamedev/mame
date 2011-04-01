@@ -33,8 +33,8 @@
 static void update_interrupts(running_machine &machine)
 {
 	batman_state *state = machine.driver_data<batman_state>();
-	cputag_set_input_line(machine, "maincpu", 4, state->scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 6, state->sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, state->m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -43,8 +43,8 @@ static MACHINE_START( batman )
 	batman_state *state = machine.driver_data<batman_state>();
 	atarigen_init(machine);
 
-	state->save_item(NAME(state->latch_data));
-	state->save_item(NAME(state->alpha_tile_bank));
+	state->save_item(NAME(state->m_latch_data));
+	state->save_item(NAME(state->m_alpha_tile_bank));
 }
 
 
@@ -54,7 +54,7 @@ static MACHINE_RESET( batman )
 
 	atarigen_eeprom_reset(state);
 	atarigen_interrupt_reset(state, update_interrupts);
-	atarivc_reset(*machine.primary_screen, state->atarivc_eof_data, 2);
+	atarivc_reset(*machine.primary_screen, state->m_atarivc_eof_data, 2);
 	atarigen_scanline_timer_reset(*machine.primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 }
@@ -90,8 +90,8 @@ static READ16_HANDLER( special_port2_r )
 {
 	batman_state *state = space->machine().driver_data<batman_state>();
 	int result = input_port_read(space->machine(), "260010");
-	if (state->sound_to_cpu_ready) result ^= 0x0010;
-	if (state->cpu_to_sound_ready) result ^= 0x0020;
+	if (state->m_sound_to_cpu_ready) result ^= 0x0010;
+	if (state->m_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
 
@@ -99,21 +99,21 @@ static READ16_HANDLER( special_port2_r )
 static WRITE16_HANDLER( latch_w )
 {
 	batman_state *state = space->machine().driver_data<batman_state>();
-	int oldword = state->latch_data;
-	COMBINE_DATA(&state->latch_data);
+	int oldword = state->m_latch_data;
+	COMBINE_DATA(&state->m_latch_data);
 
 	/* bit 4 is connected to the /RESET pin on the 6502 */
-	if (state->latch_data & 0x0010)
+	if (state->m_latch_data & 0x0010)
 		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, CLEAR_LINE);
 	else
 		cputag_set_input_line(space->machine(), "jsa", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* alpha bank is selected by the upper 4 bits */
-	if ((oldword ^ state->latch_data) & 0x7000)
+	if ((oldword ^ state->m_latch_data) & 0x7000)
 	{
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		tilemap_mark_all_tiles_dirty(state->alpha_tilemap);
-		state->alpha_tile_bank = (state->latch_data >> 12) & 7;
+		tilemap_mark_all_tiles_dirty(state->m_alpha_tilemap);
+		state->m_alpha_tile_bank = (state->m_latch_data >> 12) & 7;
 	}
 }
 
@@ -143,13 +143,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE_MEMBER(batman_state, atarivc_data)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(batman_state, playfield2)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(batman_state, playfield)
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(batman_state, playfield_upper)
+	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE_MEMBER(batman_state, m_atarivc_data)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(batman_state, m_playfield2)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(batman_state, m_playfield)
+	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(batman_state, m_playfield_upper)
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_MIRROR(0x100000) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3f8000, 0x3f8fef) AM_MIRROR(0x100000) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(batman_state, alpha)
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_MIRROR(0x100000) AM_BASE_MEMBER(batman_state, atarivc_eof_data)
+	AM_RANGE(0x3f8000, 0x3f8fef) AM_MIRROR(0x100000) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(batman_state, m_alpha)
+	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_MIRROR(0x100000) AM_BASE_MEMBER(batman_state, m_atarivc_eof_data)
 	AM_RANGE(0x3f8f80, 0x3f8fff) AM_MIRROR(0x100000) AM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3f0000, 0x3fffff) AM_MIRROR(0x100000) AM_RAM
 ADDRESS_MAP_END

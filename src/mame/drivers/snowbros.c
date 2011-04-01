@@ -129,11 +129,11 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 
 	device_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
 
-	if (state->sb3_music_is_playing)
+	if (state->m_sb3_music_is_playing)
 	{
 		if ((status&0x08)==0x00)
 		{
-			adpcm->write_command(0x80|state->sb3_music);
+			adpcm->write_command(0x80|state->m_sb3_music);
 			adpcm->write_command(0x00|0x82);
 		}
 
@@ -217,23 +217,23 @@ static WRITE8_HANDLER( prot_io_w )
 	{
 		case 0x00:
 		{
-			UINT16 word = state->hyperpac_ram[(0xe000/2)+state->semicom_prot_offset];
+			UINT16 word = state->m_hyperpac_ram[(0xe000/2)+state->m_semicom_prot_offset];
 			word = (word & 0xff00) | (data << 0);
-			state->hyperpac_ram[(0xe000/2)+state->semicom_prot_offset] = word;
+			state->m_hyperpac_ram[(0xe000/2)+state->m_semicom_prot_offset] = word;
 			break;
 		}
 
 		case 0x01:
 		{
-			UINT16 word = state->hyperpac_ram[(0xe000/2)+state->semicom_prot_offset];
+			UINT16 word = state->m_hyperpac_ram[(0xe000/2)+state->m_semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
-			state->hyperpac_ram[(0xe000/2)+state->semicom_prot_offset] = word;
+			state->m_hyperpac_ram[(0xe000/2)+state->m_semicom_prot_offset] = word;
 			break;
 		}
 
 		case 0x02: // offset
 		{
-			state->semicom_prot_offset = data;
+			state->m_semicom_prot_offset = data;
 			break;
 		}
 
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, m_bootleg_spriteram16, m_spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -276,7 +276,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, m_hyperpac_ram)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP	/* ? */
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(snowbros_68000_sound_w)	/* ? */
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x900004, 0x900005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa00000, 0xa007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
+	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, m_bootleg_spriteram16, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_map, AS_PROGRAM, 8 )
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, m_bootleg_spriteram16, m_spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -356,7 +356,7 @@ sound hardware is also different
 
 static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, m_hyperpac_ram)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
 //  AM_RANGE(0x400000, 0x400001) ???
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
@@ -391,7 +391,7 @@ static void sb3_play_music(running_machine &machine, int data)
 	UINT8 *snd;
 
 	/* sample is actually played in interrupt function so it loops */
-	state->sb3_music = data;
+	state->m_sb3_music = data;
 
 	switch (data)
 	{
@@ -399,13 +399,13 @@ static void sb3_play_music(running_machine &machine, int data)
 		case 0x26:
 		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
-		state->sb3_music_is_playing = 1;
+		state->m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
 		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
-		state->sb3_music_is_playing = 1;
+		state->m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x25:
@@ -418,11 +418,11 @@ static void sb3_play_music(running_machine &machine, int data)
 		case 0x2d:
 		snd = machine.region("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
-		state->sb3_music_is_playing = 1;
+		state->m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x2e:
-		state->sb3_music_is_playing = 0;
+		state->m_sb3_music_is_playing = 0;
 		break;
 	}
 }
@@ -456,7 +456,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
-		state->sb3_music_is_playing = 0;
+		state->m_sb3_music_is_playing = 0;
 		oki->write_command(0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
@@ -499,7 +499,7 @@ static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE( 0x600000, 0x6003ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC (paletteram)
-	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, bootleg_spriteram16, spriteram_size)
+	AM_RANGE( 0x700000, 0x7021ff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, m_bootleg_spriteram16, m_spriteram_size)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -509,7 +509,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(snowbros_state, m_hyperpac_ram)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
 //  AM_RANGE(0x400000, 0x400001) ???
 
@@ -1430,7 +1430,7 @@ static MACHINE_RESET (semiprot)
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-	state->hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+	state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 }
 
 static MACHINE_RESET (finalttr)
@@ -1440,7 +1440,7 @@ static MACHINE_RESET (finalttr)
 	int i;
 
 	for (i = 0;i < 0x200/2;i++)
-	state->hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
+	state->m_hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
 static const kaneko_pandora_interface snowbros_pandora_config =
@@ -2255,7 +2255,7 @@ static DRIVER_INIT( moremorp )
 //  int i;
 
 //  for (i = 0;i < 0x200/2;i++)
-//      state->hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+//      state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200001, FUNC(moremorp_0a_read) );
@@ -2268,8 +2268,8 @@ static DRIVER_INIT( cookbib2 )
 //  UINT16 *HCROM = (UINT16*)machine.region("maincpu")->base();
 //  UINT16 *PROTDATA = (UINT16*)machine.region("user1")->base();
 //  int i;
-//  state->hyperpac_ram[0xf000/2] = 0x46fc;
-//  state->hyperpac_ram[0xf002/2] = 0x2700;
+//  state->m_hyperpac_ram[0xf000/2] = 0x46fc;
+//  state->m_hyperpac_ram[0xf002/2] = 0x2700;
 
 // verified on real hardware, need to move this to a file really
 
@@ -2282,18 +2282,18 @@ static DRIVER_INIT( cookbib2 )
 
 
 //for (i = 0;i < sizeof(cookbib2_mcu68k)/sizeof(cookbib2_mcu68k[0]);i++)
-//      state->hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
+//      state->m_hyperpac_ram[0xf000/2 + i] = cookbib2_mcu68k[i];
 
 //  for (i = 0;i < 0x200/2;i++)
-//      state->hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
+//      state->m_hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 
 	// trojan is actually buggy and gfx flicker like crazy
 	// but we can pause the system after bootup with HALT line of 68k to get the table before
 	// it goes nuts
 
-	//  state->hyperpac_ram[0xf07a/2] = 0x4e73;
-	//  state->hyperpac_ram[0xf000/2] = 0x4e73;
+	//  state->m_hyperpac_ram[0xf07a/2] = 0x4e73;
+	//  state->m_hyperpac_ram[0xf000/2] = 0x4e73;
 
 #if 0
 
@@ -2610,7 +2610,7 @@ static DRIVER_INIT( cookbib2 )
 static DRIVER_INIT( hyperpac )
 {
 	snowbros_state *state = machine.driver_data<snowbros_state>();
-	UINT16 *hyperpac_ram = state->hyperpac_ram;
+	UINT16 *hyperpac_ram = state->m_hyperpac_ram;
 	/* simulate RAM initialization done by the protection MCU */
 	/* not verified on real hardware */
 	hyperpac_ram[0xe000/2] = 0x4ef9;

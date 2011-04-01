@@ -334,7 +334,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		welltris_state *state = space->machine().driver_data<welltris_state>();
 
-		state->pending_command = 1;
+		state->m_pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -343,24 +343,24 @@ static WRITE16_HANDLER( sound_command_w )
 static CUSTOM_INPUT( pending_sound_r )
 {
 	welltris_state *state = field->port->machine().driver_data<welltris_state>();
-	return state->pending_command ? 1 : 0;
+	return state->m_pending_command ? 1 : 0;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	welltris_state *state = space->machine().driver_data<welltris_state>();
 
-	state->pending_command = 0;
+	state->m_pending_command = 0;
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,pixelram)	/* Graph_1 & 2*/
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,m_pixelram)	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE_MEMBER(welltris_state,spriteram)			/* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE_MEMBER(welltris_state,charvideoram)		/* Char */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE_MEMBER(welltris_state,m_spriteram)			/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE_MEMBER(welltris_state,m_charvideoram)		/* Char */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)

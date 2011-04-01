@@ -69,14 +69,14 @@ VIDEO_START( shangha3 )
 	shangha3_state *state = machine.driver_data<shangha3_state>();
 	int i;
 
-	state->rawbitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_rawbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	for (i = 0;i < 14;i++)
-		state->drawmode_table[i] = DRAWMODE_SOURCE;
-	state->drawmode_table[14] = state->do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-	state->drawmode_table[15] = DRAWMODE_NONE;
+		state->m_drawmode_table[i] = DRAWMODE_SOURCE;
+	state->m_drawmode_table[14] = state->m_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	state->m_drawmode_table[15] = DRAWMODE_NONE;
 
-	if (state->do_shadows)
+	if (state->m_do_shadows)
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
@@ -101,22 +101,22 @@ WRITE16_HANDLER( shangha3_gfxlist_addr_w )
 {
 	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 
-	COMBINE_DATA(&state->gfxlist_addr);
+	COMBINE_DATA(&state->m_gfxlist_addr);
 }
 
 
 WRITE16_HANDLER( shangha3_blitter_go_w )
 {
 	shangha3_state *state = space->machine().driver_data<shangha3_state>();
-	UINT16 *shangha3_ram = state->ram;
-	bitmap_t *rawbitmap = state->rawbitmap;
-	UINT8 *drawmode_table = state->drawmode_table;
+	UINT16 *shangha3_ram = state->m_ram;
+	bitmap_t *rawbitmap = state->m_rawbitmap;
+	UINT8 *drawmode_table = state->m_drawmode_table;
 	int offs;
 
 
 	g_profiler.start(PROFILER_VIDEO);
 
-	for (offs = state->gfxlist_addr << 3; offs < state->ram_size/2; offs += 16)
+	for (offs = state->m_gfxlist_addr << 3; offs < state->m_ram_size/2; offs += 16)
 	{
 		int sx,sy,x,y,code,color,flipx,flipy,sizex,sizey,zoomx,zoomy;
 
@@ -265,6 +265,6 @@ SCREEN_UPDATE( shangha3 )
 {
 	shangha3_state *state = screen->machine().driver_data<shangha3_state>();
 
-	copybitmap(bitmap, state->rawbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, state->m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

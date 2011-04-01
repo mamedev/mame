@@ -28,13 +28,13 @@ WRITE8_HANDLER( metlclsh_rambank_w )
 
 	if (data & 1)
 	{
-		state->write_mask = 0;
-		memory_set_bankptr(space->machine(), "bank1", state->bgram);
+		state->m_write_mask = 0;
+		memory_set_bankptr(space->machine(), "bank1", state->m_bgram);
 	}
 	else
 	{
-		state->write_mask = 1 << (data >> 1);
-		memory_set_bankptr(space->machine(), "bank1", state->otherram);
+		state->m_write_mask = 1 << (data >> 1);
+		memory_set_bankptr(space->machine(), "bank1", state->m_otherram);
 	}
 }
 
@@ -42,10 +42,10 @@ WRITE8_HANDLER( metlclsh_gfxbank_w )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
 
-	if (!(data & 4) && (state->gfxbank != data))
+	if (!(data & 4) && (state->m_gfxbank != data))
 	{
-		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
-		state->gfxbank = data & 3;
+		tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
+		state->m_gfxbank = data & 3;
 	}
 }
 
@@ -74,7 +74,7 @@ static TILEMAP_MAPPER( metlclsh_bgtilemap_scan )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
-	SET_TILE_INFO(1, state->bgram[tile_index] + (state->gfxbank << 7), 0, 0);
+	SET_TILE_INFO(1, state->m_bgram[tile_index] + (state->m_gfxbank << 7), 0, 0);
 }
 
 WRITE8_HANDLER( metlclsh_bgram_w )
@@ -83,7 +83,7 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 
 	/*  This ram is banked: it's either the tilemap (e401 = 1)
         or bit n of another area (e401 = n << 1)? (that I don't understand) */
-	if (state->write_mask)
+	if (state->m_write_mask)
 	{
 		/* unknown area - the following is almost surely wrong */
 // 405b (e401 = e c a 8 6 4 2 0) writes d400++
@@ -91,14 +91,14 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 // 4085 (e401 = e a 6 2) writes d000++
 // 405b (e401 = e a 6 2) writes d000++
 
-//      state->otherram[offset] |= (data & state->write_mask);
-		state->otherram[offset] = (state->otherram[offset] & ~state->write_mask) | (data & state->write_mask);
+//      state->m_otherram[offset] |= (data & state->m_write_mask);
+		state->m_otherram[offset] = (state->m_otherram[offset] & ~state->m_write_mask) | (data & state->m_write_mask);
 	}
 	else
 	{
 		/* tilemap */
-		state->bgram[offset] = data;
-		tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x1ff);
+		state->m_bgram[offset] = data;
+		tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x1ff);
 	}
 }
 
@@ -118,8 +118,8 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
-	UINT8 code = state->fgram[tile_index + 0x000];
-	UINT8 attr = state->fgram[tile_index + 0x400];
+	UINT8 code = state->m_fgram[tile_index + 0x000];
+	UINT8 attr = state->m_fgram[tile_index + 0x400];
 	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0);
 	tileinfo->category = ((attr & 0x80) ? 1 : 2);
 }
@@ -127,8 +127,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 WRITE8_HANDLER( metlclsh_fgram_w )
 {
 	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	state->fgram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
+	state->m_fgram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
 }
 
 
@@ -142,15 +142,15 @@ VIDEO_START( metlclsh )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
 
-	state->otherram = auto_alloc_array(machine, UINT8, 0x800);	// banked ram
+	state->m_otherram = auto_alloc_array(machine, UINT8, 0x800);	// banked ram
 
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, metlclsh_bgtilemap_scan, 16, 16, 32, 16);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, metlclsh_bgtilemap_scan, 16, 16, 32, 16);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->bg_tilemap, 0);
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	state->save_pointer(NAME(state->otherram), 0x800);
+	state->save_pointer(NAME(state->m_otherram), 0x800);
 }
 
 
@@ -177,11 +177,11 @@ VIDEO_START( metlclsh )
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	metlclsh_state *state = machine.driver_data<metlclsh_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	gfx_element *gfx = machine.gfx[0];
 	int offs;
 
-	for (offs = 0; offs < state->spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
 	{
 		int attr, code, color, sx, sy, flipx, flipy, wrapy, sizey;
 
@@ -248,19 +248,19 @@ SCREEN_UPDATE( metlclsh )
 
 	bitmap_fill(bitmap, cliprect, 0x10);
 
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 1, 0);	// low priority tiles of foreground
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 1, 0);	// low priority tiles of foreground
 
-	if (state->scrollx[0] & 0x08)					// background (if enabled)
+	if (state->m_scrollx[0] & 0x08)					// background (if enabled)
 	{
 		/* The background seems to be always flipped along x */
-		tilemap_set_flip(state->bg_tilemap, (flip_screen_get(screen->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
-		tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[1] + ((state->scrollx[0] & 0x02) << 7) );
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		tilemap_set_flip(state->m_bg_tilemap, (flip_screen_get(screen->machine()) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0) ^ TILEMAP_FLIPX);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[1] + ((state->m_scrollx[0] & 0x02) << 7) );
+		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	}
 	draw_sprites(screen->machine(), bitmap, cliprect);			// sprites
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 2, 0);	// high priority tiles of foreground
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 2, 0);	// high priority tiles of foreground
 
-//  popmessage("%02X", state->scrollx[0]);
+//  popmessage("%02X", state->m_scrollx[0]);
 	return 0;
 }
 

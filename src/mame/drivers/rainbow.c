@@ -335,8 +335,8 @@ static WRITE16_HANDLER( jumping_sound_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		state->m_jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
+		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
 	AM_RANGE(0x420000, 0x420001) AM_READNOP			/* read, but result not used */
 	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE_MEMBER(rainbow_state, spriteram, spriteram_size)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE_MEMBER(rainbow_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP		/* original c-chip location (not used) */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP		/* seems it is a leftover from rainbow: scroll y written here too */
@@ -404,7 +404,7 @@ static WRITE8_DEVICE_HANDLER( bankswitch_w )
 static READ8_HANDLER( jumping_latch_r )
 {
 	rainbow_state *state = space->machine().driver_data<rainbow_state>();
-	return state->jumping_latch;
+	return state->m_jumping_latch;
 }
 
 
@@ -628,7 +628,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	rainbow_state *state = device->machine().driver_data<rainbow_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -668,10 +668,10 @@ static MACHINE_START( rainbow )
 {
 	rainbow_state *state = machine.driver_data<rainbow_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->pc080sn = machine.device("pc080sn");
-	state->pc090oj = machine.device("pc090oj");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_pc080sn = machine.device("pc080sn");
+	state->m_pc090oj = machine.device("pc090oj");
 }
 
 static MACHINE_CONFIG_START( rainbow, rainbow_state )
@@ -897,9 +897,9 @@ static DRIVER_INIT( jumping )
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
-	state->jumping_latch = 0;
+	state->m_jumping_latch = 0;
 
-	state->save_item(NAME(state->jumping_latch));
+	state->save_item(NAME(state->m_jumping_latch));
 }
 
 

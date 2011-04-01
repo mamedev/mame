@@ -33,7 +33,7 @@ static WRITE16_HANDLER( soundcommand_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data & 0xff);
-		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -44,13 +44,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM		/* galspnbl work RAM, bitmaps are decompressed here */
 	AM_RANGE(0x800000, 0x803fff) AM_RAM		/* hotpinbl work RAM */
 	AM_RANGE(0x808000, 0x80ffff) AM_RAM		/* hotpinbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE_MEMBER(galspnbl_state, spriteram, spriteram_size)
+	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE_MEMBER(galspnbl_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, colorram)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_colorram)
 	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, videoram)
+	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_videoram)
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(galspnbl_state, bgvideoram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_bgvideoram)
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
 	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
 	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_BASE_MEMBER(galspnbl_state, scroll)	/* ??? */
+	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_BASE_MEMBER(galspnbl_state, m_scroll)	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
@@ -191,7 +191,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	galspnbl_state *state = device->machine().driver_data<galspnbl_state>();
-	device_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->m_audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -204,7 +204,7 @@ static MACHINE_START( galspnbl )
 {
 	galspnbl_state *state = machine.driver_data<galspnbl_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 }
 
 static MACHINE_CONFIG_START( galspnbl, galspnbl_state )

@@ -80,11 +80,11 @@ public:
 	ghosteo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *system_memory;
-	UINT32 *steppingstone;
-	int security_count;
-	UINT32 bballoon_port[20];
-	struct nand_t nand;
+	UINT32 *m_system_memory;
+	UINT32 *m_steppingstone;
+	int m_security_count;
+	UINT32 m_bballoon_port[20];
+	struct nand_t m_nand;
 };
 
 
@@ -117,18 +117,18 @@ static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
-	UINT32 data = state->bballoon_port[port];
+	UINT32 data = state->m_bballoon_port[port];
 	switch (port)
 	{
 		case S3C2410_GPIO_PORT_F :
 		{
-			data = (data & ~0xFF) | security_data[state->security_count]; // bballoon security @ 0x3001BD68
+			data = (data & ~0xFF) | security_data[state->m_security_count]; // bballoon security @ 0x3001BD68
 		}
 		break;
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data ^ 0x20;
-			state->bballoon_port[port] = data;
+			state->m_bballoon_port[port] = data;
 		}
 		break;
 	}
@@ -138,16 +138,16 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
-	UINT32 old_value = state->bballoon_port[port];
-	state->bballoon_port[port] = data;
+	UINT32 old_value = state->m_bballoon_port[port];
+	state->m_bballoon_port[port] = data;
 	switch (port)
 	{
 		case S3C2410_GPIO_PORT_F :
 		{
 			switch (data)
 			{
-				case 0x04 : state->security_count = 0; break;
-				case 0x44 : state->security_count = 2; break;
+				case 0x04 : state->m_security_count = 0; break;
+				case 0x44 : state->m_security_count = 2; break;
 			}
 		}
 		break;
@@ -156,9 +156,9 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 			// 0 -> 1
 			if (((data & 0x10) != 0) && ((old_value & 0x10) == 0))
 			{
-				logerror( "security_count %d -> %d\n", state->security_count, state->security_count + 1);
-				state->security_count++;
-				if (state->security_count > 7) state->security_count = 0;
+				logerror( "security_count %d -> %d\n", state->m_security_count, state->m_security_count + 1);
+				state->m_security_count++;
+				if (state->m_security_count > 7) state->m_security_count = 0;
 			}
 		}
 		break;
@@ -168,7 +168,7 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
-	struct nand_t &nand = state->nand;
+	struct nand_t &nand = state->m_nand;
 //  device_t *nand = device->machine().device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
@@ -192,7 +192,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
-	struct nand_t &nand = state->nand;
+	struct nand_t &nand = state->m_nand;
 //  device_t *nand = device->machine().device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
@@ -226,7 +226,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
 	ghosteo_state *state = device->machine().driver_data<ghosteo_state>();
-	struct nand_t &nand = state->nand;
+	struct nand_t &nand = state->m_nand;
 //  device_t *nand = device->machine().device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)
@@ -316,12 +316,12 @@ static WRITE32_HANDLER( sound_w )
 }
 
 static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE_MEMBER(ghosteo_state, steppingstone) AM_MIRROR(0x40000000)
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE_MEMBER(ghosteo_state, m_steppingstone) AM_MIRROR(0x40000000)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
 	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE_MEMBER(ghosteo_state, system_memory) AM_MIRROR(0x02000000)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE_MEMBER(ghosteo_state, m_system_memory) AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
 /*
@@ -550,7 +550,7 @@ ROM_END
 static DRIVER_INIT( bballoon )
 {
 	ghosteo_state *state = machine.driver_data<ghosteo_state>();
-	memcpy( state->steppingstone, machine.region( "user1")->base(), 4 * 1024);
+	memcpy( state->m_steppingstone, machine.region( "user1")->base(), 4 * 1024);
 }
 
 GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )

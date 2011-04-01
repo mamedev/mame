@@ -4,11 +4,11 @@ public:
 	srumbler_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *backgroundram;
-	UINT8 *foregroundram;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
-	int scroll[4];
+	UINT8 *m_backgroundram;
+	UINT8 *m_foregroundram;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	int m_scroll[4];
 };
 
 

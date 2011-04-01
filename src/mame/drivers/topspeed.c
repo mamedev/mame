@@ -246,13 +246,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 static READ16_HANDLER( sharedram_r )
 {
 	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	return state->sharedram[offset];
+	return state->m_sharedram[offset];
 }
 
 static WRITE16_HANDLER( sharedram_w )
 {
 	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	COMBINE_DATA(&state->sharedram[offset]);
+	COMBINE_DATA(&state->m_sharedram[offset]);
 }
 
 static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched between 68Ks */
@@ -261,7 +261,7 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
@@ -271,7 +271,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
-	state->cpua_ctrl = data;
+	state->m_cpua_ctrl = data;
 
 	parse_control(space->machine());
 
@@ -288,7 +288,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 static TIMER_CALLBACK( topspeed_interrupt6  )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -296,7 +296,7 @@ static TIMER_CALLBACK( topspeed_interrupt6  )
 static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	device_set_input_line(state->subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -326,7 +326,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 static READ8_HANDLER( topspeed_input_bypass_r )
 {
 	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	UINT8 port = tc0220ioc_port_r(state->tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(state->m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
 	int analogue_steer = input_port_read_safe(space->machine(), STEER_PORT_TAG, 0x00);
 	int fake = input_port_read_safe(space->machine(), FAKE_PORT_TAG, 0x00);
@@ -361,7 +361,7 @@ static READ8_HANDLER( topspeed_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(state->tc0220ioc, offset);
+			return tc0220ioc_portreg_r(state->m_tc0220ioc, offset);
 	}
 }
 
@@ -396,36 +396,36 @@ static WRITE16_HANDLER( topspeed_motor_w )
 static void reset_sound_region( running_machine &machine )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
-	memory_set_bank(machine,  "bank10", state->banknum);
+	memory_set_bank(machine,  "bank10", state->m_banknum);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	state->banknum = data & 7;
+	state->m_banknum = data & 7;
 	reset_sound_region(device->machine());
 }
 
 static void topspeed_msm5205_vck( device_t *device )
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	if (state->adpcm_data != -1)
+	if (state->m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->adpcm_data & 0x0f);
-		state->adpcm_data = -1;
+		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
+		state->m_adpcm_data = -1;
 	}
 	else
 	{
-		state->adpcm_data = device->machine().region("adpcm")->base()[state->adpcm_pos];
-		state->adpcm_pos = (state->adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(device, state->adpcm_data >> 4);
+		state->m_adpcm_data = device->machine().region("adpcm")->base()[state->m_adpcm_pos];
+		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0x1ffff;
+		msm5205_data_w(device, state->m_adpcm_data >> 4);
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( topspeed_msm5205_address_w )
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	state->adpcm_pos = (state->adpcm_pos & 0x00ff) | (data << 8);
+	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff) | (data << 8);
 	msm5205_reset_w(device, 0);
 }
 
@@ -433,7 +433,7 @@ static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
 	msm5205_reset_w(device, 1);
-	state->adpcm_pos &= 0xff00;
+	state->m_adpcm_pos &= 0xff00;
 }
 
 
@@ -444,12 +444,12 @@ static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 
 static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_SIZE_MEMBER(topspeed_state, sharedram, sharedram_size)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_SIZE_MEMBER(topspeed_state, m_sharedram, m_sharedram_size)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE_MEMBER(topspeed_state, raster_ctrl)
+	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE_MEMBER(topspeed_state, m_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
 	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE("pc080sn_1", pc080sn_yscroll_word_w)
@@ -459,13 +459,13 @@ static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE("pc080sn_2", pc080sn_yscroll_word_w)
 	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE("pc080sn_2", pc080sn_xscroll_word_w)
 	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE("pc080sn_2", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE_MEMBER(topspeed_state, spriteram, spriteram_size)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(topspeed_state, spritemap)
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE_MEMBER(topspeed_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(topspeed_state, m_spritemap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(topspeed_state, sharedram)
+	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(topspeed_state, m_sharedram)
 	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
@@ -620,7 +620,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -652,16 +652,16 @@ static MACHINE_START( topspeed )
 
 	memory_configure_bank(machine, "bank10", 0, 4, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	state->maincpu = machine.device("maincpu");
-	state->subcpu = machine.device("sub");
-	state->audiocpu = machine.device("audiocpu");
-	state->tc0220ioc = machine.device("tc0220ioc");
-	state->pc080sn_1 = machine.device("pc080sn_1");
-	state->pc080sn_2 = machine.device("pc080sn_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_subcpu = machine.device("sub");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_tc0220ioc = machine.device("tc0220ioc");
+	state->m_pc080sn_1 = machine.device("pc080sn_1");
+	state->m_pc080sn_2 = machine.device("pc080sn_2");
 
-	state->save_item(NAME(state->cpua_ctrl));
-	state->save_item(NAME(state->ioc220_port));
-	state->save_item(NAME(state->banknum));
+	state->save_item(NAME(state->m_cpua_ctrl));
+	state->save_item(NAME(state->m_ioc220_port));
+	state->save_item(NAME(state->m_banknum));
 	machine.state().register_postload(topspeed_postload, NULL);
 }
 
@@ -669,11 +669,11 @@ static MACHINE_RESET( topspeed )
 {
 	topspeed_state *state = machine.driver_data<topspeed_state>();
 
-	state->cpua_ctrl = 0xff;
-	state->ioc220_port = 0;
-	state->banknum = -1;
-	state->adpcm_pos = 0;
-	state->adpcm_data = -1;
+	state->m_cpua_ctrl = 0xff;
+	state->m_ioc220_port = 0;
+	state->m_banknum = -1;
+	state->m_adpcm_pos = 0;
+	state->m_adpcm_data = -1;
 }
 
 static const pc080sn_interface topspeed_pc080sn_intf =

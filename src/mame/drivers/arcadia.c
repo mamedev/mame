@@ -193,9 +193,9 @@ static void arcadia_reset_coins(running_machine &machine)
 
 static ADDRESS_MAP_START( amiga_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(arcadia_state, chip_ram, chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(arcadia_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(arcadia_state, custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(arcadia_state, m_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)		/* Kickstart BIOS */
 
@@ -779,7 +779,7 @@ static void arcadia_init(running_machine &machine)
 	amiga_machine_config(machine, &arcadia_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */

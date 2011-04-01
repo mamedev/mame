@@ -4,27 +4,27 @@ public:
 	retofinv_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 cpu2_m6000;
-	UINT8 *fg_videoram;
-	UINT8 *bg_videoram;
-	UINT8 *sharedram;
-	UINT8 from_main;
-	UINT8 from_mcu;
-	int mcu_sent;
-	int main_sent;
-	UINT8 portA_in;
-	UINT8 portA_out;
-	UINT8 ddrA;
-	UINT8 portB_in;
-	UINT8 portB_out;
-	UINT8 ddrB;
-	UINT8 portC_in;
-	UINT8 portC_out;
-	UINT8 ddrC;
-	int fg_bank;
-	int bg_bank;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	UINT8 m_cpu2_m6000;
+	UINT8 *m_fg_videoram;
+	UINT8 *m_bg_videoram;
+	UINT8 *m_sharedram;
+	UINT8 m_from_main;
+	UINT8 m_from_mcu;
+	int m_mcu_sent;
+	int m_main_sent;
+	UINT8 m_portA_in;
+	UINT8 m_portA_out;
+	UINT8 m_ddrA;
+	UINT8 m_portB_in;
+	UINT8 m_portB_out;
+	UINT8 m_ddrB;
+	UINT8 m_portC_in;
+	UINT8 m_portC_out;
+	UINT8 m_ddrC;
+	int m_fg_bank;
+	int m_bg_bank;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
 

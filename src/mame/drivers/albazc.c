@@ -21,10 +21,10 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video-related */
-	UINT8 *  spriteram1;
-	UINT8 *  spriteram2;
-	UINT8 *  spriteram3;
-	UINT8 flip_bit;
+	UINT8 *  m_spriteram1;
+	UINT8 *  m_spriteram2;
+	UINT8 *  m_spriteram3;
+	UINT8 m_flip_bit;
 };
 
 
@@ -58,14 +58,14 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 	for (i = 511; i >= 0; i--)
 	{
-		int code = state->spriteram1[i] | (state->spriteram2[i] << 8);
-		int color = (state->spriteram2[i + 0x200] & 0xf8) >> 3;
+		int code = state->m_spriteram1[i] | (state->m_spriteram2[i] << 8);
+		int color = (state->m_spriteram2[i + 0x200] & 0xf8) >> 3;
 		int flipx = 0;
 		int flipy = 0;
-		int sx = state->spriteram1[i + 0x200] | ((state->spriteram2[i + 0x200] & 0x07) << 8);
-		int sy = 242 - state->spriteram3[i];
+		int sx = state->m_spriteram1[i + 0x200] | ((state->m_spriteram2[i + 0x200] & 0x07) << 8);
+		int sy = 242 - state->m_spriteram3[i];
 
-		if (state->flip_bit)
+		if (state->m_flip_bit)
 		{
 			sy = 242 - sy;
 			flipx = !flipx;
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( albazc_vregs_w )
 	{
 		/* core bug with this? */
 		//flip_screen_set(space->machine(), (data & 0x40) >> 6);
-		state->flip_bit = (data & 0x40) >> 6;
+		state->m_flip_bit = (data & 0x40) >> 6;
 	}
 }
 
@@ -151,9 +151,9 @@ static WRITE8_HANDLER( albazc_vregs_w )
 
 static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram3)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
 	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40

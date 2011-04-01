@@ -254,7 +254,7 @@ static const eeprom_interface undrfire_eeprom_interface =
 static CUSTOM_INPUT(frame_counter_r)
 {
 	undrfire_state *state = field->port->machine().driver_data<undrfire_state>();
-	return state->frame_counter;
+	return state->m_frame_counter;
 }
 
 static READ32_HANDLER( undrfire_input_r )
@@ -269,7 +269,7 @@ static READ32_HANDLER( undrfire_input_r )
 
 		case 0x01:
 		{
-			return input_port_read(space->machine(), "SYSTEM") | (state->coin_word << 16);
+			return input_port_read(space->machine(), "SYSTEM") | (state->m_coin_word << 16);
 		}
 	}
 
@@ -308,7 +308,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
 				coin_counter_w(space->machine(), 0, data & 0x04000000);
 				coin_counter_w(space->machine(), 1, data & 0x08000000);
-				state->coin_word = (data >> 16) &0xffff;
+				state->m_coin_word = (data >> 16) &0xffff;
 			}
 		}
 	}
@@ -318,8 +318,8 @@ static WRITE32_HANDLER( undrfire_input_w )
 static READ16_HANDLER( shared_ram_r )
 {
 	undrfire_state *state = space->machine().driver_data<undrfire_state>();
-	if ((offset&1)==0) return (state->shared_ram[offset/2]&0xffff0000)>>16;
-	return (state->shared_ram[offset/2]&0x0000ffff);
+	if ((offset&1)==0) return (state->m_shared_ram[offset/2]&0xffff0000)>>16;
+	return (state->m_shared_ram[offset/2]&0x0000ffff);
 }
 
 static WRITE16_HANDLER( shared_ram_w )
@@ -327,14 +327,14 @@ static WRITE16_HANDLER( shared_ram_w )
 	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
-			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
+			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
 		if (ACCESSING_BITS_0_7)
-			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
+			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
 	} else {
 		if (ACCESSING_BITS_8_15)
-			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
+			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
 		if (ACCESSING_BITS_0_7)
-			state->shared_ram[offset/2]=(state->shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
+			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
 
@@ -409,13 +409,13 @@ static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if (ACCESSING_BITS_0_15)
 	{
-		state->rotate_ctrl[state->port_sel] = data;
+		state->m_rotate_ctrl[state->m_port_sel] = data;
 		return;
 	}
 
 	if (ACCESSING_BITS_16_31)
 	{
-		state->port_sel = (data &0x70000) >> 16;
+		state->m_port_sel = (data &0x70000) >> 16;
 	}
 }
 
@@ -464,8 +464,8 @@ static WRITE32_HANDLER( cbombers_adc_w )
 
 static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, ram)
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(undrfire_state, spriteram, spriteram_size)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, m_ram)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(undrfire_state, m_spriteram, m_spriteram_size)
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)		/* gun vibration */
@@ -486,7 +486,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(undrfire_state, spriteram, spriteram_size)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(undrfire_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
@@ -499,7 +499,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, shared_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(undrfire_state, m_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbombers_cpub_map, AS_PROGRAM, 16 )
@@ -691,7 +691,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( undrfire_interrupt )
 {
 	undrfire_state *state = device->machine().driver_data<undrfire_state>();
-	state->frame_counter ^= 1;
+	state->m_frame_counter ^= 1;
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 

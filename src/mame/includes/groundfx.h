@@ -14,15 +14,15 @@ public:
 	groundfx_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 coin_word;
-	UINT16 frame_counter;
-	UINT16 port_sel;
-	UINT32 *ram;
-	struct tempsprite *spritelist;
-	UINT16 rotate_ctrl[8];
-	rectangle hack_cliprect;
-	UINT32 *spriteram;
-	size_t spriteram_size;
+	UINT16 m_coin_word;
+	UINT16 m_frame_counter;
+	UINT16 m_port_sel;
+	UINT32 *m_ram;
+	struct tempsprite *m_spritelist;
+	UINT16 m_rotate_ctrl[8];
+	rectangle m_hack_cliprect;
+	UINT32 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

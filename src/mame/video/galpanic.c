@@ -7,7 +7,7 @@ VIDEO_START( galpanic )
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	machine.generic.tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
-	state->sprites_bitmap = machine.primary_screen->alloc_compatible_bitmap();
+	state->m_sprites_bitmap = machine.primary_screen->alloc_compatible_bitmap();
 }
 
 PALETTE_INIT( galpanic )
@@ -29,7 +29,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	int sx,sy;
 
 
-	data = COMBINE_DATA(&state->bgvideoram[offset]);
+	data = COMBINE_DATA(&state->m_bgvideoram[offset]);
 
 	sy = offset / 256;
 	sx = offset % 256;
@@ -48,11 +48,11 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 static void comad_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	galpanic_state *state = machine.driver_data<galpanic_state>();
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < state->spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram_size/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 
@@ -88,13 +88,13 @@ static void draw_fgbitmap(running_machine &machine, bitmap_t *bitmap, const rect
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
 
-	for (offs = 0;offs < state->fgvideoram_size/2;offs++)
+	for (offs = 0;offs < state->m_fgvideoram_size/2;offs++)
 	{
 		int sx,sy,color;
 
 		sx = offs % 256;
 		sy = offs / 256;
-		color = state->fgvideoram[offs];
+		color = state->m_fgvideoram[offs];
 		if (color)
 			*BITMAP_ADDR16(bitmap, sy, sx) = color;
 	}
@@ -125,14 +125,14 @@ SCREEN_UPDATE( comad )
 
 //  if(galpanic_clear_sprites)
 	{
-		bitmap_fill(state->sprites_bitmap,cliprect,0);
+		bitmap_fill(state->m_sprites_bitmap,cliprect,0);
 		comad_draw_sprites(screen->machine(),bitmap,cliprect);
 	}
 //  else
 //  {
 //      /* keep sprites on the bitmap without clearing them */
-//      comad_draw_sprites(screen->machine(),state->sprites_bitmap,0);
-//      copybitmap_trans(bitmap,state->sprites_bitmap,0,0,0,0,cliprect,0);
+//      comad_draw_sprites(screen->machine(),state->m_sprites_bitmap,0);
+//      copybitmap_trans(bitmap,state->m_sprites_bitmap,0,0,0,0,cliprect,0);
 //  }
 	return 0;
 }

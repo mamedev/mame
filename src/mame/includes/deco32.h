@@ -4,47 +4,47 @@ public:
 	deco32_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *ram;
-	int raster_enable;
-	timer_device *raster_irq_timer;
-	UINT8 nslasher_sound_irq;
-	int strobe;
-	int tattass_eprom_bit;
-	int lastClock;
-	char buffer[32];
-	int bufPtr;
-	int pendingCommand;
-	int readBitCount;
-	int byteAddr;
-	UINT8 bsmt_latch;
-	UINT8 bsmt_reset;
+	UINT32 *m_ram;
+	int m_raster_enable;
+	timer_device *m_raster_irq_timer;
+	UINT8 m_nslasher_sound_irq;
+	int m_strobe;
+	int m_tattass_eprom_bit;
+	int m_lastClock;
+	char m_buffer[32];
+	int m_bufPtr;
+	int m_pendingCommand;
+	int m_readBitCount;
+	int m_byteAddr;
+	UINT8 m_bsmt_latch;
+	UINT8 m_bsmt_reset;
 
-	int ace_ram_dirty;
-	int has_ace_ram;
-	UINT32 *ace_ram;
+	int m_ace_ram_dirty;
+	int m_has_ace_ram;
+	UINT32 *m_ace_ram;
 		
-	UINT8 *dirty_palette;
+	UINT8 *m_dirty_palette;
 
-	int pri;
-	bitmap_t *tilemap_alpha_bitmap;
+	int m_pri;
+	bitmap_t *m_tilemap_alpha_bitmap;
 
 
-	UINT16 spriteram16[0x1000];
-	UINT16 spriteram16_buffered[0x1000];
-	UINT16 spriteram16_2[0x1000];
-	UINT16 spriteram16_2_buffered[0x1000];
-	UINT16    pf1_rowscroll[0x1000];
-	UINT16    pf2_rowscroll[0x1000];
-	UINT16    pf3_rowscroll[0x1000];
-	UINT16    pf4_rowscroll[0x1000];
+	UINT16 m_spriteram16[0x1000];
+	UINT16 m_spriteram16_buffered[0x1000];
+	UINT16 m_spriteram16_2[0x1000];
+	UINT16 m_spriteram16_2_buffered[0x1000];
+	UINT16    m_pf1_rowscroll[0x1000];
+	UINT16    m_pf2_rowscroll[0x1000];
+	UINT16    m_pf3_rowscroll[0x1000];
+	UINT16    m_pf4_rowscroll[0x1000];
 	// we use the pointers below to store a 32-bit copy..
-	UINT32 *pf1_rowscroll32;
-	UINT32 *pf2_rowscroll32;
-	UINT32 *pf3_rowscroll32;
-	UINT32 *pf4_rowscroll32;
+	UINT32 *m_pf1_rowscroll32;
+	UINT32 *m_pf2_rowscroll32;
+	UINT32 *m_pf3_rowscroll32;
+	UINT32 *m_pf4_rowscroll32;
 	
-	device_t *deco_tilegen1;
-	device_t *deco_tilegen2;
+	device_t *m_deco_tilegen1;
+	device_t *m_deco_tilegen2;
 };
 
 class dragngun_state : public deco32_state
@@ -53,12 +53,12 @@ public:
 	dragngun_state(running_machine &machine, const driver_device_config_base &config)
 		: deco32_state(machine, config) { }
 
-	UINT32 *dragngun_sprite_layout_0_ram;
-	UINT32 *dragngun_sprite_layout_1_ram;
-	UINT32 *dragngun_sprite_lookup_0_ram;
-	UINT32 *dragngun_sprite_lookup_1_ram;
-	UINT32 dragngun_sprite_ctrl;
-	int dragngun_lightgun_port;
+	UINT32 *m_dragngun_sprite_layout_0_ram;
+	UINT32 *m_dragngun_sprite_layout_1_ram;
+	UINT32 *m_dragngun_sprite_lookup_0_ram;
+	UINT32 *m_dragngun_sprite_lookup_1_ram;
+	UINT32 m_dragngun_sprite_ctrl;
+	int m_dragngun_lightgun_port;
 };
 
 

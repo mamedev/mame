@@ -115,7 +115,7 @@ static WRITE8_HANDLER( inputport_select_w )
 {
 	baraduke_state *state = space->machine().driver_data<baraduke_state>();
 	if ((data & 0xe0) == 0x60)
-		state->inputport_selected = data & 0x07;
+		state->m_inputport_selected = data & 0x07;
 	else if ((data & 0xe0) == 0xc0)
 	{
 		coin_lockout_global_w(space->machine(), ~data & 1);
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( inputport_select_w )
 static READ8_HANDLER( inputport_r )
 {
 	baraduke_state *state = space->machine().driver_data<baraduke_state>();
-	switch (state->inputport_selected)
+	switch (state->m_inputport_selected)
 	{
 		case 0x00:	/* DSW A (bits 0-4) */
 			return (input_port_read(space->machine(), "DSWA") & 0xf8) >> 3;
@@ -162,10 +162,10 @@ static WRITE8_HANDLER( baraduke_irq_ack_w )
 
 
 static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_BASE_MEMBER(baraduke_state, spriteram)	/* Sprite RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_BASE_MEMBER(baraduke_state, videoram)	/* Video RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_BASE_MEMBER(baraduke_state, m_spriteram)	/* Sprite RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_BASE_MEMBER(baraduke_state, m_videoram)	/* Video RAM */
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w)		/* PSG device, shared RAM */
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_BASE_MEMBER(baraduke_state, textram)/* video RAM (text layer) */
+	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_BASE_MEMBER(baraduke_state, m_textram)/* video RAM (text layer) */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)		/* irq acknowledge */
 	AM_RANGE(0xb000, 0xb002) AM_WRITE(baraduke_scroll0_w)		/* scroll (layer 0) */
@@ -177,7 +177,7 @@ static READ8_HANDLER( soundkludge_r )
 {
 	baraduke_state *state = space->machine().driver_data<baraduke_state>();
 
-	return ((state->counter++) >> 4) & 0xff;
+	return ((state->m_counter++) >> 4) & 0xff;
 }
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )

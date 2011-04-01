@@ -343,10 +343,10 @@ static MACHINE_START( williams_common )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure the memory bank */
-	memory_configure_bank(machine, "bank1", 0, 1, state->videoram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine.region("maincpu")->base() + 0x10000, 0);
 
-	state_save_register_global(machine, state->vram_bank);
+	state_save_register_global(machine, state->m_vram_bank);
 }
 
 
@@ -433,7 +433,7 @@ static STATE_POSTLOAD( williams2_postload )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	williams2_bank_select_w(space, 0, state->vram_bank);
+	williams2_bank_select_w(space, 0, state->m_vram_bank);
 }
 
 
@@ -441,11 +441,11 @@ MACHINE_START( williams2 )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	/* configure memory banks */
-	memory_configure_bank(machine, "bank1", 0, 1, state->videoram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram, 0);
 	memory_configure_bank(machine, "bank1", 1, 4, machine.region("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
-	state_save_register_global(machine, state->vram_bank);
+	state_save_register_global(machine, state->m_vram_bank);
 	machine.state().register_postload(williams2_postload, NULL);
 }
 
@@ -478,28 +478,28 @@ WRITE8_HANDLER( williams_vram_select_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
 	/* VRAM/ROM banking from bit 0 */
-	state->vram_bank = data & 0x01;
-	memory_set_bank(space->machine(), "bank1", state->vram_bank);
+	state->m_vram_bank = data & 0x01;
+	memory_set_bank(space->machine(), "bank1", state->m_vram_bank);
 
 	/* cocktail flip from bit 1 */
-	state->cocktail = data & 0x02;
+	state->m_cocktail = data & 0x02;
 }
 
 
 WRITE8_HANDLER( williams2_bank_select_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
-	state->vram_bank = data & 0x07;
+	state->m_vram_bank = data & 0x07;
 
 	/* the low two bits control the paging */
-	switch (state->vram_bank & 0x03)
+	switch (state->m_vram_bank & 0x03)
 	{
 		/* page 0 is video ram */
 		case 0:
 			space->install_read_bank(0x0000, 0x8fff, "bank1");
 			space->install_write_bank(0x8000, 0x87ff, "bank4");
 			memory_set_bank(space->machine(), "bank1", 0);
-			memory_set_bankptr(space->machine(), "bank4", &state->videoram[0x8000]);
+			memory_set_bankptr(space->machine(), "bank4", &state->m_videoram[0x8000]);
 			break;
 
 		/* pages 1 and 2 are ROM */
@@ -507,15 +507,15 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		case 2:
 			space->install_read_bank(0x0000, 0x8fff, "bank1");
 			space->install_write_bank(0x8000, 0x87ff, "bank4");
-			memory_set_bank(space->machine(), "bank1", 1 + ((state->vram_bank & 6) >> 1));
-			memory_set_bankptr(space->machine(), "bank4", &state->videoram[0x8000]);
+			memory_set_bank(space->machine(), "bank1", 1 + ((state->m_vram_bank & 6) >> 1));
+			memory_set_bankptr(space->machine(), "bank4", &state->m_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
 			space->install_read_bank(0x8000, 0x87ff, "bank4");
 			space->install_legacy_write_handler(0x8000, 0x87ff, FUNC(williams2_paletteram_w));
-			memory_set_bank(space->machine(), "bank1", 1 + ((state->vram_bank & 4) >> 1));
+			memory_set_bank(space->machine(), "bank1", 1 + ((state->m_vram_bank & 4) >> 1));
 			memory_set_bankptr(space->machine(), "bank4", space->machine().generic.paletteram.v);
 			break;
 	}
@@ -572,7 +572,7 @@ static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
 WRITE8_DEVICE_HANDLER( williams_port_select_w )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
-	state->port_select = data;
+	state->m_port_select = data;
 }
 
 CUSTOM_INPUT( williams_mux_r )
@@ -580,7 +580,7 @@ CUSTOM_INPUT( williams_mux_r )
 	williams_state *state = field->port->machine().driver_data<williams_state>();
 	const char *tag = (const char *)param;
 
-	if (state->port_select != 0)
+	if (state->m_port_select != 0)
 		tag += strlen(tag) + 1;
 
 	return input_port_read(field->port->machine(), tag);
@@ -621,7 +621,7 @@ READ8_DEVICE_HANDLER( williams_49way_port_0_r )
 READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
-	if (state->port_select)
+	if (state->m_port_select)
 		return williams_49way_port_0_r(device, 0);
 	else
 		return input_port_read(device->machine(), "IN3");
@@ -726,7 +726,7 @@ static STATE_POSTLOAD( defender_postload )
 {
 	williams_state *state = machine.driver_data<williams_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	defender_bank_select_w(space, 0, state->vram_bank);
+	defender_bank_select_w(space, 0, state->m_vram_bank);
 }
 
 
@@ -754,14 +754,14 @@ MACHINE_RESET( defender )
 WRITE8_HANDLER( defender_video_control_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
-	state->cocktail = data & 0x01;
+	state->m_cocktail = data & 0x01;
 }
 
 
 WRITE8_HANDLER( defender_bank_select_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
-	state->vram_bank = data & 0x0f;
+	state->m_vram_bank = data & 0x0f;
 
 	/* set bank address */
 	switch (data)
@@ -783,7 +783,7 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 9:
 			space->install_read_bank(0xc000, 0xcfff, "bank1");
 			space->unmap_write(0xc000, 0xcfff);
-			memory_set_bank(space->machine(), "bank1", state->vram_bank - 1);
+			memory_set_bank(space->machine(), "bank1", state->m_vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
@@ -809,7 +809,7 @@ READ8_HANDLER( mayday_protection_r )
 	/* These are compared against $a193 and $a194, respectively. Thus, to prevent  */
 	/* the protection from resetting the space->machine(), we just return $a193 for $a190,  */
 	/* and $a194 for $a191. */
-	return state->mayday_protection[offset + 3];
+	return state->m_mayday_protection[offset + 3];
 }
 
 
@@ -827,7 +827,7 @@ WRITE8_HANDLER( sinistar_vram_select_w )
 	williams_vram_select_w(space, offset, data);
 
 	/* window enable from bit 2 (clips to 0x7400) */
-	state->blitter_window_enable = data & 0x04;
+	state->m_blitter_window_enable = data & 0x04;
 }
 
 
@@ -844,13 +844,13 @@ MACHINE_START( blaster )
 	MACHINE_START_CALL(williams_common);
 
 	/* banking is different for blaster */
-	memory_configure_bank(machine, "bank1", 0, 1, state->videoram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram, 0);
 	memory_configure_bank(machine, "bank1", 1, 16, machine.region("maincpu")->base() + 0x18000, 0x4000);
 
-	memory_configure_bank(machine, "bank2", 0, 1, state->videoram + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", 0, 1, state->m_videoram + 0x4000, 0);
 	memory_configure_bank(machine, "bank2", 1, 16, machine.region("maincpu")->base() + 0x10000, 0x0000);
 
-	state_save_register_global(machine, state->blaster_bank);
+	state_save_register_global(machine, state->m_blaster_bank);
 }
 
 
@@ -863,8 +863,8 @@ MACHINE_RESET( blaster )
 INLINE void update_blaster_banking(running_machine &machine)
 {
 	williams_state *state = machine.driver_data<williams_state>();
-	memory_set_bank(machine, "bank1", state->vram_bank * (state->blaster_bank + 1));
-	memory_set_bank(machine, "bank2", state->vram_bank * (state->blaster_bank + 1));
+	memory_set_bank(machine, "bank1", state->m_vram_bank * (state->m_blaster_bank + 1));
+	memory_set_bank(machine, "bank2", state->m_vram_bank * (state->m_blaster_bank + 1));
 }
 
 
@@ -872,21 +872,21 @@ WRITE8_HANDLER( blaster_vram_select_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
 	/* VRAM/ROM banking from bit 0 */
-	state->vram_bank = data & 0x01;
+	state->m_vram_bank = data & 0x01;
 	update_blaster_banking(space->machine());
 
 	/* cocktail flip from bit 1 */
-	state->cocktail = data & 0x02;
+	state->m_cocktail = data & 0x02;
 
 	/* window enable from bit 2 (clips to 0x9700) */
-	state->blitter_window_enable = data & 0x04;
+	state->m_blitter_window_enable = data & 0x04;
 }
 
 
 WRITE8_HANDLER( blaster_bank_select_w )
 {
 	williams_state *state = space->machine().driver_data<williams_state>();
-	state->blaster_bank = data & 15;
+	state->m_blaster_bank = data & 15;
 	update_blaster_banking(space->machine());
 }
 
@@ -956,7 +956,7 @@ MACHINE_START( joust2 )
 	williams_state *state = machine.driver_data<williams_state>();
 	MACHINE_START_CALL(williams2);
 	williams_cvsd_init(machine);
-	state_save_register_global(machine, state->joust2_current_sound_data);
+	state_save_register_global(machine, state->m_joust2_current_sound_data);
 }
 
 
@@ -982,7 +982,7 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 	williams_state *state = device->machine().driver_data<williams_state>();
 	pia6821_device *pia_3 = device->machine().device<pia6821_device>("cvsdpia");
 
-	state->joust2_current_sound_data = (state->joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
+	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
 	pia6821_cb1_w(pia_3, data);
 }
 
@@ -990,7 +990,7 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w )
 {
 	williams_state *state = device->machine().driver_data<williams_state>();
-	state->joust2_current_sound_data = (state->joust2_current_sound_data & ~0xff) | (data & 0xff);
-	williams_cvsd_data_w(device->machine(), state->joust2_current_sound_data);
-	device->machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->joust2_current_sound_data);
+	state->m_joust2_current_sound_data = (state->m_joust2_current_sound_data & ~0xff) | (data & 0xff);
+	williams_cvsd_data_w(device->machine(), state->m_joust2_current_sound_data);
+	device->machine().scheduler().synchronize(FUNC(joust2_deferred_snd_cmd_w), state->m_joust2_current_sound_data);
 }

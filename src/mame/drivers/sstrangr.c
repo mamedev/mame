@@ -20,9 +20,9 @@ public:
 	sstrangr_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram;
-	UINT8 flip_screen;
-	UINT8 *proms;
+	UINT8 *m_ram;
+	UINT8 m_flip_screen;
+	UINT8 *m_proms;
 };
 
 
@@ -44,13 +44,13 @@ static SCREEN_UPDATE( sstrangr )
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = state->ram[offs];
+		UINT8 data = state->m_ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
-			if (state->flip_screen)
+			if (state->m_flip_screen)
 			{
 				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
 				data = data << 1;
@@ -91,7 +91,7 @@ static SCREEN_UPDATE( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = &screen->machine().region("proms")->base()[state->flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &screen->machine().region("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -102,14 +102,14 @@ static SCREEN_UPDATE( sstrngr2 )
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = state->ram[offs];
+		UINT8 data = state->m_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
-			if (state->flip_screen)
+			if (state->m_flip_screen)
 			{
 				color = (data & 0x80) ? fore_color : 0;
 				data = data << 1;
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( port_w )
 {
 	sstrangr_state *state = space->machine().driver_data<sstrangr_state>();
 
-	state->flip_screen = data & 0x20;
+	state->m_flip_screen = data & 0x20;
 }
 
 
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( port_w )
 static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(sstrangr_state,ram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(sstrangr_state,m_ram)
 	AM_RANGE(0x6000, 0x63ff) AM_ROM
 ADDRESS_MAP_END
 

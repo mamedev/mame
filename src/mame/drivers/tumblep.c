@@ -72,7 +72,7 @@ static WRITE16_HANDLER( tumblep_sound_w )
 {
 	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( jumppop_sound_w )
 {
 	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(state->audiocpu, 0, ASSERT_LINE );
+	cputag_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
 }
 #endif
 
@@ -118,12 +118,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, spriteram, spriteram_size)
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf2_rowscroll) // unused
+	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, m_pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, m_pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -277,7 +277,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	tumblep_state *driver_state = device->machine().driver_data<tumblep_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -300,9 +300,9 @@ static MACHINE_START( tumblep )
 {
 	tumblep_state *state = machine.driver_data<tumblep_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( tumblep, tumblep_state )

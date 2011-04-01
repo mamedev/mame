@@ -77,7 +77,7 @@ Notes:
 
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE_MEMBER(namcond1_state, shared_ram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE_MEMBER(namcond1_state, m_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
 	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0xff00)
 #ifdef MAME_DEBUG
@@ -223,13 +223,13 @@ GFXDECODE_END
 static WRITE16_HANDLER( sharedram_sub_w )
 {
 	namcond1_state *state = space->machine().driver_data<namcond1_state>();
-	COMBINE_DATA(&state->shared_ram[offset]);
+	COMBINE_DATA(&state->m_shared_ram[offset]);
 }
 
 static READ16_HANDLER( sharedram_sub_r )
 {
 	namcond1_state *state = space->machine().driver_data<namcond1_state>();
-	return state->shared_ram[offset];
+	return state->m_shared_ram[offset];
 }
 
 
@@ -246,7 +246,7 @@ static READ8_HANDLER( mcu_pa_read )
 static WRITE8_HANDLER( mcu_pa_write )
 {
 	namcond1_state *state = space->machine().driver_data<namcond1_state>();
-	state->p8 = data;
+	state->m_p8 = data;
 }
 
 /* H8/3002 MCU stuff */
@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( mcu_interrupt )
 {
 	namcond1_state *state = device->machine().driver_data<namcond1_state>();
-	if( state->h8_irq5_enabled )
+	if( state->m_h8_irq5_enabled )
 	{
 		generic_pulse_irq_line(device, H8_IRQ5);
 	}

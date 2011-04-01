@@ -224,7 +224,7 @@ static STREAM_UPDATE( amiga_stream_update )
 					chan->curlocation++;
 				if (chan->dmaenabled && !(chan->curlocation & 1))
 				{
-					CUSTOM_REG(REG_AUD0DAT + channum * 8) = (*state->chip_ram_r)(state, chan->curlocation);
+					CUSTOM_REG(REG_AUD0DAT + channum * 8) = (*state->m_chip_ram_r)(state, chan->curlocation);
 					if (chan->curlength != 0)
 						chan->curlength--;
 

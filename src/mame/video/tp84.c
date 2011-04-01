@@ -108,7 +108,7 @@ WRITE8_HANDLER( tp84_spriteram_w )
 	tp84_state *state = space->machine().driver_data<tp84_state>();
 	/* the game multiplexes the sprites, so update now */
 	space->machine().primary_screen->update_now();
-	state->spriteram[offset] = data;
+	state->m_spriteram[offset] = data;
 }
 
 
@@ -122,11 +122,11 @@ READ8_HANDLER( tp84_scanline_r )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
-	int code = ((state->bg_colorram[tile_index] & 0x30) << 4) | state->bg_videoram[tile_index];
-	int color = ((*state->palette_bank & 0x07) << 6) |
-				((*state->palette_bank & 0x18) << 1) |
-				(state->bg_colorram[tile_index] & 0x0f);
-	int flags = TILE_FLIPYX(state->bg_colorram[tile_index] >> 6);
+	int code = ((state->m_bg_colorram[tile_index] & 0x30) << 4) | state->m_bg_videoram[tile_index];
+	int color = ((*state->m_palette_bank & 0x07) << 6) |
+				((*state->m_palette_bank & 0x18) << 1) |
+				(state->m_bg_colorram[tile_index] & 0x0f);
+	int flags = TILE_FLIPYX(state->m_bg_colorram[tile_index] >> 6);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -134,11 +134,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
-	int code = ((state->fg_colorram[tile_index] & 0x30) << 4) | state->fg_videoram[tile_index];
-	int color = ((*state->palette_bank & 0x07) << 6) |
-				((*state->palette_bank & 0x18) << 1) |
-				(state->fg_colorram[tile_index] & 0x0f);
-	int flags = TILE_FLIPYX(state->fg_colorram[tile_index] >> 6);
+	int code = ((state->m_fg_colorram[tile_index] & 0x30) << 4) | state->m_fg_videoram[tile_index];
+	int color = ((*state->m_palette_bank & 0x07) << 6) |
+				((*state->m_palette_bank & 0x18) << 1) |
+				(state->m_fg_colorram[tile_index] & 0x0f);
+	int flags = TILE_FLIPYX(state->m_fg_colorram[tile_index] >> 6);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -147,8 +147,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( tp84 )
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -156,17 +156,17 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 {
 	tp84_state *state = machine.driver_data<tp84_state>();
 	int offs;
-	int palette_base = ((*state->palette_bank & 0x07) << 4);
+	int palette_base = ((*state->m_palette_bank & 0x07) << 4);
 
 	for (offs = 0x5c; offs >= 0; offs -= 4)
 	{
-		int x = state->spriteram[offs];
-		int y = 240 - state->spriteram[offs + 3];
+		int x = state->m_spriteram[offs];
+		int y = 240 - state->m_spriteram[offs + 3];
 
-		int code = state->spriteram[offs + 1];
-		int color = palette_base | (state->spriteram[offs + 2] & 0x0f);
-		int flip_x = ~state->spriteram[offs + 2] & 0x40;
-		int flip_y =  state->spriteram[offs + 2] & 0x80;
+		int code = state->m_spriteram[offs + 1];
+		int color = palette_base | (state->m_spriteram[offs + 2] & 0x0f);
+		int flip_x = ~state->m_spriteram[offs + 2] & 0x40;
+		int flip_y =  state->m_spriteram[offs + 2] & 0x80;
 
 		drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flip_x, flip_y, x, y,
 				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, palette_base));
@@ -185,25 +185,25 @@ SCREEN_UPDATE( tp84 )
 	{
 		tilemap_mark_all_tiles_dirty_all(screen->machine());
 
-		tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll_x);
-		tilemap_set_scrolly(state->bg_tilemap, 0, *state->scroll_y);
+		tilemap_set_scrollx(state->m_bg_tilemap, 0, *state->m_scroll_x);
+		tilemap_set_scrolly(state->m_bg_tilemap, 0, *state->m_scroll_y);
 
-		tilemap_set_flip_all(screen->machine(), ((*state->flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
-									   ((*state->flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
+		tilemap_set_flip_all(screen->machine(), ((*state->m_flipscreen_x & 0x01) ? TILEMAP_FLIPX : 0) |
+									   ((*state->m_flipscreen_y & 0x01) ? TILEMAP_FLIPY : 0));
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;
 	clip.max_x = visarea.min_x + 15;
-	tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
 
 	/* draw bottom status region */
 	clip.min_x = visarea.max_x - 15;
 	clip.max_x = visarea.max_x;
-	tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &clip, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }

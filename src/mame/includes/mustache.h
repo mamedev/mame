@@ -4,12 +4,12 @@ public:
 	mustache_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	emu_timer *clear_irq_timer;
-	tilemap_t *bg_tilemap;
-	int control_byte;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	emu_timer *m_clear_irq_timer;
+	tilemap_t *m_bg_tilemap;
+	int m_control_byte;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

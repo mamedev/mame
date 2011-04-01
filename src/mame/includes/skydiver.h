@@ -25,10 +25,10 @@ public:
 	skydiver_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int nmion;
-	UINT8 *videoram;
-	tilemap_t *bg_tilemap;
-	int width;
+	int m_nmion;
+	UINT8 *m_videoram;
+	tilemap_t *m_bg_tilemap;
+	int m_width;
 };
 
 

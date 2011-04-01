@@ -42,27 +42,28 @@ public:
 
 	/* sound-related */
 	// Jangou CVSD Sound
-	emu_timer    *cvsd_bit_timer;
-	UINT8        cvsd_shiftreg;
-	int          cvsd_shift_cnt;
+	emu_timer    *m_cvsd_bit_timer;
+	UINT8        m_cvsd_shiftreg;
+	int          m_cvsd_shift_cnt;
 	// Jangou Lady ADPCM Sound
-	UINT8        adpcm_byte;
-	int          msm5205_vclk_toggle;
+	UINT8        m_adpcm_byte;
+	int          m_msm5205_vclk_toggle;
 
 	/* misc */
-	UINT8        mux_data;
-	UINT8        nsc_latch, z80_latch;
+	UINT8        m_mux_data;
+	UINT8        m_nsc_latch;
+	UINT8		 m_z80_latch;
 
 	/* devices */
-	device_t *cpu_0;
-	device_t *cpu_1;
-	device_t *cvsd;
-	device_t *nsc;
+	device_t *m_cpu_0;
+	device_t *m_cpu_1;
+	device_t *m_cvsd;
+	device_t *m_nsc;
 
 	/* video-related */
-	UINT8        pen_data[0x10];
-	UINT8        blit_data[6];
-	UINT8        blit_buffer[256 * 256];
+	UINT8        m_pen_data[0x10];
+	UINT8        m_blit_data[6];
+	UINT8        m_blit_buffer[256 * 256];
 };
 
 
@@ -116,7 +117,7 @@ static VIDEO_START( jangou )
 {
 	jangou_state *state = machine.driver_data<jangou_state>();
 
-	state->save_item(NAME(state->blit_buffer));
+	state->save_item(NAME(state->m_blit_buffer));
 }
 
 static SCREEN_UPDATE( jangou )
@@ -126,7 +127,7 @@ static SCREEN_UPDATE( jangou )
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
-		UINT8 *src = &state->blit_buffer[y * 512 / 2 + cliprect->min_x];
+		UINT8 *src = &state->m_blit_buffer[y * 512 / 2 + cliprect->min_x];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
@@ -170,32 +171,32 @@ static void plot_jangou_gfx_pixel( running_machine &machine, UINT8 pix, int x, i
 		return;
 
 	if (x & 1)
-		state->blit_buffer[(y * 256) + (x >> 1)] = (state->blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
+		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
-		state->blit_buffer[(y * 256) + (x >> 1)] = (state->blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
+		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
 static WRITE8_HANDLER( blitter_process_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
 	int src, x, y, h, w, flipx;
-	state->blit_data[offset] = data;
+	state->m_blit_data[offset] = data;
 
 	if (offset == 5)
 	{
 		int count = 0;
 		int xcount, ycount;
 
-		/* printf("%02x %02x %02x %02x %02x %02x\n", state->blit_data[0], state->blit_data[1], state->blit_data[2],
-                    state->blit_data[3], state->blit_data[4], state->blit_data[5]); */
-		w = (state->blit_data[4] & 0xff) + 1;
-		h = (state->blit_data[5] & 0xff) + 1;
-		src = ((state->blit_data[1] << 8)|(state->blit_data[0] << 0));
-		x = (state->blit_data[2] & 0xff);
-		y = (state->blit_data[3] & 0xff);
+		/* printf("%02x %02x %02x %02x %02x %02x\n", state->m_blit_data[0], state->m_blit_data[1], state->m_blit_data[2],
+                    state->m_blit_data[3], state->m_blit_data[4], state->m_blit_data[5]); */
+		w = (state->m_blit_data[4] & 0xff) + 1;
+		h = (state->m_blit_data[5] & 0xff) + 1;
+		src = ((state->m_blit_data[1] << 8)|(state->m_blit_data[0] << 0));
+		x = (state->m_blit_data[2] & 0xff);
+		y = (state->m_blit_data[3] & 0xff);
 
 		// lowest bit of src controls flipping / draw direction?
-		flipx = (state->blit_data[0] & 1);
+		flipx = (state->m_blit_data[0] & 1);
 
 		if (!flipx)
 			src += (w * h) - 1;
@@ -209,8 +210,8 @@ static WRITE8_HANDLER( blitter_process_w )
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
 				UINT8 dat = jangou_gfx_nibble(space->machine(), src + count);
-				UINT8 cur_pen_hi = state->pen_data[(dat & 0xf0) >> 4];
-				UINT8 cur_pen_lo = state->pen_data[(dat & 0x0f) >> 0];
+				UINT8 cur_pen_hi = state->m_pen_data[(dat & 0xf0) >> 4];
+				UINT8 cur_pen_lo = state->m_pen_data[(dat & 0x0f) >> 0];
 
 				dat = cur_pen_lo | (cur_pen_hi << 4);
 
@@ -232,7 +233,7 @@ static WRITE8_HANDLER( blit_vregs_w )
 	jangou_state *state = space->machine().driver_data<jangou_state>();
 
 	//  printf("%02x %02x\n", offset, data);
-	state->pen_data[offset] = data & 0xf;
+	state->m_pen_data[offset] = data & 0xf;
 }
 
 /*************************************
@@ -244,7 +245,7 @@ static WRITE8_HANDLER( blit_vregs_w )
 static WRITE8_HANDLER( mux_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	state->mux_data = ~data;
+	state->m_mux_data = ~data;
 }
 
 static WRITE8_HANDLER( output_w )
@@ -263,7 +264,7 @@ static WRITE8_HANDLER( output_w )
 static READ8_DEVICE_HANDLER( input_mux_r )
 {
 	jangou_state *state = device->machine().driver_data<jangou_state>();
-	switch(state->mux_data)
+	switch(state->m_mux_data)
 	{
 		case 0x01: return input_port_read(device->machine(), "PL1_1");
 		case 0x02: return input_port_read(device->machine(), "PL1_2");
@@ -292,13 +293,13 @@ static WRITE8_HANDLER( sound_latch_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->m_cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->m_cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -306,7 +307,7 @@ static READ8_HANDLER( sound_latch_r )
 static WRITE8_HANDLER( cvsd_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	state->cvsd_shiftreg = data;
+	state->m_cvsd_shiftreg = data;
 }
 
 static TIMER_CALLBACK( cvsd_bit_timer_callback )
@@ -314,12 +315,12 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Data is shifted out at the MSB */
-	hc55516_digit_w(state->cvsd, (state->cvsd_shiftreg >> 7) & 1);
-	state->cvsd_shiftreg <<= 1;
+	hc55516_digit_w(state->m_cvsd, (state->m_cvsd_shiftreg >> 7) & 1);
+	state->m_cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
-	if ((++state->cvsd_shift_cnt & 7) == 0)
-		device_set_input_line(state->cpu_1, 0, HOLD_LINE);
+	if ((++state->m_cvsd_shift_cnt & 7) == 0)
+		device_set_input_line(state->m_cpu_1, 0, HOLD_LINE);
 }
 
 
@@ -327,22 +328,22 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 static WRITE8_HANDLER( adpcm_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	state->adpcm_byte = data;
+	state->m_adpcm_byte = data;
 }
 
 static void jngolady_vclk_cb( device_t *device )
 {
 	jangou_state *state = device->machine().driver_data<jangou_state>();
 
-	if (state->msm5205_vclk_toggle == 0)
-		msm5205_data_w(device, state->adpcm_byte >> 4);
+	if (state->m_msm5205_vclk_toggle == 0)
+		msm5205_data_w(device, state->m_adpcm_byte >> 4);
 	else
 	{
-		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		device_set_input_line(state->cpu_1, 0, HOLD_LINE);
+		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
+		device_set_input_line(state->m_cpu_1, 0, HOLD_LINE);
 	}
 
-	state->msm5205_vclk_toggle ^= 1;
+	state->m_msm5205_vclk_toggle ^= 1;
 }
 
 
@@ -355,27 +356,27 @@ static void jngolady_vclk_cb( device_t *device )
 static READ8_HANDLER( master_com_r )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	return state->z80_latch;
+	return state->m_z80_latch;
 }
 
 static WRITE8_HANDLER( master_com_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
 
-	device_set_input_line(state->nsc, 0, HOLD_LINE);
-	state->nsc_latch = data;
+	device_set_input_line(state->m_nsc, 0, HOLD_LINE);
+	state->m_nsc_latch = data;
 }
 
 static READ8_HANDLER( slave_com_r )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	return state->nsc_latch;
+	return state->m_nsc_latch;
 }
 
 static WRITE8_HANDLER( slave_com_w )
 {
 	jangou_state *state = space->machine().driver_data<jangou_state>();
-	state->z80_latch = data;
+	state->m_z80_latch = data;
 }
 
 /*************************************
@@ -893,8 +894,8 @@ static SOUND_START( jangou )
 	jangou_state *state = machine.driver_data<jangou_state>();
 
 	/* Create a timer to feed the CVSD DAC with sample bits */
-	state->cvsd_bit_timer = machine.scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
-	state->cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
+	state->m_cvsd_bit_timer = machine.scheduler().timer_alloc(FUNC(cvsd_bit_timer_callback));
+	state->m_cvsd_bit_timer->adjust(attotime::from_hz(MASTER_CLOCK / 1024), 0, attotime::from_hz(MASTER_CLOCK / 1024));
 }
 
 
@@ -908,14 +909,14 @@ static MACHINE_START( common )
 {
 	jangou_state *state = machine.driver_data<jangou_state>();
 
-	state->cpu_0 = machine.device("cpu0");
-	state->cpu_1 = machine.device("cpu1");
-	state->cvsd = machine.device("cvsd");
-	state->nsc = machine.device("nsc");
+	state->m_cpu_0 = machine.device("cpu0");
+	state->m_cpu_1 = machine.device("cpu1");
+	state->m_cvsd = machine.device("cvsd");
+	state->m_nsc = machine.device("nsc");
 
-	state->save_item(NAME(state->pen_data));
-	state->save_item(NAME(state->blit_data));
-	state->save_item(NAME(state->mux_data));
+	state->save_item(NAME(state->m_pen_data));
+	state->save_item(NAME(state->m_blit_data));
+	state->save_item(NAME(state->m_mux_data));
 }
 
 static MACHINE_START( jangou )
@@ -924,8 +925,8 @@ static MACHINE_START( jangou )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->cvsd_shiftreg));
-	state->save_item(NAME(state->cvsd_shift_cnt));
+	state->save_item(NAME(state->m_cvsd_shiftreg));
+	state->save_item(NAME(state->m_cvsd_shift_cnt));
 }
 
 static MACHINE_START( jngolady )
@@ -934,10 +935,10 @@ static MACHINE_START( jngolady )
 
 	MACHINE_START_CALL(common);
 
-	state->save_item(NAME(state->adpcm_byte));
-	state->save_item(NAME(state->msm5205_vclk_toggle));
-	state->save_item(NAME(state->nsc_latch));
-	state->save_item(NAME(state->z80_latch));
+	state->save_item(NAME(state->m_adpcm_byte));
+	state->save_item(NAME(state->m_msm5205_vclk_toggle));
+	state->save_item(NAME(state->m_nsc_latch));
+	state->save_item(NAME(state->m_z80_latch));
 }
 
 static MACHINE_RESET( common )
@@ -945,13 +946,13 @@ static MACHINE_RESET( common )
 	jangou_state *state = machine.driver_data<jangou_state>();
 	int i;
 
-	state->mux_data = 0;
+	state->m_mux_data = 0;
 
 	for (i = 0; i < 6; i++)
-		state->blit_data[i] = 0;
+		state->m_blit_data[i] = 0;
 
 	for (i = 0; i < 16; i++)
-		state->pen_data[i] = 0;
+		state->m_pen_data[i] = 0;
 }
 
 static MACHINE_RESET( jangou )
@@ -960,8 +961,8 @@ static MACHINE_RESET( jangou )
 
 	MACHINE_RESET_CALL(common);
 
-	state->cvsd_shiftreg = 0;
-	state->cvsd_shift_cnt = 0;
+	state->m_cvsd_shiftreg = 0;
+	state->m_cvsd_shift_cnt = 0;
 }
 
 static MACHINE_RESET( jngolady )
@@ -970,10 +971,10 @@ static MACHINE_RESET( jngolady )
 
 	MACHINE_RESET_CALL(common);
 
-	state->adpcm_byte = 0;
-	state->msm5205_vclk_toggle = 0;
-	state->nsc_latch = 0;
-	state->z80_latch = 0;
+	state->m_adpcm_byte = 0;
+	state->m_msm5205_vclk_toggle = 0;
+	state->m_nsc_latch = 0;
+	state->m_z80_latch = 0;
 }
 
 /* Note: All frequencies and dividers are unverified */

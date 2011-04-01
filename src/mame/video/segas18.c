@@ -31,9 +31,9 @@ VIDEO_START( system18 )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	int width, height;
 
-	state->grayscale_enable = 0;
-	state->vdp_enable = 0;
-	state->vdp_mixing = 0;
+	state->m_grayscale_enable = 0;
+	state->m_vdp_enable = 0;
+	state->m_vdp_mixing = 0;
 
 	/* compute palette info */
 	segaic16_palette_init(0x800);
@@ -47,13 +47,13 @@ VIDEO_START( system18 )
 	/* create a temp bitmap to draw the VDP data into */
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();
-	state->tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	state->m_tmp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 
-	state->save_item(NAME(state->grayscale_enable));
-	state->save_item(NAME(state->vdp_enable));
-	state->save_item(NAME(state->vdp_mixing));
-	state->save_item(NAME(*state->tmp_bitmap));
+	state->save_item(NAME(state->m_grayscale_enable));
+	state->save_item(NAME(state->m_vdp_enable));
+	state->save_item(NAME(state->m_vdp_mixing));
+	state->save_item(NAME(*state->m_tmp_bitmap));
 }
 
 
@@ -69,10 +69,10 @@ void system18_set_grayscale(running_machine &machine, int enable)
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	enable = (enable != 0);
-	if (enable != state->grayscale_enable)
+	if (enable != state->m_grayscale_enable)
 	{
 		machine.primary_screen->update_partial(machine.primary_screen->vpos());
-		state->grayscale_enable = enable;
+		state->m_grayscale_enable = enable;
 //      mame_printf_debug("Grayscale = %02X\n", enable);
 	}
 }
@@ -83,10 +83,10 @@ void system18_set_vdp_enable(running_machine &machine, int enable)
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
 	enable = (enable != 0);
-	if (enable != state->vdp_enable)
+	if (enable != state->m_vdp_enable)
 	{
 		machine.primary_screen->update_partial(machine.primary_screen->vpos());
-		state->vdp_enable = enable;
+		state->m_vdp_enable = enable;
 #if DEBUG_VDP
 		mame_printf_debug("VDP enable = %02X\n", enable);
 #endif
@@ -98,10 +98,10 @@ void system18_set_vdp_mixing(running_machine &machine, int mixing)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 
-	if (mixing != state->vdp_mixing)
+	if (mixing != state->m_vdp_mixing)
 	{
 		machine.primary_screen->update_partial(machine.primary_screen->vpos());
-		state->vdp_mixing = mixing;
+		state->m_vdp_mixing = mixing;
 #if DEBUG_VDP
 		mame_printf_debug("VDP mixing = %02X\n", mixing);
 #endif
@@ -124,7 +124,7 @@ static void draw_vdp(device_t *screen, bitmap_t *bitmap, const rectangle *clipre
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *src = BITMAP_ADDR16(state->tmp_bitmap, y, 0);
+		UINT16 *src = BITMAP_ADDR16(state->m_tmp_bitmap, y, 0);
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 
@@ -184,8 +184,8 @@ SCREEN_UPDATE( system18 )
         cltchitr: layer = 1 or 2 or 3, pri = 0x02 or 0x04 or 0x08
         mwalk:    layer = 3, pri = 0x04 or 0x08
 */
-	vdplayer = (state->vdp_mixing >> 1) & 3;
-	vdppri = (state->vdp_mixing & 1) ? (1 << vdplayer) : 0;
+	vdplayer = (state->m_vdp_mixing >> 1) & 3;
+	vdppri = (state->m_vdp_mixing & 1) ? (1 << vdplayer) : 0;
 
 #if DEBUG_VDP
 	if (input_code_pressed(screen->machine(), KEYCODE_Q)) vdplayer = 0;
@@ -207,8 +207,8 @@ SCREEN_UPDATE( system18 )
 	}
 
 	/* if the VDP is enabled, update our tmp_bitmap */
-	if (state->vdp_enable)
-		system18_vdp_update(state->tmp_bitmap, cliprect);
+	if (state->m_vdp_enable)
+		system18_vdp_update(state->m_tmp_bitmap, cliprect);
 
 	/* reset priorities */
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
@@ -216,28 +216,28 @@ SCREEN_UPDATE( system18 )
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
-	if (state->vdp_enable && vdplayer == 0) draw_vdp(screen, bitmap, cliprect, vdppri);
+	if (state->m_vdp_enable && vdplayer == 0) draw_vdp(screen, bitmap, cliprect, vdppri);
 
 	/* draw background again to draw non-transparent pixels over the VDP and set the priority */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
-	if (state->vdp_enable && vdplayer == 1) draw_vdp(screen, bitmap, cliprect, vdppri);
+	if (state->m_vdp_enable && vdplayer == 1) draw_vdp(screen, bitmap, cliprect, vdppri);
 
 	/* draw foreground */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
-	if (state->vdp_enable && vdplayer == 2) draw_vdp(screen, bitmap, cliprect, vdppri);
+	if (state->m_vdp_enable && vdplayer == 2) draw_vdp(screen, bitmap, cliprect, vdppri);
 
 	/* text layer */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
-	if (state->vdp_enable && vdplayer == 3) draw_vdp(screen, bitmap, cliprect, vdppri);
+	if (state->m_vdp_enable && vdplayer == 3) draw_vdp(screen, bitmap, cliprect, vdppri);
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 
 #if DEBUG_VDP
-	if (state->vdp_enable && input_code_pressed(screen->machine(), KEYCODE_V))
+	if (state->m_vdp_enable && input_code_pressed(screen->machine(), KEYCODE_V))
 	{
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 		update_system18_vdp(bitmap, cliprect);
@@ -245,7 +245,7 @@ SCREEN_UPDATE( system18 )
 	if (vdp_enable && input_code_pressed(screen->machine(), KEYCODE_B))
 	{
 		FILE *f = fopen("vdp.bin", "w");
-		fwrite(state->tmp_bitmap->base, 1, state->tmp_bitmap->rowpixels * (state->tmp_bitmap->bpp / 8) * state->tmp_bitmap->height, f);
+		fwrite(state->m_tmp_bitmap->base, 1, state->m_tmp_bitmap->rowpixels * (state->m_tmp_bitmap->bpp / 8) * state->m_tmp_bitmap->height, f);
 		fclose(f);
 	}
 #endif

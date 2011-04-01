@@ -45,20 +45,20 @@ static WRITE8_HANDLER( spd_adpcm_w )
 	switch (offset/2)
 	{
 		case 3:
-			state->adpcm_idle[chip] = 1;
+			state->m_adpcm_idle[chip] = 1;
 			msm5205_reset_w(adpcm,1);
 			break;
 
 		case 2:
-			state->adpcm_pos[chip] = (data & 0x7f) * 0x200;
+			state->m_adpcm_pos[chip] = (data & 0x7f) * 0x200;
 			break;
 
 		case 1:
-			state->adpcm_end[chip] = (data & 0x7f) * 0x200;
+			state->m_adpcm_end[chip] = (data & 0x7f) * 0x200;
 			break;
 
 		case 0:
-			state->adpcm_idle[chip] = 0;
+			state->m_adpcm_idle[chip] = 0;
 			msm5205_reset_w(adpcm,0);
 			break;
 	}
@@ -68,22 +68,22 @@ static void spd_adpcm_int(device_t *device)
 {
 	spdodgeb_state *state = device->machine().driver_data<spdodgeb_state>();
 	int chip = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
-	if (state->adpcm_pos[chip] >= state->adpcm_end[chip] || state->adpcm_pos[chip] >= 0x10000)
+	if (state->m_adpcm_pos[chip] >= state->m_adpcm_end[chip] || state->m_adpcm_pos[chip] >= 0x10000)
 	{
-		state->adpcm_idle[chip] = 1;
+		state->m_adpcm_idle[chip] = 1;
 		msm5205_reset_w(device,1);
 	}
-	else if (state->adpcm_data[chip] != -1)
+	else if (state->m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device,state->adpcm_data[chip] & 0x0f);
-		state->adpcm_data[chip] = -1;
+		msm5205_data_w(device,state->m_adpcm_data[chip] & 0x0f);
+		state->m_adpcm_data[chip] = -1;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
 
-		state->adpcm_data[chip] = ROM[state->adpcm_pos[chip]++];
-		msm5205_data_w(device,state->adpcm_data[chip] >> 4);
+		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
+		msm5205_data_w(device,state->m_adpcm_data[chip] >> 4);
 	}
 }
 
@@ -107,27 +107,27 @@ static void mcu63705_update_inputs(running_machine &machine)
 		{
 			if (curr[p][j] == 0)
 			{
-				if (state->prev[p][j] != 0)
-					state->countup[p][j] = 0;
+				if (state->m_prev[p][j] != 0)
+					state->m_countup[p][j] = 0;
 				if (curr[p][j^1])
-					state->countup[p][j] = 100;
-				state->countup[p][j]++;
-				state->running[p] &= ~(1 << j);
+					state->m_countup[p][j] = 100;
+				state->m_countup[p][j]++;
+				state->m_running[p] &= ~(1 << j);
 			}
 			else
 			{
-				if (state->prev[p][j] == 0)
+				if (state->m_prev[p][j] == 0)
 				{
-					if (state->countup[p][j] < 10 && state->countdown[p][j] < 5)
-						state->running[p] |= 1 << j;
-					state->countdown[p][j] = 0;
+					if (state->m_countup[p][j] < 10 && state->m_countdown[p][j] < 5)
+						state->m_running[p] |= 1 << j;
+					state->m_countdown[p][j] = 0;
 				}
-				state->countdown[p][j]++;
+				state->m_countdown[p][j]++;
 			}
 		}
 
-		state->prev[p][0] = curr[p][0];
-		state->prev[p][1] = curr[p][1];
+		state->m_prev[p][0] = curr[p][0];
+		state->m_prev[p][1] = curr[p][1];
 	}
 
 	/* update jumping and buttons state */
@@ -137,19 +137,19 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 		curr[p] = input_port_read(machine, p ? "P2" : "P1") & 0x30;
 
-		if (state->jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
+		if (state->m_jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
 
-		if (buttons[p] == 0x30) state->jumped[p] = 1;
-		if (curr[p] == 0x00) state->jumped[p] = 0;
+		if (buttons[p] == 0x30) state->m_jumped[p] = 1;
+		if (curr[p] == 0x00) state->m_jumped[p] = 0;
 
-		state->prev[p] = curr[p];
+		state->m_prev[p] = curr[p];
 	}
 
-	state->inputs[0] = input_port_read(machine, "P1") & 0xcf;
-	state->inputs[1] = input_port_read(machine, "P2") & 0x0f;
-	state->inputs[2] = state->running[0] | buttons[0];
-	state->inputs[3] = state->running[1] | buttons[1];
+	state->m_inputs[0] = input_port_read(machine, "P1") & 0xcf;
+	state->m_inputs[1] = input_port_read(machine, "P2") & 0x0f;
+	state->m_inputs[2] = state->m_running[0] | buttons[0];
+	state->m_inputs[3] = state->m_running[1] | buttons[1];
 }
 #else	// alternate - less sensitive
 static void mcu63705_update_inputs(running_machine &machine)
@@ -173,35 +173,35 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 		if (curr_port[p] & R)
 		{
-			if (!(state->last_port[p] & R))
+			if (!(state->m_last_port[p] & R))
 			{
-				if (state->tapc[p]) curr_dash[p] |= R; else state->tapc[p] = DBLTAP_TOLERANCE;
+				if (state->m_tapc[p]) curr_dash[p] |= R; else state->m_tapc[p] = DBLTAP_TOLERANCE;
 			}
-			else if (state->last_dash[p] & R) curr_dash[p] |= R;
+			else if (state->m_last_dash[p] & R) curr_dash[p] |= R;
 		}
 		else if (curr_port[p] & L)
 		{
-			if (!(state->last_port[p] & L))
+			if (!(state->m_last_port[p] & L))
 			{
-				if (state->tapc[p+2]) curr_dash[p] |= L; else state->tapc[p+2] = DBLTAP_TOLERANCE;
+				if (state->m_tapc[p+2]) curr_dash[p] |= L; else state->m_tapc[p+2] = DBLTAP_TOLERANCE;
 			}
-			else if (state->last_dash[p] & L) curr_dash[p] |= L;
+			else if (state->m_last_dash[p] & L) curr_dash[p] |= L;
 		}
 
-		if (curr_port[p] & A && !(state->last_port[p] & A)) curr_dash[p] |= A;
-		if (curr_port[p] & D && !(state->last_port[p] & D)) curr_dash[p] |= D;
+		if (curr_port[p] & A && !(state->m_last_port[p] & A)) curr_dash[p] |= A;
+		if (curr_port[p] & D && !(state->m_last_port[p] & D)) curr_dash[p] |= D;
 
-		state->last_port[p] = curr_port[p];
-		state->last_dash[p] = curr_dash[p];
+		state->m_last_port[p] = curr_port[p];
+		state->m_last_dash[p] = curr_dash[p];
 
-		if (state->tapc[p  ]) state->tapc[p  ]--;
-		if (state->tapc[p+2]) state->tapc[p+2]--;
+		if (state->m_tapc[p  ]) state->m_tapc[p  ]--;
+		if (state->m_tapc[p+2]) state->m_tapc[p+2]--;
 	}
 
-	state->inputs[0] = curr_port[0] & 0xcf;
-	state->inputs[1] = curr_port[1] & 0x0f;
-	state->inputs[2] = curr_dash[0];
-	state->inputs[3] = curr_dash[1];
+	state->m_inputs[0] = curr_port[0] & 0xcf;
+	state->m_inputs[1] = curr_port[1] & 0x0f;
+	state->m_inputs[2] = curr_dash[0];
+	state->m_inputs[3] = curr_dash[1];
 
 #undef DBLTAP_TOLERANCE
 #undef R
@@ -216,14 +216,14 @@ static READ8_HANDLER( mcu63701_r )
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 //  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(&space->device()),offset);
 
-	if (state->mcu63701_command == 0) return 0x6a;
+	if (state->m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
 	{
 		default:
-		case 0: return state->inputs[0];
-		case 1: return state->inputs[1];
-		case 2: return state->inputs[2];
-		case 3: return state->inputs[3];
+		case 0: return state->m_inputs[0];
+		case 1: return state->m_inputs[1];
+		case 2: return state->m_inputs[2];
+		case 3: return state->m_inputs[3];
 		case 4: return input_port_read(space->machine(), "IN1");
 	}
 }
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( mcu63701_w )
 {
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 //  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(&space->device()),data);
-	state->mcu63701_command = data;
+	state->m_mcu63701_command = data;
 	mcu63705_update_inputs(space->machine());
 }
 
@@ -242,17 +242,17 @@ static READ8_HANDLER( port_0_r )
 	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 	int port = input_port_read(space->machine(), "IN0");
 
-	state->toggle^=0x02;	/* mcu63701_busy flag */
+	state->m_toggle^=0x02;	/* mcu63701_busy flag */
 
-	return (port | state->toggle);
+	return (port | state->m_toggle);
 }
 
 
 
 static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(spdodgeb_state, spriteram, spriteram_size)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_BASE_MEMBER(spdodgeb_state, videoram)
+	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(spdodgeb_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_BASE_MEMBER(spdodgeb_state, m_videoram)
 	AM_RANGE(0x3000, 0x3000) AM_READ(port_0_r) //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
@@ -402,16 +402,16 @@ static const msm5205_interface msm5205_config =
 static MACHINE_RESET( spdodgeb )
 {
 	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
-	state->toggle = 0;
-	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
-	state->adpcm_end[0] = state->adpcm_end[1] = 0;
-	state->adpcm_idle[0] = state->adpcm_data[1] = 0;
-	state->adpcm_data[0] = state->adpcm_data[1] = -1;
-	state->mcu63701_command = 0;
-	memset(state->inputs, 0, sizeof(state->inputs));
-	memset(state->tapc, 0, sizeof(state->tapc));
-	state->last_port[0] = state->last_port[1] = 0;
-	state->last_dash[0] = state->last_dash[1] = 0;
+	state->m_toggle = 0;
+	state->m_adpcm_pos[0] = state->m_adpcm_pos[1] = 0;
+	state->m_adpcm_end[0] = state->m_adpcm_end[1] = 0;
+	state->m_adpcm_idle[0] = state->m_adpcm_data[1] = 0;
+	state->m_adpcm_data[0] = state->m_adpcm_data[1] = -1;
+	state->m_mcu63701_command = 0;
+	memset(state->m_inputs, 0, sizeof(state->m_inputs));
+	memset(state->m_tapc, 0, sizeof(state->m_tapc));
+	state->m_last_port[0] = state->m_last_port[1] = 0;
+	state->m_last_dash[0] = state->m_last_dash[1] = 0;
 }
 
 static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )

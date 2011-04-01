@@ -13,32 +13,32 @@ public:
 	starwars_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 sound_data;
-	UINT8 main_data;
-	device_t *riot;
-	UINT8 *slapstic_source;
-	UINT8 *slapstic_base;
-	UINT8 slapstic_current_bank;
-	offs_t slapstic_last_pc;
-	offs_t slapstic_last_address;
-	UINT8 is_esb;
-	UINT8 *mathram;
-	UINT8 control_num;
-	int MPA;
-	int BIC;
-	UINT16 dvd_shift;
-	UINT16 quotient_shift;
-	UINT16 divisor;
-	UINT16 dividend;
-	UINT8 *PROM_STR;
-	UINT8 *PROM_MAS;
-	UINT8 *PROM_AM;
-	int math_run;
-	emu_timer *math_timer;
-	INT16 A;
-	INT16 B;
-	INT16 C;
-	INT32 ACC;
+	UINT8 m_sound_data;
+	UINT8 m_main_data;
+	device_t *m_riot;
+	UINT8 *m_slapstic_source;
+	UINT8 *m_slapstic_base;
+	UINT8 m_slapstic_current_bank;
+	offs_t m_slapstic_last_pc;
+	offs_t m_slapstic_last_address;
+	UINT8 m_is_esb;
+	UINT8 *m_mathram;
+	UINT8 m_control_num;
+	int m_MPA;
+	int m_BIC;
+	UINT16 m_dvd_shift;
+	UINT16 m_quotient_shift;
+	UINT16 m_divisor;
+	UINT16 m_dividend;
+	UINT8 *m_PROM_STR;
+	UINT8 *m_PROM_MAS;
+	UINT8 *m_PROM_AM;
+	int m_math_run;
+	emu_timer *m_math_timer;
+	INT16 m_A;
+	INT16 m_B;
+	INT16 m_C;
+	INT32 m_ACC;
 };
 
 

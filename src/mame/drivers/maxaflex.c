@@ -29,18 +29,18 @@ public:
 	maxaflex_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 portA_in;
-	UINT8 portA_out;
-	UINT8 ddrA;
-	UINT8 portB_in;
-	UINT8 portB_out;
-	UINT8 ddrB;
-	UINT8 portC_in;
-	UINT8 portC_out;
-	UINT8 ddrC;
-	UINT8 tdr;
-	UINT8 tcr;
-	timer_device *mcu_timer;
+	UINT8 m_portA_in;
+	UINT8 m_portA_out;
+	UINT8 m_ddrA;
+	UINT8 m_portB_in;
+	UINT8 m_portB_out;
+	UINT8 m_ddrB;
+	UINT8 m_portC_in;
+	UINT8 m_portC_out;
+	UINT8 m_ddrC;
+	UINT8 m_tdr;
+	UINT8 m_tcr;
+	timer_device *m_mcu_timer;
 };
 
 
@@ -62,14 +62,14 @@ public:
 static READ8_HANDLER( mcu_portA_r )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->portA_in = input_port_read(space->machine(), "dsw") | (input_port_read(space->machine(), "coin") << 4) | (input_port_read(space->machine(), "console") << 5);
-	return (state->portA_in & ~state->ddrA) | (state->portA_out & state->ddrA);
+	state->m_portA_in = input_port_read(space->machine(), "dsw") | (input_port_read(space->machine(), "coin") << 4) | (input_port_read(space->machine(), "console") << 5);
+	return (state->m_portA_in & ~state->m_ddrA) | (state->m_portA_out & state->m_ddrA);
 }
 
 static WRITE8_HANDLER( mcu_portA_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->portA_out = data;
+	state->m_portA_out = data;
 	speaker_level_w(space->machine().device("speaker"), data >> 7);
 }
 
@@ -87,14 +87,14 @@ static WRITE8_HANDLER( mcu_portA_w )
 static READ8_HANDLER( mcu_portB_r )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return (state->portB_in & ~state->ddrB) | (state->portB_out & state->ddrB);
+	return (state->m_portB_in & ~state->m_ddrB) | (state->m_portB_out & state->m_ddrB);
 }
 
 static WRITE8_HANDLER( mcu_portB_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	UINT8 diff = data ^ state->portB_out;
-	state->portB_out = data;
+	UINT8 diff = data ^ state->m_portB_out;
+	state->m_portB_out = data;
 
 	/* clear coin interrupt */
 	if (data & 0x04)
@@ -110,10 +110,10 @@ static WRITE8_HANDLER( mcu_portB_w )
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
 	{
-		output_set_lamp_value(0, (state->portC_out >> 0) & 1);
-		output_set_lamp_value(1, (state->portC_out >> 1) & 1);
-		output_set_lamp_value(2, (state->portC_out >> 2) & 1);
-		output_set_lamp_value(3, (state->portC_out >> 3) & 1);
+		output_set_lamp_value(0, (state->m_portC_out >> 0) & 1);
+		output_set_lamp_value(1, (state->m_portC_out >> 1) & 1);
+		output_set_lamp_value(2, (state->m_portC_out >> 2) & 1);
+		output_set_lamp_value(3, (state->m_portC_out >> 3) & 1);
 	}
 }
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( mcu_portB_w )
 static READ8_HANDLER( mcu_portC_r )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return (state->portC_in & ~state->ddrC) | (state->portC_out & state->ddrC);
+	return (state->m_portC_in & ~state->m_ddrC) | (state->m_portC_out & state->m_ddrC);
 }
 
 static WRITE8_HANDLER( mcu_portC_w )
@@ -136,14 +136,14 @@ static WRITE8_HANDLER( mcu_portC_w )
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	state->portC_out = data & 0x0f;
+	state->m_portC_out = data & 0x0f;
 
 	/* displays */
-	switch( state->portB_out & 0x3 )
+	switch( state->m_portB_out & 0x3 )
 	{
-		case 0x0: output_set_digit_value(0, ls48_map[state->portC_out]); break;
-		case 0x1: output_set_digit_value(1, ls48_map[state->portC_out]); break;
-		case 0x2: output_set_digit_value(2, ls48_map[state->portC_out]); break;
+		case 0x0: output_set_digit_value(0, ls48_map[state->m_portC_out]); break;
+		case 0x1: output_set_digit_value(1, ls48_map[state->m_portC_out]); break;
+		case 0x2: output_set_digit_value(2, ls48_map[state->m_portC_out]); break;
 		case 0x3: break;
 	}
 }
@@ -156,27 +156,27 @@ static READ8_HANDLER( mcu_ddr_r )
 static WRITE8_HANDLER( mcu_portA_ddr_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->ddrA = data;
+	state->m_ddrA = data;
 }
 
 static WRITE8_HANDLER( mcu_portB_ddr_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->ddrB = data;
+	state->m_ddrB = data;
 }
 
 static WRITE8_HANDLER( mcu_portC_ddr_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->ddrC = data;
+	state->m_ddrC = data;
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 {
 	maxaflex_state *state = timer.machine().driver_data<maxaflex_state>();
-	if ( --state->tdr == 0x00 )
+	if ( --state->m_tdr == 0x00 )
 	{
-		if ( (state->tcr & 0x40) == 0 )
+		if ( (state->m_tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
 			generic_pulse_irq_line(timer.machine().device("mcu"), M68705_INT_TIMER);
@@ -188,32 +188,32 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 static READ8_HANDLER( mcu_tdr_r )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return state->tdr;
+	return state->m_tdr;
 }
 
 static WRITE8_HANDLER( mcu_tdr_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->tdr = data;
+	state->m_tdr = data;
 }
 
 /* Timer control reg */
 static READ8_HANDLER( mcu_tcr_r )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return state->tcr & ~0x08;
+	return state->m_tcr & ~0x08;
 }
 
 static WRITE8_HANDLER( mcu_tcr_w )
 {
 	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->tcr = data;
-	if ( (state->tcr & 0x40) == 0 )
+	state->m_tcr = data;
+	if ( (state->m_tcr & 0x40) == 0 )
 	{
 		int divider;
 		attotime period;
 
-		if ( !(state->tcr & 0x20) )
+		if ( !(state->m_tcr & 0x20) )
 		{
 			/* internal clock / 4*/
 			divider = 4;
@@ -224,25 +224,25 @@ static WRITE8_HANDLER( mcu_tcr_w )
 			divider = 1;
 		}
 
-		if ( state->tcr & 0x07 )
+		if ( state->m_tcr & 0x07 )
 		{
 			/* use prescaler */
-			divider = divider * (1 << (state->tcr & 0x7));
+			divider = divider * (1 << (state->m_tcr & 0x7));
 		}
 
 		period = attotime::from_hz(3579545) * divider;
-		state->mcu_timer->adjust(period, 0, period);
+		state->m_mcu_timer->adjust(period, 0, period);
 	}
 }
 
 static MACHINE_RESET(supervisor_board)
 {
 	maxaflex_state *state = machine.driver_data<maxaflex_state>();
-	state->portA_in = state->portA_out = state->ddrA	= 0;
-	state->portB_in = state->portB_out = state->ddrB	= 0;
-	state->portC_in = state->portC_out = state->ddrC	= 0;
-	state->tdr = state->tcr = 0;
-	state->mcu_timer = machine.device<timer_device>("mcu_timer");
+	state->m_portA_in = state->m_portA_out = state->m_ddrA	= 0;
+	state->m_portB_in = state->m_portB_out = state->m_ddrB	= 0;
+	state->m_portC_in = state->m_portC_out = state->m_ddrC	= 0;
+	state->m_tdr = state->m_tcr = 0;
+	state->m_mcu_timer = machine.device<timer_device>("mcu_timer");
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
@@ -262,7 +262,7 @@ static INPUT_CHANGED( coin_inserted )
 int atari_input_disabled(running_machine &machine)
 {
 	maxaflex_state *state = machine.driver_data<maxaflex_state>();
-	return (state->portB_out & 0x80) == 0x00;
+	return (state->m_portB_out & 0x80) == 0x00;
 }
 
 

@@ -11,19 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  videoram2;
-	UINT8 *  colorram2;
-//  UINT8 *  spriteram; // currently this uses generic buffered_spriteram
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_videoram2;
+	UINT8 *  m_colorram2;
+//  UINT8 *  m_spriteram; // currently this uses generic buffered_spriteram
 
 	/* video-related */
-	tilemap_t  *bg_tilemap, *fg_tilemap;
-	UINT8 scroll_x[2];
-	UINT8 scroll_y[2];
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	UINT8 m_scroll_x[2];
+	UINT8 m_scroll_y[2];
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

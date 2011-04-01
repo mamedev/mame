@@ -45,13 +45,13 @@ static WRITE8_HANDLER( battlera_sound_w )
 static WRITE8_HANDLER( control_data_w )
 {
 	battlera_state *state = space->machine().driver_data<battlera_state>();
-	state->control_port_select=data;
+	state->m_control_port_select=data;
 }
 
 static READ8_HANDLER( control_data_r )
 {
 	battlera_state *state = space->machine().driver_data<battlera_state>();
-	switch (state->control_port_select)
+	switch (state->m_control_port_select)
 	{
 		case 0xfe: return input_port_read(space->machine(), "IN0"); /* Player 1 */
 		case 0xfd: return input_port_read(space->machine(), "IN1"); /* Player 2 */
@@ -89,18 +89,18 @@ static void battlera_adpcm_int(device_t *device)
 {
 	battlera_state *state = device->machine().driver_data<battlera_state>();
 
-	msm5205_data_w(device,state->msm5205next >> 4);
-	state->msm5205next <<= 4;
+	msm5205_data_w(device,state->m_msm5205next >> 4);
+	state->m_msm5205next <<= 4;
 
-	state->toggle = 1 - state->toggle;
-	if (state->toggle)
+	state->m_toggle = 1 - state->m_toggle;
+	if (state->m_toggle)
 		cputag_set_input_line(device->machine(), "audiocpu", 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )
 {
 	battlera_state *state = space->machine().driver_data<battlera_state>();
-	state->msm5205next = data;
+	state->m_msm5205next = data;
 }
 
 static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )

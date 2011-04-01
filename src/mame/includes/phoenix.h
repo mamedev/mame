@@ -9,17 +9,17 @@ public:
 	phoenix_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram_pg[2];
-	UINT8 videoram_pg_index;
-	UINT8 palette_bank;
-	UINT8 cocktail_mode;
-	UINT8 pleiads_protection_question;
-	UINT8 survival_protection_value;
-	int survival_sid_value;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
-	UINT8 survival_input_latches[2];
-	UINT8 survival_input_readc;
+	UINT8 *m_videoram_pg[2];
+	UINT8 m_videoram_pg_index;
+	UINT8 m_palette_bank;
+	UINT8 m_cocktail_mode;
+	UINT8 m_pleiads_protection_question;
+	UINT8 m_survival_protection_value;
+	int m_survival_sid_value;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
+	UINT8 m_survival_input_latches[2];
+	UINT8 m_survival_input_readc;
 };
 
 

@@ -42,8 +42,8 @@ PALETTE_INIT( markham )
 WRITE8_HANDLER( markham_videoram_w )
 {
 	markham_state *state = space->machine().driver_data<markham_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( markham_flipscreen_w )
@@ -58,8 +58,8 @@ WRITE8_HANDLER( markham_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	markham_state *state = machine.driver_data<markham_state>();
-	int attr = state->videoram[tile_index * 2];
-	int code = state->videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
+	int attr = state->m_videoram[tile_index * 2];
+	int code = state->m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -68,15 +68,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( markham )
 {
 	markham_state *state = machine.driver_data<markham_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	tilemap_set_scroll_rows(state->m_bg_tilemap, 32);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	markham_state *state = machine.driver_data<markham_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)
@@ -125,12 +125,12 @@ SCREEN_UPDATE( markham )
 	for (i = 0; i < 32; i++)
 	{
 		if ((i > 3) && (i < 16))
-			tilemap_set_scrollx(state->bg_tilemap, i, state->xscroll[0]);
+			tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_xscroll[0]);
 		if (i >= 16)
-			tilemap_set_scrollx(state->bg_tilemap, i, state->xscroll[1]);
+			tilemap_set_scrollx(state->m_bg_tilemap, i, state->m_xscroll[1]);
 	}
 
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;
 }

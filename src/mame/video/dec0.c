@@ -14,7 +14,7 @@
 WRITE16_HANDLER( dec0_update_sprites_w )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	memcpy(state->buffered_spriteram,state->spriteram,0x800);
+	memcpy(state->m_buffered_spriteram,state->m_spriteram,0x800);
 }
 
 /******************************************************************************/
@@ -52,12 +52,12 @@ SCREEN_UPDATE( hbarrel )
 	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, 0x08, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x08, 0x0f);
 	screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 	/* HB always keeps pf2 on top of pf3, no need explicitly support priority register */
 
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, 0x00, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x00, 0x0f);
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
@@ -70,17 +70,17 @@ SCREEN_UPDATE( baddudes )
 	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	/* WARNING: inverted wrt Midnight Resistance */
-	if ((state->pri & 0x01) == 0)
+	if ((state->m_pri & 0x01) == 0)
 	{
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 2)
+		if (state->m_pri & 2)
 			screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-		if (state->pri & 4)
+		if (state->m_pri & 4)
 			screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 	else
@@ -88,12 +88,12 @@ SCREEN_UPDATE( baddudes )
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 2)
+		if (state->m_pri & 2)
 			screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
-		if (state->pri & 4)
+		if (state->m_pri & 4)
 			screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 
@@ -110,12 +110,12 @@ SCREEN_UPDATE( robocop )
 
 	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	if (state->pri & 0x04)
+	if (state->m_pri & 0x04)
 		trans = 0x08;
 	else
 		trans = 0x00;
 
-	if (state->pri & 0x01)
+	if (state->m_pri & 0x01)
 	{
 		/* WARNING: inverted wrt Midnight Resistance */
 		/* Robocop uses it only for the title screen, so this might be just */
@@ -123,8 +123,8 @@ SCREEN_UPDATE( robocop )
 		/* something (they are 0x80 in midres, 0x00 here) */
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 0x02)
-			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans, 0x0f);
+		if (state->m_pri & 0x02)
+			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
 
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
@@ -132,16 +132,16 @@ SCREEN_UPDATE( robocop )
 	{
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 0x02)
-			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans, 0x0f);
+		if (state->m_pri & 0x02)
+			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
 
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	if (state->pri & 0x02)
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans^0x08, 0x0f);
+	if (state->m_pri & 0x02)
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans^0x08, 0x0f);
 	else
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
@@ -159,7 +159,7 @@ SCREEN_UPDATE( birdtry )
     the palette does show through. */
 	bitmap_fill(bitmap,cliprect,screen->machine().pens[768]);
 	screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
@@ -171,7 +171,7 @@ SCREEN_UPDATE( hippodrm )
 	dec0_state *state = screen->machine().driver_data<dec0_state>();
 	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	if (state->pri & 0x01)
+	if (state->m_pri & 0x01)
 	{
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -182,7 +182,7 @@ SCREEN_UPDATE( hippodrm )
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
@@ -197,10 +197,10 @@ SCREEN_UPDATE( slyspy )
 	screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
-	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+	screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
-	if (state->pri&0x80)
+	if (state->m_pri&0x80)
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -216,16 +216,16 @@ SCREEN_UPDATE( midres )
 
 	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	if (state->pri & 0x04)
+	if (state->m_pri & 0x04)
 		trans = 0x00;
 	else trans = 0x08;
 
-	if (state->pri & 0x01)
+	if (state->m_pri & 0x01)
 	{
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 0x02)
-			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans, 0x0f);
+		if (state->m_pri & 0x02)
+			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
 
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
@@ -233,16 +233,16 @@ SCREEN_UPDATE( midres )
 	{
 		screen->machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
-		if (state->pri & 0x02)
-			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans, 0x0f);
+		if (state->m_pri & 0x02)
+			screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans, 0x0f);
 
 		screen->machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
-	if (state->pri & 0x02)
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x08, trans ^ 0x08, 0x0f);
+	if (state->m_pri & 0x02)
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, trans ^ 0x08, 0x0f);
 	else
-		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->buffered_spriteram, 0x00, 0x00, 0x0f);
+		screen->machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x00, 0x00, 0x0f);
 
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
@@ -252,20 +252,20 @@ SCREEN_UPDATE( midres )
 WRITE16_HANDLER( dec0_priority_w )
 {
 	dec0_state *state = space->machine().driver_data<dec0_state>();
-	COMBINE_DATA(&state->pri);
+	COMBINE_DATA(&state->m_pri);
 }
 
 VIDEO_START( dec0_nodma )
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
-	state->buffered_spriteram = state->spriteram;
+	state->m_buffered_spriteram = state->m_spriteram;
 }
 
 VIDEO_START( dec0 )
 {
 	dec0_state *state = machine.driver_data<dec0_state>();
 	VIDEO_START_CALL(dec0_nodma);
-	state->buffered_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
 }
 
 /******************************************************************************/

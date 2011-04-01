@@ -91,15 +91,15 @@ Stephh's notes :
 static READ16_HANDLER(fitfight_700000_r)
 {
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	UINT16 data = state->fof_700000_data;
+	UINT16 data = state->m_fof_700000_data;
 	return (data << 2);
 }
 
 static READ16_HANDLER(histryma_700000_r)
 {
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	UINT16 data = (state->fof_700000_data & 0x00AA);
-	data |= ((state->fof_700000_data & 0x0055) >> 2);
+	UINT16 data = (state->m_fof_700000_data & 0x00AA);
+	data |= ((state->m_fof_700000_data & 0x0055) >> 2);
 	return (data);
 }
 
@@ -107,26 +107,26 @@ static READ16_HANDLER(bbprot_700000_r)
 {
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	UINT16 data = 0;
-	data  =  (state->fof_700000_data & 0x000b);
-	data |= ((state->fof_700000_data & 0x01d0) >> 2);
-	data |= ((state->fof_700000_data & 0x0004) << 6);
-	data |= ((state->fof_700000_data & 0x0020) << 2);
+	data  =  (state->m_fof_700000_data & 0x000b);
+	data |= ((state->m_fof_700000_data & 0x01d0) >> 2);
+	data |= ((state->m_fof_700000_data & 0x0004) << 6);
+	data |= ((state->m_fof_700000_data & 0x0020) << 2);
 	return (data);
 }
 
 static WRITE16_HANDLER(fitfight_700000_w)
 {
 	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	COMBINE_DATA(&state->fof_700000[offset]);		// needed for scrolling
+	COMBINE_DATA(&state->m_fof_700000[offset]);		// needed for scrolling
 
 	if (data < 0x0200)				// to avoid considering writes of 0x0200
-		state->fof_700000_data = data;
+		state->m_fof_700000_data = data;
 }
 
 static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
 	//written at scanline 5, allways 1. Used by histryma/fitfight @0x0000ec2c/@0x0000f076
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2")
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3_DSW1")
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_600000)
 	//  Is 0x600000 controlling the slave audio CPU? data is 0x1111000zzzzzzzzz (9 sign. bits)
 	//  Used by histryma/fitfight:
 	//      @0x000031ae/0x00002b3a: 0xF000, once, during POST
@@ -145,24 +145,24 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
 //  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, fof_700000)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, m_fof_700000)
 	//  kept at 0xe07900/0xe04c56
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_800000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_800000)
 	//written at scanline 1, allways 0. Used by histryma/fitfight @0x00001d76/@0x00000f6a
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_900000) //mid tilemap scroll
+	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_900000) //mid tilemap scroll
 	//  fitfigth: @0x00002b42,@0x00000f76
 	//  histryma: @0x000031b6,@0x00001d82
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_a00000) //bak tilemap scroll
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_a00000) //bak tilemap scroll
 	//  fitfight: @0x00002b4a,@0x00000f82
 	//  histryma: @0x000031be,@0x00001d8e
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_txt_tileram)
 
 	AM_RANGE(0xb10000, 0xb13fff) AM_WRITENOP //used by histryma @0x0000b25a
 	AM_RANGE(0xb14000, 0xb17fff) AM_WRITENOP //used by histryma @0x0000b25a,b270
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, m_spriteram)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -178,30 +178,30 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
 
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW3_DSW1")
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_600000)
 
-	AM_RANGE(0x700000, 0x700001) AM_READWRITE(bbprot_700000_r, fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, fof_700000)
+	AM_RANGE(0x700000, 0x700001) AM_READWRITE(bbprot_700000_r, fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, m_fof_700000)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_800000)
-	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_900000)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, fof_a00000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_800000)
+	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_900000)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_a00000)
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_txt_tileram)
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, m_spriteram)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -721,14 +721,14 @@ static MACHINE_START( fitfight )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 
-	state->save_item(NAME(state->fof_700000_data));
+	state->save_item(NAME(state->m_fof_700000_data));
 }
 
 static MACHINE_RESET( fitfight )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 
-	state->fof_700000_data = 0;
+	state->m_fof_700000_data = 0;
 }
 
 static MACHINE_CONFIG_START( fitfight, fitfight_state )
@@ -979,7 +979,7 @@ static DRIVER_INIT( fitfight )
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(fitfight_700000_r));
-	state->bbprot_kludge = 0;
+	state->m_bbprot_kludge = 0;
 }
 
 static DRIVER_INIT( histryma )
@@ -988,13 +988,13 @@ static DRIVER_INIT( histryma )
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(histryma_700000_r));
-	state->bbprot_kludge = 0;
+	state->m_bbprot_kludge = 0;
 }
 
 static DRIVER_INIT( bbprot )
 {
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	state->bbprot_kludge = 1;
+	state->m_bbprot_kludge = 1;
 }
 
 /* GAME */

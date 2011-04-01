@@ -4,17 +4,17 @@ public:
 	snookr10_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int outportl;
-	int outporth;
-	int bit0;
-	int bit1;
-	int bit2;
-	int bit3;
-	int bit4;
-	int bit5;
-	UINT8 *videoram;
-	UINT8 *colorram;
-	tilemap_t *bg_tilemap;
+	int m_outportl;
+	int m_outporth;
+	int m_bit0;
+	int m_bit1;
+	int m_bit2;
+	int m_bit3;
+	int m_bit4;
+	int m_bit5;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	tilemap_t *m_bg_tilemap;
 };
 
 

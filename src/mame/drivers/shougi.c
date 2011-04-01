@@ -93,11 +93,11 @@ public:
 	shougi_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int nmi_enabled;
-	//UINT8 *cpu_sharedram;
-	//UINT8 cpu_sharedram_control_val;
-	int r;
+	UINT8 *m_videoram;
+	int m_nmi_enabled;
+	//UINT8 *m_cpu_sharedram;
+	//UINT8 m_cpu_sharedram_control_val;
+	int m_r;
 };
 
 
@@ -174,8 +174,8 @@ static SCREEN_UPDATE( shougi )
 		//if (flipscreen[0]) sx = 31 - sx;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		data1 = state->videoram[offs];				/* color */
-		data2 = state->videoram[0x4000 + offs];	/* pixel data */
+		data1 = state->m_videoram[offs];				/* color */
+		data2 = state->m_videoram[0x4000 + offs];	/* pixel data */
 
 		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
 		{
@@ -247,7 +247,7 @@ static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 {
 	shougi_state *state = space->machine().driver_data<shougi_state>();
 
-	state->nmi_enabled = 0; /* disable NMIs */
+	state->m_nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
@@ -258,14 +258,14 @@ static WRITE8_HANDLER( nmi_enable_w )
 {
 	shougi_state *state = space->machine().driver_data<shougi_state>();
 
-	state->nmi_enabled = 1; /* enable NMIs */
+	state->m_nmi_enabled = 1; /* enable NMIs */
 }
 
 static INTERRUPT_GEN( shougi_vblank_nmi )
 {
 	shougi_state *state = device->machine().driver_data<shougi_state>();
 
-	if ( state->nmi_enabled == 1 )
+	if ( state->m_nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
@@ -299,16 +299,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(shougi_state,videoram)	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(shougi_state,m_videoram)	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */
 static READ8_HANDLER ( dummy_r )
 {
 	shougi_state *state = space->machine().driver_data<shougi_state>();
-	state->r ^= 1;
+	state->m_r ^= 1;
 
-	if(state->r)
+	if(state->m_r)
 		return 0xff;
 	else
 		return 0;

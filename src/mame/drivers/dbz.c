@@ -72,7 +72,7 @@ static INTERRUPT_GEN( dbz_interrupt )
 			break;
 
 		case 1:
-			if (k053246_is_irq_enabled(state->k053246))
+			if (k053246_is_irq_enabled(state->m_k053246))
 				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 			break;
 	}
@@ -82,7 +82,7 @@ static INTERRUPT_GEN( dbz_interrupt )
 static READ16_HANDLER( dbzcontrol_r )
 {
 	dbz_state *state = space->machine().driver_data<dbz_state>();
-	return state->control;
+	return state->m_control;
 }
 #endif
 
@@ -91,12 +91,12 @@ static WRITE16_HANDLER( dbzcontrol_w )
 	dbz_state *state = space->machine().driver_data<dbz_state>();
 	/* bit 10 = enable '246 readback */
 
-	COMBINE_DATA(&state->control);
+	COMBINE_DATA(&state->m_control);
 
 	if (data & 0x400)
-		k053246_set_objcha_line(state->k053246, ASSERT_LINE);
+		k053246_set_objcha_line(state->m_k053246, ASSERT_LINE);
 	else
-		k053246_set_objcha_line(state->k053246, CLEAR_LINE);
+		k053246_set_objcha_line(state->m_k053246, CLEAR_LINE);
 
 	coin_counter_w(space->machine(), 0, data & 1);
 	coin_counter_w(space->machine(), 1, data & 2);
@@ -110,7 +110,7 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
 	dbz_state *state = space->machine().driver_data<dbz_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( device_t *device, int irq )
@@ -118,9 +118,9 @@ static void dbz_sound_irq( device_t *device, int irq )
 	dbz_state *state = device->machine().driver_data<dbz_state>();
 
 	if (irq)
-		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
 	else
-		device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+		device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16 )
@@ -149,8 +149,8 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITENOP		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE("k053251", k053251_lsb_w)	// 251 #2
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE_MEMBER(dbz_state, bg2_videoram)
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_BASE_MEMBER(dbz_state, bg1_videoram)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE_MEMBER(dbz_state, m_bg2_videoram)
+	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_BASE_MEMBER(dbz_state, m_bg1_videoram)
 	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE("k053936_1", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE("k053936_2", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
@@ -340,18 +340,18 @@ static MACHINE_START( dbz )
 {
 	dbz_state *state = machine.driver_data<dbz_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k053936_1 = machine.device("k053936_1");
-	state->k053936_2 = machine.device("k053936_2");
-	state->k056832 = machine.device("k056832");
-	state->k053246 = machine.device("k053246");
-	state->k053251 = machine.device("k053251");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k053936_1 = machine.device("k053936_1");
+	state->m_k053936_2 = machine.device("k053936_2");
+	state->m_k056832 = machine.device("k056832");
+	state->m_k053246 = machine.device("k053246");
+	state->m_k053251 = machine.device("k053251");
 
-	state->save_item(NAME(state->control));
-	state->save_item(NAME(state->sprite_colorbase));
-	state->save_item(NAME(state->layerpri));
-	state->save_item(NAME(state->layer_colorbase));
+	state->save_item(NAME(state->m_control));
+	state->save_item(NAME(state->m_sprite_colorbase));
+	state->save_item(NAME(state->m_layerpri));
+	state->save_item(NAME(state->m_layer_colorbase));
 }
 
 static MACHINE_RESET( dbz )
@@ -360,13 +360,13 @@ static MACHINE_RESET( dbz )
 	int i;
 
 	for (i = 0; i < 5; i++)
-		state->layerpri[i] = 0;
+		state->m_layerpri[i] = 0;
 
 	for (i = 0; i < 6; i++)
-		state->layer_colorbase[i] = 0;
+		state->m_layer_colorbase[i] = 0;
 
-	state->sprite_colorbase = 0;
-	state->control = 0;
+	state->m_sprite_colorbase = 0;
+	state->m_control = 0;
 }
 
 static MACHINE_CONFIG_START( dbz, dbz_state )

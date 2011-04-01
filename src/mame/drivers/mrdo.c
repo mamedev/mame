@@ -42,9 +42,9 @@ static READ8_HANDLER( mrdo_SECRE_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE_MEMBER(mrdo_state, bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE_MEMBER(mrdo_state, fgvideoram)
-	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(mrdo_state, spriteram, spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE_MEMBER(mrdo_state, m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE_MEMBER(mrdo_state, m_fgvideoram)
+	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(mrdo_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE("sn2", sn76496_w)

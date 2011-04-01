@@ -223,15 +223,15 @@
 static MACHINE_START( bzone )
 {
 	bzone_state *state = machine.driver_data<bzone_state>();
-	state_save_register_global(machine, state->analog_data);
+	state_save_register_global(machine, state->m_analog_data);
 }
 
 
 static MACHINE_START( redbaron )
 {
 	bzone_state *state = machine.driver_data<bzone_state>();
-	state_save_register_global(machine, state->analog_data);
-	state_save_register_global(machine, state->rb_input_select);
+	state_save_register_global(machine, state->m_analog_data);
+	state_save_register_global(machine, state->m_rb_input_select);
 }
 
 
@@ -278,13 +278,13 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
 static READ8_DEVICE_HANDLER( redbaron_joy_r )
 {
 	bzone_state *state = device->machine().driver_data<bzone_state>();
-	return input_port_read(device->machine(), state->rb_input_select ? "FAKE1" : "FAKE2");
+	return input_port_read(device->machine(), state->m_rb_input_select ? "FAKE1" : "FAKE2");
 }
 
 static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
 {
 	bzone_state *state = device->machine().driver_data<bzone_state>();
-	state->rb_input_select = data & 1;
+	state->m_rb_input_select = data & 1;
 	redbaron_sounds_w(device, offset, data);
 }
 
@@ -781,7 +781,7 @@ ROM_END
 static READ8_HANDLER( analog_data_r )
 {
 	bzone_state *state = space->machine().driver_data<bzone_state>();
-	return state->analog_data;
+	return state->m_analog_data;
 }
 
 
@@ -791,7 +791,7 @@ static WRITE8_HANDLER( analog_select_w )
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		state->analog_data = input_port_read(space->machine(), analog_port[offset]);
+		state->m_analog_data = input_port_read(space->machine(), analog_port[offset]);
 }
 
 

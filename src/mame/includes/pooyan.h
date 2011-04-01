@@ -5,19 +5,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  colorram;
-	UINT8 *  spriteram;
-	UINT8 *  spriteram2;
+	UINT8 *  m_videoram;
+	UINT8 *  m_colorram;
+	UINT8 *  m_spriteram;
+	UINT8 *  m_spriteram2;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap;
+	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	UINT8    irq_toggle, irq_enable;
+	UINT8    m_irq_toggle;
+	UINT8    m_irq_enable;
 
 	/* devices */
-	cpu_device *maincpu;
+	cpu_device *m_maincpu;
 };
 
 

@@ -183,7 +183,7 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const rectangle *cliprect, const gfx_
 
 	if (shadow)
 	{
-		SSV_DRAWGFX( { dest[sx] = ((dest[sx] & state->shadow_pen_mask) | (pen << state->shadow_pen_shift)) & 0x7fff; } )
+		SSV_DRAWGFX( { dest[sx] = ((dest[sx] & state->m_shadow_pen_mask) | (pen << state->m_shadow_pen_shift)) & 0x7fff; } )
 	}
 	else
 	{
@@ -202,16 +202,16 @@ VIDEO_START( eaglshot )
 	ssv_state *state = machine.driver_data<ssv_state>();
 	VIDEO_START_CALL(ssv);
 
-	state->eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 16 * 0x40000 / 2);
+	state->m_eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 16 * 0x40000 / 2);
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->eaglshot_gfxram);
-	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->eaglshot_gfxram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_eaglshot_gfxram);
+	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_eaglshot_gfxram);
 }
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 tile = state->gdfs_tmapram[tile_index];
+	UINT16 tile = state->m_gdfs_tmapram[tile_index];
 
 	SET_TILE_INFO(3, tile, 0, TILE_FLIPXY( tile >> 14 ));
 }
@@ -220,8 +220,8 @@ WRITE16_HANDLER( gdfs_tmapram_w )
 {
 	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(&state->gdfs_tmapram[offset]);
-	tilemap_mark_tile_dirty(state->gdfs_tmap, offset);
+	COMBINE_DATA(&state->m_gdfs_tmapram[offset]);
+	tilemap_mark_tile_dirty(state->m_gdfs_tmap, offset);
 }
 
 VIDEO_START( gdfs )
@@ -230,15 +230,15 @@ VIDEO_START( gdfs )
 
 	VIDEO_START_CALL(ssv);
 
-	state->eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 4 * 0x100000 / 2);
+	state->m_eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 4 * 0x100000 / 2);
 
 	machine.gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
-	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->eaglshot_gfxram);
+	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_eaglshot_gfxram);
 
-	state->gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 											 16,16, 0x100,0x100	);
 
-	tilemap_set_transparent_pen(state->gdfs_tmap, 0);
+	tilemap_set_transparent_pen(state->m_gdfs_tmap, 0);
 }
 
 /***************************************************************************
@@ -392,7 +392,7 @@ WRITE16_HANDLER( ssv_scroll_w )
 {
 	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(state->scroll + offset);
+	COMBINE_DATA(state->m_scroll + offset);
 
 /*  offsets 60-7f: CRT Controller   */
 
@@ -404,12 +404,12 @@ WRITE16_HANDLER( paletteram16_xrgb_swap_word_w )
 	int r, g, b;
 	UINT16 data0, data1;
 
-	COMBINE_DATA(state->paletteram + offset);
+	COMBINE_DATA(state->m_paletteram + offset);
 
 	offset &= ~1;
 
-	data0 = state->paletteram[offset + 1];
-	data1 = state->paletteram[offset];
+	data0 = state->m_paletteram[offset + 1];
+	data1 = state->m_paletteram[offset];
 
 	r = data0 & 0xff;
 	g = data1 >> 8;
@@ -609,8 +609,8 @@ From the above some noteworthy cases are:
 static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 *spriteram16 = state->spriteram;
-	UINT16 *ssv_scroll = state->scroll;
+	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *ssv_scroll = state->m_scroll;
 	rectangle clip;
 	int attr, code, color, mode, size, page, shadow;
 	int x, x1, sx1, flipx, xnum, xstart, xend, xinc;
@@ -695,7 +695,7 @@ static void draw_row(running_machine &machine, bitmap_t *bitmap, const rectangle
 			attr	=	s3[1];	// code low  bits + color
 
 			/* Code's high bits are scrambled */
-			code	+=	state->tile_code[(attr & 0x3c00)>>10];
+			code	+=	state->m_tile_code[(attr & 0x3c00)>>10];
 			flipy	=	(attr & 0x4000);
 			flipx	=	(attr & 0x8000);
 
@@ -754,8 +754,8 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 {
 	/* Sprites list */
 	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 *ssv_scroll = state->scroll;
-	UINT16 *spriteram16 = state->spriteram;
+	UINT16 *ssv_scroll = state->m_scroll;
+	UINT16 *spriteram16 = state->m_spriteram;
 
 	UINT16 *s1	=	spriteram16;
 	UINT16 *end1	=	spriteram16 + 0x02000/2;
@@ -861,7 +861,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				attr	=	s2[1];	// code low  bits + color
 
 				/* Code's high bits are scrambled */
-				code	+=	state->tile_code[(attr & 0x3c00)>>10];
+				code	+=	state->m_tile_code[(attr & 0x3c00)>>10];
 				flipy	=	(attr & 0x4000);
 				flipx	=	(attr & 0x8000);
 
@@ -1047,7 +1047,7 @@ static void gdfs_draw_zooming_sprites(running_machine &machine, bitmap_t *bitmap
 	/* Sprites list */
 
 	ssv_state *state = machine.driver_data<ssv_state>();
-	UINT16 *spriteram16_2 = state->spriteram2;
+	UINT16 *spriteram16_2 = state->m_spriteram2;
 	UINT16 *s1	=	spriteram16_2;
 	UINT16 *end1	=	spriteram16_2 + 0x02000/2;
 	UINT16 *s2;
@@ -1175,9 +1175,9 @@ SCREEN_UPDATE( gdfs )
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen->machine(), bitmap, cliprect, pri);
 
-	tilemap_set_scrollx(state->gdfs_tmap, 0, state->gdfs_tmapscroll[0x0c/2]);
-	tilemap_set_scrolly(state->gdfs_tmap, 0, state->gdfs_tmapscroll[0x10/2]);
-	tilemap_draw(bitmap,cliprect, state->gdfs_tmap, 0, 0);
+	tilemap_set_scrollx(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x0c/2]);
+	tilemap_set_scrolly(state->m_gdfs_tmap, 0, state->m_gdfs_tmapscroll[0x10/2]);
+	tilemap_draw(bitmap,cliprect, state->m_gdfs_tmap, 0, 0);
 
 	return 0;
 }
@@ -1186,7 +1186,7 @@ void ssv_enable_video(running_machine &machine, int enable)
 {
 	ssv_state *state = machine.driver_data<ssv_state>();
 
-	state->enable_video = enable;
+	state->m_enable_video = enable;
 }
 
 SCREEN_UPDATE( ssv )
@@ -1196,26 +1196,26 @@ SCREEN_UPDATE( ssv )
 	ssv_state *state = screen->machine().driver_data<ssv_state>();
 
 	// Shadow
-	if (state->scroll[0x76/2] & 0x0080)
+	if (state->m_scroll[0x76/2] & 0x0080)
 	{
 		// 4 bit shadows (mslider, stmblade)
-		state->shadow_pen_shift = 15-4;
+		state->m_shadow_pen_shift = 15-4;
 	}
 	else
 	{
 		// 2 bit shadows
-		state->shadow_pen_shift = 15-2;
+		state->m_shadow_pen_shift = 15-2;
 	}
-	state->shadow_pen_mask = (1 << state->shadow_pen_shift) - 1;
+	state->m_shadow_pen_mask = (1 << state->m_shadow_pen_shift) - 1;
 
 	/* The background color is the first one in the palette */
 	bitmap_fill(bitmap,cliprect, 0);
 
 	// used by twineag2 and ultrax
-	clip.min_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x64/2] * 2 + 2;
-	clip.max_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x62/2] * 2 + 1;
-	clip.min_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6c/2]     + 1;
-	clip.max_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6a/2]        ;
+	clip.min_x = (cliprect->max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x64/2] * 2 + 2;
+	clip.max_x = (cliprect->max_x / 2 + state->m_scroll[0x62/2]) * 2 - state->m_scroll[0x62/2] * 2 + 1;
+	clip.min_y = (cliprect->max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6c/2]     + 1;
+	clip.max_y = (cliprect->max_y     + state->m_scroll[0x6a/2])     - state->m_scroll[0x6a/2]        ;
 
 //  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
@@ -1229,7 +1229,7 @@ SCREEN_UPDATE( ssv )
 	if (clip.min_y > clip.max_y)
 		clip.min_y = clip.max_y;
 
-	if (!state->enable_video)
+	if (!state->m_enable_video)
 		return 0;
 
 	draw_layer(screen->machine(), bitmap, &clip, 0);	// "background layer"

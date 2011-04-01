@@ -13,23 +13,23 @@ public:
 	exidy440_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 bank;
-	const UINT8 *showdown_bank_data[2];
-	INT8 showdown_bank_select;
-	UINT8 showdown_bank_offset;
-	UINT8 *imageram;
-	UINT8 *scanline;
-	UINT8 firq_vblank;
-	UINT8 firq_beam;
-	UINT8 *topsecex_yscroll;
-	UINT8 latched_x;
-	UINT8 *local_videoram;
-	UINT8 *local_paletteram;
-	UINT8 firq_enable;
-	UINT8 firq_select;
-	UINT8 palettebank_io;
-	UINT8 palettebank_vis;
-	UINT8 *spriteram;
+	UINT8 m_bank;
+	const UINT8 *m_showdown_bank_data[2];
+	INT8 m_showdown_bank_select;
+	UINT8 m_showdown_bank_offset;
+	UINT8 *m_imageram;
+	UINT8 *m_scanline;
+	UINT8 m_firq_vblank;
+	UINT8 m_firq_beam;
+	UINT8 *m_topsecex_yscroll;
+	UINT8 m_latched_x;
+	UINT8 *m_local_videoram;
+	UINT8 *m_local_paletteram;
+	UINT8 m_firq_enable;
+	UINT8 m_firq_select;
+	UINT8 m_palettebank_io;
+	UINT8 m_palettebank_vis;
+	UINT8 *m_spriteram;
 };
 
 

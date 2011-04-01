@@ -59,7 +59,7 @@ static WRITE16_HANDLER( zerozone_sound_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, offset, data >> 8);
-		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(zerozone_sound_w)
 	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE_SIZE_MEMBER(zerozone_state, videoram, videoram_size)
+	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE_SIZE_MEMBER(zerozone_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(zerozone_tilebank_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */
@@ -173,15 +173,15 @@ static MACHINE_START( zerozone )
 {
 	zerozone_state *state = machine.driver_data<zerozone_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->tilebank));
+	state->save_item(NAME(state->m_tilebank));
 }
 
 static MACHINE_RESET( zerozone )
 {
 	zerozone_state *state = machine.driver_data<zerozone_state>();
-	state->tilebank = 0;
+	state->m_tilebank = 0;
 }
 
 static MACHINE_CONFIG_START( zerozone, zerozone_state )

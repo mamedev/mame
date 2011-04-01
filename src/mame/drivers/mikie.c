@@ -60,7 +60,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 static READ8_HANDLER( mikie_sh_timer_r )
 {
 	mikie_state *state = space->machine().driver_data<mikie_state>();
-	int clock = state->audiocpu->total_cycles() / MIKIE_TIMER_RATE;
+	int clock = state->m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
 }
@@ -69,13 +69,13 @@ static WRITE8_HANDLER( mikie_sh_irqtrigger_w )
 {
 	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	if (state->last_irq == 0 && data == 1)
+	if (state->m_last_irq == 0 && data == 1)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
-		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 
-	state->last_irq = data;
+	state->m_last_irq = data;
 }
 
 static WRITE8_HANDLER( mikie_coin_counter_w )
@@ -104,10 +104,10 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW3")
 	AM_RANGE(0x2500, 0x2500) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE_MEMBER(mikie_state, spriteram, spriteram_size)
+	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE_MEMBER(mikie_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE_MEMBER(mikie_state, colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_BASE_MEMBER(mikie_state, videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE_MEMBER(mikie_state, m_colorram)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_BASE_MEMBER(mikie_state, m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	// Machine checks for extra rom
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -229,19 +229,19 @@ static MACHINE_START( mikie )
 {
 	mikie_state *state = machine.driver_data<mikie_state>();
 
-	state->maincpu = machine.device<cpu_device>("maincpu");
-	state->audiocpu = machine.device<cpu_device>("audiocpu");
+	state->m_maincpu = machine.device<cpu_device>("maincpu");
+	state->m_audiocpu = machine.device<cpu_device>("audiocpu");
 
-	state->save_item(NAME(state->palettebank));
-	state->save_item(NAME(state->last_irq));
+	state->save_item(NAME(state->m_palettebank));
+	state->save_item(NAME(state->m_last_irq));
 }
 
 static MACHINE_RESET( mikie )
 {
 	mikie_state *state = machine.driver_data<mikie_state>();
 
-	state->palettebank = 0;
-	state->last_irq = 0;
+	state->m_palettebank = 0;
+	state->m_last_irq = 0;
 }
 
 static MACHINE_CONFIG_START( mikie, mikie_state )

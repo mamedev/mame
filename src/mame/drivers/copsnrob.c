@@ -88,7 +88,7 @@ static WRITE8_HANDLER( copsnrob_misc2_w )
 {
 	copsnrob_state *state = space->machine().driver_data<copsnrob_state>();
 
-	state->misc = data & 0x7f;
+	state->m_misc = data & 0x7f;
 	/* Multi Player Start */
 	set_led_status(space->machine(), 1, !((data >> 6) & 0x01));
 }
@@ -105,13 +105,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0500, 0x0507) AM_WRITE(copsnrob_misc_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, trucky)
-	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, truckram)
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_MEMBER(copsnrob_state, bulletsram)
-	AM_RANGE(0x0900, 0x0903) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, carimage)
-	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, cary)
+	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, m_trucky)
+	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, m_truckram)
+	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_MEMBER(copsnrob_state, m_bulletsram)
+	AM_RANGE(0x0900, 0x0903) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, m_carimage)
+	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, m_cary)
 	AM_RANGE(0x0b00, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_SIZE_MEMBER(copsnrob_state, videoram, videoram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_SIZE_MEMBER(copsnrob_state, m_videoram, m_videoram_size)
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
 //  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
@@ -253,16 +253,16 @@ static MACHINE_START( copsnrob )
 {
 	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
-	state->save_item(NAME(state->ic_h3_data));
-	state->save_item(NAME(state->misc));
+	state->save_item(NAME(state->m_ic_h3_data));
+	state->save_item(NAME(state->m_misc));
 }
 
 static MACHINE_RESET( copsnrob )
 {
 	copsnrob_state *state = machine.driver_data<copsnrob_state>();
 
-	state->ic_h3_data = 0;
-	state->misc = 0;
+	state->m_ic_h3_data = 0;
+	state->m_misc = 0;
 }
 
 

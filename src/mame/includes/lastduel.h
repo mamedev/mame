@@ -11,19 +11,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *    vram;
-	UINT16 *    scroll1;
-	UINT16 *    scroll2;
-//  UINT16 *    spriteram;  // this currently uses generic buffered spriteram
-	UINT16 *    paletteram;
+	UINT16 *    m_vram;
+	UINT16 *    m_scroll1;
+	UINT16 *    m_scroll2;
+//  UINT16 *    m_spriteram;  // this currently uses generic buffered spriteram
+	UINT16 *    m_paletteram;
 
 	/* video-related */
-	tilemap_t     *bg_tilemap, *fg_tilemap, *tx_tilemap;
-	UINT16      scroll[8];
-	int         sprite_flipy_mask, sprite_pri_mask, tilemap_priority;
+	tilemap_t     *m_bg_tilemap;
+	tilemap_t     *m_fg_tilemap;
+	tilemap_t     *m_tx_tilemap;
+	UINT16      m_scroll[8];
+	int         m_sprite_flipy_mask;
+	int         m_sprite_pri_mask;
+	int         m_tilemap_priority;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/lastduel.c -----------*/

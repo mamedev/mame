@@ -4,26 +4,26 @@ public:
 	twin16_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *videoram;
-	UINT16 CPUA_register;
-	UINT16 CPUB_register;
-	UINT16 sound_command;
-	int cuebrickj_nvram_bank;
-	UINT16 cuebrickj_nvram[0x400*0x20];
-	UINT16 custom_video;
-	UINT16 *gfx_rom;
-	UINT16 *text_ram;
-	UINT16 *sprite_gfx_ram;
-	UINT16 *tile_gfx_ram;
-	UINT16 sprite_buffer[0x800];
-	emu_timer *sprite_timer;
-	int sprite_busy;
-	int need_process_spriteram;
-	UINT16 gfx_bank;
-	UINT16 scrollx[3];
-	UINT16 scrolly[3];
-	UINT16 video_register;
-	tilemap_t *text_tilemap;
+	UINT16 *m_videoram;
+	UINT16 m_CPUA_register;
+	UINT16 m_CPUB_register;
+	UINT16 m_sound_command;
+	int m_cuebrickj_nvram_bank;
+	UINT16 m_cuebrickj_nvram[0x400*0x20];
+	UINT16 m_custom_video;
+	UINT16 *m_gfx_rom;
+	UINT16 *m_text_ram;
+	UINT16 *m_sprite_gfx_ram;
+	UINT16 *m_tile_gfx_ram;
+	UINT16 m_sprite_buffer[0x800];
+	emu_timer *m_sprite_timer;
+	int m_sprite_busy;
+	int m_need_process_spriteram;
+	UINT16 m_gfx_bank;
+	UINT16 m_scrollx[3];
+	UINT16 m_scrolly[3];
+	UINT16 m_video_register;
+	tilemap_t *m_text_tilemap;
 };
 
 

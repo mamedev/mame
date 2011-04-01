@@ -32,12 +32,12 @@ static INTERRUPT_GEN( chqflag_interrupt )
 
 	if (cpu_getiloops(device) == 0)
 	{
-		if (k051960_is_irq_enabled(state->k051960))
+		if (k051960_is_irq_enabled(state->m_k051960))
 			device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (k051960_is_nmi_enabled(state->k051960))
+		if (k051960_is_nmi_enabled(state->m_k051960))
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -59,10 +59,10 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 		space->install_legacy_write_handler(0x1800, 0x1fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
 		memory_set_bankptr(space->machine(), "bank5", space->machine().generic.paletteram.v);
 
-		if (state->k051316_readroms)
-			space->install_legacy_readwrite_handler(*state->k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */
+		if (state->m_k051316_readroms)
+			space->install_legacy_readwrite_handler(*state->m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */
 		else
-			space->install_legacy_readwrite_handler(*state->k051316_1, 0x1000, 0x17ff, FUNC(k051316_r), FUNC(k051316_w));		/* 051316 #1 */
+			space->install_legacy_readwrite_handler(*state->m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_r), FUNC(k051316_w));		/* 051316 #1 */
 	}
 	else
 	{
@@ -82,12 +82,12 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	coin_counter_w(space->machine(), 0, data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
-	state->k051316_readroms = (data & 0x10);
+	state->m_k051316_readroms = (data & 0x10);
 
-	if (state->k051316_readroms)
-		space->install_legacy_read_handler(*state->k051316_2, 0x2800, 0x2fff, FUNC(k051316_rom_r));	/* 051316 (ROM test) */
+	if (state->m_k051316_readroms)
+		space->install_legacy_read_handler(*state->m_k051316_2, 0x2800, 0x2fff, FUNC(k051316_rom_r));	/* 051316 (ROM test) */
 	else
-		space->install_legacy_read_handler(*state->k051316_2, 0x2800, 0x2fff, FUNC(k051316_r));		/* 051316 */
+		space->install_legacy_read_handler(*state->m_k051316_2, 0x2800, 0x2fff, FUNC(k051316_r));		/* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
@@ -99,12 +99,12 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	else
 		palette_set_shadow_factor(space->machine(), PALETTE_DEFAULT_SHADOW_FACTOR);
 
-	if ((data & 0x80) != state->last_vreg)
+	if ((data & 0x80) != state->m_last_vreg)
 	{
 		double brt = (data & 0x80) ? PALETTE_DEFAULT_SHADOW_FACTOR : 1.0;
 		int i;
 
-		state->last_vreg = data & 0x80;
+		state->m_last_vreg = data & 0x80;
 
 		/* only affect the background */
 		for (i = 512; i < 1024; i++)
@@ -121,18 +121,18 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 static WRITE8_HANDLER( select_analog_ctrl_w )
 {
 	chqflag_state *state = space->machine().driver_data<chqflag_state>();
-	state->analog_ctrl = data;
+	state->m_analog_ctrl = data;
 }
 
 static READ8_HANDLER( analog_read_r )
 {
 	chqflag_state *state = space->machine().driver_data<chqflag_state>();
-	switch (state->analog_ctrl & 0x03)
+	switch (state->m_analog_ctrl & 0x03)
 	{
-		case 0x00: return (state->accel = input_port_read(space->machine(), "IN3"));	/* accelerator */
-		case 0x01: return (state->wheel = input_port_read(space->machine(), "IN4"));	/* steering */
-		case 0x02: return state->accel;						/* accelerator (previous?) */
-		case 0x03: return state->wheel;						/* steering (previous?) */
+		case 0x00: return (state->m_accel = input_port_read(space->machine(), "IN3"));	/* accelerator */
+		case 0x01: return (state->m_wheel = input_port_read(space->machine(), "IN4"));	/* steering */
+		case 0x02: return state->m_accel;						/* accelerator (previous?) */
+		case 0x03: return state->m_wheel;						/* steering (previous?) */
 	}
 
 	return 0xff;
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
 	chqflag_state *state = space->machine().driver_data<chqflag_state>();
 	soundlatch2_w(space, 0, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -182,12 +182,12 @@ static WRITE8_HANDLER( k007232_bankswitch_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank(state->k007232_1, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(state->k007232_2, bank_A, bank_B);
+	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
 }
 
 static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8 )
@@ -293,7 +293,7 @@ INPUT_PORTS_END
 static void chqflag_ym2151_irq_w( device_t *device, int data )
 {
 	chqflag_state *state = device->machine().driver_data<chqflag_state>();
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -359,30 +359,30 @@ static MACHINE_START( chqflag )
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->k051316_1 = machine.device("k051316_1");
-	state->k051316_2 = machine.device("k051316_2");
-	state->k051960 = machine.device("k051960");
-	state->k007232_1 = machine.device("k007232_1");
-	state->k007232_2 = machine.device("k007232_2");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_k051316_1 = machine.device("k051316_1");
+	state->m_k051316_2 = machine.device("k051316_2");
+	state->m_k051960 = machine.device("k051960");
+	state->m_k007232_1 = machine.device("k007232_1");
+	state->m_k007232_2 = machine.device("k007232_2");
 
-	state->save_item(NAME(state->k051316_readroms));
-	state->save_item(NAME(state->last_vreg));
-	state->save_item(NAME(state->analog_ctrl));
-	state->save_item(NAME(state->accel));
-	state->save_item(NAME(state->wheel));
+	state->save_item(NAME(state->m_k051316_readroms));
+	state->save_item(NAME(state->m_last_vreg));
+	state->save_item(NAME(state->m_analog_ctrl));
+	state->save_item(NAME(state->m_accel));
+	state->save_item(NAME(state->m_wheel));
 }
 
 static MACHINE_RESET( chqflag )
 {
 	chqflag_state *state = machine.driver_data<chqflag_state>();
 
-	state->k051316_readroms = 0;
-	state->last_vreg = 0;
-	state->analog_ctrl = 0;
-	state->accel = 0;
-	state->wheel = 0;
+	state->m_k051316_readroms = 0;
+	state->m_last_vreg = 0;
+	state->m_analog_ctrl = 0;
+	state->m_accel = 0;
+	state->m_wheel = 0;
 }
 
 static MACHINE_CONFIG_START( chqflag, chqflag_state )

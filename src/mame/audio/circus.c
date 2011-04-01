@@ -174,66 +174,66 @@ WRITE8_HANDLER( circus_clown_z_w )
 {
 	circus_state *state = space->machine().driver_data<circus_state>();
 
-	state->clown_z = (data & 0x0f);
+	state->m_clown_z = (data & 0x0f);
 	*(space->machine().region("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
 
 	/* Bits 4-6 enable/disable trigger different events */
-	switch (state->game_id)
+	switch (state->m_game_id)
 	{
 		case 1:	/* circus */
 		case 4:	/* ripcord */
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(state->discrete, CIRCUS_MUSIC_BIT, 0);
+					discrete_sound_w(state->m_discrete, CIRCUS_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(state->discrete, CIRCUS_MUSIC_BIT, 1);
+					discrete_sound_w(state->m_discrete, CIRCUS_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Circus = Pop; Rip Cord = Splash */
-					sample_start(state->samples, 0, 0, 0);
+					sample_start(state->m_samples, 0, 0, 0);
 					break;
 
 				case 3 : /* Normal Video */
 					break;
 
 				case 4 : /* Circus = Miss; Rip Cord = Scream */
-					sample_start(state->samples, 1, 1, 0);
+					sample_start(state->m_samples, 1, 1, 0);
 					break;
 
 				case 5 : /* Invert Video */
 					break;
 
 				case 6 : /* Circus = Bounce; Rip Cord = Chute Open */
-					sample_start(state->samples, 2, 2, 0);
+					sample_start(state->m_samples, 2, 2, 0);
 					break;
 
 				case 7 : /* Circus = not used; Rip Cord = Whistle */
-					if (state->game_id == 4)
-						sample_start(state->samples, 3, 3, 0);
+					if (state->m_game_id == 4)
+						sample_start(state->m_samples, 3, 3, 0);
 					break;
 			}
 			break;
 
 		case 2:	/* robotbwl */
-			discrete_sound_w(state->discrete, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
+			discrete_sound_w(state->m_discrete, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
 
 			if (data & 0x40)	/* Hit */
-				sample_start(state->samples, 0, 0, 0);
+				sample_start(state->m_samples, 0, 0, 0);
 
 			if (data & 0x20)	/* Roll */
-				sample_start(state->samples, 1, 1, 0);
+				sample_start(state->m_samples, 1, 1, 0);
 
 			if (data & 0x10)	/* Ball Drop */
-				sample_start(state->samples, 2, 2, 0);
+				sample_start(state->m_samples, 2, 2, 0);
 
 			if (data & 0x02)	/* Demerit */
-				sample_start(state->samples, 3, 3, 0);
+				sample_start(state->m_samples, 3, 3, 0);
 
 			if (data & 0x01)	/* Reward */
-				sample_start(state->samples, 4, 4, 0);
+				sample_start(state->m_samples, 4, 4, 0);
 
 			// if (data & 0x04) /* Invert */
 			break;
@@ -243,26 +243,26 @@ WRITE8_HANDLER( circus_clown_z_w )
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(state->discrete, CRASH_MUSIC_BIT, 0);
+					discrete_sound_w(state->m_discrete, CRASH_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(state->discrete, CRASH_MUSIC_BIT, 1);
+					discrete_sound_w(state->m_discrete, CRASH_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Crash */
-					sample_start(state->samples, 0, 0, 0);
+					sample_start(state->m_samples, 0, 0, 0);
 					break;
 
 				case 3 : /* Normal Video and Beep */
-					discrete_sound_w(state->discrete, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(state->m_discrete, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 4 : /* Skid */
 					break;
 
 				case 5 : /* Invert Video and Beep */
-					discrete_sound_w(state->discrete, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(state->m_discrete, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 6 : /* Hi Motor */

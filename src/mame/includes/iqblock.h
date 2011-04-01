@@ -4,13 +4,13 @@ public:
 	iqblock_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *rambase;
-	UINT8 *bgvideoram;
-	UINT8 *fgvideoram;
-	int videoenable;
-	int video_type;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	UINT8 *m_rambase;
+	UINT8 *m_bgvideoram;
+	UINT8 *m_fgvideoram;
+	int m_videoenable;
+	int m_video_type;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 };
 
 

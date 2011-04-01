@@ -96,13 +96,13 @@
 typedef struct _namco_06xx_state namco_06xx_state;
 struct _namco_06xx_state
 {
-	UINT8 control;
-	emu_timer *nmi_timer;
-	cpu_device *nmicpu;
-	device_t *device[4];
-	read8_device_func read[4];
-	void (*readreq[4])(device_t *device);
-	write8_device_func write[4];
+	UINT8 m_control;
+	emu_timer *m_nmi_timer;
+	cpu_device *m_nmicpu;
+	device_t *m_device[4];
+	read8_device_func m_read[4];
+	void (*m_readreq[4])(device_t *device);
+	write8_device_func m_write[4];
 };
 
 INLINE namco_06xx_state *get_safe_token(device_t *device)
@@ -119,14 +119,14 @@ static TIMER_CALLBACK( nmi_generate )
 {
 	namco_06xx_state *state = get_safe_token((device_t *)ptr);
 
-	if (!state->nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (!state->m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		LOG(("NMI cpu '%s'\n",state->nmicpu->tag()));
+		LOG(("NMI cpu '%s'\n",state->m_nmicpu->tag()));
 
-		device_set_input_line(state->nmicpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->m_nmicpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		LOG(("NMI not generated because cpu '%s' is suspended\n",state->nmicpu->tag()));
+		LOG(("NMI not generated because cpu '%s' is suspended\n",state->m_nmicpu->tag()));
 }
 
 
@@ -138,15 +138,15 @@ READ8_DEVICE_HANDLER( namco_06xx_data_r )
 
 	LOG(("%s: 06XX '%s' read offset %d\n",device->machine().describe_context(),device->tag(),offset));
 
-	if (!(state->control & 0x10))
+	if (!(state->m_control & 0x10))
 	{
-		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine().describe_context(),device->tag(),state->control);
+		logerror("%s: 06XX '%s' read in write mode %02x\n",device->machine().describe_context(),device->tag(),state->m_control);
 		return 0;
 	}
 
 	for (devnum = 0; devnum < 4; devnum++)
-		if ((state->control & (1 << devnum)) && state->read[devnum] != NULL)
-			result &= (*state->read[devnum])(state->device[devnum], 0);
+		if ((state->m_control & (1 << devnum)) && state->m_read[devnum] != NULL)
+			result &= (*state->m_read[devnum])(state->m_device[devnum], 0);
 
 	return result;
 }
@@ -159,15 +159,15 @@ WRITE8_DEVICE_HANDLER( namco_06xx_data_w )
 
 	LOG(("%s: 06XX '%s' write offset %d = %02x\n",device->machine().describe_context(),device->tag(),offset,data));
 
-	if (state->control & 0x10)
+	if (state->m_control & 0x10)
 	{
-		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine().describe_context(),device->tag(),state->control);
+		logerror("%s: 06XX '%s' write in read mode %02x\n",device->machine().describe_context(),device->tag(),state->m_control);
 		return;
 	}
 
 	for (devnum = 0; devnum < 4; devnum++)
-		if ((state->control & (1 << devnum)) && state->write[devnum] != NULL)
-			(*state->write[devnum])(state->device[devnum], 0, data);
+		if ((state->m_control & (1 << devnum)) && state->m_write[devnum] != NULL)
+			(*state->m_write[devnum])(state->m_device[devnum], 0, data);
 }
 
 
@@ -175,7 +175,7 @@ READ8_DEVICE_HANDLER( namco_06xx_ctrl_r )
 {
 	namco_06xx_state *state = get_safe_token(device);
 	LOG(("%s: 06XX '%s' ctrl_r\n",device->machine().describe_context(),device->tag()));
-	return state->control;
+	return state->m_control;
 }
 
 WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
@@ -185,12 +185,12 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 	LOG(("%s: 06XX '%s' control %02x\n",device->machine().describe_context(),device->tag(),data));
 
-	state->control = data;
+	state->m_control = data;
 
-	if ((state->control & 0x0f) == 0)
+	if ((state->m_control & 0x0f) == 0)
 	{
 		LOG(("disabling nmi generate timer\n"));
-		state->nmi_timer->adjust(attotime::never);
+		state->m_nmi_timer->adjust(attotime::never);
 	}
 	else
 	{
@@ -200,12 +200,12 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming controls.
-		state->nmi_timer->adjust(attotime::from_usec(200), 0, attotime::from_usec(200));
+		state->m_nmi_timer->adjust(attotime::from_usec(200), 0, attotime::from_usec(200));
 
-		if (state->control & 0x10)
+		if (state->m_control & 0x10)
 			for (devnum = 0; devnum < 4; devnum++)
-				if ((state->control & (1 << devnum)) && state->readreq[devnum] != NULL)
-					(*state->readreq[devnum])(state->device[devnum]);
+				if ((state->m_control & (1 << devnum)) && state->m_readreq[devnum] != NULL)
+					(*state->m_readreq[devnum])(state->m_device[devnum]);
 	}
 }
 
@@ -227,53 +227,53 @@ static DEVICE_START( namco_06xx )
 	assert(config != NULL);
 
 	/* resolve our CPU */
-	state->nmicpu = device->machine().device<cpu_device>(config->nmicpu);
-	assert(state->nmicpu != NULL);
+	state->m_nmicpu = device->machine().device<cpu_device>(config->nmicpu);
+	assert(state->m_nmicpu != NULL);
 
 	/* resolve our devices */
-	state->device[0] = (config->chip0 != NULL) ? device->machine().device(config->chip0) : NULL;
-	assert(state->device[0] != NULL || config->chip0 == NULL);
-	state->device[1] = (config->chip1 != NULL) ? device->machine().device(config->chip1) : NULL;
-	assert(state->device[1] != NULL || config->chip1 == NULL);
-	state->device[2] = (config->chip2 != NULL) ? device->machine().device(config->chip2) : NULL;
-	assert(state->device[2] != NULL || config->chip2 == NULL);
-	state->device[3] = (config->chip3 != NULL) ? device->machine().device(config->chip3) : NULL;
-	assert(state->device[3] != NULL || config->chip3 == NULL);
+	state->m_device[0] = (config->chip0 != NULL) ? device->machine().device(config->chip0) : NULL;
+	assert(state->m_device[0] != NULL || config->chip0 == NULL);
+	state->m_device[1] = (config->chip1 != NULL) ? device->machine().device(config->chip1) : NULL;
+	assert(state->m_device[1] != NULL || config->chip1 == NULL);
+	state->m_device[2] = (config->chip2 != NULL) ? device->machine().device(config->chip2) : NULL;
+	assert(state->m_device[2] != NULL || config->chip2 == NULL);
+	state->m_device[3] = (config->chip3 != NULL) ? device->machine().device(config->chip3) : NULL;
+	assert(state->m_device[3] != NULL || config->chip3 == NULL);
 
 	/* loop over devices and set their read/write handlers */
 	for (devnum = 0; devnum < 4; devnum++)
-		if (state->device[devnum] != NULL)
+		if (state->m_device[devnum] != NULL)
 		{
-			device_type type = state->device[devnum]->type();
+			device_type type = state->m_device[devnum]->type();
 
 			if (type == NAMCO_50XX)
 			{
-				state->read[devnum] = namco_50xx_read;
-				state->readreq[devnum] = namco_50xx_read_request;
-				state->write[devnum] = namco_50xx_write;
+				state->m_read[devnum] = namco_50xx_read;
+				state->m_readreq[devnum] = namco_50xx_read_request;
+				state->m_write[devnum] = namco_50xx_write;
 			}
 			else if (type == NAMCO_51XX)
 			{
-				state->read[devnum] = namco_51xx_read;
-				state->write[devnum] = namco_51xx_write;
+				state->m_read[devnum] = namco_51xx_read;
+				state->m_write[devnum] = namco_51xx_write;
 			}
 			else if (type == NAMCO_52XX)
-				state->write[devnum] = namco_52xx_write;
+				state->m_write[devnum] = namco_52xx_write;
 			else if (type == NAMCO_53XX)
 			{
-				state->read[devnum] = namco_53xx_read;
-				state->readreq[devnum] = namco_53xx_read_request;
+				state->m_read[devnum] = namco_53xx_read;
+				state->m_readreq[devnum] = namco_53xx_read_request;
 			}
 			else if (type == NAMCO_54XX)
-				state->write[devnum] = namco_54xx_write;
+				state->m_write[devnum] = namco_54xx_write;
 			else
-				fatalerror("Unknown device type %s connected to Namco 06xx", state->device[devnum]->name());
+				fatalerror("Unknown device type %s connected to Namco 06xx", state->m_device[devnum]->name());
 		}
 
 	/* allocate a timer */
-	state->nmi_timer = device->machine().scheduler().timer_alloc(FUNC(nmi_generate), (void *)device);
+	state->m_nmi_timer = device->machine().scheduler().timer_alloc(FUNC(nmi_generate), (void *)device);
 
-	device->save_item(NAME(state->control));
+	device->save_item(NAME(state->m_control));
 }
 
 
@@ -284,7 +284,7 @@ static DEVICE_START( namco_06xx )
 static DEVICE_RESET( namco_06xx )
 {
 	namco_06xx_state *state = get_safe_token(device);
-	state->control = 0;
+	state->m_control = 0;
 }
 
 

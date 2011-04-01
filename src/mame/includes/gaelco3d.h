@@ -17,35 +17,35 @@ public:
 	gaelco3d_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *adsp_ram_base;
-	UINT16 *m68k_ram_base;
-	UINT16 *tms_comm_base;
-	UINT16 sound_data;
-	UINT8 sound_status;
-	offs_t tms_offset_xor;
-	UINT8 analog_ports[4];
-	UINT8 framenum;
-	timer_device *adsp_autobuffer_timer;
-	UINT16 *adsp_control_regs;
-	UINT16 *adsp_fastram_base;
-	UINT8 adsp_ireg;
-	offs_t adsp_ireg_base;
-	offs_t adsp_incs;
-	offs_t adsp_size;
-	dmadac_sound_device *dmadac[SOUND_CHANNELS];
-	UINT8 *texture;
-	UINT8 *texmask;
-	offs_t texture_size;
-	offs_t texmask_size;
-	bitmap_t *screenbits;
-	bitmap_t *zbuffer;
-	rgb_t *palette;
-	UINT32 *polydata_buffer;
-	UINT32 polydata_count;
-	int polygons;
-	int lastscan;
-	int video_changed;
-	poly_manager *poly;
+	UINT32 *m_adsp_ram_base;
+	UINT16 *m_m68k_ram_base;
+	UINT16 *m_tms_comm_base;
+	UINT16 m_sound_data;
+	UINT8 m_sound_status;
+	offs_t m_tms_offset_xor;
+	UINT8 m_analog_ports[4];
+	UINT8 m_framenum;
+	timer_device *m_adsp_autobuffer_timer;
+	UINT16 *m_adsp_control_regs;
+	UINT16 *m_adsp_fastram_base;
+	UINT8 m_adsp_ireg;
+	offs_t m_adsp_ireg_base;
+	offs_t m_adsp_incs;
+	offs_t m_adsp_size;
+	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
+	UINT8 *m_texture;
+	UINT8 *m_texmask;
+	offs_t m_texture_size;
+	offs_t m_texmask_size;
+	bitmap_t *m_screenbits;
+	bitmap_t *m_zbuffer;
+	rgb_t *m_palette;
+	UINT32 *m_polydata_buffer;
+	UINT32 m_polydata_count;
+	int m_polygons;
+	int m_lastscan;
+	int m_video_changed;
+	poly_manager *m_poly;
 };
 
 

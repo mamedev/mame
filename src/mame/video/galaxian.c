@@ -537,7 +537,7 @@ SCREEN_UPDATE( zigzag )
 static TILE_GET_INFO( bg_get_tile_info )
 {
 	galaxian_state *state = machine.driver_data<galaxian_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = videoram[tile_index];
@@ -554,7 +554,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 WRITE8_HANDLER( galaxian_videoram_w )
 {
 	galaxian_state *state = space->machine().driver_data<galaxian_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	/* update any video up to the current scanline */
 	space->machine().primary_screen->update_now();
 

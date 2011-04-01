@@ -6,10 +6,10 @@ public:
 	beezer_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int pbus;
-	int banklatch;
-	int scanline;
+	UINT8 *m_videoram;
+	int m_pbus;
+	int m_banklatch;
+	int m_scanline;
 };
 
 

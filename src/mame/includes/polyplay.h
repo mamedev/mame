@@ -8,21 +8,21 @@ public:
 	polyplay_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int freq1;
-	int freq2;
-	int channel_playing1;
-	int channel_playing2;
-	INT16 backgroundwave[SAMPLE_LENGTH];
-	int prescale1;
-	int prescale2;
-	int channel1_active;
-	int channel1_const;
-	int channel2_active;
-	int channel2_const;
-	timer_device* timer;
-	int last;
-	UINT8 *characterram;
+	UINT8 *m_videoram;
+	int m_freq1;
+	int m_freq2;
+	int m_channel_playing1;
+	int m_channel_playing2;
+	INT16 m_backgroundwave[SAMPLE_LENGTH];
+	int m_prescale1;
+	int m_prescale2;
+	int m_channel1_active;
+	int m_channel1_const;
+	int m_channel2_active;
+	int m_channel2_const;
+	timer_device* m_timer;
+	int m_last;
+	UINT8 *m_characterram;
 };
 
 

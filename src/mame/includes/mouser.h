@@ -11,18 +11,18 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    videoram;
-	UINT8 *    colorram;
-	UINT8 *    spriteram;
-	size_t     spriteram_size;
+	UINT8 *    m_videoram;
+	UINT8 *    m_colorram;
+	UINT8 *    m_spriteram;
+	size_t     m_spriteram_size;
 
 	/* misc */
-	UINT8      sound_byte;
-	UINT8      nmi_enable;
+	UINT8      m_sound_byte;
+	UINT8      m_nmi_enable;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
 };
 
 /*----------- defined in video/mouser.c -----------*/

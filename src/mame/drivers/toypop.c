@@ -40,7 +40,7 @@ TODO:
 static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	return state->m68000_sharedram[offset];
+	return state->m_m68000_sharedram[offset];
 }
 
 static WRITE16_HANDLER( toypop_m68000_sharedram_w )
@@ -48,7 +48,7 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toypop_state *state = space->machine().driver_data<toypop_state>();
-		state->m68000_sharedram[offset] = data & 0xff;
+		state->m_m68000_sharedram[offset] = data & 0xff;
 	}
 }
 
@@ -147,7 +147,7 @@ static TIMER_CALLBACK( disable_interrupts )
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	cpu_interrupt_enable(machine.device("audiocpu"), 0);
 	cputag_set_input_line(machine, "audiocpu", 0, CLEAR_LINE);
-	state->interrupt_enable_68k = 0;
+	state->m_interrupt_enable_68k = 0;
 }
 
 static MACHINE_RESET( toypop )
@@ -160,20 +160,20 @@ static MACHINE_RESET( toypop )
 static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
 	toypop_state *state = device->machine().driver_data<toypop_state>();
-	if (state->interrupt_enable_68k)
+	if (state->m_interrupt_enable_68k)
 		device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->interrupt_enable_68k = 1;
+	state->m_interrupt_enable_68k = 1;
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 {
 	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->interrupt_enable_68k = 0;
+	state->m_interrupt_enable_68k = 0;
 }
 
 
@@ -185,9 +185,9 @@ static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
  *************************************/
 
 static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
@@ -203,9 +203,9 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(toypop_m68000_sharedram_r, toypop_m68000_sharedram_w)	/* shared RAM with the main CPU */
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(toypop_merged_background_r, toypop_merged_background_w) /* RAM that has to be merged with the background image */
 	AM_RANGE(0x18fffc, 0x18ffff) AM_WRITE(toypop_flipscreen_w)				/* flip mode */
-	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE_MEMBER(toypop_state,bg_image)			/* RAM containing the background image */
+	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE_MEMBER(toypop_state,m_bg_image)			/* RAM containing the background image */
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toypop_m68000_interrupt_enable_w)	/* interrupt enable */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(toypop_m68000_interrupt_disable_w)/* interrupt disable */
 ADDRESS_MAP_END

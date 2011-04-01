@@ -40,7 +40,7 @@ PALETTE_INIT( tryout )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	int code, attr, color;
 
 	code = videoram[tile_index];
@@ -54,21 +54,21 @@ static TILE_GET_INFO( get_fg_tile_info )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
-	SET_TILE_INFO(2, state->vram[tile_index] & 0x7f, 2, 0);
+	SET_TILE_INFO(2, state->m_vram[tile_index] & 0x7f, 2, 0);
 }
 
 READ8_HANDLER( tryout_vram_r )
 {
 	tryout_state *state = space->machine().driver_data<tryout_state>();
-	return state->vram[offset]; // debug only
+	return state->m_vram[offset]; // debug only
 }
 
 WRITE8_HANDLER( tryout_videoram_w )
 {
 	tryout_state *state = space->machine().driver_data<tryout_state>();
-	UINT8 *videoram = state->videoram;
+	UINT8 *videoram = state->m_videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( tryout_vram_w )
@@ -87,14 +87,14 @@ WRITE8_HANDLER( tryout_vram_w )
     gfx data and then set high from that point onwards.
 
     */
-	const UINT8 bank=(state->vram_bank>>1)&0x7;
+	const UINT8 bank=(state->m_vram_bank>>1)&0x7;
 
 
 	if ((bank==0 || bank==2 || bank==4 || bank==6) && (offset&0x7ff)<0x400) {
 		int newoff=offset&0x3ff;
 
-		state->vram[newoff]=data;
-		tilemap_mark_tile_dirty(state->bg_tilemap,newoff);
+		state->m_vram[newoff]=data;
+		tilemap_mark_tile_dirty(state->m_bg_tilemap,newoff);
 		return;
 	}
 
@@ -108,32 +108,32 @@ WRITE8_HANDLER( tryout_vram_w )
     */
 
 	offset=(offset&0x7ff) | (bank<<11);
-	state->vram[offset]=data;
+	state->m_vram[offset]=data;
 
 	switch (offset&0x1c00) {
 	case 0x0400:
-		state->vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x0000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x2000 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0800:
-		state->vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x4000 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x4400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x0c00:
-		state->vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x0400 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x2400 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1400:
-		state->vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x0800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x2800 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1800:
-		state->vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x4800 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x4c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	case 0x1c00:
-		state->vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
-		state->vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
+		state->m_vram_gfx[(offset&0x3ff) + 0x0c00 + ((offset&0x2000)>>1)]=(~data&0xf);
+		state->m_vram_gfx[(offset&0x3ff) + 0x2c00 + ((offset&0x2000)>>1)]=(~data&0xf0)>>4;
 		break;
 	}
 
@@ -143,7 +143,7 @@ WRITE8_HANDLER( tryout_vram_w )
 WRITE8_HANDLER( tryout_vram_bankswitch_w )
 {
 	tryout_state *state = space->machine().driver_data<tryout_state>();
-	state->vram_bank = data;
+	state->m_vram_bank = data;
 }
 
 WRITE8_HANDLER( tryout_flipscreen_w )
@@ -171,22 +171,22 @@ static TILEMAP_MAPPER( get_bg_memory_offset )
 VIDEO_START( tryout )
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,get_fg_memory_offset,8,8,32,32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,get_bg_memory_offset,16,16,64,16);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,get_fg_memory_offset,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,get_bg_memory_offset,16,16,64,16);
 
-	state->vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
-	state->vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);
+	state->m_vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
+	state->m_vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);
 
-	gfx_element_set_source(machine.gfx[2], state->vram_gfx);
+	gfx_element_set_source(machine.gfx[2], state->m_vram_gfx);
 
-	tilemap_set_transparent_pen(state->fg_tilemap,0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	tryout_state *state = machine.driver_data<tryout_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs,fx,fy,x,y,color,sprite,inc;
 
 	for (offs = 0;offs < 0x7f;offs += 4)
@@ -239,30 +239,30 @@ SCREEN_UPDATE( tryout )
 	int scrollx = 0;
 
 	if (!flip_screen_get(screen->machine()))
-		tilemap_set_scrollx(state->fg_tilemap, 0, 16); /* Assumed hard-wired */
+		tilemap_set_scrollx(state->m_fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
-		tilemap_set_scrollx(state->fg_tilemap, 0, -8); /* Assumed hard-wired */
+		tilemap_set_scrollx(state->m_fg_tilemap, 0, -8); /* Assumed hard-wired */
 
-	scrollx = state->gfx_control[1] + ((state->gfx_control[0]&1)<<8) + ((state->gfx_control[0]&4)<<7) - ((state->gfx_control[0] & 2) ? 0 : 0x100);
+	scrollx = state->m_gfx_control[1] + ((state->m_gfx_control[0]&1)<<8) + ((state->m_gfx_control[0]&4)<<7) - ((state->m_gfx_control[0] & 2) ? 0 : 0x100);
 
 	/* wrap-around */
-	if(state->gfx_control[1] == 0) { scrollx+=0x100; }
+	if(state->m_gfx_control[1] == 0) { scrollx+=0x100; }
 
-	tilemap_set_scrollx(state->bg_tilemap, 0, scrollx+2); /* why +2? hard-wired? */
-	tilemap_set_scrolly(state->bg_tilemap, 0, -state->gfx_control[2]);
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, scrollx+2); /* why +2? hard-wired? */
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, -state->m_gfx_control[2]);
 
-	if(!(state->gfx_control[0] & 0x8)) // screen disable
+	if(!(state->m_gfx_control[0] & 0x8)) // screen disable
 	{
 		/* TODO: Color might be different, needs a video from an original pcb. */
 		bitmap_fill(bitmap, cliprect, screen->machine().pens[0x10]);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 		draw_sprites(screen->machine(), bitmap,cliprect);
 	}
 
-//  popmessage("%02x %02x %02x %02x",state->gfx_control[0],state->gfx_control[1],state->gfx_control[2],scrollx);
+//  popmessage("%02x %02x %02x %02x",state->m_gfx_control[0],state->m_gfx_control[1],state->m_gfx_control[2],scrollx);
 	return 0;
 }

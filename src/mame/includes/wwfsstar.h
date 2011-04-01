@@ -4,14 +4,14 @@ public:
 	wwfsstar_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int vblank;
-	int scrollx;
-	int scrolly;
-	UINT16 *spriteram;
-	UINT16 *fg0_videoram;
-	UINT16 *bg0_videoram;
-	tilemap_t *fg0_tilemap;
-	tilemap_t *bg0_tilemap;
+	int m_vblank;
+	int m_scrollx;
+	int m_scrolly;
+	UINT16 *m_spriteram;
+	UINT16 *m_fg0_videoram;
+	UINT16 *m_bg0_videoram;
+	tilemap_t *m_fg0_tilemap;
+	tilemap_t *m_bg0_tilemap;
 };
 
 

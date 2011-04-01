@@ -11,7 +11,7 @@ Mr. F. Lea
 WRITE8_HANDLER( mrflea_gfx_bank_w )
 {
 	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->gfx_bank = data;
+	state->m_gfx_bank = data;
 
 	if (data & ~0x14)
 		logerror("unknown gfx bank: 0x%02x\n", data);
@@ -23,8 +23,8 @@ WRITE8_HANDLER( mrflea_videoram_w )
 	int bank = offset / 0x400;
 
 	offset &= 0x3ff;
-	state->videoram[offset] = data;
-	state->videoram[offset + 0x400] = bank;
+	state->m_videoram[offset] = data;
+	state->m_videoram[offset + 0x400] = bank;
 	/* the address range that tile data is written to sets one bit of
       the bank select.  The remaining bits are from a video register. */
 }
@@ -36,18 +36,18 @@ WRITE8_HANDLER( mrflea_spriteram_w )
 	if (offset & 2)
 	{
 		/* tile_number */
-		state->spriteram[offset | 1] = offset & 1;
+		state->m_spriteram[offset | 1] = offset & 1;
 		offset &= ~1;
 	}
 
-	state->spriteram[offset] = data;
+	state->m_spriteram[offset] = data;
 }
 
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	mrflea_state *state = machine.driver_data<mrflea_state>();
 	const gfx_element *gfx = machine.gfx[0];
-	const UINT8 *source = state->spriteram;
+	const UINT8 *source = state->m_spriteram;
 	const UINT8 *finish = source + 0x100;
 	rectangle clip = machine.primary_screen->visible_area();
 
@@ -77,15 +77,15 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 static void draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	mrflea_state *state = machine.driver_data<mrflea_state>();
-	const UINT8 *source = state->videoram;
+	const UINT8 *source = state->m_videoram;
 	const gfx_element *gfx = machine.gfx[1];
 	int sx, sy;
 	int base = 0;
 
-	if (BIT(state->gfx_bank, 2))
+	if (BIT(state->m_gfx_bank, 2))
 		base |= 0x400;
 
-	if (BIT(state->gfx_bank, 4))
+	if (BIT(state->m_gfx_bank, 4))
 		base |= 0x200;
 
 	for (sy = 0; sy < 256; sy += 8)

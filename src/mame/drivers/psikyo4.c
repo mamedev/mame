@@ -205,7 +205,7 @@ static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 {
 	psikyo4_state *state = field->port->machine().driver_data<psikyo4_state>();
 	int player = (FPTR)param;
-	int sel = (state->io_select[0] & 0x0000ff00) >> 8;
+	int sel = (state->m_io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
 
 	if (sel & 1) ret &= input_port_read(field->port->machine(), player ? "KEY4" : "KEY0" );
@@ -220,11 +220,11 @@ static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_
 {
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->paletteram[offset]);
+	COMBINE_DATA(&state->m_paletteram[offset]);
 
-	b = ((state->paletteram[offset] & 0x0000ff00) >> 8);
-	g = ((state->paletteram[offset] & 0x00ff0000) >> 16);
-	r = ((state->paletteram[offset] & 0xff000000) >> 24);
+	b = ((state->m_paletteram[offset] & 0x0000ff00) >> 8);
+	g = ((state->m_paletteram[offset] & 0x00ff0000) >> 16);
+	r = ((state->m_paletteram[offset] & 0xff000000) >> 24);
 
 	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 	palette_set_color(space->machine(), offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
@@ -234,11 +234,11 @@ static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
 {
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->bgpen_1[0]);
+	COMBINE_DATA(&state->m_bgpen_1[0]);
 
-	b = ((state->bgpen_1[0] & 0x0000ff00) >>8);
-	g = ((state->bgpen_1[0] & 0x00ff0000) >>16);
-	r = ((state->bgpen_1[0] & 0xff000000) >>24);
+	b = ((state->m_bgpen_1[0] & 0x0000ff00) >>8);
+	g = ((state->m_bgpen_1[0] & 0x00ff0000) >>16);
+	r = ((state->m_bgpen_1[0] & 0xff000000) >>24);
 
 	palette_set_color(space->machine(), 0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
 }
@@ -247,11 +247,11 @@ static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 {
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->bgpen_2[0]);
+	COMBINE_DATA(&state->m_bgpen_2[0]);
 
-	b = ((state->bgpen_2[0] & 0x0000ff00) >>8);
-	g = ((state->bgpen_2[0] & 0x00ff0000) >>16);
-	r = ((state->bgpen_2[0] & 0xff000000) >>24);
+	b = ((state->m_bgpen_2[0] & 0x0000ff00) >>8);
+	g = ((state->m_bgpen_2[0] & 0x00ff0000) >>16);
+	r = ((state->m_bgpen_2[0] & 0xff000000) >>24);
 
 	palette_set_color(space->machine(), 0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
 }
@@ -269,14 +269,14 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 			brt1 = 0x7f; /* I reckon values must be clamped to 0x7f */
 
 		brt1 = (0x7f - brt1) / 127.0;
-		if (state->oldbrt1 != brt1)
+		if (state->m_oldbrt1 != brt1)
 		{
 			int i;
 
 			for (i = 0; i < 0x800; i++)
 				palette_set_pen_contrast(space->machine(), i, brt1);
 
-			state->oldbrt1 = brt1;
+			state->m_oldbrt1 = brt1;
 		}
 	}
 	else
@@ -301,14 +301,14 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 
 		brt2 = (0x7f - brt2) / 127.0;
 
-		if (state->oldbrt2 != brt2)
+		if (state->m_oldbrt2 != brt2)
 		{
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
 				palette_set_pen_contrast(space->machine(), i, brt2);
 
-			state->oldbrt2 = brt2;
+			state->m_oldbrt2 = brt2;
 		}
 	}
 	else
@@ -322,15 +322,15 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 static WRITE32_HANDLER( ps4_vidregs_w )
 {
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-	COMBINE_DATA(&state->vidregs[offset]);
+	COMBINE_DATA(&state->m_vidregs[offset]);
 
 #if ROMTEST
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-//          memory_set_bank(space->machine(), "bank2", state->vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
-			memory_set_bankptr(space->machine(), "bank2", space->machine().region("gfx1")->base() + 0x2000 * (state->vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
+//          memory_set_bank(space->machine(), "bank2", state->m_vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
+			memory_set_bankptr(space->machine(), "bank2", space->machine().region("gfx1")->base() + 0x2000 * (state->m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
 	}
 #endif
 }
@@ -340,11 +340,11 @@ static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
 	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	UINT8 *ROM = space->machine().region("ymf")->base();
-	return ROM[state->sample_offs++] << 16;
+	return ROM[state->m_sample_offs++] << 16;
 }
 #endif
 
-#define PCM_BANK_NO(n)	((state->io_select[0] >> (n * 4 + 24)) & 0x07)
+#define PCM_BANK_NO(n)	((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
 
 static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 {
@@ -362,7 +362,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 	int old_bank1 = PCM_BANK_NO(1);
 	int new_bank0, new_bank1;
 
-	COMBINE_DATA(&state->io_select[0]);
+	COMBINE_DATA(&state->m_io_select[0]);
 
 	new_bank0 = PCM_BANK_NO(0);
 	new_bank1 = PCM_BANK_NO(1);
@@ -377,23 +377,23 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
-	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo4_state, spriteram, spriteram_size)
+	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo4_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_DEVREADWRITE("eeprom", ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_BASE_MEMBER(psikyo4_state, vidregs) // vid regs?
+	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_BASE_MEMBER(psikyo4_state, m_vidregs) // vid regs?
 	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE(ps4_screen1_brt_w) // screen 1 brightness
-	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_BASE_MEMBER(psikyo4_state, bgpen_1) // screen 1 clear colour
+	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_BASE_MEMBER(psikyo4_state, m_bgpen_1) // screen 1 clear colour
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
-	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE_MEMBER(psikyo4_state, bgpen_2) // screen 2 clear colour
-	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyo4_state, paletteram) // palette
+	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE_MEMBER(psikyo4_state, m_bgpen_2) // screen 2 clear colour
+	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyo4_state, m_paletteram) // palette
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x05800008, 0x0580000b) AM_WRITEONLY AM_BASE_MEMBER(psikyo4_state, io_select) // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
+	AM_RANGE(0x05800008, 0x0580000b) AM_WRITEONLY AM_BASE_MEMBER(psikyo4_state, m_io_select) // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyo4_state, ram) // main RAM (1 meg)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyo4_state, m_ram) // main RAM (1 meg)
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(ps4_sample_r) // data for rom tests (Used to verify Sample rom)
@@ -688,7 +688,7 @@ INPUT_PORTS_END
 static void irqhandler( device_t *device, int linestate )
 {
 	psikyo4_state *state = device->machine().driver_data<psikyo4_state>();
-	device_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -701,26 +701,26 @@ static MACHINE_START( psikyo4 )
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
 #if ROMTEST
 //  FIXME: Too many banks! it cannot be handled in this way, currently
 //  memory_configure_bank(machine, "bank2", 0, 0x2000, machine.region("gfx1")->base(), 0x2000);
 
-	state->sample_offs = 0;
-	state->save_item(NAME(state->sample_offs));
+	state->m_sample_offs = 0;
+	state->save_item(NAME(state->m_sample_offs));
 #endif
 
-	state->save_item(NAME(state->oldbrt1));
-	state->save_item(NAME(state->oldbrt2));
+	state->save_item(NAME(state->m_oldbrt1));
+	state->save_item(NAME(state->m_oldbrt2));
 }
 
 static MACHINE_RESET( psikyo4 )
 {
 	psikyo4_state *state = machine.driver_data<psikyo4_state>();
 
-	state->oldbrt1 = -1;
-	state->oldbrt2 = -1;
+	state->m_oldbrt1 = -1;
+	state->m_oldbrt2 = -1;
 }
 
 static MACHINE_CONFIG_START( ps4big, psikyo4_state )
@@ -1014,7 +1014,7 @@ PC  :00001B48: BT      $00001B3C
 	if (cpu_get_pc(&space->device()) == 0x00001b3e)
 		device_spin_until_interrupt(&space->device());
 
-	return state->ram[0x000020 / 4];
+	return state->m_ram[0x000020 / 4];
 }
 
 static READ32_HANDLER( loderdfa_speedup_r )
@@ -1033,7 +1033,7 @@ PC  :00001B54: BT      $00001B48
 	if (cpu_get_pc(&space->device()) == 0x00001b4a)
 		device_spin_until_interrupt(&space->device());
 
-	return state->ram[0x000020 / 4];
+	return state->m_ram[0x000020 / 4];
 }
 
 static READ32_HANDLER( hotdebut_speedup_r )
@@ -1052,7 +1052,7 @@ PC  :000029F8: BT      $000029EC
 	if (cpu_get_pc(&space->device()) == 0x000029ee)
 		device_spin_until_interrupt(&space->device());
 
-	return state->ram[0x00001c / 4];
+	return state->m_ram[0x00001c / 4];
 }
 
 static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
@@ -1068,7 +1068,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);
 
-	state->io_select[0] = (state->io_select[0] & 0x00ffffff) | 0x32000000;
+	state->m_io_select[0] = (state->m_io_select[0] & 0x00ffffff) | 0x32000000;
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 

@@ -12,8 +12,8 @@ public:
 	asteroid_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *ram1;
-	UINT8 *ram2;
+	UINT8 *m_ram1;
+	UINT8 *m_ram2;
 };
 
 

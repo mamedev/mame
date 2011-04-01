@@ -52,18 +52,18 @@
 static INTERRUPT_GEN( battlex_interrupt )
 {
 	battlex_state *state = device->machine().driver_data<battlex_state>();
-	state->in0_b4 = 1;
+	state->m_in0_b4 = 1;
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( battlex_in0_b4_r )
 {
 	battlex_state *state = field->port->machine().driver_data<battlex_state>();
-	UINT32 ret = state->in0_b4;
-	if (state->in0_b4)
+	UINT32 ret = state->m_in0_b4;
+	if (state->m_in0_b4)
 	{
 		cputag_set_input_line(field->port->machine(), "maincpu", 0, CLEAR_LINE);
-		state->in0_b4 = 0;
+		state->m_in0_b4 = 0;
 	}
 
 	return ret;
@@ -78,8 +78,8 @@ static CUSTOM_INPUT( battlex_in0_b4_r )
 
 static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE_MEMBER(battlex_state, videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(battlex_state, spriteram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE_MEMBER(battlex_state, m_videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(battlex_state, m_spriteram)
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(battlex_palette_w)
 ADDRESS_MAP_END
@@ -232,20 +232,20 @@ static MACHINE_START( battlex )
 	battlex_state *state = machine.driver_data<battlex_state>();
 
 	/* register for save states */
-	state->save_item(NAME(state->scroll_lsb));
-	state->save_item(NAME(state->scroll_msb));
-	state->save_item(NAME(state->starfield_enabled));
-	state->save_item(NAME(state->in0_b4));
+	state->save_item(NAME(state->m_scroll_lsb));
+	state->save_item(NAME(state->m_scroll_msb));
+	state->save_item(NAME(state->m_starfield_enabled));
+	state->save_item(NAME(state->m_in0_b4));
 }
 
 static MACHINE_RESET( battlex )
 {
 	battlex_state *state = machine.driver_data<battlex_state>();
 
-	state->scroll_lsb = 0;
-	state->scroll_msb = 0;
-	state->starfield_enabled = 0;
-	state->in0_b4 = 0;
+	state->m_scroll_lsb = 0;
+	state->m_scroll_msb = 0;
+	state->m_starfield_enabled = 0;
+	state->m_in0_b4 = 0;
 }
 
 static MACHINE_CONFIG_START( battlex, battlex_state )

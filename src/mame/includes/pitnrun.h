@@ -4,27 +4,27 @@ public:
 	pitnrun_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 *videoram;
-	int nmi;
-	UINT8* videoram2;
-	UINT8 fromz80;
-	UINT8 toz80;
-	int zaccept;
-	int zready;
-	UINT8 portA_in;
-	UINT8 portA_out;
-	int address;
-	int h_heed;
-	int v_heed;
-	int ha;
-	int scroll;
-	int char_bank;
-	int color_select;
-	bitmap_t *tmp_bitmap[4];
-	tilemap_t *bg;
-	tilemap_t *fg;
-	UINT8 *spriteram;
-	size_t spriteram_size;
+	UINT8 *m_videoram;
+	int m_nmi;
+	UINT8* m_videoram2;
+	UINT8 m_fromz80;
+	UINT8 m_toz80;
+	int m_zaccept;
+	int m_zready;
+	UINT8 m_portA_in;
+	UINT8 m_portA_out;
+	int m_address;
+	int m_h_heed;
+	int m_v_heed;
+	int m_ha;
+	int m_scroll;
+	int m_char_bank;
+	int m_color_select;
+	bitmap_t *m_tmp_bitmap[4];
+	tilemap_t *m_bg;
+	tilemap_t *m_fg;
+	UINT8 *m_spriteram;
+	size_t m_spriteram_size;
 };
 
 

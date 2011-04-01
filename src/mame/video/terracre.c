@@ -17,7 +17,7 @@ TILE_GET_INFO( get_bg_tile_info )
 	/* xxxx.----.----.----
      * ----.xx--.----.----
      * ----.--xx.xxxx.xxxx */
-	unsigned data = state->amazon_videoram[tile_index];
+	unsigned data = state->m_amazon_videoram[tile_index];
 	unsigned color = data>>11;
 	SET_TILE_INFO( 1,data&0x3ff,color,0 );
 }
@@ -26,7 +26,7 @@ static
 TILE_GET_INFO( get_fg_tile_info )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	int data = videoram[tile_index];
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
@@ -36,7 +36,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	terracre_state *state = machine.driver_data<terracre_state>();
 	const UINT8 *spritepalettebank = machine.region("user1")->base();
 	const gfx_element *pGfx = machine.gfx[2];
-	const UINT16 *pSource = state->spriteram;
+	const UINT16 *pSource = state->m_spriteram;
 	int i;
 	int transparent_pen;
 
@@ -154,16 +154,16 @@ PALETTE_INIT( amazon )
 WRITE16_HANDLER( amazon_background_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA( &state->amazon_videoram[offset] );
-	tilemap_mark_tile_dirty( state->background, offset );
+	COMBINE_DATA( &state->m_amazon_videoram[offset] );
+	tilemap_mark_tile_dirty( state->m_background, offset );
 }
 
 WRITE16_HANDLER( amazon_foreground_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
-	UINT16 *videoram = state->videoram;
+	UINT16 *videoram = state->m_videoram;
 	COMBINE_DATA( &videoram[offset] );
-	tilemap_mark_tile_dirty( state->foreground, offset );
+	tilemap_mark_tile_dirty( state->m_foreground, offset );
 }
 
 WRITE16_HANDLER( amazon_flipscreen_w )
@@ -179,38 +179,38 @@ WRITE16_HANDLER( amazon_flipscreen_w )
 WRITE16_HANDLER( amazon_scrolly_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA(&state->yscroll);
-	tilemap_set_scrolly(state->background,0,state->yscroll);
+	COMBINE_DATA(&state->m_yscroll);
+	tilemap_set_scrolly(state->m_background,0,state->m_yscroll);
 }
 
 WRITE16_HANDLER( amazon_scrollx_w )
 {
 	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA(&state->xscroll);
-	tilemap_set_scrollx(state->background,0,state->xscroll);
+	COMBINE_DATA(&state->m_xscroll);
+	tilemap_set_scrollx(state->m_background,0,state->m_xscroll);
 }
 
 VIDEO_START( amazon )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	state->background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	state->foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
-	tilemap_set_transparent_pen(state->foreground,0xf);
+	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
+	state->m_foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
+	tilemap_set_transparent_pen(state->m_foreground,0xf);
 
 	/* register for saving */
-	state_save_register_global(machine, state->xscroll);
-	state_save_register_global(machine, state->yscroll);
+	state_save_register_global(machine, state->m_xscroll);
+	state_save_register_global(machine, state->m_yscroll);
 }
 
 SCREEN_UPDATE( amazon )
 {
 	terracre_state *state = screen->machine().driver_data<terracre_state>();
-	if( state->xscroll&0x2000 )
+	if( state->m_xscroll&0x2000 )
 		bitmap_fill( bitmap,cliprect ,get_black_pen(screen->machine()));
 	else
-		tilemap_draw( bitmap,cliprect, state->background, 0, 0 );
+		tilemap_draw( bitmap,cliprect, state->m_background, 0, 0 );
 
 	draw_sprites(screen->machine(), bitmap,cliprect );
-	tilemap_draw( bitmap,cliprect, state->foreground, 0, 0 );
+	tilemap_draw( bitmap,cliprect, state->m_foreground, 0, 0 );
 	return 0;
 }

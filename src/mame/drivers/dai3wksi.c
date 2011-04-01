@@ -51,17 +51,17 @@ public:
 		: driver_device(machine, config) { }
 
 	/* video */
-	UINT8 *     dai3wksi_videoram;
-	size_t      dai3wksi_videoram_size;
-	int         dai3wksi_flipscreen;
-	int         dai3wksi_redscreen;
-	int         dai3wksi_redterop;
+	UINT8 *     m_dai3wksi_videoram;
+	size_t      m_dai3wksi_videoram_size;
+	int         m_dai3wksi_flipscreen;
+	int         m_dai3wksi_redscreen;
+	int         m_dai3wksi_redterop;
 
 	/* sound */
-	UINT8       port_last1;
-	UINT8       port_last2;
-	int         enabled_sound;
-	int         sound3_counter;
+	UINT8       m_port_last1;
+	UINT8       m_port_last2;
+	int         m_enabled_sound;
+	int         m_sound3_counter;
 };
 
 
@@ -131,17 +131,17 @@ static SCREEN_UPDATE( dai3wksi )
 
 	dai3wksi_get_pens(pens);
 
-	for (offs = 0; offs < state->dai3wksi_videoram_size; offs++)
+	for (offs = 0; offs < state->m_dai3wksi_videoram_size; offs++)
 	{
 		offs_t i;
 
 		UINT8 x = offs << 2;
 		UINT8 y = offs >> 6;
-		UINT8 data = state->dai3wksi_videoram[offs];
+		UINT8 data = state->m_dai3wksi_videoram[offs];
 		UINT8 color;
-		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (state->dai3wksi_redterop ? 1 : 0);
+		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (state->m_dai3wksi_redterop ? 1 : 0);
 
-		if (state->dai3wksi_redscreen)
+		if (state->m_dai3wksi_redscreen)
 		{
 			color = 0x02;
 		}
@@ -157,7 +157,7 @@ static SCREEN_UPDATE( dai3wksi )
 		{
 			pen_t pen = (data & (1 << i)) ? pens[color] : pens[0];
 
-			if (state->dai3wksi_flipscreen)
+			if (state->m_dai3wksi_flipscreen)
 				*BITMAP_ADDR32(bitmap, 255-y, 255-x) = pen;
 			else
 				*BITMAP_ADDR32(bitmap, y, x) = pen;
@@ -198,50 +198,50 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 {
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
 	device_t *samples = space->machine().device("samples");
-	UINT8 rising_bits = data & ~state->port_last1;
+	UINT8 rising_bits = data & ~state->m_port_last1;
 
-	state->enabled_sound = data & 0x80;
+	state->m_enabled_sound = data & 0x80;
 
-	if ((rising_bits & 0x20) && state->enabled_sound)
+	if ((rising_bits & 0x20) && state->m_enabled_sound)
 	{
 		if (data & 0x04)
 			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 0);
 		else
 			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 1);
 	}
-	if (!(data & 0x20) && (state->port_last1 & 0x20))
+	if (!(data & 0x20) && (state->m_port_last1 & 0x20))
 		sample_stop(samples, CHANNEL_SOUND5);
 
-	state->port_last1 = data;
+	state->m_port_last1 = data;
 }
 
 static WRITE8_HANDLER( dai3wksi_audio_2_w )
 {
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
 	device_t *samples = space->machine().device("samples");
-	UINT8 rising_bits = data & ~state->port_last2;
+	UINT8 rising_bits = data & ~state->m_port_last2;
 
-	state->dai3wksi_flipscreen = data & 0x10;
-	state->dai3wksi_redscreen  = ~data & 0x20;
-	state->dai3wksi_redterop   = data & 0x40;
+	state->m_dai3wksi_flipscreen = data & 0x10;
+	state->m_dai3wksi_redscreen  = ~data & 0x20;
+	state->m_dai3wksi_redterop   = data & 0x40;
 
-	if (state->enabled_sound)
+	if (state->m_enabled_sound)
 	{
 		if (rising_bits & 0x01) sample_start(samples, CHANNEL_SOUND1, SAMPLE_SOUND1, 0);
 		if (rising_bits & 0x02) sample_start(samples, CHANNEL_SOUND2, SAMPLE_SOUND2, 0);
 		if (rising_bits & 0x08) sample_start(samples, CHANNEL_SOUND4, SAMPLE_SOUND4, 0);
 		if (rising_bits & 0x04)
 		{
-			if (!state->sound3_counter)
+			if (!state->m_sound3_counter)
 				sample_start(samples, CHANNEL_SOUND3, SAMPLE_SOUND3_1, 0);
 			else
 				sample_start(samples, CHANNEL_SOUND3, SAMPLE_SOUND3_2, 0);
 
-			state->sound3_counter ^= 1;
+			state->m_sound3_counter ^= 1;
 		}
 	}
 
-	state->port_last2 = data;
+	state->m_port_last2 = data;
 }
 
 static WRITE8_HANDLER( dai3wksi_audio_3_w )
@@ -249,7 +249,7 @@ static WRITE8_HANDLER( dai3wksi_audio_3_w )
 	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
 	device_t *samples = space->machine().device("samples");
 
-	if (state->enabled_sound)
+	if (state->m_enabled_sound)
 	{
 		if (data & 0x40)
 			sample_start(samples, CHANNEL_SOUND6, SAMPLE_SOUND6_1, 0);
@@ -300,9 +300,9 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 	device_t *ic78 = space->machine().device("ic78");
 	device_t *ic80 = space->machine().device("ic80");
 
-	state->dai3wksi_flipscreen =  data & 0x10;
-	state->dai3wksi_redscreen  = ~data & 0x20;
-	state->dai3wksi_redterop   =  data & 0x40;
+	state->m_dai3wksi_flipscreen =  data & 0x10;
+	state->m_dai3wksi_redscreen  = ~data & 0x20;
+	state->m_dai3wksi_redterop   =  data & 0x40;
 
 	sn76477_enable_w(ic77, (~data >> 0) & 0x01);	/* ship movement */
 	sn76477_enable_w(ic78, (~data >> 1) & 0x01);	/* danger text */
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(dai3wksi_audio_1_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(dai3wksi_audio_2_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dai3wksi_audio_3_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(dai3wksi_state, dai3wksi_videoram, dai3wksi_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(dai3wksi_state, m_dai3wksi_videoram, m_dai3wksi_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -567,23 +567,23 @@ static MACHINE_START( dai3wksi )
 	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
 	/* Set up save state */
-	state->save_item(NAME(state->dai3wksi_flipscreen));
-	state->save_item(NAME(state->dai3wksi_redscreen));
-	state->save_item(NAME(state->dai3wksi_redterop));
-	state->save_item(NAME(state->port_last1));
-	state->save_item(NAME(state->port_last2));
-	state->save_item(NAME(state->enabled_sound));
-	state->save_item(NAME(state->sound3_counter));
+	state->save_item(NAME(state->m_dai3wksi_flipscreen));
+	state->save_item(NAME(state->m_dai3wksi_redscreen));
+	state->save_item(NAME(state->m_dai3wksi_redterop));
+	state->save_item(NAME(state->m_port_last1));
+	state->save_item(NAME(state->m_port_last2));
+	state->save_item(NAME(state->m_enabled_sound));
+	state->save_item(NAME(state->m_sound3_counter));
 }
 
 static MACHINE_RESET( dai3wksi )
 {
 	dai3wksi_state *state = machine.driver_data<dai3wksi_state>();
 
-	state->port_last1 = 0;
-	state->port_last2 = 0;
-	state->enabled_sound = 0;
-	state->sound3_counter = 0;
+	state->m_port_last1 = 0;
+	state->m_port_last2 = 0;
+	state->m_enabled_sound = 0;
+	state->m_sound3_counter = 0;
 }
 
 

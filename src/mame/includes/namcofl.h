@@ -19,11 +19,11 @@ public:
 	namcofl_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	emu_timer *raster_interrupt_timer;
-	UINT32 *workram;
-	UINT16 *shareram;
-	UINT8 mcu_port6;
-	UINT32 sprbank;
+	emu_timer *m_raster_interrupt_timer;
+	UINT32 *m_workram;
+	UINT16 *m_shareram;
+	UINT8 m_mcu_port6;
+	UINT32 m_sprbank;
 };
 
 

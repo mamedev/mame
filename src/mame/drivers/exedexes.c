@@ -36,11 +36,11 @@ static ADDRESS_MAP_START( exedexes_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(exedexes_c804_w)								/* coin counters + text layer enable */
 	AM_RANGE(0xc806, 0xc806) AM_WRITENOP											/* Watchdog ?? */
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_BASE_MEMBER(exedexes_state, videoram)	/* Video RAM */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_BASE_MEMBER(exedexes_state, colorram)	/* Color RAM */
-	AM_RANGE(0xd800, 0xd801) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, nbg_yscroll)
-	AM_RANGE(0xd802, 0xd803) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, nbg_xscroll)
-	AM_RANGE(0xd804, 0xd805) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, bg_scroll)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_BASE_MEMBER(exedexes_state, m_videoram)	/* Video RAM */
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_BASE_MEMBER(exedexes_state, m_colorram)	/* Color RAM */
+	AM_RANGE(0xd800, 0xd801) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, m_nbg_yscroll)
+	AM_RANGE(0xd802, 0xd803) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, m_nbg_xscroll)
+	AM_RANGE(0xd804, 0xd805) AM_WRITEONLY AM_BASE_MEMBER(exedexes_state, m_bg_scroll)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(exedexes_gfxctrl_w)							/* layer enables */
 	AM_RANGE(0xe000, 0xefff) AM_RAM													/* Work RAM */
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* Sprite RAM */
@@ -196,20 +196,20 @@ static MACHINE_START( exedexes )
 {
 	exedexes_state *state = machine.driver_data<exedexes_state>();
 
-	state->save_item(NAME(state->chon));
-	state->save_item(NAME(state->objon));
-	state->save_item(NAME(state->sc1on));
-	state->save_item(NAME(state->sc2on));
+	state->save_item(NAME(state->m_chon));
+	state->save_item(NAME(state->m_objon));
+	state->save_item(NAME(state->m_sc1on));
+	state->save_item(NAME(state->m_sc2on));
 }
 
 static MACHINE_RESET( exedexes )
 {
 	exedexes_state *state = machine.driver_data<exedexes_state>();
 
-	state->chon = 0;
-	state->objon = 0;
-	state->sc1on = 0;
-	state->sc2on = 0;
+	state->m_chon = 0;
+	state->m_objon = 0;
+	state->m_sc1on = 0;
+	state->m_sc2on = 0;
 }
 
 static MACHINE_CONFIG_START( exedexes, exedexes_state )

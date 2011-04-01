@@ -227,7 +227,7 @@ Custom: GX61A01
 static INTERRUPT_GEN( homedata_irq )
 {
 	homedata_state *state = device->machine().driver_data<homedata_state>();
-	state->vblank = 1;
+	state->m_vblank = 1;
 	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -256,7 +256,7 @@ static READ8_HANDLER( mrokumei_keyboard_r )
 	{
 		for (i = 0; i < 5; i++)
 		{
-			if (state->keyb & (1 << i))
+			if (state->m_keyb & (1 << i))
 			{
 				res = input_port_read(space->machine(), keynames[i]) & 0x3f;
 				break;
@@ -270,12 +270,12 @@ static READ8_HANDLER( mrokumei_keyboard_r )
          * bit 6: vblank
          * other bits are inputs
          */
-		res |= state->visible_page << 7;
+		res |= state->m_visible_page << 7;
 
-		if (state->vblank)
+		if (state->m_vblank)
 			res |= 0x40;
 
-		state->vblank = 0;
+		state->m_vblank = 0;
 	}
 
 	return res;
@@ -284,17 +284,17 @@ static READ8_HANDLER( mrokumei_keyboard_r )
 static WRITE8_HANDLER( mrokumei_keyboard_select_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->keyb = data;
+	state->m_keyb = data;
 }
 
 
 static READ8_HANDLER( mrokumei_sound_io_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	if (state->sndbank & 4)
+	if (state->m_sndbank & 4)
 		return(soundlatch_r(space, 0));
 	else
-		return space->machine().region("audiocpu")->base()[0x10000 + offset + (state->sndbank & 1) * 0x10000];
+		return space->machine().region("audiocpu")->base()[0x10000 + offset + (state->m_sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
@@ -303,7 +303,7 @@ static WRITE8_HANDLER( mrokumei_sound_bank_w )
 	/* bit 0 = ROM bank
        bit 2 = ROM or soundlatch
      */
-	state->sndbank = data;
+	state->m_sndbank = data;
 }
 
 static WRITE8_HANDLER( mrokumei_sound_io_w )
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			dac_signed_data_w(state->dac, data);
+			dac_signed_data_w(state->m_dac, data);
 			break;
 		default:
 			logerror("%04x: I/O write to port %04x\n", cpu_get_pc(&space->device()), offset);
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -339,13 +339,13 @@ static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 static READ8_HANDLER( reikaids_upd7807_porta_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	return state->upd7807_porta;
+	return state->m_upd7807_porta;
 }
 
 static WRITE8_HANDLER( reikaids_upd7807_porta_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->upd7807_porta = data;
+	state->m_upd7807_porta = data;
 }
 
 static WRITE8_HANDLER( reikaids_upd7807_portc_w )
@@ -368,13 +368,13 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 	coin_counter_w(space->machine(), 0, ~data & 0x80);
 
-	if (BIT(state->upd7807_portc, 5) && !BIT(data, 5))	/* write clock 1->0 */
-		ym2203_w(state->ym, BIT(data, 3), state->upd7807_porta);
+	if (BIT(state->m_upd7807_portc, 5) && !BIT(data, 5))	/* write clock 1->0 */
+		ym2203_w(state->m_ym, BIT(data, 3), state->m_upd7807_porta);
 
-	if (BIT(state->upd7807_portc, 4) && !BIT(data, 4))	/* read clock 1->0 */
-		state->upd7807_porta = ym2203_r(state->ym, BIT(data, 3));
+	if (BIT(state->m_upd7807_portc, 4) && !BIT(data, 4))	/* read clock 1->0 */
+		state->m_upd7807_porta = ym2203_r(state->m_ym, BIT(data, 3));
 
-	state->upd7807_portc = data;
+	state->m_upd7807_portc = data;
 }
 
 static READ8_HANDLER( reikaids_io_r )
@@ -382,13 +382,13 @@ static READ8_HANDLER( reikaids_io_r )
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	int res = input_port_read(space->machine(), "IN2");	// bit 4 = coin, bit 5 = service
 
-	res |= BIT(state->upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
-	res |= BIT(state->upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
-	if (state->vblank)
+	res |= BIT(state->m_upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
+	res |= BIT(state->m_upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
+	if (state->m_vblank)
 		res |= 0x04;				// bit 2 = vblank
-	res |= state->visible_page * 0x08;	// bit 3 = visible page
+	res |= state->m_visible_page * 0x08;	// bit 3 = visible page
 
-	state->vblank = 0;
+	state->m_vblank = 0;
 
 	//logerror("%04x: io_r %02x\n", cpu_get_pc(&space->device()), res);
 
@@ -398,14 +398,14 @@ static READ8_HANDLER( reikaids_io_r )
 static READ8_HANDLER( reikaids_snd_command_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	//logerror("%04x: sndmcd_r (%02x)\n", cpu_get_pc(&space->device()), state->snd_command);
-	return state->snd_command;
+	//logerror("%04x: sndmcd_r (%02x)\n", cpu_get_pc(&space->device()), state->m_snd_command);
+	return state->m_snd_command;
 }
 
 static WRITE8_HANDLER( reikaids_snd_command_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->snd_command = data;
+	state->m_snd_command = data;
 	//logerror("%04x: coprocessor_command_w %02x\n", cpu_get_pc(&space->device()), data);
 }
 
@@ -422,14 +422,14 @@ static WRITE8_HANDLER( pteacher_snd_command_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	//logerror("%04x: snd_command_w %02x\n", cpu_get_pc(&space->device()), data);
-	state->from_cpu = data;
+	state->m_from_cpu = data;
 }
 
 static READ8_HANDLER( pteacher_snd_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
 	//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(&space->device()),to_cpu);
-	return state->to_cpu;
+	return state->m_to_cpu;
 }
 
 static READ8_HANDLER( pteacher_io_r )
@@ -440,12 +440,12 @@ static READ8_HANDLER( pteacher_io_r )
      * other bits seem unused
      */
 
-	int res = (state->visible_page ^ 1) << 7;
+	int res = (state->m_visible_page ^ 1) << 7;
 
-	if (!state->vblank)
+	if (!state->m_vblank)
 		res |= 0x40;
 
-	state->vblank = 0;
+	state->m_vblank = 0;
 
 	return res;
 }
@@ -458,16 +458,16 @@ static READ8_HANDLER( pteacher_keyboard_r )
 
 	//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(&space->device()),upd7807_porta);
 
-	if (state->upd7807_porta & 0x80)
+	if (state->m_upd7807_porta & 0x80)
 	{
 		/* player 1 + dip switches */
-		int row = (state->upd7807_porta & 0x07);
+		int row = (state->m_upd7807_porta & 0x07);
 		return input_port_read(space->machine(), keynames[row]) | (((dips >> row) & 1) << 5);	// 0-5
 	}
-	if (state->upd7807_porta & 0x08)
+	if (state->m_upd7807_porta & 0x08)
 	{
 		/* player 2 (not supported) + dip switches */
-		int row = ((state->upd7807_porta >> 4) & 0x07);
+		int row = ((state->m_upd7807_porta >> 4) & 0x07);
 		return 0xdf | (((dips >> (row + 5)) & 1) << 5);	// 6-11
 	}
 
@@ -477,25 +477,25 @@ static READ8_HANDLER( pteacher_keyboard_r )
 static READ8_HANDLER( pteacher_upd7807_porta_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	if (!BIT(state->upd7807_portc, 6))
-		state->upd7807_porta = state->from_cpu;
+	if (!BIT(state->m_upd7807_portc, 6))
+		state->m_upd7807_porta = state->m_from_cpu;
 	else
 		logerror("%04x: read PA with PC *not* clear\n", cpu_get_pc(&space->device()));
 
-	return state->upd7807_porta;
+	return state->m_upd7807_porta;
 }
 
 static WRITE8_HANDLER( pteacher_snd_answer_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->to_cpu = data;
-	//logerror("%04x: to_cpu = %02x\n", cpu_get_pc(&space->device()), state->to_cpu);
+	state->m_to_cpu = data;
+	//logerror("%04x: to_cpu = %02x\n", cpu_get_pc(&space->device()), state->m_to_cpu);
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_porta_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->upd7807_porta = data;
+	state->m_upd7807_porta = data;
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_portc_w )
@@ -518,10 +518,10 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 	coin_counter_w(space->machine(), 0, ~data & 0x80);
 
-	if (BIT(state->upd7807_portc, 5) && !BIT(data, 5))	/* clock 1->0 */
-		sn76496_w(state->sn, 0, state->upd7807_porta);
+	if (BIT(state->m_upd7807_portc, 5) && !BIT(data, 5))	/* clock 1->0 */
+		sn76496_w(state->m_sn, 0, state->m_upd7807_porta);
 
-	state->upd7807_portc = data;
+	state->m_upd7807_portc = data;
 }
 
 /********************************************************************************/
@@ -543,7 +543,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 
 static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, m_vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
@@ -577,14 +577,14 @@ ADDRESS_MAP_END
 /********************************************************************************/
 
 static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE_MEMBER(homedata_state, m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
 	AM_RANGE(0x7800, 0x7800) AM_RAM	/* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, m_vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
@@ -611,14 +611,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, m_videoram)
 	AM_RANGE(0x4000, 0x5eff) AM_RAM
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, m_vreg)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(pteacher_snd_command_w)
@@ -1149,21 +1149,21 @@ static MACHINE_START( homedata )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->ym = machine.device("ymsnd");
-	state->sn = machine.device("snsnd");
-	state->dac = machine.device("dac");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_ym = machine.device("ymsnd");
+	state->m_sn = machine.device("snsnd");
+	state->m_dac = machine.device("dac");
 
-	state->save_item(NAME(state->visible_page));
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->blitter_bank));
-	state->save_item(NAME(state->blitter_param_count));
-	state->save_item(NAME(state->blitter_param));
-	state->save_item(NAME(state->vblank));
-	state->save_item(NAME(state->sndbank));
-	state->save_item(NAME(state->keyb));
-	state->save_item(NAME(state->snd_command));
+	state->save_item(NAME(state->m_visible_page));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_blitter_bank));
+	state->save_item(NAME(state->m_blitter_param_count));
+	state->save_item(NAME(state->m_blitter_param));
+	state->save_item(NAME(state->m_vblank));
+	state->save_item(NAME(state->m_sndbank));
+	state->save_item(NAME(state->m_keyb));
+	state->save_item(NAME(state->m_snd_command));
 }
 
 static MACHINE_START( reikaids )
@@ -1176,11 +1176,11 @@ static MACHINE_START( reikaids )
 
 	MACHINE_START_CALL(homedata);
 
-	state->save_item(NAME(state->upd7807_porta));
-	state->save_item(NAME(state->upd7807_portc));
+	state->save_item(NAME(state->m_upd7807_porta));
+	state->save_item(NAME(state->m_upd7807_portc));
 
-	state->save_item(NAME(state->reikaids_which));
-	state->save_item(NAME(state->gfx_bank));
+	state->save_item(NAME(state->m_reikaids_which));
+	state->save_item(NAME(state->m_gfx_bank));
 }
 
 static MACHINE_START( pteacher )
@@ -1193,30 +1193,30 @@ static MACHINE_START( pteacher )
 
 	MACHINE_START_CALL(homedata);
 
-	state->save_item(NAME(state->upd7807_porta));
-	state->save_item(NAME(state->upd7807_portc));
+	state->save_item(NAME(state->m_upd7807_porta));
+	state->save_item(NAME(state->m_upd7807_portc));
 
-	state->save_item(NAME(state->gfx_bank));
-	state->save_item(NAME(state->to_cpu));
-	state->save_item(NAME(state->from_cpu));
+	state->save_item(NAME(state->m_gfx_bank));
+	state->save_item(NAME(state->m_to_cpu));
+	state->save_item(NAME(state->m_from_cpu));
 }
 
 static MACHINE_RESET( homedata )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
 
-	state->visible_page = 0;
-	state->flipscreen = 0;
-	state->blitter_bank = 0;
-	state->blitter_param_count = 0;
-	state->blitter_param[0] = 0;
-	state->blitter_param[1] = 0;
-	state->blitter_param[2] = 0;
-	state->blitter_param[3] = 0;
-	state->vblank = 0;
-	state->sndbank = 0;
-	state->keyb = 0;
-	state->snd_command = 0;
+	state->m_visible_page = 0;
+	state->m_flipscreen = 0;
+	state->m_blitter_bank = 0;
+	state->m_blitter_param_count = 0;
+	state->m_blitter_param[0] = 0;
+	state->m_blitter_param[1] = 0;
+	state->m_blitter_param[2] = 0;
+	state->m_blitter_param[3] = 0;
+	state->m_vblank = 0;
+	state->m_sndbank = 0;
+	state->m_keyb = 0;
+	state->m_snd_command = 0;
 }
 
 static MACHINE_RESET( pteacher )
@@ -1229,11 +1229,11 @@ static MACHINE_RESET( pteacher )
 
 	MACHINE_RESET_CALL(homedata);
 
-	state->upd7807_porta = 0;
-	state->gfx_bank[0] = 0;
-	state->gfx_bank[1] = 0;
-	state->to_cpu = 0;
-	state->from_cpu = 0;
+	state->m_upd7807_porta = 0;
+	state->m_gfx_bank[0] = 0;
+	state->m_gfx_bank[1] = 0;
+	state->m_to_cpu = 0;
+	state->m_from_cpu = 0;
 }
 
 static MACHINE_RESET( reikaids )
@@ -1246,10 +1246,10 @@ static MACHINE_RESET( reikaids )
 
 	MACHINE_RESET_CALL(homedata);
 
-	state->reikaids_which = state->priority;	// state->priority is set in DRIVER_INIT
-	state->upd7807_porta = 0;
-	state->gfx_bank[0] = 0;
-	state->gfx_bank[1] = 0;	// this is not used by reikaids
+	state->m_reikaids_which = state->m_priority;	// state->m_priority is set in DRIVER_INIT
+	state->m_upd7807_porta = 0;
+	state->m_gfx_bank[0] = 0;
+	state->m_gfx_bank[1] = 0;	// this is not used by reikaids
 }
 
 static MACHINE_CONFIG_START( mrokumei, homedata_state )
@@ -1450,19 +1450,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mirderby_prot_r )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->prot_data&=0x7f;
-	return state->prot_data++;
+	state->m_prot_data&=0x7f;
+	return state->m_prot_data++;
 }
 
 static WRITE8_HANDLER( mirderby_prot_w )
 {
 	homedata_state *state = space->machine().driver_data<homedata_state>();
-	state->prot_data = data;
+	state->m_prot_data = data;
 }
 
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, m_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -2046,13 +2046,13 @@ static DRIVER_INIT( mjikaga )
 static DRIVER_INIT( reikaids )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->priority = 0;
+	state->m_priority = 0;
 }
 
 static DRIVER_INIT( battlcry )
 {
 	homedata_state *state = machine.driver_data<homedata_state>();
-	state->priority = 1; /* priority and initial value for bank write */
+	state->m_priority = 1; /* priority and initial value for bank write */
 }
 
 static DRIVER_INIT( mirderby )

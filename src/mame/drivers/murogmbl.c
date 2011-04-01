@@ -44,7 +44,7 @@ public:
 	murogmbl_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8* video;
+	UINT8* m_video;
 };
 
 
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE_MEMBER(murogmbl_state, video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE_MEMBER(murogmbl_state, m_video)
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
@@ -102,7 +102,7 @@ static SCREEN_UPDATE(murogmbl)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = state->video[count];
+			int tile = state->m_video[count];
 			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;

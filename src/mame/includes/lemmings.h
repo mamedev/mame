@@ -6,22 +6,23 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT16 *  pixel_0_data;
-	UINT16 *  pixel_1_data;
-	UINT16 *  vram_data;
-	UINT16 *  control_data;
-	UINT16 *  paletteram;
-//  UINT16 *  spriteram;    // this currently uses generic buffered spriteram
-//  UINT16 *  spriteram2;   // this currently uses generic buffered spriteram
+	UINT16 *  m_pixel_0_data;
+	UINT16 *  m_pixel_1_data;
+	UINT16 *  m_vram_data;
+	UINT16 *  m_control_data;
+	UINT16 *  m_paletteram;
+//  UINT16 *  m_spriteram;    // this currently uses generic buffered spriteram
+//  UINT16 *  m_spriteram2;   // this currently uses generic buffered spriteram
 
 	/* video-related */
-	bitmap_t *bitmap0;
-	tilemap_t *vram_tilemap;
-	UINT16 *sprite_triple_buffer_0,*sprite_triple_buffer_1;
-	UINT8 *vram_buffer;
+	bitmap_t *m_bitmap0;
+	tilemap_t *m_vram_tilemap;
+	UINT16 *m_sprite_triple_buffer_0;
+	UINT16 *m_sprite_triple_buffer_1;
+	UINT8 *m_vram_buffer;
 
 	/* devices */
-	device_t *audiocpu;
+	device_t *m_audiocpu;
 };
 
 

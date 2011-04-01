@@ -12,23 +12,23 @@ public:
 	atarig1_state(running_machine &machine, const driver_device_config_base &config)
 		: atarigen_state(machine, config) { }
 
-	UINT8			is_pitfight;
+	UINT8			m_is_pitfight;
 
-	UINT8			which_input;
-	UINT16 *		mo_command;
+	UINT8			m_which_input;
+	UINT16 *		m_mo_command;
 
-	UINT16 *		bslapstic_base;
-	void *			bslapstic_bank0;
-	UINT8			bslapstic_bank;
-	UINT8			bslapstic_primed;
+	UINT16 *		m_bslapstic_base;
+	void *			m_bslapstic_bank0;
+	UINT8			m_bslapstic_bank;
+	UINT8			m_bslapstic_primed;
 
-	int 			pfscroll_xoffset;
-	UINT16			current_control;
-	UINT8			playfield_tile_bank;
-	UINT16			playfield_xscroll;
-	UINT16			playfield_yscroll;
+	int 			m_pfscroll_xoffset;
+	UINT16			m_current_control;
+	UINT8			m_playfield_tile_bank;
+	UINT16			m_playfield_xscroll;
+	UINT16			m_playfield_yscroll;
 
-	device_t *		rle;
+	device_t *		m_rle;
 };
 
 

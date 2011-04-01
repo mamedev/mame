@@ -4,14 +4,14 @@ public:
 	pirates_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *tx_tileram;
-	UINT16 *spriteram;
-	UINT16 *fg_tileram;
-	UINT16 *bg_tileram;
-	UINT16 *scroll;
-	tilemap_t *tx_tilemap;
-	tilemap_t *fg_tilemap;
-	tilemap_t *bg_tilemap;
+	UINT16 *m_tx_tileram;
+	UINT16 *m_spriteram;
+	UINT16 *m_fg_tileram;
+	UINT16 *m_bg_tileram;
+	UINT16 *m_scroll;
+	tilemap_t *m_tx_tilemap;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
 };
 
 

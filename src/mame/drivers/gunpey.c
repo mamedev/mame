@@ -57,21 +57,21 @@ public:
 	gunpey_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT16 *blit_buffer;
-	UINT16 blit_ram[0x10];
+	UINT16 *m_blit_buffer;
+	UINT16 m_blit_ram[0x10];
 };
 
 
 static VIDEO_START( gunpey )
 {
 	gunpey_state *state = machine.driver_data<gunpey_state>();
-	state->blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
+	state->m_blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
 }
 
 static SCREEN_UPDATE( gunpey )
 {
 	gunpey_state *state = screen->machine().driver_data<gunpey_state>();
-	UINT16 *blit_buffer = state->blit_buffer;
+	UINT16 *blit_buffer = state->m_blit_buffer;
 	int x,y;
 	int count;
 
@@ -129,8 +129,8 @@ static READ8_HANDLER( gunpey_inputs_r )
 static WRITE8_HANDLER( gunpey_blitter_w )
 {
 	gunpey_state *state = space->machine().driver_data<gunpey_state>();
-	UINT16 *blit_buffer = state->blit_buffer;
-	UINT16 *blit_ram = state->blit_ram;
+	UINT16 *blit_buffer = state->m_blit_buffer;
+	UINT16 *blit_ram = state->m_blit_ram;
 	UINT8 *blit_rom = space->machine().region("blit_data")->base();
 	int x,y;
 

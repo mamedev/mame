@@ -11,20 +11,20 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    k007121_ram;
+	UINT8 *    m_k007121_ram;
 //  UINT8 *    paletteram;  // this currently uses generic palette handling
 
 	/* video-related */
-	tilemap_t    *k007121_tilemap[2];
-	int        flipscreen;
+	tilemap_t    *m_k007121_tilemap[2];
+	int        m_flipscreen;
 
 	/* misc */
-	int        irq_enabled;
-	int        multiply_reg[2];
+	int        m_irq_enabled;
+	int        m_multiply_reg[2];
 
 	/* devices */
-	device_t *audiocpu;
-	device_t *k007121;
+	device_t *m_audiocpu;
+	device_t *m_k007121;
 };
 
 

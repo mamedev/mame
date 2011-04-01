@@ -36,27 +36,32 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *  videoram;
-	UINT8 *  videoram2;
-	UINT8 *  colorram;
-	UINT8 *  spriteram;
+	UINT8 *  m_videoram;
+	UINT8 *  m_videoram2;
+	UINT8 *  m_colorram;
+	UINT8 *  m_spriteram;
 
 	/* video-related */
-	tilemap_t  *bg_tilemap,*fg_tilemap;
-	int      bg_bank, bg_color_bank;
-	int      flipscreen;
-	int      scrolly, scrolly_hi;
-	int      scrollx, scrollx_hi;
-	int      rotation_x, rotation_sign;
-	int      disable_roz;
+	tilemap_t  *m_bg_tilemap;
+	tilemap_t  *m_fg_tilemap;
+	int      m_bg_bank;
+	int      m_bg_color_bank;
+	int      m_flipscreen;
+	int      m_scrolly;
+	int      m_scrolly_hi;
+	int      m_scrollx;
+	int      m_scrollx_hi;
+	int      m_rotation_x;
+	int		 m_rotation_sign;
+	int      m_disable_roz;
 
 	/* misc */
-	int      nmimask;	// zerotrgt only
+	int      m_nmimask;	// zerotrgt only
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *subcpu;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_subcpu;
 };
 
 
@@ -90,16 +95,16 @@ static PALETTE_INIT( zerotrgt )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->videoram2[tile_index];
+	int code = state->m_videoram2[tile_index];
 
-	SET_TILE_INFO(2, code + state->bg_bank, state->bg_color_bank, 0);
+	SET_TILE_INFO(2, code + state->m_bg_bank, state->m_bg_color_bank, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	int code = state->videoram[tile_index];
-	int attr = state->colorram[tile_index];
+	int code = state->m_videoram[tile_index];
+	int attr = state->m_colorram[tile_index];
 
 	code |= (attr & 0x01) << 8;
 
@@ -109,23 +114,23 @@ static TILE_GET_INFO( get_fg_tile_info )
 static VIDEO_START( cntsteer )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 64);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	//tilemap_set_flip(state->bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//tilemap_set_flip(state->m_bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static VIDEO_START( zerotrgt )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
 
-	//tilemap_set_flip(state->bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//tilemap_set_flip(state->m_bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -150,20 +155,20 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->spriteram[offs + 1] & 1) == 1)
+		if ((state->m_spriteram[offs + 1] & 1) == 1)
 			continue;
 
-		code = state->spriteram[offs + 3] + ((state->spriteram[offs + 1] & 0xc0) << 2);
-		sx = (state->spriteram[offs + 2]);
-		sy = 0xf0 - state->spriteram[offs];
-		color = 0x10 + ((state->spriteram[offs + 1] & 0x20) >> 4) + ((state->spriteram[offs + 1] & 0x8)>>3);
+		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 1] & 0xc0) << 2);
+		sx = (state->m_spriteram[offs + 2]);
+		sy = 0xf0 - state->m_spriteram[offs];
+		color = 0x10 + ((state->m_spriteram[offs + 1] & 0x20) >> 4) + ((state->m_spriteram[offs + 1] & 0x8)>>3);
 
-		fx = !(state->spriteram[offs + 1] & 0x04);
-		fy = (state->spriteram[offs + 1] & 0x02);
+		fx = !(state->m_spriteram[offs + 1] & 0x04);
+		fy = (state->m_spriteram[offs + 1] & 0x02);
 
-		multi = state->spriteram[offs + 1] & 0x10;
+		multi = state->m_spriteram[offs + 1] & 0x10;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -208,20 +213,20 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->spriteram[offs + 0] & 1) == 0)
+		if ((state->m_spriteram[offs + 0] & 1) == 0)
 			continue;
 
-		code = state->spriteram[offs + 1] + ((state->spriteram[offs + 0x80] & 0x03) << 8);
-		sx = 0x100 - state->spriteram[offs + 3];
-		sy = 0x100 - state->spriteram[offs + 2];
-		color = 0x10 + ((state->spriteram[offs + 0x80] & 0x70) >> 4);
+		code = state->m_spriteram[offs + 1] + ((state->m_spriteram[offs + 0x80] & 0x03) << 8);
+		sx = 0x100 - state->m_spriteram[offs + 3];
+		sy = 0x100 - state->m_spriteram[offs + 2];
+		color = 0x10 + ((state->m_spriteram[offs + 0x80] & 0x70) >> 4);
 
-		fx = (state->spriteram[offs + 0] & 0x04);
-		fy = (state->spriteram[offs + 0] & 0x02);
+		fx = (state->m_spriteram[offs + 0] & 0x04);
+		fy = (state->m_spriteram[offs + 0] & 0x02);
 
-		multi = state->spriteram[offs + 0] & 0x10;
+		multi = state->m_spriteram[offs + 0] & 0x10;
 
-		if (state->flipscreen)
+		if (state->m_flipscreen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -252,15 +257,15 @@ static SCREEN_UPDATE( zerotrgt )
 {
 	cntsteer_state *state = screen->machine().driver_data<cntsteer_state>();
 
-	if (state->disable_roz)
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[8 * state->bg_color_bank]);
+	if (state->m_disable_roz)
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[8 * state->m_bg_color_bank]);
 	else
 	{
 		int p1, p2, p3, p4;
 		int rot_val, x, y;
-		rot_val = state->rotation_sign ? (-state->rotation_x) : (state->rotation_x);
+		rot_val = state->m_rotation_sign ? (-state->m_rotation_x) : (state->m_rotation_x);
 
-//      popmessage("%d %02x %02x", rot_val, state->rotation_sign, state->rotation_x);
+//      popmessage("%d %02x %02x", rot_val, state->m_rotation_sign, state->m_rotation_x);
 
 		if (rot_val > 90) { rot_val = 90; }
 		if (rot_val < -90) { rot_val = -90; }
@@ -282,10 +287,10 @@ static SCREEN_UPDATE( zerotrgt )
 		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
 		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = -256 - (state->scrollx | state->scrollx_hi);
-		y = 256 + (state->scrolly | state->scrolly_hi);
+		x = -256 - (state->m_scrollx | state->m_scrollx_hi);
+		y = 256 + (state->m_scrolly | state->m_scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, state->bg_tilemap,
+		tilemap_draw_roz(bitmap, cliprect, state->m_bg_tilemap,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -294,7 +299,7 @@ static SCREEN_UPDATE( zerotrgt )
 	}
 
 	zerotrgt_draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -303,16 +308,16 @@ static SCREEN_UPDATE( cntsteer )
 {
 	cntsteer_state *state = screen->machine().driver_data<cntsteer_state>();
 
-	if (state->disable_roz)
-		bitmap_fill(bitmap, cliprect, screen->machine().pens[8 * state->bg_color_bank]);
+	if (state->m_disable_roz)
+		bitmap_fill(bitmap, cliprect, screen->machine().pens[8 * state->m_bg_color_bank]);
 	else
 	{
 		int p1, p2, p3, p4;
 		int rot_val, x, y;
 
-		rot_val = (state->rotation_x) | ((state->rotation_sign & 3) << 8);
-		rot_val = (state->rotation_sign & 4) ? (rot_val) : (-rot_val);
-//      popmessage("%d %02x %02x", rot_val, state->rotation_sign, state->rotation_x);
+		rot_val = (state->m_rotation_x) | ((state->m_rotation_sign & 3) << 8);
+		rot_val = (state->m_rotation_sign & 4) ? (rot_val) : (-rot_val);
+//      popmessage("%d %02x %02x", rot_val, state->m_rotation_sign, state->m_rotation_x);
 
 		/*
         (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
@@ -331,10 +336,10 @@ static SCREEN_UPDATE( cntsteer )
 		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
 		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = 256 + (state->scrollx | state->scrollx_hi);
-		y = 256 - (state->scrolly | state->scrolly_hi);
+		x = 256 + (state->m_scrollx | state->m_scrollx_hi);
+		y = 256 - (state->m_scrolly | state->m_scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, state->bg_tilemap,
+		tilemap_draw_roz(bitmap, cliprect, state->m_bg_tilemap,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -343,7 +348,7 @@ static SCREEN_UPDATE( cntsteer )
 	}
 
 	cntsteer_draw_sprites(screen->machine(), bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -370,19 +375,19 @@ static WRITE8_HANDLER(zerotrgt_vregs_w)
 
 	switch (offset)
 	{
-		case 0:	state->scrolly = data; break;
-		case 1:	state->scrollx = data; break;
-		case 2:	state->bg_bank = (data & 0x30) << 4;
-				state->bg_color_bank = (data & 7);
-				state->disable_roz = (data & 0x40);
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		case 0:	state->m_scrolly = data; break;
+		case 1:	state->m_scrollx = data; break;
+		case 2:	state->m_bg_bank = (data & 0x30) << 4;
+				state->m_bg_color_bank = (data & 7);
+				state->m_disable_roz = (data & 0x40);
+				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 				break;
-		case 3:	state->rotation_sign = (data & 1);
+		case 3:	state->m_rotation_sign = (data & 1);
 				flip_screen_set(space->machine(), !(data & 4));
-				state->scrolly_hi = (data & 0x30) << 4;
-				state->scrollx_hi = (data & 0xc0) << 2;
+				state->m_scrolly_hi = (data & 0x30) << 4;
+				state->m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	state->rotation_x = data; break;
+		case 4:	state->m_rotation_x = data; break;
 	}
 }
 
@@ -396,40 +401,40 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 
 	switch(offset)
 	{
-		case 0:	state->scrolly = data; break;
-		case 1:	state->scrollx = data; break;
-		case 2:	state->bg_bank = (data & 0x01) << 8;
-				state->bg_color_bank = (data & 6) >> 1;
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+		case 0:	state->m_scrolly = data; break;
+		case 1:	state->m_scrollx = data; break;
+		case 2:	state->m_bg_bank = (data & 0x01) << 8;
+				state->m_bg_color_bank = (data & 6) >> 1;
+				tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);
 				break;
-		case 3:	state->rotation_sign = (data & 7);
-				state->disable_roz = (~data & 0x08);
-				state->scrolly_hi = (data & 0x30) << 4;
-				state->scrollx_hi = (data & 0xc0) << 2;
+		case 3:	state->m_rotation_sign = (data & 7);
+				state->m_disable_roz = (~data & 0x08);
+				state->m_scrolly_hi = (data & 0x30) << 4;
+				state->m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	state->rotation_x = data; break;
+		case 4:	state->m_rotation_x = data; break;
 	}
 }
 
 static WRITE8_HANDLER( cntsteer_foreground_vram_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( cntsteer_foreground_attr_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	state->m_colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( cntsteer_background_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->videoram2[offset] = data;
-	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
+	state->m_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
 /*************************************
@@ -441,14 +446,14 @@ static WRITE8_HANDLER( cntsteer_background_w )
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
@@ -456,31 +461,31 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(&space->device()), offset, data);
-//  if (offset == 0) device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset == 0) device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset == 1) device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset == 2) device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
 //  if (data)
-//  device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+//  device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x", data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -521,17 +526,17 @@ static READ8_HANDLER( cntsteer_adx_r )
 
 static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, m_spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, m_colorram)
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, m_videoram2)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -544,9 +549,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, colorram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, m_spriteram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, m_colorram)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -554,7 +559,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2) AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, m_videoram2) AM_SHARE("share3")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("share3")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
@@ -573,13 +578,13 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( nmimask_w )
 {
 	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->nmimask = data & 0x80;
+	state->m_nmimask = data & 0x80;
 }
 
 static INTERRUPT_GEN ( sound_interrupt )
 {
 	cntsteer_state *state = device->machine().driver_data<cntsteer_state>();
-	if (!state->nmimask)
+	if (!state->m_nmimask)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -668,7 +673,7 @@ INPUT_PORTS_END
 static INPUT_CHANGED( coin_inserted )
 {
 	cntsteer_state *state = field->port->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )
@@ -802,28 +807,28 @@ static MACHINE_START( cntsteer )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->subcpu = machine.device("subcpu");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_subcpu = machine.device("subcpu");
 
-	state->save_item(NAME(state->flipscreen));
-	state->save_item(NAME(state->bg_bank));
-	state->save_item(NAME(state->scrolly));
-	state->save_item(NAME(state->scrollx));
-	state->save_item(NAME(state->scrollx_hi));
-	state->save_item(NAME(state->scrolly_hi));
-	state->save_item(NAME(state->rotation_x));
-	state->save_item(NAME(state->rotation_sign));
+	state->save_item(NAME(state->m_flipscreen));
+	state->save_item(NAME(state->m_bg_bank));
+	state->save_item(NAME(state->m_scrolly));
+	state->save_item(NAME(state->m_scrollx));
+	state->save_item(NAME(state->m_scrollx_hi));
+	state->save_item(NAME(state->m_scrolly_hi));
+	state->save_item(NAME(state->m_rotation_x));
+	state->save_item(NAME(state->m_rotation_sign));
 
-	state->save_item(NAME(state->bg_color_bank));
-	state->save_item(NAME(state->disable_roz));
+	state->save_item(NAME(state->m_bg_color_bank));
+	state->save_item(NAME(state->m_disable_roz));
 }
 
 static MACHINE_START( zerotrgt )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->save_item(NAME(state->nmimask));
+	state->save_item(NAME(state->m_nmimask));
 	MACHINE_START_CALL(cntsteer);
 }
 
@@ -832,17 +837,17 @@ static MACHINE_RESET( cntsteer )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->flipscreen = 0;
-	state->bg_bank = 0;
-	state->scrolly = 0;
-	state->scrollx = 0;
-	state->scrollx_hi = 0;
-	state->scrolly_hi = 0;
-	state->rotation_x = 0;
-	state->rotation_sign = 0;
+	state->m_flipscreen = 0;
+	state->m_bg_bank = 0;
+	state->m_scrolly = 0;
+	state->m_scrollx = 0;
+	state->m_scrollx_hi = 0;
+	state->m_scrolly_hi = 0;
+	state->m_rotation_x = 0;
+	state->m_rotation_sign = 0;
 
-	state->bg_color_bank = 0;
-	state->disable_roz = 0;
+	state->m_bg_color_bank = 0;
+	state->m_disable_roz = 0;
 }
 
 
@@ -850,7 +855,7 @@ static MACHINE_RESET( zerotrgt )
 {
 	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 
-	state->nmimask = 0;
+	state->m_nmimask = 0;
 	MACHINE_RESET_CALL(cntsteer);
 }
 

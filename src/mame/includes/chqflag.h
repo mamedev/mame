@@ -11,26 +11,28 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    ram;
-//  UINT8 *    paletteram;    // currently this uses generic palette handling
+	UINT8 *    m_ram;
+//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
-	int        zoom_colorbase[2], sprite_colorbase;
+	int        m_zoom_colorbase[2];
+	int        m_sprite_colorbase;
 
 	/* misc */
-	int        k051316_readroms;
-	int        last_vreg;
-	int        analog_ctrl;
-	int        accel, wheel;
+	int        m_k051316_readroms;
+	int        m_last_vreg;
+	int        m_analog_ctrl;
+	int        m_accel;
+	int        m_wheel;
 
 	/* devices */
-	device_t *maincpu;
-	device_t *audiocpu;
-	device_t *k007232_1;
-	device_t *k007232_2;
-	device_t *k051960;
-	device_t *k051316_1;
-	device_t *k051316_2;
+	device_t *m_maincpu;
+	device_t *m_audiocpu;
+	device_t *m_k007232_1;
+	device_t *m_k007232_2;
+	device_t *m_k051960;
+	device_t *m_k051316_1;
+	device_t *m_k051316_2;
 };
 
 /*----------- defined in video/chqflag.c -----------*/

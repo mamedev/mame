@@ -28,27 +28,27 @@ SCREEN_UPDATE( malzak )
 
 	bitmap_fill(bitmap, 0, 0);
 
-	saa5050_update(state->saa5050, bitmap, cliprect);
-	saa5050_frame_advance(state->saa5050);
+	saa5050_update(state->m_saa5050, bitmap, cliprect);
+	saa5050_frame_advance(state->m_saa5050);
 
 	// playfield - not sure exactly how this works...
 	for (x = 0; x < 16; x++)
 		for (y = 0; y < 16; y++)
 		{
-			sx = ((x * 16 - 48) - state->malzak_x) * 2;
-			sy = ((y * 16) - state->malzak_y) * 2;
+			sx = ((x * 16 - 48) - state->m_malzak_x) * 2;
+			sy = ((y * 16) - state->m_malzak_y) * 2;
 
 			if (sx < -271*2)
 				sx += 512*2;
 			if (sx < -15*2)
 				sx += 256*2;
 
-			drawgfxzoom_transpen(bitmap,cliprect, screen->machine().gfx[0], state->playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
+			drawgfxzoom_transpen(bitmap,cliprect, screen->machine().gfx[0], state->m_playfield_code[x * 16 + y], 7*2, 0, 0, sx, sy, 0x20000, 0x20000, 0);
 		}
 
 	/* update the S2636 chips */
-	s2636_0_bitmap = s2636_update(state->s2636_0, cliprect);
-	s2636_1_bitmap = s2636_update(state->s2636_1, cliprect);
+	s2636_0_bitmap = s2636_update(state->m_s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(state->m_s2636_1, cliprect);
 
 	/* copy the S2636 images into the main bitmap */
 	{
@@ -86,10 +86,10 @@ SCREEN_UPDATE( malzak )
 WRITE8_HANDLER( malzak_playfield_w )
 {
 	malzak_state *state = space->machine().driver_data<malzak_state>();
-	int tile = ((state->malzak_x / 16) * 16) + (offset / 16);
+	int tile = ((state->m_malzak_x / 16) * 16) + (offset / 16);
 
-//  state->playfield_x[tile] = state->malzak_x / 16;
-//  state->playfield_y[tile] = state->malzak_y;
-	state->playfield_code[tile] = (data & 0x1f);
+//  state->m_playfield_x[tile] = state->m_malzak_x / 16;
+//  state->m_playfield_y[tile] = state->m_malzak_y;
+	state->m_playfield_code[tile] = (data & 0x1f);
 	logerror("GFX: 0x16%02x write 0x%02x\n", offset, data);
 }

@@ -4,26 +4,26 @@ public:
 	sidearms_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	int gameid;
+	int m_gameid;
 
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *bg_scrollx;
-	UINT8 *bg_scrolly;
-	UINT8 *tilerom;
-	tilemap_t *bg_tilemap;
-	tilemap_t *fg_tilemap;
+	UINT8 *m_videoram;
+	UINT8 *m_colorram;
+	UINT8 *m_bg_scrollx;
+	UINT8 *m_bg_scrolly;
+	UINT8 *m_tilerom;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
 
-	int bgon;
-	int objon;
-	int staron;
-	int charon;
-	int flipon;
+	int m_bgon;
+	int m_objon;
+	int m_staron;
+	int m_charon;
+	int m_flipon;
 
-	UINT32 hflop_74a_n;
-	UINT32 hcount_191;
-	UINT32 vcount_191;
-	UINT32 latch_374;
+	UINT32 m_hflop_74a_n;
+	UINT32 m_hcount_191;
+	UINT32 m_vcount_191;
+	UINT32 m_latch_374;
 };
 
 /*----------- defined in video/sidearms.c -----------*/

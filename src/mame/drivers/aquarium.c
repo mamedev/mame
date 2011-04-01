@@ -78,8 +78,8 @@ static READ16_HANDLER( aquarium_coins_r )
 
 	int data;
 	data = (input_port_read(space->machine(), "SYSTEM") & 0x7fff);
-	data |= state->aquarium_snd_ack;
-	state->aquarium_snd_ack = 0;
+	data |= state->m_aquarium_snd_ack;
+	state->m_aquarium_snd_ack = 0;
 
 	return data;
 }
@@ -87,7 +87,7 @@ static READ16_HANDLER( aquarium_coins_r )
 static WRITE8_HANDLER( aquarium_snd_ack_w )
 {
 	aquarium_state *state = space->machine().driver_data<aquarium_state>();
-	state->aquarium_snd_ack = 0x8000;
+	state->m_aquarium_snd_ack = 0x8000;
 }
 
 static WRITE16_HANDLER( aquarium_sound_w )
@@ -96,7 +96,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 
 	soundlatch_w(space, 1, data & 0xff);
-	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
@@ -138,12 +138,12 @@ static WRITE8_HANDLER( aquarium_oki_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, bak_videoram)
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE_MEMBER(aquarium_state, spriteram, spriteram_size)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, m_mid_videoram)
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, m_bak_videoram)
+	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, m_txt_videoram)
+	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE_MEMBER(aquarium_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, scroll)
+	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, m_scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
@@ -331,7 +331,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	aquarium_state *state = device->machine().driver_data<aquarium_state>();
-	device_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -344,15 +344,15 @@ static MACHINE_START( aquarium )
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
 
-	state->audiocpu = machine.device("audiocpu");
+	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->aquarium_snd_ack));
+	state->save_item(NAME(state->m_aquarium_snd_ack));
 }
 
 static MACHINE_RESET( aquarium )
 {
 	aquarium_state *state = machine.driver_data<aquarium_state>();
-	state->aquarium_snd_ack = 0;
+	state->m_aquarium_snd_ack = 0;
 
 #if AQUARIUS_HACK
 	MACHINE_RESET_CALL(aquarium_hack);

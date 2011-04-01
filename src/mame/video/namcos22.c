@@ -904,7 +904,7 @@ static void RenderSprite(running_machine &machine, bitmap_t *bitmap, struct Scen
          }
          else
          {
-            code += nthword( &state->spriteram[0x800/4], i+node->data.sprite.linkType*4 );
+            code += nthword( &state->m_spriteram[0x800/4], i+node->data.sprite.linkType*4 );
          }
          poly3d_Draw3dSprite(
                bitmap,
@@ -1407,7 +1407,7 @@ DrawSprites( running_machine &machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
-	UINT32 *spriteram32 = state->spriteram;
+	UINT32 *spriteram32 = state->m_spriteram;
 	int num_sprites = ((spriteram32[0x04/4]>>16)&0x3ff)+1;
 	const UINT32 *pSource = &spriteram32[0x4000/4];
 	const UINT32 *pPal = &spriteram32[0x20000/4];

@@ -45,7 +45,7 @@ static READ8_HANDLER( trvquest_question_r )
 {
 	gameplan_state *state = space->machine().driver_data<gameplan_state>();
 
-	return space->machine().region("questions")->base()[*state->trvquest_question * 0x2000 + offset];
+	return space->machine().region("questions")->base()[*state->m_trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_BASE_MEMBER(gameplan_state, trvquest_question)
+	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_BASE_MEMBER(gameplan_state, m_trvquest_question)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	// bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -150,7 +150,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( via_irq_delayed )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
-	device_set_input_line(state->maincpu, 0, param);
+	device_set_input_line(state->m_maincpu, 0, param);
 }
 
 static void via_irq( device_t *device, int state )
@@ -187,30 +187,30 @@ static MACHINE_START( trvquest )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->maincpu = machine.device("maincpu");
+	state->m_maincpu = machine.device("maincpu");
 
 	/* register for save states */
-	state->save_item(NAME(state->video_x));
-	state->save_item(NAME(state->video_y));
-	state->save_item(NAME(state->video_command));
-	state->save_item(NAME(state->video_data));
+	state->save_item(NAME(state->m_video_x));
+	state->save_item(NAME(state->m_video_y));
+	state->save_item(NAME(state->m_video_command));
+	state->save_item(NAME(state->m_video_data));
 }
 
 static MACHINE_RESET( trvquest )
 {
 	gameplan_state *state = machine.driver_data<gameplan_state>();
 
-	state->video_x = 0;
-	state->video_y = 0;
-	state->video_command = 0;
-	state->video_data = 0;
+	state->m_video_x = 0;
+	state->m_video_y = 0;
+	state->m_video_command = 0;
+	state->m_video_data = 0;
 }
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
-	state->via_2->write_ca1(1);
-	state->via_2->write_ca1(0);
+	state->m_via_2->write_ca1(1);
+	state->m_via_2->write_ca1(0);
 }
 
 static MACHINE_CONFIG_START( trvquest, gameplan_state )

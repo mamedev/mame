@@ -33,10 +33,10 @@ PALETTE_INIT( pcktgal )
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	pcktgal_state *state = machine.driver_data<pcktgal_state>();
-	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{

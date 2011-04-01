@@ -21,9 +21,9 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("tilegen1", deco16ic_pf1_data_w)
 	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("tilegen1", deco16ic_pf2_data_w)
-	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf1_rowscroll)
-	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf2_rowscroll)
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_MEMBER(dietgo_state, spriteram, spriteram_size)
+	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, m_pf1_rowscroll)
+	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, m_pf2_rowscroll)
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_MEMBER(dietgo_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x340000, 0x3407ff) AM_READWRITE(dietgo_104_prot_r, dietgo_104_prot_w)
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
@@ -163,7 +163,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dietgo_state *driver_state = device->machine().driver_data<dietgo_state>();
-	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->m_audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =
@@ -199,9 +199,9 @@ static MACHINE_START( dietgo )
 {
 	dietgo_state *state = machine.driver_data<dietgo_state>();
 
-	state->maincpu = machine.device("maincpu");
-	state->audiocpu = machine.device("audiocpu");
-	state->deco_tilegen1 = machine.device("tilegen1");
+	state->m_maincpu = machine.device("maincpu");
+	state->m_audiocpu = machine.device("audiocpu");
+	state->m_deco_tilegen1 = machine.device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( dietgo, dietgo_state )

@@ -61,17 +61,17 @@ Grndtour:
 static WRITE8_HANDLER( iqblock_prot_w )
 {
 	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-    state->rambase[0xe26] = data;
-    state->rambase[0xe27] = data;
-    state->rambase[0xe1c] = data;
+    state->m_rambase[0xe26] = data;
+    state->m_rambase[0xe27] = data;
+    state->m_rambase[0xe1c] = data;
 }
 
 static WRITE8_HANDLER( grndtour_prot_w )
 {
 	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	state->rambase[0xe39] = data;
-    state->rambase[0xe3a] = data;
-    state->rambase[0xe2f] = data;
+	state->m_rambase[0xe39] = data;
+    state->m_rambase[0xe3a] = data;
+    state->m_rambase[0xe2f] = data;
 
 }
 
@@ -101,7 +101,7 @@ static WRITE8_DEVICE_HANDLER( port_C_w )
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
 	/* bit 5 seems to be 0 during screen redraw */
-	state->videoenable = data & 0x20;
+	state->m_videoenable = data & 0x20;
 
 	/* bit 6 is coin counter */
 	coin_counter_w(device->machine(), 0,data & 0x40);
@@ -122,7 +122,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, rambase)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, m_rambase)
 ADDRESS_MAP_END
 
 
@@ -442,10 +442,10 @@ static DRIVER_INIT( iqblock )
 	/* initialize pointers for I/O mapped RAM */
 	machine.generic.paletteram.u8         = rom + 0x12000;
 	machine.generic.paletteram2.u8       = rom + 0x12800;
-	state->fgvideoram = rom + 0x16800;
-	state->bgvideoram = rom + 0x17000;
+	state->m_fgvideoram = rom + 0x16800;
+	state->m_bgvideoram = rom + 0x17000;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe26, 0xfe26, FUNC(iqblock_prot_w));
-	state->video_type=1;
+	state->m_video_type=1;
 }
 
 static DRIVER_INIT( grndtour )
@@ -465,10 +465,10 @@ static DRIVER_INIT( grndtour )
 	/* initialize pointers for I/O mapped RAM */
 	machine.generic.paletteram.u8         = rom + 0x12000;
 	machine.generic.paletteram2.u8       = rom + 0x12800;
-	state->fgvideoram = rom + 0x16800;
-	state->bgvideoram = rom + 0x17000;
+	state->m_fgvideoram = rom + 0x16800;
+	state->m_bgvideoram = rom + 0x17000;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe39, 0xfe39, FUNC(grndtour_prot_w));
-	state->video_type=0;
+	state->m_video_type=0;
 }
 
 

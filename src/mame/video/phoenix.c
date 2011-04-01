@@ -138,9 +138,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	phoenix_state *state = machine.driver_data<phoenix_state>();
 	int code, col;
 
-	code = state->videoram_pg[state->videoram_pg_index][tile_index];
+	code = state->m_videoram_pg[state->m_videoram_pg_index][tile_index];
 	col = (code >> 5);
-	col = col | 0x08 | (state->palette_bank << 4);
+	col = col | 0x08 | (state->m_palette_bank << 4);
 	SET_TILE_INFO(
 			1,
 			code,
@@ -153,9 +153,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 	phoenix_state *state = machine.driver_data<phoenix_state>();
 	int code, col;
 
-	code = state->videoram_pg[state->videoram_pg_index][tile_index + 0x800];
+	code = state->m_videoram_pg[state->m_videoram_pg_index][tile_index + 0x800];
 	col = (code >> 5);
-	col = col | 0x00 | (state->palette_bank << 4);
+	col = col | 0x00 | (state->m_palette_bank << 4);
 	SET_TILE_INFO(
 			0,
 			code,
@@ -172,46 +172,46 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( phoenix )
 {
 	phoenix_state *state = machine.driver_data<phoenix_state>();
-	state->videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
-	state->videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	state->m_videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_configure_bank(machine, "bank1", 0, 1, state->videoram_pg[0], 0);
-	memory_configure_bank(machine, "bank1", 1, 1, state->videoram_pg[1], 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->m_videoram_pg[0], 0);
+	memory_configure_bank(machine, "bank1", 1, 1, state->m_videoram_pg[1], 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	state->videoram_pg_index = 0;
-	state->palette_bank = 0;
-	state->cocktail_mode = 0;
+	state->m_videoram_pg_index = 0;
+	state->m_palette_bank = 0;
+	state->m_cocktail_mode = 0;
 
-	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
-	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(state->fg_tilemap,0);
+	tilemap_set_transparent_pen(state->m_fg_tilemap,0);
 
-	tilemap_set_scrolldx(state->fg_tilemap, 0, (HTOTAL - HBSTART));
-	tilemap_set_scrolldx(state->bg_tilemap, 0, (HTOTAL - HBSTART));
-	tilemap_set_scrolldy(state->fg_tilemap, 0, (VTOTAL - VBSTART));
-	tilemap_set_scrolldy(state->bg_tilemap, 0, (VTOTAL - VBSTART));
+	tilemap_set_scrolldx(state->m_fg_tilemap, 0, (HTOTAL - HBSTART));
+	tilemap_set_scrolldx(state->m_bg_tilemap, 0, (HTOTAL - HBSTART));
+	tilemap_set_scrolldy(state->m_fg_tilemap, 0, (VTOTAL - VBSTART));
+	tilemap_set_scrolldy(state->m_bg_tilemap, 0, (VTOTAL - VBSTART));
 
-	state_save_register_global_pointer(machine, state->videoram_pg[0], 0x1000);
-	state_save_register_global_pointer(machine, state->videoram_pg[1], 0x1000);
-	state_save_register_global(machine, state->videoram_pg_index);
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global(machine, state->cocktail_mode);
+	state_save_register_global_pointer(machine, state->m_videoram_pg[0], 0x1000);
+	state_save_register_global_pointer(machine, state->m_videoram_pg[1], 0x1000);
+	state_save_register_global(machine, state->m_videoram_pg_index);
+	state_save_register_global(machine, state->m_palette_bank);
+	state_save_register_global(machine, state->m_cocktail_mode);
 
 	/* some more candidates */
-	state->pleiads_protection_question = 0;
-	state->survival_protection_value = 0;
-	state->survival_sid_value = 0;
-	state->survival_input_readc = 0;
-	state->survival_input_latches[0] = 0;
-	state->survival_input_latches[1] = 0;
+	state->m_pleiads_protection_question = 0;
+	state->m_survival_protection_value = 0;
+	state->m_survival_sid_value = 0;
+	state->m_survival_input_readc = 0;
+	state->m_survival_input_latches[0] = 0;
+	state->m_survival_input_latches[1] = 0;
 
-	state_save_register_global(machine, state->pleiads_protection_question);
-	state_save_register_global(machine, state->survival_protection_value);
-	state_save_register_global(machine, state->survival_sid_value);
-	state_save_register_global(machine, state->survival_input_readc);
-	state_save_register_global_array(machine, state->survival_input_latches);
+	state_save_register_global(machine, state->m_pleiads_protection_question);
+	state_save_register_global(machine, state->m_survival_protection_value);
+	state_save_register_global(machine, state->m_survival_sid_value);
+	state_save_register_global(machine, state->m_survival_input_readc);
+	state_save_register_global_array(machine, state->m_survival_input_latches);
 
 }
 
@@ -226,14 +226,14 @@ WRITE8_HANDLER( phoenix_videoram_w )
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
 	UINT8 *rom = space->machine().region("maincpu")->base();
 
-	state->videoram_pg[state->videoram_pg_index][offset] = data;
+	state->m_videoram_pg[state->m_videoram_pg_index][offset] = data;
 
 	if ((offset & 0x7ff) < 0x340)
 	{
 		if (offset & 0x800)
-			tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
+			tilemap_mark_tile_dirty(state->m_bg_tilemap,offset & 0x3ff);
 		else
-			tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
+			tilemap_mark_tile_dirty(state->m_fg_tilemap,offset & 0x3ff);
 	}
 
 	/* as part of the protecion, Survival executes code from $43a4 */
@@ -244,22 +244,22 @@ WRITE8_HANDLER( phoenix_videoram_w )
 WRITE8_HANDLER( phoenix_videoreg_w )
 {
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	if (state->videoram_pg_index != (data & 1))
+	if (state->m_videoram_pg_index != (data & 1))
 	{
 		/* set memory bank */
-		state->videoram_pg_index = data & 1;
-		memory_set_bank(space->machine(), "bank1", state->videoram_pg_index);
+		state->m_videoram_pg_index = data & 1;
+		memory_set_bank(space->machine(), "bank1", state->m_videoram_pg_index);
 
-		state->cocktail_mode = state->videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
+		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
 
-		tilemap_set_flip_all(space->machine(), state->cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
 	/* Phoenix has only one palette select effecting both layers */
-	if (state->palette_bank != ((data >> 1) & 1))
+	if (state->m_palette_bank != ((data >> 1) & 1))
 	{
-		state->palette_bank = (data >> 1) & 1;
+		state->m_palette_bank = (data >> 1) & 1;
 
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
@@ -268,15 +268,15 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 WRITE8_HANDLER( pleiads_videoreg_w )
 {
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	if (state->videoram_pg_index != (data & 1))
+	if (state->m_videoram_pg_index != (data & 1))
 	{
 		/* set memory bank */
-		state->videoram_pg_index = data & 1;
-		memory_set_bank(space->machine(), "bank1", state->videoram_pg_index);
+		state->m_videoram_pg_index = data & 1;
+		memory_set_bank(space->machine(), "bank1", state->m_videoram_pg_index);
 
-		state->cocktail_mode = state->videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
+		state->m_cocktail_mode = state->m_videoram_pg_index && (input_port_read(space->machine(), "CAB") & 0x01);
 
-		tilemap_set_flip_all(space->machine(), state->cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(space->machine(), state->m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 	}
 
@@ -285,16 +285,16 @@ WRITE8_HANDLER( pleiads_videoreg_w )
        Four palette changes by level.  The palette selection is
        wrong, but the same paletter is used for both layers. */
 
-	if (state->palette_bank != ((data >> 1) & 3))
+	if (state->m_palette_bank != ((data >> 1) & 3))
 	{
-		state->palette_bank = ((data >> 1) & 3);
+		state->m_palette_bank = ((data >> 1) & 3);
 
 		tilemap_mark_all_tiles_dirty_all(space->machine());
 
 		logerror("Palette: %02X\n", (data & 0x06) >> 1);
 	}
 
-	state->pleiads_protection_question = data & 0xfc;
+	state->m_pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
 	pleiads_sound_control_c_w(space->machine().device("cust"), offset, data);
@@ -304,14 +304,14 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 WRITE8_HANDLER( phoenix_scroll_w )
 {
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
-	tilemap_set_scrollx(state->bg_tilemap,0,data);
+	tilemap_set_scrollx(state->m_bg_tilemap,0,data);
 }
 
 
 CUSTOM_INPUT( player_input_r )
 {
 	phoenix_state *state = field->port->machine().driver_data<phoenix_state>();
-	if (state->cocktail_mode)
+	if (state->m_cocktail_mode)
 		return (input_port_read(field->port->machine(), "CTRL") & 0xf0) >> 4;
 	else
 		return (input_port_read(field->port->machine(), "CTRL") & 0x0f) >> 0;
@@ -321,7 +321,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 {
 	phoenix_state *state = field->port->machine().driver_data<phoenix_state>();
 	/* handle Pleiads protection */
-	switch (state->pleiads_protection_question)
+	switch (state->m_pleiads_protection_question)
 	{
 	case 0x00:
 	case 0x20:
@@ -332,7 +332,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		/* Bit 3 is 1 */
 		return 1;
 	default:
-		logerror("%s:Unknown protection question %02X\n", field->port->machine().describe_context(), state->pleiads_protection_question);
+		logerror("%s:Unknown protection question %02X\n", field->port->machine().describe_context(), state->m_pleiads_protection_question);
 		return 0;
 	}
 }
@@ -371,18 +371,18 @@ READ8_HANDLER( survival_input_port_0_r )
 	phoenix_state *state = space->machine().driver_data<phoenix_state>();
 	UINT8 ret = ~input_port_read(space->machine(), "IN0");
 
-	if( state->survival_input_readc++ == 2 )
+	if( state->m_survival_input_readc++ == 2 )
 	{
-		state->survival_input_readc = 0;
-		state->survival_protection_value = 0;
+		state->m_survival_input_readc = 0;
+		state->m_survival_protection_value = 0;
 		return ~ret;
 	}
 
 	// Any value that remaps the joystick input to 0,2,4 must clear bit 0
 	// on the AY8910 port B. All other remaps must set bit 0.
 
-	state->survival_protection_value = 0xff;
-	state->survival_sid_value = 0;
+	state->m_survival_protection_value = 0xff;
+	state->m_survival_sid_value = 0;
 
 	switch( ( ret >> 4) & 0xf )
 	{
@@ -393,54 +393,54 @@ READ8_HANDLER( survival_input_port_0_r )
 			ret = REMAP_JS( 8 );
 			break;
 		case 2: // js_e = 0 + 0
-			state->survival_sid_value = 0x80;
-			state->survival_protection_value = 0xfe;
+			state->m_survival_sid_value = 0x80;
+			state->m_survival_protection_value = 0xfe;
 			ret = REMAP_JS( 2 );
 			break;
 		case 3: // js_ne = 0 + 1;
-			state->survival_sid_value = 0x80;
+			state->m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 0xa );
 			break;
 		case 4: // js_w = 4 + 0
-			state->survival_sid_value = 0x80;
-			state->survival_protection_value = 0xfe;
+			state->m_survival_sid_value = 0x80;
+			state->m_survival_protection_value = 0xfe;
 			ret = REMAP_JS( 4 );
 			break;
 		case 5: // js_nw = 2 + 1
-			state->survival_sid_value = 0x80;
+			state->m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 0xc );
 			break;
 		case 8: // js_s = 5 + 1
 			ret = REMAP_JS( 1 );
 			break;
 		case 0xa: // js_se = 6 + 1
-			state->survival_sid_value = 0x80;
+			state->m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 3 );
 			break;
 		case 0xc: // js_sw = 4 + 1
-			state->survival_sid_value = 0x80;
+			state->m_survival_sid_value = 0x80;
 			ret = REMAP_JS( 5 );
 			break;
 		default:
 			break;
 	}
 
-	state->survival_input_latches[0] = state->survival_input_latches[1];
-	state->survival_input_latches[1] = ~ret;
+	state->m_survival_input_latches[0] = state->m_survival_input_latches[1];
+	state->m_survival_input_latches[1] = ~ret;
 
-	return state->survival_input_latches[0];
+	return state->m_survival_input_latches[0];
 }
 
 READ8_DEVICE_HANDLER( survival_protection_r )
 {
 	phoenix_state *state = device->machine().driver_data<phoenix_state>();
-	return state->survival_protection_value;
+	return state->m_survival_protection_value;
 }
 
 READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 {
 	phoenix_state *state = device->machine().driver_data<phoenix_state>();
-	return state->survival_sid_value;
+	return state->m_survival_sid_value;
 }
 
 
@@ -453,7 +453,7 @@ READ_LINE_DEVICE_HANDLER( survival_sid_callback )
 SCREEN_UPDATE( phoenix )
 {
 	phoenix_state *state = screen->machine().driver_data<phoenix_state>();
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_fg_tilemap,0,0);
 	return 0;
 }
