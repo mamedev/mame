@@ -15,7 +15,7 @@ public:
 
 
 static ADDRESS_MAP_START( techno_map, AS_PROGRAM, 16 )
-	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffffff) AM_NOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( techno )
