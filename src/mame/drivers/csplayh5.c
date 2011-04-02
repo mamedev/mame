@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
-	AM_RANGE(0xc80000, 0xcfffff) AM_RAM AM_SHARE("nvram") // work RAM
+	AM_RANGE(0xc80000, 0xcfffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x200000) // work RAM
 
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
@@ -514,7 +514,7 @@ static INPUT_PORTS_START( csplayh5 )
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) //enters into analyzer in some games otherwise
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
@@ -678,7 +678,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-static DRIVER_INIT( csplayh5 )
+void general_init(running_machine &machine, int patchaddress)
 {
 	UINT16 *MAINROM = (UINT16 *)machine.region("maincpu")->base();
 	UINT8 *SNDROM = machine.region("audiocpu")->base();
@@ -687,19 +687,56 @@ static DRIVER_INIT( csplayh5 )
 	csplayh5_soundbank_w(machine, 0);
 
 	/* patch DVD comms check */
-	MAINROM[0x4cb4/2] = 0x6018;
+	MAINROM[patchaddress] = 0x6018;
 
 	/* patch sound program */
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
+
 }
+
+static DRIVER_INIT( jyunai )
+{
+	general_init(machine,0x679C/2);
+}
+
+static DRIVER_INIT( csplayh5 )
+{
+	general_init(machine, 0x4cb4/2);
+}
+
+static DRIVER_INIT( bikiniko )
+{
+	general_init(machine,0x585C/2);
+}
+
+
+ROM_START( jyunai )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(5923bf2e) SHA1(8fc7b95a44eb792ce03c1bffb9ad56f82d34b470) )
+	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(4ac649ee) SHA1(f5b5bccecb6eba5addcf6a57e54deff7f29f6381) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2.va1b102",   0x00000, 0x20000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(a0472ea5) SHA1(0fd04941ff595cffe64357f3a1a9dc1170db8703) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",   0x00000, 0x80000, CRC(f17fa4c4) SHA1(fd8b69b18f9ac00f468d751bf1ea0715498ea742) )
+	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(4182dc30) SHA1(89601c62b74aff3d65b075d4b5cd1eb2ccf4e386) )
+	// 0x100000 - 0x3fffff empty sockets
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "jyunai", 0, NO_DUMP )
+ROM_END
 
 ROM_START( csplayh5 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(980bf3b0) SHA1(89da7354552f30aaa9d46442972c060b4b0f8979) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(81ca49a4) SHA1(601b6802ab85be61f45a64f5b4c7e1f1ae5ee887) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) // ???
-	ROM_LOAD16_WORD_SWAP( "daughter.bin",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2.va1a101",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
@@ -713,18 +750,40 @@ ROM_START( csplayh5 )
 	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
+ROM_START( bikiniko )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b80b5484) SHA1(35769d9502cbe587dad6380c35e535cea1578227) )
+	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(13a885af) SHA1(ba8221fab1a37f1937e4399eabe3eaa9093884d3) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2.va1b101",   0x00000, 0x20000, CRC(b92a83c8) SHA1(bd6d9adaa74cf7512478838d1bd5a79dbd0c4aa1) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(4a2142d6) SHA1(3a762f7b7cccdb6715b5f59524b04b12694fc130) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",   0x00000, 0x80000, CRC(12914d3b) SHA1(de0cdb47ee5cbf8bd19ab19b1b8d8afe103dcedf) )
+	ROM_LOAD16_BYTE( "4.ic41",   0x00001, 0x80000, CRC(1e2e1cf3) SHA1(f71b5dedf4f897644d519e412651152d0d81edb8) )
+	// 0x100000 - 0x3fffff empty sockets
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "bikiniko", 0, NO_DUMP )
+ROM_END
+
+
 // 1998
 // 01 : Mahjong Gal-pri (World Gal-con Grandprix) : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-// 03 : Jyunai - Manatsu no First Kiss : Nichibutsu/eic
+/* 03 */ GAME( 1998, jyunai,    0,   csplayh5,  csplayh5,  jyunai,   ROT0, "Nichibutsu/eic", "Jyunai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
 /* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu", "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
 // 05 : Jyunai2 - White Love Story : Nichibutsu/eic
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
+
 // 1999
 // 07 : Mahjong Maina - Kairakukan he Youkoso : Sphinx/Just&Just
 // 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
-// 09 : BiKiNikko - Okinawa de Ippai Shityaimashita : Nichibutsu/eic
+/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic", "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cospure Tengoko 6 - Jyunai hen : Nichibutsu/eic
 // 11 : The Nanpa : Nichibutsu/Love Factory/eic
 // 12 : PokoaPoka Onsen de CHU - Bijin 3 Simai ni kiwotukete : Nichibutsu/eic
