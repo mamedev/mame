@@ -39,13 +39,12 @@ Original Service Manuals and Service Mode (when available).
 
 ToDo:
 - Fix protection simulation in Birdie Try (that part needs a complete rewrite);
-- IPT_VBLANK doesn't work properly, that's particularly true for Birdie Try hang when you clear an hole (in any way it never clears out)
-  and for Boulder Dash fade in / fade out transitions (they are far too slow right now);
 - graphics are completely broken in Automat and Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't boot at all;
-- Hook up the 68705 in Midnight Resistance (bootleg)
-   (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
+- Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patches in Sly Spy and Hippodrome;
+- Accurate pixel clock parameters;
+- background pen in Birdie Try is presumably wrong.
 - Finally, get a proper decap of the MCUs used by Bad Dudes and Birdie Try;
 
 
@@ -199,6 +198,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
+			cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
 			break;
 
 		case 0xa: /* Mix Psel(?). */
@@ -1358,6 +1358,16 @@ static MACHINE_CONFIG_DERIVED( dec0_base_sound_alt, dec0_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+//	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK, DEC0_HTOTAL, DEC0_HBEND, DEC0_HBSTART, DEC0_VTOTAL, DEC0_VBEND, DEC0_VBSTART)
+
+/* TODO: These are raw guesses, only to get ~57,41 Hz */
+#define DEC0_PIXEL_CLOCK XTAL_20MHz/4
+#define DEC0_HTOTAL 256+74
+#define DEC0_HBEND 0
+#define DEC0_HBSTART 256
+#define DEC0_VTOTAL 264
+#define DEC0_VBEND 8
+#define DEC0_VBSTART 256-8
 
 
 static MACHINE_CONFIG_DERIVED( automat, dec0_base )
@@ -1372,11 +1382,10 @@ static MACHINE_CONFIG_DERIVED( automat, dec0_base )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
 	MCFG_SCREEN_UPDATE(robocop)
 
 	MCFG_GFXDECODE(automat)
@@ -1407,7 +1416,7 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1417,11 +1426,12 @@ static MACHINE_CONFIG_DERIVED( hbarrel, dec0_base_sound )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	//MCFG_SCREEN_REFRESH_RATE(57.41)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+	//MCFG_SCREEN_SIZE(32*8, 32*8)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(hbarrel)
 MACHINE_CONFIG_END
 
@@ -1430,18 +1440,19 @@ static MACHINE_CONFIG_DERIVED( baddudes, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(baddudes)
 MACHINE_CONFIG_END
 
@@ -1450,18 +1461,19 @@ static MACHINE_CONFIG_DERIVED( birdtry, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL, level 5 interrupts from i8751 */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(birdtry)
 MACHINE_CONFIG_END
 
@@ -1470,7 +1482,7 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1482,11 +1494,12 @@ static MACHINE_CONFIG_DERIVED( robocop, dec0_base_sound )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(robocop)
 MACHINE_CONFIG_END
 
@@ -1495,18 +1508,19 @@ static MACHINE_CONFIG_DERIVED( robocopb, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(robocop)
 MACHINE_CONFIG_END
 
@@ -1515,7 +1529,7 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_assert)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
@@ -1527,11 +1541,12 @@ static MACHINE_CONFIG_DERIVED( hippodrm, dec0_base_sound )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(hippodrm)
 MACHINE_CONFIG_END
 
@@ -1546,18 +1561,19 @@ static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(slyspy_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL, apparently it auto-acks */
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(slyspy)
 
 	MCFG_VIDEO_START(dec0_nodma)
@@ -1580,11 +1596,12 @@ static MACHINE_CONFIG_DERIVED( secretab, dec0_base_sound_alt )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(robocop)
 
 	MCFG_GFXDECODE(secretab)
@@ -1603,11 +1620,12 @@ static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.41)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+//	MCFG_SCREEN_REFRESH_RATE(57.41)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC0_PIXEL_CLOCK,DEC0_HTOTAL,DEC0_HBEND,DEC0_HBSTART,DEC0_VTOTAL,DEC0_VBEND,DEC0_VBSTART)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(midres)
 
 	MCFG_GFXDECODE(midres)
