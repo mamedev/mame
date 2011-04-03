@@ -45,7 +45,7 @@
 #include <tchar.h>
 
 // MAME headers
-#include "osdcore.h"
+#include "emucore.h"
 
 // MAMEOS headers
 #include "winutf8.h"
