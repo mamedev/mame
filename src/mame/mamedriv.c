@@ -6957,6 +6957,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mystston )	/* TA-0010 (c) 1984 */
 	DRIVER( myststono )	/* TA-0010 (c) 1984 */
 	DRIVER( dogfgt )	/* TA-0011 (c) 1984 */
+	DRIVER( dogfgtu )	/* TA-0011 (c) 1985 Data East USA, Inc. */
 	DRIVER( dogfgtj )	/* TA-0011 (c) 1984 */
 	DRIVER( bogeyman )	/* -0204-0 (Data East part number) (c) 1985 (Arcade TV Game List - P.96, Right, 8 from top) */
 	DRIVER( matmania )	/* TA-0015 (c) 1985 + Taito America license */
