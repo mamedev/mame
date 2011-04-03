@@ -582,10 +582,10 @@ READ8_HANDLER( snes_r_io )
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
 		default:
-//			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
+//          mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(&space->device()));
 // Added break; after commenting above line.  If uncommenting, drop the break;
                         break;
-           
+
 #endif	/* MESS */
 
 	}

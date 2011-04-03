@@ -179,7 +179,7 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 		pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape2_scan,  16, 16,  32, 64);
 	}
 	else
-	{	
+	{
 		pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape0_scan,    16,16, 64, 16);
 		pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape1_scan,    16,16, 32, 32);
 		pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape2_scan,    16,16, 16, 64);
@@ -289,12 +289,12 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 
 			p = *BITMAP_ADDR16(src_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask);
 			colpri =  *BITMAP_ADDR8(flags_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
-		
+
 			src_x++;
 			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
 			{
 
-				
+
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
 						*BITMAP_ADDR16(bitmap, y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;

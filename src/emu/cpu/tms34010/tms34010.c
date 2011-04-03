@@ -1737,8 +1737,8 @@ CPU_GET_INFO( tms34010 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10000;					break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;						break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;						break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: 		info->i = 3;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;						break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 3;						break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;

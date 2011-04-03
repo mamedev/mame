@@ -2429,7 +2429,7 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 
 
 //-------------------------------------------------
-//  install_readwrite_port - install a new I/O port 
+//  install_readwrite_port - install a new I/O port
 //  handler into this address space
 //-------------------------------------------------
 
@@ -2471,7 +2471,7 @@ void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, off
 
 
 //-------------------------------------------------
-//  install_bank_generic - install a range as 
+//  install_bank_generic - install a range as
 //  mapping to a particular bank
 //-------------------------------------------------
 
@@ -2502,7 +2502,7 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 
 
 //-------------------------------------------------
-//  install_ram_generic - install a simple fixed 
+//  install_ram_generic - install a simple fixed
 //  RAM region into the given address space
 //-------------------------------------------------
 

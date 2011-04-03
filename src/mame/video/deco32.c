@@ -548,7 +548,7 @@ VIDEO_START( dragngun )
 {
 	dragngun_state *state = machine.driver_data<dragngun_state>();
 	state->m_dirty_palette = auto_alloc_array(machine, UINT8, 4096);
-	
+
 	memset(state->m_dirty_palette,0,4096);
 
 	state_save_register_global(machine, state->m_dragngun_sprite_ctrl);
@@ -590,7 +590,7 @@ SCREEN_EOF( captaven )
 
 SCREEN_EOF( dragngun )
 {
-	
+
 }
 
 
@@ -628,7 +628,7 @@ SCREEN_UPDATE( captaven )
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	screen->machine().device<decospr_device>("spritegen")->set_alt_format(true);
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x400); 
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x400);
 
 	return 0;
 }
@@ -653,7 +653,7 @@ SCREEN_UPDATE( dragngun )
 	// zooming sprite draw is very slow, and sprites are buffered.. however, one of the levels attempts to use
 	// partial updates for every line, which causes things to be very slow... the sprites appear to support
 	// multiple layers of alpha, so rendering to a buffer for layer isn't easy (maybe there are multiple sprite
-	// chips at work?) 
+	// chips at work?)
 	//
 	// really, it needs optimizing .. the raster effects also need fixing properly, they're not correct using
 	// partial updates right now but the old buffering of scroll values was a hack and doesn't work properly
@@ -689,7 +689,7 @@ SCREEN_UPDATE( fghthist )
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
 	deco16ic_pf_update(state->m_deco_tilegen2, state->m_pf3_rowscroll, state->m_pf4_rowscroll);
 
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true); 
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
 
 	/* Draw screen */
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 1);
@@ -733,7 +733,7 @@ static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, con
 	bitmap_t* sprite0_mix_bitmap = machine.device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
 	bitmap_t* sprite1_mix_bitmap = machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 
-	
+
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
 		UINT8* tilemapPri=BITMAP_ADDR8(machine.priority_bitmap, y, 0);
@@ -879,10 +879,10 @@ SCREEN_UPDATE( nslasher )
 	screen->machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
 	screen->machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
 
-	screen->machine().device<decospr_device>("spritegen1")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true); 
-	screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_2_buffered, 0x800, true); 
+	screen->machine().device<decospr_device>("spritegen1")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffered, 0x800, true);
+	screen->machine().device<decospr_device>("spritegen2")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_2_buffered, 0x800, true);
 
-	
+
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	bitmap_fill(state->m_tilemap_alpha_bitmap,cliprect,0);
 

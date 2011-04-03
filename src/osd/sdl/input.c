@@ -1082,7 +1082,7 @@ static void sdlinput_register_keyboards(running_machine &machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 		// add the item to the device
-//		printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
+//      printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
 		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 

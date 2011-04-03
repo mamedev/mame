@@ -193,8 +193,8 @@ CPU_GET_INFO( i860 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;						break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 64;	break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;	break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: 		info->i = 0;	break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;	break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;	break;
 		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 0;	break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 0;	break;
 		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0;	break;

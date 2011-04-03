@@ -68,13 +68,13 @@
 struct z8536_interface
 {
 	devcb_write_line		m_out_int_func;
-	
+
 	devcb_read8				m_in_pa_func;
 	devcb_write8			m_out_pa_func;
-	
+
 	devcb_read8				m_in_pb_func;
 	devcb_write8			m_out_pb_func;
-	
+
 	devcb_read8				m_in_pc_func;
 	devcb_write8			m_out_pc_func;
 };
@@ -144,19 +144,19 @@ private:
 	inline UINT8 read_register(offs_t offset, UINT8 mask);
 	inline void write_register(offs_t offset, UINT8 data);
 	inline void write_register(offs_t offset, UINT8 data, UINT8 mask);
-	
+
 	inline void count(device_timer_id id);
 	inline void trigger(device_timer_id id);
 	inline void gate(device_timer_id id);
-	
+
 	devcb_resolved_write_line		m_out_int_func;
-	
+
 	devcb_resolved_read8			m_in_pa_func;
 	devcb_resolved_write8			m_out_pa_func;
-	
+
 	devcb_resolved_read8			m_in_pb_func;
 	devcb_resolved_write8			m_out_pb_func;
-	
+
 	devcb_resolved_read8			m_in_pc_func;
 	devcb_resolved_write8			m_out_pc_func;
 

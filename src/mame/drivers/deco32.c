@@ -719,7 +719,7 @@ static WRITE32_HANDLER( deco32_buffer_spriteram_w )
 {
 	deco32_state *state = space->machine().driver_data<deco32_state>();
 	memcpy(state->m_spriteram16_buffered, state->m_spriteram16, 0x1000);
-}	
+}
 
 static READ32_HANDLER( deco32_spriteram2_r )
 {
@@ -739,7 +739,7 @@ static WRITE32_HANDLER( deco32_buffer_spriteram2_w )
 {
 	deco32_state *state = space->machine().driver_data<deco32_state>();
 	memcpy(state->m_spriteram16_2_buffered, state->m_spriteram16_2, 0x1000);
-}	
+}
 
 
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
@@ -757,7 +757,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x108000, 0x108003) AM_WRITENOP /* ? */
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram) /* Main RAM */
-	
+
 	AM_RANGE(0x128000, 0x128fff) AM_READ(captaven_prot_r)
 	AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
@@ -783,7 +783,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32 )
-//	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
+//  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
 	AM_RANGE(0x120020, 0x12002f) AM_READ(fghthist_control_r)
@@ -2174,7 +2174,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	
+
 	MCFG_SCREEN_UPDATE(nslasher)
 
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
@@ -2185,7 +2185,7 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 
 	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 4);
-	
+
 
 	MCFG_GFXDECODE(tattass)
 	MCFG_PALETTE_LENGTH(2048)

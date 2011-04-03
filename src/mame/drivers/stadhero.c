@@ -4,7 +4,7 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-	Are the colours correct on the scoreboard screen? they look strange
+    Are the colours correct on the scoreboard screen? they look strange
 
 ***************************************************************************/
 

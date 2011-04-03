@@ -159,7 +159,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
-	
+
 	  m_config(_config),
 	  m_system(_config.gamedrv()),
 	  m_osd(osd),

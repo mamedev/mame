@@ -38,13 +38,13 @@ static WRITE16_HANDLER( madmotor_sound_w )
 
 /******************************************************************************/
 
-	
+
 static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x180007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)							/* text layer */
 	AM_RANGE(0x180010, 0x180017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
 	AM_RANGE(0x184000, 0x18407f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x184080, 0x1843ff) AM_RAM 
+	AM_RANGE(0x184080, 0x1843ff) AM_RAM
 	AM_RANGE(0x184400, 0x1847ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x188000, 0x189fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x18c000, 0x18c001) AM_NOP

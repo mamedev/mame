@@ -164,7 +164,7 @@ static READ8_HANDLER( laserdisc_r )
 {
 	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
 	UINT8 result = laserdisc_data_r(state->m_laserdisc);
-//	mame_printf_debug("laserdisc_r = %02X\n", result);
+//  mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 

@@ -76,10 +76,10 @@ class e0516_device :  public device_t
     e0516_device(running_machine &_machine, const e0516_device_config &_config);
 
 public:
- 	DECLARE_WRITE_LINE_MEMBER( cs_w );
- 	DECLARE_WRITE_LINE_MEMBER( clk_w );
- 	DECLARE_WRITE_LINE_MEMBER( dio_w );
- 	DECLARE_READ_LINE_MEMBER( dio_r );
+	DECLARE_WRITE_LINE_MEMBER( cs_w );
+	DECLARE_WRITE_LINE_MEMBER( clk_w );
+	DECLARE_WRITE_LINE_MEMBER( dio_w );
+	DECLARE_READ_LINE_MEMBER( dio_r );
 
 protected:
     // device-level overrides

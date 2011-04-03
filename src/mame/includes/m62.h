@@ -27,7 +27,7 @@ public:
 
 	/* misc */
 	int                 m_ldrun2_bankswap;	//ldrun2
-	int                 m_bankcontrol[2]; 	//ldrun2
+	int                 m_bankcontrol[2];	//ldrun2
 };
 
 

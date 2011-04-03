@@ -36,7 +36,7 @@ deco_karnovsprites_device::deco_karnovsprites_device(running_machine &_machine, 
 
 void deco_karnovsprites_device::device_start()
 {
-	
+
 }
 
 void deco_karnovsprites_device::device_reset()

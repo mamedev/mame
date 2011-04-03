@@ -22,7 +22,7 @@ public:
 	int m_ace_ram_dirty;
 	int m_has_ace_ram;
 	UINT32 *m_ace_ram;
-		
+
 	UINT8 *m_dirty_palette;
 
 	int m_pri;
@@ -42,7 +42,7 @@ public:
 	UINT32 *m_pf2_rowscroll32;
 	UINT32 *m_pf3_rowscroll32;
 	UINT32 *m_pf4_rowscroll32;
-	
+
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 };

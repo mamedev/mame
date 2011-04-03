@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_DECOCOMN_ADD("deco_common", pktgaldx_decocomn_intf)
 
 	MCFG_DECO16IC_ADD("tilegen1", pktgaldx_deco16ic_tilegen1_intf)
-	
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

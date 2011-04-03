@@ -328,7 +328,7 @@ static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
 static const deco16ic_interface boogwing_deco16ic_tilegen2_intf =
 {
 	"screen",
-	0, 1, 
+	0, 1,
 	0x0f, 0x0f,
 	0, 16,
 	0x0f, 0x0f,

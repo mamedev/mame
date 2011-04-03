@@ -66,7 +66,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pcktgal )
 {
-//	flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+//  flip_screen_set(screen->machine(), screen->machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 	screen->machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(screen->machine(), bitmap, cliprect);
 	return 0;

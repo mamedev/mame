@@ -48,7 +48,7 @@ public:
 	/* Turbo-specific states */
 	UINT8		m_turbo_opa;
 	UINT8		m_turbo_opb;
-	UINT8 		m_turbo_opc;
+	UINT8		m_turbo_opc;
 	UINT8		m_turbo_ipa;
 	UINT8		m_turbo_ipb;
 	UINT8		m_turbo_ipc;

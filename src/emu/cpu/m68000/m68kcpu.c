@@ -1016,8 +1016,8 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 24;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: 		info->i = 0;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (m68k->virq_state >> 1) & 1;	break;
@@ -1667,7 +1667,7 @@ CPU_GET_INFO( m68008 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 22;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 22;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
@@ -1773,7 +1773,7 @@ CPU_GET_INFO( m68020 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020);						break;
@@ -1886,7 +1886,7 @@ CPU_GET_INFO( m68ec020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 24;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 24;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec020);					break;
@@ -1943,7 +1943,7 @@ CPU_GET_INFO( m68030 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68030);						break;
@@ -2050,7 +2050,7 @@ CPU_GET_INFO( m68040 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68040);						break;
@@ -2178,7 +2178,7 @@ CPU_GET_INFO( scc68070 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: 		info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(scc68070);	break;

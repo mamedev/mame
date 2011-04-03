@@ -3,7 +3,7 @@
    Dark Seal Video emulation - Bryan McPhail, mish@tendril.co.uk
 
 ****************************************************************************
- 
+
  uses 2x DECO55 tilemaps
 
 **************************************************************************
@@ -71,7 +71,7 @@ SCREEN_UPDATE( darkseal )
 
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen2, bitmap, cliprect, 0, 0);
-	
+
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, screen->machine().generic.buffered_spriteram.u16, 0x400);
 	deco16ic_tilemap_2_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0);

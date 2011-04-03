@@ -181,8 +181,8 @@ static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
 	AM_RANGE(0x700000, 0x700003) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_scroll_0)									// Scroll
 	AM_RANGE(0x700004, 0x700007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_scroll_1)									//
-	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_x) 							// not used in mchampdx?
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_x)							// not used in mchampdx?
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_y)							// not used in mchampdx?
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP																// ??
 	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_head_layersize)								// ??
 	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)												// not used in mchampdx?
@@ -200,8 +200,8 @@ static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, m_vram_1)							// mirror?
 	AM_RANGE(0x400000, 0x400003) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_scroll_0)									// Scroll
 	AM_RANGE(0x400004, 0x400007) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_scroll_1)									//
-	AM_RANGE(0x400008, 0x400009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_x) 							// not used in mchampdx?
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x400008, 0x400009) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_x)							// not used in mchampdx?
+	AM_RANGE(0x40000a, 0x40000b) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_headpanic_platform_y)							// not used in mchampdx?
 	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP																// ??
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITEONLY AM_BASE_MEMBER(esd16_state, m_head_layersize)									// ??
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack

@@ -226,14 +226,14 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 {
 	m_sk = state;
-	
+
 	if (!m_cs || !m_sk) return;
-	
+
 	switch (m_state)
 	{
 	case STATE_IDLE:
 		if (LOG) logerror("NMC9306 '%s' Idle %u\n", tag(), m_di);
-		
+
 		if (m_di)
 		{
 			// start bit received
@@ -241,28 +241,28 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 			m_bits = 0;
 		}
 		break;
-		
+
 	case STATE_COMMAND:
 		if (LOG) logerror("NMC9306 '%s' Command Bit %u\n", tag(), m_di);
-		
+
 		m_command <<= 1;
 		m_command |= m_di;
 		m_bits++;
-		
+
 		if (m_bits == 4)
 		{
 			m_state = STATE_ADDRESS;
 			m_bits = 0;
 		}
 		break;
-		
+
 	case STATE_ADDRESS:
 		if (LOG) logerror("NMC9306 '%s' Address Bit %u\n", tag(), m_di);
-		
+
 		m_address <<= 1;
 		m_address |= m_di;
 		m_bits++;
-		
+
 		if (m_bits == 4)
 		{
 			switch ((m_command >> 2) & 0x03)
@@ -275,11 +275,11 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 					m_ewen = false;
 					m_state = STATE_IDLE;
 					break;
-					
+
 				case WRAL:
 					if (LOG) logerror("NMC9306 '%s' WRAL\n", tag());
 					break;
-					
+
 				case ERAL:
 					if (LOG) logerror("NMC9306 '%s' ERAL\n", tag());
 					break;
@@ -296,46 +296,46 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 				if (LOG) logerror("NMC9306 '%s' WRITE %u\n", tag(), m_address & 0x0f);
 				m_state = STATE_DATA_IN;
 				break;
-				
+
 			case READ:
 				if (LOG) logerror("NMC9306 '%s' READ %u\n", tag(), m_address & 0x0f);
 				m_data = read(m_address & 0x0f);
 				m_state = STATE_DATA_OUT;
 				break;
-				
+
 			case ERASE:
 				if (LOG) logerror("NMC9306 '%s' ERASE %u\n", tag(), m_address & 0x0f);
 				erase(m_address & 0x0f);
 				m_state = STATE_ERASE;
 				break;
 			}
-			
+
 			m_bits = 0;
 		}
 		break;
-		
+
 	case STATE_DATA_IN:
 		if (LOG) logerror("NMC9306 '%s' Data Bit IN %u\n", tag(), m_di);
-		
+
 		m_data <<= 1;
 		m_data |= m_di;
 		m_bits++;
-		
+
 		if (m_bits == 16)
 		{
 			write(m_address & 0x0f, m_data);
-			
+
 			m_state = STATE_IDLE;
 		}
 		break;
-		
+
 	case STATE_DATA_OUT:
 		if (LOG) logerror("NMC9306 '%s' Data Bit OUT %u\n", tag(), m_di);
-		
+
 		m_do = BIT(m_data, 15);
 		m_data <<= 1;
 		m_bits++;
-		
+
 		if (m_bits == 16)
 		{
 			m_state = STATE_IDLE;

@@ -1212,7 +1212,7 @@ static UINT64 expression_read_memory(void *param, const char *name, expression_s
 				break;
 			result = expression_read_memory_region(machine, name, address, size);
 			break;
-		
+
 		default:
 			break;
 	}
@@ -1383,7 +1383,7 @@ static void expression_write_memory(void *param, const char *name, expression_sp
 				break;
 			expression_write_memory_region(machine, name, address, size, data);
 			break;
-		
+
 		default:
 			break;
 	}

@@ -1853,9 +1853,9 @@ READ16_HANDLER( stmsp_speedup_r )
 		state->m_stmsp_sync[0][2] == 0 &&		/* 80030 */
 		state->m_stmsp_sync[0][3] == 0 &&		/* 80040 */
 		state->m_stmsp_sync[0][4] == 0 &&		/* 80050 */
-		state->m_stmsp_sync[0][5] == 0 && 		/* 80060 */
-		state->m_stmsp_sync[0][6] == 0 && 		/* 80070 */
-		state->m_stmsp_sync[1][0] == 0 && 		/* 99680 */
+		state->m_stmsp_sync[0][5] == 0 &&		/* 80060 */
+		state->m_stmsp_sync[0][6] == 0 &&		/* 80070 */
+		state->m_stmsp_sync[1][0] == 0 &&		/* 99680 */
 		state->m_stmsp_sync[2][0] == 0xffff &&	/* 99d30 */
 		state->m_stmsp_sync[2][1] == 0xffff &&	/* 99d40 */
 		state->m_stmsp_sync[2][2] == 0 &&		/* 99d50 */

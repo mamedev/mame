@@ -31,7 +31,7 @@ WRITE16_HANDLER( realbrk_flipscreen_w )
 		coin_counter_w(space->machine(), 0,	data & 0x0001);
 		coin_counter_w(space->machine(), 1,	data & 0x0004);
 
-		flip_screen_set(space->machine(), 	data & 0x0080);
+		flip_screen_set(space->machine(),	data & 0x0080);
 	}
 
 	if (ACCESSING_BITS_8_15)

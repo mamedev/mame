@@ -353,7 +353,7 @@ static WRITE64_HANDLER(unk4_w)
 	{
 		if (data & 0x800000)
 		{
-//			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->device().tag(), cpu_get_pc(&space->device()));
+//          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->device().tag(), cpu_get_pc(&space->device()));
 			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
@@ -433,11 +433,11 @@ static WRITE64_HANDLER(unk4000010_w)
 {
 	if ((data & 0xff) == 0xd)
 	{
-//		mame_printf_debug("\n");
+//      mame_printf_debug("\n");
 	}
 	else
 	{
-//		mame_printf_debug("%c", (UINT8)(data & 0xff));
+//      mame_printf_debug("%c", (UINT8)(data & 0xff));
 	}
 }
 
@@ -525,7 +525,7 @@ static void cde_handle_command(running_machine &machine)
 			state->m_cde_status_bytes[0] = 0x04;
 			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: SET SPEED %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2]);
+//          mame_printf_debug("CDE: SET SPEED %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2]);
 			break;
 		}
 		case 0x06:		// Audio Format / Data Format
@@ -537,11 +537,11 @@ static void cde_handle_command(running_machine &machine)
 
 			if (state->m_cde_command_bytes[1] == 0x00)		// Audio Format
 			{
-//				mame_printf_debug("CDE: AUDIO FORMAT\n");
+//              mame_printf_debug("CDE: AUDIO FORMAT\n");
 			}
 			else if (state->m_cde_command_bytes[1] == 0x78)	// Data Format
 			{
-//				mame_printf_debug("CDE: DATA FORMAT\n");
+//              mame_printf_debug("CDE: DATA FORMAT\n");
 			}
 			else
 			{
@@ -558,16 +558,16 @@ static void cde_handle_command(running_machine &machine)
 
 			if (state->m_cde_command_bytes[1] == 0x00)		// Eject
 			{
-//				mame_printf_debug("CDE: EJECT command\n");
+//              mame_printf_debug("CDE: EJECT command\n");
 			}
 			else if (state->m_cde_command_bytes[1] == 0x02)	// Pause
 			{
-//				mame_printf_debug("CDE: PAUSE command\n");
+//              mame_printf_debug("CDE: PAUSE command\n");
 				state->m_cde_drive_state = CDE_DRIVE_STATE_PAUSED;
 			}
 			else if (state->m_cde_command_bytes[1] == 0x03)	// Play
 			{
-//				mame_printf_debug("CDE: PLAY command\n");
+//              mame_printf_debug("CDE: PLAY command\n");
 			}
 			else
 			{
@@ -584,7 +584,7 @@ static void cde_handle_command(running_machine &machine)
 
 			state->m_cde_drive_state = CDE_DRIVE_STATE_SEEK_DONE;
 
-//			mame_printf_debug("CDE: SEEK %08X\n", (state->m_cde_command_bytes[1] << 16) | (state->m_cde_command_bytes[2] << 8) | (state->m_cde_command_bytes[3]));
+//          mame_printf_debug("CDE: SEEK %08X\n", (state->m_cde_command_bytes[1] << 16) | (state->m_cde_command_bytes[2] << 8) | (state->m_cde_command_bytes[3]));
 			break;
 		}
 		case 0x0b:		// Get Drive State
@@ -605,7 +605,7 @@ static void cde_handle_command(running_machine &machine)
 				state->m_cde_enable_seek_reports = 0;
 			}
 
-//			mame_printf_debug("CDE: GET DRIVE STATE %02X\n", state->m_cde_command_bytes[1]);
+//          mame_printf_debug("CDE: GET DRIVE STATE %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x0c:		// ?
@@ -625,7 +625,7 @@ static void cde_handle_command(running_machine &machine)
 				state->m_cde_enable_qchannel_reports = 0;
 			}
 
-//			mame_printf_debug("CDE: UNKNOWN CMD 0x0c %02X\n", state->m_cde_command_bytes[1]);
+//          mame_printf_debug("CDE: UNKNOWN CMD 0x0c %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x0d:		// Get Switch State
@@ -637,7 +637,7 @@ static void cde_handle_command(running_machine &machine)
 			state->m_cde_status_bytes[2] = 0x02;
 			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: GET SWITCH STATE %02X\n", state->m_cde_command_bytes[1]);
+//          mame_printf_debug("CDE: GET SWITCH STATE %02X\n", state->m_cde_command_bytes[1]);
 			break;
 		}
 		case 0x21:		// Mech type
@@ -655,7 +655,7 @@ static void cde_handle_command(running_machine &machine)
 
 			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: MECH TYPE %02X, %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2], state->m_cde_command_bytes[3]);
+//          mame_printf_debug("CDE: MECH TYPE %02X, %02X, %02X\n", state->m_cde_command_bytes[1], state->m_cde_command_bytes[2], state->m_cde_command_bytes[3]);
 			break;
 		}
 		case 0x83:		// Read ID
@@ -677,7 +677,7 @@ static void cde_handle_command(running_machine &machine)
 
 			state->m_cde_status_byte_ptr = 0;
 
-//			mame_printf_debug("CDE: READ ID\n");
+//          mame_printf_debug("CDE: READ ID\n");
 			break;
 		}
 		default:
@@ -704,7 +704,7 @@ static void cde_handle_reports(running_machine &machine)
 
 				state->m_cde_command_bytes[0] = 0x0c;
 
-//				mame_printf_debug("CDE: SEEK REPORT\n");
+//              mame_printf_debug("CDE: SEEK REPORT\n");
 			}
 			break;
 		}
@@ -800,7 +800,7 @@ static void cde_handle_reports(running_machine &machine)
 				state->m_cde_status_byte_ptr = 0;
 				state->m_cde_command_bytes[0] = 0x0c;
 
-//				mame_printf_debug("CDE: QCHANNEL REPORT\n");
+//              mame_printf_debug("CDE: QCHANNEL REPORT\n");
 				break;
 			}
 		}
@@ -961,7 +961,7 @@ static WRITE64_HANDLER(cde_w)
 
 		case 0x300/4:		// DMA Channel 0 enable
 		{
-//			mame_printf_debug("CDE: DMA0 enable %08X\n", d);
+//          mame_printf_debug("CDE: DMA0 enable %08X\n", d);
 
 			if (d & 0x20)
 			{
@@ -979,28 +979,28 @@ static WRITE64_HANDLER(cde_w)
 		}
 		case 0x308/4:		// DMA Channel 0 destination address
 		{
-//			mame_printf_debug("CDE: DMA0 dst addr %08X\n", d);
+//          mame_printf_debug("CDE: DMA0 dst addr %08X\n", d);
 
 			state->m_cde_dma[0].dst_addr = d;
 			break;
 		}
 		case 0x30c/4:		// DMA Channel 0 length?
 		{
-//			mame_printf_debug("CDE: DMA0 length %08X\n", d);
+//          mame_printf_debug("CDE: DMA0 length %08X\n", d);
 
 			state->m_cde_dma[0].length = d;
 			break;
 		}
 		case 0x318/4:		// DMA Channel 0 next destination address
 		{
-//			mame_printf_debug("CDE: DMA0 next dst addr %08X\n", d);
+//          mame_printf_debug("CDE: DMA0 next dst addr %08X\n", d);
 
 			state->m_cde_dma[0].next_dst_addr = d;
 			break;
 		}
 		case 0x31c/4:		// DMA Channel 0 next length?
 		{
-//			mame_printf_debug("CDE: DMA0 next length %08X\n", d);
+//          mame_printf_debug("CDE: DMA0 next length %08X\n", d);
 
 			state->m_cde_dma[0].next_length = d;
 			break;
@@ -1008,33 +1008,33 @@ static WRITE64_HANDLER(cde_w)
 
 		case 0x320/4:		// DMA Channel 1 enable
 		{
-//			mame_printf_debug("CDE: DMA1 enable %08X\n", d);
+//          mame_printf_debug("CDE: DMA1 enable %08X\n", d);
 			break;
 		}
 		case 0x328/4:		// DMA Channel 1 destination address
 		{
-//			mame_printf_debug("CDE: DMA1 dst addr %08X\n", d);
+//          mame_printf_debug("CDE: DMA1 dst addr %08X\n", d);
 
 			state->m_cde_dma[1].dst_addr = d;
 			break;
 		}
 		case 0x32c/4:		// DMA Channel 1 length?
 		{
-//			mame_printf_debug("CDE: DMA1 length %08X\n", d);
+//          mame_printf_debug("CDE: DMA1 length %08X\n", d);
 
 			state->m_cde_dma[1].length = d;
 			break;
 		}
 		case 0x338/4:		// DMA Channel 1 next destination address
 		{
-//			mame_printf_debug("CDE: DMA1 next dst addr %08X\n", d);
+//          mame_printf_debug("CDE: DMA1 next dst addr %08X\n", d);
 
 			state->m_cde_dma[1].next_dst_addr = d;
 			break;
 		}
 		case 0x33c/4:		// DMA Channel 1 next length?
 		{
-//			mame_printf_debug("CDE: DMA1 next length %08X\n", d);
+//          mame_printf_debug("CDE: DMA1 next length %08X\n", d);
 
 			state->m_cde_dma[1].next_length = d;
 			break;

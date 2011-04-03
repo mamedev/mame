@@ -23,7 +23,7 @@
     There is another Karnov rom set - a bootleg version of the Japanese roms with
     the Data East copyright removed - not supported because the original Japanese
     roms work fine.
-	^^ This should be added (DH, 30/03/11)
+    ^^ This should be added (DH, 30/03/11)
 
     One of the two color PROMs for chelnov and chelnoj is different; one is most
     likely a bad read, but I don't know which one.

@@ -3,7 +3,7 @@
     deco16ic.h
 
     Implementation of Data East tilemap ICs
-	Data East IC 55 / 56 / 74 / 141
+    Data East IC 55 / 56 / 74 / 141
 
 **************************************************************************/
 

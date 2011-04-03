@@ -849,7 +849,7 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 		{
 			int buflen = strlen(menustate->filename_buffer);
 			bool update_selected = FALSE;
-			
+
 			/* if it's a backspace and we can handle it, do so */
 			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
 			{
@@ -886,7 +886,7 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 							if (mame_strnicmp(entry->basename, menustate->filename_buffer, i) == 0)
 								match = i;
 						}
-						
+
 						if (match > bestmatch)
 						{
 							bestmatch = match;
@@ -905,7 +905,7 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 							if (mame_strnicmp(entry->basename, menustate->filename_buffer, i) == 0)
 								match = i;
 						}
-						
+
 						if (match > bestmatch)
 						{
 							bestmatch = match;
@@ -913,11 +913,11 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 						}
 					}
 				}
-					
+
 				if (selected_entry != NULL && selected_entry != cur_selected)
 					ui_menu_set_selection(menu, (void *) selected_entry);
 			}
-		}		
+		}
 	}
 }
 

@@ -28,11 +28,11 @@
 #define MSM6255_INTERFACE(name) \
 	const msm6255_interface (name) =
 
-	
+
 #define MSM6255_CHAR_RAM_READ(_name) \
 	UINT8 _name(device_t *device, UINT16 ma, UINT8 ra)
 
-	
+
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -105,9 +105,9 @@ private:
 	void draw_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra);
 	void update_graphics(bitmap_t *bitmap, const rectangle *cliprect);
 	void update_text(bitmap_t *bitmap, const rectangle *cliprect);
-	
+
 	screen_device *m_screen;
-	
+
 	UINT8 m_ir;						// instruction register
 	UINT8 m_mor;					// mode control register
 	UINT8 m_pr;						// character pitch register

@@ -74,10 +74,10 @@ class nmc9306_device :  public device_t,
     nmc9306_device(running_machine &_machine, const nmc9306_device_config &_config);
 
 public:
- 	DECLARE_WRITE_LINE_MEMBER( cs_w );
- 	DECLARE_WRITE_LINE_MEMBER( sk_w );
- 	DECLARE_WRITE_LINE_MEMBER( di_w );
- 	DECLARE_READ_LINE_MEMBER( do_r );
+	DECLARE_WRITE_LINE_MEMBER( cs_w );
+	DECLARE_WRITE_LINE_MEMBER( sk_w );
+	DECLARE_WRITE_LINE_MEMBER( di_w );
+	DECLARE_READ_LINE_MEMBER( do_r );
 
 protected:
     // device-level overrides
@@ -94,7 +94,7 @@ private:
 	inline void erase(offs_t offset);
 
 	UINT16 m_register[16];
-	
+
 	int m_bits;
 	int m_state;
 	UINT8 m_command;

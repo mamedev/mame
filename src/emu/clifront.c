@@ -185,7 +185,7 @@ int cli_execute(cli_options &options, osd_interface &osd, int argc, char **argv)
 			// if we failed, check for no command and a system name first; in that case error on the name
 			if (strlen(options.command()) == 0 && options.system() == NULL && strlen(options.system_name()) > 0)
 				throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "Unknown system '%s'", options.system_name());
-			
+
 			// otherwise, error on the options
 			throw emu_fatalerror(MAMERR_INVALID_CONFIG, "%s", option_errors.trimspace().cstr());
 		}
@@ -846,9 +846,9 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n"
 				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n"
 				// shared features get stored in the part->feature below and are output there
-				// this means that we don't output any <sharedfeat> and that -lsoft output will 
-				// be different from the list in hash/ when the list uses sharedfeat. But this 
-				// is by design: sharedfeat is only available to simplify the life to list creators, 
+				// this means that we don't output any <sharedfeat> and that -lsoft output will
+				// be different from the list in hash/ when the list uses sharedfeat. But this
+				// is by design: sharedfeat is only available to simplify the life to list creators,
 				// to e.g. avoid manually adding the same feature to each disk of a 9 floppies game!
 				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n"
 				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n"

@@ -14,12 +14,12 @@ public:
 
 	UINT16* m_pf1_rowscroll;
 	UINT16* m_pf2_rowscroll;
-	
+
 	UINT16* m_sprite_paletteram;
 	UINT16* m_sprite_paletteram2;
 	UINT16* m_tile_paletteram1;
 	UINT16* m_tile_paletteram2;
-	
+
 	required_device<deco16ic_device> m_deco_tilegen1;
 };
 

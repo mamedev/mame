@@ -175,10 +175,10 @@ private:
 
 	struct cache_entry
 	{
-		cache_entry(FPTR address, const char *symbol) : 
+		cache_entry(FPTR address, const char *symbol) :
 			m_next(NULL), m_address(address), m_name(symbol) { }
 		cache_entry *next() const { return m_next; }
-		
+
 		cache_entry *	m_next;
 		FPTR			m_address;
 		astring			m_name;

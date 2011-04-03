@@ -44,7 +44,7 @@ SCREEN_UPDATE( sshangha )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine()));
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);
-	
+
 	/* the tilemap 4bpp + 4bpp = 8bpp mixing actually seems external to the tilemap, note video_control is not part of the tilemap chip */
 	if ((state->m_video_control&4)==0) {
 		deco16ic_tilemap_12_combine_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 0, 1);

@@ -36,7 +36,7 @@ public:
 	int              m_sndpending;
 	int              m_snd_toggle;
 	INT32            m_fade_effect;
-	INT32 			 m_old_fade;
+	INT32			 m_old_fade;
 
 	/* devices */
 	device_t *m_maincpu;

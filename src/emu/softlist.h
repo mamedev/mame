@@ -44,7 +44,7 @@ struct software_info
 	const char *year;			// Copyright year on title screen, actual release dates can be tracked in external resources
 	const char *publisher;
 	feature_list *other_info;	// Here we store info like developer, serial #, etc. which belong to the software entry as a whole
-	feature_list *shared_info;	// Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited 
+	feature_list *shared_info;	// Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
 								// by each part of this software entry (after loading these are stored in partdata->featurelist)
 	UINT32 supported;
 	software_part *partdata;

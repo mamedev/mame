@@ -22,7 +22,7 @@ class deco_bac06_device : public device_t
 	deco_bac06_device(running_machine &_machine, const deco_bac06_device_config &config);
 public:
 	void set_gfxregion(int region8x8, int region16x16) { m_gfxregion8x8 = region8x8; m_gfxregion16x16 = region16x16; };
-	
+
 
 	UINT16* pf_data;
 	UINT16* pf_rowscroll, *pf_colscroll;
@@ -65,7 +65,7 @@ protected:
 							const UINT16 *control1,
 							int flags,
 							UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
-							
+
 private:
 
 

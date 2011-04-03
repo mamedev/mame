@@ -313,7 +313,7 @@ VIDEO_START( cobracom )
 	state->m_game_uses_priority = 0;
 	machine.device<deco_bac06_device>("tilegen1")->set_colmask(0x3);
 	machine.device<deco_bac06_device>("tilegen2")->set_colmask(0x3);
-	
+
 }
 
 /******************************************************************************/

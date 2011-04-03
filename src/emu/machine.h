@@ -348,7 +348,7 @@ public:
 	int sample_rate() const { return m_sample_rate; }
 	bool save_or_load_pending() const { return m_saveload_pending_file; }
 	screen_device *first_screen() const { return primary_screen; }
-	
+
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
 	memory_region *first_region() const { return m_regionlist.first(); }
@@ -442,7 +442,7 @@ private:
 
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
-	
+
 	// internal state
 	const machine_config &	m_config;				// reference to the constructed machine_config
 	const game_driver &		m_system;				// reference to the definition of the game machine
@@ -501,7 +501,7 @@ private:
 
 		// getters
 		notifier_callback_item *next() const { return m_next; }
-		
+
 		// state
 		notifier_callback_item *	m_next;
 		notify_callback				m_func;
@@ -514,10 +514,10 @@ private:
 	public:
 		// construction/destruction
 		logerror_callback_item(logerror_callback func);
-		
+
 		// getters
 		logerror_callback_item *next() const { return m_next; }
-		
+
 		// state
 		logerror_callback_item *	m_next;
 		logerror_callback			m_func;

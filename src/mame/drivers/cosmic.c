@@ -56,8 +56,8 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	{
 		switch (offset)
 		{
-		case 0:	if (data) sample_start(state->m_samples, 0, 0, 0); break; 	/* Walk */
-		case 1:	if (data) sample_start(state->m_samples, 0, 5, 0); break; 	/* Enemy Die 1 */
+		case 0:	if (data) sample_start(state->m_samples, 0, 0, 0); break;	/* Walk */
+		case 1:	if (data) sample_start(state->m_samples, 0, 5, 0); break;	/* Enemy Die 1 */
 		case 2:	if (data)									/* Drop 1 */
 				{
 					if (!sample_playing(state->m_samples, 1))

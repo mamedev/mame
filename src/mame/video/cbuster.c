@@ -54,7 +54,7 @@ SCREEN_UPDATE( twocrude )
 
 	flip_screen_set(screen->machine(), !BIT(flip, 7));
 
-	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffer, 0x400); 
+	screen->machine().device<decospr_device>("spritegen")->draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram16_buffer, 0x400);
 
 
 	deco16ic_pf_update(state->m_deco_tilegen1, state->m_pf1_rowscroll, state->m_pf2_rowscroll);

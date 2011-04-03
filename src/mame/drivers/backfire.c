@@ -72,7 +72,7 @@ static VIDEO_START( backfire )
 
 	state->m_left =  auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	state->m_right = auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
-	
+
 	state->save_pointer(NAME(state->m_spriteram_1), 0x2000/2);
 	state->save_pointer(NAME(state->m_spriteram_2), 0x2000/2);
 

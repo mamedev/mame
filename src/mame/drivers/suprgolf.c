@@ -257,7 +257,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
-//	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
+//  mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
 	memory_set_bankptr(space->machine(), "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	state->m_msm_nmi_mask = data & 0x40;
@@ -267,7 +267,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = space->machine().region("user2")->base();
-//	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
+//  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
 
 	memory_set_bankptr(space->machine(), "bank1", region_base + (data&0x0f ) * 0x4000);
 

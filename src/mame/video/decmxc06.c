@@ -91,7 +91,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 		w = (1 << ((sy & 0x0600) >>  9));	/* 1x, 2x, 4x, 8x width */
 		/* multi width used only on the title screen? */
 
-	
+
 
 		sx = sx & 0x01ff;
 		sy = sy & 0x01ff;
@@ -100,7 +100,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 		sx = 240 - sx;
 		sy = 240 - sy;
 
-	
+
 		if (flip_screen_get(machine))
 		{
 			sy = 240 - sy;
@@ -118,7 +118,7 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 			code = spriteram[offs + 1] & 0x1fff;
 
 			code &= ~(h-1);
-		
+
 			if (flipy)
 				incy = -1;
 			else
@@ -146,14 +146,14 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_t *bitmap
 						{
 							if (pri_mask && (color >= pri_val))
 								continue;
-				
+
 							if (!pri_mask && !(color >= pri_val))
 								continue;
 
 							draw = 1;
 						}
 					}
-					
+
 					if (draw)
 					{
 						drawgfx_transpen(bitmap,cliprect,machine.gfx[m_gfxregion],

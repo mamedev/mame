@@ -89,7 +89,7 @@ void e0516_device::device_start()
 	// allocate timers
 	m_timer = timer_alloc();
 	m_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
-	
+
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_clk));
@@ -165,7 +165,7 @@ void e0516_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 WRITE_LINE_MEMBER( e0516_device::cs_w )
 {
 	m_cs = state;
-	
+
 	if (m_cs)
 	{
 		m_data_latch = 0;
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 WRITE_LINE_MEMBER( e0516_device::clk_w )
 {
 	m_clk = state;
-	
+
 	if (m_cs || m_clk) return;
 
 	m_bits++;
@@ -215,7 +215,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 		{
 			// read
 			if (LOG) logerror("E05-16 '%s' Data Bit OUT %u\n", tag(), m_dio);
-			
+
 			m_dio = BIT(m_data_latch, 0);
 			m_data_latch >>= 1;
 		}

@@ -1,6 +1,6 @@
 /* Common DECO video functions (general, not sorted by IC) */
 /* I think most of this stuff is driver specific and really shouldn't be in a device at all.
-   It was only put here because I wanted to split deco_tilegen1 to just be the device for the 
+   It was only put here because I wanted to split deco_tilegen1 to just be the device for the
    tilemap chips, and not contain all this extra unrelated stuff */
 
 

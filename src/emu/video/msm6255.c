@@ -93,7 +93,7 @@ void msm6255_device_config::device_config_complete()
 	if (intf != NULL)
 	{
 		*static_cast<msm6255_interface *>(this) = *intf;
-		
+
 		m_char_ram_r = intf->m_char_ram_r;
 	}
 	// or initialize to defaults if none provided
@@ -178,7 +178,7 @@ void msm6255_device::device_reset()
 READ8_MEMBER( msm6255_device::read )
 {
 	UINT8 data = 0;
-	
+
 	if (offset & 0x01)
 	{
 		return m_ir;
@@ -222,7 +222,7 @@ READ8_MEMBER( msm6255_device::read )
 			break;
 		}
 	}
-	
+
 	return data;
 }
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER( msm6255_device::write )
 
 
 //-------------------------------------------------
-//  update_cursor - 
+//  update_cursor -
 //-------------------------------------------------
 
 void msm6255_device::update_cursor()
@@ -329,7 +329,7 @@ void msm6255_device::update_cursor()
 
 
 //-------------------------------------------------
-//  draw_scanline - 
+//  draw_scanline -
 //-------------------------------------------------
 
 void msm6255_device::draw_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 ma, UINT8 ra)
@@ -370,7 +370,7 @@ void msm6255_device::draw_scanline(bitmap_t *bitmap, const rectangle *cliprect, 
 
 
 //-------------------------------------------------
-//  update_graphics - 
+//  update_graphics -
 //-------------------------------------------------
 
 void msm6255_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect)
@@ -398,7 +398,7 @@ void msm6255_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 
 
 //-------------------------------------------------
-//  update_text - 
+//  update_text -
 //-------------------------------------------------
 
 void msm6255_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)

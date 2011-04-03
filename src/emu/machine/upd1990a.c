@@ -86,7 +86,7 @@ void upd1990a_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  convert_to_bcd - 
+//  convert_to_bcd -
 //-------------------------------------------------
 
 inline UINT8 upd1990a_device::convert_to_bcd(int val)
@@ -96,7 +96,7 @@ inline UINT8 upd1990a_device::convert_to_bcd(int val)
 
 
 //-------------------------------------------------
-//  bcd_to_integer - 
+//  bcd_to_integer -
 //-------------------------------------------------
 
 inline int upd1990a_device::bcd_to_integer(UINT8 val)
@@ -106,7 +106,7 @@ inline int upd1990a_device::bcd_to_integer(UINT8 val)
 
 
 //-------------------------------------------------
-//  advance_seconds - 
+//  advance_seconds -
 //-------------------------------------------------
 
 inline void upd1990a_device::advance_seconds()
@@ -263,7 +263,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  oe_w - 
+//  oe_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::oe_w )
@@ -275,7 +275,7 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 
 
 //-------------------------------------------------
-//  cs_w - 
+//  cs_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::cs_w )
@@ -287,7 +287,7 @@ WRITE_LINE_MEMBER( upd1990a_device::cs_w )
 
 
 //-------------------------------------------------
-//  stb_w - 
+//  stb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::stb_w )
@@ -425,7 +425,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 
 //-------------------------------------------------
-//  clk_w - 
+//  clk_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::clk_w )
@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 
 
 //-------------------------------------------------
-//  c0_w - 
+//  c0_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::c0_w )
@@ -479,7 +479,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c0_w )
 
 
 //-------------------------------------------------
-//  c1_w - 
+//  c1_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::c1_w )
@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c1_w )
 
 
 //-------------------------------------------------
-//  c2_w - 
+//  c2_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::c2_w )
@@ -503,7 +503,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c2_w )
 
 
 //-------------------------------------------------
-//  data_in_w - 
+//  data_in_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
@@ -515,7 +515,7 @@ WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
 
 
 //-------------------------------------------------
-//  data_out_r - 
+//  data_out_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd1990a_device::data_out_r )
@@ -525,7 +525,7 @@ READ_LINE_MEMBER( upd1990a_device::data_out_r )
 
 
 //-------------------------------------------------
-//  tp_r - 
+//  tp_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd1990a_device::tp_r )

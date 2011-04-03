@@ -293,7 +293,7 @@ static const deco16ic_interface funkyjet_deco16ic_tilegen1_intf =
 	0x0f, 0x0f,	/* trans masks (default values) */
 	0, 16, /* color base (default values) */
 	0x0f, 0x0f, /* color masks (default values) */
-	NULL, NULL, 
+	NULL, NULL,
 	0,1,
 };
 

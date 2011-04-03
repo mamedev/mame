@@ -166,13 +166,13 @@ enum
 
 // master interrupt control register
 #define MICR_RESET		0x01	// reset
-#define MICR_RJA 		0x02	// right justified address
+#define MICR_RJA		0x02	// right justified address
 #define MICR_CT_VIS		0x04	// counter/timer vector includes status
 #define MICR_PB_VIS		0x08	// port B vector includes status
 #define MICR_PA_VIS		0x10	// port A vector includes status
 #define MICR_NV 		0x20	// no vector
-#define MICR_DLC 		0x40	// disable lower chain
-#define MICR_MIE 		0x80	// master interrupt enable
+#define MICR_DLC		0x40	// disable lower chain
+#define MICR_MIE		0x80	// master interrupt enable
 
 
 // master configuration control register
@@ -287,7 +287,7 @@ void z8536_device_config::device_config_complete()
 inline UINT8 z8536_device::read_register(offs_t offset)
 {
 	UINT8 data = 0;
-	
+
 	data = m_register[offset]; // HACK
 
 	switch (offset)
@@ -295,19 +295,19 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 	case PORT_A_DATA:
 		data = devcb_call_read8(&m_in_pa_func, 0);
 		break;
-		
+
 	case PORT_B_DATA:
 		data = devcb_call_read8(&m_in_pb_func, 0);
 		break;
-		
+
 	case PORT_C_DATA:
 		data = 0xf0 | (devcb_call_read8(&m_in_pc_func, 0) & 0x0f);
 		break;
-		
+
 	default:
 		logerror("Z8536 '%s' Unimplemented read from register %u\n", tag(), offset);
 	}
-	
+
 	return data;
 }
 
@@ -340,29 +340,29 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 			m_state = STATE_0;
 		}
 		break;
-		
+
 	case PORT_A_DATA:
 		devcb_call_write8(&m_out_pa_func, 0, data);
 		break;
-		
+
 	case PORT_B_DATA:
 		devcb_call_write8(&m_out_pb_func, 0, data);
 		break;
-		
+
 	case PORT_C_DATA:
 		{
 		UINT8 mask = (data & 0xf0) | (data >> 4);
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
-		
+
 		devcb_call_write8(&m_out_pc_func, 0, m_output[PORT_C]);
 		}
 		break;
-		
+
 	default:
 		logerror("Z8536 '%s' Unimplemented write %02x to register %u\n", tag(), data, offset);
 	}
-	
+
 	m_register[offset] = data; // HACK
 }
 
@@ -374,13 +374,13 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 inline void z8536_device::write_register(offs_t offset, UINT8 data, UINT8 mask)
 {
 	UINT8 combined_data = (data & mask) | (m_register[offset] & (mask ^ 0xff));
-	
+
 	write_register(offset, combined_data);
 }
 
 
 //-------------------------------------------------
-//   count - 
+//   count -
 //-------------------------------------------------
 
 inline void z8536_device::count(device_timer_id id)
@@ -389,7 +389,7 @@ inline void z8536_device::count(device_timer_id id)
 
 
 //-------------------------------------------------
-//  trigger - 
+//  trigger -
 //-------------------------------------------------
 
 inline void z8536_device::trigger(device_timer_id id)
@@ -398,7 +398,7 @@ inline void z8536_device::trigger(device_timer_id id)
 
 
 //-------------------------------------------------
-//  gate - 
+//  gate -
 //-------------------------------------------------
 
 inline void z8536_device::gate(device_timer_id id)
@@ -432,7 +432,7 @@ void z8536_device::device_start()
 	m_timer[TIMER_1] = timer_alloc(TIMER_1);
 	m_timer[TIMER_2] = timer_alloc(TIMER_2);
 	m_timer[TIMER_3] = timer_alloc(TIMER_3);
-		
+
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
 	devcb_resolve_read8(&m_in_pa_func, &m_config.m_in_pa_func, this);
@@ -451,12 +451,12 @@ void z8536_device::device_start()
 void z8536_device::device_reset()
 {
 	m_state = STATE_RESET;
-	
+
 	for (int i = 0; i < 48; i++)
 	{
 		m_register[i] = 0;
 	}
-	
+
 	m_register[MASTER_INTERRUPT_CONTROL] = MICR_RESET;
 	m_pointer = 0;
 }
@@ -473,11 +473,11 @@ void z8536_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case TIMER_1:
 		count(TIMER_1);
 		break;
-		
+
 	case TIMER_2:
 		count(TIMER_2);
 		break;
-		
+
 	case TIMER_3:
 		count(TIMER_3);
 		break;
@@ -527,7 +527,7 @@ READ8_MEMBER( z8536_device::read )
 			break;
 		}
 	}
-	
+
 	return data;
 }
 
