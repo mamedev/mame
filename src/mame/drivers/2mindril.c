@@ -13,7 +13,7 @@ TODO:
  - simulate the sensors (there are still some shutter errors/defender errors that pops up)
  - Hook-up timers for shutter/defender sensors (check service mode)
  - Dip-Switches
- - find video control regs (layer enable, scroll)
+ - This HW uses the same video chip as Taito F3, convert the driver by using that;
 
 BG scroll:
 BG maps are 2048x256 (128x16 16x16 tiles).
@@ -34,10 +34,10 @@ looks like regs @460000 are used,  pairs at N, and N+8, so
 
  Sound            - Yamaha YM2610B
 
- Taito custom ICs - TC0400YSC
-                  - TC0260DAR
-                  - TC0630FDP
-                  - TC0510NI0
+ Taito custom ICs - TC0400YSC (m68k -> ym2610 communication)
+                  - TC0260DAR (palette chip)
+                  - TC0630FDP (Taito F3 video chip)
+                  - TC0510NIO (known input chip)
 
 DAC               -26.6860Mhz
                   -32.0000Mhz
@@ -62,9 +62,15 @@ public:
 	UINT16 *      m_map4ram;
 	UINT16 *      m_charram;
 	UINT16 *      m_textram;
-	UINT16 *      m_unkram;
+	UINT16 *      m_vregs;
 //  UINT16 *      m_paletteram;   // currently this uses generic palette handling
 	UINT16 *      m_iodata;
+
+	tilemap_t *m_map1_tilemap;
+	tilemap_t *m_map2_tilemap;
+	tilemap_t *m_map3_tilemap;
+	tilemap_t *m_map4_tilemap;
+	tilemap_t *m_tx_tilemap;
 
 	/* input-related */
 	UINT16        m_defender_sensor;
@@ -74,59 +80,190 @@ public:
 	device_t *m_maincpu;
 };
 
-
-
-#define DRAW_MAP(map,num)	\
-			{	int x, y; \
-				for (y = 0; y < 16; y++) \
-					for (x = 0; x < 128; x++) \
-					{ \
-						UINT16 data0 = map[y * 128 + x * 2]; \
-						UINT16 data1 = map[y * 128 + x * 2 + 1]; \
-						drawgfx_transpen(bitmap, \
-							cliprect,screen->machine().gfx[0], data1, \
-							data0 & 0xff, \
-							data0 & 0x4000, data0 & 0x8000, \
-							x * 16 - 512 /*+(((INT16)(state->m_unkram[0x60000 / 2 + num])) / 32)*/, \
-							y * 16 /*+(((INT16)(state->m_unkram[0x60008 / 2 + num])) / 32)*/,0); \
-					}	\
-			}
-
-static SCREEN_UPDATE( drill )
+/*
+[0]
+x--- ---- ---- ---- flip y
+-x-- ---- ---- ---- flip x
+---- ---- xxxx xxxx color
+[1]
+xxxx xxxx xxxx xxxx tile number
+*/
+static TILE_GET_INFO( get_map1_tile_info )
 {
-	_2mindril_state *state = screen->machine().driver_data<_2mindril_state>();
-	bitmap_fill(bitmap, NULL, 0);
+	_2mindril_state *state = machine.driver_data<_2mindril_state>();
+	int tile = state->m_map1ram[tile_index*2+1] & 0xffff;
+	int color = state->m_map1ram[tile_index*2+0] & 0xff;
+	UINT8 flipxy = (state->m_map1ram[tile_index*2+0] & 0xc000) >> 14;
 
-	DRAW_MAP(state->m_map1ram, 0)
-	DRAW_MAP(state->m_map2ram, 1)
-	DRAW_MAP(state->m_map3ram, 2)
-	DRAW_MAP(state->m_map4ram, 3)
+	SET_TILE_INFO(
+			0,
+			tile,
+			color,
+			TILE_FLIPYX(flipxy));
+}
 
-	{
-		int x, y;
-		for (y = 0; y < 64; y++)
-			for(x = 0; x < 64; x++)
-			{
-				drawgfx_transpen(	bitmap,
-						cliprect,
-						screen->machine().gfx[1],
-						state->m_textram[y * 64 + x] & 0xff, //1ff ??
-						((state->m_textram[y * 64 + x] >> 9) & 0xf),
-						0, 0,
-						x*8,y*8,0);
-			}
-	}
-	/*printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", state->m_unkram[0x60000 / 2], state->m_unkram[0x60000 / 2 + 1], state->m_unkram[0x60000 / 2 + 2],
-                                    state->m_unkram[0x60000 / 2 + 3], state->m_unkram[0x60000 / 2 + 4], state->m_unkram[0x60000 / 2 + 5]);*/
-	return 0;
+static TILE_GET_INFO( get_map2_tile_info )
+{
+	_2mindril_state *state = machine.driver_data<_2mindril_state>();
+	int tile = state->m_map2ram[tile_index*2+1] & 0xffff;
+	int color = state->m_map2ram[tile_index*2+0] & 0xff;
+	UINT8 flipxy = (state->m_map2ram[tile_index*2+0] & 0xc000) >> 14;
+
+	SET_TILE_INFO(
+			0,
+			tile,
+			color,
+			TILE_FLIPYX(flipxy));
+}
+
+static TILE_GET_INFO( get_map3_tile_info )
+{
+	_2mindril_state *state = machine.driver_data<_2mindril_state>();
+	int tile = state->m_map3ram[tile_index*2+1] & 0xffff;
+	int color = state->m_map3ram[tile_index*2+0] & 0xff;
+	UINT8 flipxy = (state->m_map3ram[tile_index*2+0] & 0xc000) >> 14;
+
+	SET_TILE_INFO(
+			0,
+			tile,
+			color,
+			TILE_FLIPYX(flipxy));
+}
+
+static TILE_GET_INFO( get_map4_tile_info )
+{
+	_2mindril_state *state = machine.driver_data<_2mindril_state>();
+	int tile = state->m_map4ram[tile_index*2+1] & 0xffff;
+	int color = state->m_map4ram[tile_index*2+0] & 0xff;
+	UINT8 flipxy = (state->m_map4ram[tile_index*2+0] & 0xc000) >> 14;
+
+	SET_TILE_INFO(
+			0,
+			tile,
+			color,
+			TILE_FLIPYX(flipxy));
+}
+
+/*
+xxxx xxx- ---- ---- color
+---- ---- xxxx xxxx tile number
+*/
+static TILE_GET_INFO( get_tx_tile_info )
+{
+	_2mindril_state *state = machine.driver_data<_2mindril_state>();
+	int tile = state->m_textram[tile_index] & 0xff;
+	int color = (state->m_textram[tile_index] & 0xfe00) >> 9;
+
+	SET_TILE_INFO(
+			1,
+			tile,
+			color,
+			0);
+}
+
+static WRITE16_HANDLER( map1vram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_map1ram[offset]);
+	tilemap_mark_tile_dirty(state->m_map1_tilemap,offset >> 1);
+}
+
+static WRITE16_HANDLER( map2vram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_map2ram[offset]);
+	tilemap_mark_tile_dirty(state->m_map2_tilemap,offset >> 1);
+}
+
+static WRITE16_HANDLER( map3vram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_map3ram[offset]);
+	tilemap_mark_tile_dirty(state->m_map3_tilemap,offset >> 1);
+}
+
+static WRITE16_HANDLER( map4vram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_map4ram[offset]);
+	tilemap_mark_tile_dirty(state->m_map4_tilemap,offset >> 1);
+}
+
+static WRITE16_HANDLER( tvram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_textram[offset]);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap,offset);
+}
+
+static WRITE16_HANDLER( charram_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_charram[offset]);
+	gfx_element_mark_dirty(space->machine().gfx[1], offset / 16);
+}
+
+static WRITE16_HANDLER( vregs_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+
+	COMBINE_DATA(&state->m_vregs[offset]);
+
+	//popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",state->m_vregs[0x0/2] & 0x7fff,state->m_vregs[0x2/2]& 0x7fff,state->m_vregs[0x4/2]& 0x7fff,state->m_vregs[0x6/2]& 0x7fff,
+	//                  state->m_vregs[0x8/2],state->m_vregs[0xa/2],state->m_vregs[0xc/2],state->m_vregs[0xe/2]);
+	popmessage("%04x %04x",state->m_vregs[0x18/2],state->m_vregs[0x1a/2]);
 }
 
 static VIDEO_START( drill )
 {
 	_2mindril_state *state = machine.driver_data<_2mindril_state>();
 
+	state->m_map1_tilemap = tilemap_create(machine, get_map1_tile_info,tilemap_scan_rows,16,16,64,32);
+	state->m_map2_tilemap = tilemap_create(machine, get_map2_tile_info,tilemap_scan_rows,16,16,64,32);
+	state->m_map3_tilemap = tilemap_create(machine, get_map3_tile_info,tilemap_scan_rows,16,16,64,32);
+	state->m_map4_tilemap = tilemap_create(machine, get_map4_tile_info,tilemap_scan_rows,16,16,64,32);
+	state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,64,64);
+
 	machine.gfx[0]->color_granularity = 16;
 	gfx_element_set_source(machine.gfx[1], (UINT8 *)state->m_charram);
+
+	tilemap_set_transparent_pen(state->m_map1_tilemap,0);
+	tilemap_set_transparent_pen(state->m_map2_tilemap,0);
+	tilemap_set_transparent_pen(state->m_map3_tilemap,0);
+	tilemap_set_transparent_pen(state->m_map4_tilemap,0);
+	tilemap_set_transparent_pen(state->m_tx_tilemap,0);
+}
+
+
+static SCREEN_UPDATE( drill )
+{
+	_2mindril_state *state = screen->machine().driver_data<_2mindril_state>();
+	bitmap_fill(bitmap, NULL, 0);
+
+//	tilemap_set_scrollx(state->m_map1_tilemap, 0, (state->m_vregs[0x0/2] & 0x003f) << 10);
+//	tilemap_set_scrollx(state->m_map2_tilemap, 0, (0xffff-state->m_vregs[0x2/2]) >> 6);
+//	tilemap_set_scrollx(state->m_map3_tilemap, 0, (0xffff-state->m_vregs[0x4/2]) >> 6);
+//	tilemap_set_scrollx(state->m_map4_tilemap, 0, (0xffff-state->m_vregs[0x6/2]) >> 6);
+	tilemap_set_scrolly(state->m_map1_tilemap, 0, state->m_vregs[0x8/2] >> 7);
+	tilemap_set_scrolly(state->m_map2_tilemap, 0, state->m_vregs[0xa/2] >> 7);
+	tilemap_set_scrolly(state->m_map3_tilemap, 0, state->m_vregs[0xc/2] >> 7);
+	tilemap_set_scrolly(state->m_map4_tilemap, 0, state->m_vregs[0xe/2] >> 7);
+
+//state->m_vregs[0x8/2],state->m_vregs[0xa/2],state->m_vregs[0xc/2],state->m_vregs[0xe/2
+
+	tilemap_draw(bitmap,cliprect,state->m_map1_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_map2_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_map3_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_map4_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->m_tx_tilemap,0,0);
+
+	return 0;
 }
 
 static READ16_HANDLER( drill_io_r )
@@ -235,30 +372,26 @@ static WRITE16_HANDLER( sensors_w )
 	}
 }
 
-static WRITE16_HANDLER( charram_w )
-{
-	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
-
-	COMBINE_DATA(&state->m_charram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[1], offset / 16);
-}
-
 static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM
-	AM_RANGE(0x410000, 0x411fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map1ram)
-	AM_RANGE(0x412000, 0x413fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map2ram)
-	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map3ram)
-	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_map4ram)
-	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_textram)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+	AM_RANGE(0x410000, 0x411fff) AM_RAM_WRITE(map1vram_w) AM_BASE_MEMBER(_2mindril_state, m_map1ram)
+	AM_RANGE(0x412000, 0x413fff) AM_RAM_WRITE(map2vram_w) AM_BASE_MEMBER(_2mindril_state, m_map2ram)
+	AM_RANGE(0x414000, 0x415fff) AM_RAM_WRITE(map3vram_w) AM_BASE_MEMBER(_2mindril_state, m_map3ram)
+	AM_RANGE(0x416000, 0x417fff) AM_RAM_WRITE(map4vram_w) AM_BASE_MEMBER(_2mindril_state, m_map4ram)
+	AM_RANGE(0x41c000, 0x41dfff) AM_RAM_WRITE(tvram_w) AM_BASE_MEMBER(_2mindril_state, m_textram)
 	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(_2mindril_state, m_charram)
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_unkram)// video stuff, 460000 - video regs ?
+	AM_RANGE(0x420000, 0x42ffff) AM_RAM
+	AM_RANGE(0x430000, 0x43ffff) AM_RAM
+	AM_RANGE(0x460000, 0x46001f) AM_RAM_WRITE(vregs_w) AM_BASE_MEMBER(_2mindril_state, m_vregs)
+//	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(_2mindril_state, m_unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x503fff) AM_RAM
+	AM_RANGE(0x502000, 0x503fff) AM_RAM // presumably more paletteram
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_r, ym2610_w, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_RAM
-	AM_RANGE(0x60000e, 0x60000f) AM_RAM
+	AM_RANGE(0x60000c, 0x60000d) AM_RAM // check me
+	AM_RANGE(0x60000e, 0x60000f) AM_RAM // check me
 	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, m_iodata) // i/o
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
@@ -396,8 +529,8 @@ static const gfx_layout vramlayout=
     256,
     4,
     { 0, 1, 2, 3 },
-    {20,16,28,24,4,0,12,8},
-	  { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+    { 20, 16, 28, 24, 4, 0, 12, 8 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
     32*8
 };
 
