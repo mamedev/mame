@@ -62,8 +62,8 @@ public:
 	tilemap_t *m_pixel_layer;
 	tilemap_t *m_vram_layer;
 	UINT32 *m_spriteram32_buffered;
-	UINT32 m_f3_control_0[8];
-	UINT32 m_f3_control_1[8];
+	UINT16 m_f3_control_0[8];
+	UINT16 m_f3_control_1[8];
 	int m_flipscreen;
 	UINT8 m_sprite_extra_planes;
 	UINT8 m_sprite_pen_mask;
@@ -193,8 +193,8 @@ VIDEO_START( f3 );
 SCREEN_UPDATE( f3 );
 SCREEN_EOF( f3 );
 
-WRITE32_HANDLER( f3_control_0_w );
-WRITE32_HANDLER( f3_control_1_w );
+WRITE16_HANDLER( f3_control_0_w );
+WRITE16_HANDLER( f3_control_1_w );
 WRITE32_HANDLER( f3_palette_24bit_w );
 WRITE32_HANDLER( f3_pf_data_w );
 WRITE32_HANDLER( f3_vram_w );

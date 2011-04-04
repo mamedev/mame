@@ -325,6 +325,7 @@ static void init_alpha_blend_func(running_machine &machine);
 
 /******************************************************************************/
 
+/* TODO: fix shifting there */
 static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
@@ -708,13 +709,13 @@ WRITE32_HANDLER( f3_pf_data_w )
 	}
 }
 
-WRITE32_HANDLER( f3_control_0_w )
+WRITE16_HANDLER( f3_control_0_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_control_0[offset]);
 }
 
-WRITE32_HANDLER( f3_control_1_w )
+WRITE16_HANDLER( f3_control_1_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_control_1[offset]);
@@ -3165,21 +3166,21 @@ SCREEN_UPDATE( f3 )
 	tilemap_set_flip_all(screen->machine(),state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */
-	sy_fix[0]=((state->m_f3_control_0[2]&0xffff0000)>> 7) + (1<<16);
-	sy_fix[1]=((state->m_f3_control_0[2]&0x0000ffff)<< 9) + (1<<16);
-	sy_fix[2]=((state->m_f3_control_0[3]&0xffff0000)>> 7) + (1<<16);
-	sy_fix[3]=((state->m_f3_control_0[3]&0x0000ffff)<< 9) + (1<<16);
-	sx_fix[0]=((state->m_f3_control_0[0]&0xffc00000)>> 6) - (6<<16);
-	sx_fix[1]=((state->m_f3_control_0[0]&0x0000ffc0)<<10) - (10<<16);
-	sx_fix[2]=((state->m_f3_control_0[1]&0xffc00000)>> 6) - (14<<16);
-	sx_fix[3]=((state->m_f3_control_0[1]&0x0000ffc0)<<10) - (18<<16);
-	sx_fix[4]=-(state->m_f3_control_1[2]>>16)+41;
-	sy_fix[4]=-(state->m_f3_control_1[2]&0x1ff);
+	sy_fix[0]=((state->m_f3_control_0[4]&0xffff)<< 9) + (1<<16);
+	sy_fix[1]=((state->m_f3_control_0[5]&0xffff)<< 9) + (1<<16);
+	sy_fix[2]=((state->m_f3_control_0[6]&0xffff)<< 9) + (1<<16);
+	sy_fix[3]=((state->m_f3_control_0[7]&0xffff)<< 9) + (1<<16);
+	sx_fix[0]=((state->m_f3_control_0[0]&0xffc0)<<10) - (6<<16);
+	sx_fix[1]=((state->m_f3_control_0[1]&0xffc0)<<10) - (10<<16);
+	sx_fix[2]=((state->m_f3_control_0[2]&0xffc0)<<10) - (14<<16);
+	sx_fix[3]=((state->m_f3_control_0[3]&0xffc0)<<10) - (18<<16);
+	sx_fix[4]=-(state->m_f3_control_1[4])+41;
+	sy_fix[4]=-(state->m_f3_control_1[5]&0x1ff);
 
-	sx_fix[0]-=((state->m_f3_control_0[0]&0x003f0000)>> 6)+0x0400-0x10000;
-	sx_fix[1]-=((state->m_f3_control_0[0]&0x0000003f)<<10)+0x0400-0x10000;
-	sx_fix[2]-=((state->m_f3_control_0[1]&0x003f0000)>> 6)+0x0400-0x10000;
-	sx_fix[3]-=((state->m_f3_control_0[1]&0x0000003f)<<10)+0x0400-0x10000;
+	sx_fix[0]-=((state->m_f3_control_0[0]&0x003f)<<10)+0x0400-0x10000;
+	sx_fix[1]-=((state->m_f3_control_0[1]&0x003f)<<10)+0x0400-0x10000;
+	sx_fix[2]-=((state->m_f3_control_0[2]&0x003f)<<10)+0x0400-0x10000;
+	sx_fix[3]-=((state->m_f3_control_0[3]&0x003f)<<10)+0x0400-0x10000;
 
 	if (state->m_flipscreen)
 	{

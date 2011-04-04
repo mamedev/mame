@@ -16,12 +16,13 @@
     - Sound doesn't work in RidingF/RingRage?
       (for RingRage it's probably a timing / cpu sync bug, if you go into test mode
        for a while then exit you'll have sound, this doesn't work on RidingF)
-    - It does work in ringrage but you have to enter test mode first
+      \- It does work in ringrage but you have to enter test mode first
     - Sound balance is not emulated (see arabianm test mode)
     - When playing space invaders dx in original mode, t.t. with overlay, the
     alpha blending effect is wrong (see Taito B version of game)
     - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
     - Various other missing blending effects (see Mametesters)
+    - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
 
     Feel free to report any other issues to me.
 
@@ -161,8 +162,8 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x61e000, 0x61ffff) AM_RAM_WRITE(f3_vram_w) AM_BASE_MEMBER(taito_f3_state, m_f3_vram)
 	AM_RANGE(0x620000, 0x62ffff) AM_RAM_WRITE(f3_lineram_w) AM_BASE_MEMBER(taito_f3_state, m_f3_line_ram)
 	AM_RANGE(0x630000, 0x63ffff) AM_RAM_WRITE(f3_pivot_w) AM_BASE_MEMBER(taito_f3_state, m_f3_pivot_ram)
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE(f3_control_0_w)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE(f3_control_1_w)
+	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
+	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
