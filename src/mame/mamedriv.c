@@ -9369,6 +9369,7 @@ Other Sun games
 	DRIVER( othello )	/* (c) 1984 Success */
 	DRIVER( sothello )	/* (c) 1986 Success / Fujiwara */
 	DRIVER( quake )		/* (c) 19?? Lazer-Tron / iD Software  */
+	DRIVER( majorpkr )	/* (c) 1994 PAL System. */
 
 	/* Multi Amenity Cassette System */
 	DRIVER( macsbios )

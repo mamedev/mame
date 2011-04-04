@@ -1687,6 +1687,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/magictg.o \
 	$(DRIVERS)/magtouch.o \
+	$(DRIVERS)/majorpkr.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
@@ -1884,6 +1885,8 @@ $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
 $(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh \
 						$(LAYOUT)/musicsrt.lh
+
+$(DRIVERS)/majorpkr.o:	$(LAYOUT)/majorpkr.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 

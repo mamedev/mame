@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="hold1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="hold5" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="cancel" defstate="0">
+		<rect state="1">
+			<color red="0.25" green="0.25" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.075" green="0.075" blue="0.15" />
+		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="dup" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+		</rect>
+		<text string="D-UP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="take" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="big" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<text string="BIG">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="small" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<text string="SMALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="deal" defstate="0">
+		<rect state="1">
+			<color red="0.5" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.05" green="0.1" blue="0.0" />
+		</rect>
+		<text string="DEAL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="bet" defstate="0">
+		<rect state="1">
+			<color red="0.5" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.05" green="0.1" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1" height="0.6" />
+		</text>
+	</element>
+
+	<element name="fever" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<text string="-----">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.05" width="1" height="0.3" />
+		</text>
+		<text string="FEVER">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.35" width="1" height="0.3" />
+		</text>
+		<text string="-----">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.65" width="1" height="0.3" />
+		</text>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp0" element="hold1">
+			<bounds x="0" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp9" element="cancel">
+			<bounds x="0" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp1" element="hold2">
+			<bounds x="0.60" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp11" element="dup">
+			<bounds x="0.60" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp2" element="hold3">
+			<bounds x="1.2" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp10" element="take">
+			<bounds x="1.2" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp3" element="hold4">
+			<bounds x="1.8" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp5" element="big">
+			<bounds x="1.8" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp4" element="hold5">
+			<bounds x="2.4" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp6" element="small">
+			<bounds x="2.4" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp12" element="fever">
+			<bounds x="3" y="3.02" width="0.40" height="0.50" />
+		</bezel>
+
+		<bezel name="lamp8" element="deal">
+			<bounds x="3.50" y="3.02" width="0.50" height="0.24" />
+		</bezel>
+
+		<bezel name="lamp7" element="bet">
+			<bounds x="3.50" y="3.28" width="0.50" height="0.24" />
+		</bezel>
+	</view>
+</mamelayout>
