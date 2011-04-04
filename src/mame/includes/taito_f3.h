@@ -52,7 +52,7 @@ public:
 	UINT32 *m_f3_ram;
 	int m_f3_game;
 	UINT16 *m_f3_vram;
-	UINT32 *m_f3_line_ram;
+	UINT16 *m_f3_line_ram;
 	UINT32 *m_f3_pf_data;
 	UINT16 *m_f3_pivot_ram;
 	tilemap_t *m_pf1_tilemap;
@@ -199,11 +199,11 @@ WRITE32_HANDLER( f3_palette_24bit_w );
 WRITE32_HANDLER( f3_pf_data_w );
 WRITE16_HANDLER( f3_vram_w );
 WRITE16_HANDLER( f3_pivot_w );
-WRITE32_HANDLER( f3_lineram_w );
+WRITE16_HANDLER( f3_lineram_w );
 WRITE16_HANDLER( f3_videoram_w );
 
 //READ16_HANDLER( f3_pf_data_r );
 READ16_HANDLER( f3_vram_r );
 READ16_HANDLER( f3_pivot_r );
-//READ16_HANDLER( f3_lineram_r );
+READ16_HANDLER( f3_lineram_r );
 READ16_HANDLER( f3_videoram_r );

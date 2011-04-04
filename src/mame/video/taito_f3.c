@@ -329,7 +329,7 @@ static void init_alpha_blend_func(running_machine &machine);
 static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *f3_line_ram = state->m_f3_line_ram;
+	UINT16 *f3_line_ram = state->m_f3_line_ram;
 	int l[16];
 	char buf[64*16];
 	char *bufptr = buf;
@@ -763,7 +763,13 @@ WRITE16_HANDLER( f3_pivot_w )
 	gfx_element_mark_dirty(space->machine().gfx[3], offset/16);
 }
 
-WRITE32_HANDLER( f3_lineram_w )
+READ16_HANDLER( f3_lineram_r )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	return state->m_f3_line_ram[offset];
+}
+
+WRITE16_HANDLER( f3_lineram_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
@@ -775,7 +781,7 @@ WRITE32_HANDLER( f3_lineram_w )
 	if (state->m_f3_game==DARIUSG) {
 		if (state->m_f3_skip_this_frame)
 			return;
-		if (offset==0xb000/4 && data==0x003f0000) {
+		if (offset==0xb000/2 && data==0x003f) {
 			state->m_f3_skip_this_frame=1;
 			return;
 		}
@@ -1702,42 +1708,24 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 	while(y!=y_end)
 	{
 		/* The zoom, column and row values can latch according to control ram */
-		if (y&1)
 		{
-			if (state->m_f3_line_ram[0x080+(y>>1)]&1)
-				clip0_low=(state->m_f3_line_ram[clip_base_low/4]>> 0)&0xffff;
-			if (state->m_f3_line_ram[0x000+(y>>1)]&4)
-				clip0_high=(state->m_f3_line_ram[clip_base_high/4]>> 0)&0xffff;
-			if (state->m_f3_line_ram[0x080+(y>>1)]&2)
-				clip1_low=(state->m_f3_line_ram[(clip_base_low+0x200)/4]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x100+(y)]&1)
+				clip0_low=(state->m_f3_line_ram[clip_base_low/2]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x000+(y)]&4)
+				clip0_high=(state->m_f3_line_ram[clip_base_high/2]>> 0)&0xffff;
+			if (state->m_f3_line_ram[0x100+(y)]&2)
+				clip1_low=(state->m_f3_line_ram[(clip_base_low+0x200)/2]>> 0)&0xffff;
 
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x8)
-				spri=state->m_f3_line_ram[spri_base/4]&0xffff;
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x4)
-				sprite_clip=state->m_f3_line_ram[(spri_base-0x200)/4]&0xffff;
-			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x1)
-				sprite_alpha=state->m_f3_line_ram[(spri_base-0x1600)/4]&0xffff;
-			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x2)
-				alpha_level=state->m_f3_line_ram[(spri_base-0x1400)/4]&0xffff;
+			if (state->m_f3_line_ram[(0x0600/2)+(y)]&0x8)
+				spri=state->m_f3_line_ram[spri_base/2]&0xffff;
+			if (state->m_f3_line_ram[(0x0600/2)+(y)]&0x4)
+				sprite_clip=state->m_f3_line_ram[(spri_base-0x200)/2]&0xffff;
+			if (state->m_f3_line_ram[(0x0400/2)+(y)]&0x1)
+				sprite_alpha=state->m_f3_line_ram[(spri_base-0x1600)/2]&0xffff;
+			if (state->m_f3_line_ram[(0x0400/2)+(y)]&0x2)
+				alpha_level=state->m_f3_line_ram[(spri_base-0x1400)/2]&0xffff;
 		}
-		else
-		{
-			if (state->m_f3_line_ram[0x080+(y>>1)]&0x10000)
-				clip0_low=(state->m_f3_line_ram[clip_base_low/4]>>16)&0xffff;
-			if (state->m_f3_line_ram[0x000+(y>>1)]&0x40000)
-				clip0_high=(state->m_f3_line_ram[clip_base_high/4]>>16)&0xffff;
-			if (state->m_f3_line_ram[0x080+(y>>1)]&0x20000)
-				clip1_low=(state->m_f3_line_ram[(clip_base_low+0x200)/4]>>16)&0xffff;
 
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x80000)
-				spri=state->m_f3_line_ram[spri_base/4]>>16;
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x40000)
-				sprite_clip=state->m_f3_line_ram[(spri_base-0x200)/4]>>16;
-			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x10000)
-				sprite_alpha=state->m_f3_line_ram[(spri_base-0x1600)/4]>>16;
-			if (state->m_f3_line_ram[(0x0400/4)+(y>>1)]&0x20000)
-				alpha_level=state->m_f3_line_ram[(spri_base-0x1400)/4]>>16;
-		}
 
 		line_t->alpha_level[y]=alpha_level;
 		line_t->spri[y]=spri;
@@ -1792,8 +1780,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 	int colscroll=0,x_offset=0,line_zoom=0;
 	UINT32 _y_zoom[256];
 	UINT16 pri=0;
-	int bit_select0=0x10000<<pos;
-	int bit_select1=1<<pos;
+	int bit_select=1<<pos;
 
 	int _colscroll[256];
 	UINT32 _x_offset[256];
@@ -1833,82 +1820,42 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 	while(y!=y_end)
 	{
 		/* The zoom, column and row values can latch according to control ram */
-		if (y&1)
 		{
-			if (state->m_f3_line_ram[0x300+(y>>1)]&bit_select1)
-				x_offset=(state->m_f3_line_ram[line_base/4]&0xffff)<<10;
-			if (state->m_f3_line_ram[0x380+(y>>1)]&bit_select1)
-				pri=state->m_f3_line_ram[pri_base/4]&0xffff;
+			if (state->m_f3_line_ram[0x600+(y)]&bit_select)
+				x_offset=(state->m_f3_line_ram[line_base/2]&0xffff)<<10;
+			if (state->m_f3_line_ram[0x700+(y)]&bit_select)
+				pri=state->m_f3_line_ram[pri_base/2]&0xffff;
 
 			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
 			switch (pos)
 			{
 			case 0:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select1)
-					line_zoom=state->m_f3_line_ram[(zoom_base+0x000)/4]&0xffff;
+				if (state->m_f3_line_ram[0x400+(y)]&bit_select)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x000)/2]&0xffff;
 				break;
 			case 1:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x2)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x8)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x400+(y)]&0x2)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/2]&0xffff)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x400+(y)]&0x8)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/2]&0xffff)&0x00ff) | (line_zoom&0xff00);
 				break;
 			case 2:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select1)
-					line_zoom=state->m_f3_line_ram[(zoom_base+0x400)/4]&0xffff;
+				if (state->m_f3_line_ram[0x400+(y)]&bit_select)
+					line_zoom=state->m_f3_line_ram[(zoom_base+0x400)/2]&0xffff;
 				break;
 			case 3:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x8)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]&0xffff)&0xff00) | (line_zoom&0x00ff);
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x2)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]&0xffff)&0x00ff) | (line_zoom&0xff00);
+				if (state->m_f3_line_ram[0x400+(y)]&0x8)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/2]&0xffff)&0xff00) | (line_zoom&0x00ff);
+				if (state->m_f3_line_ram[0x400+(y)]&0x2)
+					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/2]&0xffff)&0x00ff) | (line_zoom&0xff00);
 				break;
 			default:
 				break;
 			}
 
 			// Column scroll only affects playfields 2 & 3
-			if (pos>=2 && state->m_f3_line_ram[0x000+(y>>1)]&bit_select1)
-				colscroll=(state->m_f3_line_ram[col_base/4]>> 0)&0x3ff;
-		}
-		else
-		{
-			if (state->m_f3_line_ram[0x300+(y>>1)]&bit_select0)
-				x_offset=(state->m_f3_line_ram[line_base/4]&0xffff0000)>>6;
-
-			if (state->m_f3_line_ram[0x380+(y>>1)]&bit_select0)
-				pri=(state->m_f3_line_ram[pri_base/4]>>16)&0xffff;
-
-			// Zoom for playfields 1 & 3 is interleaved, as is the latch select
-			switch (pos)
-			{
-			case 0:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select0)
-					line_zoom=state->m_f3_line_ram[(zoom_base+0x000)/4]>>16;
-				break;
-			case 1:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x20000)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]>>16)&0xff00) | (line_zoom&0x00ff);
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x80000)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]>>16)&0x00ff) | (line_zoom&0xff00);
-				break;
-			case 2:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&bit_select0)
-					line_zoom=state->m_f3_line_ram[(zoom_base+0x400)/4]>>16;
-				break;
-			case 3:
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x80000)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x600)/4]>>16)&0xff00) | (line_zoom&0x00ff);
-				if (state->m_f3_line_ram[0x200+(y>>1)]&0x20000)
-					line_zoom=((state->m_f3_line_ram[(zoom_base+0x200)/4]>>16)&0x00ff) | (line_zoom&0xff00);
-				break;
-			default:
-				break;
-			}
-
-			// Column scroll only affects playfields 2 & 3
-			if (pos>=2 && state->m_f3_line_ram[0x000+(y>>1)]&bit_select0)
-				colscroll=(state->m_f3_line_ram[col_base/4]>>16)&0x3ff;
+			if (pos>=2 && state->m_f3_line_ram[0x000+(y)]&bit_select)
+				colscroll=(state->m_f3_line_ram[col_base/2]>> 0)&0x3ff;
 		}
 
 		if (!pri || (!state->m_flipscreen && y<24) || (state->m_flipscreen && y>231) ||
@@ -2038,16 +1985,11 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 	while(y!=y_end)
 	{
 		/* The zoom, column and row values can latch according to control ram */
-		if (y&1)
 		{
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x2)
-				pri=(state->m_f3_line_ram[pri_base/4]&0xffff);
+			if (state->m_f3_line_ram[(0x0600/2)+(y)]&0x2)
+				pri=(state->m_f3_line_ram[pri_base/2]&0xffff);
 		}
-		else
-		{
-			if (state->m_f3_line_ram[(0x0600/4)+(y>>1)]&0x20000)
-				pri=(state->m_f3_line_ram[pri_base/4]&0xffff0000)>>16;
-		}
+
 
 		if (!pri || (!state->m_flipscreen && y<24) || (state->m_flipscreen && y>231) ||
 			(pri&0xc000)==0xc000 || !(pri&0x2000)/**/)
