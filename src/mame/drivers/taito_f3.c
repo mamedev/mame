@@ -151,14 +151,45 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 static WRITE16_HANDLER( f3_unk_w )
 {
 	/*
-	ringrage: 0x0000
-	arabianm: 0x0000
+	Several games writes a value here at POST, dunno what kind of config this is ...
+	ringrage:  0x0000
+	arabianm:  0x0000
 	ridingf: (no init)
 	gseeker: (no init)
-	commandw: (no init)
-	cupfinal: 0x0100
+	commandw:(no init)
+	cupfinal:  0x0100
+	trstar:  (no init)
+	gunlock:   0x0000
+	scfinals:  0x0100
+	lightbr: (no init)
+	intcup94:  0x0100
+	kaiserkn:  0x0100
+	dariusg:   0x278b
+	bublbob2:(no init)
+	pwrgoal:   0x0100
+	qtheater:  0x0090
+	elvactr:   0x278b
+	recalh:    0x0090
+	spcinv95:  0x0100
+	twinqix: (no init)
+	quizhuhu:  0x0000
+	pbobble2:  0x278b
+	gekiridn:  0x278b
+	tcobra2:   0x0000
+	bubblem: (no init)
+	cleopatr:  0x0100
+	pbobble3:  0x278b
+	arkretn:   0x0000
+	kirameki:  0x0100
+	puchicar:  0x0000
+	pbobble4:  0x278b
+	popnpop:   0x0000
+	landmakr:  0x278b
 	*/
-	printf("%02x %04x\n",offset,data);
+	if(offset == 0)
+		logerror("0x4c0000 write %04x\n",data);
+	else
+		popmessage("0x4c0002 write %04x, contact MAMEdev",data); //shouldn't happen
 }
 
 /******************************************************************************/
