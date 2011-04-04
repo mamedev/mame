@@ -159,9 +159,9 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taito_f3_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x610000, 0x61bfff) AM_RAM_WRITE(f3_pf_data_w) AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
 	AM_RANGE(0x61c000, 0x61dfff) AM_RAM_WRITE(f3_videoram_w) AM_BASE_MEMBER(taito_f3_state, m_videoram)
-	AM_RANGE(0x61e000, 0x61ffff) AM_RAM_WRITE(f3_vram_w) AM_BASE_MEMBER(taito_f3_state, m_f3_vram)
+	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff) AM_BASE_MEMBER(taito_f3_state, m_f3_vram)
 	AM_RANGE(0x620000, 0x62ffff) AM_RAM_WRITE(f3_lineram_w) AM_BASE_MEMBER(taito_f3_state, m_f3_line_ram)
-	AM_RANGE(0x630000, 0x63ffff) AM_RAM_WRITE(f3_pivot_w) AM_BASE_MEMBER(taito_f3_state, m_f3_pivot_ram)
+	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff) AM_BASE_MEMBER(taito_f3_state, m_f3_pivot_ram)
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
@@ -289,15 +289,13 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-#define XOR(a) WORD2_XOR_BE(a)
-
 static const gfx_layout charlayout =
 {
 	8,8,
 	256,
 	4,
 	{ 0,1,2,3 },
-	{ XOR(7)*4, XOR(6)*4, XOR(5)*4, XOR(4)*4, XOR(3)*4, XOR(2)*4, XOR(1)*4, XOR(0)*4 },
+    { 20, 16, 28, 24, 4, 0, 12, 8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
@@ -308,7 +306,7 @@ static const gfx_layout pivotlayout =
 	2048,
 	4,
 	{ 0,1,2,3 },
-	{ XOR(7)*4, XOR(6)*4, XOR(5)*4, XOR(4)*4, XOR(3)*4, XOR(2)*4, XOR(1)*4, XOR(0)*4 },
+    { 20, 16, 28, 24, 4, 0, 12, 8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
@@ -446,14 +444,14 @@ static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(recalh_eeprom, 128)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3 )
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_EEPROM_DATA(recalh_eeprom, 128)
+	MCFG_EEPROM_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =

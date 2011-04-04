@@ -51,10 +51,10 @@ public:
 	UINT32 m_coin_word[2];
 	UINT32 *m_f3_ram;
 	int m_f3_game;
-	UINT32 *m_f3_vram;
+	UINT16 *m_f3_vram;
 	UINT32 *m_f3_line_ram;
 	UINT32 *m_f3_pf_data;
-	UINT32 *m_f3_pivot_ram;
+	UINT16 *m_f3_pivot_ram;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_pf2_tilemap;
 	tilemap_t *m_pf3_tilemap;
@@ -197,9 +197,13 @@ WRITE16_HANDLER( f3_control_0_w );
 WRITE16_HANDLER( f3_control_1_w );
 WRITE32_HANDLER( f3_palette_24bit_w );
 WRITE32_HANDLER( f3_pf_data_w );
-WRITE32_HANDLER( f3_vram_w );
-WRITE32_HANDLER( f3_pivot_w );
+WRITE16_HANDLER( f3_vram_w );
+WRITE16_HANDLER( f3_pivot_w );
 WRITE32_HANDLER( f3_lineram_w );
 WRITE32_HANDLER( f3_videoram_w );
 
-
+//READ16_HANDLER( f3_pf_data_r );
+READ16_HANDLER( f3_vram_r );
+READ16_HANDLER( f3_pivot_r );
+//READ16_HANDLER( f3_lineram_r );
+//READ16_HANDLER( f3_videoram_r );

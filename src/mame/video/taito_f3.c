@@ -740,18 +740,30 @@ WRITE32_HANDLER( f3_videoram_w )
 	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off+32);
 }
 
-WRITE32_HANDLER( f3_vram_w )
+READ16_HANDLER( f3_vram_r )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	return state->m_f3_vram[offset];
+}
+
+WRITE16_HANDLER( f3_vram_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_vram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
 }
 
-WRITE32_HANDLER( f3_pivot_w )
+READ16_HANDLER( f3_pivot_r )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	return state->m_f3_pivot_ram[offset];
+}
+
+WRITE16_HANDLER( f3_pivot_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_pivot_ram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[3], offset/8);
+	gfx_element_mark_dirty(space->machine().gfx[3], offset/16);
 }
 
 WRITE32_HANDLER( f3_lineram_w )
