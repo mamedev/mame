@@ -616,7 +616,7 @@ VIDEO_START( f3 )
 	state_save_register_global_array(machine, state->m_f3_control_0);
 	state_save_register_global_array(machine, state->m_f3_control_1);
 
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_f3_vram);
+	//gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_f3_vram);
 	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_f3_pivot_ram);
 
 	state->m_f3_skip_this_frame=0;
@@ -726,7 +726,7 @@ WRITE16_HANDLER( f3_videoram_w )
 	COMBINE_DATA(&state->m_videoram[offset]);
 
 	tilemap_mark_tile_dirty(state->m_vram_layer,offset);
-	tilemap_mark_tile_dirty(state->m_vram_layer,offset+1);
+	//tilemap_mark_tile_dirty(state->m_vram_layer,offset+1);
 
 	if (offset>0x7ff) offset-=0x800;
 
@@ -734,19 +734,21 @@ WRITE16_HANDLER( f3_videoram_w )
 	col_off=((tile&0x3f)*32)+((tile&0xfc0)>>6);
 
 	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off);
-	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off+32);
+	//tilemap_mark_tile_dirty(state->m_pixel_layer,col_off+32);
 }
+
 
 READ16_HANDLER( f3_vram_r )
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	return state->m_f3_vram[offset];
+	UINT16 *pcg_ram = (UINT16 *)space->machine().region("pcg")->base();
+
+	return pcg_ram[offset];
 }
 
 WRITE16_HANDLER( f3_vram_w )
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	COMBINE_DATA(&state->m_f3_vram[offset]);
+	UINT16 *pcg_ram = (UINT16 *)space->machine().region("pcg")->base();
+	COMBINE_DATA(&pcg_ram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
 }
 
