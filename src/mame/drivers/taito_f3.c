@@ -148,6 +148,19 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 	}
 }
 
+static WRITE16_HANDLER( f3_unk_w )
+{
+	/*
+	ringrage: 0x0000
+	arabianm: 0x0000
+	ridingf: (no init)
+	gseeker: (no init)
+	commandw: (no init)
+	cupfinal: 0x0100
+	*/
+	printf("%02x %04x\n",offset,data);
+}
+
 /******************************************************************************/
 
 static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
@@ -156,6 +169,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE_MEMBER(taito_f3_state, m_f3_ram)
 	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
+	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(taito_f3_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x610000, 0x61bfff) AM_RAM_WRITE(f3_pf_data_w) AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
 	AM_RANGE(0x61c000, 0x61dfff) AM_RAM_WRITE(f3_videoram_w) AM_BASE_MEMBER(taito_f3_state, m_videoram)

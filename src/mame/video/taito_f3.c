@@ -472,7 +472,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 	UINT32 *videoram = state->m_videoram;
 	int vram_tile,col_off;
 	int flags=0;
-	int y_offs=(state->m_f3_control_1[2]&0x1ff);
+	int y_offs=(state->m_f3_control_1[5]&0x1ff);
 	if (state->m_flipscreen) y_offs+=0x100;
 
 	/* Colour is shared with VRAM layer */
