@@ -447,14 +447,10 @@ static TILE_GET_INFO( get_tile_info4 )
 static TILE_GET_INFO( get_tile_info_vram )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *videoram = state->m_videoram;
 	int vram_tile;
 	int flags=0;
 
-	if (tile_index&1)
-		vram_tile = (videoram[tile_index>>1]&0xffff);
-	else
-		vram_tile = (videoram[tile_index>>1]>>16);
+	vram_tile = (state->m_videoram[tile_index]&0xffff);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
@@ -469,7 +465,6 @@ static TILE_GET_INFO( get_tile_info_vram )
 static TILE_GET_INFO( get_tile_info_pixel )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *videoram = state->m_videoram;
 	int vram_tile,col_off;
 	int flags=0;
 	int y_offs=(state->m_f3_control_1[5]&0x1ff);
@@ -481,10 +476,7 @@ static TILE_GET_INFO( get_tile_info_pixel )
 	else
 		col_off=((tile_index%32)*0x40)+((tile_index&0xfe0)>>5);
 
-	if (col_off&1)
-		vram_tile = (videoram[col_off>>1]&0xffff);
-	else
-		vram_tile = (videoram[col_off>>1]>>16);
+	vram_tile = (state->m_videoram[col_off]&0xffff);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
@@ -721,19 +713,24 @@ WRITE16_HANDLER( f3_control_1_w )
 	COMBINE_DATA(&state->m_f3_control_1[offset]);
 }
 
-WRITE32_HANDLER( f3_videoram_w )
+READ16_HANDLER( f3_videoram_r )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	UINT32 *videoram = state->m_videoram;
+	return state->m_videoram[offset];
+}
+
+WRITE16_HANDLER( f3_videoram_w )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	int tile,col_off;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&state->m_videoram[offset]);
 
-	tilemap_mark_tile_dirty(state->m_vram_layer,offset<<1);
-	tilemap_mark_tile_dirty(state->m_vram_layer,(offset<<1)+1);
+	tilemap_mark_tile_dirty(state->m_vram_layer,offset);
+	tilemap_mark_tile_dirty(state->m_vram_layer,offset+1);
 
-	if (offset>0x3ff) offset-=0x400;
+	if (offset>0x7ff) offset-=0x800;
 
-	tile=offset<<1;
+	tile=offset;
 	col_off=((tile&0x3f)*32)+((tile&0xfc0)>>6);
 
 	tilemap_mark_tile_dirty(state->m_pixel_layer,col_off);

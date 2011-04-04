@@ -200,10 +200,10 @@ WRITE32_HANDLER( f3_pf_data_w );
 WRITE16_HANDLER( f3_vram_w );
 WRITE16_HANDLER( f3_pivot_w );
 WRITE32_HANDLER( f3_lineram_w );
-WRITE32_HANDLER( f3_videoram_w );
+WRITE16_HANDLER( f3_videoram_w );
 
 //READ16_HANDLER( f3_pf_data_r );
 READ16_HANDLER( f3_vram_r );
 READ16_HANDLER( f3_pivot_r );
 //READ16_HANDLER( f3_lineram_r );
-//READ16_HANDLER( f3_videoram_r );
+READ16_HANDLER( f3_videoram_r );
