@@ -395,7 +395,7 @@ void decospr_device::draw_sprites( running_machine &machine, bitmap_t *bitmap, c
 
 			x = spriteram[offs+1];
 
-			if (!((y&0x2000) && (machine.primary_screen->frame_number() & 1)));
+			if (!((y&0x2000) && (machine.primary_screen->frame_number() & 1)))
 			{
 				if (!m_sprite_bitmap)
 					colour = (spriteram[offs+2] >>0) & 0x1f;
