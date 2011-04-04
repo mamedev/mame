@@ -243,6 +243,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/rgbutil.o		\
 	$(EMUVIDEO)/s2636.o			\
 	$(EMUVIDEO)/saa5050.o		\
+	$(EMUVIDEO)/sed1330.o		\
 	$(EMUVIDEO)/tlc34076.o		\
 	$(EMUVIDEO)/tms34061.o		\
 	$(EMUVIDEO)/tms9927.o		\
