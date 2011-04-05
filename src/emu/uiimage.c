@@ -844,6 +844,10 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 					ui_menu_stack_pop(machine);
 					break;
 			}
+
+			// reset the char buffer when pressing IPT_UI_SELECT
+			if (menustate->filename_buffer[0] != '\0')
+				memset(menustate->filename_buffer, '\0', ARRAY_LENGTH(menustate->filename_buffer));
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
