@@ -325,7 +325,6 @@ static void init_alpha_blend_func(running_machine &machine);
 
 /******************************************************************************/
 
-/* TODO: fix shifting there */
 static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
@@ -334,67 +333,67 @@ static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 	char buf[64*16];
 	char *bufptr = buf;
 
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[0]>>22,(state->m_f3_control_0[0]&0xffff)>>6,state->m_f3_control_0[1]>>22,(state->m_f3_control_0[1]&0xffff)>>6);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[2]>>23,(state->m_f3_control_0[2]&0xffff)>>7,state->m_f3_control_0[3]>>23,(state->m_f3_control_0[3]&0xffff)>>7);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[0]>>16,state->m_f3_control_1[0]&0xffff,state->m_f3_control_1[1]>>16,state->m_f3_control_1[1]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[2]>>16,state->m_f3_control_1[2]&0xffff,state->m_f3_control_1[3]>>16,state->m_f3_control_1[3]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[0]>>6,state->m_f3_control_0[1]>>6,state->m_f3_control_0[2]>>6,state->m_f3_control_0[3]>>6);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_0[4]>>7,state->m_f3_control_0[5]>>7,state->m_f3_control_0[6]>>7,state->m_f3_control_0[7]>>7);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[0],state->m_f3_control_1[1],state->m_f3_control_1[2],state->m_f3_control_1[3]);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[4],state->m_f3_control_1[5],state->m_f3_control_1[6],state->m_f3_control_1[7]);
 
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[0]>>16,state->m_spriteram16_buffered[0]&0xffff,state->m_spriteram16_buffered[1]>>16,state->m_spriteram16_buffered[1]&0xffff,state->m_spriteram16_buffered[2]>>16,state->m_spriteram16_buffered[2]&0xffff,state->m_spriteram16_buffered[3]>>16,state->m_spriteram16_buffered[3]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[4]>>16,state->m_spriteram16_buffered[4]&0xffff,state->m_spriteram16_buffered[5]>>16,state->m_spriteram16_buffered[5]&0xffff,state->m_spriteram16_buffered[6]>>16,state->m_spriteram16_buffered[6]&0xffff,state->m_spriteram16_buffered[7]>>16,state->m_spriteram16_buffered[7]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[8]>>16,state->m_spriteram16_buffered[8]&0xffff,state->m_spriteram16_buffered[9]>>16,state->m_spriteram16_buffered[9]&0xffff,state->m_spriteram16_buffered[10]>>16,state->m_spriteram16_buffered[10]&0xffff,state->m_spriteram16_buffered[11]>>16,state->m_spriteram16_buffered[11]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[0],state->m_spriteram16_buffered[1],state->m_spriteram16_buffered[2],state->m_spriteram16_buffered[3],state->m_spriteram16_buffered[4],state->m_spriteram16_buffered[5],state->m_spriteram16_buffered[6],state->m_spriteram16_buffered[7]);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[8],state->m_spriteram16_buffered[9],state->m_spriteram16_buffered[10],state->m_spriteram16_buffered[11],state->m_spriteram16_buffered[12],state->m_spriteram16_buffered[13],state->m_spriteram16_buffered[14],state->m_spriteram16_buffered[15]);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[16],state->m_spriteram16_buffered[17],state->m_spriteram16_buffered[18],state->m_spriteram16_buffered[19],state->m_spriteram16_buffered[20],state->m_spriteram16_buffered[21],state->m_spriteram16_buffered[22],state->m_spriteram16_buffered[23]);
 
-	l[0]=f3_line_ram[0x0040]&0xffff;
-	l[1]=f3_line_ram[0x00c0]&0xffff;
-	l[2]=f3_line_ram[0x0140]&0xffff;
-	l[3]=f3_line_ram[0x01c0]&0xffff;
+	l[0]=f3_line_ram[0x0040*2]&0xffff;
+	l[1]=f3_line_ram[0x00c0*2]&0xffff;
+	l[2]=f3_line_ram[0x0140*2]&0xffff;
+	l[3]=f3_line_ram[0x01c0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Ctr1: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x0240]&0xffff;
-	l[1]=f3_line_ram[0x02c0]&0xffff;
-	l[2]=f3_line_ram[0x0340]&0xffff;
-	l[3]=f3_line_ram[0x03c0]&0xffff;
+	l[0]=f3_line_ram[0x0240*2]&0xffff;
+	l[1]=f3_line_ram[0x02c0*2]&0xffff;
+	l[2]=f3_line_ram[0x0340*2]&0xffff;
+	l[3]=f3_line_ram[0x03c0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Ctr2: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x2c60]&0xffff;
-	l[1]=f3_line_ram[0x2ce0]&0xffff;
-	l[2]=f3_line_ram[0x2d60]&0xffff;
-	l[3]=f3_line_ram[0x2de0]&0xffff;
+	l[0]=f3_line_ram[0x2c60*2]&0xffff;
+	l[1]=f3_line_ram[0x2ce0*2]&0xffff;
+	l[2]=f3_line_ram[0x2d60*2]&0xffff;
+	l[3]=f3_line_ram[0x2de0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Pri : %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x2060]&0xffff;
-	l[1]=f3_line_ram[0x20e0]&0xffff;
-	l[2]=f3_line_ram[0x2160]&0xffff;
-	l[3]=f3_line_ram[0x21e0]&0xffff;
+	l[0]=f3_line_ram[0x2060*2]&0xffff;
+	l[1]=f3_line_ram[0x20e0*2]&0xffff;
+	l[2]=f3_line_ram[0x2160*2]&0xffff;
+	l[3]=f3_line_ram[0x21e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Zoom: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x2860]&0xffff;
-	l[1]=f3_line_ram[0x28e0]&0xffff;
-	l[2]=f3_line_ram[0x2960]&0xffff;
-	l[3]=f3_line_ram[0x29e0]&0xffff;
+	l[0]=f3_line_ram[0x2860*2]&0xffff;
+	l[1]=f3_line_ram[0x28e0*2]&0xffff;
+	l[2]=f3_line_ram[0x2960*2]&0xffff;
+	l[3]=f3_line_ram[0x29e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Line: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x1c60]&0xffff;
-	l[1]=f3_line_ram[0x1ce0]&0xffff;
-	l[2]=f3_line_ram[0x1d60]&0xffff;
-	l[3]=f3_line_ram[0x1de0]&0xffff;
+	l[0]=f3_line_ram[0x1c60*2]&0xffff;
+	l[1]=f3_line_ram[0x1ce0*2]&0xffff;
+	l[2]=f3_line_ram[0x1d60*2]&0xffff;
+	l[3]=f3_line_ram[0x1de0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Sprt: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x1860]&0xffff;
-	l[1]=f3_line_ram[0x18e0]&0xffff;
-	l[2]=f3_line_ram[0x1960]&0xffff;
-	l[3]=f3_line_ram[0x19e0]&0xffff;
+	l[0]=f3_line_ram[0x1860*2]&0xffff;
+	l[1]=f3_line_ram[0x18e0*2]&0xffff;
+	l[2]=f3_line_ram[0x1960*2]&0xffff;
+	l[3]=f3_line_ram[0x19e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Pivt: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x1060]&0xffff;
-	l[1]=f3_line_ram[0x10e0]&0xffff;
-	l[2]=f3_line_ram[0x1160]&0xffff;
-	l[3]=f3_line_ram[0x11e0]&0xffff;
+	l[0]=f3_line_ram[0x1060*2]&0xffff;
+	l[1]=f3_line_ram[0x10e0*2]&0xffff;
+	l[2]=f3_line_ram[0x1160*2]&0xffff;
+	l[3]=f3_line_ram[0x11e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"Colm: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	l[0]=f3_line_ram[0x1460]&0xffff;
-	l[1]=f3_line_ram[0x14e0]&0xffff;
-	l[2]=f3_line_ram[0x1560]&0xffff;
-	l[3]=f3_line_ram[0x15e0]&0xffff;
+	l[0]=f3_line_ram[0x1460*2]&0xffff;
+	l[1]=f3_line_ram[0x14e0*2]&0xffff;
+	l[2]=f3_line_ram[0x1560*2]&0xffff;
+	l[3]=f3_line_ram[0x15e0*2]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
 	ui_draw_text(&machine.render().ui_container(), buf, 60, 40);
