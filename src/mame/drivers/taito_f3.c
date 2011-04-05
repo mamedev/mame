@@ -19,7 +19,7 @@
       \- It does work in ringrage but you have to enter test mode first
     - Sound balance is not emulated (see arabianm test mode)
     - When playing space invaders dx in original mode, t.t. with overlay, the
-    alpha blending effect is wrong (see Taito B version of game)
+      alpha blending effect is wrong (see Taito B version of game)
     - Bubble Symphony has an alpha transition effect that doesn't appear in Mame
     - Various other missing blending effects (see Mametesters)
     - Find how this HW drives the CRTC, and convert video timings to use screen raw params;
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
 	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE_MEMBER(taito_f3_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x610000, 0x61bfff) AM_RAM_WRITE(f3_pf_data_w) 								AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
+	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff) 		//AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
 	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)		//AM_BASE_MEMBER(taito_f3_state, m_videoram)
 	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff) 			//AM_BASE_MEMBER(taito_f3_state, m_f3_vram)
 	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)		//AM_BASE_MEMBER(taito_f3_state, m_f3_line_ram)

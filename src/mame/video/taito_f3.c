@@ -402,9 +402,9 @@ static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 
 /******************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index, UINT32 *gfx_base)
+INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, int tile_index, UINT16 *gfx_base)
 {
-	UINT32 tile=gfx_base[tile_index];
+	UINT32 tile=(gfx_base[tile_index*2+0]<<16)|(gfx_base[tile_index*2+1]&0xffff);
 	UINT8 abtype=(tile>>(16+9)) & 1;
 	// tiles can be configured to use 4, 5, or 6 bpp data.
 	// if tiles use more than 4bpp, the bottom bits of the color code must be masked out.
@@ -553,7 +553,7 @@ VIDEO_START( f3 )
 	state->m_f3_game_config=pCFG;
 
 	state->m_f3_vram =      auto_alloc_array(machine, UINT16, 0x2000/2);
-	//state->m_f3_pf_data =   auto_alloc_array(machine, UINT16, 0xc000/2);
+	state->m_f3_pf_data =   auto_alloc_array(machine, UINT16, 0xc000/2);
 	state->m_videoram =     auto_alloc_array(machine, UINT16, 0x2000/2);
 	state->m_f3_line_ram =  auto_alloc_array(machine, UINT16, 0x10000/2);
 	state->m_f3_pivot_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -565,14 +565,14 @@ VIDEO_START( f3 )
 		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,64,32);
 		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,64,32);
 
-		state->m_f3_pf_data_1=state->m_f3_pf_data+0x0000;
-		state->m_f3_pf_data_2=state->m_f3_pf_data+0x0800;
-		state->m_f3_pf_data_3=state->m_f3_pf_data+0x1000;
-		state->m_f3_pf_data_4=state->m_f3_pf_data+0x1800;
+		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
+		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x2000/2);
+		state->m_f3_pf_data_3=state->m_f3_pf_data+(0x4000/2);
+		state->m_f3_pf_data_4=state->m_f3_pf_data+(0x6000/2);
 
 		state->m_width_mask=0x3ff;
-		state->m_twidth_mask=0x3f;
-		state->m_twidth_mask_bit=6;
+		state->m_twidth_mask=0x7f;
+		state->m_twidth_mask_bit=7;
 
 	} else {
 		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
@@ -580,14 +580,14 @@ VIDEO_START( f3 )
 		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,32,32);
 		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,32,32);
 
-		state->m_f3_pf_data_1=state->m_f3_pf_data+0x0000;
-		state->m_f3_pf_data_2=state->m_f3_pf_data+0x0400;
-		state->m_f3_pf_data_3=state->m_f3_pf_data+0x0800;
-		state->m_f3_pf_data_4=state->m_f3_pf_data+0x0c00;
+		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
+		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x1000/2);
+		state->m_f3_pf_data_3=state->m_f3_pf_data+(0x2000/2);
+		state->m_f3_pf_data_4=state->m_f3_pf_data+(0x3000/2);
 
 		state->m_width_mask=0x1ff;
-		state->m_twidth_mask=0x1f;
-		state->m_twidth_mask_bit=5;
+		state->m_twidth_mask=0x3f;
+		state->m_twidth_mask_bit=6;
 	}
 
 	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -690,21 +690,27 @@ VIDEO_START( f3 )
 
 /******************************************************************************/
 
-WRITE32_HANDLER( f3_pf_data_w )
+READ16_HANDLER( f3_pf_data_r )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	return state->m_f3_pf_data[offset];
+}
+
+WRITE16_HANDLER( f3_pf_data_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_pf_data[offset]);
 
 	if (state->m_f3_game_config->extend) {
-		if (offset<0x800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset-0x0000);
-		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,offset-0x0800);
-		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,offset-0x1000);
-		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,offset-0x1800);
+		if 		(offset<0x1000) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0xfff) >> 1);
+		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0xfff) >> 1);
+		else if (offset<0x3000) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0xfff) >> 1);
+		else if (offset<0x4000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0xfff) >> 1);
 	} else {
-		if (offset<0x400) tilemap_mark_tile_dirty(state->m_pf1_tilemap,offset-0x0000);
-		else if (offset<0x800) tilemap_mark_tile_dirty(state->m_pf2_tilemap,offset-0x0400);
-		else if (offset<0xc00) tilemap_mark_tile_dirty(state->m_pf3_tilemap,offset-0x0800);
-		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,offset-0xc00);
+		if 		(offset<0x0800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0x7ff) >> 1);
 	}
 }
 
@@ -1513,10 +1519,10 @@ static void visible_tile_check(running_machine &machine,
 							   struct f3_playfield_line_inf *line_t,
 								int line,
 								UINT32 x_index_fx,UINT32 y_index,
-								UINT32 *f3_pf_data_n)
+								UINT16 *f3_pf_data_n)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
-	UINT32 *pf_base;
+	UINT16 *pf_base;
 	int i,trans_all,tile_index,tile_num;
 	int alpha_type,alpha_mode;
 	int opaque_all;
@@ -1544,7 +1550,7 @@ static void visible_tile_check(running_machine &machine,
 	alpha_type=0;
 	for(i=0;i<tile_num;i++)
 	{
-		UINT32 tile=pf_base[(tile_index)&state->m_twidth_mask];
+		UINT32 tile=(pf_base[(tile_index*2+0)&state->m_twidth_mask]<<16)|(pf_base[(tile_index*2+1)&state->m_twidth_mask]);
 		UINT8  extra_planes = (tile>>(16+10)) & 3;
 		if(tile&0xffff)
 		{
@@ -1787,7 +1793,7 @@ static void get_spritealphaclip_info(taito_f3_state *state)
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
+static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx, int sy, int pos, UINT16 *f3_pf_data_n)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	struct f3_playfield_line_inf *line_t=&state->m_pf_line_inf[pos];
@@ -1982,7 +1988,7 @@ static void get_vram_info(running_machine &machine, tilemap_t *vram_tilemap, til
 
 	UINT16 pri=0;
 
-	const int vram_width_mask=0x1ff;
+	const int vram_width_mask=0x3ff;
 
 	if (state->m_flipscreen)
 	{
