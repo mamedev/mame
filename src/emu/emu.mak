@@ -231,6 +231,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/crt9007.o		\
 	$(EMUVIDEO)/crt9021.o		\
 	$(EMUVIDEO)/crt9212.o		\
+	$(EMUVIDEO)/dm9368.o		\
 	$(EMUVIDEO)/generic.o		\
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
