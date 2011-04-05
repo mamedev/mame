@@ -45,13 +45,13 @@ public:
 	taito_f3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 *m_videoram;
+	UINT16 *m_videoram;
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
 	UINT32 m_coin_word[2];
 	UINT32 *m_f3_ram;
 	int m_f3_game;
-//	UINT16 *m_f3_vram;
+	UINT16 *m_f3_vram;
 	UINT16 *m_f3_line_ram;
 	UINT32 *m_f3_pf_data;
 	UINT16 *m_f3_pivot_ram;

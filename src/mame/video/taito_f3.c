@@ -552,6 +552,12 @@ VIDEO_START( f3 )
 
 	state->m_f3_game_config=pCFG;
 
+	state->m_f3_vram =      auto_alloc_array(machine, UINT16, 0x2000/2);
+	//state->m_f3_pf_data =   auto_alloc_array(machine, UINT16, 0xc000/2);
+	state->m_videoram =     auto_alloc_array(machine, UINT16, 0x2000/2);
+	state->m_f3_line_ram =  auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->m_f3_pivot_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
+
 	if (state->m_f3_game_config->extend) {
 		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);
 		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,64,32);
@@ -616,7 +622,7 @@ VIDEO_START( f3 )
 	state_save_register_global_array(machine, state->m_f3_control_0);
 	state_save_register_global_array(machine, state->m_f3_control_1);
 
-	//gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_f3_vram);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_f3_vram);
 	gfx_element_set_source(machine.gfx[3], (UINT8 *)state->m_f3_pivot_ram);
 
 	state->m_f3_skip_this_frame=0;
@@ -740,15 +746,15 @@ WRITE16_HANDLER( f3_videoram_w )
 
 READ16_HANDLER( f3_vram_r )
 {
-	UINT16 *pcg_ram = (UINT16 *)space->machine().region("pcg")->base();
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 
-	return pcg_ram[offset];
+	return state->m_f3_vram[offset];
 }
 
 WRITE16_HANDLER( f3_vram_w )
 {
-	UINT16 *pcg_ram = (UINT16 *)space->machine().region("pcg")->base();
-	COMBINE_DATA(&pcg_ram[offset]);
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	COMBINE_DATA(&state->m_f3_vram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
 }
 
