@@ -155,8 +155,8 @@ static int write_config(emu_options &options, const char *filename, const game_d
 
 static void image_options_extract(running_machine &machine)
 {
-	/* only extract the device options if we've added them */
-//  if (machine.options().bool_value(OPTION_ADDED_DEVICE_OPTIONS))
+	/* only extract the device options if we've added them 
+	   no need to assert in case they are missing */
 	{
 		int index = 0;
 		device_image_interface *image = NULL;
@@ -168,7 +168,6 @@ static void image_options_extract(running_machine &machine)
 			/* and set the option */
 			astring error;
 			machine.options().set_value(image->image_config().instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
-			assert(!error);
 
 			index++;
 		}
