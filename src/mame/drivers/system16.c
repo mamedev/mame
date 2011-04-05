@@ -3084,11 +3084,11 @@ ROM_START( iqpipe )
 	ROM_LOAD( "82s123.2",  0x0000, 0x0020, NO_DUMP ) //same as beauty block?
 
 	ROM_REGION( 0x0144, "pals", 0 )
-	ROM_LOAD( "iqpipe.a",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "iqpipe.b",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "iqpipe.c",  0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.a",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.b",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.c",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
 	ROM_LOAD( "iqpipe.d",  0x0000, 0x0144, CRC(36e30d71) SHA1(e38f0257f9beedccc9421eec78701a86465d16ad) )
-	ROM_LOAD( "iqpipe.u4", 0x0000, 0x0104, CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.u4", 0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
 ROM_END
 
 
