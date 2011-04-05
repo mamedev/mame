@@ -79,10 +79,10 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, m_vram_0)					// Layers
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE_MEMBER(fuuki16_state, m_vram_1)					//
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE_MEMBER(fuuki16_state, m_vram_2)					//
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE_MEMBER(fuuki16_state, m_vram_3)					//
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, m_vram[0])					// Layers
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE_MEMBER(fuuki16_state, m_vram[1])					//
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE_MEMBER(fuuki16_state, m_vram[2])					//
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE_MEMBER(fuuki16_state, m_vram[3])					//
 	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE_MEMBER(fuuki16_state, m_spriteram, m_spriteram_size)	// Sprites, mirrored?
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")

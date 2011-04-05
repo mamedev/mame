@@ -80,11 +80,11 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 
 
-class sandscrp_state : public driver_device
+class sandscrp_state : public kaneko16_state
 {
 public:
 	sandscrp_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
 	UINT8 m_sprite_irq;
 	UINT8 m_unknown_irq;
@@ -96,16 +96,17 @@ public:
 
 static MACHINE_RESET( sandscrp )
 {
-	kaneko16_sprite_type  = 0;
+	sandscrp_state *state = machine.driver_data<sandscrp_state>();
+	state->m_sprite_type  = 0;
 
-	kaneko16_sprite_xoffs = 0;
-	kaneko16_sprite_yoffs = 0;
+	state->m_sprite_xoffs = 0;
+	state->m_sprite_yoffs = 0;
 
-	kaneko16_priority.sprite[0] = 1;	// above tile[0],   below the others
-	kaneko16_priority.sprite[1] = 2;	// above tile[0-1], below the others
-	kaneko16_priority.sprite[2] = 3;	// above tile[0-2], below the others
-	kaneko16_priority.sprite[3] = 8;	// above all
-	kaneko16_sprite_type = 3;	// "different" sprites layout
+	state->m_priority.sprite[0] = 1;	// above tile[0],   below the others
+	state->m_priority.sprite[1] = 2;	// above tile[0-1], below the others
+	state->m_priority.sprite[2] = 3;	// above tile[0-2], below the others
+	state->m_priority.sprite[3] = 8;	// above all
+	state->m_sprite_type = 3;	// "different" sprites layout
 }
 
 /* Sand Scorpion */
@@ -158,8 +159,8 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
 	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_sprite_flipx	=	data & 1;
-		kaneko16_sprite_flipy	=	data & 1;
+		state->m_sprite_flipx	=	data & 1;
+		state->m_sprite_flipy	=	data & 1;
 
 		if (data & 0x08)	state->m_sprite_irq  = 0;
 		if (data & 0x10)	state->m_unknown_irq = 0;
@@ -227,11 +228,11 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM		// RAM
 	AM_RANGE(0x200000, 0x20001f) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)	// Protection
-	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
-	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
-	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
+	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(sandscrp_state, m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(sandscrp_state, m_vram[1])	// Layers 0
+	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(sandscrp_state, m_vram[0])	//
+	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE_MEMBER(sandscrp_state, m_vscroll[1])									//
+	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE_MEMBER(sandscrp_state, m_vscroll[0])									//
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)

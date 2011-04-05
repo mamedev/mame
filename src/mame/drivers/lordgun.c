@@ -271,22 +271,22 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram_0)	// DISPLAY
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram_1)	// DISPLAY
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram_2)	// DISPLAY
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram[0])	// DISPLAY
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram[1])	// DISPLAY
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram[2])	// DISPLAY
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram_3)	// DISPLAY
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram[3])	// DISPLAY
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_scrollram)							// LINE
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, m_spriteram, m_spriteram_size)						// ANIMATOR
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_0)
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_1)
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_2)
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_3)
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_0)
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_1)
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_2)
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_3)
+	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[0])
+	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[1])
+	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[2])
+	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[3])
+	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[0])
+	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[1])
+	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[2])
+	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[3])
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x503800, 0x503801) AM_READ(lordgun_gun_0_x_r)
 	AM_RANGE(0x503a00, 0x503a01) AM_READ(lordgun_gun_1_x_r)
@@ -303,22 +303,22 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram_0)	// BACKGROUND 1
-	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram_1)	// BACKGROUND 2
-	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram_2)	// BACKGROUND 3
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(lordgun_vram_0_w) AM_BASE_MEMBER(lordgun_state, m_vram[0])	// BACKGROUND 1
+	AM_RANGE(0x310000, 0x313fff) AM_RAM_WRITE(lordgun_vram_1_w) AM_BASE_MEMBER(lordgun_state, m_vram[1])	// BACKGROUND 2
+	AM_RANGE(0x314000, 0x314fff) AM_RAM_WRITE(lordgun_vram_2_w) AM_BASE_MEMBER(lordgun_state, m_vram[2])	// BACKGROUND 3
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
-	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram_3)	// TEXT
+	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, m_vram[3])	// TEXT
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_scrollram)							// LINE OFFSET
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, m_spriteram, m_spriteram_size)						// ANIMATE
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_0)
-	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_1)
-	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_2)
-	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x_3)
-	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_0)
-	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_1)
-	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_2)
-	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y_3)
+	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[0])
+	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[1])
+	AM_RANGE(0x502400, 0x502401) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[2])
+	AM_RANGE(0x502600, 0x502601) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_x[3])
+	AM_RANGE(0x502800, 0x502801) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[0])
+	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[1])
+	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[2])
+	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, m_scroll_y[3])
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
 	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)

@@ -61,69 +61,31 @@ WRITE16_HANDLER( lordgun_paletteram_w )
 ***************************************************************************/
 
 
-static TILE_GET_INFO( get_tile_info_0 )
+INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, int _N_)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 attr = state->m_vram_0[ tile_index * 2 + 0 ];
-	UINT16 code = state->m_vram_0[ tile_index * 2 + 1 ];
+	UINT16 attr = state->m_vram[_N_][tile_index * 2 + 0 ];
+	UINT16 code = state->m_vram[_N_][ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO( 0, code, ((attr & 0x0030) >> 4)+0x500/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	SET_TILE_INFO( _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
-static TILE_GET_INFO( get_tile_info_1 )
-{
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 attr = state->m_vram_1[ tile_index * 2 + 0 ];
-	UINT16 code = state->m_vram_1[ tile_index * 2 + 1 ];
-	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO( 1, code, ((attr & 0x0070) >> 4)+0x600/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
-}
+static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine, tileinfo, tile_index, 0); }
+static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine, tileinfo, tile_index, 1); }
+static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine, tileinfo, tile_index, 2); }
+static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info(machine, tileinfo, tile_index, 3); }
 
-static TILE_GET_INFO( get_tile_info_2 )
-{
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 attr = state->m_vram_2[ tile_index * 2 + 0 ];
-	UINT16 code = state->m_vram_2[ tile_index * 2 + 1 ];
-	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO( 2, code, ((attr & 0x0030) >> 4)+0x700/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
-}
-
-static TILE_GET_INFO( get_tile_info_3 )
-{
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 attr = state->m_vram_3[ tile_index * 2 + 0 ];
-	UINT16 code = state->m_vram_3[ tile_index * 2 + 1 ];
-	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO( 3, code, ((attr & 0x00f0) >> 4)+0x400/0x40+pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
-}
-
-WRITE16_HANDLER( lordgun_vram_0_w )
+INLINE void lordgun_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
 	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_0, offset/2);
+	COMBINE_DATA(&state->m_vram[_N_][offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap[_N_], offset/2);
 }
 
-WRITE16_HANDLER( lordgun_vram_1_w )
-{
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_1, offset/2);
-}
-
-WRITE16_HANDLER( lordgun_vram_2_w )
-{
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_vram_2[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_2, offset/2);
-}
-
-WRITE16_HANDLER( lordgun_vram_3_w )
-{
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_vram_3[offset]);
-	tilemap_mark_tile_dirty(state->m_tilemap_3, offset/2);
-}
+WRITE16_HANDLER( lordgun_vram_0_w ) { lordgun_vram_w(space, offset, data, mem_mask, 0); }
+WRITE16_HANDLER( lordgun_vram_1_w ) { lordgun_vram_w(space, offset, data, mem_mask, 1); }
+WRITE16_HANDLER( lordgun_vram_2_w ) { lordgun_vram_w(space, offset, data, mem_mask, 2); }
+WRITE16_HANDLER( lordgun_vram_3_w ) { lordgun_vram_w(space, offset, data, mem_mask, 3); }
 
 /***************************************************************************
 
@@ -140,39 +102,39 @@ VIDEO_START( lordgun )
 	int h = machine.primary_screen->height();
 
 	// 0x800 x 200
-	state->m_tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
+	state->m_tilemap[0] = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 8,8, 0x100, 0x40 );
 
 	// 0x800 x 200
-	state->m_tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
+	state->m_tilemap[1] = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 0x80,0x20 );
 
 	// 0x800 x 200
-	state->m_tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
+	state->m_tilemap[2] = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								 32,32, 0x40,0x10 );
 
 	// 0x200 x 100
-	state->m_tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
+	state->m_tilemap[3] = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								 8,8, 0x40,0x20 );
 
-	tilemap_set_scroll_rows(state->m_tilemap_0,1);
-	tilemap_set_scroll_cols(state->m_tilemap_0,1);
-	tilemap_set_transparent_pen(state->m_tilemap_0,0x3f);
+	tilemap_set_scroll_rows(state->m_tilemap[0],1);
+	tilemap_set_scroll_cols(state->m_tilemap[0],1);
+	tilemap_set_transparent_pen(state->m_tilemap[0],0x3f);
 
 	// Has line scroll
-	tilemap_set_scroll_rows(state->m_tilemap_1,0x200);
-	tilemap_set_scroll_cols(state->m_tilemap_1,1);
-	tilemap_set_transparent_pen(state->m_tilemap_1,0x3f);
+	tilemap_set_scroll_rows(state->m_tilemap[1],0x200);
+	tilemap_set_scroll_cols(state->m_tilemap[1],1);
+	tilemap_set_transparent_pen(state->m_tilemap[1],0x3f);
 
-	tilemap_set_scroll_rows(state->m_tilemap_2,1);
-	tilemap_set_scroll_cols(state->m_tilemap_2,1);
-	tilemap_set_transparent_pen(state->m_tilemap_2,0x3f);
+	tilemap_set_scroll_rows(state->m_tilemap[2],1);
+	tilemap_set_scroll_cols(state->m_tilemap[2],1);
+	tilemap_set_transparent_pen(state->m_tilemap[2],0x3f);
 
-	tilemap_set_scroll_rows(state->m_tilemap_3,1);
-	tilemap_set_scroll_cols(state->m_tilemap_3,1);
-	tilemap_set_transparent_pen(state->m_tilemap_3,0x3f);
+	tilemap_set_scroll_rows(state->m_tilemap[3],1);
+	tilemap_set_scroll_cols(state->m_tilemap[3],1);
+	tilemap_set_transparent_pen(state->m_tilemap[3],0x3f);
 
-	// Buffer state->m_bitmaps for 4 tilemaps (0-3) + sprites (4)
+	// Buffer bitmaps for 4 tilemaps (0-3) + sprites (4)
 	for (i = 0; i < 5; i++)
 		state->m_bitmaps[i] = auto_bitmap_alloc(machine, w, h, BITMAP_FORMAT_INDEXED16);
 }
@@ -392,18 +354,18 @@ SCREEN_UPDATE( lordgun )
 
 	int x, y;
 
-	tilemap_set_scrollx( state->m_tilemap_0, 0, *state->m_scroll_x_0 );
-	tilemap_set_scrolly( state->m_tilemap_0, 0, *state->m_scroll_y_0 );
+	tilemap_set_scrollx( state->m_tilemap[0], 0, *state->m_scroll_x[0] );
+	tilemap_set_scrolly( state->m_tilemap[0], 0, *state->m_scroll_y[0] );
 
 	for (y = 0; y < 0x200; y++)
-		tilemap_set_scrollx( state->m_tilemap_1, y, (*state->m_scroll_x_1) + state->m_scrollram[y * 4/2 + 2/2]);
-	tilemap_set_scrolly( state->m_tilemap_1, 0, *state->m_scroll_y_1 );
+		tilemap_set_scrollx( state->m_tilemap[1], y, (*state->m_scroll_x[1]) + state->m_scrollram[y * 4/2 + 2/2]);
+	tilemap_set_scrolly( state->m_tilemap[1], 0, *state->m_scroll_y[1] );
 
-	tilemap_set_scrollx( state->m_tilemap_2, 0, *state->m_scroll_x_2 );
-	tilemap_set_scrolly( state->m_tilemap_2, 0, *state->m_scroll_y_2 );
+	tilemap_set_scrollx( state->m_tilemap[2], 0, *state->m_scroll_x[2] );
+	tilemap_set_scrolly( state->m_tilemap[2], 0, *state->m_scroll_y[2] );
 
-	tilemap_set_scrollx( state->m_tilemap_3, 0, *state->m_scroll_x_3 );
-	tilemap_set_scrolly( state->m_tilemap_3, 0, *state->m_scroll_y_3 );
+	tilemap_set_scrollx( state->m_tilemap[3], 0, *state->m_scroll_x[3] );
+	tilemap_set_scrolly( state->m_tilemap[3], 0, *state->m_scroll_y[3] );
 
 	// Rendering:
 
@@ -416,10 +378,10 @@ SCREEN_UPDATE( lordgun )
 	for (l = 0; l < 5; l++)
 		bitmap_fill(state->m_bitmaps[l], cliprect, trans_pen);
 
-	if (layers_ctrl & 1)	tilemap_draw(state->m_bitmaps[0], cliprect, state->m_tilemap_0, 0, 0);
-	if (layers_ctrl & 2)	tilemap_draw(state->m_bitmaps[1], cliprect, state->m_tilemap_1, 0, 0);
-	if (layers_ctrl & 4)	tilemap_draw(state->m_bitmaps[2], cliprect, state->m_tilemap_2, 0, 0);
-	if (layers_ctrl & 8)	tilemap_draw(state->m_bitmaps[3], cliprect, state->m_tilemap_3, 0, 0);
+	if (layers_ctrl & 1)	tilemap_draw(state->m_bitmaps[0], cliprect, state->m_tilemap[0], 0, 0);
+	if (layers_ctrl & 2)	tilemap_draw(state->m_bitmaps[1], cliprect, state->m_tilemap[1], 0, 0);
+	if (layers_ctrl & 4)	tilemap_draw(state->m_bitmaps[2], cliprect, state->m_tilemap[2], 0, 0);
+	if (layers_ctrl & 8)	tilemap_draw(state->m_bitmaps[3], cliprect, state->m_tilemap[3], 0, 0);
 	if (layers_ctrl & 16)	draw_sprites(screen->machine(), state->m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap

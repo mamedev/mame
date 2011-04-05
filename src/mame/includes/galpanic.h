@@ -1,8 +1,10 @@
-class galpanic_state : public driver_device
+#include "includes/kaneko16.h"
+
+class galpanic_state : public kaneko16_state
 {
 public:
 	galpanic_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
 	UINT16 *m_bgvideoram;
 	UINT16 *m_fgvideoram;

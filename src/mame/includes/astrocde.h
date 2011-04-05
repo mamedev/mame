@@ -19,13 +19,58 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *m_videoram;
+	UINT8 m_video_config;
+	UINT8 m_sparkle[4];
+	char m_totalword[256];
+	char *m_totalword_ptr;
+	char m_oldword[256];
+	int m_plural;
+	UINT8 *m_protected_ram;
+	UINT8 m_port_1_last;
+	UINT8 m_port_2_last;
+	UINT8 m_ram_write_enable;
+	UINT8 m_input_select;
+	UINT8 m_profpac_bank;
+	UINT8 *m_sparklestar;
+	UINT8 m_interrupt_enabl;
+	UINT8 m_interrupt_vector;
+	UINT8 m_interrupt_scanline;
+	UINT8 m_vertical_feedback;
+	UINT8 m_horizontal_feedback;
+	emu_timer *m_scanline_timer;
+	UINT8 m_colors[8];
+	UINT8 m_colorsplit;
+	UINT8 m_bgdata;
+	UINT8 m_vblank;
+	UINT8 m_video_mode;
+	UINT8 m_funcgen_expand_color[2];
+	UINT8 m_funcgen_control;
+	UINT8 m_funcgen_expand_count;
+	UINT8 m_funcgen_rotate_count;
+	UINT8 m_funcgen_rotate_data[4];
+	UINT8 m_funcgen_shift_prev_data;
+	UINT8 m_funcgen_intercept;
+	UINT16 m_pattern_source;
+	UINT8 m_pattern_mode;
+	UINT16 m_pattern_dest;
+	UINT8 m_pattern_skip;
+	UINT8 m_pattern_width;
+	UINT8 m_pattern_height;
+	UINT16 *m_profpac_videoram;
+	UINT16 m_profpac_palette[16];
+	UINT8 m_profpac_colormap[4];
+	UINT8 m_profpac_intercept;
+	UINT8 m_profpac_vispage;
+	UINT8 m_profpac_readpage;
+	UINT8 m_profpac_readshift;
+	UINT8 m_profpac_writepage;
+	UINT8 m_profpac_writemode;
+	UINT16 m_profpac_writemask;
+	UINT8 m_profpac_vw;
 };
 
 
 /*----------- defined in video/astrocde.c -----------*/
-
-extern UINT8 astrocade_video_config;
-extern UINT8 astrocade_sparkle[4];
 
 PALETTE_INIT( astrocde );
 PALETTE_INIT( profpac );

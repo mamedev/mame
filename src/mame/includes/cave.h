@@ -29,14 +29,8 @@ public:
 
 	/* memory pointers */
 	UINT16 *     m_videoregs;
-	UINT16 *     m_vram_0;
-	UINT16 *     m_vram_1;
-	UINT16 *     m_vram_2;
-	UINT16 *     m_vram_3;
-	UINT16 *     m_vctrl_0;
-	UINT16 *     m_vctrl_1;
-	UINT16 *     m_vctrl_2;
-	UINT16 *     m_vctrl_3;
+	UINT16 *     m_vram[4];
+	UINT16 *     m_vctrl[4];
 	UINT16 *     m_spriteram;
 	UINT16 *     m_spriteram_2;
 	UINT16 *     m_paletteram;
@@ -60,18 +54,9 @@ public:
 	void (*m_get_sprite_info)(running_machine &machine);
 	void (*m_sprite_draw)(running_machine &machine, int priority);
 
-	tilemap_t    *m_tilemap_0;
-	tilemap_t    *m_tilemap_1;
-	tilemap_t    *m_tilemap_2;
-	tilemap_t    *m_tilemap_3;
-	int          m_tiledim_0;
-	int          m_old_tiledim_0;
-	int          m_tiledim_1;
-	int          m_old_tiledim_1;
-	int          m_tiledim_2;
-	int          m_old_tiledim_2;
-	int          m_tiledim_3;
-	int          m_old_tiledim_3;
+	tilemap_t    *m_tilemap[4];
+	int          m_tiledim[4];
+	int          m_old_tiledim[4];
 
 	bitmap_t     *m_sprite_zbuf;
 	UINT16       m_sprite_zbuf_baseval;

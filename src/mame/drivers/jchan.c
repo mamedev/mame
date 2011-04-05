@@ -175,11 +175,11 @@ there are 9 PALS on the pcb (not dumped)
 #include "includes/kaneko16.h"
 #include "video/sknsspr.h"
 
-class jchan_state : public driver_device
+class jchan_state : public kaneko16_state
 {
 public:
 	jchan_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
 	bitmap_t *m_sprite_bitmap_1;
 	bitmap_t *m_sprite_bitmap_2;
@@ -260,24 +260,23 @@ static void jchan_mcu_run(running_machine &machine)
 	}
 }
 
-#define JCHAN_MCU_COM_W(_n_) \
-static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
-{ \
-	jchan_state *state = space->machine().driver_data<jchan_state>(); \
-	COMBINE_DATA(&state->m_mcu_com[_n_]); \
-	if (state->m_mcu_com[0] != 0xFFFF)	return; \
-	if (state->m_mcu_com[1] != 0xFFFF)	return; \
-	if (state->m_mcu_com[2] != 0xFFFF)	return; \
-	if (state->m_mcu_com[3] != 0xFFFF)	return; \
-\
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	jchan_mcu_run(space->machine()); \
+INLINE void jchan_mcu_com_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+{
+	jchan_state *state = space->machine().driver_data<jchan_state>();
+	COMBINE_DATA(&state->m_mcu_com[_n_]);
+	if (state->m_mcu_com[0] != 0xFFFF)	return;
+	if (state->m_mcu_com[1] != 0xFFFF)	return;
+	if (state->m_mcu_com[2] != 0xFFFF)	return;
+	if (state->m_mcu_com[3] != 0xFFFF)	return;
+
+	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );
+	jchan_mcu_run(space->machine());
 }
 
-JCHAN_MCU_COM_W(0)
-JCHAN_MCU_COM_W(1)
-JCHAN_MCU_COM_W(2)
-JCHAN_MCU_COM_W(3)
+static WRITE16_HANDLER( jchan_mcu_com0_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 0); }
+static WRITE16_HANDLER( jchan_mcu_com1_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 1); }
+static WRITE16_HANDLER( jchan_mcu_com2_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 2); }
+static WRITE16_HANDLER( jchan_mcu_com3_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 3); }
 
 static READ16_HANDLER( jchan_mcu_status_r )
 {
@@ -536,11 +535,11 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_mainsub_shared_ram) AM_SHARE("share1")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
-	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
-	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
-	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(jchan_state, m_vram[1])	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(jchan_state, m_vram[0])	//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_vscroll[1])									//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_vscroll[0])									//
+	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(jchan_state, m_layers_0_regs)	// Layers 0 Regs
 
 	/* background prites */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(jchan_suprnova_sprite32_2_w) AM_BASE_MEMBER(jchan_state, m_spriteram_2)

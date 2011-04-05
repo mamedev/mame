@@ -100,74 +100,68 @@ const char *const wow_sample_names[] =
 };
 
 
-/* Total word to join the phonemes together - Global to make it easier to use */
-
-static char totalword[256], *totalword_ptr;
-static char oldword[256];
-static int plural;
-
 READ8_HANDLER( wow_speech_r )
 {
+	astrocde_state *state = space->machine().driver_data<astrocde_state>();
 	device_t *samples = space->machine().device("samples");
 	int Phoneme/*, Intonation*/;
 	int i = 0;
-
 	UINT8 data = offset >> 8;
 	offset &= 0xff;
 
-	totalword_ptr = totalword;
+	state->m_totalword_ptr = state->m_totalword;
 
 	Phoneme = data & 0x3F;
-//  Intonation = data >> 6;
+	//Intonation = data >> 6;
 
-//  logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
+	//logerror("Data : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	if(Phoneme==63) {
 		sample_stop(samples, 0);
-//              logerror("Clearing sample %s\n",totalword);
-				totalword[0] = 0;				   /* Clear the total word stack */
-				return data;
+		//logerror("Clearing sample %s\n",state->m_totalword);
+		state->m_totalword[0] = 0;				   /* Clear the total word stack */
+		return data;
 	}
 	if (Phoneme==3)						   /* We know PA0 is never part of a word */
-				totalword[0] = 0;				   /* Clear the total word stack */
+		state->m_totalword[0] = 0;				   /* Clear the total word stack */
 
-/* Phoneme to word translation */
+	/* Phoneme to word translation */
 
-	if (strlen(totalword) == 0) {
-	   strcpy(totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
-	   if (plural != 0) {
-//        logerror("found a possible plural at %d\n",plural-1);
-		  if (!strcmp("S",totalword)) {		   /* Plural check */
-			 sample_start(samples, 0, num_samples-2, 0);	   /* play the sample at position of word */
-			 sample_set_freq(samples, 0, 11025);    /* play at correct rate */
-			 totalword[0] = 0;				   /* Clear the total word stack */
-			 oldword[0] = 0;				   /* Clear the total word stack */
-			 return data;
-		  } else {
-			 plural=0;
-		  }
-	   }
+	if (strlen(state->m_totalword) == 0) {
+		strcpy(state->m_totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
+		if (state->m_plural != 0) {
+			//logerror("found a possible plural at %d\n",state->m_plural-1);
+			if (!strcmp("S",state->m_totalword)) {		   /* Plural check */
+				sample_start(samples, 0, num_samples-2, 0);	   /* play the sample at position of word */
+				sample_set_freq(samples, 0, 11025);    /* play at correct rate */
+				state->m_totalword[0] = 0;				   /* Clear the total word stack */
+				state->m_oldword[0] = 0;				   /* Clear the total word stack */
+				return data;
+			} else {
+				 state->m_plural=0;
+			}
+		}
 	} else
-	   strcat(totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
+		strcat(state->m_totalword,PhonemeTable[Phoneme]);	                   /* Copy over the first phoneme */
 
-//  logerror("Total word = %s\n",totalword);
+	//logerror("Total word = %s\n",state->m_totalword);
 
 	for (i=0; wowWordTable[i]; i++) {
-	   if (!strcmp(wowWordTable[i],totalword)) {		   /* Scan the word (sample) table for the complete word */
-	  /* WOW has Dungeon */
-		  if ((!strcmp("GDTO1RFYA2N",totalword)) || (!strcmp("RO1U1BAH1T",totalword)) || (!strcmp("KO1UH3I3E1N",totalword))) {		   /* May be plural */
-			 plural=i+1;
-			 strcpy(oldword,totalword);
-//       logerror("Storing sample position %d and copying string %s\n",plural,oldword);
-		  } else {
-			 plural=0;
-		  }
-		  sample_start(samples, 0, i, 0);	                   /* play the sample at position of word */
-		  sample_set_freq(samples, 0, 11025);         /* play at correct rate */
-//        logerror("Playing sample %d\n",i);
-		  totalword[0] = 0;				   /* Clear the total word stack */
-		  return data;
-	   }
+		if (!strcmp(wowWordTable[i],state->m_totalword)) {		   /* Scan the word (sample) table for the complete word */
+			/* WOW has Dungeon */
+			if ((!strcmp("GDTO1RFYA2N",state->m_totalword)) || (!strcmp("RO1U1BAH1T",state->m_totalword)) || (!strcmp("KO1UH3I3E1N",state->m_totalword))) {		   /* May be plural */
+				state->m_plural=i+1;
+				strcpy(state->m_oldword,state->m_totalword);
+				//logerror("Storing sample position %d and copying string %s\n",state->m_plural,state->m_oldword);
+			} else {
+				state->m_plural=0;
+			}
+			sample_start(samples, 0, i, 0);	                   /* play the sample at position of word */
+			sample_set_freq(samples, 0, 11025);         /* play at correct rate */
+			//logerror("Playing sample %d\n",i);
+			state->m_totalword[0] = 0;				   /* Clear the total word stack */
+			return data;
+		}
 	}
 
 	/* Note : We should really also use volume in this as well as frequency */

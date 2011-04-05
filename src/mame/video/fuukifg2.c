@@ -44,27 +44,30 @@
 
 ***************************************************************************/
 
-#define LAYER( _N_ ) \
-\
-static TILE_GET_INFO( get_tile_info_##_N_ ) \
-{ \
-	fuuki16_state *state = machine.driver_data<fuuki16_state>(); \
-	UINT16 code = state->m_vram_##_N_[2 * tile_index + 0]; \
-	UINT16 attr = state->m_vram_##_N_[2 * tile_index + 1]; \
-	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3)); \
-} \
-\
-WRITE16_HANDLER( fuuki16_vram_##_N_##_w ) \
-{ \
-	fuuki16_state *state = space->machine().driver_data<fuuki16_state>(); \
-	COMBINE_DATA(&state->m_vram_##_N_[offset]); \
-	tilemap_mark_tile_dirty(state->m_tilemap_##_N_, offset / 2); \
+INLINE void get_tile_info(running_machine &machine, tile_data *tileinfo, tilemap_memory_index tile_index, int _N_)
+{
+	fuuki16_state *state = machine.driver_data<fuuki16_state>();
+	UINT16 code = state->m_vram[_N_][2 * tile_index + 0];
+	UINT16 attr = state->m_vram[_N_][2 * tile_index + 1];
+	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-LAYER( 0 )
-LAYER( 1 )
-LAYER( 2 )
-LAYER( 3 )
+static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine, tileinfo, tile_index, 0); }
+static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine, tileinfo, tile_index, 1); }
+static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine, tileinfo, tile_index, 2); }
+static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info(machine, tileinfo, tile_index, 3); }
+
+INLINE void fuuki16_vram_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+{
+	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
+	COMBINE_DATA(&state->m_vram[_N_][offset]);
+	tilemap_mark_tile_dirty(state->m_tilemap[_N_], offset / 2);
+}
+
+WRITE16_HANDLER( fuuki16_vram_0_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 0); }
+WRITE16_HANDLER( fuuki16_vram_1_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 1); }
+WRITE16_HANDLER( fuuki16_vram_2_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 2); }
+WRITE16_HANDLER( fuuki16_vram_3_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -91,15 +94,15 @@ PALETTE_INIT( fuuki16 )
 VIDEO_START( fuuki16 )
 {
 	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	state->m_tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
-	state->m_tilemap_2 = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 64, 32);
-	state->m_tilemap_3 = tilemap_create(machine, get_tile_info_3, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
+	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
+	state->m_tilemap[2] = tilemap_create(machine, get_tile_info_2, tilemap_scan_rows, 8, 8, 64, 32);
+	state->m_tilemap[3] = tilemap_create(machine, get_tile_info_3, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(state->m_tilemap_0, 0x0f);	// 4 bits
-	tilemap_set_transparent_pen(state->m_tilemap_1, 0xff);	// 8 bits
-	tilemap_set_transparent_pen(state->m_tilemap_2, 0x0f);	// 4 bits
-	tilemap_set_transparent_pen(state->m_tilemap_3, 0x0f);	// 4 bits
+	tilemap_set_transparent_pen(state->m_tilemap[0], 0x0f);	// 4 bits
+	tilemap_set_transparent_pen(state->m_tilemap[1], 0xff);	// 8 bits
+	tilemap_set_transparent_pen(state->m_tilemap[2], 0x0f);	// 4 bits
+	tilemap_set_transparent_pen(state->m_tilemap[3], 0x0f);	// 4 bits
 
 	machine.gfx[2]->color_granularity = 16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
 }
@@ -269,12 +272,12 @@ static void fuuki16_draw_layer( running_machine &machine, bitmap_t *bitmap, cons
 
 	switch( i )
 	{
-		case 2:	if (buffer)	tilemap_draw(bitmap, cliprect, state->m_tilemap_3, flag, pri);
-				else		tilemap_draw(bitmap, cliprect, state->m_tilemap_2, flag, pri);
+		case 2:	if (buffer)	tilemap_draw(bitmap, cliprect, state->m_tilemap[3], flag, pri);
+				else		tilemap_draw(bitmap, cliprect, state->m_tilemap[2], flag, pri);
 				return;
-		case 1:	tilemap_draw(bitmap, cliprect, state->m_tilemap_1, flag, pri);
+		case 1:	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], flag, pri);
 				return;
-		case 0:	tilemap_draw(bitmap, cliprect, state->m_tilemap_0, flag, pri);
+		case 0:	tilemap_draw(bitmap, cliprect, state->m_tilemap[0], flag, pri);
 				return;
 	}
 }
@@ -318,15 +321,15 @@ SCREEN_UPDATE( fuuki16 )
 	layer2_scrolly = state->m_vregs[0x8 / 2];
 	layer2_scrollx = state->m_vregs[0xa / 2];
 
-	tilemap_set_scrollx(state->m_tilemap_0, 0, layer0_scrollx);
-	tilemap_set_scrolly(state->m_tilemap_0, 0, layer0_scrolly);
-	tilemap_set_scrollx(state->m_tilemap_1, 0, layer1_scrollx);
-	tilemap_set_scrolly(state->m_tilemap_1, 0, layer1_scrolly);
+	tilemap_set_scrollx(state->m_tilemap[0], 0, layer0_scrollx);
+	tilemap_set_scrolly(state->m_tilemap[0], 0, layer0_scrolly);
+	tilemap_set_scrollx(state->m_tilemap[1], 0, layer1_scrollx);
+	tilemap_set_scrolly(state->m_tilemap[1], 0, layer1_scrolly);
 
-	tilemap_set_scrollx(state->m_tilemap_2, 0, layer2_scrollx + 0x10);
-	tilemap_set_scrolly(state->m_tilemap_2, 0, layer2_scrolly /*+ 0x02*/);
-	tilemap_set_scrollx(state->m_tilemap_3, 0, layer2_scrollx + 0x10);
-	tilemap_set_scrolly(state->m_tilemap_3, 0, layer2_scrolly /*+ 0x02*/);
+	tilemap_set_scrollx(state->m_tilemap[2], 0, layer2_scrollx + 0x10);
+	tilemap_set_scrolly(state->m_tilemap[2], 0, layer2_scrolly /*+ 0x02*/);
+	tilemap_set_scrollx(state->m_tilemap[3], 0, layer2_scrollx + 0x10);
+	tilemap_set_scrolly(state->m_tilemap[3], 0, layer2_scrolly /*+ 0x02*/);
 
 	/* The backmost tilemap decides the background color(s) but sprites can
        go below the opaque pixels of that tilemap. We thus need to mark the

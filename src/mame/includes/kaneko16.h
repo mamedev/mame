@@ -4,12 +4,110 @@
 
 ***************************************************************************/
 
+#ifndef __KANEKO16_H__
+#define __KANEKO16_H__
+
 #include "machine/nvram.h"
 
-/*----------- defined in machine/kaneko16.c -----------*/
+typedef struct
+{
+	int VIEW2_2_pri;
+	int sprite[4];
+} kaneko16_priority_t;
 
-extern UINT16 *kaneko16_mcu_ram; /* for calc3 and toybox */
-extern UINT8 kaneko16_nvram_save[128];
+
+typedef struct
+{
+	UINT16 x1p, y1p, x1s, y1s;
+	UINT16 x2p, y2p, x2s, y2s;
+
+	INT16 x12, y12, x21, y21;
+
+	UINT16 mult_a, mult_b;
+} calc1_hit_t;
+
+typedef struct
+{
+	int x1p, y1p, z1p, x1s, y1s, z1s;
+	int x2p, y2p, z2p, x2s, y2s, z2s;
+
+	int x1po, y1po, z1po, x1so, y1so, z1so;
+	int x2po, y2po, z2po, x2so, y2so, z2so;
+
+	int x12, y12, z12, x21, y21, z21;
+
+	int x_coll, y_coll, z_coll;
+
+	int x1tox2, y1toy2, z1toz2;
+
+	UINT16 mult_a, mult_b;
+
+	UINT16 flags;
+	UINT16 mode;
+} calc3_hit_t;
+
+typedef struct
+{
+	int mcu_status;
+	int mcu_command_offset;
+	UINT16 mcu_crc;
+	UINT8 decryption_key_byte;
+	UINT8 alternateswaps;
+	UINT8 shift;
+	UINT8 subtracttype;
+	UINT8 mode;
+	UINT8 blocksize_offset;
+	UINT16 dataend;
+	UINT16 database;
+	int data_header[2];
+	UINT32 writeaddress;
+	UINT32 writeaddress_current;
+	UINT16 dsw_addr;
+	UINT16 eeprom_addr;
+	UINT16 poll_addr;
+	UINT16 checksumaddress;
+} calc3_t;
+
+class kaneko16_state : public driver_device
+{
+public:
+	kaneko16_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *m_mcu_ram;
+	UINT8 m_nvram_save[128];
+	UINT16 *m_vram[4];
+	UINT16 *m_layers_0_regs;
+	UINT16 *m_layers_1_regs;
+	UINT16 *m_vscroll[4];
+	int m_sprite_type;
+	int m_sprite_fliptype;
+	UINT16 m_sprite_xoffs;
+	UINT16 m_sprite_flipx;
+	UINT16 m_sprite_yoffs;
+	UINT16 m_sprite_flipy;
+	UINT16 *m_sprites_regs;
+	UINT16 *m_bg15_select;
+	UINT16 *m_bg15_reg;
+	struct tempsprite *m_first_sprite;
+	kaneko16_priority_t m_priority;
+	UINT16* m_galsnew_bg_pixram;
+	UINT16* m_galsnew_fg_pixram;
+	UINT16* m_mainram;
+	calc1_hit_t m_hit;
+	calc3_hit_t m_hit3;
+	calc3_t m_calc3;
+	void (*m_toybox_mcu_run)(running_machine &machine);
+	UINT16 m_toybox_mcu_com[4];
+	UINT16 m_disp_enable;
+	tilemap_t *m_tmap[4];
+	int m_keep_sprites;
+	bitmap_t *m_bg15_bitmap;
+	bitmap_t *m_sprites_bitmap;
+};
+
+
+/*----------- defined in machine/kaneko16.c -----------*/
 
 READ16_HANDLER( galpanib_calc_r );
 WRITE16_HANDLER( galpanib_calc_w );
@@ -17,27 +115,26 @@ WRITE16_HANDLER( galpanib_calc_w );
 READ16_HANDLER( bloodwar_calc_r );
 WRITE16_HANDLER( bloodwar_calc_w );
 
-void calc3_mcu_init(void);
+void calc3_mcu_init(running_machine &machine);
 WRITE16_HANDLER( calc3_mcu_ram_w );
 WRITE16_HANDLER( calc3_mcu_com0_w );
 WRITE16_HANDLER( calc3_mcu_com1_w );
 WRITE16_HANDLER( calc3_mcu_com2_w );
 WRITE16_HANDLER( calc3_mcu_com3_w );
 
-void toybox_mcu_init(void);
+void toybox_mcu_init(running_machine &machine);
 WRITE16_HANDLER( toybox_mcu_com0_w );
 WRITE16_HANDLER( toybox_mcu_com1_w );
 WRITE16_HANDLER( toybox_mcu_com2_w );
 WRITE16_HANDLER( toybox_mcu_com3_w );
 READ16_HANDLER( toybox_mcu_status_r );
 
-extern void (*toybox_mcu_run)(running_machine &machine);	/* one of the following */
 void bloodwar_mcu_run(running_machine &machine);
 void bonkadv_mcu_run(running_machine &machine);
 void gtmr_mcu_run(running_machine &machine);
 void calc3_mcu_run(running_machine &machine);
 
-void toxboy_handle_04_subcommand(running_machine& machine,UINT8 mcu_subcmd, UINT16*mcu_ram);
+void toxboy_handle_04_subcommand(running_machine& machine, UINT8 mcu_subcmd, UINT16*mcu_ram);
 
 DRIVER_INIT( decrypt_toybox_rom );
 DRIVER_INIT( decrypt_toybox_rom_alt );
@@ -53,13 +150,6 @@ MACHINE_RESET( kaneko16 );
 
 WRITE16_HANDLER( kaneko16_display_enable );
 
-/* Tile Layers: */
-
-extern UINT16 *kaneko16_vram_0,    *kaneko16_vram_1,    *kaneko16_layers_0_regs;
-extern UINT16 *kaneko16_vscroll_0, *kaneko16_vscroll_1;
-extern UINT16 *kaneko16_vram_2,    *kaneko16_vram_3,    *kaneko16_layers_1_regs;
-extern UINT16 *kaneko16_vscroll_2, *kaneko16_vscroll_3;
-
 WRITE16_HANDLER( kaneko16_vram_0_w );
 WRITE16_HANDLER( kaneko16_vram_1_w );
 WRITE16_HANDLER( kaneko16_vram_2_w );
@@ -68,23 +158,10 @@ WRITE16_HANDLER( kaneko16_vram_3_w );
 WRITE16_HANDLER( kaneko16_layers_0_regs_w );
 WRITE16_HANDLER( kaneko16_layers_1_regs_w );
 
-
-/* Sprites: */
-
-extern int kaneko16_sprite_type;
-extern int kaneko16_sprite_fliptype;
-extern UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
-extern UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
-extern UINT16 *kaneko16_sprites_regs;
-
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
 void kaneko16_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
-
-/* Pixel Layer: */
-
-extern UINT16 *kaneko16_bg15_select, *kaneko16_bg15_reg;
 
 READ16_HANDLER ( kaneko16_bg15_select_r );
 WRITE16_HANDLER( kaneko16_bg15_select_w );
@@ -93,21 +170,6 @@ READ16_HANDLER ( kaneko16_bg15_reg_r );
 WRITE16_HANDLER( kaneko16_bg15_reg_w );
 
 PALETTE_INIT( berlwall );
-
-
-/* Priorities: */
-
-typedef struct
-{
-	int VIEW2_2_pri;
-	int sprite[4];
-}	kaneko16_priority_t;
-
-extern kaneko16_priority_t kaneko16_priority;
-
-
-/* Machine */
-
 
 VIDEO_START( kaneko16_sprites );
 VIDEO_START( kaneko16_1xVIEW2_tilemaps );
@@ -125,5 +187,4 @@ SCREEN_UPDATE( jchan_view2 );
 VIDEO_START( galsnew );
 SCREEN_UPDATE( galsnew );
 
-extern UINT16* galsnew_bg_pixram;
-extern UINT16* galsnew_fg_pixram;
+#endif

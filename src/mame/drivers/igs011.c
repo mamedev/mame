@@ -476,26 +476,24 @@ static WRITE16_HANDLER( igs_dips_w )
 	COMBINE_DATA(&state->m_igs_dips_sel);
 }
 
-#define IGS_DIPS_R( NUM )																\
-static READ16_HANDLER( igs_##NUM##_dips_r )												\
-{ \
-	igs011_state *state = space->machine().driver_data<igs011_state>();																						\
-	int i;																				\
-	UINT16 ret=0;																		\
-	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };	\
-																						\
-	for (i = 0; i < NUM; i++)															\
-		if ((~state->m_igs_dips_sel) & (1 << i) )												\
-			ret = input_port_read(space->machine(), dipnames[i]);							\
-																						\
-	/* 0x0100 is blitter busy */														\
-	return	(ret & 0xff) | 0x0000;														\
+INLINE UINT16 igs_dips_r(address_space *space, int NUM) 
+{
+	igs011_state *state = space->machine().driver_data<igs011_state>();
+	int i;
+	UINT16 ret=0;
+	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };
+
+	for (i = 0; i < NUM; i++)
+		if ((~state->m_igs_dips_sel) & (1 << i) )
+			ret = input_port_read(space->machine(), dipnames[i]);
+	/* 0x0100 is blitter busy */
+	return	(ret & 0xff) | 0x0000;
 }
 
 // Games have 3 to 5 dips
-IGS_DIPS_R( 3 )
-IGS_DIPS_R( 4 )
-IGS_DIPS_R( 5 )
+static READ16_HANDLER( igs_3_dips_r ) { return igs_dips_r(space, 3); }
+static READ16_HANDLER( igs_4_dips_r ) { return igs_dips_r(space, 4); }
+static READ16_HANDLER( igs_5_dips_r ) { return igs_dips_r(space, 5); }
 
 /***************************************************************************
 

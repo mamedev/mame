@@ -1117,20 +1117,13 @@ ADDRESS_MAP_END
 
 #define KARATOUR_OFFS( _x_ ) ((_x_) & (0x3f)) + (((_x_) & ~(0x3f)) * (0x100 / 0x40))
 
-#define KARATOUR_VRAM( _n_ ) \
-static READ16_HANDLER( karatour_vram_##_n_##_r ) \
-{ \
-	metro_state *state = space->machine().driver_data<metro_state>(); \
-	return state->m_vram_##_n_[KARATOUR_OFFS(offset)]; \
-} \
-static WRITE16_HANDLER( karatour_vram_##_n_##_w ) \
-{ \
-	metro_vram_##_n_##_w(space, KARATOUR_OFFS(offset), data, mem_mask); \
-}
+static READ16_HANDLER( karatour_vram_0_r ) { return space->machine().driver_data<metro_state>()->m_vram_0[KARATOUR_OFFS(offset)]; }
+static READ16_HANDLER( karatour_vram_1_r ) { return space->machine().driver_data<metro_state>()->m_vram_1[KARATOUR_OFFS(offset)]; }
+static READ16_HANDLER( karatour_vram_2_r ) { return space->machine().driver_data<metro_state>()->m_vram_2[KARATOUR_OFFS(offset)]; }
 
-KARATOUR_VRAM( 0 )
-KARATOUR_VRAM( 1 )
-KARATOUR_VRAM( 2 )
+static WRITE16_HANDLER( karatour_vram_0_w ) { metro_vram_0_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
+static WRITE16_HANDLER( karatour_vram_1_w ) { metro_vram_1_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
+static WRITE16_HANDLER( karatour_vram_2_w ) { metro_vram_2_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
 
 static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM

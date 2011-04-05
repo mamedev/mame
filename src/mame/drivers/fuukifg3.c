@@ -234,10 +234,10 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																// Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM																// Work RAM (used by asurabus)
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki32_vram_0_w) AM_BASE_MEMBER(fuuki32_state, m_vram_0)					// Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki32_vram_1_w) AM_BASE_MEMBER(fuuki32_state, m_vram_1)					// Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki32_vram_2_w) AM_BASE_MEMBER(fuuki32_state, m_vram_2)					// Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_BASE_MEMBER(fuuki32_state, m_vram_3)					// Tilemap bg2
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki32_vram_0_w) AM_BASE_MEMBER(fuuki32_state, m_vram[0])					// Tilemap 1
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki32_vram_1_w) AM_BASE_MEMBER(fuuki32_state, m_vram[1])					// Tilemap 2
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki32_vram_2_w) AM_BASE_MEMBER(fuuki32_state, m_vram[2])					// Tilemap bg
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_BASE_MEMBER(fuuki32_state, m_vram[3])					// Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM																// More tilemap, or linescroll? Seems to be empty all of the time
 
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_BASE_SIZE_MEMBER(fuuki32_state, m_spriteram, m_spriteram_size)					// Sprites

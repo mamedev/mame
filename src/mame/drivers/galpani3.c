@@ -68,11 +68,11 @@ Dumped by Uki
 #include "includes/kaneko16.h"
 #include "video/sknsspr.h"
 
-class galpani3_state : public driver_device
+class galpani3_state : public kaneko16_state
 {
 public:
 	galpani3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
 	UINT16* m_priority_buffer;
 	UINT16* m_framebuffer1;
@@ -531,24 +531,24 @@ static void galpani3_mcu_run(running_machine &machine)
    * com0=com1=0xFFFF -> command to execute
    * com2=com3=0xFFFF -> status reading only
 */
-#define GALPANI3_MCU_COM_W(_n_) \
-static WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
-{ \
-	galpani3_state *state = space->machine().driver_data<galpani3_state>(); \
-	COMBINE_DATA(&state->m_mcu_com[_n_]); \
-	if (state->m_mcu_com[0] != 0xFFFF)	return; \
-	if (state->m_mcu_com[1] != 0xFFFF)	return; \
-	if (state->m_mcu_com[2] != 0xFFFF)	return; \
-	if (state->m_mcu_com[3] != 0xFFFF)	return; \
-\
-	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	galpani3_mcu_run(space->machine()); \
+
+INLINE void galpani3_mcu_com_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int _n_)
+{
+	galpani3_state *state = space->machine().driver_data<galpani3_state>();
+	COMBINE_DATA(&state->m_mcu_com[_n_]);
+	if (state->m_mcu_com[0] != 0xFFFF)	return;
+	if (state->m_mcu_com[1] != 0xFFFF)	return;
+	if (state->m_mcu_com[2] != 0xFFFF)	return;
+	if (state->m_mcu_com[3] != 0xFFFF)	return;
+
+	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );
+	galpani3_mcu_run(space->machine());
 }
 
-GALPANI3_MCU_COM_W(0)
-GALPANI3_MCU_COM_W(1)
-GALPANI3_MCU_COM_W(2)
-GALPANI3_MCU_COM_W(3)
+static WRITE16_HANDLER( galpani3_mcu_com0_w ) { galpani3_mcu_com_w(space, offset, data, mem_mask, 0); }
+static WRITE16_HANDLER( galpani3_mcu_com1_w ) { galpani3_mcu_com_w(space, offset, data, mem_mask, 1); }
+static WRITE16_HANDLER( galpani3_mcu_com2_w ) { galpani3_mcu_com_w(space, offset, data, mem_mask, 2); }
+static WRITE16_HANDLER( galpani3_mcu_com3_w ) { galpani3_mcu_com_w(space, offset, data, mem_mask, 3); }
 
 static READ16_HANDLER( galpani3_mcu_status_r )
 {

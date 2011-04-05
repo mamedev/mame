@@ -151,11 +151,11 @@ the layer is misplaced however, different scroll regs?
 #include "sound/okim6295.h"
 
 
-class expro02_state : public driver_device
+class expro02_state : public kaneko16_state
 {
 public:
 	expro02_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;
@@ -336,7 +336,7 @@ static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
-			if(kaneko16_vram_0[i])
+			if(state->m_vram[0][i])
 			{
 				kaneko16_vram_0_w(space, i+1, data << 8, 0xFF00);
 			}
@@ -353,7 +353,7 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 	{
 		for(i = 0; i < 0x1000 / 2; i += 2)
 		{
-			if(kaneko16_vram_1[i])
+			if(state->m_vram[1][i])
 			{
 				kaneko16_vram_1_w(space, i+1, data << 8, 0xFF00);
 			}
@@ -375,21 +375,21 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 
 
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galsnew_bg_pixram)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(&galsnew_fg_pixram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_bg_pixram)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_fg_pixram)
 
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
-	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
-	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(expro02_state, m_vram[1])	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(expro02_state, m_vram[0])	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE_MEMBER(expro02_state, m_vscroll[1])									//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE_MEMBER(expro02_state, m_vscroll[0])									//
 
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
 
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(expro02_state, m_layers_0_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(expro02_state, m_spriteram, m_spriteram_size)	 // sprites? 0x72f words tested
 
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE_MEMBER(expro02_state, m_sprites_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
@@ -413,16 +413,16 @@ ADDRESS_MAP_END
 //  no CALC mcu
 static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galsnew_bg_pixram)
-	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(&galsnew_fg_pixram)
-	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
-	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
-	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_bg_pixram)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_fg_pixram)
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(expro02_state, m_vram[1])	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(expro02_state, m_vram[0])	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE_MEMBER(expro02_state, m_vscroll[1])									//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE_MEMBER(expro02_state, m_vscroll[0])									//
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(expro02_state, m_layers_0_regs) // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(expro02_state, m_spriteram, m_spriteram_size)	 // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE_MEMBER(expro02_state, m_sprites_regs) // sprite regs? tileregs?
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
@@ -449,16 +449,17 @@ static INTERRUPT_GEN( galsnew_interrupt )
 
 static MACHINE_RESET( galsnew )
 {
-	kaneko16_sprite_type  = 0;
+	expro02_state *state = machine.driver_data<expro02_state>();
+	state->m_sprite_type  = 0;
 
-	kaneko16_sprite_xoffs = 0;
-	kaneko16_sprite_yoffs = -1*0x40; // align testgrid with bitmap in service mode
+	state->m_sprite_xoffs = 0;
+	state->m_sprite_yoffs = -1*0x40; // align testgrid with bitmap in service mode
 
 	// priorities not verified
-	kaneko16_priority.sprite[0] = 8;	// above all
-	kaneko16_priority.sprite[1] = 8;	// above all
-	kaneko16_priority.sprite[2] = 8;	// above all
-	kaneko16_priority.sprite[3] = 8;	// above all
+	state->m_priority.sprite[0] = 8;	// above all
+	state->m_priority.sprite[1] = 8;	// above all
+	state->m_priority.sprite[2] = 8;	// above all
+	state->m_priority.sprite[3] = 8;	// above all
 }
 
 /*************************************

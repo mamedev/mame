@@ -1,17 +1,15 @@
-class galpani2_state : public driver_device
+#include "includes/kaneko16.h"
+
+class galpani2_state : public kaneko16_state
 {
 public:
 	galpani2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: kaneko16_state(machine, config) { }
 
-	UINT16 *m_bg8_0;
-	UINT16 *m_bg8_1;
-	UINT16 *m_palette_0;
-	UINT16 *m_palette_1;
-	UINT16 *m_bg8_0_scrollx;
-	UINT16 *m_bg8_1_scrollx;
-	UINT16 *m_bg8_0_scrolly;
-	UINT16 *m_bg8_1_scrolly;
+	UINT16 *m_bg8[2];
+	UINT16 *m_palette[2];
+	UINT16 *m_bg8_scrollx[2];
+	UINT16 *m_bg8_scrolly[2];
 	UINT16 *m_bg15;
 	UINT16 m_eeprom_word;
 	UINT16 *m_ram;
@@ -19,8 +17,7 @@ public:
 	UINT16 m_old_mcu_nmi1;
 	UINT16 m_old_mcu_nmi2;
 	UINT16 *m_rombank;
-	bitmap_t *m_bg8_bitmap_0;
-	bitmap_t *m_bg8_bitmap_1;
+	bitmap_t *m_bg8_bitmap[2];
 	bitmap_t *m_bg15_bitmap;
 };
 

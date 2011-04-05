@@ -157,27 +157,6 @@ NEP-16
 
 #define BIOS_SKIP 1 // Skip Bios as it takes too long and doesn't complete atm.
 
-UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
-UINT32 *skns_palette_ram;
-UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
-
-static UINT32 *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
-
-/* hit.c */
-
-static struct {
-	UINT16 x1p, y1p, z1p, x1s, y1s, z1s;
-	UINT16 x2p, y2p, z2p, x2s, y2s, z2s;
-	UINT16 org;
-
-	UINT16 x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
-	UINT16 x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
-	UINT16 x1tox2, y1toy2, z1toz2;
-	INT16 x_in, y_in, z_in;
-	UINT16 flag;
-
-	UINT8 disconnect;
-} hit;
 
 static void hit_calc_orig(UINT16 p, UINT16 s, UINT16 org, UINT16 *l, UINT16 *r)
 {
@@ -217,8 +196,11 @@ static void hit_calc_axis(UINT16 x1p, UINT16 x1s, UINT16 x2p, UINT16 x2s, UINT16
 	*x_in = x1r-x2l;
 }
 
-static void hit_recalc(void)
+static void hit_recalc(running_machine &machine)
 {
+	skns_state *state = machine.driver_data<skns_state>();
+	hit_t &hit = state->m_hit;
+
 	hit_calc_axis(hit.x1p, hit.x1s, hit.x2p, hit.x2s, hit.org,
 		&hit.x1_p1, &hit.x1_p2, &hit.x2_p1, &hit.x2_p2,
 		&hit.x_in, &hit.x1tox2);
@@ -252,6 +234,8 @@ static void hit_recalc(void)
 static WRITE32_HANDLER ( skns_hit_w )
 //void hit_w(UINT32 adr, UINT32 data, int type)
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
+	hit_t &hit = state->m_hit;
 	int adr = offset * 4;
 
 	switch(adr) {
@@ -310,11 +294,13 @@ static WRITE32_HANDLER ( skns_hit_w )
 //      log_write("HIT", adr, data, type);
 	break;
 	}
-	hit_recalc();
+	hit_recalc(space->machine());
 }
 
 static WRITE32_HANDLER ( skns_hit2_w )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
+	hit_t &hit = state->m_hit;
 //  log_event("HIT", "Set disconnect to %02x", data);
 	hit.disconnect = data;
 }
@@ -323,6 +309,8 @@ static WRITE32_HANDLER ( skns_hit2_w )
 static READ32_HANDLER( skns_hit_r )
 //UINT32 hit_r(UINT32 adr, int type)
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
+	hit_t &hit = state->m_hit;
 	int adr = offset *4;
 
 //  log_read("HIT", adr, type);
@@ -591,11 +579,11 @@ static INPUT_PORTS_START( vblokbrk )	/* 3 buttons, 2 players, paddle */
 INPUT_PORTS_END
 
 
-static UINT32 timer_0_temp[4];
 
 static WRITE32_HANDLER( skns_msm6242_w )
 {
-	COMBINE_DATA(&timer_0_temp[offset]);
+	skns_state *state = space->machine().driver_data<skns_state>();
+	COMBINE_DATA(&state->m_timer_0_temp[offset]);
 
 	if(offset>=4)
 	{
@@ -709,14 +697,15 @@ static READ32_HANDLER( skns_msm6242_r )
 
 static WRITE32_HANDLER( skns_v3t_w )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	UINT8 *btiles = space->machine().region("gfx3")->base();
 
-	COMBINE_DATA(&skns_v3t_ram[offset]);
+	COMBINE_DATA(&state->m_v3t_ram[offset]);
 
 	gfx_element_mark_dirty(space->machine().gfx[1], offset/0x40);
 	gfx_element_mark_dirty(space->machine().gfx[3], offset/0x20);
 
-	data = skns_v3t_ram[offset];
+	data = state->m_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?
 	btiles[offset*4+0] = (data & 0xff000000) >> 24;
 	btiles[offset*4+1] = (data & 0x00ff0000) >> 16;
@@ -736,18 +725,18 @@ static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x01000000, 0x0100000f) AM_READWRITE(skns_msm6242_r, skns_msm6242_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
 	AM_RANGE(0x02000000, 0x02003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
-	AM_RANGE(0x02100000, 0x0210003f) AM_RAM AM_BASE(&skns_spc_regs) /* sprite registers */
-	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(skns_v3_regs_w) AM_BASE(&skns_v3_regs) /* tilemap registers */
-	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(skns_tilemapA_w) AM_BASE(&skns_tilemapA_ram) /* tilemap A */
-	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(skns_tilemapB_w) AM_BASE(&skns_tilemapB_ram) /* tilemap B */
-	AM_RANGE(0x02600000, 0x02607fff) AM_RAM AM_BASE(&skns_v3slc_ram) /* tilemap linescroll */
-	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(skns_pal_regs_w) AM_BASE(&skns_pal_regs)
-	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(skns_palette_ram_w) AM_BASE(&skns_palette_ram)
+	AM_RANGE(0x02100000, 0x0210003f) AM_RAM AM_BASE_MEMBER(skns_state, m_spc_regs) /* sprite registers */
+	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(skns_v3_regs_w) AM_BASE_MEMBER(skns_state, m_v3_regs) /* tilemap registers */
+	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(skns_tilemapA_w) AM_BASE_MEMBER(skns_state, m_tilemapA_ram) /* tilemap A */
+	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(skns_tilemapB_w) AM_BASE_MEMBER(skns_state, m_tilemapB_ram) /* tilemap B */
+	AM_RANGE(0x02600000, 0x02607fff) AM_RAM AM_BASE_MEMBER(skns_state, m_v3slc_ram) /* tilemap linescroll */
+	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(skns_pal_regs_w) AM_BASE_MEMBER(skns_state, m_pal_regs)
+	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(skns_palette_ram_w) AM_BASE_MEMBER(skns_state, m_palette_ram)
 	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(skns_hit_r, skns_hit_w)
 	AM_RANGE(0x04000000, 0x041fffff) AM_ROMBANK("bank1") /* GAME ROM */
-	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(skns_v3t_w) AM_BASE(&skns_v3t_ram) /* tilemap b ram based tiles */
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&skns_main_ram)
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_BASE(&skns_cache_ram) /* 'cache' RAM */
+	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(skns_v3t_w) AM_BASE_MEMBER(skns_state, m_v3t_ram) /* tilemap b ram based tiles */
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(skns_state, m_main_ram)
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_BASE_MEMBER(skns_state, m_cache_ram) /* 'cache' RAM */
 ADDRESS_MAP_END
 
 /***** GFX DECODE *****/
@@ -843,16 +832,18 @@ MACHINE_CONFIG_END
 
 static READ32_HANDLER( bios_skip_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 #if BIOS_SKIP
 	if ((cpu_get_pc(&space->device())==0x6f8) || (cpu_get_pc(&space->device())==0x6fa)) space->write_byte(0x06000029,1);
 #endif
-	return skns_main_ram[0x00028/4];
+	return state->m_main_ram[0x00028/4];
 }
 
 /***** IDLE SKIPPING *****/
 
 static READ32_HANDLER( gutsn_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 /*
     0402206A: MOV.L   @($8C,PC),R5
     0402206C: MOV.L   @($8C,PC),R1
@@ -863,38 +854,43 @@ static READ32_HANDLER( gutsn_speedup_r )
 */
 	if (cpu_get_pc(&space->device())==0x402206e)
 	{
-		if(skns_main_ram[0x00078/4] == skns_main_ram[0x0c780/4])
+		if(state->m_main_ram[0x00078/4] == state->m_main_ram[0x0c780/4])
 			device_spin_until_interrupt(&space->device());
 	}
-	return skns_main_ram[0x0c780/4];
+	return state->m_main_ram[0x0c780/4];
 }
 
 static READ32_HANDLER( cyvern_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x402ebd2) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x4d3c8/4];
+	return state->m_main_ram[0x4d3c8/4];
 }
 
 static READ32_HANDLER( puzzloopj_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x401dca0) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x86714/4];
+	return state->m_main_ram[0x86714/4];
 }
 
 static READ32_HANDLER( puzzloopa_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x401d9d4) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x85bcc/4];
+	return state->m_main_ram[0x85bcc/4];
 }
 
 static READ32_HANDLER( puzzloopu_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x401dab0) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x85cec/4];
+	return state->m_main_ram[0x85cec/4];
 }
 
 static READ32_HANDLER( puzzloop_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 /*
     0401DA12: MOV.L   @($80,PC),R1
     0401DA14: MOV.L   @R1,R0 (R1=0x6081d38)
@@ -903,61 +899,70 @@ static READ32_HANDLER( puzzloop_speedup_r )
     0401DA26: BRA     $0401DA12
 */
 	if (cpu_get_pc(&space->device())==0x401da14) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x81d38/4];
+	return state->m_main_ram[0x81d38/4];
 }
 
 static READ32_HANDLER( senknow_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x4017dce) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x0000dc/4];
+	return state->m_main_ram[0x0000dc/4];
 }
 
 static READ32_HANDLER( teljan_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x401ba32) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x002fb4/4];
+	return state->m_main_ram[0x002fb4/4];
 }
 
 static READ32_HANDLER( jjparads_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x4015e84) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x000994/4];
+	return state->m_main_ram[0x000994/4];
 }
 
 static READ32_HANDLER( jjparad2_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x401620a) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x000984/4];
+	return state->m_main_ram[0x000984/4];
 }
 
 static READ32_HANDLER( ryouran_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x40182ce) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x000a14/4];
+	return state->m_main_ram[0x000a14/4];
 }
 
 static READ32_HANDLER( galpans2_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x4049ae2) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x0fb6bc/4];
+	return state->m_main_ram[0x0fb6bc/4];
 }
 
 static READ32_HANDLER( panicstr_speedup_r )
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x404e68a) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0x0f19e4/4];
+	return state->m_main_ram[0x0f19e4/4];
 }
 
 static READ32_HANDLER( sengekis_speedup_r ) // 60006ee  600308e
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x60006ec) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0xb74bc/4];
+	return state->m_main_ram[0xb74bc/4];
 }
 
 static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 {
+	skns_state *state = space->machine().driver_data<skns_state>();
 	if (cpu_get_pc(&space->device())==0x60006ec) device_spin_until_interrupt(&space->device());
-	return skns_main_ram[0xb7380/4];
+	return state->m_main_ram[0xb7380/4];
 }
 
 static void init_skns(running_machine &machine)
