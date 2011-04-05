@@ -2039,7 +2039,7 @@ static void render_flush(running_machine &machine, bitmap_t *bitmap)
 	for(int i=0; i<render.poly_count; i++)
 		render.poly_order[i] = &render.polys[i];
 
-	qsort(render.poly_order, render.poly_count, sizeof(int), render_poly_compare);
+	qsort(render.poly_order, render.poly_count, sizeof(namcos23_poly_entry *), render_poly_compare);
 
 	const static rectangle scissor = { 0, 639, 0, 479 };
 
