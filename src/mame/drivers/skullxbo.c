@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/skullxbo.h"
 
 
@@ -151,8 +152,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(skullxbo_state, m_playfield)
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(skullxbo_state, m_playfield_upper)
 	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(skullxbo_state, m_alpha)
-	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffcf80, 0xffcfff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -19,8 +19,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/shuuz.h"
 #include "sound/okim6295.h"
+#include "video/atarimo.h"
+#include "includes/shuuz.h"
 
 
 
@@ -151,10 +152,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_BASE_MEMBER(shuuz_state, m_atarivc_data)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE_MEMBER(shuuz_state, m_playfield)
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE_MEMBER(shuuz_state, m_atarivc_eof_data)
-	AM_RANGE(0x3f5f80, 0x3f5fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(shuuz_state, m_playfield_upper)
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
-	AM_RANGE(0x3fd000, 0x3fd3ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3fd000, 0x3fd3ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3fd400, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 

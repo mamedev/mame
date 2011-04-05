@@ -21,6 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/thunderj.h"
 
 
@@ -168,10 +169,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE_MEMBER(thunderj_state, m_playfield2)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE_MEMBER(thunderj_state, m_playfield)
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_RAM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE_MEMBER(thunderj_state, m_playfield_upper)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f8000, 0x3f8eff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(thunderj_state, m_alpha)
 	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_RAM AM_BASE_MEMBER(thunderj_state, m_atarivc_eof_data)
-	AM_RANGE(0x3f8f80, 0x3f8fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3f8f80, 0x3f8fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f9000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 #include "includes/toobin.h"
 
 
@@ -207,7 +208,7 @@ WRITE16_HANDLER( toobin_yscroll_w )
 
 WRITE16_HANDLER( toobin_slip_w )
 {
-	int oldslip = atarimo_0_slipram[offset];
+	int oldslip = atarimo_0_slipram_r(space, offset, mem_mask);
 	int newslip = oldslip;
 	COMBINE_DATA(&newslip);
 

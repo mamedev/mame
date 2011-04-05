@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "video/atarimo.h"
 #include "includes/atarisy1.h"
 
 
@@ -348,7 +349,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 WRITE16_HANDLER( atarisy1_spriteram_w )
 {
 	int active_bank = atarimo_get_bank(0);
-	int oldword = atarimo_0_spriteram[offset];
+	int oldword = atarimo_0_spriteram_r(space, offset, mem_mask);
 	int newword = oldword;
 	COMBINE_DATA(&newword);
 
@@ -356,7 +357,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 	if (oldword != newword && (offset >> 8) == active_bank)
 	{
 		/* if modifying a timer, beware */
-		if (((offset & 0xc0) == 0x00 && atarimo_0_spriteram[offset | 0x40] == 0xffff) ||
+		if (((offset & 0xc0) == 0x00 && atarimo_0_spriteram_r(space, offset | 0x40, mem_mask) == 0xffff) ||
 		    ((offset & 0xc0) == 0x40 && (newword == 0xffff || oldword == 0xffff)))
 		{
 			/* if the timer is in the active bank, update the display list */
@@ -434,7 +435,9 @@ READ16_HANDLER( atarisy1_int3state_r )
 static void update_timers(running_machine &machine, int scanline)
 {
 	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	UINT16 *base = &atarimo_0_spriteram[atarimo_get_bank(0) * 64 * 4];
+	address_space *space = NULL;
+	UINT16 mem_mask = 0xffff;
+	int offset = atarimo_get_bank(0) * 64 * 4;
 	int link = 0, best = scanline, found = 0;
 	UINT8 spritevisit[64];
 
@@ -445,9 +448,9 @@ static void update_timers(running_machine &machine, int scanline)
 	while (!spritevisit[link])
 	{
 		/* timers are indicated by 0xffff in entry 2 */
-		if (base[link + 0x40] == 0xffff)
+		if (atarimo_0_spriteram_r(space, offset + link + 0x40, mem_mask) == 0xffff)
 		{
-			int data = base[link];
+			int data = atarimo_0_spriteram_r(space, offset + link, mem_mask);
 			int vsize = (data & 15) + 1;
 			int ypos = (256 - (data >> 5) - vsize * 8 - 1) & 0x1ff;
 
@@ -469,7 +472,7 @@ static void update_timers(running_machine &machine, int scanline)
 
 		/* link to the next */
 		spritevisit[link] = 1;
-		link = base[link + 0xc0] & 0x3f;
+		link = atarimo_0_spriteram_r(space, offset + link + 0xc0, mem_mask) & 0x3f;
 	}
 
 	/* if nothing was found, use scanline -1 */

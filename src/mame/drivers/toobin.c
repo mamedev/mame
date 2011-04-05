@@ -21,6 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/toobin.h"
 
 #define MASTER_CLOCK		XTAL_32MHz
@@ -111,14 +112,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_WRITE(atarigen_playfield_large_w) AM_BASE_MEMBER(toobin_state, m_playfield)
 	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(toobin_state, m_alpha)
-	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(toobin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP		/* who knows? read at controls time */
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(toobin_intensity_w)
 	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_BASE_MEMBER(toobin_state, m_interrupt_scan)
-	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_WRITE(toobin_slip_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_READWRITE(atarimo_0_slipram_r, toobin_slip_w)
 	AM_RANGE(0xff83c0, 0xff83c1) AM_MIRROR(0x45003e) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xff8500, 0xff8501) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_eeprom_enable_w)

@@ -19,8 +19,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/klax.h"
 #include "sound/okim6295.h"
+#include "video/atarimo.h"
+#include "includes/klax.h"
 
 
 
@@ -93,9 +94,9 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(klax_state, m_playfield)
-	AM_RANGE(0x3f0f80, 0x3f0fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3f0f80, 0x3f0fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(klax_state, m_playfield_upper)
-	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3f2000, 0x3f27ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
 

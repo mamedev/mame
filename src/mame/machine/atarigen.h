@@ -41,7 +41,6 @@
 #define __MACHINE_ATARIGEN__
 
 #include "machine/nvram.h"
-#include "video/atarimo.h"
 #include "machine/er2055.h"
 
 

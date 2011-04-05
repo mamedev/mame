@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 #include "includes/xybots.h"
 
 

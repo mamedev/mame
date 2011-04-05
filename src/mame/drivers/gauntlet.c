@@ -124,6 +124,7 @@
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
+#include "video/atarimo.h"
 #include "includes/gauntlet.h"
 
 
@@ -325,11 +326,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 
 	/* VBUS */
 	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(gauntlet_state, m_playfield)
-	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
 	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_BASE_MEMBER(gauntlet_state, m_yscroll)
 	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(gauntlet_state, m_alpha)
-	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_BASE_MEMBER(gauntlet_state, m_xscroll)
 ADDRESS_MAP_END

@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "machine/atarigen.h"
+#include "video/atarimo.h"
 #include "includes/cyberbal.h"
 
 
@@ -143,15 +144,12 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 	};
 	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
-	/* set the slip variables */
-	atarimo_0_slipram = &state->m_current_slip[0];
-	atarimo_1_slipram = &state->m_current_slip[1];
-
 	/* initialize the playfield */
 	state->m_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &mo0desc);
+	atarimo_set_slipram(0, &state->m_current_slip[0]);
 
 	/* initialize the alphanumerics */
 	state->m_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  16,8, 64,32);
@@ -166,6 +164,7 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 
 		/* initialize the motion objects */
 		atarimo_init(machine, 1, &mo1desc);
+		atarimo_set_slipram(1, &state->m_current_slip[1]);
 
 		/* initialize the alphanumerics */
 		state->m_alpha2_tilemap = tilemap_create(machine, get_alpha2_tile_info, tilemap_scan_rows,  16,8, 64,32);

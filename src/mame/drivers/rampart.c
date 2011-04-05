@@ -24,9 +24,10 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/rampart.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
+#include "video/atarimo.h"
+#include "includes/rampart.h"
 
 
 #define MASTER_CLOCK		XTAL_14_31818MHz
@@ -139,9 +140,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(rampart_state, m_bitmap)
 	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3e3f80, 0x3effff) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_DEVWRITE8("ymsnd", ym2413_w, 0xff00)

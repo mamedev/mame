@@ -21,6 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/blstroid.h"
 
 
@@ -108,7 +109,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(blstroid_state, m_playfield)
-	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_MIRROR(0x7f8000) AM_RAM
 ADDRESS_MAP_END
 

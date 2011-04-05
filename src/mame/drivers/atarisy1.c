@@ -193,10 +193,11 @@ RoadBlasters (aka Future Vette):005*
 #include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
-#include "includes/atarisy1.h"
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
+#include "video/atarimo.h"
+#include "includes/atarisy1.h"
 
 
 
@@ -481,7 +482,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarisy1_state, m_playfield)
-	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(atarimo_0_spriteram_r, atarisy1_spriteram_w)
 	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarisy1_state, m_alpha)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")

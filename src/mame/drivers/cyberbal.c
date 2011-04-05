@@ -26,6 +26,7 @@
 #include "sound/dac.h"
 #include "rendlay.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/cyberbal.h"
 
 
@@ -162,11 +163,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(cyberbal_paletteram_0_w) AM_SHARE("share2") AM_BASE_MEMBER(cyberbal_state, m_paletteram_0)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield2_w)   AM_SHARE("share3") AM_BASE_MEMBER(cyberbal_state, m_playfield2)
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha2_w)       AM_SHARE("share4") AM_BASE_MEMBER(cyberbal_state, m_alpha2)
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM_WRITE(atarimo_1_spriteram_w)   AM_SHARE("share5") AM_BASE(&atarimo_1_spriteram)
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
 	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE("share6")
 	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(atarigen_playfield_w)    AM_SHARE("share7") AM_BASE_MEMBER(cyberbal_state, m_playfield)
 	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(atarigen_alpha_w)        AM_SHARE("share8") AM_BASE_MEMBER(cyberbal_state, m_alpha)
-	AM_RANGE(0xff7000, 0xff77ff) AM_RAM_WRITE(atarimo_0_spriteram_w)   AM_SHARE("share9") AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE("share10")
 	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP               AM_SHARE("share11")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                           AM_SHARE("share12")
@@ -189,11 +190,11 @@ static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(cyberbal_paletteram_0_w) AM_SHARE("share2")
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield2_w)   AM_SHARE("share3")
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha2_w)       AM_SHARE("share4")
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM_WRITE(atarimo_1_spriteram_w)   AM_SHARE("share5")
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
 	AM_RANGE(0xff3800, 0xff3fff) AM_RAM                                           AM_SHARE("share6")
 	AM_RANGE(0xff4000, 0xff5fff) AM_RAM_WRITE(atarigen_playfield_w)    AM_SHARE("share7")
 	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(atarigen_alpha_w)        AM_SHARE("share8")
-	AM_RANGE(0xff7000, 0xff77ff) AM_RAM_WRITE(atarimo_0_spriteram_w)   AM_SHARE("share9")
+	AM_RANGE(0xff7000, 0xff77ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE("share10")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM                                           AM_SHARE("share11")
 	AM_RANGE(0xffc000, 0xffffff) AM_READONLY AM_WRITENOP               AM_SHARE("share12")
@@ -263,7 +264,7 @@ static ADDRESS_MAP_START( cyberbal2p_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xfe0003) AM_READ(sound_state_r)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(cyberbal_state, m_playfield)
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(cyberbal_state, m_alpha)
-	AM_RANGE(0xff3000, 0xff37ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xff3800, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

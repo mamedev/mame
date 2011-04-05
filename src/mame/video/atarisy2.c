@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "video/atarimo.h"
 #include "includes/slapstic.h"
 #include "includes/atarisy2.h"
 
@@ -96,7 +97,6 @@ VIDEO_START( atarisy2 )
 
 	/* initialize banked memory */
 	state->m_alpha = &state->m_vram[0x0000];
-	atarimo_0_spriteram = &state->m_vram[0x0c00];
 	state->m_playfield = &state->m_vram[0x2000];
 
 	/* initialize the playfield */
@@ -264,7 +264,13 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
 READ16_HANDLER( atarisy2_videoram_r )
 {
 	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
-	return state->m_vram[offset | state->m_videobank];
+	int offs = offset | state->m_videobank;
+	if (offs >= 0xc00 && offs < 0x1000)
+	{
+		return atarimo_0_spriteram_r(space, offs - 0x0c00, mem_mask);
+	}
+
+	return state->m_vram[offs];
 }
 
 

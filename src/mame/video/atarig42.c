@@ -215,7 +215,7 @@ SCREEN_UPDATE( atarig42 )
 				if (mo[x])
 				{
 					int pfpri = pri[x];
-					int mopri = mo[x] >> ATARIMO_PRIORITY_SHIFT;
+					int mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
 					if (mopri >= pfpri)
 						pf[x] = mo[x] & ATARIRLE_DATA_MASK;
 				}

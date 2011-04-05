@@ -26,6 +26,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
+#include "video/atarimo.h"
 #include "includes/eprom.h"
 
 
@@ -176,9 +177,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(eprom_state, m_playfield)
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3f2000, 0x3f3fff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f4000, 0x3f4f7f) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(eprom_state, m_alpha)
-	AM_RANGE(0x3f4f80, 0x3f4fff) AM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3f4f80, 0x3f4fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x3f8000, 0x3f9fff) AM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(eprom_state, m_playfield_upper)
 	AM_RANGE(0x3f0000, 0x3f9fff) AM_RAM
 ADDRESS_MAP_END
@@ -202,9 +203,9 @@ static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(eprom_state, m_playfield_upper)
 	AM_RANGE(0xff8000, 0xff9fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(eprom_state, m_playfield)
-	AM_RANGE(0xffa000, 0xffbfff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0xffc000, 0xffcf7f) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(eprom_state, m_alpha)
-	AM_RANGE(0xffcf80, 0xffcfff) AM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0xffcf80, 0xffcfff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
