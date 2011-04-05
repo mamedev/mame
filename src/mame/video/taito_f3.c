@@ -270,7 +270,7 @@ struct tempsprite
 	int pri;
 };
 
-static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_ptr);
+static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_ptr);
 
 struct f3_playfield_line_inf
 {
@@ -339,9 +339,9 @@ static void print_debug_info(running_machine &machine, bitmap_t *bitmap)
 	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[0]>>16,state->m_f3_control_1[0]&0xffff,state->m_f3_control_1[1]>>16,state->m_f3_control_1[1]&0xffff);
 	bufptr += sprintf(bufptr,"%04X %04X %04X %04X\n",state->m_f3_control_1[2]>>16,state->m_f3_control_1[2]&0xffff,state->m_f3_control_1[3]>>16,state->m_f3_control_1[3]&0xffff);
 
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[0]>>16,state->m_spriteram32_buffered[0]&0xffff,state->m_spriteram32_buffered[1]>>16,state->m_spriteram32_buffered[1]&0xffff,state->m_spriteram32_buffered[2]>>16,state->m_spriteram32_buffered[2]&0xffff,state->m_spriteram32_buffered[3]>>16,state->m_spriteram32_buffered[3]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[4]>>16,state->m_spriteram32_buffered[4]&0xffff,state->m_spriteram32_buffered[5]>>16,state->m_spriteram32_buffered[5]&0xffff,state->m_spriteram32_buffered[6]>>16,state->m_spriteram32_buffered[6]&0xffff,state->m_spriteram32_buffered[7]>>16,state->m_spriteram32_buffered[7]&0xffff);
-	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram32_buffered[8]>>16,state->m_spriteram32_buffered[8]&0xffff,state->m_spriteram32_buffered[9]>>16,state->m_spriteram32_buffered[9]&0xffff,state->m_spriteram32_buffered[10]>>16,state->m_spriteram32_buffered[10]&0xffff,state->m_spriteram32_buffered[11]>>16,state->m_spriteram32_buffered[11]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[0]>>16,state->m_spriteram16_buffered[0]&0xffff,state->m_spriteram16_buffered[1]>>16,state->m_spriteram16_buffered[1]&0xffff,state->m_spriteram16_buffered[2]>>16,state->m_spriteram16_buffered[2]&0xffff,state->m_spriteram16_buffered[3]>>16,state->m_spriteram16_buffered[3]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[4]>>16,state->m_spriteram16_buffered[4]&0xffff,state->m_spriteram16_buffered[5]>>16,state->m_spriteram16_buffered[5]&0xffff,state->m_spriteram16_buffered[6]>>16,state->m_spriteram16_buffered[6]&0xffff,state->m_spriteram16_buffered[7]>>16,state->m_spriteram16_buffered[7]&0xffff);
+	bufptr += sprintf(bufptr,"%04X %04X %04X %04X %04X %04X %04X %04X\n",state->m_spriteram16_buffered[8]>>16,state->m_spriteram16_buffered[8]&0xffff,state->m_spriteram16_buffered[9]>>16,state->m_spriteram16_buffered[9]&0xffff,state->m_spriteram16_buffered[10]>>16,state->m_spriteram16_buffered[10]&0xffff,state->m_spriteram16_buffered[11]>>16,state->m_spriteram16_buffered[11]&0xffff);
 
 	l[0]=f3_line_ram[0x0040]&0xffff;
 	l[1]=f3_line_ram[0x00c0]&0xffff;
@@ -497,9 +497,9 @@ SCREEN_EOF( f3 )
 	{
 		if (machine.video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, state->m_spriteram32_buffered);
+			get_sprite_info(machine, state->m_spriteram16_buffered);
 		}
-		memcpy(state->m_spriteram32_buffered,state->m_spriteram,state->m_spriteram_size);
+		memcpy(state->m_spriteram16_buffered,state->m_spriteram,0x10000);
 	}
 	else if (state->m_sprite_lag==1)
 	{
@@ -536,7 +536,7 @@ VIDEO_START( f3 )
 	state->m_tr_3b = 1;
 
 	state->m_spritelist=0;
-	state->m_spriteram32_buffered=0;
+	state->m_spriteram16_buffered=0;
 	state->m_pf_line_inf=0;
 	state->m_pri_alp_bitmap=0;
 	state->m_tile_opaque_sp=0;
@@ -557,6 +557,7 @@ VIDEO_START( f3 )
 	state->m_videoram =     auto_alloc_array(machine, UINT16, 0x2000/2);
 	state->m_f3_line_ram =  auto_alloc_array(machine, UINT16, 0x10000/2);
 	state->m_f3_pivot_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->m_spriteram =    auto_alloc_array(machine, UINT16, 0x10000/2);
 
 	if (state->m_f3_game_config->extend) {
 		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,32);
@@ -589,7 +590,7 @@ VIDEO_START( f3 )
 		state->m_twidth_mask_bit=5;
 	}
 
-	state->m_spriteram32_buffered = auto_alloc_array(machine, UINT32, 0x10000/4);
+	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
 	state->m_spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 	state->m_sprite_end = state->m_spritelist;
 	state->m_vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
@@ -616,8 +617,8 @@ VIDEO_START( f3 )
 	machine.gfx[2]->color_granularity=16;
 
 	state->m_flipscreen = 0;
-	memset(state->m_spriteram32_buffered,0,state->m_spriteram_size);
-	memset(state->m_spriteram,0,state->m_spriteram_size);
+	memset(state->m_spriteram16_buffered,0,0x10000);
+	memset(state->m_spriteram,0,0x10000);
 
 	state_save_register_global_array(machine, state->m_f3_control_0);
 	state_save_register_global_array(machine, state->m_f3_control_1);
@@ -717,6 +718,18 @@ WRITE16_HANDLER( f3_control_1_w )
 {
 	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	COMBINE_DATA(&state->m_f3_control_1[offset]);
+}
+
+READ16_HANDLER( f3_spriteram_r )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	return state->m_spriteram[offset];
+}
+
+WRITE16_HANDLER( f3_spriteram_w )
+{
+	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
+	COMBINE_DATA(&state->m_spriteram[offset]);
 }
 
 READ16_HANDLER( f3_videoram_r )
@@ -2508,8 +2521,8 @@ static void scanline_draw(running_machine &machine, bitmap_t *bitmap, const rect
 
 INLINE void f3_drawgfx(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
-		UINT32 code,
-		UINT32 color,
+		int code,
+		int color,
 		int flipx,int flipy,
 		int sx,int sy,
 		UINT8 pri_dst)
@@ -2672,8 +2685,8 @@ INLINE void f3_drawgfx(
 
 INLINE void f3_drawgfxzoom(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
-		UINT32 code,
-		UINT32 color,
+		int code,
+		int color,
 		int flipx,int flipy,
 		int sx,int sy,
 		int scalex, int scaley,
@@ -2806,7 +2819,7 @@ INLINE void f3_drawgfxzoom(
 	/*zoom##p = p##_addition << 12;*/							\
 }
 
-static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_ptr)
+static void get_sprite_info(running_machine &machine, const UINT16 *spriteram16_ptr)
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
@@ -2832,24 +2845,24 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 	//old_x=0;
 	y=x=0;
 
-	sprite_top=0x1000;
-	for (offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 4)
+	sprite_top=0x2000;
+	for (offs = 0; offs < sprite_top && (total_sprites < 0x400); offs += 8)
 	{
 		const int current_offs=offs; /* Offs can change during loop, current_offs cannot */
 
 		/* Check if the sprite list jump command bit is set */
-		if ((spriteram32_ptr[current_offs+3]>>16) & 0x8000) {
-			UINT32 jump = (spriteram32_ptr[current_offs+3]>>16)&0x3ff;
+		if ((spriteram16_ptr[current_offs+6+0]) & 0x8000) {
+			UINT32 jump = (spriteram16_ptr[current_offs+6+0])&0x3ff;
 
-			UINT32 new_offs=((offs&0x2000)|((jump<<4)/4));
+			UINT32 new_offs=((offs&0x4000)|((jump<<4)/2));
 			if (new_offs==offs)
 				break;
-			offs=new_offs - 4;
+			offs=new_offs - 8;
 		}
 
 		/* Check if special command bit is set */
-		if (spriteram32_ptr[current_offs+1] & 0x8000) {
-			UINT32 cntrl=(spriteram32_ptr[current_offs+2])&0xffff;
+		if (spriteram16_ptr[current_offs+2+1] & 0x8000) {
+			UINT32 cntrl=(spriteram16_ptr[current_offs+4+1])&0xffff;
 			state->m_flipscreen=cntrl&0x2000;
 
 			/*  cntrl&0x1000 = disabled?  (From F2 driver, doesn't seem used anywhere)
@@ -2862,39 +2875,39 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 
 			/* Sprite bank select */
 			if (cntrl&1) {
-				offs=offs|0x2000;
-				sprite_top=sprite_top|0x2000;
+				offs=offs|0x4000;
+				sprite_top=sprite_top|0x4000;
 			}
 		}
 
 		/* Set global sprite scroll */
-		if (((spriteram32_ptr[current_offs+1]>>16) & 0xf000) == 0xa000) {
-			global_x = (spriteram32_ptr[current_offs+1]>>16) & 0xfff;
+		if (((spriteram16_ptr[current_offs+2+0]) & 0xf000) == 0xa000) {
+			global_x = (spriteram16_ptr[current_offs+2+0]) & 0xfff;
 			if (global_x >= 0x800) global_x -= 0x1000;
-			global_y = spriteram32_ptr[current_offs+1] & 0xfff;
+			global_y = spriteram16_ptr[current_offs+2+1] & 0xfff;
 			if (global_y >= 0x800) global_y -= 0x1000;
 		}
 
 		/* And sub-global sprite scroll */
-		if (((spriteram32_ptr[current_offs+1]>>16) & 0xf000) == 0x5000) {
-			subglobal_x = (spriteram32_ptr[current_offs+1]>>16) & 0xfff;
+		if (((spriteram16_ptr[current_offs+2+0]) & 0xf000) == 0x5000) {
+			subglobal_x = (spriteram16_ptr[current_offs+2+0]) & 0xfff;
 			if (subglobal_x >= 0x800) subglobal_x -= 0x1000;
-			subglobal_y = spriteram32_ptr[current_offs+1] & 0xfff;
+			subglobal_y = spriteram16_ptr[current_offs+2+1] & 0xfff;
 			if (subglobal_y >= 0x800) subglobal_y -= 0x1000;
 		}
 
-		if (((spriteram32_ptr[current_offs+1]>>16) & 0xf000) == 0xb000) {
-			subglobal_x = (spriteram32_ptr[current_offs+1]>>16) & 0xfff;
+		if (((spriteram16_ptr[current_offs+2+0]) & 0xf000) == 0xb000) {
+			subglobal_x = (spriteram16_ptr[current_offs+2+0]) & 0xfff;
 			if (subglobal_x >= 0x800) subglobal_x -= 0x1000;
-			subglobal_y = spriteram32_ptr[current_offs+1] & 0xfff;
+			subglobal_y = spriteram16_ptr[current_offs+2+1] & 0xfff;
 			if (subglobal_y >= 0x800) subglobal_y -= 0x1000;
 			global_y=subglobal_y;
 			global_x=subglobal_x;
 		}
 
 		/* A real sprite to process! */
-		sprite = (spriteram32_ptr[current_offs]>>16) | ((spriteram32_ptr[current_offs+2]&1)<<16);
-		spritecont = spriteram32_ptr[current_offs+2]>>24;
+		sprite = (spriteram16_ptr[current_offs+0+0]) | ((spriteram16_ptr[current_offs+4+1]&1)<<16);
+		spritecont = spriteram16_ptr[current_offs+4+0]>>8;
 
 /* These games either don't set the XY control bits properly (68020 bug?), or
     have some different mode from the others */
@@ -2907,7 +2920,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 		if (multi) {
 			/* Bit 0x4 is 'use previous colour' for this block part */
 			if (spritecont&0x4) color=last_color;
-			else color=(spriteram32_ptr[current_offs+2]>>16)&0xff;
+			else color=(spriteram16_ptr[current_offs+4+0])&0xff;
 
 #ifdef DARIUSG_KLUDGE
 			if (state->m_f3_game==DARIUSG || state->m_f3_game==GEKIRIDO || state->m_f3_game==CLEOPATR || state->m_f3_game==RECALH) {
@@ -2916,12 +2929,12 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 					if (spritecont & 0x4) {
 						x = block_x;
 					} else {
-						this_x = spriteram32_ptr[current_offs+1]>>16;
+						this_x = spriteram16_ptr[current_offs+2+0];
 						if (this_x&0x800) this_x= 0 - (0x800 - (this_x&0x7ff)); else this_x&=0x7ff;
 
-						if ((spriteram32_ptr[current_offs+1]>>16)&0x8000) {
+						if ((spriteram16_ptr[current_offs+2+0])&0x8000) {
 							this_x+=0;
-						} else if ((spriteram32_ptr[current_offs+1]>>16)&0x4000) {
+						} else if ((spriteram16_ptr[current_offs+2+0])&0x4000) {
 							/* Ignore subglobal (but apply global) */
 							this_x+=global_x;
 						} else { /* Apply both scroll offsets */
@@ -2943,12 +2956,12 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 					if (spritecont & 0x4) {
 						y = block_y;
 					} else {
-						this_y = spriteram32_ptr[current_offs+1]&0xffff;
+						this_y = spriteram16_ptr[current_offs+2+1]&0xffff;
 						if (this_y&0x800) this_y= 0 - (0x800 - (this_y&0x7ff)); else this_y&=0x7ff;
 
-						if ((spriteram32_ptr[current_offs+1]>>16)&0x8000) {
+						if ((spriteram16_ptr[current_offs+2+0])&0x8000) {
 							this_y+=0;
-						} else if ((spriteram32_ptr[current_offs+1]>>16)&0x4000) {
+						} else if ((spriteram16_ptr[current_offs+2+0])&0x4000) {
 							/* Ignore subglobal (but apply global) */
 							this_y+=global_y;
 						} else { /* Apply both scroll offsets */
@@ -2992,20 +3005,20 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 		}
 		/* Else this sprite is the possible start of a block */
 		else {
-			color = (spriteram32_ptr[current_offs+2]>>16)&0xff;
+			color = (spriteram16_ptr[current_offs+4+0])&0xff;
 			last_color=color;
 
 			/* Sprite positioning */
-			this_y = spriteram32_ptr[current_offs+1]&0xffff;
-			this_x = spriteram32_ptr[current_offs+1]>>16;
+			this_y = spriteram16_ptr[current_offs+2+1]&0xffff;
+			this_x = spriteram16_ptr[current_offs+2+0]&0xffff;
 			if (this_y&0x800) this_y= 0 - (0x800 - (this_y&0x7ff)); else this_y&=0x7ff;
 			if (this_x&0x800) this_x= 0 - (0x800 - (this_x&0x7ff)); else this_x&=0x7ff;
 
 			/* Ignore both scroll offsets for this block */
-			if ((spriteram32_ptr[current_offs+1]>>16)&0x8000) {
+			if ((spriteram16_ptr[current_offs+2+0])&0x8000) {
 				this_x+=0;
 				this_y+=0;
-			} else if ((spriteram32_ptr[current_offs+1]>>16)&0x4000) {
+			} else if ((spriteram16_ptr[current_offs+2+0])&0x4000) {
 				/* Ignore subglobal (but apply global) */
 				this_x+=global_x;
 				this_y+=global_y;
@@ -3017,7 +3030,7 @@ static void get_sprite_info(running_machine &machine, const UINT32 *spriteram32_
 	        block_y = y = this_y;
             block_x = x = this_x;
 
-			block_zoom_x=spriteram32_ptr[current_offs];
+			block_zoom_x=spriteram16_ptr[current_offs+0+1];
 			block_zoom_y=(block_zoom_x>>8)&0xff;
 			block_zoom_x&=0xff;
 

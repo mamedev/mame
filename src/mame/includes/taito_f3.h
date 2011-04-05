@@ -46,8 +46,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *m_videoram;
-	UINT32 *m_spriteram;
-	size_t m_spriteram_size;
+	UINT16 *m_spriteram;
+//	size_t m_spriteram_size;
 	UINT32 m_coin_word[2];
 	UINT32 *m_f3_ram;
 	int m_f3_game;
@@ -61,7 +61,7 @@ public:
 	tilemap_t *m_pf4_tilemap;
 	tilemap_t *m_pixel_layer;
 	tilemap_t *m_vram_layer;
-	UINT32 *m_spriteram32_buffered;
+	UINT16 *m_spriteram16_buffered;
 	UINT16 m_f3_control_0[8];
 	UINT16 m_f3_control_1[8];
 	int m_flipscreen;
@@ -201,9 +201,11 @@ WRITE16_HANDLER( f3_vram_w );
 WRITE16_HANDLER( f3_pivot_w );
 WRITE16_HANDLER( f3_lineram_w );
 WRITE16_HANDLER( f3_videoram_w );
+WRITE16_HANDLER( f3_spriteram_w );
 
 //READ16_HANDLER( f3_pf_data_r );
 READ16_HANDLER( f3_vram_r );
 READ16_HANDLER( f3_pivot_r );
 READ16_HANDLER( f3_lineram_r );
 READ16_HANDLER( f3_videoram_r );
+READ16_HANDLER( f3_spriteram_r );
