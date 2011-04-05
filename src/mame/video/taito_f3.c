@@ -1885,8 +1885,8 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
             Until this is understood we disable those lines (which would usually wrap and show the grass
             area.
         */
-		if (colscroll&0x200)
-			pri|=0x0800;
+		//if (colscroll&0x200)
+		//	pri|=0x0800;
 
 		/* Evaluate clipping */
 		if (pri&0x0800)
