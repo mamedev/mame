@@ -9542,6 +9542,7 @@ Other Sun games
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( saloon )	/* 199? unknown */
 	DRIVER( funquiz )	/* (c) 198? Funworld */
+	DRIVER( witchryl )	/* (c) 199? Video Klein */
 	DRIVER( photoply )
 
 	/* Sandii' */

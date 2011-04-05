@@ -1,6 +1,5 @@
 /**********************************************************************************
 
-
   FUNWORLD / TAB.
 
   Original preliminary driver:    Curt Coder, Peter Trauner.
@@ -9,62 +8,61 @@
 
   Games running on this hardware:
 
-  * Jolly Card (austrian),                            TAB Austria,        1985.
+  * Jolly Card (Austrian),                            TAB Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
-  * Jolly Card (croatian, set 1),                     TAB Austria,        1985.
-  * Jolly Card (croatian, set 2),                     Soft Design,        1993.
-  * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
-  * Jolly Card (italian, encrypted bootleg),          bootleg,            1990.
+  * Jolly Card (Croatian, set 1),                     TAB Austria,        1985.
+  * Jolly Card (Croatian, set 2),                     Soft Design,        1993.
+  * Jolly Card (Italian, blue TAB board, encrypted),  bootleg,            199?.
+  * Jolly Card (Italian, encrypted bootleg),          bootleg,            1990.
   * Super Joly 2000 - 3x,                             M.P.                1985.
-  * Jolly Card (austrian, Funworld, bootleg),         Inter Games,        1986.
-  * Big Deal (hungarian, set 1),                      Funworld,           1986.
-  * Big Deal (hungarian, set 2),                      Funworld,           1986.
-  * Jolly Card (austrian, Funworld),                  Funworld,           1986.
-  * Cuore 1 (italian),                                C.M.C.,             1996.
-  * Elephant Family (italian, new),                   C.M.C.,             1997.
-  * Elephant Family (italian, old),                   C.M.C.,             1996.
-  * Pool 10 (italian, set 1),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 2),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 3),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 4),                         C.M.C.,             1997.
-  * Tortuga Family (italian),                         C.M.C.,             1997.
-  * Pot Game (italian),                               C.M.C.,             1996.
-  * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
-  * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
-  * Royal Card (austrian, set 1),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 2),                     TAB Austria,        1991.
-  * Royal Card (austrian/polish, set 3),              TAB Austria,        1991.
-  * Royal Card (austrian, set 4),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 5),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 6),                     TAB Austria,        1991.
+  * Jolly Card (Austrian, Funworld, bootleg),         Inter Games,        1986.
+  * Big Deal (Hungarian, set 1),                      Funworld,           1986.
+  * Big Deal (Hungarian, set 2),                      Funworld,           1986.
+  * Jolly Card (Austrian, Funworld),                  Funworld,           1986.
+  * Cuore 1 (Italian),                                C.M.C.,             1996.
+  * Elephant Family (Italian, new),                   C.M.C.,             1997.
+  * Elephant Family (Italian, old),                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 1),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 2),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 3),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 4),                         C.M.C.,             1997.
+  * Tortuga Family (Italian),                         C.M.C.,             1997.
+  * Pot Game (Italian),                               C.M.C.,             1996.
+  * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
+  * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
+  * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
+  * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
+  * Royal Card (Austrian, set 4),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
   * Royal Card (TAB original),                        TAB Austria,        1991.
-  * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
+  * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
-  * Magic Card II (bulgarian),                        Impera,             1996.
-  * Magic Card II (green TAB or Impera board),        Impera,             1996.
-  * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
-  * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
-  * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
-  * Royal Vegas Joker Card (fast deal, english gfx),  Soft Design,        1993.
-  * Royal Vegas Joker Card (fast deal, Mile),         Mile,               1993.
+  * Magic Card II (Bulgarian),                        Impera,             1996.
+  * Magic Card II (Green TAB or Impera board),        Impera,             1996.
+  * Magic Card II (Blue TAB board, encrypted),        Impera,             1996.
+  * Royal Vegas Joker Card (Slow deal),               Funworld,           1993.
+  * Royal Vegas Joker Card (Fast deal),               Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, english gfx),  Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, Mile),         Mile,               1993.
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
   * Multi Win (Ver.0167, encrypted),                  Funworld,           1992.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
-  * Mongolfier New (italian),                         bootleg,            199?.
-  * Soccer New (italian),                             bootleg,            199?.
-  * Saloon (french, encrypted),                       unknown,            199?.
-  * Fun World Quiz (austrian),                        Funworld,           198?.
-
+  * Mongolfier New (Italian),                         bootleg,            199?.
+  * Soccer New (Italian),                             bootleg,            199?.
+  * Saloon (French, encrypted),                       unknown,            199?.
+  * Fun World Quiz (Austrian),                        Funworld,           198?.
+  * Witch Royal (Export version 2.1),                 Video Klein,        199?.
 
 ***********************************************************************************
-
 
   The hardware is generally composed by:
 
@@ -321,7 +319,7 @@
   Beschreibung / Description
   --------------------------
 
-  F?r OES 5,-- Einwurf werden 3 Kredite gegeben. F?r einen Kredit bekommt der Spieler
+  Fur OES 5,-- Einwurf werden 3 Kredite gegeben. Fur einen Kredit bekommt der Spieler
   500 Spielpunkte. Bei jeder Frage kann der Spieler 100, 500 oder alle Punkte einsetzen.
   Wird die Frage richtig beantwortet, wird der Einsatz aufaddiert. Erreicht der Spieler
   nach 5 Fragen mehr als 2500 Punkte, bekommt er Bonusfragen. Das Spiel endet bei einer
@@ -348,7 +346,6 @@
 
   If the game has credits loaded, the bookkeeping mode will start
   as soon as the current game ends.
-
 
 
 ***********************************************************************************
@@ -719,6 +716,11 @@
   - Now principal Royal Card sets have a working bet button.
   - Added default NVRAM to the new sets.
 
+  [2011/04/04]
+  - Added 'Witch Royal' from Video Klein. Seems a hybrid game
+     from Witch Card and Royal Card...
+  - Reworked the button-lamps layout to get the hold buttons
+     more centered.
 
 
   *** TO DO ***
@@ -901,6 +903,20 @@ ADDRESS_MAP_END
     1000    RW  ;input? (W 0xff & 0xfd)
 
 */
+
+static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 /*************************
@@ -1954,6 +1970,90 @@ static INPUT_PORTS_START( funquiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( witchryl )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )	PORT_NAME("Remote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Halten (Hold) 1 / Hoch (High)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )	PORT_NAME("Loeschen/Gamble (Cancel/Play)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )			PORT_NAME("Geben (Start)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Halten (Hold) 5 / Half Gamble")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )		PORT_NAME("Buchhalt (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )		PORT_NAME("Einstellen (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Halten (Hold) 4 / Kassieren (Take)")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Halten (Hold) 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Halten (Hold) 3 / Tief (Low)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("unknown bit 08") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_NAME("Hoppersch") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	PORT_NAME("Abschreib (Payout)")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "Keyboard Test" )
+	PORT_DIPSETTING(    0x01, "Game" )
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
+	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
+	PORT_DIPSETTING(    0x04, "10 Points/Coin" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "5 Points/Coin" )
+	PORT_DIPSETTING(    0x08, "10 Points/Coin" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -2209,6 +2309,12 @@ static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
+
+	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_PROGRAM_MAP(witchryl_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+MACHINE_CONFIG_END
 
 
 /*************************
@@ -3919,7 +4025,7 @@ ROM_END
 /**** Fun World Quiz ****
 
   Fun World Quiz
-  ?hlinger Ges.m.b.H.
+  Oehlinger Ges.m.b.H.
 
   Horizontal Display
   Currents
@@ -4021,6 +4127,31 @@ ROM_START( funquiz )	/* Fun World Quiz */
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(f990a9ae) SHA1(f7133798b5f20dd5b8dbe5d1a6876341710d93a8) )
 ROM_END
 
+
+/*
+  Witch Royal
+  by Video Klein
+
+  Original Video Klein PCB
+  with CPU box.
+  
+*/
+ROM_START( witchryl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "hn58c256.bin", 0x8000, 0x8000, CRC(b89a47b9) SHA1(11fcdd5756f2998748d2f1084b1db459e90126df) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.u11", 0x0000, 0x8000, CRC(7edc8f44) SHA1(cabad613fa8a72dc12587d19a72bc9c6861486bd) )
+	ROM_IGNORE(                0x8000 )	/* Identical halves. Discarding 2nd half */
+	ROM_LOAD( "3.u4",  0x8000, 0x8000, CRC(5e4a0d59) SHA1(08eb9b1a617a7b2e6f87377819dba07082cf38b4) )
+	ROM_IGNORE(                0x8000 )	/* Identical halves. Discarding 2nd half */
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "witchryl_nvram.bin", 0x0000, 0x0800, CRC(98366bed) SHA1(279a5ce4639b8b2ac29146b32512615253c45991) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s29.u26", 0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+ROM_END
 
 
 /**************************
@@ -4369,5 +4500,5 @@ GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  0,        ROT0, "Vesely S
 GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  0,        ROT0, "bootleg",         "Mongolfier New (Italian)",                        GAME_NOT_WORKING )
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  soccernw, ROT0, "bootleg",         "Soccer New (Italian)",                            GAME_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,   0,        ROT0, "Funworld / " O_UMLAUT "hlinger", "Fun World Quiz (Austrian)",                   0 )
-
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,   0,        ROT0, "Funworld / " O_UMLAUT "hlinger", "Fun World Quiz (Austrian)",        0 )
+GAMEL( 199?, witchryl,  0,        witchryl, witchryl,  0,        ROT0, "Video Klein",     "Witch Royal (Export version 2.1)",                0,                       layout_jollycrd )

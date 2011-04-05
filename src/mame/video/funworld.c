@@ -8,59 +8,59 @@
 
   Games running on this hardware:
 
-  * Jolly Card (austrian),                            TAB Austria,        1985.
+  * Jolly Card (Austrian),                            TAB Austria,        1985.
   * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
-  * Jolly Card (croatian, set 1),                     TAB Austria,        1985.
-  * Jolly Card (croatian, set 2),                     Soft Design,        1993.
-  * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
-  * Jolly Card (italian, encrypted bootleg),          bootleg,            1990.
+  * Jolly Card (Croatian, set 1),                     TAB Austria,        1985.
+  * Jolly Card (Croatian, set 2),                     Soft Design,        1993.
+  * Jolly Card (Italian, blue TAB board, encrypted),  bootleg,            199?.
+  * Jolly Card (Italian, encrypted bootleg),          bootleg,            1990.
   * Super Joly 2000 - 3x,                             M.P.                1985.
-  * Jolly Card (austrian, Funworld, bootleg),         Inter Games,        1986.
-  * Big Deal (hungarian, set 1),                      Funworld,           1986.
-  * Big Deal (hungarian, set 2),                      Funworld,           1986.
-  * Jolly Card (austrian, Funworld),                  Funworld,           1986.
-  * Cuore 1 (italian),                                C.M.C.,             1996.
-  * Elephant Family (italian, new),                   C.M.C.,             1997.
-  * Elephant Family (italian, old),                   C.M.C.,             1996.
-  * Pool 10 (italian, set 1),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 2),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 3),                         C.M.C.,             1996.
-  * Pool 10 (italian, set 4),                         C.M.C.,             1997.
-  * Tortuga Family (italian),                         C.M.C.,             1997.
-  * Pot Game (italian),                               C.M.C.,             1996.
-  * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
-  * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
-  * Royal Card (austrian, set 1),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 2),                     TAB Austria,        1991.
-  * Royal Card (austrian/polish, set 3),              TAB Austria,        1991.
-  * Royal Card (austrian, set 4),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 5),                     TAB Austria,        1991.
-  * Royal Card (austrian, set 6),                     TAB Austria,        1991.
+  * Jolly Card (Austrian, Funworld, bootleg),         Inter Games,        1986.
+  * Big Deal (Hungarian, set 1),                      Funworld,           1986.
+  * Big Deal (Hungarian, set 2),                      Funworld,           1986.
+  * Jolly Card (Austrian, Funworld),                  Funworld,           1986.
+  * Cuore 1 (Italian),                                C.M.C.,             1996.
+  * Elephant Family (Italian, new),                   C.M.C.,             1997.
+  * Elephant Family (Italian, old),                   C.M.C.,             1996.
+  * Pool 10 (Italian, set 1),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 2),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 3),                         C.M.C.,             1996.
+  * Pool 10 (Italian, set 4),                         C.M.C.,             1997.
+  * Tortuga Family (Italian),                         C.M.C.,             1997.
+  * Pot Game (Italian),                               C.M.C.,             1996.
+  * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
+  * Bottle 10 (Italian, set 2),                       C.M.C.,             1996.
+  * Royal Card (Austrian, set 1),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 2),                     TAB Austria,        1991.
+  * Royal Card (Austrian/Polish, set 3),              TAB Austria,        1991.
+  * Royal Card (Austrian, set 4),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 5),                     TAB Austria,        1991.
+  * Royal Card (Austrian, set 6),                     TAB Austria,        1991.
   * Royal Card (TAB original),                        TAB Austria,        1991.
-  * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
+  * Royal Card (Slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
   * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
-  * Magic Card II (bulgarian),                        Impera,             1996.
-  * Magic Card II (green TAB or Impera board),        Impera,             1996.
-  * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
-  * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
-  * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
-  * Royal Vegas Joker Card (fast deal, english gfx),  Soft Design,        1993.
-  * Royal Vegas Joker Card (fast deal, Mile),         Mile,               1993.
+  * Magic Card II (Bulgarian),                        Impera,             1996.
+  * Magic Card II (Green TAB or Impera board),        Impera,             1996.
+  * Magic Card II (Blue TAB board, encrypted),        Impera,             1996.
+  * Royal Vegas Joker Card (Slow deal),               Funworld,           1993.
+  * Royal Vegas Joker Card (Fast deal),               Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, english gfx),  Soft Design,        1993.
+  * Royal Vegas Joker Card (Fast deal, Mile),         Mile,               1993.
   * Jolly Joker (98bet, set 1).                       Impera,             198?.
   * Jolly Joker (98bet, set 2).                       Impera,             198?.
   * Jolly Joker (40bet, croatian hack),               Impera,             198?.
   * Multi Win (Ver.0167, encrypted),                  Funworld,           1992.
   * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
-  * Mongolfier New (italian),                         bootleg,            199?.
-  * Soccer New (italian),                             bootleg,            199?.
-  * Saloon (french, encrypted),                       unknown,            199?.
-  * Fun World Quiz (austrian),                        Funworld,           198?.
-
+  * Mongolfier New (Italian),                         bootleg,            199?.
+  * Soccer New (Italian),                             bootleg,            199?.
+  * Saloon (French, encrypted),                       unknown,            199?.
+  * Fun World Quiz (Austrian),                        Funworld,           198?.
+  * Witch Royal (Export version 2.1),                 Video Klein,        199?.
 
 ***********************************************************************************
 
