@@ -268,7 +268,11 @@ static void execute_commands(cli_options &options, const char *exename)
 	if (strcmp(options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
 		astring helpstring;
+#ifndef MESS
 		mame_printf_info("Usage: %s [%s] [options]\n\nOptions:\n%s", exename, GAMENOUN, options.output_help(helpstring));
+#else
+		mame_printf_info("Usage: %s [%s] [media] [software] [options]\n\nOptions:\n%s", exename, GAMENOUN, options.output_help(helpstring));
+#endif
 		return;
 	}
 
