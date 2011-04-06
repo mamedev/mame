@@ -60,6 +60,10 @@ public:
 	tilemap_t *m_pf2_tilemap;
 	tilemap_t *m_pf3_tilemap;
 	tilemap_t *m_pf4_tilemap;
+	tilemap_t *m_pf5_tilemap;
+	tilemap_t *m_pf6_tilemap;
+	tilemap_t *m_pf7_tilemap;
+	tilemap_t *m_pf8_tilemap;
 	tilemap_t *m_pixel_layer;
 	tilemap_t *m_vram_layer;
 	UINT16 *m_spriteram16_buffered;
@@ -72,6 +76,10 @@ public:
 	UINT16 *m_f3_pf_data_2;
 	UINT16 *m_f3_pf_data_3;
 	UINT16 *m_f3_pf_data_4;
+	UINT16 *m_f3_pf_data_5;
+	UINT16 *m_f3_pf_data_6;
+	UINT16 *m_f3_pf_data_7;
+	UINT16 *m_f3_pf_data_8;
 	int m_f3_skip_this_frame;
 	int m_sprite_lag;
 	UINT8 m_sprite_pri_usage;
@@ -89,7 +97,7 @@ public:
 	int m_twidth_mask;
 	int m_twidth_mask_bit;
 	UINT8 *m_tile_opaque_sp;
-	UINT8 *m_tile_opaque_pf[4];
+	UINT8 *m_tile_opaque_pf[8];
 	UINT8 m_add_sat[256][256];
 	int m_alpha_s_1_1;
 	int m_alpha_s_1_2;

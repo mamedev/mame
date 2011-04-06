@@ -12,7 +12,7 @@
 
     Other Issues:
     - Dsp isn't hooked up.
-    - Crowd/boards not shown in the football games
+    - Various hacks in video core that needs squashing;
     - Sound doesn't work in RidingF/RingRage?
       (for RingRage it's probably a timing / cpu sync bug, if you go into test mode
        for a while then exit you'll have sound, this doesn't work on RidingF)

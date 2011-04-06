@@ -444,6 +444,31 @@ static TILE_GET_INFO( get_tile_info4 )
 	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_4);
 }
 
+static TILE_GET_INFO( get_tile_info5 )
+{
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_5);
+}
+
+static TILE_GET_INFO( get_tile_info6 )
+{
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_6);
+}
+
+static TILE_GET_INFO( get_tile_info7 )
+{
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_7);
+}
+
+static TILE_GET_INFO( get_tile_info8 )
+{
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
+	get_tile_info(machine,tileinfo,tile_index,state->m_f3_pf_data_8);
+}
+
+
 static TILE_GET_INFO( get_tile_info_vram )
 {
 	taito_f3_state *state = machine.driver_data<taito_f3_state>();
@@ -574,20 +599,43 @@ VIDEO_START( f3 )
 		state->m_twidth_mask=0x7f;
 		state->m_twidth_mask_bit=7;
 
+		tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
+
+
 	} else {
 		state->m_pf1_tilemap = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
 		state->m_pf2_tilemap = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,32,32);
 		state->m_pf3_tilemap = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,16,16,32,32);
 		state->m_pf4_tilemap = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,16,16,32,32);
+		state->m_pf5_tilemap = tilemap_create(machine, get_tile_info5,tilemap_scan_rows,16,16,32,32);
+		state->m_pf6_tilemap = tilemap_create(machine, get_tile_info6,tilemap_scan_rows,16,16,32,32);
+		state->m_pf7_tilemap = tilemap_create(machine, get_tile_info7,tilemap_scan_rows,16,16,32,32);
+		state->m_pf8_tilemap = tilemap_create(machine, get_tile_info8,tilemap_scan_rows,16,16,32,32);
 
 		state->m_f3_pf_data_1=state->m_f3_pf_data+(0x0000/2);
 		state->m_f3_pf_data_2=state->m_f3_pf_data+(0x1000/2);
 		state->m_f3_pf_data_3=state->m_f3_pf_data+(0x2000/2);
 		state->m_f3_pf_data_4=state->m_f3_pf_data+(0x3000/2);
+		state->m_f3_pf_data_5=state->m_f3_pf_data+(0x4000/2);
+		state->m_f3_pf_data_6=state->m_f3_pf_data+(0x5000/2);
+		state->m_f3_pf_data_7=state->m_f3_pf_data+(0x6000/2);
+		state->m_f3_pf_data_8=state->m_f3_pf_data+(0x7000/2);
 
 		state->m_width_mask=0x1ff;
 		state->m_twidth_mask=0x3f;
 		state->m_twidth_mask_bit=6;
+
+		tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);	
+		tilemap_set_transparent_pen(state->m_pf5_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf6_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf7_tilemap,0);
+		tilemap_set_transparent_pen(state->m_pf8_tilemap,0);
 	}
 
 	state->m_spriteram16_buffered = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -601,13 +649,10 @@ VIDEO_START( f3 )
 	height = machine.primary_screen->height();
 	state->m_pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
 	state->m_tile_opaque_sp = auto_alloc_array(machine, UINT8, machine.gfx[2]->total_elements);
-	for (i=0; i<4; i++)
+	for (i=0; i<8; i++)
 		state->m_tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine.gfx[1]->total_elements);
 
-	tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
-	tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
-	tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
-	tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
+
 	tilemap_set_transparent_pen(state->m_vram_layer,0);
 	tilemap_set_transparent_pen(state->m_pixel_layer,0);
 
@@ -711,6 +756,10 @@ WRITE16_HANDLER( f3_pf_data_w )
 		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0x7ff) >> 1);
 		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0x7ff) >> 1);
 		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x2800) tilemap_mark_tile_dirty(state->m_pf5_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x3000) tilemap_mark_tile_dirty(state->m_pf6_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x3800) tilemap_mark_tile_dirty(state->m_pf7_tilemap,(offset & 0x7ff) >> 1);
+		else if (offset<0x4000) tilemap_mark_tile_dirty(state->m_pf8_tilemap,(offset & 0x7ff) >> 1);
 	}
 }
 
@@ -1844,6 +1893,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 	}
 
 	y=y_start;
+
 	while(y!=y_end)
 	{
 		/* The zoom, column and row values can latch according to control ram */
@@ -1898,15 +1948,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		_colscroll[y]=colscroll;
 		_x_offset[y]=(x_offset&0xffff0000) - (x_offset&0x0000ffff);
 		_y_zoom[y] = (line_zoom&0xff) << 9;
-
-		/* The football games use values in the range 0x200-0x3ff where the crowd should be drawn - !?
-
-            Until this is understood we disable those lines (which would usually wrap and show the grass
-            area.
-        */
-		//if (colscroll&0x200)
-		//	pri|=0x0800;
-
+	
 		/* Evaluate clipping */
 		if (pri&0x0800)
 			line_enable=0;
@@ -1933,15 +1975,44 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		y +=y_inc;
 	}
 
-	/* set pixmap pointer */
-	srcbitmap = tilemap_get_pixmap(tmap);
-	flagsbitmap = tilemap_get_flagsmap(tmap);
+
+	tilemap_t* tm = tmap;
 
 	y=y_start;
 	while(y!=y_end)
 	{
 		UINT32 x_index_fx;
 		UINT32 y_index;
+
+		/* The football games use values in the range 0x200-0x3ff where the crowd should be drawn - !?
+
+		   This appears to cause it to reference outside of the normal tilemap RAM area into the unused
+		   area on the 32x32 tilemap configuration.. but exactly how isn't understood
+
+            Until this is understood we're creating additional tilemaps for the otherwise unused area of
+			RAM and forcing it to look up there.
+
+			the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
+			in ram??
+        */
+		int cs = _colscroll[y];
+		
+		if (cs&0x200)
+		{
+			if (state->m_pf5_tilemap && state->m_pf6_tilemap)
+			{
+				if (tmap == state->m_pf3_tilemap) tmap = state->m_pf5_tilemap; // pitch -> crowd
+				if (tmap == state->m_pf4_tilemap) tmap = state->m_pf6_tilemap; // corruption on goals -> blank (hthero94)
+			}
+		}
+		else
+		{
+			tmap = tm;
+		}
+
+		/* set pixmap pointer */
+		srcbitmap = tilemap_get_pixmap(tmap);
+		flagsbitmap = tilemap_get_flagsmap(tmap);
 
 		if(line_t->alpha_mode[y]!=0)
 		{
