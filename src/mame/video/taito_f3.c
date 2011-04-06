@@ -257,6 +257,7 @@ static const struct F3config f3_config_table[] =
 	{ PBOBBLE4,  0,     1 },
 	{ POPNPOP,   1,     1 },
 	{ LANDMAKR,  1,     1 },
+	{ TMDRILL,   1,     0 },
 	{0}
 };
 

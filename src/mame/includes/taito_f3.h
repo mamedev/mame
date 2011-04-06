@@ -36,7 +36,8 @@ enum {
 	POPNPOP,	/* E51 */
 	LANDMAKR,	/* E61 */
 	RECALH,		/* prototype */
-	COMMANDW	/* prototype */
+	COMMANDW,	/* prototype */
+	TMDRILL
 };
 
 class taito_f3_state : public driver_device
