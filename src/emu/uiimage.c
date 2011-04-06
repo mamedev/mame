@@ -21,6 +21,7 @@
 #include "image.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "uiswlist.h"
 #include "zippath.h"
 #include "unicode.h"
 #include "imagedev/cassette.h"

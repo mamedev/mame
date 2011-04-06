@@ -101,6 +101,7 @@ EMUOBJS = \
 	$(EMUOBJ)/uigfx.o \
 	$(EMUOBJ)/uiimage.o \
 	$(EMUOBJ)/uiinput.o \
+	$(EMUOBJ)/uiswlist.o \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \

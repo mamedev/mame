@@ -10,6 +10,7 @@
 #define __SOFTLIST_H_
 
 #include "uimenu.h"
+#include "expat.h"
 
 
 /*********************************************************************
@@ -52,7 +53,48 @@ struct software_info
 };
 
 
+enum softlist_parse_position
+{
+	POS_ROOT,
+	POS_MAIN,
+	POS_SOFT,
+	POS_PART,
+	POS_DATA
+};
+
+
+typedef struct _parse_state parse_state;
+struct _parse_state
+{
+	XML_Parser	parser;
+	int			done;
+	
+	void (*error_proc)(const char *message);
+	void *param;
+	
+	enum softlist_parse_position pos;
+	char **text_dest;
+};
+
+
 typedef struct _software_list software_list;
+struct _software_list
+{
+	emu_file	*file;
+	object_pool	*pool;
+	parse_state	state;
+	const char *description;
+	struct software_info	*software_info_list;
+	struct software_info	*current_software_info;
+	software_info	*softinfo;
+	const char *look_for;
+	int part_entries;
+	int current_part_entry;
+	int rom_entries;
+	int current_rom_entry;
+	void (*error_proc)(const char *message);
+	int list_entries;
+};
 
 /* Handling a software list */
 software_list *software_list_open(emu_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
@@ -70,8 +112,6 @@ UINT32 software_get_support(emu_options &options, char *swlist, const char *swna
 const char *software_part_get_feature(software_part *part, const char *feature_name);
 
 bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
-
-void ui_image_menu_software(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 
 
 /*********************************************************************
