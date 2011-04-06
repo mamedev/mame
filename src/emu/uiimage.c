@@ -922,6 +922,12 @@ static void menu_file_selector(running_machine &machine, ui_menu *menu, void *pa
 					ui_menu_set_selection(menu, (void *) selected_entry);
 			}
 		}
+		else if (event->iptkey == IPT_UI_CANCEL)
+		{
+			// reset the char buffer also in this case
+			if (menustate->filename_buffer[0] != '\0')
+				memset(menustate->filename_buffer, '\0', ARRAY_LENGTH(menustate->filename_buffer));
+		}
 	}
 }
 

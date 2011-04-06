@@ -2166,6 +2166,12 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 					ui_menu_set_selection(menu, (void *) selected_entry);
 			}
 		}
+		else if (event->iptkey == IPT_UI_CANCEL)
+		{
+			// reset the char buffer also in this case
+			if (sw_state->filename_buffer[0] != '\0')
+				memset(sw_state->filename_buffer, '\0', ARRAY_LENGTH(sw_state->filename_buffer));
+		}
 	}
 }
 
