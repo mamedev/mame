@@ -1845,22 +1845,26 @@ DEVICE_GET_INFO( software_list )
     MENU SUPPORT
 ***************************************************************************/
 
+/* state of a software entry */
+typedef struct _software_entry_state software_entry_state;
+struct _software_entry_state
+{
+	software_entry_state *next;
+	
+	const char *short_name;
+	const char *long_name;
+	const char *interface;
+	char *list_name;
+	device_image_interface* image;
+};
+
 /* state of the software menu */
 typedef struct _software_menu_state software_menu_state;
 struct _software_menu_state
 {
 	char *list_name;	/* currently selected list */
 	device_image_interface* image;
-};
-
-/* state of a software entry */
-typedef struct _software_entry_state software_entry_state;
-struct _software_entry_state
-{
-	const char *short_name;
-	const char *interface;
-	char *list_name;
-	device_image_interface* image;
+	software_entry_state *entrylist;
 };
 
 /* state of a software part */
@@ -1942,33 +1946,61 @@ void ui_mess_menu_software_parts(running_machine &machine, ui_menu *menu, void *
 }
 
 /* populate a specific list */
-static void ui_mess_menu_populate_software_entries(running_machine &machine, ui_menu *menu, char *list_name, device_image_interface* image)
+
+static software_entry_state *append_software_entry(ui_menu *menu, software_menu_state *menustate,
+													   software_info *swinfo, char *list_name, device_image_interface* image)
 {
-	software_list *list = software_list_open(machine.options(), list_name, FALSE, NULL);
+	software_entry_state *entry = NULL;
+	software_entry_state **entryptr;
 	const char *interface = image->image_config().image_interface();
+	
+	// check if at least one of the parts has the correct interface and add a menu entry only in this case
+	for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
+	{
+		if (strcmp(interface, swpart->interface_) == 0)
+		{
+			// allocate a new entry
+			entry = (software_entry_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
+			memset(entry, 0, sizeof(*entry));
+
+			entry->short_name = ui_menu_pool_strdup(menu, swinfo->shortname);
+			entry->long_name = ui_menu_pool_strdup(menu, swinfo->longname);
+			entry->list_name = list_name;
+			entry->image = image;
+			entry->interface = ui_menu_pool_strdup(menu, swpart->interface_);
+			break;
+		}
+	}
+
+	// find the end of the list
+	entryptr = &menustate->entrylist;
+	while ((*entryptr != NULL) /*&& (compare_software_entries(entry, *entryptr) >= 0)*/)
+		entryptr = &(*entryptr)->next;
+	
+	// insert the entry
+	entry->next = *entryptr;
+	*entryptr = entry;
+
+	return entry;
+}
+
+
+static void ui_mess_menu_populate_software_entries(running_machine &machine, ui_menu *menu, software_menu_state *menustate)
+{
+	software_list *list = software_list_open(machine.options(), menustate->list_name, FALSE, NULL);
+
+	// build up the list of entries for the menu
 	if (list)
 	{
 		for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
-		{
-			software_entry_state *entry = (software_entry_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
-			entry->short_name = ui_menu_pool_strdup(menu, swinfo->shortname);
-			entry->list_name = list_name;
-			entry->image = image;
-
-			// check if at least one of the parts has the correct interface
-			for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
-			{
-				if (strcmp(interface, swpart->interface_) == 0)
-				{
-					entry->interface = ui_menu_pool_strdup(menu, swpart->interface_);
-					ui_menu_item_append(menu, swinfo->shortname, swinfo->longname, 0, entry);
-					break;
-				}
-			}
-		}
+			append_software_entry(menu, menustate, swinfo, menustate->list_name, menustate->image);
 
 		software_list_close(list);
 	}
+
+	// append all of the menu entries
+	for (software_entry_state *entry = menustate->entrylist; entry != NULL; entry = entry->next)
+		ui_menu_item_append(menu, entry->short_name, entry->long_name, 0, entry);
 }
 
 bool swinfo_has_multiple_parts(software_info *swinfo, const char *interface)
@@ -1992,7 +2024,7 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	{
 		if (sw_state->list_name)
 		{
-			ui_mess_menu_populate_software_entries(machine, menu, sw_state->list_name, sw_state->image);
+			ui_mess_menu_populate_software_entries(machine, menu, sw_state);
 		}
 	}
 
@@ -2035,6 +2067,7 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 	bool haveCompatible = FALSE;
 	const char *interface = image->image_config().image_interface();
 
+	// Add original software lists for this system
 	for (const device_config *dev = machine.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
@@ -2065,6 +2098,7 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 		}
 	}
 
+	// Add compatible software lists for this system
 	for (const device_config *dev = machine.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
@@ -2117,6 +2151,7 @@ void ui_image_menu_software(running_machine &machine, ui_menu *menu, void *param
 		software_menu_state *child_menustate = (software_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 		child_menustate->list_name = (char *)event->itemref;
 		child_menustate->image = image;
+		child_menustate->entrylist = NULL;
 		ui_menu_stack_push(child_menu);
 	}
 }
