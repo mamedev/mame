@@ -13,6 +13,7 @@
 #include "emuopts.h"
 #include "hash.h"
 #include "softlist.h"
+#include "ui.h"
 
 #include <ctype.h>
 
@@ -1865,6 +1866,7 @@ struct _software_menu_state
 	char *list_name;	/* currently selected list */
 	device_image_interface* image;
 	software_entry_state *entrylist;
+	char filename_buffer[1024];
 };
 
 /* state of a software part */
@@ -2041,7 +2043,10 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 {
 	const ui_menu_event *event;
 	software_menu_state *sw_state = (software_menu_state *)state;
-
+	const software_entry_state *entry;
+	const software_entry_state *selected_entry = NULL;
+	int bestmatch = 0;
+	
 	if (!ui_menu_populated(menu))
 	{
 		if (sw_state->list_name)
@@ -2053,33 +2058,114 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	/* process the menu */
 	event = ui_menu_process(machine, menu, 0);
 
-	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
+	if (event != NULL && event->itemref != NULL)
 	{
-		device_image_interface *image = sw_state->image;
-		software_entry_state *entry = (software_entry_state *) event->itemref;
-		software_list *tmp_list = software_list_open(machine.options(), sw_state->list_name, FALSE, NULL);
-		software_info *tmp_info = software_list_find(tmp_list, entry->short_name, NULL);
-
-		// if the selected software has multiple parts that can be loaded, open the submenu
-		if (swinfo_has_multiple_parts(tmp_info, image->image_config().image_interface()))
+		/* handle selections */
+		if (event->iptkey == IPT_UI_SELECT)
 		{
-			ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_parts, entry);
-			software_entry_state *child_menustate = (software_entry_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
-			child_menustate->short_name = entry->short_name;
-			child_menustate->interface = image->image_config().image_interface();
-			child_menustate->list_name = sw_state->list_name;
-			child_menustate->image = image;
-			ui_menu_stack_push(child_menu);
-		}
-		else
-		{
-			// otherwise, load the file
-			if (image != NULL)
-				image->load(entry->short_name);
+			device_image_interface *image = sw_state->image;
+			software_entry_state *entry = (software_entry_state *) event->itemref;
+			software_list *tmp_list = software_list_open(machine.options(), sw_state->list_name, FALSE, NULL);
+			software_info *tmp_info = software_list_find(tmp_list, entry->short_name, NULL);
+			
+			// if the selected software has multiple parts that can be loaded, open the submenu
+			if (swinfo_has_multiple_parts(tmp_info, image->image_config().image_interface()))
+			{
+				ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_parts, entry);
+				software_entry_state *child_menustate = (software_entry_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+				child_menustate->short_name = entry->short_name;
+				child_menustate->interface = image->image_config().image_interface();
+				child_menustate->list_name = sw_state->list_name;
+				child_menustate->image = image;
+				ui_menu_stack_push(child_menu);
+			}
 			else
-				popmessage("No matching device found for interface '%s'!", entry->interface);
+			{
+				// otherwise, load the file
+				if (image != NULL)
+					image->load(entry->short_name);
+				else
+					popmessage("No matching device found for interface '%s'!", entry->interface);
+			}
+			software_list_close(tmp_list);
+			
+			// reset the char buffer when pressing IPT_UI_SELECT
+			if (sw_state->filename_buffer[0] != '\0')
+				memset(sw_state->filename_buffer, '\0', ARRAY_LENGTH(sw_state->filename_buffer));
 		}
-		software_list_close(tmp_list);
+		else if (event->iptkey == IPT_SPECIAL)
+		{
+			int buflen = strlen(sw_state->filename_buffer);
+			bool update_selected = FALSE;
+			
+			/* if it's a backspace and we can handle it, do so */
+			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
+			{
+				*(char *)utf8_previous_char(&sw_state->filename_buffer[buflen]) = 0;
+				update_selected = TRUE;
+				
+				if (ARRAY_LENGTH(sw_state->filename_buffer) > 0)
+					ui_popup_time(5, "%s", sw_state->filename_buffer);
+			}
+			/* if it's any other key and we're not maxed out, update */
+			else if (event->unichar >= ' ' && event->unichar < 0x7f)
+			{
+				buflen += utf8_from_uchar(&sw_state->filename_buffer[buflen], ARRAY_LENGTH(sw_state->filename_buffer) - buflen, event->unichar);
+				sw_state->filename_buffer[buflen] = 0;
+				update_selected = TRUE;
+				
+				if (ARRAY_LENGTH(sw_state->filename_buffer) > 0)
+					ui_popup_time(5, "%s", sw_state->filename_buffer);
+			}
+			
+			if (update_selected)
+			{
+				const software_entry_state *cur_selected = (const software_entry_state *)ui_menu_get_selection(menu);
+				
+				// check for entries which matches our filename_buffer:
+				// from current entry to the end
+				for (entry = cur_selected; entry != NULL; entry = entry->next)
+				{
+					if (entry->short_name != NULL && sw_state->filename_buffer != NULL)
+					{
+						int match = 0;
+						for (int i = 0; i < ARRAY_LENGTH(sw_state->filename_buffer); i++)
+						{
+							if (mame_strnicmp(entry->short_name, sw_state->filename_buffer, i) == 0)
+								match = i;
+						}
+						
+						if (match > bestmatch)
+						{
+							bestmatch = match;
+							selected_entry = entry;
+						}
+					}
+				}
+				// and from the first entry to current one
+				for (entry = sw_state->entrylist; entry != cur_selected; entry = entry->next)
+				{
+					if (entry->short_name != NULL && sw_state->filename_buffer != NULL)
+					{
+						int match = 0;
+						for (int i = 0; i < ARRAY_LENGTH(sw_state->filename_buffer); i++)
+						{
+							if (mame_strnicmp(entry->short_name, sw_state->filename_buffer, i) == 0)
+								match = i;
+						}
+						
+						if (match > bestmatch)
+						{
+							bestmatch = match;
+							selected_entry = entry;
+						}
+					}
+				}
+				
+				if (selected_entry != NULL && selected_entry != cur_selected)
+					ui_menu_set_selection(menu, (void *) selected_entry);
+			}
+		}
 	}
 }
 
