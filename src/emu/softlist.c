@@ -1945,6 +1945,28 @@ void ui_mess_menu_software_parts(running_machine &machine, ui_menu *menu, void *
 	}
 }
 
+static int compare_software_entries(const software_entry_state *e1, const software_entry_state *e2)
+{
+	int result;
+	const char *e1_basename = (e1->short_name != NULL) ? e1->short_name : "";
+	const char *e2_basename = (e2->short_name != NULL) ? e2->short_name : "";
+	
+	result = mame_stricmp(e1_basename, e2_basename);
+	if (result == 0)
+	{
+		result = strcmp(e1_basename, e2_basename);
+		if (result == 0)
+		{
+			if (e1 < e2)
+				result = -1;
+			else if (e1 > e2)
+				result = 1;
+		}
+	}
+	
+	return result;
+}
+
 /* populate a specific list */
 
 static software_entry_state *append_software_entry(ui_menu *menu, software_menu_state *menustate,
@@ -1974,7 +1996,7 @@ static software_entry_state *append_software_entry(ui_menu *menu, software_menu_
 
 	// find the end of the list
 	entryptr = &menustate->entrylist;
-	while ((*entryptr != NULL) /*&& (compare_software_entries(entry, *entryptr) >= 0)*/)
+	while ((*entryptr != NULL) && (compare_software_entries(entry, *entryptr) >= 0))
 		entryptr = &(*entryptr)->next;
 	
 	// insert the entry
