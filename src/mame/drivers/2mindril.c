@@ -50,6 +50,7 @@ public:
 	/* input-related */
 	UINT16        m_defender_sensor;
 	UINT16		  m_shutter_sensor;
+	UINT16		  irq_reg;
 
 	/* devices */
 	device_t *m_maincpu;
@@ -162,6 +163,33 @@ static WRITE16_HANDLER( sensors_w )
 	}
 }
 
+static READ16_HANDLER( drill_irq_r )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+	return state->irq_reg;
+}
+
+static WRITE16_HANDLER( drill_irq_w )
+{
+	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
+	/*
+	(note: could rather be irq mask)
+	---- ---- ---x ---- irq lv 5 ack, 0->1 latch
+	---- ---- ---- x--- irq lv 4 ack, 0->1 latch
+	---- ---- -??- -??? connected to the other levels?
+	*/
+	if(((state->irq_reg & 8) == 0) && data & 8)
+		cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+
+	if(((state->irq_reg & 0x10) == 0) && data & 0x10)
+		cputag_set_input_line(space->machine(), "maincpu", 5, CLEAR_LINE);
+
+	if(data & 0xffe7)
+		printf("%04x\n",data);
+
+	COMBINE_DATA(&state->irq_reg);
+}
+
 static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
@@ -175,10 +203,10 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x460000, 0x46000f) AM_WRITE(f3_control_0_w)
 	AM_RANGE(0x460010, 0x46001f) AM_WRITE(f3_control_1_w)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x502000, 0x503fff) AM_RAM // presumably more paletteram
+	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_r, ym2610_w, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_RAM // check me
-	AM_RANGE(0x60000e, 0x60000f) AM_RAM // check me
+	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
+	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
 	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, m_iodata) // i/o
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
@@ -362,10 +390,17 @@ static GFXDECODE_START( 2mindril )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( drill_interrupt )
+static INTERRUPT_GEN( drill_vblank_irq )
 {
-	device_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, ASSERT_LINE);
 }
+
+#if 0
+static INTERRUPT_GEN( drill_device_irq )
+{
+	device_set_input_line(device, 5, ASSERT_LINE);
+}
+#endif
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
 static void irqhandler(device_t *device, int irq)
@@ -396,24 +431,26 @@ static MACHINE_RESET( drill )
 
 	state->m_defender_sensor = 0;
 	state->m_shutter_sensor = 0;
+	state->irq_reg = 0;
 }
 
 static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)
-	MCFG_CPU_VBLANK_INT("screen", drill_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", drill_vblank_irq)
+	//MCFG_CPU_PERIODIC_INT(drill_device_irq,60)
 	MCFG_GFXDECODE(2mindril)
 
 	MCFG_MACHINE_START(drill)
 	MCFG_MACHINE_RESET(drill)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.97)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(624) /* 58.97 Hz, 624us vblank time */)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+232-1)
+	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 	MCFG_SCREEN_UPDATE(f3)
 	MCFG_SCREEN_EOF(f3)
 
@@ -423,7 +460,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
 	MCFG_SOUND_CONFIG(ym2610_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
