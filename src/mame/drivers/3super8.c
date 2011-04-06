@@ -48,10 +48,16 @@ static SCREEN_UPDATE(3super8)
 	return 0;
 }
 
-static ADDRESS_MAP_START( map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+
+static ADDRESS_MAP_START( super8_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xf3ff) AM_ROM
+	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( super8_io, AS_IO, 8 )
+	AM_RANGE(0x5000, 0x5fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 3super8 )
 INPUT_PORTS_END
@@ -77,8 +83,9 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( 3super8, _3super8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(map)
-	//MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PROGRAM_MAP(super8_map)
+	MCFG_CPU_IO_MAP(super8_io)
+	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -128,4 +135,12 @@ ROM_START( 3super8 )
 	ROM_LOAD( "sound.bin", 0x00000, 0x40000, BAD_DUMP CRC(230b31c3) SHA1(38c107325d3a4e9781912078b1317dc9ba3e1ced) )
 ROM_END
 
-GAME( 199?, 3super8,  0,    3super8, 3super8,  0, ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+static DRIVER_INIT( 3super8 )
+{
+	//UINT8 *ROM = machine.region("maincpu")->base();
+
+	//ROM[0x19a] = 0xed;
+	//ROM[0x19b] = 0x4d; //reti
+}
+
+GAME( 199?, 3super8,  0,    3super8, 3super8,  3super8, ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
