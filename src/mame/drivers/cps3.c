@@ -52,30 +52,82 @@ Capcom CP SYSTEM III Hardware Overview
 Capcom, 1996-1999
 
 From late 1996 to 1999 Capcom developed another hardware platform to rival the CPS2 System and called
-it CP SYSTEM III. Only 6 games were produced....
+it CP SYSTEM III. Only 6 games were produced. Here's a detailed table of all known releases until now:
 
-Game                                                 Date   S/W Rev        CD Part#     Label         Cart Part#
-----------------------------------------------------------------------------------------------------------------
-JoJo no Kimyouna Bouken / JoJo's Venture             1998   98/12/02       CAP-JJK000   CAP-JJK-140   JJK98c00F
-                                                            99/01/08                    CAP-JJK-160
-                                                            99/01/28 **
-JoJo no Kimyouna Bouken  Miraie no Isan
-/ JoJo's Bizarre Adventure Heritage for the Future   1999   99/09/13       CAP-JJM000   CAP-JJM-110   JJM99900F
-                                                            99/09/27 **
+                                                           |--------------- Cart ----------------|  |--------------- CD --------------|
+Game                                                 Year  Part #     Label      Region  CD  NO CD  Part #      Catalog #   Label        Revision
+---------------------------------------------------  ----  ---------  ---------  ------  --  -----  ----------  ----------  -----------  --------
+Warzard                                              1996  WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-3   CAP-WZD-3    961023
+Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 
-Street Fighter III New Generation                    1997   97/02/04       CAP-SF3000   CAP-SF3-3     SF397200F
+Street Fighter III: New Generation                   1997  SF397200F  CP300000G  JAPAN   X          CAP-SF3000  CAP-SF3-3   CAP-SF3-3    970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                           970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  CAP-SF3-3   CAP-SF3-3    970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  CAP-SF3-3   CAP-SF3-3    970204
 
-Street Fighter III 2nd Impact Giant Attack           1997   97/09/30       CAP-3GA000   CAP-3GA-1     3GA97a00F
+Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  CAP-3GA000  CAP-3GA-1    970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
 
-Street Fighter III 3rd Strike Fight for the Future   1999   99/05/12       CAP-33S000   CAP-33S-1     33S99400F
-                                                            99/06/08                    CAP-33S-2
+JoJo no Kimyouna Bouken                              1998  JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK000  CAP-JJK-140  981202
+JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-2   CAP-JJK-160  990108
+JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  ?           ?            990128*
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128*
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  ?           ?            990128*
 
-Warzard / Red Earth                                  1996   96/11/21       CAP-WZD000   CAP-WZD-5     WZD96a00F
+Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE* X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE* X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                           990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                           990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
 
-** NOT DUMPED but known to exist
+JoJo no Kimyouna Bouken: Miraie no Isan              1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  ?           ?            990927*
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990913
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990927*
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990927*
 
-The Game Region / No CD Flags / Development flags etc. are controlled by a byte in the bios roms.  The CDs
-contain revisions of the game code and are independent of the region.
+* NOT DUMPED but known to exist
+
+Each game consists of a Cart and a CD having various codes needed to identify them. Carts and CDs have
+both a different Part # printed on their front/top side that includes the game Cart/CD code and ends
+respectively with 00F/000 for all Japan releases and with A0F/0A0 for all the other ones. Therefore,
+the Part # can be used only to identify Japan releases and further parameters need to be introduced.
+The Cart is responsible for the game Region that can be identified by a Label with coloured characters
+and a code printed on back side. The antepenultimate character of the Label code and the colour of the
+sticker vary by Region, exactly as happens on the boot screen when the board is powered on. There are two
+types of Carts. Some require the CD to boot, some don't since the game is already loaded into the SIMMs.
+Both types are externally identical and use the same codes, so the only way to distinguish them is dump
+the BIOSes. The game Region and CD/NO CD flags are controlled by two different bytes in the BIOS rom.
+The CD (and SIMMs too if the Cart is of type NO CD) contains the game Revision that can be identified
+by two codes, the Catalog # and the Label. The Catalog # is the identifying code printed in the mirror
+ring on top side close to the CD's center while the Label is the code appearing on the CD icon when
+it's inserted into a PC CD reader. It has been verified that the Catalog # and Label are the same for
+some games but quite different for some others, so it's better to check both to avoid confusion. It
+has also been verified that the Catalog # and Label (and the data on CDs) don't change between Regions,
+only between Revisions. However, knowing one of them and comparing it with the table above will help
+to understand if a new game Revision has been discovered. Current CD dumps have been documented using
+the Catalog # as name, since the Label is already included into the images used to generate CHDs.
 
 The CP SYSTEM III comprises a main board with several custom ASICs, custom 72-pin SIMMs for program
 and graphics storage (the same SIMMs are also used in some CPS2 titles), SCSI CDROM and CDROM disc,
@@ -83,29 +135,29 @@ and a plug-in security cart containing a boot ROM, an NVRAM and another custom A
 decryption information held by a [suicide] battery.
 
 Not much is known about the actual CPU used in this system due to the extensive use of encryption,
-and the volatile nature of the security information. There appears to be a custom Hitachi SH-2
-CPU on the mainboard and there has been confirmed to be one in the cart. Tests were done by decrypting
-the BIOS and code and running it on the PCB. It is known that neither of these CPU's will run standard
+and the volatile nature of the security information. There appears to be a custom Hitachi SH-2 CPU on
+the mainboard and there has been confirmed to be one in the cart. Tests were done by decrypting the
+BIOS and code and running it on the PCB. It is known that neither of these CPU's will run standard
 (i.e. unencrypted) SH2 code.
 
-The security cart is thought to work like this....  the flashROM in the cart contains a program BIOS which is
-decrypted by the CPU in the cart (the CPU has built-in decryption) then executed by that CPU to boot the BIOS
-code.  Even though the code in the flashROM is encrypted, the cart can run it even if it is dead/suicided because
-it has been discovered that the BIOS contains a hidden security menu allowing the cart to be loaded with the
-security data. This proves the cart runs the BIOS even if it is dead. The special security menu is not
-normally available but is likely accessed with a special key/button combination which is unknown ATM.
+The security cart is thought to work like this: the flashROM in the cart contains a program BIOS which is
+decrypted by the CPU in the cart (the CPU has built-in decryption) then executed by that CPU to boot the
+BIOS code. Even though the code in the flashROM is encrypted, the cart can run it even if it is dead/suicided
+because it has been discovered that the BIOS contains a hidden security menu allowing the cart to be loaded
+with the security data. This proves the cart runs the BIOS even if it is dead. The special security menu is
+not normally available but is likely accessed with a special key/button combination which is unknown ATM.
 The cart contains a FM1208S NVRAM which appears to either be unused or holds game settings. Because the CPU
 in the cart is always powered by a battery, it has stealth capability that allows it to continually monitor
 the situation. If the custom CPU detects any tampering (generally things such as voltage fluctuation or
 voltage dropping or even removal of the cart with the power on), it immediately erases the SRAM inside the
 CPU (and thus the key) which effectively kills the security cart dead. This also suggests that the custom
-Capcom CPU contains some additional internal code to initiate the boot process which is battery-backed
-as well. It is known (from decapping it) that the CPU in the security cart does contain an amount of static
+Capcom CPU contains some additional internal code to initiate the boot process which is battery-backed as
+well. It is known (from decapping it) that the CPU in the security cart does contain an amount of static
 RAM for data storage and a SH2 core.
 
 The main board uses the familiar Capcom SIMM modules to hold the data from the CDROM so that the life of
-the CD drive is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs
-that can be updated with different games on bootup using a built-in software updating system.
+the CD drive is maximized. The SIMMs don't contain RAM, but instead TSOP48 surface mounted flashROMs that
+can be updated with different games on bootup using a built-in software updating system.
 The SIMMs that hold the program code are located in positions 1 & 2 and are 64MBit.
 The SIMMs that hold the graphics are located in positions 3, 4, 5, 6 & 7 and are 128MBit.
 The data in the SIMMs is not decrypted, it is merely taken directly from the CDROM and shuffled slightly
@@ -142,12 +194,12 @@ Warzard / Red Earth                                  64MBit  -       128MBit  12
 Due to the built-in upgradability of the hardware, and the higher frame-rates the hardware seems to have,
 it appears Capcom had big plans for this system and possibly intended to create many games on it, as they
 did with CPS2. Unfortunately for Capcom, CP SYSTEM III was an absolute flop in the arcades so those plans
-were cancelled. Possible reasons include...
-- The games were essentially just 2D, and already there were many 3D games coming out onto the market that
-  interested operators more than this.
-- The cost of the system was quite expensive when compared to other games on the market.
-- It is rumoured that the system was difficult to program for developers.
-- These PCBs were not popular with operators because the security carts are extremely static-sensitive and most
+were cancelled. Possible reasons include:
+- the games were essentially just 2D, and already there were many 3D games coming out onto the market that
+  interested operators more than this,
+- the cost of the system was quite expensive when compared to other games on the market,
+- it is rumoured that the system was difficult to program for developers,
+- these PCBs were not popular with operators because the security carts are extremely static-sensitive and most
   of them failed due to the decryption information being zapped by simple handling of the PCBs or by touching
   the security cart edge connector underneath the PCB while the security cart was plugged in, or by power
   fluctuations while flashing the SIMMs. You will know if your cart has been zapped because on bootup, you get
@@ -161,7 +213,7 @@ PCB Layouts
 -----------
 
 CAPCOM
-CP SYSTEMIII
+CP SYSTEM III
 95682A-4 (older rev 95682A-3)
    |----------------------------------------------------------------------|
   |= J1             HM514260     |------------|      |  |  |  |  |        |
@@ -2608,7 +2660,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "sfiii-simm5.1", 0x00000, 0x200000, CRC(c6f1c066) SHA1(00de492dd1ef7aef05027a8c501c296b6602e917) ) \
 
 #define SFIII_970204_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "sf3000", 0, SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
 
 #define SFIII2_970930_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "sfiii2-simm1.0", 0x00000, 0x200000, CRC(2d666f0b) SHA1(68de034b3a3aeaf4b26122a84ad48b0b763e4122) ) \
@@ -2645,7 +2697,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROM_LOAD( "sfiii2-simm5.7", 0x00000, 0x200000, CRC(93ffa199) SHA1(33ec2379f30c6fdf47ba72c1d0cad8bdd02f17df) ) \
 
 #define SFIII2_970930_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "3ga000", 0, SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
 
 #define SFIII3_990608_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "sfiii3-simm1.0", 0x00000, 0x200000, CRC(11dfd3cd) SHA1(dba1f77c46e80317e3279298411154dfb6db2309) ) \
@@ -2735,7 +2787,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm6.7", 0 ) ROM_LOAD( "sfiii3-simm6.7", 0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b) ) \
 
 #define SFIII3_990512_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "33s000", 0, SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
 
 #define JOJO_990108_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojo-simm1.0", 0x00000, 0x200000, CRC(cfbc38d6) SHA1(c33e3a51fe8ab54e0912a1d6e662fe1ade73cee7) ) \
@@ -2766,7 +2818,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "jojo-simm5.1", 0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32) ) \
 
 #define JOJO_990108_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
 
 #define JOJO_981202_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojoa-simm1.0",0x00000, 0x200000, CRC(e06ba886) SHA1(4defd5e8e1e6d0c439fed8a6454e89a59e24ea4c) ) \
@@ -2797,7 +2849,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "jojo-simm5.1", 0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32) ) \
 
 #define JOJO_981202_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "jjk000", 0, SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
 
 #define JOJOBA_990913_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojoba-simm1.0", 0x00000, 0x200000, CRC(76976231) SHA1(90adde7e5983ec6a4e02789d5cefe9e85c9c52d5) ) \
@@ -2834,7 +2886,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) ) \
 
 #define JOJOBA_990913_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "jjm000", 0, SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) ) \
 
 #define REDEARTH_961121_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "redearth-simm1.0", 0x00000, 0x200000, CRC(cad468f8) SHA1(b3aa4f7d3fae84e8821417ccde9528d3eda2b7a6) ) \
@@ -2861,7 +2913,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23) ) \
 
 #define REDEARTH_961121_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "wzd000", 0, SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
 
 #define REDEARTH_961023_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "redeartha-simm1.0", 0x00000, 0x200000, CRC(65bac346) SHA1(6f4ba0c2cae91a37fc97bea5fc8a50aaf6ca6513) ) \
@@ -2888,7 +2940,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23) ) \
 
 #define REDEARTH_961023_CDROM \
-	DISK_REGION( "cdrom" )	DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-3", 0, SHA1(a6ff67093db6bc80ee5fc46e4300e0177b213a52) ) \
 
 
 /* CD sets - use CD BIOS roms */
@@ -2906,6 +2958,14 @@ ROM_END
 ROM_START( sfiiij )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
+
+	SFIII_970204_FLASH
+	SFIII_970204_CDROM
+ROM_END
+
+ROM_START( sfiiih )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "sfiii_hispanic.29f400.u2", 0x000000, 0x080000, CRC(d2b3cd48) SHA1(00ebb270c24a66515c97e35331de54ff5358000e) )
 
 	SFIII_970204_FLASH
 	SFIII_970204_CDROM
@@ -3006,7 +3066,6 @@ ROM_START( jojoaj )
 	JOJO_981202_FLASH
 	JOJO_981202_CDROM
 ROM_END
-
 
 ROM_START( jojoba )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
@@ -3226,6 +3285,7 @@ GAME( 1996, warzard,  redearth, redearth, cps3, redearth, ROT0, "Capcom", "Warza
 GAME( 1996, warzarda, redearth, redearth, cps3, redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiii,    0,        sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiiij,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiih,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiii2,   0,        sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiii2j,  sfiii2,   sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, jojo,     0,        jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_IMPERFECT_GRAPHICS )

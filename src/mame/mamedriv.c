@@ -3154,6 +3154,7 @@ V-V                           TP-027
 	DRIVER( warzarda )	/* 23/10/1996 (c) 1996 (Japan) */
 	DRIVER( sfiii )	/* 04/02/1997 (c) 1997 (USA) */
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 (Japan) */
+	DRIVER( sfiiih )	/* 04/02/1997 (c) 1997 (Hispanic) */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 (USA) */
 	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 (Japan) */
 	DRIVER( jojo )	/* 08/01/1999 (c) 1998 (USA) */
