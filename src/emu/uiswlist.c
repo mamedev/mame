@@ -416,7 +416,7 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 					}
 					if (found) {
 						if (!haveCompatible) {
-							ui_menu_item_append(menu, "[compatible lists]", NULL, 0, NULL);
+							ui_menu_item_append(menu, "[compatible lists]", NULL, MENU_FLAG_DISABLE, NULL);
 						}
 						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
 					}
