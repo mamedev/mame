@@ -767,7 +767,7 @@ ROM_START( bikiniko )
 	// 0x100000 - 0x3fffff empty sockets
 
 	DISK_REGION( "dvd" )
-	DISK_IMAGE( "bikiniko", 0, NO_DUMP )
+	DISK_IMAGE( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
 ROM_END
 
 
