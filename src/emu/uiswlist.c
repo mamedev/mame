@@ -48,6 +48,8 @@ struct _software_menu_state
 	device_image_interface* image;
 	software_entry_state *entrylist;
 	char filename_buffer[1024];
+	int ordered_by_shortname;
+	int reorder;
 };
 
 /* state of a software part */
@@ -128,11 +130,22 @@ void ui_mess_menu_software_parts(running_machine &machine, ui_menu *menu, void *
 	}
 }
 
-static int compare_software_entries(const software_entry_state *e1, const software_entry_state *e2)
+static int compare_software_entries(const software_entry_state *e1, const software_entry_state *e2, int shortname)
 {
 	int result;
-	const char *e1_basename = (e1->short_name != NULL) ? e1->short_name : "";
-	const char *e2_basename = (e2->short_name != NULL) ? e2->short_name : "";
+	const char *e1_basename;
+	const char *e2_basename;
+
+	if (shortname)
+	{
+		e1_basename = (e1->short_name != NULL) ? e1->short_name : "";
+		e2_basename = (e2->short_name != NULL) ? e2->short_name : "";
+	}
+	else
+	{
+		e1_basename = (e1->long_name != NULL) ? e1->long_name : "";
+		e2_basename = (e2->long_name != NULL) ? e2->long_name : "";
+	}
 	
 	result = mame_stricmp(e1_basename, e2_basename);
 	if (result == 0)
@@ -179,7 +192,7 @@ static software_entry_state *append_software_entry(ui_menu *menu, software_menu_
 	
 	// find the end of the list
 	entryptr = &menustate->entrylist;
-	while ((*entryptr != NULL) && (compare_software_entries(entry, *entryptr) >= 0))
+	while ((*entryptr != NULL) && (compare_software_entries(entry, *entryptr, menustate->ordered_by_shortname) >= 0))
 		entryptr = &(*entryptr)->next;
 	
 	// insert the entry
@@ -203,6 +216,9 @@ static void ui_mess_menu_populate_software_entries(running_machine &machine, ui_
 		software_list_close(list);
 	}
 	
+	// add an entry to change ordering
+	ui_menu_item_append(menu, "Switch Item Ordering", NULL, 0, (void *)1);
+
 	// append all of the menu entries
 	for (software_entry_state *entry = menustate->entrylist; entry != NULL; entry = entry->next)
 		ui_menu_item_append(menu, entry->short_name, entry->long_name, 0, entry);
@@ -228,8 +244,10 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	const software_entry_state *selected_entry = NULL;
 	int bestmatch = 0;
 	
-	if (!ui_menu_populated(menu))
+	if (!ui_menu_populated(menu) || sw_state->reorder)
 	{
+		sw_state->reorder = 0;
+
 		if (sw_state->list_name)
 		{
 			ui_mess_menu_populate_software_entries(machine, menu, sw_state);
@@ -241,8 +259,20 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 	
 	if (event != NULL && event->itemref != NULL)
 	{
+		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
+		{
+			sw_state->ordered_by_shortname ^= 1;
+			sw_state->reorder = 1;
+			sw_state->entrylist = NULL;
+			// reset the char buffer if we change ordering criterion
+			memset(sw_state->filename_buffer, '\0', ARRAY_LENGTH(sw_state->filename_buffer));
+
+			// reload the menu with the new order
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
+			popmessage("Switched Order: entries now ordered by %s", sw_state->ordered_by_shortname ? "shortname" : "description");
+		}
 		/* handle selections */
-		if (event->iptkey == IPT_UI_SELECT)
+		else if (event->iptkey == IPT_UI_SELECT)
 		{
 			device_image_interface *image = sw_state->image;
 			software_entry_state *entry = (software_entry_state *) event->itemref;
@@ -298,21 +328,30 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 				if (ARRAY_LENGTH(sw_state->filename_buffer) > 0)
 					ui_popup_time(ERROR_MESSAGE_TIME, "%s", sw_state->filename_buffer);
 			}
-			
+
 			if (update_selected)
 			{
-				const software_entry_state *cur_selected = (const software_entry_state *)ui_menu_get_selection(menu);
-				
+				const software_entry_state *cur_selected;
+
+				// if the current selection is a software entry, start search from here
+				if ((FPTR)event->itemref != 1)
+					cur_selected= (const software_entry_state *)ui_menu_get_selection(menu);
+				// else (if we are on the 'Switch Order' entry) start from the beginning
+				else
+					cur_selected= sw_state->entrylist;
+
 				// check for entries which matches our filename_buffer:
 				// from current entry to the end
 				for (entry = cur_selected; entry != NULL; entry = entry->next)
 				{
-					if (entry->short_name != NULL && sw_state->filename_buffer != NULL)
+					const char *compare_name = sw_state->ordered_by_shortname ? entry->short_name : entry->long_name;
+
+					if (compare_name != NULL && sw_state->filename_buffer != NULL)
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(sw_state->filename_buffer); i++)
 						{
-							if (mame_strnicmp(entry->short_name, sw_state->filename_buffer, i) == 0)
+							if (mame_strnicmp(compare_name, sw_state->filename_buffer, i) == 0)
 								match = i;
 						}
 						
@@ -326,12 +365,14 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 				// and from the first entry to current one
 				for (entry = sw_state->entrylist; entry != cur_selected; entry = entry->next)
 				{
-					if (entry->short_name != NULL && sw_state->filename_buffer != NULL)
+					const char *compare_name = sw_state->ordered_by_shortname ? entry->short_name : entry->long_name;
+					
+					if (compare_name != NULL && sw_state->filename_buffer != NULL)
 					{
 						int match = 0;
 						for (int i = 0; i < ARRAY_LENGTH(sw_state->filename_buffer); i++)
 						{
-							if (mame_strnicmp(entry->short_name, sw_state->filename_buffer, i) == 0)
+							if (mame_strnicmp(compare_name, sw_state->filename_buffer, i) == 0)
 								match = i;
 						}
 						
@@ -447,6 +488,7 @@ void ui_image_menu_software(running_machine &machine, ui_menu *menu, void *param
 		child_menustate->list_name = (char *)event->itemref;
 		child_menustate->image = image;
 		child_menustate->entrylist = NULL;
+		child_menustate->ordered_by_shortname = 1;
 		ui_menu_stack_push(child_menu);
 	}
 }
