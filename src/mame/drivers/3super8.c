@@ -165,9 +165,18 @@ static DRIVER_INIT( 3super8 )
 	UINT8 *ROM = machine.region("maincpu")->base();
 	int i;
 
-	/* TODO: proper decryption scheme */
+	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
+	/* The encryption is quite awful actually, especially since the program rom is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext */
+	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
+	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
+	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
 	for(i=0;i<0x10000;i++)
-		ROM[i] ^= (ROM[i+0x10000] ^ 0xff);
+	{
+		UINT8 a6, a7, a8, a9, a11, d5 = 0;
+		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
+		d5 = (a6&a8)&((!a7&a11)|(a9&!a11));
+		ROM[i] ^= d5*0x20;
+	}
 }
 
 GAME( 199?, 3super8,  0,    3super8, 3super8,  3super8, ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
