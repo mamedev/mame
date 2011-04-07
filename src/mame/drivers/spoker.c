@@ -227,13 +227,16 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
 
+	/* TODO: ppi #1 */
 	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE( spoker_nmi_and_coins_w )
-
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
+
+	/* TODO: ppi #2 */
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
 	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE( spoker_video_and_leds_w )
 	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( spoker_leds_w )
+
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
 
 	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )

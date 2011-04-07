@@ -35,6 +35,8 @@ public:
 	_3super8_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	UINT8 *m_lovram;
+	UINT8 *m_hivram;
 };
 
 
@@ -45,18 +47,39 @@ static VIDEO_START(3super8)
 
 static SCREEN_UPDATE(3super8)
 {
+	_3super8_state *state = screen->machine().driver_data<_3super8_state>();
+	int count = 0x00000;
+	int y,x;
+	const gfx_element *gfx = screen->machine().gfx[0];
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			int tile = ((state->m_lovram[count])+(state->m_hivram[count]<<8)) & 0xfff;
+			//int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,3,0,0,(x*8),(y*8));
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
 
 static ADDRESS_MAP_START( super8_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xf3ff) AM_ROM
+	AM_RANGE(0x0000, 0xf3ff) AM_RAM AM_REGION("maincpu",0)
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( super8_io, AS_IO, 8 )
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(_3super8_state, m_lovram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE_MEMBER(_3super8_state, m_hivram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 3super8 )
@@ -68,7 +91,7 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+2*8, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+2*8,RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+2*8 },
+	{ RGN_FRAC(0,3)+8, RGN_FRAC(0,3)+2*8, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+2*8,RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+2*8 },
 	{ 0, 1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 4*8, 5*8, 8*8, 9*8,  12*8, 13*8,},
 	16*8
@@ -85,7 +108,7 @@ static MACHINE_CONFIG_START( 3super8, _3super8_state )
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(super8_map)
 	MCFG_CPU_IO_MAP(super8_io)
-	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+//	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -97,7 +120,7 @@ static MACHINE_CONFIG_START( 3super8, _3super8_state )
 	MCFG_SCREEN_UPDATE(3super8)
 
 	MCFG_GFXDECODE(3super8)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x800)
 
 	MCFG_VIDEO_START(3super8)
 
@@ -137,10 +160,12 @@ ROM_END
 
 static DRIVER_INIT( 3super8 )
 {
-	//UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.region("maincpu")->base();
+	int i;
 
-	//ROM[0x19a] = 0xed;
-	//ROM[0x19b] = 0x4d; //reti
+	/* TODO: proper decryption scheme */
+	for(i=0;i<0x10000;i++)
+		ROM[i] ^= (ROM[i+0x10000] ^ 0xff);
 }
 
 GAME( 199?, 3super8,  0,    3super8, 3super8,  3super8, ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
