@@ -56,7 +56,7 @@ static SCREEN_UPDATE(3super8)
 
 	for (y=0;y<32;y++)
 	{
-		for (x=0;x<64;x++)
+		for (x=0;x<128;x++)
 		{
 			int tile = ((state->m_lovram[count])+(state->m_hivram[count]<<8)) & 0xfff;
 			//int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
@@ -110,7 +110,7 @@ static MACHINE_CONFIG_START( 3super8, _3super8_state )
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(super8_map)
 	MCFG_CPU_IO_MAP(super8_io)
-//	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -170,7 +170,7 @@ static DRIVER_INIT( 3super8 )
 	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
 	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
 	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
-	for(i=0;i<0x10000;i++)
+	for(i=0;i<0x20000;i++)
 	{
 		UINT8 a6, a7, a8, a9, a11, d5 = 0;
 		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
