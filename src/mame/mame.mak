@@ -1587,7 +1587,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/39in1.o \
 	$(DRIVERS)/1945kiii.o \
 	$(DRIVERS)/2mindril.o \
-	$(DRIVERS)/3super8.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/5clown.o \

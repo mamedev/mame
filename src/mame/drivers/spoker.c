@@ -10,6 +10,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "cpu/z80/z80.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
@@ -248,7 +249,34 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x2800, 0x2bff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( bg_tile_w ) AM_BASE_MEMBER( spoker_state,m_bg_tile_ram )
+
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
+
+	/* TODO: ppi #1 */
+	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE( spoker_nmi_and_coins_w )
+	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
+	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
+
+	/* TODO: ppi #2 */
+	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
+	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE( spoker_video_and_leds_w )
+	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( spoker_leds_w )
+
+	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
+
+	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
+
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( spoker_magic_r, spoker_magic_w )	// DSW1-5
+
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
+ADDRESS_MAP_END
 
 
 /***************************************************************************
@@ -357,6 +385,17 @@ static const gfx_layout layout_8x32x6 =
 	8*32*2
 };
 
+static const gfx_layout layout3s8_8x8x6 =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(0,3)+2*8, RGN_FRAC(0,3)+0, RGN_FRAC(1,3)+2*8, RGN_FRAC(1,3)+0,RGN_FRAC(2,3)+2*8, RGN_FRAC(2,3)+0 },
+	{ 0, 1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 4*8, 5*8, 8*8, 9*8,  12*8, 13*8 },
+	16*8
+};
+
 static GFXDECODE_START( spoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,  0, 16 )
@@ -365,7 +404,13 @@ static GFXDECODE_START( spoker )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,  0, 16 )
 GFXDECODE_END
 
-
+static GFXDECODE_START( 3super8 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, layout3s8_8x8x6,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,     0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6,     0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c000, layout_8x32x6,     0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,     0, 16 )
+GFXDECODE_END
 
 
 /***************************************************************************
@@ -424,6 +469,17 @@ static MACHINE_CONFIG_START( spoker, spoker_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( 3super8, spoker )
+
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_24MHz / 4)	/* z840006, 24/4 MHz? */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spoker_map)
+	MCFG_CPU_IO_MAP(3super8_portmap)
+	MCFG_CPU_VBLANK_INT("screen",nmi_line_pulse)
+
+	MCFG_GFXDECODE(3super8)
+
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( spk116it )
 {
@@ -440,26 +496,6 @@ static DRIVER_INIT( spk116it )
 		if ((A & 0x1208) == 0x1208) rom[A] ^= 0x01;
 	}
 }
-
-
-ROM_START( spk115it )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(df52997b) SHA1(72a76e84aeedfdebd4c6cb47809117a28b5d3892) )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(f9b027f8) SHA1(c4686a4024062482f9864e0445087e32899fc775) )
-	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(baca51b6) SHA1(c97322c814729332378b6304a79062fea385ca97) )
-	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(1172c790) SHA1(43f1d019ecae5c605722e3fe77ae2f022b01260b) )
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
-	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
-	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
-
-	ROM_REGION( 0x40000, "oki", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
-	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
-ROM_END
-
 
 ROM_START( spk116it )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -479,5 +515,117 @@ ROM_START( spk116it )
 	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
+ROM_START( spk115it )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(df52997b) SHA1(72a76e84aeedfdebd4c6cb47809117a28b5d3892) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "6.bin",  0x80000, 0x40000, CRC(f9b027f8) SHA1(c4686a4024062482f9864e0445087e32899fc775) )
+	ROM_LOAD( "5.bin",  0x40000, 0x40000, CRC(baca51b6) SHA1(c97322c814729332378b6304a79062fea385ca97) )
+	ROM_LOAD( "4.bin",  0x00000, 0x40000, CRC(1172c790) SHA1(43f1d019ecae5c605722e3fe77ae2f022b01260b) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "3.bin",  0x20000, 0x10000, CRC(5f18b012) SHA1(c9a96237eaf3138f136bbaffb29dde0ef568ce73) )
+	ROM_LOAD( "2.bin",  0x10000, 0x10000, CRC(50fc3505) SHA1(ca1e4ee7e0bb59c3bd67727f65054a48000ae7fe) )
+	ROM_LOAD( "1.bin",  0x00000, 0x10000, CRC(28ce630a) SHA1(9b597073d33841e7db2c68bbe9f30b734d7f7b41) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
+ROM_END
+
+/*
+
+Produttore  ?Italy?
+N.revisione
+CPU
+
+1x 24mhz osc
+2x fpga
+1x z840006
+1x PIC16c65a-20/p
+1x 6295 oki
+
+ROMs
+
+Note
+
+4x 8 dipswitch
+1x 4 dispwitch
+
+*/
+
+// all gfx / sound roms are bad.  they're definitely meant to have different data
+//  in each half, and maybe even be twice the size.
+//  in all cases the first half is missing (the sample table in the samples rom for example)
+//1.bin                                           1ST AND 2ND HALF IDENTICAL
+//2.bin                                           1ST AND 2ND HALF IDENTICAL
+//3.bin                                           1ST AND 2ND HALF IDENTICAL
+//sound.bin                                       1ST AND 2ND HALF IDENTICAL
+
+
+ROM_START( 3super8 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "prgrom.bin", 0x00000, 0x20000, CRC(37c85dfe) SHA1(56bd2fb859b17dda1e675a385b6bcd6867ecceb0)  )
+
+	ROM_REGION( 0x1000, "pic", 0 )
+	ROM_LOAD( "pic16c65a-20-p", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "1.bin", 0x00000, 0x40000, BAD_DUMP CRC(d9d3e21e) SHA1(2f3f07ca427d9f56f0ff143d15d95cbf15255e33) )
+	ROM_LOAD( "2.bin", 0x40000, 0x40000, BAD_DUMP CRC(fbb50ab1) SHA1(50a7ef9219c38d59117c510fe6d53fb3ba1fa456) )
+	ROM_LOAD( "3.bin", 0x80000, 0x40000, BAD_DUMP CRC(545aa4e6) SHA1(3348d4b692900c9e9cd4a52b20922a84e596cd35) )
+	ROM_FILL( 0x00000 ,0x20000, 0x00 )
+	ROM_FILL( 0x40000 ,0x20000, 0x00 )
+	ROM_FILL( 0x80000 ,0x20000, 0x00 )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0xc0000, "rep_gfx", 0 ) //not real, taken from spk116it
+	ROM_LOAD( "4.bin",  0x00000, 0x40000, BAD_DUMP CRC(ec2c6ac3) SHA1(e0a38da26202d2b9a481060fe5b88a38e284201e) )
+	ROM_LOAD( "5.bin",  0x40000, 0x40000, BAD_DUMP CRC(163f5b64) SHA1(5d3a5c2a64691ee9e2bb3a7c283aa9efa53fb35e) )
+	ROM_LOAD( "6.bin",  0x80000, 0x40000, BAD_DUMP CRC(55b54b11) SHA1(decf27d40ec842374af02c93d761375690be83a3) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sound.bin", 0x00000, 0x40000, BAD_DUMP CRC(230b31c3) SHA1(38c107325d3a4e9781912078b1317dc9ba3e1ced) )
+ROM_END
+
+static DRIVER_INIT( 3super8 )
+{
+	UINT8 *ROM = machine.region("maincpu")->base();
+	int i;
+
+	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
+	/* The encryption is quite awful actually, especially since the program rom is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext */
+	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
+	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
+	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
+	for(i=0;i<0x20000;i++)
+	{
+		UINT8 a6, a7, a8, a9, a11, d5 = 0;
+		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
+		d5 = (a6&a8)&((!a7&a11)|(a9&!a11));
+		ROM[i] ^= d5*0x20;
+	}
+
+	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
+	{
+		UINT8 *src = machine.region("rep_gfx")->base();
+		UINT8 *dst = machine.region("gfx1")->base();
+		UINT8 x;
+
+		for(x=0;x<3;x++)
+		{
+			for(i=0;i<0x20000;i+=4)
+			{
+				dst[i+0+x*0x40000] = src[i+0+x*0x40000];
+				dst[i+1+x*0x40000] = src[i+2+x*0x40000];
+				dst[i+2+x*0x40000] = src[i+1+x*0x40000];
+				dst[i+3+x*0x40000] = src[i+3+x*0x40000];
+			}
+		}
+	}
+}
+
 GAME( 1993?, spk116it, 0,        spoker, spoker,  spk116it, ROT0, "IGS", "Super Poker (v116IT)", 0 )
 GAME( 1993?, spk115it, spk116it, spoker, spoker,  spk116it, ROT0, "IGS", "Super Poker (v115IT)", 0 )
+GAME( 1993?, 3super8,  spk116it, 3super8,spoker,  3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)", GAME_NOT_WORKING )
