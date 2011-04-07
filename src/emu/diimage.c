@@ -155,7 +155,7 @@ void device_config_image_interface::device_compute_hash(hash_collection &hashes,
 
 
 //**************************************************************************
-//  DEVICE image INTERFACE
+//  DEVICE IMAGE INTERFACE
 //**************************************************************************
 
 /*-------------------------------------------------

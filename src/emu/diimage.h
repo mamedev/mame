@@ -116,6 +116,7 @@ typedef void (*device_image_display_func)(device_image_interface &image);
 typedef void (*device_image_partialhash_func)(hash_collection &, const unsigned char *, unsigned long, const char *);
 typedef void (*device_image_get_devices_func)(device_image_interface &device);
 typedef bool (*device_image_softlist_load_func)(device_image_interface &image, char *swlist, char *swname, rom_entry *start_entry);
+typedef void (*device_image_display_info_func)(device_image_interface &image);
 
 //**************************************************************************
 //  MACROS
@@ -137,6 +138,9 @@ typedef bool (*device_image_softlist_load_func)(device_image_interface &image, c
 
 #define DEVICE_IMAGE_DISPLAY_NAME(name)     device_image_display_func##name
 #define DEVICE_IMAGE_DISPLAY(name)          void DEVICE_IMAGE_DISPLAY_NAME(name)(device_image_interface &image)
+
+#define DEVICE_IMAGE_DISPLAY_INFO_NAME(name)     device_image_display_info_func##name
+#define DEVICE_IMAGE_DISPLAY_INFO(name)          void DEVICE_IMAGE_DISPLAY_INFO_NAME(name)(device_image_interface &image)
 
 #define DEVICE_IMAGE_GET_DEVICES_NAME(name) device_image_get_devices_##name
 #define DEVICE_IMAGE_GET_DEVICES(name)      void DEVICE_IMAGE_GET_DEVICES_NAME(name)(device_image_interface &image)
@@ -207,6 +211,7 @@ public:
 	virtual int call_create(int format_type, option_resolution *format_options) = 0;
 	virtual void call_unload() = 0;
 	virtual void call_display() = 0;
+	virtual void call_display_info() = 0;
 	virtual device_image_partialhash_func get_partial_hash() = 0;
 	virtual void call_get_devices() = 0;
 	virtual void *get_device_specific_call() = 0;

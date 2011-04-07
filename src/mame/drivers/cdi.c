@@ -266,6 +266,19 @@ static MACHINE_RESET( quizrr42 )
 	scc68070_set_quizard_mcu_ack(machine, 0x57);
 }
 
+static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
+{
+	const char *compatibility = image.get_feature("compatibility");
+	if (compatibility)
+	{
+		if (!mame_stricmp(compatibility, "DVC"))
+		{
+			mame_printf_warning("This software requires the Digital Video Cartridge to work.\n");
+			mame_printf_warning("Therefore, it might not work in MESS at present.\n");
+		}
+	}
+}
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -324,6 +337,7 @@ static MACHINE_CONFIG_DERIVED( cdimono1, cdi )
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
+	MCFG_CDROM_DISPLAY_INFO(cdi_cdinfo)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 MACHINE_CONFIG_END

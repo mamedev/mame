@@ -173,6 +173,13 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cdrom); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cdrom); break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cdrom);	break;
+		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:			
+			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
+				info->f = (genf *) get_config_dev(device)->device_displayinfo;
+			} else {
+				info->f = NULL;
+			}
+			break;
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *) cd_option_guide; break;
 		case DEVINFO_PTR_IMAGE_CREATE_OPTSPEC+0:	info->p = (void *) cd_option_spec; break;
 

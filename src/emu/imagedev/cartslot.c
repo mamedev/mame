@@ -456,6 +456,13 @@ DEVICE_GET_INFO( cartslot )
 				info->f = NULL;
 			}
 			break;
+		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:
+			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
+				info->f = (genf *) get_config_dev(device)->device_displayinfo;
+			} else {
+				info->f = NULL;
+			}
+			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cartslot"); break;

@@ -186,7 +186,6 @@ device_image_partialhash_func legacy_image_device_config_base::get_partial_hash(
 	return reinterpret_cast<device_image_partialhash_func>(get_legacy_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH));
 }
 
-
 //**************************************************************************
 //  LIVE LEGACY IMAGE DEVICE
 //**************************************************************************
@@ -439,6 +438,8 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 		// we would have recorded the wrong name, so record it again based on software_info
 		if (m_software_info_ptr && m_software_info_ptr->shortname)
 			m_err = set_image_filename(m_software_info_ptr->shortname);
+
+		call_display_info();
 	}
 
 	if (is_create || filename_has_period)
@@ -663,6 +664,12 @@ void legacy_image_device_base::call_unload()
 void legacy_image_device_base::call_display()
 {
 	device_image_display_func func = reinterpret_cast<device_image_display_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY));
+	if (func) (*func)(*this);
+}
+
+void legacy_image_device_base::call_display_info()
+{
+	device_image_display_info_func func = reinterpret_cast<device_image_display_info_func>(m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_DISPLAY_INFO));
 	if (func) (*func)(*this);
 }
 

@@ -59,6 +59,7 @@ struct _cartslot_config
 	device_image_load_func			device_load;
 	device_image_unload_func		device_unload;
 	device_image_partialhash_func	device_partialhash;
+	device_image_display_info_func	device_displayinfo;
 	cartslot_pcb_type				pcb_types[16];
 };
 
@@ -104,6 +105,9 @@ int cartslot_get_resource_length(device_t *device, const char *socket_name);
 
 #define MCFG_CARTSLOT_UNLOAD(_unload)									\
 	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_unload, DEVICE_IMAGE_UNLOAD_NAME(_unload))
+
+#define MCFG_CARTSLOT_DISPLAY_INFO(_displayinfo)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
 
 #define MCFG_CARTSLOT_PARTIALHASH(_partialhash)							\
 	MCFG_DEVICE_CONFIG_DATAPTR(cartslot_config, device_partialhash, _partialhash)

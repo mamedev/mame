@@ -160,6 +160,7 @@ enum
     DEVINFO_FCT_IMAGE_UNLOAD,                                   /* R/O: device_image_unload_func */
     DEVINFO_FCT_IMAGE_DISPLAY,                                  /* R/O: device_image_display_func */
     DEVINFO_FCT_IMAGE_PARTIAL_HASH,                             /* R/O: device_image_partialhash_func */
+    DEVINFO_FCT_IMAGE_DISPLAY_INFO,                             /* R/O: device_image_display_info_func */
     DEVINFO_FCT_IMAGE_GET_DEVICES,                              /* R/O: device_image_get_devices_func */
 	DEVINFO_FCT_IMAGE_SOFTLIST_LOAD,                            /* R/O: device_image_softlist_load_func */
     DEVINFO_FCT_IMAGE_LAST = DEVINFO_FCT_FIRST + 0x0fff,
@@ -651,6 +652,7 @@ public:
 	virtual int call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display();
+	virtual void call_display_info();
 	virtual device_image_partialhash_func get_partial_hash();
 	virtual void call_get_devices();
 	virtual void *get_device_specific_call();
