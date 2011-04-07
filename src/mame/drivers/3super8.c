@@ -4,6 +4,8 @@
 
 this dump is bad
 
+TODO:
+needs merging with spoker.c
 
 Produttore  ?Italy?
 N.revisione
