@@ -43,22 +43,22 @@
 typedef struct _sc61860_state sc61860_state;
 struct _sc61860_state
 {
-    sc61860_cpu_core *config;
-    UINT8 ram[0x60]; // internal special ram
-    UINT8 p, q, r; //7 bits only?
+	sc61860_cpu_core *config;
+	UINT8 p, q, r; //7 bits only?
 
-    UINT8 c;        // port c, used for HLT.
-    UINT8 d, h;
-    UINT16 oldpc, pc, dp;
+	UINT8 c;        // port c, used for HLT.
+	UINT8 d, h;
+	UINT16 oldpc, pc, dp;
 
-    int carry, zero;
+	int carry, zero;
 
-    struct { int t2ms, t512ms; int count;} timer;
+	struct { int t2ms, t512ms; int count; } timer;
 
-    legacy_cpu_device *device;
-    address_space *program;
-    direct_read_data *direct;
-    int icount;
+	legacy_cpu_device *device;
+	address_space *program;
+	direct_read_data *direct;
+	int icount;
+	UINT8 ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
 };
 
 INLINE sc61860_state *get_safe_token(device_t *device)
@@ -122,19 +122,21 @@ static CPU_EXECUTE( sc61860 )
 
 		sc61860_instruction(cpustate);
 
-               /* Are we in HLT-mode? */
-               /*if (cpustate->c & 4)
-         {
-         if ((cpustate->config && cpustate->config->ina && (cpustate->config->ina(cpustate)!=0)) || cpustate->timer.t512ms)
-         {
-                 cpustate->c&=0xfb;
-                 if (cpustate->config->outc) cpustate->config->outc(cpustate->c);
-         }
-         cpustate->icount-=4;
-         }
-         else if(cpustate->c & 8) {}
+#if 0
+		/* Are we in HLT-mode? */
+		if (cpustate->c & 4)
+		{
+			if ((cpustate->config && cpustate->config->ina && (cpustate->config->ina(cpustate)!=0)) || cpustate->timer.t512ms)
+			{
+				cpustate->c&=0xfb;
+				if (cpustate->config->outc) cpustate->config->outc(cpustate->c);
+			}
+			cpustate->icount-=4;
+		}
+		else if(cpustate->c & 8) {}
 
-         else sc61860_instruction(cpustate);*/
+		else sc61860_instruction(cpustate);
+#endif
 
 	} while (cpustate->icount > 0);
 }
