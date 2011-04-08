@@ -323,6 +323,7 @@ protected:
     bool m_writeable;
     bool m_created;
 	bool m_init_phase;
+	bool m_from_swlist;
 
     /* special - used when creating */
     int m_create_format;

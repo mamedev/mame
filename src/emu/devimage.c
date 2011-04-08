@@ -410,6 +410,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
     UINT32 open_plan[4];
     int i;
 	bool softload = FALSE;
+	m_from_swlist = FALSE;
 
 	// if the path contains no period, we are using softlists, so we won't create an image
 	astring pathstr(path);
@@ -439,7 +440,7 @@ bool legacy_image_device_base::load_internal(const char *path, bool is_create, i
 		if (m_software_info_ptr && m_software_info_ptr->shortname)
 			m_err = set_image_filename(m_software_info_ptr->shortname);
 
-		call_display_info();
+		m_from_swlist = TRUE;
 	}
 
 	if (is_create || filename_has_period)
@@ -538,7 +539,10 @@ bool legacy_image_device_base::finish_load()
     {
 		image_checkhash();
 
-        if (has_been_created() && m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE)!=NULL)
+		if (m_from_swlist)
+			call_display_info();
+
+		if (has_been_created() && m_config.get_legacy_config_fct(DEVINFO_FCT_IMAGE_CREATE) != NULL)
         {
             err = call_create(m_create_format, m_create_args);
             if (err)
