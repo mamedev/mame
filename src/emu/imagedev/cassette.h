@@ -49,6 +49,11 @@ struct cassette_config_t
 	const char *					interface;
 };
 
+typedef struct inline_cassette_config_t	inline_cassette_config;
+struct inline_cassette_config_t
+{
+	device_image_display_info_func	device_displayinfo;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -79,6 +84,9 @@ DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
 #define MCFG_CASSETTE_MODIFY(_tag, _config)	\
 	MCFG_DEVICE_MODIFY(_tag)		\
 	MCFG_DEVICE_CONFIG(_config)
+
+#define MCFG_CASSETTE_DISPLAY_INFO(_displayinfo)										\
+	MCFG_DEVICE_CONFIG_DATAPTR(inline_cassette_config, device_displayinfo, DEVICE_IMAGE_DISPLAY_INFO_NAME(_displayinfo))
 
 extern const cassette_config default_cassette_config;
 

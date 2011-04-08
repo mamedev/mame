@@ -127,6 +127,13 @@ INLINE floppy_drive *get_safe_token(device_t *device)
 	return (floppy_drive *) downcast<legacy_device_base *>(device)->token();
 }
 
+INLINE const inline_floppy_config *get_config_dev(const device_config *device)
+{
+	assert(device != NULL);
+	assert( device->type() == FLOPPY || device->type() == FLOPPY_APPLE || device->type() == FLOPPY_SONY);
+	return (const inline_floppy_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+}
+
 floppy_image *flopimg_get_image(device_t *image)
 {
 	return get_safe_token(image)->floppy;
@@ -963,7 +970,7 @@ DEVICE_GET_INFO(floppy)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(floppy_drive); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(inline_floppy_config); break;
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_FLOPPY; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
@@ -987,6 +994,14 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(floppy);	break;
+		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:			
+			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
+				info->f = (genf *) get_config_dev(device)->device_displayinfo;
+			} else {
+				info->f = NULL;
+			}
+			break;
+		
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *)floppy_option_guide; break;
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:
 		{
