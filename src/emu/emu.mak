@@ -250,6 +250,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/tms34061.o		\
 	$(EMUVIDEO)/tms9927.o		\
 	$(EMUVIDEO)/tms9928a.o		\
+	$(EMUVIDEO)/upd3301.o		\
 	$(EMUVIDEO)/v9938.o			\
 	$(EMUVIDEO)/vector.o		\
 	$(EMUVIDEO)/voodoo.o		\
