@@ -231,6 +231,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/z8536.o		\
 
 EMUVIDEOOBJS = \
+	$(EMUVIDEO)/cdp1861.o		\
 	$(EMUVIDEO)/crt9007.o		\
 	$(EMUVIDEO)/crt9021.o		\
 	$(EMUVIDEO)/crt9212.o		\
