@@ -54,11 +54,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/7474.h"
 
 
-class dambustr_state : public driver_device
+class dambustr_state : public galaxold_state
 {
 public:
 	dambustr_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: galaxold_state(machine, config) { }
 
 	int m_noise_data;
 };
@@ -84,11 +84,11 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
-	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
+	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
 
 	AM_RANGE(0xd880, 0xd8ff) AM_RAM
 

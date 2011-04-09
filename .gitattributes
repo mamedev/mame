@@ -3141,6 +3141,7 @@ src/mame/includes/sauro.h svneol=native#text/plain
 src/mame/includes/sbasketb.h svneol=native#text/plain
 src/mame/includes/sbugger.h svneol=native#text/plain
 src/mame/includes/scotrsht.h svneol=native#text/plain
+src/mame/includes/scramble.h svneol=native#text/plain
 src/mame/includes/sderby.h svneol=native#text/plain
 src/mame/includes/segag80r.h svneol=native#text/plain
 src/mame/includes/segag80v.h svneol=native#text/plain

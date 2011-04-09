@@ -17,7 +17,7 @@
 #include "sound/flt_rc.h"
 #include "sound/tms5110.h"
 #include "sound/ay8910.h"
-#include "includes/galaxold.h"
+#include "includes/scramble.h"
 
 #define AD2083_TMS5110_CLOCK		XTAL_640kHz
 

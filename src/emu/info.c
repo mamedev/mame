@@ -199,9 +199,6 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 
-//			if(input_field_name(field) != NULL)
-//	  			fprintf(out, "=%s\n", xml_normalize_string(input_field_name(field)));
-
 			if (nplayer < field->player + 1)
 				nplayer = field->player + 1;
 

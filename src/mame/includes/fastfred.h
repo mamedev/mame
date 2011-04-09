@@ -5,11 +5,13 @@
 
 ***************************************************************************/
 
-class fastfred_state : public driver_device
+#include "includes/galaxold.h"
+
+class fastfred_state : public galaxold_state
 {
 public:
 	fastfred_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: galaxold_state(machine, config) { }
 
 	UINT8 m_imago_sprites[0x800*3];
 	UINT16 m_imago_sprites_address;

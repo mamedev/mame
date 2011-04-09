@@ -11,12 +11,10 @@
 #include "machine/7474.h"
 #include "includes/galaxold.h"
 
-static int irq_line;
-
-static UINT8 _4in1_bank;
 
 static IRQ_CALLBACK(hunchbkg_irq_callback)
 {
+	//galaxold_state *state = device->machine().driver_data<galaxold_state>();
 	/* for some reason a call to cputag_set_input_line
      * is significantly delayed ....
      *
@@ -25,7 +23,7 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
      * Therefore we reset the line without any detour ....
      */
 	device_set_input_line(device->machine().firstcpu, 0, CLEAR_LINE);
-	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + irq_line, CLEAR_LINE);
+	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + state->m_irq_line, CLEAR_LINE);
 	return 0x03;
 }
 
@@ -39,8 +37,9 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback )
 
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 {
+	galaxold_state *drvstate = device->machine().driver_data<galaxold_state>();
 	/* Q goes to the NMI line */
-	cputag_set_input_line(device->machine(), "maincpu", irq_line, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", drvstate->m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
@@ -68,9 +67,10 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 
 static void machine_reset_common(running_machine &machine, int line)
 {
+	galaxold_state *state = machine.driver_data<galaxold_state>();
     device_t *ttl7474_9m_1 = machine.device("7474_9m_1");
     device_t *ttl7474_9m_2 = machine.device("7474_9m_2");
-	irq_line = line;
+	state->m_irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
 	ttl7474_preset_w(ttl7474_9m_2, 1);
@@ -249,17 +249,19 @@ READ8_HANDLER( scramblb_protection_2_r )
 
 WRITE8_HANDLER( _4in1_bank_w )
 {
-	_4in1_bank = data & 0x03;
-	galaxold_gfxbank_w(space, 0, _4in1_bank);
-	memory_set_bank(space->machine(), "bank1", _4in1_bank);
+	galaxold_state *state = space->machine().driver_data<galaxold_state>();
+	state->m__4in1_bank = data & 0x03;
+	galaxold_gfxbank_w(space, 0, state->m__4in1_bank);
+	memory_set_bank(space->machine(), "bank1", state->m__4in1_bank);
 }
 
 CUSTOM_INPUT( _4in1_fake_port_r )
 {
+	galaxold_state *state = field->port->machine().driver_data<galaxold_state>();
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (FPTR)param;
 
-	return (input_port_read(field->port->machine(), portnames[_4in1_bank]) & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field->port->machine(), portnames[state->m__4in1_bank]) & bit_mask) ? 0x01 : 0x00;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -397,6 +399,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( 4in1 )
 {
+	galaxold_state *state = machine.driver_data<galaxold_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t i, len = machine.region("maincpu")->bytes();
 	UINT8 *RAM = machine.region("maincpu")->base();
@@ -410,7 +413,7 @@ DRIVER_INIT( 4in1 )
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
-	state_save_register_global(machine, _4in1_bank);
+	state_save_register_global(machine, state->m__4in1_bank);
 }
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )

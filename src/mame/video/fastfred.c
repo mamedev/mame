@@ -9,14 +9,13 @@
 #include "emu.h"
 #include "video/resnet.h"
 #include "includes/fastfred.h"
-#include "includes/galaxold.h"
 
 
 
 static const rectangle spritevisiblearea =
 {
-      2*8, 32*8-1,
-      2*8, 30*8-1
+	2*8, 32*8-1,
+	2*8, 30*8-1
 };
 
 static const rectangle spritevisibleareaflipx =
@@ -371,7 +370,7 @@ VIDEO_START( imago )
 
 	/* the game has a galaxian starfield */
 	galaxold_init_stars(machine, 256);
-	galaxold_stars_on = 1;
+	state->m_stars_on = 1;
 
 	/* web colors */
 	palette_set_color(machine,256+64+0,MAKE_RGB(0x50,0x00,0x00));

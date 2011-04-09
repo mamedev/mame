@@ -555,7 +555,7 @@ void video_manager::exit()
 		global_free(m_snap_bitmap);
 
 	// print a final result if we have at least 5 seconds' worth of data
-	if (m_overall_emutime.seconds >= 1)
+	if (m_overall_emutime.seconds >= 5)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
@@ -1044,8 +1044,7 @@ void video_manager::recompute_speed(attotime emutime)
 		{
 			// create a final screenshot
 			emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			file_error filerr = open_next(file, "png");
-//			file_error filerr = file.open(m_machine.basename(), PATH_SEPARATOR "final.png");
+			file_error filerr = file.open(m_machine.basename(), PATH_SEPARATOR "final.png");
 			if (filerr == FILERR_NONE)
 				save_snapshot(m_machine.primary_screen, file);
 		}

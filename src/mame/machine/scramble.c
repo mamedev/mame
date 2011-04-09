@@ -10,20 +10,18 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
-#include "includes/galaxold.h"
+#include "includes/scramble.h"
 
-static UINT8 cavelon_bank;
-
-static UINT8 security_2B_counter;
 
 MACHINE_RESET( scramble )
 {
+	scramble_state *state = machine.driver_data<scramble_state>();
 	MACHINE_RESET_CALL(galaxold);
 
 	if (machine.device("audiocpu") != NULL)
 		scramble_sh_init(machine);
 
-  security_2B_counter = 0;
+	state->m_security_2B_counter = 0;
 }
 
 MACHINE_RESET( explorer )
@@ -51,11 +49,11 @@ CUSTOM_INPUT( darkplnt_custom_r )
 }
 
 /* state of the security PAL (6J) */
-static UINT8 xb;
 
 static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
-	xb = data;
+	scramble_state *state = device->machine().driver_data<scramble_state>();
+	state->m_xb = data;
 }
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
@@ -107,12 +105,13 @@ READ8_HANDLER( triplep_pap_r )
 
 static void cavelon_banksw(running_machine &machine)
 {
+	scramble_state *state = machine.driver_data<scramble_state>();
 	/* any read/write access in the 0x8000-0xffff region causes a bank switch.
        Only the lower 0x2000 is switched but we switch the whole region
        to keep the CPU core happy at the boundaries */
 
-	cavelon_bank = !cavelon_bank;
-	memory_set_bank(machine, "bank1", cavelon_bank);
+	state->m_cavelon_bank = !state->m_cavelon_bank;
+	memory_set_bank(machine, "bank1", state->m_cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
@@ -325,6 +324,7 @@ DRIVER_INIT( hotshock )
 
 DRIVER_INIT( cavelon )
 {
+	scramble_state *state = machine.driver_data<scramble_state>();
 	UINT8 *ROM = machine.region("maincpu")->base();
 
 	/* banked ROM */
@@ -338,7 +338,7 @@ DRIVER_INIT( cavelon )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x2000);	/* ??? */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x3800, 0x3801);  /* looks suspicously like
                                                                an AY8910, but not sure */
-	state_save_register_global(machine, cavelon_bank);
+	state_save_register_global(machine, state->m_cavelon_bank);
 }
 
 
@@ -395,7 +395,7 @@ DRIVER_INIT( mimonscr )
 }
 
 
-static int bit(int i,int n)
+INLINE int bit(int i,int n)
 {
 	return ((i >> n) & 1);
 }
