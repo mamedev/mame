@@ -6,6 +6,8 @@ TODO:
 - Understand how to reset NVRAM
 - Map DSW (Operator mode doesn't help)
 - Map Leds and Coin counters
+- 3super8 randomly crashes
+- 3super8 doesn't have the 8x32 tilemap, change the video emulation accordingly
 ***************************************************************************/
 
 #include "emu.h"
@@ -34,7 +36,7 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	int m_video_enable;
-	int m_nmi_enable;
+	int m_nmi_ack;
 	int m_hopper;
 	UINT8 m_igs_magic[2];
 	UINT8 m_out[3];
@@ -121,7 +123,7 @@ static WRITE8_HANDLER( spoker_nmi_and_coins_w )
 {
 	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	if ((state->m_nmi_enable ^ data) & (~0xdd))
+	if ((data) & (0x22))
 	{
 		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space->device()),data);
 //      popmessage("%02x",data);
@@ -134,7 +136,10 @@ static WRITE8_HANDLER( spoker_nmi_and_coins_w )
 
 	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin out / hopper active
 
-	state->m_nmi_enable = data;	//  data & 0x80     // nmi enable?
+	if(((state->m_nmi_ack & 0x80) == 0) && data & 0x80)
+		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+
+	state->m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
 
 	state->m_out[0] = data;
 	show_out(state->m_out);
@@ -249,18 +254,6 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( super8_outputb_w )
-{
-	spoker_state *state = space->machine().driver_data<spoker_state>();
-
-	if(((state->m_out[1] & 0x80) == 0) && data & 0x80)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-
-	state->m_video_enable = data & 2;
-
-	state->m_out[1] = data;
-}
-
 static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
 //	AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
 
@@ -279,26 +272,14 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
 
-	/* TODO: ppi #1 */
-	//AM_RANGE( 0x6480, 0x6480 ) AM_WRITE( spoker_nmi_and_coins_w )
-	//AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
-	//AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
+	AM_RANGE( 0x6480, 0x6480 ) AM_READ_PORT( "IN0" )
+	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "IN1" )
+	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "IN2" )
+	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE( spoker_leds_w )
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_READNOP //irq ack?
 
-	/* TODO: ppi #2 */
-	//AM_RANGE( 0x6491, 0x6491) AM_READ_PORT("IN0")
-	//AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
-	//AM_RANGE( 0x6491, 0x6491 ) AM_WRITE( spoker_video_and_leds_w )
-	//AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( spoker_leds_w )
-
-	//AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
-
-	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
-
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-
-	//AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( spoker_magic_r, spoker_magic_w )	// DSW1-5
-
-	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(super8_outputb_w )
+	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(spoker_nmi_and_coins_w )
 
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
 ADDRESS_MAP_END
@@ -418,30 +399,14 @@ static INPUT_PORTS_START( 3super8 )
 	PORT_DIPUNKNOWN( 0xff, 0xff )
 
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2   )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
@@ -470,82 +435,14 @@ static INPUT_PORTS_START( 3super8 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / High / Low")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / W-Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Red / Black")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -614,17 +511,16 @@ static MACHINE_RESET( spoker )
 {
 	spoker_state *state = machine.driver_data<spoker_state>();
 
-	state->m_nmi_enable		=	0;
+	state->m_nmi_ack		=	0;
 	state->m_hopper			=	0;
 	state->m_video_enable	=	1;
 }
 
 static INTERRUPT_GEN( spoker_interrupt )
 {
-	spoker_state *state = device->machine().driver_data<spoker_state>();
+//	spoker_state *state = device->machine().driver_data<spoker_state>();
 
-	 if (state->m_nmi_enable & 0x80)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )
@@ -668,10 +564,12 @@ static MACHINE_CONFIG_DERIVED( 3super8, spoker )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(3super8_portmap)
-	MCFG_CPU_VBLANK_INT("screen",nmi_line_assert)
+	MCFG_CPU_VBLANK_INT("screen",spoker_interrupt)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,120) // this signal comes from the PIC
 
 	MCFG_GFXDECODE(3super8)
 
+	MCFG_DEVICE_REMOVE("ymsnd")
 MACHINE_CONFIG_END
 
 static DRIVER_INIT( spk116it )
@@ -821,4 +719,4 @@ static DRIVER_INIT( 3super8 )
 
 GAME( 1993?, spk116it, 0,        spoker, spoker,  spk116it, ROT0, "IGS",       "Super Poker (v116IT)", 0 )
 GAME( 1993?, spk115it, spk116it, spoker, spoker,  spk116it, ROT0, "IGS",       "Super Poker (v115IT)", 0 )
-GAME( 1993?, 3super8,  spk116it, 3super8,3super8, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    GAME_NOT_WORKING )
+GAME( 1993?, 3super8,  spk116it, 3super8,3super8, 3super8,  ROT0, "<unknown>", "3 Super 8 (Italy)",    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) //roms are badly dumped
