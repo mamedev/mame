@@ -67,144 +67,208 @@ enum
 	Z80_CLEAR
 };
 
-static UINT8 irqvector;
-static UINT32 sample_addr;
+typedef struct _m72_audio_state m72_audio_state;
+struct _m72_audio_state
+{
+	UINT8 irqvector;
+	UINT32 sample_addr;
+	UINT8 *samples;
+	UINT32 samples_size;
+	address_space *space;
+	device_t *dac;
+};
+
+INLINE m72_audio_state *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == M72);
+
+	return (m72_audio_state *)downcast<legacy_device_base *>(device)->token();
+}
+
 
 static TIMER_CALLBACK( setvector_callback )
 {
+	m72_audio_state *state = (m72_audio_state *)ptr;
+
 	switch(param)
 	{
 		case VECTOR_INIT:
-			irqvector = 0xff;
+			state->irqvector = 0xff;
 			break;
 
 		case YM2151_ASSERT:
-			irqvector &= 0xef;
+			state->irqvector &= 0xef;
 			break;
 
 		case YM2151_CLEAR:
-			irqvector |= 0x10;
+			state->irqvector |= 0x10;
 			break;
 
 		case Z80_ASSERT:
-			irqvector &= 0xdf;
+			state->irqvector &= 0xdf;
 			break;
 
 		case Z80_CLEAR:
-			irqvector |= 0x20;
+			state->irqvector |= 0x20;
 			break;
 	}
 
-	if (irqvector == 0)
+	if (state->irqvector == 0)
 		logerror("You didn't call m72_init_sound()\n");
 
-	if (irqvector == 0xff)	/* no IRQs pending */
-		cputag_set_input_line_and_vector(machine, "soundcpu",0,CLEAR_LINE, irqvector);
-	else	/* IRQ pending */
-		cputag_set_input_line_and_vector(machine, "soundcpu",0,ASSERT_LINE, irqvector);
+	cputag_set_input_line_and_vector(machine, "soundcpu", 0, (state->irqvector == 0xff) ? CLEAR_LINE : ASSERT_LINE, state->irqvector);
 }
 
-SOUND_START( m72 )
+static DEVICE_START( m72_audio )
 {
-	state_save_register_global(machine, irqvector);
-	state_save_register_global(machine, sample_addr);
+	m72_audio_state *state = get_safe_token(device);
+
+	state->samples = device->machine().region("samples")->base();
+	state->samples_size = device->machine().region("samples")->bytes();
+	state->space = device->machine().device("soundcpu")->memory().space(AS_IO);
+	state->dac = device->machine().device("dac");
+
+	device->save_item(NAME(state->irqvector));
+	device->save_item(NAME(state->sample_addr));
 }
 
-SOUND_RESET( m72 )
+static DEVICE_RESET( m72_audio )
 {
-	setvector_callback(machine, NULL, VECTOR_INIT);
+	m72_audio_state *state = get_safe_token(device);
+
+	setvector_callback(device->machine(), state, VECTOR_INIT);
 }
 
 void m72_ym2151_irq_handler(device_t *device, int irq)
 {
-	if (irq)
-		device->machine().scheduler().synchronize(FUNC(setvector_callback), YM2151_ASSERT);
-	else
-		device->machine().scheduler().synchronize(FUNC(setvector_callback), YM2151_CLEAR);
+	device_t *audio = device->machine().device("m72");
+	m72_audio_state *state = get_safe_token(audio);
+
+	device->machine().scheduler().synchronize(FUNC(setvector_callback), irq ? YM2151_ASSERT : YM2151_CLEAR, state);
 }
 
-WRITE16_HANDLER( m72_sound_command_w )
+WRITE16_DEVICE_HANDLER( m72_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data);
-		space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
+		m72_audio_state *state = get_safe_token(device);
+
+		soundlatch_w(state->space, offset, data);
+		device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
 	}
 }
 
-WRITE8_HANDLER( m72_sound_command_byte_w )
+WRITE8_DEVICE_HANDLER( m72_sound_command_byte_w )
 {
-	soundlatch_w(space,offset,data);
-	space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT);
+	m72_audio_state *state = get_safe_token(device);
+
+	soundlatch_w(state->space, offset, data);
+	device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_ASSERT, state);
 }
 
-WRITE8_HANDLER( m72_sound_irq_ack_w )
+WRITE8_DEVICE_HANDLER( m72_sound_irq_ack_w )
 {
-	space->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR);
+	m72_audio_state *state = get_safe_token(device);
+
+	device->machine().scheduler().synchronize(FUNC(setvector_callback), Z80_CLEAR, state);
 }
 
 
 
-void m72_set_sample_start(int start)
+void m72_set_sample_start(device_t *device, int start)
 {
-	sample_addr = start;
+	m72_audio_state *state = get_safe_token(device);
+
+	state->sample_addr = start;
 }
 
-WRITE8_HANDLER( vigilant_sample_addr_w )
+WRITE8_DEVICE_HANDLER( vigilant_sample_addr_w )
 {
-	if (offset == 1)
-		sample_addr = (sample_addr & 0x00ff) | ((data << 8) & 0xff00);
-	else
-		sample_addr = (sample_addr & 0xff00) | ((data << 0) & 0x00ff);
-}
-
-WRITE8_HANDLER( shisen_sample_addr_w )
-{
-	sample_addr >>= 2;
+	m72_audio_state *state = get_safe_token(device);
 
 	if (offset == 1)
-		sample_addr = (sample_addr & 0x00ff) | ((data << 8) & 0xff00);
+		state->sample_addr = (state->sample_addr & 0x00ff) | ((data << 8) & 0xff00);
 	else
-		sample_addr = (sample_addr & 0xff00) | ((data << 0) & 0x00ff);
-
-	sample_addr <<= 2;
+		state->sample_addr = (state->sample_addr & 0xff00) | ((data << 0) & 0x00ff);
 }
 
-WRITE8_HANDLER( rtype2_sample_addr_w )
+WRITE8_DEVICE_HANDLER( shisen_sample_addr_w )
 {
-	sample_addr >>= 5;
+	m72_audio_state *state = get_safe_token(device);
+
+	state->sample_addr >>= 2;
 
 	if (offset == 1)
-		sample_addr = (sample_addr & 0x00ff) | ((data << 8) & 0xff00);
+		state->sample_addr = (state->sample_addr & 0x00ff) | ((data << 8) & 0xff00);
 	else
-		sample_addr = (sample_addr & 0xff00) | ((data << 0) & 0x00ff);
+		state->sample_addr = (state->sample_addr & 0xff00) | ((data << 0) & 0x00ff);
 
-	sample_addr <<= 5;
+	state->sample_addr <<= 2;
 }
 
-WRITE8_HANDLER( poundfor_sample_addr_w )
+WRITE8_DEVICE_HANDLER( rtype2_sample_addr_w )
 {
+	m72_audio_state *state = get_safe_token(device);
+
+	state->sample_addr >>= 5;
+
+	if (offset == 1)
+		state->sample_addr = (state->sample_addr & 0x00ff) | ((data << 8) & 0xff00);
+	else
+		state->sample_addr = (state->sample_addr & 0xff00) | ((data << 0) & 0x00ff);
+
+	state->sample_addr <<= 5;
+}
+
+WRITE8_DEVICE_HANDLER( poundfor_sample_addr_w )
+{
+	m72_audio_state *state = get_safe_token(device);
+
 	/* poundfor writes both sample start and sample END - a first for Irem...
        we don't handle the end written here, 00 marks the sample end as usual. */
 	if (offset > 1) return;
 
-	sample_addr >>= 4;
+	state->sample_addr >>= 4;
 
 	if (offset == 1)
-		sample_addr = (sample_addr & 0x00ff) | ((data << 8) & 0xff00);
+		state->sample_addr = (state->sample_addr & 0x00ff) | ((data << 8) & 0xff00);
 	else
-		sample_addr = (sample_addr & 0xff00) | ((data << 0) & 0x00ff);
+		state->sample_addr = (state->sample_addr & 0xff00) | ((data << 0) & 0x00ff);
 
-	sample_addr <<= 4;
+	state->sample_addr <<= 4;
 }
 
-READ8_HANDLER( m72_sample_r )
+READ8_DEVICE_HANDLER( m72_sample_r )
 {
-	return space->machine().region("samples")->base()[sample_addr];
+	m72_audio_state *state = get_safe_token(device);
+
+	return state->samples[state->sample_addr];
 }
 
 WRITE8_DEVICE_HANDLER( m72_sample_w )
 {
-	dac_signed_data_w(device, data);
-	sample_addr = (sample_addr + 1) & (device->machine().region("samples")->bytes() - 1);
+	m72_audio_state *state = get_safe_token(device);
+
+	dac_signed_data_w(state->dac, data);
+	state->sample_addr = (state->sample_addr + 1) & (state->samples_size - 1);
 }
+
+DEVICE_GET_INFO( m72_audio )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(m72_audio_state);			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m72_audio);	break;
+		case DEVINFO_FCT_RESET:							info->start = DEVICE_RESET_NAME(m72_audio);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M72 Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+DEFINE_LEGACY_SOUND_DEVICE(M72, m72_audio);

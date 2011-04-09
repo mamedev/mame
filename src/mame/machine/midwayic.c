@@ -820,7 +820,7 @@ void midway_ioasic_fifo_w(running_machine &machine, UINT16 data)
 		if (LOG_FIFO)
 			logerror("fifo_w(%04X): out of space!\n", data);
 	}
-	dcs_fifo_notify(ioasic.fifo_bytes, FIFO_SIZE);
+	dcs_fifo_notify(machine, ioasic.fifo_bytes, FIFO_SIZE);
 }
 
 
@@ -830,7 +830,7 @@ void midway_ioasic_fifo_full_w(running_machine &machine, UINT16 data)
 		logerror("fifo_full_w(%04X)\n", data);
 	ioasic.force_fifo_full = 1;
 	update_ioasic_irq(machine);
-	dcs_fifo_notify(ioasic.fifo_bytes, FIFO_SIZE);
+	dcs_fifo_notify(machine, ioasic.fifo_bytes, FIFO_SIZE);
 }
 
 
@@ -894,13 +894,13 @@ READ32_HANDLER( midway_ioasic_r )
 			result = 0;
 			if (ioasic.has_dcs)
 			{
-				result |= ((dcs_control_r() >> 4) ^ 0x40) & 0x00c0;
+				result |= ((dcs_control_r(space->machine()) >> 4) ^ 0x40) & 0x00c0;
 				result |= ioasic_fifo_status_r(&space->device()) & 0x0038;
-				result |= dcs_data2_r() & 0xff00;
+				result |= dcs_data2_r(space->machine()) & 0xff00;
 			}
 			else if (ioasic.has_cage)
 			{
-				result |= (cage_control_r() << 6) ^ 0x80;
+				result |= (cage_control_r(space->machine()) << 6) ^ 0x80;
 			}
 			else
 				result |= 0x48;
@@ -910,12 +910,12 @@ READ32_HANDLER( midway_ioasic_r )
 			result = 0;
 			if (ioasic.has_dcs)
 			{
-				result = dcs_data_r();
+				result = dcs_data_r(space->machine());
 				if (ioasic.auto_ack)
-					dcs_ack_w();
+					dcs_ack_w(space->machine());
 			}
 			else if (ioasic.has_cage)
-				result = main_from_cage_r(space);
+				result = cage_main_r(space);
 			else
 			{
 				static UINT16 val = 0;
@@ -994,7 +994,7 @@ WRITE32_HANDLER( midway_ioasic_w )
 			/* sound reset? */
 			if (ioasic.has_dcs)
 			{
-				dcs_reset_w(~newreg & 1);
+				dcs_reset_w(space->machine(), ~newreg & 1);
 			}
 			else if (ioasic.has_cage)
 			{
@@ -1012,13 +1012,13 @@ WRITE32_HANDLER( midway_ioasic_w )
 
 		case IOASIC_SOUNDOUT:
 			if (ioasic.has_dcs)
-				dcs_data_w(newreg);
+				dcs_data_w(space->machine(), newreg);
 			else if (ioasic.has_cage)
-				main_to_cage_w(newreg);
+				cage_main_w(space, newreg);
 			break;
 
 		case IOASIC_SOUNDIN:
-			dcs_ack_w();
+			dcs_ack_w(space->machine());
 			/* acknowledge data read */
 			break;
 

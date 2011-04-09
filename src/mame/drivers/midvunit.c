@@ -53,8 +53,8 @@ static MACHINE_START( midvunit )
 static MACHINE_RESET( midvunit )
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
-	dcs_reset_w(1);
-	dcs_reset_w(0);
+	dcs_reset_w(machine, 1);
+	dcs_reset_w(machine, 0);
 
 	memcpy(state->m_ram_base, machine.region("user1")->base(), 0x20000*4);
 	machine.device("maincpu")->reset();
@@ -67,8 +67,8 @@ static MACHINE_RESET( midvunit )
 static MACHINE_RESET( midvplus )
 {
 	midvunit_state *state = machine.driver_data<midvunit_state>();
-	dcs_reset_w(1);
-	dcs_reset_w(0);
+	dcs_reset_w(machine, 1);
+	dcs_reset_w(machine, 0);
 
 	memcpy(state->m_ram_base, machine.region("user1")->base(), 0x20000*4);
 	machine.device("maincpu")->reset();
@@ -203,7 +203,7 @@ static WRITE32_HANDLER( midvunit_control_w )
 		watchdog_reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
-	dcs_reset_w((~state->m_control_data >> 1) & 1);
+	dcs_reset_w(space->machine(), (~state->m_control_data >> 1) & 1);
 
 	/* log anything unusual */
 	if ((olddata ^ state->m_control_data) & ~0x00e8)
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 	COMBINE_DATA(&state->m_control_data);
 
 	/* bit 11 is the DCS sound reset */
-	dcs_reset_w((~state->m_control_data >> 11) & 1);
+	dcs_reset_w(space->machine(), (~state->m_control_data >> 11) & 1);
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ state->m_control_data) & 0x0200)
@@ -235,7 +235,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 static WRITE32_HANDLER( midvunit_sound_w )
 {
 	logerror("Sound W = %02X\n", data);
-	dcs_data_w(data & 0xff);
+	dcs_data_w(space->machine(), data & 0xff);
 }
 
 

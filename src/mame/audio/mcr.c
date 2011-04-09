@@ -193,8 +193,8 @@ void mcr_sound_reset(running_machine &machine)
 	/* Advanced Audio */
 	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
 	{
-		williams_cvsd_reset_w(1);
-		williams_cvsd_reset_w(0);
+		williams_cvsd_reset_w(machine, 1);
+		williams_cvsd_reset_w(machine, 0);
 	}
 }
 

@@ -47,15 +47,19 @@
     STATIC GLOBALS
 ****************************************************************************/
 
-static UINT8 williams_sound_int_state;
+typedef struct _williams_audio_state williams_audio_state;
+struct _williams_audio_state
+{
+	UINT8 sound_int_state;
 
-static UINT8 audio_talkback;
-static UINT8 audio_sync;
+	UINT8 audio_talkback;
+	UINT8 audio_sync;
 
-static device_t *sound_cpu;
-static device_t *soundalt_cpu;
+	device_t *sound_cpu;
+	device_t *soundalt_cpu;
+};
 
-
+static williams_audio_state audio;
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -266,12 +270,13 @@ MACHINE_CONFIG_END
 
 void williams_cvsd_init(running_machine &machine)
 {
+	williams_audio_state *state = &audio;
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = machine.device("cvsdcpu");
-	soundalt_cpu = NULL;
+	state->sound_cpu = machine.device("cvsdcpu");
+	state->soundalt_cpu = NULL;
 
 	/* configure master CPU banks */
 	ROM = machine.region("cvsdcpu")->base();
@@ -291,19 +296,20 @@ void williams_cvsd_init(running_machine &machine)
 	pia6821_ca1_w(machine.device("cvsdpia"), 1);
 
 	/* register for save states */
-	state_save_register_global(machine, williams_sound_int_state);
-	state_save_register_global(machine, audio_talkback);
+	state_save_register_global(machine, state->sound_int_state);
+	state_save_register_global(machine, state->audio_talkback);
 }
 
 
 void williams_narc_init(running_machine &machine)
 {
+	williams_audio_state *state = &audio;
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = machine.device("narc1cpu");
-	soundalt_cpu = machine.device("narc2cpu");
+	state->sound_cpu = machine.device("narc1cpu");
+	state->soundalt_cpu = machine.device("narc2cpu");
 
 	/* configure master CPU banks */
 	ROM = machine.region("narc1cpu")->base();
@@ -334,19 +340,20 @@ void williams_narc_init(running_machine &machine)
 	memory_set_bankptr(machine, "bank8", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
-	state_save_register_global(machine, williams_sound_int_state);
-	state_save_register_global(machine, audio_talkback);
-	state_save_register_global(machine, audio_sync);
+	state_save_register_global(machine, state->sound_int_state);
+	state_save_register_global(machine, state->audio_talkback);
+	state_save_register_global(machine, state->audio_sync);
 }
 
 
 void williams_adpcm_init(running_machine &machine)
 {
+	williams_audio_state *state = &audio;
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpu = machine.device("adpcm");
-	soundalt_cpu = NULL;
+	state->sound_cpu = machine.device("adpcm");
+	state->soundalt_cpu = NULL;
 
 	/* configure banks */
 	ROM = machine.region("adpcm")->base();
@@ -373,18 +380,22 @@ void williams_adpcm_init(running_machine &machine)
 	memcpy(ROM + 0x020000, ROM + 0x060000, 0x20000);
 
 	/* register for save states */
-	state_save_register_global(machine, williams_sound_int_state);
-	state_save_register_global(machine, audio_talkback);
+	state_save_register_global(machine, state->sound_int_state);
+	state_save_register_global(machine, state->audio_talkback);
 }
 
 
 static void init_audio_state(running_machine &machine)
 {
+	williams_audio_state *state = &audio;
+	device_t *sound_cpu = state->sound_cpu;
+	device_t *soundalt_cpu = state->soundalt_cpu;
+
 	/* reset the YM2151 state */
 	devtag_reset(machine, "ymsnd");
 
 	/* clear all the interrupts */
-	williams_sound_int_state = 0;
+	state->sound_int_state = 0;
 	if (sound_cpu != NULL)
 	{
 		device_set_input_line(sound_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
@@ -413,13 +424,17 @@ static void cvsd_ym2151_irq(device_t *device, int state)
 
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqa )
 {
-	device_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	williams_audio_state *sndstate = &audio;
+
+	device_set_input_line(sndstate->sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb )
 {
-	device_set_input_line(sound_cpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	williams_audio_state *sndstate = &audio;
+
+	device_set_input_line(sndstate->sound_cpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -430,7 +445,9 @@ static WRITE_LINE_DEVICE_HANDLER( cvsd_irqb )
 
 static void adpcm_ym2151_irq(device_t *device, int state)
 {
-	device_set_input_line(sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	williams_audio_state *sndstate = &audio;
+
+	device_set_input_line(sndstate->sound_cpu, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -447,7 +464,9 @@ static WRITE8_HANDLER( cvsd_bank_select_w )
 
 static WRITE8_DEVICE_HANDLER( cvsd_talkback_w )
 {
-	audio_talkback = data;
+	williams_audio_state *state = &audio;
+
+	state->audio_talkback = data;
 	logerror("CVSD Talkback = %02X\n", data);
 }
 
@@ -484,9 +503,10 @@ void williams_cvsd_data_w(running_machine &machine, int data)
 }
 
 
-void williams_cvsd_reset_w(int state)
+void williams_cvsd_reset_w(running_machine &machine, int state)
 {
-	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
+	williams_audio_state *sndstate = &audio;
+	address_space *space = sndstate->sound_cpu->memory().space(AS_PROGRAM);
 
 	/* going high halts the CPU */
 	if (state)
@@ -520,42 +540,54 @@ static WRITE8_HANDLER( narc_slave_bank_select_w )
 
 static READ8_HANDLER( narc_command_r )
 {
-	device_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
-	williams_sound_int_state = 0;
+	williams_audio_state *state = &audio;
+
+	device_set_input_line(state->sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
+	state->sound_int_state = 0;
 	return soundlatch_r(space, 0);
 }
 
 
 static WRITE8_HANDLER( narc_command2_w )
 {
+	williams_audio_state *state = &audio;
+
 	soundlatch2_w(space, 0, data & 0xff);
-	device_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
+	device_set_input_line(state->soundalt_cpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	device_set_input_line(soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
+	williams_audio_state *state = &audio;
+
+	device_set_input_line(state->soundalt_cpu, M6809_FIRQ_LINE, CLEAR_LINE);
 	return soundlatch2_r(space, 0);
 }
 
 
 static WRITE8_HANDLER( narc_master_talkback_w )
 {
-	audio_talkback = data;
+	williams_audio_state *state = &audio;
+
+	state->audio_talkback = data;
 	logerror("Master Talkback = %02X\n", data);
 }
 
 
 static TIMER_CALLBACK( narc_sync_clear )
 {
-	audio_sync &= ~param;
+	williams_audio_state *state = &audio;
+
+	state->audio_sync &= ~param;
 }
 
 static WRITE8_HANDLER( narc_master_sync_w )
 {
+	williams_audio_state *state = &audio;
+
 	space->machine().scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x01);
-	audio_sync |= 0x01;
+	state->audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
 
@@ -568,8 +600,10 @@ static WRITE8_HANDLER( narc_slave_talkback_w )
 
 static WRITE8_HANDLER( narc_slave_sync_w )
 {
+	williams_audio_state *state = &audio;
+
 	space->machine().scheduler().timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), FUNC(narc_sync_clear), 0x02);
-	audio_sync |= 0x02;
+	state->audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }
 
@@ -579,8 +613,10 @@ static WRITE8_HANDLER( narc_slave_sync_w )
     NARC COMMUNICATIONS
 ****************************************************************************/
 
-void williams_narc_data_w(int data)
+void williams_narc_data_w(running_machine &machine, int data)
 {
+	williams_audio_state *state = &audio;
+	device_t *sound_cpu = state->sound_cpu;
 	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
@@ -588,13 +624,17 @@ void williams_narc_data_w(int data)
 	if (!(data & 0x200))
 	{
 		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
-		williams_sound_int_state = 1;
+		state->sound_int_state = 1;
 	}
 }
 
 
-void williams_narc_reset_w(int state)
+void williams_narc_reset_w(running_machine &machine, int state)
 {
+	williams_audio_state *sndstate = &audio;
+	device_t *sound_cpu = sndstate->sound_cpu;
+	device_t *soundalt_cpu = sndstate->soundalt_cpu;
+
 	/* going high halts the CPU */
 	if (state)
 	{
@@ -614,9 +654,11 @@ void williams_narc_reset_w(int state)
 }
 
 
-int williams_narc_talkback_r(void)
+int williams_narc_talkback_r(running_machine &machine)
 {
-	return audio_talkback | (audio_sync << 8);
+	williams_audio_state *state = &audio;
+
+	return state->audio_talkback | (state->audio_sync << 8);
 }
 
 
@@ -639,12 +681,16 @@ static WRITE8_DEVICE_HANDLER( adpcm_6295_bank_select_w )
 
 static TIMER_CALLBACK( clear_irq_state )
 {
-	williams_sound_int_state = 0;
+	williams_audio_state *state = &audio;
+
+	state->sound_int_state = 0;
 }
 
 
 static READ8_HANDLER( adpcm_command_r )
 {
+	williams_audio_state *state = &audio;
+	device_t *sound_cpu = state->sound_cpu;
 	device_set_input_line(sound_cpu, M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
@@ -656,7 +702,8 @@ static READ8_HANDLER( adpcm_command_r )
 
 static WRITE8_HANDLER( adpcm_talkback_w )
 {
-	audio_talkback = data;
+	williams_audio_state *state = &audio;
+	state->audio_talkback = data;
 	logerror("ADPCM Talkback = %02X\n", data);
 }
 
@@ -666,21 +713,26 @@ static WRITE8_HANDLER( adpcm_talkback_w )
     ADPCM COMMUNICATIONS
 ****************************************************************************/
 
-void williams_adpcm_data_w(int data)
+void williams_adpcm_data_w(running_machine &machine, int data)
 {
+	williams_audio_state *state = &audio;
+	device_t *sound_cpu = state->sound_cpu;
 	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
 		device_set_input_line(sound_cpu, M6809_IRQ_LINE, ASSERT_LINE);
-		williams_sound_int_state = 1;
+		state->sound_int_state = 1;
 		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	}
 }
 
 
-void williams_adpcm_reset_w(int state)
+void williams_adpcm_reset_w(running_machine &machine, int state)
 {
+	williams_audio_state *sndstate = &audio;
+	device_t *sound_cpu = sndstate->sound_cpu;
+
 	/* going high halts the CPU */
 	if (state)
 	{
@@ -695,7 +747,8 @@ void williams_adpcm_reset_w(int state)
 }
 
 
-int williams_adpcm_sound_irq_r(void)
+int williams_adpcm_sound_irq_r(running_machine &machine)
 {
-	return williams_sound_int_state;
+	williams_audio_state *state = &audio;
+	return state->sound_int_state;
 }

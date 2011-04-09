@@ -238,10 +238,8 @@ static WRITE16_HANDLER(es5510_dsp_w)
 	}
 }
 
-static UINT16 *sound_ram;
-
 static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1") AM_BASE(&sound_ram)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
 	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
@@ -258,6 +256,7 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)machine.region("audiocpu")->base();
+	UINT16 *sound_ram = (UINT16 *)memory_get_shared(machine, "share1");
 	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
 	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
 	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);

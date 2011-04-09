@@ -210,7 +210,7 @@ static WRITE16_HANDLER( archrivl_control_w )
 {
 	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	COMBINE_DATA(&state->m_control_word);
-	williams_cvsd_reset_w(~state->m_control_word & 0x0400);
+	williams_cvsd_reset_w(space->machine(), ~state->m_control_word & 0x0400);
 	williams_cvsd_data_w(space->machine(), state->m_control_word & 0x3ff);
 }
 

@@ -178,8 +178,8 @@ static WRITE16_HANDLER( term2_sound_w )
 	if (offset == 0)
 		state->m_term2_analog_select = (data >> 12) & 3;
 
-	williams_adpcm_reset_w((~data & 0x100) >> 1);
-	williams_adpcm_data_w(data);
+	williams_adpcm_reset_w(space->machine(), (~data & 0x100) >> 1);
+	williams_adpcm_data_w(space->machine(), data);
 }
 
 
@@ -569,19 +569,19 @@ MACHINE_RESET( midyunit )
 	switch (state->m_chip_type)
 	{
 		case SOUND_NARC:
-			williams_narc_reset_w(1);
-			williams_narc_reset_w(0);
+			williams_narc_reset_w(machine, 1);
+			williams_narc_reset_w(machine, 0);
 			break;
 
 		case SOUND_CVSD:
 		case SOUND_CVSD_SMALL:
-			williams_cvsd_reset_w(1);
-			williams_cvsd_reset_w(0);
+			williams_cvsd_reset_w(machine, 1);
+			williams_cvsd_reset_w(machine, 0);
 			break;
 
 		case SOUND_ADPCM:
-			williams_adpcm_reset_w(1);
-			williams_adpcm_reset_w(0);
+			williams_adpcm_reset_w(machine, 1);
+			williams_adpcm_reset_w(machine, 0);
 			break;
 
 		case SOUND_YAWDIM:
@@ -612,18 +612,18 @@ WRITE16_HANDLER( midyunit_sound_w )
 		switch (state->m_chip_type)
 		{
 			case SOUND_NARC:
-				williams_narc_data_w(data);
+				williams_narc_data_w(space->machine(), data);
 				break;
 
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
-				williams_cvsd_reset_w((~data & 0x100) >> 8);
+				williams_cvsd_reset_w(space->machine(), (~data & 0x100) >> 8);
 				williams_cvsd_data_w(space->machine(), (data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
-				williams_adpcm_reset_w((~data & 0x100) >> 8);
-				williams_adpcm_data_w(data);
+				williams_adpcm_reset_w(space->machine(), (~data & 0x100) >> 8);
+				williams_adpcm_data_w(space->machine(), data);
 				break;
 
 			case SOUND_YAWDIM:

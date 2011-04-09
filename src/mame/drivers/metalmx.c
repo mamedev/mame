@@ -351,9 +351,9 @@ static READ32_HANDLER( sound_data_r )
 	UINT32 result = 0;
 
 	if (ACCESSING_BITS_0_15)
-		result |= cage_control_r();
+		result |= cage_control_r(space->machine());
 	if (ACCESSING_BITS_16_31)
-		result |= main_from_cage_r(space) << 16;
+		result |= cage_main_r(space) << 16;
 	return result;
 }
 
@@ -362,7 +362,7 @@ static WRITE32_HANDLER( sound_data_w )
 	if (ACCESSING_BITS_0_15)
 		cage_control_w(space->machine(), data);
 	if (ACCESSING_BITS_16_31)
-		main_to_cage_w(data >> 16);
+		cage_main_w(space, data >> 16);
 }
 
 static void cage_irq_callback(running_machine &machine, int reason)

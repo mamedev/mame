@@ -160,12 +160,6 @@ static MACHINE_START( g80r )
 }
 
 
-static MACHINE_RESET( pignewt )
-{
-	sega_usb_reset(machine, 0x10);
-}
-
-
 
 /*************************************
  *
@@ -196,7 +190,7 @@ static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(space, decrypt_
 static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
 static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
 static WRITE8_HANDLER( sindbadm_vidram_w ) { sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
-static WRITE8_HANDLER( usb_ram_w )         { sega_usb_ram_w(space, decrypt_offset(space, offset), data); }
+static WRITE8_DEVICE_HANDLER( usb_ram_w )         { sega_usb_ram_w(device, decrypt_offset(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 
 
 
@@ -916,7 +910,6 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MCFG_MACHINE_RESET(pignewt)
 	MCFG_FRAGMENT_ADD(sega_universal_sound_board)
 MACHINE_CONFIG_END
 
@@ -1439,6 +1432,8 @@ static void monsterb_expand_gfx(running_machine &machine, const char *region)
 static DRIVER_INIT( astrob )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	device_t *speech = machine.device("segaspeech");
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure the 315-0062 security chip */
 	state->m_decrypt = segag80_security(62);
@@ -1447,11 +1442,11 @@ static DRIVER_INIT( astrob )
 	state->m_background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	iospace->install_legacy_write_handler(*speech, 0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(*speech, 0x3b, 0x3b, FUNC(sega_speech_control_w));
 
 	/* install Astro Blaster sound board */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x3e, 0x3f, FUNC(astrob_sound_w));
+	iospace->install_legacy_write_handler(0x3e, 0x3f, FUNC(astrob_sound_w));
 }
 
 
@@ -1470,6 +1465,7 @@ static DRIVER_INIT( 005 )
 static DRIVER_INIT( spaceod )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
 
 	/* configure the 315-0063 security chip */
 	state->m_decrypt = segag80_security(63);
@@ -1478,20 +1474,22 @@ static DRIVER_INIT( spaceod )
 	state->m_background_pcb = G80_BACKGROUND_SPACEOD;
 
 	/* configure ports for the background board */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x08, 0x0f, FUNC(spaceod_back_port_r), FUNC(spaceod_back_port_w));
+	iospace->install_legacy_readwrite_handler(0x08, 0x0f, FUNC(spaceod_back_port_r), FUNC(spaceod_back_port_w));
 
 	/* install Space Odyssey sound board */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x0e, 0x0f, FUNC(spaceod_sound_w));
+	iospace->install_legacy_write_handler(0x0e, 0x0f, FUNC(spaceod_sound_w));
 
 	/* install our wacky mangled ports */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xfb, FUNC(spaceod_mangled_ports_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xfc, 0xfc, FUNC(spaceod_port_fc_r));
+	iospace->install_legacy_read_handler(0xf8, 0xfb, FUNC(spaceod_mangled_ports_r));
+	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spaceod_port_fc_r));
 }
 
 
 static DRIVER_INIT( monsterb )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* configure the 315-0082 security chip */
 	state->m_decrypt = segag80_security(82);
@@ -1501,14 +1499,16 @@ static DRIVER_INIT( monsterb )
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xb8, 0xbd, FUNC(monsterb_back_port_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xffff, FUNC(monsterb_vidram_w));
+	iospace->install_legacy_write_handler(0xb8, 0xbd, FUNC(monsterb_back_port_w));
+	pgmspace->install_legacy_write_handler(0xe000, 0xffff, FUNC(monsterb_vidram_w));
 }
 
 
 static DRIVER_INIT( monster2 )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* configure the 315-5006 security chip */
 	spatter_decode(machine, "maincpu");
@@ -1519,15 +1519,18 @@ static DRIVER_INIT( monster2 )
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xb4, 0xb5, FUNC(pignewt_back_color_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xb8, 0xbd, FUNC(pignewt_back_port_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xffff, FUNC(pignewt_vidram_w));
+	iospace->install_legacy_write_handler(0xb4, 0xb5, FUNC(pignewt_back_color_w));
+	iospace->install_legacy_write_handler(0xb8, 0xbd, FUNC(pignewt_back_port_w));
+	pgmspace->install_legacy_write_handler(0xe000, 0xffff, FUNC(pignewt_vidram_w));
 }
 
 
 static DRIVER_INIT( pignewt )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	device_t *usbsnd = machine.device("usbsnd");
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* configure the 315-0063? security chip */
 	state->m_decrypt = segag80_security(63);
@@ -1537,19 +1540,21 @@ static DRIVER_INIT( pignewt )
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xb4, 0xb5, FUNC(pignewt_back_color_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xb8, 0xbd, FUNC(pignewt_back_port_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xffff, FUNC(pignewt_vidram_w));
+	iospace->install_legacy_write_handler(0xb4, 0xb5, FUNC(pignewt_back_color_w));
+	iospace->install_legacy_write_handler(0xb8, 0xbd, FUNC(pignewt_back_port_w));
+	pgmspace->install_legacy_write_handler(0xe000, 0xffff, FUNC(pignewt_vidram_w));
 
 	/* install Universal sound board */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	iospace->install_legacy_readwrite_handler(*usbsnd, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 }
 
 
 static DRIVER_INIT( sindbadm )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
+	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* configure the encrypted Z80 */
 	sindbadm_decode(machine, "maincpu");
@@ -1559,8 +1564,8 @@ static DRIVER_INIT( sindbadm )
 	state->m_background_pcb = G80_BACKGROUND_SINDBADM;
 
 	/* install background board handlers */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x40, 0x41, FUNC(sindbadm_back_port_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xffff, FUNC(sindbadm_vidram_w));
+	iospace->install_legacy_write_handler(0x40, 0x41, FUNC(sindbadm_back_port_w));
+	pgmspace->install_legacy_write_handler(0xe000, 0xffff, FUNC(sindbadm_vidram_w));
 }
 
 

@@ -97,7 +97,7 @@ WRITE16_HANDLER( midwunit_io_w )
 			logerror("%08X:Control W @ %05X = %04X\n", cpu_get_pc(&space->device()), offset, data);
 
 			/* bit 4 reset sound CPU */
-			dcs_reset_w(newword & 0x10);
+			dcs_reset_w(space->machine(), newword & 0x10);
 
 			/* bit 5 (active low) reset security chip */
 			midway_serial_pic_reset_w(newword & 0x20);
@@ -378,8 +378,8 @@ MACHINE_RESET( midwunit )
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(1);
-	dcs_reset_w(0);
+	dcs_reset_w(machine, 1);
+	dcs_reset_w(machine, 0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
@@ -418,13 +418,13 @@ READ16_HANDLER( midwunit_sound_r )
 {
 	logerror("%08X:Sound read\n", cpu_get_pc(&space->device()));
 
-	return dcs_data_r() & 0xff;
+	return dcs_data_r(space->machine()) & 0xff;
 }
 
 
 READ16_HANDLER( midwunit_sound_state_r )
 {
-	return dcs_control_r();
+	return dcs_control_r(space->machine());
 }
 
 
@@ -441,6 +441,6 @@ WRITE16_HANDLER( midwunit_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
-		dcs_data_w(data & 0xff);
+		dcs_data_w(space->machine(), data & 0xff);
 	}
 }

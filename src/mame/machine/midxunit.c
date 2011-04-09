@@ -104,7 +104,7 @@ WRITE16_HANDLER( midxunit_unknown_w )
 	int offs = offset / 0x40000;
 
 	if (offs == 1 && ACCESSING_BITS_0_7)
-		dcs_reset_w(data & 2);
+		dcs_reset_w(space->machine(), data & 2);
 
 	if (ACCESSING_BITS_0_7 && offset % 0x40000 == 0)
 		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", cpu_get_pc(&space->device()), offs, data & 0xff);
@@ -274,7 +274,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 			break;
 
 		case 5:	/* register 5 write seems to reset things */
-			dcs_data_r();
+			dcs_data_r(space->machine());
 			break;
 
 		default: /* everyone else just stores themselves */
@@ -342,8 +342,8 @@ MACHINE_RESET( midxunit )
 	int i;
 
 	/* reset sound */
-	dcs_reset_w(1);
-	dcs_reset_w(0);
+	dcs_reset_w(machine, 1);
+	dcs_reset_w(machine, 0);
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
@@ -392,13 +392,13 @@ READ16_HANDLER( midxunit_sound_r )
 {
 	logerror("%08X:Sound read\n", cpu_get_pc(&space->device()));
 
-	return dcs_data_r() & 0xff;
+	return dcs_data_r(space->machine()) & 0xff;
 }
 
 
 READ16_HANDLER( midxunit_sound_state_r )
 {
-	return dcs_control_r();
+	return dcs_control_r(space->machine());
 }
 
 
@@ -415,6 +415,6 @@ WRITE16_HANDLER( midxunit_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
-		dcs_data_w(data & 0xff);
+		dcs_data_w(space->machine(), data & 0xff);
 	}
 }

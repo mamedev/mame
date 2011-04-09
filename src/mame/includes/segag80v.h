@@ -13,7 +13,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *m_mainram;
-	UINT8 m_has_usb;
+	device_t *m_usb;
 	UINT8 m_mult_data[2];
 	UINT16 m_mult_result;
 	UINT8 m_spinner_select;

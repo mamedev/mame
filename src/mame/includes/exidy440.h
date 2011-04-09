@@ -30,6 +30,7 @@ public:
 	UINT8 m_palettebank_io;
 	UINT8 m_palettebank_vis;
 	UINT8 *m_spriteram;
+	device_t *m_custom;
 };
 
 

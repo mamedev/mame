@@ -216,45 +216,45 @@ enum
 
 
 /* these macros are used to reference the SDRC ASIC */
-#define SDRC_ROM_ST		((sdrc.reg[0] >> 0) & 3)	/* 0=0000, 1=3000, 2=3400, 3=none */
-#define SDRC_ROM_SZ		((sdrc.reg[0] >> 4) & 1)	/* 0=4k, 1=1k */
-#define SDRC_ROM_MS		((sdrc.reg[0] >> 5) & 1)	/* 0=/BMS, 1=/DMS */
-#define SDRC_ROM_PG		((sdrc.reg[0] >> 7) & 7)
-#define SDRC_SM_EN		((sdrc.reg[0] >> 11) & 1)
-#define SDRC_SM_BK		((sdrc.reg[0] >> 12) & 1)
-#define SDRC_SMODE		((sdrc.reg[0] >> 13) & 7)
+#define SDRC_ROM_ST		((dcs.sdrc.reg[0] >> 0) & 3)	/* 0=0000, 1=3000, 2=3400, 3=none */
+#define SDRC_ROM_SZ		((dcs.sdrc.reg[0] >> 4) & 1)	/* 0=4k, 1=1k */
+#define SDRC_ROM_MS		((dcs.sdrc.reg[0] >> 5) & 1)	/* 0=/BMS, 1=/DMS */
+#define SDRC_ROM_PG		((dcs.sdrc.reg[0] >> 7) & 7)
+#define SDRC_SM_EN		((dcs.sdrc.reg[0] >> 11) & 1)
+#define SDRC_SM_BK		((dcs.sdrc.reg[0] >> 12) & 1)
+#define SDRC_SMODE		((dcs.sdrc.reg[0] >> 13) & 7)
 
-#define SDRC_DM_ST		((sdrc.reg[1] >> 0) & 3)	/* 0=none, 1=0000, 2=3000, 3=3400 */
-#define SDRC_DM_REF		((sdrc.reg[1] >> 4) & 3)
-#define SDRC_DM_3WS		((sdrc.reg[1] >> 7) & 1)
-#define SDRC_TFS_INV	((sdrc.reg[1] >> 8) & 1)
-#define SDRC_RES_TFS	((sdrc.reg[1] >> 10) & 3)
-#define SDRC_LED		((sdrc.reg[1] >> 13) & 1)
-#define SDRC_MUTE		((sdrc.reg[1] >> 14) & 1)
-#define SDRC_AREF_ACT	((sdrc.reg[1] >> 15) & 1)
+#define SDRC_DM_ST		((dcs.sdrc.reg[1] >> 0) & 3)	/* 0=none, 1=0000, 2=3000, 3=3400 */
+#define SDRC_DM_REF		((dcs.sdrc.reg[1] >> 4) & 3)
+#define SDRC_DM_3WS		((dcs.sdrc.reg[1] >> 7) & 1)
+#define SDRC_TFS_INV	((dcs.sdrc.reg[1] >> 8) & 1)
+#define SDRC_RES_TFS	((dcs.sdrc.reg[1] >> 10) & 3)
+#define SDRC_LED		((dcs.sdrc.reg[1] >> 13) & 1)
+#define SDRC_MUTE		((dcs.sdrc.reg[1] >> 14) & 1)
+#define SDRC_AREF_ACT	((dcs.sdrc.reg[1] >> 15) & 1)
 
-#define SDRC_DM_PG		((sdrc.reg[2] >> 0) & 0x7ff)
-#define SDRC_EPM_PG		((sdrc.reg[2] >> 0) & 0x1fff)
+#define SDRC_DM_PG		((dcs.sdrc.reg[2] >> 0) & 0x7ff)
+#define SDRC_EPM_PG		((dcs.sdrc.reg[2] >> 0) & 0x1fff)
 
 
 /* these macros are used to reference the DSIO ASIC */
-#define DSIO_EMPTY_FIFO	((dsio.reg[1] >> 0) & 1)
-#define DSIO_CUR_OUTPUT	((dsio.reg[1] >> 4) & 1)
-#define DSIO_RES_TFS	((dsio.reg[1] >> 10) & 1)
-#define DSIO_LED		((dsio.reg[1] >> 13) & 1)
-#define DSIO_MUTE		((dsio.reg[1] >> 14) & 1)
+#define DSIO_EMPTY_FIFO	((dcs.dsio.reg[1] >> 0) & 1)
+#define DSIO_CUR_OUTPUT	((dcs.dsio.reg[1] >> 4) & 1)
+#define DSIO_RES_TFS	((dcs.dsio.reg[1] >> 10) & 1)
+#define DSIO_LED		((dcs.dsio.reg[1] >> 13) & 1)
+#define DSIO_MUTE		((dcs.dsio.reg[1] >> 14) & 1)
 
-#define DSIO_DM_PG		((dsio.reg[2] >> 0) & 0x7ff)
+#define DSIO_DM_PG		((dcs.dsio.reg[2] >> 0) & 0x7ff)
 
 
 /* these macros are used to reference the DENVER ASIC */
-#define DENV_DSP_SPEED	((dsio.reg[1] >> 2) & 3)	/* read only: 1=33.33MHz */
-#define DENV_RES_TFS	((dsio.reg[1] >> 10) & 1)
-#define DENV_CHANNELS	((dsio.reg[1] >> 11) & 3)	/* 0=2ch, 1=4ch, 2=6ch */
-#define DENV_LED		((dsio.reg[1] >> 13) & 1)
-#define DENV_MUTE		((dsio.reg[1] >> 14) & 1)
+#define DENV_DSP_SPEED	((dcs.dsio.reg[1] >> 2) & 3)	/* read only: 1=33.33MHz */
+#define DENV_RES_TFS	((dcs.dsio.reg[1] >> 10) & 1)
+#define DENV_CHANNELS	((dcs.dsio.reg[1] >> 11) & 3)	/* 0=2ch, 1=4ch, 2=6ch */
+#define DENV_LED		((dcs.dsio.reg[1] >> 13) & 1)
+#define DENV_MUTE		((dcs.dsio.reg[1] >> 14) & 1)
 
-#define DENV_DM_PG		((dsio.reg[2] >> 0) & 0x7ff)
+#define DENV_DM_PG		((dcs.dsio.reg[2] >> 0) & 0x7ff)
 
 
 
@@ -278,6 +278,23 @@ struct _dsio_denver_state
 	UINT16		reg[4];
 	UINT8		start_on_next_write;
 	UINT16		channelbits;
+};
+
+
+typedef struct _hle_transfer_state hle_transfer_state;
+struct _hle_transfer_state
+{
+	UINT8		hle_enabled;
+	INT32		dcs_state;
+	INT32		state;
+	INT32		start;
+	INT32		stop;
+	INT32		type;
+	INT32		temp;
+	INT32		writes_left;
+	UINT16		sum;
+	INT32		fifo_entries;
+	timer_device *watchdog;
 };
 
 
@@ -334,23 +351,15 @@ struct _dcs_state
 	UINT32		timer_scale;
 	UINT32		timer_period;
 	UINT32		timers_fired;
-};
 
+	UINT16 *sram;
+	UINT16 *polling_base;
+	UINT32 *internal_program_ram;
+	UINT32 *external_program_ram;
 
-typedef struct _hle_transfer_state hle_transfer_state;
-struct _hle_transfer_state
-{
-	UINT8		hle_enabled;
-	INT32		dcs_state;
-	INT32		state;
-	INT32		start;
-	INT32		stop;
-	INT32		type;
-	INT32		temp;
-	INT32		writes_left;
-	UINT16		sum;
-	INT32		fifo_entries;
-	timer_device *watchdog;
+	sdrc_state sdrc;
+	dsio_state dsio;
+	hle_transfer_state transfer;
 };
 
 
@@ -362,16 +371,6 @@ struct _hle_transfer_state
  *************************************/
 
 static dcs_state dcs;
-static sdrc_state sdrc;
-static dsio_state dsio;
-static hle_transfer_state transfer;
-
-static UINT16 *dcs_sram;
-
-static UINT16 *dcs_polling_base;
-
-static UINT32 *dcs_internal_program_ram;
-static UINT32 *dcs_external_program_ram;
 
 
 
@@ -390,11 +389,11 @@ static READ16_HANDLER( sdrc_r );
 static WRITE16_HANDLER( sdrc_w );
 static STATE_POSTLOAD( sdrc_postload );
 
-static void dsio_reset(void);
+static void dsio_reset(running_machine &machine);
 static READ16_HANDLER( dsio_r );
 static WRITE16_HANDLER( dsio_w );
 
-static void denver_reset(void);
+static void denver_reset(running_machine &machine);
 static READ16_HANDLER( denver_r );
 static WRITE16_HANDLER( denver_w );
 
@@ -432,10 +431,10 @@ static int preprocess_write(running_machine &machine, UINT16 data);
 
 /* DCS 2k memory map */
 static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&dcs_internal_program_ram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE(&dcs_external_program_ram)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("dcsext")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("dcsext")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16 )
@@ -463,8 +462,8 @@ ADDRESS_MAP_END
 
 /* DCS 8k memory map */
 static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&dcs_internal_program_ram)
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE(&dcs_external_program_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
+	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16 )
@@ -487,12 +486,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01ff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -530,7 +529,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -562,7 +561,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
@@ -750,7 +749,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static void dcs_boot(void)
+static void dcs_boot(running_machine &machine)
 {
 	UINT8 buffer[0x1000];
 	UINT32 max_banks;
@@ -769,7 +768,7 @@ static void dcs_boot(void)
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			dcs.cpu->load_boot_data(buffer, dcs_internal_program_ram);
+			dcs.cpu->load_boot_data(buffer, dcs.internal_program_ram);
 			break;
 
 		/* rev 2: use the ROM page in the SDRC to boot from */
@@ -790,14 +789,14 @@ static void dcs_boot(void)
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			dcs.cpu->load_boot_data(buffer, dcs_internal_program_ram);
+			dcs.cpu->load_boot_data(buffer, dcs.internal_program_ram);
 			break;
 
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
 		case 3:
 		case 4:
 			device_set_input_line(dcs.cpu, INPUT_LINE_HALT, ASSERT_LINE);
-			dsio.start_on_next_write = 0;
+			dcs.dsio.start_on_next_write = 0;
 			break;
 	}
 }
@@ -831,12 +830,12 @@ static TIMER_CALLBACK( dcs_reset )
 
 		/* rev 3: reset the DSIO ASIC */
 		case 3:
-			dsio_reset();
+			dsio_reset(machine);
 			break;
 
 		/* rev 4: reset the Denver ASIC */
 		case 4:
-			denver_reset();
+			denver_reset(machine);
 			break;
 	}
 
@@ -862,7 +861,7 @@ static TIMER_CALLBACK( dcs_reset )
 		(*dcs.output_full_cb)(machine, dcs.last_output_full = 0);
 
 	/* boot */
-	dcs_boot();
+	dcs_boot(machine);
 
 	/* reset timers */
 	dcs.timer_enable = 0;
@@ -874,7 +873,7 @@ static TIMER_CALLBACK( dcs_reset )
 		dcs.sport_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 
 	/* reset the HLE transfer states */
-	transfer.dcs_state = transfer.state = 0;
+	dcs.transfer.dcs_state = dcs.transfer.state = 0;
 }
 
 
@@ -887,12 +886,12 @@ static TIMER_CALLBACK( dcs_reset )
 
 static void dcs_register_state(running_machine &machine)
 {
-	state_save_register_global_array(machine, sdrc.reg);
-	state_save_register_global(machine, sdrc.seed);
+	state_save_register_global_array(machine, dcs.sdrc.reg);
+	state_save_register_global(machine, dcs.sdrc.seed);
 
-	state_save_register_global_array(machine, dsio.reg);
-	state_save_register_global(machine, dsio.start_on_next_write);
-	state_save_register_global(machine, dsio.channelbits);
+	state_save_register_global_array(machine, dcs.dsio.reg);
+	state_save_register_global(machine, dcs.dsio.start_on_next_write);
+	state_save_register_global(machine, dcs.dsio.channelbits);
 
 	state_save_register_global(machine, dcs.channels);
 	state_save_register_global(machine, dcs.size);
@@ -921,18 +920,18 @@ static void dcs_register_state(running_machine &machine)
 	state_save_register_global(machine, dcs.timer_period);
 	state_save_register_global(machine, dcs.timers_fired);
 
-	state_save_register_global(machine, transfer.dcs_state);
-	state_save_register_global(machine, transfer.state);
-	state_save_register_global(machine, transfer.start);
-	state_save_register_global(machine, transfer.stop);
-	state_save_register_global(machine, transfer.type);
-	state_save_register_global(machine, transfer.temp);
-	state_save_register_global(machine, transfer.writes_left);
-	state_save_register_global(machine, transfer.sum);
-	state_save_register_global(machine, transfer.fifo_entries);
+	state_save_register_global(machine, dcs.transfer.dcs_state);
+	state_save_register_global(machine, dcs.transfer.state);
+	state_save_register_global(machine, dcs.transfer.start);
+	state_save_register_global(machine, dcs.transfer.stop);
+	state_save_register_global(machine, dcs.transfer.type);
+	state_save_register_global(machine, dcs.transfer.temp);
+	state_save_register_global(machine, dcs.transfer.writes_left);
+	state_save_register_global(machine, dcs.transfer.sum);
+	state_save_register_global(machine, dcs.transfer.fifo_entries);
 
-	if (dcs_sram != NULL)
-		state_save_register_global_pointer(machine, dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
+	if (dcs.sram != NULL)
+		state_save_register_global_pointer(machine, dcs.sram, 0x8000*4 / sizeof(dcs.sram[0]));
 
 	if (dcs.rev == 2)
 		machine.state().register_postload(sdrc_postload, NULL);
@@ -941,7 +940,10 @@ static void dcs_register_state(running_machine &machine)
 void dcs_init(running_machine &machine)
 {
 	memset(&dcs, 0, sizeof(dcs));
-	dcs_sram = NULL;
+	dcs.sram = NULL;
+
+	dcs.internal_program_ram = (UINT32 *)memory_get_shared(machine, "dcsint");
+	dcs.external_program_ram = (UINT32 *)memory_get_shared(machine, "dcsext");
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs");
@@ -979,6 +981,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	int soundbank_words;
 
 	memset(&dcs, 0, sizeof(dcs));
+	dcs.internal_program_ram = (UINT32 *)memory_get_shared(machine, "dcsint");
+	dcs.external_program_ram = (UINT32 *)memory_get_shared(machine, "dcsext");
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs2");
@@ -1022,7 +1026,7 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 		memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
-	dcs_sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
+	dcs.sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
 
 	/* create the timers */
 	dcs.internal_timer = machine.device<timer_device>("dcs_int_timer");
@@ -1035,12 +1039,12 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	/* install the speedup handler */
 	dcs.polling_offset = polling_offset;
 	if (polling_offset)
-		dcs_polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(polling_offset, polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+		dcs.polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 
 	/* allocate a watchdog timer for HLE transfers */
-	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
-	if (transfer.hle_enabled)
-		transfer.watchdog = machine.device<timer_device>("dcs_hle_timer");
+	dcs.transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
+	if (dcs.transfer.hle_enabled)
+		dcs.transfer.watchdog = machine.device<timer_device>("dcs_hle_timer");
 
 	/* register for save states */
 	dcs_register_state(machine);
@@ -1050,7 +1054,7 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 }
 
 
-void dcs_set_auto_ack(int state)
+void dcs_set_auto_ack(running_machine &machine, int state)
 {
 	dcs.auto_ack = state;
 }
@@ -1065,15 +1069,15 @@ void dcs_set_auto_ack(int state)
 
 static READ16_HANDLER( dcs_dataram_r )
 {
-	return dcs_external_program_ram[offset] >> 8;
+	return dcs.external_program_ram[offset] >> 8;
 }
 
 
 static WRITE16_HANDLER( dcs_dataram_w )
 {
-	UINT16 newdata = dcs_external_program_ram[offset] >> 8;
+	UINT16 newdata = dcs.external_program_ram[offset] >> 8;
 	COMBINE_DATA(&newdata);
-	dcs_external_program_ram[offset] = (newdata << 8) | (dcs_external_program_ram[offset] & 0xff);
+	dcs.external_program_ram[offset] = (newdata << 8) | (dcs.external_program_ram[offset] & 0xff);
 }
 
 
@@ -1134,23 +1138,23 @@ static void sdrc_remap_memory(running_machine &machine)
 	else
 	{
 		/* first start with a clean program map */
-		dcs.program->install_ram(0x0800, 0x3fff, dcs_sram + 0x4800);
+		dcs.program->install_ram(0x0800, 0x3fff, dcs.sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			dcs.data->install_ram(0x0800, 0x17ff, dcs_sram + 0x0000);
-			dcs.data->install_ram(0x1800, 0x27ff, dcs_sram + 0x1000);
-			dcs.data->install_ram(0x2800, 0x37ff, dcs_sram + 0x2000);
+			dcs.data->install_ram(0x0800, 0x17ff, dcs.sram + 0x0000);
+			dcs.data->install_ram(0x1800, 0x27ff, dcs.sram + 0x1000);
+			dcs.data->install_ram(0x2800, 0x37ff, dcs.sram + 0x2000);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
 			dcs.data->unmap_readwrite(0x0800, 0x17ff);
-			dcs.data->install_ram(0x1800, 0x27ff, dcs_sram + 0x3000);
-			dcs.data->install_ram(0x2800, 0x37ff, dcs_sram + 0x2000);
+			dcs.data->install_ram(0x1800, 0x27ff, dcs.sram + 0x3000);
+			dcs.data->install_ram(0x2800, 0x37ff, dcs.sram + 0x2000);
 		}
 	}
 
@@ -1174,7 +1178,7 @@ static void sdrc_remap_memory(running_machine &machine)
 
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
-		dcs_polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
+		dcs.polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 }
 
 
@@ -1186,7 +1190,7 @@ static STATE_POSTLOAD( sdrc_postload )
 
 static void sdrc_reset(running_machine &machine)
 {
-	memset(sdrc.reg, 0, sizeof(sdrc.reg));
+	memset(dcs.sdrc.reg, 0, sizeof(dcs.sdrc.reg));
 	sdrc_remap_memory(machine);
 }
 
@@ -1200,6 +1204,7 @@ static void sdrc_reset(running_machine &machine)
 
 static READ16_HANDLER( sdrc_r )
 {
+	sdrc_state &sdrc = dcs.sdrc;
 	UINT16 result = sdrc.reg[offset];
 
 	/* offset 3 is for security */
@@ -1248,6 +1253,7 @@ static READ16_HANDLER( sdrc_r )
 
 static WRITE16_HANDLER( sdrc_w )
 {
+	sdrc_state &sdrc = dcs.sdrc;
 	UINT16 diff = sdrc.reg[offset] ^ data;
 
 	switch (offset)
@@ -1264,7 +1270,7 @@ static WRITE16_HANDLER( sdrc_w )
 		/* offset 1 controls RAM mapping */
 		case 1:
 			sdrc.reg[1] = data;
-//          dmadac_enable(&dcs.dmadac[0], dcs.channels, SDRC_MUTE);
+			//dmadac_enable(&dcs.dmadac[0], dcs.channels, SDRC_MUTE);
 			if (diff & 0x0003)
 				sdrc_remap_memory(space->machine());
 			break;
@@ -1320,14 +1326,15 @@ static WRITE16_HANDLER( sdrc_w )
  *
  *************************************/
 
-static void dsio_reset(void)
+static void dsio_reset(running_machine &machine)
 {
-	memset(&dsio, 0, sizeof(dsio));
+	memset(&dcs.dsio, 0, sizeof(dcs.dsio));
 }
 
 
 static READ16_HANDLER( dsio_r )
 {
+	dsio_state &dsio = dcs.dsio;
 	UINT16 result = dsio.reg[offset];
 
 	if (offset == 1)
@@ -1342,6 +1349,8 @@ static READ16_HANDLER( dsio_r )
 
 static WRITE16_HANDLER( dsio_w )
 {
+	dsio_state &dsio = dcs.dsio;
+
 	switch (offset)
 	{
 		/* offset 1 controls I/O */
@@ -1371,15 +1380,15 @@ static WRITE16_HANDLER( dsio_w )
  *
  *************************************/
 
-static void denver_reset(void)
+static void denver_reset(running_machine &machine)
 {
-	memset(&dsio, 0, sizeof(dsio));
+	memset(&dcs.dsio, 0, sizeof(dcs.dsio));
 }
 
 
 static READ16_HANDLER( denver_r )
 {
-	UINT16 result = dsio.reg[offset];
+	UINT16 result = dcs.dsio.reg[offset];
 
 	if (offset == 3)
 	{
@@ -1392,6 +1401,7 @@ static READ16_HANDLER( denver_r )
 
 static WRITE16_HANDLER( denver_w )
 {
+	dsio_state &dsio = dcs.dsio;
 	int enable, channels, chan;
 
 	switch (offset)
@@ -1444,6 +1454,7 @@ static WRITE16_HANDLER( denver_w )
 
 WRITE32_HANDLER( dsio_idma_addr_w )
 {
+	dsio_state &dsio = dcs.dsio;
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(&space->device()), data);
 	downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
@@ -1454,6 +1465,7 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 
 WRITE32_HANDLER( dsio_idma_data_w )
 {
+	dsio_state &dsio = dcs.dsio;
 	UINT32 pc = cpu_get_pc(&space->device());
 	if (ACCESSING_BITS_0_15)
 	{
@@ -1504,24 +1516,24 @@ void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(device_t *device), UINT16 (*fi
 }
 
 
-int dcs_control_r(void)
+int dcs_control_r(running_machine &machine)
 {
 	/* only boost for DCS2 boards */
-	if (!dcs.auto_ack && !transfer.hle_enabled)
-		dcs.cpu->machine().scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
+	if (!dcs.auto_ack && !dcs.transfer.hle_enabled)
+		machine.scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
 	return dcs.latch_control;
 }
 
 
-void dcs_reset_w(int state)
+void dcs_reset_w(running_machine &machine, int state)
 {
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%s: DCS reset = %d\n", dcs.cpu->machine().describe_context(), state);
+		logerror("%s: DCS reset = %d\n", machine.describe_context(), state);
 
 		/* just run through the init code again */
-		dcs.cpu->machine().scheduler().synchronize(FUNC(dcs_reset));
+		machine.scheduler().synchronize(FUNC(dcs_reset));
 		device_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1538,9 +1550,9 @@ static READ16_HANDLER( latch_status_r )
 		result |= 0x80;
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
-	if (dcs.fifo_status_r != NULL && (!transfer.hle_enabled || transfer.state == 0))
+	if (dcs.fifo_status_r != NULL && (!dcs.transfer.hle_enabled || dcs.transfer.state == 0))
 		result |= (*dcs.fifo_status_r)(dcs.cpu) & 0x38;
-	if (transfer.hle_enabled && transfer.state != 0)
+	if (dcs.transfer.hle_enabled && dcs.transfer.state != 0)
 		result |= 0x08;
 	return result;
 }
@@ -1587,17 +1599,17 @@ static TIMER_CALLBACK( dcs_delayed_data_w_callback )
 }
 
 
-void dcs_data_w(int data)
+void dcs_data_w(running_machine &machine, int data)
 {
 	/* preprocess the write */
-	if (preprocess_write(dcs.cpu->machine(), data))
+	if (preprocess_write(machine, data))
 		return;
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (dcs.sport_timer == NULL)
-		dcs.cpu->machine().scheduler().synchronize(FUNC(dcs_delayed_data_w_callback), data);
+		machine.scheduler().synchronize(FUNC(dcs_delayed_data_w_callback), data);
 	else
-		dcs_delayed_data_w(dcs.cpu->machine(), data);
+		dcs_delayed_data_w(machine, data);
 }
 
 
@@ -1642,7 +1654,7 @@ static WRITE16_HANDLER( output_latch_w )
 }
 
 
-static void delayed_ack_w(void)
+static void delayed_ack_w(running_machine &machine)
 {
 	SET_OUTPUT_EMPTY();
 }
@@ -1650,26 +1662,26 @@ static void delayed_ack_w(void)
 
 static TIMER_CALLBACK( delayed_ack_w_callback )
 {
-	delayed_ack_w();
+	delayed_ack_w(machine);
 }
 
 
-void dcs_ack_w(void)
+void dcs_ack_w(running_machine &machine)
 {
-	dcs.cpu->machine().scheduler().synchronize(FUNC(delayed_ack_w_callback));
+	machine.scheduler().synchronize(FUNC(delayed_ack_w_callback));
 }
 
 
-int dcs_data_r(void)
+int dcs_data_r(running_machine &machine)
 {
 	/* data is actually only 8 bit (read from d8-d15) */
 	if (dcs.last_output_full && dcs.output_full_cb)
-		(*dcs.output_full_cb)(dcs.cpu->machine(), dcs.last_output_full = 0);
+		(*dcs.output_full_cb)(machine, dcs.last_output_full = 0);
 	if (dcs.auto_ack)
-		delayed_ack_w();
+		delayed_ack_w(machine);
 
 	if (LOG_DCS_IO)
-		logerror("%s:dcs_data_r(%04X)\n", dcs.cpu->machine().describe_context(), dcs.output_data);
+		logerror("%s:dcs_data_r(%04X)\n", machine.describe_context(), dcs.output_data);
 	return dcs.output_data;
 }
 
@@ -1703,7 +1715,7 @@ static READ16_HANDLER( output_control_r )
 }
 
 
-int dcs_data2_r(void)
+int dcs_data2_r(running_machine &machine)
 {
 	return dcs.output_control;
 }
@@ -1803,12 +1815,12 @@ static void timer_enable_callback(adsp21xx_device &device, int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
+		//mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
 		reset_timer(device.machine());
 	}
 	else
 	{
-//      mame_printf_debug("Timer disabled\n");
+		//mame_printf_debug("Timer disabled\n");
 		dcs.internal_timer->reset();
 	}
 }
@@ -1879,7 +1891,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			{
 				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(&space->device()));
 				device_set_input_line(dcs.cpu, INPUT_LINE_RESET, PULSE_LINE);
-				dcs_boot();
+				dcs_boot(space->machine());
 				dcs.control_regs[SYSCONTROL_REG] = 0;
 			}
 
@@ -2074,14 +2086,14 @@ static READ16_HANDLER( dcs_polling_r )
 {
 	if (dcs.polling_count++ > 5)
 		device_eat_cycles(&space->device(), 10000);
-	return *dcs_polling_base;
+	return *dcs.polling_base;
 }
 
 
 static WRITE16_HANDLER( dcs_polling_w )
 {
 	dcs.polling_count = 0;
-	COMBINE_DATA(dcs_polling_base);
+	COMBINE_DATA(dcs.polling_base);
 }
 
 
@@ -2090,8 +2102,10 @@ static WRITE16_HANDLER( dcs_polling_w )
     DATA TRANSFER HLE MECHANISM
 ****************************************************************************/
 
-void dcs_fifo_notify(int count, int max)
+void dcs_fifo_notify(running_machine &machine, int count, int max)
 {
+	hle_transfer_state &transfer = dcs.transfer;
+
 	/* skip if not in mid-transfer */
 	if (!transfer.hle_enabled || transfer.state == 0 || !dcs.fifo_data_r)
 	{
@@ -2104,13 +2118,14 @@ void dcs_fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(dcs.cpu->machine(), (*dcs.fifo_data_r)(dcs.cpu));
+			preprocess_write(machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
 }
 
 
 static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback )
 {
+	hle_transfer_state &transfer = dcs.transfer;
 	int starting_writes_left = param;
 
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
@@ -2152,6 +2167,8 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 
 static int preprocess_stage_1(running_machine &machine, UINT16 data)
 {
+	hle_transfer_state &transfer = dcs.transfer;
+
 	switch (transfer.state)
 	{
 		case 0:
@@ -2223,12 +2240,12 @@ static int preprocess_stage_1(running_machine &machine, UINT16 data)
 			{
 				if (transfer.type == 1 && SDRC_SM_BK == 1)
 				{
-					sdrc.reg[0] &= ~0x1000;
+					dcs.sdrc.reg[0] &= ~0x1000;
 					sdrc_remap_memory(machine);
 				}
 				if (transfer.type == 2 && SDRC_SM_BK == 0)
 				{
-					sdrc.reg[0] |= 0x1000;
+					dcs.sdrc.reg[0] |= 0x1000;
 					sdrc_remap_memory(machine);
 				}
 				return 1;
@@ -2288,6 +2305,8 @@ static TIMER_CALLBACK( s2_ack_callback )
 
 static int preprocess_stage_2(running_machine &machine, UINT16 data)
 {
+	hle_transfer_state &transfer = dcs.transfer;
+
 	switch (transfer.state)
 	{
 		case 0:
@@ -2388,6 +2407,7 @@ static int preprocess_stage_2(running_machine &machine, UINT16 data)
 
 static int preprocess_write(running_machine &machine, UINT16 data)
 {
+	hle_transfer_state &transfer = dcs.transfer;
 	int result;
 
 	/* if we're not DCS2, skip */

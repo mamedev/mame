@@ -577,8 +577,8 @@ static MACHINE_RESET( vegas )
 	/* reset the DCS system if we have one */
 	if (machine.device("dcs2") != NULL || machine.device("dsio") != NULL || machine.device("denver") != NULL)
 	{
-		dcs_reset_w(1);
-		dcs_reset_w(0);
+		dcs_reset_w(machine, 1);
+		dcs_reset_w(machine, 0);
 	}
 
 	/* initialize IRQ states */
@@ -1313,7 +1313,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		if (!(data & 0x01))
 		{
 			midway_ioasic_reset(space->machine());
-			dcs_reset_w(data & 0x01);
+			dcs_reset_w(space->machine(), data & 0x01);
 		}
 
 		/* they toggle bit 0x08 low to reset the VBLANK */

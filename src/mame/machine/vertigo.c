@@ -169,7 +169,8 @@ WRITE16_HANDLER( vertigo_wsot_w )
 
 static TIMER_CALLBACK( sound_command_w )
 {
-	exidy440_sound_command(machine, param);
+	vertigo_state *state = machine.driver_data<vertigo_state>();
+	exidy440_sound_command(state->m_custom, param);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting
@@ -188,7 +189,8 @@ WRITE16_HANDLER( vertigo_audio_w )
 
 READ16_HANDLER( vertigo_sio_r )
 {
-	return exidy440_sound_command_ack() ? 0xfc : 0xfd;
+	vertigo_state *state = space->machine().driver_data<vertigo_state>();
+	return exidy440_sound_command_ack(state->m_custom) ? 0xfc : 0xfd;
 }
 
 
@@ -202,6 +204,10 @@ READ16_HANDLER( vertigo_sio_r )
 MACHINE_START( vertigo )
 {
 	vertigo_state *state = machine.driver_data<vertigo_state>();
+
+	state->m_custom = machine.device("custom");
+	state->m_ttl74148 = machine.device("74148");
+
 	state_save_register_global(machine, state->m_irq_state);
 	state_save_register_global(machine, state->m_adc_result);
 	state_save_register_global(machine, state->m_irq4_time);
@@ -214,7 +220,6 @@ MACHINE_RESET( vertigo )
 	vertigo_state *state = machine.driver_data<vertigo_state>();
 	int i;
 
-	state->m_ttl74148 = machine.device("74148");
 	ttl74148_enable_input_w(state->m_ttl74148, 0);
 
 	for (i = 0; i < 8; i++)

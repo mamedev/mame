@@ -334,13 +334,6 @@ static MACHINE_START( zaxxon )
 }
 
 
-static MACHINE_RESET( razmataz )
-{
-	/* the timer value is unknown, but this seems to work well */
-	sega_usb_reset(machine, 0x10);
-}
-
-
 
 /*************************************
  *
@@ -981,8 +974,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( razmataz, root )
 
-	MCFG_MACHINE_RESET(razmataz)
-
 	/* video hardware */
 	MCFG_VIDEO_START(razmataz)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1508,19 +1499,21 @@ static DRIVER_INIT( futspy )
 static DRIVER_INIT( razmataz )
 {
 	zaxxon_state *state = machine.driver_data<zaxxon_state>();
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *usbsnd = machine.device("usbsnd");
 
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	pgmspace->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
+	pgmspace->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
+	pgmspace->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
+	pgmspace->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
 
 	/* connect the universal sound board */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 
 	/* additional state saving */
 	state->save_item(NAME(state->m_razmataz_dial_pos));
@@ -1530,10 +1523,13 @@ static DRIVER_INIT( razmataz )
 
 static DRIVER_INIT( ixion )
 {
+	address_space *pgmspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *usbsnd = machine.device("usbsnd");
+
 	szaxxon_decode(machine, "maincpu");
 
 	/* connect the universal sound board */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 }
 
 

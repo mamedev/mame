@@ -577,13 +577,13 @@ MACHINE_RESET( midtunit )
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
-			williams_adpcm_reset_w(1);
-			williams_adpcm_reset_w(0);
+			williams_adpcm_reset_w(machine, 1);
+			williams_adpcm_reset_w(machine, 0);
 			break;
 
 		case SOUND_DCS:
-			dcs_reset_w(1);
-			dcs_reset_w(0);
+			dcs_reset_w(machine, 1);
+			dcs_reset_w(machine, 0);
 			break;
 	}
 }
@@ -601,7 +601,7 @@ READ16_HANDLER( midtunit_sound_state_r )
 /*  logerror("%08X:Sound status read\n", cpu_get_pc(&space->device()));*/
 
 	if (chip_type == SOUND_DCS)
-		return dcs_control_r() >> 4;
+		return dcs_control_r(space->machine()) >> 4;
 
 	if (fake_sound_state)
 	{
@@ -616,7 +616,7 @@ READ16_HANDLER( midtunit_sound_r )
 	logerror("%08X:Sound data read\n", cpu_get_pc(&space->device()));
 
 	if (chip_type == SOUND_DCS)
-		return dcs_data_r() & 0xff;
+		return dcs_data_r(space->machine()) & 0xff;
 
 	return ~0;
 }
@@ -636,8 +636,8 @@ WRITE16_HANDLER( midtunit_sound_w )
 		{
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
-				williams_adpcm_reset_w(~data & 0x100);
-				williams_adpcm_data_w(data & 0xff);
+				williams_adpcm_reset_w(space->machine(), ~data & 0x100);
+				williams_adpcm_data_w(space->machine(), data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				fake_sound_state = 128;
@@ -645,8 +645,8 @@ WRITE16_HANDLER( midtunit_sound_w )
 
 			case SOUND_DCS:
 				logerror("%08X:Sound write = %04X\n", cpu_get_pc(&space->device()), data);
-				dcs_reset_w(~data & 0x100);
-				dcs_data_w(data & 0xff);
+				dcs_reset_w(space->machine(), ~data & 0x100);
+				dcs_data_w(space->machine(), data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				fake_sound_state = 128;
 				break;

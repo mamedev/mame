@@ -555,8 +555,8 @@ static MACHINE_RESET( seattle )
 	/* reset either the DCS2 board or the CAGE board */
 	if (machine.device("dcs2") != NULL)
 	{
-		dcs_reset_w(1);
-		dcs_reset_w(0);
+		dcs_reset_w(machine, 1);
+		dcs_reset_w(machine, 0);
 	}
 	else if (machine.device("cage") != NULL)
 	{

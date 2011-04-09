@@ -152,19 +152,19 @@ static WRITE8_DEVICE_HANDLER( yawdim_oki_bank_w )
 
 static CUSTOM_INPUT( narc_talkback_strobe_r )
 {
-	return (williams_narc_talkback_r() >> 8) & 1;
+	return (williams_narc_talkback_r(field->port->machine()) >> 8) & 1;
 }
 
 
 static CUSTOM_INPUT( narc_talkback_data_r )
 {
-	return williams_narc_talkback_r() & 0xff;
+	return williams_narc_talkback_r(field->port->machine()) & 0xff;
 }
 
 
 static CUSTOM_INPUT( adpcm_irq_state_r )
 {
-	return williams_adpcm_sound_irq_r() & 1;
+	return williams_adpcm_sound_irq_r(field->port->machine()) & 1;
 }
 
 

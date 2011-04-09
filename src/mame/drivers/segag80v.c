@@ -178,15 +178,6 @@ static MACHINE_START( g80v )
 }
 
 
-static MACHINE_RESET( g80v )
-{
-	segag80v_state *state = machine.driver_data<segag80v_state>();
-	/* if we have a Universal Sound Board, reset it here */
-	if (state->m_has_usb)
-		sega_usb_reset(machine, 0x10);
-}
-
-
 
 /*************************************
  *
@@ -213,8 +204,7 @@ static WRITE8_HANDLER( mainram_w )
 	state->m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space, offset), data); }
-
+static WRITE8_DEVICE_HANDLER( usb_ram_w ) { sega_usb_ram_w(device, decrypt_offset(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
 static WRITE8_HANDLER( vectorram_w )
 {
 	segag80v_state *state = space->machine().driver_data<segag80v_state>();
@@ -919,7 +909,6 @@ static MACHINE_CONFIG_START( g80v_base, segag80v_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MCFG_MACHINE_START(g80v)
-	MCFG_MACHINE_RESET(g80v)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -1318,7 +1307,7 @@ static DRIVER_INIT( elim2 )
 	state->m_decrypt = segag80_security(70);
 
 	/* configure sound */
-	state->m_has_usb = FALSE;
+	state->m_usb = NULL;
 	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
 	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
 }
@@ -1333,7 +1322,7 @@ static DRIVER_INIT( elim4 )
 	state->m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	state->m_has_usb = FALSE;
+	state->m_usb = NULL;
 	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
 	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
 
@@ -1352,9 +1341,9 @@ static DRIVER_INIT( spacfury )
 	state->m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	state->m_has_usb = FALSE;
-	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
-	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	state->m_usb = NULL;
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(spacfury1_sh_w));
 	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(spacfury2_sh_w));
 }
@@ -1370,9 +1359,9 @@ static DRIVER_INIT( zektor )
 	state->m_decrypt = segag80_security(82);
 
 	/* configure sound */
-	state->m_has_usb = FALSE;
-	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
-	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	state->m_usb = NULL;
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 	iospace->install_legacy_write_handler(*ay, 0x3c, 0x3d, FUNC(ay8910_address_data_w));
 	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(zektor1_sh_w));
 	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(zektor2_sh_w));
@@ -1393,9 +1382,9 @@ static DRIVER_INIT( tacscan )
 	state->m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	state->m_has_usb = TRUE;
-	iospace->install_legacy_readwrite_handler(0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	pgmspace->install_legacy_readwrite_handler(0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	state->m_usb = machine.device("segausb");
+	iospace->install_legacy_readwrite_handler(*state->m_usb, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
 	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
@@ -1413,12 +1402,12 @@ static DRIVER_INIT( startrek )
 	state->m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	state->m_has_usb = TRUE;
-	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
-	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	state->m_usb = machine.device("segausb");
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 
-	iospace->install_legacy_readwrite_handler(0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
-	pgmspace->install_legacy_readwrite_handler(0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
+	iospace->install_legacy_readwrite_handler(*state->m_usb, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
 	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));

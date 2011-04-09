@@ -85,6 +85,7 @@ public:
 
 	UINT16 *m_vectorram;
 	device_t *m_ttl74148;
+	device_t *m_custom;
 	attotime m_irq4_time;
 	UINT8 m_irq_state;
 	UINT8 m_adc_result;

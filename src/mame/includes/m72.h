@@ -37,6 +37,7 @@ public:
 	INT32 m_scrolly2;
 	INT32 m_video_off;
 	int m_majtitle_rowscroll;
+	device_t *m_audio;
 };
 
 
