@@ -434,64 +434,42 @@ TO DO :
 
 /*************************************
  *
- *  Globals
- *
- *************************************/
-
-static UINT8 gmgalax_selected_game;
-static UINT8 zigzag_ay8910_latch;
-static UINT8 kingball_speech_dip;
-static UINT8 kingball_sound;
-static UINT8 mshuttle_ay8910_cs;
-
-static UINT16 protection_state;
-static UINT8 protection_result;
-
-static UINT8 konami_sound_control;
-static UINT8 sfx_sample_control;
-
-static UINT8 moonwar_port_select;
-
-static UINT8 irq_enabled;
-static int irq_line;
-
-static int tenspot_current_game;
-
-/*************************************
- *
  *  Interrupts
  *
  *************************************/
 
 static INTERRUPT_GEN( interrupt_gen )
 {
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
-	if (irq_enabled)
-		device_set_input_line(device, irq_line, ASSERT_LINE);
+	if (state->m_irq_enabled)
+		device_set_input_line(device, state->m_irq_line, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( fakechange_interrupt_gen )
 {
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	interrupt_gen(device);
 
 	if (input_port_read_safe(device->machine(), "FAKE_SELECT", 0x00))
 	{
-		tenspot_current_game++;
-		tenspot_current_game%=10;
-		tenspot_set_game_bank(device->machine(), tenspot_current_game, 1);
+		state->m_tenspot_current_game++;
+		state->m_tenspot_current_game%=10;
+		tenspot_set_game_bank(device->machine(), state->m_tenspot_current_game, 1);
 		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( irq_enable_w )
 {
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
-	irq_enabled = data & 1;
+	state->m_irq_enabled = data & 1;
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
-	if (!irq_enabled)
-		device_set_input_line(&space->device(), irq_line, CLEAR_LINE);
+	if (!state->m_irq_enabled)
+		device_set_input_line(&space->device(), state->m_irq_line, CLEAR_LINE);
 }
 
 /*************************************
@@ -562,8 +540,9 @@ static WRITE8_HANDLER( konami_ay8910_w )
 
 static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
 {
-	UINT8 old = konami_sound_control;
-	konami_sound_control = data;
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+	UINT8 old = state->m_konami_sound_control;
+	state->m_konami_sound_control = data;
 
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
@@ -717,42 +696,45 @@ static const ppi8255_interface theend_ppi8255_0_intf =
 
 static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/*
         This is not fully understood; the low 4 bits of port C are
         inputs; the upper 4 bits are outputs. Scramble main set always
         writes sequences of 3 or more nibbles to the low port and
         expects certain results in the upper nibble afterwards.
     */
-	protection_state = (protection_state << 4) | (data & 0x0f);
-	switch (protection_state & 0xfff)
+	state->m_protection_state = (state->m_protection_state << 4) | (data & 0x0f);
+	switch (state->m_protection_state & 0xfff)
 	{
 		/* scramble */
-		case 0xf09:		protection_result = 0xff;	break;
-		case 0xa49:		protection_result = 0xbf;	break;
-		case 0x319:		protection_result = 0x4f;	break;
-		case 0x5c9:		protection_result = 0x6f;	break;
+		case 0xf09:		state->m_protection_result = 0xff;	break;
+		case 0xa49:		state->m_protection_result = 0xbf;	break;
+		case 0x319:		state->m_protection_result = 0x4f;	break;
+		case 0x5c9:		state->m_protection_result = 0x6f;	break;
 
 		/* scrambls */
-		case 0x246:		protection_result ^= 0x80;	break;
-		case 0xb5f:		protection_result = 0x6f;	break;
+		case 0x246:		state->m_protection_result ^= 0x80;	break;
+		case 0xb5f:		state->m_protection_result = 0x6f;	break;
 	}
 }
 
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	return protection_result;
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+	return state->m_protection_result;
 }
 
 
 static CUSTOM_INPUT( scramble_protection_alt_r )
 {
+	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
 	/*
         There are two additional bits that are derived from bit 7 of
         the protection result. This is just a guess but works well enough
         to boot scrambls.
     */
-	return (protection_result >> 7) & 1;
+	return (state->m_protection_result >> 7) & 1;
 }
 
 
@@ -813,8 +795,9 @@ static WRITE8_HANDLER( sfx_sample_io_w )
 
 static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 {
-	UINT8 old = sfx_sample_control;
-	sfx_sample_control = data;
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+	UINT8 old = state->m_sfx_sample_control;
+	state->m_sfx_sample_control = data;
 
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
@@ -963,11 +946,12 @@ static WRITE8_HANDLER( scorpion_ay8910_w )
 
 static READ8_DEVICE_HANDLER( scorpion_protection_r )
 {
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	UINT16 paritybits;
 	UINT8 parity = 0;
 
 	/* compute parity of the current (bitmask & $CE29) */
-	for (paritybits = protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
+	for (paritybits = state->m_protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
 		if (paritybits & 1)
 			parity++;
 
@@ -978,15 +962,16 @@ static READ8_DEVICE_HANDLER( scorpion_protection_r )
 
 static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 {
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
 	/* bit 5 low is a reset */
 	if (!(data & 0x20))
-		protection_state = 0x0000;
+		state->m_protection_state = 0x0000;
 
 	/* bit 4 low is a clock */
 	if (!(data & 0x10))
 	{
 		/* each clock shifts left one bit and ORs in the inverse of the parity */
-		protection_state = (protection_state << 1) | (~scorpion_protection_r(device, 0) & 1);
+		state->m_protection_state = (state->m_protection_state << 1) | (~scorpion_protection_r(device, 0) & 1);
 	}
 }
 
@@ -1023,14 +1008,15 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
+	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
 	address_space *space = field->port->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* new value is the selected game */
-	gmgalax_selected_game = newval;
+	state->m_gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(field->port->machine(), "bank1", gmgalax_selected_game);
-	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
+	memory_set_bank(field->port->machine(), "bank1", state->m_gmgalax_selected_game);
+	galaxian_gfxbank_w(space, 0, state->m_gmgalax_selected_game);
 
 	/* reset the stars */
 	galaxian_stars_enable_w(space, 0, 0);
@@ -1042,8 +1028,9 @@ static INPUT_CHANGED( gmgalax_game_changed )
 
 static CUSTOM_INPUT( gmgalax_port_r )
 {
+	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
 	const char *portname = (const char *)param;
-	if (gmgalax_selected_game != 0)
+	if (state->m_gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
 	return input_port_read(field->port->machine(), portname);
 }
@@ -1065,6 +1052,7 @@ static WRITE8_HANDLER( zigzag_bankswap_w )
 
 static WRITE8_HANDLER( zigzag_ay8910_w )
 {
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	switch (offset & 0x300)
 	{
 		case 0x000:
@@ -1072,12 +1060,12 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				ay8910_data_address_w(space->machine().device("aysnd"), offset >> 1, zigzag_ay8910_latch);
+				ay8910_data_address_w(space->machine().device("aysnd"), offset >> 1, state->m_zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
 			/* data latch */
-			zigzag_ay8910_latch = offset & 0xff;
+			state->m_zigzag_ay8910_latch = offset & 0xff;
 			break;
 
 		case 0x200:
@@ -1109,8 +1097,9 @@ static CUSTOM_INPUT( azurian_port_r )
 
 static CUSTOM_INPUT( kingball_muxbit_r )
 {
+	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (input_port_read(field->port->machine(), "FAKE") >> kingball_speech_dip) & 1;
+	return (input_port_read(field->port->machine(), "FAKE") >> state->m_kingball_speech_dip) & 1;
 }
 
 
@@ -1125,20 +1114,23 @@ static CUSTOM_INPUT( kingball_noise_r )
 
 static WRITE8_HANDLER( kingball_speech_dip_w )
 {
-	kingball_speech_dip = data;
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	state->m_kingball_speech_dip = data;
 }
 
 
 static WRITE8_HANDLER( kingball_sound1_w )
 {
-	kingball_sound = (kingball_sound & ~0x01) | data;
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	state->m_kingball_sound = (state->m_kingball_sound & ~0x01) | data;
 }
 
 
 static WRITE8_HANDLER( kingball_sound2_w )
 {
-	kingball_sound = (kingball_sound & ~0x02) | (data << 1);
-	soundlatch_w(space, 0, kingball_sound | 0xf0);
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	state->m_kingball_sound = (state->m_kingball_sound & ~0x02) | (data << 1);
+	soundlatch_w(space, 0, state->m_kingball_sound | 0xf0);
 }
 
 
@@ -1157,27 +1149,31 @@ static WRITE8_DEVICE_HANDLER( kingball_dac_w )
 
 static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
 {
-	mshuttle_ay8910_cs = data & 1;
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	state->m_mshuttle_ay8910_cs = data & 1;
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_control_w )
 {
-	if (!mshuttle_ay8910_cs)
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	if (!state->m_mshuttle_ay8910_cs)
 		ay8910_address_w(space->machine().device("aysnd"), offset, data);
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_data_w )
 {
-	if (!mshuttle_ay8910_cs)
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	if (!state->m_mshuttle_ay8910_cs)
 		ay8910_data_w(space->machine().device("aysnd"), offset, data);
 }
 
 
 static READ8_HANDLER( mshuttle_ay8910_data_r )
 {
-	if (!mshuttle_ay8910_cs)
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	if (!state->m_mshuttle_ay8910_cs)
 		return ay8910_r(space->machine().device("aysnd"), offset);
 	return 0xff;
 }
@@ -1276,7 +1272,8 @@ static READ8_HANDLER( dingoe_3001_r )
 
 static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 {
-	moonwar_port_select = data & 0x10;
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+	state->m_moonwar_port_select = data & 0x10;
 }
 
 
@@ -2620,14 +2617,15 @@ static void common_init(
 	galaxian_extend_tile_info_func extend_tile_info,
 	galaxian_extend_sprite_info_func extend_sprite_info)
 {
-	irq_enabled = 0;
-	irq_line = INPUT_LINE_NMI;
-	galaxian_frogger_adjust = FALSE;
-	galaxian_sfx_tilemap = FALSE;
-	galaxian_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : galaxian_draw_bullet;
-	galaxian_draw_background_ptr = (draw_background != NULL) ? draw_background : galaxian_draw_background;
-	galaxian_extend_tile_info_ptr = extend_tile_info;
-	galaxian_extend_sprite_info_ptr = extend_sprite_info;
+	galaxian_state *state = machine.driver_data<galaxian_state>();
+	state->m_irq_enabled = 0;
+	state->m_irq_line = INPUT_LINE_NMI;
+	state->m_frogger_adjust = FALSE;
+	state->m_sfx_tilemap = FALSE;
+	state->m_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : galaxian_draw_bullet;
+	state->m_draw_background_ptr = (draw_background != NULL) ? draw_background : galaxian_draw_background;
+	state->m_extend_tile_info_ptr = extend_tile_info;
+	state->m_extend_sprite_info_ptr = extend_sprite_info;
 }
 
 
@@ -2680,6 +2678,7 @@ static DRIVER_INIT( azurian )
 
 static DRIVER_INIT( gmgalax )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
@@ -2691,7 +2690,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine.m_portlist.first()->fieldlist, NULL, 0, 0);
-	state_save_register_global(machine, gmgalax_selected_game);
+	state_save_register_global(machine, state->m_gmgalax_selected_game);
 }
 
 
@@ -2798,8 +2797,9 @@ static DRIVER_INIT( pacmanbl )
 
 static READ8_HANDLER( tenspot_dsw_read )
 {
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	char tmp[64];
-	sprintf(tmp,"IN2_GAME%d", tenspot_current_game);
+	sprintf(tmp,"IN2_GAME%d", state->m_tenspot_current_game);
 	return input_port_read_safe(space->machine(), tmp, 0x00);
 }
 
@@ -2849,6 +2849,7 @@ void tenspot_set_game_bank(running_machine& machine, int bank, int from_game)
 
 static DRIVER_INIT( tenspot )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
@@ -2865,9 +2866,9 @@ static DRIVER_INIT( tenspot )
 
 	space->install_legacy_write_handler(0x6002, 0x6002, 0, 0x7f8, FUNC(artic_gfxbank_w));
 
-	tenspot_current_game = 0;
+	state->m_tenspot_current_game = 0;
 
-	tenspot_set_game_bank(machine, tenspot_current_game, 0);
+	tenspot_set_game_bank(machine, state->m_tenspot_current_game, 0);
 
 	space->install_legacy_read_handler(0x7000, 0x7000, FUNC(tenspot_dsw_read));
 }
@@ -2876,21 +2877,23 @@ static DRIVER_INIT( tenspot )
 
 static DRIVER_INIT( devilfsg )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* IRQ line is INT, not NMI */
-	irq_line = 0;
+	state->m_irq_line = 0;
 }
 
 
 static DRIVER_INIT( zigzag )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
-	galaxian_draw_bullet_ptr = NULL;
+	state->m_draw_bullet_ptr = NULL;
 
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
@@ -3044,6 +3047,7 @@ static void mshuttle_decode(running_machine &machine, const UINT8 convtable[8][1
 
 static DRIVER_INIT( mshuttle )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const UINT8 convtable[8][16] =
 	{
 		/* -1 marks spots which are unused and therefore unknown */
@@ -3061,7 +3065,7 @@ static DRIVER_INIT( mshuttle )
 	common_init(machine, mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
 
 	/* IRQ line is INT, not NMI */
-	irq_line = 0;
+	state->m_irq_line = 0;
 
 	/* decrypt the code */
 	mshuttle_decode(machine, convtable);
@@ -3070,6 +3074,7 @@ static DRIVER_INIT( mshuttle )
 
 static DRIVER_INIT( mshuttlj )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	static const UINT8 convtable[8][16] =
 	{
 		{ 0x41,0x54,0x51,0x14,0x05,0x10,0x01,0x55,0x44,0x11,0x00,0x50,0x15,0x40,0x04,0x45 },
@@ -3086,7 +3091,7 @@ static DRIVER_INIT( mshuttlj )
 	common_init(machine, mshuttle_draw_bullet, galaxian_draw_background, mshuttle_extend_tile_info, mshuttle_extend_sprite_info);
 
 	/* IRQ line is INT, not NMI */
-	irq_line = 0;
+	state->m_irq_line = 0;
 
 	/* decrypt the code */
 	mshuttle_decode(machine, convtable);
@@ -3095,6 +3100,7 @@ static DRIVER_INIT( mshuttlj )
 
 static DRIVER_INIT( kingball )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
@@ -3105,8 +3111,8 @@ static DRIVER_INIT( kingball )
 	space->install_legacy_write_handler(0xb002, 0xb002, 0, 0x7f8, FUNC(kingball_sound2_w));
 	space->install_legacy_write_handler(0xb003, 0xb003, 0, 0x7f8, FUNC(kingball_speech_dip_w));
 
-	state_save_register_global(machine, kingball_speech_dip);
-	state_save_register_global(machine, kingball_sound);
+	state_save_register_global(machine, state->m_kingball_speech_dip);
+	state_save_register_global(machine, state->m_kingball_sound);
 }
 
 
@@ -3197,9 +3203,10 @@ static DRIVER_INIT( explorer )
 
 static DRIVER_INIT( sfx )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* basic configuration */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, upper_extend_tile_info, NULL);
-	galaxian_sfx_tilemap = TRUE;
+	state->m_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
 	machine.device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
@@ -3239,9 +3246,10 @@ static DRIVER_INIT( losttomb )
 
 static DRIVER_INIT( frogger )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
-	galaxian_frogger_adjust = TRUE;
+	state->m_frogger_adjust = TRUE;
 
 	/* decrypt */
 	decode_frogger_sound(machine);
@@ -3367,10 +3375,11 @@ static DRIVER_INIT( calipso )
 
 static DRIVER_INIT( moonwar )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
-	state_save_register_global(machine, moonwar_port_select);
+	state_save_register_global(machine, state->m_moonwar_port_select);
 }
 
 

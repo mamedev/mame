@@ -35,15 +35,14 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *m_videoram;
+	UINT8 m_port60;
+	UINT8 m_port70;
 };
 
 
 #define XTAL1	 8000000
 #define XTAL2	21477270
 
-
-static UINT8 port60;
-static UINT8 port70;
 
 static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
@@ -110,23 +109,25 @@ static WRITE8_HANDLER(vram_w)
 {
 	quizo_state *state = space->machine().driver_data<quizo_state>();
 	UINT8 *videoram = state->m_videoram;
-	int bank=(port70&8)?1:0;
+	int bank=(state->m_port70&8)?1:0;
 	videoram[offset+bank*0x4000]=data;
 }
 
 static WRITE8_HANDLER(port70_w)
 {
-	port70=data;
+	quizo_state *state = space->machine().driver_data<quizo_state>();
+	state->m_port70=data;
 }
 
 static WRITE8_HANDLER(port60_w)
 {
+	quizo_state *state = space->machine().driver_data<quizo_state>();
 	if(data>9)
 	{
 		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(&space->device()));
 		data=0;
 	}
-	port60=data;
+	state->m_port60=data;
 	memory_set_bankptr(space->machine(),  "bank1", &space->machine().region("user1")->base()[rombankLookup[data]*0x4000] );
 }
 

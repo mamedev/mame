@@ -989,40 +989,6 @@ Notes:
 #define S23_HSYNC	(16666150)
 #define S23_MODECLOCK	(130205)
 
-static tilemap_t *bgtilemap;
-static UINT32 *namcos23_textram, *namcos23_shared_ram, *gmen_sh2_shared;
-static UINT32 *namcos23_charram;
-static UINT8 namcos23_jvssense;
-static INT32 has_jvsio;
-
-static bool ctl_vbl_active;
-static UINT8 ctl_led;
-static UINT16 ctl_inp_buffer[2];
-
-static int s23_subcpu_running;
-
-static emu_timer *c361_timer;
-
-static UINT32 p3d_address, p3d_size;
-
-static const UINT32 *ptrom;
-static const UINT16 *tmlrom;
-static const UINT8  *tmhrom, *texrom;
-static UINT32 tileid_mask, tile_mask, ptrom_limit;
-
-// It may only be 128
-// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
-// That fits pretty much anywhere, including inside a IC
-// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
-
-// Matrices are stored in signed 2.14 fixed point
-// Vectors are stored in signed 10.14 fixed point
-
-static INT16 matrices[256][9];
-static INT32 vectors[256][3];
-static INT32 light_vector[3];
-static UINT16 scaling;
-
 enum { MODEL, FLUSH };
 
 struct namcos23_render_entry {
@@ -1039,8 +1005,9 @@ struct namcos23_render_entry {
 };
 
 struct namcos23_render_data {
+	running_machine *machine;
 	const pen_t *pens;
-	UINT32 (*texture_lookup)(const pen_t *pens, float x, float y);
+	UINT32 (*texture_lookup)(running_machine &machine, const pen_t *pens, float x, float y);
 };
 
 struct namcos23_poly_entry {
@@ -1085,6 +1052,12 @@ typedef struct
 
 typedef struct
 {
+	emu_timer *timer;
+	int scanline;
+} c361_t;
+
+typedef struct
+{
 	poly_manager *polymgr;
 	int cur;
 	int poly_count;
@@ -1100,11 +1073,62 @@ public:
 	namcos23_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	c361_t m_c361;
 	c417_t m_c417;
 	c412_t m_c412;
 	c421_t m_c421;
 	c422_t m_c422;
-	render_t render;
+	render_t m_render;
+
+	tilemap_t *m_bgtilemap;
+	UINT32 *m_textram;
+	UINT32 *m_shared_ram;
+	UINT32 *m_gmen_sh2_shared;
+	UINT32 *m_charram;
+	UINT8 m_jvssense;
+	INT32 m_has_jvsio;
+	bool m_ctl_vbl_active;
+	UINT8 m_ctl_led;
+	UINT16 m_ctl_inp_buffer[2];
+	int m_s23_subcpu_running;
+	UINT32 m_p3d_address;
+	UINT32 m_p3d_size;
+	const UINT32 *m_ptrom;
+	const UINT16 *m_tmlrom;
+	const UINT8 *m_tmhrom;
+	const UINT8 *m_texrom;
+	UINT32 m_tileid_mask;
+	UINT32 m_tile_mask;
+	UINT32 m_ptrom_limit;
+
+// It may only be 128
+// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
+// That fits pretty much anywhere, including inside a IC
+// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
+
+// Matrices are stored in signed 2.14 fixed point
+// Vectors are stored in signed 10.14 fixed point
+
+	INT16 m_matrices[256][9];
+	INT32 m_vectors[256][3];
+	INT32 m_light_vector[3];
+	UINT16 m_scaling;
+	INT32 m_spv[3];
+	INT16 m_spm[3];
+
+	int m_s23_porta;
+	int m_s23_rtcstate;
+	int m_s23_lastpB;
+	int m_s23_setstate;
+	int m_s23_setnum;
+	int m_s23_settings[8];
+	UINT8 m_maintoio[128];
+	UINT8 m_mi_rd;
+	UINT8 m_mi_wr;
+	UINT8 m_iotomain[128];
+	UINT8 m_im_rd;
+	UINT8 m_im_wr;
+	UINT8 m_s23_tssio_port_4;
 };
 
 
@@ -1117,7 +1141,8 @@ static UINT16 nthword( const UINT32 *pSource, int offs )
 
 static TILE_GET_INFO( TextTilemapGetInfo )
 {
-	UINT16 data = nthword( namcos23_textram,tile_index );
+	namcos23_state *state = machine.driver_data<namcos23_state>();
+	UINT16 data = nthword( state->m_textram,tile_index );
   /**
     * x---.----.----.---- blend
     * xxxx.----.----.---- palette select
@@ -1129,14 +1154,16 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 
 static WRITE32_HANDLER( namcos23_textram_w )
 {
-	COMBINE_DATA( &namcos23_textram[offset] );
-	tilemap_mark_tile_dirty(bgtilemap, offset*2);
-	tilemap_mark_tile_dirty(bgtilemap, (offset*2)+1);
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	COMBINE_DATA( &state->m_textram[offset] );
+	tilemap_mark_tile_dirty(state->m_bgtilemap, offset*2);
+	tilemap_mark_tile_dirty(state->m_bgtilemap, (offset*2)+1);
 }
 
 static WRITE32_HANDLER( s23_txtchar_w )
 {
-	COMBINE_DATA(&namcos23_charram[offset]);
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	COMBINE_DATA(&state->m_charram[offset]);
 	gfx_element_mark_dirty(space->machine().gfx[0], offset/32);
 }
 
@@ -1195,13 +1222,13 @@ static READ16_HANDLER(s23_c417_r)
 		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417.adr, c417.ram[c417.adr], cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
 		return c417.ram[c417.adr];
 	case 5:
-		if(c417.pointrom_adr >= ptrom_limit)
+		if(c417.pointrom_adr >= state->m_ptrom_limit)
 			return 0xffff;
-		return ptrom[c417.pointrom_adr] >> 16;
+		return state->m_ptrom[c417.pointrom_adr] >> 16;
 	case 6:
-		if(c417.pointrom_adr >= ptrom_limit)
+		if(c417.pointrom_adr >= state->m_ptrom_limit)
 			return 0xffff;
-		return ptrom[c417.pointrom_adr];
+		return state->m_ptrom[c417.pointrom_adr];
 
 	}
 
@@ -1370,30 +1397,31 @@ static WRITE16_HANDLER(s23_c421_w)
 
 static WRITE16_HANDLER(s23_ctl_w)
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	switch(offset) {
 	case 0: {
-		if(ctl_led != (data & 0xff)) {
-			ctl_led = data;
+		if(state->m_ctl_led != (data & 0xff)) {
+			state->m_ctl_led = data;
 /*          logerror("LEDS %c%c%c%c%c%c%c%c\n",
-                     ctl_led & 0x80 ? '.' : '#',
-                     ctl_led & 0x40 ? '.' : '#',
-                     ctl_led & 0x20 ? '.' : '#',
-                     ctl_led & 0x10 ? '.' : '#',
-                     ctl_led & 0x08 ? '.' : '#',
-                     ctl_led & 0x04 ? '.' : '#',
-                     ctl_led & 0x02 ? '.' : '#',
-                     ctl_led & 0x01 ? '.' : '#');*/
+                     state->m_ctl_led & 0x80 ? '.' : '#',
+                     state->m_ctl_led & 0x40 ? '.' : '#',
+                     state->m_ctl_led & 0x20 ? '.' : '#',
+                     state->m_ctl_led & 0x10 ? '.' : '#',
+                     state->m_ctl_led & 0x08 ? '.' : '#',
+                     state->m_ctl_led & 0x04 ? '.' : '#',
+                     state->m_ctl_led & 0x02 ? '.' : '#',
+                     state->m_ctl_led & 0x01 ? '.' : '#');*/
 		}
 		break;
 	}
 
 	case 2: case 3:
 		// These may be coming from another CPU, in particular the I/O one
-		ctl_inp_buffer[offset-2] = input_port_read(space->machine(), offset == 2 ? "P1" : "P2");
+		state->m_ctl_inp_buffer[offset-2] = input_port_read(space->machine(), offset == 2 ? "P1" : "P2");
 		break;
 	case 5:
-		if(ctl_vbl_active) {
-			ctl_vbl_active = false;
+		if(state->m_ctl_vbl_active) {
+			state->m_ctl_vbl_active = false;
 			device_set_input_line(&space->device(), MIPS3_IRQ0, CLEAR_LINE);
 		}
 		break;
@@ -1410,12 +1438,13 @@ static WRITE16_HANDLER(s23_ctl_w)
 
 static READ16_HANDLER(s23_ctl_r)
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	switch(offset) {
 		// 0100 set freezes gorgon (polygon fifo flag)
 	case 1: return 0x0000 | input_port_read(space->machine(), "DSW");
 	case 2: case 3: {
-		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
-		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
+		UINT16 res = state->m_ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+		state->m_ctl_inp_buffer[offset-2] = (state->m_ctl_inp_buffer[offset-2] << 1) | 1;
 		return res;
 	}
 	}
@@ -1424,37 +1453,42 @@ static READ16_HANDLER(s23_ctl_r)
 }
 
 // raster timer.  TC2 indicates it's probably one-shot since it resets it each VBL...
-static int c361_scanline;
 static TIMER_CALLBACK( c361_timer_cb )
 {
-	if (c361_scanline != 511)
+	namcos23_state *state = machine.driver_data<namcos23_state>();
+	c361_t &c361 = state->m_c361;
+
+	if (c361.scanline != 511)
 	{
 		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		c361_timer->adjust(attotime::never);
+		c361.timer->adjust(attotime::never);
 	}
 }
 
 static WRITE16_HANDLER(s23_c361_w)
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	c361_t &c361 = state->m_c361;
+
 	switch(offset) {
 	case 0:
-		tilemap_set_scrollx(bgtilemap, 0, data&0xfff);
+		tilemap_set_scrollx(state->m_bgtilemap, 0, data&0xfff);
 		break;
 
 	case 1:
-		tilemap_set_scrolly(bgtilemap, 0, data&0xfff);
+		tilemap_set_scrolly(state->m_bgtilemap, 0, data&0xfff);
 		break;
 
 	case 4:	// interrupt control
-		c361_scanline = data;
+		c361.scanline = data;
 		if (data == 0x1ff)
 		{
 			cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-			c361_timer->adjust(attotime::never);
+			c361.timer->adjust(attotime::never);
 		}
 		else
 		{
-			c361_timer->adjust(space->machine().primary_screen->time_until_pos(c361_scanline));
+			c361.timer->adjust(space->machine().primary_screen->time_until_pos(c361.scanline));
 		}
 		break;
 
@@ -1511,6 +1545,7 @@ static WRITE16_HANDLER(s23_c422_w)
 // as with System 22, we need to halt the MCU while checking shared RAM
 static WRITE32_HANDLER( s23_mcuen_w )
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	logerror("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
 	if (mem_mask == 0x0000ffff)
 	{
@@ -1519,19 +1554,19 @@ static WRITE32_HANDLER( s23_mcuen_w )
 			logerror("S23: booting H8/3002\n");
 
 			// Panic Park: writing 1 when it's already running means reboot?
-			if (s23_subcpu_running)
+			if (state->m_s23_subcpu_running)
 			{
 				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 			}
 
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-			s23_subcpu_running = 1;
+			state->m_s23_subcpu_running = 1;
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-			s23_subcpu_running = 0;
+			state->m_s23_subcpu_running = 0;
 		}
 	}
 }
@@ -1544,12 +1579,14 @@ static WRITE32_HANDLER( s23_mcuen_w )
 
 static READ32_HANDLER( gorgon_sharedram_r )
 {
-	return namcos23_shared_ram[offset];
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	return state->m_shared_ram[offset];
 }
 
 static WRITE32_HANDLER( gorgon_sharedram_w )
 {
-	COMBINE_DATA(&namcos23_shared_ram[offset]);
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	COMBINE_DATA(&state->m_shared_ram[offset]);
 
 	// hack for final furlong
 	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
@@ -1588,21 +1625,22 @@ INLINE UINT8 light(UINT8 c, float l)
 	return UINT8(l);
 }
 
-static UINT32 texture_lookup_nocache_point(const pen_t *pens, float x, float y)
+static UINT32 texture_lookup_nocache_point(running_machine &machine, const pen_t *pens, float x, float y)
 {
+	namcos23_state *state = machine.driver_data<namcos23_state>();
 	UINT32 xx = UINT32(x);
 	UINT32 yy = UINT32(y);
-	UINT32 tileid = ((xx >> 4) & 0xff) | ((yy << 4) & tileid_mask);
-	UINT8 attr = tmhrom[tileid >> 1];
+	UINT32 tileid = ((xx >> 4) & 0xff) | ((yy << 4) & state->m_tileid_mask);
+	UINT8 attr = state->m_tmhrom[tileid >> 1];
 	if(tileid & 1)
 		attr &= 15;
 	else
 		attr >>= 4;
-	UINT32 tile = (tmlrom[tileid] | (attr << 16)) & tile_mask;
+	UINT32 tile = (state->m_tmlrom[tileid] | (attr << 16)) & state->m_tile_mask;
 
 	// Probably swapx/swapy to add on bits 2-3 of attr
 	// Bits used by motoxgo at least
-	UINT8 color = texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
+	UINT8 color = state->m_texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
 	return pens[color];
 }
 
@@ -1623,7 +1661,7 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 
 	for(int x = extent->startx; x < extent->stopx; x++) {
 		float z = w ? 1/w : 0;
-		UINT32 pcol = rd->texture_lookup(rd->pens, u*z, v*z);
+		UINT32 pcol = rd->texture_lookup(*rd->machine, rd->pens, u*z, v*z);
 		float ll = l*z;
 		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
 
@@ -1635,62 +1673,60 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	}
 }
 
-static INT32 *p3d_getv(UINT16 id)
+static INT32 *p3d_getv(namcos23_state *state, UINT16 id)
 {
-	static INT32 sp[3];
 	if(id == 0x8000)
-		return light_vector;
+		return state->m_light_vector;
 	if(id >= 0x100) {
-		memset(sp, 0, sizeof(sp));
-		return sp;
+		memset(state->m_spv, 0, sizeof(state->m_spv));
+		return state->m_spv;
 	}
-	return vectors[id];
+	return state->m_vectors[id];
 }
 
-static INT16 *p3d_getm(UINT16 id)
+static INT16 *p3d_getm(namcos23_state *state, UINT16 id)
 {
-	static INT16 sp[3];
 	if(id >= 0x100) {
-		memset(sp, 0, sizeof(sp));
-		return sp;
+		memset(state->m_spm, 0, sizeof(state->m_spm));
+		return state->m_spm;
 	}
-	return matrices[id];
+	return state->m_matrices[id];
 }
 
-static void p3d_matrix_set(const UINT16 *p, int size)
+static void p3d_matrix_set(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 10) {
 		logerror("WARNING: p3d_matrix_set with size %d\n", size);
 		return;
 	}
-	INT16 *t = p3d_getm(*p++);
+	INT16 *t = p3d_getm(state, *p++);
 	for(int i=0; i<9; i++)
 		t[i] = *p++;
 }
 
-static void p3d_vector_set(const UINT16 *p, int size)
+static void p3d_vector_set(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 7) {
 		logerror("WARNING: p3d_vector_set with size %d\n", size);
 		return;
 	}
-	INT32 *t = p3d_getv(*p++);
+	INT32 *t = p3d_getv(state, *p++);
 	for(int i=0; i<3; i++) {
 		t[i] = u32_to_s24((p[0] << 16) | p[1]);
 		p += 2;
 	}
 }
 
-static void p3d_scaling_set(const UINT16 *p, int size)
+static void p3d_scaling_set(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 1) {
 		logerror("WARNING: p3d_scaling_set with size %d\n", size);
 		return;
 	}
-	scaling = *p;
+	state->m_scaling = *p;
 }
 
-static void p3d_vector_matrix_mul(const UINT16 *p, int size)
+static void p3d_vector_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 4) {
 		logerror("WARNING: p3d_vector_matrix_mul with size %d\n", size);
@@ -1699,16 +1735,16 @@ static void p3d_vector_matrix_mul(const UINT16 *p, int size)
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_vector_matrix_mul with +2=%04x\n", p[2]);
 
-	INT32 *t       = p3d_getv(p[0]);
-	const INT16 *m = p3d_getm(p[1]);
-	const INT32 *v = p3d_getv(p[3]);
+	INT32 *t       = p3d_getv(state, p[0]);
+	const INT16 *m = p3d_getm(state, p[1]);
+	const INT32 *v = p3d_getv(state, p[3]);
 
 	t[0] = INT32((m[0]*INT64(v[0]) + m[3]*INT64(v[1]) + m[6]*INT64(v[2])) >> 14);
 	t[1] = INT32((m[1]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
 	t[2] = INT32((m[2]*INT64(v[0]) + m[5]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
 }
 
-static void p3d_matrix_vector_mul(const UINT16 *p, int size)
+static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 4) {
 		logerror("WARNING: p3d_matrix_vector_mul with size %d\n", size);
@@ -1717,9 +1753,9 @@ static void p3d_matrix_vector_mul(const UINT16 *p, int size)
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_matrix_vector_mul with +2=%04x\n", p[2]);
 
-	INT32 *t       = p3d_getv(p[0]);
-	const INT16 *m = p3d_getm(p[1]);
-	const INT32 *v = p3d_getv(p[3]);
+	INT32 *t       = p3d_getv(state, p[0]);
+	const INT16 *m = p3d_getm(state, p[1]);
+	const INT32 *v = p3d_getv(state, p[3]);
 
 	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
 	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
@@ -1727,7 +1763,7 @@ static void p3d_matrix_vector_mul(const UINT16 *p, int size)
 }
 
 
-static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
+static void p3d_matrix_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
 {
 	if(size != 4) {
 		logerror("WARNING: p3d_matrix_matrix_mul with size %d\n", size);
@@ -1736,9 +1772,9 @@ static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_matrix_matrix_mul with +2=%04x\n", p[2]);
 
-	INT16 *t        = p3d_getm(p[0]);
-	const INT16 *m1 = p3d_getm(p[1]);
-	const INT16 *m2 = p3d_getm(p[3]);
+	INT16 *t        = p3d_getm(state, p[0]);
+	const INT16 *m1 = p3d_getm(state, p[1]);
+	const INT16 *m2 = p3d_getm(state, p[3]);
 
 	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]) >> 14);
 	t[1] = INT16((m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]) >> 14);
@@ -1751,10 +1787,9 @@ static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
 	t[8] = INT16((m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]) >> 14);
 }
 
-static void p3d_render(running_machine &machine, const UINT16 *p, int size, bool use_scaling)
+static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool use_scaling)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->render;
+	render_t &render = state->m_render;
 
 	if(size != 3) {
 		logerror("WARNING: p3d_render with size %d\n", size);
@@ -1773,13 +1808,13 @@ static void p3d_render(running_machine &machine, const UINT16 *p, int size, bool
 	}
 
 	// Vector and matrix may be inverted
-	const INT16 *m = p3d_getm(p[1]);
-	const INT32 *v = p3d_getv(p[2]);
+	const INT16 *m = p3d_getm(state, p[1]);
+	const INT32 *v = p3d_getv(state, p[2]);
 
 	namcos23_render_entry *re = render.entries[render.cur] + render.count[render.cur];
 	re->type = MODEL;
 	re->model.model = p[0];
-	re->model.scaling = use_scaling ? scaling / 16384.0 : 1.0;
+	re->model.scaling = use_scaling ? state->m_scaling / 16384.0 : 1.0;
 	memcpy(re->model.m, m, sizeof(re->model.m));
 	memcpy(re->model.v, v, sizeof(re->model.v));
 	if(0)
@@ -1794,10 +1829,9 @@ static void p3d_render(running_machine &machine, const UINT16 *p, int size, bool
 }
 
 
-static void p3d_flush(running_machine &machine, const UINT16 *p, int size)
+static void p3d_flush(namcos23_state *state, const UINT16 *p, int size)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->render;
+	render_t &render = state->m_render;
 
 	if(size != 0) {
 		logerror("WARNING: p3d_flush with size %d\n", size);
@@ -1811,8 +1845,9 @@ static void p3d_flush(running_machine &machine, const UINT16 *p, int size)
 
 static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 {
-	adr &= 0x1fffffff;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	UINT16 buffer[256];
+	adr &= 0x1fffffff;
 	int pos = 0;
 	while(pos < size) {
 		UINT16 h = space->read_word(adr+pos);
@@ -1840,15 +1875,15 @@ static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 		}
 
 		switch(h1) {
-		case 0x0040: p3d_matrix_set(buffer, psize); break;
-		case 0x0050: p3d_vector_set(buffer, psize); break;
-		case 0x0000: p3d_matrix_matrix_mul(buffer, psize); break;
-		case 0x0810: p3d_matrix_vector_mul(buffer, psize); break;
-		case 0x1010: p3d_vector_matrix_mul(buffer, psize); break;
-		case 0x4400: p3d_scaling_set(buffer, psize); break;
-		case 0x8000: p3d_render(space->machine(), buffer, psize, false); break;
-		case 0x8080: p3d_render(space->machine(), buffer, psize, true); break;
-		case 0xc000: p3d_flush(space->machine(), buffer, psize); break;
+		case 0x0040: p3d_matrix_set(state, buffer, psize); break;
+		case 0x0050: p3d_vector_set(state, buffer, psize); break;
+		case 0x0000: p3d_matrix_matrix_mul(state, buffer, psize); break;
+		case 0x0810: p3d_matrix_vector_mul(state, buffer, psize); break;
+		case 0x1010: p3d_vector_matrix_mul(state, buffer, psize); break;
+		case 0x4400: p3d_scaling_set(state, buffer, psize); break;
+		case 0x8000: p3d_render(state, buffer, psize, false); break;
+		case 0x8080: p3d_render(state, buffer, psize, true); break;
+		case 0xc000: p3d_flush(state, buffer, psize); break;
 		default: {
 			if(0) {
 				logerror("p3d - [%04x] %04x", h1, h);
@@ -1874,16 +1909,17 @@ static READ32_HANDLER( p3d_r )
 
 static WRITE32_HANDLER( p3d_w)
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	switch(offset) {
-	case 0x7: COMBINE_DATA(&p3d_address); return;
-	case 0x8: COMBINE_DATA(&p3d_size); return;
+	case 0x7: COMBINE_DATA(&state->m_p3d_address); return;
+	case 0x8: COMBINE_DATA(&state->m_p3d_size); return;
 	case 0x9:
 		if(data & 1)
-			p3d_dma(space, p3d_address, p3d_size);
+			p3d_dma(space, state->m_p3d_address, state->m_p3d_size);
 		return;
 	case 0x17:
 		cputag_set_input_line(space->machine(), "maincpu", MIPS3_IRQ1, CLEAR_LINE);
-		c361_timer->adjust(attotime::never);
+		state->m_c361.timer->adjust(attotime::never);
 		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()), (unsigned int)cpu_get_reg(&space->device(), MIPS3_R31));
@@ -1919,17 +1955,18 @@ static void render_project(poly_vertex &pv)
 static void render_one_model(running_machine &machine, const namcos23_render_entry *re)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	UINT32 adr = ptrom[re->model.model];
-	if(adr >= ptrom_limit) {
+	render_t &render = state->m_render;
+	UINT32 adr = state->m_ptrom[re->model.model];
+	if(adr >= state->m_ptrom_limit) {
 		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
 		return;
 	}
 
-	while(adr < ptrom_limit) {
+	while(adr < state->m_ptrom_limit) {
 		poly_vertex pv[15];
 
-		UINT32 type = ptrom[adr++];
-		UINT32 h    = ptrom[adr++];
+		UINT32 type = state->m_ptrom[adr++];
+		UINT32 h    = state->m_ptrom[adr++];
 
 
 		float tbase = (type >> 24) << 12;
@@ -1948,15 +1985,15 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			extptr = adr;
 			adr += ne;
 		} else
-			light = ptrom[adr++];
+			light = state->m_ptrom[adr++];
 
 		float minz = FLT_MAX;
 		float maxz = FLT_MIN;
 
 		for(int i=0; i<ne; i++) {
-			UINT32 v1 = ptrom[adr++];
-			UINT32 v2 = ptrom[adr++];
-			UINT32 v3 = ptrom[adr++];
+			UINT32 v1 = state->m_ptrom[adr++];
+			UINT32 v2 = state->m_ptrom[adr++];
+			UINT32 v3 = state->m_ptrom[adr++];
 
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
@@ -1975,14 +2012,14 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 				pv[i].p[3] = 1.0;
 				break;
 			case 3: {
-				UINT32 norm = ptrom[extptr++];
+				UINT32 norm = state->m_ptrom[extptr++];
 				INT32 nx = u32_to_s10(norm >> 20);
 				INT32 ny = u32_to_s10(norm >> 10);
 				INT32 nz = u32_to_s10(norm);
 				INT32 nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
 
-				float lsi = float(nrx*light_vector[0] + nry*light_vector[1] + nrz*light_vector[2])/4194304.0;
+				float lsi = float(nrx*state->m_light_vector[0] + nry*state->m_light_vector[1] + nrz*state->m_light_vector[2])/4194304.0;
 				if(lsi < 0)
 					lsi = 0;
 
@@ -1993,7 +2030,7 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			}
 		}
 
-		namcos23_poly_entry *p = state->render.polys + state->render.poly_count;
+		namcos23_poly_entry *p = render.polys + render.poly_count;
 
 		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001f);
 
@@ -2007,9 +2044,10 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			}
 			p->zkey = 0.5*(minz+maxz);
 			p->front = !(h & 0x00000001);
+			p->rd.machine = &machine;
 			p->rd.texture_lookup = texture_lookup_nocache_point;
 			p->rd.pens = machine.pens + (color << 8);
-			state->render.poly_count++;
+			render.poly_count++;
 		}
 
 		if(type & 0x000010000)
@@ -2031,7 +2069,7 @@ static int render_poly_compare(const void *i1, const void *i2)
 static void render_flush(running_machine &machine, bitmap_t *bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->render;
+	render_t &render = state->m_render;
 
 	if(!render.poly_count)
 		return;
@@ -2055,7 +2093,7 @@ static void render_flush(running_machine &machine, bitmap_t *bitmap)
 static void render_run(running_machine &machine, bitmap_t *bitmap)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->render;
+	render_t &render = state->m_render;
 	const namcos23_render_entry *re = render.entries[!render.cur];
 
 	render.poly_count = 0;
@@ -2079,26 +2117,27 @@ static void render_run(running_machine &machine, bitmap_t *bitmap)
 static VIDEO_START( ss23 )
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	gfx_element_set_source(machine.gfx[0], (UINT8 *)namcos23_charram);
-	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
-	tilemap_set_transparent_pen(bgtilemap, 0xf);
+	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_charram);
+	state->m_bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
+	tilemap_set_transparent_pen(state->m_bgtilemap, 0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
 	if ((!strcmp(machine.system().name, "rapidrvr")) ||
 	    (!strcmp(machine.system().name, "rapidrvr2")) ||
 	    (!strcmp(machine.system().name, "finlflng")))
 	{
-		tilemap_set_scrolldx(bgtilemap, 0, 0);
+		tilemap_set_scrolldx(state->m_bgtilemap, 0, 0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(bgtilemap, 860, 860);
+		tilemap_set_scrolldx(state->m_bgtilemap, 860, 860);
 	}
-	state->render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
+	state->m_render.polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
 }
 
 static SCREEN_UPDATE( ss23 )
 {
+	namcos23_state *state = screen->machine().driver_data<namcos23_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	render_run( screen->machine(), bitmap );
@@ -2106,17 +2145,17 @@ static SCREEN_UPDATE( ss23 )
 	gfx_element *gfx = screen->machine().gfx[0];
 	memset(gfx->dirty, 1, gfx->total_elements);
 
-	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
+	tilemap_draw( bitmap, cliprect, state->m_bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
 	return 0;
 }
 
 static INTERRUPT_GEN(s23_interrupt)
 {
 	namcos23_state *state = device->machine().driver_data<namcos23_state>();
-	render_t &render = state->render;
+	render_t &render = state->m_render;
 
-	if(!ctl_vbl_active) {
-		ctl_vbl_active = true;
+	if(!state->m_ctl_vbl_active) {
+		state->m_ctl_vbl_active = true;
 		device_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
 	}
 
@@ -2126,8 +2165,10 @@ static INTERRUPT_GEN(s23_interrupt)
 
 static MACHINE_START( s23 )
 {
-	c361_timer = machine.scheduler().timer_alloc(FUNC(c361_timer_cb));
-	c361_timer->adjust(attotime::never);
+	namcos23_state *state = machine.driver_data<namcos23_state>();
+	c361_t &c361 = state->m_c361;
+	c361.timer = machine.scheduler().timer_alloc(FUNC(c361_timer_cb));
+	c361.timer->adjust(attotime::never);
 }
 
 static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32 )
@@ -2135,7 +2176,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE(&namcos23_shared_ram)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE_MEMBER(namcos23_state, m_shared_ram)
 
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
@@ -2144,9 +2185,9 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32 )
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
 	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE_MEMBER(namcos23_state, m_charram)	// text layer characters
 	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE_MEMBER(namcos23_state, m_textram)
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
@@ -2166,15 +2207,15 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
+	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE_MEMBER(namcos23_state, m_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
-	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram) // text layer characters (shown as CGRAM in POST)
+	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE_MEMBER(namcos23_state, m_charram) // text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE_MEMBER(namcos23_state, m_textram)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
@@ -2197,12 +2238,14 @@ static READ32_HANDLER( gmen_trigger_sh2 )
 
 static READ32_HANDLER( sh2_shared_r )
 {
-	return gmen_sh2_shared[offset];
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	return state->m_gmen_sh2_shared[offset];
 }
 
 static WRITE32_HANDLER( sh2_shared_w )
 {
-	COMBINE_DATA(&gmen_sh2_shared[offset]);
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	COMBINE_DATA(&state->m_gmen_sh2_shared[offset]);
 }
 
 static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32 )
@@ -2213,7 +2256,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32 )
-	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE(&gmen_sh2_shared)
+	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE_MEMBER(namcos23_state, m_gmen_sh2_shared)
 	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
 
@@ -2225,10 +2268,11 @@ static MACHINE_RESET(gmen)
 
 static WRITE16_HANDLER( sharedram_sub_w )
 {
-	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	UINT16 *shared16 = (UINT16 *)state->m_shared_ram;
 
 	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
-	if (!has_jvsio)
+	if (!state->m_has_jvsio)
 	{
 		if ((offset == 0x4052/2) && (data == 0x78))
 		{
@@ -2241,7 +2285,8 @@ static WRITE16_HANDLER( sharedram_sub_w )
 
 static READ16_HANDLER( sharedram_sub_r )
 {
-	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	UINT16 *shared16 = (UINT16 *)state->m_shared_ram;
 
 	return shared16[BYTE_XOR_BE(offset)];
 }
@@ -2278,23 +2323,24 @@ static READ8_HANDLER( s23_mcu_p8_r )
 // in System 12, bit 0 of H8/3002 port A is connected to it's chip enable
 // the actual I/O takes place through the H8/3002's serial port B.
 
-static int s23_porta = 0, s23_rtcstate = 0;
 
 static READ8_HANDLER( s23_mcu_pa_r )
 {
-	return s23_porta;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	return state->m_s23_porta;
 }
 
 static WRITE8_HANDLER( s23_mcu_pa_w )
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	// bit 0 = chip enable for the RTC
 	// reset the state on the rising edge of the bit
-	if ((!(s23_porta & 1)) && (data & 1))
+	if ((!(state->m_s23_porta & 1)) && (data & 1))
 	{
-		s23_rtcstate = 0;
+		state->m_s23_rtcstate = 0;
 	}
 
-	s23_porta = data;
+	state->m_s23_porta = data;
 }
 
 INLINE UINT8 make_bcd(UINT8 data)
@@ -2304,13 +2350,14 @@ INLINE UINT8 make_bcd(UINT8 data)
 
 static READ8_HANDLER( s23_mcu_rtc_r )
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	UINT8 ret = 0;
 	system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
 	space->machine().current_datetime(systime);
 
-	switch (s23_rtcstate)
+	switch (state->m_s23_rtcstate)
 	{
 		case 0:
 			ret = make_bcd(systime.local_time.second);	// seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low
@@ -2338,65 +2385,66 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 			break;
 	}
 
-	s23_rtcstate++;
+	state->m_s23_rtcstate++;
 
 	return ret;
 }
 
-static int s23_lastpB, s23_setstate, s23_setnum, s23_settings[8];
 
 static READ8_HANDLER( s23_mcu_portB_r )
 {
-	s23_lastpB ^= 0x80;
-	return s23_lastpB;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	state->m_s23_lastpB ^= 0x80;
+	return state->m_s23_lastpB;
 }
 
 static WRITE8_HANDLER( s23_mcu_portB_w )
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	// bit 7 = chip enable for the video settings controller
 	if (data & 0x80)
 	{
-		s23_setstate = 0;
+		state->m_s23_setstate = 0;
 	}
 
-	s23_lastpB = data;
+	state->m_s23_lastpB = data;
 }
 
 static WRITE8_HANDLER( s23_mcu_settings_w )
 {
-	if (s23_setstate)
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	if (state->m_s23_setstate)
 	{
 		// data
-		s23_settings[s23_setnum] = data;
+		state->m_s23_settings[state->m_s23_setnum] = data;
 
-		if (s23_setnum == 7)
+		if (state->m_s23_setnum == 7)
 		{
 			logerror("S23 video settings: Contrast: %02x  R: %02x  G: %02x  B: %02x\n",
-				BITSWAP8(s23_settings[0], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s23_settings[1], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s23_settings[2], 0, 1, 2, 3, 4, 5, 6, 7),
-				BITSWAP8(s23_settings[3], 0, 1, 2, 3, 4, 5, 6, 7));
+				BITSWAP8(state->m_s23_settings[0], 0, 1, 2, 3, 4, 5, 6, 7),
+				BITSWAP8(state->m_s23_settings[1], 0, 1, 2, 3, 4, 5, 6, 7),
+				BITSWAP8(state->m_s23_settings[2], 0, 1, 2, 3, 4, 5, 6, 7),
+				BITSWAP8(state->m_s23_settings[3], 0, 1, 2, 3, 4, 5, 6, 7));
 		}
 	}
 	else
 	{	// setting number
-		s23_setnum = (data >> 4)-1;
+		state->m_s23_setnum = (data >> 4)-1;
 	}
 
-	s23_setstate ^= 1;
+	state->m_s23_setstate ^= 1;
 }
 
-static UINT8 maintoio[128], mi_rd, mi_wr;
-static UINT8 iotomain[128], im_rd, im_wr;
 
 static READ8_HANDLER( s23_mcu_iob_r )
 {
-	UINT8 ret = iotomain[im_rd];
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	UINT8 ret = state->m_iotomain[state->m_im_rd];
 
-	im_rd++;
-	im_rd &= 0x7f;
+	state->m_im_rd++;
+	state->m_im_rd &= 0x7f;
 
-	if (im_rd == im_wr)
+	if (state->m_im_rd == state->m_im_wr)
 	{
 		cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, CLEAR_LINE);
 	}
@@ -2411,8 +2459,9 @@ static READ8_HANDLER( s23_mcu_iob_r )
 
 static WRITE8_HANDLER( s23_mcu_iob_w )
 {
-	maintoio[mi_wr++] = data;
-	mi_wr &= 0x7f;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	state->m_maintoio[state->m_mi_wr++] = data;
+	state->m_mi_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine(), "ioboard", H8_SCI_0_RX, ASSERT_LINE);
 }
@@ -2589,8 +2638,9 @@ INPUT_PORTS_END
 
 static READ8_HANDLER(s23_mcu_p6_r)
 {
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
-		return (namcos23_jvssense << 1) | 0xfd;
+		return (state->m_jvssense << 1) | 0xfd;
 }
 
 static WRITE8_HANDLER(s23_mcu_p6_w)
@@ -2630,12 +2680,13 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( s23_iob_mcu_r )
 {
-	UINT8 ret = maintoio[mi_rd];
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	UINT8 ret = state->m_maintoio[state->m_mi_rd];
 
-	mi_rd++;
-	mi_rd &= 0x7f;
+	state->m_mi_rd++;
+	state->m_mi_rd &= 0x7f;
 
-	if (mi_rd == mi_wr)
+	if (state->m_mi_rd == state->m_mi_wr)
 	{
 		cputag_set_input_line(space->machine(), "ioboard", H8_SCI_0_RX, CLEAR_LINE);
 	}
@@ -2645,24 +2696,26 @@ static READ8_HANDLER( s23_iob_mcu_r )
 
 static WRITE8_HANDLER( s23_iob_mcu_w )
 {
-	iotomain[im_wr++] = data;
-	im_wr &= 0x7f;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	state->m_iotomain[state->m_im_wr++] = data;
+	state->m_im_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine(), "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 }
 
-static UINT8 s23_tssio_port_4 = 0;
 
 static READ8_HANDLER( s23_iob_p4_r )
 {
-	return s23_tssio_port_4;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	return state->m_s23_tssio_port_4;
 }
 
 static WRITE8_HANDLER( s23_iob_p4_w )
 {
-	s23_tssio_port_4 = data;
+	namcos23_state *state = space->machine().driver_data<namcos23_state>();
+	state->m_s23_tssio_port_4 = data;
 
-	namcos23_jvssense = (data & 0x04) ? 0 : 1;
+	state->m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
 static READ8_HANDLER(iob_r)
@@ -2714,26 +2767,26 @@ ADDRESS_MAP_END
 static DRIVER_INIT(ss23)
 {
 	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->render;
-	ptrom  = (const UINT32 *)machine.region("pointrom")->base();
-	tmlrom = (const UINT16 *)machine.region("textilemapl")->base();
-	tmhrom = machine.region("textilemaph")->base();
-	texrom = machine.region("textile")->base();
+	render_t &render = state->m_render;
+	state->m_ptrom  = (const UINT32 *)machine.region("pointrom")->base();
+	state->m_tmlrom = (const UINT16 *)machine.region("textilemapl")->base();
+	state->m_tmhrom = machine.region("textilemaph")->base();
+	state->m_texrom = machine.region("textile")->base();
 
-	tileid_mask = (machine.region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
-	tile_mask = machine.region("textile")->bytes()/256 - 1;
-	ptrom_limit = machine.region("pointrom")->bytes()/4;
+	state->m_tileid_mask = (machine.region("textilemapl")->bytes()/2 - 1) & ~0xff; // Used for y masking
+	state->m_tile_mask = machine.region("textile")->bytes()/256 - 1;
+	state->m_ptrom_limit = machine.region("pointrom")->bytes()/4;
 
-	mi_rd = mi_wr = im_rd = im_wr = 0;
-	namcos23_jvssense = 1;
-	ctl_vbl_active = false;
-	s23_lastpB = 0x50;
-	s23_setstate = 0;
-	s23_setnum = 0;
-	memset(s23_settings, 0, sizeof(s23_settings));
-	s23_tssio_port_4 = 0;
-	s23_porta = 0, s23_rtcstate = 0;
-	s23_subcpu_running = 1;
+	state->m_mi_rd = state->m_mi_wr = state->m_im_rd = state->m_im_wr = 0;
+	state->m_jvssense = 1;
+	state->m_ctl_vbl_active = false;
+	state->m_s23_lastpB = 0x50;
+	state->m_s23_setstate = 0;
+	state->m_s23_setnum = 0;
+	memset(state->m_s23_settings, 0, sizeof(state->m_s23_settings));
+	state->m_s23_tssio_port_4 = 0;
+	state->m_s23_porta = 0, state->m_s23_rtcstate = 0;
+	state->m_s23_subcpu_running = 1;
 	render.count[0] = render.count[1] = 0;
 	render.cur = 0;
 
@@ -2753,11 +2806,11 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine.system().name, "timecrs2b")) ||
 	    (!strcmp(machine.system().name, "timecrs2")))
 	{
-		has_jvsio = 1;
+		state->m_has_jvsio = 1;
 	}
 	else
 	{
-		has_jvsio = 0;
+		state->m_has_jvsio = 0;
 	}
 }
 

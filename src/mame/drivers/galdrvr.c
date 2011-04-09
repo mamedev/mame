@@ -1537,38 +1537,38 @@ static INPUT_PORTS_START( thepitm )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // turning both of these on boots with 9 credits?
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // turning both of these on boots with 9 credits?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN2")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*************************************
@@ -2169,9 +2169,9 @@ static INPUT_PORTS_START( aracnis )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_8WAY
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 
@@ -2179,21 +2179,21 @@ static INPUT_PORTS_START( aracnis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start 1 / P1 Button 1")		/* also P1 Button 1 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start 2 / P1 Button 2")		/* also P1 Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 
 	PORT_START("IN2")      /* 0xb001 */
@@ -2203,49 +2203,49 @@ static INPUT_PORTS_START( aracnis )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")      /* 0xb002 */
-    PORT_DIPNAME( 0x01, 0x01, "0xb002" )
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "0xb002" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -2354,26 +2354,25 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( moonwar_dial_r )
 {
+	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
 	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
-	int p = (~moonwar_port_select >> 4) & 1;
+	int p = (~state->m_moonwar_port_select >> 4) & 1;
 
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	static int counter_74ls161[2] = {0, 0};
-	static int direction[2] = {0, 0};
 	signed char dialread = input_port_read(field->port->machine(), dialname[p]);
 
 	UINT8 ret;
 
-	if (dialread < 0) direction[p] = 0x00;
-	else if (dialread > 0) direction[p] = 0x10;
+	if (dialread < 0) state->m_direction[p] = 0x00;
+	else if (dialread > 0) state->m_direction[p] = 0x10;
 
-	counter_74ls161[p] += abs(dialread);
-	counter_74ls161[p] &= 0xf;
+	state->m_counter_74ls161[p] += abs(dialread);
+	state->m_counter_74ls161[p] &= 0xf;
 
-	ret = counter_74ls161[p] | direction[p];
-	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161[p], ret);
+	ret = state->m_counter_74ls161[p] | state->m_direction[p];
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, state->m_counter_74ls161[p], ret);
 
 	return ret;
 }

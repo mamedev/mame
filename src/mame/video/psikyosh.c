@@ -71,8 +71,6 @@ The only viable way to do this is to have one tilemap per bank (0x0a-0x20), and 
 //#define DEBUG_KEYS
 //#define DEBUG_MESSAGE
 
-static UINT8 alphatable[256];	// this might be moved to psikyosh_state, if we ever add a machine parameter to drawgfxm.h macros
-
 
 /*-------------------------------------------------
     palette.h like macros
@@ -201,6 +199,8 @@ static void drawgfx_alphastore(bitmap_t *dest, const rectangle *cliprect, const 
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
+	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
+	UINT8 *alphatable = state->m_alphatable;
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	const pen_t *paldata;
 
@@ -246,6 +246,8 @@ static void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const 
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
+	psikyosh_state *state = gfx->machine().driver_data<psikyosh_state>();
+	UINT8 *alphatable = state->m_alphatable;
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 
 	const pen_t *paldata;
@@ -535,6 +537,7 @@ static void psikyosh_drawgfxzoom( running_machine &machine,
 		int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
+	UINT8 *alphatable = state->m_alphatable;
 	rectangle myclip; /* Clip to screen boundaries */
 	int code_offset = 0;
 	int xtile, ytile, xpixel, ypixel;
@@ -1254,6 +1257,7 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_t *bitmap, 
 VIDEO_START( psikyosh )
 {
 	psikyosh_state *state = machine.driver_data<psikyosh_state>();
+	UINT8 *alphatable = state->m_alphatable;
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
 

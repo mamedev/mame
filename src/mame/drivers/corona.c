@@ -299,6 +299,13 @@
 
 **************************************************************************/
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "machine/nvram.h"
+#include "re800.lh"
+#include "luckyrlt.lh"
+
 #define WC81_MAIN_XTAL		(XTAL_24MHz)		/* Main crystal for Winners Circle 28*28 pins PCB's */
 #define WC82_MAIN_XTAL		(XTAL_18_432MHz)	/* Main crystal for Winners Circle 18*22 pins PCB's */
 #define RE_MAIN_XTAL		(XTAL_16MHz)		/* Main for roulette boards */
@@ -307,23 +314,24 @@
 #define AY_CLK2				(2000000)			/* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "re800.lh"
-#include "luckyrlt.lh"
-
 #define VIDEOBUF_SIZE 512*512
 
-static UINT8 blitter_x_reg = 0;
-static UINT8 blitter_y_reg = 0;
-static UINT8 blitter_aux_reg = 0;
-static UINT8 blitter_unk_reg = 0;
-static UINT8 *videobuf;
 
-static UINT8 lamp = 0;
-static UINT8 lamp_old = 0;
+class corona_state : public driver_device
+{
+public:
+	corona_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 m_blitter_x_reg;
+	UINT8 m_blitter_y_reg;
+	UINT8 m_blitter_aux_reg;
+	UINT8 m_blitter_unk_reg;
+	UINT8 *m_videobuf;
+	UINT8 m_lamp;
+	UINT8 m_lamp_old;
+	int m_input_selector;
+};
 
 
 /*********************************************
@@ -359,22 +367,26 @@ static PALETTE_INIT( winner )
 
 static WRITE8_HANDLER( blitter_y_w )
 {
-	blitter_y_reg = data;
+	corona_state *state = space->machine().driver_data<corona_state>();
+	state->m_blitter_y_reg = data;
 }
 
 static WRITE8_HANDLER( blitter_unk_w )
 {
-	blitter_unk_reg = data;
+	corona_state *state = space->machine().driver_data<corona_state>();
+	state->m_blitter_unk_reg = data;
 }
 
 static WRITE8_HANDLER( blitter_x_w )
 {
-	blitter_x_reg = data;
+	corona_state *state = space->machine().driver_data<corona_state>();
+	state->m_blitter_x_reg = data;
 }
 
 static WRITE8_HANDLER( blitter_aux_w )
 {
-	blitter_aux_reg = data;
+	corona_state *state = space->machine().driver_data<corona_state>();
+	state->m_blitter_aux_reg = data;
 }
 
 static READ8_HANDLER( blitter_status_r )
@@ -389,7 +401,7 @@ static READ8_HANDLER( blitter_status_r )
 	return 0x80 | ((space->machine().primary_screen->vblank() & 1) << 6);
 }
 
-static void blitter_execute(int x, int y, int color, int width, int flag)
+static void blitter_execute(corona_state *state, int x, int y, int color, int width, int flag)
 {
 	int i;
 	int xdir = (flag & 0x10)    ? -1 : 1;
@@ -407,7 +419,7 @@ static void blitter_execute(int x, int y, int color, int width, int flag)
 
 		for(yp = 0; yp < 0x100; yp++)
 			for(xp = 0; xp < 0x100; xp++)
-				videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
+				state->m_videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
 	}
 	else /* line shape */
 	{
@@ -415,7 +427,7 @@ static void blitter_execute(int x, int y, int color, int width, int flag)
 
 		for(i = 0; i < width; i++)
 		{
-			videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
+			state->m_videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
 
 			if(flag & 0x40) { x+=xdir; }
 			if(flag & 0x80) { y+=ydir; }
@@ -425,32 +437,36 @@ static void blitter_execute(int x, int y, int color, int width, int flag)
 
 static WRITE8_HANDLER( blitter_trig_wdht_w)
 {
-	blitter_execute(blitter_x_reg, 0x100 - blitter_y_reg, blitter_aux_reg & 0xf, data, blitter_aux_reg & 0xf0);
+	corona_state *state = space->machine().driver_data<corona_state>();
+	blitter_execute(state, state->m_blitter_x_reg, 0x100 - state->m_blitter_y_reg, state->m_blitter_aux_reg & 0xf, data, state->m_blitter_aux_reg & 0xf0);
 }
 
 static VIDEO_START(winner)
 {
-	videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
+	corona_state *state = machine.driver_data<corona_state>();
+	state->m_videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
 }
 
 static SCREEN_UPDATE(winner)
 {
+	corona_state *state = screen->machine().driver_data<corona_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			*BITMAP_ADDR16(bitmap, y, x) = videobuf[y * 512 + x];
+			*BITMAP_ADDR16(bitmap, y, x) = state->m_videobuf[y * 512 + x];
 
 	return 0;
 }
 
 static SCREEN_UPDATE(luckyrlt)
 {
+	corona_state *state = screen->machine().driver_data<corona_state>();
 	int x, y;
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			*BITMAP_ADDR16(bitmap, 255 - y, x) = videobuf[y * 512 + x];
+			*BITMAP_ADDR16(bitmap, 255 - y, x) = state->m_videobuf[y * 512 + x];
 
 	return 0;
 }
@@ -475,21 +491,22 @@ static READ8_HANDLER( sound_latch_r )
 
 static WRITE8_HANDLER( ball_w )
 {
-	lamp = data;
+	corona_state *state = space->machine().driver_data<corona_state>();
+	state->m_lamp = data;
 
 	output_set_lamp_value(data, 1);
-	output_set_lamp_value(lamp_old, 0);
-	lamp_old = lamp;
+	output_set_lamp_value(state->m_lamp_old, 0);
+	state->m_lamp_old = state->m_lamp;
 }
 
 
 /********  Multiplexed Inputs  ********/
 
-static int input_selector = 0;
 
 static READ8_HANDLER( mux_port_r )
 {
-	switch( input_selector )
+	corona_state *state = space->machine().driver_data<corona_state>();
+	switch( state->m_input_selector )
 	{
 		case 0x01: return input_port_read(space->machine(), "IN0-1");
 		case 0x02: return input_port_read(space->machine(), "IN0-2");
@@ -504,6 +521,7 @@ static READ8_HANDLER( mux_port_r )
 
 static WRITE8_HANDLER( mux_port_w )
 {
+	corona_state *state = space->machine().driver_data<corona_state>();
 /*  - bits -
     7654 3210
     --xx xxxx   Input selector.
@@ -513,12 +531,12 @@ static WRITE8_HANDLER( mux_port_w )
    Data is written inverted.
 
 */
-	input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
+	state->m_input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
 
 	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
 	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
 
-//  logerror("muxsel: %02x \n", input_selector);
+//  logerror("muxsel: %02x \n", state->m_input_selector);
 }
 
 static WRITE8_HANDLER( wc_meters_w )
@@ -1326,7 +1344,7 @@ static const ay8910_interface aysnd_config =
 *             Machine Drivers              *
 *******************************************/
 
-static MACHINE_CONFIG_START( winner81, driver_device )
+static MACHINE_CONFIG_START( winner81, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
@@ -1361,7 +1379,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winner82, driver_device )
+static MACHINE_CONFIG_START( winner82, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
@@ -1394,7 +1412,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( re800, driver_device )
+static MACHINE_CONFIG_START( re800, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1428,7 +1446,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rcirulet, driver_device )
+static MACHINE_CONFIG_START( rcirulet, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1461,7 +1479,7 @@ static MACHINE_CONFIG_START( rcirulet, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckyrlt, driver_device )
+static MACHINE_CONFIG_START( luckyrlt, corona_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)

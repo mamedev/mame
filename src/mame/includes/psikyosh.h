@@ -36,7 +36,7 @@ public:
 	bitmap_t       *m_z_bitmap;
 	bitmap_t       *m_bg_bitmap;
 	UINT16         *m_bg_zoom;
-//  UINT8          *m_alphatable;
+	UINT8          m_alphatable[256];
 
 	/* misc */
 	UINT32         m_sample_offs;	// only used if ROMTEST = 1
