@@ -1382,7 +1382,7 @@ static DRIVER_INIT( tacscan )
 	state->m_decrypt = segag80_security(76);
 
 	/* configure sound */
-	state->m_usb = machine.device("segausb");
+	state->m_usb = machine.device("usbsnd");
 	iospace->install_legacy_readwrite_handler(*state->m_usb, 0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
@@ -1402,7 +1402,7 @@ static DRIVER_INIT( startrek )
 	state->m_decrypt = segag80_security(64);
 
 	/* configure sound */
-	state->m_usb = machine.device("segausb");
+	state->m_usb = machine.device("usbsnd");
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 

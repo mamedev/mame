@@ -106,6 +106,7 @@ static TIMER_CALLBACK( kengo_scanline_interrupt );
 static MACHINE_START( m72 )
 {
 	m72_state *state = machine.driver_data<m72_state>();
+	state->m_audio = machine.device("m72");
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(m72_scanline_interrupt));
 
 	state->save_item(NAME(state->m_mcu_sample_addr));
@@ -456,7 +457,7 @@ static INTERRUPT_GEN(fake_nmi)
 	m72_state *state = device->machine().driver_data<m72_state>();
 	int sample = m72_sample_r(state->m_audio,0);
 	if (sample)
-		m72_sample_w(device->machine().device("dac"),0,sample);
+		m72_sample_w(state->m_audio,0,sample);
 }
 
 
@@ -1110,7 +1111,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", m72_sample_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_sample_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
 ADDRESS_MAP_END
 
@@ -1119,7 +1120,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", m72_sample_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */

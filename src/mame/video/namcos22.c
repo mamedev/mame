@@ -591,6 +591,7 @@ mydrawgfxzoom(
 		vert[3].p[1] = flipy ? 0 : fheight;
 
 		extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+		extra->machine = &gfx->machine();
 		extra->z = z;
 		extra->alpha = alpha;
 		extra->prioverchar = prioverchar;
