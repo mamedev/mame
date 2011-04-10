@@ -158,6 +158,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/at28c16.o		\
 	$(EMUMACHINE)/cdp1852.o		\
 	$(EMUMACHINE)/cdp1871.o		\
+	$(EMUMACHINE)/com8116.o		\
 	$(EMUMACHINE)/cr589.o		\
 	$(EMUMACHINE)/ds1302.o		\
 	$(EMUMACHINE)/ds2401.o		\
