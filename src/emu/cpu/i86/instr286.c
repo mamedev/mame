@@ -335,7 +335,7 @@ static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT
 			throw GENERAL_PROTECTION_FAULT;
 
 		/* Would we go past the segment boundary? */
-		if ( offset + size > cpustate->limit[check_seg] )
+		if ( (offset + (size-1)) > cpustate->limit[check_seg] )
 		{
 			throw GENERAL_PROTECTION_FAULT;
 		}
