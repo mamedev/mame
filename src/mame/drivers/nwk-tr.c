@@ -770,7 +770,7 @@ ROM_START(racingj)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(47e1628c) SHA1(7c42d06ae2f2cd24d083890f333552cbf4f1d3c9) )
 ROM_END
 
-ROM_START(racingj2)
+ROM_START(racingj2j)
 	ROM_REGION32_BE(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
 
@@ -792,6 +792,30 @@ ROM_START(racingj2)
 
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f691f5ab) SHA1(e81f652c5caa2caa8bd1c6d6db488d849bda058e) )
+ROM_END
+
+ROM_START(racingj2)
+	ROM_REGION32_BE(0x200000, "user1", 0)	/* PowerPC program roms */
+	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
+
+	ROM_REGION32_BE(0x800000, "user2", 0)		/* Data roms */
+	ROM_LOAD32_WORD_SWAP( "676a04.bin",	0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
+	ROM_LOAD32_WORD_SWAP( "676a05.bin",	0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
+	ROM_LOAD32_WORD_SWAP( "888a06.12t",	0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
+
+	ROM_REGION32_BE(0x800000, "user5", 0)	/* CG Board Texture roms */
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",    0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x",   0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program roms */
+	ROM_LOAD16_WORD_SWAP( "888a08.7s",    0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
+
+	ROM_REGION(0x1000000, "rfsnd", 0)		/* PCM sample roms */
+	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
+	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1.35d", 0x000000, 0x002000, CRC(1aa43a1f) SHA1(814b691b8a358bf1545a13d595d17070e612e9a4) ) 
 ROM_END
 
 ROM_START(thrilld)
@@ -840,9 +864,35 @@ ROM_START(thrilldb)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) )
 ROM_END
 
+ROM_START(thrilldae)
+	ROM_REGION32_BE(0x200000, "user1", 0)	/* PowerPC program roms */
+	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
+
+	ROM_REGION32_BE(0x800000, "user2", 0)		/* Data roms */
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
+
+	ROM_REGION32_BE(0x800000, "user5", 0)	/* CG Board Texture roms */
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program roms */
+	ROM_LOAD16_WORD_SWAP( "713a08.7s",    0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+
+	ROM_REGION(0x1000000, "rfsnd", 0)		/* PCM sample roms */
+	ROM_LOAD( "713a09.16p",   0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p",   0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
+ROM_END
+
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam (JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1999, racingj2,   racingj, nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1999, racingj2j,  racingj, nwktr,   nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr, ROT0, "Konami", "Thrill Drive (JAE)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr, ROT0, "Konami", "Thrill Drive (JAB)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr, ROT0, "Konami", "Thrill Drive (EAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
+
