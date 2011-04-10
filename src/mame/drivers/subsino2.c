@@ -14,6 +14,7 @@ in program space, the latter in I/O space.
 Year  Game            CPU         Sound            Custom                            Other
 -------------------------------------------------------------------------------------------------------------
 1996  Magic Train     HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
+1996  Water-Nymph     HD647180*   U6295            SS9601, SS9602                    HM86171 RAMDAC, Battery
 1998  Express Card    AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 1998  Ying Hua Lian   AM188-EM    M6295 + YM3812?  SS9601, SS9602                    HM86171 RAMDAC, Battery
 1999  Bishou Jan      H8/3044     SS9904?          SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
@@ -40,6 +41,7 @@ To do:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "machine/subsino.h"
 #include "machine/ticket.h"
 
 
@@ -312,8 +314,8 @@ saklove:
 
 More registers, at boot (never changed AFAICT):
 
-mtrain      saklove     xtrain,      expcard
-                        xplan
+mtrain,     saklove     xtrain,      expcard
+wtrnymph                xplan
 
                          C0 = 0A     C0 = 0A
                          E0 = 18     E0 = 18
@@ -328,7 +330,7 @@ mtrain      saklove     xtrain,      expcard
 9107 = 00   207 = 00    207 = 00    207 = 00
 9108 = 33   208 = 33    208 = 33    208 = 33
 9109 = 16   209 = 0E    209 = 0E    209 = 0E
-910A = F6   20A = FD    20A = FD    20A = FD
+910A = F6   20A = FD    20A = FD    20A = FD    *F5 in wtrnymph
 910B = 22   20B = 22    20B = 22    20B = 22
 910C = FE   20C = FE    20C = FE    20C = FE
 910D = FB   20D = FB    20D = FB    20D = FB
@@ -1999,6 +2001,153 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL       )										// serial in?
 INPUT_PORTS_END
 
+/***************************************************************************
+                               Water-Nymph
+***************************************************************************/
+
+static INPUT_PORTS_START( wtrnymph )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x00, "Key Coinage" )			PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x08, "1 Key / 1 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Key / 2 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Key / 5 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Key / 10 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Key / 20 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Key / 25 Credits" )
+	PORT_DIPSETTING(    0x30, "1 Key / 50 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Key / 100 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, "Pay Out" )				PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "Coin" )
+	PORT_DIPSETTING(    0x00, "Key" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, "Minimum Bet" )			PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x02, "16" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )				PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x0c, "60" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Game Limit" )			PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x20, "10k" )
+	PORT_DIPSETTING(    0x00, "20k" )
+	PORT_DIPSETTING(    0x40, "30k" )
+	PORT_DIPSETTING(    0x60, "40k" )
+	PORT_DIPNAME( 0x80, 0x80, "Double Up" )				PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "Win Rate" )		PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x07, "55%" )
+	PORT_DIPSETTING(    0x06, "60%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "70%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x02, "85%" )
+	PORT_DIPSETTING(    0x01, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x07, 0x07, "Double-Up Rate" )		PORT_DIPLOCATION("SW4:1,2,3")
+	PORT_DIPSETTING(    0x00, "82%" )
+	PORT_DIPSETTING(    0x01, "84%" )
+	PORT_DIPSETTING(    0x02, "88%" )
+	PORT_DIPSETTING(    0x03, "90%" )
+	PORT_DIPSETTING(    0x04, "92%" )
+	PORT_DIPSETTING(    0x05, "94%" )
+	PORT_DIPSETTING(    0x06, "96%" )
+	PORT_DIPSETTING(    0x07, "98%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x00, "5k" )
+	PORT_DIPSETTING(    0x08, "10k" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START      )	PORT_CODE(KEYCODE_N)	PORT_NAME("Start All")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_CODE(KEYCODE_Z)	PORT_NAME("Info / Double?")	// down
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+
+	PORT_START("IN B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) PORT_IMPULSE(5)			// key in
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1         )							// coin in
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   )	// stats
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE       )	// service mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )	// payout (hopper error)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )	// key out
+
+	PORT_START("IN C")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )	PORT_NAME("Stop 3 / Right")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )	PORT_NAME("Stop 2 / Left / Play Gambling 1")		// C \__ play gambling game
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER      )	PORT_NAME("Play Gambling 2") PORT_CODE(KEYCODE_D)	// D /
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )	PORT_NAME("Stop 1 / Take / Rotate")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER      ) PORT_NAME("Play Tetris")     PORT_CODE(KEYCODE_T)	// T |__ play Tetris game
+
+	PORT_START("IN D")	// not shown in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL  )	// serial in?
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Machine Drivers
@@ -2348,11 +2497,18 @@ ROM_START( mtrain )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "rom_5.u27", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
 	ROM_RELOAD(            0x40000, 0x40000 )
+
+    ROM_REGION( 0x117, "plds", 0 )
+    ROM_LOAD( "gal16v8d.u6",  0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u18", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 ROM_END
 
 /***************************************************************************
 
-  Decryption of mtrain (lifted from subsino.c)
+  Decryption of mtrain (same as crsbingo)
 
   Notes:
 
@@ -2366,42 +2522,6 @@ ROM_END
   ec40 -> 6b40  ; after decryption
 
 ***************************************************************************/
-
-static void crsbingo_bitswaps(UINT8* decrypt, int i)
-{
-	if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-	if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-	if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,0,7,6,1,4);
-	if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
-	if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
-	if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
-	if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
-	if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
-}
-
-static const unsigned char crsbingo_xors[8] = { 0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee };
-
-static void subsino_decrypt(running_machine& machine, void (*bitswaps)(UINT8* decrypt, int i), const UINT8* xors, int size)
-{
-	int i;
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8* region = machine.region("maincpu")->base();
-
-	for (i=0;i<0x10000;i++)
-	{
-		if (i<size)
-		{
-			decrypt[i] = region[i]^xors[i&7];
-			bitswaps(decrypt, i);
-		}
-		else
-		{
-			decrypt[i] = region[i];
-		}
-	}
-//  dump_decrypted(machine, decrypt);
-	memcpy(region, decrypt, 0x10000);
-}
 
 DRIVER_INIT( mtrain )
 {
@@ -2588,9 +2708,56 @@ static DRIVER_INIT( xtrain )
 	rom[0xe190f-0xc0000] = 0xeb;
 }
 
-GAME( 1996, mtrain,  0, mtrain,  mtrain,  mtrain,  ROT0, "Subsino",        "Magic Train (Ver. 1.31)",               0 )
-GAME( 1998, expcard, 0, expcard, expcard, expcard, ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",    0 )
-GAME( 1998, saklove, 0, saklove, saklove, saklove, ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)",  0 )
-GAME( 1999, xtrain,  0, xtrain,  xtrain,  xtrain,  ROT0, "Subsino",        "X-Train (Ver. 1.3)",                    0 )
-GAME( 1999, bishjan, 0, bishjan, bishjan, bishjan, ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",         GAME_NO_SOUND )
-GAME( 2006, xplan,   0, xplan,   xplan,   xplan,   ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                    0 )
+/***************************************************************************
+
+Water-Nymph (Ver. 1.4)
+(c) 1996 Subsino
+
+Same PCB as Magic Train
+
+***************************************************************************/
+
+ROM_START( wtrnymph )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// code starts at 0x8100!
+	ROM_LOAD( "ocean-n tetris_1 v1.4.u17", 0x0000, 0x8100, CRC(c7499123) SHA1(39a9ea6d927ee839cfb127747e5e3df3535af098) )
+	ROM_CONTINUE(                          0x0000, 0x7f00 )
+	ROM_RELOAD(                            0xa000, 0x6000 )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "ocean-n tetris_2 v1.21.u2", 0x00000, 0x40000, CRC(813aac90) SHA1(4555adf8dc363359b10f1d5cfae2dcebed411679) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_3 v1.21.u3", 0x00001, 0x40000, CRC(83c39379) SHA1(e7f9315d19370c18b664b759e433052a88f8c146) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_4 v1.21.u4", 0x00002, 0x40000, CRC(6fc64b42) SHA1(80110d7dae28cca5e39c8a7c2ceebf589116ae23) )
+	ROM_LOAD32_BYTE( "ocean-n tetris_5 v1.21.u5", 0x00003, 0x40000, CRC(8c7515ee) SHA1(a67b21c1e8ca8a098fe558c73561bca13962893e) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "ocean-n tetris_6 v1.21.u27", 0x00000, 0x40000, CRC(1c8a886d) SHA1(faa983801b368a6d04ef80e359c6fb67b240c60d) )
+	ROM_RELOAD(                             0x40000, 0x40000 )
+
+    ROM_REGION( 0x117, "plds", 0 )
+    ROM_LOAD( "gal16v8d.u6",  0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u18", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
+    ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+DRIVER_INIT( wtrnymph )
+{
+	subsino_decrypt(machine, victor5_bitswaps, victor5_xors, 0x8000);
+
+	// patch serial protection test (it always enters test mode on boot otherwise)
+	UINT8 *rom = machine.region("maincpu")->base();
+	rom[0x0d79] = 0x18;
+	rom[0xc1cf] = 0x18;
+	rom[0xc2a9] = 0x18;
+	rom[0xc2d7] = 0x18;
+}
+
+GAME( 1996, mtrain,   0,        mtrain,   mtrain,   mtrain,   ROT0, "Subsino",        "Magic Train (Ver. 1.31)",              0 )
+GAME( 1996, wtrnymph, 0,        mtrain,   wtrnymph, wtrnymph, ROT0, "Subsino",        "Water-Nymph (Ver. 1.4)",               0 )
+GAME( 1998, expcard,  0,        expcard,  expcard,  expcard,  ROT0, "American Alpha", "Express Card / Top Card (Ver. 1.5)",   0 )
+GAME( 1998, saklove,  0,        saklove,  saklove,  saklove,  ROT0, "Subsino",        "Ying Hua Lian 2.0 (China, Ver. 1.02)", 0 )
+GAME( 1999, xtrain,   0,        xtrain,   xtrain,   xtrain,   ROT0, "Subsino",        "X-Train (Ver. 1.3)",                   0 )
+GAME( 1999, bishjan,  0,        bishjan,  bishjan,  bishjan,  ROT0, "Subsino",        "Bishou Jan (Japan, Ver. 2.03)",        GAME_NO_SOUND )
+GAME( 2006, xplan,    0,        xplan,    xplan,    xplan,    ROT0, "Subsino",        "X-Plan (Ver. 1.01)",                   0 )

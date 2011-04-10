@@ -9629,13 +9629,14 @@ Other Sun games
 	DRIVER( victor6 )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6a )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( victor6b )	/* (c) 1995 Subsino (Alpha license) */
+	DRIVER( mtrain )	/* (c) 1996 Subsino */
+	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
 	DRIVER( sharkpy )	/* (c) 1996 Subsino */
 	DRIVER( sharkpya )	/* (c) 1996 Subsino */
 	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
-	DRIVER( mtrain )	/* (c) 1996 Subsino */
-	DRIVER( mtrainnv )	/* (c) 1996 Subsino */
+	DRIVER( wtrnymph )	/* (c) 1996 Subsino */
 	DRIVER( expcard )	/* (c) 1998 American Alpha */
 	DRIVER( saklove )	/* (c) 1998 Subsino */
 	DRIVER( bishjan )	/* (c) 1999 Subsino */

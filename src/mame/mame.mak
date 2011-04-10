@@ -1270,6 +1270,7 @@ $(MAMEOBJ)/subsino.a: \
 	$(DRIVERS)/lastfght.o \
 	$(DRIVERS)/subsino.o \
 	$(DRIVERS)/subsino2.o \
+	$(MACHINE)/subsino.o \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
