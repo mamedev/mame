@@ -4259,12 +4259,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pururun, metro_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)		/* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
-	//MCFG_CPU_VBLANK_INT_HACK(msgogo_interrupt,262)    /* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
-	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)    /* ? */
+	//MCFG_CPU_VBLANK_INT_HACK(msgogo_interrupt,262) 	/* fixes the title screen scroll in GunMaster, but makes the game painfully slow */
+	MCFG_CPU_VBLANK_INT_HACK(metro_interrupt,10)		/* ? */
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)		/* Not confiremd */
 	MCFG_CPU_CONFIG(metro_cpu_config)
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
@@ -4289,12 +4289,12 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* Confirmed match to reference video */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, OKIM6295_PIN7_HIGH)// was /128.. so pin 7 not verified - not confirmed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
