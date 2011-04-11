@@ -143,6 +143,7 @@ private:
 		DMA8237_SI,			/* Idle state */
 		DMA8237_S0,			/* HRQ has been triggered, waiting to receive HLDA */
 	//  DMA8237_SW,         /* Wait state */
+		DMA8237_SC,			/* Cascade mode, waiting for peripheral */
 
 		/* Normal transfer states */
 		DMA8237_S1,			/* Output A8-A15; only used when A8-A15 really needs to be output */

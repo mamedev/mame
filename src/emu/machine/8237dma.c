@@ -306,6 +306,7 @@ void i8237_device::i8237_timerproc()
 			/* Store the channel we will be servicing and go to the next state */
 			m_service_channel = prio_channel;
 			m_last_service_channel = prio_channel;
+
 			m_hrq = 1;
 			devcb_call_write_line(&m_out_hrq_func, m_hrq);
 			m_state = DMA8237_S0;
@@ -330,16 +331,48 @@ void i8237_device::i8237_timerproc()
           for confirmation. */
 		if ( m_hlda )
 		{
-			if ( m_command & 0x01 )
+			if ( DMA_MODE_TRANSFERMODE( m_chan[m_service_channel].m_mode ) == DMA8237_CASCADE_MODE )
 			{
-				/* Memory-to-memory transfers */
-				m_state = DMA8237_S11;
+				/* Cascade Mode, set DACK */
+				i8327_set_dack(m_service_channel);
+
+				/* Wait until peripheral is done */
+				m_state = DMA8237_SC;
 			}
 			else
 			{
-				/* Regular transfers */
-				m_state = DMA8237_S1;
+				if ( m_command & 0x01 )
+				{
+					/* Memory-to-memory transfers */
+					m_state = DMA8237_S11;
+				}
+				else
+				{
+					/* Regular transfers */
+					m_state = DMA8237_S1;
+				}
 			}
+		}
+		break;
+
+	case DMA8237_SC:	/* Cascade mode, waiting until peripheral is done */
+		if ( ! ( m_drq & ( 0x01 << m_service_channel ) ) )
+		{
+			m_hrq = 0;
+			m_hlda = 0;
+			devcb_call_write_line(&m_out_hrq_func, m_hrq);
+			m_state = DMA8237_SI;
+
+			/* Clear DACK */
+			i8327_set_dack(-1);
+		}
+
+		/* Not sure if this is correct, documentation is not clear */
+		/* Check if EOP output needs to be asserted  */
+		if ( m_status & ( 0x01 << m_service_channel ) )
+		{
+			m_eop = 0;
+			devcb_call_write_line(&m_out_eop_func, m_eop ? ASSERT_LINE : CLEAR_LINE);
 		}
 		break;
 
@@ -422,16 +455,6 @@ void i8237_device::i8237_timerproc()
 					m_state = m_chan[channel].m_high_address_changed ? DMA8237_S1 : DMA8237_S2;
 				}
 				break;
-
-			case DMA8237_CASCADE_MODE:
-				if ( ! ( m_drq & ( 0x01 << channel ) ) )
-				{
-					m_hrq = 0;
-					m_hlda = 0;
-					devcb_call_write_line(&m_out_hrq_func, m_hrq);
-					m_state = DMA8237_SI;
-				}
-				break;
 			}
 
 			/* Check if EOP output needs to be asserted */
@@ -443,7 +466,10 @@ void i8237_device::i8237_timerproc()
 		}
 
 		/* clear DACK */
-		i8327_set_dack(-1);
+		if ( m_state == DMA8237_SI )
+		{
+			i8327_set_dack(-1);
+		}
 		break;
 
 	case DMA8237_S11: /* Output A8-A15 */
