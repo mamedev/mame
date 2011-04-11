@@ -11,8 +11,8 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	size_t     m_videoram_size;
+	UINT8 	   m_videoram[0x1000];
+	UINT8      m_workram[0x1000];
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;

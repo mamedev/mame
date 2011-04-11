@@ -2,6 +2,10 @@
 
 Driver by Tomasz Slanina  dox@space.pl
 
+TODO:
+- video and irq timings;
+- there's a waitstate penalty on the VRAM apparently?
+
 ***************************************************************************
 
 RAM :
@@ -53,6 +57,8 @@ Sound :
 #include "sound/ay8910.h"
 #include "includes/4enraya.h"
 
+#define MAIN_CLOCK XTAL_8MHz
+
 static WRITE8_HANDLER( sound_data_w )
 {
 	_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
@@ -69,12 +75,77 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 	state->m_last_snd_ctrl = data;
 }
 
+static READ8_HANDLER( fenraya_custom_map_r )
+{
+	UINT8 *prom = space->machine().region("pal_prom")->base();
+	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
+	UINT8 res;
+
+	res = 0;
+
+	if(prom_routing & 1) //ROM5
+	{
+		UINT8 *rom = space->machine().region("maincpu")->base();
+		res |= rom[offset & 0x7fff];
+	}
+
+	if(prom_routing & 2) //ROM4
+	{
+		UINT8 *rom = space->machine().region("maincpu")->base();
+		res |= rom[(offset & 0x7fff) | 0x8000];
+	}
+
+	if(prom_routing & 4) //RAM
+	{
+		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
+		res |= state->m_workram[offset & 0xfff];
+	}
+
+	if(prom_routing & 8) //gfx control / RAM wait
+	{
+		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
+		res |= state->m_videoram[offset & 0xfff];
+	}
+
+	return res;
+}
+
+static WRITE8_HANDLER( fenraya_custom_map_w )
+{
+	UINT8 *prom = space->machine().region("pal_prom")->base();
+	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
+
+	if(prom_routing & 1) //ROM5
+	{
+		// ...
+	}
+
+	if(prom_routing & 2) //ROM4
+	{
+		// ...
+	}
+
+	if(prom_routing & 4) //RAM
+	{
+		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
+		state->m_workram[offset & 0xfff] = data;
+	}
+
+	if(prom_routing & 8) //gfx control / RAM wait
+	{
+		fenraya_videoram_w(space,offset & 0xfff,data);
+	}
+}
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r,fenraya_custom_map_w)
+	#if 0
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_NOP
+	#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
@@ -135,13 +206,13 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	RGN_FRAC(1,3),	/* 1024 characters */
-	3,	/* 3 bits per pixel */
-	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },	/* the bitplanes are separated */
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8*8
 };
 
 static GFXDECODE_START( 4enraya )
@@ -176,7 +247,7 @@ static PALETTE_INIT( 4enraya )
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000/2)
+	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
@@ -202,7 +273,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4) /* guess */
+	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -222,8 +293,8 @@ ROM_START( 4enraya )
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(2b0a3793) SHA1(2c3d224251557824bb9641dc2f98a000ab72c4a2) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
-	ROM_REGION( 0x0020,  "proms", 0 )
-	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* system control - not used */
+	ROM_REGION( 0x0020,  "pal_prom", 0 )
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* system control: used for memory mapping */
 ROM_END
 
 GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
