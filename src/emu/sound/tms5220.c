@@ -59,7 +59,6 @@ TODO:
     * If a command is still executing, /READY will be kept high until the command has
       finished if the next command is written.
     * tomcat has a 5220 which is not hooked up at all
-    * documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The patent text and images imply 0x00, but I'm (LN) not completely convinced yet.
     * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct? I'm (LN) guessing no. The patent schematics state that TS=0 shuts off the output dac completely, though doesn't affect the I/O pin.
 
 Pedantic detail from observation of real chip:
@@ -103,7 +102,7 @@ Patent notes (important timing info for interpolation):
   3 = >>3 (/8)
   4 = >>2 (/4)
   5 = >>2 (/4)
-  6 = >>1 (/2) (NOTE: this value may actually be >>2 (/4), the patent has an error on it and is unclear)
+  6 = >>1 (/2) (NOTE: the patent has an error regarding this value on one table implying it should be /4, but circuit simulation of parts of the patent shows that the /2 value is correct.)
   7 = >>1 (/2)
   0 = >>0 (/1, forcing current values to equal target values)
     Every IP full count, a new frame is parsed, but ONLY on the 0->*
@@ -251,24 +250,55 @@ device), PES Speech adapter (serial port connection)
 
 /* *****optional defines***** */
 
-/* this define controls the interpolation shift logic. one of the following two lines should be used, and the other commented; the second line is more accurate mathematically but less accurate to hardware (Unless I (LN) misunderstand the way the shifter works, which is quite likely) */
+/* Hacky improvements which don't match patent: */
+/* Interpolation shift logic:
+ * One of the following two lines should be used, and the other commented
+ * The second line is more accurate mathematically but not accurate to the patent
+ */
 #define INTERP_SHIFT >> tms->coeff->interp_coeff[tms->interp_period]
 //#define INTERP_SHIFT / (1<<tms->coeff->interp_coeff[tms->interp_period])
 
-/* if undefined, various hacky improvements are used, such as inverting excitation waveform, and increasing the magnitude of unvoiced speech excitation */
-#define NORMALMODE 1
+/* Excitation hacks */
+/* The real chip uses an 8-bit excitation (shifted up to the top 8 bits) for
+   both voiced and unvoiced speech.
+   According to the patent, the voiced speech comes from a 51 entry rom
+   And the unvoiced speech is ~0x3F(i.e. 0xC0) or 0x40 depending on an LFSR */
+/* HACK: if defined, change the unvoiced excitation to use ~0x7F and 0x80
+ * if not defined, acts as shown in patent */
+#undef UNVOICED_HACK
 
+/* HACKS: VOICED waveform hacks;
+ * if none defined, acts as shown in patent
+ * if VOICED_INV_HACK defined, acts as shown in patent but the output is inverted
+ * if VOICED_ZERO_HACK defined, acts as shown in patent, but the first and >=51 samples are 0x80 (-128)
+ * if VOICED_PULSE_HACK defined, acts as a pulse waveform with a period of PWIDTH samples at PAMP, PWIDTH samples at ~PAMP, and the rest at 0
+ * if VOICED_PULSE_MONOPOLAR_HACK defined, acts as a pulse waveform with a period of PWIDTH samples at PAMP, and the rest at 0
+ * If you want this to sound like MGE, set VOICED_PULSE_MONOPOLAR_HACK to 1, PAMP to 0x3F and PWIDTH to 1
+ */
+#undef VOICED_INV_HACK
+#undef VOICED_ZERO_HACK
+#undef VOICED_PULSE_HACK
+#undef VOICED_PULSE_MONOPOLAR_HACK
+#undef PAMP
+#undef PWIDTH
+
+/* Other hacks */
+/* HACK: if defined, outputs the low 4 bits of the lattice filter to the i/o
+ * or clip logic, even though the real hardware doesn't do this */
+#undef ALLOW_4_LSB
+
+/* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
+// TODO: as of around mame 0.141 this doesn't work right. please fix! - LN, to LN
+#undef PERFECT_INTERPOLATION_HACK
+
+
+/* *****configuration of chip connection stuff***** */
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
 #define FORCE_DIGITAL 0
 
 /* must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
 #define FORCE_SUBC_RELOAD 1
 
-/* if defined, outputs the low 4 bits of the lattice filter to the i/o or clip logic, even though the real hardware doesn't do this */
-#undef ALLOW_4_LSB
-
-/* if defined, uses impossibly perfect 'straight line' interpolation */
-#undef PERFECT_INTERPOLATION_HACK
 
 /* *****debugging defines***** */
 #undef VERBOSE
@@ -857,28 +887,31 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
     int i, bitout, zpar;
     INT32 this_sample;
 
+    /* the following gotos are probably safe to remove */
     /* if we're empty and still not speaking, fill with nothingness */
-	if (!tms->speaking_now)
-        goto empty;
+    if (!tms->speaking_now)
+           goto empty;
 
     /* if speak external is set, but talk status is not (yet) set,
     wait for buffer low to clear */
-	if (!tms->talk_status && tms->speak_external && tms->buffer_low)
+    if (!tms->talk_status && tms->speak_external && tms->buffer_low)
            goto empty;
 
     /* loop until the buffer is full or we've stopped speaking */
 	while ((size > 0) && tms->speaking_now)
     {
         /* if it is the appropriate time to update the old energy/pitch idxes,
-         * i.e. when IP=7, PC=12, do so. */
-        if ((tms->interp_period == 7) && (tms->PC == 12))
+         * i.e. when IP=7, PC=12, T=17, do so. Since IP=7 PC=12 T=17 is JUST
+         * BEFORE the transition to IP=0 PC=0 T=0 (4 T-cycles later), we change
+         * on the latter.*/
+        if ((tms->interp_period == 0) && (tms->PC == 0))
 		{
 			tms->OLDE = (tms->new_frame_energy_idx == 0);
 			tms->OLDP = (tms->new_frame_pitch_idx == 0);
 		}
 
         /* if we're ready for a new frame to be applied, i.e. when IP=0, PC=12, Sub=1 */
-		/* (In reality, the frame was really loaded incrementally during the entire IP=0 PC=x time period, but it doesn't affect anything until IP=0 PC=12 happens) */
+        /* (In reality, the frame was really loaded incrementally during the entire IP=0 PC=x time period, but it doesn't affect anything until IP=0 PC=12 happens) */
         if ((tms->interp_period == 0) && (tms->PC == 12) && (tms->subcycle == 1))
         {
 			// HACK for regression testing, be sure to comment out before release!
@@ -1010,7 +1043,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		if (OLD_FRAME_UNVOICED_FLAG == 1)
 		{
 			/* generate unvoiced samples here */
-#ifdef NORMALMODE
+#ifndef UNVOICED_HACK
 			if (tms->RNG & 1)
 				tms->excitation_data = ~0x3F; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)*/
 			else
@@ -1022,7 +1055,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				tms->excitation_data = 0x80;
 #endif
         }
-        else
+        else /* (OLD_FRAME_UNVOICED_FLAG == 0) */
         {
             /* generate voiced samples here */
             /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
@@ -1032,16 +1065,39 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
              * disabled, forcing all samples beyond 51d to be == 51d
              * (address 51d holds zeroes, which may or may not be inverted to -1)
              */
-#ifdef NORMALMODE
           if (tms->pitch_count >= 51)
               tms->excitation_data = tms->coeff->chirptable[51];
           else /*tms->pitch_count < 51*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
-#else // hack based sort of on the D68_10.ASM file from qboxpro, which has  0x580 and 0x3A80 at the end of its chirp table
-          if ((tms->pitch_count >= 45) || tms->pitch_count == 0)
+#ifdef VOICED_INV_HACK
+          // invert waveform
+          if (tms->pitch_count >= 51)
+              tms->excitation_data = ~tms->coeff->chirptable[51];
+          else /*tms->pitch_count < 51*/
+              tms->excitation_data = ~tms->coeff->chirptable[tms->pitch_count];
+#endif
+#ifdef VOICED_ZERO_HACK
+          // 0 and >=51 are -128, as implied by qboxpro tables
+          if ((tms->pitch_count == 0) | (tms->pitch_count >= 51))
               tms->excitation_data = -128;
-          else /*tms->pitch_count < 45*/
+          else /*tms->pitch_count < 51 && > 0*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
+#endif
+#ifdef VOICED_PULSE_HACK
+          // if pitch is between 0 and PWIDTH, out = PAMP, if between PWIDTH and 2*PWIDTH, out ~PAMP, else out = 0
+          if (tms->pitch_count < PWIDTH)
+              tms->excitation_data = PAMP;
+          else if (tms->pitch_count < PWIDTH*2)
+              tms->excitation_data = ~PAMP;
+          else
+              tms->excitation_data = 0;
+#endif
+#ifdef VOICED_PULSE_MONOPOLAR_HACK
+          // if pitch is between 0 and PWIDTH, out = PAMP, else out = 0
+          if (tms->pitch_count < PWIDTH)
+              tms->excitation_data = PAMP;
+          else
+              tms->excitation_data = 0;
 #endif
         }
 
@@ -1207,7 +1263,7 @@ static INT32 lattice_filter(tms5220_state *tms)
       Kn = tms->current_k[n-1]
       bn = tms->x[n-1]
     */
-        tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
+        tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data<<6));  //Y(11)
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
         tms->u[7] = tms->u[8] - matrix_multiply(tms->current_k[7], tms->x[7]);
