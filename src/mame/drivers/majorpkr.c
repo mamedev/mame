@@ -578,10 +578,10 @@ static WRITE8_HANDLER(paletteram_w)
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 	state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset] = data;
-	
+
 	offset >>= 1;
-	int color=state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2] + state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	palette_set_color(space->machine(), offset +state->m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
+	int color = state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2] + state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2 + 1] * 256;
+	palette_set_color(space->machine(), offset + state->m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 
 
@@ -601,6 +601,7 @@ static WRITE8_HANDLER(vram_w)
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 	state->m_videoram[state->m_vram_bank * 0x800 + offset] = data;
+
 	if (state->m_vram_bank == 0)
 	{
 		tilemap_mark_tile_dirty(state->m_fg_tilemap, offset >> 1);
@@ -812,8 +813,8 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
 	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
 
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+//	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_address_w)
+//	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
@@ -978,12 +979,12 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	16, 8,
-	RGN_FRAC(1, 2),
+	RGN_FRAC(1,2),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 
-		0*8, 0*8+RGN_FRAC(1, 2), 1*8, 1*8+RGN_FRAC(1, 2), 2*8, 2*8+RGN_FRAC(1, 2), 3*8, 3*8+RGN_FRAC(1, 2), 
-		4*8, 4*8+RGN_FRAC(1, 2), 5*8, 5*8+RGN_FRAC(1, 2), 6*8, 6*8+RGN_FRAC(1, 2), 7*8, 7*8+RGN_FRAC(1, 2) 
+		0*8, 0*8+RGN_FRAC(1,2), 1*8, 1*8+RGN_FRAC(1,2), 2*8, 2*8+RGN_FRAC(1,2), 3*8, 3*8+RGN_FRAC(1,2), 
+		4*8, 4*8+RGN_FRAC(1,2), 5*8, 5*8+RGN_FRAC(1,2), 6*8, 6*8+RGN_FRAC(1,2), 7*8, 7*8+RGN_FRAC(1,2) 
 	},
 	{ 0*8*8, 1*8*8, 2*8*8, 3*8*8, 4*8*8, 5*8*8, 6*8*8, 7*8*8 },
 	8*8*8
@@ -1034,11 +1035,12 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(52.786)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)				/* through CRTC registers: 768 x 296 */
-	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1)	/* through CRTC registers: 560(+16) x 224 */
+//	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1)	/* through CRTC registers: 560(+16) x 224 */
+	MCFG_SCREEN_VISIBLE_AREA(0, (35*16)-1, 0, (28*8)-1)
 
 	MCFG_GFXDECODE(majorpkr)
 	MCFG_PALETTE_LENGTH(0x100 * 16)
@@ -1085,9 +1087,6 @@ static DRIVER_INIT( majorpkr )
 {
 	UINT8 * ROM = (UINT8 *)machine.region("maincpu")->base();
 	memory_configure_bank(machine, "rom_bank", 0, 4, &ROM[0x10000], 0x800);
-
-	/* hidding the last unused column. masking the CRTC register */
-	ROM[0x30ca] = 0x23;
 }
 
 
@@ -1095,5 +1094,5 @@ static DRIVER_INIT( majorpkr )
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT      INIT      ROT    COMPANY       FULLNAME             FLAGS  LAYOUT */
-GAMEL( 1994, majorpkr, 0,      majorpkr, majorpkr,  majorpkr, ROT0, "PAL System", "Major Poker (v2.0)", 0,     layout_majorpkr )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME             FLAGS  LAYOUT */
+GAMEL( 1994, majorpkr, 0,      majorpkr, majorpkr, majorpkr, ROT0, "PAL System", "Major Poker (v2.0)", 0,     layout_majorpkr )
