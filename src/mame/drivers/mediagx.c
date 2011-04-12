@@ -1007,14 +1007,7 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	mediagx_state *state = device->machine().driver_data<mediagx_state>();
-	int r;
-
-	r = pic8259_acknowledge( state->m_pic8259_2);
-	if (r==0)
-	{
-		r = pic8259_acknowledge( state->m_pic8259_1);
-	}
-	return r;
+	return pic8259_acknowledge( state->m_pic8259_1);
 }
 
 static MACHINE_START(mediagx)
@@ -1061,14 +1054,27 @@ static WRITE_LINE_DEVICE_HANDLER( mediagx_pic8259_1_set_int_line )
 	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	mediagx_state *state = device->machine().driver_data<mediagx_state>();
+	if (offset==2) { // IRQ = 2
+		return pic8259_acknowledge(state->m_pic8259_2);
+	}
+	return 0x00;
+}
+
 static const struct pic8259_interface mediagx_pic8259_1_config =
 {
-	DEVCB_LINE(mediagx_pic8259_1_set_int_line)
+	DEVCB_LINE(mediagx_pic8259_1_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 static const struct pic8259_interface mediagx_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 

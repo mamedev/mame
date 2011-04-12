@@ -38,6 +38,10 @@ struct pic8259_interface
 {
 	/* Called when int line changes */
 	devcb_write_line out_int_func;
+	/* 1 - when master, 0 - when slave */
+	devcb_read_line sp_en_func;
+	/* Called when on master slave irq is trigered*/
+	devcb_read8 read_slave_ack_func;	
 };
 
 

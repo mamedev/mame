@@ -67,6 +67,7 @@
 #define IDE_COMMAND_READ_MULTIPLE		0x20
 #define IDE_COMMAND_READ_MULTIPLE_ONCE	0x21
 #define IDE_COMMAND_WRITE_MULTIPLE		0x30
+#define IDE_COMMAND_DIAGNOSTIC			0x90
 #define IDE_COMMAND_SET_CONFIG			0x91
 #define IDE_COMMAND_READ_MULTIPLE_BLOCK	0xc4
 #define IDE_COMMAND_WRITE_MULTIPLE_BLOCK 0xc5
@@ -1148,6 +1149,21 @@ static void handle_command(ide_state *ide, UINT8 command)
 			signal_delayed_interrupt(ide, MINIMUM_COMMAND_TIME, 1);
 			break;
 
+		case IDE_COMMAND_DIAGNOSTIC:
+			ide->error = IDE_ERROR_DEFAULT;
+
+			/* signal an interrupt */
+			signal_interrupt(ide);
+			break;
+
+		case IDE_COMMAND_RECALIBRATE:
+			/* clear the error too */
+			ide->error = IDE_ERROR_NONE;
+
+			/* signal an interrupt */
+			signal_interrupt(ide);
+			break;
+
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", ide->cur_head + 1, ide->sector_count));
 
@@ -1225,6 +1241,9 @@ static void handle_command(ide_state *ide, UINT8 command)
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			debugger_break(ide->device->machine());
+		
+			/* signal an interrupt */
+			signal_interrupt(ide);
 			break;
 	}
 }
@@ -1281,6 +1300,7 @@ static UINT32 ide_controller_read(device_t *device, int bank, offs_t offset, int
 				{
 					LOG(("%s:IDE completed PIO read\n", device->machine().describe_context()));
 					continue_read(ide);
+					ide->error = IDE_ERROR_DEFAULT;
 				}
 			}
 			break;

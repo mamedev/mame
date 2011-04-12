@@ -264,25 +264,31 @@ static WRITE_LINE_DEVICE_HANDLER( pic8259_1_set_int_line )
 	cputag_set_input_line(device->machine(), "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
+static READ8_DEVICE_HANDLER( get_slave_ack )
+{
+	if (offset==2) { // IRQ = 2
+		return pic8259_acknowledge(device->machine().device("pic8259_2"));
+	}
+	return 0x00;
+}
+
 static const struct pic8259_interface pic8259_1_config =
 {
-	DEVCB_LINE(pic8259_1_set_int_line)
+	DEVCB_LINE(pic8259_1_set_int_line),
+	DEVCB_LINE_VCC,
+	DEVCB_HANDLER(get_slave_ack)
 };
 
 static const struct pic8259_interface pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w)
+	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_LINE_GND,
+	DEVCB_NULL
 };
 
 IRQ_CALLBACK(pcat_irq_callback)
 {
-	int r = 0;
-	r = pic8259_acknowledge(device->machine().device("pic8259_2"));
-	if (r==0)
-	{
-		r = pic8259_acknowledge(device->machine().device("pic8259_1"));
-	}
-	return r;
+	return pic8259_acknowledge(device->machine().device("pic8259_1"));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
