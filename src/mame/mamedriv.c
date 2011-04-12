@@ -3212,6 +3212,9 @@ V-V                           TP-027
 	DRIVER( strider2a )	/* Strider 2 (ASIA 991213) */
 	DRIVER( shiryu2 )	/* Strider Hiryu 2 (JAPAN 991213) */
 
+	DRIVER( alien )		/* (c) 2005 */
+	/* Alien Danger */
+
 	/* Tecmo ZN1 */
 	DRIVER( tps )
 	DRIVER( glpracr2 )	/* Gallop Racer 2 (USA) */

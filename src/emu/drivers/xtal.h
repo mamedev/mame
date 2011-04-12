@@ -188,6 +188,7 @@ enum
 	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
 	XTAL_100MHz 		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	XTAL_101_4912MHz	= 101491200,	/* PSX-based Namco System 10 */
+	XTAL_200MHz			= 200000000,	/* Base SH4 CPU (Naomi, Hikaru etc.) */
 
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 

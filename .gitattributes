@@ -1543,6 +1543,7 @@ src/mame/drivers/albazc.c svneol=native#text/plain
 src/mame/drivers/albazg.c svneol=native#text/plain
 src/mame/drivers/aleck64.c svneol=native#text/plain
 src/mame/drivers/alg.c svneol=native#text/plain
+src/mame/drivers/alien.c svneol=native#text/plain
 src/mame/drivers/aliens.c svneol=native#text/plain
 src/mame/drivers/allied.c svneol=native#text/plain
 src/mame/drivers/alpha68k.c svneol=native#text/plain

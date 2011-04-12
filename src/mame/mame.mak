@@ -506,6 +506,7 @@ $(MAMEOBJ)/bmc.a: \
 $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1942.o $(VIDEO)/1942.o \
 	$(DRIVERS)/1943.o $(VIDEO)/1943.o \
+	$(DRIVERS)/alien.o \
 	$(DRIVERS)/bionicc.o $(VIDEO)/bionicc.o \
 	$(DRIVERS)/blktiger.o $(VIDEO)/blktiger.o \
 	$(DRIVERS)/cbasebal.o $(VIDEO)/cbasebal.o \
