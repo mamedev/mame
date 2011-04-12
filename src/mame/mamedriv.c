@@ -7335,6 +7335,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( galgbios )	/* (c) 1998 Creative Electronics & Software (CES) */
 	DRIVER( galgame2 )	/* (c) 1998 Creative Electronics & Software (CES) / Namco */
 
+	/* Creative Electronics & Software */
+	DRIVER( hrclass )
+	DRIVER( ccclass )
+	DRIVER( tsclass )
+
 	/* Cinematronics raster games */
 	DRIVER( embargo )
 	DRIVER( tripool )	/* (c) 1981 Noma (Casino Tech license) */

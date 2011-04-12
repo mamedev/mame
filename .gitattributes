@@ -1681,6 +1681,7 @@ src/mame/drivers/cclimber.c svneol=native#text/plain
 src/mame/drivers/cd32.c svneol=native#text/plain
 src/mame/drivers/cdi.c svneol=native#text/plain
 src/mame/drivers/centiped.c svneol=native#text/plain
+src/mame/drivers/cesclass.c svneol=native#text/plain
 src/mame/drivers/chaknpop.c svneol=native#text/plain
 src/mame/drivers/cham24.c svneol=native#text/plain
 src/mame/drivers/champbas.c svneol=native#text/plain
