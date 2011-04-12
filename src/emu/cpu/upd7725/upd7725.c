@@ -114,7 +114,7 @@ UINT32 necdsp_device_config::execute_max_cycles() const
 
 UINT32 necdsp_device_config::execute_input_lines() const
 {
-	return 0;
+	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
 }
 
 
@@ -151,7 +151,35 @@ UINT32 necdsp_device_config::disasm_max_opcode_bytes() const
 	return 4;
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
+void necdsp_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const necdsp_interface *intf = reinterpret_cast<const necdsp_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<necdsp_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_int_func, 0, sizeof(m_in_int_func));
+		//memset(&m_in_si_func, 0, sizeof(m_in_si_func));
+		//memset(&m_in_sck_func, 0, sizeof(m_in_sck_func));
+		//memset(&m_in_sien_func, 0, sizeof(m_in_sien_func));
+		//memset(&m_in_soen_func, 0, sizeof(m_in_soen_func));
+		//memset(&m_in_dack_func, 0, sizeof(m_in_dack_func));
+		memset(&m_out_p0_func, 0, sizeof(m_out_p0_func));
+		memset(&m_out_p1_func, 0, sizeof(m_out_p1_func));
+		//memset(&m_out_so_func, 0, sizeof(m_out_so_func));
+		//memset(&m_out_sorq_func, 0, sizeof(m_out_sorq_func));
+		//memset(&m_out_drq_func, 0, sizeof(m_out_drq_func));
+	}
+}
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -159,9 +187,11 @@ UINT32 necdsp_device_config::disasm_max_opcode_bytes() const
 
 necdsp_device::necdsp_device(running_machine &_machine, const necdsp_device_config &config)
 	: cpu_device(_machine, config),
+	m_irq(0),
 	m_program(NULL),
 	m_data(NULL),
-	m_direct(NULL)
+	m_direct(NULL),
+	m_config(config)
 {
 }
 
@@ -206,6 +236,19 @@ void necdsp_device::device_start()
 	state_add(UPD7725_SI, "SI", regs.si);
 	state_add(UPD7725_SO, "SO", regs.so);
 	state_add(UPD7725_IDB, "IDB", regs.idb);
+
+	// resolve callbacks
+	devcb_resolve_read_line(&m_in_int_func, &m_config.m_in_int_func, this);
+	//devcb_resolve_read8(&m_in_si_func, &m_config.m_in_si_func, this);
+	//devcb_resolve_read_line(&m_in_sck_func, &m_config.m_in_sck_func, this);
+	//devcb_resolve_read_line(&m_in_sien_func, &m_config.m_in_sien_func, this);
+	//devcb_resolve_read_line(&m_in_soen_func, &m_config.m_in_soen_func, this);
+	//devcb_resolve_read_line(&m_in_dack_func, &m_config.m_in_dack_func, this);
+	devcb_resolve_write_line(&m_out_p0_func, &m_config.m_out_p0_func, this);
+	devcb_resolve_write_line(&m_out_p1_func, &m_config.m_out_p1_func, this);
+	//devcb_resolve_write8(&m_out_so_func, &m_config.m_out_so_func, this);
+	//devcb_resolve_write_line(&m_out_sorq_func, &m_config.m_out_sorq_func, this);
+	//devcb_resolve_write_line(&m_out_drq_func, &m_config.m_out_drq_func, this);
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -323,6 +366,21 @@ void necdsp_device::state_string_export(const device_state_entry &entry, astring
 	}
 }
 
+//-------------------------------------------------
+//  execute_set_input -
+//-------------------------------------------------
+
+void necdsp_device::execute_set_input(int inputnum, int state)
+{
+	switch (inputnum)
+	{
+	case NECDSP_INPUT_LINE_INT:
+		//TODO: detect rising edge; if rising edge found AND IE = 1, push PC, pc = 0x100; else do nothing
+		m_irq = state; // set old state to current state
+		break;
+	// add more when needed
+	}
+}
 
 //-------------------------------------------------
 //  disasm_disassemble - call the disassembly
@@ -571,7 +629,10 @@ void necdsp_device::exec_ld(UINT32 opcode) {
     case  4: regs.dp = id; break;
     case  5: regs.rp = id; break;
     case  6: regs.dr = id; regs.sr.rqm = 1; break;
-    case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c); break;
+    case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
+             devcb_call_write_line(&m_out_p0_func, regs.sr&0x1);
+             devcb_call_write_line(&m_out_p1_func, (regs.sr&0x2)>>1);
+             break;
 	case  8: regs.so = id; break;  //LSB
 	case  9: regs.so = id; break;  //MSB
     case 10: regs.k = id; break;

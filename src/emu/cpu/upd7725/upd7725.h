@@ -12,6 +12,17 @@
 #define __UPD7725_H__
 
 //**************************************************************************
+//  ENUMERATIONS
+//**************************************************************************
+
+// input lines
+enum
+{
+	NECDSP_INPUT_LINE_INT = 0
+	// add more here as needed
+};
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -19,9 +30,29 @@ class necdsp_device;
 class upd7725_device;
 class upd96050_device;
 
+// ======================> necdsp_interface
+
+struct necdsp_interface
+{
+	devcb_read_line		m_in_int_func;
+	//devcb_read8		m_in_si_func;
+	//devcb_read_line	m_in_sck_func;
+	//devcb_read_line	m_in_sien_func;
+	//devcb_read_line	m_in_soen_func;
+	//devcb_read_line	m_in_dack_func;
+	devcb_write_line	m_out_p0_func;
+	devcb_write_line	m_out_p1_func;
+	//devcb_write8		m_out_so_func;
+	//devcb_write_line	m_out_sorq_func;
+	//devcb_write_line	m_out_drq_func;
+};
+
+#define NECDSP_INTERFACE(name) \
+	const necdsp_interface (name) =
+
 // ======================> necdsp_device_config
 
-class necdsp_device_config :	public cpu_device_config
+class necdsp_device_config :	public cpu_device_config, public necdsp_interface
 {
 	friend class necdsp_device;
 
@@ -35,6 +66,9 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 
 protected:
+	// device_config overrides
+	virtual void device_config_complete();
+
 	// device_config_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const;
 	virtual UINT32 execute_max_cycles() const;
@@ -98,6 +132,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -179,9 +214,26 @@ private:
   void stack_pull();
 
   int m_icount;
+  int m_irq; // old irq line state, for detecting rising edges.
 
   address_space *m_program, *m_data;
   direct_read_data *m_direct;
+
+protected:
+// device callbacks
+	devcb_resolved_read_line	m_in_int_func;
+	//devcb_resolved_read8		m_in_si_func;
+	//devcb_resolved_read_line	m_in_sck_func;
+	//devcb_resolved_read_line	m_in_sien_func;
+	//devcb_resolved_read_line	m_in_soen_func;
+	//devcb_resolved_read_line	m_in_dack_func;
+	devcb_resolved_write_line	m_out_p0_func;
+	devcb_resolved_write_line	m_out_p1_func;
+	//devcb_resolved_write8		m_out_so_func;
+	//devcb_resolved_write_line	m_out_sorq_func;
+	//devcb_resolved_write_line	m_out_drq_func;
+
+  const necdsp_device_config &m_config;
 };
 
 class upd7725_device : public necdsp_device
@@ -236,4 +288,4 @@ enum
 	UPD7725_IDB
 };
 
-#endif // UPD7725
+#endif /* __UPD7725_H__ */
