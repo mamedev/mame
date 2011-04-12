@@ -1241,9 +1241,6 @@ static void handle_command(ide_state *ide, UINT8 command)
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			debugger_break(ide->device->machine());
-		
-			/* signal an interrupt */
-			signal_interrupt(ide);
 			break;
 	}
 }
