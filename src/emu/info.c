@@ -223,7 +223,7 @@ void info_xml_creator::output(FILE *out)
 	// output the DTD
 	fprintf(m_output, "<?xml version=\"1.0\"?>\n");
 	fprintf(m_output, "%s\n\n", s_dtd_string);
-	
+
 	// top-level tag
 	fprintf(m_output, "<" XML_ROOT " build=\"%s\" debug=\""
 #ifdef MAME_DEBUG
@@ -665,15 +665,15 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	// enumerated list of control types
 	enum
 	{
-		ANALOG_TYPE_JOYSTICK, 
-		ANALOG_TYPE_DIAL, 
-		ANALOG_TYPE_TRACKBALL, 
-		ANALOG_TYPE_PADDLE, 
-		ANALOG_TYPE_LIGHTGUN, 
-		ANALOG_TYPE_PEDAL, 
+		ANALOG_TYPE_JOYSTICK,
+		ANALOG_TYPE_DIAL,
+		ANALOG_TYPE_TRACKBALL,
+		ANALOG_TYPE_PADDLE,
+		ANALOG_TYPE_LIGHTGUN,
+		ANALOG_TYPE_PEDAL,
 		ANALOG_TYPE_COUNT
 	};
-	
+
 	// directions
 	const UINT8 DIR_LEFTRIGHT = 0x01;
 	const UINT8 DIR_UPDOWN = 0x02;
@@ -681,7 +681,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	const UINT8 DIR_DUAL = 0x08;
 
 	// initialize the list of control types
-	struct 
+	struct
 	{
 		const char *	type;			/* general type of input */
 		bool			analog;
@@ -710,7 +710,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
 		{
 			int analogtype = -1;
-			
+
 			// track the highest player number
 			if (nplayer < field->player + 1)
 				nplayer = field->player + 1;
@@ -863,7 +863,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		const char *way = ((joytype & DIR_LEFTRIGHT) == 0 || (joytype & DIR_UPDOWN) == 0) ? "2way" : ((joytype & DIR_4WAY) != 0) ? "4way" : "8way";
 		fprintf(m_output, "\t\t\t<control type=\"%s%s%s\"/>\n", vertical, doubletype, way);
 	}
-	
+
 	// output analog types
 	for (int type = 0; type < ANALOG_TYPE_COUNT; type++)
 		if (control_info[type].type != NULL)
@@ -883,7 +883,7 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 
 			fprintf(m_output, "/>\n");
 		}
-	
+
 	// output keypad and keyboard
 	if (keypad)
 		fprintf(m_output, "\t\t\t<control type=\"keypad\"/>\n");
@@ -1125,7 +1125,7 @@ void info_xml_creator::output_ramoptions()
 		if (ram->extra_options != NULL)
 		{
 			astring options(ram->extra_options);
-			for (int start, end = options.chr(0, ','); ; start = end + 1, end = options.chr(start, ','))
+			for (int start = 0, end = options.chr(0, ','); ; start = end + 1, end = options.chr(start, ','))
 			{
 				astring option;
 				option.cpysubstr(options, start, (end == -1) ? -1 : end - start);
@@ -1146,10 +1146,10 @@ void info_xml_creator::output_ramoptions()
 const char *info_xml_creator::get_merge_name(const hash_collection &romhashes)
 {
 	const char *merge_name = NULL;
-	
+
 	// walk the parent chain
 	for (int clone_of = m_drivlist.find(m_drivlist.driver().parent); clone_of != -1; clone_of = m_drivlist.find(m_drivlist.driver(clone_of).parent))
-	
+
 		// look in the parent's ROMs
 		for (const rom_source *psource = rom_first_source(m_drivlist.config(clone_of)); psource != NULL; psource = rom_next_source(*psource))
 			for (const rom_entry *pregion = rom_first_region(*psource); pregion != NULL; pregion = rom_next_region(pregion))
