@@ -20,7 +20,7 @@
  *
  *************************************/
 
-static MACHINE_START( empty )
+static MACHINE_START( ___empty )
 {
 	/* force the UI to show the game select screen */
 	ui_menu_force_game_select(machine, &machine.render().ui_container());
@@ -34,9 +34,9 @@ static MACHINE_START( empty )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( empty, driver_device )
+static MACHINE_CONFIG_START( ___empty, driver_device )
 
-	MCFG_MACHINE_START(empty)
+	MCFG_MACHINE_START(___empty)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -54,8 +54,8 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( empty )
-	ROM_REGION( 0x10, "user1", 0 )
+ROM_START( ___empty )
+	ROM_REGION( 0x10, "user1", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -66,4 +66,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2007, empty, 0, empty, 0, 0, ROT0, "MAME", "No Driver Loaded", 0 )
+GAME( 2007, ___empty, 0, ___empty, 0, 0, ROT0, "MAME", "No Driver Loaded", GAME_NO_SOUND )

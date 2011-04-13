@@ -1589,7 +1589,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	else if ((rawROM[0x2080] == 'E') && (rawROM[0x2081] == 'A') &&
 			 (rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))
 	{
-		tmpROMnew = (unsigned char *)osd_malloc(length);
+		tmpROMnew = global_alloc_array(unsigned char, length);
 		secondhalf = &tmpROMnew[length >> 1];
 
 		if (!tmpROMnew)
@@ -1605,7 +1605,7 @@ static int megadrive_load_nonlist(device_image_interface &image)
 			ROM[ptr] = secondhalf[ptr >> 1];
 			ROM[ptr + 1] = tmpROMnew[ptr >> 1];
 		}
-		free(tmpROMnew);
+		global_free(tmpROMnew);
 
 #ifdef LSB_FIRST
 		for (ptr = 0; ptr < length; ptr += 2)

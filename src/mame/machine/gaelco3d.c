@@ -130,7 +130,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 
 	if (create)
 	{
-		char *buf = (char *) osd_malloc(size);
+		char *buf = (char *) osd_malloc_array(size);
 		memset(buf,0, size);
 
 		fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
@@ -147,7 +147,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 		}
 		os_shmem->creator = 0;
 	}
-	os_shmem->fn = (char *) osd_malloc(strlen(path)+1);
+	os_shmem->fn = (char *) osd_malloc_array(strlen(path)+1);
 	strcpy(os_shmem->fn, path);
 
 	assert(fd != -1);
@@ -178,7 +178,7 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 
 	os_shmem->creator = 0;
 
-	os_shmem->ptr = (void *) osd_malloc(size);
+	os_shmem->ptr = (void *) osd_malloc_array(size);
 	os_shmem->size = size;
 	return os_shmem;
 }

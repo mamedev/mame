@@ -208,7 +208,7 @@ struct _select_game_state
 	UINT8				error;
 	UINT8				rerandomize;
 	char				search[40];
-	const game_driver *	matchlist[VISIBLE_GAMES_IN_LIST];
+	int					matchlist[VISIBLE_GAMES_IN_LIST];
 	const game_driver *	driverlist[1];
 };
 
@@ -244,6 +244,9 @@ static render_texture *arrow_texture;
 static const char priortext[] = "Return to Prior Menu";
 static const char backtext[] = "Return to " CAPSTARTGAMENOUN;
 static const char exittext[] = "Exit";
+
+// temporary hack until this is C++-ified
+static driver_enumerator *drivlist;
 
 
 
@@ -299,7 +302,6 @@ static void menu_crosshair_populate(running_machine &machine, ui_menu *menu);
 static void menu_quit_game(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 static void menu_select_game(running_machine &machine, ui_menu *menu, void *parameter, void *state);
 static void menu_select_game_populate(running_machine &machine, ui_menu *menu, select_game_state *menustate);
-static int CLIB_DECL menu_select_game_driver_compare(const void *elem1, const void *elem2);
 static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state *menustate);
 static void menu_select_game_custom_render(running_machine &machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
@@ -3426,9 +3428,10 @@ static void menu_select_game(running_machine &machine, ui_menu *menu, void *para
 	/* if no state, allocate some */
 	if (state == NULL)
 	{
-		state = ui_menu_alloc_state(menu, sizeof(*menustate) + sizeof(menustate->driverlist) * driver_list_get_count(drivers), NULL);
+		state = ui_menu_alloc_state(menu, sizeof(*menustate) + sizeof(menustate->driverlist) * driver_list::total(), NULL);
 		if (parameter != NULL)
 			strcpy(((select_game_state *)state)->search, (const char *)parameter);
+		((select_game_state *)state)->matchlist[0] = -1;
 	}
 	menustate = (select_game_state *)state;
 
@@ -3459,24 +3462,20 @@ static void menu_select_game(running_machine &machine, ui_menu *menu, void *para
 			/* anything else is a driver */
 			else
 			{
-				audit_record *audit;
-				int audit_records;
-				int audit_result;
+				// audit the game first to see if we're going to work
+				driver_enumerator enumerator(machine.options(), *driver);
+				enumerator.next();
+				media_auditor auditor(enumerator);
+				media_auditor::summary summary = auditor.audit_media(AUDIT_VALIDATE_FAST);
 
-				/* audit the game first to see if we're going to work */
-				audit_records = audit_images(menu->machine().options(), driver, AUDIT_VALIDATE_FAST, &audit);
-				audit_result = audit_summary(driver, audit_records, audit, FALSE);
-				if (audit_records > 0)
-					global_free(audit);
-
-				/* if everything looks good, schedule the new driver */
-				if (audit_result == CORRECT || audit_result == BEST_AVAILABLE)
+				// if everything looks good, schedule the new driver
+				if (summary == media_auditor::CORRECT || summary == media_auditor::BEST_AVAILABLE)
 				{
 					machine.schedule_new_driver(*driver);
 					ui_menu_stack_reset(machine);
 				}
 
-				/* otherwise, display an error */
+				// otherwise, display an error
 				else
 				{
 					ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
@@ -3551,18 +3550,19 @@ static void menu_select_game_populate(running_machine &machine, ui_menu *menu, s
 	}
 
 	/* otherwise, rebuild the match list */
-	if (menustate->search[0] != 0 || menustate->matchlist[0] == NULL || menustate->rerandomize)
-		driver_list_get_approx_matches(menustate->driverlist, menustate->search, matchcount, menustate->matchlist);
+	assert(drivlist != NULL);
+	if (menustate->search[0] != 0 || menustate->matchlist[0] == -1 || menustate->rerandomize)
+		drivlist->find_approximate_matches(menustate->search, matchcount, menustate->matchlist);
 	menustate->rerandomize = FALSE;
 
 	/* iterate over entries */
 	for (curitem = 0; curitem < matchcount; curitem++)
 	{
-		const game_driver *driver = menustate->matchlist[curitem];
-		if (driver != NULL)
+		int curmatch = menustate->matchlist[curitem];
+		if (curmatch != -1)
 		{
-			const game_driver *cloneof = driver_get_clone(driver);
-			ui_menu_item_append(menu, driver->name, driver->description, (cloneof == NULL || (cloneof->flags & GAME_IS_BIOS_ROOT)) ? 0 : MENU_FLAG_INVERT, (void *)driver);
+			int cloneof = drivlist->non_bios_clone(curmatch);
+			ui_menu_item_append(menu, drivlist->driver(curmatch).name, drivlist->driver(curmatch).description, (cloneof == -1) ? 0 : MENU_FLAG_INVERT, (void *)&drivlist->driver(curmatch));
 		}
 	}
 
@@ -3579,41 +3579,17 @@ static void menu_select_game_populate(running_machine &machine, ui_menu *menu, s
 
 
 /*-------------------------------------------------
-    menu_select_game_driver_compare - compare the
-    names of two drivers
--------------------------------------------------*/
-
-static int CLIB_DECL menu_select_game_driver_compare(const void *elem1, const void *elem2)
-{
-	const game_driver **driver1_ptr = (const game_driver **)elem1;
-	const game_driver **driver2_ptr = (const game_driver **)elem2;
-	const char *driver1 = (*driver1_ptr)->name;
-	const char *driver2 = (*driver2_ptr)->name;
-
-	while (*driver1 == *driver2 && *driver1 != 0)
-		driver1++, driver2++;
-	return *driver1 - *driver2;
-}
-
-
-/*-------------------------------------------------
     menu_select_game_build_driver_list - build a
     list of available drivers
 -------------------------------------------------*/
 
 static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state *menustate)
 {
-	int driver_count = driver_list_get_count(drivers);
-	int drivnum, listnum;
-	UINT8 *found;
-
-	/* create a sorted copy of the main driver list */
-	memcpy((void *)menustate->driverlist, drivers, driver_count * sizeof(menustate->driverlist[0]));
-	qsort((void *)menustate->driverlist, driver_count, sizeof(menustate->driverlist[0]), menu_select_game_driver_compare);
-
-	/* allocate a temporary array to track which ones we found */
-	found = (UINT8 *)ui_menu_pool_alloc(menu, (driver_count + 7) / 8);
-	memset(found, 0, (driver_count + 7) / 8);
+	// start with an empty list
+	// hack alert: use new directly here to avoid reporting this one-time static memory as unfreed
+	if (drivlist == NULL)
+		drivlist = new driver_enumerator(menu->machine().options());
+	drivlist->exclude_all();
 
 	/* open a path to the ROMs and find them in the array */
 	file_enumerator path(menu->machine().options().media_path());
@@ -3622,9 +3598,6 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	/* iterate while we get new objects */
 	while ((dir = path.next()) != NULL)
 	{
-		game_driver tempdriver;
-		game_driver *tempdriver_ptr;
-		const game_driver **found_driver;
 		char drivername[50];
 		char *dst = drivername;
 		const char *src;
@@ -3634,23 +3607,16 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 			*dst++ = tolower((UINT8)*src);
 		*dst = 0;
 
-		/* find it in the array */
-		tempdriver.name = drivername;
-		tempdriver_ptr = &tempdriver;
-		found_driver = (const game_driver **)bsearch(&tempdriver_ptr, menustate->driverlist, driver_count, sizeof(*menustate->driverlist), menu_select_game_driver_compare);
-
-		/* if found, mark the corresponding entry in the array */
-		if (found_driver != NULL)
-		{
-			int index = found_driver - menustate->driverlist;
-			found[index / 8] |= 1 << (index % 8);
-		}
+		int drivnum = drivlist->find(drivername);
+		if (drivnum != -1)
+			drivlist->include(drivnum);
 	}
 
 	/* now build the final list */
-	for (drivnum = listnum = 0; drivnum < driver_count; drivnum++)
-		if (found[drivnum / 8] & (1 << (drivnum % 8)))
-			menustate->driverlist[listnum++] = menustate->driverlist[drivnum];
+	drivlist->reset();
+	int listnum = 0;
+	while (drivlist->next())
+		menustate->driverlist[listnum++] = &drivlist->driver();
 
 	/* NULL-terminate */
 	menustate->driverlist[listnum] = NULL;

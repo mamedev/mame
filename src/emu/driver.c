@@ -2,10 +2,38 @@
 
     driver.c
 
-    Driver construction helpers.
+    Driver enumeration helpers.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -14,219 +42,74 @@
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  DRIVER LIST
+//**************************************************************************
 
-#define DRIVER_LRU_SIZE			10
+//-------------------------------------------------
+//  driver_list - constructor
+//-------------------------------------------------
 
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static int driver_lru[DRIVER_LRU_SIZE];
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static int penalty_compare(const char *source, const char *target);
-
-
-
-/***************************************************************************
-    MISC FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    driver_get_name - return a pointer to a
-    driver given its name
--------------------------------------------------*/
-
-const game_driver *driver_get_name(const char *name)
+driver_list::driver_list()
 {
-	int lurnum, drvnum;
-
-	/* scan the LRU list first */
-	for (lurnum = 0; lurnum < DRIVER_LRU_SIZE; lurnum++)
-		if (mame_stricmp(drivers[driver_lru[lurnum]]->name, name) == 0)
-		{
-			/* if not first, swap with the head */
-			if (lurnum != 0)
-			{
-				int temp = driver_lru[0];
-				driver_lru[0] = driver_lru[lurnum];
-				driver_lru[lurnum] = temp;
-			}
-			return drivers[driver_lru[0]];
-		}
-
-	/* scan for a match in the drivers -- slow! */
-	for (drvnum = 0; drivers[drvnum] != NULL; drvnum++)
-		if (mame_stricmp(drivers[drvnum]->name, name) == 0)
-		{
-			memmove((void *)&driver_lru[1], (void *)&driver_lru[0], sizeof(driver_lru[0]) * (DRIVER_LRU_SIZE - 1));
-			driver_lru[0] = drvnum;
-			return drivers[drvnum];
-		}
-
-	return NULL;
 }
 
 
-/*-------------------------------------------------
-    driver_get_clone - return a pointer to the
-    clone of a game driver.
--------------------------------------------------*/
+//-------------------------------------------------
+//  find - find a driver by name
+//-------------------------------------------------
 
-const game_driver *driver_get_clone(const game_driver *driver)
+int driver_list::find(const char *name)
 {
-	/* if no clone, easy out */
-	if (driver->parent == NULL || (driver->parent[0] == '0' && driver->parent[1] == 0))
-		return NULL;
+	// if no name, bail
+	if (name == NULL)
+		return -1;
 
-	/* convert the name to a game_driver */
-	return driver_get_name(driver->parent);
+	// create a dummy item for comparison purposes
+	game_driver driver;
+	driver.name = name;
+	game_driver *driverptr = &driver;
+	
+	// binary search to find it
+	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
+	return (result == NULL) ? -1 : result - s_drivers_sorted;
 }
 
 
-/*-------------------------------------------------
-    driver_get_searchpath - return a search path
-    for a given driver
--------------------------------------------------*/
+//-------------------------------------------------
+//  driver_sort_callback - compare two items in
+//  an array of game_driver pointers
+//-------------------------------------------------
 
-const char *driver_get_searchpath(const game_driver &driver, astring &string)
+int driver_list::driver_sort_callback(const void *elem1, const void *elem2)
 {
-	// create the search path consisting of gamedrv[;parent[;...]]
-	string = driver.name;
-	for (const game_driver *parent = driver_get_clone(&driver); parent != NULL; parent = driver_get_clone(parent))
-		string.cat(";").cat(parent->name);
-	return string;
+	const game_driver * const *item1 = reinterpret_cast<const game_driver * const *>(elem1);
+	const game_driver * const *item2 = reinterpret_cast<const game_driver * const *>(elem2);
+	return mame_stricmp((*item1)->name, (*item2)->name);
 }
 
 
-/*-------------------------------------------------
-    driver_list_get_approx_matches - find the best
-    n matches to a driver name.
--------------------------------------------------*/
+//-------------------------------------------------
+//  penalty_compare - compare two strings for
+//  closeness and assign a score.
+//-------------------------------------------------
 
-void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list)
-{
-#undef rand
-
-	int matchnum, drvnum;
-	int *penalty;
-
-	/* if no name, pick random entries */
-	if (name == NULL || name[0] == 0)
-	{
-		const game_driver **templist;
-		int driver_count;
-		int shufnum;
-
-		/* allocate a temporary list */
-		templist = global_alloc_array(const game_driver *, driver_list_get_count(driverlist));
-
-		/* build up a list of valid entries */
-		for (drvnum = driver_count = 0; driverlist[drvnum] != NULL; drvnum++)
-			if ((driverlist[drvnum]->flags & GAME_NO_STANDALONE) == 0)
-				templist[driver_count++] = driverlist[drvnum];
-
-		/* seed the RNG first */
-		srand(osd_ticks());
-
-		/* shuffle */
-		for (shufnum = 0; shufnum < 4 * driver_count; shufnum++)
-		{
-			int item1 = rand() % driver_count;
-			int item2 = rand() % driver_count;
-			const game_driver *temp;
-
-			temp = templist[item1];
-			templist[item1] = templist[item2];
-			templist[item2] = temp;
-		}
-
-		/* copy out the first few entries */
-		for (matchnum = 0; matchnum < matches; matchnum++)
-			list[matchnum] = templist[matchnum % driver_count];
-
-		global_free(templist);
-		return;
-	}
-
-	/* allocate some temp memory */
-	penalty = global_alloc_array(int, matches);
-
-	/* initialize everyone's states */
-	for (matchnum = 0; matchnum < matches; matchnum++)
-	{
-		penalty[matchnum] = 9999;
-		list[matchnum] = NULL;
-	}
-
-	/* scan the entire drivers array */
-	for (drvnum = 0; driverlist[drvnum] != NULL; drvnum++)
-	{
-		int curpenalty, tmp;
-
-		/* skip things that can't run */
-		if ((driverlist[drvnum]->flags & GAME_NO_STANDALONE) != 0)
-			continue;
-
-		/* pick the best match between driver name and description */
-		curpenalty = penalty_compare(name, driverlist[drvnum]->description);
-		tmp = penalty_compare(name, driverlist[drvnum]->name);
-		curpenalty = MIN(curpenalty, tmp);
-
-		/* insert into the sorted table of matches */
-		for (matchnum = matches - 1; matchnum >= 0; matchnum--)
-		{
-			/* stop if we're worse than the current entry */
-			if (curpenalty >= penalty[matchnum])
-				break;
-
-			/* as lng as this isn't the last entry, bump this one down */
-			if (matchnum < matches - 1)
-			{
-				penalty[matchnum + 1] = penalty[matchnum];
-				list[matchnum + 1] = list[matchnum];
-			}
-			list[matchnum] = driverlist[drvnum];
-			penalty[matchnum] = curpenalty;
-		}
-	}
-
-	/* free our temp memory */
-	global_free(penalty);
-}
-
-
-/*-------------------------------------------------
-    penalty_compare - compare two strings for
-    closeness and assign a score.
--------------------------------------------------*/
-
-static int penalty_compare(const char *source, const char *target)
+int driver_list::penalty_compare(const char *source, const char *target)
 {
 	int gaps = 1;
-	int last = TRUE;
+	bool last = true;
 
-	/* scan the strings */
+	// scan the strings
 	for ( ; *source && *target; target++)
 	{
-		/* do a case insensitive match */
-		int match = (tolower((UINT8)*source) == tolower((UINT8)*target));
+		// do a case insensitive match
+		bool match = (tolower((UINT8)*source) == tolower((UINT8)*target));
 
-		/* if we matched, advance the source */
+		// if we matched, advance the source
 		if (match)
 			source++;
 
-		/* if the match state changed, count gaps */
+		// if the match state changed, count gaps
 		if (match != last)
 		{
 			last = match;
@@ -235,11 +118,11 @@ static int penalty_compare(const char *source, const char *target)
 		}
 	}
 
-	/* penalty if short string does not completely fit in */
+	// penalty if short string does not completely fit in
 	for ( ; *source; source++)
 		gaps++;
 
-	/* if we matched perfectly, gaps == 0 */
+	// if we matched perfectly, gaps == 0
 	if (gaps == 1 && *source == 0 && *target == 0)
 		gaps = 0;
 
@@ -247,31 +130,244 @@ static int penalty_compare(const char *source, const char *target)
 }
 
 
-/*-------------------------------------------------
-    driver_list_get_count - returns the amount of
-    drivers
--------------------------------------------------*/
 
-int driver_list_get_count(const game_driver * const driverlist[])
+//**************************************************************************
+//  DRIVER ENUMERATOR
+//**************************************************************************
+
+//-------------------------------------------------
+//  driver_enumerator - constructor
+//-------------------------------------------------
+
+driver_enumerator::driver_enumerator(emu_options &options)
+	: m_current(-1),
+	  m_filtered_count(0),
+	  m_options(options),
+	  m_included(global_alloc_array(UINT8, s_driver_count)),
+	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
 {
-	int count;
-
-	for (count = 0; driverlist[count] != NULL; count++) ;
-	return count;
+	include_all();
 }
 
-/*-------------------------------------------------
-    driver_get_compatible - return a pointer to the
-    compatible driver.
--------------------------------------------------*/
 
-const game_driver *driver_get_compatible(const game_driver *drv)
+driver_enumerator::driver_enumerator(emu_options &options, const char *string)
+	: m_current(-1),
+	  m_filtered_count(0),
+	  m_options(options),
+	  m_included(global_alloc_array(UINT8, s_driver_count)),
+	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
 {
-	if (driver_get_clone(drv))
-		drv = driver_get_clone(drv);
-	else if (drv->compatible_with)
-		drv = driver_get_name(drv->compatible_with);
-	else
-		drv = NULL;
-	return drv;
+	filter(string);
+}
+
+
+driver_enumerator::driver_enumerator(emu_options &options, const game_driver &driver)
+	: m_current(-1),
+	  m_filtered_count(0),
+	  m_options(options),
+	  m_included(global_alloc_array(UINT8, s_driver_count)),
+	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+{
+	filter(driver);
+}
+
+
+//-------------------------------------------------
+//  ~driver_enumerator - destructor
+//-------------------------------------------------
+
+driver_enumerator::~driver_enumerator()
+{
+	// free any configs
+	for (int index = 0; index < s_driver_count; index++)
+		global_free(m_config[index]);
+
+	// free the arrays
+	global_free(m_included);
+	global_free(m_config);
+}
+
+
+//-------------------------------------------------
+//  config - return a machine_config for the given
+//  driver, allocating on demand if needed
+//-------------------------------------------------
+
+machine_config &driver_enumerator::config(int index) const
+{
+	assert(index >= 0 && index < s_driver_count);
+	if (m_config[index] == NULL)
+		m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], m_options));
+	return *m_config[index];
+}
+
+
+//-------------------------------------------------
+//  filter - filter the driver list against the
+//  given string
+//-------------------------------------------------
+
+int driver_enumerator::filter(const char *filterstring)
+{
+	// reset the count
+	exclude_all();
+	
+	// match name against each driver in the list
+	for (int index = 0; index < s_driver_count; index++)
+		if (matches(filterstring, s_drivers_sorted[index]->name))
+			include(index);
+
+	return m_filtered_count;
+}
+
+
+//-------------------------------------------------
+//  filter - filter the driver list against the
+//  given driver
+//-------------------------------------------------
+
+int driver_enumerator::filter(const game_driver &driver)
+{
+	// reset the count
+	exclude_all();
+	
+	// match name against each driver in the list
+	for (int index = 0; index < s_driver_count; index++)
+		if (s_drivers_sorted[index] == &driver)
+			include(index);
+
+	return m_filtered_count;
+}
+
+
+//-------------------------------------------------
+//  next - get the next driver matching the given
+//  filter
+//-------------------------------------------------
+
+bool driver_enumerator::next()
+{
+	// always advance one
+	m_current++;
+	
+	// if we have a filter, scan forward to the next match
+	while (m_current < s_driver_count)
+	{
+		if (m_included[m_current])
+			break;
+		m_current++;
+	}
+
+	// return true if we end up in range
+	return (m_current >= 0 && m_current < s_driver_count);
+}
+
+
+//-------------------------------------------------
+//  next_excluded - get the next driver that is
+//  not currently included in the list
+//-------------------------------------------------
+
+bool driver_enumerator::next_excluded()
+{
+	// always advance one
+	m_current++;
+	
+	// if we have a filter, scan forward to the next match
+	while (m_current < s_driver_count)
+	{
+		if (!m_included[m_current])
+			break;
+		m_current++;
+	}
+
+	// return true if we end up in range
+	return (m_current >= 0 && m_current < s_driver_count);
+}
+
+
+//-------------------------------------------------
+//  driver_sort_callback - compare two items in
+//  an array of game_driver pointers
+//-------------------------------------------------
+
+void driver_enumerator::find_approximate_matches(const char *string, int count, int *results)
+{
+#undef rand
+
+	// if no name, pick random entries
+	if (string == NULL || string[0] == 0)
+	{
+		// seed the RNG first
+		srand(osd_ticks());
+
+		// allocate a temporary list
+		int *templist = global_alloc_array(int, m_filtered_count);
+		int arrayindex = 0;
+		for (int index = 0; index < s_driver_count; index++)
+			if (m_included[index])
+				templist[arrayindex++] = index;
+		assert(arrayindex == m_filtered_count);
+
+		// shuffle
+		for (int shufnum = 0; shufnum < 4 * s_driver_count; shufnum++)
+		{
+			int item1 = rand() % m_filtered_count;
+			int item2 = rand() % m_filtered_count;
+			int temp = templist[item1];
+			templist[item1] = templist[item2];
+			templist[item2] = temp;
+		}
+
+		// copy out the first few entries
+		for (int matchnum = 0; matchnum < count; matchnum++)
+			results[matchnum] = templist[matchnum % m_filtered_count];
+
+		global_free(templist);
+		return;
+	}
+
+	// allocate memory to track the penalty value
+	int *penalty = global_alloc_array(int, count);
+
+	// initialize everyone's states
+	for (int matchnum = 0; matchnum < count; matchnum++)
+	{
+		penalty[matchnum] = 9999;
+		results[matchnum] = -1;
+	}
+
+	// scan the entire drivers array
+	for (int index = 0; index < s_driver_count; index++)
+		if (m_included[index])
+		{
+			// skip things that can't run
+			if ((s_drivers_sorted[index]->flags & GAME_NO_STANDALONE) != 0)
+				continue;
+
+			// pick the best match between driver name and description
+			int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
+			int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
+			curpenalty = MIN(curpenalty, tmp);
+
+			// insert into the sorted table of matches
+			for (int matchnum = count - 1; matchnum >= 0; matchnum--)
+			{
+				// stop if we're worse than the current entry
+				if (curpenalty >= penalty[matchnum])
+					break;
+
+				// as long as this isn't the last entry, bump this one down
+				if (matchnum < count - 1)
+				{
+					penalty[matchnum + 1] = penalty[matchnum];
+					results[matchnum + 1] = results[matchnum];
+				}
+				results[matchnum] = index;
+				penalty[matchnum] = curpenalty;
+			}
+		}
+
+	// free our temp memory
+	global_free(penalty);
 }

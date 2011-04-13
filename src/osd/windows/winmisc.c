@@ -45,7 +45,7 @@
 #include <tchar.h>
 
 // MAME headers
-#include "emucore.h"
+#include "osdcore.h"
 
 // MAMEOS headers
 #include "winutf8.h"
@@ -59,9 +59,6 @@
 
 // presumed size of a page of memory
 #define PAGE_SIZE			4096
-
-// allocations this size and larger get guard pages
-#define GUARD_PAGE_THRESH	32
 
 // align allocations to start or end of the page?
 #define GUARD_ALIGN_START	0
@@ -85,36 +82,49 @@ void *osd_malloc(size_t size)
 #ifndef MALLOC_DEBUG
 	return HeapAlloc(GetProcessHeap(), 0, size);
 #else
-	// add in space for the base pointer
+	// add in space for the size
 	size += sizeof(size_t);
 
-	// small items just come from the heap
-	void *result;
-	if (size < GUARD_PAGE_THRESH)
-		result = HeapAlloc(GetProcessHeap(), 0, size);
+	// basic objects just come from the heap
+	void *result = HeapAlloc(GetProcessHeap(), 0, size);
 
-	// large items get guard pages
-	else
-	{
-		// round the size up to a page boundary
-		size_t rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
-
-		// reserve that much memory, plus two guard pages
-		void *page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
-		if (page_base == NULL)
-			return NULL;
-
-		// now allow access to everything but the first and last pages
-		page_base = VirtualAlloc(reinterpret_cast<UINT8 *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
-		if (page_base == NULL)
-			return NULL;
-
-		// work backwards from the page base to get to the block base
-		result = GUARD_ALIGN_START ? page_base : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
-	}
-
-	// store the page_base at the start
+	// store the size and return and pointer to the data afterward
 	*reinterpret_cast<size_t *>(result) = size;
+	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
+#endif
+}
+
+
+//============================================================
+//  osd_malloc_array
+//============================================================
+
+void *osd_malloc_array(size_t size)
+{
+#ifndef MALLOC_DEBUG
+	return HeapAlloc(GetProcessHeap(), 0, size);
+#else
+	// add in space for the size
+	size += sizeof(size_t);
+
+	// round the size up to a page boundary
+	size_t rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
+
+	// reserve that much memory, plus two guard pages
+	void *page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
+	if (page_base == NULL)
+		return NULL;
+
+	// now allow access to everything but the first and last pages
+	page_base = VirtualAlloc(reinterpret_cast<UINT8 *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
+	if (page_base == NULL)
+		return NULL;
+
+	// work backwards from the page base to get to the block base
+	void *result = GUARD_ALIGN_START ? page_base : (reinterpret_cast<UINT8 *>(page_base) + rounded_size - size);
+
+	// store the size at the start with a flag indicating it has a guard page
+	*reinterpret_cast<size_t *>(result) = size | 0x80000000;
 	return reinterpret_cast<UINT8 *>(result) + sizeof(size_t);
 #endif
 }
@@ -131,14 +141,14 @@ void osd_free(void *ptr)
 #else
 	size_t size = reinterpret_cast<size_t *>(ptr)[-1];
 
-	// small items just get freed
-	if (size < GUARD_PAGE_THRESH)
+	// if no guard page, just free the pointer
+	if ((size & 0x80000000) == 0)
 		HeapFree(GetProcessHeap(), 0, reinterpret_cast<UINT8 *>(ptr) - sizeof(size_t));
 
 	// large items need more care
 	else
 	{
-		FPTR page_base = (reinterpret_cast<FPTR>(ptr) - sizeof(size_t)) & ~(PAGE_SIZE - 1);
+		ULONG_PTR page_base = (reinterpret_cast<ULONG_PTR>(ptr) - sizeof(size_t)) & ~(PAGE_SIZE - 1);
 		VirtualFree(reinterpret_cast<void *>(page_base - PAGE_SIZE), 0, MEM_RELEASE);
 	}
 #endif

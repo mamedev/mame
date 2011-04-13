@@ -161,7 +161,7 @@ public:
 	bool remove(char type);
 
 	// CRC-specific helpers
-	bool crc(UINT32 &result);
+	bool crc(UINT32 &result) const;
 	hash_base *add_crc(UINT32 crc);
 
 	// string conversion

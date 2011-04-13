@@ -115,7 +115,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	tmpstr = NULL;
 
 	// allocate a file object, plus space for the converted filename
-	*file = (osd_file *) osd_malloc(sizeof(**file) + sizeof(char) * strlen(path));
+	*file = (osd_file *) osd_malloc_array(sizeof(**file) + sizeof(char) * strlen(path));
 	if (*file == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -160,14 +160,14 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		goto error;
 	}
 
-	tmpstr = (char *) osd_malloc(strlen((*file)->filename)+1);
+	tmpstr = (char *) osd_malloc_array(strlen((*file)->filename)+1);
 	strcpy(tmpstr, (*file)->filename);
 
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = (char *) osd_malloc(strlen(tmpstr)+1);
+		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -184,7 +184,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			osd_free(tmpstr);
-			tmpstr = (char *) osd_malloc(j);
+			tmpstr = (char *) osd_malloc_array(j);
 
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);

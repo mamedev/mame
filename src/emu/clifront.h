@@ -80,6 +80,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// cli_options wraps the general emu options with CLI-specific additions
 class cli_options : public emu_options
 {
 public:
@@ -91,22 +92,75 @@ private:
 };
 
 
+// cli_frontend handles command-line processing and emulator execution
+class cli_frontend
+{
+public:
+	// construction/destruction
+	cli_frontend(cli_options &options, osd_interface &osd);
+	~cli_frontend();
+	
+	// execute based on the incoming argc/argv
+	int execute(int argc, char **argv);
+	
+	// direct access to the command operations
+	void listxml(const char *gamename = "*");
+	void listfull(const char *gamename = "*");
+	void listsource(const char *gamename = "*");
+	void listclones(const char *gamename = "*");
+	void listbrothers(const char *gamename = "*");
+	void listcrc(const char *gamename = "*");
+	void listroms(const char *gamename = "*");
+	void listsamples(const char *gamename = "*");
+	void listdevices(const char *gamename = "*");
+	void listmedia(const char *gamename = "*");
+	void verifyroms(const char *gamename = "*");
+	void verifysamples(const char *gamename = "*");
+	void romident(const char *filename);
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+private:
+	// internal helpers
+	void execute_commands(const char *exename);
+	void display_help();
+	void display_suggestions(const char *gamename);
 
-int cli_execute(cli_options &options, osd_interface &osd, int argc, char **argv);
+	// internal state
+	cli_options &		m_options;
+	osd_interface &		m_osd;
+	int					m_result;
+};
 
-/* informational functions */
-void cli_info_listxml(emu_options &options, const char *gamename);
-void cli_info_listfull(emu_options &options, const char *gamename);
-void cli_info_listsource(emu_options &options, const char *gamename);
-void cli_info_listclones(emu_options &options, const char *gamename);
-void cli_info_listbrothers(emu_options &options, const char *gamename);
-void cli_info_listcrc(emu_options &options, const char *gamename);
-void cli_info_listroms(emu_options &options, const char *gamename);
-void cli_info_listsamples(emu_options &options, const char *gamename);
-void cli_info_listdevices(emu_options &options, const char *gamename);
+
+// media_identifier class identifies media by hash via a search in
+// the driver database
+class media_identifier
+{
+public:
+	// construction/destruction
+	media_identifier(cli_options &options);
+
+	// getters
+	const char *result() const { return m_result; }
+	int total() const { return m_total; }
+	int matches() const { return m_matches; }
+	int nonroms() const { return m_nonroms; }
+
+	// operations
+	void reset() { m_total = m_matches = m_nonroms = 0; m_result.reset(); } 
+	void identify(const char *name);
+	void identify_file(const char *name);
+	void identify_data(const char *name, const UINT8 *data, int length);
+	int find_by_hash(const hash_collection &hashes, int length);
+
+private:
+	// internal state
+	driver_enumerator	m_drivlist;
+	astring				m_result;
+	int					m_total;
+	int					m_matches;
+	int					m_nonroms;
+};
+
+
 
 #endif	/* __CLIFRONT_H__ */

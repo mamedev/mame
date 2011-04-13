@@ -349,12 +349,12 @@ void emu_options::parse_standard_inis(astring &error_string)
 	}
 
 	// then parse the grandparent, parent, and system-specific INIs
-	const game_driver *parent = driver_get_clone(cursystem);
-	const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
-	if (gparent != NULL)
-		parse_one_ini(gparent->name, OPTION_PRIORITY_GPARENT_INI, &error_string);
-	if (parent != NULL)
-		parse_one_ini(parent->name, OPTION_PRIORITY_PARENT_INI, &error_string);
+	int parent = driver_list::clone(*cursystem);
+	int gparent = (parent != -1) ? driver_list::clone(parent) : -1;
+	if (gparent != -1)
+		parse_one_ini(driver_list::driver(gparent).name, OPTION_PRIORITY_GPARENT_INI, &error_string);
+	if (parent != -1)
+		parse_one_ini(driver_list::driver(parent).name, OPTION_PRIORITY_PARENT_INI, &error_string);
 	parse_one_ini(cursystem->name, OPTION_PRIORITY_DRIVER_INI, &error_string);
 }
 
@@ -367,7 +367,8 @@ void emu_options::parse_standard_inis(astring &error_string)
 const game_driver *emu_options::system() const
 {
 	astring tempstr;
-	return driver_get_name(*core_filename_extract_base(&tempstr, system_name(), TRUE));
+	int index = driver_list::find(*core_filename_extract_base(&tempstr, system_name(), TRUE));
+	return (index != -1) ? &driver_list::driver(index) : NULL;
 }
 
 

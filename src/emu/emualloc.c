@@ -92,6 +92,7 @@ public:
 	static UINT64		s_curid;			// current ID
 	static osd_lock *	s_lock;				// lock for managing the list
 	static bool			s_lock_alloc;		// set to true temporarily during lock allocation
+	static bool			s_tracking;			// set to true when tracking is live
 	static memory_entry *s_hash[k_hash_prime];// hash table based on pointer
 	static memory_entry *s_freehead;		// pointer to the head of the free list
 
@@ -118,9 +119,10 @@ resource_pool global_resource_pool;
 const zeromem_t zeromem = { };
 
 // globals for memory_entry
-UINT64 memory_entry::s_curid = 0;
+UINT64 memory_entry::s_curid = 1;
 osd_lock *memory_entry::s_lock = NULL;
 bool memory_entry::s_lock_alloc = false;
+bool memory_entry::s_tracking = false;
 memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
 memory_entry *memory_entry::s_freehead = NULL;
 
@@ -139,6 +141,31 @@ void *malloc_file_line(size_t size, const char *file, int line)
 {
 	// allocate the memory and fail if we can't
 	void *result = osd_malloc(size);
+	if (result == NULL)
+		return NULL;
+
+	// add a new entry
+	memory_entry::allocate(size, result, file, line);
+
+#ifdef MAME_DEBUG
+	// randomize the memory
+	rand_memory(result, size);
+#endif
+
+	return result;
+}
+
+
+//-------------------------------------------------
+//  malloc_array_file_line - allocate memory with 
+//  file and line number information, and a hint
+//  that this object is an array
+//-------------------------------------------------
+
+void *malloc_array_file_line(size_t size, const char *file, int line)
+{
+	// allocate the memory and fail if we can't
+	void *result = osd_malloc_array(size);
 	if (result == NULL)
 		return NULL;
 
@@ -189,7 +216,19 @@ void free_file_line(void *memory, const char *file, int line)
 //  memory
 //-------------------------------------------------
 
-void dump_unfreed_mem(void)
+void track_memory(bool track)
+{
+	memory_entry::s_tracking = track;
+}
+
+
+//-------------------------------------------------
+//  dump_unfreed_mem - called from the exit path
+//  of any code that wants to check for unfreed
+//  memory
+//-------------------------------------------------
+
+void dump_unfreed_mem()
 {
 #ifdef MAME_DEBUG
 	memory_entry::report_unfreed();
@@ -446,7 +485,7 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	if (s_freehead == NULL)
 	{
 		// create a new chunk, and fail if we can't
-		memory_entry *entry = reinterpret_cast<memory_entry *>(osd_malloc(memory_block_alloc_chunk * sizeof(memory_entry)));
+		memory_entry *entry = reinterpret_cast<memory_entry *>(osd_malloc_array(memory_block_alloc_chunk * sizeof(memory_entry)));
 		if (entry == NULL)
 		{
 			release_lock();
@@ -468,8 +507,8 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	// populate it
 	entry->m_size = size;
 	entry->m_base = base;
-	entry->m_file = file;
-	entry->m_line = line;
+	entry->m_file = s_tracking ? file : NULL;
+	entry->m_line = s_tracking ? line : 0;
 	entry->m_id = s_curid++;
 	if (LOG_ALLOCS)
 		fprintf(stderr, "#%06d, alloc %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
@@ -561,5 +600,5 @@ void memory_entry::report_unfreed()
 	release_lock();
 
 	if (total > 0)
-		fprintf(stderr, "a total of %d bytes were not free()'d\n", total);
+		fprintf(stderr, "a total of %d bytes were not freed\n", total);
 }

@@ -593,7 +593,7 @@ bool hash_collection::remove(char type)
 //  crc - return the CRC hash if present
 //-------------------------------------------------
 
-bool hash_collection::crc(UINT32 &result)
+bool hash_collection::crc(UINT32 &result) const
 {
 	// attempt to find the CRC hash; if we fail, return false
 	hash_base *crchash = hash(HASH_CRC);
@@ -601,7 +601,7 @@ bool hash_collection::crc(UINT32 &result)
 		return false;
 
 	// downcast to a hash_crc and convert to a UINT32
-	result = *downcast<hash_crc *>(crchash);
+	result = *downcast<const hash_crc *>(crchash);
 	return true;
 }
 

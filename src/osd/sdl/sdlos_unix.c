@@ -93,6 +93,20 @@ void *osd_malloc(size_t size)
 
 
 //============================================================
+//  osd_malloc_array
+//============================================================
+
+void *osd_malloc_array(size_t size)
+{
+#ifndef MALLOC_DEBUG
+	return malloc(size);
+#else
+#error "MALLOC_DEBUG not yet supported"
+#endif
+}
+
+
+//============================================================
 //  osd_free
 //============================================================
 
@@ -207,7 +221,7 @@ char *osd_get_clipboard_text(void)
 		/* return a copy & free original */
 		if (prop != NULL)
 		{
-			result = (char *) osd_malloc(strlen((char *)prop)+1);
+			result = (char *) osd_malloc_array(strlen((char *)prop)+1);
 			strcpy(result, (char *)prop);
 		}
 		else
@@ -256,7 +270,7 @@ osd_directory_entry *osd_stat(const char *path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *) osd_malloc(sizeof(*result) + strlen(path) + 1);
+	result = (osd_directory_entry *) osd_malloc_array(sizeof(*result) + strlen(path) + 1);
 	strcpy(((char *) result) + sizeof(*result), path);
 	result->name = ((char *) result) + sizeof(*result);
 	result->type = S_ISDIR(st.st_mode) ? ENTTYPE_DIR : ENTTYPE_FILE;
@@ -293,7 +307,7 @@ file_error osd_get_full_path(char **dst, const char *path)
 	}
 	else
 	{
-		*dst = (char *)osd_malloc(strlen(path_buffer)+strlen(path)+3);
+		*dst = (char *)osd_malloc_array(strlen(path_buffer)+strlen(path)+3);
 
 		// if it's already a full path, just pass it through
 		if (path[0] == '/')

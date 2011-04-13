@@ -157,7 +157,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		const game_driver *system = options.system();
 		if (system == NULL)
 		{
-			system = &GAME_NAME(empty);
+			system = &GAME_NAME(___empty);
 			if (firstgame)
 				started_empty = true;
 		}

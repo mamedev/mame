@@ -71,7 +71,6 @@ SOUNDS += CEM3394
 #-------------------------------------------------
 
 DRVLIBS = \
-	$(MAMEOBJ)/tiny.o \
 	$(EMUDRIVERS)/emudummy.o \
 	$(MACHINE)/ticket.o \
 	$(DRIVERS)/carpolo.o $(MACHINE)/carpolo.o $(VIDEO)/carpolo.o \

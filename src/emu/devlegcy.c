@@ -62,6 +62,7 @@ legacy_device_config_base::legacy_device_config_base(const machine_config &mconf
 	// set the proper name
 	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 	m_shortname = get_legacy_config_string(DEVINFO_STR_SHORTNAME);
+	m_searchpath = m_shortname;
 }
 
 

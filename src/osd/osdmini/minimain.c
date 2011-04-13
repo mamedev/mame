@@ -93,10 +93,12 @@ static INT32 keyboard_get_state(void *device_internal, void *item_internal);
 
 int main(int argc, char *argv[])
 {
-	// cli_execute does the heavy lifting; if we have osd-specific options, we
-	// would pass them as the third parameter here
+	// cli_frontend does the heavy lifting; if we have osd-specific options, we
+	// create a derivative of cli_options and add our own
+	cli_options options;
 	mini_osd_interface osd;
-	return cli_execute(argc, argv, osd, NULL);
+	cli_frontend frontend(options, osd);
+	return frontend.execute(argc, argv);
 }
 
 
@@ -135,7 +137,7 @@ void mini_osd_interface::init(running_machine &machine)
 
 	// initialize the input system by adding devices
 	// let's pretend like we have a keyboard device
-	keyboard_device = input_device_add(&machine, DEVICE_CLASS_KEYBOARD, "Keyboard", NULL);
+	keyboard_device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, "Keyboard", NULL);
 	if (keyboard_device == NULL)
 		fatalerror("Error creating keyboard device");
 

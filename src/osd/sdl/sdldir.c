@@ -67,7 +67,7 @@ struct _osd_directory
 
 static char *build_full_path(const char *path, const char *file)
 {
-	char *ret = (char *) osd_malloc(strlen(path)+strlen(file)+2);
+	char *ret = (char *) osd_malloc_array(strlen(path)+strlen(file)+2);
 	char *p = ret;
 
 	strcpy(p, path);
@@ -126,13 +126,13 @@ osd_directory *osd_opendir(const char *dirname)
 		dir->fd = NULL;
 	}
 
-	tmpstr = (char *) osd_malloc(strlen(dirname)+1);
+	tmpstr = (char *) osd_malloc_array(strlen(dirname)+1);
 	strcpy(tmpstr, dirname);
 
 	if (tmpstr[0] == '$')
 	{
 		char *envval;
-		envstr = (char *) osd_malloc(strlen(tmpstr)+1);
+		envstr = (char *) osd_malloc_array(strlen(tmpstr)+1);
 
 		strcpy(envstr, tmpstr);
 
@@ -149,7 +149,7 @@ osd_directory *osd_opendir(const char *dirname)
 		{
 			j = strlen(envval) + strlen(tmpstr) + 1;
 			osd_free(tmpstr);
-			tmpstr = (char *) osd_malloc(j);
+			tmpstr = (char *) osd_malloc_array(j);
 
 			// start with the value of $HOME
 			strcpy(tmpstr, envval);

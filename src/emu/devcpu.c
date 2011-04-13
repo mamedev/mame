@@ -88,6 +88,7 @@ legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig
 	// set the real name
 	m_name = get_legacy_config_string(DEVINFO_STR_NAME);
 	m_shortname = get_legacy_config_string(DEVINFO_STR_SHORTNAME);
+	m_searchpath = m_shortname;
 }
 
 

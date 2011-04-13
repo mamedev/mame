@@ -126,7 +126,7 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc(samples * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc_array(samples * sizeof(temp[0]));
 	if (!temp)
 		return;
 
@@ -154,7 +154,7 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc_array(samples * 2 * sizeof(temp[0]));
 	if (!temp)
 		return;
 
@@ -179,7 +179,7 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 	if (!wav) return;
 
 	/* allocate temp memory */
-	temp = (INT16 *)osd_malloc(samples * 2 * sizeof(temp[0]));
+	temp = (INT16 *)osd_malloc_array(samples * 2 * sizeof(temp[0]));
 	if (!temp)
 		return;
 

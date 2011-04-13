@@ -280,7 +280,7 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */
-	if (!first_time || (str > 0 && str < 60*5) || &machine.system() == &GAME_NAME(empty) || (machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (!first_time || (str > 0 && str < 60*5) || &machine.system() == &GAME_NAME(___empty) || (machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
@@ -907,8 +907,6 @@ static astring &warnings_string(running_machine &machine, astring &string)
 						GAME_IMPERFECT_GRAPHICS | \
 						GAME_NO_COCKTAIL)
 
-	int i;
-
 	string.reset();
 
 	/* if no warnings, nothing to return */
@@ -955,10 +953,6 @@ static astring &warnings_string(running_machine &machine, astring &string)
 		/* if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger */
 		if (machine.system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 		{
-			const game_driver *maindrv;
-			const game_driver *clone_of;
-			int foundworking;
-
 			/* add the strings for these warnings */
 			if (machine.system().flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
@@ -970,25 +964,25 @@ static astring &warnings_string(running_machine &machine, astring &string)
 					 "It is not possible to fully play this " GAMENOUN ".\n");
 
 			/* find the parent of this driver */
-			clone_of = driver_get_clone(&machine.system());
-			if (clone_of != NULL && !(clone_of->flags & GAME_IS_BIOS_ROOT))
+			driver_enumerator drivlist(machine.options());
+			int maindrv = drivlist.find(machine.system());
+			int clone_of = drivlist.non_bios_clone(maindrv);
+			if (clone_of != -1)
 				maindrv = clone_of;
-			else
-				maindrv = &machine.system();
 
 			/* scan the driver list for any working clones and add them */
-			foundworking = FALSE;
-			for (i = 0; drivers[i] != NULL; i++)
-				if (drivers[i] == maindrv || driver_get_clone(drivers[i]) == maindrv)
-					if ((drivers[i]->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
+			bool foundworking = false;
+			while (drivlist.next())
+				if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
+					if ((drivlist.driver().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL)) == 0)
 					{
 						/* this one works, add a header and display the name of the clone */
 						if (!foundworking)
 							string.cat("\n\nThere are working clones of this game: ");
 						else
 							string.cat(", ");
-						string.cat(drivers[i]->name);
-						foundworking = TRUE;
+						string.cat(drivlist.driver().name);
+						foundworking = true;
 					}
 
 			if (foundworking)

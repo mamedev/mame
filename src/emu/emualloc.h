@@ -47,8 +47,24 @@
 
 
 //**************************************************************************
+//  DEBUGGING
+//**************************************************************************
+
+// set to 1 to track memory allocated by emualloc.h itself as well
+#define TRACK_SELF_MEMORY		(0)
+
+
+
+//**************************************************************************
 //  MACROS
 //**************************************************************************
+
+// self-allocation helpers
+#if TRACK_SELF_MEMORY
+#define EMUALLOC_SELF_NEW new(__FILE__, __LINE__)
+#else
+#define EMUALLOC_SELF_NEW new
+#endif
 
 // pool allocation helpers
 #define pool_alloc(_pool, _type)					(_pool).add_object(new(__FILE__, __LINE__) _type)
@@ -72,11 +88,13 @@
 
 // allocate memory with file and line number information
 void *malloc_file_line(size_t size, const char *file, int line);
+void *malloc_array_file_line(size_t size, const char *file, int line);
 
 // free memory with file and line number information
 void free_file_line(void *memory, const char *file, int line);
 
 // called from the exit path of any code that wants to check for unfreed memory
+void track_memory(bool track);
 void dump_unfreed_mem();
 
 
@@ -100,7 +118,7 @@ ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_al
 
 ATTR_FORCE_INLINE inline void *operator new[](std::size_t size) throw (std::bad_alloc)
 {
-	void *result = malloc_file_line(size, NULL, 0);
+	void *result = malloc_array_file_line(size, NULL, 0);
 	if (result == NULL)
 		throw std::bad_alloc();
 	return result;
@@ -130,7 +148,7 @@ ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, 
 
 ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc)
 {
-	void *result = malloc_file_line(size, file, line);
+	void *result = malloc_array_file_line(size, file, line);
 	if (result == NULL)
 		throw std::bad_alloc();
 	return result;
@@ -161,7 +179,7 @@ ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, 
 
 ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
 {
-	void *result = malloc_file_line(size, file, line);
+	void *result = malloc_array_file_line(size, file, line);
 	if (result == NULL)
 		throw std::bad_alloc();
 	memset(result, 0, size);
@@ -270,8 +288,8 @@ public:
 	bool contains(void *ptrstart, void *ptrend);
 	void clear();
 
-	template<class T> T *add_object(T* object) { add(*new(__FILE__, __LINE__) resource_pool_object<T>(object)); return object; }
-	template<class T> T *add_array(T* array, int count) { add(*new(__FILE__, __LINE__) resource_pool_array<T>(array, count)); return array; }
+	template<class T> T *add_object(T* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<T>(object)); return object; }
+	template<class T> T *add_array(T* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<T>(array, count)); return array; }
 
 private:
 	static const int		k_hash_prime = 193;
@@ -306,7 +324,7 @@ extern const zeromem_t zeromem;
 #undef realloc
 #undef free
 
-#define malloc(x)		malloc_file_line(x, __FILE__, __LINE__)
+#define malloc(x)		malloc_array_file_line(x, __FILE__, __LINE__)
 #define calloc(x,y)		__error_use_auto_alloc_clear_or_global_alloc_clear_instead__
 #define realloc(x,y)	__error_realloc_is_dangerous__
 #define free(x)			free_file_line(x, __FILE__, __LINE__)

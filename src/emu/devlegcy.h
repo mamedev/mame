@@ -126,7 +126,7 @@ enum
 	DEVINFO_STR_FIRST = 0x30000,
 
 		DEVINFO_STR_NAME = DEVINFO_STR_FIRST,			// R/O: name of the device
-		DEVINFO_STR_SHORTNAME,							// R/O: short name of device, used in case of romload
+		DEVINFO_STR_SHORTNAME,							// R/O: search path of device, used for media loading
 		DEVINFO_STR_FAMILY,								// R/O: family of the device
 		DEVINFO_STR_VERSION,							// R/O: version of the device
 		DEVINFO_STR_SOURCE_FILE,						// R/O: file containing the device implementation

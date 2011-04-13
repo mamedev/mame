@@ -141,7 +141,7 @@ char *core_strdup(const char *str)
 	char *cpy = NULL;
 	if (str != NULL)
 	{
-		cpy = (char *)osd_malloc(strlen(str) + 1);
+		cpy = (char *)osd_malloc_array(strlen(str) + 1);
 		if (cpy != NULL)
 			strcpy(cpy, str);
 	}

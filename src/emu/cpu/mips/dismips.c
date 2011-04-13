@@ -336,6 +336,12 @@ void *malloc_file_line(size_t size, const char *file, int line)
 	return osd_malloc(size);
 }
 
+void *malloc_array_file_line(size_t size, const char *file, int line)
+{
+	// allocate the memory and fail if we can't
+	return osd_malloc_array(size);
+}
+
 void free_file_line( void *memory, const char *file, int line )
 {
 	osd_free( memory );

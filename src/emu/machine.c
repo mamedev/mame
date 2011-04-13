@@ -943,8 +943,17 @@ driver_device_config_base::driver_device_config_base(const machine_config &mconf
 
 void driver_device_config_base::static_set_game(device_config *device, const game_driver *game)
 {
-	downcast<driver_device_config_base *>(device)->m_system = game;
-	downcast<driver_device_config_base *>(device)->m_shortname = game->name;
+	driver_device_config_base *base = downcast<driver_device_config_base *>(device);
+	
+	base->m_system = game;
+
+ 	// set the short name to the game's name
+	base->m_shortname = game->name;
+	
+	// and set the search path to include all parents
+	base->m_searchpath = game->name;
+	for (int parent = driver_list::clone(*game); parent != -1; parent = driver_list::clone(parent))
+		base->m_searchpath.cat(";").cat(driver_list::driver(parent).name);
 }
 
 

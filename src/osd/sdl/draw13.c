@@ -964,7 +964,7 @@ static texture_info *texture_create(sdl_window_info *window, const render_texinf
 
 	if ( (texture->copyinfo->func != NULL) && (texture->sdl_access == SDL_TEXTUREACCESS_STATIC))
 	{
-		texture->pixels = osd_malloc(texture->setup.rotwidth * texture->setup.rotheight * texture->copyinfo->dst_bpp);
+		texture->pixels = osd_malloc_array(texture->setup.rotwidth * texture->setup.rotheight * texture->copyinfo->dst_bpp);
 	 texture->pixels_own=TRUE;
  }
 	/* add us to the texture list */

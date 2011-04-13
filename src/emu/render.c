@@ -1642,10 +1642,10 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 		load_layout_file(NULL, m_manager.machine().config().m_default_layout);
 
 	// try to load another file based on the parent driver name
-	const game_driver *cloneof = driver_get_clone(&system);
-	if (cloneof != NULL)
-		if (!load_layout_file(cloneof->name, cloneof->name))
-			load_layout_file(cloneof->name, "default");
+	int cloneof = driver_list::clone(system);
+	if (cloneof != -1)
+		if (!load_layout_file(driver_list::driver(cloneof).name, driver_list::driver(cloneof).name))
+			load_layout_file(driver_list::driver(cloneof).name, "default");
 
 	// now do the built-in layouts for single-screen games
 	if (m_manager.machine().m_devicelist.count(SCREEN) == 1)

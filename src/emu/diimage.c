@@ -383,7 +383,6 @@ bool device_image_interface::try_change_working_directory(const char *subdir)
 
 void device_image_interface::setup_working_directory()
 {
-    const game_driver *gamedrv;
 	char *dst = NULL;
 
 	osd_get_full_path(&dst,".");
@@ -394,10 +393,10 @@ void device_image_interface::setup_working_directory()
     if (try_change_working_directory("software"))
     {
         /* now down to a directory for this computer */
-        gamedrv = &device().machine().system();
-        while(gamedrv && !try_change_working_directory(gamedrv->name))
+        int gamedrv = driver_list::find(device().machine().system());
+        while(gamedrv != -1 && !try_change_working_directory(driver_list::driver(gamedrv).name))
         {
-            gamedrv = driver_get_compatible(gamedrv);
+            gamedrv = driver_list::compatible_with(gamedrv);
         }
     }
 	osd_free(dst);

@@ -348,7 +348,8 @@ int main(int argc, char *argv[])
 	{
 		sdl_osd_interface osd;
 		sdl_options options;
-		res = cli_execute(options, osd, argc, argv);
+		cli_frontend frontend(options, osd);
+		res = frontend.execute(argc, argv);
 	}
 
 #ifdef MALLOC_DEBUG

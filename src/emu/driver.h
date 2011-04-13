@@ -2,10 +2,38 @@
 
     driver.h
 
-    Definitions relating to game drivers.
+    Driver enumeration helpers.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -78,6 +106,108 @@ struct game_driver
 	const char *		compatible_with;
 	UINT32				flags;						/* orientation and other flags; see defines below */
 	const char *		default_layout;				/* default internally defined layout */
+};
+
+
+// driver_list is a purely static class that wraps the global driver list
+class driver_list
+{
+	DISABLE_COPYING(driver_list);
+
+protected:
+	// construction/destruction
+	driver_list();
+
+public:
+	// getters
+	static int total() { return s_driver_count; }
+	
+	// any item by index
+	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
+	static int clone(int index) { return find(driver(index).parent); }
+	static int non_bios_clone(int index) { int result = find(driver(index).parent); return (result != -1 && (driver(result).flags & GAME_IS_BIOS_ROOT) == 0) ? result : -1; }
+	static int compatible_with(int index) { int result = clone(index); return (result != -1) ? result : find(driver(index).compatible_with); }
+
+	// any item by driver
+	static int clone(const game_driver &driver) { int index = find(driver); assert(index != -1); return clone(index); }
+	static int non_bios_clone(const game_driver &driver) { int index = find(driver); assert(index != -1); return non_bios_clone(index); }
+	static int compatible_with(const game_driver &driver) { int index = find(driver); assert(index != -1); return compatible_with(index); }
+
+	// general helpers
+	static int find(const char *name);
+	static int find(const game_driver &driver) { return find(driver.name); }
+
+	// static helpers
+	static bool matches(const char *wildstring, const char *string) { return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0); }
+
+protected:
+	// internal helpers
+	static int driver_sort_callback(const void *elem1, const void *elem2);
+	static int penalty_compare(const char *source, const char *target);
+
+	// internal state
+	static int							s_driver_count;
+	static const game_driver * const 	s_drivers_sorted[];
+};
+
+
+// driver_enumerator enables efficient iteration through the driver list
+class driver_enumerator : public driver_list
+{
+	DISABLE_COPYING(driver_enumerator);
+
+public:
+	// construction/destruction
+	driver_enumerator(emu_options &options);
+	driver_enumerator(emu_options &options, const char *filter);
+	driver_enumerator(emu_options &options, const game_driver &filter);
+	~driver_enumerator();
+	
+	// getters
+	int count() const { return m_filtered_count; }
+	int current() const { return m_current; }
+	emu_options &options() const { return m_options; }
+	
+	// current item
+	const game_driver &driver() const { return driver_list::driver(m_current); }
+	machine_config &config() const { return config(m_current); }
+	int clone() { return driver_list::clone(m_current); }
+	int non_bios_clone() { return driver_list::non_bios_clone(m_current); }
+	int compatible_with() { return driver_list::compatible_with(m_current); }
+	void include() { include(m_current); }
+	void exclude() { exclude(m_current); }
+
+	// any item by index
+	bool included(int index) const { assert(index >= 0 && index < s_driver_count); return m_included[index]; }
+	bool excluded(int index) const { assert(index >= 0 && index < s_driver_count); return !m_included[index]; }
+	machine_config &config(int index) const;
+	void include(int index) { assert(index >= 0 && index < s_driver_count); if (!m_included[index]) { m_included[index] = true; m_filtered_count++; }  }
+	void exclude(int index) { assert(index >= 0 && index < s_driver_count); if (m_included[index]) { m_included[index] = false; m_filtered_count--; } }
+	using driver_list::driver;
+	using driver_list::clone;
+	using driver_list::non_bios_clone;
+	using driver_list::compatible_with;
+
+	// filtering/iterating
+	int filter(const char *string = NULL);
+	int filter(const game_driver &driver);
+	void include_all() { memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count; }
+	void exclude_all() { memset(m_included, 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
+	void reset() { m_current = -1; }
+	bool next();
+	bool next_excluded();
+
+	// general helpers
+	void set_current(int index) { assert(index >= -1 && index <= s_driver_count); m_current = index; }
+	void find_approximate_matches(const char *string, int count, int *results);
+
+private:
+	// internal state
+	int					m_current;
+	int					m_filtered_count;
+	emu_options &		m_options;
+	UINT8 *				m_included;
+	machine_config **	m_config;
 };
 
 
@@ -176,24 +306,8 @@ extern const game_driver GAME_NAME(NAME) =	\
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern const game_driver * const drivers[];
+GAME_EXTERN(___empty);
 
-GAME_EXTERN(empty);
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-const game_driver *driver_get_name(const char *name);
-const game_driver *driver_get_clone(const game_driver *driver);
-const game_driver *driver_get_compatible(const game_driver *drv);
-
-const char *driver_get_searchpath(const game_driver &driver, astring &string);
-
-void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list);
-int driver_list_get_count(const game_driver * const driverlist[]);
 
 
 #endif

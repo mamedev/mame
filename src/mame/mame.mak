@@ -235,11 +235,6 @@ SOUNDS += MAS3507D
 # the list of drivers
 #-------------------------------------------------
 
-ifeq ($(TARGET),mame)
-DRVLIBS += \
-	$(MAMEOBJ)/mamedriv.o
-endif
-
 DRVLIBS += \
 	$(MAMEOBJ)/alba.a \
 	$(MAMEOBJ)/alliedl.a \

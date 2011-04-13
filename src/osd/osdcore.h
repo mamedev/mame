@@ -723,7 +723,7 @@ void osd_work_item_release(osd_work_item *item);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
-    osd_malloc: allocate memory that
+    osd_malloc: allocate memory
 
     Parameters:
 
@@ -739,6 +739,26 @@ void osd_work_item_release(osd_work_item *item);
         It can be safely written as a wrapper to malloc().
 -----------------------------------------------------------------------------*/
 void *osd_malloc(size_t size);
+
+
+/*-----------------------------------------------------------------------------
+    osd_malloc_array: allocate memory, hinting tha this memory contains an 
+    array
+
+    Parameters:
+
+        size - the number of bytes to allocate
+
+    Return value:
+
+        a pointer to the allocated memory
+
+    Notes:
+
+        This is just a hook to do OS-specific allocation trickery.
+        It can be safely written as a wrapper to malloc().
+-----------------------------------------------------------------------------*/
+void *osd_malloc_array(size_t size);
 
 
 /*-----------------------------------------------------------------------------

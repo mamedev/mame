@@ -235,13 +235,13 @@ static int config_load_xml(running_machine &machine, emu_file &file, int which_t
 
 			case CONFIG_TYPE_CONTROLLER:
 			{
-				const game_driver *clone_of;
+				int clone_of;
 				/* match on: default, game name, source file name, parent name, grandparent name */
 				if (strcmp(name, "default") != 0 &&
 					strcmp(name, machine.system().name) != 0 &&
 					strcmp(name, srcfile) != 0 &&
-					((clone_of = driver_get_clone(&machine.system())) == NULL || strcmp(name, clone_of->name) != 0) &&
-					(clone_of == NULL || ((clone_of = driver_get_clone(clone_of)) == NULL) || strcmp(name, clone_of->name) != 0))
+					((clone_of = driver_list::clone(machine.system())) == -1 || strcmp(name, driver_list::driver(clone_of).name) != 0) &&
+					(clone_of == -1 || ((clone_of = driver_list::clone(clone_of)) == -1) || strcmp(name, driver_list::driver(clone_of).name) != 0))
 					continue;
 				break;
 			}

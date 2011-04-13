@@ -262,6 +262,7 @@ class device_config
 protected:
 	// construction/destruction
 	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0);
+	device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0);
 	virtual ~device_config();
 
 public:
@@ -289,6 +290,7 @@ public:
 	UINT32 clock() const { return m_clock; }
 	const char *name() const { return m_name; }
 	const char *shortname() const { return m_shortname; }
+	const char *searchpath() const { return m_searchpath; }
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
 	const machine_config &mconfig() const { return m_machine_config; }
@@ -336,7 +338,9 @@ protected:
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
 	astring					m_name;					// name of the device
-	astring					m_shortname;			// short name of the device, used for potential romload
+	astring					m_shortname;			// short name of the device
+	astring					m_searchpath;			// search path, used for media loading
+
 private:
 	astring 				m_tag;					// tag for this instance
 	bool					m_config_complete;		// have we completed our configuration?

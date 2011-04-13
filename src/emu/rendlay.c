@@ -117,6 +117,10 @@
 #include "lcd.lh"
 #include "lcd_rot.lh"
 
+// generic dummy pinball layout
+#include "pinball.lh"
+
+
 
 //**************************************************************************
 //  CONSTANTS
