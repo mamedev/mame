@@ -724,8 +724,8 @@ ROM_END
 /* We need proper names for most of these BIOS ROMs! */
 ROM_START( segacd )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	/* v1.10 */
-	ROM_LOAD( "segacd_model1_bios_1_10_u.bin", 0x000000,  0x020000, CRC(c6d10268) SHA1(f4f315adcef9b8feb0364c21ab7f0eaf5457f3ed) )
+	/* v1.10 confirmed dump by dead_screem */
+	ROM_LOAD( "mpr-15045b.bin", 0x000000,  0x020000, CRC(c6d10268) SHA1(f4f315adcef9b8feb0364c21ab7f0eaf5457f3ed) )
 ROM_END
 
 ROM_START( megacd )
@@ -736,10 +736,24 @@ ROM_END
 
 ROM_START( megacdj )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S") /* also used for Asia PAL - not handled yet */
-	ROMX_LOAD( "megacd_model1_bios_1_00s_j.bin", 0x000000,  0x020000, CRC(550f30bb) SHA1(e4193c6ae44c3cea002707d2a88f1fbcced664de), ROM_BIOS(1) )
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
+	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(1, "v100p", "v1.00P")
 	ROMX_LOAD( "megacd_model1_bios_1_00p_j.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(2) )
+	/* Confirmed by ElBarto */
+	ROM_SYSTEM_BIOS(2, "v100l", "v1.00L")
+	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
+ROM_END
+
+/* Asia bios, when run in USA region will show :
+ERROR!
+THIS IS A PAL-COMPATIBLE MEGA CD
+FOR EXCLUSIVE USE IN SOUTHEAST ASIA.
+*/
+ROM_START( megacda )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "megacd_model1_bios_1_00s_a.bin", 0x000000,  0x020000, CRC(550f30bb) SHA1(e4193c6ae44c3cea002707d2a88f1fbcced664de))
 ROM_END
 
 ROM_START( segacd2 )
@@ -754,18 +768,20 @@ ROM_START( segacd2 )
 	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(3) )
 ROM_END
 
+/* All confirmed good dump by ElBarto */
 ROM_START( megacd2 )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_SYSTEM_BIOS(0, "v200w", "v2.00W")	// confirmed good dump
-	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(2a4b82b5) SHA1(45134ef8655b9d06b130726786efe2f8b1d430a3), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(0, "v200w", "v2.00W")
+	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(53f1757c) SHA1(67bf3970ca5a05fd5ce3d6c446789c5d971b98a4), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 	ROM_SYSTEM_BIOS(1, "v200", "v2.00")
-	ROMX_LOAD( "mpr-15512-t.bin", 0x000000,  0x020000, CRC(62108fff) SHA1(cfcf092e0a70779fc5912da0fbd154838df997da), ROM_BIOS(2) )
+	ROMX_LOAD( "mpr-15512.bin", 0x000000,  0x020000, CRC(cb76f114) SHA1(939f173cadc41e996a3c34498da1bf55e7e18ff8), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
+/* Confirmed good dump by ElBarto */
 ROM_START( megacd2j )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v200c", "v2.00C")
-	ROMX_LOAD( "mpr-15398.bin", 0x000000,  0x020000, CRC(ba7bf31d) SHA1(762d20ebb85b980c17c53f928c002d747920a281), ROM_BIOS(1) )
+	ROMX_LOAD( "mpr-15398.bin", 0x000000,  0x020000, CRC(1e4344e6) SHA1(4d1251a6973d932e734ae5e8c6b9b55eb40e4143), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
 ROM_START( laseract )
@@ -1093,6 +1109,7 @@ CONS( 1994, 32x,        0,         0,      ms_32x,          md_sel, mess_32x,  "
 CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd,     segacd,    0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1991, megacda,    segacd,    0,      genesis_scd_mcdj,md,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
 CONS( 1993, segacd2,    0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, megacd2,    segacd2,   0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
 CONS( 1993, megacd2j,   segacd2,   0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
