@@ -1251,6 +1251,9 @@ const game_driver * const drivers[] =
 	DRIVER( supergm3 )  /* 1996 */
 	DRIVER( cham24 )	/* 2002 */
 
+        /* Famicom Box */
+	DRIVER( famibox )	/* 1986 */
+
 	/* Nintendo Super System Games */
 	DRIVER( nss )
 	DRIVER( nss_ssoc )	/* 1992 Human Inc. */
@@ -1272,8 +1275,6 @@ const game_driver * const drivers[] =
 	DRIVER( pss62 )		/* 199? T & E Soft / I'Max */
 	//pss63 - Super Donkey Kong / Super Tetris 2 + Bombliss
 	//pss64 - Super Donkey Kong / Super Bomberman 2
-
-
 
 	/* SNES-based hacks */
 	DRIVER( kinstb )	/* bootleg */

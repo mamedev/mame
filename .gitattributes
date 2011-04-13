@@ -1828,6 +1828,7 @@ src/mame/drivers/exterm.c svneol=native#text/plain
 src/mame/drivers/exzisus.c svneol=native#text/plain
 src/mame/drivers/f-32.c svneol=native#text/plain
 src/mame/drivers/f1gp.c svneol=native#text/plain
+src/mame/drivers/famibox.c svneol=native#text/plain
 src/mame/drivers/fantland.c svneol=native#text/plain
 src/mame/drivers/fastfred.c svneol=native#text/plain
 src/mame/drivers/fastlane.c svneol=native#text/plain
