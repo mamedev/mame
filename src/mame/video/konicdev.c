@@ -1445,8 +1445,9 @@ void k007121_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 	}
 	else	/* all others */
 	{
+		/* TODO: sprite limit is supposed to be per-line! (check MT #00185) */
+		num = 0x40;
 		//num = (k007121->ctrlram[0x03] & 0x40) ? 0x80 : 0x40; /* WRONG!!! (needed by combatsc)  */
-		num = 0x40; // combatsc writes 70 sprites to VRAM at peak but the chip only processes the first 64.
 
 		inc = 5;
 		offs[0] = 0x00;
