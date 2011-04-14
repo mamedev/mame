@@ -4141,10 +4141,10 @@ ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C */
 	ROM_LOAD("mpr-19750.24s", 0xc00000, 0x400000, CRC(cd95d0bf) SHA1(40e2a2980c89049c339fefd48bf7aac79962cd2e) )
 ROM_END
 
-ROM_START( topskatru ) /* Top Skater (USA), Model 2C */
+ROM_START( topskatru ) /* Top Skater Revision A (USA), Model 2C */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-	ROM_LOAD32_WORD( "epr-19753.15", 0x000000, 0x080000, CRC(3b3028de) SHA1(717ebf0ccd87128a24776e618cf15f07aaf48537) )
-	ROM_LOAD32_WORD( "epr-19754.16", 0x000002, 0x080000, CRC(17535b98) SHA1(a2329d09821900ec4f867caf1a93759085bd0a62) )
+	ROM_LOAD32_WORD( "epr-19753a.15", 0x000000, 0x080000, CRC(3b3028de) SHA1(717ebf0ccd87128a24776e618cf15f07aaf48537) )
+	ROM_LOAD32_WORD( "epr-19754a.16", 0x000002, 0x080000, CRC(17535b98) SHA1(a2329d09821900ec4f867caf1a93759085bd0a62) )
 
 	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Data
 	ROM_LOAD32_WORD("mpr-19735.11",  0x000000, 0x400000, CRC(8e509266) SHA1(49afc91467f08befaf34e743cbe823de3e3c9d85) )
@@ -5161,7 +5161,7 @@ GAME( 1997, hotd,            0, model2c, model2, 0, ROT0, "Sega", "House of the 
 GAME( 1997, overrev,         0, model2c, srallyc, overrev, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c, model2, 0, ROT0, "Sega", "Sega Water Ski (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0, ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, topskatru,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, topskatru,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatrj,topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, bel,             0, model2c, bel,    0, ROT0, "Sega / EPL Productions", "Behind Enemy Lines", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopc,dynamcop, model2c, model2, 0, ROT0, "Sega", "Dynamite Cop (USA, Model 2C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
