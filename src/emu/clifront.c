@@ -1207,6 +1207,7 @@ void cli_frontend::display_help()
 	mame_printf_info(USAGE "\n\n"
 		   "        " APPNAME " -showusage    for a brief list of options\n"
 		   "        " APPNAME " -showconfig   for a list of configuration options\n"
+		   "        " APPNAME " -listmedia    for a full list of supported media\n"
 		   "        " APPNAME " -createconfig to create a " CONFIGNAME ".ini\n\n"
 		   "For usage instructions, please consult the file windows.txt\n",APPNAME,GAMENOUN);
 }
