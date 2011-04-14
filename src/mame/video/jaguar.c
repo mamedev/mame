@@ -199,6 +199,7 @@ static UINT8 cpu_irq_state;
 static bitmap_t *screen_bitmap;
 
 static pen_t *pen_table;
+static int pixel_clock;
 
 UINT8 blitter_status;
 
@@ -761,7 +762,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 						visarea.max_x = hbstart / 2 - 1;
 						visarea.min_y = vbend / 2;
 						visarea.max_y = vbstart / 2 - 1;
-						space->machine().primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+						space->machine().primary_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS((double)pixel_clock * 2 / hperiod / vperiod));
 					}
 				}
 				break;
@@ -916,8 +917,14 @@ VIDEO_START( cojag )
 	state_save_register_global_array(machine, gpu_regs);
 	state_save_register_global(machine, cpu_irq_state);
 	machine.state().register_postload(cojag_postload, NULL);
+	pixel_clock = COJAG_PIXEL_CLOCK;
 }
 
+VIDEO_START( jaguar )
+{
+	VIDEO_START_CALL( cojag );
+	pixel_clock = JAGUAR_CLOCK;
+}
 
 
 /*************************************

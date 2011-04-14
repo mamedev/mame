@@ -146,6 +146,8 @@ enum
 	XTAL_25MHz  		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
 	XTAL_25_1748MHz 	= 25174800,		/* Sega S16A, S16B */
 	XTAL_25_447MHz  	= 25447000,		/* Namco EVA3A (Funcube2) */
+	XTAL_25_590906MHz	= 25590906,		/* Atari Jaguar NTSC */
+	XTAL_25_593900MHz	= 25593900,		/* Atari Jaguar PAL */
 	XTAL_25_601712MHz	= 25601712,		/* Astro Corp.'s Show Hand */
 	XTAL_26_66666MHz	= 26666660,		/* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
