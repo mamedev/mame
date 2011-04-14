@@ -117,7 +117,7 @@ public:
 	viper_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 m_mpc8240_regs[256/4];
+	
 	UINT32 m_epic_iack;
 	int m_cf_card_ide;
 	int m_unk1_bit;
@@ -125,11 +125,14 @@ public:
 	
 };
 
+UINT32 m_mpc8240_regs[256/4];
+
 /*****************************************************************************/
 
 static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
+// device is null?
+//	viper_state *state = device->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //	printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	#endif
@@ -137,18 +140,19 @@ static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function,
 	switch (reg)
 	{
 	}
-
-	return state->m_mpc8240_regs[reg/4];
+	return m_mpc8240_regs[reg/4];
+	//return state->m_mpc8240_regs[reg/4];
 }
 
 static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	viper_state *state = device->machine().driver_data<viper_state>();
+// device is null?
+//	viper_state *state = device->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //	printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	#endif
-
-	COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
+	COMBINE_DATA(m_mpc8240_regs + (reg/4));
+	//COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
 }
 
 
@@ -1007,7 +1011,7 @@ static MACHINE_CONFIG_START( viper, viper_state )
 	MCFG_MACHINE_RESET(viper)
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE(0, NULL, mpc8240_pci_r, mpc8240_pci_w)
+	MCFG_PCI_BUS_DEVICE(0, "mpc8240", mpc8240_pci_r, mpc8240_pci_w)
 	MCFG_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
