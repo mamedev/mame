@@ -51,9 +51,6 @@
 
 #include <new>
 #include <ctype.h>
-#ifdef MESS
-#include "mess.h"
-#endif
 
 
 //**************************************************************************
@@ -1119,11 +1116,7 @@ void cli_frontend::execute_commands(const char *exename)
 	if (strcmp(m_options.command(), CLICOMMAND_SHOWUSAGE) == 0)
 	{
 		astring helpstring;
-#ifndef MESS
-		mame_printf_info("Usage: %s [%s] [options]\n\nOptions:\n%s", exename, GAMENOUN, m_options.output_help(helpstring));
-#else
-		mame_printf_info("Usage: %s [%s] [media] [software] [options]\n\nOptions:\n%s", exename, GAMENOUN, m_options.output_help(helpstring));
-#endif
+		mame_printf_info(USAGE "\n\nOptions:\n%s", exename, GAMENOUN, m_options.output_help(helpstring));
 		return;
 	}
 
@@ -1208,18 +1201,14 @@ void cli_frontend::execute_commands(const char *exename)
 
 void cli_frontend::display_help()
 {
-#ifndef MESS
-	mame_printf_info("M.A.M.E. v%s - Multiple Arcade Machine Emulator\n"
-		   "Copyright Nicola Salmoria and the MAME Team\n\n", build_version);
-	mame_printf_info("%s\n", mame_disclaimer);
-	mame_printf_info("Usage:  MAME gamename [options]\n\n"
-		   "        MAME -showusage    for a brief list of options\n"
-		   "        MAME -showconfig   for a list of configuration options\n"
-		   "        MAME -createconfig to create a " CONFIGNAME ".ini\n\n"
-		   "For usage instructions, please consult the file windows.txt\n");
-#else
-	mess_display_help();
-#endif
+	mame_printf_info(APPLONGNAME " v%s - " FULLLONGNAME "\n"
+		   COPYRIGHT_INFO "\n\n", build_version);		   
+	mame_printf_info("%s\n", DISCLAIMER);
+	mame_printf_info(USAGE "\n\n"
+		   "        " APPNAME " -showusage    for a brief list of options\n"
+		   "        " APPNAME " -showconfig   for a list of configuration options\n"
+		   "        " APPNAME " -createconfig to create a " CONFIGNAME ".ini\n\n"
+		   "For usage instructions, please consult the file windows.txt\n",APPNAME,GAMENOUN);
 }
 
 

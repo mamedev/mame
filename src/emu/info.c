@@ -47,18 +47,6 @@
 
 #include <ctype.h>
 
-
-// MAME vs MESS configuration
-#ifdef MESS
-#define XML_ROOT "mess"
-#define XML_TOP "machine"
-#else
-#define XML_ROOT "mame"
-#define XML_TOP "game"
-#endif
-
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************

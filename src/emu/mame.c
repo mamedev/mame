@@ -107,19 +107,6 @@ static running_machine *global_machine;
 static output_callback_func output_cb[OUTPUT_CHANNEL_COUNT];
 static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
 
-/* the "disclaimer" that should be printed when run with no parameters */
-const char mame_disclaimer[] =
-	"MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n"
-	"several arcade machines. But hardware is useless without software, so an image\n"
-	"of the ROMs which run on that hardware is required. Such ROMs, like any other\n"
-	"commercial software, are copyrighted material and it is therefore illegal to\n"
-	"use them if you don't own the original arcade machine. Needless to say, ROMs\n"
-	"are not distributed together with MAME. Distribution of MAME together with ROM\n"
-	"images is a violation of copyright law and should be promptly reported to the\n"
-	"authors so that appropriate legal action can be taken.\n";
-
-
-
 /***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/

@@ -85,13 +85,7 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-#ifdef MESS
-const char state_manager::s_magic_num[8] = { 'M', 'E', 'S', 'S', 'S', 'A', 'V', 'E' };
-#else
-const char state_manager::s_magic_num[8] = { 'M', 'A', 'M', 'E', 'S', 'A', 'V', 'E' };
-#endif
-
-
+const char state_manager::s_magic_num[8] = { STATE_MAGIC_NUM };
 
 //**************************************************************************
 //  INITIALIZATION
