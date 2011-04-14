@@ -12,9 +12,10 @@
 #endif /* MESS */
 #endif
 
+/* CoJag and Jaguar have completely different XTALs, pixel clock in Jaguar is the same as the GPU one */
 #define COJAG_PIXEL_CLOCK		XTAL_14_31818MHz
-
-
+#define JAGUAR_CLOCK			XTAL_25_590906MHz // NTSC
+// XTAL_25_593900MHz PAL, TODO
 
 /*----------- defined in drivers/cojag.c -----------*/
 
@@ -67,4 +68,5 @@ WRITE32_HANDLER( jaguar_tom_regs32_w );
 READ32_HANDLER( cojag_gun_input_r );
 
 VIDEO_START( cojag );
+VIDEO_START( jaguar );
 SCREEN_UPDATE( cojag );
