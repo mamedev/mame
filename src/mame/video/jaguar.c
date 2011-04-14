@@ -625,7 +625,7 @@ READ32_HANDLER( jaguar_blitter_r )
 WRITE32_HANDLER( jaguar_blitter_w )
 {
 	COMBINE_DATA(&blitter_regs[offset]);
-	if (offset == B_CMD)
+	if ((offset == B_CMD) && (mem_mask & 0x0000ffff))
 	{
 		blitter_status = 0;
 		space->machine().scheduler().timer_set(attotime::from_usec(100), FUNC(blitter_done));
