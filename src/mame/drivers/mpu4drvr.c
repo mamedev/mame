@@ -1956,6 +1956,8 @@ static MACHINE_RESET( mpu4_vid )
 	state->m_IC23G2B   = 0;
 
 	state->m_prot_col  = 0;
+	state->m_chr_counter    = 0;
+	state->m_chr_value		= 0;
 }
 
 static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
@@ -2058,7 +2060,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_read, ptm6840_write, 0xff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_r, pia6821_w, 0xff)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREADWRITE8("6840ptm_ic3ss", ptm6840_read, ptm6840_write, 0xff)
-	AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
 /* Deal 'Em */
@@ -2561,6 +2563,10 @@ incorrect behaviour manifesting in ridiculously large payouts.
 In fact, the software seems deliberately designed to mislead, but is (fortunately for
 us) prone to similar weaknesses that allow a per game solution.
 
+See MPU4.c for more info
+
+As BwB games aren't yet booting on the 16-bit board, we're duplicating the 8-bit program
+Precedent suggests this is not that dangerous an assumption to make.
 */
 
 
@@ -2573,38 +2579,34 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 	if (!state->m_current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
-	if (offset == 0)//initialisation is always at 0x800
+	if (offset == 0)
 	{
+		if (!state->m_chr_state)
 		{
-			if (call == 0)
-			{
-				state->m_init_col =0;
-			}
-			else
-			{
-				for (x = state->m_init_col; x < 64; x++)
-				{
-					if	(state->m_current_chr_table[(x)].call == call)
-					{
-						state->m_init_col = x;
-						LOG_CHR_FULL(("BwB Characteriser init column %02X\n",state->m_init_col));
-						break;
-					}
-				}
-			}
+			state->m_chr_state=1;
+			state->m_chr_counter=0;
+		}
+		if (call == 0)
+		{
+			state->m_init_col ++;
+		}
+		else
+		{
+			state->m_init_col =0;
 		}
 	}
-	else
+	state->m_chr_value = space->machine().rand();
+	for (x = 0; x < 4; x++)
 	{
-		for (x = state->m_prot_col; x < 64;)
+		if	(state->m_current_chr_table[(x)].call == call)
 		{
-			x++;
-			if	(state->m_current_chr_table[(x)].call == call)
+			if (x == 0) // reinit
 			{
-				state->m_prot_col = x;
-				LOG_CHR(("BwB Characteriser init column %02X\n",state->m_prot_col));
-				break;
+				state->m_bwb_return = 0;
 			}
+			state->m_chr_value = bwb_chr_table_common[(state->m_bwb_return)];
+			state->m_bwb_return++;
+			break;
 		}
 	}
 }
@@ -2612,21 +2614,38 @@ static WRITE16_HANDLER( bwb_characteriser16_w )
 static READ16_HANDLER( bwb_characteriser16_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
 
 	if (offset ==0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_init_col].response));
-		return state->m_current_chr_table[state->m_init_col].response;
+		switch (state->m_chr_counter)
+		{
+			case 6:
+			case 13:
+			case 20:
+			case 27:
+			case 34:
+			{
+				return state->m_bwb_chr_table1[(((state->m_chr_counter + 1) / 7) - 1)].response;
+				break;
+			}
+			default:
+			{
+				if (state->m_chr_counter > 34)
+				{
+					state->m_chr_counter = 35;
+					state->m_chr_state = 2;
+				}
+				state->m_chr_counter ++;
+				return state->m_chr_value;
+			}
+		}
 	}
-	else
+	else 
 	{
-		LOG_CHR(("Characteriser read BwB data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
-		return state->m_current_chr_table[state->m_prot_col].response;
+		return state->m_chr_value;
 	}
 }
 
@@ -2773,18 +2792,16 @@ static const mpu4_chr_table quidgrid_data[64] = {
 	{0x0D, 0x04}, {0x1F, 0x64}, {0x16, 0x24}, {0x05, 0x64}, {0x13, 0x24}, {0x1C, 0x64}, {0x02, 0x74}, {0x00, 0x00}
 };
 
-static const mpu4_chr_table prizeinv_data[72] = {
-{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x2e, 0x36},{0x20, 0x42},
-{0x0f, 0x27},{0x24, 0x42},{0x3c, 0x09},{0x2c, 0x01},{0x01, 0x1d},{0x1d, 0x40},{0x40, 0xd2},{0xd2, 0x01},
-{0x01, 0xf9},{0xb1, 0x41},{0x41, 0x1c},{0x1c, 0x01},{0x01, 0xf9},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},
-{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0xc9},
-{0xc9, 0x05},{0x05, 0x04},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},
-{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0x36},{0x36, 0x00},{0x42, 0x04},{0x27, 0x04},
-{0x42, 0x0c},{0x09, 0x0c},{0x42, 0x1c},{0x27, 0x14},{0x42, 0x2c},{0x42, 0x5c},{0x09, 0x2c},
-//All this may be garbage - the ROM table seems endless
-{0x0A, 0x00},
-{0x31, 0x20},{0x34, 0x90}, {0x1e, 0x40},{0x04, 0x90},{0x01, 0xe4},{0x0c, 0xf4},{0x18, 0x64},{0x19, 0x10},
-{0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
+
+static const bwb_chr_table prizeinv_data1[5] = {
+//This is all wrong, but without BwB Vid booting,
+//I can't find the right values. These should be close though
+	{0x67},{0x17},{0x0f},{0x24},{0x3c},
+};
+
+static const mpu4_chr_table prizeinv_data[8] = {
+{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
+{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
 static DRIVER_INIT (adders)
@@ -3490,6 +3507,6 @@ GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"
 GAME( 199?,  prizeinv,  0,        bwbvid,	mpu4,     prizeinv, ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
 GAME( 199?,  blox,      0,        bwbvid,	mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
 GAME( 199?,  bloxd,     blox,     bwbvid,	mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
-GAME( 1996,  renoreel,  0,        bwbvid5,  mpu4,     0,		ROT0, "BwB",			"Reno Reels (20p/10GBP Cash, release A)",							GAME_NOT_WORKING )
+GAME( 1996,  renoreel,  0,        bwbvid5,  mpu4,     prizeinv,	ROT0, "BwB",			"Reno Reels (20p/10GBP Cash, release A)",							GAME_NOT_WORKING )
 GAME( 199?,  redhtpkr,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"Red Hot Poker (20p/10GBP Cash, release 3)",						GAME_NOT_WORKING )
 GAME( 199?,  bwbtetrs,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"BwB Tetris v 2.2",													GAME_NOT_WORKING )

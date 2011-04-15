@@ -4,16 +4,16 @@
   This is the core driver, no video specific stuff should go in here.
   This driver holds all the mechanical games.
 
-     01-2011: Adding the missing 'OKI' sound card, and documented it.
-     05-2009: Miscellaneous lamp fixes, based on data from FME Forever.
+     04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
+	          This is still a hard coded system, but significantly different to Barcrest's version.
+     03-2011: Lamp timing fixes, support for all known expansion cards added.
+	 01-2011: Adding the missing 'OKI' sound card, and documented it, but needs 6376 rewrite.
      09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
                          Connect 4 now has the right sound.
   03-07-2007: J Wallace: Several major changes, including input relabelling, and system timer improvements.
      06-2007: Atari Ace, many cleanups and optimizations of I/O routines
   09-06-2007: J Wallace: Fixed 50Hz detection circuit.
-  09-04-2007: J Wallace: Corrected a lot of out of date info in this revision history.
-                         Revisionism, if you will.
   17-02-2007: J Wallace: Added Deal 'Em - still needs some work.
   10-02-2007: J Wallace: Improved input timing.
   30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
@@ -256,8 +256,10 @@ TODO: - Distinguish door switches using manual
 static TIMER_CALLBACK( ic24_timeout );
 
 
-static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used
+static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
+
+static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
 #define STANDARD_REEL  0	/* As originally designed 3/4 reels*/
 #define FIVE_REEL_5TO8 1	/* Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel*/
@@ -290,6 +292,11 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 struct mpu4_chr_table
 {
 	UINT8 call;
+	UINT8 response;
+};
+
+struct bwb_chr_table//dynamic populated table
+{
 	UINT8 response;
 };
 
@@ -358,9 +365,15 @@ public:
 	int m_card_live;
 	int m_led_extender;
 	int m_bwb_bank;
+	int m_chr_state;
+	int m_chr_counter;
+	int m_chr_value;
+	int m_bwb_return;
+	int m_pageval;
+	int m_pageset;
 	int m_hopper;
 	const mpu4_chr_table* m_current_chr_table;
-
+	const bwb_chr_table* m_bwb_chr_table1;
 	//Video
 	UINT8 m_m6840_irq_state;
 	UINT8 m_m6850_irq_state;
@@ -608,7 +621,10 @@ static void mpu4_stepper_reset(mpu4_state *state)
 	for (reel = 0; reel < 6; reel++)
 	{
 		stepper_reset_position(reel);
-		if (stepper_optic_state(reel)) pattern |= 1<<reel;
+		if(!state->m_reel_mux)
+		{
+			if (stepper_optic_state(reel)) pattern |= 1<<reel;
+		}
 	}
 	state->m_optic_pattern = pattern;
 }
@@ -633,8 +649,10 @@ static MACHINE_RESET( mpu4 )
 	state->m_IC23G2B   = 0;
 
 	state->m_prot_col  = 0;
+	state->m_chr_counter    = 0;
+	state->m_chr_value		= 0;
 
-/* init rom bank, some games don't set this */
+	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
 		UINT8 *rom = machine.region("maincpu")->base();
 
@@ -643,7 +661,6 @@ static MACHINE_RESET( mpu4 )
 		memory_set_bank(machine, "bank1",0);
 		machine.device("maincpu")->reset();
 	}
-
 }
 
 
@@ -680,16 +697,35 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	}
 }
 
-/* Bankswitching */
+/* Bankswitching 
+The MOD 4 ROM cards are set up to handle 8 separate ROM pages, arranged as 2 sets of 4.
+The bankswitch selects which of the 4 pages in the set is active, while the bankset
+switches between the sets.
+It appears that the cards were originally intended to be used in a 'half' page setup,
+where the two halves of the ROM space could be mixed and matched as appropriate. 
+However, there is no evidence to suggest this was ever implemented. 
+The controls for it exist however, in the form of the Soundboard PIA CB2 pin, which is
+used in some cabinets instead of the main control.
+*/
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine(), "bank1",data & 0x07);
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	state->m_pageval=(data&0x03);
+	memory_set_bank(space->machine(), "bank1",state->m_pageval + (state->m_pageset?4:0));
 }
 
 
 static READ8_HANDLER( bankswitch_r )
 {
 	return memory_get_bank(space->machine(), "bank1");
+}
+
+
+static WRITE8_HANDLER( bankset_w )
+{
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	state->m_pageval=(data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
+	memory_set_bank(space->machine(), "bank1",state->m_pageval + (state->m_pageset?4:0));
 }
 
 
@@ -810,7 +846,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_cb2_w )
 {
 	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",device->machine().describe_context(),state));
-
+// DM Data pin A
 	if ( state ) ROC10937_reset(0);
 	ROC10937_draw_16seg(0);
 }
@@ -1117,72 +1153,86 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 	}
 
 		if (mame_stricmp(device->machine().system().name, "m_gmball") == 0)
-	{
+		{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
         provide a truly fair hi-lo gamble for an AWP machine. Functionally, it consists of
         a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
         holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
-        hole it's currently in, to land in another. Landing in the same hole cause the machine to
+        hole it's currently in, to land in another. Landing in the same hole causes the machine to
         refire the ball. The ball detection is done by the high 4 bytes of AUX1.
-        Here we call the MAME RNG, clamping it to 16 values, with the unused
-        values effectively asking the machine to 'roll again'. We then trigger the switches corresponding to
-        the correct number. This appears to be the best way of making the game fair, short of simulating
-        the physics of a bouncing ball ;)*/
+        Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We 
+		then trigger the switches corresponding to the correct number. This appears to be the best way
+		of making the game fair, short of simulating the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
-			switch (device->machine().rand() & 0xf)
+			switch (device->machine().rand() & 0x2)
 			{
-			case 0x00:
-			default:
-			break;// stay where we are if we roll a zero, or roll more than 12
-			case 0x01:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x50;
-			break;
-			case 0x02:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x90;
-			break;
-			case 0x03:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x20;
-			break;
-			case 0x04:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0xb0;
-			break;
-			case 0x05:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x00;
-			break;
-			case 0x06:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x30;
-			break;
-			case 0x07:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0xa0;
-			break;
-			case 0x08:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0xd0;
-			break;
-			case 0x09:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0xd0;
-			break;
-			case 0x0a:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x10;
-			break;
-			case 0xb:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x80;
-			break;
-			case 0xc:
-			state->m_aux1_input = (state->m_aux1_input & 0x0f);
-			state->m_aux1_input|= 0x40;
-			break;
+				case 0x00: //Top row
+				{
+					switch (device->machine().rand() & 0x3)
+					{
+						case 0x00: //7
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0xa0;
+						break;
+						case 0x01://4
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0xb0;
+						break;
+						case 0x02://9
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0xc0;
+						break;
+						case 0x03://8
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0xd0;
+						break;
+					}
+				}
+				case 0x01: //Middle row - note switches don't match pattern
+				{
+					switch (device->machine().rand() & 0x3)
+					{
+						case 0x00://12
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x40;
+						break;
+						case 0x01://1
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x50;
+						break;
+						case 0x02://11
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x80;
+						break;
+						case 0x03://2
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x90;
+						break;
+					}
+				}
+				case 0x02: //Bottom row 
+				{
+					switch (device->machine().rand() & 0x3)
+					{
+						case 0x00://5
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x00;
+						break;
+						case 0x01://10
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x10;
+						break;
+						case 0x02://3
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x20;
+						break;
+						case 0x03://6
+						state->m_aux1_input = (state->m_aux1_input & 0x0f);
+						state->m_aux1_input|= 0x30;
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -1574,6 +1624,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
 	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine().describe_context(), state & 0xFF));
 
+	// DM Data pin B
 	if ( !drvstate->m_alpha_clock && (state) )
 	{
 		ROC10937_shift_data(0, drvstate->m_alpha_data_line&0x01?0:1);
@@ -1663,7 +1714,9 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	//Some BWB games use this to drive the bankswitching
 	if (mstate->m_bwb_bank)
 	{
-		memory_set_bank(device->machine(), "bank1",state);
+		mstate->m_pageval=state;
+
+		memory_set_bank(device->machine(), "bank1",mstate->m_pageval + (mstate->m_pageset?4:0));
 	}
 }
 
@@ -1771,56 +1824,56 @@ static INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
 
 	PORT_START("DIL1")
-	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPNAME( 0x20, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("DIL2")
-	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPNAME( 0x20, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
@@ -1886,56 +1939,56 @@ static INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Drop")
 
 	PORT_START("DIL1")
-	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "Invert Alpha?" ) PORT_DIPLOCATION("DIL1:08")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("DIL2")
-	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPNAME( 0x20, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
@@ -2000,56 +2053,56 @@ static INPUT_PORTS_START( gamball )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
 
 	PORT_START("DIL1")
-	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPNAME( 0x20, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("DIL2")
-	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPNAME( 0x20, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
 	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_SPECIAL)//Handled by Gamball unit
@@ -2072,6 +2125,16 @@ static const stepper_interface barcrest_reel_interface =
 	4,
 	0x00
 };
+
+static const stepper_interface barcrest_reelrev_interface =
+{
+	BARCREST_48STEP_REEL,
+	92,
+	4,
+	0x00,
+	1
+};
+
 static const stepper_interface barcrest_opto1_interface =
 {
 	BARCREST_48STEP_REEL,
@@ -2181,7 +2244,8 @@ For most Barcrest games, the following method was used:
 The initial 'PALTEST' routine as found in the Barcrest programs simply writes the first 'call' to the CHR space,
 to read back the 'response'. There is no attempt to alter the order or anything else, just
 a simple runthrough of the entire data table. The only 'catch' in this is to note that the CHR chip always scans
-through the table starting at the last accessed data value, unless 00 is used to reset to the beginning.
+through the table starting at the last accessed data value, unless 00 is used to reset to the beginning. This is obviously
+a simplification, in fact the PAL does bit manipulation with some latching.
 
 However, a final 8 byte row, that controls the lamp matrix is not tested - to date, no-one outside of Barcrest knows
 how this is generated, and currently trial and error is the only sensible method. It is noted that the default,
@@ -2280,11 +2344,38 @@ static READ8_HANDLER( characteriser_r )
 BwB Characteriser (CHR)
 
 The BwB method of protection is considerably different to the Barcrest one, with any
-incorrect behaviour manifesting in ridiculously large payouts.
+incorrect behaviour manifesting in ridiculously large payouts. The hardware is the
+same, however the main weakness of the software has been eliminated.
 
 In fact, the software seems deliberately designed to mislead, but is (fortunately for
 us) prone to similar weaknesses that allow a per game solution.
 
+Project Amber performed a source analysis (available on request) which appears to make things work.
+Said weaknesses (A Cheats Guide according to Project Amber)
+
+The common initialisation sequence is "00 04 04 0C 0C 1C 14 2C 5C 2C"
+                                        0  1  2  3  4  5  6  7  8
+Using debug search for the first read from said string (best to find it first).
+
+At this point, the X index on the CPU is at the magic number address.
+
+The subsequent calls for each can be found based on the magic address
+
+           (0) = ( (BWBMagicAddress))
+           (1) = ( (BWBMagicAddress + 1))
+           (2) = ( (BWBMagicAddress + 2))
+           (3) = ( (BWBMagicAddress + 4))
+            
+           (4) = ( (BWBMagicAddress - 5))
+           (5) = ( (BWBMagicAddress - 4))
+           (6) = ( (BWBMagicAddress - 3))
+           (7) = ( (BWBMagicAddress - 2))
+           (8) = ( (BWBMagicAddress - 1))
+
+These return the standard init sequence as above.
+
+For ease of understanding, we use three tables, one holding the common responses
+and two holding the appropriate call and response pairs for the two stages of operation
 */
 
 
@@ -2297,38 +2388,35 @@ static WRITE8_HANDLER( bwb_characteriser_w )
 	if (!state->m_current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
-	if (offset == 0)//initialisation is always at 0x800
+	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
 	{
+		if (!state->m_chr_state)
 		{
-			if (call == 0)
-			{
-				state->m_init_col =0;
-			}
-			else
-			{
-				for (x = state->m_init_col; x < 64; x++)
-				{
-					if	(state->m_current_chr_table[(x)].call == call)
-					{
-						state->m_init_col = x;
-						LOG_CHR_FULL(("BwB Characteriser init column %02X\n",state->m_init_col));
-						break;
-					}
-				}
-			}
+			state->m_chr_state=1;
+			state->m_chr_counter=0;
+		}
+		if (call == 0)
+		{
+			state->m_init_col ++;
+		}
+		else
+		{
+			state->m_init_col =0;
 		}
 	}
-	else
+
+	state->m_chr_value = space->machine().rand();
+	for (x = 0; x < 4; x++)
 	{
-		for (x = state->m_prot_col; x < 64;)
+		if	(state->m_current_chr_table[(x)].call == call)
 		{
-			x++;
-			if	(state->m_current_chr_table[(x)].call == call)
+			if (x == 0) // reinit
 			{
-				state->m_prot_col = x;
-				LOG_CHR(("BwB Characteriser init column %02X\n",state->m_prot_col));
-				break;
+				state->m_bwb_return = 0;
 			}
+			state->m_chr_value = bwb_chr_table_common[(state->m_bwb_return)];
+			state->m_bwb_return++;
+			break;
 		}
 	}
 }
@@ -2336,21 +2424,38 @@ static WRITE8_HANDLER( bwb_characteriser_w )
 static READ8_HANDLER( bwb_characteriser_r )
 {
 	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
 
 	if (offset ==0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_init_col].response));
-		return state->m_current_chr_table[state->m_init_col].response;
+		switch (state->m_chr_counter)
+		{
+			case 6:
+			case 13:
+			case 20:
+			case 27:
+			case 34:
+			{
+				return state->m_bwb_chr_table1[(((state->m_chr_counter + 1) / 7) - 1)].response;
+				break;
+			}
+			default:
+			{
+				if (state->m_chr_counter > 34)
+				{
+					state->m_chr_counter = 35;
+					state->m_chr_state = 2;
+				}
+				state->m_chr_counter ++;
+				return state->m_chr_value;
+			}
+		}
 	}
-	else
+	else 
 	{
-		LOG_CHR(("Characteriser read BwB data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
-		return state->m_current_chr_table[state->m_prot_col].response;
+		return state->m_chr_value;
 	}
 }
 
@@ -2402,18 +2507,19 @@ static const mpu4_chr_table oldtmr_data[72] = {
 {0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
 };
 
-static const mpu4_chr_table blsbys_data[72] = {
-{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x2e, 0x36},{0x20, 0x42},
-{0x0f, 0x27},{0x24, 0x42},{0x3c, 0x09},{0x2c, 0x01},{0x01, 0x1d},{0x1d, 0x40},{0x40, 0xd2},{0xd2, 0x01},
-{0x01, 0xf9},{0xb1, 0x41},{0x41, 0x1c},{0x1c, 0x01},{0x01, 0xf9},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},
-{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0xc9},
-{0xc9, 0x05},{0x05, 0x04},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},
-{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0x36},{0x36, 0x00},{0x42, 0x04},{0x27, 0x04},
-{0x42, 0x0c},{0x09, 0x0c},{0x42, 0x1c},{0x27, 0x14},{0x42, 0x2c},{0x42, 0x5c},{0x09, 0x2c},
-//All this may be garbage - it never gets called, but is in the ROM (?)
-{0x0A, 0x00},
-{0x31, 0x20},{0x34, 0x90}, {0x1e, 0x40},{0x04, 0x90},{0x01, 0xe4},{0x0c, 0xf4},{0x18, 0x64},{0x19, 0x10},
-{0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
+static const bwb_chr_table blsbys_data1[5] = {
+//Magic number 724A
+
+// PAL Codes
+// 0   1   2  3  4  5  6  7  8
+// ??  ?? 20 0F 24 3C 36 27 09
+
+	{0x67},{0x17},{0x0f},{0x24},{0x3c},
+};
+
+static const mpu4_chr_table blsbys_data[8] = {
+{0xEF, 0x02},{0x81, 0x00},{0xCE, 0x00},{0x00, 0x2e},
+{0x06, 0x20},{0xC6, 0x0f},{0xF8, 0x24},{0x8E, 0x3c},
 };
 
 // set percentage and other options. 2e 20 0f
@@ -2465,8 +2571,9 @@ static DRIVER_INIT (m_grtecp)
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=FIVE_REEL_5TO8;
 	state->m_lamp_extender=SMALL_CARD;
-	// setup 5 default 96 half step reels with the mux board
-	mpu4_config_common_reels(machine,5);
+	// setup 4 default 96 half step reels with the mux board
+	mpu4_config_common_reels(machine,4);
+	stepper_config(machine, 4, &barcrest_reelrev_interface);
 	state->m_current_chr_table = grtecp_data;
 }
 
@@ -2481,6 +2588,7 @@ static DRIVER_INIT (m_blsbys)
 	stepper_config(machine, 2, &bwb_opto1_interface);
 	stepper_config(machine, 3, &bwb_opto1_interface);
 	stepper_config(machine, 4, &bwb_opto1_interface);
+	state->m_bwb_chr_table1 = blsbys_data1;
 	state->m_current_chr_table = blsbys_data;
 }
 
@@ -2517,10 +2625,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
 	state->m_signal_50hz = state->m_signal_50hz?0:1;
 	pia6821_ca1_w(timer.machine().device("pia_ic4"), state->m_signal_50hz);	/* signal is connected to IC4 CA1 */
 
-	if (state->m_signal_50hz)
-	{
-		update_meters(state);
-	}
+	update_meters(state);//run at 100Hz to sync with PIAs
 }
 
 static ADDRESS_MAP_START( mod2_memmap, AS_PROGRAM, 8 )
@@ -2599,6 +2704,7 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
 	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
@@ -2771,8 +2877,9 @@ ROM_START( m_grtecp )
 ROM_END
 
 ROM_START( m_blsbys )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD("bbprog.bin",  0x00000, 0x20000,  CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b))
+	ROM_RELOAD(0x40000,0x20000)
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "bbsnd.p1",  0x000000, 0x080000,  CRC(715c9e95) SHA1(6a0c9c63e56cfc21bf77cf29c1b844b8e0844c1e) )

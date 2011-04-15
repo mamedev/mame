@@ -207,7 +207,7 @@ static WRITE8_HANDLER( reel12_w )
 {
 	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	if ( state->m_locked & 0x01 )
-	{	// hardware is still state->m_locked,
+	{	// hardware is still locked,
 		if ( data == 0x46 ) state->m_locked &= ~0x01;
 	}
 	else
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( reel34_w )
 {
 	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	if ( state->m_locked & 0x02 )
-	{	// hardware is still state->m_locked,
+	{	// hardware is still locked,
 		if ( data == 0x42 ) state->m_locked &= ~0x02;
 	}
 	else
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( mmtr_w )
 	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	int i;
 	if ( state->m_locked & 0x04 )
-	{	// hardware is still state->m_locked,
+	{	// hardware is still locked,
 		state->m_locked &= ~0x04;
 	}
 	else
@@ -745,7 +745,7 @@ static MACHINE_RESET( bfm_sc1 )
 	}
 
 	state->m_acia_status   = 0x02; // MC6850 transmit buffer empty !!!
-	state->m_locked		  = 0x07; // hardware is state->m_locked
+	state->m_locked		  = 0x07; // hardware is locked
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
@@ -797,7 +797,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_RAM_WRITE(watchdog_w)	// 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE (watchdog_w)//AM_RAM_WRITE(watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END
 

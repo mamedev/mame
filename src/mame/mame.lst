@@ -10669,6 +10669,10 @@ screenpl
 screenp1
 screenp2
 
+// MPU3
+mpu3utst
+m_hprvpr
+
 // MPU4
 m_oldtmr		// Barcrest - highly prelim
 m_ccelbr

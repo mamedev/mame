@@ -5,10 +5,6 @@
 // Emulates : 48 step motors driven with full step or half step          //
 //            also emulates the index optic                              //
 //                                                                       //
-// 26-01-2007: J. Wallace - Rewritten to make it more flexible           //
-//                          and to allow indices to be set in drivers    //
-// 29-12-2006: J. Wallace - Added state save support                     //
-// 05-03-2004: Re-Animator                                               //
 //                                                                       //
 // TODO:  add different types of stepper motors if needed                //
 //        someone who understands the device system may want to convert  //
@@ -34,6 +30,7 @@ struct _stepper_interface
 	INT16 index_start;/* start position of index (in half steps) */
 	INT16 index_end;  /* end position of index (in half steps) */
 	INT16 index_patt; /* pattern needed on coils (0=don't care) */
+	UINT8 reverse; /* Reel spins in reverse (symbols appear from the bottom) */
 };
 
 extern const stepper_interface starpoint_interface_48step;
