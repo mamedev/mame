@@ -298,7 +298,7 @@ Notes:
 #include "includes/jaguar.h"
 
 
-#define JAGUAR_CLOCK		XTAL_52MHz
+//#define JAGUAR_CLOCK		XTAL_52MHz
 #define R3000_CLOCK			XTAL_40MHz
 #define M68K_CLOCK			XTAL_50MHz
 
@@ -1134,11 +1134,11 @@ static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 	MCFG_CPU_CONFIG(r3000_config)
 	MCFG_CPU_PROGRAM_MAP(r3000_map)
 
-	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK/2)
+	MCFG_CPU_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
 	MCFG_CPU_CONFIG(gpu_config)
 	MCFG_CPU_PROGRAM_MAP(gpu_map)
 
-	MCFG_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK/2)
+	MCFG_CPU_ADD("audiocpu", JAGUARDSP, JAGUAR_CLOCK)
 	MCFG_CPU_CONFIG(dsp_config)
 	MCFG_CPU_PROGRAM_MAP(dsp_map)
 
