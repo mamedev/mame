@@ -3,10 +3,19 @@
     Midway Quicksilver skeleton driver
 
     Main CPU : Intel Celeron 333/366MHz
-    Motherboard : Intel SE44BX-2
-    RAM : 64MB
+    Motherboard : Intel SE440BX-2
+    RAM : 64MB PC100-222-620 non-ecc
+    Sound: Integrated YMF740G
+    Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
     Graphics Chips : Quantum Obsidian 3DFX
     Storage : Hard Drive
+    
+    Chipsets (440BX AGPset):
+    - 82371EB PCI-ISA bridge
+    - 82371EB Power Management Controller
+    - 82371AB/EB Universal Host Controller (USB UHCI)
+    - 82371AB/EB PCI Bus Master IDE Controller
+    
 ***************************************************************************/
 
 #include "emu.h"
