@@ -190,7 +190,7 @@ int i8257_device::i8257_do_operation(int channel)
 		}
 		if (&m_out_iow_func[channel].target != NULL)
 		{
-			devcb_call_write8(&m_out_iow_func[channel], 0, data);
+			devcb_call_write8(&m_out_iow_func[channel], m_address[channel], data);
 		}
 		else
 		{
@@ -205,7 +205,7 @@ int i8257_device::i8257_do_operation(int channel)
 	case 2:
 		if (&m_in_ior_func[channel].target != NULL)
 		{
-			data = devcb_call_read8(&m_in_ior_func[channel], 0);
+			data = devcb_call_read8(&m_in_ior_func[channel], m_address[channel]);
 		}
 		else
 		{

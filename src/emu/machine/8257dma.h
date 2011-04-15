@@ -67,8 +67,8 @@ struct i8257_interface
 	devcb_write_line	m_out_mark_func;
 
 	/* accessors to main memory */
-	devcb_read8			m_in_memr_func;
-	devcb_write8		m_out_memw_func;
+	devcb_read8			m_in_memr_func; // TODO m_in_memr_func[I8257_NUM_CHANNELS];
+	devcb_write8		m_out_memw_func; // TODO m_out_memw_func[I8257_NUM_CHANNELS];
 
 	/* channel accesors */
 	devcb_read8			m_in_ior_func[I8257_NUM_CHANNELS];
