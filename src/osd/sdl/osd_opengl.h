@@ -32,6 +32,17 @@
 #endif
 	#ifdef USE_DISPATCH_GL
 
+#ifdef MACOSX_USE_LIBSDL
+	#ifndef APIENTRY
+	#define APIENTRY
+	#endif
+	
+	#include "GL/gl.h"
+	#include "GL/glext.h"
+
+	typedef void (APIENTRY * PFNGLACTIVETEXTUREARBPROC) (GLenum target);
+#endif
+
 	#define OSD_GL(ret,func,params) ret (APIENTRY *func) params;
 	#define OSD_GL_UNUSED(ret,func,params)
 
