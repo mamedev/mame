@@ -118,6 +118,20 @@ device_t *sed1330_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void sed1330_device_config::static_set_config(device_config *device, const char *screen_tag)
+{
+	sed1330_device_config *sed1330 = downcast<sed1330_device_config *>(device);
+
+	assert(screen_tag != NULL);
+
+	sed1330->m_screen_tag = screen_tag;
+}
+
+
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
@@ -135,26 +149,6 @@ const address_space_config *sed1330_device_config::memory_space_config(address_s
 const rom_entry *sed1330_device_config::device_rom_region() const
 {
 	return ROM_NAME( sed1330 );
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sed1330_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const sed1330_interface *intf = reinterpret_cast<const sed1330_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<sed1330_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
 }
 
 

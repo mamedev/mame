@@ -20,13 +20,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SED1330_ADD(_tag, _clock, _config) \
+#define MCFG_SED1330_ADD(_tag, _clock, _screen_tag, _map) \
 	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define SED1330_INTERFACE(name) \
-	const sed1330_interface (name) =
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
+	sed1330_device_config::static_set_config(device, _screen_tag);
 
 
 
@@ -34,20 +31,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sed1330_interface
-
-struct sed1330_interface
-{
-	const char *screen_tag;
-};
-
-
-
 // ======================> sed1330_device_config
 
 class sed1330_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public sed1330_interface
+								public device_config_memory_interface
 {
     friend class sed1330_device;
 
@@ -59,10 +46,10 @@ public:
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	// inline configuration helpers
+	static void static_set_config(device_config *device, const char *screen_tag);
 
+protected:
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 
@@ -71,6 +58,9 @@ protected:
 
     // address space configurations
 	const address_space_config		m_space_config;
+
+private:
+	const char *m_screen_tag;
 };
 
 
