@@ -361,3 +361,162 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		}
 	}
 }
+
+
+/*-------------------------------------------------
+    devcb_resolve_read16 - convert a static
+    16-bit read definition to a live definition
+-------------------------------------------------*/
+
+static READ16_DEVICE_HANDLER( trampoline_read_port_to_read16 )
+{
+	return input_port_read_direct((const input_port_config *)device);
+}
+
+static READ16_DEVICE_HANDLER( trampoline_read_line_to_read16 )
+{
+	const devcb_resolved_read16 *resolved = (const devcb_resolved_read16 *)device;
+	return (*resolved->real.readline)((device_t *)resolved->realtarget);
+}
+
+void devcb_resolve_read16(devcb_resolved_read16 *resolved, const devcb_read16 *config, device_t *device)
+{
+	/* reset the resolved structure */
+	memset(resolved, 0, sizeof(*resolved));
+
+	/* input port handlers */
+	if (config->type == DEVCB_TYPE_INPUT)
+	{
+		resolved->target = device->machine().port(config->tag);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_read16: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+		resolved->read = trampoline_read_port_to_read16;
+	}
+
+	/* address space handlers */
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
+	{
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
+
+		device_t *targetdev = device->siblingdevice(config->tag);
+		if (targetdev == NULL)
+			fatalerror("devcb_resolve_read16: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+		device_memory_interface *memory;
+		if (!targetdev->interface(memory))
+			fatalerror("devcb_resolve_read16: device '%s' (requested by %s '%s') has no memory", config->tag, device->name(), device->tag());
+
+		resolved->target = targetdev->memory().space(spacenum);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_read16: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
+		resolved->read = (read16_device_func)config->readspace;
+	}
+
+	/* device handlers */
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->readline != NULL || config->readdevice != NULL))
+	{
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine().driver_data();
+		else
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
+
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_read16: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+
+		/* read16 to read16 is direct */
+		if (config->readdevice != NULL)
+			resolved->read = config->readdevice;
+
+		/* read16 to read_line goes through a trampoline */
+		else
+		{
+			resolved->realtarget = resolved->target;
+			resolved->real.readline = config->readline;
+			resolved->target = resolved;
+			resolved->read = trampoline_read_line_to_read16;
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    devcb_resolve_write16 - convert a static
+    16-bit write definition to a live definition
+-------------------------------------------------*/
+
+static WRITE16_DEVICE_HANDLER( trampoline_write_port_to_write16 )
+{
+	input_port_write_direct((const input_port_config *)device, data, 0xff);
+}
+
+static WRITE16_DEVICE_HANDLER( trampoline_write_line_to_write16 )
+{
+	const devcb_resolved_write16 *resolved = (const devcb_resolved_write16 *)device;
+	(*resolved->real.writeline)((device_t *)resolved->realtarget, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void devcb_resolve_write16(devcb_resolved_write16 *resolved, const devcb_write16 *config, device_t *device)
+{
+	/* reset the resolved structure */
+	memset(resolved, 0, sizeof(*resolved));
+
+	if (config->type == DEVCB_TYPE_INPUT)
+	{
+		resolved->target = device->machine().port(config->tag);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_read_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+		resolved->write = trampoline_write_port_to_write16;
+	}
+
+	/* address space handlers */
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	{
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
+
+		device_t *targetdev = device->siblingdevice(config->tag);
+		if (targetdev == NULL)
+			fatalerror("devcb_resolve_write16: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+		device_memory_interface *memory;
+		if (!targetdev->interface(memory))
+			fatalerror("devcb_resolve_write16: device '%s' (requested by %s '%s') has no memory", config->tag, device->name(), device->tag());
+
+		resolved->target = targetdev->memory().space(spacenum);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_write16: unable to find device '%s' space %d (requested by %s '%s')", config->tag, (int)spacenum, device->name(), device->tag());
+		resolved->write = (write16_device_func)config->writespace;
+	}
+
+	/* device handlers */
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->writeline != NULL || config->writedevice != NULL))
+	{
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine().driver_data();
+		else
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
+
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_write16: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
+
+		/* write16 to write16 is direct */
+		if (config->writedevice != NULL)
+			resolved->write = config->writedevice;
+
+		/* write16 to write_line goes through a trampoline */
+		else
+		{
+			resolved->realtarget = resolved->target;
+			resolved->real.writeline = config->writeline;
+			resolved->target = resolved;
+			resolved->write = trampoline_write_line_to_write16;
+		}
+	}
+}

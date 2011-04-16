@@ -20,6 +20,8 @@
         write_line_device_func: (device, data)
         read8_device_func:      (device, offset)
         write8_device_func:     (device, offset, data)
+        read16_device_func:      (device, offset)
+        write16_device_func:     (device, offset, data)
 
     The adapted callback types supported are:
 
@@ -31,6 +33,10 @@
         write8_device_func:     (device, offset, data)
         read8_space_func:       (space, offset)
         write8_space_func:      (space, offset, data)
+        read16_device_func:      (device, offset)
+        write16_device_func:     (device, offset, data)
+        read16_space_func:       (space, offset)
+        write16_space_func:      (space, offset, data)
 
 ***************************************************************************/
 
@@ -78,6 +84,14 @@ UINT8 devcb_stub(device_t *device, offs_t offset)
 	return (target->*_Function)(*memory_nonspecific_space(device->machine()), offset, 0xff);
 }
 
+// static template for a read16 stub function that calls through a given READ16_MEMBER
+template<class _Class, UINT16 (_Class::*_Function)(address_space &, offs_t, UINT16)>
+UINT16 devcb_stub(device_t *device, offs_t offset)
+{
+	_Class *target = downcast<_Class *>(device);
+	return (target->*_Function)(*memory_nonspecific_space(device->machine()), offset, 0xffff);
+}
+
 // static template for a write_line stub function that calls through a given WRITE_LINE_MEMBER
 template<class _Class, void (_Class::*_Function)(int state)>
 void devcb_line_stub(device_t *device, int state)
@@ -92,6 +106,14 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 {
 	_Class *target = downcast<_Class *>(device);
 	(target->*_Function)(*memory_nonspecific_space(device->machine()), offset, data, 0xff);
+}
+
+// static template for a write16 stub function that calls through a given WRITE16_MEMBER
+template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT16, UINT16)>
+void devcb_stub(device_t *device, offs_t offset, UINT16 data)
+{
+	_Class *target = downcast<_Class *>(device);
+	(target->*_Function)(*memory_nonspecific_space(device->machine()), offset, data, 0xffff);
 }
 
 #define DEVCB_NULL							{ DEVCB_TYPE_NULL }
@@ -261,6 +283,57 @@ struct _devcb_resolved_write8
 };
 
 
+/* static structure used for device configuration when the desired callback type is a read16_device_func */
+typedef struct _devcb_read16 devcb_read16;
+struct _devcb_read16
+{
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
+	const char *			tag;			/* tag of target, where appropriate */
+	read_line_device_func	readline;		/* read line function */
+	read16_device_func		readdevice;		/* read device function */
+	read16_space_func		readspace;		/* read space function */
+};
+
+typedef struct _devcb_resolved_read16 devcb_resolved_read16;
+struct _devcb_resolved_read16
+{
+	const void *			target;			/* target object */
+	read16_device_func		read;			/* read function */
+	const void *			realtarget;		/* real target object for stubs */
+	union
+	{
+		read16_device_func	readdevice;
+		read16_space_func	readspace;
+		read_line_device_func readline;
+	} real;									/* real read function for stubs */
+};
+
+
+/* static structure used for device configuration when the desired callback type is a write16_device_func */
+typedef struct _devcb_write16 devcb_write16;
+struct _devcb_write16
+{
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
+	const char *			tag;			/* tag of target, where appropriate */
+	write_line_device_func	writeline;		/* write line function */
+	write16_device_func		writedevice;	/* write device function */
+	write16_space_func		writespace;		/* write space function */
+};
+
+typedef struct _devcb_resolved_write16 devcb_resolved_write16;
+struct _devcb_resolved_write16
+{
+	const void *			target;			/* target object */
+	write16_device_func		write;			/* write function */
+	const void *			realtarget;		/* real target object for stubs */
+	union
+	{
+		write16_device_func	writedevice;
+		write16_space_func	writespace;
+		write_line_device_func writeline;
+	} real;									/* real write function for stubs */
+};
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -280,6 +353,12 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 
 /* convert a static 8-bit write definition to a live definition */
 void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *config, device_t *device);
+
+/* convert a static 16-bit read definition to a live definition */
+void devcb_resolve_read16(devcb_resolved_read16 *resolved, const devcb_read16 *config, device_t *device);
+
+/* convert a static 16-bit write definition to a live definition */
+void devcb_resolve_write16(devcb_resolved_write16 *resolved, const devcb_write16 *config, device_t *device);
 
 
 
@@ -310,6 +389,17 @@ INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 
 
 /*-------------------------------------------------
+    devcb_call_read16 - call through a
+    resolved read16 handler
+-------------------------------------------------*/
+
+INLINE int devcb_call_read16(const devcb_resolved_read16 *resolved, offs_t offset)
+{
+	return (resolved->read != NULL) ? (*resolved->read)((device_t *)resolved->target, offset, 0xffff) : 0;
+}
+
+
+/*-------------------------------------------------
     devcb_call_write_line - call through a
     resolved write_line handler
 -------------------------------------------------*/
@@ -332,6 +422,19 @@ INLINE void devcb_call_write8(const devcb_resolved_write8 *resolved, offs_t offs
 		(*resolved->write)((device_t *)resolved->target, offset, data);
 }
 
+
+/*-------------------------------------------------
+    devcb_call_write16 - call through a
+    resolved write16 handler
+-------------------------------------------------*/
+
+INLINE void devcb_call_write16(const devcb_resolved_write16 *resolved, offs_t offset, UINT16 data)
+{
+	if (resolved->write != NULL)
+		(*resolved->write)((device_t *)resolved->target, offset, data, 0xffff);
+}
+
+
 /*-------------------------------------------------
     devcb_line_gnd_r - input tied to GND
 -------------------------------------------------*/
@@ -340,6 +443,7 @@ INLINE READ_LINE_DEVICE_HANDLER( devcb_line_gnd_r )
 {
 	return 0;
 }
+
 
 /*-------------------------------------------------
     devcb_line_vcc_r - input tied to Vcc
