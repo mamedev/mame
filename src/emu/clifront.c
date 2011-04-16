@@ -591,7 +591,7 @@ void cli_frontend::listmedia(const char *gamename)
 			astring extensions(imagedev->file_extensions());
 			for (int start = 0, end = extensions.chr(0, ','); ; start = end + 1, end = extensions.chr(start, ','))
 			{
-				astring curext(extensions, start, (end == -1) ? -1 : end - 1);
+				astring curext(extensions, start, (end == -1) ? extensions.len() - start : end - start);
 				printf(".%-5s", curext.cstr());
 				if (end == -1)
 					break;
