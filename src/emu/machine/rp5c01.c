@@ -168,6 +168,26 @@ void rp5c01_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
+//  set_alarm_line -
+//-------------------------------------------------
+
+inline void rp5c01_device::set_alarm_line()
+{
+	int alarm = ((m_mode & MODE_ALARM_EN) ? m_alarm_on : 1) &
+				((m_reset & RESET_16_HZ) ? 1 : m_16hz) &
+				((m_reset & RESET_1_HZ) ? 1 : m_1hz);
+	
+	if (m_alarm != alarm)
+	{
+		if (LOG) logerror("RP5C01 '%s' Alarm %u\n", tag(), alarm);
+
+		devcb_call_write_line(&m_out_alarm_func, alarm);
+		m_alarm = alarm;
+	}
+}
+
+
+//-------------------------------------------------
 //  read_counter -
 //-------------------------------------------------
 
@@ -206,12 +226,6 @@ inline void rp5c01_device::advance_seconds()
 	}
 
 	write_counter(REGISTER_1_SECOND, seconds);
-	
-	if (!(m_mode & RESET_1_HZ))
-	{
-		// pulse 1Hz alarm signal
-		trigger_alarm();
-	}
 }
 
 
@@ -275,6 +289,7 @@ inline void rp5c01_device::advance_minutes()
 	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = day_of_week;
 
 	check_alarm();
+	set_alarm_line();
 }
 
 
@@ -284,26 +299,16 @@ inline void rp5c01_device::advance_minutes()
 
 inline void rp5c01_device::check_alarm()
 {
-	if (m_mode & MODE_ALARM_EN)
+	bool all_match = true;
+	bool all_zeroes = true;
+
+	for (int i = REGISTER_1_MINUTE; i < REGISTER_1_MONTH; i++)
 	{
-		for (int i = REGISTER_1_MINUTE; i < REGISTER_1_MONTH; i++)
-		{
-			if (m_reg[MODE01][i] != m_reg[MODE00][i]) return;
-		}
-
-		trigger_alarm();
+		if (m_reg[MODE01][i] != 0) all_zeroes = false;
+		if (m_reg[MODE01][i] != m_reg[MODE00][i]) all_match = false;
 	}
-}
 
-
-//-------------------------------------------------
-//  trigger_alarm -
-//-------------------------------------------------
-
-inline void rp5c01_device::trigger_alarm()
-{
-	devcb_call_write_line(&m_out_alarm_func, 0);
-	devcb_call_write_line(&m_out_alarm_func, 1);
+	m_alarm_on = (all_match || (!m_alarm_on && all_zeroes)) ? 0 : 1;
 }
 
 
@@ -319,6 +324,10 @@ inline void rp5c01_device::trigger_alarm()
 rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_config &config)
     : device_t(_machine, config),
 	  device_nvram_interface(_machine, config, *this),
+	  m_alarm(1),
+	  m_alarm_on(1),
+	  m_1hz(1),
+	  m_16hz(1),
       m_config(config)
 {
 }
@@ -335,16 +344,20 @@ void rp5c01_device::device_start()
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
-	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+	m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 	
-	m_alarm_timer = timer_alloc(TIMER_ALARM);
-	m_alarm_timer->adjust(attotime::from_hz(clock() / 2048), 0, attotime::from_hz(clock() / 2048));
+	m_16hz_timer = timer_alloc(TIMER_16HZ);
+	m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 
 	// state saving
 	save_item(NAME(m_reg[MODE00]));
 	save_item(NAME(m_reg[MODE01]));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_reset));
+	save_item(NAME(m_alarm));
+	save_item(NAME(m_alarm_on));
+	save_item(NAME(m_1hz));
+	save_item(NAME(m_16hz));
 }
 
 
@@ -357,14 +370,18 @@ void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case TIMER_CLOCK:
-		advance_seconds();
+		if (m_1hz && (m_mode & MODE_TIMER_EN))
+		{
+			advance_seconds();
+		}
+
+		m_1hz = !m_1hz;
+		set_alarm_line();
 		break;
 
-	case TIMER_ALARM:
-		if (!(m_reset & RESET_16_HZ))
-		{
-			trigger_alarm();
-		}
+	case TIMER_16HZ:
+		m_16hz = !m_16hz;
+		set_alarm_line();
 		break;
 	}
 }
@@ -449,7 +466,9 @@ READ8_MEMBER( rp5c01_device::read )
 		break;
 	}
 
-	return data;
+	if (LOG) logerror("RP5C01 '%s' Register %u Read %02x\n", tag(), offset & 0x0f, data);
+
+	return data & 0x0f;
 }
 
 
@@ -464,9 +483,7 @@ WRITE8_MEMBER( rp5c01_device::write )
 	switch (offset & 0x0f)
 	{
 	case REGISTER_MODE:
-		m_mode = data;
-
-		m_clock_timer->enable(data & MODE_TIMER_EN);
+		m_mode = data & 0x0f;
 
 		if (LOG)
 		{
@@ -481,7 +498,7 @@ WRITE8_MEMBER( rp5c01_device::write )
 		break;
 
 	case REGISTER_RESET:
-		m_reset = data;
+		m_reset = data & 0x0f;
 
 		if (data & RESET_ALARM)
 		{

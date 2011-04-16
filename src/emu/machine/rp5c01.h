@@ -11,9 +11,9 @@
                     CS   2 |             | 17  OSCOUT
                    ADJ   3 |             | 16  OSCIN
                     A0   4 |   RP5C01    | 15  _ALARM
-                    A1   5 |   RP5C01   | 14  D3
+                    A1   5 |   RP5C01A   | 14  D3
                     A2   6 |   RF5C01A   | 13  D2
-                    A3   7 |             | 12  D1
+                    A3   7 |   TC8521    | 12  D1
                    _RD   8 |             | 11  D0
                    GND   9 |_____________| 10  _WR
 
@@ -104,15 +104,15 @@ protected:
 	virtual void nvram_write(emu_file &file);
 
 private:
+	inline void set_alarm_line();
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
 	inline void advance_seconds();
 	inline void advance_minutes();
-	inline void trigger_alarm();
 	inline void check_alarm();
 
 	static const device_timer_id TIMER_CLOCK = 0;
-	static const device_timer_id TIMER_ALARM = 1;
+	static const device_timer_id TIMER_16HZ = 1;
 
 	devcb_resolved_write_line	m_out_alarm_func;
 
@@ -121,10 +121,14 @@ private:
 
 	UINT8 m_mode;				// mode register
 	UINT8 m_reset;				// reset register
+	int m_alarm;				// alarm output
+	int m_alarm_on;				// alarm condition
+	int m_1hz;					// 1 Hz condition
+	int m_16hz;					// 16 Hz condition
 
 	// timers
 	emu_timer *m_clock_timer;
-	emu_timer *m_alarm_timer;
+	emu_timer *m_16hz_timer;
 
 	const rp5c01_device_config &m_config;
 };
