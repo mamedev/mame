@@ -1232,11 +1232,11 @@ static READ32_HANDLER( speedup9_r ) { return generic_speedup(space, 9); }
 static READ32_HANDLER( speedup10_r ) { return generic_speedup(space, 10); }
 static READ32_HANDLER( speedup11_r ) { return generic_speedup(space, 11); }
 
-static const read32_space_func speedup_handlers[] =
+static const struct { read32_space_func func; const char *name; } speedup_handlers[] =
 {
-	speedup0_r,		speedup1_r,		speedup2_r,		speedup3_r,
-	speedup4_r,		speedup5_r,		speedup6_r,		speedup7_r,
-	speedup8_r,		speedup9_r,		speedup10_r,	speedup11_r
+	{ FUNC(speedup0_r) },	{ FUNC(speedup1_r) },	{ FUNC(speedup2_r) },	{ FUNC(speedup3_r) },
+	{ FUNC(speedup4_r) },	{ FUNC(speedup5_r) },	{ FUNC(speedup6_r) },	{ FUNC(speedup7_r) },
+	{ FUNC(speedup8_r) },	{ FUNC(speedup9_r) },	{ FUNC(speedup10_r) },	{ FUNC(speedup11_r) }
 };
 
 #ifdef MAME_DEBUG
@@ -1261,7 +1261,7 @@ static void install_speedups(running_machine &machine, const speedup_entry *entr
 	state->m_speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, FUNC(speedup_handlers[i]));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, speedup_handlers[i].func, speedup_handlers[i].name);
 
 #ifdef MAME_DEBUG
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);

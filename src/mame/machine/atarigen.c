@@ -454,7 +454,7 @@ static STATE_POSTLOAD( slapstic_postload )
 
 DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
 {
-	atarigen_state *state = machine->driver_data<atarigen_state>();
+	atarigen_state *state = machine.driver_data<atarigen_state>();
 
 	/* if we jump to an address in the slapstic region, tweak the slapstic
        at that address and return ~0; this will cause us to be called on
@@ -511,7 +511,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		state->m_slapstic_mirror = mirror;
 
 		address_space *space = downcast<cpu_device *>(device)->space(AS_PROGRAM);
-		space->set_direct_update_handler(direct_update_delegate_create_static(atarigen_slapstic_setdirect, device->machine()));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(atarigen_slapstic_setdirect), &device->machine()));
 	}
 }
 

@@ -182,6 +182,7 @@ MACHINE_RESET( mcr68 )
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine);
 	state->m_v493_callback = mcr68_493_callback;
+	state->m_v493_callback_name = "mcr68_493_callback";
 
 	/* vectors are 1 and 2 */
 	state->m_v493_irq_vector = 1;
@@ -201,6 +202,7 @@ MACHINE_RESET( zwackery )
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine);
 	state->m_v493_callback = zwackery_493_callback;
+	state->m_v493_callback_name = "zwackery_493_callback";
 
 	/* vectors are 5 and 6 */
 	state->m_v493_irq_vector = 5;
@@ -227,7 +229,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	device->machine().scheduler().timer_set(attotime::from_hz(30) - state->m_timing_factor, FUNC(state->m_v493_callback));
+	device->machine().scheduler().timer_set(attotime::from_hz(30) - state->m_timing_factor, state->m_v493_callback, state->m_v493_callback_name);
 }
 
 

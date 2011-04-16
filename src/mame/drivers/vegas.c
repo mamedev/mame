@@ -528,8 +528,8 @@ static MACHINE_START( vegas )
 	state->m_voodoo = machine.device("voodoo");
 
 	/* allocate timers for the NILE */
-	state->m_timer[0] = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_timer[1] = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_timer[0] = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_timer[1] = machine.scheduler().timer_alloc(FUNC_NULL);
 	state->m_timer[2] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
 	state->m_timer[3] = machine.scheduler().timer_alloc(FUNC(nile_timer_callback));
 

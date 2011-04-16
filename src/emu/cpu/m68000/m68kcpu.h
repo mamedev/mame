@@ -546,21 +546,13 @@ union _fp_reg
 
 /* Redirect memory calls */
 
-typedef proto_delegate_1param<UINT8, offs_t> m68k_read8_proto_delegate;
-typedef proto_delegate_1param<UINT16, offs_t> m68k_readimm16_proto_delegate;
-typedef proto_delegate_1param<UINT16, offs_t> m68k_read16_proto_delegate;
-typedef proto_delegate_1param<UINT32, offs_t> m68k_read32_proto_delegate;
-typedef proto_delegate_2param<void, offs_t, UINT8> m68k_write8_proto_delegate;
-typedef proto_delegate_2param<void, offs_t, UINT16> m68k_write16_proto_delegate;
-typedef proto_delegate_2param<void, offs_t, UINT32> m68k_write32_proto_delegate;
-
-typedef delegate_1param<UINT8, offs_t> m68k_read8_delegate;
-typedef delegate_1param<UINT16, offs_t> m68k_readimm16_delegate;
-typedef delegate_1param<UINT16, offs_t> m68k_read16_delegate;
-typedef delegate_1param<UINT32, offs_t> m68k_read32_delegate;
-typedef delegate_2param<void, offs_t, UINT8> m68k_write8_delegate;
-typedef delegate_2param<void, offs_t, UINT16> m68k_write16_delegate;
-typedef delegate_2param<void, offs_t, UINT32> m68k_write32_delegate;
+typedef delegate<UINT8 (offs_t)> m68k_read8_delegate;
+typedef delegate<UINT16 (offs_t)> m68k_readimm16_delegate;
+typedef delegate<UINT16 (offs_t)> m68k_read16_delegate;
+typedef delegate<UINT32 (offs_t)> m68k_read32_delegate;
+typedef delegate<void (offs_t, UINT8)> m68k_write8_delegate;
+typedef delegate<void (offs_t, UINT16)> m68k_write16_delegate;
+typedef delegate<void (offs_t, UINT32)> m68k_write32_delegate;
 
 class m68k_memory_interface : public bindable_object
 {

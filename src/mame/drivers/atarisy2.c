@@ -213,7 +213,7 @@ DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 	/* make sure slapstic area looks like ROM */
 	if (address >= 0x8000 && address < 0x8200)
 	{
-		atarisy2_state *state = machine->driver_data<atarisy2_state>();
+		atarisy2_state *state = machine.driver_data<atarisy2_state>();
 		direct.explicit_configure(0x8000, 0x81ff, 0x1ff, (UINT8 *)state->m_slapstic_base);
 		return ~0;
 	}
@@ -246,7 +246,7 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_scanline_timer_reset(*machine.primary_screen, scanline_update, 64);
 
 	address_space *main = machine.device<t11_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate_create_static(atarisy2_direct_handler, machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(atarisy2_direct_handler), &machine));
 
 	state->m_p2portwr_state = 0;
 	state->m_p2portrd_state = 0;

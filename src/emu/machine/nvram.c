@@ -104,7 +104,7 @@ void nvram_device_config::static_set_default_value(device_config *device, defaul
 //  helper to set a custom callback
 //-------------------------------------------------
 
-void nvram_device_config::static_set_custom_handler(device_config *device, nvram_init_proto_delegate handler)
+void nvram_device_config::static_set_custom_handler(device_config *device, nvram_init_delegate handler)
 {
 	nvram_device_config *nvram = downcast<nvram_device_config *>(device);
 	nvram->m_default_value = DEFAULT_CUSTOM;
@@ -139,7 +139,7 @@ void nvram_device::device_start()
 {
 	// bind our handler
 	if (!m_config.m_custom_handler.isnull())
-		m_custom_handler = nvram_init_delegate(m_config.m_custom_handler, *m_owner);
+		m_custom_handler = nvram_init_delegate(m_config.m_custom_handler, m_owner);
 }
 
 

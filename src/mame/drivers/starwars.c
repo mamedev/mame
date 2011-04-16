@@ -123,7 +123,7 @@ static WRITE8_HANDLER( esb_slapstic_w )
 
 DIRECT_UPDATE_HANDLER( esb_setdirect )
 {
-	starwars_state *state = machine->driver_data<starwars_state>();
+	starwars_state *state = machine.driver_data<starwars_state>();
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
@@ -521,7 +521,7 @@ static DRIVER_INIT( esb )
 
 	/* install an opcode base handler */
 	address_space *space = machine.device<m6809_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(esb_setdirect, machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(esb_setdirect), &machine));
 
 	/* install read/write handlers for it */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(esb_slapstic_r), FUNC(esb_slapstic_w));

@@ -506,7 +506,7 @@ DRIVER_INIT( mkyturbo )
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine &machine, write16_space_func hack_w)
+static void term2_init_common(running_machine &machine, write16_space_func hack_w, const char *name)
 {
 	midyunit_state *state = machine.driver_data<midyunit_state>();
 	/* protection */
@@ -526,13 +526,13 @@ static void term2_init_common(running_machine &machine, write16_space_func hack_
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x010aa0e0, 0x010aa0ff, FUNC(hack_w));
+	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x010aa0e0, 0x010aa0ff, hack_w, name);
 }
 
-DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }
-DRIVER_INIT( term2la3 ) { term2_init_common(machine, term2la3_hack_w); }
-DRIVER_INIT( term2la2 ) { term2_init_common(machine, term2la2_hack_w); }
-DRIVER_INIT( term2la1 ) { term2_init_common(machine, term2la1_hack_w); }
+DRIVER_INIT( term2 ) { term2_init_common(machine, FUNC(term2_hack_w)); }
+DRIVER_INIT( term2la3 ) { term2_init_common(machine, FUNC(term2la3_hack_w)); }
+DRIVER_INIT( term2la2 ) { term2_init_common(machine, FUNC(term2la2_hack_w)); }
+DRIVER_INIT( term2la1 ) { term2_init_common(machine, FUNC(term2la1_hack_w)); }
 
 
 

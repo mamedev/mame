@@ -70,28 +70,24 @@ bindable_object::~bindable_object()
 
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
 
-// NULL structure used in dummy constructor
-delegate_gcc_mfp_internal delegate_gcc_mfp_null;
-
-
 //-------------------------------------------------
 //  delegate_convert_raw - given an object and
 //  an raw function, adjust the object base and
 //  return the actual final code pointer
 //-------------------------------------------------
 
-delegate_generic_function delegate_convert_raw(delegate_generic_class *&object, delegate_gcc_mfp_internal &mfp)
+delegate_generic_function delegate_internal_mfp::convert_to_generic(delegate_generic_class *&object) const
 {
 	// apply the "this" delta to the object first
-	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + mfp.this_delta);
+	object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
 
 	// if the low bit of the vtable index is clear, then it is just a raw function pointer
-	if (!(mfp.u.vtable_index & 1))
-		return mfp.u.funcptr;
+	if (!(m_function & 1))
+		return reinterpret_cast<delegate_generic_function>(m_function);
 
 	// otherwise, it is the byte index into the vtable where the actual function lives
 	UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(object);
-	return *reinterpret_cast<delegate_generic_function *>(vtable_base + mfp.u.vtable_index - 1);
+	return *reinterpret_cast<delegate_generic_function *>(vtable_base + m_function - 1);
 }
 
 #endif

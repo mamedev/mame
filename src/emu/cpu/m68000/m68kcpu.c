@@ -1084,13 +1084,13 @@ void m68k_memory_interface::init8(address_space &space)
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, m68008_read_immediate_16), *this);
-	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word), space);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword), space);
-	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word), space);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword), space);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::m68008_read_immediate_16), this);
+	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
+	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
+	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
+	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
+	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
+	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }
 
 /****************************************************************************
@@ -1114,13 +1114,13 @@ void m68k_memory_interface::init16(address_space &space)
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, simple_read_immediate_16), *this);
-	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word), space);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword), space);
-	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word), space);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword), space);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::simple_read_immediate_16), this);
+	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
+	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
+	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
+	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
+	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
+	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }
 
 /****************************************************************************
@@ -1135,13 +1135,13 @@ void m68k_memory_interface::init32(address_space &space)
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16), *this);
-	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word_unaligned), space);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword_unaligned), space);
-	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word_unaligned), space);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword_unaligned), space);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16), this);
+	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
+	read16 = m68k_read16_delegate(FUNC(address_space::read_word_unaligned), &space);
+	read32 = m68k_read32_delegate(FUNC(address_space::read_dword_unaligned), &space);
+	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
+	write16 = m68k_write16_delegate(FUNC(address_space::write_word_unaligned), &space);
+	write32 = m68k_write32_delegate(FUNC(address_space::write_dword_unaligned), &space);
 }
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
@@ -1353,13 +1353,13 @@ void m68k_memory_interface::init32mmu(address_space &space)
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16_mmu), *this);
-	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(m68k_memory_interface, read_byte_32_mmu), *this);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32_mmu), *this);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32_mmu), *this);
-	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(m68k_memory_interface, write_byte_32_mmu), *this);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32_mmu), *this);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32_mmu), *this);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16_mmu), this);
+	read8 = m68k_read8_delegate(FUNC(m68k_memory_interface::read_byte_32_mmu), this);
+	read16 = m68k_read16_delegate(FUNC(m68k_memory_interface::readword_d32_mmu), this);
+	read32 = m68k_read32_delegate(FUNC(m68k_memory_interface::readlong_d32_mmu), this);
+	write8 = m68k_write8_delegate(FUNC(m68k_memory_interface::write_byte_32_mmu), this);
+	write16 = m68k_write16_delegate(FUNC(m68k_memory_interface::writeword_d32_mmu), this);
+	write32 = m68k_write32_delegate(FUNC(m68k_memory_interface::writelong_d32_mmu), this);
 }
 
 
@@ -1480,13 +1480,13 @@ void m68k_memory_interface::init32hmmu(address_space &space)
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16_hmmu), *this);
-	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(m68k_memory_interface, read_byte_32_hmmu), *this);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32_hmmu), *this);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32_hmmu), *this);
-	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(m68k_memory_interface, write_byte_32_hmmu), *this);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32_hmmu), *this);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32_hmmu), *this);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16_hmmu), this);
+	read8 = m68k_read8_delegate(FUNC(m68k_memory_interface::read_byte_32_hmmu), this);
+	read16 = m68k_read16_delegate(FUNC(m68k_memory_interface::readword_d32_hmmu), this);
+	read32 = m68k_read32_delegate(FUNC(m68k_memory_interface::readlong_d32_hmmu), this);
+	write8 = m68k_write8_delegate(FUNC(m68k_memory_interface::write_byte_32_hmmu), this);
+	write16 = m68k_write16_delegate(FUNC(m68k_memory_interface::writeword_d32_hmmu), this);
+	write32 = m68k_write32_delegate(FUNC(m68k_memory_interface::writelong_d32_hmmu), this);
 }
 
 void m68k_set_reset_callback(device_t *device, m68k_reset_func callback)

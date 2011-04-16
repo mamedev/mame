@@ -731,7 +731,7 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 
 	address_space *main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate_create_static(cps3_direct_handler, machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_direct_handler), &machine));
 
 	// flash roms
 	astring tempstr;
@@ -1298,7 +1298,7 @@ static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 
 DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 {
-	cps3_state *state = machine->driver_data<cps3_state>();
+	cps3_state *state = machine.driver_data<cps3_state>();
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */

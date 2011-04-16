@@ -2210,15 +2210,15 @@ static void security_w(device_t *device, UINT8 data)
 
 /*****************************************************************************/
 
-static void init_lights(running_machine &machine, write32_space_func out1, write32_space_func out2, write32_space_func out3)
+static void init_lights(running_machine &machine, write32_space_func out1, const char *out1name, write32_space_func out2, const char *out2name, write32_space_func out3, const char *out3name)
 {
-	if(!out1) out1 = lamp_output_w;
-	if(!out2) out1 = lamp_output2_w;
-	if(!out3) out1 = lamp_output3_w;
+	if(!out1) out1 = lamp_output_w, out1name = "lamp_output_w";
+	if(!out2) out2 = lamp_output2_w, out2name = "lamp_output2_w";
+	if(!out3) out3 = lamp_output3_w, out3name = "lamp_output3_w";
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000804, 0x7d000807, FUNC(out1));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000320, 0x7d000323, FUNC(out2));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000324, 0x7d000327, FUNC(out3));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000804, 0x7d000807, out1, out1name);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000320, 0x7d000323, out2, out2name);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000324, 0x7d000327, out3, out3name);
 }
 
 static void init_firebeat(running_machine &machine)
@@ -2240,20 +2240,20 @@ static void init_firebeat(running_machine &machine)
 
 	set_ibutton(state, rom);
 
-	init_lights(machine, NULL, NULL, NULL);
+	init_lights(machine, FUNC_NULL, FUNC_NULL, FUNC_NULL);
 }
 
 static DRIVER_INIT(ppp)
 {
 	init_firebeat(machine);
-	init_lights(machine, lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
+	init_lights(machine, FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
 }
 
 static DRIVER_INIT(ppd)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	init_firebeat(machine);
-	init_lights(machine, lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
+	init_lights(machine, FUNC(lamp_output_ppp_w), FUNC(lamp_output2_ppp_w), FUNC(lamp_output3_ppp_w));
 
 	state->m_cur_cab_data = ppd_cab_data;
 }
@@ -2270,7 +2270,7 @@ static DRIVER_INIT(kbm)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	init_firebeat(machine);
-	init_lights(machine, lamp_output_kbm_w, NULL, NULL);
+	init_lights(machine, FUNC(lamp_output_kbm_w), FUNC_NULL, FUNC_NULL);
 
 	init_keyboard(machine);
 

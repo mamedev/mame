@@ -314,29 +314,31 @@ static void update_memory_mapping(running_machine &machine, struct memory_mapper
 		offs_t region_end = region_start + ((rgn->length - 1 < region_size) ? rgn->length - 1 : region_size);
 		const char *writebank = rgn->writebank;
 		write16_space_func write = rgn->write;
+		const char *writename = rgn->writename;
 		const char *readbank = rgn->readbank;
 		read16_space_func read = rgn->read;
+		const char *readname = rgn->readname;
 
 		/* ROM areas need extra clamping */
 		if (rgn->romoffset != ~0)
 		{
 			offs_t romsize = chip->cpu->region()->bytes();
 			if (region_start >= romsize)
-				read = NULL;
+				read = NULL, readname = "(null)";
 			else if (region_start + rgn->length > romsize)
 				region_end = romsize - 1;
 		}
 
 		/* map it */
 		if (read != NULL)
-			space->install_legacy_read_handler(region_start, region_end, 0, region_mirror, FUNC(read));
+			space->install_legacy_read_handler(region_start, region_end, 0, region_mirror, read, readname);
 		else if (readbank != NULL)
 			space->install_read_bank(region_start, region_end, 0, region_mirror, readbank);
 		else
 			space->install_legacy_read_handler(region_start, region_end, 0, region_mirror, FUNC(segaic16_open_bus_r));
 
 		if (write != NULL)
-			space->install_legacy_write_handler(region_start, region_end, 0, region_mirror, FUNC(write));
+			space->install_legacy_write_handler(region_start, region_end, 0, region_mirror, write, writename);
 		else if (writebank != NULL)
 			space->install_write_bank(region_start, region_end, 0, region_mirror, writebank);
 		else

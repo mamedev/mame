@@ -57,7 +57,7 @@ VIDEO_START( victory )
 	state->m_scrollx = state->m_scrolly = 0;
 	state->m_video_control = 0;
 	memset(&state->m_micro, 0, sizeof(state->m_micro));
-	state->m_micro.timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_micro.timer = machine.scheduler().timer_alloc(FUNC_NULL);
 
 	/* register for state saving */
 	state_save_register_global_array(machine, state->m_paletteram);

@@ -173,7 +173,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 		space->install_legacy_write_handler(0xc600, 0xc7ff, FUNC(watchdog_reset_w));
 		space->install_legacy_write_handler(0xc800, 0xc9ff, FUNC(beezer_map_w));
 		space->install_legacy_read_handler(0xca00, 0xcbff, FUNC(beezer_line_r));
-		space->install_readwrite_handler(0xce00, 0xcfff, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
+		space->install_readwrite_handler(0xce00, 0xcfff, read8_delegate(FUNC(via6522_device::read), via_0), write8_delegate(FUNC(via6522_device::write), via_0));
 	}
 	else
 	{

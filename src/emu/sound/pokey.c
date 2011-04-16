@@ -648,7 +648,7 @@ static DEVICE_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = device->machine().scheduler().timer_alloc(FUNC(NULL));
+	chip->rtimer = device->machine().scheduler().timer_alloc(FUNC_NULL);
 
 	chip->timer[0] = device->machine().scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);
 	chip->timer[1] = device->machine().scheduler().timer_alloc(FUNC(pokey_timer_expire), chip);

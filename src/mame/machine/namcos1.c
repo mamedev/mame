@@ -58,20 +58,20 @@ static WRITE8_HANDLER( bank14_w ) { bank_w(space, offset, data, 13); }
 static WRITE8_HANDLER( bank15_w ) { bank_w(space, offset, data, 14); }
 static WRITE8_HANDLER( bank16_w ) { bank_w(space, offset, data, 15); }
 
-static const read8_space_func io_bank_handler_r[16] =
+static const struct { read8_space_func func; const char *name; } io_bank_handler_r[16] =
 {
-	bank1_r, bank2_r, bank3_r, bank4_r,
-	bank5_r, bank6_r, bank7_r, bank8_r,
-	bank9_r, bank10_r, bank11_r, bank12_r,
-	bank13_r, bank14_r, bank15_r, bank16_r
+	{ FUNC(bank1_r) }, { FUNC(bank2_r) }, { FUNC(bank3_r) }, { FUNC(bank4_r) },
+	{ FUNC(bank5_r) }, { FUNC(bank6_r) }, { FUNC(bank7_r) }, { FUNC(bank8_r) },
+	{ FUNC(bank9_r) }, { FUNC(bank10_r) }, { FUNC(bank11_r) }, { FUNC(bank12_r) },
+	{ FUNC(bank13_r) }, { FUNC(bank14_r) }, { FUNC(bank15_r) }, { FUNC(bank16_r) }
 };
 
-static const write8_space_func io_bank_handler_w[16] =
+static const struct { write8_space_func func; const char *name; } io_bank_handler_w[16] =
 {
-	bank1_w, bank2_w, bank3_w, bank4_w,
-	bank5_w, bank6_w, bank7_w, bank8_w,
-	bank9_w, bank10_w, bank11_w, bank12_w,
-	bank13_w, bank14_w, bank15_w, bank16_w
+	{ FUNC(bank1_w) }, { FUNC(bank2_w) }, { FUNC(bank3_w) }, { FUNC(bank4_w) },
+	{ FUNC(bank5_w) }, { FUNC(bank6_w) }, { FUNC(bank7_w) }, { FUNC(bank8_w) },
+	{ FUNC(bank9_w) }, { FUNC(bank10_w) }, { FUNC(bank11_w) }, { FUNC(bank12_w) },
+	{ FUNC(bank13_w) }, { FUNC(bank14_w) }, { FUNC(bank15_w) }, { FUNC(bank16_w) }
 };
 
 
@@ -690,7 +690,7 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 	else
 	{
 		if (!state->m_active_bank[banknum].bank_handler_r)
-			space->install_legacy_read_handler(bankstart, bankstart + 0x1fff, FUNC(io_bank_handler_r[banknum]));
+			space->install_legacy_read_handler(bankstart, bankstart + 0x1fff, io_bank_handler_r[banknum].func, io_bank_handler_r[banknum].name);
 	}
 
 	/* write handlers (except for the 0xe000-0xffff range) */
@@ -704,7 +704,7 @@ static void set_bank(running_machine &machine, int banknum, const bankhandler *h
 		else
 		{
 			if (!state->m_active_bank[banknum].bank_handler_r)
-				space->install_legacy_write_handler(bankstart, bankstart + 0x1fff, FUNC(io_bank_handler_w[banknum]));
+				space->install_legacy_write_handler(bankstart, bankstart + 0x1fff, io_bank_handler_w[banknum].func, io_bank_handler_w[banknum].name);
 		}
 	}
 

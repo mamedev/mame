@@ -238,7 +238,7 @@ static CPU_INIT( dsp56k )
 
 	/* Setup the direct memory handler for this CPU */
 	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
-	const_cast<address_space *>(cpustate->program)->set_direct_update_handler(direct_update_delegate_create_static(dsp56k_direct_handler, device->machine()));
+	cpustate->program->set_direct_update_handler(direct_update_delegate(FUNC(dsp56k_direct_handler), &device->machine()));
 }
 
 

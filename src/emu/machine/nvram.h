@@ -66,7 +66,7 @@
 
 #define MCFG_NVRAM_ADD_CUSTOM(_tag, _class, _method) \
 	MCFG_DEVICE_ADD(_tag, NVRAM, 0) \
-	nvram_device_config::static_set_custom_handler(device, nvram_init_proto_delegate::_create_member<_class, &_class::_method>(#_class "::" #_method)); \
+	nvram_device_config::static_set_custom_handler(device, nvram_init_delegate(&_class::_method, #_class "::" #_method, (_class *)0)); \
 
 
 #define MCFG_NVRAM_REPLACE_0FILL(_tag) \
@@ -83,7 +83,7 @@
 
 #define MCFG_NVRAM_REPLACE_CUSTOM(_tag, _class, _method) \
 	MCFG_DEVICE_REPLACE(_tag, NVRAM, 0) \
-	nvram_device_config::static_set_custom_handler(device, nvram_init_proto_delegate::_create_member<_class, &_class::_method>(#_class "::" #_method)); \
+	nvram_device_config::static_set_custom_handler(device, nvram_init_delegate(&_class::_method, #_class "::" #_method, (_class *)0)); \
 
 
 
@@ -95,8 +95,7 @@ class nvram_device;
 
 
 // custom initialization for default state
-typedef proto_delegate_3param<void, nvram_device &, void *, size_t> nvram_init_proto_delegate;
-typedef delegate_3param<void, nvram_device &, void *, size_t> nvram_init_delegate;
+typedef delegate<void (nvram_device &, void *, size_t)> nvram_init_delegate;
 
 
 // ======================> nvram_device_config
@@ -126,12 +125,12 @@ public:
 
 	// inline configuration helpers
 	static void static_set_default_value(device_config *device, default_value value);
-	static void static_set_custom_handler(device_config *device, nvram_init_proto_delegate callback);
+	static void static_set_custom_handler(device_config *device, nvram_init_delegate callback);
 
 protected:
 	// internal state
 	default_value				m_default_value;
-	nvram_init_proto_delegate	m_custom_handler;
+	nvram_init_delegate			m_custom_handler;
 };
 
 

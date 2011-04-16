@@ -342,17 +342,17 @@ static const ppi8255_interface single_ppi_intf =
 
 static const segaic16_memory_map_entry outrun_info[] =
 {
-	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, NULL,     segaic16_road_control_0_w, NULL,     NULL,                  "road control" },
-	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, NULL,                      "bank10", NULL,                      "bank10", &segaic16_roadram_0,   "road RAM" },
-	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, NULL,                      "bank11", NULL,                      "bank11", &cpu1ram,              "CPU 1 RAM" },
-	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, NULL,                      "bank12", NULL,                      NULL,     &cpu1rom,              "CPU 1 ROM" },
-	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                 NULL,     misc_io_w,                 NULL,     NULL,                  "I/O space" },
-	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, NULL,                      "bank13", NULL,                      "bank13", &segaic16_spriteram_0, "object RAM" },
-	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, NULL,                      "bank14", segaic16_paletteram_w,     NULL,     &segaic16_paletteram,  "color RAM" },
-	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, NULL,                      "bank15", segaic16_tileram_0_w,      NULL,     &segaic16_tileram_0,   "tile RAM" },
-	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, NULL,                      "bank16", segaic16_textram_0_w,      NULL,     &segaic16_textram_0,   "text RAM" },
-	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, NULL,                      "bank17", NULL,                      "bank17", &workram,              "CPU 0 RAM" },
-	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, NULL,                      "bank18", NULL,                      NULL,     NULL,                  "CPU 0 ROM" },
+	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, FUNC(segaic16_road_control_0_r), NULL,     FUNC(segaic16_road_control_0_w), NULL,     NULL,                  "road control" },
+	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, FUNC_NULL,                       "bank10", FUNC_NULL,                       "bank10", &segaic16_roadram_0,   "road RAM" },
+	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, FUNC_NULL,                       "bank11", FUNC_NULL,                       "bank11", &cpu1ram,              "CPU 1 RAM" },
+	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, FUNC_NULL,                       "bank12", FUNC_NULL,                       NULL,     &cpu1rom,              "CPU 1 ROM" },
+	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, FUNC(misc_io_r),                 NULL,     FUNC(misc_io_w),                 NULL,     NULL,                  "I/O space" },
+	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, FUNC_NULL,                       "bank13", FUNC_NULL,                       "bank13", &segaic16_spriteram_0, "object RAM" },
+	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, FUNC_NULL,                       "bank14", FUNC(segaic16_paletteram_w),     NULL,     &segaic16_paletteram,  "color RAM" },
+	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, FUNC_NULL,                       "bank15", FUNC(segaic16_tileram_0_w),      NULL,     &segaic16_tileram_0,   "tile RAM" },
+	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, FUNC_NULL,                       "bank16", FUNC(segaic16_textram_0_w),      NULL,     &segaic16_textram_0,   "text RAM" },
+	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, FUNC_NULL,                       "bank17", FUNC_NULL,                       "bank17", &workram,              "CPU 0 RAM" },
+	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, FUNC_NULL,                       "bank18", FUNC_NULL,                       NULL,     NULL,                  "CPU 0 ROM" },
 	{ 0 }
 };
 

@@ -560,14 +560,14 @@ static DEVICE_START( common_sh_start )
 	state->m_i80186.timer[0].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->m_i80186.timer[1].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
 	state->m_i80186.timer[2].int_timer = machine.scheduler().timer_alloc(FUNC(internal_timer_int), device);
-	state->m_i80186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_i80186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
-	state->m_i80186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC(NULL));
+	state->m_i80186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_i80186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
+	state->m_i80186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
 	state->m_i80186.dma[0].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback), device);
 	state->m_i80186.dma[1].finish_timer = machine.scheduler().timer_alloc(FUNC(dma_timer_callback), device);
 
 	for (i = 0; i < 9; i++)
-		state->m_counter[i].timer = machine.scheduler().timer_alloc(FUNC(NULL));
+		state->m_counter[i].timer = machine.scheduler().timer_alloc(FUNC_NULL);
 }
 
 static DEVICE_START( leland_80186_sound )

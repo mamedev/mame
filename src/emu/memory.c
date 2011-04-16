@@ -2082,18 +2082,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *object), data.m_mask);		break;
-					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *object), data.m_mask);		break;
-					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *object), data.m_mask);		break;
-					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *object), data.m_mask);		break;
+					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, object), data.m_mask);		break;
+					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, object), data.m_mask);		break;
+					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, object), data.m_mask);		break;
+					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, object), data.m_mask);		break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *object), data.m_mask);		break;
-					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *object), data.m_mask);	break;
-					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *object), data.m_mask);	break;
-					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *object), data.m_mask);	break;
+					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, object), data.m_mask);		break;
+					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, object), data.m_mask);	break;
+					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, object), data.m_mask);	break;
+					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, object), data.m_mask);	break;
 				}
 			break;
 
@@ -3743,30 +3743,30 @@ address_table_read::address_table_read(address_space &space, bool large)
 	{
 		// 8-bit case
 		case 8:
-			m_handlers[STATIC_UNMAP]->set_delegate(read8_delegate_create(address_table_read, unmap_r<UINT8>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(read8_delegate_create(address_table_read, nop_r<UINT8>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate_create(address_table_read, watchpoint_r<UINT8>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read8_delegate(FUNC(address_table_read::unmap_r<UINT8>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read8_delegate(FUNC(address_table_read::nop_r<UINT8>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read8_delegate(FUNC(address_table_read::watchpoint_r<UINT8>), this));
 			break;
 
 		// 16-bit case
 		case 16:
-			m_handlers[STATIC_UNMAP]->set_delegate(read16_delegate_create(address_table_read, unmap_r<UINT16>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(read16_delegate_create(address_table_read, nop_r<UINT16>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate_create(address_table_read, watchpoint_r<UINT16>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read16_delegate(FUNC(address_table_read::unmap_r<UINT16>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read16_delegate(FUNC(address_table_read::nop_r<UINT16>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read16_delegate(FUNC(address_table_read::watchpoint_r<UINT16>), this));
 			break;
 
 		// 32-bit case
 		case 32:
-			m_handlers[STATIC_UNMAP]->set_delegate(read32_delegate_create(address_table_read, unmap_r<UINT32>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(read32_delegate_create(address_table_read, nop_r<UINT32>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate_create(address_table_read, watchpoint_r<UINT32>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read32_delegate(FUNC(address_table_read::unmap_r<UINT32>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read32_delegate(FUNC(address_table_read::nop_r<UINT32>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read32_delegate(FUNC(address_table_read::watchpoint_r<UINT32>), this));
 			break;
 
 		// 64-bit case
 		case 64:
-			m_handlers[STATIC_UNMAP]->set_delegate(read64_delegate_create(address_table_read, unmap_r<UINT64>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(read64_delegate_create(address_table_read, nop_r<UINT64>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate_create(address_table_read, watchpoint_r<UINT64>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(read64_delegate(FUNC(address_table_read::unmap_r<UINT64>), this));
+			m_handlers[STATIC_NOP]->set_delegate(read64_delegate(FUNC(address_table_read::nop_r<UINT64>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(read64_delegate(FUNC(address_table_read::watchpoint_r<UINT64>), this));
 			break;
 	}
 
@@ -3819,30 +3819,30 @@ address_table_write::address_table_write(address_space &space, bool large)
 	{
 		// 8-bit case
 		case 8:
-			m_handlers[STATIC_UNMAP]->set_delegate(write8_delegate_create(address_table_write, unmap_w<UINT8>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(write8_delegate_create(address_table_write, nop_w<UINT8>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate_create(address_table_write, watchpoint_w<UINT8>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write8_delegate(FUNC(address_table_write::unmap_w<UINT8>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write8_delegate(FUNC(address_table_write::nop_w<UINT8>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write8_delegate(FUNC(address_table_write::watchpoint_w<UINT8>), this));
 			break;
 
 		// 16-bit case
 		case 16:
-			m_handlers[STATIC_UNMAP]->set_delegate(write16_delegate_create(address_table_write, unmap_w<UINT16>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(write16_delegate_create(address_table_write, nop_w<UINT16>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate_create(address_table_write, watchpoint_w<UINT16>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write16_delegate(FUNC(address_table_write::unmap_w<UINT16>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write16_delegate(FUNC(address_table_write::nop_w<UINT16>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write16_delegate(FUNC(address_table_write::watchpoint_w<UINT16>), this));
 			break;
 
 		// 32-bit case
 		case 32:
-			m_handlers[STATIC_UNMAP]->set_delegate(write32_delegate_create(address_table_write, unmap_w<UINT32>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(write32_delegate_create(address_table_write, nop_w<UINT32>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate_create(address_table_write, watchpoint_w<UINT32>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write32_delegate(FUNC(address_table_write::unmap_w<UINT32>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write32_delegate(FUNC(address_table_write::nop_w<UINT32>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write32_delegate(FUNC(address_table_write::watchpoint_w<UINT32>), this));
 			break;
 
 		// 64-bit case
 		case 64:
-			m_handlers[STATIC_UNMAP]->set_delegate(write64_delegate_create(address_table_write, unmap_w<UINT64>, *this));
-			m_handlers[STATIC_NOP]->set_delegate(write64_delegate_create(address_table_write, nop_w<UINT64>, *this));
-			m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate_create(address_table_write, watchpoint_w<UINT64>, *this));
+			m_handlers[STATIC_UNMAP]->set_delegate(write64_delegate(FUNC(address_table_write::unmap_w<UINT64>), this));
+			m_handlers[STATIC_NOP]->set_delegate(write64_delegate(FUNC(address_table_write::nop_w<UINT64>), this));
+			m_handlers[STATIC_WATCHPOINT]->set_delegate(write64_delegate(FUNC(address_table_write::watchpoint_w<UINT64>), this));
 			break;
 	}
 
@@ -4446,11 +4446,11 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 8);
 		if (m_datawidth == 16)
-			set_delegate(read16_delegate(read16_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_16_from_8>(delegate.name()), *this));
+			set_delegate(read16_delegate(&handler_entry_read::read_stub_16_from_8, delegate.name(), this));
 		else if (m_datawidth == 32)
-			set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_32_from_8>(delegate.name()), *this));
+			set_delegate(read32_delegate(&handler_entry_read::read_stub_32_from_8, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_64_from_8>(delegate.name()), *this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_8, delegate.name(), this));
 	}
 }
 
@@ -4475,9 +4475,9 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 16);
 		if (m_datawidth == 32)
-			set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_32_from_16>(delegate.name()), *this));
+			set_delegate(read32_delegate(&handler_entry_read::read_stub_32_from_16, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_64_from_16>(delegate.name()), *this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_16, delegate.name(), this));
 	}
 }
 
@@ -4502,7 +4502,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
-			set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_64_from_32>(delegate.name()), *this));
+			set_delegate(read64_delegate(&handler_entry_read::read_stub_64_from_32, delegate.name(), this));
 	}
 }
 
@@ -4532,28 +4532,28 @@ void handler_entry_read::set_legacy_func(address_space &space, read8_space_func 
 {
 	m_legacy_handler.space8 = func;
 	m_legacy_object.space = &space;
-	set_delegate(read8_delegate(read8_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space16 = func;
 	m_legacy_object.space = &space;
-	set_delegate(read16_delegate(read16_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space32 = func;
 	m_legacy_object.space = &space;
-	set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space64 = func;
 	m_legacy_object.space = &space;
-	set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 
@@ -4566,28 +4566,28 @@ void handler_entry_read::set_legacy_func(device_t &device, read8_device_func fun
 {
 	m_legacy_handler.device8 = func;
 	m_legacy_object.device = &device;
-	set_delegate(read8_delegate(read8_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device16 = func;
 	m_legacy_object.device = &device;
-	set_delegate(read16_delegate(read16_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device32 = func;
 	m_legacy_object.device = &device;
-	set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device64 = func;
 	m_legacy_object.device = &device;
-	set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
+	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
 }
 
 
@@ -4600,13 +4600,13 @@ void handler_entry_read::set_ioport(const input_port_config &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(read8_delegate(read8_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_ioport<UINT8> >(ioport.tag), *this));
+		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag, this));
 	else if (m_datawidth == 16)
-		set_delegate(read16_delegate(read16_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_ioport<UINT16> >(ioport.tag), *this));
+		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag, this));
 	else if (m_datawidth == 32)
-		set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_ioport<UINT32> >(ioport.tag), *this));
+		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag, this));
 	else if (m_datawidth == 64)
-		set_delegate(read64_delegate(read64_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_ioport<UINT64> >(ioport.tag), *this));
+		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag, this));
 }
 
 
@@ -4788,11 +4788,11 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 8);
 		if (m_datawidth == 16)
-			set_delegate(write16_delegate(write16_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_16_from_8>(delegate.name()), *this));
+			set_delegate(write16_delegate(&handler_entry_write::write_stub_16_from_8, delegate.name(), this));
 		else if (m_datawidth == 32)
-			set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_32_from_8>(delegate.name()), *this));
+			set_delegate(write32_delegate(&handler_entry_write::write_stub_32_from_8, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_64_from_8>(delegate.name()), *this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_8, delegate.name(), this));
 	}
 }
 
@@ -4812,9 +4812,9 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 16);
 		if (m_datawidth == 32)
-			set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_32_from_16>(delegate.name()), *this));
+			set_delegate(write32_delegate(&handler_entry_write::write_stub_32_from_16, delegate.name(), this));
 		else if (m_datawidth == 64)
-			set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_64_from_16>(delegate.name()), *this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_16, delegate.name(), this));
 	}
 }
 
@@ -4834,7 +4834,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
 	{
 		configure_subunits(mask, 32);
 		if (m_datawidth == 64)
-			set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_64_from_32>(delegate.name()), *this));
+			set_delegate(write64_delegate(&handler_entry_write::write_stub_64_from_32, delegate.name(), this));
 	}
 }
 
@@ -4859,28 +4859,28 @@ void handler_entry_write::set_legacy_func(address_space &space, write8_space_fun
 {
 	m_legacy_handler.space8 = func;
 	m_legacy_object.space = &space;
-	set_delegate(write8_delegate(write8_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space16 = func;
 	m_legacy_object.space = &space;
-	set_delegate(write16_delegate(write16_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space32 = func;
 	m_legacy_object.space = &space;
-	set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space64 = func;
 	m_legacy_object.space = &space;
-	set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 
@@ -4893,28 +4893,28 @@ void handler_entry_write::set_legacy_func(device_t &device, write8_device_func f
 {
 	m_legacy_handler.device8 = func;
 	m_legacy_object.device = &device;
-	set_delegate(write8_delegate(write8_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device16 = func;
 	m_legacy_object.device = &device;
-	set_delegate(write16_delegate(write16_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device32 = func;
 	m_legacy_object.device = &device;
-	set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.device64 = func;
 	m_legacy_object.device = &device;
-	set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
+	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
 }
 
 
@@ -4927,13 +4927,13 @@ void handler_entry_write::set_ioport(const input_port_config &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(write8_delegate(write8_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_ioport<UINT8> >(ioport.tag), *this));
+		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag, this));
 	else if (m_datawidth == 16)
-		set_delegate(write16_delegate(write16_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_ioport<UINT16> >(ioport.tag), *this));
+		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag, this));
 	else if (m_datawidth == 32)
-		set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_ioport<UINT32> >(ioport.tag), *this));
+		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag, this));
 	else if (m_datawidth == 64)
-		set_delegate(write64_delegate(write64_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_ioport<UINT64> >(ioport.tag), *this));
+		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag, this));
 }
 
 

@@ -32,6 +32,7 @@ public:
 	UINT8 m_v493_irq_state;
 	UINT8 m_v493_irq_vector;
 	timer_expired_func m_v493_callback;
+	const char *m_v493_callback_name;
 	UINT8 m_zwackery_sound_data;
 	attotime m_m6840_counter_periods[3];
 	attotime m_m6840_internal_counter_period;

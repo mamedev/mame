@@ -78,8 +78,8 @@ static TIMER_CALLBACK( invasn_gun_callback );
 
 static MACHINE_START( midzeus )
 {
-	timer[0] = machine.scheduler().timer_alloc(FUNC(NULL));
-	timer[1] = machine.scheduler().timer_alloc(FUNC(NULL));
+	timer[0] = machine.scheduler().timer_alloc(FUNC_NULL);
+	timer[1] = machine.scheduler().timer_alloc(FUNC_NULL);
 
 	gun_timer[0] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));
 	gun_timer[1] = machine.scheduler().timer_alloc(FUNC(invasn_gun_callback));

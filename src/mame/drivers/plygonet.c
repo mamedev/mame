@@ -315,7 +315,7 @@ static READ16_HANDLER( dsp56k_bootload_r )
 
 DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 {
-	polygonet_state *state = machine->driver_data<polygonet_state>();
+	polygonet_state *state = machine.driver_data<polygonet_state>();
 
 	/* Call the dsp's update handler first */
 	if (!state->m_dsp56k_update_handler.isnull())
@@ -757,7 +757,7 @@ static DRIVER_INIT(polygonet)
 
 	/* The dsp56k occasionally executes out of mapped memory */
 	address_space *space = machine.device<dsp56k_device>("dsp")->space(AS_PROGRAM);
-	state->m_dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate_create_static(plygonet_dsp56k_direct_handler, machine));
+	state->m_dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate(FUNC(plygonet_dsp56k_direct_handler), &machine));
 
     /* save states */
 	state->save_item(NAME(state->m_dsp56k_bank00_ram));

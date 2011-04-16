@@ -151,65 +151,25 @@ struct data_accessors
 // ======================> direct_update_delegate
 
 // direct region update handler
-typedef proto_delegate_2param<offs_t, direct_read_data &, offs_t> direct_update_proto_delegate;
-typedef delegate_2param<offs_t, direct_read_data &, offs_t> direct_update_delegate;
-
-#define direct_update_delegate_create(_Class, _Method, _Object) direct_update_delegate(direct_update_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method), _Object)
-#define direct_update_delegate_create_static(_Function, _Object) direct_update_delegate(direct_update_proto_delegate::_create_static<running_machine, &_Function>(#_Function), _Object)
+typedef delegate<offs_t (direct_read_data &, offs_t)> direct_update_delegate;
 
 
 // ======================> read_delegate
 
-// declare proto-delegates for each width
-typedef proto_delegate_3param<UINT8, address_space &, offs_t, UINT8> read8_proto_delegate;
-typedef proto_delegate_3param<UINT16, address_space &, offs_t, UINT16> read16_proto_delegate;
-typedef proto_delegate_3param<UINT32, address_space &, offs_t, UINT32> read32_proto_delegate;
-typedef proto_delegate_3param<UINT64, address_space &, offs_t, UINT64> read64_proto_delegate;
-
 // declare delegates for each width
-typedef delegate_3param<UINT8, address_space &, offs_t, UINT8> read8_delegate;
-typedef delegate_3param<UINT16, address_space &, offs_t, UINT16> read16_delegate;
-typedef delegate_3param<UINT32, address_space &, offs_t, UINT32> read32_delegate;
-typedef delegate_3param<UINT64, address_space &, offs_t, UINT64> read64_delegate;
-
-// macros for creating read proto-delegates
-#define read8_proto_delegate_create(_Class, _Method) read8_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define read16_proto_delegate_create(_Class, _Method) read16_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define read32_proto_delegate_create(_Class, _Method) read32_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define read64_proto_delegate_create(_Class, _Method) read64_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-
-// macros for creating read delegates, bound to the provided object
-#define read8_delegate_create(_Class, _Method, _Object) read8_delegate(read8_proto_delegate_create(_Class, _Method), _Object)
-#define read16_delegate_create(_Class, _Method, _Object) read16_delegate(read16_proto_delegate_create(_Class, _Method), _Object)
-#define read32_delegate_create(_Class, _Method, _Object) read32_delegate(read32_proto_delegate_create(_Class, _Method), _Object)
-#define read64_delegate_create(_Class, _Method, _Object) read64_delegate(read64_proto_delegate_create(_Class, _Method), _Object)
+typedef delegate<UINT8 (address_space &, offs_t, UINT8)> read8_delegate;
+typedef delegate<UINT16 (address_space &, offs_t, UINT16)> read16_delegate;
+typedef delegate<UINT32 (address_space &, offs_t, UINT32)> read32_delegate;
+typedef delegate<UINT64 (address_space &, offs_t, UINT64)> read64_delegate;
 
 
 // ======================> write_delegate
 
-// declare proto-delegates for each width
-typedef proto_delegate_4param<void, address_space &, offs_t, UINT8, UINT8> write8_proto_delegate;
-typedef proto_delegate_4param<void, address_space &, offs_t, UINT16, UINT16> write16_proto_delegate;
-typedef proto_delegate_4param<void, address_space &, offs_t, UINT32, UINT32> write32_proto_delegate;
-typedef proto_delegate_4param<void, address_space &, offs_t, UINT64, UINT64> write64_proto_delegate;
-
 // declare delegates for each width
-typedef delegate_4param<void, address_space &, offs_t, UINT8, UINT8> write8_delegate;
-typedef delegate_4param<void, address_space &, offs_t, UINT16, UINT16> write16_delegate;
-typedef delegate_4param<void, address_space &, offs_t, UINT32, UINT32> write32_delegate;
-typedef delegate_4param<void, address_space &, offs_t, UINT64, UINT64> write64_delegate;
-
-// macros for creating write proto-delegates
-#define write8_proto_delegate_create(_Class, _Method) write8_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define write16_proto_delegate_create(_Class, _Method) write16_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define write32_proto_delegate_create(_Class, _Method) write32_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-#define write64_proto_delegate_create(_Class, _Method) write64_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method)
-
-// macros for creating write delegates, bound to the provided object
-#define write8_delegate_create(_Class, _Method, _Object) write8_delegate(write8_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method), _Object)
-#define write16_delegate_create(_Class, _Method, _Object) write16_delegate(write16_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method), _Object)
-#define write32_delegate_create(_Class, _Method, _Object) write32_delegate(write32_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method), _Object)
-#define write64_delegate_create(_Class, _Method, _Object) write64_delegate(write64_proto_delegate::_create_member<_Class, &_Class::_Method>(#_Class "::" #_Method), _Object)
+typedef delegate<void (address_space &, offs_t, UINT8, UINT8)> write8_delegate;
+typedef delegate<void (address_space &, offs_t, UINT16, UINT16)> write16_delegate;
+typedef delegate<void (address_space &, offs_t, UINT32, UINT32)> write32_delegate;
+typedef delegate<void (address_space &, offs_t, UINT64, UINT64)> write64_delegate;
 
 
 // ======================> direct_read_data
@@ -604,7 +564,7 @@ protected:
 
 // opcode base adjustment handler function macro
 #define DIRECT_UPDATE_MEMBER(name)		offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
-#define DIRECT_UPDATE_HANDLER(name)		offs_t name(ATTR_UNUSED running_machine *machine, ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
+#define DIRECT_UPDATE_HANDLER(name)		offs_t name(ATTR_UNUSED running_machine &machine, ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 
 
 // space read/write handler function macros

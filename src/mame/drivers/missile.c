@@ -515,7 +515,7 @@ static MACHINE_START( missile )
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
 	address_space *space = machine.device<m6502_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(missile_direct_handler), &machine));
 
 	/* create a timer to speed/slow the CPU */
 	state->m_cpu_timer = machine.scheduler().timer_alloc(FUNC(adjust_cpu_speed));

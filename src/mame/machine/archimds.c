@@ -340,7 +340,7 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 void archimedes_driver_init(running_machine &machine)
 {
 //  address_space *space = machine.device<arm_device>("maincpu")->space(AS_PROGRAM);
-//  space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, machine));
+//  space->set_direct_update_handler(direct_update_delegate(FUNC(a310_setopbase), &machine));
 }
 
 static const char *const ioc_regnames[] =

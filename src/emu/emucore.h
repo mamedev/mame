@@ -202,7 +202,8 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define NAME(x) x, #x
 
 // this macro wraps a function 'x' and can be used to pass a function followed by its name
-#define FUNC(x) x, #x
+#define FUNC(x) &x, #x
+#define FUNC_NULL NULL, "(null)"
 
 // this macro wraps a member function 'x' from class 'c'
 #define MFUNC(c,x) &c::x, #c "::" #x

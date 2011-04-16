@@ -1851,7 +1851,7 @@ static DEVICE_START( ide_controller )
 	}
 
 	/* create a timer for timing status */
-	ide->last_status_timer = device->machine().scheduler().timer_alloc(FUNC(NULL));
+	ide->last_status_timer = device->machine().scheduler().timer_alloc(FUNC_NULL);
 	ide->reset_timer = device->machine().scheduler().timer_alloc(FUNC(reset_callback), (void *)device);
 
 	/* register ide states */

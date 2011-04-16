@@ -884,29 +884,30 @@ static const struct
 {
 	const char *s_name;
 	read32_space_func keycus_r;
+	const char *keycus_r_name;
 	int n_daughterboard;
 } namcos11_config_table[] =
 {
-	{ "tekken", NULL, 32 },
-	{ "tekkena", NULL, 32 },
-	{ "tekkenb", NULL, 32 },
-	{ "tekkenc", NULL, 32 },
-	{ "tekken2", keycus_c406_r, 32 },
-	{ "tekken2a", keycus_c406_r, 32 },
-	{ "tekken2b", keycus_c406_r, 32 },
-	{ "souledge", keycus_c409_r, 32 },
-	{ "souledgea", keycus_c409_r, 32 },
-	{ "souledge1", keycus_c409_r, 32 },
-	{ "souledge1j", keycus_c409_r, 32 },
-	{ "dunkmnia", keycus_c410_r, 32 },
-	{ "dunkmniaj", keycus_c410_r, 32 },
-	{ "xevi3dg",  keycus_c430_r, 32 },
-	{ "primglex", keycus_c411_r, 32 },
-	{ "danceyes", keycus_c431_r, 32 },
-	{ "pocketrc", keycus_c432_r, 32 },
-	{ "starswep", keycus_c442_r, 0 },
-	{ "myangel3", keycus_c443_r, 64 },
-	{ "ptblank2a",keycus_c443_r, 64 },
+	{ "tekken", FUNC_NULL, 32 },
+	{ "tekkena", FUNC_NULL, 32 },
+	{ "tekkenb", FUNC_NULL, 32 },
+	{ "tekkenc", FUNC_NULL, 32 },
+	{ "tekken2", FUNC(keycus_c406_r), 32 },
+	{ "tekken2a", FUNC(keycus_c406_r), 32 },
+	{ "tekken2b", FUNC(keycus_c406_r), 32 },
+	{ "souledge", FUNC(keycus_c409_r), 32 },
+	{ "souledgea", FUNC(keycus_c409_r), 32 },
+	{ "souledge1", FUNC(keycus_c409_r), 32 },
+	{ "souledge1j", FUNC(keycus_c409_r), 32 },
+	{ "dunkmnia", FUNC(keycus_c410_r), 32 },
+	{ "dunkmniaj", FUNC(keycus_c410_r), 32 },
+	{ "xevi3dg",  FUNC(keycus_c430_r), 32 },
+	{ "primglex", FUNC(keycus_c411_r), 32 },
+	{ "danceyes", FUNC(keycus_c431_r), 32 },
+	{ "pocketrc", FUNC(keycus_c432_r), 32 },
+	{ "starswep", FUNC(keycus_c442_r), 0 },
+	{ "myangel3", FUNC(keycus_c443_r), 64 },
+	{ "ptblank2a",FUNC(keycus_c443_r), 64 },
 	{ NULL, NULL }
 };
 
@@ -932,7 +933,7 @@ static DRIVER_INIT( namcos11 )
 		{
 			if( namcos11_config_table[ n_game ].keycus_r != NULL )
 			{
-				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(namcos11_config_table[ n_game ].keycus_r) );
+				machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, namcos11_config_table[ n_game ].keycus_r, namcos11_config_table[ n_game ].keycus_r_name );
 			}
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{

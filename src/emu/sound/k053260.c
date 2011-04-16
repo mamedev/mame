@@ -258,7 +258,7 @@ static DEVICE_START( k053260 )
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		device->machine().scheduler().timer_pulse( attotime::from_hz(device->clock()) * 32, FUNC(ic->intf->irq ));
+		device->machine().scheduler().timer_pulse( attotime::from_hz(device->clock()) * 32, ic->intf->irq, "ic->intf->irq" );
 }
 
 INLINE void check_bounds( k053260_state *ic, int channel )

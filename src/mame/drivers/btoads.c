@@ -53,7 +53,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	device_triggerint(machine.device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
-	machine.scheduler().timer_set(attotime::from_usec(50), FUNC(NULL));
+	machine.scheduler().timer_set(attotime::from_usec(50), FUNC_NULL);
 }
 
 

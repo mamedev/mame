@@ -19,8 +19,10 @@ struct _segaic16_memory_map_entry
 	offs_t			mirror;				/* maximal mirror values (will be truncated) */
 	offs_t			romoffset;			/* offset within REGION_CPU0, or ~0 for independent entries */
 	read16_space_func	read;				/* read handler */
+	const char *	readname;
 	const char *	readbank;			/* bank for reading */
 	write16_space_func	write;				/* write handler */
+	const char *	writename;
 	const char *	writebank;			/* bank for writing */
 	UINT16 **		base;				/* pointer to memory base */
 	const char *	name;				/* friendly name for debugging */
