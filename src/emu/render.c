@@ -1341,6 +1341,9 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 		return;
 	}
 
+	if (m_curview == NULL)
+		throw emu_fatalerror("Mandatory artwork is missing");
+
 	// scan the current view for all screens
 	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
 
