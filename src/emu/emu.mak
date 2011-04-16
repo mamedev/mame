@@ -151,6 +151,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/8237dma.o		\
 	$(EMUMACHINE)/8255ppi.o		\
 	$(EMUMACHINE)/8257dma.o		\
+	$(EMUMACHINE)/adc0808.o		\
 	$(EMUMACHINE)/adc083x.o		\
 	$(EMUMACHINE)/adc1038.o		\
 	$(EMUMACHINE)/adc1213x.o	\
