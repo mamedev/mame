@@ -1,233 +1,235 @@
 /**********************************************************************
 
     RCA CDP1852 Byte-Wide Input/Output Port emulation
-
+	
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 
-#include "emu.h"
 #include "cdp1852.h"
+#include "machine/devhelpr.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _cdp1852_t cdp1852_t;
-struct _cdp1852_t
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+enum
 {
-	devcb_resolved_write_line	out_sr_func;
-	devcb_resolved_read8		in_data_func;
-	devcb_resolved_write8		out_data_func;
-
-	cdp1852_mode mode;				/* operation mode */
-	int new_data;					/* new data written */
-	UINT8 data;						/* data latch */
-	UINT8 next_data;				/* next data*/
-
-	int sr;							/* service request flag */
-	int next_sr;					/* next value of service request flag */
-
-	/* timers */
-	emu_timer *scan_timer;			/* scan timer */
+	MODE_INPUT = 0,
+	MODE_OUTPUT
 };
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
 
-INLINE cdp1852_t *get_safe_token(device_t *device)
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type CDP1852 = cdp1852_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(cdp1852, "CDP1852")
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1852_device_config::device_config_complete()
 {
-	assert(device != NULL);
-	return (cdp1852_t *)downcast<legacy_device_base *>(device)->token();
-}
+	// inherit a copy of the static data
+	const cdp1852_interface *intf = reinterpret_cast<const cdp1852_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1852_interface *>(this) = *intf;
 
-INLINE const cdp1852_interface *get_interface(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == CDP1852));
-	return (const cdp1852_interface *) device->baseconfig().static_config();
-}
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    set_sr_line - service request out
--------------------------------------------------*/
-
-static void set_sr_line(cdp1852_t *cdp1852, int level)
-{
-	if (cdp1852->sr != level)
+	// or initialize to defaults if none provided
+	else
 	{
-		cdp1852->sr = level;
-
-		devcb_call_write_line(&cdp1852->out_sr_func, cdp1852->sr);
+		memset(&m_in_mode_func, 0, sizeof(m_in_mode_func));
+		memset(&m_out_sr_func, 0, sizeof(m_out_sr_func));
+		memset(&m_in_data_func, 0, sizeof(m_in_data_func));
+		memset(&m_out_data_func, 0, sizeof(m_out_data_func));
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( cdp1852_scan_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( cdp1852_scan_tick )
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_mode - 
+//-------------------------------------------------
+
+int cdp1852_device::get_mode()
 {
-	device_t *device = (device_t *)ptr;
-	cdp1852_t *cdp1852 = get_safe_token(device);
+	return devcb_call_read_line(&m_in_mode_func);
+}
 
-	switch (cdp1852->mode)
+
+//-------------------------------------------------
+//  set_sr_line - 
+//-------------------------------------------------
+
+void cdp1852_device::set_sr_line(int state)
+{
+	if (m_sr != state)
 	{
-	case CDP1852_MODE_INPUT:
-		/* input data into register */
-		cdp1852->data = devcb_call_read8(&cdp1852->in_data_func, 0);
+		m_sr = state;
 
-		/* signal processor */
-		set_sr_line(cdp1852, 0);
-		break;
-
-	case CDP1852_MODE_OUTPUT:
-		if (cdp1852->new_data)
-		{
-			cdp1852->new_data = 0;
-
-			/* latch data into register */
-			cdp1852->data = cdp1852->next_data;
-
-			/* output data */
-			devcb_call_write8(&cdp1852->out_data_func, 0, cdp1852->data);
-
-			/* signal peripheral device */
-			set_sr_line(cdp1852, 1);
-
-			cdp1852->next_sr = 0;
-		}
-		else
-		{
-			set_sr_line(cdp1852, cdp1852->next_sr);
-		}
-		break;
+		devcb_call_write_line(&m_out_sr_func, m_sr);
 	}
 }
 
-/*-------------------------------------------------
-    cdp1852_data_r - data register read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( cdp1852_data_r )
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1852_device - constructor
+//-------------------------------------------------
+
+cdp1852_device::cdp1852_device(running_machine &_machine, const cdp1852_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
 {
-	cdp1852_t *cdp1852 = get_safe_token(device);
-
-	if (cdp1852->mode == CDP1852_MODE_INPUT && device->clock() == 0)
-	{
-		// input data into register
-		cdp1852->data = devcb_call_read8(&cdp1852->in_data_func, 0);
-	}
-
-	set_sr_line(cdp1852, 1);
-
-	return cdp1852->data;
 }
 
-/*-------------------------------------------------
-    cdp1852_data_r - data register write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1852_data_w )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cdp1852_device::device_start()
 {
-	cdp1852_t *cdp1852 = get_safe_token(device);
+	// resolve callbacks
+	devcb_resolve_read_line(&m_in_mode_func, &m_config.m_in_mode_func, this);
+	devcb_resolve_write_line(&m_out_sr_func, &m_config.m_out_sr_func, this);
+	devcb_resolve_read8(&m_in_data_func, &m_config.m_in_data_func, this);
+	devcb_resolve_write8(&m_out_data_func, &m_config.m_out_data_func, this);
 
-	if (cdp1852->mode == CDP1852_MODE_OUTPUT)
+	// allocate timers
+	if (clock() > 0)
 	{
-		cdp1852->next_data = data;
-		cdp1852->new_data = 1;
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_START( cdp1852 )
--------------------------------------------------*/
-
-static DEVICE_START( cdp1852 )
-{
-	cdp1852_t *cdp1852 = get_safe_token(device);
-	const cdp1852_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&cdp1852->in_data_func, &intf->in_data_func, device);
-	devcb_resolve_write8(&cdp1852->out_data_func, &intf->out_data_func, device);
-	devcb_resolve_write_line(&cdp1852->out_sr_func, &intf->out_sr_func, device);
-
-	/* set initial values */
-	cdp1852->mode = (cdp1852_mode)intf->mode;
-
-	if (device->clock() > 0)
-	{
-		/* create the scan timer */
-		cdp1852->scan_timer = device->machine().scheduler().timer_alloc(FUNC(cdp1852_scan_tick), (void *)device);
-		cdp1852->scan_timer->adjust(attotime::zero, 0, attotime::from_hz(device->clock()));
+		m_scan_timer = timer_alloc();
+		m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 	}
 
-	/* register for state saving */
-	device->save_item(NAME(cdp1852->new_data));
-	device->save_item(NAME(cdp1852->data));
-	device->save_item(NAME(cdp1852->next_data));
-	device->save_item(NAME(cdp1852->sr));
-	device->save_item(NAME(cdp1852->next_sr));
+	// register for state saving
+	save_item(NAME(m_new_data));
+	save_item(NAME(m_data));
+	save_item(NAME(m_next_data));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_next_sr));
 }
 
-/*-------------------------------------------------
-    DEVICE_RESET( cdp1852 )
--------------------------------------------------*/
 
-static DEVICE_RESET( cdp1852 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void cdp1852_device::device_reset()
 {
-	cdp1852_t *cdp1852 = get_safe_token(device);
+	// reset data register
+	m_data = 0;
 
-	/* reset data register */
-	cdp1852->data = 0;
-
-	if (cdp1852->mode == CDP1852_MODE_INPUT)
+	if (get_mode() == MODE_INPUT)
 	{
-		/* reset service request flip-flop */
-		set_sr_line(cdp1852, 1);
+		// reset service request flip-flop
+		set_sr_line(1);
 	}
 	else
 	{
-		/* output data */
-		devcb_call_write8(&cdp1852->out_data_func, 0, cdp1852->data);
+		// output data
+		devcb_call_write8(&m_out_data_func, 0, m_data);
 
-		/* reset service request flip-flop */
-		set_sr_line(cdp1852, 0);
+		// reset service request flip-flop
+		set_sr_line(0);
 	}
 }
 
-/*-------------------------------------------------
-    DEVICE_GET_INFO( cdp1852 )
--------------------------------------------------*/
 
-DEVICE_GET_INFO( cdp1852 )
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void cdp1852_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch (state)
+	switch (get_mode())
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1852_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+	case MODE_INPUT:
+		// input data into register
+		m_data = devcb_call_read8(&m_in_data_func, 0);
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1852);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1852);	break;
+		// signal processor
+		set_sr_line(0);
+		break;
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1852");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	case MODE_OUTPUT:
+		if (m_new_data)
+		{
+			m_new_data = 0;
+
+			// latch data into register
+			m_data = m_next_data;
+
+			// output data
+			devcb_call_write8(&m_out_data_func, 0, m_data);
+
+			// signal peripheral device
+			set_sr_line(1);
+
+			m_next_sr = 0;
+		}
+		else
+		{
+			set_sr_line(m_next_sr);
+		}
+		break;
 	}
 }
 
 
-DEFINE_LEGACY_DEVICE(CDP1852, cdp1852);
+//-------------------------------------------------
+//  read - data read
+//-------------------------------------------------
+
+READ8_MEMBER( cdp1852_device::read )
+{
+	if ((get_mode() == MODE_INPUT) && (clock() == 0))
+	{
+		// input data into register
+		m_data = devcb_call_read8(&m_in_data_func, 0);
+	}
+
+	set_sr_line(1);
+
+	return m_data;
+}
+
+
+//-------------------------------------------------
+//  write - data write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1852_device::write )
+{
+	if (get_mode() == MODE_OUTPUT)
+	{
+		m_next_data = data;
+		m_new_data = 1;
+	}
+}

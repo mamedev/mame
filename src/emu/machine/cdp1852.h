@@ -22,58 +22,126 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __CDP1852__
 #define __CDP1852__
 
-#include "devlegcy.h"
+#include "emu.h"
 
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
 #define CDP1852_CLOCK_HIGH	0
 
-DECLARE_LEGACY_DEVICE(CDP1852, cdp1852);
+#define CDP1852_MODE_INPUT \
+	DEVCB_LINE_GND
+
+#define CDP1852_MODE_OUTPUT \
+	DEVCB_LINE_VCC
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MCFG_CDP1852_ADD(_tag, _clock, _config) \
 	MCFG_DEVICE_ADD(_tag, CDP1852, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
 
-#define CDP1852_INTERFACE(_name) \
-	const cdp1852_interface (_name)=
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+#define CDP1852_INTERFACE(name) \
+	const cdp1852_interface (name)=
 
-enum _cdp1852_mode {
-	CDP1852_MODE_INPUT = 0,
-	CDP1852_MODE_OUTPUT
-};
-typedef enum _cdp1852_mode cdp1852_mode;
 
-typedef struct _cdp1852_interface cdp1852_interface;
-struct _cdp1852_interface
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> cdp1852_interface
+
+struct cdp1852_interface
 {
-	int mode;				/* operation mode */
+	devcb_read_line			m_in_mode_func;
 
-	/* this gets called for every external data read */
-	devcb_read8				in_data_func;
+	devcb_read8				m_in_data_func;
+	devcb_write8			m_out_data_func;
 
-	/* this gets called for every external data write */
-	devcb_write8			out_data_func;
-
-	/* this gets called for every change of the SR pin (pin 23) */
-	devcb_write_line		out_sr_func;
+	devcb_write_line		m_out_sr_func;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* data access */
-READ8_DEVICE_HANDLER( cdp1852_data_r );
-WRITE8_DEVICE_HANDLER( cdp1852_data_w );
+// ======================> cdp1852_device_config
+
+class cdp1852_device_config :   public device_config,
+                                public cdp1852_interface
+{
+    friend class cdp1852_device;
+
+    // construction/destruction
+    cdp1852_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+// ======================> cdp1852_device
+
+class cdp1852_device :  public device_t
+{
+    friend class cdp1852_device_config;
+
+    // construction/destruction
+    cdp1852_device(running_machine &_machine, const cdp1852_device_config &_config);
+
+public:
+    DECLARE_READ8_MEMBER( read );
+    DECLARE_WRITE8_MEMBER( write );
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+private:
+	int get_mode();
+	inline void set_sr_line(int state);
+
+	devcb_resolved_read_line	m_in_mode_func;
+	devcb_resolved_write_line	m_out_sr_func;
+	devcb_resolved_read8		m_in_data_func;
+	devcb_resolved_write8		m_out_data_func;
+
+	int m_new_data;				// new data written
+	UINT8 m_data;				// data latch
+	UINT8 m_next_data;			// next data
+
+	int m_sr;					// service request flag
+	int m_next_sr;				// next value of service request flag
+
+	// timers
+	emu_timer *m_scan_timer;
+
+	const cdp1852_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type CDP1852;
+
+
 
 #endif

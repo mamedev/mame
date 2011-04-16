@@ -107,8 +107,8 @@ static CDP1869_PCB_READ( draco_pcb_r )
 WRITE_LINE_MEMBER( cidelsa_state::prd_w )
 {
 	/* invert PRD signal */
-	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
-	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Page RAM */
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 
 /* CDP1869 Interface */
 
-static CDP1869_INTERFACE( destryer_cdp1869_intf )
+static CDP1869_INTERFACE( destryer_vis_intf )
 {
 	SCREEN_TAG,
 	0,
@@ -136,7 +136,7 @@ static CDP1869_INTERFACE( destryer_cdp1869_intf )
 	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
 };
 
-static CDP1869_INTERFACE( altair_cdp1869_intf )
+static CDP1869_INTERFACE( altair_vis_intf )
 {
 	SCREEN_TAG,
 	0,
@@ -147,7 +147,7 @@ static CDP1869_INTERFACE( altair_cdp1869_intf )
 	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
 };
 
-static CDP1869_INTERFACE( draco_cdp1869_intf )
+static CDP1869_INTERFACE( draco_vis_intf )
 {
 	SCREEN_TAG,
 	0,
@@ -167,14 +167,14 @@ void cidelsa_state::video_start()
 	m_charram = auto_alloc_array(m_machine, UINT8, CIDELSA_CHARRAM_SIZE);
 
 	// register for state saving
-	state_save_register_global(m_machine, m_cdp1869_pcb);
-	state_save_register_global_pointer(m_machine, m_pcbram, CIDELSA_CHARRAM_SIZE);
-	state_save_register_global_pointer(m_machine, m_charram, CIDELSA_CHARRAM_SIZE);
+	save_item(NAME(m_cdp1869_pcb));
+	save_pointer(NAME(m_pcbram), CIDELSA_CHARRAM_SIZE);
+	save_pointer(NAME(m_charram), CIDELSA_CHARRAM_SIZE);
 }
 
 /* AY-3-8910 */
 
-WRITE8_MEMBER( cidelsa_state::draco_ay8910_port_b_w )
+WRITE8_MEMBER( draco_state::psg_pb_w )
 {
 	/*
 
@@ -192,14 +192,14 @@ WRITE8_MEMBER( cidelsa_state::draco_ay8910_port_b_w )
     */
 }
 
-static const ay8910_interface ay8910_config =
+static const ay8910_interface psg_intf =
 {
 	AY8910_SINGLE_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(cidelsa_state, draco_ay8910_port_b_w)
+	DEVCB_DRIVER_MEMBER(draco_state, psg_pb_w)
 };
 
 /* Machine Drivers */
@@ -209,7 +209,7 @@ MACHINE_CONFIG_FRAGMENT( destryer_video )
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, DESTRYER_CHR2, destryer_cdp1869_intf, cidelsa_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, DESTRYER_CHR2, destryer_vis_intf, cidelsa_page_ram)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -218,7 +218,7 @@ MACHINE_CONFIG_FRAGMENT( altair_video )
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, ALTAIR_CHR2, altair_cdp1869_intf, cidelsa_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, ALTAIR_CHR2, altair_vis_intf, cidelsa_page_ram)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -227,8 +227,8 @@ MACHINE_CONFIG_FRAGMENT( draco_video )
 	MCFG_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.360, 0.024)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1869_ADD(CDP1869_TAG, DRACO_CHR2, draco_cdp1869_intf, draco_page_ram)
+	MCFG_CDP1869_ADD(CDP1869_TAG, DRACO_CHR2, draco_vis_intf, draco_page_ram)
 	MCFG_SOUND_ADD(AY8910_TAG, AY8910, DRACO_SND_CHR1)
-	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
