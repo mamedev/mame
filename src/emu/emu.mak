@@ -240,6 +240,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/crt9212.o		\
 	$(EMUVIDEO)/dm9368.o		\
 	$(EMUVIDEO)/generic.o		\
+	$(EMUVIDEO)/hd44102.o		\
 	$(EMUVIDEO)/hd61830.o		\
 	$(EMUVIDEO)/hd63484.o		\
 	$(EMUVIDEO)/mc6845.o		\
