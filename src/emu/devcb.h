@@ -86,7 +86,7 @@ UINT8 devcb_stub(device_t *device, offs_t offset)
 
 // static template for a read16 stub function that calls through a given READ16_MEMBER
 template<class _Class, UINT16 (_Class::*_Function)(address_space &, offs_t, UINT16)>
-UINT16 devcb_stub(device_t *device, offs_t offset)
+UINT16 devcb_stub16(device_t *device, offs_t offset)
 {
 	_Class *target = downcast<_Class *>(device);
 	return (target->*_Function)(*memory_nonspecific_space(device->machine()), offset, 0xffff);
@@ -110,7 +110,7 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 
 // static template for a write16 stub function that calls through a given WRITE16_MEMBER
 template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT16, UINT16)>
-void devcb_stub(device_t *device, offs_t offset, UINT16 data)
+void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 {
 	_Class *target = downcast<_Class *>(device);
 	(target->*_Function)(*memory_nonspecific_space(device->machine()), offset, data, 0xffff);
