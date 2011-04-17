@@ -344,7 +344,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 	}
 	
 	// compute the final status
-	compute_status(record, rom, record.actual_length() != 0);
+	compute_status(record, rom, err == CHDERR_NONE);
 	return &record;
 }
 
