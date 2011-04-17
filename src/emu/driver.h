@@ -138,7 +138,7 @@ public:
 	static int find(const game_driver &driver) { return find(driver.name); }
 
 	// static helpers
-	static bool matches(const char *wildstring, const char *string) { return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0); }
+	static bool matches(const char *wildstring, const char *string);
 
 protected:
 	// internal helpers
@@ -191,7 +191,7 @@ public:
 	// filtering/iterating
 	int filter(const char *string = NULL);
 	int filter(const game_driver &driver);
-	void include_all() { memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count; }
+	void include_all();
 	void exclude_all() { memset(m_included, 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
 	void reset() { m_current = -1; }
 	bool next();

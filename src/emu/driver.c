@@ -77,6 +77,22 @@ int driver_list::find(const char *name)
 
 
 //-------------------------------------------------
+//  matches - true if we match, taking into
+//  account wildcards in the wildstring
+//-------------------------------------------------
+
+bool driver_list::matches(const char *wildstring, const char *string)
+{
+	// can only match internal drivers if the wildstring starts with an underscore
+	if (string[0] == '_' && (wildstring == NULL || wildstring[0] != '_'))
+		return false;
+
+	// match everything else normally
+	return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0);
+}
+
+
+//-------------------------------------------------
 //  driver_sort_callback - compare two items in
 //  an array of game_driver pointers
 //-------------------------------------------------
@@ -237,6 +253,19 @@ int driver_enumerator::filter(const game_driver &driver)
 			include(index);
 
 	return m_filtered_count;
+}
+
+
+//-------------------------------------------------
+//  include_all - include all non-internal drivers
+//-------------------------------------------------
+
+void driver_enumerator::include_all()
+{
+	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
+	int empty = find("___empty");
+	assert(empty != -1);
+	m_included[empty] = 0;
 }
 
 
