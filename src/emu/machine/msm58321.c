@@ -11,7 +11,9 @@
 
     TODO:
 
-    - count
+	- 12/24 hour
+	- AM/PM
+	- leap year
     - stop
     - reset
     - reference registers
@@ -50,6 +52,10 @@ enum
 	REGISTER_REF0,
 	REGISTER_REF1
 };
+
+
+// days per month
+static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 
 
@@ -92,6 +98,112 @@ void msm58321_device_config::device_config_complete()
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  read_counter -
+//-------------------------------------------------
+
+inline int msm58321_device::read_counter(int counter)
+{
+	return (m_reg[counter + 1] * 10) + m_reg[counter];
+}
+
+
+//-------------------------------------------------
+//  write_counter -
+//-------------------------------------------------
+
+inline void msm58321_device::write_counter(int counter, int value)
+{
+	m_reg[counter] = value % 10;
+	m_reg[counter + 1] = value / 10;
+}
+
+
+//-------------------------------------------------
+//  advance_seconds - 
+//-------------------------------------------------
+
+inline void msm58321_device::advance_seconds()
+{
+	int seconds = read_counter(REGISTER_S1);
+
+	seconds++;
+
+	if (seconds > 59)
+	{
+		seconds = 0;
+
+		advance_minutes();
+	}
+
+	write_counter(REGISTER_S1, seconds);
+}
+
+
+//-------------------------------------------------
+//  advance_minutes -
+//-------------------------------------------------
+
+inline void msm58321_device::advance_minutes()
+{
+	int minutes = read_counter(REGISTER_MI1);
+	int hours = read_counter(REGISTER_H1);
+	int days = read_counter(REGISTER_D1);
+	int month = read_counter(REGISTER_MO1);
+	int year = read_counter(REGISTER_Y1);
+	int day_of_week = m_reg[REGISTER_W];
+
+	minutes++;
+
+	if (minutes > 59)
+	{
+		minutes = 0;
+		hours++;
+	}
+
+	if (hours > 23)
+	{
+		hours = 0;
+		days++;
+		day_of_week++;
+	}
+
+	if (day_of_week > 6)
+	{
+		day_of_week++;
+	}
+
+	if (days > DAYS_PER_MONTH[month - 1])
+	{
+		days = 1;
+		month++;
+	}
+
+	if (month > 12)
+	{
+		month = 1;
+		year++;
+	}
+
+	if (year > 99)
+	{
+		year = 0;
+	}
+
+	write_counter(REGISTER_MI1, minutes);
+	write_counter(REGISTER_H1, hours);
+	write_counter(REGISTER_D1, days);
+	write_counter(REGISTER_MO1, month);
+	write_counter(REGISTER_Y1, year);
+	m_reg[REGISTER_W] = day_of_week;
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -103,6 +215,8 @@ msm58321_device::msm58321_device(running_machine &_machine, const msm58321_devic
     : device_t(_machine, config),
       m_config(config)
 {
+	for (int i = 0; i < 13; i++)
+		m_reg[i] = 0;
 }
 
 
@@ -116,8 +230,11 @@ void msm58321_device::device_start()
 	devcb_resolve_write_line(&m_out_busy_func, &m_config.m_out_busy_func, this);
 
 	// allocate timers
-	m_busy_timer = timer_alloc();
-	m_busy_timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
+
+	m_busy_timer = timer_alloc(TIMER_BUSY);
+	m_busy_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
 
 	// state saving
 	save_item(NAME(m_cs1));
@@ -138,9 +255,17 @@ void msm58321_device::device_start()
 
 void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	devcb_call_write_line(&m_out_busy_func, m_busy);
+	switch (id)
+	{
+	case TIMER_CLOCK:
+		advance_seconds();
+		break;
 
-	m_busy = !m_busy;
+	case TIMER_BUSY:
+		devcb_call_write_line(&m_out_busy_func, m_busy);
+		m_busy = !m_busy;
+		break;
+	}
 }
 
 
@@ -156,26 +281,8 @@ READ8_MEMBER( msm58321_device::read )
 	{
 		if (m_read)
 		{
-			system_time systime;
-
-			m_machine.current_datetime(systime);
-
 			switch (m_address)
 			{
-			case REGISTER_S1:	data = systime.local_time.second % 10; break;
-			case REGISTER_S10:	data = systime.local_time.second / 10; break;
-			case REGISTER_MI1:	data = systime.local_time.minute % 10; break;
-			case REGISTER_MI10: data = systime.local_time.minute / 10; break;
-			case REGISTER_H1:	data = systime.local_time.hour % 10; break;
-			case REGISTER_H10:	data = (systime.local_time.hour / 10) | 0x08; break;
-			case REGISTER_W:	data = systime.local_time.weekday; break;
-			case REGISTER_D1:	data = systime.local_time.mday % 10; break;
-			case REGISTER_D10:	data = (systime.local_time.mday / 10) | ((systime.local_time.year % 4) ? 0 : 0x04); break;
-			case REGISTER_MO1:	data = (systime.local_time.month + 1) % 10; break;
-			case REGISTER_MO10: data = (systime.local_time.month + 1) / 10; break;
-			case REGISTER_Y1:	data = systime.local_time.year % 10; break;
-			case REGISTER_Y10:	data = (systime.local_time.year / 10) % 10;	break;
-
 			case REGISTER_RESET:
 				break;
 
@@ -184,7 +291,7 @@ READ8_MEMBER( msm58321_device::read )
 				break;
 
 			default:
-				data = m_reg[offset];
+				data = m_reg[m_address];
 				break;
 			}
 		}
@@ -238,7 +345,7 @@ WRITE8_MEMBER( msm58321_device::write )
 
 		default:
 			if (LOG) logerror("MSM58321 '%s' Register Write %01x: %01x\n", tag(), m_address, data & 0x0f);
-			m_reg[offset] = m_latch & 0x0f;
+			m_reg[m_address] = m_latch & 0x0f;
 			break;
 		}
 	}

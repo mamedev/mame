@@ -103,6 +103,14 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const device_timer_id TIMER_CLOCK = 0;
+	static const device_timer_id TIMER_BUSY = 1;
+
+	inline int read_counter(int counter);
+	inline void write_counter(int counter, int value);
+	inline void advance_seconds();
+	inline void advance_minutes();
+
 	devcb_resolved_write_line	m_out_busy_func;
 
 	int m_cs1;					// chip select 1
@@ -117,6 +125,7 @@ private:
 	UINT8 m_address;			// address latch
 
 	// timers
+	emu_timer *m_clock_timer;
 	emu_timer *m_busy_timer;
 
 	const msm58321_device_config &m_config;
