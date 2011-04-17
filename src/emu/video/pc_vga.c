@@ -598,8 +598,8 @@ static void vga_cpu_interface(running_machine &machine)
 {
 	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
-	read8_space_func read_handler; const char *read_handler_name;
-	write8_space_func write_handler; const char *write_handler_name;
+	read8_space_func read_handler; const char *read_handler_name=NULL;
+	write8_space_func write_handler; const char *write_handler_name=NULL;
 	read16_space_func read_handler16;
 	write16_space_func write_handler16;
 	read32_space_func read_handler32;
