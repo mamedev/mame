@@ -1002,7 +1002,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			if (tms->interp_period == 0) tms->inhibit = 0; // disable inhibit when reaching the last interp period
 #ifdef PERFECT_INTERPOLATION_HACK
 			int samples_per_frame = tms->subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
-			int current_sample = ((tms->PC*(3-tms->subc_reload))+((tms->subc_reload?38:25)*tms->interp_period));
+			int current_sample = ((tms->PC*(3-tms->subc_reload))+((tms->subc_reload?38:25)*((tms->interp_period-1)&7)));
 			zpar = OLD_FRAME_UNVOICED_FLAG;
 			// reset the current energy, pitch, etc to what it was at frame start
 			tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
