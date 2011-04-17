@@ -445,7 +445,7 @@ bool hash_collection::operator==(const hash_collection &rhs) const
 	for (hash_base *hash = m_hashlist.first(); hash != NULL; hash = hash->next())
 	{
 		hash_base *rhs_hash = rhs.hash(hash->id());
-		if (hash != NULL && rhs_hash != NULL)
+		if (rhs_hash != NULL)
 		{
 			if (*hash != *rhs_hash)
 				return false;
