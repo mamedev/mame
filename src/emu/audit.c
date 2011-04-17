@@ -74,6 +74,10 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 	// store validation for later
 	m_validation = validation;
 
+// temporary hack until romload is update: get the driver path and support it for
+// all searches
+const char *driverpath = m_enumerator.config().m_devicelist.find("root")->searchpath();
+
 	// iterate over ROM sources and regions
 	bool anyfound = false;
 	bool anyrequired = false;
@@ -81,9 +85,13 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 	{
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = source->searchpath();
-		
+
 		// also determine if this is the driver's specific ROMs or not
 		bool source_is_gamedrv = (dynamic_cast<const driver_device_config_base *>(source) != NULL);
+		
+// temporary hack: add the driver path
+astring combinedpath(m_searchpath, ";", driverpath);
+m_searchpath = combinedpath;
 		
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
