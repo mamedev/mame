@@ -2712,7 +2712,6 @@ VIDEO_START(model2)
 	int	width = visarea.max_x - visarea.min_x;
 	int	height = visarea.max_y - visarea.min_y;
 
-	sys24_tile_vh_start(machine, 0x3fff);
 	state->m_sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
@@ -2750,10 +2749,11 @@ SCREEN_UPDATE(model2)
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
 
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 4, 0, 0);
+	segas24_tile *tile = screen->machine().device<segas24_tile>("tile");
+	tile->draw(state->m_sys24_bitmap, cliprect, 7, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 6, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 5, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 4, 0, 0);
 
 	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
 
@@ -2767,10 +2767,10 @@ SCREEN_UPDATE(model2)
 	model2_3d_frame_end( state, bitmap, cliprect );
 
 	bitmap_fill(state->m_sys24_bitmap, cliprect, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(screen->machine(), state->m_sys24_bitmap, cliprect, 0, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 3, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 2, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 1, 0, 0);
+	tile->draw(state->m_sys24_bitmap, cliprect, 0, 0, 0);
 
 	convert_bitmap(screen->machine(), bitmap, state->m_sys24_bitmap, cliprect);
 

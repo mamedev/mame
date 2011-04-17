@@ -877,12 +877,12 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, m_display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, m_color_xlat)
@@ -925,12 +925,12 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, m_display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, char_r, char_w)
 
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, m_color_xlat)
@@ -1513,6 +1513,8 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_MACHINE_START(model1)
 	MCFG_MACHINE_RESET(model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 

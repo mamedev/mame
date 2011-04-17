@@ -12,81 +12,78 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 
 */
 
-/*
- * System 16 color palette formats
- */
-
-
-/* system24temp_ functions / variables are from shared rewrite files,
-   once the rest of the rewrite is complete they can be removed, I
-   just made a copy & renamed them for now to avoid any conflicts
-*/
-
 #include "emu.h"
 #include "segaic24.h"
 
 
-static void set_color(running_machine &machine, int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
-{
-	palette_set_color (machine, color, MAKE_RGB(r, g, b));
+const device_type S24TILE   = segas24_tile_config::static_alloc_device_config;
+const device_type S24SPRITE = segas24_sprite_config::static_alloc_device_config;
+const device_type S24MIXER  = segas24_mixer_config::static_alloc_device_config;
 
-	if(highlight) {
-		r = 255-0.6*(255-r);
-		g = 255-0.6*(255-g);
-		b = 255-0.6*(255-b);
-	} else {
-		r = 0.6*r;
-		g = 0.6*g;
-		b = 0.6*b;
-	}
-	palette_set_color(machine,color+machine.total_colors()/2, MAKE_RGB(r, g, b));
+segas24_tile_config::segas24_tile_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "S24TILE", tag, owner, clock)
+{
 }
 
-// 315-5242
-
-// qgh expects to be able to read the palette shared between CPUs
-READ16_HANDLER( system24temp_sys16_paletteram1_r )
+device_config *segas24_tile_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return space->machine().generic.paletteram.u16[offset];
+	return global_alloc(segas24_tile_config(mconfig, tag, owner, clock));
+}
+
+void segas24_tile_config::static_set_tile_mask(device_config *device, UINT16 _tile_mask)
+{
+	segas24_tile_config *dev = downcast<segas24_tile_config *>(device);
+	dev->tile_mask = _tile_mask;
+}
+
+device_t *segas24_tile_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, segas24_tile(machine, *this));
 }
 
 
-WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
+segas24_sprite_config::segas24_sprite_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "S24SPRITE", tag, owner, clock)
 {
-	int r, g, b;
-	COMBINE_DATA (space->machine().generic.paletteram.u16 + offset);
-	data = space->machine().generic.paletteram.u16[offset];
-
-	r = (data & 0x00f) << 4;
-	if(data & 0x1000)
-		r |= 8;
-
-	g = data & 0x0f0;
-	if(data & 0x2000)
-		g |= 8;
-
-	b = (data & 0xf00) >> 4;
-	if(data & 0x4000)
-		b |= 8;
-
-	r |= r >> 5;
-	g |= g >> 5;
-	b |= b >> 5;
-	set_color(space->machine(), offset, r, g, b, data & 0x8000);
 }
 
-// - System 24
+device_config *segas24_sprite_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(segas24_sprite_config(mconfig, tag, owner, clock));
+}
 
-enum {SYS24_TILES = 0x4000};
+device_t *segas24_sprite_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, segas24_sprite(machine, *this));
+}
 
-static UINT16 *sys24_char_ram, *sys24_tile_ram;
-static UINT16 sys24_tile_mask;
-static int sys24_char_gfx_index;
-static tilemap_t *sys24_tile_layer[4];
+
+segas24_mixer_config::segas24_mixer_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "S24MIXER", tag, owner, clock)
+{
+}
+
+device_config *segas24_mixer_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(segas24_mixer_config(mconfig, tag, owner, clock));
+}
+
+device_t *segas24_mixer_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, segas24_mixer(machine, *this));
+}
+
+
+
+segas24_tile::segas24_tile(running_machine &_machine, const segas24_tile_config &_config)
+	: device_t(_machine, _config),
+	  config(_config)
+{
+}
 
 #define XOR(a) WORD_XOR_BE(a)
 
-static const gfx_layout sys24_char_layout = {
+const gfx_layout segas24_tile::char_layout = {
 	8, 8,
 	SYS24_TILES,
 	4,
@@ -96,79 +93,75 @@ static const gfx_layout sys24_char_layout = {
 	8*32
 };
 
-static TILE_GET_INFO( sys24_tile_info_0s )
+void segas24_tile::tile_info(int offset, tile_data *tileinfo, tilemap_memory_index tile_index)
 {
-	UINT16 val = sys24_tile_ram[tile_index];
+	UINT16 val = tile_ram[tile_index|offset];
 	tileinfo->category = (val & 0x8000) != 0;
-	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
+	tileinfo_set(machine(), tileinfo, char_gfx_index, val & config.tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static TILE_GET_INFO( sys24_tile_info_0w )
+TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0s )
 {
-	UINT16 val = sys24_tile_ram[tile_index|0x1000];
-	tileinfo->category = (val & 0x8000) != 0;
-	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
+	downcast<segas24_tile *>(device)->tile_info(0x0000, tileinfo, tile_index);
 }
 
-static TILE_GET_INFO( sys24_tile_info_1s )
+TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0w )
 {
-	UINT16 val = sys24_tile_ram[tile_index|0x2000];
-	tileinfo->category = (val & 0x8000) != 0;
-	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
+	downcast<segas24_tile *>(device)->tile_info(0x1000, tileinfo, tile_index);
 }
 
-static TILE_GET_INFO( sys24_tile_info_1w )
+TILE_GET_INFO_DEVICE( segas24_tile::tile_info_1s )
 {
-	UINT16 val = sys24_tile_ram[tile_index|0x3000];
-	tileinfo->category = (val & 0x8000) != 0;
-	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
+	downcast<segas24_tile *>(device)->tile_info(0x2000, tileinfo, tile_index);
 }
 
-void sys24_tile_vh_start(running_machine &machine, UINT16 tile_mask)
+TILE_GET_INFO_DEVICE( segas24_tile::tile_info_1w )
 {
-	sys24_tile_mask = tile_mask;
+	downcast<segas24_tile *>(device)->tile_info(0x3000, tileinfo, tile_index);
+}
 
-	for(sys24_char_gfx_index = 0; sys24_char_gfx_index < MAX_GFX_ELEMENTS; sys24_char_gfx_index++)
-		if (machine.gfx[sys24_char_gfx_index] == 0)
+void segas24_tile::device_start()
+{
+	for(char_gfx_index = 0; char_gfx_index < MAX_GFX_ELEMENTS; char_gfx_index++)
+		if (machine().gfx[char_gfx_index] == 0)
 			break;
-	assert(sys24_char_gfx_index != MAX_GFX_ELEMENTS);
+	assert(char_gfx_index != MAX_GFX_ELEMENTS);
 
-	sys24_char_ram = auto_alloc_array(machine, UINT16, 0x80000/2);
+	char_ram = auto_alloc_array(machine(), UINT16, 0x80000/2);
+	tile_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 
-	sys24_tile_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
+	tile_layer[0] = tilemap_create_device(this, tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
+	tile_layer[1] = tilemap_create_device(this, tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
+	tile_layer[2] = tilemap_create_device(this, tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
+	tile_layer[3] = tilemap_create_device(this, tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
 
-	sys24_tile_layer[0] = tilemap_create(machine, sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[1] = tilemap_create(machine, sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[2] = tilemap_create(machine, sys24_tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
-	sys24_tile_layer[3] = tilemap_create(machine, sys24_tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
+	tilemap_set_transparent_pen(tile_layer[0], 0);
+	tilemap_set_transparent_pen(tile_layer[1], 0);
+	tilemap_set_transparent_pen(tile_layer[2], 0);
+	tilemap_set_transparent_pen(tile_layer[3], 0);
 
-	tilemap_set_transparent_pen(sys24_tile_layer[0], 0);
-	tilemap_set_transparent_pen(sys24_tile_layer[1], 0);
-	tilemap_set_transparent_pen(sys24_tile_layer[2], 0);
-	tilemap_set_transparent_pen(sys24_tile_layer[3], 0);
+	memset(char_ram, 0, 0x80000);
+	memset(tile_ram, 0, 0x10000);
 
-	memset(sys24_char_ram, 0, 0x80000);
-	memset(sys24_tile_ram, 0, 0x10000);
+	machine().gfx[char_gfx_index] = gfx_element_alloc(machine(), &char_layout, (UINT8 *)char_ram, machine().total_colors() / 16, 0);
 
-	machine.gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine.total_colors() / 16, 0);
-
-	state_save_register_global_pointer(machine, sys24_tile_ram, 0x10000/2);
-	state_save_register_global_pointer(machine, sys24_char_ram, 0x80000/2);
+	save_pointer(NAME(tile_ram), 0x10000/2);
+	save_pointer(NAME(char_ram), 0x80000/2);
 }
 
-static void sys24_tile_draw_rect(running_machine &machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
-								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+void segas24_tile::draw_rect(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+							 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT8        *prib = (UINT8 *)machine.priority_bitmap->base;
+	UINT8        *prib = (UINT8 *)machine().priority_bitmap->base;
 	UINT16       *dest = (UINT16 *)dm->base;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
 	dest += yy1*dm->rowpixels + xx1;
-	prib += yy1*machine.priority_bitmap->rowpixels + xx1;
+	prib += yy1*machine().priority_bitmap->rowpixels + xx1;
 	mask += yy1*4;
 	yy2 -= yy1;
 
@@ -280,7 +273,7 @@ static void sys24_tile_draw_rect(running_machine &machine, bitmap_t *bm, bitmap_
 		source += bm->rowpixels;
 		trans  += tm->rowpixels;
 		dest   += dm->rowpixels;
-		prib   += machine.priority_bitmap->rowpixels;
+		prib   += machine().priority_bitmap->rowpixels;
 		mask   += 4;
 	}
 }
@@ -288,16 +281,16 @@ static void sys24_tile_draw_rect(running_machine &machine, bitmap_t *bm, bitmap_
 
 // The rgb version is used by model 1 & 2 which do not need to care
 // about sprite priority hence the lack of support for the
-// machine.priority_bitmap
+// priority_bitmap
 
-static void sys24_tile_draw_rect_rgb(running_machine &machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
-									 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+void segas24_tile::draw_rect_rgb(bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
+								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
 	UINT16       *dest = (UINT16 *)dm->base;
-	const pen_t  *pens   = machine.pens;
+	const pen_t  *pens   = machine().pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
@@ -402,12 +395,12 @@ static void sys24_tile_draw_rect_rgb(running_machine &machine, bitmap_t *bm, bit
 	}
 }
 
-void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
+void segas24_tile::draw(bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
 {
-	UINT16 hscr = sys24_tile_ram[0x5000+(layer >> 1)];
-	UINT16 vscr = sys24_tile_ram[0x5004+(layer >> 1)];
-	UINT16 ctrl = sys24_tile_ram[0x5004+((layer >> 1) & 2)];
-	UINT16 *mask = sys24_tile_ram + (layer & 4 ? 0x6800 : 0x6000);
+	UINT16 hscr = tile_ram[0x5000+(layer >> 1)];
+	UINT16 vscr = tile_ram[0x5004+(layer >> 1)];
+	UINT16 ctrl = tile_ram[0x5004+((layer >> 1) & 2)];
+	UINT16 *mask = tile_ram + (layer & 4 ? 0x6800 : 0x6000);
 	UINT16 tpri = layer & 1;
 
 	lpri = 1 << lpri;
@@ -422,11 +415,11 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 		if(layer & 1)
 			return;
 
-		tilemap_set_scrolly(sys24_tile_layer[layer],   0, vscr & 0x1ff);
-		tilemap_set_scrolly(sys24_tile_layer[layer|1], 0, vscr & 0x1ff);
+		tilemap_set_scrolly(tile_layer[layer],   0, vscr & 0x1ff);
+		tilemap_set_scrolly(tile_layer[layer|1], 0, vscr & 0x1ff);
 
 		if(hscr & 0x8000) {
-			UINT16 *hscrtb = sys24_tile_ram + 0x4000 + 0x200*layer;
+			UINT16 *hscrtb = tile_ram + 0x4000 + 0x200*layer;
 
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
@@ -446,8 +439,8 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 					hscr = hscrtb[y];
 
 					h = hscr & 0x1ff;
-					tilemap_set_scrollx(sys24_tile_layer[l1], 0, -h);
-					tilemap_draw(bitmap, &c, sys24_tile_layer[l1], tpri, lpri);
+					tilemap_set_scrollx(tile_layer[l1], 0, -h);
+					tilemap_draw(bitmap, &c, tile_layer[l1], tpri, lpri);
 				}
 				break;
 			}
@@ -462,8 +455,8 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 					hscr = hscrtb[y];
 
 					h = hscr & 0x1ff;
-					tilemap_set_scrollx(sys24_tile_layer[layer],   0, -h);
-					tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -h);
+					tilemap_set_scrollx(tile_layer[layer],   0, -h);
+					tilemap_set_scrollx(tile_layer[layer|1], 0, -h);
 
 					if(c1.max_x >= h)
 						c1.max_x = h-1;
@@ -474,16 +467,16 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
 
-					tilemap_draw(bitmap, &c1, sys24_tile_layer[l1],   tpri, lpri);
-					tilemap_draw(bitmap, &c2, sys24_tile_layer[l1^1], tpri, lpri);
+					tilemap_draw(bitmap, &c1, tile_layer[l1],   tpri, lpri);
+					tilemap_draw(bitmap, &c2, tile_layer[l1^1], tpri, lpri);
 				}
 				break;
 			}
 			}
 
 		} else {
-			tilemap_set_scrollx(sys24_tile_layer[layer],   0, -(hscr & 0x1ff));
-			tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -(hscr & 0x1ff));
+			tilemap_set_scrollx(tile_layer[layer],   0, -(hscr & 0x1ff));
+			tilemap_set_scrollx(tile_layer[layer|1], 0, -(hscr & 0x1ff));
 
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
@@ -498,8 +491,8 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
+				tilemap_draw(bitmap, &c1, tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, &c2, tile_layer[layer^1], tpri, lpri);
 				break;
 			}
 			case 2: case 3: {
@@ -514,8 +507,8 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
 
-				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
-				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
+				tilemap_draw(bitmap, &c1, tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, &c2, tile_layer[layer^1], tpri, lpri);
 				break;
 			}
 			}
@@ -523,32 +516,32 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 
 	} else {
 		bitmap_t *bm, *tm;
-		void (*draw)(running_machine &machine, bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
+		void (segas24_tile::*draw)(bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
 					 UINT16, UINT8, int, int, int, int, int, int, int);
 		int win = layer & 1;
 
 		if(bitmap->format != BITMAP_FORMAT_INDEXED16)
-			draw = sys24_tile_draw_rect_rgb;
+			draw = &segas24_tile::draw_rect_rgb;
 		else
-			draw = sys24_tile_draw_rect;
+			draw = &segas24_tile::draw_rect;
 
-		bm = tilemap_get_pixmap(sys24_tile_layer[layer]);
-		tm = tilemap_get_flagsmap(sys24_tile_layer[layer]);
+		bm = tilemap_get_pixmap(tile_layer[layer]);
+		tm = tilemap_get_flagsmap(tile_layer[layer]);
 
 		if(hscr & 0x8000) {
 			int y;
-			UINT16 *hscrtb = sys24_tile_ram + 0x4000 + 0x200*layer;
+			UINT16 *hscrtb = tile_ram + 0x4000 + 0x200*layer;
 			vscr &= 0x1ff;
 
 			for(y=0; y<384; y++) {
 				hscr = (-hscrtb[y]) & 0x1ff;
 				if(hscr + 496 <= 512) {
 					// Horizontal split unnecessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
 				} else {
 					// Horizontal split necessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        y,      496,      y+1);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        y,      496,      y+1);
 				}
 				vscr = (vscr + 1) & 0x1ff;
 			}
@@ -560,89 +553,90 @@ void sys24_tile_draw(running_machine &machine, bitmap_t *bitmap, const rectangle
 				// Horizontal split unnecessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496, 512-vscr);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr,      496,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496, 512-vscr);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr,      496,      384);
 
 				}
 			} else {
 				// Horizontal split necessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr,      384);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
-					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
+					(this->*draw)(bm, tm, bitmap, mask, tpri, lpri, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
 				}
 			}
 		}
 	}
 }
 
-READ16_HANDLER(sys24_tile_r)
+READ16_MEMBER(segas24_tile::tile_r)
 {
-	return sys24_tile_ram[offset];
+	return tile_ram[offset];
 }
 
-READ16_HANDLER(sys24_char_r)
+READ16_MEMBER(segas24_tile::char_r)
 {
-	return sys24_char_ram[offset];
+	return char_ram[offset];
 }
 
-WRITE16_HANDLER(sys24_tile_w)
+WRITE16_MEMBER(segas24_tile::tile_w)
 {
-	COMBINE_DATA(sys24_tile_ram + offset);
+	COMBINE_DATA(tile_ram + offset);
 	if(offset < 0x4000)
-		tilemap_mark_tile_dirty(sys24_tile_layer[offset >> 12], offset & 0xfff);
+		tilemap_mark_tile_dirty(tile_layer[offset >> 12], offset & 0xfff);
 }
 
-WRITE16_HANDLER(sys24_char_w)
+WRITE16_MEMBER(segas24_tile::char_w)
 {
-	UINT16 old = sys24_char_ram[offset];
-	COMBINE_DATA(sys24_char_ram + offset);
-	if(old != sys24_char_ram[offset]) {
-		gfx_element_mark_dirty(space->machine().gfx[sys24_char_gfx_index], offset / 16);
-	}
+	UINT16 old = char_ram[offset];
+	COMBINE_DATA(char_ram + offset);
+	if(old != char_ram[offset])
+		gfx_element_mark_dirty(machine().gfx[char_gfx_index], offset / 16);
 }
 
-READ32_HANDLER(sys24_tile32_r)
+READ32_MEMBER(segas24_tile::tile32_r)
 {
-	return sys24_tile_r(space, offset*2, mem_mask&0xffff) | sys24_tile_r(space, (offset*2)+1, mem_mask>>16)<<16;
+	return tile_r(space, offset*2, mem_mask&0xffff) | tile_r(space, (offset*2)+1, mem_mask>>16)<<16;
 }
 
-READ32_HANDLER(sys24_char32_r)
+READ32_MEMBER(segas24_tile::char32_r)
 {
-	return sys24_char_r(space, offset*2, mem_mask&0xffff) | sys24_char_r(space, (offset*2)+1, mem_mask>>16)<<16;
+	return char_r(space, offset*2, mem_mask&0xffff) | char_r(space, (offset*2)+1, mem_mask>>16)<<16;
 }
 
-WRITE32_HANDLER(sys24_tile32_w)
+WRITE32_MEMBER(segas24_tile::tile32_w)
 {
-	sys24_tile_w(space, offset*2, data&0xffff, mem_mask&0xffff);
-	sys24_tile_w(space, (offset*2)+1, data>>16, mem_mask>>16);
+	tile_w(space, offset*2, data&0xffff, mem_mask&0xffff);
+	tile_w(space, (offset*2)+1, data>>16, mem_mask>>16);
 }
 
-WRITE32_HANDLER(sys24_char32_w)
+WRITE32_MEMBER(segas24_tile::char32_w)
 {
-	sys24_char_w(space,offset*2, data&0xffff, mem_mask&0xffff);
-	sys24_char_w(space,(offset*2)+1, data>>16, mem_mask>>16);
+	char_w(space, offset*2, data&0xffff, mem_mask&0xffff);
+	char_w(space, (offset*2)+1, data>>16, mem_mask>>16);
 }
 
-// - System 24
 
-static UINT16 *sys24_sprite_ram;
-
-void sys24_sprite_vh_start(running_machine &machine)
+segas24_sprite::segas24_sprite(running_machine &_machine, const segas24_sprite_config &_config)
+	: device_t(_machine, _config),
+	  config(_config)
 {
-	sys24_sprite_ram = auto_alloc_array(machine, UINT16, 0x40000/2);
+}
 
-	state_save_register_global_pointer(machine, sys24_sprite_ram, 0x40000/2);
-	//  kc = 0;
+void segas24_sprite::device_start()
+{
+	sprite_ram = auto_alloc_array(machine(), UINT16, 0x40000/2);
+
+	save_pointer(NAME(sprite_ram), 0x40000/2);
 }
 
 /* System24 sprites
@@ -669,7 +663,7 @@ void sys24_sprite_vh_start(running_machine &machine)
     0   11------    --------
 */
 
-void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
+void segas24_sprite::draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;
@@ -686,7 +680,7 @@ void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectang
 		UINT16 *source;
 		UINT16 type;
 
-		source = sys24_sprite_ram + (curspr << 3);
+		source = sprite_ram + (curspr << 3);
 
 		if(curspr == 0 && source[0] == 0)
 			break;
@@ -783,7 +777,7 @@ void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectang
 		flipy = source[4] & 0x8000;
 		sy = 1 << ((source[4] & 0x7000) >> 12);
 
-		pix = &sys24_sprite_ram[(source[3] & 0x3fff)* 0x8];
+		pix = &sprite_ram[(source[3] & 0x3fff)* 0x8];
 		for(px=0; px<8; px++) {
 			int c;
 			c              = pix[px] >> 8;
@@ -830,8 +824,8 @@ void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectang
 									if(xpos2 >= min_x && xpos2 <= max_x) {
 										int zx1 = flipx ? 7-zx : zx;
 										UINT32 neweroffset = (newoffset+(zx1>>2))&0x1ffff; // crackdown sometimes attempts to use data past the end of spriteram
-										int c = (sys24_sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
-										UINT8 *pri = BITMAP_ADDR8(machine.priority_bitmap, ypos1, xpos2);
+										int c = (sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
+										UINT8 *pri = BITMAP_ADDR8(machine().priority_bitmap, ypos1, xpos2);
 										if(!(*pri & pm[c])) {
 											c = colors[c];
 											if(c) {
@@ -868,39 +862,41 @@ void sys24_sprite_draw(running_machine &machine, bitmap_t *bitmap, const rectang
 }
 
 
-WRITE16_HANDLER(sys24_sprite_w)
+WRITE16_MEMBER(segas24_sprite::write)
 {
-	COMBINE_DATA(sys24_sprite_ram + offset);
+	COMBINE_DATA(sprite_ram + offset);
 }
 
-READ16_HANDLER(sys24_sprite_r)
+READ16_MEMBER(segas24_sprite::read)
 {
-	return sys24_sprite_ram[offset];
+	return sprite_ram[offset];
 }
 
-// Programmable mixers
-//   System 24
 
-static UINT16 sys24_mixer_reg[0x10];
-
-void sys24_mixer_vh_start(running_machine &machine)
+segas24_mixer::segas24_mixer(running_machine &_machine, const segas24_mixer_config &_config)
+	: device_t(_machine, _config),
+	  config(_config)
 {
-	memset(sys24_mixer_reg, 0, sizeof(sys24_mixer_reg));
-	state_save_register_global_array(machine, sys24_mixer_reg);
 }
 
-WRITE16_HANDLER (sys24_mixer_w)
+void segas24_mixer::device_start()
 {
-	COMBINE_DATA(sys24_mixer_reg + offset);
+	memset(mixer_reg, 0, sizeof(mixer_reg));
+	save_item(NAME(mixer_reg));
 }
 
-READ16_HANDLER (sys24_mixer_r)
+WRITE16_MEMBER(segas24_mixer::write)
 {
-	return sys24_mixer_reg[offset];
+	COMBINE_DATA(mixer_reg + offset);
 }
 
-int sys24_mixer_get_reg(int reg)
+READ16_MEMBER(segas24_mixer::read)
 {
-	return sys24_mixer_reg[reg];
+	return mixer_reg[offset];
+}
+
+UINT16 segas24_mixer::get_reg(int reg)
+{
+	return mixer_reg[reg];
 }
 

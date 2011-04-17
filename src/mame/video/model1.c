@@ -1452,8 +1452,6 @@ VIDEO_START(model1)
 
 	state->m_view = auto_alloc_clear(machine, struct view);
 
-	sys24_tile_vh_start(machine, 0x3fff);
-
 	state->m_poly_rom = (UINT32 *)machine.region("user1")->base();
 	state->m_poly_ram = auto_alloc_array_clear(machine, UINT32, 0x400000);
 	state->m_tgp_ram = auto_alloc_array_clear(machine, UINT16, 0x100000-0x40000);
@@ -1523,17 +1521,18 @@ SCREEN_UPDATE(model1)
 	bitmap_fill(screen->machine().priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, screen->machine().pens[0]);
 
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 4, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 0, 0, 0);
+	segas24_tile *tile = screen->machine().device<segas24_tile>("tile");
+	tile->draw(bitmap, cliprect, 6, 0, 0);
+	tile->draw(bitmap, cliprect, 4, 0, 0);
+	tile->draw(bitmap, cliprect, 2, 0, 0);
+	tile->draw(bitmap, cliprect, 0, 0, 0);
 
 	tgp_render(screen->machine(), bitmap, cliprect);
 
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(screen->machine(), bitmap, cliprect, 1, 0, 0);
+	tile->draw(bitmap, cliprect, 7, 0, 0);
+	tile->draw(bitmap, cliprect, 5, 0, 0);
+	tile->draw(bitmap, cliprect, 3, 0, 0);
+	tile->draw(bitmap, cliprect, 1, 0, 0);
 
 	return 0;
 }

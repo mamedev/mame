@@ -3681,7 +3681,6 @@ src/mame/machine/segag80.h svneol=native#text/plain
 src/mame/machine/segaic16.c svneol=native#text/plain
 src/mame/machine/segaic16.h svneol=native#text/plain
 src/mame/machine/segamsys.c svneol=native#text/plain
-src/mame/machine/segas24.c svneol=native#text/plain
 src/mame/machine/segas32.c svneol=native#text/plain
 src/mame/machine/seibuspi.c svneol=native#text/plain
 src/mame/machine/seibuspi.h svneol=native#text/plain
