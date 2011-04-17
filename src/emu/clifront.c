@@ -1084,7 +1084,6 @@ void cli_frontend::romident(const char *filename)
 	// identify the file, then output results
 	mame_printf_info("Identifying %s....\n", filename);
 	ident.identify(filename);
-	mame_printf_info("%s\n", ident.result());
 
 	// return the appropriate error code
 	if (ident.matches() == ident.total())
@@ -1311,7 +1310,7 @@ void media_identifier::identify_file(const char *name)
 	{
 		// output the name
 		astring basename;
-		m_result.catprintf("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+		mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
 		m_total++;
 
 		// attempt to open as a CHD; fail if not
@@ -1319,7 +1318,7 @@ void media_identifier::identify_file(const char *name)
 		chd_error err = chd_open(name, CHD_OPEN_READ, NULL, &chd);
 		if (err != CHDERR_NONE)
 		{
-			m_result.catprintf("NOT A CHD\n");
+			mame_printf_info("NOT A CHD\n");
 			m_nonroms++;
 			return;
 		}
@@ -1331,7 +1330,7 @@ void media_identifier::identify_file(const char *name)
 		// error on writable CHDs
 		if (header.flags & CHDFLAGS_IS_WRITEABLE)
 		{
-			m_result.catprintf("is a writeable CHD\n");
+			mame_printf_info("is a writeable CHD\n");
 			return;
 		}
 		
@@ -1347,7 +1346,7 @@ void media_identifier::identify_file(const char *name)
 		// determine whether this file exists
 		int found = find_by_hash(hashes, header.logicalbytes);
 		if (found == 0)
-			m_result.catprintf("NO MATCH\n");
+			mame_printf_info("NO MATCH\n");
 		else
 			m_matches++;
 	}
@@ -1392,7 +1391,7 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 	// output the name
 	m_total++;
 	astring basename;
-	m_result.catprintf("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
+	mame_printf_info("%-20s", core_filename_extract_base(&basename, name, FALSE)->cstr());
 
 	// see if we can find a match in the ROMs
 	int found = find_by_hash(hashes, length);
@@ -1403,13 +1402,13 @@ void media_identifier::identify_data(const char *name, const UINT8 *data, int le
 		// if not a power of 2, assume it is a non-ROM file
 		if ((length & (length - 1)) != 0)
 		{
-			m_result.catprintf("NOT A ROM\n");
+			mame_printf_info("NOT A ROM\n");
 			m_nonroms++;
 		}
 
 		// otherwise, it's just not a match
 		else
-			m_result.catprintf("NO MATCH\n");
+			mame_printf_info("NO MATCH\n");
 	}
 
 	// if we did find it, count it as a match
