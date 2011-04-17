@@ -41,13 +41,13 @@ IRQ line connected to CPU
            |   |                 |        CA2    OUTPUT, A on strobe multiplexer
            |   |                 |        IRQA           Not connected
            |   |                 |
-		   |   |                 |        CB2 IC19 Triac switch
+           |   |                 |        CB2 IC19 Triac switch
            |   |                 | Port B triacs
 
 9800       |R/W| D D D D D D D D | PIA6821 IC4
            |   |                 | PA0-PA6 INPUT  Yellow 15 way data (7SEG LED or Meters)
-		   |   |                 | PA7     802 (Q) IC11 G1
-		   |   |                 | PB0-PB7 INPUT  IC24
+           |   |                 | PA7     802 (Q) IC11 G1
+           |   |                 | PB0-PB7 INPUT  IC24
            |   |                 |        CA2    OUTPUT, B on strobe multiplexer
            |   |                 |        CB2    TRiac switch
 
@@ -55,7 +55,7 @@ A000-A003  |R/W| D D D D D D D D | PIA6821 IC5 port A Reel drives
            |   |                 |          port B Reel opto
            |   |                 |
            |   |                 |        CA2    OUTPUT, C on strobe multiplexer
-		   |   |                 |        CB2    TRiac switch
+           |   |                 |        CB2    TRiac switch
 -----------+---+-----------------+--------------------------------------------------------------------------
 A800-A803  |R/W| D D D D D D D D | PIA6821 IC6 PA0-PA7, AUX1 connector (ALPHA)
            |   |                 |             PB0-PB7, AUX2 connector
@@ -63,13 +63,13 @@ A800-A803  |R/W| D D D D D D D D | PIA6821 IC6 PA0-PA7, AUX1 connector (ALPHA)
            |   |                 |
 
 -----------+---+-----------------+--------------------------------------------------------------------------
-??? B000-FFFF | R | D D D D D D D D | ROM 
+??? B000-FFFF | R | D D D D D D D D | ROM
 -----------+---+-----------------+--------------------------------------------------------------------------
 
 TODO: - Distinguish door switches using manual
-	  - Add discrete sound functionality (same as MPU4 alarm)
-	  - Is pulse timer ic11 right?
-	  - 12V meter alarm on hyper viper - how are meters sensed?
+      - Add discrete sound functionality (same as MPU4 alarm)
+      - Is pulse timer ic11 right?
+      - 12V meter alarm on hyper viper - how are meters sensed?
 
 ***********************************************************************************************************/
 #include "emu.h"
@@ -154,7 +154,7 @@ static void update_triacs(running_machine &machine)
 	int i,triacdata;
 
 	triacdata=state->m_triac_ic3 + (state->m_triac_ic4 << 8) + (state->m_triac_ic5 << 9);
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		output_set_indexed_value("triac", i, triacdata & (1 << i));
@@ -325,7 +325,7 @@ static READ8_DEVICE_HANDLER( pia_ic3_porta_r )
 	LOG(("%s: IC3 PIA Read of Port A (MUX input data)\n", device->machine().describe_context()));
 	popmessage("%x",state->m_input_strobe);
 	switch (state->m_input_strobe)
-	{	
+	{
 		case 0:
 		case 1:
 		case 2:
@@ -531,12 +531,12 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
 	mpu3_state *state = device->machine().driver_data<mpu3_state>();
-	if (state->m_ic3_data & 0x80 ) 
+	if (state->m_ic3_data & 0x80 )
 	{
 		return state->m_optic_pattern;
 	}
 	else
-	{ 
+	{
 		return state->m_ic3_data;
 	}
 }
@@ -671,7 +671,7 @@ static INPUT_PORTS_START( mpu3 )
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -697,7 +697,7 @@ static INPUT_PORTS_START( mpu3 )
 	PORT_START("DIL2")
 	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -775,7 +775,7 @@ static MACHINE_START( mpu3 )
 /*
 Characteriser (CHR)
 
-The MPU3 characteriser is surprisingly simple to simulate, as it operates a call, response pairing. The only factor that provides a challenge is that the 
+The MPU3 characteriser is surprisingly simple to simulate, as it operates a call, response pairing. The only factor that provides a challenge is that the
 address of the PAL in memory varies between games. Once found, the memory location of the data table is easily found from the X register of the CPU.
 */
 

@@ -631,7 +631,7 @@ VIDEO_START( f3 )
 		tilemap_set_transparent_pen(state->m_pf1_tilemap,0);
 		tilemap_set_transparent_pen(state->m_pf2_tilemap,0);
 		tilemap_set_transparent_pen(state->m_pf3_tilemap,0);
-		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);	
+		tilemap_set_transparent_pen(state->m_pf4_tilemap,0);
 		tilemap_set_transparent_pen(state->m_pf5_tilemap,0);
 		tilemap_set_transparent_pen(state->m_pf6_tilemap,0);
 		tilemap_set_transparent_pen(state->m_pf7_tilemap,0);
@@ -747,12 +747,12 @@ WRITE16_HANDLER( f3_pf_data_w )
 	COMBINE_DATA(&state->m_f3_pf_data[offset]);
 
 	if (state->m_f3_game_config->extend) {
-		if 		(offset<0x1000) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0xfff) >> 1);
+		if		(offset<0x1000) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0xfff) >> 1);
 		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0xfff) >> 1);
 		else if (offset<0x3000) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0xfff) >> 1);
 		else if (offset<0x4000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0xfff) >> 1);
 	} else {
-		if 		(offset<0x0800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0x7ff) >> 1);
+		if		(offset<0x0800) tilemap_mark_tile_dirty(state->m_pf1_tilemap,(offset & 0x7ff) >> 1);
 		else if (offset<0x1000) tilemap_mark_tile_dirty(state->m_pf2_tilemap,(offset & 0x7ff) >> 1);
 		else if (offset<0x1800) tilemap_mark_tile_dirty(state->m_pf3_tilemap,(offset & 0x7ff) >> 1);
 		else if (offset<0x2000) tilemap_mark_tile_dirty(state->m_pf4_tilemap,(offset & 0x7ff) >> 1);
@@ -1948,7 +1948,7 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 		_colscroll[y]=colscroll;
 		_x_offset[y]=(x_offset&0xffff0000) - (x_offset&0x0000ffff);
 		_y_zoom[y] = (line_zoom&0xff) << 9;
-	
+
 		/* Evaluate clipping */
 		if (pri&0x0800)
 			line_enable=0;
@@ -1986,17 +1986,17 @@ static void get_line_ram_info(running_machine &machine, tilemap_t *tmap, int sx,
 
 		/* The football games use values in the range 0x200-0x3ff where the crowd should be drawn - !?
 
-		   This appears to cause it to reference outside of the normal tilemap RAM area into the unused
-		   area on the 32x32 tilemap configuration.. but exactly how isn't understood
+           This appears to cause it to reference outside of the normal tilemap RAM area into the unused
+           area on the 32x32 tilemap configuration.. but exactly how isn't understood
 
             Until this is understood we're creating additional tilemaps for the otherwise unused area of
-			RAM and forcing it to look up there.
+            RAM and forcing it to look up there.
 
-			the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
-			in ram??
+            the crowd area still seems to 'lag' behind the pitch area however.. but these are the values
+            in ram??
         */
 		int cs = _colscroll[y];
-		
+
 		if (cs&0x200)
 		{
 			if (state->m_pf5_tilemap && state->m_pf6_tilemap)

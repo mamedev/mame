@@ -2643,7 +2643,7 @@ static READ16_HANDLER( bwb_characteriser16_r )
 			}
 		}
 	}
-	else 
+	else
 	{
 		return state->m_chr_value;
 	}

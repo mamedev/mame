@@ -25,23 +25,23 @@ released for it.  Why?
 
 - The FamicomBox will not run mmc3 games and many other advanced mappers
 - There a special lockout chip, but the lockout chip connects to different pins on
-  a FamicomBox cartridge’s connector than a regular cart
-- The lockout chips in the system and the games have to “talk” before the system will
+  a FamicomBox cartridge?s connector than a regular cart
+- The lockout chips in the system and the games have to ?talk? before the system will
   load any games into its menu.
 
-Here’s a list of some of the games known to have come with the FamicomBox:
+Here?s a list of some of the games known to have come with the FamicomBox:
 1943; Baseball; Bomber Man; Devil World; Donkey Kong; Donkey Kong Jr.; Duck Hunt;
-Excite Bike; F1 Race; Fighting Golf; Golf; Gradius; Hogan’s Alley; Ice Climbers;
-Ice Hockey; Knight Rider; Makaimura: Ghosts ‘n Goblins; McKids; Mah-Jong; Mario Bros.;
-Mike Tyson’s Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
-Rygar; Senjou no Ookami; Soccer League Winner’s Cup; Super Chinese 2; Super Mario Bros;
+Excite Bike; F1 Race; Fighting Golf; Golf; Gradius; Hogan?s Alley; Ice Climbers;
+Ice Hockey; Knight Rider; Makaimura: Ghosts ?n Goblins; McKids; Mah-Jong; Mario Bros.;
+Mike Tyson?s Punch-Out!!; Ninja Ryukenden; Operation Wolf (?); Punch-Out!!; Rock Man;
+Rygar; Senjou no Ookami; Soccer League Winner?s Cup; Super Chinese 2; Super Mario Bros;
 Tag Team Pro Wrestling; Takahashi Meijin no Boukenjima; Tennis; Twin Bee;
 Volleyball; Wild Gunman; Wrecking Crew.
 
-Here’s a list of some of the games known to have come with the FamicomStation:
+Here?s a list of some of the games known to have come with the FamicomStation:
 1943; Baseball; Donkey Kong; Duck Hunt; F1 Race; Golf; Kame no Ongaeshi:
 Urashima Densetsu; Mah-Jong; Mario Bros.; Night Raider; Senjou no Ookami;
-Soccer League Winner’s Cup; Super Chinese 2; Super Mario Bros; Tag Team Pro Wrestling;
+Soccer League Winner?s Cup; Super Chinese 2; Super Mario Bros; Tag Team Pro Wrestling;
 Takahashi Meijin no Boukenjima; Tennis; Wild Gunman; Wrecking Crew.
 
 ***************************************************************************/

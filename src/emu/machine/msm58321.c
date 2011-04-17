@@ -11,9 +11,9 @@
 
     TODO:
 
-	- 12/24 hour
-	- AM/PM
-	- leap year
+    - 12/24 hour
+    - AM/PM
+    - leap year
     - stop
     - reset
     - reference registers
@@ -123,7 +123,7 @@ inline void msm58321_device::write_counter(int counter, int value)
 
 
 //-------------------------------------------------
-//  advance_seconds - 
+//  advance_seconds -
 //-------------------------------------------------
 
 inline void msm58321_device::advance_seconds()

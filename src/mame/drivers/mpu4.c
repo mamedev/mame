@@ -5,9 +5,9 @@
   This driver holds all the mechanical games.
 
      04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
-	          This is still a hard coded system, but significantly different to Barcrest's version.
+              This is still a hard coded system, but significantly different to Barcrest's version.
      03-2011: Lamp timing fixes, support for all known expansion cards added.
-	 01-2011: Adding the missing 'OKI' sound card, and documented it, but needs 6376 rewrite.
+     01-2011: Adding the missing 'OKI' sound card, and documented it, but needs 6376 rewrite.
      09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
                          Connect 4 now has the right sound.
@@ -697,13 +697,13 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	}
 }
 
-/* Bankswitching 
+/* Bankswitching
 The MOD 4 ROM cards are set up to handle 8 separate ROM pages, arranged as 2 sets of 4.
 The bankswitch selects which of the 4 pages in the set is active, while the bankset
 switches between the sets.
 It appears that the cards were originally intended to be used in a 'half' page setup,
-where the two halves of the ROM space could be mixed and matched as appropriate. 
-However, there is no evidence to suggest this was ever implemented. 
+where the two halves of the ROM space could be mixed and matched as appropriate.
+However, there is no evidence to suggest this was ever implemented.
 The controls for it exist however, in the form of the Soundboard PIA CB2 pin, which is
 used in some cabinets instead of the main control.
 */
@@ -1160,9 +1160,9 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
         holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
         hole it's currently in, to land in another. Landing in the same hole causes the machine to
         refire the ball. The ball detection is done by the high 4 bytes of AUX1.
-        Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We 
-		then trigger the switches corresponding to the correct number. This appears to be the best way
-		of making the game fair, short of simulating the physics of a bouncing ball ;)*/
+        Here we call the MAME RNG, once to pick a row, once to pick from the four pockets within it. We
+        then trigger the switches corresponding to the correct number. This appears to be the best way
+        of making the game fair, short of simulating the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
 			switch (device->machine().rand() & 0x2)
@@ -1211,7 +1211,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 						break;
 					}
 				}
-				case 0x02: //Bottom row 
+				case 0x02: //Bottom row
 				{
 					switch (device->machine().rand() & 0x3)
 					{
@@ -1826,7 +1826,7 @@ static INPUT_PORTS_START( mpu4 )
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -1852,7 +1852,7 @@ static INPUT_PORTS_START( mpu4 )
 	PORT_START("DIL2")
 	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -1941,7 +1941,7 @@ static INPUT_PORTS_START( connect4 )
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -1967,7 +1967,7 @@ static INPUT_PORTS_START( connect4 )
 	PORT_START("DIL2")
 	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -2055,7 +2055,7 @@ static INPUT_PORTS_START( gamball )
 	PORT_START("DIL1")
 	PORT_DIPNAME( 0x80, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -2081,7 +2081,7 @@ static INPUT_PORTS_START( gamball )
 	PORT_START("DIL2")
 	PORT_DIPNAME( 0x80, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )	
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 	PORT_DIPNAME( 0x40, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
@@ -2365,7 +2365,7 @@ The subsequent calls for each can be found based on the magic address
            (1) = ( (BWBMagicAddress + 1))
            (2) = ( (BWBMagicAddress + 2))
            (3) = ( (BWBMagicAddress + 4))
-            
+
            (4) = ( (BWBMagicAddress - 5))
            (5) = ( (BWBMagicAddress - 4))
            (6) = ( (BWBMagicAddress - 3))
@@ -2453,7 +2453,7 @@ static READ8_HANDLER( bwb_characteriser_r )
 			}
 		}
 	}
-	else 
+	else
 	{
 		return state->m_chr_value;
 	}

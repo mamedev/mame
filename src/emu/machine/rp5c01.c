@@ -12,7 +12,7 @@
     TODO:
 
     - 12 hour clock
-	- test register
+    - test register
     - timer reset
 
 */
@@ -176,7 +176,7 @@ inline void rp5c01_device::set_alarm_line()
 	int alarm = ((m_mode & MODE_ALARM_EN) ? m_alarm_on : 1) &
 				((m_reset & RESET_16_HZ) ? 1 : m_16hz) &
 				((m_reset & RESET_1_HZ) ? 1 : m_1hz);
-	
+
 	if (m_alarm != alarm)
 	{
 		if (LOG) logerror("RP5C01 '%s' Alarm %u\n", tag(), alarm);
@@ -345,7 +345,7 @@ void rp5c01_device::device_start()
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
-	
+
 	m_16hz_timer = timer_alloc(TIMER_16HZ);
 	m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
 

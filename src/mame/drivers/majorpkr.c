@@ -18,9 +18,9 @@
   1x M6295 @ 1.5 MHz. (4 channel mixing ADPCM voice synthesis). Pin7 high.
 
   1x 6845 (CRT Controller) @ 750 kHz.
-		  Hs 15625 Hz
-		  Vs 52.786 Hz
-	
+          Hs 15625 Hz
+          Vs 52.786 Hz
+
   2x MB8464 (Video?)8kx8
   1x MB8416 (NVRAM) 2Kx8
   1x MB8464 (?) 8kx8
@@ -47,7 +47,7 @@
   00  W ---> ROM bank.
   01  W ---> RAM bank.
   02  W ---> RAM bank.
-  
+
   10 R  ---> Regular inputs (holds) multiplexed with credits out.
   10  W ---> Writes a kind of watchdog (bit4) and mech counters pulses (bits 0-1-2-3).
   11 R  ---> Read input port (remaining controls).
@@ -58,22 +58,22 @@
   13  W ---> Lamps out (array a)
   14 R  ---> Freeze. Switch in bit0 that pause the game when active. Just once active, the code loops till the bit resets.
   14  W ---> Lamps out (array b).
-  
+
   50 RW ---> OKI6295 (R/W)
-  
+
   60  W ---> PSG SN76489/96 initialization routines. (Maybe a leftover for different hardware)
              The offset is initialized with the following sequence: 0x9f, 0xbf, 0xdf, 0xff.
 
 
   Pulses - Port 10h.
-  ------------------ 
+  ------------------
     - bits -
     7654 3210
     ---- ---x   Credits Out mech counter.
     ---- --x-   Credits 3 mech counter.
     ---- -x--   Credits 1 mech counter.
     ---- x---   Credits 2 mech counter.
-    ---x ----   Watchdog? (constant writes). (*) 
+    ---x ----   Watchdog? (constant writes). (*)
     xxx- ----   Unknown.
 
   (*) Tied to a ULN Opto Triac (pin3 solder side edge connector - Lock Out (100V))
@@ -125,7 +125,7 @@
   ....
 
   Service Mode:
-  
+
   F2 to enter the Book/Settings Mode.
   HOLD1 to move UP.
   HOLD2 to move DOWN.
@@ -277,7 +277,7 @@
 ***********************************************************************************
 
   Power Supply edge connector Layout...
-  
+
   .-----------------------+-+--+---------------------------.
   |       Components side |L|PN| Solder side               |
   +-----------------------+-+--+---------------------------+
@@ -292,7 +292,7 @@
   |       Lamp TAKE SCORE |K|09| Lamp HOLD 4               |
   |        Lamp DOUBLE UP |L|10| Lamp HOLD 5               |
   '-----------------------+-+--+---------------------------'
-  
+
   Edge connector Layout...
 
   .-----------------------+-+--+---------------------------.
@@ -403,7 +403,7 @@
   FVR-SLOT              OFF  ON         <--- Fever's number slot.
   AMUSEMENT-MODE        OFF  ON         <--- Self explanatory....
 
-  1ST BET           1  5  10  20  30    <--- First Bet. 
+  1ST BET           1  5  10  20  30    <--- First Bet.
   CNT BET           1  5  10  20  30    <--- Second Bet.
 
   BACK-RGB R        0 1 2 3 4 5 6 7     <--- Background R component (0 = light, 7 = strong)
@@ -436,7 +436,7 @@
 ***********************************************************************************
 
   To Do:
-  
+
   - Find the input that unlocks the "KEY-LOCK" mode in the settings.
   - Proper flip mode.
   - Resistors Network.
@@ -465,11 +465,11 @@ public:
 	int	m_palette_bank;
 	int m_vram_bank;
 	int m_flip_state;
-	
+
 	tilemap_t    *m_bg_tilemap,	*m_fg_tilemap;
 
 	UINT8 *m_videoram;
-	
+
 	required_device<okim6295_device> oki;
 
 };
@@ -482,9 +482,9 @@ public:
 static TILE_GET_INFO( bg_get_tile_info )
 {
 	majorpkr_state *state = machine.driver_data<majorpkr_state>();
-	
+
 	int code = state->m_videoram[0x800 + 2 * tile_index] + (state->m_videoram[0x800 + 2 * tile_index + 1] << 8);
-	
+
 	SET_TILE_INFO(
 			0,
 			(code & 0x1fff),
@@ -497,7 +497,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 	majorpkr_state *state = machine.driver_data<majorpkr_state>();
 
 	int code = state->m_videoram[2 * tile_index] + (state->m_videoram[2 * tile_index + 1] << 8);
-	
+
 	SET_TILE_INFO(
 			1,
 			(code & 0x07ff),
@@ -509,11 +509,11 @@ static TILE_GET_INFO( fg_get_tile_info )
 static VIDEO_START(majorpkr)
 {
 	majorpkr_state *state = machine.driver_data<majorpkr_state>();
-	
+
 	state->m_bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0);
-	
+
 	state->machine().generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 4 * 0x800);
 
 	state->m_videoram = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 2 banks in use, but the game clears 4 after boot ... */
@@ -523,7 +523,7 @@ static VIDEO_START(majorpkr)
 static SCREEN_UPDATE(majorpkr)
 {
 	majorpkr_state *state = screen->machine().driver_data<majorpkr_state>();
-	
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
 	rectangle custom_clip;
@@ -532,7 +532,7 @@ static SCREEN_UPDATE(majorpkr)
        form the render. We need more proof about how the video is working.
     */
 	custom_clip.min_x=cliprect->min_x;
-//	custom_clip.max_x=cliprect->max_x-16;
+//  custom_clip.max_x=cliprect->max_x-16;
 	custom_clip.max_x=cliprect->max_x;
 	custom_clip.min_y=cliprect->min_y;
 	custom_clip.max_y=cliprect->max_y;
@@ -563,7 +563,7 @@ static WRITE8_HANDLER(rom_bank_w)
 static WRITE8_HANDLER(palette_bank_w)
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	
+
 	state->m_palette_bank=data;
 }
 
@@ -625,18 +625,18 @@ static WRITE8_HANDLER(vidreg_w)
 
 /*  If bit6 is active, the screen is drawn upside down.
     (also 0xfc and 0x11 are written to the CRTC registers 0xc0 and 0xd0)
-	So, the CRTC display start address = 0xfc11
-*/	
+    So, the CRTC display start address = 0xfc11
+*/
 	if (data & 0x40)
 	{
 		/* upside down screen */
 		state->m_flip_state = 1;
 	}
-	
+
 /*  If bit6 is not active, the screen is drawn normally.
     (also 0x00 is written to the CRTC registers 0xc0 and 0xd0)
-	So, the CRTC display start address = 0x0000
-*/	
+    So, the CRTC display start address = 0x0000
+*/
 	else
 	{
 		/* normal screen */
@@ -650,7 +650,7 @@ static WRITE8_HANDLER(vidreg_w)
 static READ8_HANDLER( mux_port_r )
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	
+
 	switch( (state->m_mux_data & 0xf0) )		/* 00-10-20-30-0F-1F-2F-3F */
 	{
 		case 0x00: return input_port_read(space->machine(), "DSW1");	/* confirmed */
@@ -658,14 +658,14 @@ static READ8_HANDLER( mux_port_r )
 		case 0x20: return input_port_read(space->machine(), "DSW3");	/* confirmed */
 		case 0x30: return input_port_read(space->machine(), "DSW4");	/* confirmed */
 	}
-	
+
 	return 0xff;
 }
 
 static READ8_HANDLER( mux_port2_r )
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	
+
 	if ((state->m_mux_data & 0x0f) == 4)
 	{
 		return input_port_read(space->machine(), "IN0-1");
@@ -675,7 +675,7 @@ static READ8_HANDLER( mux_port2_r )
 		return input_port_read(space->machine(), "IN0-0");
 	}
 }
-	
+
 static WRITE8_HANDLER( mux_sel_w )
 {
 	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
@@ -735,7 +735,7 @@ static WRITE8_HANDLER( lamps_b_w )
 	output_set_lamp_value(10, (data >> 3) & 1);	/* Lamp 10: Take */
 	output_set_lamp_value(11, (data >> 4) & 1);	/* Lamp 11: D-UP */
 	output_set_lamp_value(12, (data >> 5) & 1);	/* Lamp 12: Fever */
-	
+
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
 }
@@ -779,7 +779,7 @@ ADDRESS_MAP_END
   00  W ---> ROM bank.
   01  W ---> RAM bank.
   02  W ---> RAM bank.
-  
+
   10 R  ---> Regular inputs (holds) multiplexed with credits out.
   10  W ---> Writes a kind of watchdog (bit4) and mech counters pulses (bits 0-1-2-3).
   11 R  ---> Read input port (remaining controls).
@@ -790,9 +790,9 @@ ADDRESS_MAP_END
   13  W ---> Lamps out (array a)
   14 R  ---> Freeze. Switch in bit0 that pause the game when active. Just once active, the code loops till the bit resets.
   14  W ---> Lamps out (array b).
-  
+
   50 RW ---> OKI6295 (RW)
-  
+
   60  W ---> PSG SN76489/96 initialization routines.
              (Maybe a leftover for different hardware).
 */
@@ -801,7 +801,7 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(rom_bank_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(vram_bank_w)
-	
+
 	AM_RANGE(0x10, 0x10) AM_READ(mux_port2_r)	/* muxed set of controls */
 	AM_RANGE(0x10, 0x10) AM_WRITE(pulses_w)		/* kind of watchdog on bit4... mech counters on bits 0-1-2-3 */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
@@ -813,8 +813,8 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
 	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
 
-//	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_address_w)
-//	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_address_w)
+//  AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
@@ -982,9 +982,9 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 
-		0*8, 0*8+RGN_FRAC(1,2), 1*8, 1*8+RGN_FRAC(1,2), 2*8, 2*8+RGN_FRAC(1,2), 3*8, 3*8+RGN_FRAC(1,2), 
-		4*8, 4*8+RGN_FRAC(1,2), 5*8, 5*8+RGN_FRAC(1,2), 6*8, 6*8+RGN_FRAC(1,2), 7*8, 7*8+RGN_FRAC(1,2) 
+	{
+		0*8, 0*8+RGN_FRAC(1,2), 1*8, 1*8+RGN_FRAC(1,2), 2*8, 2*8+RGN_FRAC(1,2), 3*8, 3*8+RGN_FRAC(1,2),
+		4*8, 4*8+RGN_FRAC(1,2), 5*8, 5*8+RGN_FRAC(1,2), 6*8, 6*8+RGN_FRAC(1,2), 7*8, 7*8+RGN_FRAC(1,2)
 	},
 	{ 0*8*8, 1*8*8, 2*8*8, 3*8*8, 4*8*8, 5*8*8, 6*8*8, 7*8*8 },
 	8*8*8
@@ -1039,7 +1039,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)				/* through CRTC registers: 768 x 296 */
-//	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1)	/* through CRTC registers: 560(+16) x 224 */
+//  MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
 	MCFG_SCREEN_VISIBLE_AREA(0, (35*16)-1, 0, (28*8)-1)
 
 	MCFG_GFXDECODE(majorpkr)
@@ -1047,7 +1047,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	MCFG_VIDEO_START(majorpkr)
 	MCFG_SCREEN_UPDATE(majorpkr)
-	
+
 	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf) /* verified */
 
 	/* sound hardware */
@@ -1065,7 +1065,7 @@ ROM_START( majorpkr )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "6_27c512_823b.bin", 0x00000, 0x0e000, CRC(a3d5475e) SHA1(cb41508b55da8b8c658a2f2ccc6ebda09db29040)  )
 	ROM_CONTINUE(0x10000,0x2000)
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "p1_27c040_7d3b.bin", 0x00000, 0x80000, CRC(67299eff) SHA1(34d3d8baf08dea495b699dd63272b445e2acb42d) )
 	ROM_LOAD( "p2_27c040_6039.bin", 0x80000, 0x80000, CRC(2d68b177) SHA1(01c934e0383991f2208b915cc5015463a8b6a8fd) )

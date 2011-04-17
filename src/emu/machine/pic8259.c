@@ -36,9 +36,9 @@ struct pic8259
 	devcb_resolved_write_line out_int_func;
 
 	devcb_resolved_read_line sp_en_func;
-	
+
 	devcb_resolved_read8 read_slave_ack_func;
-	
+
 	emu_timer *timer;
 
 	pic8259_state_t state;
@@ -183,19 +183,19 @@ int pic8259_acknowledge(device_t *device)
 			if (!pic8259->auto_eoi)
 				pic8259->isr |= mask;
 			pic8259_set_timer(pic8259);
-			
+
 			if ((pic8259->cascade!=0) && (pic8259->master!=0) && (mask & pic8259->slave)) {
 				// it's from slave device
 				return devcb_call_read8(&pic8259->read_slave_ack_func,irq);
 			} else {
 				if (pic8259->is_x86) {
 					/* For x86 mode*/
-					return irq + pic8259->base;					
+					return irq + pic8259->base;
 				} else {
 					/* in case of 8080/85) */
 					return 0xcd0000 + (pic8259->vector_addr_high << 8) + pic8259->vector_addr_low + (irq << (3-pic8259->vector_size));
 				}
-			}			
+			}
 		}
 	}
 	return 0;
@@ -422,7 +422,7 @@ static DEVICE_START( pic8259 )
 	/* resolve callbacks */
 	devcb_resolve_write_line(&pic8259->out_int_func, &intf->out_int_func, device);
 	devcb_resolve_read_line(&pic8259->sp_en_func, &intf->sp_en_func, device);
-	devcb_resolve_read8(&pic8259->read_slave_ack_func, &intf->read_slave_ack_func, device);	
+	devcb_resolve_read8(&pic8259->read_slave_ack_func, &intf->read_slave_ack_func, device);
 }
 
 
@@ -450,7 +450,7 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259->is_x86 = 0;
 	pic8259->vector_addr_low = 0;
 	pic8259->vector_addr_high = 0;
-	
+
 	pic8259->master = devcb_call_read_line(&pic8259->sp_en_func);
 }
 

@@ -43,55 +43,55 @@ DASM code snippets:
 
     IRQs:
 
-    IRQ0: ???				(Task 4)
+    IRQ0: ???               (Task 4)
     IRQ1: unused
     IRQ2: unused
-    IRQ3: ???				(Task 5, sound?)
-    IRQ4: Voodoo3			Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
-    
-    I2C:  ???				(no task switch) what drives this? network?
+    IRQ3: ???               (Task 5, sound?)
+    IRQ4: Voodoo3           Currently only for User Interrupt Command, maybe a more extensive handler gets installed later?
+
+    I2C:  ???               (no task switch) what drives this? network?
     DMA0: unused
     DMA1: unused
     IIVPR3: unused
-    
+
     Memory:
-    
+
     0x000001E0:             Current task
     0x000001E1:             Current FPU task
     0x000001E4:             Scheduled tasks bitvector (bit 31 = task0, etc.)
     0x00000A00...BFF:       Task structures
-    						0x00-03:    unknown
-    						0x04:       unknown
-    						0x05:       if non-zero, this task uses FPU
-    						0x06-07:    unknown
-    						0x08:       unknown mem pointer, task stack pointer?
-    						0x0c:       pointer to task PC (also top of stack?)
-    						
-    
-    0x00000310:				Global timer 0 IRQ handler
-    0x00000320:				Global timer 1 IRQ handler
-    0x00000330:				Global timer 2 IRQ handler
-    0x00000340:				Global timer 3 IRQ handler
-    0x00000350:				IRQ0 handler
-    0x00000360:				IRQ1 handler
-    0x00000370:				IRQ2 handler
-    0x00000380:				IRQ3 handler
-    0x00000390:				IRQ4 handler
-    0x000003a0:				I2C IRQ handler
-    0x000003b0:				DMA0 IRQ handler
-    0x000003c0:				DMA1 IRQ handler
-    0x000003d0:				Message Unit IRQ handler
-    
-    0x000004e4:				Global timer 0 IRQ handler function ptr
-    0x000004e8:				Global timer 1 IRQ handler function ptr
-    0x000004ec:				Global timer 2 IRQ handler function ptr
-    0x000004f0:				Global timer 3 IRQ handler function ptr
+                            0x00-03:    unknown
+                            0x04:       unknown
+                            0x05:       if non-zero, this task uses FPU
+                            0x06-07:    unknown
+                            0x08:       unknown mem pointer, task stack pointer?
+                            0x0c:       pointer to task PC (also top of stack?)
 
-    
+
+    0x00000310:             Global timer 0 IRQ handler
+    0x00000320:             Global timer 1 IRQ handler
+    0x00000330:             Global timer 2 IRQ handler
+    0x00000340:             Global timer 3 IRQ handler
+    0x00000350:             IRQ0 handler
+    0x00000360:             IRQ1 handler
+    0x00000370:             IRQ2 handler
+    0x00000380:             IRQ3 handler
+    0x00000390:             IRQ4 handler
+    0x000003a0:             I2C IRQ handler
+    0x000003b0:             DMA0 IRQ handler
+    0x000003c0:             DMA1 IRQ handler
+    0x000003d0:             Message Unit IRQ handler
+
+    0x000004e4:             Global timer 0 IRQ handler function ptr
+    0x000004e8:             Global timer 1 IRQ handler function ptr
+    0x000004ec:             Global timer 2 IRQ handler function ptr
+    0x000004f0:             Global timer 3 IRQ handler function ptr
+
+
     Functions of interest:
-    
+
     0x0000f7b4:     SwitchTask()
-    0x00009d00:		LoadProgram(): R3 = ptr to filename
+    0x00009d00:     LoadProgram(): R3 = ptr to filename
 */
 
 #include "emu.h"
@@ -117,12 +117,12 @@ public:
 	viper_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	
+
 	UINT32 m_epic_iack;
 	int m_cf_card_ide;
 	int m_unk1_bit;
 	UINT32 m_voodoo3_pci_reg[0x100];
-	
+
 };
 
 UINT32 m_mpc8240_regs[256/4];
@@ -132,9 +132,9 @@ UINT32 m_mpc8240_regs[256/4];
 static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
 // device is null?
-//	viper_state *state = device->machine().driver_data<viper_state>();
+//  viper_state *state = device->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
-//	printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
+//  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	#endif
 
 	switch (reg)
@@ -147,9 +147,9 @@ static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function,
 static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 // device is null?
-//	viper_state *state = device->machine().driver_data<viper_state>();
+//  viper_state *state = device->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
-//	printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
+//  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	#endif
 	COMBINE_DATA(m_mpc8240_regs + (reg/4));
 	//COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
@@ -226,11 +226,11 @@ typedef struct
 	UINT32 iack;
 	UINT32 eicr;
 	UINT32 svr;
-	
+
 	int active_irq;
-	
+
 	MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
-	
+
 } MPC8240_EPIC;
 
 
@@ -240,10 +240,10 @@ static MPC8240_EPIC epic;
 static void epic_update_interrupts(running_machine &machine)
 {
 	int i;
-	
+
 	int irq = -1;
 	int priority = -1;
-	
+
 	// find the highest priority pending interrupt
 	for (i=MPC8240_NUM_INTERRUPTS-1; i >= 0; i--)
 	{
@@ -256,17 +256,17 @@ static void epic_update_interrupts(running_machine &machine)
 			}
 		}
 	}
-	
+
 	if (irq >= 0 && epic.active_irq == -1)
 	{
 		printf("EPIC IRQ%d taken\n", irq);
-		
+
 		epic.active_irq = irq;
 		epic.irq[epic.active_irq].pending = 0;
 		epic.irq[epic.active_irq].active = 1;
-		
+
 		epic.iack = epic.irq[epic.active_irq].vector;
-		
+
 		printf("vector = %02X\n", epic.iack);
 
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -281,9 +281,9 @@ static READ32_HANDLER( epic_r )
 {
 	int reg;
 	reg = offset * 4;
-	
+
 	//printf("EPIC: read %08X, %08X at %08X\n", reg, mem_mask, activecpu_get_pc());
-	
+
 	switch (reg >> 16)
 	{
 		// 0x50000 - 0x5FFFF
@@ -310,18 +310,18 @@ static READ32_HANDLER( epic_r )
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
 					int value = 0;
-					
+
 					value |= epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
 					value |= epic.irq[MPC8240_IRQ0 + irq].priority << 16;
 					value |= epic.irq[MPC8240_IRQ0 + irq].vector;
 					value |= epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
-					
+
 					return value;
 				}
 			}
 			break;
 		}
-		
+
 		// 0x60000 - 0x6FFFF
 		case 0x6:
 		{
@@ -330,7 +330,7 @@ static READ32_HANDLER( epic_r )
 				case 0x00a0:			// Offset 0x600A0 - IACK
 				{
 					epic_update_interrupts(space->machine());
-					
+
 					if (epic.active_irq >= 0)
 					{
 						return epic.iack;
@@ -341,12 +341,12 @@ static READ32_HANDLER( epic_r )
 						return epic.svr;
 					}
 				}
-						
+
 			}
-			break;	
+			break;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -354,7 +354,7 @@ static WRITE32_HANDLER( epic_w )
 {
 	int reg;
 	reg = offset * 4;
-	
+
 	printf("EPIC: write %08X, %08X, %08X at %08X\n", data, reg, mem_mask, cpu_get_pc(&space->device()));
 
 	switch (reg >> 16)
@@ -369,20 +369,20 @@ static WRITE32_HANDLER( epic_w )
 					epic.eicr = data;
 					if (data & 0x08000000)
 						fatalerror("EPIC: serial interrupts mode not implemented");
-					break;	
+					break;
 				}
 				case 0x10e0:			// Offset 0x410E0 - Spurious Vector Register
 				{
 					epic.svr = data;
-					break;	
+					break;
 				}
 				case 0x1120:			// Offset 0x41120 - Global timer 0 vector/priority register
 				case 0x1160:			// Offset 0x41160 - Global timer 1 vector/priority register
 				case 0x11a0:			// Offset 0x411A0 - Global timer 2 vector/priority register
-				case 0x11e0:			// Offset 0x411E0 - Global timer 3 vector/priority register				
+				case 0x11e0:			// Offset 0x411E0 - Global timer 3 vector/priority register
 				{
 					int timer = ((reg & 0xffff) - 0x1120) >> 6;
-					
+
 					epic.irq[MPC8240_GTIMER0_IRQ + timer].mask = (data & 0x80000000) ? 1 : 0;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer].vector = data & 0xff;
@@ -394,14 +394,14 @@ static WRITE32_HANDLER( epic_w )
 				case 0x11f0:			// Offset 0x411F0 - Global timer 3 destination register
 				{
 					int timer = ((reg & 0xffff) - 0x1130) >> 6;
-					
+
 					epic.irq[MPC8240_GTIMER0_IRQ + timer].destination = data & 0x1;
-					break;	
+					break;
 				}
 			}
-			break;	
+			break;
 		}
-		
+
 		// 0x50000 - 0x5FFFF
 		case 0x5:
 		{
@@ -425,7 +425,7 @@ static WRITE32_HANDLER( epic_w )
 				case 0x03e0:			// Offset 0x503e0 - IRQ15 vector/priority register
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
-					
+
 					epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
 					epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
@@ -449,14 +449,14 @@ static WRITE32_HANDLER( epic_w )
 				case 0x03f0:			// Offset 0x503f0 - IRQ15 destination register
 				{
 					int irq = ((reg & 0xffff) - 0x210) >> 5;
-					
+
 					epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
-					break;	
+					break;
 				}
 			}
-			break;	
+			break;
 		}
-		
+
 		// 0x60000 - 0x6FFFF
 		case 0x6:
 		{
@@ -466,11 +466,11 @@ static WRITE32_HANDLER( epic_w )
 					printf("EPIC IRQ%d cleared.\n", epic.active_irq);
 					epic.irq[epic.active_irq].active = 0;
 					epic.active_irq = -1;
-					
+
 					epic_update_interrupts(space->machine());
 					break;
 			}
-			break;	
+			break;
 		}
 	}
 }
@@ -490,7 +490,7 @@ static void mpc8240_interrupt(running_machine &machine, int irq)
 	if (epic.irq[irq].mask == 0 && epic.irq[irq].priority > 0)
 	{
 		epic.irq[irq].pending = 1;
-	
+
 		epic_update_interrupts(machine);
 	}
 }
@@ -498,12 +498,12 @@ static void mpc8240_interrupt(running_machine &machine, int irq)
 static void mpc8240_epic_reset(void)
 {
 	int i;
-	
+
 	for (i=0; i < MPC8240_NUM_INTERRUPTS; i++)
 	{
-		epic.irq[i].mask = 1;	
+		epic.irq[i].mask = 1;
 	}
-	
+
 	epic.active_irq = -1;
 }
 
@@ -696,7 +696,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 						// cylinder high register is set to 0x00
 
 						ide_bus_w(device, 1, 6, 0x04);
-						
+
 						ide_bus_w(device, 0, 2, 0x01);
 						ide_bus_w(device, 0, 3, 0x01);
 						ide_bus_w(device, 0, 4, 0x00);
@@ -943,9 +943,9 @@ static WRITE64_HANDLER(voodoo3_lfb_w)
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE(epic_64be_r, epic_64be_w)
-//	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32("voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
-//	AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32("voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
-//	AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32("voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
+//  AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32("voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
+//  AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32("voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
+//  AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32("voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
@@ -979,7 +979,7 @@ static const powerpc_config viper_ppc_cfg =
 static INTERRUPT_GEN(viper_vblank)
 {
 	mpc8240_interrupt(device->machine(), MPC8240_IRQ0);
-	//mpc8240_interrupt(device->machine, MPC8240_IRQ3);	
+	//mpc8240_interrupt(device->machine, MPC8240_IRQ3);
 }
 
 static void voodoo_vblank(const device_config *device, int param)

@@ -52,7 +52,7 @@ typedef struct
 
 	UINT8 timer_enabled[2];
 	timer_device *timer[2];
-	
+
 	UINT32 tms32031_io_regs[0x100];
 	UINT16 from_main;
 	UINT16 control;

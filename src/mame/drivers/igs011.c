@@ -476,7 +476,7 @@ static WRITE16_HANDLER( igs_dips_w )
 	COMBINE_DATA(&state->m_igs_dips_sel);
 }
 
-INLINE UINT16 igs_dips_r(address_space *space, int NUM) 
+INLINE UINT16 igs_dips_r(address_space *space, int NUM)
 {
 	igs011_state *state = space->machine().driver_data<igs011_state>();
 	int i;

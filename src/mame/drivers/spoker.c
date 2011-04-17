@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
-//	AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
+//  AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
 
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
 	AM_RANGE( 0x4003, 0x4003 ) AM_READ_PORT( "DSW4" )
 	AM_RANGE( 0x4004, 0x4004 ) AM_READ_PORT( "DSW5" )
 
-//	AM_RANGE( 0x4000, 0x40ff ) AM_WRITENOP
+//  AM_RANGE( 0x4000, 0x40ff ) AM_WRITENOP
 
 	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
 
@@ -518,7 +518,7 @@ static MACHINE_RESET( spoker )
 
 static INTERRUPT_GEN( spoker_interrupt )
 {
-//	spoker_state *state = device->machine().driver_data<spoker_state>();
+//  spoker_state *state = device->machine().driver_data<spoker_state>();
 
 	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }

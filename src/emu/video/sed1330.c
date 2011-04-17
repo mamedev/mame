@@ -278,7 +278,7 @@ void sed1330_device::device_reset()
 
 
 //-------------------------------------------------
-//  status_r - 
+//  status_r -
 //-------------------------------------------------
 
 READ8_MEMBER( sed1330_device::status_r )
@@ -290,7 +290,7 @@ READ8_MEMBER( sed1330_device::status_r )
 
 
 //-------------------------------------------------
-//  command_w - 
+//  command_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( sed1330_device::command_w )
@@ -326,7 +326,7 @@ WRITE8_MEMBER( sed1330_device::command_w )
 
 
 //-------------------------------------------------
-//  data_r - 
+//  data_r -
 //-------------------------------------------------
 
 READ8_MEMBER( sed1330_device::data_r )
@@ -342,7 +342,7 @@ READ8_MEMBER( sed1330_device::data_r )
 
 
 //-------------------------------------------------
-//  data_w - 
+//  data_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( sed1330_device::data_w )
@@ -617,7 +617,7 @@ WRITE8_MEMBER( sed1330_device::data_w )
 
 
 //-------------------------------------------------
-//  draw_text_scanline - 
+//  draw_text_scanline -
 //-------------------------------------------------
 
 void sed1330_device::draw_text_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va)
@@ -658,7 +658,7 @@ void sed1330_device::draw_text_scanline(bitmap_t *bitmap, const rectangle *clipr
 
 
 //-------------------------------------------------
-//  draw_graphics_scanline - 
+//  draw_graphics_scanline -
 //-------------------------------------------------
 
 void sed1330_device::draw_graphics_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va)
@@ -679,7 +679,7 @@ void sed1330_device::draw_graphics_scanline(bitmap_t *bitmap, const rectangle *c
 
 
 //-------------------------------------------------
-//  update_graphics - 
+//  update_graphics -
 //-------------------------------------------------
 
 void sed1330_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect)
@@ -688,7 +688,7 @@ void sed1330_device::update_graphics(bitmap_t *bitmap, const rectangle *cliprect
 
 
 //-------------------------------------------------
-//  update_text - 
+//  update_text -
 //-------------------------------------------------
 
 void sed1330_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
@@ -721,7 +721,7 @@ void sed1330_device::update_text(bitmap_t *bitmap, const rectangle *cliprect)
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void sed1330_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)

@@ -136,7 +136,7 @@ WRITE8_MEMBER( draco_state::out1_w )
 {
 	/*
       bit   description
-	  
+
         0   3K9 -> Green signal
         1   820R -> Blue signal
         2   510R -> Red signal

@@ -173,11 +173,11 @@ static WRITE16_HANDLER( drill_irq_w )
 {
 	_2mindril_state *state = space->machine().driver_data<_2mindril_state>();
 	/*
-	(note: could rather be irq mask)
-	---- ---- ---x ---- irq lv 5 ack, 0->1 latch
-	---- ---- ---- x--- irq lv 4 ack, 0->1 latch
-	---- ---- -??- -??? connected to the other levels?
-	*/
+    (note: could rather be irq mask)
+    ---- ---- ---x ---- irq lv 5 ack, 0->1 latch
+    ---- ---- ---- x--- irq lv 4 ack, 0->1 latch
+    ---- ---- -??- -??? connected to the other levels?
+    */
 	if(((state->irq_reg & 8) == 0) && data & 8)
 		cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
 

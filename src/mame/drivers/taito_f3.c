@@ -151,41 +151,41 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 static WRITE16_HANDLER( f3_unk_w )
 {
 	/*
-	Several games writes a value here at POST, dunno what kind of config this is ...
-	ringrage:  0x0000
-	arabianm:  0x0000
-	ridingf: (no init)
-	gseeker: (no init)
-	commandw:(no init)
-	cupfinal:  0x0100
-	trstar:  (no init)
-	gunlock:   0x0000
-	scfinals:  0x0100
-	lightbr: (no init)
-	intcup94:  0x0100
-	kaiserkn:  0x0100
-	dariusg:   0x278b
-	bublbob2:(no init)
-	pwrgoal:   0x0100
-	qtheater:  0x0090
-	elvactr:   0x278b
-	recalh:    0x0090
-	spcinv95:  0x0100
-	twinqix: (no init)
-	quizhuhu:  0x0000
-	pbobble2:  0x278b
-	gekiridn:  0x278b
-	tcobra2:   0x0000
-	bubblem: (no init)
-	cleopatr:  0x0100
-	pbobble3:  0x278b
-	arkretn:   0x0000
-	kirameki:  0x0100
-	puchicar:  0x0000
-	pbobble4:  0x278b
-	popnpop:   0x0000
-	landmakr:  0x278b
-	*/
+    Several games writes a value here at POST, dunno what kind of config this is ...
+    ringrage:  0x0000
+    arabianm:  0x0000
+    ridingf: (no init)
+    gseeker: (no init)
+    commandw:(no init)
+    cupfinal:  0x0100
+    trstar:  (no init)
+    gunlock:   0x0000
+    scfinals:  0x0100
+    lightbr: (no init)
+    intcup94:  0x0100
+    kaiserkn:  0x0100
+    dariusg:   0x278b
+    bublbob2:(no init)
+    pwrgoal:   0x0100
+    qtheater:  0x0090
+    elvactr:   0x278b
+    recalh:    0x0090
+    spcinv95:  0x0100
+    twinqix: (no init)
+    quizhuhu:  0x0000
+    pbobble2:  0x278b
+    gekiridn:  0x278b
+    tcobra2:   0x0000
+    bubblem: (no init)
+    cleopatr:  0x0100
+    pbobble3:  0x278b
+    arkretn:   0x0000
+    kirameki:  0x0100
+    puchicar:  0x0000
+    pbobble4:  0x278b
+    popnpop:   0x0000
+    landmakr:  0x278b
+    */
 	if(offset == 0)
 		logerror("0x4c0000 write %04x\n",data);
 	else
@@ -202,11 +202,11 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
 	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE_MEMBER(taito_f3_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff) 		//AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
+	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)		//AM_BASE_MEMBER(taito_f3_state, m_f3_pf_data)
 	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)		//AM_BASE_MEMBER(taito_f3_state, m_videoram)
 	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff) 			//AM_BASE_MEMBER(taito_f3_state, m_f3_vram)
 	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)		//AM_BASE_MEMBER(taito_f3_state, m_f3_line_ram)
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff) 			//AM_BASE_MEMBER(taito_f3_state, m_f3_pivot_ram)
+	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)			//AM_BASE_MEMBER(taito_f3_state, m_f3_pivot_ram)
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")

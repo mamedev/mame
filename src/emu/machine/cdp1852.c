@@ -1,7 +1,7 @@
 /**********************************************************************
 
     RCA CDP1852 Byte-Wide Input/Output Port emulation
-	
+
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -69,7 +69,7 @@ void cdp1852_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_mode - 
+//  get_mode -
 //-------------------------------------------------
 
 int cdp1852_device::get_mode()
@@ -79,7 +79,7 @@ int cdp1852_device::get_mode()
 
 
 //-------------------------------------------------
-//  set_sr_line - 
+//  set_sr_line -
 //-------------------------------------------------
 
 void cdp1852_device::set_sr_line(int state)

@@ -11,7 +11,7 @@
 
     TODO:
 
-	- this is a clone of Intel 8274?
+    - this is a clone of Intel 8274?
     - everything
 
 */
@@ -80,7 +80,7 @@ void upd7201_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  receive - 
+//  receive -
 //-------------------------------------------------
 
 inline void upd7201_device::receive(int channel)
@@ -89,7 +89,7 @@ inline void upd7201_device::receive(int channel)
 
 
 //-------------------------------------------------
-//  transmit - 
+//  transmit -
 //-------------------------------------------------
 
 inline void upd7201_device::transmit(int channel)
@@ -161,7 +161,7 @@ void upd7201_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  cd_ba_r - 
+//  cd_ba_r -
 //-------------------------------------------------
 
 READ8_MEMBER( upd7201_device::cd_ba_r )
@@ -171,7 +171,7 @@ READ8_MEMBER( upd7201_device::cd_ba_r )
 
 
 //-------------------------------------------------
-//  cd_ba_w - 
+//  cd_ba_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd7201_device::cd_ba_w )
@@ -180,7 +180,7 @@ WRITE8_MEMBER( upd7201_device::cd_ba_w )
 
 
 //-------------------------------------------------
-//  ba_cd_r - 
+//  ba_cd_r -
 //-------------------------------------------------
 
 READ8_MEMBER( upd7201_device::ba_cd_r )
@@ -190,7 +190,7 @@ READ8_MEMBER( upd7201_device::ba_cd_r )
 
 
 //-------------------------------------------------
-//  ba_cd_w - 
+//  ba_cd_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd7201_device::ba_cd_w )
@@ -199,7 +199,7 @@ WRITE8_MEMBER( upd7201_device::ba_cd_w )
 
 
 //-------------------------------------------------
-//  intak_r - 
+//  intak_r -
 //-------------------------------------------------
 
 READ8_MEMBER( upd7201_device::intak_r )
@@ -209,7 +209,7 @@ READ8_MEMBER( upd7201_device::intak_r )
 
 
 //-------------------------------------------------
-//  synca_w - 
+//  synca_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::synca_w )
@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER( upd7201_device::synca_w )
 
 
 //-------------------------------------------------
-//  syncb_w - 
+//  syncb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::syncb_w )
@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER( upd7201_device::syncb_w )
 
 
 //-------------------------------------------------
-//  ctsa_w - 
+//  ctsa_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::ctsa_w )
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER( upd7201_device::ctsa_w )
 
 
 //-------------------------------------------------
-//  ctsb_w - 
+//  ctsb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::ctsb_w )
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( upd7201_device::ctsb_w )
 
 
 //-------------------------------------------------
-//  dtra_r - 
+//  dtra_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd7201_device::dtra_r )
@@ -255,7 +255,7 @@ READ_LINE_MEMBER( upd7201_device::dtra_r )
 
 
 //-------------------------------------------------
-//  dtrb_r - 
+//  dtrb_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd7201_device::dtrb_r )
@@ -265,7 +265,7 @@ READ_LINE_MEMBER( upd7201_device::dtrb_r )
 
 
 //-------------------------------------------------
-//  hai_w - 
+//  hai_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::hai_w )
@@ -274,7 +274,7 @@ WRITE_LINE_MEMBER( upd7201_device::hai_w )
 
 
 //-------------------------------------------------
-//  rxda_w - 
+//  rxda_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::rxda_w )
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( upd7201_device::rxda_w )
 
 
 //-------------------------------------------------
-//  txda_r - 
+//  txda_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd7201_device::txda_r )
@@ -293,7 +293,7 @@ READ_LINE_MEMBER( upd7201_device::txda_r )
 
 
 //-------------------------------------------------
-//  rxdb_w - 
+//  rxdb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::rxdb_w )
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( upd7201_device::rxdb_w )
 
 
 //-------------------------------------------------
-//  txdb_r - 
+//  txdb_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd7201_device::txdb_r )
@@ -312,7 +312,7 @@ READ_LINE_MEMBER( upd7201_device::txdb_r )
 
 
 //-------------------------------------------------
-//  rxca_w - 
+//  rxca_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::rxca_w )
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER( upd7201_device::rxca_w )
 
 
 //-------------------------------------------------
-//  rxcb_w - 
+//  rxcb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::rxcb_w )
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER( upd7201_device::rxcb_w )
 
 
 //-------------------------------------------------
-//  txca_w - 
+//  txca_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::txca_w )
@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER( upd7201_device::txca_w )
 
 
 //-------------------------------------------------
-//  txcb_w - 
+//  txcb_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd7201_device::txcb_w )

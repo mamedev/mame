@@ -4134,7 +4134,7 @@ ROM_END
 
   Original Video Klein PCB
   with CPU box.
-  
+
 */
 ROM_START( witchryl )
 	ROM_REGION( 0x10000, "maincpu", 0 )

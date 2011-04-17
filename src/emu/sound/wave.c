@@ -28,7 +28,7 @@ static STREAM_UPDATE( wave_sound_update )
 	double time_index;
 	double duration;
 	stream_sample_t *left_buffer = outputs[0];
-	stream_sample_t *right_buffer = NULL;	
+	stream_sample_t *right_buffer = NULL;
 	int i;
 
 	if (speakers>1)

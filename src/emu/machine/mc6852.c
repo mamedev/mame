@@ -231,7 +231,7 @@ void mc6852_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 //-------------------------------------------------
-//  read - 
+//  read -
 //-------------------------------------------------
 
 READ8_MEMBER( mc6852_device::read )
@@ -253,7 +253,7 @@ READ8_MEMBER( mc6852_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  write -
 //-------------------------------------------------
 
 WRITE8_MEMBER( mc6852_device::write )
@@ -326,7 +326,7 @@ WRITE8_MEMBER( mc6852_device::write )
 
 
 //-------------------------------------------------
-//  rx_clk_w - 
+//  rx_clk_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mc6852_device::rx_clk_w )
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( mc6852_device::rx_clk_w )
 
 
 //-------------------------------------------------
-//  tx_clk_w - 
+//  tx_clk_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mc6852_device::tx_clk_w )
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( mc6852_device::tx_clk_w )
 
 
 //-------------------------------------------------
-//  cts_w - 
+//  cts_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mc6852_device::cts_w )
@@ -356,7 +356,7 @@ WRITE_LINE_MEMBER( mc6852_device::cts_w )
 
 
 //-------------------------------------------------
-//  dcd_w - 
+//  dcd_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( mc6852_device::dcd_w )
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER( mc6852_device::dcd_w )
 
 
 //-------------------------------------------------
-//  sm_dtr_r - 
+//  sm_dtr_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( mc6852_device::sm_dtr_r )
@@ -376,7 +376,7 @@ READ_LINE_MEMBER( mc6852_device::sm_dtr_r )
 
 
 //-------------------------------------------------
-//  tuf_r - 
+//  tuf_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( mc6852_device::tuf_r )

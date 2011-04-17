@@ -74,7 +74,7 @@ void hd44102_device_config::static_set_config(device_config *device, const char 
 //**************************************************************************
 
 //-------------------------------------------------
-//  count_up_or_down - 
+//  count_up_or_down -
 //-------------------------------------------------
 
 inline void hd44102_device::count_up_or_down()
@@ -235,7 +235,7 @@ WRITE8_MEMBER( hd44102_device::control_w )
 		else
 		{
 			if (LOG) logerror("HD44102 '%s' Address X %u Y %u (%02x)\n", tag(), data, x, y);
-			
+
 			m_x = x;
 			m_y = y;
 		}

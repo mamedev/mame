@@ -1,14 +1,14 @@
 /**********************************************************************************
 
-	Alien: The Arcade Medal Edition (c) 2005 Capcom
+    Alien: The Arcade Medal Edition (c) 2005 Capcom
 
-	skeleton driver
+    skeleton driver
 
-	- sh-4 clocked with 200MHz
-	- 2 x Panasonic MN677511DE chips (MPEG2 decoders)
-	- Altera ACEX 1K PLD
-	- M48T35Y timekeeper device
-	- CF interface
+    - sh-4 clocked with 200MHz
+    - 2 x Panasonic MN677511DE chips (MPEG2 decoders)
+    - Altera ACEX 1K PLD
+    - M48T35Y timekeeper device
+    - CF interface
 
 ***********************************************************************************/
 

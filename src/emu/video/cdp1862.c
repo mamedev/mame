@@ -74,7 +74,7 @@ void cdp1862_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  initialize_palette - 
+//  initialize_palette -
 //-------------------------------------------------
 
 inline void cdp1862_device::initialize_palette()
@@ -160,7 +160,7 @@ void cdp1862_device::device_reset()
 
 
 //-------------------------------------------------
-//  dma_w - 
+//  dma_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( cdp1862_device::dma_w )
@@ -194,7 +194,7 @@ WRITE8_MEMBER( cdp1862_device::dma_w )
 
 
 //-------------------------------------------------
-//  disp_on_w - 
+//  disp_on_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
@@ -203,7 +203,7 @@ WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
 	{
 		m_bgcolor++;
 
-		if (m_bgcolor > 3) 
+		if (m_bgcolor > 3)
 		{
 			m_bgcolor = 0;
 		}
@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
 
 
 //-------------------------------------------------
-//  disp_off_w - 
+//  disp_off_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( cdp1862_device::con_w )
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( cdp1862_device::con_w )
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void cdp1862_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)

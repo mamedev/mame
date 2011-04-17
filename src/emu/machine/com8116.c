@@ -123,7 +123,7 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  str_w - 
+//  str_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( com8116_device::str_w )
@@ -137,7 +137,7 @@ WRITE8_MEMBER( com8116_device::str_w )
 
 
 //-------------------------------------------------
-//  stt_w - 
+//  stt_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( com8116_device::stt_w )

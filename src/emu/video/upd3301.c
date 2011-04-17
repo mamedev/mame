@@ -107,7 +107,7 @@ void upd3301_device_config::device_config_complete()
 //**************************************************************************
 
 //-------------------------------------------------
-//  set_interrupt - 
+//  set_interrupt -
 //-------------------------------------------------
 
 inline void upd3301_device::set_interrupt(int state)
@@ -369,7 +369,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  read - 
+//  read -
 //-------------------------------------------------
 
 READ8_MEMBER( upd3301_device::read )
@@ -392,7 +392,7 @@ READ8_MEMBER( upd3301_device::read )
 
 
 //-------------------------------------------------
-//  write - 
+//  write -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd3301_device::write )
@@ -533,7 +533,7 @@ WRITE8_MEMBER( upd3301_device::write )
 
 
 //-------------------------------------------------
-//  dack_w - 
+//  dack_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( upd3301_device::dack_w )
@@ -557,10 +557,10 @@ WRITE8_MEMBER( upd3301_device::dack_w )
 	if ((m_data_fifo_pos == m_h) && (m_attr_fifo_pos == (m_attr << 1)))
 	{
 		m_input_fifo = !m_input_fifo;
-		
+
 		m_data_fifo_pos = 0;
 		m_attr_fifo_pos = 0;
-		
+
 		draw_scanline();
 
 		if (m_y == (m_l * m_r))
@@ -573,7 +573,7 @@ WRITE8_MEMBER( upd3301_device::dack_w )
 
 
 //-------------------------------------------------
-//  lpen_w - 
+//  lpen_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( upd3301_device::lpen_w )
@@ -582,7 +582,7 @@ WRITE_LINE_MEMBER( upd3301_device::lpen_w )
 
 
 //-------------------------------------------------
-//  hrtc_r - 
+//  hrtc_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd3301_device::hrtc_r )
@@ -592,7 +592,7 @@ READ_LINE_MEMBER( upd3301_device::hrtc_r )
 
 
 //-------------------------------------------------
-//  vrtc_r - 
+//  vrtc_r -
 //-------------------------------------------------
 
 READ_LINE_MEMBER( upd3301_device::vrtc_r )
@@ -602,7 +602,7 @@ READ_LINE_MEMBER( upd3301_device::vrtc_r )
 
 
 //-------------------------------------------------
-//  draw_scanline - 
+//  draw_scanline -
 //-------------------------------------------------
 
 void upd3301_device::draw_scanline()
@@ -630,7 +630,7 @@ void upd3301_device::draw_scanline()
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)

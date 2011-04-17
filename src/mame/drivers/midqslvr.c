@@ -9,13 +9,13 @@
     Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
     Graphics Chips : Quantum Obsidian 3DFX
     Storage : Hard Drive
-    
+
     Chipsets (440BX AGPset):
     - 82371EB PCI-ISA bridge
     - 82371EB Power Management Controller
     - 82371AB/EB Universal Host Controller (USB UHCI)
     - 82371AB/EB PCI Bus Master IDE Controller
-    
+
 ***************************************************************************/
 
 #include "emu.h"

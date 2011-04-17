@@ -1,6 +1,6 @@
 /*
 
-	CES Classic wall games
+    CES Classic wall games
 
 */
 
@@ -77,7 +77,7 @@ ROM_START(ccclass)
 ROM_END
 
 ROM_START(tsclass)
-	ROM_REGION( 0x100000, "maincpu", 0 )	
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD("tsclassic-v100-u43u44.bin", 0x000000, 0x100000, CRC(a820ec9a) SHA1(84e38c7e54bb9e80142ed4e7763c9e36df560f42) )
 
 	ROM_REGION( 0x80000, "oki", 0 )

@@ -11,11 +11,11 @@
 
     TODO:
 
-	- 12/24 hour
-	- AM/PM
-	- leap year
-	- test input
-	- reference signal output
+    - 12/24 hour
+    - AM/PM
+    - leap year
+    - test input
+    - reference signal output
 
 */
 
@@ -99,7 +99,7 @@ inline void msm5832_device::write_counter(int counter, int value)
 
 
 //-------------------------------------------------
-//  advance_seconds - 
+//  advance_seconds -
 //-------------------------------------------------
 
 inline void msm5832_device::advance_seconds()
@@ -246,7 +246,7 @@ void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int para
 READ8_MEMBER( msm5832_device::data_r )
 {
 	UINT8 data = 0;
-	
+
 	if (m_cs && m_read)
 	{
 		if (m_address == REGISTER_REF)

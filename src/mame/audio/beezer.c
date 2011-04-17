@@ -16,7 +16,7 @@
      a silence waveform for 55516, alternating zeroes and ones.
     * The channel mixing is done additively at the moment rather than
      emulating the original multiplexer, which is actually not that hard to do
-	 but adds a bit of complexity to the render loop.
+     but adds a bit of complexity to the render loop.
     * The 'FM OR AM' output of the audio via (pb1) appears to control some sort
      of suppression or filtering change of the post-DAC amplifier when enabled,
      only during the TIMER1 OUT time-slot of the multiplexer, see page 1B 3-3
@@ -32,8 +32,8 @@
      of 74ls670 4x4 register files wired up as four 8-bit words;
      The four words are used as the volumes for four 1-bit channels by inversion
      of the MSB of the 8 bit value.
-	NOISE is the output of an MM5837 whitenoise generator, a self-clocked (at
-	 around 100khz) LFSR with taps on bits (base-0) 16 and 13.
+    NOISE is the output of an MM5837 whitenoise generator, a self-clocked (at
+     around 100khz) LFSR with taps on bits (base-0) 16 and 13.
     The four channels are:
     CNT1 CNT0
     0    0    6522 pin 7 output (squarewave); 'FM or AM' affects this slot only

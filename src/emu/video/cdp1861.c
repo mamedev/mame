@@ -217,7 +217,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  dma_w - 
+//  dma_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( cdp1861_device::dma_w )
@@ -236,7 +236,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 
 
 //-------------------------------------------------
-//  disp_on_w - 
+//  disp_on_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( cdp1861_device::disp_on_w )
@@ -248,7 +248,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_on_w )
 
 
 //-------------------------------------------------
-//  disp_off_w - 
+//  disp_off_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
@@ -263,7 +263,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 
 
 //-------------------------------------------------
-//  update_screen - 
+//  update_screen -
 //-------------------------------------------------
 
 void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
