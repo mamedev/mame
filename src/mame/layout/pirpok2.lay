@@ -14,7 +14,7 @@
 		<text string="BET">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
+		</text>
 	</element>
 
 	<element name="CARD2" defstate="1">
@@ -31,9 +31,9 @@
 		<text string="BIG">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
-	</element>	
-	
+		</text>
+	</element>
+
 	<element name="CARD3" defstate="1">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -48,9 +48,9 @@
 		<text string="DOUBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
-	</element>		
-	
+		</text>
+	</element>
+
 	<element name="CARD4" defstate="1">
 		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -65,7 +65,7 @@
 		<text string="SMALL">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
+		</text>
 	</element>
 
 	<element name="CARD5" defstate="1">
@@ -82,8 +82,8 @@
 		<text string="     ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
-	</element>		
+		</text>
+	</element>
 
 	<element name="START" defstate="1">
 		<rect state="1">
@@ -99,9 +99,9 @@
 		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.6" width="1" height="0.4" />
-		</text>	
-	</element>			
-	
+		</text>
+	</element>
+
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
@@ -114,15 +114,15 @@
 		</bezel>
 		<bezel name="lamp2" element="CARD3">
 			<bounds x="1.0" y="3.15" width="0.40" height="0.24" />
-		</bezel>	
+		</bezel>
 		<bezel name="lamp3" element="CARD4">
 			<bounds x="1.5" y="3.15" width="0.40" height="0.24" />
-		</bezel>	
+		</bezel>
 		<bezel name="lamp4" element="CARD5">
 			<bounds x="2.0" y="3.15" width="0.40" height="0.24" />
-		</bezel>		
+		</bezel>
 		<bezel name="lamp5" element="START">
 			<bounds x="2.5" y="3.15" width="0.40" height="0.24" />
-		</bezel>		
+		</bezel>
 	</view>
 </mamelayout>

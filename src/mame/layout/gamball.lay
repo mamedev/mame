@@ -68,7 +68,7 @@
 			<color red="1.0" green="1.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="1" />
 		</text>
-	</element>	
+	</element>
 	<element name="6" defstate="0">
 		<text string="6" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -201,7 +201,7 @@
 		<text string="HI">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>	
+		</text>
 	</element>
 	<element name="lo" defstate="0">
 		<rect state="1">
@@ -213,7 +213,7 @@
 		<text string="LO">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
-		</text>	
+		</text>
 	</element>
 	<element name="cancol" defstate="0">
 		<rect state="1">
@@ -225,7 +225,7 @@
 		<text string="CANCEL / COLLECT">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0" width="1" height=".6" />
-		</text>	
+		</text>
 	</element>
 	<element name="hold" defstate="0">
 		<rect state="1">
@@ -237,7 +237,7 @@
 		<text string="HOLD / NUDGE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0" width="1" height=".6" />
-		</text>	
+		</text>
 	</element>
 	<element name="start" defstate="0">
 		<rect state="1">
@@ -249,7 +249,7 @@
 		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0" width="1" height=".6" />
-		</text>	
+		</text>
 	</element>
 	<element name="credit" defstate="0">
 		<text string="CREDIT" state="0">
@@ -643,7 +643,7 @@
 			<bounds x="0" y="0.1" width="1" height="1" />
 		</text>
 	</element>
-	
+
 	<element name="Reel2" defstate="96">
 		<text string="7" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -788,7 +788,7 @@
 		<text string="Bar" state="35">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="1" />
-		</text>	
+		</text>
 		<text string="7" state="36">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0.1" width="1" height="1" />
@@ -1030,7 +1030,7 @@
 			<bounds x="0" y="0.1" width="1" height="1" />
 		</text>
 	</element>
-	
+
 	<element name="Reel3" defstate="96">
 		<text string="7" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />

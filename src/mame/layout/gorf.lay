@@ -22,42 +22,42 @@
 	<element name="spacetext">
 		<text string="SPACE">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="rank">
 		<text string="SPACE RANK">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="cadet">
 		<text string="CADET">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="captain">
 		<text string="CAPTAIN">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="colonel">
 		<text string="COLONEL">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="general">
 		<text string="GENERAL">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="warrior">
 		<text string="WARRIOR">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<element name="avenger">
 		<text string="AVENGER">
 			<color red="0" green="0" blue="0" />
-		</text> 
+		</text>
 	</element>
 	<view name="Lamps">
 		<bounds x="-112" y="0" width="524" height="400" />

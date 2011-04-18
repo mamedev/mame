@@ -139,7 +139,7 @@
 			<bounds x="3.92" y="3.2" width="0.05" height="0.06" />
 		</bezel>
 		<bezel name="digit8" element="Dig1">
- 			<bounds x="3.87" y="3.2" width="0.05" height="0.06" />
+			<bounds x="3.87" y="3.2" width="0.05" height="0.06" />
 		</bezel>
 		<bezel name="digit9" element="Dig1">
 			<bounds x="3.82" y="3.2" width="0.05" height="0.06" />

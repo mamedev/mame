@@ -5,7 +5,7 @@
 			<color red="1.0" green="0.3" blue="0.0" />
 		</led7seg>
 	</element>
-	
+
    <view name="Simple LEDs">
        <bounds left="-59" top="0" right="330" bottom="248" />
 
@@ -138,5 +138,5 @@
        <bezel name="digit9" element="digit">
            <bounds left="-44" top="50" right="-39" bottom="60" />
        </bezel>
-	</view>	
+	</view>
 </mamelayout>

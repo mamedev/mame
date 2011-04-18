@@ -5,10 +5,10 @@
 			<color red="1.0" green="0.3" blue="0.0" />
 		</led7seg>
 	</element>
-	
+
 	<view name="Simple LEDs">
 		<bounds left="0" right="256" top="0" bottom="256" />
-		
+
 		<!-- left panel -->
 		<!-- TIME -->
 		<bezel name="digit3" element="digit">
@@ -17,7 +17,7 @@
 		<bezel name="digit2" element="digit">
 			<bounds left="10" top="0" right="19" bottom="15" />
 		</bezel>
-		
+
 		<!-- not connected -->
 		<bezel name="dummy_digita" element="digit">
 			<bounds left="20" top="0" right="29" bottom="15" />
@@ -25,7 +25,7 @@
 		<bezel name="dummy_digitb" element="digit">
 			<bounds left="30" top="0" right="39" bottom="15" />
 		</bezel>
-		
+
 		<!-- M.P.H. -->
 		<bezel name="digit1" element="digit">
 			<bounds left="40" top="0" right="49" bottom="15" />
@@ -33,7 +33,7 @@
 		<bezel name="digit0" element="digit">
 			<bounds left="50" top="0" right="59" bottom="15" />
 		</bezel>
-		
+
 		<!-- right panel -->
 		<!-- SCORE -->
 		<bezel name="digit9" element="digit">

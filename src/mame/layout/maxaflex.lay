@@ -39,7 +39,7 @@
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="digit" defstate="10">
 		<led7seg>
 			<color red="1.0" green="0.3" blue="0.0" />

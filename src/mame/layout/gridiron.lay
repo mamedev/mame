@@ -17,9 +17,9 @@
 		<bezel name="digit0" element="digit">
 			<bounds left="-15" top="18" right="-8" bottom="31" />
 		</bezel>
-		
+
 		<bezel name="digit1" element="digit">
 			<bounds left="-15" top="50" right="-8" bottom="63" />
-		</bezel>		
-	</view>	
+		</bezel>
+	</view>
 </mamelayout>

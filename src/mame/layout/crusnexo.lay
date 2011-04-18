@@ -87,7 +87,7 @@
 		</text>
 	</element>
 
-	
+
 	<view name="Simple LEDs">
 		<bounds left="0" top="0" right="4" bottom="3.472" />
 
@@ -179,5 +179,5 @@
 		<bezel name="lamp3" element="view3">
 			<bounds x="0.1" y="3.3" width="0.4" height="0.1" />
 		</bezel>
-	</view>	
+	</view>
 </mamelayout>

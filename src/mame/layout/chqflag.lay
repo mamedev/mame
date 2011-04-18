@@ -51,7 +51,7 @@
 	<view name="Shifter-R">
 		<screen index="0">
 			<bounds x="0" y="0" width="480" height="640" />
-		</screen>		
+		</screen>
 		<bezel element="shifter" inputtag="IN2" inputmask="0x01">
 			<bounds x="446" y="574" width="32" height="64" />
 			<color alpha="0.6" />
@@ -60,7 +60,7 @@
 	<view name="Shifter-L">
 		<screen index="0">
 			<bounds x="0" y="0" width="480" height="640" />
-		</screen>		
+		</screen>
 		<bezel element="shifter" inputtag="IN2" inputmask="0x01">
 			<bounds x="2" y="574" width="32" height="64" />
 			<color alpha="0.6" />

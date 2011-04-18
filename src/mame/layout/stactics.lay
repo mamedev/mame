@@ -17,12 +17,12 @@
 	<element name="basetext">
 		<text string="BASE MISSILE BUTTON">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="scoretext">
 		<text string="SCORE">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="digit" defstate="10">
 		<led7seg>
@@ -32,32 +32,32 @@
 	<element name="c_text">
 		<text string="C">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="r_text">
 		<text string="R">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="e_text">
 		<text string="E">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="d_text">
 		<text string="D">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="i_text">
 		<text string="I">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="t_text">
 		<text string="T">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="yellow_disc" defstate="0">
 		<disk state="1">
@@ -82,67 +82,67 @@
 	<element name="energy_text">
 		<text string="ENERGY BARRIER">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="energy_b_text">
 		<text string="ENERGY BARRIER BUTTON">
 			<color red="0" green="0" blue="0" />
-		</text>	
+		</text>
 	</element>
 	<element name="round_text">
 		<text string="ROUND">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="1_text">
 		<text string="1">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="2_text">
 		<text string="2">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="3_text">
 		<text string="3">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="4_text">
 		<text string="4">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="5_text">
 		<text string="5">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="6_text">
 		<text string="6">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="7_text">
 		<text string="7">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="8_text">
 		<text string="8">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="9_text">
 		<text string="9">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="0_text">
 		<text string="0">
 			<color red="1.0" green="1.0" blue="1.0" />
-		</text>	
+		</text>
 	</element>
 	<element name="green_disc" defstate="0">
 		<disk state="1">
@@ -448,19 +448,19 @@
             		<bounds x="59" y="573" width="7" height="7" />
 		</bezel>
 		<bezel element="0_text">
-           		<bounds x="63" y="573" width="7" height="7" />
+        		<bounds x="63" y="573" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="71" y="573" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
-           		<bounds x="75" y="573" width="7" height="7" />
+        		<bounds x="75" y="573" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="83" y="573" width="7" height="7" />
 		</bezel>
 		<bezel element="2_text">
-           		<bounds x="87" y="573" width="7" height="7" />
+        		<bounds x="87" y="573" width="7" height="7" />
 		</bezel>
 
 <!--Energy Barrier Lamp-->
@@ -636,37 +636,37 @@
             		<bounds x="59" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="0_text">
-           		<bounds x="63" y="673" width="7" height="7" />
+        		<bounds x="63" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="71" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
-           		<bounds x="75" y="673" width="7" height="7" />
+        		<bounds x="75" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="83" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="2_text">
-           		<bounds x="87" y="673" width="7" height="7" />
+        		<bounds x="87" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="95" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="3_text">
-           		<bounds x="99" y="673" width="7" height="7" />
+        		<bounds x="99" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="107" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="4_text">
-           		<bounds x="111" y="673" width="7" height="7" />
+        		<bounds x="111" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="1_text">
             		<bounds x="119" y="673" width="7" height="7" />
 		</bezel>
 		<bezel element="5_text">
-           		<bounds x="123" y="673" width="7" height="7" />
+        		<bounds x="123" y="673" width="7" height="7" />
 		</bezel>
 
 <!--Laser Beam Left-->

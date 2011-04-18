@@ -5,37 +5,37 @@
 			<color red="1.0" green="0.3" blue="0.0" />
 		</led7seg>
 	</element>
-	
+
 	<element name="panel">
 		<rect>
 			<bounds left="-168.29" top="0" right="0" bottom="376" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
-		
+
 		<text string="1ST">
 			<bounds left="-88" top="33" right="0" bottom="52" />
 		</text>
-		
+
 		<text string="2ND">
 			<bounds left="-88" top="60" right="0" bottom="79" />
 		</text>
-		
+
 		<text string="3RD">
 			<bounds left="-88" top="87" right="0" bottom="106" />
 		</text>
-		
+
 		<text string="4TH">
 			<bounds left="-88" top="114" right="0" bottom="133" />
 		</text>
-		
+
 		<text string="5TH">
 			<bounds left="-88" top="141" right="0" bottom="160" />
 		</text>
-		
+
 		<text string="SCORE">
 			<bounds left="-88" top="175" right="0" bottom="194" />
 		</text>
-		
+
 		<text string="TIME">
 			<bounds left="-88" top="264" right="0" bottom="283" />
 		</text>

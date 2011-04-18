@@ -5,7 +5,7 @@
 			<color red="0.75" green="0" blue="0.0" />
 		</led7seg>
 	</element>
-  	<element name="dummy_str" defstate="0">
+	<element name="dummy_str" defstate="0">
 		<text string="Pinball">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds x="0" y="0" width="25" height="5" />

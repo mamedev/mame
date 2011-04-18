@@ -57,8 +57,8 @@
 		</screen>
 		<screen index="2">
 			<bounds x="1280" y="0" width="640" height="480" />
-		</screen>		
-		
+		</screen>
+
 <bezel element="shifter" inputtag="PPI_PORTA" inputmask="0x40">
 
 			<bounds x="1886" y="414" width="32" height="64" />
@@ -74,8 +74,8 @@
 		</screen>
 		<screen index="2">
 			<bounds x="1280" y="0" width="640" height="480" />
-		</screen>		
-		
+		</screen>
+
 <bezel element="shifter" inputtag="PPI_PORTA" inputmask="0x40">
 
 			<bounds x="2" y="414" width="32" height="64" />
@@ -85,8 +85,8 @@
 	<view name="Shifter-1R">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
-		</screen>		
-		
+		</screen>
+
 <bezel element="shifter" inputtag="PPI_PORTA" inputmask="0x40">
 
 			<bounds x="606" y="414" width="32" height="64" />
@@ -96,8 +96,8 @@
 	<view name="Shifter-1L">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
-		</screen>		
-		
+		</screen>
+
 <bezel element="shifter" inputtag="PPI_PORTA" inputmask="0x40">
 
 			<bounds x="2" y="414" width="32" height="64" />

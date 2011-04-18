@@ -16,9 +16,9 @@
 		</bezel>
 		<bezel element="crop">
 			<bounds x="288" y="385" width="12" height="15" />
-		</bezel>		
+		</bezel>
 		<screen index="0">
-           		<bounds x="0" y="0" width="300" height="400" />
+        		<bounds x="0" y="0" width="300" height="400" />
 		</screen>
 	</view>
 </mamelayout>
