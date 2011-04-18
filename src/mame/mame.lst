@@ -1,7 +1,7 @@
 /******************************************************************************
 
     mame.lst
-    
+
     List of all enabled drivers in the system. This file is parsed by
     makelist.exe, sorted, and output as C code describing the drivers.
 
@@ -86,7 +86,7 @@ piranha			// GL
 piranhao		// GL
 nmouse			// (c) 1981 Amenip (Palcom Queen River)
 nmouseb			// (c) 1981 Amenip Nova Games Ltd.
-mspacman		// (c) 1981 Midway 	// made by General Computer
+mspacman		// (c) 1981 Midway	// made by General Computer
 mspacmnf		// hack
 mspacmat		// hack
 woodpeck		// (c) 1981 Amenip (Palcom Queen River)
@@ -728,7 +728,7 @@ galaga3a		// (c) 1984
 liblrabl		// (c) 1983
 toypop			// (c) 1986
 // Z8000 games
-polepos			// (c) 1982 
+polepos			// (c) 1982
 poleposa		// 136014   (c) 1982 + Atari license
 polepos1		// 136014   (c) 1982 Atari
 topracer		// bootleg
@@ -1544,7 +1544,7 @@ gridlee			// [1983 Videa] prototype - no copyright notice
 andromed		// (c) 1979
 ipminvad		// M10 no copyright notice (Arcade TV Game List - P.67, Left, 26 from top)
 ipminvad1		// M10 incomplete dump
-ptrmj			// M14 (c) 1979 
+ptrmj			// M14 (c) 1979
 skychut			// Irem [1980]
 spacbeam		// M15 no copyright notice
 greenber		// Irem
@@ -1612,7 +1612,7 @@ rtype			// (c) 1987 (Japan)
 rtypej			// (c) 1987 (Japan)
 rtypejp			// (c) 1987 (Japan)
 rtypeu			// (c) 1987 + Nintendo USA license (US)
-rtypeb			// bootleg 
+rtypeb			// bootleg
 bchopper		// (c) 1987
 mrheli			// (c) 1987 (Japan)
 nspirit			// (c) 1988
@@ -1728,7 +1728,7 @@ usvsthem		// GV-??? (c) 198? Mylstar
 qbertqub		// GV-119 (c) 1983 Mylstar
 screwloo		// GV-123 (c) 1983 Mylstar - never released
 curvebal		// GV-134 (c) 1984 Mylstar
-vidvince		// GV-??? (c) 1984 Mylstar - never released 
+vidvince		// GV-??? (c) 1984 Mylstar - never released
 wizwarz			// GV-??? (c) 1984 Mylstar - never released
 
 // Taito "Qix hardware" games
@@ -2358,7 +2358,7 @@ outzoneb		// TP-O18 (c) 1990 Toaplan
 outzonec		// TP-O18 (c) 1990 Toaplan
 outzoned		// TP-O18 (c) 1990 Toaplan
 vimana			// TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
-vimana1			// TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan) 
+vimana1			// TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
 vimanan			// TP-O19 (c) 1991 Toaplan (+ Nova Apparate GMBH & Co license)
 snowbros		// MIN16-02 (c) 1990 Toaplan + Romstar license
 snowbrosa		// MIN16-02 (c) 1990 Toaplan + Romstar license
@@ -2607,9 +2607,9 @@ lottofun		// (c) 1987 H.A.R. Management
 
 // Capcom games
 // The following is a COMPLETE list of the Capcom games up to 1997, as shown on
-// their web site. The list is sorted by production date.                      
-// A comprehensive list of Capcom games with board info can be found here:     
-// http://www.arcadeflyers.com/strider/capcom_list.html                        
+// their web site. The list is sorted by production date.
+// A comprehensive list of Capcom games with board info can be found here:
+// http://www.arcadeflyers.com/strider/capcom_list.html
 vulgus			//  5/1984 (c) 1984
 vulgus2			//  5/1984 (c) 1984
 vulgusj			//  5/1984 (c) 1984
@@ -4116,8 +4116,8 @@ dduxbl			// (c) 1989 (Datsu bootleg)
 eswatbl			// BOOTLEG
 fpointbl		// (c) 1989 (Datsu bootleg)
 fpointbj		// (c) 1989 (Datsu bootleg, Japan)
-goldnaxeb1		// BOOTLEG 
-goldnaxeb2		// BOOTLEG 
+goldnaxeb1		// BOOTLEG
+goldnaxeb2		// BOOTLEG
 passht4b		// bootleg
 passshtb		// bootleg
 shinoblb		// (c) 1987 (but bootleg)
@@ -4311,7 +4311,7 @@ alien3u			// 1993.11 Aliens 3 (US)
 sonic			// 1993.09 Sonic the Hedgehog (Japan)
 sonicp			// 1993.?? Sonic the Hedgehog (proto, Japan)
 kokoroj2		// 1993.12 Soreike! Kokoroji 2 (Japan)
-jpark			// 1994.?? Jurassic Park (World) 
+jpark			// 1994.?? Jurassic Park (World)
 				// 1994.?? Jurassic Park (US)
 				// 1994.02 Jurassic Park (Japan)
 dbzvrvs			// 1994.03 Dragon Ball Z V.R.V.S. (Japan)
@@ -5912,7 +5912,7 @@ bm1stmix		// GQ753 (c) 1997 (Japan)
 bm2ndmix		// GX853 (c) 1998 (Japan)
 bm2ndmxa		// GX853 (c) 1998 (Japan)
 bm3rdmix		// GX853 (c) 1998 (Japan)
-//bm3rdmxb    	// GX853 (c) 1998 (Japan)
+//bm3rdmxb  	// GX853 (c) 1998 (Japan)
 bmcompmx		// GX858 (c) 1999 (Japan)
 hmcompmx		// GX858 (c) 1999
 bm4thmix		// GX847 (c) 1999 (Japan)
@@ -5926,10 +5926,10 @@ bm6thmix		// GXA21 (c) 2001 (Japan)
 bm7thmix		// GXB07 (c) 2001 (Japan)
 bmfinal			// GXC01 (c) 2002 (Japan)
 
-//popn1       	// GX803 (c) 1998 (Japan)
+//popn1     	// GX803 (c) 1998 (Japan)
 popn2			// GX831 (c) 1998 (Japan)
-//popn3       	// GX980 (c) 1999 (Japan)
-//popnstex    	// GX970 (c) 1999 (Japan)
+//popn3     	// GX980 (c) 1999 (Japan)
+//popnstex  	// GX970 (c) 1999 (Japan)
 
 // Firebeat games
 ppp				// GQ977 (c) 2000
@@ -6074,7 +6074,7 @@ skyraid			// 009709           1978/03 [6502]
 tourtabl		// 030170           1978/03 [6507]
 tourtab2		// 030170           1978/03 [6507]
 avalnche		// 030574           1978/04 [6502]
-cascade			// bootleg                        
+cascade			// bootleg
 firetrk			// 030926           1978/06 [6808]
 skydiver		// 009787           1978/06 [6800]
 // Smokey Joe	// 030926           1978/07 [6502]
@@ -7017,7 +7017,7 @@ ddungeon		// Game Room
 ddungeone		// East Coast Coin Company (Melbourne)
 darktowr		// Game Room
 tstrike			// East Coast Coin Company (Melbourne)
-tstrikea		// Game Room 
+tstrikea		// Game Room
 ctribe			// TA-0028 (c) 1990 (US)
 ctribe1			// TA-0028 (c) 1990 (US) - Set 1?
 ctribej			// TA-0028 (c) 1990 (Japan)
@@ -9384,7 +9384,7 @@ ssingles		// Yachiyo?
 tcl				// (c) 1995 Uniwang
 othello			// (c) 1984 Success
 sothello		// (c) 1986 Success / Fujiwara
-quake			// (c) 19?? Lazer-Tron / iD Software 
+quake			// (c) 19?? Lazer-Tron / iD Software
 majorpkr		// (c) 1994 PAL System.
 
 // Multi Amenity Cassette System
@@ -10395,15 +10395,15 @@ cmkenospa		// (c) 2000 Coinmaster-Gaming, Ltd.
 
 // Igrosoft Original sets
 // Multifish
-//mfish   		// (c) 2002
-//mfish_2 		// (c) 2002
-//mfish_4 		// (c) 2002
-//mfish_5 		// (c) 2002
-//mfish_7 		// (c) 2002
-//mfish_8 		// (c) 2002
-//mfish_9 		// (c) 2002
-//mfish_10    	// (c) 2002
-//mfish_13    	// (c) 2002
+//mfish 		// (c) 2002
+//mfish_2		// (c) 2002
+//mfish_4		// (c) 2002
+//mfish_5		// (c) 2002
+//mfish_7		// (c) 2002
+//mfish_8		// (c) 2002
+//mfish_9		// (c) 2002
+//mfish_10  	// (c) 2002
+//mfish_13  	// (c) 2002
 mfish_3			// (c) 2002
 mfish_6			// (c) 2002
 mfish_11		// (c) 2002
@@ -10411,22 +10411,22 @@ mfish_12		// (c) 2002
 mfish_13		// (c) 2002
 
 // Crazy Monkey
-//crzmon  		// (c) 2003
-//crzmon_2    	// (c) 2003
-//crzmon_3    	// (c) 2003
-//crzmon_4    	// (c) 2003
-//crzmon_5    	// (c) 2003
-//crzmon_6    	// (c) 2003
+//crzmon		// (c) 2003
+//crzmon_2  	// (c) 2003
+//crzmon_3  	// (c) 2003
+//crzmon_4  	// (c) 2003
+//crzmon_5  	// (c) 2003
+//crzmon_6  	// (c) 2003
 crzmon_5		// (c) 2003
 crzmon_7		// (c) 2003
 crzmon_8		// (c) 2003
 crzmon_9		// (c) 2003
 
 // Fruit Cocktail
-//fcockt  		// (c) 2003
-//fcockt_2    	// (c) 2003
+//fcockt		// (c) 2003
+//fcockt_2  	// (c) 2003
 fcockt_3		// (c) 2003
-//fcockt_4   	// (c) 2003
+//fcockt_4  	// (c) 2003
 fcockt_5		// (c) 2003
 fcockt_6		// (c) 2003
 fcockt_7		// (c) 2003
@@ -10437,9 +10437,9 @@ fcockt_11		// (c) 2003
 fcockt_12		// (c) 2003
 
 // Lucky Haunter
-//lhaunt  		// (c) 2003
+//lhaunt		// (c) 2003
 lhaunt_2		// (c) 2003
-//lhaunt_3    	// (c) 2003
+//lhaunt_3  	// (c) 2003
 lhaunt_4		// (c) 2003
 lhaunt_5		// (c) 2003
 lhaunt_6		// (c) 2003
@@ -10447,20 +10447,20 @@ lhaunt_7		// (c) 2003
 lhaunt_8		// (c) 2003
 
 // Rollfruit
-//rollfr  		// (c) 2003
+//rollfr		// (c) 2003
 rollfr_2		// (c) 2003
 
 // Garage
-//garage  		// (c) 2004
-//garage_2    	// (c) 2004
-//garage_3    	// (c) 2004
+//garage		// (c) 2004
+//garage_2  	// (c) 2004
+//garage_3  	// (c) 2004
 garage_4		// (c) 2004
 garage_5		// (c) 2004
 garage_6		// (c) 2004
 garage_7		// (c) 2004
 
 // Rock Climber
-//rclimb_2    	// (c) 2004
+//rclimb_2  	// (c) 2004
 rclimb			// (c) 2004
 rclimb_3		// (c) 2004
 rclimb_4		// (c) 2004
@@ -10480,7 +10480,7 @@ island			// (c) 2005
 island_2		// (c) 2005
 
 // Pirate
-//pirate  		// (c) 2005
+//pirate		// (c) 2005
 pirate_2		// (c) 2005
 pirate_3		// (c) 2005
 pirate_4		// (c) 2005
@@ -10819,7 +10819,7 @@ blackjck
 bowarrow
 eightbll
 evelknie
-freedom 
+freedom
 matahari
 nightrdr
 nightr20
@@ -10831,17 +10831,17 @@ stk_sprs
 */
 bullseye
 blakpyra
-bmx     
-centaur 
+bmx
+centaur
 cosflash
 cybrnaut
 dollyptn
 eballdlx
 eballd14
-elektra 
-embryon 
-fathom  
-fbclass 
+elektra
+embryon
+fathom
+fbclass
 fball_ii
 flashgdn
 flashgdnf
@@ -10854,47 +10854,47 @@ granslam
 granslam4
 hglbtrtr
 hotdoggn
-kosteel 
-kiss	
+kosteel
+kiss
 lostwrlp
-medusa  
-m_mpac  
-mystic  
+medusa
+m_mpac
+mystic
 myststar
-newwave 
+newwave
 ngndshkr
-paragon 
-playboy 
+paragon
+playboy
 rapidfip
 rollston
-saturn2 
+saturn2
 slbmania
 skatebll
 spacehaw
 spaceinv
 speakesy
 speakesy4p
-spectrm 
+spectrm
 spectrm4
 spyhuntr
 startrep
-sst 	
-smman   
+sst
+smman
 tigerrag
-vector  
-viking  
-voltan  
-xsandos 
-xenon   
-xenonf  
+vector
+viking
+voltan
+xsandos
+xenon
+xenonf
 worlddef
 darkshad
 skflight
-cobrap	
+cobrap
 futrquen
-f1gpp   
-toppin  
-uboat65 
+f1gpp
+toppin
+uboat65
 bbbowlin
 monrobwl
 mdntmrdr
@@ -10904,7 +10904,7 @@ suprbowl
 /*
    Bally Kiss 8035 prototype
 */
-kissp	
+kissp
 
 /*
    Bally MPU A084-91786-AH06 (6803)
@@ -10933,8 +10933,8 @@ trucksp2
 /*
    Bally MPU AS-2518-133
 */
-babypac 
-granny  
+babypac
+granny
 
 // by68701.c
 flashgdnp1
