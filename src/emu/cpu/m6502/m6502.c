@@ -81,7 +81,7 @@ struct _m6502_Regs
 
 	UINT8    ddr;
 	UINT8    port;
-	
+
 	devcb_resolved_read8	in_port_func;
 	devcb_resolved_write8	out_port_func;
 };
