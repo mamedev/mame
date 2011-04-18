@@ -91,12 +91,18 @@ const char *driverpath = m_enumerator.config().m_devicelist.find("root")->search
 		// also determine if this is the driver's specific ROMs or not
 		bool source_is_gamedrv = (dynamic_cast<const driver_device_config_base *>(source) != NULL);
 
-// temporary hack: add the driver path
-astring combinedpath(m_searchpath, ";", driverpath);
-m_searchpath = combinedpath;
-
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
+		{
+// temporary hack: add the driver path & region name
+astring combinedpath(m_searchpath, ";", driverpath);
+if(ROMREGION_ISLOADBYNAME(region))
+{
+	combinedpath=combinedpath.cat(";");
+	combinedpath=combinedpath.cat(ROMREGION_GETTAG(region));
+}
+m_searchpath = combinedpath;
+
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
@@ -135,6 +141,7 @@ m_searchpath = combinedpath;
 					}
 				}
 			}
+		}
 	}
 
 	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
