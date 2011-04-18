@@ -232,7 +232,7 @@ void psxcpu_device::set_biu( UINT32 data, UINT32 mem_mask )
 
 void psxcpu_device::stop()
 {
-	debugger_break( m_machine );
+	debugger_break( machine() );
 	debugger_instruction_hook( this,  m_pc );
 }
 

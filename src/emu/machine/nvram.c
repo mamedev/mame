@@ -179,7 +179,7 @@ void nvram_device::nvram_default()
 		{
 			UINT8 *nvram = reinterpret_cast<UINT8 *>(m_base);
 			for (int index = 0; index < m_length; index++)
-				nvram[index] = m_machine.rand();
+				nvram[index] = machine().rand();
 			break;
 		}
 
@@ -231,7 +231,7 @@ void nvram_device::determine_final_base()
 	// find our shared pointer with the target RAM
 	if (m_base == NULL)
 	{
-		m_base = memory_get_shared(m_machine, tag(), m_length);
+		m_base = memory_get_shared(machine(), tag(), m_length);
 		if (m_base == NULL)
 			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
 	}

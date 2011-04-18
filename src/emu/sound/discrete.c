@@ -688,7 +688,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 		/* make sure we have one simple task
          * No need to create a node since there are no dependencies.
          */
-		task = auto_alloc_clear(m_machine, discrete_task(*this));
+		task = auto_alloc_clear(machine(), discrete_task(*this));
 		task_list.add(task);
 	}
 
@@ -722,7 +722,7 @@ void discrete_device::init_nodes(const sound_block_list_t &block_list)
 					{
 						if (task != NULL)
 							fatalerror("init_nodes() - Nested DISCRETE_START_TASK.");
-						task = auto_alloc_clear(m_machine, discrete_task(*this));
+						task = auto_alloc_clear(machine(), discrete_task(*this));
 						task->task_group = block->initial[0];
 						if (task->task_group < 0 || task->task_group >= DISCRETE_MAX_TASK_GROUPS)
 							fatalerror("discrete_dso_task: illegal task_group %d", task->task_group);
@@ -921,7 +921,7 @@ discrete_device::~discrete_device(void)
 void discrete_device::device_start()
 {
 	// create the stream
-	//m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 22257);
+	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
 	const discrete_block *intf_start = (m_config.m_intf != NULL) ? m_config.m_intf : (discrete_block *) baseconfig().static_config();
 	char name[32];
@@ -1021,7 +1021,7 @@ void discrete_sound_device::device_start()
 		fatalerror("init_nodes() - Couldn't find an output node");
 
 	/* initialize the stream(s) */
-	m_stream = m_machine.sound().stream_alloc(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
+	m_stream = machine().sound().stream_alloc(*this,m_input_stream_list.count(), m_output_list.count(), m_sample_rate);
 
 	/* Finalize stream_input_nodes */
 	for_each(discrete_dss_input_stream_node **, node, &m_input_stream_list)

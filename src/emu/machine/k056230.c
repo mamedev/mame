@@ -65,7 +65,7 @@ void k056230_device::device_start()
 {
 	if(m_config.m_cpu)
 	{
-		m_cpu = m_machine.device(m_config.m_cpu);
+		m_cpu = machine().device(m_config.m_cpu);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ void k056230_device::device_start()
 
 	m_is_thunderh = m_config.m_is_thunderh;
 
-	m_ram = auto_alloc_array(m_machine, UINT32, 0x2000);
+	m_ram = auto_alloc_array(machine(), UINT32, 0x2000);
 
 	save_pointer(NAME(m_ram), 0x2000);
 }
@@ -128,7 +128,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
 					{
 						device_set_input_line(m_cpu, INPUT_LINE_IRQ2, ASSERT_LINE);
 					}
-					m_machine.scheduler().timer_set(attotime::from_usec(10), FUNC(network_irq_clear_callback), 0, (void*)this);
+					machine().scheduler().timer_set(attotime::from_usec(10), FUNC(network_irq_clear_callback), 0, (void*)this);
 				}
 			}
 //          else

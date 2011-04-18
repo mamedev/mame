@@ -849,7 +849,7 @@ sound_stream *sound_manager::stream_alloc(device_t &device, int inputs, int outp
 void sound_manager::set_attenuation(int attenuation)
 {
 	m_attenuation = attenuation;
-	m_machine.osd().set_mastervolume(m_muted ? -32 : m_attenuation);
+	machine().osd().set_mastervolume(m_muted ? -32 : m_attenuation);
 }
 
 
@@ -862,7 +862,7 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
 {
 	// scan through the speakers until we find the indexed input
-	for (info.speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
+	for (info.speaker = downcast<speaker_device *>(machine().m_devicelist.first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
 	{
 		if (index < info.speaker->inputs())
 		{
@@ -1003,11 +1003,11 @@ void sound_manager::update()
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	for (speaker_device *speaker = downcast<speaker_device *>(m_machine.m_devicelist.first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
+	for (speaker_device *speaker = downcast<speaker_device *>(machine().m_devicelist.first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
 		speaker->mix(m_leftmix, m_rightmix, samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result
-	UINT32 finalmix_step = m_machine.video().speed_factor();
+	UINT32 finalmix_step = machine().video().speed_factor();
 	UINT32 finalmix_offset = 0;
 	INT16 *finalmix = m_finalmix;
 	int sample;
@@ -1037,14 +1037,14 @@ void sound_manager::update()
 	if (finalmix_offset > 0)
 	{
 		if (!m_nosound_mode)
-			m_machine.osd().update_audio_stream(finalmix, finalmix_offset / 2);
-		m_machine.video().add_sound_to_recording(finalmix, finalmix_offset / 2);
+			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
+		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
 		if (m_wavfile != NULL)
 			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
 	}
 
 	// see if we ticked over to the next second
-	attotime curtime = m_machine.time();
+	attotime curtime = machine().time();
 	bool second_tick = false;
 	if (curtime.seconds != m_last_update.seconds)
 	{

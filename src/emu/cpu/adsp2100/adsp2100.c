@@ -1263,7 +1263,7 @@ void adsp21xx_device::execute_set_input(int inputnum, int state)
 
 void adsp21xx_device::execute_run()
 {
-	bool check_debugger = ((device_t::m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	check_irqs();
 

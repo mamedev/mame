@@ -177,7 +177,7 @@ void okim6295_device::device_start()
 
 	// create the stream
 	int divisor = m_config.m_pin7 ? 132 : 165;
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, clock() / divisor);
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
 	save_item(NAME(m_bank_offs));
@@ -266,7 +266,7 @@ void okim6295_device::set_bank_base(offs_t base)
 	if (m_bank_installed)
 	{
 		m_bank_offs = base;
-		memory_set_bankptr(m_machine, tag(), m_region->base() + base);
+		memory_set_bankptr(machine(), tag(), m_region->base() + base);
 	}
 }
 

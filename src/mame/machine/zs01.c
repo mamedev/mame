@@ -22,7 +22,7 @@ inline void ATTR_PRINTF(3,4) zs01_device::verboselog(int n_level, const char *s_
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("zs01 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
+		logerror("zs01 %s %s: %s", config.tag(), machine().describe_context(), buf);
 	}
 }
 
@@ -427,7 +427,7 @@ void zs01_device::scl_1()
 								switch(write_buffer[1]) {
 								case 0xfd: {
 									/* TODO: use read/write to talk to the ds2401, which will require a timer. */
-									ds2401_device *ds2401 = m_machine.device<ds2401_device>(config.ds2401_tag);
+									ds2401_device *ds2401 = machine().device<ds2401_device>(config.ds2401_tag);
 									for(int i = 0; i < SIZE_DATA_BUFFER; i++)
 										read_buffer[2+i] = ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
 									break;

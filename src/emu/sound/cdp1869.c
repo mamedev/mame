@@ -416,7 +416,7 @@ cdp1869_device::cdp1869_device(running_machine &_machine, const cdp1869_device_c
 void cdp1869_device::device_start()
 {
 	// get the screen device
-	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(m_config.screen_tag);
 	assert(m_screen != NULL);
 
 	// resolve callbacks
@@ -434,7 +434,7 @@ void cdp1869_device::device_start()
 	initialize_palette();
 
 	// create sound stream
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, m_machine.sample_rate());
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
 	// register for state saving
 	save_item(NAME(m_prd));
@@ -496,7 +496,7 @@ void cdp1869_device::initialize_palette()
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(m_machine, i, get_rgb(i, i, 15));
+		palette_set_color(machine(), i, get_rgb(i, i, 15));
 	}
 
 	// tone-on-tone display (CFC=1)
@@ -504,7 +504,7 @@ void cdp1869_device::initialize_palette()
 	{
 		for (int l = 0; l < 8; l++)
 		{
-			palette_set_color(m_machine, i, get_rgb(i, c, l));
+			palette_set_color(machine(), i, get_rgb(i, c, l));
 			i++;
 		}
 	}
@@ -529,7 +529,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
 //      double amplitude = m_toneamp * ((0.78*5) / 15);
 
-		int rate = m_machine.sample_rate() / 2;
+		int rate = machine().sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = m_incr;

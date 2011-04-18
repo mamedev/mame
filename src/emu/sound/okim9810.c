@@ -150,7 +150,7 @@ void okim9810_device::device_start()
 
 	// create the stream
 	//int divisor = m_config.m_pin7 ? 132 : 165;
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, clock());
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
     // save state stuff
     // m_TMP_register

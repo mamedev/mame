@@ -214,6 +214,7 @@ class memory_region
 
 public:
 	// getters
+	running_machine &machine() const { return m_machine; }
 	memory_region *next() const { return m_next; }
 	UINT8 *base() const { return (this != NULL) ? m_base.u8 : NULL; }
 	UINT8 *end() const { return (this != NULL) ? m_base.u8 + m_length : NULL; }

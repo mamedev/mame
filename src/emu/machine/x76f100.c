@@ -23,7 +23,7 @@ inline void ATTR_PRINTF(3,4) x76f100_device::verboselog(int n_level, const char 
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("x76f100 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
+		logerror("x76f100 %s %s: %s", config.tag(), machine().describe_context(), buf);
 	}
 }
 

@@ -129,7 +129,7 @@ asc_device::asc_device(running_machine &_machine, const asc_device_config &confi
 void asc_device::device_start()
 {
 	// create the stream
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, 22257, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257, this);
 
 	memset(m_regs, 0, sizeof(m_regs));
 

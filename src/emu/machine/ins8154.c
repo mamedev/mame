@@ -133,7 +133,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_r)
 	{
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", m_machine.describe_context(), tag(), offset);
+			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", machine().describe_context(), tag(), offset);
 		}
 		return 0xff;
 	}
@@ -207,7 +207,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_w)
 	{
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", m_machine.describe_context(), tag(), data, offset);
+			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", machine().describe_context(), tag(), data, offset);
 		}
 		return;
 	}
@@ -225,7 +225,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_w)
 	case 0x22:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' ODRA set to %02x\n", m_machine.describe_context(), tag(), data);
+			logerror("%s: INS8154 '%s' ODRA set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_odra = data;
@@ -234,7 +234,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_w)
 	case 0x23:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' ODRB set to %02x\n", m_machine.describe_context(), tag(), data);
+			logerror("%s: INS8154 '%s' ODRB set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_odrb = data;
@@ -243,7 +243,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_w)
 	case 0x24:
 		if (VERBOSE)
 		{
-			logerror("%s: INS8154 '%s' MDR set to %02x\n", m_machine.describe_context(), tag(), data);
+			logerror("%s: INS8154 '%s' MDR set to %02x\n", machine().describe_context(), tag(), data);
 		}
 
 		m_mdr = data;

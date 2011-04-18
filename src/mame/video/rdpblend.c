@@ -243,7 +243,7 @@ bool Blender::AlphaCompare(UINT8 alpha)
 	INT32 threshold;
 	if (m_other_modes->alpha_compare_en)
 	{
-		threshold = (m_other_modes->dither_alpha_en) ? (m_machine->rand() & 0xff) : m_rdp->GetBlendColor()->i.a;
+		threshold = (m_other_modes->dither_alpha_en) ? (machine().rand() & 0xff) : m_rdp->GetBlendColor()->i.a;
 		if (alpha < threshold)
 		{
 			return false;

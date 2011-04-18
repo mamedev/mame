@@ -116,8 +116,8 @@ void acia6850_device::device_start()
 	m_tx_clock = m_config.m_tx_clock;
 	m_tx_counter = 0;
 	m_rx_counter = 0;
-	m_rx_timer = m_machine.scheduler().timer_alloc(FUNC(receive_event_callback), (void *)this);
-	m_tx_timer = m_machine.scheduler().timer_alloc(FUNC(transmit_event_callback), (void *)this);
+	m_rx_timer = machine().scheduler().timer_alloc(FUNC(receive_event_callback), (void *)this);
+	m_tx_timer = machine().scheduler().timer_alloc(FUNC(transmit_event_callback), (void *)this);
 	m_first_reset = 1;
 	m_status_read = 0;
 	m_brk = 0;
@@ -349,7 +349,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_data_w)
 	}
 	else
 	{
-		logerror("%s:ACIA %p: Data write while in reset!\n", m_machine.describe_context(), this);
+		logerror("%s:ACIA %p: Data write while in reset!\n", machine().describe_context(), this);
 	}
 }
 

@@ -186,7 +186,7 @@ public:
 	~DView()
 	{
 		this->target->debug_free(*this->container);
-		m_machine->debug_view().free_view(*this->view);
+		machine().debug_view().free_view(*this->view);
 	}
 
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }

@@ -114,7 +114,7 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
 	{
-		device_t *newdevice = devconfig->alloc_device(*m_machine);
+		device_t *newdevice = devconfig->alloc_device(machine);
 		append(devconfig->tag(), *newdevice);
 		newdevice->find_interfaces();
 	}
@@ -130,12 +130,12 @@ void device_list::start_all()
 {
 	// add exit and reset callbacks
 	assert(m_machine != NULL);
-	m_machine->add_notifier(MACHINE_NOTIFY_RESET, static_reset);
-	m_machine->add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
+	machine().add_notifier(MACHINE_NOTIFY_RESET, static_reset);
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
 
 	// add pre-save and post-load callbacks
-	m_machine->state().register_presave(static_pre_save, this);
-	m_machine->state().register_postload(static_post_load, this);
+	machine().state().register_presave(static_pre_save, this);
+	machine().state().register_postload(static_post_load, this);
 
 	// iterate over devices to start them
 	device_t *nextdevice;
@@ -596,7 +596,7 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 
 device_t::~device_t()
 {
-	auto_free(m_machine, m_debug);
+	auto_free(machine(), m_debug);
 }
 
 
@@ -613,7 +613,7 @@ const memory_region *device_t::subregion(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return m_machine.region(subtag(tempstring, _tag));
+	return machine().region(subtag(tempstring, _tag));
 }
 
 
@@ -630,7 +630,7 @@ device_t *device_t::subdevice(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return m_machine.device(subtag(tempstring, _tag));
+	return machine().device(subtag(tempstring, _tag));
 }
 
 
@@ -647,7 +647,7 @@ device_t *device_t::siblingdevice(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return m_machine.device(siblingtag(tempstring, _tag));
+	return machine().device(siblingtag(tempstring, _tag));
 }
 
 
@@ -714,7 +714,7 @@ UINT64 device_t::attotime_to_clocks(attotime duration) const
 
 emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 {
-	return m_machine.scheduler().timer_alloc(*this, id, ptr);
+	return machine().scheduler().timer_alloc(*this, id, ptr);
 }
 
 
@@ -725,7 +725,7 @@ emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 
 void device_t::timer_set(attotime duration, device_timer_id id, int param, void *ptr)
 {
-	m_machine.scheduler().timer_set(duration, *this, id, param, ptr);
+	machine().scheduler().timer_set(duration, *this, id, param, ptr);
 }
 
 
@@ -749,7 +749,7 @@ void device_t::find_interfaces()
 void device_t::start()
 {
 	// populate the region field
-	m_region = m_machine.region(tag());
+	m_region = machine().region(tag());
 
 	// find all the registered devices
 	for (auto_finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
@@ -760,19 +760,19 @@ void device_t::start()
 		intf->interface_pre_start();
 
 	// remember the number of state registrations
-	int state_registrations = m_machine.state().registration_count();
+	int state_registrations = machine().state().registration_count();
 
 	// start the device
 	device_start();
 
 	// complain if nothing was registered by the device
-	state_registrations = m_machine.state().registration_count() - state_registrations;
+	state_registrations = machine().state().registration_count() - state_registrations;
 	device_execute_interface *exec;
 	device_sound_interface *sound;
 	if (state_registrations == 0 && (interface(exec) || interface(sound)))
 	{
 		logerror("Device '%s' did not register any state to save!\n", tag());
-		if ((m_machine.system().flags & GAME_SUPPORTS_SAVE) != 0)
+		if ((machine().system().flags & GAME_SUPPORTS_SAVE) != 0)
 			fatalerror("Device '%s' did not register any state to save!", tag());
 	}
 
@@ -784,9 +784,9 @@ void device_t::start()
 	notify_clock_changed();
 
 	// if we're debugging, create a device_debug object
-	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		m_debug = auto_alloc(m_machine, device_debug(*this));
+		m_debug = auto_alloc(machine(), device_debug(*this));
 		debug_setup();
 	}
 

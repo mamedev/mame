@@ -726,7 +726,7 @@ inline void cosmac_device::run()
 
 inline void cosmac_device::debug()
 {
-	if (device_t::m_machine.debug_flags & DEBUG_FLAG_ENABLED)
+	if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		debugger_instruction_hook(this, R[P]);
 	}

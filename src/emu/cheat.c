@@ -1125,7 +1125,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 void cheat_manager::set_enable(bool enable)
 {
 	// if the cheat engine is disabled, we're done
-	if (!m_machine.options().cheat())
+	if (!machine().options().cheat())
 		return;
 
 	// if we're enabled currently and we don't want to be, turn things off
@@ -1160,7 +1160,7 @@ void cheat_manager::set_enable(bool enable)
 void cheat_manager::reload()
 {
 	// if the cheat engine is disabled, we're done
-	if (!m_machine.options().cheat())
+	if (!machine().options().cheat())
 		return;
 
 	// free everything
@@ -1175,7 +1175,7 @@ void cheat_manager::reload()
 	// load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
     // and MAME will load gamename.xml
 	device_image_interface *image = NULL;
-	for (bool gotone = m_machine.m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine().m_devicelist.first(image); gotone; gotone = image->next(image))
 		if (image->exists())
 		{
 			// if we are loading through software lists, try to load shortname.xml
@@ -1199,7 +1199,7 @@ void cheat_manager::reload()
 
 	// if we haven't found the cheats yet, load by basename
 	if (m_cheatlist.count() == 0)
-		load_cheats(m_machine.basename());
+		load_cheats(machine().basename());
 
 	// temporary: save the file back out as output.xml for comparison
 	if (m_cheatlist.count() != 0)
@@ -1215,7 +1215,7 @@ void cheat_manager::reload()
 bool cheat_manager::save_all(const char *filename)
 {
 	// open the file with the proper name
-	emu_file cheatfile(m_machine.options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = cheatfile.open(filename, ".xml");
 
 	// if that failed, return nothing
@@ -1262,7 +1262,7 @@ void cheat_manager::render_text(render_container &container)
 		{
 			// output the text
 			ui_draw_text_full(&container, m_output[linenum],
-					0.0f, (float)linenum * ui_get_line_height(m_machine), 1.0f,
+					0.0f, (float)linenum * ui_get_line_height(machine()), 1.0f,
 					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 					ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 		}
@@ -1389,7 +1389,7 @@ void cheat_manager::frame_update()
 {
 	// set up for accumulating output
 	m_lastline = 0;
-	m_numlines = floor(1.0f / ui_get_line_height(m_machine));
+	m_numlines = floor(1.0f / ui_get_line_height(machine()));
 	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
 	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
 		m_output[linenum].reset();
@@ -1411,7 +1411,7 @@ void cheat_manager::frame_update()
 void cheat_manager::load_cheats(const char *filename)
 {
 	xml_data_node *rootnode = NULL;
-	emu_file cheatfile(m_machine.options().cheat_path(), OPEN_FLAG_READ);
+	emu_file cheatfile(machine().options().cheat_path(), OPEN_FLAG_READ);
 	try
 	{
 		// open the file with the proper name
@@ -1446,7 +1446,7 @@ void cheat_manager::load_cheats(const char *filename)
 			for (xml_data_node *cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
 			{
 				// load this entry
-				cheat_entry *curcheat = auto_alloc(m_machine, cheat_entry(*this, m_symtable, filename, *cheatnode));
+				cheat_entry *curcheat = auto_alloc(machine(), cheat_entry(*this, m_symtable, filename, *cheatnode));
 
 				// make sure we're not a duplicate
 				cheat_entry *scannode = NULL;
@@ -1462,7 +1462,7 @@ void cheat_manager::load_cheats(const char *filename)
 				if (scannode == NULL)
 					m_cheatlist.append(*curcheat);
 				else
-					auto_free(m_machine, curcheat);
+					auto_free(machine(), curcheat);
 			}
 
 			// free the file and loop for the next one

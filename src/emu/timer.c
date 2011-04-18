@@ -280,7 +280,7 @@ void timer_device::device_start()
 {
 	// fetch the screen
 	if (m_config.m_screen != NULL)
-		m_screen = downcast<screen_device *>(m_machine.device(m_config.m_screen));
+		m_screen = downcast<screen_device *>(machine().device(m_config.m_screen));
 
 	// allocate the timer
 	m_timer = timer_alloc();

@@ -132,9 +132,9 @@ void ptm6840_device::device_start()
 	}
 
 
-	m_timer[0] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer1_cb), (void *)this);
-	m_timer[1] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer2_cb), (void *)this);
-	m_timer[2] = m_machine.scheduler().timer_alloc(FUNC(ptm6840_timer3_cb), (void *)this);
+	m_timer[0] = machine().scheduler().timer_alloc(FUNC(ptm6840_timer1_cb), (void *)this);
+	m_timer[1] = machine().scheduler().timer_alloc(FUNC(ptm6840_timer2_cb), (void *)this);
+	m_timer[2] = machine().scheduler().timer_alloc(FUNC(ptm6840_timer3_cb), (void *)this);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -500,7 +500,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_read)
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%s: MC6840 #%s: Status read = %04X\n", m_machine.describe_context(), tag(), m_status_reg));
+			PLOG(("%s: MC6840 #%s: Status read = %04X\n", machine().describe_context(), tag(), m_status_reg));
 			m_status_read_since_int |= m_status_reg & 0x07;
 			val = m_status_reg;
 			break;
@@ -522,7 +522,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_read)
 
 			m_lsb_buffer = result & 0xff;
 
-			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", m_machine.describe_context(), tag(), idx, result >> 8));
+			PLOG(("%s: MC6840 #%s: Counter %d read = %04X\n", machine().describe_context(), tag(), idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -633,7 +633,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_write)
 				reload_count(idx);
 			}
 
-			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", m_machine.describe_context(), tag(), idx, m_latch[idx]));
+			PLOG(("%s:MC6840 #%s: Counter %d latch = %04X\n", machine().describe_context(), tag(), idx, m_latch[idx]));
 			break;
 		}
 	}

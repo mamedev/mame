@@ -156,7 +156,7 @@ void state_manager::register_presave(prepost_func func, void *param)
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	// allocate a new entry
-	m_presave_list.append(*auto_alloc(m_machine, state_callback(func, param)));
+	m_presave_list.append(*auto_alloc(machine(), state_callback(func, param)));
 }
 
 
@@ -177,7 +177,7 @@ void state_manager::register_postload(prepost_func func, void *param)
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	// allocate a new entry
-	m_postload_list.append(*auto_alloc(m_machine, state_callback(func, param)));
+	m_postload_list.append(*auto_alloc(machine(), state_callback(func, param)));
 }
 
 
@@ -194,7 +194,7 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 	if (!m_reg_allowed)
 	{
 		logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		if (m_machine.system().flags & GAME_SUPPORTS_SAVE)
+		if (machine().system().flags & GAME_SUPPORTS_SAVE)
 			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
 		m_illegal_regs++;
 		return;
@@ -222,7 +222,7 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 	}
 
 	// insert us into the list
-	m_entry_list.insert_after(*auto_alloc(m_machine, state_entry(val, totalname, valsize, valcount)), insert_after);
+	m_entry_list.insert_after(*auto_alloc(machine(), state_entry(val, totalname, valsize, valcount)), insert_after);
 }
 
 
@@ -273,7 +273,7 @@ state_save_error state_manager::read_file(emu_file &file)
 
 	// verify the header and report an error if it doesn't match
 	UINT32 sig = signature();
-	if (validate_header(header, m_machine.system().name, sig, popmessage, "Error: ")  != STATERR_NONE)
+	if (validate_header(header, machine().system().name, sig, popmessage, "Error: ")  != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
 
 	// determine whether or not to flip the data when done
@@ -293,7 +293,7 @@ state_save_error state_manager::read_file(emu_file &file)
 
 	// call the post-load functions
 	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(m_machine, func->m_param);
+		(*func->m_func)(machine(), func->m_param);
 
 	return STATERR_NONE;
 }
@@ -314,7 +314,7 @@ state_save_error state_manager::write_file(emu_file &file)
 	memcpy(&header[0], s_magic_num, 8);
 	header[8] = SAVE_VERSION;
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
-	strncpy((char *)&header[0x0a], m_machine.system().name, 0x1c - 0x0a);
+	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
 	UINT32 sig = signature();
 	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(sig);
 
@@ -327,7 +327,7 @@ state_save_error state_manager::write_file(emu_file &file)
 
 	// call the pre-save functions
 	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(m_machine, func->m_param);
+		(*func->m_func)(machine(), func->m_param);
 
 	// then write all the data
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())

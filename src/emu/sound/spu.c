@@ -1148,7 +1148,7 @@ void spu_device::init_stream()
 {
 	const unsigned int hz=44100;
 
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 2, hz);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, hz);
 
 	rev=new reverb(hz);
 

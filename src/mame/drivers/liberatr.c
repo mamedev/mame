@@ -161,13 +161,13 @@ void liberatr_state::machine_start()
 
 WRITE8_MEMBER( liberatr_state::led_w )
 {
-	set_led_status(m_machine, offset, ~data & 0x10);
+	set_led_status(machine(), offset, ~data & 0x10);
 }
 
 
 WRITE8_MEMBER( liberatr_state::coin_counter_w )
 {
-	::coin_counter_w(m_machine, offset ^ 0x01, data & 0x10);
+	::coin_counter_w(machine(), offset ^ 0x01, data & 0x10);
 }
 
 
@@ -184,8 +184,8 @@ WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 	/* input becomes the starting point for the trackball counters */
 	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = input_port_read(m_machine, "FAKE");
-		UINT8 switches = input_port_read(m_machine, "IN0");
+		UINT8 trackball = input_port_read(machine(), "FAKE");
+		UINT8 switches = input_port_read(machine(), "IN0");
 		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
 	m_ctrld = data & 0x10;
@@ -197,13 +197,13 @@ READ8_MEMBER( liberatr_state::port0_r )
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
 	{
-		UINT8 trackball = input_port_read(m_machine, "FAKE");
+		UINT8 trackball = input_port_read(machine(), "FAKE");
 		return ((trackball & 0xf0) - (m_trackball_offset & 0xf0)) | ((trackball - m_trackball_offset) & 0x0f);
 	}
 
 	/* otherwise, the LS191 is simply passing through the raw switch inputs */
 	else
-		return input_port_read(m_machine, "IN0");
+		return input_port_read(machine(), "IN0");
 }
 
 

@@ -343,12 +343,12 @@ void gp9001vdp_device::create_tilemaps(int region)
 
 void gp9001vdp_device::device_start()
 {
-	top.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_TOP_VRAM_SIZE/2);
-	fg.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_FG_VRAM_SIZE/2);
-	bg.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_BG_VRAM_SIZE/2);
+	top.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_TOP_VRAM_SIZE/2);
+	fg.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_FG_VRAM_SIZE/2);
+	bg.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_BG_VRAM_SIZE/2);
 
-	sp.vram16 = auto_alloc_array_clear(m_machine, UINT16, GP9001_SPRITERAM_SIZE/2);
-	sp.vram16_buffer = auto_alloc_array_clear(m_machine, UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16 = auto_alloc_array_clear(machine(), UINT16, GP9001_SPRITERAM_SIZE/2);
+	sp.vram16_buffer = auto_alloc_array_clear(machine(), UINT16, GP9001_SPRITERAM_SIZE/2);
 
 	create_tilemaps(m_gfxregion);
 

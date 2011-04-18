@@ -129,7 +129,7 @@ void ds2404_device::device_start()
 	m_rtc[3] = (current_time >> 16) & 0xff;
 	m_rtc[4] = (current_time >> 24) & 0xff;
 
-	emu_timer *timer = m_machine.scheduler().timer_alloc(FUNC(ds2404_tick_callback), (void *)this);
+	emu_timer *timer = machine().scheduler().timer_alloc(FUNC(ds2404_tick_callback), (void *)this);
 	timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 }
 

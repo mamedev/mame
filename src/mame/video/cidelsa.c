@@ -163,8 +163,8 @@ static CDP1869_INTERFACE( draco_vis_intf )
 void cidelsa_state::video_start()
 {
 	// allocate memory
-	m_pcbram = auto_alloc_array(m_machine, UINT8, CIDELSA_CHARRAM_SIZE);
-	m_charram = auto_alloc_array(m_machine, UINT8, CIDELSA_CHARRAM_SIZE);
+	m_pcbram = auto_alloc_array(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
+	m_charram = auto_alloc_array(machine(), UINT8, CIDELSA_CHARRAM_SIZE);
 
 	// register for state saving
 	save_item(NAME(m_cdp1869_pcb));

@@ -129,7 +129,7 @@ at28c16_device::at28c16_device( running_machine &_machine, const at28c16_device_
 
 void at28c16_device::device_start()
 {
-	m_write_timer = m_machine.scheduler().timer_alloc( FUNC(write_finished), this );
+	m_write_timer = machine().scheduler().timer_alloc( FUNC(write_finished), this );
 
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );
@@ -187,7 +187,7 @@ void at28c16_device::nvram_default()
 
 void at28c16_device::nvram_read( emu_file &file )
 {
-	UINT8 *buffer = auto_alloc_array( m_machine, UINT8, AT28C16_TOTAL_BYTES );
+	UINT8 *buffer = auto_alloc_array( machine(), UINT8, AT28C16_TOTAL_BYTES );
 
 	file.read( buffer, AT28C16_TOTAL_BYTES );
 
@@ -196,7 +196,7 @@ void at28c16_device::nvram_read( emu_file &file )
 		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
 	}
 
-	auto_free( m_machine, buffer );
+	auto_free( machine(), buffer );
 }
 
 //-------------------------------------------------
@@ -206,7 +206,7 @@ void at28c16_device::nvram_read( emu_file &file )
 
 void at28c16_device::nvram_write( emu_file &file )
 {
-	UINT8 *buffer = auto_alloc_array( m_machine, UINT8, AT28C16_TOTAL_BYTES );
+	UINT8 *buffer = auto_alloc_array( machine(), UINT8, AT28C16_TOTAL_BYTES );
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
@@ -215,7 +215,7 @@ void at28c16_device::nvram_write( emu_file &file )
 
 	file.write( buffer, AT28C16_TOTAL_BYTES );
 
-	auto_free( m_machine, buffer );
+	auto_free( machine(), buffer );
 }
 
 

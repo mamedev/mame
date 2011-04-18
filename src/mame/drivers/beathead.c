@@ -142,7 +142,7 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 
 void beathead_state::machine_start()
 {
-	atarigen_init(m_machine);
+	atarigen_init(machine());
 }
 
 
@@ -159,9 +159,9 @@ void beathead_state::machine_reset()
 	memcpy(m_ram_base, m_rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	m_hblank_offset = m_machine.primary_screen->scan_period() * (455 - 336 - 25) / 455;
-	timer_device *scanline_timer = m_machine.device<timer_device>("scan_timer");
-	scanline_timer->adjust(m_machine.primary_screen->time_until_pos(0) - m_hblank_offset);
+	m_hblank_offset = machine().primary_screen->scan_period() * (455 - 336 - 25) / 455;
+	timer_device *scanline_timer = machine().device<timer_device>("scan_timer");
+	scanline_timer->adjust(machine().primary_screen->time_until_pos(0) - m_hblank_offset);
 
 	/* reset IRQs */
 	m_irq_line_state = CLEAR_LINE;
@@ -192,7 +192,7 @@ void beathead_state::update_interrupts()
 	{
 		m_irq_line_state = gen_int;
 		//if (m_irq_line_state != CLEAR_LINE)
-			cputag_set_input_line(m_machine, "maincpu", ASAP_IRQ0, m_irq_line_state);
+			cputag_set_input_line(machine(), "maincpu", ASAP_IRQ0, m_irq_line_state);
 		//else
 			//asap_set_irq_line(ASAP_IRQ0, m_irq_line_state);
 	}
@@ -257,7 +257,7 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 
 READ32_MEMBER( beathead_state::input_2_r )
 {
-	int result = input_port_read(m_machine, "IN2");
+	int result = input_port_read(machine(), "IN2");
 	if (m_sound_to_cpu_ready) result ^= 0x10;
 	if (m_cpu_to_sound_ready) result ^= 0x20;
 	return result;
@@ -287,7 +287,7 @@ WRITE32_MEMBER( beathead_state::sound_data_w )
 WRITE32_MEMBER( beathead_state::sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cputag_set_input_line(m_machine, "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -300,7 +300,7 @@ WRITE32_MEMBER( beathead_state::sound_reset_w )
 
 WRITE32_MEMBER( beathead_state::coin_count_w )
 {
-	coin_counter_w(m_machine, 0, !offset);
+	coin_counter_w(machine(), 0, !offset);
 }
 
 

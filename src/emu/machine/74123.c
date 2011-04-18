@@ -106,7 +106,7 @@ ttl74123_device::ttl74123_device(running_machine &_machine, const ttl74123_devic
 
 void ttl74123_device::device_start()
 {
-	m_timer = m_machine.scheduler().timer_alloc(FUNC(clear_callback), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(FUNC(clear_callback), (void *)this);
 
 	/* start with the defaults */
 	m_a = m_config.m_a;
@@ -202,7 +202,7 @@ void ttl74123_device::set_output()
 {
 	int output = timer_running();
 
-	m_machine.scheduler().timer_set( attotime::zero, FUNC(output_callback ), output, (void *)this);
+	machine().scheduler().timer_set( attotime::zero, FUNC(output_callback ), output, (void *)this);
 
 	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
 }

@@ -509,7 +509,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 layout_element::~layout_element()
 {
 	// loop over all states and free their textures
-	auto_free(m_machine, m_elemtex);
+	auto_free(machine(), m_elemtex);
 }
 
 
@@ -526,7 +526,7 @@ render_texture *layout_element::state_texture(int state)
 	{
 		m_elemtex[state].m_element = this;
 		m_elemtex[state].m_state = state;
-		m_elemtex[state].m_texture = m_machine.render().texture_alloc(element_scale, &m_elemtex[state]);
+		m_elemtex[state].m_texture = machine().render().texture_alloc(element_scale, &m_elemtex[state]);
 	}
 	return m_elemtex[state].m_texture;
 }
@@ -554,7 +554,7 @@ void layout_element::element_scale(bitmap_t &dest, const bitmap_t &source, const
 			bounds.max_y = render_round_nearest(curcomp->bounds().y1 * dest.height);
 
 			// based on the component type, add to the texture
-			curcomp->draw(elemtex->m_element->m_machine, dest, bounds, elemtex->m_state);
+			curcomp->draw(elemtex->m_element->machine(), dest, bounds, elemtex->m_state);
 		}
 }
 
@@ -582,7 +582,7 @@ layout_element::texture::texture()
 layout_element::texture::~texture()
 {
 	if (m_element != NULL)
-		m_element->m_machine.render().texture_free(m_texture);
+		m_element->machine().render().texture_free(m_texture);
 }
 
 

@@ -819,7 +819,7 @@ void tms3203x_device::execute_run()
 	}
 
 	// non-debug case
-	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		while (m_icount > 0)
 		{
@@ -854,7 +854,7 @@ void tms3203x_device::execute_run()
 		{
 			// watch for out-of-range stack pointers
 			if (IREG(TMR_SP) & 0xff000000)
-				debugger_break(m_machine);
+				debugger_break(machine());
 			if ((IREG(TMR_ST) & RMFLAG) && m_pc == IREG(TMR_RE) + 1)
 			{
 				if ((INT32)--IREG(TMR_RC) >= 0)

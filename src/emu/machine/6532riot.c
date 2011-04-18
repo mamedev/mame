@@ -121,7 +121,7 @@ void riot6532_device::update_irqstate()
 	}
 	else
 	{
-		logerror("%s:6532RIOT chip #%d: no irq callback function\n", m_machine.describe_context(), m_index);
+		logerror("%s:6532RIOT chip #%d: no irq callback function\n", machine().describe_context(), m_index);
 	}
 }
 
@@ -238,7 +238,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 	if ((offset & 0x14) == 0x14)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = m_machine.time();
+		attotime curtime = machine().time();
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -302,7 +302,7 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 			}
 			else
 			{
-				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", m_machine.describe_context(), tag(), 'A' + (offset & 1), data);
+				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", machine().describe_context(), tag(), 'A' + (offset & 1), data);
 			}
 		}
 
@@ -390,7 +390,7 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 			}
 			else
 			{
-				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", m_machine.describe_context(), tag(), 'A' + (offset & 1));
+				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", machine().describe_context(), tag(), 'A' + (offset & 1));
 			}
 
 			/* apply the DDR to the result */
@@ -522,7 +522,7 @@ void riot6532_device::device_start()
 	assert(this != NULL);
 
 	/* set static values */
-	m_index = m_machine.m_devicelist.indexof(RIOT6532, tag());
+	m_index = machine().m_devicelist.indexof(RIOT6532, tag());
 
 	/* configure the ports */
 	devcb_resolve_read8(&m_port[0].m_in_func, &m_config.m_in_a_func, this);
@@ -534,7 +534,7 @@ void riot6532_device::device_start()
 	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
 
 	/* allocate timers */
-	m_timer = m_machine.scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);
 
 	/* register for save states */
 	save_item(NAME(m_port[0].m_in));

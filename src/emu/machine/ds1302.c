@@ -151,7 +151,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_clk_w)
 			if(m_icount == 8)	//Command start
 			{
 				system_time systime;
-				m_machine.base_datetime(systime);
+				machine().base_datetime(systime);
 
 				switch(m_shift_in)
 				{

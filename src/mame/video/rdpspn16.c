@@ -34,7 +34,7 @@ void Processor::RenderSpans(int start, int end, int tilenum, bool flip)
 
 	for(int i = start; i <= end; i++)
 	{
-		m_span[i].SetMachine(*m_machine);
+		m_span[i].SetMachine(machine());
 		switch(m_other_modes.cycle_type)
 		{
 			case CYCLE_TYPE_1: m_span[i].Draw1Cycle(i, tilenum, flip); break;

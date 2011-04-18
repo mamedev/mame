@@ -169,7 +169,7 @@ UINT16 via6522_device::get_counter1_value()
 	}
     else
     {
-        val = 0xffff - time_to_cycles(m_machine.time() - m_time1);
+        val = 0xffff - time_to_cycles(machine().time() - m_time1);
 	}
 
 	return val;
@@ -217,7 +217,7 @@ void via6522_device::device_start()
     m_t1lh = 0xb5; /* ports are not written by kernel! */
     m_t2ll = 0xff; /* taken from vice */
     m_t2lh = 0xff;
-    m_time2 = m_time1 = m_machine.time();
+    m_time2 = m_time1 = machine().time();
     m_t1 = timer_alloc(TIMER_T1);
     m_t2 = timer_alloc(TIMER_T2);
     m_shift_timer = timer_alloc(TIMER_SHIFT);
@@ -225,7 +225,7 @@ void via6522_device::device_start()
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
     {
-		set_unscaled_clock(m_machine.firstcpu->clock());
+		set_unscaled_clock(machine().firstcpu->clock());
     }
 
 	/* save state register */
@@ -304,7 +304,7 @@ void via6522_device::set_int(int data)
 	m_ifr |= data;
 	if (TRACE_VIA)
     {
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", m_machine.describe_context(), tag(), m_ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
     }
 
 	if (m_ier & m_ifr)
@@ -325,7 +325,7 @@ void via6522_device::clear_int(int data)
 
 	if (TRACE_VIA)
     {
-		logerror("%s:6522VIA chip %s: IFR = %02X\n", m_machine.describe_context(), tag(), m_ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", machine().describe_context(), tag(), m_ifr);
     }
 
 	if (m_ifr & m_ier)
@@ -441,7 +441,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		            m_out_b |= 0x80;
 		        }
 		        m_t1_active = 0;
-		        m_time1 = m_machine.time();
+		        m_time1 = machine().time();
 		    }
 		    if (m_ddr_b)
 			{
@@ -458,7 +458,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		// t2 timeout
 		case TIMER_T2:
 		    m_t2_active = 0;
-		    m_time2 = m_machine.time();
+		    m_time2 = machine().time();
 
 		    if (!(m_ifr & INT_T2))
 		    {
@@ -492,7 +492,7 @@ READ8_MEMBER( via6522_device::read )
                 }
 				else
                 {
-					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", m_machine.describe_context(), tag());
+					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", machine().describe_context(), tag());
                 }
 			}
 		}
@@ -522,7 +522,7 @@ READ8_MEMBER( via6522_device::read )
                 }
 				else
                 {
-					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
+					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", machine().describe_context(), tag());
                 }
 			}
 		}
@@ -558,7 +558,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", machine().describe_context(), tag());
             }
 		}
 
@@ -605,7 +605,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(m_machine.time() - m_time2) & 0xffff) - 1) & 0xff;
+				val = (0x10000 - (time_to_cycles(machine().time() - m_time2) & 0xffff) - 1) & 0xff;
             }
 		}
 		break;
@@ -623,7 +623,7 @@ READ8_MEMBER( via6522_device::read )
             }
 			else
             {
-				val = (0x10000 - (time_to_cycles(m_machine.time() - m_time2) & 0xffff) - 1) >> 8;
+				val = (0x10000 - (time_to_cycles(machine().time() - m_time2) & 0xffff) - 1) >> 8;
             }
 		}
 		break;
@@ -825,7 +825,7 @@ WRITE8_MEMBER( via6522_device::write )
 		{
 			m_t2->adjust(cycles_to_time(TIMER2_VALUE));
 			m_t2_active = 1;
-			m_time2 = m_machine.time();
+			m_time2 = machine().time();
 		}
 		break;
 
@@ -848,7 +848,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 		if (TRACE_VIA)
         {
-			logerror("%s:6522VIA chip %s: PCR = %02X\n", m_machine.describe_context(), tag(), data);
+			logerror("%s:6522VIA chip %s: PCR = %02X\n", machine().describe_context(), tag(), data);
         }
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ m_out_ca2)
@@ -942,7 +942,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
 	if (state != m_in_ca1)
     {
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %s: CA1 = %02X\n", m_machine.describe_context(), tag(), state);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", machine().describe_context(), tag(), state);
 
 		if ((CA1_LOW_TO_HIGH(m_pcr) && state) || (CA1_HIGH_TO_LOW(m_pcr) && !state))
 		{
@@ -954,7 +954,7 @@ WRITE_LINE_MEMBER( via6522_device::write_ca1 )
                 }
 				else
                 {
-                    logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", m_machine.describe_context(), tag());
+                    logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", machine().describe_context(), tag());
                 }
 			}
 
@@ -1024,7 +1024,7 @@ WRITE_LINE_MEMBER( via6522_device::write_cb1 )
                 }
 				else
                 {
-                    logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", m_machine.describe_context(), tag());
+                    logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", machine().describe_context(), tag());
                 }
 			}
 			if (SO_EXT_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))

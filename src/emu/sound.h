@@ -220,6 +220,7 @@ public:
 	~sound_manager();
 
 	// getters
+	running_machine &machine() const { return m_machine; }
 	int attenuation() const { return m_attenuation; }
 	sound_stream *first_stream() const { return m_stream_list.first(); }
 	attotime last_update() const { return m_last_update; }

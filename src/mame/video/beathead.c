@@ -17,11 +17,11 @@
 
 void beathead_state::video_start()
 {
-	state_save_register_global(m_machine, m_finescroll);
-	state_save_register_global(m_machine, m_vram_latch_offset);
-	state_save_register_global(m_machine, m_hsyncram_offset);
-	state_save_register_global(m_machine, m_hsyncram_start);
-	state_save_register_global_array(m_machine, m_hsyncram);
+	state_save_register_global(machine(), m_finescroll);
+	state_save_register_global(machine(), m_vram_latch_offset);
+	state_save_register_global(machine(), m_hsyncram_offset);
+	state_save_register_global(machine(), m_hsyncram_start);
+	state_save_register_global_array(machine(), m_hsyncram);
 }
 
 

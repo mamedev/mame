@@ -200,7 +200,7 @@ void timekeeper_device::device_start()
 	/* validate some basic stuff */
 	assert(this != NULL);
 
-	m_machine.base_datetime(systime);
+	machine().base_datetime(systime);
 
 	m_control = 0;
 	m_seconds = make_bcd( systime.local_time.second );
@@ -211,7 +211,7 @@ void timekeeper_device::device_start()
 	m_month = make_bcd( systime.local_time.month + 1 );
 	m_year = make_bcd( systime.local_time.year % 100 );
 	m_century = make_bcd( systime.local_time.year / 100 );
-	m_data = auto_alloc_array( m_machine, UINT8, m_size );
+	m_data = auto_alloc_array( machine(), UINT8, m_size );
 
 	m_default_data = *region();
 	if (m_default_data)

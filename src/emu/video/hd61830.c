@@ -208,7 +208,7 @@ void hd61830_device::device_start()
 	// resolve callbacks
     devcb_resolve_read8(&m_in_rd_func, &m_config.m_in_rd_func, this);
 
-	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(m_config.screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_bf));

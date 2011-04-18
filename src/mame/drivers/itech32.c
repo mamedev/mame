@@ -895,11 +895,11 @@ static READ32_DEVICE_HANDLER( timekeeper_32be_r )
 
 void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
-	itech32_state *state = m_machine.driver_data<itech32_state>();
+	itech32_state *state = machine().driver_data<itech32_state>();
 	// if nvram is the main RAM, don't overwrite exception vectors
 	int start = (base == state->m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
-		((UINT8 *)base)[i] = m_machine.rand();
+		((UINT8 *)base)[i] = machine().rand();
 
 	// due to accessing uninitialized RAM, we need this hack
 	if (state->m_is_drivedge)

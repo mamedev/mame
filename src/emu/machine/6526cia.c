@@ -200,7 +200,7 @@ void mos6526_device::device_start()
 	for (int t = 0; t < (sizeof(m_timer) / sizeof(m_timer[0])); t++)
 	{
 		cia_timer *timer = &m_timer[t];
-		timer->m_timer = m_machine.scheduler().timer_alloc(FUNC(timer_proc), (void*)this);
+		timer->m_timer = machine().scheduler().timer_alloc(FUNC(timer_proc), (void*)this);
 		timer->m_cia = this;
 		timer->m_irq = 0x01 << t;
 	}
@@ -208,7 +208,7 @@ void mos6526_device::device_start()
 	/* setup TOD timer, if appropriate */
 	if (m_config.m_tod_clock != 0)
 	{
-		m_machine.scheduler().timer_pulse(attotime::from_hz(m_config.m_tod_clock), FUNC(clock_tod_callback), 0, (void *)this);
+		machine().scheduler().timer_pulse(attotime::from_hz(m_config.m_tod_clock), FUNC(clock_tod_callback), 0, (void *)this);
 	}
 
 	/* state save support */

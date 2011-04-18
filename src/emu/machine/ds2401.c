@@ -20,7 +20,7 @@ inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("ds2401 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
+		logerror("ds2401 %s %s: %s", config.tag(), machine().describe_context(), buf);
 	}
 }
 

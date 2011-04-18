@@ -419,22 +419,21 @@ class Processor
 			m_span_dady = da;
 			m_span_dzdy = dz;
 		}
+		
+		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
 		void	InitInternalState()
 		{
-			if(m_machine)
+			m_tmem = auto_alloc_array(machine(), UINT8, 0x1000);
+			memset(m_tmem, 0, 0x1000);
+
+			UINT8 *normpoint = machine().region("normpoint")->base();
+			UINT8 *normslope = machine().region("normslope")->base();
+
+			for(INT32 i = 0; i < 64; i++)
 			{
-				m_tmem = auto_alloc_array(*m_machine, UINT8, 0x1000);
-				memset(m_tmem, 0, 0x1000);
-
-				UINT8 *normpoint = m_machine->region("normpoint")->base();
-				UINT8 *normslope = m_machine->region("normslope")->base();
-
-				for(INT32 i = 0; i < 64; i++)
-				{
-					m_norm_point_rom[i] = (normpoint[(i << 1) + 1] << 8) | normpoint[i << 1];
-					m_norm_slope_rom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
-				}
+				m_norm_point_rom[i] = (normpoint[(i << 1) + 1] << 8) | normpoint[i << 1];
+				m_norm_slope_rom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
 			}
 		}
 

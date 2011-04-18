@@ -124,7 +124,7 @@ void i8237_device::device_start()
 		devcb_resolve_write_line(&m_chan[i].m_out_dack_func, &m_config.m_out_dack_func[i], this);
 	}
 
-	m_timer = m_machine.scheduler().timer_alloc(FUNC(i8237_timerproc_callback), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(FUNC(i8237_timerproc_callback), (void *)this);
 }
 
 

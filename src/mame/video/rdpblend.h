@@ -36,6 +36,8 @@ class Blender
 		void				SetShiftA(INT32 shift) { m_shift_a = shift; }
 		void				SetShiftB(INT32 shift) { m_shift_b = shift; }
 
+		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	private:
 		running_machine*	m_machine;
 		OtherModes*			m_other_modes;

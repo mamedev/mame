@@ -42,6 +42,8 @@ class Span
 		void	DrawCopy(int index, int tilenum, bool flip);
 		void	DrawFill(int index, int tilenum, bool flip);
 
+		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	public:
 		int m_lx;
 		int m_rx;

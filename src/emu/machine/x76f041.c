@@ -25,7 +25,7 @@ inline void ATTR_PRINTF(3,4) x76f041_device::verboselog(int n_level, const char 
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("x76f041 %s %s: %s", config.tag(), m_machine.describe_context(), buf);
+		logerror("x76f041 %s %s: %s", config.tag(), machine().describe_context(), buf);
 	}
 }
 

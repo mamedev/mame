@@ -241,6 +241,8 @@ public:
 	device_list(resource_pool &pool = global_resource_pool);
 	void import_config_list(const device_config_list &list, running_machine &machine);
 
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
 	void start_all();
 	void reset_all();
 };

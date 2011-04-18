@@ -170,7 +170,7 @@ void speaker_device::device_start()
 	}
 
 	// allocate the mixer stream
-	m_mixer_stream = m_machine.sound().stream_alloc(*this, m_auto_allocated_inputs, 1, m_machine.sample_rate());
+	m_mixer_stream = machine().sound().stream_alloc(*this, m_auto_allocated_inputs, 1, machine().sample_rate());
 }
 
 
@@ -182,7 +182,7 @@ void speaker_device::device_start()
 
 void speaker_device::device_post_load()
 {
-	m_mixer_stream->set_sample_rate(m_machine.sample_rate());
+	m_mixer_stream->set_sample_rate(machine().sample_rate());
 }
 
 

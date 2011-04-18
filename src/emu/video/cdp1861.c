@@ -95,9 +95,9 @@ void cdp1861_device::device_start()
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// find devices
-	m_cpu = m_machine.device<cpu_device>(m_config.m_cpu_tag);
-	m_screen =  m_machine.device<screen_device>(m_config.m_screen_tag);
-	m_bitmap = auto_bitmap_alloc(m_machine, m_screen->width(), m_screen->height(), m_screen->format());
+	m_cpu = machine().device<cpu_device>(m_config.m_cpu_tag);
+	m_screen =  machine().device<screen_device>(m_config.m_screen_tag);
+	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
 
 	// register for state saving
 	save_item(NAME(m_disp));
@@ -274,6 +274,6 @@ void cdp1861_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(m_machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
 	}
 }

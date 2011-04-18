@@ -103,7 +103,7 @@ inline void cdp1862_device::initialize_palette()
 		g = (i & 1) ? luma : 0;
 		b = (i & 2) ? luma : 0;
 
-		palette_set_color_rgb(m_machine, i, r, g, b);
+		palette_set_color_rgb(machine(), i, r, g, b);
 	}
 }
 
@@ -136,8 +136,8 @@ void cdp1862_device::device_start()
 	devcb_resolve_read_line(&m_in_gd_func, &m_config.m_in_gd_func, this);
 
 	// find devices
-	m_screen =  m_machine.device<screen_device>(m_config.m_screen_tag);
-	m_bitmap = auto_bitmap_alloc(m_machine, m_screen->width(), m_screen->height(), m_screen->format());
+	m_screen =  machine().device<screen_device>(m_config.m_screen_tag);
+	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
 
 	// init palette
 	initialize_palette();

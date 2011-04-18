@@ -236,7 +236,7 @@ void z80dma_device::device_start()
 	devcb_resolve_write8(&m_out_iorq_func, &m_config.m_out_iorq_func, this);
 
 	// allocate timer
-	m_timer = m_machine.scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
+	m_timer = machine().scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -876,7 +876,7 @@ void z80dma_device::rdy_write_callback(int state)
 void z80dma_device::rdy_w(int state)
 {
 	if (LOG) logerror("Z80DMA '%s' RDY: %d Active High: %d\n", tag(), state, READY_ACTIVE_HIGH);
-	m_machine.scheduler().synchronize(FUNC(static_rdy_write_callback), state, (void *)this);
+	machine().scheduler().synchronize(FUNC(static_rdy_write_callback), state, (void *)this);
 }
 
 

@@ -117,7 +117,7 @@ hd44102_device::hd44102_device(running_machine &_machine, const hd44102_device_c
 void hd44102_device::device_start()
 {
 	// find screen
-	m_screen = m_machine.device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ram[0]));

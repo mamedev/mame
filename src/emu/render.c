@@ -2530,7 +2530,7 @@ float render_manager::max_update_rate() const
 
 render_target *render_manager::target_alloc(const char *layoutfile, UINT32 flags)
 {
-	return &m_targetlist.append(*auto_alloc(m_machine, render_target(*this, layoutfile, flags)));
+	return &m_targetlist.append(*auto_alloc(machine(), render_target(*this, layoutfile, flags)));
 }
 
 
@@ -2624,7 +2624,7 @@ void render_manager::texture_free(render_texture *texture)
 
 render_font *render_manager::font_alloc(const char *filename)
 {
-	return auto_alloc(m_machine, render_font(*this, filename));
+	return auto_alloc(machine(), render_font(*this, filename));
 }
 
 
@@ -2634,7 +2634,7 @@ render_font *render_manager::font_alloc(const char *filename)
 
 void render_manager::font_free(render_font *font)
 {
-	auto_free(m_machine, font);
+	auto_free(machine(), font);
 }
 
 
@@ -2661,7 +2661,7 @@ void render_manager::invalidate_all(void *refptr)
 
 render_container *render_manager::container_alloc(screen_device *screen)
 {
-	render_container *container = auto_alloc(m_machine, render_container(*this, screen));
+	render_container *container = auto_alloc(machine(), render_container(*this, screen));
 	if (screen != NULL)
 		m_screen_container_list.append(*container);
 	return container;
@@ -2675,7 +2675,7 @@ render_container *render_manager::container_alloc(screen_device *screen)
 void render_manager::container_free(render_container *container)
 {
 	m_screen_container_list.detach(*container);
-	auto_free(m_machine, container);
+	auto_free(machine(), container);
 }
 
 
@@ -2799,19 +2799,19 @@ void render_manager::config_save(int config_type, xml_data_node *parentnode)
 			container->get_user_settings(settings);
 
 			// output the color controls
-			if (settings.m_brightness != m_machine.options().brightness())
+			if (settings.m_brightness != machine().options().brightness())
 			{
 				xml_set_attribute_float(screennode, "brightness", settings.m_brightness);
 				changed = true;
 			}
 
-			if (settings.m_contrast != m_machine.options().contrast())
+			if (settings.m_contrast != machine().options().contrast())
 			{
 				xml_set_attribute_float(screennode, "contrast", settings.m_contrast);
 				changed = true;
 			}
 
-			if (settings.m_gamma != m_machine.options().gamma())
+			if (settings.m_gamma != machine().options().gamma())
 			{
 				xml_set_attribute_float(screennode, "gamma", settings.m_gamma);
 				changed = true;

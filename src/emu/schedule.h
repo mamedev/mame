@@ -159,6 +159,7 @@ public:
 	~device_scheduler();
 
 	// getters
+	running_machine &machine() const { return m_machine; }
 	attotime time() const;
 	emu_timer *first_timer() const { return m_timer_list; }
 	device_execute_interface *currently_executing() const { return m_executing_device; }

@@ -45,7 +45,7 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(m_machine, "bank1", bank);
+	memory_set_bank(machine(), "bank1", bank);
 }
 
 WRITE8_MEMBER( draco_state::sound_g_w )
@@ -127,9 +127,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
         7   CONT. M1
     */
 
-	set_led_status(m_machine, 0, data & 0x08); // 1P
-	set_led_status(m_machine, 1, data & 0x10); // 2P
-	set_led_status(m_machine, 2, data & 0x20); // FIRE
+	set_led_status(machine(), 0, data & 0x08); // 1P
+	set_led_status(machine(), 1, data & 0x10); // 2P
+	set_led_status(machine(), 2, data & 0x20); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -442,8 +442,8 @@ void cidelsa_state::machine_start()
 void draco_state::machine_start()
 {
 	/* setup COP402 memory banking */
-	memory_configure_bank(m_machine, "bank1", 0, 2, m_machine.region(COP402N_TAG)->base(), 0x400);
-	memory_set_bank(m_machine, "bank1", 0);
+	memory_configure_bank(machine(), "bank1", 0, 2, machine().region(COP402N_TAG)->base(), 0x400);
+	memory_set_bank(machine(), "bank1", 0);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));
@@ -457,7 +457,7 @@ void cidelsa_state::machine_reset()
 {
 	/* reset the CPU */
 	m_reset = 0;
-	m_machine.scheduler().timer_set(attotime::from_msec(200), FUNC(set_cpu_mode));
+	machine().scheduler().timer_set(attotime::from_msec(200), FUNC(set_cpu_mode));
 }
 
 /* Machine Drivers */

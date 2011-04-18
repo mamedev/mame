@@ -244,22 +244,22 @@ void z80sti_device::device_start()
 	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
 
 	// create the counter timers
-	m_timer[TIMER_A] = m_machine.scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
-	m_timer[TIMER_B] = m_machine.scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
-	m_timer[TIMER_C] = m_machine.scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
-	m_timer[TIMER_D] = m_machine.scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
+	m_timer[TIMER_A] = machine().scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
+	m_timer[TIMER_B] = machine().scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
+	m_timer[TIMER_C] = machine().scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
+	m_timer[TIMER_D] = machine().scheduler().timer_alloc(FUNC(static_timer_count), (void *)this);
 
 	// create serial receive clock timer
 	if (m_config.m_rx_clock > 0)
 	{
-		m_rx_timer = m_machine.scheduler().timer_alloc(FUNC(static_rx_tick), (void *)this);
+		m_rx_timer = machine().scheduler().timer_alloc(FUNC(static_rx_tick), (void *)this);
 		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.m_rx_clock));
 	}
 
 	// create serial transmit clock timer
 	if (m_config.m_tx_clock > 0)
 	{
-		m_tx_timer = m_machine.scheduler().timer_alloc(FUNC(static_tx_tick), (void *)this);
+		m_tx_timer = machine().scheduler().timer_alloc(FUNC(static_tx_tick), (void *)this);
 		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.m_tx_clock));
 	}
 

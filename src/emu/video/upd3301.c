@@ -269,7 +269,7 @@ void upd3301_device::device_start()
 	devcb_resolve_write_line(&m_out_vrtc_func, &m_config.m_out_vrtc_func, this);
 
 	// get the screen device
-	m_screen = m_machine.device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
 	assert(m_screen != NULL);
 
 	// state saving
@@ -663,6 +663,6 @@ void upd3301_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(m_machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
 	}
 }

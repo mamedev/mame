@@ -143,7 +143,7 @@ msm6255_device::msm6255_device(running_machine &_machine, const msm6255_device_c
 void msm6255_device::device_start()
 {
 	// find screen
-	m_screen = m_machine.device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ir));
@@ -447,6 +447,6 @@ void msm6255_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	else
 	{
-		bitmap_fill(bitmap, cliprect, get_black_pen(m_machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine()));
 	}
 }

@@ -116,8 +116,8 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 
 debug_view_disasm::~debug_view_disasm()
 {
-	auto_free(m_machine, m_byteaddress);
-	auto_free(m_machine, m_dasm);
+	auto_free(machine(), m_byteaddress);
+	auto_free(machine(), m_dasm);
 }
 
 
@@ -134,10 +134,10 @@ void debug_view_disasm::enumerate_sources()
 	// iterate over devices with disassembly interfaces
 	device_disasm_interface *dasm = NULL;
 	astring name;
-	for (bool gotone = m_machine.m_devicelist.first(dasm); gotone; gotone = dasm->next(dasm))
+	for (bool gotone = machine().m_devicelist.first(dasm); gotone; gotone = dasm->next(dasm))
 	{
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
-		m_source_list.append(*auto_alloc(m_machine, debug_view_disasm_source(name, dasm->device())));
+		m_source_list.append(*auto_alloc(machine(), debug_view_disasm_source(name, dasm->device())));
 	}
 
 	// reset the source to a known good entry
@@ -377,12 +377,12 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		m_allocated = m_total;
 
 		// allocate address array
-		auto_free(m_machine, m_byteaddress);
-		m_byteaddress = auto_alloc_array(m_machine, offs_t, m_allocated.y);
+		auto_free(machine(), m_byteaddress);
+		m_byteaddress = auto_alloc_array(machine(), offs_t, m_allocated.y);
 
 		// allocate disassembly buffer
-		auto_free(m_machine, m_dasm);
-		m_dasm = auto_alloc_array(m_machine, char, m_allocated.x * m_allocated.y);
+		auto_free(machine(), m_dasm);
+		m_dasm = auto_alloc_array(machine(), char, m_allocated.x * m_allocated.y);
 	}
 
 	// iterate over lines

@@ -148,6 +148,7 @@ public:
 	state_manager(running_machine &machine);
 
 	// getters
+	running_machine &machine() const { return m_machine; }
 	int registration_count() const { return m_entry_list.count(); }
 	bool registration_allowed() const { return m_reg_allowed; }
 

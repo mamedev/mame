@@ -183,7 +183,7 @@ mc146818_device::mc146818_device(running_machine &_machine, const mc146818_devic
 
 void mc146818_device::device_start()
 {
-	m_last_refresh = m_machine.time();
+	m_last_refresh = machine().time();
 	emu_timer *timer = timer_alloc();
 	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
@@ -327,7 +327,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 
 	m_updated = true;  /* clock has been updated */
-	m_last_refresh = m_machine.time();
+	m_last_refresh = machine().time();
 }
 
 
@@ -387,7 +387,7 @@ void mc146818_device::set_base_datetime()
 	system_time systime;
 	system_time::full_time current_time;
 
-	m_machine.base_datetime(systime);
+	machine().base_datetime(systime);
 
 	current_time = m_config.m_type == mc146818_device_config::MC146818_UTC ? systime.utc_time: systime.local_time;
 

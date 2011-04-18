@@ -290,11 +290,11 @@ void emu_timer::register_save()
 	}
 
 	// save the bits
-	m_machine->state().save_item("timer", name, index, NAME(m_param));
-	m_machine->state().save_item("timer", name, index, NAME(m_enabled));
-	m_machine->state().save_item("timer", name, index, NAME(m_period));
-	m_machine->state().save_item("timer", name, index, NAME(m_start));
-	m_machine->state().save_item("timer", name, index, NAME(m_expire));
+	machine().state().save_item("timer", name, index, NAME(m_param));
+	machine().state().save_item("timer", name, index, NAME(m_enabled));
+	machine().state().save_item("timer", name, index, NAME(m_period));
+	machine().state().save_item("timer", name, index, NAME(m_start));
+	machine().state().save_item("timer", name, index, NAME(m_expire));
 }
 
 
@@ -340,12 +340,12 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// append a single never-expiring timer so there is always one in the list
-	m_timer_list = &m_timer_allocator.alloc()->init(m_machine, NULL, NULL, NULL, true);
+	m_timer_list = &m_timer_allocator.alloc()->init(machine, NULL, NULL, NULL, true);
 	m_timer_list->adjust(attotime::never);
 
 	// register global states
-	m_machine.state().save_item(NAME(m_basetime));
-	m_machine.state().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
+	machine.state().save_item(NAME(m_basetime));
+	machine.state().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
 }
 
 
@@ -401,7 +401,7 @@ bool device_scheduler::can_save() const
 
 void device_scheduler::timeslice()
 {
-	bool call_debugger = ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	bool call_debugger = ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	// build the execution list if we don't have one yet
 	if (m_execute_list == NULL)
@@ -562,7 +562,7 @@ void device_scheduler::boost_interleave(attotime timeslice_time, attotime boost_
 
 emu_timer *device_scheduler::timer_alloc(timer_expired_func callback, const char *name, void *ptr)
 {
-	return &m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, false);
+	return &m_timer_allocator.alloc()->init(machine(), callback, name, ptr, false);
 }
 
 
@@ -574,7 +574,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_func callback, const char
 
 void device_scheduler::timer_set(attotime duration, timer_expired_func callback, const char *name, int param, void *ptr)
 {
-	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, true).adjust(duration, param);
+	m_timer_allocator.alloc()->init(machine(), callback, name, ptr, true).adjust(duration, param);
 }
 
 
@@ -586,7 +586,7 @@ void device_scheduler::timer_set(attotime duration, timer_expired_func callback,
 
 void device_scheduler::timer_pulse(attotime period, timer_expired_func callback, const char *name, int param, void *ptr)
 {
-	m_timer_allocator.alloc()->init(m_machine, callback, name, ptr, false).adjust(period, param, period);
+	m_timer_allocator.alloc()->init(machine(), callback, name, ptr, false).adjust(period, param, period);
 }
 
 
@@ -719,22 +719,22 @@ void device_scheduler::rebuild_execute_list()
 	if (m_quantum_list.first() == NULL)
 	{
 		// set the core scheduling quantum
-		attotime min_quantum = m_machine.config().m_minimum_quantum;
+		attotime min_quantum = machine().config().m_minimum_quantum;
 
 		// if none specified default to 60Hz
 		if (min_quantum == attotime::zero)
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (m_machine.config().m_perfect_cpu_quantum != NULL)
+		if (machine().config().m_perfect_cpu_quantum != NULL)
 		{
-			device_t *device = m_machine.device(m_machine.config().m_perfect_cpu_quantum);
+			device_t *device = machine().device(machine().config().m_perfect_cpu_quantum);
 			if (device == NULL)
-				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config().m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not present!", machine().config().m_perfect_cpu_quantum);
 
 			device_execute_interface *exec;
 			if (!device->interface(exec))
-				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config().m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", machine().config().m_perfect_cpu_quantum);
 
 			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}
@@ -756,7 +756,7 @@ void device_scheduler::rebuild_execute_list()
 
 	// iterate over all devices
 	device_execute_interface *exec = NULL;
-	for (bool gotone = m_machine.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = machine().m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		// append to the appropriate list
 		exec->m_nextexec = NULL;
@@ -875,7 +875,7 @@ void device_scheduler::execute_timers()
 			if (timer.m_device != NULL)
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
 			else if (timer.m_callback != NULL)
-				(*timer.m_callback)(m_machine, timer.m_ptr, timer.m_param);
+				(*timer.m_callback)(machine(), timer.m_ptr, timer.m_param);
 
 			g_profiler.stop();
 		}
