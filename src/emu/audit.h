@@ -105,7 +105,7 @@ public:
 	// construction/destruction
 	audit_record(const rom_entry &media, media_type type);
 	audit_record(const char *name, media_type type);
-	
+
 	// getters
 	audit_record *next() const { return m_next; }
 	media_type type() const { return m_type; }
@@ -123,7 +123,7 @@ public:
 		m_status = status;
 		m_substatus = substatus;
 	}
-	
+
 	void set_actual(const hash_collection &hashes, UINT64 length = 0)
 	{
 		m_hashes = hashes;
@@ -139,7 +139,7 @@ private:
 	const char *		m_name;					/* name of item */
 	UINT64				m_explength;			/* expected length of item */
 	UINT64				m_length;				/* actual length of item */
-	hash_collection		m_exphashes;      		/* expected hash data */
+	hash_collection		m_exphashes;    		/* expected hash data */
 	hash_collection		m_hashes;				/* actual hash information */
 };
 
@@ -162,7 +162,7 @@ public:
 
 	// construction/destruction
 	media_auditor(const driver_enumerator &enumerator);
-	
+
 	// getters
 	audit_record *first() const { return m_record_list.first(); }
 	int count() const { return m_record_list.count(); }
@@ -171,7 +171,7 @@ public:
 	summary audit_media(const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_samples();
 	summary summarize(astring *output = NULL);
-	
+
 private:
 	// internal helpers
 	audit_record *audit_one_rom(const rom_entry *rom);

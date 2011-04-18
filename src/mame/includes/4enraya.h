@@ -11,7 +11,7 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 	   m_videoram[0x1000];
+	UINT8	   m_videoram[0x1000];
 	UINT8      m_workram[0x1000];
 
 	/* video-related */

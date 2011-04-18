@@ -35,16 +35,16 @@ class upd96050_device;
 struct necdsp_interface
 {
 	devcb_read_line		m_in_int_func;
-	//devcb_read8		m_in_si_func;
-	//devcb_read_line	m_in_sck_func;
-	//devcb_read_line	m_in_sien_func;
-	//devcb_read_line	m_in_soen_func;
-	//devcb_read_line	m_in_dack_func;
+	//devcb_read8       m_in_si_func;
+	//devcb_read_line   m_in_sck_func;
+	//devcb_read_line   m_in_sien_func;
+	//devcb_read_line   m_in_soen_func;
+	//devcb_read_line   m_in_dack_func;
 	devcb_write_line	m_out_p0_func;
 	devcb_write_line	m_out_p1_func;
-	//devcb_write8		m_out_so_func;
-	//devcb_write_line	m_out_sorq_func;
-	//devcb_write_line	m_out_drq_func;
+	//devcb_write8      m_out_so_func;
+	//devcb_write_line  m_out_sorq_func;
+	//devcb_write_line  m_out_drq_func;
 };
 
 #define NECDSP_INTERFACE(name) \
@@ -222,16 +222,16 @@ private:
 protected:
 // device callbacks
 	devcb_resolved_read_line	m_in_int_func;
-	//devcb_resolved_read8		m_in_si_func;
-	//devcb_resolved_read_line	m_in_sck_func;
-	//devcb_resolved_read_line	m_in_sien_func;
-	//devcb_resolved_read_line	m_in_soen_func;
-	//devcb_resolved_read_line	m_in_dack_func;
+	//devcb_resolved_read8      m_in_si_func;
+	//devcb_resolved_read_line  m_in_sck_func;
+	//devcb_resolved_read_line  m_in_sien_func;
+	//devcb_resolved_read_line  m_in_soen_func;
+	//devcb_resolved_read_line  m_in_dack_func;
 	devcb_resolved_write_line	m_out_p0_func;
 	devcb_resolved_write_line	m_out_p1_func;
-	//devcb_resolved_write8		m_out_so_func;
-	//devcb_resolved_write_line	m_out_sorq_func;
-	//devcb_resolved_write_line	m_out_drq_func;
+	//devcb_resolved_write8     m_out_so_func;
+	//devcb_resolved_write_line m_out_sorq_func;
+	//devcb_resolved_write_line m_out_drq_func;
 
   const necdsp_device_config &m_config;
 };

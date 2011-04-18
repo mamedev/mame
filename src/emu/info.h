@@ -53,7 +53,7 @@ class info_xml_creator
 public:
 	// construction/destruction
 	info_xml_creator(driver_enumerator &drivlist);
-	
+
 	// output
 	void output(FILE *out);
 

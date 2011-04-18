@@ -257,16 +257,16 @@ struct delegate_raw_mfp
 		return *this;
 	}
 
-	// comparison operator	
+	// comparison operator
 	bool operator==(const delegate_raw_mfp &rhs) const
 	{
 		return (memcmp(&m_rawdata, &rhs.m_rawdata, sizeof(m_rawdata)) == 0);
 	}
-	
+
 	// convert back to a member function pointer
 	template<class _FunctionType>
 	_FunctionType &mfp() const { return *reinterpret_cast<_FunctionType *>(&m_rawdata); }
-	
+
 	// raw buffer to hold the copy of the function pointer
 	mutable struct { UINT8 bytes[MAX_MFP_SIZE]; } m_rawdata;
 };
@@ -326,7 +326,7 @@ public:
 		  m_object(NULL),
 		  m_callobject(NULL),
 		  m_function(reinterpret_cast<generic_static_func>(funcptr)) { bind(object); }
-	
+
 	// construct from static reference function with object pointer
 	template<class _FunctionClass>
 	delegate_base(typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_ref_func_type funcptr, const char *name, _FunctionClass *object)
@@ -335,7 +335,7 @@ public:
 		  m_object(NULL),
 		  m_callobject(NULL),
 		  m_function(reinterpret_cast<generic_static_func>(funcptr)) { bind(object); }
-	
+
 	// copy operator
 	delegate_base &operator=(const delegate_base &src)
 	{
@@ -350,20 +350,20 @@ public:
 		}
 		return *this;
 	}
-	
+
 	// comparison operator
 	bool operator==(const delegate_base &rhs) const
 	{
-		return (m_caster == rhs.m_caster && m_object == rhs.m_object && 
+		return (m_caster == rhs.m_caster && m_object == rhs.m_object &&
 				m_function == m_function && m_rawfunction == m_rawfunction);
 	}
-	
+
 	// getters
 	bool isnull() const { return (m_caster == NULL); }
 	bool valid_target(bindable_object &object) const { return ((*m_caster)(object) != NULL); }
 	bool has_object() const { return (m_object != NULL); }
 	const char *name() const { return m_name; }
-	
+
 	// call the function
 	_ReturnType operator()() const { return (*m_function)(m_callobject); }
 	_ReturnType operator()(_P1Type p1) const { return (*m_function)(m_callobject, p1); }
@@ -432,7 +432,7 @@ protected:
 	deferred_cast_func			m_caster;			// pointer to helper function that does the cast
 	const char *				m_name;				// name string
 	generic_static_func			m_function;			// generic static function pointer
-	delegate_raw_mfp			m_rawfunction; 		// copy of raw MFP
+	delegate_raw_mfp			m_rawfunction;		// copy of raw MFP
 	delegate_generic_class *	m_object;			// pointer to the post-cast object
 	delegate_generic_class *	m_callobject;		// pointer to the object used for calling
 };
@@ -546,7 +546,7 @@ public:
 		  m_name(name),
 		  m_object(NULL),
 		  m_function(reinterpret_cast<generic_static_func>(funcptr)) { bind(object); }
-	
+
 	// construct from static reference function with object pointer
 	template<class _FunctionClass>
 	delegate_base(typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_ref_func_type funcptr, const char *name, _FunctionClass *object)
@@ -554,7 +554,7 @@ public:
 		  m_name(name),
 		  m_object(NULL),
 		  m_function(reinterpret_cast<generic_static_func>(funcptr)) { bind(object); }
-	
+
 	// copy operator
 	delegate_base &operator=(const delegate_base &src)
 	{
@@ -568,20 +568,20 @@ public:
 		}
 		return *this;
 	}
-	
+
 	// comparison operator
 	bool operator==(const delegate_base &rhs) const
 	{
-		return (m_caster == rhs.m_caster && m_object == rhs.m_object && 
+		return (m_caster == rhs.m_caster && m_object == rhs.m_object &&
 				m_function == m_function && m_rawfunction == m_rawfunction);
 	}
-	
+
 	// getters
 	bool isnull() const { return (m_caster == NULL); }
 	bool valid_target(bindable_object &object) const { return ((*m_caster)(object) != NULL); }
 	bool has_object() const { return (m_object != NULL); }
 	const char *name() const { return m_name; }
-	
+
 	// call the function
 	_ReturnType operator()() const { return (*m_function)(m_object); }
 	_ReturnType operator()(_P1Type p1) const { return (*m_function)(m_object, p1); }

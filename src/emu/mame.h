@@ -64,7 +64,7 @@ enum
 								"images is a violation of copyright law and should be promptly reported to the\n" \
 								"authors so that appropriate legal action can be taken.\n"
 #define USAGE					"Usage:  %s [%s] [options]"
-#define XML_ROOT 			    "mame"
+#define XML_ROOT			    "mame"
 #define XML_TOP 				"game"
 #define STATE_MAGIC_NUM			'M', 'A', 'M', 'E', 'S', 'A', 'V', 'E'
 #else
@@ -91,8 +91,8 @@ enum
 								"with these files is a violation of copyright law and should be promptly\n" \
 								"reported to the authors so that appropriate legal action can be taken.\n"
 #define USAGE					"Usage:  %s [%s] [media] [software] [options]"
-#define XML_ROOT 			    "mess"
-#define XML_TOP 				"machine"	
+#define XML_ROOT			    "mess"
+#define XML_TOP 				"machine"
 #define STATE_MAGIC_NUM			'M', 'E', 'S', 'S', 'S', 'A', 'V', 'E'
 #endif
 

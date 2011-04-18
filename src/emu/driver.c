@@ -69,7 +69,7 @@ int driver_list::find(const char *name)
 	game_driver driver;
 	driver.name = name;
 	game_driver *driverptr = &driver;
-	
+
 	// binary search to find it
 	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
 	return (result == NULL) ? -1 : result - s_drivers_sorted;
@@ -227,7 +227,7 @@ int driver_enumerator::filter(const char *filterstring)
 {
 	// reset the count
 	exclude_all();
-	
+
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
 		if (matches(filterstring, s_drivers_sorted[index]->name))
@@ -246,7 +246,7 @@ int driver_enumerator::filter(const game_driver &driver)
 {
 	// reset the count
 	exclude_all();
-	
+
 	// match name against each driver in the list
 	for (int index = 0; index < s_driver_count; index++)
 		if (s_drivers_sorted[index] == &driver)
@@ -278,7 +278,7 @@ bool driver_enumerator::next()
 {
 	// always advance one
 	m_current++;
-	
+
 	// if we have a filter, scan forward to the next match
 	while (m_current < s_driver_count)
 	{
@@ -301,7 +301,7 @@ bool driver_enumerator::next_excluded()
 {
 	// always advance one
 	m_current++;
-	
+
 	// if we have a filter, scan forward to the next match
 	while (m_current < s_driver_count)
 	{

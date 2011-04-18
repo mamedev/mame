@@ -48,7 +48,7 @@ public:
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
-//	size_t m_spriteram_size;
+//  size_t m_spriteram_size;
 	UINT32 m_coin_word[2];
 	UINT32 *m_f3_ram;
 	int m_f3_game;

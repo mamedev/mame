@@ -36,7 +36,7 @@
 	#ifndef APIENTRY
 	#define APIENTRY
 	#endif
-	
+
 	#include "GL/gl.h"
 	#include "GL/glext.h"
 

@@ -121,7 +121,7 @@ protected:
 public:
 	// getters
 	static int total() { return s_driver_count; }
-	
+
 	// any item by index
 	static const game_driver &driver(int index) { assert(index >= 0 && index < s_driver_count); return *s_drivers_sorted[index]; }
 	static int clone(int index) { return find(driver(index).parent); }
@@ -147,7 +147,7 @@ protected:
 
 	// internal state
 	static int							s_driver_count;
-	static const game_driver * const 	s_drivers_sorted[];
+	static const game_driver * const	s_drivers_sorted[];
 };
 
 
@@ -162,12 +162,12 @@ public:
 	driver_enumerator(emu_options &options, const char *filter);
 	driver_enumerator(emu_options &options, const game_driver &filter);
 	~driver_enumerator();
-	
+
 	// getters
 	int count() const { return m_filtered_count; }
 	int current() const { return m_current; }
 	emu_options &options() const { return m_options; }
-	
+
 	// current item
 	const game_driver &driver() const { return driver_list::driver(m_current); }
 	machine_config &config() const { return config(m_current); }

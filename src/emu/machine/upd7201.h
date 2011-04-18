@@ -145,7 +145,7 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
-	
+
 private:
 	static const device_timer_id TIMER_RX_A = 0;
 	static const device_timer_id TIMER_TX_A = 1;

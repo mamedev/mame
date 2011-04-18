@@ -157,7 +157,7 @@ void *malloc_file_line(size_t size, const char *file, int line)
 
 
 //-------------------------------------------------
-//  malloc_array_file_line - allocate memory with 
+//  malloc_array_file_line - allocate memory with
 //  file and line number information, and a hint
 //  that this object is an array
 //-------------------------------------------------

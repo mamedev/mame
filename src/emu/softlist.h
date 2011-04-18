@@ -68,10 +68,10 @@ struct _parse_state
 {
 	XML_Parser	parser;
 	int			done;
-	
+
 	void (*error_proc)(const char *message);
 	void *param;
-	
+
 	enum softlist_parse_position pos;
 	char **text_dest;
 };

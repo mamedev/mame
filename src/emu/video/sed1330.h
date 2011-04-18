@@ -92,7 +92,7 @@ protected:
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 m_data);
 	inline void increment_csr();
-	
+
 	void draw_text_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va);
 	void draw_graphics_scanline(bitmap_t *bitmap, const rectangle *cliprect, int y, UINT16 va);
 	void update_graphics(bitmap_t *bitmap, const rectangle *cliprect);

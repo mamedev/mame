@@ -99,10 +99,10 @@ public:
 	// construction/destruction
 	cli_frontend(cli_options &options, osd_interface &osd);
 	~cli_frontend();
-	
+
 	// execute based on the incoming argc/argv
 	int execute(int argc, char **argv);
-	
+
 	// direct access to the command operations
 	void listxml(const char *gamename = "*");
 	void listfull(const char *gamename = "*");
@@ -145,7 +145,7 @@ public:
 	int nonroms() const { return m_nonroms; }
 
 	// operations
-	void reset() { m_total = m_matches = m_nonroms = 0; } 
+	void reset() { m_total = m_matches = m_nonroms = 0; }
 	void identify(const char *name);
 	void identify_file(const char *name);
 	void identify_data(const char *name, const UINT8 *data, int length);

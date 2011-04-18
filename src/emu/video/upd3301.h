@@ -54,7 +54,7 @@
 	MCFG_DEVICE_ADD(_tag, UPD3301, _clock) \
 	MCFG_DEVICE_CONFIG(_intrf)
 
-	
+
 #define UPD3301_INTERFACE(name) \
 	const upd3301_interface (name) =
 
@@ -147,9 +147,9 @@ private:
 	inline void update_hrtc_timer(int state);
 	inline void update_vrtc_timer(int state);
 	inline void recompute_parameters();
-	
+
 	void draw_scanline();
-	
+
 	devcb_resolved_write_line		m_out_int_func;
 	devcb_resolved_write_line		m_out_drq_func;
 	devcb_resolved_write_line		m_out_hrtc_func;
@@ -191,9 +191,9 @@ private:
 	int m_z;						// horizontal blanking width
 
 	// attributes
-	int m_at1;						// 
-	int m_at0;						// 
-	int m_sc;						// 
+	int m_at1;						//
+	int m_at0;						//
+	int m_sc;						//
 	int m_attr;						// attributes per row
 	int m_attr_blink;				// attribute blink
 	int m_attr_frame;				// attribute blink frame counter

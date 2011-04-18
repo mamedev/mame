@@ -742,7 +742,7 @@ void *osd_malloc(size_t size);
 
 
 /*-----------------------------------------------------------------------------
-    osd_malloc_array: allocate memory, hinting tha this memory contains an 
+    osd_malloc_array: allocate memory, hinting tha this memory contains an
     array
 
     Parameters:

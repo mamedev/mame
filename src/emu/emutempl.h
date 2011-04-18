@@ -247,7 +247,7 @@ private:
 
 // ======================> simple_list_wrapper
 
-// a simple_list_wrapper wraps an existing object with a next pointer so it 
+// a simple_list_wrapper wraps an existing object with a next pointer so it
 // can live in a simple_list without requiring the object to have a next
 // pointer
 template<class T>
@@ -258,13 +258,13 @@ public:
 	simple_list_wrapper(T *object)
 		: m_next(NULL),
 		  m_object(object) { }
-	
+
 	// operators
 	operator T *() { return m_object; }
 	operator T *() const { return m_object; }
 	T *operator *() { return m_object; }
 	T *operator *() const { return m_object; }
-	
+
 	// getters
 	simple_list_wrapper *next() const { return m_next; }
 	T *object() const { return m_object; }

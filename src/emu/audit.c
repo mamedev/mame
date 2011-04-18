@@ -88,11 +88,11 @@ const char *driverpath = m_enumerator.config().m_devicelist.find("root")->search
 
 		// also determine if this is the driver's specific ROMs or not
 		bool source_is_gamedrv = (dynamic_cast<const driver_device_config_base *>(source) != NULL);
-		
+
 // temporary hack: add the driver path
 astring combinedpath(m_searchpath, ";", driverpath);
 m_searchpath = combinedpath;
-		
+
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
@@ -102,7 +102,7 @@ m_searchpath = combinedpath;
 				// if a dump exists, then at least one entry is required
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 					anyrequired = true;
-				
+
 				// audit a file
 				audit_record *record = NULL;
 				if (ROMREGION_ISROMDATA(region))
@@ -111,12 +111,12 @@ m_searchpath = combinedpath;
 				// audit a disk
 				else if (ROMREGION_ISDISKDATA(region))
 					record = audit_one_disk(rom);
-				
+
 				// skip if no record
 				if (record == NULL)
 					continue;
-				
-				// if we got a record back, 
+
+				// if we got a record back,
 				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv && also_used_by_parent(hashes) == -1)
 					anyfound = true;
 			}
@@ -125,7 +125,7 @@ m_searchpath = combinedpath;
 	// if we found nothing, we don't have the set at all
 	if (!anyfound && anyrequired)
 		m_record_list.reset();
-	
+
 	// return a summary
 	return summarize();
 }
@@ -160,10 +160,10 @@ media_auditor::summary media_auditor::audit_samples()
 						searchpath.cat(";").cat(&intf->samplenames[sampnum][1]);
 						continue;
 					}
-						
+
 					// create a new record
 					audit_record &record = m_record_list.append(*global_alloc(audit_record(intf->samplenames[sampnum], audit_record::MEDIA_SAMPLE)));
-				
+
 					// look for the files
 					emu_file file(m_enumerator.options().sample_path(), OPEN_FLAG_READ | OPEN_FLAG_NO_PRELOAD);
 					path_iterator path(searchpath);
@@ -180,7 +180,7 @@ media_auditor::summary media_auditor::audit_samples()
 				}
 			}
 		}
-	
+
 	// return a summary
 	return summarize();
 }
@@ -264,7 +264,7 @@ media_auditor::summary media_auditor::summarize(astring *string)
 			case audit_record::SUBSTATUS_NOT_FOUND_BIOS:
 				if (string != NULL) string->catprintf("NOT FOUND (BIOS)\n");
 				break;
-			
+
 			default:
 				assert(false);
 		}
@@ -301,7 +301,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 			filerr = file.open(curpath, crc);
 		else
 			filerr = file.open(curpath);
-		
+
 		// if it worked, get the actual length and hashes, then stop
 		if (filerr == FILERR_NONE)
 		{
@@ -309,7 +309,7 @@ audit_record *media_auditor::audit_one_rom(const rom_entry *rom)
 			break;
 		}
 	}
-	
+
 	// compute the final status
 	compute_status(record, rom, record.actual_length() != 0);
 	return &record;
@@ -329,7 +329,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 	emu_file *source_file;
 	chd_file *source;
 	chd_error err = open_disk_image(m_enumerator.options(), &m_enumerator.driver(), rom, &source_file, &source, NULL);
-	
+
 	// if we succeeded, get the hashes
 	if (err == CHDERR_NONE)
 	{
@@ -342,7 +342,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 			hashes.add_from_buffer(hash_collection::HASH_MD5, header.md5, sizeof(header.md5));
 		if (memcmp(nullhash, header.sha1, sizeof(header.sha1)) != 0)
 			hashes.add_from_buffer(hash_collection::HASH_SHA1, header.sha1, sizeof(header.sha1));
-		
+
 		// update the actual values
 		record.set_actual(hashes);
 
@@ -350,7 +350,7 @@ audit_record *media_auditor::audit_one_disk(const rom_entry *rom)
 		chd_close(source);
 		global_free(source_file);
 	}
-	
+
 	// compute the final status
 	compute_status(record, rom, err == CHDERR_NONE);
 	return &record;
@@ -368,7 +368,7 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 	if (!found)
 	{
 		int parent;
-		
+
 		// no good dump
 		if (record.expected_hashes().flag(hash_collection::FLAG_NO_DUMP))
 			record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND_NODUMP);
@@ -390,7 +390,7 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 		else
 			record.set_status(audit_record::STATUS_NOT_FOUND, audit_record::SUBSTATUS_NOT_FOUND);
 	}
-	
+
 	// if found, provide more details
 	else
 	{
