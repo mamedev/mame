@@ -79,8 +79,10 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 const char *driverpath = m_enumerator.config().m_devicelist.find("root")->searchpath();
 
 	// iterate over ROM sources and regions
-	bool anyfound = false;
-	bool anyrequired = false;
+	int found = 0;
+	int required = 0;
+	int sharedFound = 0;
+	int sharedRequired = 0;
 	for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
 	{
 		// determine the search path for this source and iterate through the regions
@@ -98,10 +100,17 @@ m_searchpath = combinedpath;
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
+				bool shared = also_used_by_parent(hashes) >= 0;
 
 				// if a dump exists, then at least one entry is required
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
-					anyrequired = true;
+				{
+					required++;
+					if (shared)
+					{
+						sharedRequired++;
+					}
+				}
 
 				// audit a file
 				audit_record *record = NULL;
@@ -117,13 +126,19 @@ m_searchpath = combinedpath;
 					continue;
 
 				// if we got a record back,
-				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv && also_used_by_parent(hashes) == -1)
-					anyfound = true;
+				if (record->status() != audit_record::STATUS_NOT_FOUND && source_is_gamedrv)
+				{
+					found++;
+					if (shared)
+					{
+						sharedFound++;
+					}
+				}
 			}
 	}
 
-	// if we found nothing, we don't have the set at all
-	if (!anyfound && anyrequired)
+	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
+	if (found == sharedFound && required > 0 && (required != sharedRequired || sharedFound == 0))
 		m_record_list.reset();
 
 	// return a summary
