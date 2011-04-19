@@ -464,7 +464,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_t *bitmap, const recta
 
 	for (i = 0; i < 0x20; i++)
 	{
-		gfx_element gfx;
+		gfx_element gfx(machine);
 
 		if (!(state->m_videoregs[0x02/2] & 0x8000))
 		{

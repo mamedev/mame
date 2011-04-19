@@ -742,6 +742,7 @@ public:
 
 	input_port_config *next() const { return m_next; }
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	void set_machine(running_machine &machine) { m_machine = &machine; }
 
 	input_port_config *			m_next;			/* pointer to next port */
 	const char *				tag;			/* pointer to this port's tag */
@@ -749,9 +750,11 @@ public:
 
 	/* these fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
-	running_machine *			m_machine;		/* machine if port is live */
 	device_config *				owner;			/* associated device, when appropriate */
 	input_port_value			active;			/* mask of active bits in the port */
+
+private:
+	running_machine *			m_machine;		/* machine if port is live */
 };
 
 

@@ -559,7 +559,7 @@ typedef UINT32 input_code;
 typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
 /* (opaque) input device object */
-typedef struct _input_device input_device;
+class input_device;
 
 
 

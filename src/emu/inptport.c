@@ -2099,7 +2099,7 @@ static void init_port_state(running_machine &machine)
 		/* allocate a new input_port_info structure */
 		portstate = auto_alloc_clear(machine, input_port_state);
 		((input_port_config *)port)->state = portstate;
-		((input_port_config *)port)->m_machine = &machine;
+		((input_port_config *)port)->set_machine(machine);
 
 		/* start with tail pointers to all the data */
 		analogstatetail = &portstate->analoglist;
@@ -3646,9 +3646,9 @@ input_port_config::input_port_config(const char *_tag)
 	  tag(_tag),
 	  fieldlist(NULL),
 	  state(NULL),
-	  m_machine(NULL),
 	  owner(NULL),
-	  active(0)
+	  active(0),
+	  m_machine(NULL)
 {
 }
 

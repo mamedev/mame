@@ -148,7 +148,7 @@ enum
 //============================================================
 
 typedef struct _debugview_info debugview_info;
-typedef struct _debugwin_info debugwin_info;
+class debugwin_info;
 
 
 struct _debugview_info
@@ -161,9 +161,13 @@ struct _debugview_info
 };
 
 
-struct _debugwin_info
+class debugwin_info
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	debugwin_info(running_machine &machine)
+		: m_machine(machine) { }
+
+	running_machine &machine() const { return m_machine; }
 
 	debugwin_info *			next;
 	HWND					wnd;
@@ -191,7 +195,8 @@ struct _debugwin_info
 
 	HWND					otherwnd[MAX_OTHER_WND];
 
-	running_machine *		m_machine;
+private:
+	running_machine &		m_machine;
 };
 
 
@@ -542,7 +547,7 @@ static debugwin_info *debugwin_window_create(running_machine &machine, LPCSTR ti
 	RECT work_bounds;
 
 	// allocate memory
-	info = global_alloc_clear(debugwin_info);
+	info = global_alloc_clear(debugwin_info(machine));
 
 	// create the window
 	info->handler = handler;
@@ -562,8 +567,6 @@ static debugwin_info *debugwin_window_create(running_machine &machine, LPCSTR ti
 	info->handle_command = global_handle_command;
 	info->handle_key = global_handle_key;
 	strcpy(info->edit_defstr, "");
-
-	info->m_machine = &machine;
 
 	// hook us in
 	info->next = window_list;

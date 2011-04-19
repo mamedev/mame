@@ -227,7 +227,7 @@ gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, c
 	gfx_element *gfx;
 
 	/* allocate memory for the gfx_element structure */
-	gfx = auto_alloc_clear(machine, gfx_element);
+	gfx = auto_alloc_clear(machine, gfx_element(machine));
 
 	/* fill in the data */
 	gfx->width = width;
@@ -243,7 +243,6 @@ gfx_element *gfx_element_alloc(running_machine &machine, const gfx_layout *gl, c
 	gfx->total_colors = total_colors;
 
 	gfx->srcdata = srcdata;
-	gfx->m_machine = &machine;
 
 	/* copy the layout */
 	gfx->layout = *gl;
@@ -379,8 +378,6 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine &machine, UIN
 	gfx->srcdata = base;
 	gfx->dirty = &not_dirty;
 	gfx->dirtyseq = 0;
-
-	gfx->m_machine = &machine;
 }
 
 

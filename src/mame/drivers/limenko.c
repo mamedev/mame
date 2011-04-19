@@ -368,7 +368,7 @@ static void draw_sprites(running_machine &machine, UINT32 *sprites, const rectan
 	UINT8 *gfx_max	= base_gfx + machine.region("gfx1")->bytes();
 
 	UINT8 *gfxdata;
-	gfx_element gfx;
+	gfx_element gfx(machine);
 
 	for(i = 0; i <= count*2; i += 2)
 	{

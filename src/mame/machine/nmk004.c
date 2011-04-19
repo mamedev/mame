@@ -88,16 +88,17 @@ struct effects_control
 /* C1CA-C1CB */	UINT16 timer_duration;
 };
 
-static struct
+struct nmk004_state
 {
+public:
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	void set_machine(running_machine &machine) { m_machine = &machine; }
 
 	const UINT8 *rom;	// NMK004 data ROM
 	UINT8 from_main;	// command from main CPU
 	UINT8 to_main;		// answer to main CPU
 	int protection_check;
 
-	running_machine *m_machine;
 	device_t *ymdevice;
 	okim6295_device *oki1device;
 	okim6295_device *oki2device;
@@ -107,7 +108,12 @@ static struct
 	/* C020-C19F */	struct fm_control fm_control[FM_CHANNELS];
 	/* C220-C2DF */	struct psg_control psg_control[PSG_CHANNELS];
 	/* C1A0-C21F */	struct effects_control effects_control[EFFECTS_CHANNELS];
-} NMK004_state;
+
+private:
+	running_machine *m_machine;
+};
+
+static nmk004_state NMK004_state;
 
 
 #define SAMPLE_TABLE_0		0xefe0
@@ -1022,7 +1028,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
 
-	NMK004_state.m_machine = &machine;
+	NMK004_state.set_machine(machine);
 	NMK004_state.ymdevice = machine.device("ymsnd");
 	NMK004_state.oki1device = machine.device<okim6295_device>("oki1");
 	NMK004_state.oki2device = machine.device<okim6295_device>("oki2");

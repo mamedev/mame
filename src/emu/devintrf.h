@@ -502,7 +502,6 @@ protected:
 
 	//------------------- end derived class overrides
 
-	running_machine &		m_machine;
 	state_manager &			m_state_manager;
 	device_debug *			m_debug;
 
@@ -629,6 +628,9 @@ protected:
 	void register_auto_finder(auto_finder_base &autodev);
 
 	auto_finder_base *		m_auto_finder_list;
+
+private:
+	running_machine &		m_machine;
 };
 
 

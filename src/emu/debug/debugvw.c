@@ -201,7 +201,6 @@ const debug_view_source *debug_view_source_list::match_device(device_t *device) 
 
 debug_view::debug_view(running_machine &machine, debug_view_type type, debug_view_osd_update_func osdupdate, void *osdprivate)
 	: m_next(NULL),
-	  m_machine(machine),
 	  m_type(type),
 	  m_source(NULL),
 	  m_source_list(machine),
@@ -218,7 +217,8 @@ debug_view::debug_view(running_machine &machine, debug_view_type type, debug_vie
 	  m_update_pending(true),
 	  m_osd_update_pending(true),
 	  m_viewdata(NULL),
-	  m_viewdata_size(0)
+	  m_viewdata_size(0),
+	  m_machine(machine)
 {
 	// allocate memory for the buffer
 	m_viewdata_size = m_visible.y * m_visible.x;

@@ -26,12 +26,12 @@ TODO: Add CDDA support
 #define CD_SECTOR_TIME		(1000/((150*1024)/2048))	/* 1X CDROM sector time in msec (300KBps) */
 
 
-typedef struct _akiko_state akiko_state;
-struct _akiko_state
+class akiko_state
 {
+public:
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	void set_machine(running_machine &machine) { m_machine = &machine; }
 
-	running_machine *m_machine;
 	address_space *m_space;
 
 	/* chunky to planar converter */
@@ -68,6 +68,9 @@ struct _akiko_state
 	device_t *m_i2cmem;
 
 	int m_cdrom_is_device;
+
+private:
+	running_machine *m_machine;
 };
 
 static TIMER_CALLBACK(akiko_dma_proc);
@@ -172,7 +175,7 @@ static DEVICE_START( akiko )
 	running_machine &machine = device->machine();
 	akiko_state *state = get_safe_token(device);
 
-	state->m_machine = &machine;
+	state->set_machine(machine);
 	state->m_space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->m_c2p_input_index = 0;
 	state->m_c2p_output_index = 0;

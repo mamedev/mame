@@ -116,11 +116,14 @@ struct _ui_menu_item
 };
 
 
-struct _ui_menu
+class ui_menu
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	ui_menu(running_machine &machine)
+		: m_machine(machine) { }
+		
+	running_machine &machine() const { return m_machine; }
 
-	running_machine *	m_machine;			/* machine we are attached to */
 	render_container *	container;			/* render_container we render to */
 	ui_menu_handler_func handler;			/* handler callback */
 	void *				parameter;			/* parameter */
@@ -140,6 +143,9 @@ struct _ui_menu
 	float				customtop;			/* amount of extra height to add at the top */
 	float				custombottom;		/* amount of extra height to add at the bottom */
 	ui_menu_pool *		pool;				/* list of memory pools */
+
+private:
+	running_machine &	m_machine;			/* machine we are attached to */
 };
 
 
@@ -441,10 +447,9 @@ ui_menu *ui_menu_alloc(running_machine &machine, render_container *container, ui
 	ui_menu *menu;
 
 	/* allocate and clear memory for the menu and the state */
-	menu = auto_alloc_clear(machine, ui_menu);
+	menu = auto_alloc_clear(machine, ui_menu(machine));
 
 	/* initialize the state */
-	menu->m_machine = &machine;
 	menu->container = container;
 	menu->handler = handler;
 	menu->parameter = parameter;

@@ -120,7 +120,10 @@ struct _gfx_layout
 class gfx_element
 {
 public:
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	gfx_element(running_machine &machine)
+		: m_machine(machine) { }
+
+	running_machine &machine() const { return m_machine; }
 
 	UINT16			width;				/* current pixel width of each element (changeble with source clipping) */
 	UINT16			height;				/* current pixel height of each element (changeble with source clipping) */
@@ -146,8 +149,10 @@ public:
 	UINT8 *			dirty;				/* dirty array for detecting tiles that need decoding */
 	UINT32			dirtyseq;			/* sequence number; incremented each time a tile is dirtied */
 
-	running_machine *m_machine;			/* pointer to the owning machine */
 	gfx_layout		layout;				/* copy of the original layout */
+
+private:
+	running_machine &m_machine;			/* pointer to the owning machine */
 };
 
 

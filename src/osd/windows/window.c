@@ -609,13 +609,12 @@ void winwindow_video_window_create(running_machine &machine, int index, win_moni
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// allocate a new window object
-	window = global_alloc_clear(win_window_info);
+	window = global_alloc_clear(win_window_info(machine));
 	window->maxwidth = config->width;
 	window->maxheight = config->height;
 	window->refresh = config->refresh;
 	window->monitor = monitor;
 	window->fullscreen = !video_config.windowed;
-	window->m_machine = &machine;
 
 	// see if we are safe for fullscreen
 	window->fullscreen_safe = TRUE;

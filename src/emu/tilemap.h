@@ -380,7 +380,7 @@
 typedef UINT32 tilemap_memory_index;
 
 /* opaque tilemap definition */
-typedef struct _tilemap_t tilemap_t;
+class tilemap_t;
 
 
 /* tile_data is filled in by the get_tile_info callback */

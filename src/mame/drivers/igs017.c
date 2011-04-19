@@ -249,7 +249,7 @@ static void draw_sprite(running_machine &machine, bitmap_t *bitmap,const rectang
 {
 	igs017_state *state = machine.driver_data<igs017_state>();
 	// prepare GfxElement on the fly
-	gfx_element gfx;
+	gfx_element gfx(machine);
 
 	// Bounds checking
 	if ( addr + dimx * dimy >= state->m_sprites_gfx_size )

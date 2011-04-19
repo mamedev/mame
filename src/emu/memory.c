@@ -1795,7 +1795,6 @@ address_space::address_space(device_memory_interface &memory, address_spacenum s
 	: m_next(NULL),
 	  m_config(*memory.space_config(spacenum)),
 	  m_device(memory.device()),
-	  m_machine(memory.device().machine()),
 	  m_map(NULL),
 	  m_addrmask(0xffffffffUL >> (32 - m_config.m_addrbus_width)),
 	  m_bytemask(address_to_byte_end(m_addrmask)),
@@ -1808,7 +1807,8 @@ address_space::address_space(device_memory_interface &memory, address_spacenum s
 	  m_direct(*auto_alloc(memory.device().machine(), direct_read_data(*this))),
 	  m_name(memory.space_config(spacenum)->name()),
 	  m_addrchars((m_config.m_databus_width + 3) / 4),
-	  m_logaddrchars((m_config.m_logaddr_width + 3) / 4)
+	  m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
+	  m_machine(memory.device().machine())
 {
 	// notify the device
 	memory.set_address_space(spacenum, *this);

@@ -24,8 +24,7 @@
 #define IS_POLYEND(x)		(((x) ^ ((x) >> 1)) & 0x4000)
 
 
-typedef struct _poly_extra_data poly_extra_data;
-struct _poly_extra_data
+struct poly_extra_data
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 

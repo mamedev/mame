@@ -160,10 +160,13 @@ struct _rawinput_device_info
 
 
 // generic device information
-typedef struct _device_info device_info;
-struct _device_info
+class device_info
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	device_info(running_machine &machine)
+		: m_machine(machine) { }
+
+	running_machine &machine() const { return m_machine; }
 
 	// device information
 	device_info **			head;
@@ -172,7 +175,6 @@ struct _device_info
 	void					(*poll)(device_info *info);
 
 	// MAME information
-	running_machine *		m_machine;
 	input_device *			device;
 
 	// device state
@@ -186,6 +188,9 @@ struct _device_info
 	// DirectInput/RawInput-specific state
 	dinput_device_info		dinput;
 	rawinput_device_info	rawinput;
+
+private:
+	running_machine &		m_machine;
 };
 
 
@@ -817,9 +822,8 @@ static device_info *generic_device_alloc(running_machine &machine, device_info *
 	device_info *devinfo;
 
 	// allocate memory for the device object
-	devinfo = global_alloc_clear(device_info);
+	devinfo = global_alloc_clear(device_info(machine));
 	devinfo->head = devlist_head_ptr;
-	devinfo->m_machine = &machine;
 
 	// allocate a UTF8 copy of the name
 	devinfo->name = utf8_from_tstring(name);

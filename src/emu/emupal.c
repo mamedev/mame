@@ -62,13 +62,18 @@ struct _palette_private
 class colortable_t
 {
 public:
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	colortable_t(running_machine &machine)
+		: m_machine(machine) { }
 
-	running_machine *	m_machine;			/* associated machine */
+	running_machine &machine() const { return m_machine; }
+
 	UINT32				entries;			/* number of entries */
 	UINT32				palentries;			/* number of palette entries */
 	UINT16 *			raw;				/* raw data about each entry */
 	rgb_t *				palette;			/* palette entries */
+
+private:
+	running_machine &	m_machine;			/* associated machine */
 };
 
 
@@ -323,10 +328,9 @@ colortable_t *colortable_alloc(running_machine &machine, UINT32 palettesize)
 	assert(palettesize > 0);
 
 	/* allocate the colortable */
-	ctable = auto_alloc_clear(machine, colortable_t);
+	ctable = auto_alloc_clear(machine, colortable_t(machine));
 
 	/* fill in the basics */
-	ctable->m_machine = &machine;
 	ctable->entries = machine.total_colors();
 	ctable->palentries = palettesize;
 

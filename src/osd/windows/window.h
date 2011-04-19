@@ -65,10 +65,13 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-typedef struct _win_window_info win_window_info;
-struct _win_window_info
+struct win_window_info
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	win_window_info(running_machine &machine)
+		: m_machine(machine) { }
+		
+	running_machine &machine() const { return m_machine; }
 
 	win_window_info *	next;
 	volatile int		init_state;
@@ -106,7 +109,8 @@ struct _win_window_info
 	// drawing data
 	void *				drawdata;
 
-	running_machine *	m_machine;
+private:
+	running_machine &	m_machine;
 };
 
 

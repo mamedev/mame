@@ -187,7 +187,6 @@ void vertigo_vproc_reset(running_machine &machine)
 	memset(&state->m_vs, 0, sizeof(state->m_vs));
 	memset(&state->m_bsp, 0, sizeof(state->m_bsp));
 	memset(&state->m_vgen, 0, sizeof(state->m_vgen));
-	state->m_vgen.m_machine = &machine;
 }
 
 

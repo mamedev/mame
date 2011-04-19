@@ -569,8 +569,7 @@ void device_interface::interface_debug_setup()
 //-------------------------------------------------
 
 device_t::device_t(running_machine &_machine, const device_config &config)
-	: m_machine(_machine),
-	  m_state_manager(_machine.state()),
+	: m_state_manager(_machine.state()),
 	  m_debug(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
@@ -585,7 +584,8 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 	  m_unscaled_clock(config.m_clock),
 	  m_clock_scale(1.0),
 	  m_attoseconds_per_clock((config.m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(config.m_clock)),
-	  m_auto_finder_list(NULL)
+	  m_auto_finder_list(NULL),
+	  m_machine(_machine)
 {
 }
 

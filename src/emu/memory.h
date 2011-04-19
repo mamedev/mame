@@ -540,7 +540,6 @@ protected:
 	address_space *			m_next;				// next address space in the global list
 	const address_space_config &m_config;		// configuration of this space
 	device_t &				m_device;			// reference to the owning device
-	running_machine &		m_machine;			// reference to the owning machine
 	address_map *			m_map;				// original memory map
 	offs_t					m_addrmask;			// physical address mask
 	offs_t					m_bytemask;			// byte-converted physical address mask
@@ -554,6 +553,9 @@ protected:
 	const char *			m_name;				// friendly name of the address space
 	UINT8					m_addrchars;		// number of characters to use for physical addresses
 	UINT8					m_logaddrchars;		// number of characters to use for logical addresses
+
+private:
+	running_machine &		m_machine;			// reference to the owning machine
 };
 
 

@@ -56,8 +56,7 @@ UINT8 *avgdvg_colorram;
  *
  *************************************/
 
-typedef struct _vgvector vgvector;
-struct _vgvector
+struct vgvector
 {
 	int x; int y;
 	rgb_t color;
@@ -66,12 +65,10 @@ struct _vgvector
 	int status;
 };
 
-typedef struct _vgdata vgdata;
-struct _vgdata
+struct vgdata
 {
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-
-	running_machine *m_machine;
+	void set_machine(running_machine &machine) { m_machine = &machine; }
 
 	UINT16 pc;
 	UINT8 sp;
@@ -110,6 +107,9 @@ struct _vgdata
 	INT32 clipy_min;
 	INT32 clipx_max;
 	INT32 clipy_max;
+
+private:
+	running_machine *m_machine;
 };
 
 typedef struct _vgconf vgconf;
@@ -1494,7 +1494,7 @@ static VIDEO_START( avg_common )
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	vg = &vgd;
-	vg->m_machine = &machine;
+	vg->set_machine(machine);
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
@@ -1527,7 +1527,7 @@ VIDEO_START( dvg )
 
 	vgc = &dvg_default;
 	vg = &vgd;
-	vg->m_machine = &machine;
+	vg->set_machine(machine);
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;

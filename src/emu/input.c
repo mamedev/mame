@@ -78,11 +78,14 @@ struct _joystick_map
 
 
 /* a single input device */
-struct _input_device
+class input_device
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	input_device(running_machine &machine)
+		: m_machine(machine) { }
 
-	running_machine *		m_machine;				/* machine we are attached to */
+	running_machine &machine() const { return m_machine; }
+
 	astring					name;					/* string name of device */
 	input_device_class		devclass;				/* class of this device */
 	int						devindex;				/* device index of this device */
@@ -93,6 +96,9 @@ struct _input_device
 	/* joystick information */
 	joystick_map			joymap;					/* joystick map for this device */
 	UINT8					lastmap;				/* last joystick map value for this device */
+
+private:
+	running_machine &		m_machine;				/* machine we are attached to */
 };
 
 
@@ -759,7 +765,7 @@ input_device *input_device_add(running_machine &machine, input_device_class devc
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
 	/* allocate a new device */
-	input_device *device = auto_alloc_clear(machine, input_device);
+	input_device *device = auto_alloc_clear(machine, input_device(machine));
 	input_device **newlist = auto_alloc_array(machine, input_device *, devlist->count + 1);
 	for (int devnum = 0; devnum < devlist->count; devnum++)
 		newlist[devnum] = devlist->list[devnum];
@@ -768,7 +774,6 @@ input_device *input_device_add(running_machine &machine, input_device_class devc
 	devlist->list[devlist->count++] = device;
 
 	/* fill in the data */
-	device->m_machine = &machine;
 	device->name.cpy(name);
 	device->devclass = devclass;
 	device->devindex = devlist->count - 1;

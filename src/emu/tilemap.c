@@ -65,12 +65,15 @@ struct _blit_parameters
 
 
 /* core tilemap structure */
-struct _tilemap_t
+class tilemap_t
 {
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+public:
+	tilemap_t(running_machine &machine)
+		: m_machine(machine) { }
+
+	running_machine &machine() const { return m_machine; }
 
 	tilemap_t *					next;				/* pointer to next tilemap */
-	running_machine *			m_machine;			/* pointer back to the owning machine */
 
 	/* basic tilemap metrics */
 	UINT32						rows;				/* number of tile rows */
@@ -120,6 +123,9 @@ struct _tilemap_t
 	bitmap_t *					flagsmap;			/* per-pixel flags */
 	UINT8 *						tileflags;			/* per-tile flags */
 	UINT8 *						pen_to_flags;		/* mapping of pens to flags */
+
+private:
+	running_machine &			m_machine;			/* pointer back to the owning machine */
 };
 
 
@@ -350,10 +356,9 @@ static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info
 	tilemap_instance = machine.tilemap_data->instance;
 
 	/* allocate the tilemap itself */
-	tmap = auto_alloc_clear(machine, tilemap_t);
+	tmap = auto_alloc_clear(machine, tilemap_t(machine));
 
 	/* fill in the basic metrics */
-	tmap->m_machine = &machine;
 	tmap->rows = rows;
 	tmap->cols = cols;
 	tmap->tilewidth = tilewidth;

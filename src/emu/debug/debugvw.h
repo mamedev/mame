@@ -240,7 +240,6 @@ protected:
 protected:
 	// core view data
 	debug_view *			m_next;				// link to the next view
-	running_machine &		m_machine;			// machine associated with this view
 	debug_view_type			m_type;				// type of view
 	const debug_view_source *m_source;			// currently selected data source
 	debug_view_source_list	m_source_list;		// list of available data sources
@@ -264,6 +263,9 @@ protected:
 	bool					m_osd_update_pending; // true if there is a pending update
 	debug_view_char *		m_viewdata;			// current array of view data
 	int						m_viewdata_size;	// number of elements of the viewdata array
+
+private:
+	running_machine &		m_machine;			// machine associated with this view
 };
 
 

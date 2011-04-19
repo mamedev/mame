@@ -53,7 +53,7 @@ typedef enum _ui_menu_reset_options ui_menu_reset_options;
 ***************************************************************************/
 
 /* forward declarations */
-typedef struct _ui_menu ui_menu;
+class ui_menu;
 
 
 /* menu-related callback functions */
