@@ -87,7 +87,7 @@ public:
 	int					m_line;				// line number within that file
 	UINT64				m_id;				// unique id
 
-	static const int	k_hash_prime = 193;
+	static const int	k_hash_prime = 6151;
 
 	static UINT64		s_curid;			// current ID
 	static osd_lock *	s_lock;				// lock for managing the list
@@ -113,7 +113,7 @@ private:
 //**************************************************************************
 
 // global resource pool to handle allocations outside of the emulator context
-resource_pool global_resource_pool;
+resource_pool global_resource_pool(6151);
 
 // dummy zeromem object
 const zeromem_t zeromem = { };
@@ -246,12 +246,14 @@ void dump_unfreed_mem()
 //  pool
 //-------------------------------------------------
 
-resource_pool::resource_pool()
-	: m_listlock(osd_lock_alloc()),
+resource_pool::resource_pool(int hash_size)
+	: m_hash_size(hash_size),
+	  m_listlock(osd_lock_alloc()),
+	  m_hash(new resource_pool_item *[hash_size]),
 	  m_ordered_head(NULL),
 	  m_ordered_tail(NULL)
 {
-	memset(m_hash, 0, sizeof(m_hash));
+	memset(m_hash, 0, hash_size * sizeof(m_hash[0]));
 }
 
 
@@ -266,6 +268,7 @@ resource_pool::~resource_pool()
 	clear();
 	if (m_listlock != NULL)
 		osd_lock_free(m_listlock);
+	delete[] m_hash;
 }
 
 
@@ -278,7 +281,7 @@ void resource_pool::add(resource_pool_item &item)
 	osd_lock_acquire(m_listlock);
 
 	// insert into hash table
-	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % k_hash_prime;
+	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % m_hash_size;
 	item.m_next = m_hash[hashval];
 	m_hash[hashval] = &item;
 
@@ -338,7 +341,7 @@ void resource_pool::remove(void *ptr)
 	// search for the item
 	osd_lock_acquire(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
+	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
 	for (resource_pool_item **scanptr = &m_hash[hashval]; *scanptr != NULL; scanptr = &(*scanptr)->m_next)
 
 		// must match the pointer
@@ -379,7 +382,7 @@ resource_pool_item *resource_pool::find(void *ptr)
 	// search for the item
 	osd_lock_acquire(m_listlock);
 
-	int hashval = reinterpret_cast<FPTR>(ptr) % k_hash_prime;
+	int hashval = reinterpret_cast<FPTR>(ptr) % m_hash_size;
 	resource_pool_item *item;
 	for (item = m_hash[hashval]; item != NULL; item = item->m_next)
 		if (item->m_ptr == ptr)

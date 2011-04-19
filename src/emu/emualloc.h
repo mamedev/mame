@@ -277,7 +277,7 @@ private:
 	resource_pool &operator=(const resource_pool &);
 
 public:
-	resource_pool();
+	resource_pool(int hash_size = 193);
 	~resource_pool();
 
 	void add(resource_pool_item &item);
@@ -292,10 +292,9 @@ public:
 	template<class T> T *add_array(T* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<T>(array, count)); return array; }
 
 private:
-	static const int		k_hash_prime = 193;
-
+	int						m_hash_size;
 	osd_lock *				m_listlock;
-	resource_pool_item *	m_hash[k_hash_prime];
+	resource_pool_item **	m_hash;
 	resource_pool_item *	m_ordered_head;
 	resource_pool_item *	m_ordered_tail;
 };
