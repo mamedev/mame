@@ -419,7 +419,7 @@ class Processor
 			m_span_dady = da;
 			m_span_dzdy = dz;
 		}
-		
+
 		running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
 		void	InitInternalState()

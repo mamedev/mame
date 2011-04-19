@@ -54,7 +54,7 @@ protected:
 	// internal helpers
 	chd_file *get_disc();
 	void process_commands();
-	
+
 	// derived classes
 	virtual void execute_command(int command) { assert(false); }
 
@@ -120,7 +120,7 @@ protected:
 
 	// command execution hook
 	virtual void execute_command(int command);
-	
+
 	// internal helpers
 	inline void add_command(UINT8 command);
 
@@ -304,7 +304,7 @@ void ldplayer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			timer_set(target, TIMER_ID_VSYNC_UPDATE);
 			break;
 		}
-		
+
 		case TIMER_ID_AUTOPLAY:
 			// start playing
 			execute_command(CMD_PLAY);
@@ -377,12 +377,12 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			m_bit_timer->adjust(duration, (bitsleft << 16) | data);
 			break;
 		}
-		
+
 		// deassert the control line
 		case TIMER_ID_BIT_OFF:
 			laserdisc_line_w(m_laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
 			break;
-		
+
 		// others to the parent class
 		default:
 			ldplayer_state::device_timer(timer, id, param, ptr);

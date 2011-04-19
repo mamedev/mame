@@ -26,7 +26,7 @@ class vector_generator
 public:
 	vector_generator(running_machine &machine)
 		: m_machine(machine) { }
-		
+
 	running_machine &machine() const { return m_machine; }
 
 	UINT32 sreg;	  /* shift register */

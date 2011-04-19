@@ -70,7 +70,7 @@ struct win_window_info
 public:
 	win_window_info(running_machine &machine)
 		: m_machine(machine) { }
-		
+
 	running_machine &machine() const { return m_machine; }
 
 	win_window_info *	next;

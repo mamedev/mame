@@ -60,7 +60,7 @@ public:
 	SDD1_GCD(running_machine &machine, SDD1_IM* associatedIM)
 		: IM(associatedIM),
 		   m_machine(machine) { }
-		
+
 	running_machine &machine() const { return m_machine; }
 
 	SDD1_IM* IM;
@@ -247,7 +247,7 @@ public:
 		BG[6] = associatedBG6;
 		BG[7] = associatedBG7;
 	}
-	
+
 	running_machine &machine() const { return m_machine; }
 
 	SDD1_PEM_ContextInfo contextInfo[32];
@@ -304,7 +304,7 @@ public:
 	SDD1_CM(running_machine& machine, SDD1_PEM* associatedPEM)
 		: PEM(associatedPEM),
 		  m_machine(machine) { }
-	
+
 	running_machine &machine() const { return m_machine; }
 
 	UINT8 bitplanesInfo;
@@ -481,7 +481,7 @@ class SDD1emu
 {
 public:
 	SDD1emu(running_machine &machine);
-	
+
 	running_machine &machine() const { return m_machine; }
 
 	SDD1_IM* IM;

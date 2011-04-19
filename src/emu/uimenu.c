@@ -121,7 +121,7 @@ class ui_menu
 public:
 	ui_menu(running_machine &machine)
 		: m_machine(machine) { }
-		
+
 	running_machine &machine() const { return m_machine; }
 
 	render_container *	container;			/* render_container we render to */

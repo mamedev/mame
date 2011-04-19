@@ -276,7 +276,7 @@ public:
 	// construction/destruction
 	debug_view_manager(running_machine &machine);
 	~debug_view_manager();
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 
