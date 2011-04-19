@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
 		windows_options options;
 		windows_osd_interface osd;
 		cli_frontend frontend(options, osd);
-		frontend.execute(argc, argv);
+		result = frontend.execute(argc, argv);
 	}
 
 	// free symbols
