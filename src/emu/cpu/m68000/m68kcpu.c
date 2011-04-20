@@ -501,6 +501,7 @@ INLINE m68ki_cpu_core *get_safe_token(device_t *device)
 		   device->type() == M68010 ||
 		   device->type() == M68EC020 ||
 		   device->type() == M68020 ||
+		   device->type() == M68020HMMU ||
 		   device->type() == M68020PMMU ||
 		   device->type() == M68EC030 ||
 		   device->type() == M68030 ||
