@@ -9589,7 +9589,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( megadriv, driver_device )
+MACHINE_CONFIG_START( megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 MACHINE_CONFIG_END
 
