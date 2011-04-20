@@ -28,7 +28,6 @@ public:
 	UINT16   m_bg_scrolly;
 	int      m_scroll_type;
 	int      m_sprite_offy;
-	int      m_mcu_mode;
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
 	int      m_oldmode;
@@ -51,4 +50,3 @@ WRITE16_HANDLER( armedf_fg_scrollx_w );
 WRITE16_HANDLER( armedf_fg_scrolly_w );
 WRITE16_HANDLER( armedf_bg_scrollx_w );
 WRITE16_HANDLER( armedf_bg_scrolly_w );
-WRITE16_HANDLER( armedf_mcu_cmd );

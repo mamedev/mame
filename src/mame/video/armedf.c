@@ -241,12 +241,6 @@ WRITE16_HANDLER( armedf_bg_scrolly_w )
 	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_bg_scrolly);
 }
 
-WRITE16_HANDLER( armedf_mcu_cmd )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_mcu_mode);
-}
-
 
 
 /***************************************************************************
@@ -340,22 +334,22 @@ SCREEN_UPDATE( armedf )
 
 	if ((state->m_scroll_type == 0)||(state->m_scroll_type == 5 ))
 	{
-		if (state->m_old_mcu_mode != state->m_mcu_mode)
+		if (state->m_old_mcu_mode != state->m_vreg)
 		{
-			if ((state->m_mcu_mode & 0x000f) == 0x0004)
+			if ((state->m_vreg & 0x000f) == 0x0004)
 			{	// transparent tx
 				tilemap_set_transparent_pen(state->m_tx_tilemap, 0x0f);
 				tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
 				//logerror("? Transparent TX 0x0f\n");
 			}
-			if ((state->m_mcu_mode & 0x000f) == 0x000f)
+			if ((state->m_vreg & 0x000f) == 0x000f)
 			{		// opaque tx
 				tilemap_set_transparent_pen(state->m_tx_tilemap, 0x10);
 				tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
 				//logerror("? Opaque TX\n");
 			}
 
-			state->m_old_mcu_mode = state->m_mcu_mode;
+			state->m_old_mcu_mode = state->m_vreg;
 			//logerror("MCU Change => %04x\n", state->m_mcu_mode);
 		}
 	}
@@ -418,24 +412,24 @@ SCREEN_UPDATE( armedf )
 	}
 #endif
 
-	if ((state->m_mcu_mode & 0x0030) == 0x0030)
+	if ((state->m_vreg & 0x0030) == 0x0030)
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
-	if ((state->m_mcu_mode & 0x0030) == 0x0020)
+	if ((state->m_vreg & 0x0030) == 0x0020)
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
 
-	if ((state->m_mcu_mode & 0x0030) == 0x0010)
+	if ((state->m_vreg & 0x0030) == 0x0010)
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
-	if ((state->m_mcu_mode & 0x0030) == 0x0000)
+	if ((state->m_vreg & 0x0030) == 0x0000)
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	if (sprite_enable)

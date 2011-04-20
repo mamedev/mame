@@ -23,7 +23,7 @@ actually bootlegs.
 TODO:
 - simulate the mcu/blitter (particularly needed in terrafu and legion)
    -- or figure out which chip it is, decap it, and emulate it.
-- time over doesn't kill the player in Kodure Ookami;
+
 
 
 
@@ -204,7 +204,6 @@ static WRITE16_HANDLER( terraf_io_w )
 		//logerror("vreg WIPE TX\n");
 	}
 	//logerror("VReg = %04x\n", state->m_vreg);
-
 }
 
 static WRITE16_HANDLER( kodure_io_w )
@@ -237,6 +236,16 @@ static READ8_HANDLER( soundlatch_clear_r )
 {
 	soundlatch_clear_w(space, 0, 0);
 	return 0;
+}
+
+static WRITE16_HANDLER( irq_lv1_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( irq_lv2_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -278,7 +287,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
 ADDRESS_MAP_END
 
@@ -304,7 +313,7 @@ static ADDRESS_MAP_START( terrafb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
 ADDRESS_MAP_END
 
@@ -326,6 +335,7 @@ static ADDRESS_MAP_START( kodure_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
@@ -349,8 +359,8 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITENOP /* ? */
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
@@ -372,8 +382,8 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)	/* MCU Command ? */
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
@@ -397,8 +407,8 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	//AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd) /* MCU Command ? */
 	//AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
@@ -421,6 +431,7 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x06d006, 0x06d007) AM_WRITE(armedf_fg_scrollx_w)
 	AM_RANGE(0x06d008, 0x06d009) AM_WRITE(armedf_fg_scrolly_w)
 	AM_RANGE(0x06d00a, 0x06d00b) AM_WRITE(sound_command_w)
+	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
 
@@ -763,7 +774,6 @@ static MACHINE_START( armedf )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 
-	state->save_item(NAME(state->m_mcu_mode));
 	state->save_item(NAME(state->m_old_mcu_mode));
 	state->save_item(NAME(state->m_scroll_msb));
 	state->save_item(NAME(state->m_waiting_msb));
@@ -778,7 +788,6 @@ static MACHINE_RESET( armedf )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 
-	state->m_mcu_mode = 0;
 	state->m_old_mcu_mode = 0;
 	state->m_scroll_msb = 0;
 	state->m_waiting_msb = 0;
@@ -795,7 +804,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -841,7 +850,7 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -891,7 +900,7 @@ static MACHINE_CONFIG_START( kodure, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(kodure_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -936,7 +945,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
-	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -981,7 +990,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
@@ -1026,7 +1035,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legion_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
@@ -1071,7 +1080,7 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
 	MCFG_CPU_PROGRAM_MAP(legiono_map)
-	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
@@ -1580,7 +1589,7 @@ GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibuts
 GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",        "Terra Force (bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
