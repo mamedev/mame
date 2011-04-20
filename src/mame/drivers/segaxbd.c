@@ -715,14 +715,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE_MEMBER(segas1x_state, m_tileram_0)
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE_MEMBER(segas1x_state, m_textram_0)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_main", segaic16_multiply_r, segaic16_multiply_w)
 	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_main", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5250_main", segaic16_compare_timer_r, segaic16_compare_timer_w)
-	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_0)
-	AM_RANGE(0x110000, 0x11ffff) AM_DEVWRITE("segaspr1", segaic16_sprites_draw_w)
-	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_state, m_paletteram)
+	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
+	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
 	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
 	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
 	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
-	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE_MEMBER(segas1x_state, m_roadram_0)
+	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE(&segaic16_roadram_0)
 	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
@@ -1332,19 +1332,6 @@ static const ic_315_5250_interface segaxb_5250_2_intf =
 	NULL, NULL
 };
 
-static const sega16sp_interface xboard_sega16sp_intf =
-{
-	0,  // colorbase
-	0x1000, // ramsize
-	0,     // xoffs
-	segaic16_sprites_xboard_draw, // draw function
-	1, // use buffer
-	myoffsetof(segas1x_state, m_paletteram),
-	myoffsetof(segas1x_state, m_spriteram_0),
-};
-
-
-
 static MACHINE_CONFIG_START( xboard, segas1x_state )
 
 	/* basic machine hardware */
@@ -1383,7 +1370,7 @@ static MACHINE_CONFIG_START( xboard, segas1x_state )
 
 	MCFG_VIDEO_START(xboard)
 
-	MCFG_SEGA16SP_ADD("segaspr1", xboard_sega16sp_intf)
+	MCFG_SEGA16SP_ADD_XBOARD("segaspr1")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

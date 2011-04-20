@@ -18,13 +18,11 @@
 
 VIDEO_START( system16a )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
-
 	/* compute palette info */
-	segaic16_palette_init(0x800, state->m_paletteram);
+	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16A, 0x000, 0, 1, state->m_textram_0, state->m_tileram_0);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16A, 0x000, 0, 1);
 }
 
 
@@ -64,6 +62,6 @@ SCREEN_UPDATE( system16a )
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
 }

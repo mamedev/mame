@@ -24,7 +24,7 @@ struct _segaic16_memory_map_entry
 	write16_space_func	write;				/* write handler */
 	const char *	writename;
 	const char *	writebank;			/* bank for writing */
-	int		base;				/* offset to memory base */
+	UINT16 **		base;				/* pointer to memory base */
 	const char *	name;				/* friendly name for debugging */
 };
 

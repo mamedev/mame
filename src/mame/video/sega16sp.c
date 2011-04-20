@@ -2,6 +2,12 @@
 #include "segaic16.h"
 
 
+UINT16 *segaic16_spriteram_0;
+UINT16 *segaic16_spriteram_1;
+
+
+
+
 /*****************************************************************************
     INLINE FUNCTIONS
 *****************************************************************************/
@@ -59,7 +65,7 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == sega16sp->colorbase + (0x3f << 4))						\
-				dest[x] += sega16sp->shadow ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += sega16sp->shadow ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -70,9 +76,8 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_hangon_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_hangon_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
@@ -225,7 +230,7 @@ void segaic16_sprites_hangon_draw(device_t *device, bitmap_t *bitmap, const rect
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (shadow && pix == 0xa)										\
-				dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -236,9 +241,8 @@ void segaic16_sprites_hangon_draw(device_t *device, bitmap_t *bitmap, const rect
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_sharrier_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_sharrier_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
 	const UINT8 *zoom = (const UINT8 *)machine.region("proms")->base();
@@ -397,7 +401,7 @@ void segaic16_sprites_sharrier_draw(device_t *device, bitmap_t *bitmap, const re
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == sega16sp->colorbase + (0x3f << 4))						\
-				dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -408,9 +412,8 @@ void segaic16_sprites_sharrier_draw(device_t *device, bitmap_t *bitmap, const re
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16a_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -557,8 +560,8 @@ void segaic16_sprites_16a_draw(device_t *device, bitmap_t *bitmap, const rectang
 			{																\
 				/* we have to check this for System 18 so that we don't */  \
 				/* attempt to shadow VDP pixels */							\
-				if (dest[x] < sega16sp->palette_entries)								\
-					dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries; \
+				if (dest[x] < segaic16_palette.entries)								\
+					dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries; \
 			}																\
 																			\
 			/* regular draw */												\
@@ -570,9 +573,8 @@ void segaic16_sprites_16a_draw(device_t *device, bitmap_t *bitmap, const rectang
 		pri[x] = 0xff;														\
 	}																		\
 
-void segaic16_sprites_16b_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks;
 	const UINT16 *spritebase;
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -726,7 +728,7 @@ void segaic16_sprites_16b_draw(device_t *device, bitmap_t *bitmap, const rectang
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (pix == 14)													\
-				dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -737,9 +739,8 @@ void segaic16_sprites_16b_draw(device_t *device, bitmap_t *bitmap, const rectang
 		pri[x] = 0;															\
 	}																		\
 
-void segaic16_sprites_yboard_16b_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_16b_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x20000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -905,7 +906,7 @@ void segaic16_sprites_yboard_16b_draw(device_t *device, bitmap_t *bitmap, const 
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (shadow && pix == 0xa)										\
-				dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -916,9 +917,8 @@ void segaic16_sprites_yboard_16b_draw(device_t *device, bitmap_t *bitmap, const 
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_xboard_outrun_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
+static void segaic16_sprites_xboard_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int type)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1043,14 +1043,14 @@ static void segaic16_sprites_xboard_outrun_draw(device_t *device, bitmap_t *bitm
 	}
 }
 
-void segaic16_sprites_outrun_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_outrun_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	segaic16_sprites_xboard_outrun_draw(device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
+	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_OUTRUN);
 }
 
-void segaic16_sprites_xboard_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_xboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	segaic16_sprites_xboard_outrun_draw(device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
+	segaic16_sprites_xboard_outrun_draw(machine, device, bitmap, cliprect, SEGAIC16_SPRITES_XBOARD);
 }
 
 
@@ -1088,12 +1088,11 @@ void segaic16_sprites_xboard_draw(device_t *device, bitmap_t *bitmap, const rect
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-void segaic16_sprites_yboard_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_yboard_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx1")->bytes() / 0x80000;
 	const UINT64 *spritebase = (const UINT64 *)machine.region("gfx1")->base();
-	const UINT16 *rotatebase = segaic16_rotate_base(0);
+	const UINT16 *rotatebase = segaic16_rotate[0].buffer ? segaic16_rotate[0].buffer : segaic16_rotate[0].rotateram;
 	UINT8 visited[0x1000];
 	sega16sp_state *sega16sp = get_safe_token(device);
 	int next = 0;
@@ -1274,7 +1273,7 @@ void segaic16_sprites_yboard_draw(device_t *device, bitmap_t *bitmap, const rect
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == sega16sp->colorbase + (0x3f << 4))						\
-				dest[x] += (sega16sp->paletteram[dest[x]] & 0x8000) ? sega16sp->palette_entries*2 : sega16sp->palette_entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? segaic16_palette.entries*2 : segaic16_palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -1383,9 +1382,8 @@ void segaic16_sprites_yboard_draw(device_t *device, bitmap_t *bitmap, const rect
 
 
 
-void segaic16_sprites_16a_bootleg_wb3bl_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_wb3bl_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1407,9 +1405,8 @@ void segaic16_sprites_16a_bootleg_wb3bl_draw(device_t *device, bitmap_t *bitmap,
 }
 
 /* 4 player passing shot is different to this.. */
-void segaic16_sprites_16a_bootleg_passhtb_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_passhtb_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1430,9 +1427,8 @@ void segaic16_sprites_16a_bootleg_passhtb_draw(device_t *device, bitmap_t *bitma
 	}
 }
 
-void segaic16_sprites_16a_bootleg_shinobld_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_16a_bootleg_shinobld_draw(running_machine &machine, device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	running_machine &machine = device->machine();
 	UINT8 numbanks = machine.region("gfx2")->bytes() / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)machine.region("gfx2")->base();
 	sega16sp_state *sega16sp = get_safe_token(device);
@@ -1459,10 +1455,27 @@ void segaic16_sprites_16a_bootleg_shinobld_draw(device_t *device, bitmap_t *bitm
  *
  *************************************/
 
-void segaic16_sprites_draw(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect, device_t *device)
+void segaic16_sprites_draw(device_t *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
 {
-	sega16sp_state *sega16sp = get_safe_token(device);
-	(*sega16sp->draw)(device, bitmap, cliprect);
+	device_t* device = 0;
+	sega16sp_state *sega16sp;
+
+	if (!which)
+		device = screen->machine().device("segaspr1");
+	else
+		device = screen->machine().device("segaspr2");
+
+	if (!device)
+		fatalerror("segaic16_sprites_draw device not found\n");
+
+	sega16sp = get_safe_token(device);
+
+	if (!sega16sp->which)
+		sega16sp->spriteram = segaic16_spriteram_0;
+	else
+		sega16sp->spriteram = segaic16_spriteram_1;
+
+	(*sega16sp->draw)(screen->machine(), device, bitmap, cliprect);
 }
 
 
@@ -1473,19 +1486,23 @@ void segaic16_sprites_draw(screen_device *screen, bitmap_t *bitmap, const rectan
  *
  *************************************/
 
-void segaic16_sprites_set_banks(device_t *device, const UINT8 *bank)
+void segaic16_sprites_set_bank(running_machine &machine, int which, int banknum, int offset)
 {
-	sega16sp_state *sega16sp = get_safe_token(device);
-	memcpy(sega16sp->bank, bank, sizeof(sega16sp->bank));
-}
+	device_t* device = 0;
 
-void segaic16_sprites_set_bank(device_t *device, int banknum, int offset)
-{
+	if (!which)
+		device = machine.device("segaspr1");
+	else
+		device = machine.device("segaspr2");
+
+	if (!device)
+		fatalerror("segaic16_sprites_set_bank device not found\n");
+
 	sega16sp_state *sega16sp = get_safe_token(device);
 
 	if (sega16sp->bank[banknum] != offset)
 	{
-		screen_device *screen = device->machine().primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->bank[banknum] = offset;
 	}
@@ -1499,14 +1516,24 @@ void segaic16_sprites_set_bank(device_t *device, int banknum, int offset)
  *
  *************************************/
 
-void segaic16_sprites_set_flip(device_t *device, int flip)
+void segaic16_sprites_set_flip(running_machine &machine, int which, int flip)
 {
+	device_t* device = 0;
+
+	if (!which)
+		device = machine.device("segaspr1");
+	else
+		device = machine.device("segaspr2");
+
+	if (!device)
+		fatalerror("segaic16_sprites_set_flip device not found\n");
+
 	sega16sp_state *sega16sp = get_safe_token(device);
 
 	flip = (flip != 0);
 	if (sega16sp->flip != flip)
 	{
-		screen_device *screen = device->machine().primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->flip = flip;
 	}
@@ -1520,14 +1547,24 @@ void segaic16_sprites_set_flip(device_t *device, int flip)
  *
  *************************************/
 
-void segaic16_sprites_set_shadow(device_t *device, int shadow)
+void segaic16_sprites_set_shadow(running_machine &machine, int which, int shadow)
 {
+	device_t* device = 0;
+
+	if (!which)
+		device = machine.device("segaspr1");
+	else
+		device = machine.device("segaspr2");
+
+	if (!device)
+		fatalerror("segaic16_sprites_set_shadow device not found\n");
+
 	sega16sp_state *sega16sp = get_safe_token(device);
 
 	shadow = (shadow != 0);
 	if (sega16sp->shadow != shadow)
 	{
-		screen_device *screen = device->machine().primary_screen;
+		screen_device *screen = machine.primary_screen;
 		screen->update_partial(screen->vpos());
 		sega16sp->shadow = shadow;
 	}
@@ -1544,6 +1581,12 @@ void segaic16_sprites_set_shadow(device_t *device, int shadow)
 static void segaic16_sprites_buffer(device_t* device)
 {
 	sega16sp_state *sega16sp = get_safe_token(device);
+
+	if (!sega16sp->which)
+		sega16sp->spriteram = segaic16_spriteram_0;
+	else
+		sega16sp->spriteram = segaic16_spriteram_1;
+
 
 	if (sega16sp->buffer)
 	{
@@ -1567,9 +1610,30 @@ static void segaic16_sprites_buffer(device_t* device)
 }
 
 
-WRITE16_DEVICE_HANDLER( segaic16_sprites_draw_w )
+WRITE16_HANDLER( segaic16_sprites_draw_0_w )
 {
+	device_t* device = 0;
+
+	device = space->machine().device("segaspr1");
+
+	if (!device)
+		fatalerror("segaic16_sprites_draw_0_w device not found\n");
+
 	segaic16_sprites_buffer(device);
+}
+
+
+WRITE16_HANDLER( segaic16_sprites_draw_1_w )
+{
+	device_t* device = 0;
+
+	device = space->machine().device("segaspr2");
+
+	if (!device)
+		fatalerror("segaic16_sprites_draw_1_w device not found\n");
+
+	if (device)
+		segaic16_sprites_buffer(device);
 }
 
 
@@ -1589,6 +1653,7 @@ static DEVICE_START( sega16sp )
 	for (i=0;i<16;i++)
 		sega16sp->bank[i] = i;// intf->bank[i];
 
+	sega16sp->which = intf->which;
 	sega16sp->colorbase = intf->colorbase;
 	sega16sp->ramsize = intf->ramsize;
 	sega16sp->xoffs = intf->xoffs;
@@ -1611,18 +1676,6 @@ static DEVICE_START( sega16sp )
 }
 
 
-static DEVICE_RESET( sega16sp )
-{
-	sega16sp_state *sega16sp = get_safe_token(device);
-	const sega16sp_interface *intf = get_interface(device);
-	UINT8 *base = (UINT8 *)device->machine().driver_data<driver_device>();
-
-	sega16sp->palette_entries = segaic16_palette_entries();
-	sega16sp->paletteram = *(UINT16 **)(base + intf->paletteram_offset);
-	sega16sp->spriteram = *(UINT16 **)(base + intf->spriteram_offset);
-}
-
-
 DEVICE_GET_INFO( sega16sp )
 {
 	switch (state)
@@ -1633,7 +1686,7 @@ DEVICE_GET_INFO( sega16sp )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sega16sp);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(sega16sp);	break;
+		case DEVINFO_FCT_RESET:					/*info->reset = DEVICE_RESET_NAME(sega16sp);*/	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Sega System SH/HO/OR/16/18/X/Y Sprites");				break;

@@ -126,8 +126,8 @@ static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x411000, 0x411fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
 	AM_RANGE(0x412000, 0x412fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_nmi_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -184,8 +184,8 @@ static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
@@ -266,8 +266,8 @@ static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
 	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ(passht4b_service_r)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ(passht4b_io1_r)
 	AM_RANGE(0xc41004, 0xc41005) AM_READ(passht4b_io2_r)
@@ -316,8 +316,8 @@ static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
 	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg1_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -520,10 +520,10 @@ static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -621,8 +621,8 @@ static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x118018, 0x118019) AM_WRITE(s16bl_bgscrollx_w)
 	AM_RANGE(0x118020, 0x118021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x118028, 0x118029) AM_WRITE(s16bl_bgpage_w)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
@@ -639,7 +639,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x718018, 0x718019) AM_WRITE(s16bl_bgscrollx_w)
 	AM_RANGE(0x718020, 0x718021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x718028, 0x718029) AM_WRITE(s16bl_bgpage_w)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x901000, 0x901001) AM_READ_PORT("SERVICE") AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x901002, 0x901003) AM_READ_PORT("P1")
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
@@ -712,7 +712,7 @@ static WRITE16_HANDLER( datsu_page3_w )
 static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
-	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x710000, 0x710fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
 	AM_RANGE(0x718000, 0x718001) AM_WRITE(s16bl_fgscrolly_w)
@@ -724,7 +724,7 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x718024, 0x718025) AM_WRITE(datsu_page2_w)
 	AM_RANGE(0x718026, 0x718027) AM_WRITE(datsu_page3_w)
 
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x900006, 0x900007) AM_WRITE(sound_command_w)
@@ -738,8 +738,8 @@ static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -836,8 +836,8 @@ static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("DSW2") AM_WRITENOP
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(sound_command_w)
 	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
@@ -874,7 +874,7 @@ static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
 
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
 
 	AM_RANGE(0xC46000, 0xC46001) AM_WRITE(s16bl_fgscrolly_w)
@@ -915,8 +915,8 @@ static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P2")
@@ -942,8 +942,8 @@ static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_fgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_bgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
@@ -983,8 +983,8 @@ static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x418020, 0x418021) AM_WRITE(s16bl_bgpage_w)
 	AM_RANGE(0x418028, 0x418029) AM_WRITE(s16bl_fgpage_w)
 
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w)  AM_BASE(&segaic16_paletteram)
 
 	AM_RANGE(0xC41000, 0xC41001) AM_READ(beautyb_unkx_r )
 	AM_RANGE(0xC41002, 0xC41003) AM_READ(beautyb_unkx_r )
@@ -1000,10 +1000,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
-	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(sys16_coinctrl_w)
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
@@ -1149,8 +1149,8 @@ static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_NOP
 	AM_RANGE(0xc40000, 0xc40001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc40002, 0xc40003) AM_READ_PORT("DSW1")
@@ -1293,8 +1293,8 @@ static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 
 	/* bootleg video regs */
 	/*AM_RANGE(0xc00000, 0xc00001) AM_NOP
@@ -1335,8 +1335,8 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_spriteram_0)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00006, 0xa00007) AM_WRITE(sound_command_nmi_w)
@@ -2135,13 +2135,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface shinobld_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	117,     // xoffs
 	segaic16_sprites_16a_bootleg_shinobld_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( shinobib, system16 )
@@ -2159,13 +2158,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface passshtb_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	117,     // xoffs
 	segaic16_sprites_16a_bootleg_passhtb_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( passshtb, system16_7759 )
@@ -2198,13 +2196,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface wb3bbl_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	117,     // xoffs
 	segaic16_sprites_16a_bootleg_wb3bl_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( wb3bb, system16 )
@@ -2223,13 +2220,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x121_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	121,     // xoffs
 	segaic16_sprites_16b_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
@@ -2276,13 +2272,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x107_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	107,     // xoffs
 	segaic16_sprites_16b_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
@@ -2318,13 +2313,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x112_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	112,     // xoffs
 	segaic16_sprites_16b_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( dduxbl, system16 )
@@ -2338,13 +2332,12 @@ MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x124_sega16sp_intf =
 {
+	0,	   // which spriteram
 	1024,  // colorbase
 	0x800, // ramsize
 	124,     // xoffs
 	segaic16_sprites_16b_draw, // draw function
 	0, // use buffer
-	myoffsetof(segas1x_bootleg_state, m_paletteram),
-	myoffsetof(segas1x_bootleg_state, m_spriteram_0),
 };
 
 static MACHINE_CONFIG_DERIVED( eswatbl, system16_7759 )

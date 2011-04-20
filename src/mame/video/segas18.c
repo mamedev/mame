@@ -36,10 +36,10 @@ VIDEO_START( system18 )
 	state->m_vdp_mixing = 0;
 
 	/* compute palette info */
-	segaic16_palette_init(0x800, state->m_paletteram);
+	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x000, 0, 8, state->m_textram_0, state->m_tileram_0);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x000, 0, 8);
 
 	/* create the VDP */
 	system18_vdp_start(machine);
@@ -234,7 +234,7 @@ SCREEN_UPDATE( system18 )
 	if (state->m_vdp_enable && vdplayer == 3) draw_vdp(screen, bitmap, cliprect, vdppri);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 
 #if DEBUG_VDP
 	if (state->m_vdp_enable && input_code_pressed(screen->machine(), KEYCODE_V))

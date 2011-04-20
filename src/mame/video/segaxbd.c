@@ -17,16 +17,14 @@
 
 VIDEO_START( xboard )
 {
-	segas1x_state *state = machine.driver_data<segas1x_state>();
-
 	/* compute palette info */
-	segaic16_palette_init(0x2000, state->m_paletteram);
+	segaic16_palette_init(0x2000);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2, state->m_textram_0, state->m_tileram_0);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 
 	/* initialize the road */
-	segaic16_road_init(machine, 0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166, state->m_roadram_0);
+	segaic16_road_init(machine, 0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }
 
 
@@ -72,6 +70,6 @@ SCREEN_UPDATE( xboard )
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
 }
