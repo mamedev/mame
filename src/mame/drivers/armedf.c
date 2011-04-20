@@ -23,7 +23,7 @@ actually bootlegs.
 TODO:
 - simulate the mcu/blitter (particularly needed in terrafu and legion)
    -- or figure out which chip it is, decap it, and emulate it.
-
+- time over doesn't kill the player in Kodure Ookami;
 
 
 
@@ -1580,7 +1580,7 @@ GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibuts
 GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",        "Terra Force (bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
