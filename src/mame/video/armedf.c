@@ -388,7 +388,10 @@ SCREEN_UPDATE( armedf )
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_text_videoram[13] & 0xff) | ((state->m_text_videoram[14] & 0x3) << 8));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_text_videoram[11] & 0xff) | ((state->m_text_videoram[12] & 0x3) << 8));
 			break;
-
+		case 7:	/* terra force (japan bootleg) */
+			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
+			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
+			break;
 	}
 
 

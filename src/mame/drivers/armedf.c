@@ -23,7 +23,10 @@ actually bootlegs.
 TODO:
 - simulate the mcu/blitter (particularly needed in terrafu and legion)
    -- or figure out which chip it is, decap it, and emulate it.
-
+- time over doesn't kill the player in Kodure Ookami;
+- attract mode has a glitch with the "Terra Force" title screen at the left-right edges of the screen.
+  could be due of protection;
+- priorities, especially with the text layer (Terra Force);
 
 
 
@@ -141,21 +144,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
     0x020000-0x024fff and 0x040000-0x04ffff, and reports an error if
     the checksum isn't correct.
 
+========================================================================
+
+ DIP locations verified for:
+  -cclimbr2
+  -legion
+  -terraf
+
 ***********************************************************************/
 
-/*
-
-    2003-06-01  Added cocktail support to all games
-
-    2005-04-02  Sebastien Chevalier : various update to video on terrafu, plus some typos here and there
-
-
-    DIP locations verified for:
-    -cclimbr2
-    -legion
-    -terraf
-
-*/
 
 #include "emu.h"
 #include "deprecat.h"
@@ -204,6 +201,19 @@ static WRITE16_HANDLER( terraf_io_w )
 		//logerror("vreg WIPE TX\n");
 	}
 	//logerror("VReg = %04x\n", state->m_vreg);
+}
+
+static WRITE16_HANDLER( terrafb_io_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+		cputag_set_input_line(space->machine(), "extra", 0, HOLD_LINE);
+
+	COMBINE_DATA(&state->m_vreg);
+	/* bits 0 and 1 of armedf_vreg are coin counters */
+	/* bit 12 seems to handle screen flipping */
+	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
 static WRITE16_HANDLER( kodure_io_w )
@@ -306,11 +316,9 @@ static ADDRESS_MAP_START( terrafb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w)
+	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terrafb_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)			/* not use in terrafu, 0x07c008 neither */
-	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
@@ -445,14 +453,14 @@ static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( exz80ram_r )
+static READ8_HANDLER( blitter_txram_r )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	return state->m_text_videoram[offset] & 0xff;
 }
 
-static WRITE8_HANDLER( exz80ram_w )
+static WRITE8_HANDLER( blitter_txram_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
@@ -460,14 +468,40 @@ static WRITE8_HANDLER( exz80ram_w )
 	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
 }
 
+static WRITE8_HANDLER( fg_scrollx_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	state->m_fg_scrollx = (data & 0xff) | (state->m_fg_scrollx & 0x300);
+}
+
+static WRITE8_HANDLER( fg_scrolly_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	state->m_fg_scrolly = (data & 0xff) | (state->m_fg_scrolly & 0x300);
+}
+
+static WRITE8_HANDLER( fg_scroll_msb_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	state->m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (state->m_fg_scrolly & 0xff);
+	state->m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (state->m_fg_scrollx & 0xff);
+}
+
+
 static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(exz80ram_r,exz80ram_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
+	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
+	AM_RANGE(0x02,0x02) AM_WRITE(fg_scroll_msb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
@@ -876,8 +910,6 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)			// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafb_extraz80_portmap)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	//MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -1547,7 +1579,7 @@ static DRIVER_INIT( terrafu )
 static DRIVER_INIT( terrafb )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 5;
+	state->m_scroll_type = 7;
 
 	{
 		UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
@@ -1615,10 +1647,10 @@ static DRIVER_INIT( cclimbr2 )
 GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
 GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (Japan set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (Japan set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )

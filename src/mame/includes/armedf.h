@@ -31,6 +31,7 @@ public:
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
 	int      m_oldmode;
+	UINT16   m_fg_scroll_msb;
 };
 
 
