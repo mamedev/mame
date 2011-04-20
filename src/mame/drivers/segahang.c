@@ -35,14 +35,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT16 *workram;
-
-/*************************************
- *
  *  Prototypes
  *
  *************************************/
@@ -300,9 +292,10 @@ static WRITE8_DEVICE_HANDLER( video_lamps_w )
 	/* D2 : LAMP1 */
 	/* D1 : COIN2 */
 	/* D0 : COIN1 */
+	device_t *spr = device->machine().device("segaspr1");
 	segaic16_tilemap_set_flip(device->machine(), 0, data & 0x80);
-	segaic16_sprites_set_flip(device->machine(), 0, data & 0x80);
-	segaic16_sprites_set_shadow(device->machine(), 0, ~data & 0x40);
+	segaic16_sprites_set_flip(spr, data & 0x80);
+	segaic16_sprites_set_shadow(spr, ~data & 0x40);
 	segaic16_set_display_enable(device->machine(), data & 0x10);
 	set_led_status(device->machine(), 1, data & 0x08);
 	set_led_status(device->machine(), 0, data & 0x04);
@@ -389,7 +382,8 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void sharrier_i8751_sim(running_machine &machine)
 {
-	workram[0x492/2] = (input_port_read(machine, "ADC0") << 8) | input_port_read(machine, "ADC1");
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+	state->m_workram[0x492/2] = (input_port_read(machine, "ADC0") << 8) | input_port_read(machine, "ADC1");
 }
 
 
@@ -428,12 +422,12 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE_MEMBER(segas1x_state, m_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE_MEMBER(segas1x_state, m_textram_0)
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_0)
+	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_state, m_paletteram)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("sub", 0)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE(&segaic16_roadram_0)
+	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(segas1x_state, m_roadram_0)
 	AM_RANGE(0xc7c000, 0xc7ffff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
@@ -441,14 +435,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sharrier_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_BASE(&workram)
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_BASE_MEMBER(segas1x_state, m_workram)
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE_MEMBER(segas1x_state, m_tileram_0)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE_MEMBER(segas1x_state, m_textram_0)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_state, m_paletteram)
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_0)
 	AM_RANGE(0x140000, 0x14ffff) AM_READWRITE(sharrier_io_r, sharrier_io_w)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE(&segaic16_roadram_0)
+	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(segas1x_state, m_roadram_0)
 ADDRESS_MAP_END
 
 
@@ -907,6 +901,28 @@ GFXDECODE_END
 
 
 
+static const sega16sp_interface hangon_sega16sp_intf =
+{
+	1024,  // colorbase
+	0x800, // ramsize
+	0,     // xoffs
+	segaic16_sprites_hangon_draw, // draw function
+	0, // use buffer
+	myoffsetof(segas1x_state, m_paletteram),
+	myoffsetof(segas1x_state, m_spriteram_0),
+};
+
+static const sega16sp_interface sharrier_sega16sp_intf =
+{
+	1024,  // colorbase
+	0x1000, // ramsize
+	0,     // xoffs
+	segaic16_sprites_sharrier_draw, // draw function
+	0, // use buffer
+	myoffsetof(segas1x_state, m_paletteram),
+	myoffsetof(segas1x_state, m_spriteram_0),
+};
+
 /*************************************
  *
  *  Generic machine drivers
@@ -1056,7 +1072,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hangon, hangon_base )
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 
-	MCFG_SEGA16SP_ADD_HANGON("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", hangon_sega16sp_intf)
 MACHINE_CONFIG_END
 
 
@@ -1069,7 +1085,7 @@ static MACHINE_CONFIG_DERIVED( shangupb, hangon_base )
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_CLOCK(10000000)
 
-	MCFG_SEGA16SP_ADD_HANGON("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", hangon_sega16sp_intf)
 MACHINE_CONFIG_END
 
 
@@ -1080,28 +1096,28 @@ static MACHINE_CONFIG_DERIVED( sharrier, sharrier_base )
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse)
 
-	MCFG_SEGA16SP_ADD_SHARRIER("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", sharrier_sega16sp_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( enduror, sharrier_base )
 	MCFG_FRAGMENT_ADD(sound_board_2151)
 
-	MCFG_SEGA16SP_ADD_SHARRIER("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", sharrier_sega16sp_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( enduror1, sharrier_base )
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 
-	MCFG_SEGA16SP_ADD_SHARRIER("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", sharrier_sega16sp_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( endurob2, sharrier_base )
 	MCFG_FRAGMENT_ADD(sound_board_2203x2)
 
-	MCFG_SEGA16SP_ADD_SHARRIER("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", sharrier_sega16sp_intf)
 MACHINE_CONFIG_END
 
 

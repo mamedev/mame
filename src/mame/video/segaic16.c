@@ -376,15 +376,6 @@ Quick review of the system16 hardware:
  *************************************/
 
 UINT8 segaic16_display_enable;
-UINT16 *segaic16_tileram_0;
-UINT16 *segaic16_textram_0;
-UINT16 *segaic16_roadram_0;
-UINT16 *segaic16_rotateram_0;
-UINT16 *segaic16_paletteram;
-
-struct palette_info segaic16_palette;
-struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
-struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
 
 
 
@@ -394,6 +385,9 @@ struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
  *
  *************************************/
 
+static struct palette_info segaic16_palette;
+static struct rotate_info segaic16_rotate[SEGAIC16_MAX_ROTATE];
+static struct road_info segaic16_road[SEGAIC16_MAX_ROADS];
 static struct tilemap_info bg_tilemap[SEGAIC16_MAX_TILEMAPS];
 
 
@@ -439,7 +433,7 @@ void segaic16_set_display_enable(running_machine &machine, int enable)
     is bit 15 of each color RAM entry.
 */
 
-void segaic16_palette_init(int entries)
+void segaic16_palette_init(int entries, UINT16 *paletteram)
 {
 	static const int resistances_normal[6] = { 3900, 2000, 1000, 1000/2, 1000/4, 0   };
 	static const int resistances_sh[6]     = { 3900, 2000, 1000, 1000/2, 1000/4, 470 };
@@ -449,6 +443,7 @@ void segaic16_palette_init(int entries)
 
 	/* compute the number of palette entries */
 	info->entries = entries;
+	info->paletteram = paletteram;
 
 	/* compute weight table for regular palette entries */
 	compute_resistor_weights(0, 255, -1.0,
@@ -478,6 +473,10 @@ void segaic16_palette_init(int entries)
 }
 
 
+int segaic16_palette_entries(void)
+{
+	return segaic16_palette.entries;
+}
 
 /*************************************
  *
@@ -492,9 +491,9 @@ WRITE16_HANDLER( segaic16_paletteram_w )
 	struct palette_info *info = &segaic16_palette;
 
 	/* get the new value */
-	newval = segaic16_paletteram[offset];
+	newval = info->paletteram[offset];
 	COMBINE_DATA(&newval);
-	segaic16_paletteram[offset] = newval;
+	info->paletteram[offset] = newval;
 
 	/*     byte 0    byte 1 */
 	/*  sBGR BBBB GGGG RRRR */
@@ -1113,7 +1112,7 @@ static void segaic16_tilemap_16b_reset(running_machine &machine, struct tilemap_
  *
  *************************************/
 
-void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks)
+void segaic16_tilemap_init(running_machine &machine, int which, int type, int colorbase, int xoffs, int numbanks, UINT16 *textram, UINT16 *tileram)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 	tile_get_info_func get_text_info;
@@ -1129,13 +1128,13 @@ void segaic16_tilemap_init(running_machine &machine, int which, int type, int co
 		info->bank[i] = i;
 	info->banksize = 0x2000 / numbanks;
 	info->xoffs = xoffs;
+	info->textram = textram;
+	info->tileram = tileram;
 
 	/* set up based on which tilemap */
 	switch (which)
 	{
 		case 0:
-			info->textram = segaic16_textram_0;
-			info->tileram = segaic16_tileram_0;
 			break;
 
 		default:
@@ -1352,19 +1351,21 @@ void segaic16_tilemap_set_colscroll(running_machine &machine, int which, int ena
 
 WRITE16_HANDLER( segaic16_tileram_0_w )
 {
-	COMBINE_DATA(&segaic16_tileram_0[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap[0].tilemaps[offset / (64*32)], offset % (64*32));
+	struct tilemap_info *info = &bg_tilemap[0];
+	COMBINE_DATA(&info->tileram[offset]);
+	tilemap_mark_tile_dirty(info->tilemaps[offset / (64*32)], offset % (64*32));
 }
 
 
 WRITE16_HANDLER( segaic16_textram_0_w )
 {
+	struct tilemap_info *info = &bg_tilemap[0];
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 
-	COMBINE_DATA(&segaic16_textram_0[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);
+	COMBINE_DATA(&info->textram[offset]);
+	tilemap_mark_tile_dirty(info->textmap, offset);
 }
 
 
@@ -1874,7 +1875,7 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, 
  *
  *************************************/
 
-void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
+void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs, UINT16 *roadram)
 {
 	struct road_info *info = &segaic16_road[which];
 
@@ -1886,12 +1887,12 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
 	info->colorbase2 = colorbase2;
 	info->colorbase3 = colorbase3;
 	info->xoffs = xoffs;
+	info->roadram = roadram;
 
 	/* set up based on which road generator */
 	switch (which)
 	{
 		case 0:
-			info->roadram = segaic16_roadram_0;
 			break;
 
 		default:
@@ -1903,6 +1904,7 @@ void segaic16_road_init(running_machine &machine, int which, int type, int color
 	{
 		case SEGAIC16_ROAD_HANGON:
 		case SEGAIC16_ROAD_SHARRIER:
+			info->buffer = NULL;
 			info->draw = segaic16_road_hangon_draw;
 			segaic16_road_hangon_decode(machine, info);
 			break;
@@ -1982,7 +1984,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
  *
  *************************************/
 
-void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase)
+void segaic16_rotate_init(running_machine &machine, int which, int type, int colorbase, UINT16 *rotateram)
 {
 	struct rotate_info *info = &segaic16_rotate[which];
 
@@ -1991,12 +1993,12 @@ void segaic16_rotate_init(running_machine &machine, int which, int type, int col
 	info->index = which;
 	info->type = type;
 	info->colorbase = colorbase;
+	info->rotateram = rotateram;
 
 	/* set up based on which road generator */
 	switch (which)
 	{
 		case 0:
-			info->rotateram = segaic16_rotateram_0;
 			break;
 
 		default:
@@ -2085,6 +2087,11 @@ void segaic16_rotate_draw(running_machine &machine, int which, bitmap_t *bitmap,
 }
 
 
+UINT16 *segaic16_rotate_base(int which)
+{
+	struct rotate_info *info = &segaic16_rotate[which];
+	return info->buffer ? info->buffer : info->rotateram;
+}
 
 /*************************************
  *

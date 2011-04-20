@@ -347,9 +347,10 @@ static void update_memory_mapping(running_machine &machine, struct memory_mapper
 		/* set the bank pointer */
 		if (readbank != NULL)
 		{
-			if (rgn->base != NULL)
+			if (rgn->base != -1)
 			{
-				memory_configure_bank(machine, readbank, 0, 1, *rgn->base, 0);
+				void *base = *(void **)((UINT8 *)machine.driver_data<driver_device>() + rgn->base);
+				memory_configure_bank(machine, readbank, 0, 1, base, 0);
 				memory_set_bank(machine, readbank, 0);
 			}
 			else if (rgn->romoffset != ~0)

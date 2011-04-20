@@ -11,6 +11,8 @@ public:
 	UINT16 *    m_bg1_tileram;
 	UINT16 *    m_textram;
 	UINT16 *    m_tileram;
+	UINT16 *    m_spriteram_0;
+	UINT16 *    m_paletteram;
 
 	UINT16 m_coinctrl;
 
@@ -102,26 +104,26 @@ public:
 
 /*----------- defined in video/system16.c -----------*/
 
-extern VIDEO_START( s16a_bootleg );
-extern VIDEO_START( s16a_bootleg_wb3bl );
-extern VIDEO_START( s16a_bootleg_shinobi );
-extern VIDEO_START( s16a_bootleg_passsht );
-extern SCREEN_UPDATE( s16a_bootleg );
-extern SCREEN_UPDATE( s16a_bootleg_passht4b );
-extern WRITE16_HANDLER( s16a_bootleg_tilemapselect_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrollx_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrollx_w );
+VIDEO_START( s16a_bootleg );
+VIDEO_START( s16a_bootleg_wb3bl );
+VIDEO_START( s16a_bootleg_shinobi );
+VIDEO_START( s16a_bootleg_passsht );
+SCREEN_UPDATE( s16a_bootleg );
+SCREEN_UPDATE( s16a_bootleg_passht4b );
+WRITE16_HANDLER( s16a_bootleg_tilemapselect_w );
+WRITE16_HANDLER( s16a_bootleg_bgscrolly_w );
+WRITE16_HANDLER( s16a_bootleg_bgscrollx_w );
+WRITE16_HANDLER( s16a_bootleg_fgscrolly_w );
+WRITE16_HANDLER( s16a_bootleg_fgscrollx_w );
 
 /* video hardware */
-extern WRITE16_HANDLER( sys16_tileram_w );
-extern WRITE16_HANDLER( sys16_textram_w );
+WRITE16_HANDLER( sys16_tileram_w );
+WRITE16_HANDLER( sys16_textram_w );
 
 /* "normal" video hardware */
-extern VIDEO_START( system16 );
-extern SCREEN_UPDATE( system16 );
+VIDEO_START( system16 );
+SCREEN_UPDATE( system16 );
 
 /* system18 video hardware */
-extern VIDEO_START( system18old );
-extern SCREEN_UPDATE( system18old );
+VIDEO_START( system18old );
+SCREEN_UPDATE( system18old );

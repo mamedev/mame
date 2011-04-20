@@ -7,11 +7,14 @@ public:
 		  m_interrupt_timer(*this, "int_timer") { }
 
 	/* memory pointers */
-//  UINT16 *  m_workram;  // this is used in the nvram handler, hence it cannot be added here
-//  UINT16 *  m_paletteram;   // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  m_tileram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  m_textram_0;    // this is used in the segaic16 mapper, hence it cannot be added here (yet)
-//  UINT16 *  m_spriteram_0;  // this is used in the segaic16 mapper, hence it cannot be added here (yet)
+	UINT16 *  m_workram;
+	UINT16 *  m_paletteram;
+	UINT16 *  m_tileram_0;
+	UINT16 *  m_textram_0;
+	UINT16 *  m_spriteram_0;
+	UINT16 *  m_spriteram_1;
+	UINT16 *  m_roadram_0;
+	UINT16 *  m_rotateram_0;
 
 	/* misc video */
 	UINT8 m_road_priority;		// segaxbd

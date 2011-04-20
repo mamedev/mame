@@ -33,23 +33,11 @@
 static void setup_system16_bootleg_spritebanking( running_machine& machine )
 {
 	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
+	static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+	static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
+	device_t *spr = machine.device("segaspr1");
 
-	if (state->m_spritebank_type == 1)
-	{
-		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-		int i;
-		for (i = 0; i < 16; i++)
-			segaic16_sprites_set_bank(machine, 0, i, default_banklist[i]);
-	}
-	else
-	{
-		static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
-		int i;
-		for (i = 0; i < 16; i++)
-			segaic16_sprites_set_bank(machine, 0, i, alternate_banklist[i]);
-
-	}
-
+	segaic16_sprites_set_banks(spr, (state->m_spritebank_type == 1) ? default_banklist : alternate_banklist);
 }
 
 
@@ -434,10 +422,8 @@ VIDEO_START( system16 )
 		state->m_system18 = 0;
 	}
 
-	segaic16_palette_init(0x800);
+	segaic16_palette_init(0x800, state->m_paletteram);
 	setup_system16_bootleg_spritebanking(machine);
-
-
 }
 
 VIDEO_START( system18old )
@@ -606,8 +592,7 @@ VIDEO_START( s16a_bootleg )
 	tilemap_set_transparent_pen(state->m_bg_tilemaps[0], 0);
 	tilemap_set_transparent_pen(state->m_bg_tilemaps[1], 0);
 
-	segaic16_palette_init(0x800);
-
+	segaic16_palette_init(0x800, state->m_paletteram);
 }
 
 VIDEO_START( s16a_bootleg_wb3bl )
@@ -681,7 +666,7 @@ SCREEN_UPDATE( s16a_bootleg )
 	}
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
 
 	return 0;
 }
@@ -722,7 +707,7 @@ SCREEN_UPDATE( s16a_bootleg_passht4b )
 	}
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
 
 	return 0;
 }
@@ -771,7 +756,7 @@ SCREEN_UPDATE( system16 )
 	//draw_sprites(screen->machine(), bitmap, cliprect,0);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
 	return 0;
 }
 
@@ -805,7 +790,7 @@ SCREEN_UPDATE( system18old )
 	tilemap_draw(bitmap, cliprect, state->m_text_layer, 0, 0xf);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
 
 	return 0;
 }

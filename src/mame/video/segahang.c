@@ -18,27 +18,31 @@
 
 VIDEO_START( hangon )
 {
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+
 	/* compute palette info */
-	segaic16_palette_init(0x800);
+	segaic16_palette_init(0x800, state->m_paletteram);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2, state->m_textram_0, state->m_tileram_0);
 
 	/* initialize the road */
-	segaic16_road_init(machine, 0, SEGAIC16_ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
+	segaic16_road_init(machine, 0, SEGAIC16_ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0, state->m_roadram_0);
 }
 
 
 VIDEO_START( sharrier )
 {
+	segas1x_state *state = machine.driver_data<segas1x_state>();
+
 	/* compute palette info */
-	segaic16_palette_init(0x800);
+	segaic16_palette_init(0x800, state->m_paletteram);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2, state->m_textram_0, state->m_tileram_0);
 
 	/* initialize the road */
-	segaic16_road_init(machine, 0, SEGAIC16_ROAD_SHARRIER, 0x038, 0x7c0, 0x7c0, 0);
+	segaic16_road_init(machine, 0, SEGAIC16_ROAD_SHARRIER, 0x038, 0x7c0, 0x7c0, 0, state->m_roadram_0);
 }
 
 
@@ -82,7 +86,7 @@ SCREEN_UPDATE( hangon )
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
 
 	/* draw the sprites */
-	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+	segaic16_sprites_draw(screen, bitmap, cliprect, screen->machine().device("segaspr1"));
 	return 0;
 }
 

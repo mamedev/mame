@@ -161,15 +161,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT16 *workram;
-
-
-/*************************************
- *
  *  Prototypes
  *
  *************************************/
@@ -375,7 +366,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
 	state->m_video_control = data;
 
 	segaic16_tilemap_set_flip(device->machine(), 0, data & 0x80);
-	segaic16_sprites_set_flip(device->machine(), 0, data & 0x80);
+	segaic16_sprites_set_flip(device->machine().device("segaspr1"), data & 0x80);
 
 	if (state->m_mcu != NULL)
 		device_set_input_line(state->m_mcu, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -552,10 +543,10 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 static void dumpmtmt_i8751_sim(running_machine &machine)
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
-	UINT8 flag = workram[0x200/2] >> 8;
-	UINT8 tick = workram[0x200/2] & 0xff;
-	UINT8 sec = workram[0x202/2] >> 8;
-	UINT8 min = workram[0x202/2] & 0xff;
+	UINT8 flag = state->m_workram[0x200/2] >> 8;
+	UINT8 tick = state->m_workram[0x200/2] & 0xff;
+	UINT8 sec = state->m_workram[0x202/2] >> 8;
+	UINT8 min = state->m_workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
 	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
@@ -590,8 +581,8 @@ static void dumpmtmt_i8751_sim(running_machine &machine)
 			}
 		}
 	}
-	workram[0x200/2] = (flag << 8) + tick;
-	workram[0x202/2] = (sec << 8) + min;
+	state->m_workram[0x200/2] = (flag << 8) + tick;
+	state->m_workram[0x202/2] = (sec << 8) + min;
 }
 
 
@@ -604,12 +595,12 @@ static void quartet_i8751_sim(running_machine &machine)
 	device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 
 	/* X scroll values */
-	segaic16_textram_0_w(space, 0xff8/2, workram[0x0d14/2], 0xffff);
-	segaic16_textram_0_w(space, 0xffa/2, workram[0x0d18/2], 0xffff);
+	segaic16_textram_0_w(space, 0xff8/2, state->m_workram[0x0d14/2], 0xffff);
+	segaic16_textram_0_w(space, 0xffa/2, state->m_workram[0x0d18/2], 0xffff);
 
 	/* page values */
-	segaic16_textram_0_w(space, 0xe9e/2, workram[0x0d1c/2], 0xffff);
-	segaic16_textram_0_w(space, 0xe9c/2, workram[0x0d1e/2], 0xffff);
+	segaic16_textram_0_w(space, 0xe9e/2, state->m_workram[0x0d1c/2], 0xffff);
+	segaic16_textram_0_w(space, 0xe9c/2, state->m_workram[0x0d1e/2], 0xffff);
 }
 
 
@@ -1005,13 +996,13 @@ static INTERRUPT_GEN( mcu_irq_assert )
 static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE_MEMBER(segas1x_state, m_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE_MEMBER(segas1x_state, m_textram_0)
+	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_state, m_paletteram)
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram) AM_SHARE("nvram")
+	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE_MEMBER(segas1x_state, m_workram) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -1934,6 +1925,18 @@ static GFXDECODE_START( segas16a )
 GFXDECODE_END
 
 
+static const sega16sp_interface s16a_sega16sp_intf =
+{
+	1024,  // colorbase
+	0x800, // ramsize
+	0,     // xoffs
+	segaic16_sprites_16a_draw, // draw function
+	0, // use buffer
+	myoffsetof(segas1x_state, m_paletteram),
+	myoffsetof(segas1x_state, m_spriteram_0),
+};
+
+
 
 /*************************************
  *
@@ -1971,7 +1974,7 @@ static MACHINE_CONFIG_START( system16a, segas1x_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE(system16a)
 
-	MCFG_SEGA16SP_ADD_16A("segaspr1")
+	MCFG_SEGA16SP_ADD("segaspr1", s16a_sega16sp_intf)
 
 	MCFG_GFXDECODE(segas16a)
 	MCFG_PALETTE_LENGTH(2048*3)

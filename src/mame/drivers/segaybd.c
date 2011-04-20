@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( subx_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&segaic16_spriteram_1)
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_1)
 	AM_RANGE(0x1f8000, 0x1fbfff) AM_RAM
 	AM_RANGE(0x1fc000, 0x1fffff) AM_RAM AM_SHARE("backupram")
 ADDRESS_MAP_END
@@ -457,9 +457,9 @@ static ADDRESS_MAP_START( suby_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080007) AM_MIRROR(0x001ff8) AM_DEVREADWRITE("5248_suby", segaic16_multiply_r, segaic16_multiply_w)
 	AM_RANGE(0x084000, 0x08401f) AM_MIRROR(0x001fe0) AM_DEVREADWRITE("5249_suby", segaic16_divide_r, segaic16_divide_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE(&segaic16_rotateram_0)
-	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0x180000, 0x1807ff) AM_MIRROR(0x007800) AM_RAM AM_BASE_MEMBER(segas1x_state, m_rotateram_0)
+	AM_RANGE(0x188000, 0x188fff) AM_MIRROR(0x007000) AM_RAM AM_BASE_MEMBER(segas1x_state, m_spriteram_0)
+	AM_RANGE(0x190000, 0x193fff) AM_MIRROR(0x004000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE_MEMBER(segas1x_state, m_paletteram)
 	AM_RANGE(0x198000, 0x19ffff) AM_READ(segaic16_rotate_control_0_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -979,6 +979,28 @@ static const sega_pcm_interface segapcm_interface =
 };
 
 
+static const sega16sp_interface yboard_16b_sega16sp_intf =
+{
+	2048,  // colorbase
+	0x800, // ramsize
+	0,     // xoffs
+	segaic16_sprites_yboard_16b_draw, // draw function
+	0, // use buffer
+	myoffsetof(segas1x_state, m_paletteram),
+	myoffsetof(segas1x_state, m_spriteram_0),
+};
+
+static const sega16sp_interface yboard_sega16sp_intf =
+{
+	4096,  // colorbase
+	0x10000, // ramsize
+	0,     // xoffs
+	segaic16_sprites_yboard_draw, // draw function
+	0, // use buffer
+	myoffsetof(segas1x_state, m_paletteram),
+	myoffsetof(segas1x_state, m_spriteram_1),
+};
+
 
 /*************************************
  *
@@ -1024,8 +1046,8 @@ static MACHINE_CONFIG_START( yboard, segas1x_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE(yboard)
 
-	MCFG_SEGA16SP_ADD_YBOARD_16B("segaspr1")
-	MCFG_SEGA16SP_ADD_YBOARD("segaspr2")
+	MCFG_SEGA16SP_ADD("segaspr1", yboard_16b_sega16sp_intf )
+	MCFG_SEGA16SP_ADD("segaspr2", yboard_sega16sp_intf)
 
 	MCFG_PALETTE_LENGTH(8192*3)
 
