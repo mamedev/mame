@@ -331,7 +331,7 @@ public:
 	osd_interface &osd() const { return m_osd; }
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
-	state_manager &state() { return m_state; }
+	save_manager &save() { return m_save; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
@@ -451,7 +451,7 @@ private:
 
 	// embedded managers and objects
 	tagged_list<memory_region> m_regionlist;		// list of memory regions
-	state_manager			m_state;				// state manager
+	save_manager			m_save;					// save manager
 	device_scheduler		m_scheduler;			// scheduler object
 
 	// managers

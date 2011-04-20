@@ -181,7 +181,6 @@
 #include "machine/8255ppi.h"
 #include "deprecat.h"
 #include "aristmk4.lh"
-#include "state.h"
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"

@@ -1090,7 +1090,7 @@ static MACHINE_START( neogeo )
 	state->save_item(NAME(state->m_led2_value));
 	state->save_item(NAME(state->m_recurse));
 
-	machine.state().register_postload(neogeo_postload, NULL);
+	machine.save().register_postload(neogeo_postload, NULL);
 }
 
 

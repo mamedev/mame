@@ -65,7 +65,7 @@ VIDEO_START( tail2nos )
 	state->m_zoomdata = (UINT16 *)machine.region("gfx3")->base();
 
 	state->save_pointer(NAME(state->m_zoomdata), 0x20000 / 2);
-	machine.state().register_postload(tail2nos_postload, NULL);
+	machine.save().register_postload(tail2nos_postload, NULL);
 }
 
 

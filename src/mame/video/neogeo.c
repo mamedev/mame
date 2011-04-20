@@ -892,7 +892,7 @@ VIDEO_START( neogeo )
 	state->save_item(NAME(state->m_auto_animation_counter));
 	state->save_item(NAME(state->m_auto_animation_frame_counter));
 
-	machine.state().register_postload(regenerate_pens, NULL);
+	machine.save().register_postload(regenerate_pens, NULL);
 
 	state->m_region_zoomy = machine.region("zoomy")->base();
 }

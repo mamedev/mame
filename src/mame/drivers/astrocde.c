@@ -1796,7 +1796,7 @@ static DRIVER_INIT( profpac )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.state().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(profbank_banksw_restore, NULL);
 }
 
 
@@ -1813,7 +1813,7 @@ static DRIVER_INIT( demndrgn )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.state().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(profbank_banksw_restore, NULL);
 }
 
 
@@ -1835,7 +1835,7 @@ static DRIVER_INIT( tenpindx )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.state().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(profbank_banksw_restore, NULL);
 }
 
 

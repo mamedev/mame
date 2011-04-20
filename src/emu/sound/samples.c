@@ -493,7 +493,7 @@ static DEVICE_START( samples )
         device->save_item(NAME(info->channel[i].loop), i);
         device->save_item(NAME(info->channel[i].paused), i);
 	}
-	device->machine().state().register_postload(samples_postload, info);
+	device->machine().save().register_postload(samples_postload, info);
 
 	/* initialize any custom handlers */
 	if (intf->start)

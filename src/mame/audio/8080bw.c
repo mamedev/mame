@@ -926,7 +926,7 @@ MACHINE_START( schaser_sh )
 	state->save_item(NAME(state->m_schaser_effect_555_is_low));
 	state->save_item(NAME(state->m_schaser_effect_555_time_remain_savable));
 	state->save_item(NAME(state->m_port_2_last_extra));
-	machine.state().register_postload(schaser_reinit_555_time_remain, NULL);
+	machine.save().register_postload(schaser_reinit_555_time_remain, NULL);
 }
 
 

@@ -547,7 +547,7 @@ static MACHINE_START( slapshot )
 
 	state->m_banknum = 0;
 	state->save_item(NAME(state->m_banknum));
-	machine.state().register_postload(slapshot_postload, NULL);
+	machine.save().register_postload(slapshot_postload, NULL);
 }
 
 

@@ -628,7 +628,7 @@ static void register_for_save(upd7759_state *chip, device_t *device)
 	device->save_item(NAME(chip->sample));
 
 	device->save_item(NAME(chip->romoffset));
-	device->machine().state().register_postload(upd7759_postload, chip);
+	device->machine().save().register_postload(upd7759_postload, chip);
 }
 
 

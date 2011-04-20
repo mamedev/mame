@@ -669,7 +669,7 @@ static CPU_INIT( tms34010 )
 	device->save_item(NAME(tms->pixelshift));
 	device->save_item(NAME(tms->gfxcycles));
 	device->save_pointer(NAME(&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
-	device->machine().state().register_postload(tms34010_state_postload, tms);
+	device->machine().save().register_postload(tms34010_state_postload, tms);
 }
 
 static CPU_RESET( tms34010 )

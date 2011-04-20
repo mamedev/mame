@@ -150,8 +150,8 @@ void palette_init(running_machine &machine)
 		palette->save_bright = auto_alloc_array(machine, float, numcolors);
 		state_save_register_global_pointer(machine, palette->save_pen, numcolors);
 		state_save_register_global_pointer(machine, palette->save_bright, numcolors);
-		machine.state().register_presave(palette_presave, palette);
-		machine.state().register_postload(palette_postload, palette);
+		machine.save().register_presave(palette_presave, palette);
+		machine.save().register_postload(palette_postload, palette);
 	}
 }
 

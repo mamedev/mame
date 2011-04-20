@@ -630,7 +630,7 @@ static MACHINE_START( taitoair )
 		state_save_register_item(machine, "globals", NULL, i, state->m_q.p[i].y);
 	}
 
-	machine.state().register_postload(taitoair_postload, NULL);
+	machine.save().register_postload(taitoair_postload, NULL);
 }
 
 static MACHINE_RESET( taitoair )

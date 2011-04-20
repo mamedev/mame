@@ -111,16 +111,16 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	// create a unique tag for saving
 	astring state_tag;
 	state_tag.printf("%d", m_device.machine().sound().m_stream_list.count());
-	m_device.machine().state().save_item("stream", state_tag, 0, NAME(m_sample_rate));
-	m_device.machine().state().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
+	m_device.machine().save().save_item("stream", state_tag, 0, NAME(m_sample_rate));
+	m_device.machine().save().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
 
 	// save the gain of each input and output
 	for (int inputnum = 0; inputnum < m_inputs; inputnum++)
-		m_device.machine().state().save_item("stream", state_tag, inputnum, NAME(m_input[inputnum].m_gain));
+		m_device.machine().save().save_item("stream", state_tag, inputnum, NAME(m_input[inputnum].m_gain));
 	for (int outputnum = 0; outputnum < m_outputs; outputnum++)
 	{
 		m_output[outputnum].m_stream = this;
-		m_device.machine().state().save_item("stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
+		m_device.machine().save().save_item("stream", state_tag, outputnum, NAME(m_output[outputnum].m_gain));
 	}
 
 	// force an update to the sample rates; this will cause everything to be recomputed

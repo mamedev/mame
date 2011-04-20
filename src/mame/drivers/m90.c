@@ -1149,7 +1149,7 @@ static DRIVER_INIT( quizf1 )
 	set_m90_bank(machine);
 
 	state_save_register_global(machine, state->m_bankaddress);
-	machine.state().register_postload(quizf1_postload, NULL);
+	machine.save().register_postload(quizf1_postload, NULL);
 }
 
 

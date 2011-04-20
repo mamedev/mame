@@ -874,7 +874,7 @@ static MACHINE_START( mystwarr )
 
 	state_save_register_global(machine, state->m_mw_irq_control);
 	state_save_register_global(machine, state->m_cur_sound_region);
-	machine.state().register_postload(mystwarr_postload, NULL);
+	machine.save().register_postload(mystwarr_postload, NULL);
 }
 
 static MACHINE_RESET(mystwarr)

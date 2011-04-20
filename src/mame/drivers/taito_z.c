@@ -2994,7 +2994,7 @@ static MACHINE_START( taitoz )
 
 	memory_configure_bank(machine, "bank10", 0, banks, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	machine.state().register_postload(taitoz_postload, NULL);
+	machine.save().register_postload(taitoz_postload, NULL);
 
 	MACHINE_START_CALL(bshark);
 }
@@ -4888,7 +4888,7 @@ static DRIVER_INIT( bshark )
 	state->m_dblaxle_vibration = 0;
 	state->m_eep_latch = 0;
 
-	machine.state().register_postload(bshark_postload, NULL);
+	machine.save().register_postload(bshark_postload, NULL);
 	state->save_item(NAME(state->m_eep_latch));
 }
 

@@ -493,7 +493,7 @@ static MACHINE_START( xexex )
 
 	state->save_item(NAME(state->m_cur_control2));
 	state->save_item(NAME(state->m_cur_sound_region));
-	machine.state().register_postload(xexex_postload, NULL);
+	machine.save().register_postload(xexex_postload, NULL);
 
 	state->m_dmadelay_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
 }

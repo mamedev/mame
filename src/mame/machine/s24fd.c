@@ -179,5 +179,5 @@ void s24_fd1094_driver_init(running_machine &machine)
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
-	machine.state().register_postload(s24_fd1094_postload, NULL);
+	machine.save().register_postload(s24_fd1094_postload, NULL);
 }

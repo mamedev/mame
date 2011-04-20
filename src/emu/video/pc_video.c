@@ -53,7 +53,7 @@ void pc_video_start(running_machine &machine,
 		video_start_generic_bitmapped(machine);
 	}
 
-	machine.state().register_postload(pc_video_postload, NULL);
+	machine.save().register_postload(pc_video_postload, NULL);
 }
 
 

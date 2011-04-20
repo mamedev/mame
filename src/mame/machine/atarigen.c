@@ -166,7 +166,7 @@ void atarigen_init(running_machine &machine)
 	state->save_item(NAME(state->m_playfield2_latch));
 
 	/* need a postload to reset the state */
-	machine.state().register_postload(slapstic_postload, NULL);
+	machine.save().register_postload(slapstic_postload, NULL);
 }
 
 

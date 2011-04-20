@@ -783,7 +783,7 @@ static MACHINE_START( ninjaw )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_pandata));
-	machine.state().register_postload(ninjaw_postload, NULL);
+	machine.save().register_postload(ninjaw_postload, NULL);
 }
 
 static MACHINE_RESET( ninjaw )

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    state.h
+    save.h
 
     Save state management functions.
 
@@ -43,8 +43,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __STATE_H__
-#define __STATE_H__
+#ifndef __SAVE_H__
+#define __SAVE_H__
 
 
 
@@ -52,7 +52,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-enum state_save_error
+enum save_error
 {
 	STATERR_NONE,
 	STATERR_ILLEGAL_REGISTRATIONS,
@@ -91,43 +91,43 @@ void state_postload_stub(running_machine &machine, void *param)
 // use this to declare a given type is a simple, non-pointer type that can be
 // saved; in general, this is intended only to be used for specific enum types
 // defined by your device
-#define ALLOW_SAVE_TYPE(TYPE) template<> struct state_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
+#define ALLOW_SAVE_TYPE(TYPE) template<> struct save_manager::type_checker<TYPE> { static const bool is_atom = true; static const bool is_pointer = false; }
 
 
 
 // register items with explicit tags
 #define state_save_register_item(_mach, _mod, _tag, _index, _val) \
-	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).save().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_pointer(_mach, _mod, _tag, _index, _val, _count) \
-	(_mach).state().save_pointer(_mod, _tag, _index, _val, #_val, _count)
+	(_mach).save().save_pointer(_mod, _tag, _index, _val, #_val, _count)
 
 #define state_save_register_item_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).save().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_2d_array(_mach, _mod, _tag, _index, _val) \
-	(_mach).state().save_item(_mod, _tag, _index, _val, #_val)
+	(_mach).save().save_item(_mod, _tag, _index, _val, #_val)
 
 #define state_save_register_item_bitmap(_mach, _mod, _tag, _index, _val) \
-	(_mach).state().save_item(_mod, _tag, _index, *(_val), #_val)
+	(_mach).save().save_item(_mod, _tag, _index, *(_val), #_val)
 
 
 
 // register global items
 #define state_save_register_global(_mach, _val) \
-	(_mach).state().save_item(_val, #_val)
+	(_mach).save().save_item(_val, #_val)
 
 #define state_save_register_global_pointer(_mach, _val, _count) \
-	(_mach).state().save_pointer(_val, #_val, _count)
+	(_mach).save().save_pointer(_val, #_val, _count)
 
 #define state_save_register_global_array(_mach, _val) \
-	(_mach).state().save_item(_val, #_val)
+	(_mach).save().save_item(_val, #_val)
 
 #define state_save_register_global_2d_array(_mach, _val) \
-	(_mach).state().save_item(_val, #_val)
+	(_mach).save().save_item(_val, #_val)
 
 #define state_save_register_global_bitmap(_mach, _val) \
-	(_mach).state().save_item(*(_val), #_val)
+	(_mach).save().save_item(*(_val), #_val)
 
 
 
@@ -135,7 +135,7 @@ void state_postload_stub(running_machine &machine, void *param)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class state_manager
+class save_manager
 {
 	// type_checker is a set of templates to identify valid save types
 	template<typename T> struct type_checker { static const bool is_atom = false; static const bool is_pointer = false; };
@@ -145,7 +145,7 @@ public:
 	typedef void (*prepost_func)(running_machine &machine, void *param);
 
 	// construction/destruction
-	state_manager(running_machine &machine);
+	save_manager(running_machine &machine);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -203,15 +203,15 @@ public:
 	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { save_pointer("global", NULL, index, value, valname, count); }
 
 	// file processing
-	static state_save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
-	state_save_error write_file(emu_file &file);
-	state_save_error read_file(emu_file &file);
+	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+	save_error write_file(emu_file &file);
+	save_error read_file(emu_file &file);
 
 private:
 	// internal helpers
 	UINT32 signature() const;
 	void dump_registry() const;
-	static state_save_error validate_header(const UINT8 *header, const char *gamename, UINT32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
+	static save_error validate_header(const UINT8 *header, const char *gamename, UINT32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
 
 	// state callback item
 	class state_callback
@@ -290,7 +290,7 @@ ALLOW_SAVE_TYPE(endianness_t);
 //-------------------------------------------------
 
 template<>
-inline void state_manager::save_item(const char *module, const char *tag, int index, bitmap_t &value, const char *name)
+inline void save_manager::save_item(const char *module, const char *tag, int index, bitmap_t &value, const char *name)
 {
 	save_memory(module, tag, index, name, value.base, value.bpp / 8, value.rowpixels * value.height);
 }
@@ -301,7 +301,7 @@ inline void state_manager::save_item(const char *module, const char *tag, int in
 //-------------------------------------------------
 
 template<>
-inline void state_manager::save_item(const char *module, const char *tag, int index, attotime &value, const char *name)
+inline void save_manager::save_item(const char *module, const char *tag, int index, attotime &value, const char *name)
 {
 	astring tempstr(name, ".attoseconds");
 	save_memory(module, tag, index, tempstr, &value.attoseconds, sizeof(value.attoseconds));
@@ -310,4 +310,4 @@ inline void state_manager::save_item(const char *module, const char *tag, int in
 }
 
 
-#endif	/* __STATE_H__ */
+#endif	/* __SAVE_H__ */

@@ -751,7 +751,7 @@ static void psx_gpu_init( running_machine &machine, int n_gputype )
 	}
 
 	// icky!!!
-	machine.state().save_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&p_psxgpu->m_packet, 1, sizeof( p_psxgpu->m_packet ) );
+	machine.save().save_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&p_psxgpu->m_packet, 1, sizeof( p_psxgpu->m_packet ) );
 
 	state_save_register_global_pointer( machine, p_psxgpu->p_vram, p_psxgpu->n_vram_size );
 	state_save_register_global( machine, p_psxgpu->n_gpu_buffer_offset );
@@ -785,7 +785,7 @@ static void psx_gpu_init( running_machine &machine, int n_gputype )
 	state_save_register_global( machine, p_psxgpu->n_iy );
 	state_save_register_global( machine, p_psxgpu->n_ti );
 
-	machine.state().register_postload( updatevisiblearea, NULL );
+	machine.save().register_postload( updatevisiblearea, NULL );
 	machine.driver_data<psx_state>()->m_p_psxgpu = p_psxgpu;
 }
 

@@ -463,9 +463,9 @@ public:
 
 	// state saving interfaces
 	template<typename T>
-	void save_item(T &value, const char *valname, int index = 0) { m_state_manager.save_item(name(), tag(), index, value, valname); }
+	void save_item(T &value, const char *valname, int index = 0) { m_save_manager.save_item(name(), tag(), index, value, valname); }
 	template<typename T>
-	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { m_state_manager.save_pointer(name(), tag(), index, value, valname, count); }
+	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { m_save_manager.save_pointer(name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
@@ -502,7 +502,7 @@ protected:
 
 	//------------------- end derived class overrides
 
-	state_manager &			m_state_manager;
+	save_manager &			m_save_manager;
 	device_debug *			m_debug;
 
 	// core device interfaces for speed

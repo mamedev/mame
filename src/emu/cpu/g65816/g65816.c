@@ -365,7 +365,7 @@ static CPU_INIT( g65816 )
 	device->save_item(NAME(cpustate->irq_delay));
 	device->save_item(NAME(cpustate->stopped));
 
-	device->machine().state().register_postload(g65816_restore_state, cpustate);
+	device->machine().save().register_postload(g65816_restore_state, cpustate);
 }
 
 /**************************************************************************

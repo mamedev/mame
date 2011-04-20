@@ -1021,7 +1021,7 @@ static DEVICE_START( pc080sn )
 
 	device->save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
 	device->save_item(NAME(pc080sn->ctrl));
-	device->machine().state().register_postload(pc080sn_restore_scroll, pc080sn);
+	device->machine().save().register_postload(pc080sn_restore_scroll, pc080sn);
 }
 
 
@@ -1907,7 +1907,7 @@ static DEVICE_START( tc0080vco )
 	device->machine().gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine(), &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
 
 	device->save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
-	device->machine().state().register_postload(tc0080vco_postload, tc0080vco);
+	device->machine().save().register_postload(tc0080vco_postload, tc0080vco);
 }
 
 /***************************************************************************/
@@ -2517,7 +2517,7 @@ static DEVICE_START( tc0100scn )
 	device->save_item(NAME(tc0100scn->ctrl));
 	device->save_item(NAME(tc0100scn->dblwidth));
 	device->save_item(NAME(tc0100scn->gfxbank));
-	device->machine().state().register_postload(tc0100scn_postload, tc0100scn);
+	device->machine().save().register_postload(tc0100scn_postload, tc0100scn);
 }
 
 
@@ -3727,7 +3727,7 @@ static DEVICE_START( tc0480scp )
 	device->save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
 	device->save_item(NAME(tc0480scp->ctrl));
 	device->save_item(NAME(tc0480scp->dblwidth));
-	device->machine().state().register_postload(tc0480scp_postload, tc0480scp);
+	device->machine().save().register_postload(tc0480scp_postload, tc0480scp);
 }
 
 static DEVICE_RESET( tc0480scp )
@@ -4760,7 +4760,7 @@ static DEVICE_START( tc0110pcr )
 
 	device->save_pointer(NAME(tc0110pcr->ram), TC0110PCR_RAM_SIZE);
 	device->save_item(NAME(tc0110pcr->type));
-	device->machine().state().register_postload(tc0110pcr_restore_colors, tc0110pcr);
+	device->machine().save().register_postload(tc0110pcr_restore_colors, tc0110pcr);
 }
 
 static DEVICE_RESET( tc0110pcr )

@@ -123,7 +123,7 @@ VIDEO_START( fortyl )
 	state->save_item(NAME(*state->m_tmp_bitmap1));
 	state->save_item(NAME(*state->m_tmp_bitmap2));
 	state->save_item(NAME(state->m_pixram_sel));
-	machine.state().register_postload(redraw_pixels, NULL);
+	machine.save().register_postload(redraw_pixels, NULL);
 }
 
 

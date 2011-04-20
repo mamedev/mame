@@ -534,7 +534,7 @@ static MACHINE_START( taitoh )
 	state->m_tc0080vco = machine.device("tc0080vco");
 
 	state->save_item(NAME(state->m_banknum));
-	machine.state().register_postload(taitoh_postload, NULL);
+	machine.save().register_postload(taitoh_postload, NULL);
 }
 
 

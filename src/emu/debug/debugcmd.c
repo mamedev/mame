@@ -244,7 +244,7 @@ void debug_command_init(running_machine &machine)
 		void *base;
 
 		/* stop when we run out of items */
-		name = machine.state().indexed_item(itemnum, base, valsize, valcount);
+		name = machine.save().indexed_item(itemnum, base, valsize, valcount);
 		if (name == NULL)
 			break;
 

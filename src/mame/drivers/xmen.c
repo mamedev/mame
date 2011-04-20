@@ -330,7 +330,7 @@ static MACHINE_START( xmen )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	machine.state().register_postload(xmen_postload, NULL);
+	machine.save().register_postload(xmen_postload, NULL);
 }
 
 static MACHINE_RESET( xmen )

@@ -706,7 +706,7 @@ static MACHINE_START( othunder )
 	state->save_item(NAME(state->m_ad_irq));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_pan));
-	machine.state().register_postload(othunder_postload, NULL);
+	machine.save().register_postload(othunder_postload, NULL);
 }
 
 static MACHINE_RESET( othunder )

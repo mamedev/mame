@@ -587,7 +587,7 @@ static MACHINE_START( crystal )
 	state->save_item(NAME(state->m_PIO));
 	state->save_item(NAME(state->m_DMActrl));
 	state->save_item(NAME(state->m_OldPort4));
-	machine.state().register_postload(crystal_banksw_postload, NULL);
+	machine.save().register_postload(crystal_banksw_postload, NULL);
 }
 
 static MACHINE_RESET( crystal )

@@ -662,7 +662,7 @@ static MACHINE_START( topspeed )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_ioc220_port));
 	state->save_item(NAME(state->m_banknum));
-	machine.state().register_postload(topspeed_postload, NULL);
+	machine.save().register_postload(topspeed_postload, NULL);
 }
 
 static MACHINE_RESET( topspeed )

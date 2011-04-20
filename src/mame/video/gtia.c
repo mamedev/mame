@@ -139,7 +139,7 @@ static void gtia_state(running_machine &machine)
 	state_save_register_global(machine, gtia.w.gractl);
 	state_save_register_global(machine, gtia.w.hitclr);
 	state_save_register_global(machine, gtia.w.cons);
-	machine.state().register_postload(gtia_state_postload, NULL);
+	machine.save().register_postload(gtia_state_postload, NULL);
 }
 
 

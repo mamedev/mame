@@ -5774,7 +5774,7 @@ static DRIVER_INIT( driveout )
 	state->save_item(NAME(state->m_driveout_sound_latch));
 	state->save_item(NAME(state->m_oki_bank));
 	state->save_item(NAME(state->m_nibble));
-	machine.state().register_postload(driveout_postload, NULL);
+	machine.save().register_postload(driveout_postload, NULL);
 }
 
 

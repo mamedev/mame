@@ -360,7 +360,7 @@ VIDEO_START( rallybik )
 
 	register_common(machine);
 
-	machine.state().register_postload(rallybik_flipscreen, NULL);
+	machine.save().register_postload(rallybik_flipscreen, NULL);
 }
 
 VIDEO_START( toaplan1 )
@@ -384,7 +384,7 @@ VIDEO_START( toaplan1 )
 
 	register_common(machine);
 
-	machine.state().register_postload(toaplan1_flipscreen, NULL);
+	machine.save().register_postload(toaplan1_flipscreen, NULL);
 }
 
 

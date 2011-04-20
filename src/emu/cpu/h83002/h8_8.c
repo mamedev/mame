@@ -259,7 +259,7 @@ static CPU_INIT(h8bit)
 	device->save_item(NAME(h8->h8TSTR));
 	device->save_item(NAME(h8->h8TCNT));
 
-	h8->device->machine().state().register_postload(h8_onstateload, h8);
+	h8->device->machine().save().register_postload(h8_onstateload, h8);
 }
 
 static CPU_RESET(h8bit)

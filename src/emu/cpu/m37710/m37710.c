@@ -949,7 +949,7 @@ static CPU_INIT( m37710 )
 	device->save_item(NAME(cpustate->reload[6]));
 	device->save_item(NAME(cpustate->reload[7]));
 
-	device->machine().state().register_postload(m37710_restore_state, cpustate);
+	device->machine().save().register_postload(m37710_restore_state, cpustate);
 }
 
 /**************************************************************************

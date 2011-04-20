@@ -329,7 +329,7 @@ static MACHINE_START( ace )
 {
 	ace_state *state = machine.driver_data<ace_state>();
 	state->save_item(NAME(state->m_objpos));
-	machine.state().register_postload(ace_postload, NULL);
+	machine.save().register_postload(ace_postload, NULL);
 }
 
 static MACHINE_RESET( ace )

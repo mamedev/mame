@@ -439,7 +439,7 @@ void demonwld_driver_savestate(running_machine &machine)
 	state->save_item(NAME(state->m_main_ram_seg));
 	state->save_item(NAME(state->m_dsp_BIO));
 	state->save_item(NAME(state->m_dsp_execute));
-	machine.state().register_postload(demonwld_restore_dsp, NULL);
+	machine.save().register_postload(demonwld_restore_dsp, NULL);
 }
 
 MACHINE_RESET( vimana )

@@ -118,7 +118,7 @@ static DEVICE_START( ym2612 )
 	info->chip = ym2612_init(info,device,device->clock(),rate,timer_handler,IRQHandler);
 	assert_always(info->chip != NULL, "Error creating YM2612 chip");
 
-	device->machine().state().register_postload(ym2612_intf_postload, info);
+	device->machine().save().register_postload(ym2612_intf_postload, info);
 }
 
 

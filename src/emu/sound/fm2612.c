@@ -1682,7 +1682,7 @@ INLINE void CSMKeyControll(FM_OPN *OPN, FM_CH *CH)
 	OPN->SL3.key_csm = 1;
 }
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 {
@@ -2317,7 +2317,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 	INTERNAL_TIMER_B(&OPN->ST,length)
 }
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 void ym2612_postload(void *chip)
 {
 	if (chip)
@@ -2385,7 +2385,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	F2612->OPN.ST.timer_handler = timer_handler;
 	F2612->OPN.ST.IRQ_Handler   = IRQHandler;
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 	YM2612_save_state(F2612, device);
 #endif
 	return F2612;

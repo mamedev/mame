@@ -89,12 +89,12 @@ EMUOBJS = \
 	$(EMUOBJ)/rendlay.o \
 	$(EMUOBJ)/rendutil.o \
 	$(EMUOBJ)/romload.o \
+	$(EMUOBJ)/save.o \
 	$(EMUOBJ)/schedule.o \
 	$(EMUOBJ)/screen.o \
 	$(EMUOBJ)/softlist.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/speaker.o \
-	$(EMUOBJ)/state.o \
 	$(EMUOBJ)/tilemap.o \
 	$(EMUOBJ)/timer.o \
 	$(EMUOBJ)/ui.o \

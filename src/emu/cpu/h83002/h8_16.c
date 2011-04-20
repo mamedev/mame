@@ -237,7 +237,7 @@ static CPU_INIT(h8)
 	device->save_item(NAME(h8->h8TSTR));
 	device->save_item(NAME(h8->h8TCNT));
 
-	device->machine().state().register_postload(h8_onstateload, h8);
+	device->machine().save().register_postload(h8_onstateload, h8);
 
 	h8_itu_init(h8);
 }

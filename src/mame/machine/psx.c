@@ -1758,5 +1758,5 @@ void psx_driver_init( running_machine &machine )
 	state_save_register_global_array( machine, p_psx->mdec.p_n_quantize_uv );
 	state_save_register_global_array( machine, p_psx->mdec.p_n_cos );
 
-	machine.state().register_postload( psx_postload, NULL );
+	machine.save().register_postload( psx_postload, NULL );
 }

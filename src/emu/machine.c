@@ -164,7 +164,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_system(_config.gamedrv()),
 	  m_osd(osd),
 	  m_regionlist(m_respool),
-	  m_state(*this),
+	  m_save(*this),
 	  m_scheduler(*this),
 	  m_cheat(NULL),
 	  m_render(NULL),
@@ -337,7 +337,7 @@ void running_machine::start()
 	m_cheat = auto_alloc(*this, cheat_manager(*this));
 
 	// disallow save state registrations starting here
-	m_state.allow_registration(false);
+	m_save.allow_registration(false);
 }
 
 
@@ -779,10 +779,10 @@ void running_machine::handle_saveload()
 	if (filerr == FILERR_NONE)
 	{
 		// read/write the save state
-		state_save_error staterr = (m_saveload_schedule == SLS_LOAD) ? m_state.read_file(file) : m_state.write_file(file);
+		save_error saverr = (m_saveload_schedule == SLS_LOAD) ? m_save.read_file(file) : m_save.write_file(file);
 
 		// handle the result
-		switch (staterr)
+		switch (saverr)
 		{
 			case STATERR_ILLEGAL_REGISTRATIONS:
 				popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
@@ -813,7 +813,7 @@ void running_machine::handle_saveload()
 		}
 
 		// close and perhaps delete the file
-		if (staterr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
+		if (saverr != STATERR_NONE && m_saveload_schedule == SLS_SAVE)
 			file.remove_on_close();
 	}
 	else

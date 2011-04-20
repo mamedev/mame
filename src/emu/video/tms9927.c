@@ -283,7 +283,7 @@ static DEVICE_START( tms9927 )
 	}
 
 	/* register for state saving */
-	device->machine().state().register_postload(tms9927_state_save_postload, tms);
+	device->machine().save().register_postload(tms9927_state_save_postload, tms);
 
 	device->save_item(NAME(tms->clock));
 	device->save_item(NAME(tms->reg));

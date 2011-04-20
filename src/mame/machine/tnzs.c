@@ -713,7 +713,7 @@ MACHINE_START( tnzs )
 	state->save_item(NAME(state->m_bank1));
 	state->save_item(NAME(state->m_bank2));
 
-	machine.state().register_postload(tnzs_postload, NULL);
+	machine.save().register_postload(tnzs_postload, NULL);
 }
 
 MACHINE_START( jpopnics )
@@ -735,7 +735,7 @@ MACHINE_START( jpopnics )
 	state->save_item(NAME(state->m_bank1));
 	state->save_item(NAME(state->m_bank2));
 
-	machine.state().register_postload(tnzs_postload, NULL);
+	machine.save().register_postload(tnzs_postload, NULL);
 }
 
 

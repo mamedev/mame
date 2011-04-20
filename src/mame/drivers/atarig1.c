@@ -1228,7 +1228,7 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 		pitfightb_cheap_slapstic_init(machine);
 		state->save_item(NAME(state->m_bslapstic_bank));
 		state->save_item(NAME(state->m_bslapstic_primed));
-		machine.state().register_postload(pitfightb_state_postload, NULL);
+		machine.save().register_postload(pitfightb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(machine.device("maincpu"), slapstic_base, 0, slapstic);

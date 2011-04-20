@@ -446,7 +446,7 @@ MACHINE_START( williams2 )
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_vram_bank);
-	machine.state().register_postload(williams2_postload, NULL);
+	machine.save().register_postload(williams2_postload, NULL);
 }
 
 
@@ -737,7 +737,7 @@ MACHINE_START( defender )
 	/* configure the banking and make sure it is reset to 0 */
 	memory_configure_bank(machine, "bank1", 0, 9, &machine.region("maincpu")->base()[0x10000], 0x1000);
 
-	machine.state().register_postload(defender_postload, NULL);
+	machine.save().register_postload(defender_postload, NULL);
 }
 
 

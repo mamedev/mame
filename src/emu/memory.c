@@ -1590,7 +1590,7 @@ void memory_init(running_machine &machine)
 		space->locate_memory();
 
 	// register a callback to reset banks when reloading state
-	machine.state().register_postload(bank_reattach, NULL);
+	machine.save().register_postload(bank_reattach, NULL);
 
 	// dump the final memory configuration
 	generate_memdump(machine);
@@ -4094,7 +4094,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 		int bytes_per_element = space.data_width() / 8;
 		astring name;
 		name.printf("%08x-%08x", bytestart, byteend);
-		space.machine().state().save_memory("memory", space.device().tag(), space.spacenum(), name, m_data, bytes_per_element, (UINT32)(byteend + 1 - bytestart) / bytes_per_element);
+		space.machine().save().save_memory("memory", space.device().tag(), space.spacenum(), name, m_data, bytes_per_element, (UINT32)(byteend + 1 - bytestart) / bytes_per_element);
 	}
 }
 
@@ -4144,8 +4144,8 @@ memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs
 		m_name.printf("Bank '%s'", tag);
 	}
 
-	if (!m_anonymous && space.machine().state().registration_allowed())
-		space.machine().state().save_item("memory", m_tag, 0, NAME(m_curentry));
+	if (!m_anonymous && space.machine().save().registration_allowed())
+		space.machine().save().save_item("memory", m_tag, 0, NAME(m_curentry));
 }
 
 

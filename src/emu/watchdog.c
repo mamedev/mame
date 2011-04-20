@@ -44,8 +44,8 @@ void watchdog_init(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, watchdog_internal_reset);
 
 	/* save some stuff in the default tag */
-	machine.state().save_item(NAME(watchdog_enabled));
-	machine.state().save_item(NAME(watchdog_counter));
+	machine.save().save_item(NAME(watchdog_enabled));
+	machine.save().save_item(NAME(watchdog_counter));
 }
 
 

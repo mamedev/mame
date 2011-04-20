@@ -262,7 +262,7 @@ static MACHINE_START( pengadvb )
 	state_save_register_global_pointer(machine, state->m_main_mem, 0x4000);
 	state_save_register_global(machine, state->m_mem_map);
 	state_save_register_global_array(machine, state->m_mem_banks);
-	machine.state().register_postload(pengadvb, NULL);
+	machine.save().register_postload(pengadvb, NULL);
 }
 
 static MACHINE_RESET( pengadvb )

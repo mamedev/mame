@@ -1445,7 +1445,7 @@ static MACHINE_START( djmain )
 	state_save_register_global(machine, state->m_v_ctrl);
 	state_save_register_global_array(machine, state->m_obj_regs);
 
-	machine.state().register_postload(djmain_postload, NULL);
+	machine.save().register_postload(djmain_postload, NULL);
 }
 
 

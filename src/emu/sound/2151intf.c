@@ -61,7 +61,7 @@ static DEVICE_START( ym2151 )
 	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
-	device->machine().state().register_postload(ym2151intf_postload, info);
+	device->machine().save().register_postload(ym2151intf_postload, info);
 
 	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
 	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);

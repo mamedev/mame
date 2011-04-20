@@ -73,7 +73,7 @@
 
 // machine-wide utilities
 #include "romload.h"
-#include "state.h"
+#include "save.h"
 
 // define machine_config_constructor here due to circular dependency
 // between devices and the machine config

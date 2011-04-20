@@ -2170,7 +2170,7 @@ static VIDEO_START( cps )
 		state->save_pointer(NAME(state->m_cps2_buffered_obj), state->m_cps2_obj_size / 2);
 	}
 
-	machine.state().register_postload(cps_postload, NULL);
+	machine.save().register_postload(cps_postload, NULL);
 }
 
 VIDEO_START( cps1 )

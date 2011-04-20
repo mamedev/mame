@@ -230,7 +230,7 @@ static MACHINE_START( atarisy2 )
 	state->save_item(NAME(state->m_which_adc));
 	state->save_item(NAME(state->m_p2portwr_state));
 	state->save_item(NAME(state->m_p2portrd_state));
-	machine.state().register_postload(bankselect_postload, NULL);
+	machine.save().register_postload(bankselect_postload, NULL);
 	state->save_item(NAME(state->m_sound_reset_state));
 }
 

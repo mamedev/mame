@@ -455,7 +455,7 @@ void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs)
 }
 void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT)
 {
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 	device->save_item(NAME(DELTAT->portstate));
 	device->save_item(NAME(DELTAT->now_addr));
 	device->save_item(NAME(DELTAT->now_step));

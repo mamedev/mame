@@ -100,16 +100,16 @@ void generic_machine_init(running_machine &machine)
 		state->interrupt_device[index++] = &exec->device();
 
 	/* register coin save state */
-	machine.state().save_item(NAME(state->coin_count));
-	machine.state().save_item(NAME(state->coinlockedout));
-	machine.state().save_item(NAME(state->lastcoin));
+	machine.save().save_item(NAME(state->coin_count));
+	machine.save().save_item(NAME(state->coinlockedout));
+	machine.save().save_item(NAME(state->lastcoin));
 
 	/* reset memory card info */
 	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
 	machine.add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
-	machine.state().save_item(NAME(state->interrupt_enable));
+	machine.save().save_item(NAME(state->interrupt_enable));
 
 	/* register for configuration */
 	config_register(machine, "counters", counters_load, counters_save);

@@ -381,7 +381,7 @@ static VIDEO_START( common_14220 )
 	/* Set up save state */
 	state->save_item(NAME(state->m_sprite_xoffs));
 	state->save_item(NAME(state->m_sprite_yoffs));
-	machine.state().register_postload(hyprduel_postload, NULL);
+	machine.save().register_postload(hyprduel_postload, NULL);
 }
 
 VIDEO_START( hyprduel_14220 )

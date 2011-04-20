@@ -767,7 +767,7 @@ static void sprite_init_cave( running_machine &machine )
 	state->save_item(NAME(state->m_blit.clip_top));
 	state->save_item(NAME(state->m_blit.clip_bottom));
 
-	machine.state().register_postload(cave_sprite_postload, NULL);
+	machine.save().register_postload(cave_sprite_postload, NULL);
 }
 
 static void cave_sprite_check( screen_device &screen, const rectangle *clip )

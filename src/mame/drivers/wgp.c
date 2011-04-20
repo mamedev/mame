@@ -964,7 +964,7 @@ static MACHINE_START( wgp )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_port_sel));
-	machine.state().register_postload(wgp_postload, NULL);
+	machine.save().register_postload(wgp_postload, NULL);
 }
 
 static const tc0100scn_interface wgp_tc0100scn_intf =

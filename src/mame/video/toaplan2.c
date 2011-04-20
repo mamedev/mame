@@ -115,7 +115,7 @@ VIDEO_START( truxton2 )
 
 	/* Create the Text tilemap for this game */
 	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_tx_gfxram16);
-	machine.state().register_postload(truxton2_postload, NULL);
+	machine.save().register_postload(truxton2_postload, NULL);
 
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->m_tx_tilemap, 0x1d4 +1, 0x2a);
@@ -170,7 +170,7 @@ VIDEO_START( batrider )
 	state->m_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
 	state->save_pointer(NAME(state->m_tx_gfxram16), RAIZING_TX_GFXRAM_SIZE/2);
 	gfx_element_set_source(machine.gfx[2], (UINT8 *)state->m_tx_gfxram16);
-	machine.state().register_postload(truxton2_postload, NULL);
+	machine.save().register_postload(truxton2_postload, NULL);
 
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->m_tx_tilemap, 0x1d4, 0x2a);

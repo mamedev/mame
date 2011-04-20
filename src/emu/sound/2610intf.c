@@ -179,7 +179,7 @@ static DEVICE_START( ym2610 )
 		           timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2610 chip");
 
-	device->machine().state().register_postload(ym2610_intf_postload, info);
+	device->machine().save().register_postload(ym2610_intf_postload, info);
 }
 
 static DEVICE_STOP( ym2610 )

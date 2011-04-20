@@ -2069,7 +2069,7 @@ void K052109_vh_start(running_machine &machine,const char *gfx_memory_region,int
 	state_save_register_global_array(machine, K052109_dy);
 	state_save_register_global(machine, has_extra_video_ram);
 
-	machine.state().register_postload(K052109_tileflip_reset, NULL);
+	machine.save().register_postload(K052109_tileflip_reset, NULL);
 }
 
 READ8_HANDLER( K052109_r )
@@ -5128,7 +5128,7 @@ void K053251_vh_start(running_machine &machine)
 	K053251_set_tilemaps(NULL,NULL,NULL,NULL,NULL);
 
 	state_save_register_global_array(machine, K053251_ram);
-	machine.state().register_postload(K053251_reset_indexes, NULL);
+	machine.save().register_postload(K053251_reset_indexes, NULL);
 }
 
 void K053251_set_tilemaps(tilemap_t *ci0,tilemap_t *ci1,tilemap_t *ci2,tilemap_t *ci3,tilemap_t *ci4)
@@ -5901,7 +5901,7 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 	state_save_register_global_array(machine, K056832_dy);
 	state_save_register_global_array(machine, K056832_LayerTileMode);
 
-	machine.state().register_postload(K056832_postload, NULL);
+	machine.save().register_postload(K056832_postload, NULL);
 }
 
 /* call if a game uses external linescroll */

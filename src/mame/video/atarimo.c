@@ -292,9 +292,9 @@ static void init_savestate(running_machine &machine, int index, atarimo_data *mo
 	state_save_register_item(machine, "atarimo", NULL, index, mo->dirtyheight);
 #endif
 
-	machine.state().save_item("atarimo", NULL, index, *mo->bitmap, "bitmap");
+	machine.save().save_item("atarimo", NULL, index, *mo->bitmap, "bitmap");
 
-	machine.state().save_memory("atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
+	machine.save().save_memory("atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
 
 	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
 

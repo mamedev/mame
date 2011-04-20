@@ -656,7 +656,7 @@ static void init_save_state(device_t *device)
 	voodoo_state *v = get_safe_token(device);
 	int index, subindex;
 
-	device->machine().state().register_postload(voodoo_postload, v);
+	device->machine().save().register_postload(voodoo_postload, v);
 
 	/* register states: core */
 	device->save_item(NAME(v->extra_cycles));

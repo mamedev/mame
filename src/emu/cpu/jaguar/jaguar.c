@@ -430,7 +430,7 @@ static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callbac
 	device->save_item(NAME(jaguar->a));
 	device->save_item(NAME(jaguar->ctrl));
 	device->save_item(NAME(jaguar->ppc));
-	device->machine().state().register_postload(jaguar_postload, (void *)device);
+	device->machine().save().register_postload(jaguar_postload, (void *)device);
 }
 
 

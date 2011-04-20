@@ -69,7 +69,7 @@ VIDEO_START( gridlee )
 
     state_save_register_global(machine, state->m_cocktail_flip);
     state_save_register_global(machine, state->m_palettebank_vis);
-    machine.state().register_postload(expand_pixels, NULL);
+    machine.save().register_postload(expand_pixels, NULL);
 }
 
 

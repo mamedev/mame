@@ -290,11 +290,11 @@ void emu_timer::register_save()
 	}
 
 	// save the bits
-	machine().state().save_item("timer", name, index, NAME(m_param));
-	machine().state().save_item("timer", name, index, NAME(m_enabled));
-	machine().state().save_item("timer", name, index, NAME(m_period));
-	machine().state().save_item("timer", name, index, NAME(m_start));
-	machine().state().save_item("timer", name, index, NAME(m_expire));
+	machine().save().save_item("timer", name, index, NAME(m_param));
+	machine().save().save_item("timer", name, index, NAME(m_enabled));
+	machine().save().save_item("timer", name, index, NAME(m_period));
+	machine().save().save_item("timer", name, index, NAME(m_start));
+	machine().save().save_item("timer", name, index, NAME(m_expire));
 }
 
 
@@ -344,8 +344,8 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_timer_list->adjust(attotime::never);
 
 	// register global states
-	machine.state().save_item(NAME(m_basetime));
-	machine.state().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
+	machine.save().save_item(NAME(m_basetime));
+	machine.save().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
 }
 
 

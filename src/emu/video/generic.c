@@ -233,8 +233,8 @@ void generic_video_init(running_machine &machine)
 
 	state = machine.generic_video_data = auto_alloc_clear(machine, generic_video_private);
 
-	machine.state().save_item(NAME(state->flip_screen_x));
-	machine.state().save_item(NAME(state->flip_screen_y));
+	machine.save().save_item(NAME(state->flip_screen_x));
+	machine.save().save_item(NAME(state->flip_screen_y));
 
 	// create spriteram buffers if necessary
 	if (machine.config().m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
@@ -276,7 +276,7 @@ VIDEO_START( generic_bitmapped )
 	machine.generic.tmpbitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	/* ensure the contents of the bitmap are saved */
-	machine.state().save_item(NAME(*machine.generic.tmpbitmap));
+	machine.save().save_item(NAME(*machine.generic.tmpbitmap));
 }
 
 

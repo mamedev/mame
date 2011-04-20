@@ -1679,7 +1679,7 @@ INLINE void CSMKeyControll(UINT8 type, FM_CH *CH)
 	}
 }
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 {
@@ -2208,7 +2208,7 @@ void ym2203_reset_chip(void *chip)
 	for(i = 0x26 ; i >= 0x20 ; i-- ) OPNWriteReg(OPN,i,0);
 }
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 void ym2203_postload(void *chip)
 {
 	if (chip)
@@ -2283,7 +2283,7 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	F2203->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2203->OPN.ST.SSG           = ssg;
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 	YM2203_save_state(F2203, device);
 #endif
 	return F2203;
@@ -2650,7 +2650,7 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 	}
 }
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 /* FM channel save , internal state only */
 static void FMsave_state_adpcma(device_t *device,ADPCM_CH *adpcm)
 {
@@ -3405,7 +3405,7 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 	FM_STATUS_SET(&OPN->ST, 0);
 
 }
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 void ym2608_postload(void *chip)
 {
 	if (chip)
@@ -3527,7 +3527,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 
 	Init_ADPCMATable();
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 	YM2608_save_state(F2608, device);
 #endif
 	return F2608;
@@ -4083,7 +4083,7 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 #endif /* BUILD_YM2610B */
 
 
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 void ym2610_postload(void *chip)
 {
 	if (chip)
@@ -4202,7 +4202,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	F2610->deltaT.status_change_EOS_bit = 0x80;	/* status flag: set bit7 on End Of Sample */
 
 	Init_ADPCMATable();
-#ifdef __STATE_H__
+#ifdef __SAVE_H__
 	YM2610_save_state(F2610, device);
 #endif
 	return F2610;

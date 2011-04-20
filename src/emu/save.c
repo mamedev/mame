@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    state.c
+    save.c
 
     Save state management functions.
 
@@ -85,17 +85,17 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const char state_manager::s_magic_num[8] = { STATE_MAGIC_NUM };
+const char save_manager::s_magic_num[8] = { STATE_MAGIC_NUM };
 
 //**************************************************************************
 //  INITIALIZATION
 //**************************************************************************
 
 //-------------------------------------------------
-//  state_manager - constructor
+//  save_manager - constructor
 //-------------------------------------------------
 
-state_manager::state_manager(running_machine &machine)
+save_manager::save_manager(running_machine &machine)
 	: m_machine(machine),
 	  m_reg_allowed(true),
 	  m_illegal_regs(0),
@@ -111,7 +111,7 @@ state_manager::state_manager(running_machine &machine)
 //  registrations to happen
 //-------------------------------------------------
 
-void state_manager::allow_registration(bool allowed)
+void save_manager::allow_registration(bool allowed)
 {
 	// allow/deny registration
 	m_reg_allowed = allowed;
@@ -125,7 +125,7 @@ void state_manager::allow_registration(bool allowed)
 //  index
 //-------------------------------------------------
 
-const char *state_manager::indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const
+const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const
 {
 	state_entry *entry = m_entry_list.find(index);
 	if (entry == NULL)
@@ -144,7 +144,7 @@ const char *state_manager::indexed_item(int index, void *&base, UINT32 &valsize,
 //  function callback
 //-------------------------------------------------
 
-void state_manager::register_presave(prepost_func func, void *param)
+void save_manager::register_presave(prepost_func func, void *param)
 {
 	// check for invalid timing
 	if (!m_reg_allowed)
@@ -165,7 +165,7 @@ void state_manager::register_presave(prepost_func func, void *param)
 //  register a post-load function callback
 //-------------------------------------------------
 
-void state_manager::register_postload(prepost_func func, void *param)
+void save_manager::register_postload(prepost_func func, void *param)
 {
 	// check for invalid timing
 	if (!m_reg_allowed)
@@ -186,7 +186,7 @@ void state_manager::register_postload(prepost_func func, void *param)
 //  memory
 //-------------------------------------------------
 
-void state_manager::save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void save_manager::save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
 {
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
@@ -231,11 +231,11 @@ void state_manager::save_memory(const char *module, const char *tag, UINT32 inde
 //  state
 //-------------------------------------------------
 
-state_save_error state_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	// if we want to validate the signature, compute it
 	UINT32 sig = 0;
-	sig = machine.state().signature();
+	sig = machine.save().signature();
 
 	// seek to the beginning and read the header
 	file.compress(FCOMPRESS_NONE);
@@ -257,7 +257,7 @@ state_save_error state_manager::check_file(running_machine &machine, emu_file &f
 //  read_file - read the data from a file
 //-------------------------------------------------
 
-state_save_error state_manager::read_file(emu_file &file)
+save_error save_manager::read_file(emu_file &file)
 {
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
@@ -303,7 +303,7 @@ state_save_error state_manager::read_file(emu_file &file)
 //  write_file - writes the data to a file
 //-------------------------------------------------
 
-state_save_error state_manager::write_file(emu_file &file)
+save_error save_manager::write_file(emu_file &file)
 {
 	// if we have illegal registrations, return an error
 	if (m_illegal_regs > 0)
@@ -345,7 +345,7 @@ state_save_error state_manager::write_file(emu_file &file)
 //  is a CRC over the structure of the data
 //-------------------------------------------------
 
-UINT32 state_manager::signature() const
+UINT32 save_manager::signature() const
 {
 	// iterate over entries
 	UINT32 crc = 0;
@@ -369,7 +369,7 @@ UINT32 state_manager::signature() const
 //  logfile
 //-------------------------------------------------
 
-void state_manager::dump_registry() const
+void save_manager::dump_registry() const
 {
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
 		LOG(("%s: %d x %d\n", entry->m_name.cstr(), entry->m_typesize, entry->m_typecount));
@@ -381,7 +381,7 @@ void state_manager::dump_registry() const
 //  header
 //-------------------------------------------------
 
-state_save_error state_manager::validate_header(const UINT8 *header, const char *gamename, UINT32 signature,
+save_error save_manager::validate_header(const UINT8 *header, const char *gamename, UINT32 signature,
 	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
 {
 	// check magic number
@@ -427,7 +427,7 @@ state_save_error state_manager::validate_header(const UINT8 *header, const char 
 //  state_callback - constructor
 //-------------------------------------------------
 
-state_manager::state_callback::state_callback(prepost_func callback, void *param)
+save_manager::state_callback::state_callback(prepost_func callback, void *param)
 	: m_next(NULL),
 	  m_param(param),
 	  m_func(callback)
@@ -439,7 +439,7 @@ state_manager::state_callback::state_callback(prepost_func callback, void *param
 //  state_entry - constructor
 //-------------------------------------------------
 
-state_manager::state_entry::state_entry(void *data, const char *name, UINT8 size, UINT32 count)
+save_manager::state_entry::state_entry(void *data, const char *name, UINT8 size, UINT32 count)
 	: m_next(NULL),
 	  m_data(data),
 	  m_name(name),
@@ -455,7 +455,7 @@ state_manager::state_entry::state_entry(void *data, const char *name, UINT8 size
 //  block of  data
 //-------------------------------------------------
 
-void state_manager::state_entry::flip_data()
+void save_manager::state_entry::flip_data()
 {
 	UINT16 *data16;
 	UINT32 *data32;

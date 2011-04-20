@@ -403,22 +403,22 @@ static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info
 	machine.tilemap_data->tailptr = &tmap->next;
 
 	/* save relevant state */
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->enable));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->attributes));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->palette_offset));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->pen_data_offset));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollrows));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollcols));
-	machine.state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->rowscroll), rows * tileheight);
-	machine.state().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->colscroll), cols * tilewidth);
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx_flipped));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy));
-	machine.state().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy_flipped));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->enable));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->attributes));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->palette_offset));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->pen_data_offset));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollrows));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->scrollcols));
+	machine.save().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->rowscroll), rows * tileheight);
+	machine.save().save_pointer("tilemap", NULL, tilemap_instance, NAME(tmap->colscroll), cols * tilewidth);
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dx_flipped));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy));
+	machine.save().save_item("tilemap", NULL, tilemap_instance, NAME(tmap->dy_flipped));
 	machine.tilemap_data->instance++;
 
 	/* reset everything after a load */
-	machine.state().register_postload(tilemap_postload, tmap);
+	machine.save().register_postload(tilemap_postload, tmap);
 	return tmap;
 }
 

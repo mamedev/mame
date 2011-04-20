@@ -1957,7 +1957,7 @@ static void OPL_save_state(FM_OPL *OPL, device_t *device)
 	device->save_item(NAME(OPL->statusmask));
 	device->save_item(NAME(OPL->mode));
 
-	device->machine().state().register_postload(OPL_postload, OPL);
+	device->machine().save().register_postload(OPL_postload, OPL);
 }
 
 

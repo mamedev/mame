@@ -472,7 +472,7 @@ static MACHINE_START( mjsister )
 	state->save_item(NAME(state->m_dac_bank));
 	state->save_item(NAME(state->m_dac_adr_s));
 	state->save_item(NAME(state->m_dac_adr_e));
-	machine.state().register_postload(mjsister_redraw, 0);
+	machine.save().register_postload(mjsister_redraw, 0);
 }
 
 static MACHINE_RESET( mjsister )

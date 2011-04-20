@@ -1485,7 +1485,7 @@ static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 
 	device->save_item(NAME(chip->connect));
 
-	device->machine().state().register_postload(ym2151_postload, chip);
+	device->machine().save().register_postload(ym2151_postload, chip);
 }
 #else
 STATE_POSTLOAD( ym2151_postload )

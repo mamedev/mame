@@ -181,7 +181,7 @@ VIDEO_START( chaknpop )
 	memory_set_bank(machine, "bank1", 0);
 	tx_tilemap_mark_all_dirty(machine);
 
-	machine.state().register_postload(chaknpop_postload, NULL);
+	machine.save().register_postload(chaknpop_postload, NULL);
 }
 
 

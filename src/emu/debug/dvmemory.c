@@ -177,7 +177,7 @@ void debug_view_memory::enumerate_sources()
 		// stop when we run out of items
 		UINT32 valsize, valcount;
 		void *base;
-		const char *itemname = machine().state().indexed_item(itemnum, base, valsize, valcount);
+		const char *itemname = machine().save().indexed_item(itemnum, base, valsize, valcount);
 		if (itemname == NULL)
 			break;
 

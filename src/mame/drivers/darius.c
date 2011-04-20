@@ -899,7 +899,7 @@ static MACHINE_START( darius )
 	state->save_item(NAME(state->m_nmi_enable));
 	state->save_item(NAME(state->m_vol));
 	state->save_item(NAME(state->m_pan));
-	machine.state().register_postload(darius_postload, NULL);
+	machine.save().register_postload(darius_postload, NULL);
 }
 
 

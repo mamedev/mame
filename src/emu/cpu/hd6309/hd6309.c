@@ -541,7 +541,7 @@ static CPU_INIT( hd6309 )
 	device->save_item(NAME(DP));
 	device->save_item(NAME(CC));
 	device->save_item(NAME(MD));
-	device->machine().state().register_postload(hd6309_postload, (void *) device);
+	device->machine().save().register_postload(hd6309_postload, (void *) device);
 	device->save_item(NAME(m68_state->int_state));
 	device->save_item(NAME(m68_state->nmi_state));
 	device->save_item(NAME(m68_state->irq_state[0]));

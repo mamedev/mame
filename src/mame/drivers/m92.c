@@ -233,7 +233,7 @@ static MACHINE_START( m92 )
 	state->save_item(NAME(state->m_irqvector));
 	state->save_item(NAME(state->m_sound_status));
 	state->save_item(NAME(state->m_bankaddress));
-	machine.state().register_postload(m92_postload, NULL);
+	machine.save().register_postload(m92_postload, NULL);
 
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
 }

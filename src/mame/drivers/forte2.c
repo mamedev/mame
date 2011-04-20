@@ -120,7 +120,7 @@ static MACHINE_START( forte2 )
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_input_mask);
-	machine.state().register_postload(forte2, NULL);
+	machine.save().register_postload(forte2, NULL);
 }
 
 static MACHINE_RESET( forte2 )

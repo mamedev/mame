@@ -763,8 +763,8 @@ static CPU_INIT( m68k )
 	device->save_item(NAME(m68k->save_halted));
 	device->save_item(NAME(m68k->pref_addr));
 	device->save_item(NAME(m68k->pref_data));
-	device->machine().state().register_presave(m68k_presave, m68k);
-	device->machine().state().register_postload(m68k_postload, m68k);
+	device->machine().save().register_presave(m68k_presave, m68k);
+	device->machine().save().register_postload(m68k_postload, m68k);
 }
 
 /* Pulse the RESET line on the CPU */

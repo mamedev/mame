@@ -934,7 +934,7 @@ static void dcs_register_state(running_machine &machine)
 		state_save_register_global_pointer(machine, dcs.sram, 0x8000*4 / sizeof(dcs.sram[0]));
 
 	if (dcs.rev == 2)
-		machine.state().register_postload(sdrc_postload, NULL);
+		machine.save().register_postload(sdrc_postload, NULL);
 }
 
 void dcs_init(running_machine &machine)
