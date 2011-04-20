@@ -445,9 +445,25 @@ static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static READ8_HANDLER( exz80ram_r )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	return state->m_text_videoram[offset] & 0xff;
+}
+
+static WRITE8_HANDLER( exz80ram_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	state->m_text_videoram[offset] = (data & 0xff) | (state->m_text_videoram[offset] & 0xff00);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+}
 
 static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(exz80ram_r,exz80ram_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8 )
@@ -860,7 +876,8 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)			// 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafb_extraz80_portmap)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	//MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
 
 	MCFG_MACHINE_START(armedf)
 	MCFG_MACHINE_RESET(armedf)
@@ -1253,8 +1270,8 @@ ROM_START( terrafb )
 	ROM_LOAD16_BYTE( "tfb-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
 	ROM_LOAD16_BYTE( "tfb-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
 	ROM_LOAD16_BYTE( "tfb-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
-	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, CRC(1de681a1) SHA1(bddf404988226698d65e075b4c21de736a862df1) )
-	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) )
+	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, BAD_DUMP CRC(1de681a1) SHA1(bddf404988226698d65e075b4c21de736a862df1) ) // - one bit is bit-rotted, there might be more ...
+	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, BAD_DUMP CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) ) // /
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
@@ -1527,6 +1544,18 @@ static DRIVER_INIT( terrafu )
 	state->m_scroll_type = 5;
 }
 
+static DRIVER_INIT( terrafb )
+{
+	armedf_state *state = machine.driver_data<armedf_state>();
+	state->m_scroll_type = 5;
+
+	{
+		UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+
+		ROM[0x41ca0 / 2] = 0x209a; //0x249a, almost surely a bitrot
+	}
+}
+
 static DRIVER_INIT( armedf )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
@@ -1585,9 +1614,9 @@ static DRIVER_INIT( cclimbr2 )
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
 GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
-GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",        "Terra Force (bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (Japan set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (Japan set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
