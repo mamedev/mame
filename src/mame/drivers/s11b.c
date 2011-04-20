@@ -550,7 +550,7 @@ ROM_START(eatpm_p7)
 ROM_END
 
 /*--------------------
-/ Jokerz 1/89
+/ Jokerz! 1/89
 /--------------------*/
 ROM_START(jokrz_l6)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -899,8 +899,8 @@ GAME(1989,	eatpm_l2,		eatpm_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT
 GAME(1989,	eatpm_4g,		eatpm_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Elvira and the Party Monsters (LG-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	eatpm_4u,		eatpm_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Elvira and the Party Monsters (LU-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	eatpm_p7,		eatpm_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Elvira and the Party Monsters (PA-7)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1989,	jokrz_l6,		0,			williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Williams",				"Jokerz (L-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1989,	jokrz_l3,		jokrz_l6,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Williams",				"Jokerz (L-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1989,	jokrz_l6,		0,			williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Williams",				"Jokerz! (L-6)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1989,	jokrz_l3,		jokrz_l6,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Williams",				"Jokerz! (L-3)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	mousn_l4,		0,			williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Mousin' Around (LA-4)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	mousn_l1,		mousn_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Mousin' Around (LA-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(1989,	mousn_lu,		mousn_l4,	williams_s11b,	williams_s11b,	williams_s11b,	ROT0,	"Bally",				"Mousin' Around (LU-1)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
