@@ -332,7 +332,7 @@ SCREEN_UPDATE( armedf )
 	tilemap_set_enable(state->m_fg_tilemap, state->m_vreg & 0x400);
 	tilemap_set_enable(state->m_tx_tilemap, state->m_vreg & 0x100);
 
-	if ((state->m_scroll_type == 0)||(state->m_scroll_type == 5 ))
+	if ((state->m_scroll_type == 5 ))
 	{
 		if (state->m_old_mcu_mode != state->m_vreg)
 		{
