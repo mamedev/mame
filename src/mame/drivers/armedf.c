@@ -265,10 +265,10 @@ static void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			}
 			else
 			{
-				for(i=0;i<0x18;i++) /* PUSH START BUTTON (0x1a8? Gets wrong on the continue with this ...) */
+				for(i=0;i<0x18;i++) /* PUSH START BUTTON (0x128? Gets wrong on the continue with this ...) */
 				{
-					state->m_text_videoram[i+0x128+0x0000] = data[i+0x00+0x004b] & 0xff;
-					state->m_text_videoram[i+0x128+0x0400] = data[i+0x18+0x004b] & 0xff;
+					state->m_text_videoram[i+0x1a8+0x0000] = data[i+0x00+0x004b] & 0xff;
+					state->m_text_videoram[i+0x1a8+0x0400] = data[i+0x18+0x004b] & 0xff;
 				}
 			}
 
@@ -276,7 +276,7 @@ static void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			{
 				for(i=0;i<0x18;i++) /* ONE PLAYER ONLY */
 				{
-					state->m_text_videoram[i+0x168+0x0000] = data[i+0x00+0x007d] & 0xff;
+					state->m_text_videoram[i+0x168+0x0000] = (fl_cond) ? 0x20 : data[i+0x00+0x007d] & 0xff;
 					state->m_text_videoram[i+0x168+0x0400] = data[i+0x18+0x007d] & 0xff;
 				}
 			}
@@ -284,7 +284,7 @@ static void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			{
 				for(i=0;i<0x18;i++) /* ONE OR TWO PLAYERS */
 				{
-					state->m_text_videoram[i+0x168+0x0000] = data[i+0x00+0x00af] & 0xff;
+					state->m_text_videoram[i+0x168+0x0000] = (fl_cond) ? 0x20 : data[i+0x00+0x00af] & 0xff;
 					state->m_text_videoram[i+0x168+0x0400] = data[i+0x18+0x00af] & 0xff;
 				}
 			}
