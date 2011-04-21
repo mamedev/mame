@@ -367,7 +367,7 @@ SCREEN_UPDATE( armedf )
 
 	switch (state->m_scroll_type)
 	{
-		case 0:	/* terra force */
+		case 0:	/* terra force, kodure ookami */
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;
@@ -381,7 +381,6 @@ SCREEN_UPDATE( armedf )
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_legion_cmd[13] & 0xff) | ((state->m_legion_cmd[14] & 0x3) << 8));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_legion_cmd[11] & 0xff) | ((state->m_legion_cmd[12] & 0x3) << 8));
 			break;
-		case 2: /* kodure ookami */
 		case 3:
 		case 4: /* crazy climber 2 */
 			{

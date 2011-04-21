@@ -224,8 +224,8 @@ static WRITE16_HANDLER( kodure_io_w )
 	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
 	{
 		/* latch fg scroll values */
-		//state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
-		//state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
+		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
+		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
 
 		/* process the command */
 		kodure_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
@@ -1587,7 +1587,7 @@ static DRIVER_INIT( armedf )
 static DRIVER_INIT( kodure )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 2;
+	state->m_scroll_type = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(kodure_io_w) );
 
