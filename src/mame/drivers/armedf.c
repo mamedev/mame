@@ -221,20 +221,23 @@ static WRITE16_HANDLER( kodure_io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
+	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+	{
+		/* latch fg scroll values */
+		//state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
+		//state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
+
+		/* process the command */
+		kodure_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+
+		/* mark tiles dirty */
+		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+	}
+
 	COMBINE_DATA(&state->m_vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
-
-	/* This is a temporary condition specification. */
-	if (!(state->m_vreg & 0x0080))
-	{
-		int i;
-		for (i = 0; i < 0x1000; i++)
-		{
-			armedf_text_videoram_w(space,i, ' ', 0xffff);
-		}
-	}
 }
 
 static WRITE16_HANDLER( bootleg_io_w )
@@ -294,7 +297,7 @@ static WRITE16_HANDLER( irq_lv2_ack_w )
  *************************************/
 
 static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x04ffff) AM_ROM
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -316,26 +319,12 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kodure_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
-	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
-	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
-	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
-	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
-	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
-	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kodure_io_w)
-	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
-	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
+	AM_RANGE(0x060400, 0x063fff) AM_RAM
+//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kodure_io_w)
+//	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
+//	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
+	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
@@ -680,10 +669,10 @@ static INPUT_PORTS_START( kodure )
 	PORT_DIPSETTING(    0x00, "50k then every 90k" )
 	PORT_DIPSETTING(    0x0c, "Every 60k" )
 	PORT_DIPSETTING(    0x04, "Every 90k" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:7" )				/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )				/* Listed as "Unused" */
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )				PORT_DIPLOCATION("SW2:3,4")
@@ -694,6 +683,7 @@ static INPUT_PORTS_START( kodure )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cclimbr2 )
@@ -957,7 +947,7 @@ static MACHINE_CONFIG_START( kodure, armedf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 1*8, 31*8-1 ) // vertical res confirmed by a real HW video
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
@@ -1223,7 +1213,7 @@ ROM_START( legiono )
 ROM_END
 
 ROM_START( terraf )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64K*8 for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "tf-014.6e", 0x00000, 0x10000, CRC(8e5f557f) SHA1(3462a58146c3f33bf8686adbd2ead25dae3804a8) )
 	ROM_LOAD16_BYTE( "tf-011.6h", 0x00001, 0x10000, CRC(5320162a) SHA1(eaffafcaf146cdddb03f40f92ce23dfd096eb89e) )
 	ROM_LOAD16_BYTE( "tf-013.4e", 0x20000, 0x10000, CRC(a86951e0) SHA1(804cc6f143993f5a9d5f3798e971d7abfe94c3a8) )
@@ -1287,7 +1277,7 @@ Company logo and copyright string removed.
 
 
 ROM_START( terrafb )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64K*8 for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "tfb-8.bin", 0x00000, 0x10000, CRC(b11a6fa7) SHA1(7bb2b98be02d8913796a6d4fa20eed16226ce6b9) )
 	ROM_LOAD16_BYTE( "tfb-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
 	ROM_LOAD16_BYTE( "tfb-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
@@ -1323,7 +1313,7 @@ ROM_END
 
 
 ROM_START( terrafu )
-	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64K*8 for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "tf-8.6e", 0x00000, 0x10000, CRC(fea6dd64) SHA1(682eae338ce14808f134897f594fae1c69e75a1a) )
 	ROM_LOAD16_BYTE( "tf-3.6h", 0x00001, 0x10000, CRC(02f9d05a) SHA1(88985373bc3cffbc838e0b701ecd732a417975a1) )
 	ROM_LOAD16_BYTE( "tf-7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
@@ -1357,7 +1347,7 @@ ROM_START( terrafu )
 ROM_END
 
 ROM_START( terrafa )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 64K*8 for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "8.6e", 0x00000, 0x10000, CRC(fd58fa06) SHA1(f1f5fbd153be5fd5669aada66134baedfeac5d32) )
 	ROM_LOAD16_BYTE( "3.6h", 0x00001, 0x10000, CRC(54823a7d) SHA1(bdf67890428710470a622ea48383b3fae8de8cbd) )
 	ROM_LOAD16_BYTE( "7.4e", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
@@ -1598,6 +1588,9 @@ static DRIVER_INIT( kodure )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 2;
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(kodure_io_w) );
+
 }
 
 static DRIVER_INIT( legion )
