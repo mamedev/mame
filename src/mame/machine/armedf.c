@@ -1,12 +1,13 @@
 /*******************************************************************************************************************
 
-Text tilemap protection simulation for Armed Formation HW games
+Nichibutsu 1414M4 device emulation
 
 Written by Angelo Salese, based on researches by Tomasz Slanina with Legion
 
-TODO:
-- name of this device / MCU;
+This is some fancy MCU / blitter that copies text strings in various Nihon Bussan games;
 
+TODO:
+- Device-ify this;
 
 Notes:
 - just before any string in the "MCU" rom, there's an offset, it indicates where the string should go in the tilemap.
@@ -136,7 +137,7 @@ static void	kodure_score_msg(address_space *space,UINT16 dst,UINT8 src_base)
 
 }
 
-static void service_mode(address_space *space)
+static void service_mode(address_space *space, UINT8 is2p)
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
@@ -207,7 +208,13 @@ static void service_mode(address_space *space)
 		terrafu_sm_onoff(space,0x079 + (i * 0x20),(state->m_text_videoram[0x06] >> (7-i)) & 1);
 	}
 
-	/* TODO: inputs layout? */
+	terrafu_sm_transfer(space,0x2d8 + (is2p * 0x18),0x1e4,12,1); // 1p / 2p
+
+	for(i=0;i<5;i++) /* coin inputs */
+		terrafu_sm_onoff(space,0x06c + (i * 0x20),(state->m_text_videoram[0x04] >> (4-i)) & 1);
+
+	for(i=0;i<7;i++) /* 1p inputs */
+		terrafu_sm_onoff(space,0x10c + (i * 0x20),(state->m_text_videoram[0x02 + is2p] >> (6-i)) & 1);
 }
 
 void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
@@ -245,7 +252,8 @@ void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			terrafu_sm_transfer(space,0x2000,0x0000,0x400,1);
 			break;
 		case 0x600: /* service mode */
-			service_mode(space);
+		case 0x601:
+			service_mode(space,mcu_cmd & 1);
 			break;
 		//default:
 			//printf("%04x\n",mcu_cmd);
@@ -313,7 +321,8 @@ void kodure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			break;
 
 		case 0x600:
-			service_mode(space);
+		case 0x601:
+			service_mode(space,mcu_cmd & 1);
 			break;
 
 		//default:
