@@ -1,7 +1,4 @@
 
-
-
-
 class armedf_state : public driver_device
 {
 public:
@@ -50,3 +47,5 @@ WRITE16_HANDLER( armedf_fg_scrollx_w );
 WRITE16_HANDLER( armedf_fg_scrolly_w );
 WRITE16_HANDLER( armedf_bg_scrollx_w );
 WRITE16_HANDLER( armedf_bg_scrolly_w );
+
+void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd);

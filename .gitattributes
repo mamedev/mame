@@ -3519,6 +3519,7 @@ src/mame/machine/ajax.c svneol=native#text/plain
 src/mame/machine/amiga.c svneol=native#text/plain
 src/mame/machine/archimds.c svneol=native#text/plain
 src/mame/machine/arkanoid.c svneol=native#text/plain
+src/mame/machine/armedf.c svneol=native#text/plain
 src/mame/machine/asic65.c svneol=native#text/plain
 src/mame/machine/asic65.h svneol=native#text/plain
 src/mame/machine/asteroid.c svneol=native#text/plain

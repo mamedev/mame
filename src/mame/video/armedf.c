@@ -186,25 +186,30 @@ WRITE16_HANDLER( armedf_bg_videoram_w )
 	tilemap_mark_tile_dirty(state->m_bg_tilemap, offset);
 }
 
-WRITE16_HANDLER( terraf_fg_scrollx_w )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	if (ACCESSING_BITS_8_15)
-	{
-		state->m_fg_scrollx = data >> 8;
-		state->m_waiting_msb = 1;
-	}
-}
-
 WRITE16_HANDLER( terraf_fg_scrolly_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	if (ACCESSING_BITS_8_15)
 	{
+		state->m_fg_scrolly = ((data >> 8) & 0xff) | (state->m_fg_scrolly & 0x300);
+		state->m_waiting_msb = 1;
+	}
+}
+
+WRITE16_HANDLER( terraf_fg_scrollx_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+	if (ACCESSING_BITS_8_15)
+	{
 		if (state->m_waiting_msb)
+		{
 			state->m_scroll_msb = data >> 8;
+			state->m_fg_scrollx = (state->m_fg_scrollx & 0xff) | (((state->m_scroll_msb >> 4) & 3) << 8);
+			state->m_fg_scrolly = (state->m_fg_scrolly & 0xff) | (((state->m_scroll_msb >> 0) & 3) << 8);
+			//popmessage("%04X %04X %04X",data,state->m_fg_scrollx,state->m_fg_scrolly);
+		}
 		else
-			state->m_fg_scrolly = data >> 8;
+			state->m_fg_scrollx = ((data >> 8) & 0xff) | (state->m_fg_scrollx & 0x300);
 	}
 }
 
@@ -332,7 +337,7 @@ SCREEN_UPDATE( armedf )
 	tilemap_set_enable(state->m_fg_tilemap, state->m_vreg & 0x400);
 	tilemap_set_enable(state->m_tx_tilemap, state->m_vreg & 0x100);
 
-	if ((state->m_scroll_type == 5 ))
+	if ((state->m_scroll_type == 3 ))
 	{
 		if (state->m_old_mcu_mode != state->m_vreg)
 		{
@@ -356,9 +361,9 @@ SCREEN_UPDATE( armedf )
 
 	switch (state->m_scroll_type)
 	{
-		case 0: /* terra force */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, state->m_fg_scrolly + ((state->m_scroll_msb >> 4) & 3) * 256);
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fg_scrollx + ((state->m_scroll_msb) & 3) * 256);
+		case 0:	/* terra force */
+			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
+			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;
 
 		case 1: /* armed formation */
@@ -383,14 +388,6 @@ SCREEN_UPDATE( armedf )
 				tilemap_set_scrolly(state->m_fg_tilemap, 0, scrolly);
 
 			}
-			break;
-		case 5: /* terra force (US) */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_text_videoram[13] & 0xff) | ((state->m_text_videoram[14] & 0x3) << 8));
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_text_videoram[11] & 0xff) | ((state->m_text_videoram[12] & 0x3) << 8));
-			break;
-		case 7:	/* terra force (japan bootleg) */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;
 	}
 

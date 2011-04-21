@@ -997,7 +997,7 @@ $(MAMEOBJ)/neogeo.a: \
 	$(MACHINE)/neoprot.o \
 
 $(MAMEOBJ)/nichibut.a: \
-	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o \
+	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o $(MACHINE)/armedf.o \
 	$(DRIVERS)/bigfghtr.o \
 	$(DRIVERS)/cclimber.o $(MACHINE)/cclimber.o $(AUDIO)/cclimber.o $(VIDEO)/cclimber.o \
 	$(DRIVERS)/clshroad.o $(VIDEO)/clshroad.o \
