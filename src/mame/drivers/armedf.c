@@ -36,7 +36,7 @@ TODO:
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
   red to blue;
-
+- Crazy Climber 2 does use the 1414M4 chip, but the data used gets overwritten by the m68k code.
 
 
 
@@ -192,46 +192,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 	---- ---- ---- ---x coin counter 0
 */
 
-static WRITE16_HANDLER( io_w )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		printf("%04x\n",(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
-
-	COMBINE_DATA(&state->m_vreg);
-
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
-
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
-}
-
-static WRITE16_HANDLER( cclimbr2_io_w )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-	{
-		/* latch fg scroll values */
-		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
-		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
-
-		/* process the command */
-		//terrafu_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
-
-		/* mark tiles dirty */
-		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-	}
-
-	COMBINE_DATA(&state->m_vreg);
-
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
-
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
-}
-
 static WRITE16_HANDLER( terraf_io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
@@ -243,7 +203,7 @@ static WRITE16_HANDLER( terraf_io_w )
 		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
 
 		/* process the command */
-		terrafu_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+		nb_1414m4_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
 
 		/* mark tiles dirty */
 		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
@@ -272,61 +232,12 @@ static WRITE16_HANDLER( terrafb_io_w )
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
-static WRITE16_HANDLER( kozure_io_w )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-	{
-		/* latch fg scroll values */
-		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
-		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
-
-		/* process the command */
-		kozure_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
-
-		/* mark tiles dirty */
-		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-	}
-
-	COMBINE_DATA(&state->m_vreg);
-
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
-
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
-}
-
 static WRITE16_HANDLER( bootleg_io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	//if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
 	//	cputag_set_input_line(space->machine(), "extra", 0, HOLD_LINE);
-
-	COMBINE_DATA(&state->m_vreg);
-
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
-
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
-}
-
-static WRITE16_HANDLER( legion_io_w )
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-	{
-		/* latch fg scroll values */
-		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
-		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
-
-		legion_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
-
-		/* mark tiles dirty */
-		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-	}
 
 	COMBINE_DATA(&state->m_vreg);
 
@@ -489,7 +400,7 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x06c004, 0x06c005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06c006, 0x06c007) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
-	AM_RANGE(0x06d000, 0x06d001) AM_WRITE(io_w)
+	AM_RANGE(0x06d000, 0x06d001) AM_WRITE(terraf_io_w)
 	AM_RANGE(0x06d002, 0x06d003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x06d004, 0x06d005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x06d006, 0x06d007) AM_WRITE(armedf_fg_scrollx_w)
@@ -1259,7 +1170,7 @@ ROM_START( legion )
 	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) ) // lg12
 	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) ) // lg11
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
 ROM_END
 
@@ -1287,7 +1198,6 @@ ROM_START( legiono )
 	ROM_REGION( 0x20000, "gfx4", 0 )
 	ROM_LOAD( "legion.1k", 0x000000, 0x010000, CRC(ff5a0db9) SHA1(9308deb363d3b7686cc69485ec14201dd68f9a97) )
 	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
-
 ROM_END
 
 ROM_START( terraf )
@@ -1317,7 +1227,7 @@ ROM_START( terraf )
 	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
 	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter, shouldn't be loaded? */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
@@ -1417,7 +1327,7 @@ ROM_START( terrafu )
 	ROM_LOAD( "tf-003.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
 	ROM_LOAD( "tf-002.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
@@ -1451,7 +1361,7 @@ ROM_START( terrafa )
 	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
 	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
@@ -1484,7 +1394,7 @@ ROM_START( kozure )
 	ROM_LOAD( "kozure12.8d", 0x00000, 0x20000, CRC(15f4021d) SHA1(b2ba6fda1a7bdaae97de4b0157b9b656b4385e08) )	/* sprites */
 	ROM_LOAD( "kozure13.9d", 0x20000, 0x20000, CRC(b3b6c753) SHA1(9ad061cac9558320b5cfd1ac1ac8d7f1788270cc) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "kozure10.11c", 0x0000, 0x4000, CRC(f48be21d) SHA1(5d6db049f30cab98f672814a86a06609c1fa8fb4) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
@@ -1521,7 +1431,7 @@ ROM_START( cclimbr2 )
 	ROM_LOAD( "13.bin", 0x20000, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
 	ROM_LOAD( "14.bin", 0x30000, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(740d260f) SHA1(5b4487930c7a1fb0a796aec2243bec631b1b5104) )
 ROM_END
 
@@ -1555,7 +1465,7 @@ ROM_START( cclimbr2a )
 	ROM_LOAD( "13.bin", 0x20000, 0x10000, CRC(6b6ec999) SHA1(7749ce435f497732bd1b6958974cd95e960fc9fe) )
 	ROM_LOAD( "14.bin", 0x30000, 0x10000, CRC(f426a4ad) SHA1(facccb21ca73c560d3a38e05e677782516d5b0c0) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter */
 	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(740d260f) SHA1(5b4487930c7a1fb0a796aec2243bec631b1b5104) )
 ROM_END
 
@@ -1667,7 +1577,7 @@ static DRIVER_INIT( kozure )
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(kozure_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
 
 }
 
@@ -1683,7 +1593,7 @@ static DRIVER_INIT( legion )
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(legion_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
 
 	state->m_scroll_type = 2;
 }
@@ -1708,7 +1618,7 @@ static DRIVER_INIT( cclimbr2 )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(cclimbr2_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
 
 	state->m_scroll_type = 3;
 }
