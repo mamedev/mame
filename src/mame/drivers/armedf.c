@@ -6,7 +6,7 @@ Legion
 Terra Force
 (c)1987 Nichibutsu
 
-Kodure Ookami
+Kozure Ookami
 (c)1987 Nichibutsu
 
 Crazy Climber 2
@@ -23,7 +23,7 @@ actually bootlegs.
 TODO:
 - simulate the mcu/blitter (particularly needed in terrafu and legion)
    -- or figure out which chip it is, decap it, and emulate it.
-- time over doesn't kill the player in Kodure Ookami;
+- time over doesn't kill the player in Kozure Ookami;
 - intro in Terra Force isn't right, the square panels should be cleared after every
   animation is played, almost likely to not be protection related;
 - priorities, especially with the text layer (Terra Force);
@@ -125,7 +125,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     0002C2: 4EF9 0000 0124           jmp     $124.l
 
 
-3)  'kodure'
+3)  'kozure'
 
   - The ROM test (code at 0x004fac) checks range 0x000000-0x05ffff
     and reports an error if the checksum isn't correct.
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( terrafb_io_w )
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
-static WRITE16_HANDLER( kodure_io_w )
+static WRITE16_HANDLER( kozure_io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
@@ -228,7 +228,7 @@ static WRITE16_HANDLER( kodure_io_w )
 		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
 
 		/* process the command */
-		kodure_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+		kozure_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
 
 		/* mark tiles dirty */
 		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
@@ -318,10 +318,10 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kodure_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kodure_io_w)
+//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
 //	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
 	AM_IMPORT_FROM( terraf_map )
@@ -653,7 +653,7 @@ static INPUT_PORTS_START( terraf )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kodure )
+static INPUT_PORTS_START( kozure )
 	PORT_INCLUDE( terraf )
 
 	PORT_MODIFY("DSW1")
@@ -924,11 +924,11 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kodure, armedf_state )
+static MACHINE_CONFIG_START( kozure, armedf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
-	MCFG_CPU_PROGRAM_MAP(kodure_map)
+	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
@@ -1380,34 +1380,34 @@ ROM_START( terrafa )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
-ROM_START( kodure )
+ROM_START( kozure )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "kodure8.6e", 0x00000, 0x10000, CRC(6bbfb1e6) SHA1(ffc8f835e28ff5f5b11f826b74ac2712c3018178) )
-	ROM_LOAD16_BYTE( "kodure3.6h", 0x00001, 0x10000, CRC(f9178ec8) SHA1(68085b6030f4d1f89931263df68635b3b276e9f0) )
-	ROM_LOAD16_BYTE( "kodure7.5e", 0x20000, 0x10000, CRC(a7ee09bb) SHA1(70ea2ab09b44e9188eb9500d9663d11e521caa1a) )
-	ROM_LOAD16_BYTE( "kodure2.5h", 0x20001, 0x10000, CRC(236d820f) SHA1(e8784c0bbfe22e63a442a8eac18247b740f437a8) )
-	ROM_LOAD16_BYTE( "kodure6.3e", 0x40000, 0x10000, CRC(9120e728) SHA1(af2ce368d66d01cbad136ae119b31b1701ad0595) )
-	ROM_LOAD16_BYTE( "kodure1.3h", 0x40001, 0x10000, CRC(345fe7a5) SHA1(56ad809cf4a609447cce3e0181ff86e3f0e8966c) )
+	ROM_LOAD16_BYTE( "kozure8.6e", 0x00000, 0x10000, CRC(6bbfb1e6) SHA1(ffc8f835e28ff5f5b11f826b74ac2712c3018178) )
+	ROM_LOAD16_BYTE( "kozure3.6h", 0x00001, 0x10000, CRC(f9178ec8) SHA1(68085b6030f4d1f89931263df68635b3b276e9f0) )
+	ROM_LOAD16_BYTE( "kozure7.5e", 0x20000, 0x10000, CRC(a7ee09bb) SHA1(70ea2ab09b44e9188eb9500d9663d11e521caa1a) )
+	ROM_LOAD16_BYTE( "kozure2.5h", 0x20001, 0x10000, CRC(236d820f) SHA1(e8784c0bbfe22e63a442a8eac18247b740f437a8) )
+	ROM_LOAD16_BYTE( "kozure6.3e", 0x40000, 0x10000, CRC(9120e728) SHA1(af2ce368d66d01cbad136ae119b31b1701ad0595) )
+	ROM_LOAD16_BYTE( "kozure1.3h", 0x40001, 0x10000, CRC(345fe7a5) SHA1(56ad809cf4a609447cce3e0181ff86e3f0e8966c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
-	ROM_LOAD( "kodure11.17k", 0x00000, 0x10000, CRC(dba51e2d) SHA1(49e799d39d298cd3e01602ae5a2d123dfbfa9134) )
+	ROM_LOAD( "kozure11.17k", 0x00000, 0x10000, CRC(dba51e2d) SHA1(49e799d39d298cd3e01602ae5a2d123dfbfa9134) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "kodure9.11e", 0x00000, 0x08000, CRC(e041356e) SHA1(3e4c8564e7a8c940bbe72db11759903aa295287f) )	/* characters */
+	ROM_LOAD( "kozure9.11e", 0x00000, 0x08000, CRC(e041356e) SHA1(3e4c8564e7a8c940bbe72db11759903aa295287f) )	/* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "kodure5.15h", 0x00000, 0x20000, CRC(0b510258) SHA1(e7ec89faa574b755605ddb67d6c908a9f5f2d6ac) )	/* foreground tiles */
-	ROM_LOAD( "kodure4.14h", 0x20000, 0x10000, CRC(fb8e13e6) SHA1(f2eafcf6d7362dc62e808f582a7bd2970e5e1ad1) )
+	ROM_LOAD( "kozure5.15h", 0x00000, 0x20000, CRC(0b510258) SHA1(e7ec89faa574b755605ddb67d6c908a9f5f2d6ac) )	/* foreground tiles */
+	ROM_LOAD( "kozure4.14h", 0x20000, 0x10000, CRC(fb8e13e6) SHA1(f2eafcf6d7362dc62e808f582a7bd2970e5e1ad1) )
 
 	ROM_REGION( 0x10000, "gfx3", 0 )
-	ROM_LOAD( "kodure14.8a", 0x00000, 0x10000, CRC(94a9c3d0) SHA1(7a5d810ea370d158b2099c17f4d656fbd3deeac8) )	/* background tiles */
+	ROM_LOAD( "kozure14.8a", 0x00000, 0x10000, CRC(94a9c3d0) SHA1(7a5d810ea370d158b2099c17f4d656fbd3deeac8) )	/* background tiles */
 
 	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "kodure12.8d", 0x00000, 0x20000, CRC(15f4021d) SHA1(b2ba6fda1a7bdaae97de4b0157b9b656b4385e08) )	/* sprites */
-	ROM_LOAD( "kodure13.9d", 0x20000, 0x20000, CRC(b3b6c753) SHA1(9ad061cac9558320b5cfd1ac1ac8d7f1788270cc) )
+	ROM_LOAD( "kozure12.8d", 0x00000, 0x20000, CRC(15f4021d) SHA1(b2ba6fda1a7bdaae97de4b0157b9b656b4385e08) )	/* sprites */
+	ROM_LOAD( "kozure13.9d", 0x20000, 0x20000, CRC(b3b6c753) SHA1(9ad061cac9558320b5cfd1ac1ac8d7f1788270cc) )
 
 	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
-	ROM_LOAD( "kodure10.11c", 0x0000, 0x4000, CRC(f48be21d) SHA1(5d6db049f30cab98f672814a86a06609c1fa8fb4) )
+	ROM_LOAD( "kozure10.11c", 0x0000, 0x4000, CRC(f48be21d) SHA1(5d6db049f30cab98f672814a86a06609c1fa8fb4) )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* Unknown use */
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
@@ -1584,12 +1584,12 @@ static DRIVER_INIT( armedf )
 }
 
 
-static DRIVER_INIT( kodure )
+static DRIVER_INIT( kozure )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(kodure_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(kozure_io_w) );
 
 }
 
@@ -1642,7 +1642,7 @@ GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "bootleg",
 GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA",     "Terra Force (US set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION ) //world?
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",     "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )

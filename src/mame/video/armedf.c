@@ -367,7 +367,7 @@ SCREEN_UPDATE( armedf )
 
 	switch (state->m_scroll_type)
 	{
-		case 0:	/* terra force, kodure ookami */
+		case 0:	/* terra force, kozure ookami */
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;

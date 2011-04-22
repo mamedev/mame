@@ -106,7 +106,7 @@ static void credit_msg(address_space *space, UINT8 tile_base,UINT8 pal_base)
 	}
 }
 
-static void	kodure_score_msg(address_space *space,UINT16 dst,UINT8 src_base)
+static void	kozure_score_msg(address_space *space,UINT16 dst,UINT8 src_base)
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	int i;
@@ -260,7 +260,7 @@ void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 	}
 }
 
-void kodure_mcu_exec(address_space *space,UINT16 mcu_cmd)
+void kozure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 {
 	switch(mcu_cmd)
 	{
@@ -305,11 +305,11 @@ void kodure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			if(mcu_cmd & 0x04)
 			{
 				terrafu_sm_transfer(space,0x00fd,0x03a0,8,!(mcu_cmd & 1)); /* 1p-msg */
-				kodure_score_msg(space,0x380,0); /* 1p score */
+				kozure_score_msg(space,0x380,0); /* 1p score */
 				if(mcu_cmd & 0x80)
 				{
 					terrafu_sm_transfer(space,0x0119,0x03b8,8,!(mcu_cmd & 2)); /* 2p-msg */
-					kodure_score_msg(space,0x398,1); /* 2p score */
+					kozure_score_msg(space,0x398,1); /* 2p score */
 				}
 			}
 			else
