@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Ricoh RP5C01(A) Real Time Clock With Internal RAM emulation
+    Ricoh RP5C15 Real Time Clock emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,11 +9,11 @@
                             _____   _____
                    _CS   1 |*    \_/     | 18  Vcc
                     CS   2 |             | 17  OSCOUT
-                   ADJ   3 |             | 16  OSCIN
-                    A0   4 |   RP5C01    | 15  _ALARM
-                    A1   5 |   RP5C01A   | 14  D3
-                    A2   6 |   RF5C01A   | 13  D2
-                    A3   7 |   TC8521    | 12  D1
+                CLKOUT   3 |             | 16  OSCIN
+                    A0   4 |   RP5C15    | 15  _ALARM
+                    A1   5 |   RF5C15    | 14  D3
+                    A2   6 |   RJ5C15    | 13  D2
+                    A3   7 |             | 12  D1
                    _RD   8 |             | 11  D0
                    GND   9 |_____________| 10  _WR
 
@@ -21,8 +21,8 @@
 
 #pragma once
 
-#ifndef __RP5C01__
-#define __RP5C01__
+#ifndef __RP5C15__
+#define __RP5C15__
 
 #include "emu.h"
 
@@ -32,13 +32,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_RP5C01_ADD(_tag, _clock, _config) \
-	MCFG_DEVICE_ADD((_tag), RP5C01, _clock)	\
+#define MCFG_RP5C15_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), RP5C15, _clock)	\
 	MCFG_DEVICE_CONFIG(_config)
 
 
-#define RP5C01_INTERFACE(name) \
-	const rp5c01_interface (name) =
+#define RP5C15_INTERFACE(name) \
+	const rp5c15_interface (name) =
 
 
 
@@ -46,25 +46,25 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> rp5c01_interface
+// ======================> rp5c15_interface
 
-struct rp5c01_interface
+struct rp5c15_interface
 {
 	devcb_write_line		m_out_alarm_func;
+	devcb_write_line		m_out_clkout_func;
 };
 
 
 
-// ======================> rp5c01_device_config
+// ======================> rp5c15_device_config
 
-class rp5c01_device_config :   public device_config,
-							   public device_config_nvram_interface,
-                               public rp5c01_interface
+class rp5c15_device_config :   public device_config,
+                               public rp5c15_interface
 {
-    friend class rp5c01_device;
+    friend class rp5c15_device;
 
     // construction/destruction
-    rp5c01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    rp5c15_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
     // allocators
@@ -78,15 +78,14 @@ protected:
 
 
 
-// ======================> rp5c01_device
+// ======================> rp5c15_device
 
-class rp5c01_device :	public device_t,
-						public device_nvram_interface
+class rp5c15_device :	public device_t
 {
-    friend class rp5c01_device_config;
+    friend class rp5c15_device_config;
 
     // construction/destruction
-    rp5c01_device(running_machine &_machine, const rp5c01_device_config &_config);
+    rp5c15_device(running_machine &_machine, const rp5c15_device_config &_config);
 
 public:
 	DECLARE_READ8_MEMBER( read );
@@ -97,11 +96,6 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// device_nvram_interface overrides
-	virtual void nvram_default();
-	virtual void nvram_read(emu_file &file);
-	virtual void nvram_write(emu_file &file);
 
 private:
 	inline void set_alarm_line();
@@ -114,8 +108,10 @@ private:
 
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_16HZ = 1;
+	static const device_timer_id TIMER_CLKOUT = 2;
 
 	devcb_resolved_write_line	m_out_alarm_func;
+	devcb_resolved_write_line	m_out_clkout_func;
 
 	UINT8 m_reg[2][13];			// clock registers
 	UINT8 m_ram[13];			// RAM
@@ -126,17 +122,19 @@ private:
 	int m_alarm_on;				// alarm condition
 	int m_1hz;					// 1 Hz condition
 	int m_16hz;					// 16 Hz condition
+	int m_clkout;				// clock output
 
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_16hz_timer;
+	emu_timer *m_clkout_timer;
 
-	const rp5c01_device_config &m_config;
+	const rp5c15_device_config &m_config;
 };
 
 
 // device type definition
-extern const device_type RP5C01;
+extern const device_type RP5C15;
 
 
 

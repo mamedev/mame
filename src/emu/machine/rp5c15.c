@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Ricoh RP5C01(A) Real Time Clock With Internal RAM emulation
+    Ricoh RP5C15 Real Time Clock emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -17,7 +17,7 @@
 
 */
 
-#include "rp5c01.h"
+#include "rp5c15.h"
 
 
 
@@ -28,14 +28,11 @@
 #define LOG 0
 
 
-#define RAM_SIZE 13
-
-
 // registers
 enum
 {
-	REGISTER_1_SECOND = 0,
-	REGISTER_10_SECOND,
+	REGISTER_1_SECOND = 0, REGISTER_CLOCK_OUTPUT = REGISTER_1_SECOND,
+	REGISTER_10_SECOND, REGISTER_ADJUST = REGISTER_10_SECOND,
 	REGISTER_1_MINUTE,
 	REGISTER_10_MINUTE,
 	REGISTER_1_HOUR,
@@ -53,11 +50,25 @@ enum
 };
 
 
+// clock output select
+enum
+{
+	CLKOUT_Z = 0,
+	CLKOUT_16384_HZ,
+	CLKOUT_1024_HZ,
+	CLKOUT_128_HZ,
+	CLKOUT_16_HZ,
+	CLKOUT_1_HZ,
+	CLKOUT_1_DIV_60_HZ,
+	CLKOUT_L
+};
+
+
 // register write mask
 static const int REGISTER_WRITE_MASK[2][16] =
 {
 	{ 0xf, 0x7, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0xf, 0x1, 0xf, 0xf, 0xf, 0xf, 0xf },
-	{ 0x0, 0x0, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0x0, 0x1, 0x3, 0x0, 0xf, 0xf, 0xf }
+	{ 0x3, 0x1, 0xf, 0x7, 0xf, 0x3, 0x7, 0xf, 0x3, 0x0, 0x1, 0x3, 0x0, 0xf, 0xf, 0xf }
 };
 
 
@@ -69,16 +80,14 @@ static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 
 enum
 {
 	MODE00 = 0,
-	MODE01,
-	BLOCK10,
-	BLOCK11
+	MODE01
 };
 
 
 // mode register
 #define MODE_TIMER_EN		0x08
 #define MODE_ALARM_EN		0x04
-#define MODE_MASK			0x03
+#define MODE_MASK			0x01
 
 
 // test register
@@ -101,7 +110,7 @@ enum
 //**************************************************************************
 
 // devices
-const device_type RP5C01 = rp5c01_device_config::static_alloc_device_config;
+const device_type RP5C15 = rp5c15_device_config::static_alloc_device_config;
 
 
 
@@ -110,12 +119,11 @@ const device_type RP5C01 = rp5c01_device_config::static_alloc_device_config;
 //**************************************************************************
 
 //-------------------------------------------------
-//  rp5c01_device_config - constructor
+//  rp5c15_device_config - constructor
 //-------------------------------------------------
 
-rp5c01_device_config::rp5c01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "RP5C01", tag, owner, clock),
-	  device_config_nvram_interface(mconfig, *this)
+rp5c15_device_config::rp5c15_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "RP5C15", tag, owner, clock)
 {
 }
 
@@ -125,9 +133,9 @@ rp5c01_device_config::rp5c01_device_config(const machine_config &mconfig, const 
 //  configuration object
 //-------------------------------------------------
 
-device_config *rp5c01_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+device_config *rp5c15_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	return global_alloc(rp5c01_device_config(mconfig, tag, owner, clock));
+	return global_alloc(rp5c15_device_config(mconfig, tag, owner, clock));
 }
 
 
@@ -135,9 +143,9 @@ device_config *rp5c01_device_config::static_alloc_device_config(const machine_co
 //  alloc_device - allocate a new device object
 //-------------------------------------------------
 
-device_t *rp5c01_device_config::alloc_device(running_machine &machine) const
+device_t *rp5c15_device_config::alloc_device(running_machine &machine) const
 {
-	return auto_alloc(machine, rp5c01_device(machine, *this));
+	return auto_alloc(machine, rp5c15_device(machine, *this));
 }
 
 
@@ -147,17 +155,18 @@ device_t *rp5c01_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void rp5c01_device_config::device_config_complete()
+void rp5c15_device_config::device_config_complete()
 {
 	// inherit a copy of the static data
-	const rp5c01_interface *intf = reinterpret_cast<const rp5c01_interface *>(static_config());
+	const rp5c15_interface *intf = reinterpret_cast<const rp5c15_interface *>(static_config());
 	if (intf != NULL)
-		*static_cast<rp5c01_interface *>(this) = *intf;
+		*static_cast<rp5c15_interface *>(this) = *intf;
 
 	// or initialize to defaults if none provided
 	else
 	{
 		memset(&m_out_alarm_func, 0, sizeof(m_out_alarm_func));
+		memset(&m_out_clkout_func, 0, sizeof(m_out_clkout_func));
 	}
 }
 
@@ -171,7 +180,7 @@ void rp5c01_device_config::device_config_complete()
 //  set_alarm_line -
 //-------------------------------------------------
 
-inline void rp5c01_device::set_alarm_line()
+inline void rp5c15_device::set_alarm_line()
 {
 	int alarm = ((m_mode & MODE_ALARM_EN) ? m_alarm_on : 1) &
 				((m_reset & RESET_16_HZ) ? 1 : m_16hz) &
@@ -179,7 +188,7 @@ inline void rp5c01_device::set_alarm_line()
 
 	if (m_alarm != alarm)
 	{
-		if (LOG) logerror("RP5C01 '%s' Alarm %u\n", tag(), alarm);
+		if (LOG) logerror("RP5C15 '%s' Alarm %u\n", tag(), alarm);
 
 		devcb_call_write_line(&m_out_alarm_func, alarm);
 		m_alarm = alarm;
@@ -191,7 +200,7 @@ inline void rp5c01_device::set_alarm_line()
 //  read_counter -
 //-------------------------------------------------
 
-inline int rp5c01_device::read_counter(int counter)
+inline int rp5c15_device::read_counter(int counter)
 {
 	return (m_reg[MODE00][counter + 1] * 10) + m_reg[MODE00][counter];
 }
@@ -201,7 +210,7 @@ inline int rp5c01_device::read_counter(int counter)
 //  write_counter -
 //-------------------------------------------------
 
-inline void rp5c01_device::write_counter(int counter, int value)
+inline void rp5c15_device::write_counter(int counter, int value)
 {
 	m_reg[MODE00][counter] = value % 10;
 	m_reg[MODE00][counter + 1] = value / 10;
@@ -212,7 +221,7 @@ inline void rp5c01_device::write_counter(int counter, int value)
 //  advance_seconds -
 //-------------------------------------------------
 
-inline void rp5c01_device::advance_seconds()
+inline void rp5c15_device::advance_seconds()
 {
 	int seconds = read_counter(REGISTER_1_SECOND);
 
@@ -233,7 +242,7 @@ inline void rp5c01_device::advance_seconds()
 //  advance_minutes -
 //-------------------------------------------------
 
-inline void rp5c01_device::advance_minutes()
+inline void rp5c15_device::advance_minutes()
 {
 	int minutes = read_counter(REGISTER_1_MINUTE);
 	int hours = read_counter(REGISTER_1_HOUR);
@@ -297,7 +306,7 @@ inline void rp5c01_device::advance_minutes()
 //  adjust_seconds -
 //-------------------------------------------------
 
-inline void rp5c01_device::adjust_seconds()
+inline void rp5c15_device::adjust_seconds()
 {
 	int seconds = read_counter(REGISTER_1_SECOND);
 
@@ -317,7 +326,7 @@ inline void rp5c01_device::adjust_seconds()
 //  check_alarm -
 //-------------------------------------------------
 
-inline void rp5c01_device::check_alarm()
+inline void rp5c15_device::check_alarm()
 {
 	bool all_match = true;
 	bool all_zeroes = true;
@@ -338,16 +347,16 @@ inline void rp5c01_device::check_alarm()
 //**************************************************************************
 
 //-------------------------------------------------
-//  rp5c01_device - constructor
+//  rp5c15_device - constructor
 //-------------------------------------------------
 
-rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_config &config)
+rp5c15_device::rp5c15_device(running_machine &_machine, const rp5c15_device_config &config)
     : device_t(_machine, config),
-	  device_nvram_interface(_machine, config, *this),
 	  m_alarm(1),
 	  m_alarm_on(1),
 	  m_1hz(1),
 	  m_16hz(1),
+	  m_clkout(1),
       m_config(config)
 {
 }
@@ -357,10 +366,11 @@ rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_conf
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void rp5c01_device::device_start()
+void rp5c15_device::device_start()
 {
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_alarm_func, &m_config.m_out_alarm_func, this);
+	devcb_resolve_write_line(&m_out_clkout_func, &m_config.m_out_clkout_func, this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
@@ -368,6 +378,8 @@ void rp5c01_device::device_start()
 
 	m_16hz_timer = timer_alloc(TIMER_16HZ);
 	m_16hz_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+
+	m_clkout_timer = timer_alloc(TIMER_CLKOUT);
 
 	// state saving
 	save_item(NAME(m_reg[MODE00]));
@@ -378,6 +390,7 @@ void rp5c01_device::device_start()
 	save_item(NAME(m_alarm_on));
 	save_item(NAME(m_1hz));
 	save_item(NAME(m_16hz));
+	save_item(NAME(m_clkout));
 }
 
 
@@ -385,7 +398,7 @@ void rp5c01_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rp5c15_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -403,51 +416,11 @@ void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_16hz = !m_16hz;
 		set_alarm_line();
 		break;
-	}
-}
 
-
-//-------------------------------------------------
-//  nvram_default - called to initialize NVRAM to
-//  its default state
-//-------------------------------------------------
-
-void rp5c01_device::nvram_default()
-{
-}
-
-
-//-------------------------------------------------
-//  nvram_read - called to read NVRAM from the
-//  .nv file
-//-------------------------------------------------
-
-void rp5c01_device::nvram_read(emu_file &file)
-{
-	file.read(m_ram, RAM_SIZE);
-}
-
-
-//-------------------------------------------------
-//  nvram_write - called to write NVRAM to the
-//  .nv file
-//-------------------------------------------------
-
-void rp5c01_device::nvram_write(emu_file &file)
-{
-	file.write(m_ram, RAM_SIZE);
-}
-
-
-//-------------------------------------------------
-//  adj_w -
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( rp5c01_device::adj_w )
-{
-	if (state)
-	{
-		adjust_seconds();
+	case TIMER_CLKOUT:
+		m_clkout = !m_clkout;
+		devcb_call_write_line(&m_out_clkout_func, m_clkout);
+		break;
 	}
 }
 
@@ -456,7 +429,7 @@ WRITE_LINE_MEMBER( rp5c01_device::adj_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( rp5c01_device::read )
+READ8_MEMBER( rp5c15_device::read )
 {
 	UINT8 data = 0;
 
@@ -476,7 +449,7 @@ READ8_MEMBER( rp5c01_device::read )
 		break;
 	}
 
-	if (LOG) logerror("RP5C01 '%s' Register %u Read %02x\n", tag(), offset & 0x0f, data);
+	if (LOG) logerror("RP5C15 '%s' Register %u Read %02x\n", tag(), offset & 0x0f, data);
 
 	return data & 0x0f;
 }
@@ -486,7 +459,7 @@ READ8_MEMBER( rp5c01_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( rp5c01_device::write )
+WRITE8_MEMBER( rp5c15_device::write )
 {
 	int mode = m_mode & MODE_MASK;
 
@@ -497,14 +470,14 @@ WRITE8_MEMBER( rp5c01_device::write )
 
 		if (LOG)
 		{
-			logerror("RP5C01 '%s' Mode %u\n", tag(), data & MODE_MASK);
-			logerror("RP5C01 '%s' Timer %s\n", tag(), (data & MODE_TIMER_EN) ? "enabled" : "disabled");
-			logerror("RP5C01 '%s' Alarm %s\n", tag(), (data & MODE_ALARM_EN) ? "enabled" : "disabled");
+			logerror("RP5C15 '%s' Mode %u\n", tag(), data & MODE_MASK);
+			logerror("RP5C15 '%s' Timer %s\n", tag(), (data & MODE_TIMER_EN) ? "enabled" : "disabled");
+			logerror("RP5C15 '%s' Alarm %s\n", tag(), (data & MODE_ALARM_EN) ? "enabled" : "disabled");
 		}
 		break;
 
 	case REGISTER_TEST:
-		if (LOG) logerror("RP5C01 '%s' Test %u not supported!\n", tag(), data);
+		if (LOG) logerror("RP5C15 '%s' Test %u not supported!\n", tag(), data);
 		break;
 
 	case REGISTER_RESET:
@@ -523,10 +496,10 @@ WRITE8_MEMBER( rp5c01_device::write )
 
 		if (LOG)
 		{
-			if (data & RESET_ALARM) logerror("RP5C01 '%s' Alarm Reset\n", tag());
-			if (data & RESET_TIMER) logerror("RP5C01 '%s' Timer Reset not supported!\n", tag());
-			logerror("RP5C01 '%s' 16Hz Signal %s\n", tag(), (data & RESET_16_HZ) ? "disabled" : "enabled");
-			logerror("RP5C01 '%s' 1Hz Signal %s\n", tag(), (data & RESET_1_HZ) ? "disabled" : "enabled");
+			if (data & RESET_ALARM) logerror("RP5C15 '%s' Alarm Reset\n", tag());
+			if (data & RESET_TIMER) logerror("RP5C15 '%s' Timer Reset not supported!\n", tag());
+			logerror("RP5C15 '%s' 16Hz Signal %s\n", tag(), (data & RESET_16_HZ) ? "disabled" : "enabled");
+			logerror("RP5C15 '%s' 1Hz Signal %s\n", tag(), (data & RESET_1_HZ) ? "disabled" : "enabled");
 		}
 		break;
 
@@ -534,20 +507,65 @@ WRITE8_MEMBER( rp5c01_device::write )
 		switch (mode)
 		{
 		case MODE00:
-		case MODE01:
 			m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
 			break;
 
-		case BLOCK10:
-			m_ram[offset & 0x0f] = (m_ram[offset & 0x0f] & 0xf0) | (data & 0x0f);
-			break;
+		case MODE01:
+			switch (offset & 0x0f)
+			{
+			case REGISTER_CLOCK_OUTPUT:
+				switch (data & 0x07)
+				{
+				case CLKOUT_16384_HZ:
+					m_clkout_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+					break;
 
-		case BLOCK11:
-			m_ram[offset & 0x0f] = (data << 4) | (m_ram[offset & 0x0f] & 0x0f);
+				case CLKOUT_1024_HZ:
+					m_clkout_timer->adjust(attotime::from_hz(clock() / 16), 0, attotime::from_hz(clock() / 16));
+					break;
+
+				case CLKOUT_128_HZ:
+					m_clkout_timer->adjust(attotime::from_hz(clock() / 128), 0, attotime::from_hz(clock() / 128));
+					break;
+
+				case CLKOUT_16_HZ:
+					m_clkout_timer->adjust(attotime::from_hz(clock() / 1024), 0, attotime::from_hz(clock() / 1024));
+					break;
+
+				case CLKOUT_1_HZ:
+					m_clkout_timer->adjust(attotime::from_hz(clock() / 16384), 0, attotime::from_hz(clock() / 16384));
+					break;
+
+				case CLKOUT_1_DIV_60_HZ:
+					// TODO
+					break;
+
+				case CLKOUT_L:
+				case CLKOUT_Z:
+					m_clkout = 1;
+					m_clkout_timer->adjust(attotime::zero, 0);
+					break;
+				}
+
+				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				break;
+
+			case REGISTER_ADJUST:
+				if (BIT(data, 0))
+				{
+					adjust_seconds();
+				}
+				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				break;
+
+			default:
+				m_reg[mode][offset & 0x0f] = data & REGISTER_WRITE_MASK[mode][offset & 0x0f];
+				break;
+			}
 			break;
 		}
 
-		if (LOG) logerror("RP5C01 '%s' Register %u Write %02x\n", tag(), offset & 0x0f, data);
+		if (LOG) logerror("RP5C15 '%s' Register %u Write %02x\n", tag(), offset & 0x0f, data);
 		break;
 	}
 }

@@ -208,6 +208,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ram.o			\
 	$(EMUMACHINE)/roc10937.o	\
 	$(EMUMACHINE)/rp5c01.o		\
+	$(EMUMACHINE)/rp5c15.o		\
 	$(EMUMACHINE)/rp5h01.o		\
 	$(EMUMACHINE)/rtc65271.o	\
 	$(EMUMACHINE)/s3c2400.o		\
