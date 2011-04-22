@@ -9,7 +9,7 @@ public:
 	UINT16 *  m_text_videoram;
 	UINT16 *  m_bg_videoram;
 	UINT16 *  m_fg_videoram;
-	UINT16 *  m_legion_cmd;	// legion only!
+	UINT16 m_legion_cmd[4];	// legiono only!
 //  UINT16 *  m_spriteram;    // currently this uses generic buffered_spriteram
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
@@ -50,3 +50,4 @@ WRITE16_HANDLER( armedf_bg_scrolly_w );
 
 void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd);
 void kozure_mcu_exec(address_space *space,UINT16 mcu_cmd);
+void legion_mcu_exec(address_space *space,UINT16 mcu_cmd);

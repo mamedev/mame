@@ -257,8 +257,17 @@ static WRITE16_HANDLER( legion_io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	//if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-	// ...
+	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+	{
+		/* latch fg scroll values */
+		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
+		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
+
+		legion_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+
+		/* mark tiles dirty */
+		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+	}
 
 	COMBINE_DATA(&state->m_vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
@@ -365,7 +374,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(legion_io_w)
+//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(legion_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -373,10 +382,20 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( legiono_fg_scroll_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	if(offset >= 0xb && offset < 0xf)
+		state->m_legion_cmd[offset-0xb] = data & 0xff;
+
+	state->m_fg_scrollx = (state->m_legion_cmd[0x02] & 0xff) | ((state->m_legion_cmd[0x03] & 0x3) << 8);
+	state->m_fg_scrolly = (state->m_legion_cmd[0x00] & 0xff) | ((state->m_legion_cmd[0x01] & 0x3) << 8);
+}
+
 static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04003f) AM_WRITEONLY AM_BASE_MEMBER(armedf_state, m_legion_cmd)
-	AM_RANGE(0x040040, 0x05ffff) AM_ROM
+	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legiono_fg_scroll_w,0x00ff)
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -390,7 +409,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
+//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -1186,7 +1205,7 @@ ROM_START( legion )
 ROM_END
 
 ROM_START( legiono )
-	ROM_REGION( 0x60000, "maincpu", 0 )	/* 64K*8 for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "legion.1a", 0x000001, 0x010000, CRC(8c0cda1d) SHA1(14b93d4fb4381ebc6a4ccdb480089bf69c6f474b) )
 	ROM_LOAD16_BYTE( "legion.1c", 0x000000, 0x010000, CRC(21226660) SHA1(ee48812d6ec9d4dccc58684164916f91b71aabf2) )
 	ROM_LOAD16_BYTE( "legion.1b", 0x020001, 0x010000, CRC(c306660a) SHA1(31c6b868ba07677b5110c577335873354bff596f) )
@@ -1605,6 +1624,8 @@ static DRIVER_INIT( legion )
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(legion_io_w) );
+
 	state->m_scroll_type = 3;
 }
 
@@ -1619,7 +1640,9 @@ static DRIVER_INIT( legiono )
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	state->m_scroll_type = 6;
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(bootleg_io_w) );
+
+	state->m_scroll_type = 3;
 }
 
 static DRIVER_INIT( cclimbr2 )
@@ -1636,8 +1659,8 @@ static DRIVER_INIT( cclimbr2 )
  *************************************/
 
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
 GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "bootleg",        "Terra Force (bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) //world bootleg?
 GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

@@ -8,9 +8,10 @@ This is some fancy MCU / blitter that copies text strings in various Nihon Bussa
 
 TODO:
 - Device-ify this;
+- merge implementations
 
 Notes:
-- just before any string in the "MCU" rom, there's an offset, it indicates where the string should go in the tilemap.
+- Just before any string in the "MCU" rom, there's an offset, it indicates where the string should go in the tilemap.
    This is currently hard-coded in this handling;
 - I'm sure that this is a shared device, that shares everything. All of the known differences are due of not
   understood features of the chip (some bytes in the ROM etc.)
@@ -28,8 +29,26 @@ static void terrafu_sm_transfer(address_space *space,UINT16 src,UINT16 dst,UINT1
 
 	for(i=0;i<size;i++)
 	{
+		if(i+dst+0x000 < 18)
+			continue;
+
 		state->m_text_videoram[i+dst+0x000] = (condition) ? (data[i+(0)+src] & 0xff) : 0x20;
 		state->m_text_videoram[i+dst+0x400] = data[i+(size)+src] & 0xff;
+	}
+}
+
+static void legion_layer_clear(address_space *space,UINT16 dst,UINT16 size)
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+	int i;
+
+	for(i=0;i<size;i++)
+	{
+		if(i+dst+0x000 < 18)
+			continue;
+
+		state->m_text_videoram[i+dst+0x000] = 0x20;
+		state->m_text_videoram[i+dst+0x400] = 0x00;
 	}
 }
 
@@ -72,13 +91,17 @@ static void insert_coin_msg(address_space *space)
 	}
 }
 
-static void credit_msg(address_space *space, UINT8 tile_base,UINT8 pal_base)
+static void credit_msg(address_space *space)
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
 	int i;
 	int credit_count = (state->m_text_videoram[0xf] & 0xff);
 	UINT8 fl_cond = space->machine().primary_screen->frame_number() & 0x10; /* for insert coin "flickering" */
+	UINT8 tile_base, pal_base;
+
+	tile_base = data[0x47];
+	pal_base = data[0x48];
 
 	for(i=0;i<0x10;i++)
 	{
@@ -219,41 +242,34 @@ static void service_mode(address_space *space, UINT8 is2p)
 
 void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
-	int i;
-
-	switch(mcu_cmd)
+	switch(mcu_cmd & 0xff00)
 	{
-		case 0x0e00:
-			break;
-		case 0x0e1c: /* gameplay, unknown ... */
-			break;
-		case 0x0e80: /* attract demo */
-			insert_coin_msg(space);
-			credit_msg(space,0x10,0x40);
-
-			for(i=0;i<0x10;i++) /* GAME OVER */
-			{
-				state->m_text_videoram[i+0x1a8+0x0000] = data[i+0x00+0x0135] & 0xff;
-				state->m_text_videoram[i+0x1a8+0x0400] = data[i+0x10+0x0135] & 0xff;
-			}
-			break;
 		case 0x0000: /* title screen / continue */
 			insert_coin_msg(space);
-			credit_msg(space,0x10,0x40);
+			credit_msg(space);
 			break;
-		case 0x0280: /* layer clearances */
-		case 0x0282:
-			terrafu_sm_transfer(space,0x2800,0x0000,0x400,1);
+
+		case 0x0200:
+			switch(mcu_cmd & 0xff)
+			{
+				case 0x80: case 0x82: terrafu_sm_transfer(space,0x2800,0x0000,0x400,1); break; /* layer clearance */
+				case 0x00: case 0x01: case 0x02: terrafu_sm_transfer(space,0x2000,0x0000,0x400,1); break; /* Nichibutsu logo */
+				case 0x06: case 0x86: terrafu_sm_transfer(space,0x3800,0x0000,0x400,1); break; /* ranking screen */
+				default:   popmessage("1414M4 layer clearance param %02x, contact MAMEdev",mcu_cmd & 0xff); break;
+			}
 			break;
-		case 0x0200: /* Nichibutsu logo */
-		case 0x0201:
-			terrafu_sm_transfer(space,0x2000,0x0000,0x400,1);
-			break;
-		case 0x600: /* service mode */
-		case 0x601:
+		case 0x0600: /* service mode */
 			service_mode(space,mcu_cmd & 1);
+			break;
+
+		case 0x0e00:
+			if(!(mcu_cmd & 4))
+			{
+				insert_coin_msg(space);
+				credit_msg(space);
+
+				terrafu_sm_transfer(space,0x0135,0x01a8,0x10,!(mcu_cmd & 1)); /* game over */
+			}
 			break;
 		//default:
 			//printf("%04x\n",mcu_cmd);
@@ -262,45 +278,29 @@ void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 
 void kozure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 {
-	switch(mcu_cmd)
+	switch(mcu_cmd & 0xff00)
 	{
 		case 0x0000: /* title screen / continue */
 			insert_coin_msg(space);
-			credit_msg(space,0x30,0x30);
+			credit_msg(space);
 			break;
 
-		case 0x0280: /* layer clearances */
-		case 0x0282:
-			terrafu_sm_transfer(space,0x2800,0x0000,0x400,1);
+		case 0x0200: /* layer clearances */
+			switch(mcu_cmd & 0xff)
+			{
+				case 0x80: case 0x82: terrafu_sm_transfer(space,0x2800,0x0000,0x400,1); break; /* layer clearance */
+				case 0x00: case 0x01: case 0x02: terrafu_sm_transfer(space,0x2000,0x0000,0x400,1); break; /* Nichibutsu logo */
+				case 0x06: case 0x86: terrafu_sm_transfer(space,0x3800,0x0000,0x400,1); break; /* ranking screen */
+				default:   popmessage("1414M4 DMA param %02x, contact MAMEdev",mcu_cmd & 0xff); break;
+			}
+
 			break;
 
-		case 0x0200: /* Nichibutsu logo */
-		case 0x0201:
-			terrafu_sm_transfer(space,0x2000,0x0000,0x400,1);
+		case 0x0600:
+			service_mode(space,mcu_cmd & 1);
 			break;
 
-		case 0x206: /* ranking screen */
-		case 0x286:
-			terrafu_sm_transfer(space,0x3800,0x0000,0x400,1);
-			//if(mcu_cmd & 0x80)
-			//	credit_msg(space,0x30,0x30);
-			break;
-
-		case 0xe1c: /* 1p / hi-score msg / 2p + points */
-		case 0xe1d:
-		case 0xe9c:
-		case 0xe9d:
-		case 0xe9e:
-		case 0xe98:
-		case 0xe18:
-		case 0xe19:
-		case 0xe14:
-		case 0xe15:
-		case 0xe94:
-		case 0xe95:
-		case 0xe96:
-		case 0xe99:
-		case 0xe9a:
+		case 0x0e00: /* 1p / hi-score msg / 2p + points */
 			terrafu_sm_transfer(space,0x00e1,0x03ac,8,1); /* hi-score */
 			if(mcu_cmd & 0x04)
 			{
@@ -320,9 +320,55 @@ void kozure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			}
 			break;
 
-		case 0x600:
-		case 0x601:
+		//default:
+		//	printf("%04x\n",mcu_cmd);
+	}
+}
+
+void legion_mcu_exec(address_space *space,UINT16 mcu_cmd)
+{
+	switch(mcu_cmd & 0xff00)
+	{
+		case 0x0000: /* title screen / continue */
+			insert_coin_msg(space);
+			credit_msg(space);
+			break;
+
+		case 0x0200: /* layer clearances */
+			switch(mcu_cmd & 0xff)
+			{
+				case 0x00:		legion_layer_clear(space,0x0000,0x400);		  	  break;
+				case 0x01: 		terrafu_sm_transfer(space,0x2000,0x0000,0x400,1); break;
+				case 0x06: 		terrafu_sm_transfer(space,0x3800,0x0000,0x400,1); break; /* portraits */
+				case 0x82:		terrafu_sm_transfer(space,0x2800,0x0000,0x400,1); break;
+				case 0x87:		terrafu_sm_transfer(space,0x3000,0x0000,0x400,1); break; /* service mode? */
+				default:		popmessage("1414M4 DMA param %02x, contact MAMEdev",mcu_cmd & 0xff); break;
+			}
+
+			break;
+
+		case 0x0600:
 			service_mode(space,mcu_cmd & 1);
+			break;
+
+		case 0x0e00: /* 1p / hi-score msg / 2p + points */
+			terrafu_sm_transfer(space,0x00e1,0x080c,8,1); /* hi-score */
+			if(mcu_cmd & 0x04)
+			{
+				terrafu_sm_transfer(space,0x00fd,0x03a0,8,!(mcu_cmd & 1)); /* 1p-msg */
+				//kozure_score_msg(space,0x380,0); /* 1p score */
+				if(mcu_cmd & 0x80)
+				{
+					terrafu_sm_transfer(space,0x0119,0x03b8,8,!(mcu_cmd & 2)); /* 2p-msg */
+					//kozure_score_msg(space,0x398,1); /* 2p score */
+				}
+			}
+			else
+			{
+				terrafu_sm_transfer(space,0x0135,0x0128,0x10,!(mcu_cmd & 1)); /* game over */
+				insert_coin_msg(space);
+				//credit_msg(space,0x30,0x30);
+			}
 			break;
 
 		//default:

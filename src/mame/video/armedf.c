@@ -294,46 +294,6 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	}
 }
 
-static void copy_textmap(running_machine &machine, int index)
-{
-	/*
-        (not simulated)
-        1st half of the MCU ROM contains various strings and
-        gfx elements (copied by MCU to textram)
-
-
-        (partially simulated)
-        2nd half of the MCu external ROM contains text tilemaps:
-
-         4 - title screen
-         5 - bottom layer gfx, visible  in later levels, during boss fight
-         6 - test mode screen (not hooked up)
-         7 - portraits (title)
-
-    */
-
-	armedf_state *state = machine.driver_data<armedf_state>();
-	UINT8 * data = (UINT8 *)machine.region("gfx5")->base();
-
-	for(int i=0;i<0x400;++i)
-	{
-		if(i<0x10) continue;
-
-		int tile=data[0x800*index+i];
-		int bank=data[0x800*index+i+0x400]&3;
-
-		if( (tile|(bank<<8))!=0x20)
-		{
-			state->m_text_videoram[i]=tile;
-			state->m_text_videoram[i+0x400]=data[0x800*index+i+0x400];
-		}
-
-	}
-
-	tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-
-}
-
 SCREEN_UPDATE( armedf )
 {
 	armedf_state *state = screen->machine().driver_data<armedf_state>();
@@ -343,31 +303,10 @@ SCREEN_UPDATE( armedf )
 	tilemap_set_enable(state->m_fg_tilemap, state->m_vreg & 0x400);
 	tilemap_set_enable(state->m_tx_tilemap, state->m_vreg & 0x100);
 
-	if ((state->m_scroll_type == 3 ))
-	{
-		if (state->m_old_mcu_mode != state->m_vreg)
-		{
-			if ((state->m_vreg & 0x000f) == 0x0004)
-			{	// transparent tx
-				tilemap_set_transparent_pen(state->m_tx_tilemap, 0x0f);
-				tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-				//logerror("? Transparent TX 0x0f\n");
-			}
-			if ((state->m_vreg & 0x000f) == 0x000f)
-			{		// opaque tx
-				tilemap_set_transparent_pen(state->m_tx_tilemap, 0x10);
-				tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
-				//logerror("? Opaque TX\n");
-			}
-
-			state->m_old_mcu_mode = state->m_vreg;
-			//logerror("MCU Change => %04x\n", state->m_mcu_mode);
-		}
-	}
-
 	switch (state->m_scroll_type)
 	{
 		case 0:	/* terra force, kozure ookami */
+		case 3: /* legion */
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;
@@ -377,11 +316,6 @@ SCREEN_UPDATE( armedf )
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fg_scrolly);
 			break;
 
-		case 6: /* legiono */
-			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_legion_cmd[13] & 0xff) | ((state->m_legion_cmd[14] & 0x3) << 8));
-			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_legion_cmd[11] & 0xff) | ((state->m_legion_cmd[12] & 0x3) << 8));
-			break;
-		case 3:
 		case 4: /* crazy climber 2 */
 			{
 				int scrollx, scrolly;
@@ -439,24 +373,6 @@ SCREEN_UPDATE( armedf )
 
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 0);
-
-	if(state->m_scroll_type == 3) /* legion */
-	{
-		int mode=state->m_text_videoram[1]&0xff;
-
-		if (mode != state->m_oldmode)
-		{
-			state->m_oldmode=mode;
-			switch(mode)
-			{
-				case 0x01: copy_textmap(screen->machine(), 4); break; /* title screen */
-				case 0x06: copy_textmap(screen->machine(), 7); break; /* portraits on title screen */
-				case 0x1c: copy_textmap(screen->machine(), 5); break; /* bottom, in-game layer */
-				default: logerror("unknown mode %d\n", mode); break;
-			}
-		}
-
-	}
 
 
 	return 0;
