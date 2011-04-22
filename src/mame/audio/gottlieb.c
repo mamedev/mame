@@ -114,17 +114,17 @@ static const riot6532_interface gottlieb_riot6532_intf =
 
 static void play_sample(device_t *samples, const char *phonemes)
 {
-	if (strcmp(phonemes, " HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
+	if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
 		sample_start(samples, 0, 42, 0);
-	else if (strcmp(phonemes, "BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
+	else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
 		sample_start(samples, 0, 43, 0);
-	else if (strcmp(phonemes, "A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
+	else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
 		sample_start(samples, 0, 0, 0);
-	else if (strcmp(phonemes, "SI3KS DTYN LEH2FTTH") == 0)				  /* Reactor - Sixteen left */
+	else if (strcmp(phonemes, "[0]SI3KS DTYN LEH2FTTH") == 0)				  /* Reactor - Sixteen left */
 		sample_start(samples, 0, 1, 0);
-	else if (strcmp(phonemes, "WO2RNYNG KO2R UH1NSDTABUH1L") == 0)		  /* Reactor - Warning core unstable */
+	else if (strcmp(phonemes, "[0]WO2RNYNG KO2R UH1NSDTABUH1L") == 0)		  /* Reactor - Warning core unstable */
 		sample_start(samples, 0, 5, 0);
-	else if (strcmp(phonemes, "CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
+	else if (strcmp(phonemes, "[0]CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
 		sample_start(samples, 0, 7, 0);
 }
 
