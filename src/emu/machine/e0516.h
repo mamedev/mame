@@ -28,13 +28,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
-
-
-//**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -50,7 +43,8 @@
 
 // ======================> e0516_device_config
 
-class e0516_device_config :   public device_config
+class e0516_device_config :   public device_config,
+							  public device_config_rtc_interface
 {
     friend class e0516_device;
 
@@ -68,7 +62,8 @@ protected:
 
 // ======================> e0516_device
 
-class e0516_device :  public device_t
+class e0516_device :  public device_t,
+					  public device_rtc_interface
 {
     friend class e0516_device_config;
 
@@ -87,7 +82,13 @@ protected:
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// device_rtc_interface overrides
+	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	virtual bool rtc_is_year_2000_compliant() { return false; }
+
 private:
+	inline void advance_seconds();
+
 	int m_cs;						// chip select
 	int m_clk;						// clock
 	int m_data_latch;				// data latch

@@ -115,6 +115,7 @@ const device_type RP5C01 = rp5c01_device_config::static_alloc_device_config;
 
 rp5c01_device_config::rp5c01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 	: device_config(mconfig, static_alloc_device_config, "RP5C01", tag, owner, clock),
+	  device_config_rtc_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this)
 {
 }
@@ -343,6 +344,7 @@ inline void rp5c01_device::check_alarm()
 
 rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_config &config)
     : device_t(_machine, config),
+	  device_rtc_interface(_machine, config, *this),
 	  device_nvram_interface(_machine, config, *this),
 	  m_alarm(1),
 	  m_alarm_on(1),
@@ -404,6 +406,23 @@ void rp5c01_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		set_alarm_line();
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  rtc_set_time - called to initialize the RTC to
+//  a known state
+//-------------------------------------------------
+
+void rp5c01_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	write_counter(REGISTER_1_YEAR, year);
+	write_counter(REGISTER_1_MONTH, month);
+	write_counter(REGISTER_1_DAY, day);
+	m_reg[MODE00][REGISTER_DAY_OF_THE_WEEK] = day_of_week;
+	write_counter(REGISTER_1_HOUR, hour);
+	write_counter(REGISTER_1_MINUTE, minute);
+	write_counter(REGISTER_1_SECOND, second);
 }
 
 

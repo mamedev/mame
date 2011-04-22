@@ -63,7 +63,8 @@ struct upd1990a_interface
 // ======================> upd1990a_device_config
 
 class upd1990a_device_config :   public device_config,
-                                public upd1990a_interface
+                                 public upd1990a_interface,
+								 public device_config_rtc_interface
 {
     friend class upd1990a_device;
 
@@ -84,7 +85,8 @@ protected:
 
 // ======================> upd1990a_device
 
-class upd1990a_device :	public device_t
+class upd1990a_device :	public device_t,
+						public device_rtc_interface
 {
     friend class upd1990a_device_config;
 
@@ -108,6 +110,10 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_rtc_interface overrides
+	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	virtual bool rtc_is_year_2000_compliant() { return false; }
 
 private:
 	inline UINT8 convert_to_bcd(int val);

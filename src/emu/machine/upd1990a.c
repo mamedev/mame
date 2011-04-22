@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "upd1990a.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -56,7 +55,36 @@ const device_type UPD1990A = upd1990a_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(upd1990a, "uPD1990A")
+//-------------------------------------------------
+//  upd1990a_device_config - constructor
+//-------------------------------------------------
+
+upd1990a_device_config::upd1990a_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "uPD1990A", tag, owner, clock),
+	  device_config_rtc_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *upd1990a_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(upd1990a_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *upd1990a_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, upd1990a_device(machine, *this));
+}
 
 
 //-------------------------------------------------
@@ -176,6 +204,7 @@ inline void upd1990a_device::advance_seconds()
 
 upd1990a_device::upd1990a_device(running_machine &_machine, const upd1990a_device_config &config)
     : device_t(_machine, config),
+	  device_rtc_interface(_machine, config, *this),
       m_config(config)
 {
 }
@@ -259,6 +288,21 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		devcb_call_write_line(&m_out_data_func, m_data_out);
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  rtc_set_time - called to initialize the RTC to
+//  a known state
+//-------------------------------------------------
+
+void upd1990a_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_time_counter[0] = convert_to_bcd(second);
+	m_time_counter[1] = convert_to_bcd(minute);
+	m_time_counter[2] = convert_to_bcd(hour);
+	m_time_counter[3] = convert_to_bcd(day);
+	m_time_counter[4] = (month << 4) | day_of_week;
 }
 
 

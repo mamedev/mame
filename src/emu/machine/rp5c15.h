@@ -59,7 +59,8 @@ struct rp5c15_interface
 // ======================> rp5c15_device_config
 
 class rp5c15_device_config :   public device_config,
-                               public rp5c15_interface
+                               public rp5c15_interface,
+							   public device_config_rtc_interface
 {
     friend class rp5c15_device;
 
@@ -80,7 +81,8 @@ protected:
 
 // ======================> rp5c15_device
 
-class rp5c15_device :	public device_t
+class rp5c15_device :	public device_t,
+						public device_rtc_interface
 {
     friend class rp5c15_device_config;
 
@@ -96,6 +98,10 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_rtc_interface overrides
+	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	virtual bool rtc_is_year_2000_compliant() { return false; }
 
 private:
 	inline void set_alarm_line();

@@ -118,6 +118,7 @@ const device_type MC146818 = mc146818_device_config::static_alloc_device_config;
 
 mc146818_device_config::mc146818_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 	: device_config(mconfig, static_alloc_device_config, "NVRAM", tag, owner, clock),
+	  device_config_rtc_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
 	  m_type(MC146818_STANDARD)
 {
@@ -167,6 +168,7 @@ void mc146818_device_config::static_set_type(device_config *device, mc146818_typ
 
 mc146818_device::mc146818_device(running_machine &_machine, const mc146818_device_config &config)
 	: device_t(_machine, config),
+	  device_rtc_interface(_machine, config, *this),
 	  device_nvram_interface(_machine, config, *this),
 	  m_config(config),
 	  m_index(0),
@@ -330,6 +332,22 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	m_last_refresh = machine().time();
 }
 
+
+//-------------------------------------------------
+//  rtc_set_time - called to initialize the RTC to
+//  a known state
+//-------------------------------------------------
+
+void mc146818_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	YEAR = year;
+	MONTH = month;
+	DAY = day;
+	WEEK_DAY = day_of_week;
+	m_data[4] = hour;
+	m_data[2] = minute;
+	m_data[0] = second;
+}
 
 
 //-------------------------------------------------

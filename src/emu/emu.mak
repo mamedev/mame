@@ -63,6 +63,7 @@ EMUOBJS = \
 	$(EMUOBJ)/diimage.o \
 	$(EMUOBJ)/dimemory.o \
 	$(EMUOBJ)/dinvram.o \
+	$(EMUOBJ)/dirtc.o \
 	$(EMUOBJ)/disound.o \
 	$(EMUOBJ)/distate.o \
 	$(EMUOBJ)/drawgfx.o \

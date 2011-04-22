@@ -20,7 +20,6 @@
 */
 
 #include "msm5832.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -69,8 +68,36 @@ const device_type MSM5832 = msm5832_device_config::static_alloc_device_config;
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(msm5832, "MSM5832")
+//-------------------------------------------------
+//  msm5832_device_config - constructor
+//-------------------------------------------------
 
+msm5832_device_config::msm5832_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "MSM5832", tag, owner, clock),
+	  device_config_rtc_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *msm5832_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(msm5832_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *msm5832_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(machine, msm5832_device(machine, *this));
+}
 
 
 //**************************************************************************
@@ -189,6 +216,7 @@ inline void msm5832_device::advance_minutes()
 
 msm5832_device::msm5832_device(running_machine &_machine, const msm5832_device_config &config)
     : device_t(_machine, config),
+	  device_rtc_interface(_machine, config, *this),
 	  m_hold(0),
 	  m_address(0),
 	  m_read(0),
@@ -236,6 +264,23 @@ void msm5832_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 		break;
 	}
+}
+
+
+//-------------------------------------------------
+//  rtc_set_time - called to initialize the RTC to
+//  a known state
+//-------------------------------------------------
+
+void msm5832_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	write_counter(REGISTER_Y1, year);
+	write_counter(REGISTER_MO1, month);
+	write_counter(REGISTER_D1, day);
+	m_reg[REGISTER_W] = day_of_week;
+	write_counter(REGISTER_H1, hour);
+	write_counter(REGISTER_MI1, minute);
+	write_counter(REGISTER_S1, second);
 }
 
 

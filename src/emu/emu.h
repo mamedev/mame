@@ -90,6 +90,7 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 #include "diimage.h"
 #include "disound.h"
 #include "dinvram.h"
+#include "dirtc.h"
 #include "didisasm.h"
 #include "schedule.h"
 #include "timer.h"

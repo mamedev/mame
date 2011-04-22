@@ -35,6 +35,7 @@ class mc146818_device;
 // ======================> mc146818_device_config
 
 class mc146818_device_config :	public device_config,
+							    public device_config_rtc_interface,
 								public device_config_nvram_interface
 {
 	friend class mc146818_device;
@@ -68,6 +69,7 @@ protected:
 // ======================> mc146818_device
 
 class mc146818_device :	public device_t,
+					    public device_rtc_interface,
 						public device_nvram_interface
 {
 	friend class mc146818_device_config;
@@ -85,7 +87,11 @@ protected:
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// device_mc146818_interface overrides
+	// device_rtc_interface overrides
+	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	virtual bool rtc_is_year_2000_compliant() { return false; }
+
+	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);

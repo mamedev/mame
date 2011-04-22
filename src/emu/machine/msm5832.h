@@ -43,7 +43,8 @@
 
 // ======================> msm5832_device_config
 
-class msm5832_device_config :   public device_config
+class msm5832_device_config :   public device_config,
+								public device_config_rtc_interface
 {
     friend class msm5832_device;
 
@@ -60,7 +61,8 @@ public:
 
 // ======================> msm5832_device
 
-class msm5832_device :	public device_t
+class msm5832_device :	public device_t,
+						public device_rtc_interface
 {
     friend class msm5832_device_config;
 
@@ -85,6 +87,10 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_rtc_interface overrides
+	virtual void rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	virtual bool rtc_is_year_2000_compliant() { return false; }
 
 private:
 	static const device_timer_id TIMER_CLOCK = 0;
