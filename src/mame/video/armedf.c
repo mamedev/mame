@@ -37,36 +37,19 @@ static TILE_GET_INFO( get_tx_tile_info )
 	int tile_number = state->m_text_videoram[tile_index] & 0xff;
 	int attributes;
 
+	/* TODO: Armed F doesn't seem to use the NB1414M4! */
 	if (state->m_scroll_type == 1)
 		attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
 	else
+	{
 		attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
 
-	SET_TILE_INFO(
-			0,
-			tile_number + 256 * (attributes & 0x3),
-			attributes >> 4,
-			0);
-}
-
-static TILE_GET_INFO( get_legion_tx_tile_info )
-{
-	armedf_state *state = machine.driver_data<armedf_state>();
-
-	int tile_number = state->m_text_videoram[tile_index] & 0xff;
-
-	if(tile_index<0x10) tile_number=0x20;
-
-	int attributes;
-
-	attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
-
-	tileinfo->category = 0;
-
-	if((attributes & 0x3) == 3)
-	{
-		tileinfo->category = 1;
+		if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+			tile_number = attributes = 0x00;
 	}
+
+	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
+	tileinfo->category = (attributes & 0x8) >> 3;
 
 	SET_TILE_INFO(
 			0,
@@ -123,7 +106,7 @@ VIDEO_START( armedf )
 			break;
 
 		case 2: /* legion */
-			state->m_tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
+			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
 			break;
 
 		default:
@@ -153,16 +136,6 @@ WRITE16_HANDLER( armedf_text_videoram_w )
 		tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
 	else
 		tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0xbff);
-/*
-  if (offset < 0x10)
-        logerror("%04x %04x %04x %04x %04x %04x %04x %04x-%04x %04x %04x %04x %04x %04x %04x %04x (%04x)\n",
-            state->m_text_videoram[0], state->m_text_videoram[1], state->m_text_videoram[2],
-            state->m_text_videoram[3], state->m_text_videoram[4], state->m_text_videoram[5],
-            state->m_text_videoram[6], state->m_text_videoram[7], state->m_text_videoram[8],
-            state->m_text_videoram[9], state->m_text_videoram[10], state->m_text_videoram[11],
-            state->m_text_videoram[12], state->m_text_videoram[13], state->m_text_videoram[14],
-            state->m_text_videoram[15], offset);
-*/
 }
 
 WRITE16_HANDLER( armedf_fg_videoram_w )
@@ -306,50 +279,24 @@ SCREEN_UPDATE( armedf )
 
 	}
 
-
 	bitmap_fill(bitmap, cliprect , 0xff);
 
-	if(state->m_scroll_type == 2) /* legion / legiono */
-	{
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 1, 0);
-	}
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(1), 0);
 
-	if (state->m_vreg & 0x0800)
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-#if 0
-	if(state->m_vreg & 0x0800)
-	{
-		tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
-	}
-	else
-	{
-		bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine()) & 0x0f);
-	}
-#endif
-
-	if ((state->m_vreg & 0x0030) == 0x0030)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 2);
 
-	if ((state->m_vreg & 0x0030) == 0x0020)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-
 	tilemap_draw(bitmap, cliprect, state->m_fg_tilemap, 0, 0);
-
-	if ((state->m_vreg & 0x0030) == 0x0010)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
 
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 
-	if ((state->m_vreg & 0x0030) == 0x0000)
-		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 0, 0);
-
 	if (sprite_enable)
 		draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
+	tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, TILEMAP_DRAW_CATEGORY(0), 0);
 
 	return 0;
 }

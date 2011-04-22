@@ -8,11 +8,11 @@ This is some fancy MCU / blitter that copies text strings in various Nihon Bussa
 
 TODO:
 - Device-ify this;
-- merge implementations
 - where is the condition that makes "insert coin" text to properly blink?
 - first byte meaning is completely unknown;
 - Kozure Ookami "credit X" message during attract mode completely clears the status bar, dunno how it's supposed to
   be displayed;
+- (after device-ifization) hook this up for Ninja Emaki;
 
 Notes:
 - Just before any string in the "MCU" rom, there's a control byte, this meaning is as follows:
@@ -37,10 +37,10 @@ static void nichibutsu_1414m4_dma(address_space *space,UINT16 src,UINT16 dst,UIN
 
 	for(i=0;i<size;i++)
 	{
-		if(i+dst+0x000 < 18)
+		if(i+dst+0x000 < 18) //avoid param overwrite
 			continue;
 
-		state->m_text_videoram[i+dst+0x000] = (condition) ? (data[i+(0)+src] & 0xff) : 0x00;
+		state->m_text_videoram[i+dst+0x000] = (condition) ? (data[i+(0)+src] & 0xff) : data[0x320];
 		state->m_text_videoram[i+dst+0x400] = data[i+(size)+src] & 0xff;
 	}
 }
@@ -52,7 +52,7 @@ static void nichibutsu_1414m4_fill(address_space *space,UINT16 dst,UINT8 tile,UI
 
 	for(i=0;i<0x400;i++)
 	{
-		if(i+dst+0x000 < 18)
+		if(i+dst+0x000 < 18) //avoid param overwrite
 			continue;
 
 		state->m_text_videoram[i+dst+0x000] = tile;
@@ -276,6 +276,13 @@ static void nichibutsu_1414m4_0e00(address_space *space,UINT16 mcu_cmd)
 
 void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd)
 {
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	/* latch fg scroll values */
+	state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
+	state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
+
+	/* process the command */
 	switch(mcu_cmd & 0xff00)
 	{
 		/* title screen / continue screens */
@@ -293,4 +300,7 @@ void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd)
 			popmessage("NB 1414M4 executes %04x command, contact MAMEdev\n",mcu_cmd);
 			break;
 	}
+
+	/* mark tiles dirty */
+	tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
 }
