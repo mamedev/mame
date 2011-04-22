@@ -58,19 +58,6 @@ static void legion_layer_clear(address_space *space,UINT16 dst,UINT8 tile,UINT8 
 	}
 }
 
-static void terrafu_sm_onoff(address_space *space,UINT16 dst,UINT8 condition)
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
-	int i;
-
-	for(i=0;i<3;i++)
-	{
-		state->m_text_videoram[i+dst+0x000] = (condition) ? (data[i+0x0+0x316] & 0xff) : (data[i+0x0+0x310] & 0xff);
-		state->m_text_videoram[i+dst+0x400] = (condition) ? (data[i+0x0+0x319] & 0xff) : (data[i+0x0+0x313] & 0xff);
-	}
-}
-
 static void insert_coin_msg(address_space *space)
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
@@ -171,86 +158,6 @@ static void	kozure_score_msg(address_space *space,UINT16 dst,UINT8 src_base)
 
 }
 
-static void service_mode(address_space *space, UINT8 is2p)
-{
-	armedf_state *state = space->machine().driver_data<armedf_state>();
-	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
-	int i;
-
-	for(i=0;i<0x400;i++)
-	{
-		if(i < 18 || i == 0x377 || i == 0x357) // params and digits for bonus lives doesn't get overwritten
-			continue;
-
-		state->m_text_videoram[i+0x000+0x0000] = data[i+0x000+0x3000] & 0xff;
-		state->m_text_videoram[i+0x000+0x0400] = data[i+0x400+0x3000] & 0xff;
-	}
-
-	state->m_text_videoram[0x252+0x000] = ((state->m_text_videoram[0x11] & 0xf0) >> 4) + 0x30;
-	state->m_text_videoram[0x253+0x000] = (state->m_text_videoram[0x11] & 0x0f) + 0x30;
-	//state->m_text_videoram[0x252+0x400] = (0x40);
-	//state->m_text_videoram[0x253+0x400] = (0x40);
-
-	/*
-	[0x02] & 0x01 p1 up
-	[0x02] & 0x02 p1 down
-	[0x02] & 0x04 p1 left
-	[0x02] & 0x08 p1 right
-	[0x02] & 0x10 p1 button 1
-	[0x02] & 0x20 p1 button 2
-	[0x02] & 0x40 p1 button 3
-	[0x03] & 0x01 p2 up
-	[0x03] & 0x02 p2 down
-	[0x03] & 0x04 p2 left
-	[0x03] & 0x08 p2 right
-	[0x03] & 0x10 p2 button 1
-	[0x03] & 0x20 p2 button 2
-	[0x03] & 0x40 p2 button 3
-	[0x04] & 0x10 service
-	[0x04] & 0x04 coin A
-	[0x04] & 0x08 coin B
-	[0x04] & 0x01 start 1
-	[0x04] & 0x02 start 2
-	[0x05] DSW1
-	[0x06] DSW2
-	[0x07] & 0x40 demo sounds ON / OFF
-	[0x07] & 0x7 lives setting
-	[0x07] & 0x80 cabinet (upright / table)
-	[0x07] & 0x30 difficulty (easy / normal / hard / hardest)
-	[0x0f] coinage A
-	[0x10] coinage B
-	*/
-	state->m_text_videoram[0x3bb|0x000] = (state->m_text_videoram[7] & 0x7) + 0x30;
-	//state->m_text_videoram[0x3bb|0x400] = (0x40);
-
-	terrafu_sm_transfer(space,0x1fa + (((state->m_text_videoram[7] & 0x30) >> 4) * 0x18),0x390,12,1);
-	terrafu_sm_transfer(space,0x264 + (((state->m_text_videoram[7] & 0x80) >> 7) * 0x18),0x330,12,1);
-	terrafu_sm_transfer(space,0x296 + (((state->m_text_videoram[7] & 0x40) >> 6) * 0x18),0x310,12,1);
-
-	state->m_text_videoram[0x2ee|0x000] = ((state->m_text_videoram[0xf] & 0xf0) >> 4) + 0x30;
-	//state->m_text_videoram[0x2ee|0x400] = (0x40);
-	state->m_text_videoram[0x2f5|0x000] = ((state->m_text_videoram[0xf] & 0x0f) >> 0) + 0x30;
-	//state->m_text_videoram[0x2f5|0x400] = (0x40);
-	state->m_text_videoram[0x2ce|0x000] = ((state->m_text_videoram[0x10] & 0xf0) >> 4) + 0x30;
-	//state->m_text_videoram[0x2ce|0x400] = (0x40);
-	state->m_text_videoram[0x2d5|0x000] = ((state->m_text_videoram[0x10] & 0x0f) >> 0) + 0x30;
-	//state->m_text_videoram[0x2d5|0x400] = (0x40);
-
-	for(i=0;i<8;i++) /* dips */
-	{
-		terrafu_sm_onoff(space,0x074 + (i * 0x20),(state->m_text_videoram[0x05] >> (7-i)) & 1);
-		terrafu_sm_onoff(space,0x079 + (i * 0x20),(state->m_text_videoram[0x06] >> (7-i)) & 1);
-	}
-
-	terrafu_sm_transfer(space,0x2d8 + (is2p * 0x18),0x1e4,12,1); // 1p / 2p
-
-	for(i=0;i<5;i++) /* coin inputs */
-		terrafu_sm_onoff(space,0x06c + (i * 0x20),(state->m_text_videoram[0x04] >> (4-i)) & 1);
-
-	for(i=0;i<7;i++) /* 1p inputs */
-		terrafu_sm_onoff(space,0x10c + (i * 0x20),(state->m_text_videoram[0x02 + is2p] >> (6-i)) & 1);
-}
-
 static void nichibutsu_1414m4_0200(address_space *space, UINT16 mcu_cmd)
 {
 	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
@@ -264,6 +171,93 @@ static void nichibutsu_1414m4_0200(address_space *space, UINT16 mcu_cmd)
 		legion_layer_clear(space,0x0000,data[dst & 0x3fff],data[dst+1]);
 	else // src -> dst
 		terrafu_sm_transfer(space,dst & 0x3fff,0x0000,0x400,1);
+}
+
+/*
+[0x02] & 0x01 p1 up
+[0x02] & 0x02 p1 down
+[0x02] & 0x04 p1 left
+[0x02] & 0x08 p1 right
+[0x02] & 0x10 p1 button 1
+[0x02] & 0x20 p1 button 2
+[0x02] & 0x40 p1 button 3
+[0x03] & 0x01 p2 up
+[0x03] & 0x02 p2 down
+[0x03] & 0x04 p2 left
+[0x03] & 0x08 p2 right
+[0x03] & 0x10 p2 button 1
+[0x03] & 0x20 p2 button 2
+[0x03] & 0x40 p2 button 3
+[0x04] & 0x10 service
+[0x04] & 0x04 coin A
+[0x04] & 0x08 coin B
+[0x04] & 0x01 start 1
+[0x04] & 0x02 start 2
+[0x05] DSW1
+[0x06] DSW2
+[0x07] & 0x40 demo sounds ON / OFF
+[0x07] & 0x7 lives setting
+[0x07] & 0x80 cabinet (upright / table)
+[0x07] & 0x30 difficulty (easy / normal / hard / hardest)
+[0x0f] coinage A
+[0x10] coinage B
+[0x11] sound test num
+*/
+static void nichibutsu_1414m4_0600(address_space *space, UINT8 is2p)
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+	UINT8 * data = (UINT8 *)space->machine().region("gfx5")->base();
+	int i;
+	UINT16 dst;
+
+	dst = ((data[0x1f5]<<8)|(data[0x1f6]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst] = (state->m_text_videoram[7] & 0x7) + 0x30;//data[0x1f7];
+
+	dst = ((data[0x1f8]<<8)|(data[0x1f9]&0xff)) & 0x3fff;
+	terrafu_sm_transfer(space,0x1fa + (((state->m_text_videoram[7] & 0x30) >> 4) * 0x18),dst,12,1);
+
+	// 0x25a - 0x261 unknown meaning
+
+	dst = ((data[0x262]<<8)|(data[0x263]&0xff)) & 0x3fff;
+	terrafu_sm_transfer(space,0x264 + (((state->m_text_videoram[7] & 0x80) >> 7) * 0x18),dst,12,1);
+
+	dst = ((data[0x294]<<8)|(data[0x295]&0xff)) & 0x3fff;
+	terrafu_sm_transfer(space,0x296 + (((state->m_text_videoram[7] & 0x40) >> 6) * 0x18),dst,12,1);
+
+	dst = ((data[0x2c6]<<8)|(data[0x2c7]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst] = ((state->m_text_videoram[0xf] & 0xf0) >> 4) + 0x30;//data[0x2c8];
+
+	dst = ((data[0x2c9]<<8)|(data[0x2ca]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst] = ((state->m_text_videoram[0xf] & 0x0f) >> 0) + 0x30;//data[0x2cb];
+
+	dst = ((data[0x2cc]<<8)|(data[0x2cd]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst] = ((state->m_text_videoram[0x10] & 0xf0) >> 4) + 0x30;//data[0x2ce];
+
+	dst = ((data[0x2cf]<<8)|(data[0x2d0]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst] = ((state->m_text_videoram[0x10] & 0x0f) >> 0) + 0x30;//data[0x2d1];
+
+	dst = ((data[0x2d2]<<8)|(data[0x2d3]&0xff)) & 0x3fff;
+	state->m_text_videoram[dst+0] = ((state->m_text_videoram[0x11] & 0xf0) >> 4) + 0x30;//data[0x2d4];
+	state->m_text_videoram[dst+1] = (state->m_text_videoram[0x11] & 0x0f) + 0x30;//data[0x2d5];
+
+	dst = ((data[0x2d6]<<8)|(data[0x2d7]&0xff)) & 0x3fff;
+	terrafu_sm_transfer(space,0x2d8 + (is2p * 0x18),dst,12,1); // 1p / 2p string
+
+	dst = ((data[0x308]<<8)|(data[0x309]&0xff)) & 0x3fff;
+	for(i=0;i<5;i++) /* system inputs */
+		terrafu_sm_transfer(space,0x310 + (((state->m_text_videoram[0x04] >> (4-i)) & 1) * 6),dst + (i * 0x20),0x3,1);
+
+	dst = ((data[0x30a]<<8)|(data[0x30b]&0xff)) & 0x3fff;
+	for(i=0;i<7;i++) /* 1p / 2p inputs */
+		terrafu_sm_transfer(space,0x310 + (((state->m_text_videoram[0x02 + is2p] >> (6-i)) & 1) * 6),dst + (i * 0x20),0x3,1);
+
+	dst = ((data[0x30c]<<8)|(data[0x30d]&0xff)) & 0x3fff;
+	for(i=0;i<8;i++) /* dips */
+		terrafu_sm_transfer(space,0x310 + (((state->m_text_videoram[0x05] >> (7-i)) & 1) * 6),dst + (i * 0x20),0x3,1);
+
+	dst = ((data[0x30e]<<8)|(data[0x30f]&0xff)) & 0x3fff;
+	for(i=0;i<8;i++) /* dips */
+		terrafu_sm_transfer(space,0x310 + (((state->m_text_videoram[0x06] >> (7-i)) & 1) * 6),dst + (i * 0x20),0x3,1);
 }
 
 void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
@@ -280,7 +274,7 @@ void terrafu_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			break;
 
 		case 0x0600: /* service mode */
-			service_mode(space,mcu_cmd & 1);
+			nichibutsu_1414m4_0600(space,mcu_cmd & 1);
 			break;
 
 		case 0x0e00:
@@ -311,7 +305,7 @@ void kozure_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			break;
 
 		case 0x0600:
-			service_mode(space,mcu_cmd & 1);
+			nichibutsu_1414m4_0600(space,mcu_cmd & 1);
 			break;
 
 		case 0x0e00: /* 1p / hi-score msg / 2p + points */
@@ -353,7 +347,7 @@ void legion_mcu_exec(address_space *space,UINT16 mcu_cmd)
 			break;
 
 		case 0x0600:
-			service_mode(space,mcu_cmd & 1);
+			nichibutsu_1414m4_0600(space,mcu_cmd & 1);
 			break;
 
 		case 0x0e00: /* 1p / hi-score msg / 2p + points */
