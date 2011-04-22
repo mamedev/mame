@@ -9,6 +9,7 @@ public:
 	UINT16 *  m_text_videoram;
 	UINT16 *  m_bg_videoram;
 	UINT16 *  m_fg_videoram;
+	UINT16 *  m_spr_pal_clut;
 	UINT16 m_legion_cmd[4];	// legiono only!
 //  UINT16 *  m_spriteram;    // currently this uses generic buffered_spriteram
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling

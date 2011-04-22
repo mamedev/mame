@@ -27,6 +27,16 @@ TODO:
 - intro in Terra Force isn't right, the square panels should be cleared after every
   animation is played, almost likely to not be protection related;
 - priorities, especially with the text layer (Terra Force);
+- sprites use a RAM clut for colors, used for color cycling effects. Examples are:
+  - "2" logo in Crazy Climber 2 title screen;
+  - ship rays on Armed F title screen;
+  - gameplay in Armed F abuses of this effect (shots, player ship lights etc.);
+
+
+Notes:
+- the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
+  red to blue;
+
 
 
 
@@ -171,6 +181,17 @@ Stephh's notes (based on the games M68000 code and some tests) :
  *
  *************************************/
 
+/*
+	-x-- ---- ---- ---- trigger 1414M4 operation
+	---x ---- ---- ---- flip screen
+	---- x--- ---- ---- disable bg layer
+	---- -x-- ---- ---- disable fg layer
+	---- --x- ---- ---- disable sprite
+	---- ---x ---- ---- disable tx layer
+	---- ---- ---- --x- coin counter 1
+	---- ---- ---- ---x coin counter 0
+*/
+
 static WRITE16_HANDLER( io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
@@ -180,8 +201,9 @@ static WRITE16_HANDLER( io_w )
 
 	COMBINE_DATA(&state->m_vreg);
 
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -204,8 +226,9 @@ static WRITE16_HANDLER( cclimbr2_io_w )
 
 	COMBINE_DATA(&state->m_vreg);
 
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -227,8 +250,10 @@ static WRITE16_HANDLER( terraf_io_w )
 	}
 
 	COMBINE_DATA(&state->m_vreg);
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -240,8 +265,10 @@ static WRITE16_HANDLER( terrafb_io_w )
 		cputag_set_input_line(space->machine(), "extra", 0, HOLD_LINE);
 
 	COMBINE_DATA(&state->m_vreg);
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -263,8 +290,10 @@ static WRITE16_HANDLER( kozure_io_w )
 	}
 
 	COMBINE_DATA(&state->m_vreg);
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -276,8 +305,10 @@ static WRITE16_HANDLER( bootleg_io_w )
 	//	cputag_set_input_line(space->machine(), "extra", 0, HOLD_LINE);
 
 	COMBINE_DATA(&state->m_vreg);
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -298,8 +329,10 @@ static WRITE16_HANDLER( legion_io_w )
 	}
 
 	COMBINE_DATA(&state->m_vreg);
-	/* bits 0 and 1 of armedf_vreg are coin counters */
-	/* bit 12 seems to handle screen flipping */
+
+	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
+	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
 }
 
@@ -340,7 +373,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
-	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
+	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
 	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
@@ -357,7 +390,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x060400, 0x063fff) AM_RAM
+	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
 //	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
 //	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
@@ -371,8 +404,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
-	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
+	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
 	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
@@ -394,8 +426,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
-	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
+	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
 	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
@@ -429,8 +460,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
-	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
+	AM_RANGE(0x06c000, 0x06cfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
 	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
@@ -441,7 +471,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	//AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
@@ -453,7 +483,7 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
 	AM_RANGE(0x06a000, 0x06afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06b000, 0x06bfff) AM_RAM
+	AM_RANGE(0x06b000, 0x06bfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
 	AM_RANGE(0x06c000, 0x06c001) AM_READ_PORT("P1")
 	AM_RANGE(0x06c002, 0x06c003) AM_READ_PORT("P2")
 	AM_RANGE(0x06c004, 0x06c005) AM_READ_PORT("DSW1")
@@ -465,6 +495,7 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x06d006, 0x06d007) AM_WRITE(armedf_fg_scrollx_w)
 	AM_RANGE(0x06d008, 0x06d009) AM_WRITE(armedf_fg_scrolly_w)
 	AM_RANGE(0x06d00a, 0x06d00b) AM_WRITE(sound_command_w)
+	AM_RANGE(0x06d00c, 0x06d00d) AM_WRITENOP //watchdog
 	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
@@ -1697,7 +1728,7 @@ GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA",     "Terra Force (US set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION ) //world?
 GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",     "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
-GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE| GAME_IMPERFECT_COLORS )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE| GAME_IMPERFECT_COLORS )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE| GAME_IMPERFECT_COLORS )
