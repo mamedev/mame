@@ -691,7 +691,7 @@ static void extract_video_config(running_machine &machine)
 		// default to working video please
 		video_config.prefer16bpp_tex = 0;
 		video_config.forcepow2texture = options.gl_force_pow2_texture();
-		video_config.allowtexturerect = options.gl_no_texture_rect();
+		video_config.allowtexturerect = !(options.gl_no_texture_rect());
 		video_config.vbo         = options.gl_vbo();
 		video_config.pbo         = options.gl_pbo();
 		video_config.glsl        = options.gl_glsl();
