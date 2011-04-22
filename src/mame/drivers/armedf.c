@@ -175,7 +175,35 @@ static WRITE16_HANDLER( io_w )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
 
+	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+		printf("%04x\n",(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+
 	COMBINE_DATA(&state->m_vreg);
+
+	/* bits 0 and 1 of armedf_vreg are coin counters */
+	/* bit 12 seems to handle screen flipping */
+	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
+}
+
+static WRITE16_HANDLER( cclimbr2_io_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+	{
+		/* latch fg scroll values */
+		state->m_fg_scrollx = (state->m_text_videoram[0x0d] & 0xff) | ((state->m_text_videoram[0x0e] & 0x3) << 8);
+		state->m_fg_scrolly = (state->m_text_videoram[0x0b] & 0xff) | ((state->m_text_videoram[0x0c] & 0x3) << 8);
+
+		/* process the command */
+		//terrafu_mcu_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff));
+
+		/* mark tiles dirty */
+		tilemap_mark_all_tiles_dirty(state->m_tx_tilemap);
+	}
+
+	COMBINE_DATA(&state->m_vreg);
+
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
 	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
@@ -351,7 +379,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
+//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -1626,7 +1654,7 @@ static DRIVER_INIT( legion )
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(legion_io_w) );
 
-	state->m_scroll_type = 3;
+	state->m_scroll_type = 2;
 }
 
 static DRIVER_INIT( legiono )
@@ -1642,13 +1670,16 @@ static DRIVER_INIT( legiono )
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(bootleg_io_w) );
 
-	state->m_scroll_type = 3;
+	state->m_scroll_type = 2;
 }
 
 static DRIVER_INIT( cclimbr2 )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
-	state->m_scroll_type = 4;
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(cclimbr2_io_w) );
+
+	state->m_scroll_type = 3;
 }
 
 

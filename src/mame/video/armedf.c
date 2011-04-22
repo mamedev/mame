@@ -59,11 +59,7 @@ static TILE_GET_INFO( get_legion_tx_tile_info )
 
 	int attributes;
 
-	if (state->m_scroll_type == 1)
-		attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
-	else
-		attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
-
+	attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
 
 	tileinfo->category = 0;
 
@@ -115,33 +111,24 @@ VIDEO_START( armedf )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 
-	state->m_oldmode = -1;
-	if (state->m_scroll_type == 4 || /* cclimbr2 */
-		state->m_scroll_type == 3 || /* legion */
-		state->m_scroll_type == 6 )  /* legiono */
-	{
-		state->m_sprite_offy = 0;
-	}
-	else
-		state->m_sprite_offy = 128;
+	state->m_sprite_offy = (state->m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 
 	switch (state->m_scroll_type)
 	{
-	case 1: /* armed formation */
-		state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type1, 8, 8, 64, 32);
-		break;
+		case 1: /* armed formation */
+			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type1, 8, 8, 64, 32);
+			break;
 
-	case 3: /* legion */
-	case 6: /* legiono */
-		state->m_tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
-		break;
+		case 2: /* legion */
+			state->m_tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
+			break;
 
-	default:
-		state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type2, 8, 8, 64, 32);
-		break;
+		default:
+			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type2, 8, 8, 64, 32);
+			break;
 	}
 
 	tilemap_set_transparent_pen(state->m_bg_tilemap, 0xf);
@@ -306,7 +293,8 @@ SCREEN_UPDATE( armedf )
 	switch (state->m_scroll_type)
 	{
 		case 0:	/* terra force, kozure ookami */
-		case 3: /* legion */
+		case 2: /* legion */
+		case 3:	/* crazy climber */
 			tilemap_set_scrollx(state->m_fg_tilemap, 0, (state->m_fg_scrollx & 0x3ff));
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, (state->m_fg_scrolly & 0x3ff));
 			break;
@@ -316,24 +304,12 @@ SCREEN_UPDATE( armedf )
 			tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_fg_scrolly);
 			break;
 
-		case 4: /* crazy climber 2 */
-			{
-				int scrollx, scrolly;
-
-				/* scrolling is handled by the protection mcu */
-				scrollx = (state->m_text_videoram[13] & 0xff) | (state->m_text_videoram[14] << 8);
-				scrolly = (state->m_text_videoram[11] & 0xff) | (state->m_text_videoram[12] << 8);
-				tilemap_set_scrollx(state->m_fg_tilemap, 0, scrollx);
-				tilemap_set_scrolly(state->m_fg_tilemap, 0, scrolly);
-
-			}
-			break;
 	}
 
 
 	bitmap_fill(bitmap, cliprect , 0xff);
 
-	if(state->m_scroll_type == 3 || state->m_scroll_type == 6) /* legion / legiono */
+	if(state->m_scroll_type == 2) /* legion / legiono */
 	{
 		tilemap_draw(bitmap, cliprect, state->m_tx_tilemap, 1, 0);
 	}

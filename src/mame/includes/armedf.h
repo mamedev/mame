@@ -27,7 +27,6 @@ public:
 	int      m_sprite_offy;
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
-	int      m_oldmode;
 };
 
 
