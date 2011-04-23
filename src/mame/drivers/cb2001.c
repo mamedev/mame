@@ -44,7 +44,6 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
-#include "deprecat.h"
 
 
 class cb2001_state : public driver_device
@@ -737,10 +736,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
-	else
-		device_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0);
 }
 
 static const gfx_layout cb2001_layout =
@@ -836,7 +832,7 @@ static MACHINE_CONFIG_START( cb2001, cb2001_state )
 	MCFG_CPU_CONFIG(cb2001_config)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
 	MCFG_CPU_IO_MAP(cb2001_io)
-	MCFG_CPU_VBLANK_INT_HACK(vblank_irq, 2)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", cb2001_ppi8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", cb2001_ppi8255_intf[1] )

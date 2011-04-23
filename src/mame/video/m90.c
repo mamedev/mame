@@ -105,6 +105,8 @@ VIDEO_START( m90 )
 	tilemap_set_transparent_pen(state->m_pf1_wide_layer,0);
 
 	state_save_register_global_array(machine, state->m_video_control_data);
+	state_save_register_global(machine, state->m_last_pf1);
+	state_save_register_global(machine, state->m_last_pf2);
 }
 
 VIDEO_START( bomblord )
@@ -298,8 +300,8 @@ WRITE16_HANDLER( m90_video_w )
 SCREEN_UPDATE( m90 )
 {
 	m90_state *state = screen->machine().driver_data<m90_state>();
-	int pf1_base = state->m_video_control_data[5] & 0x3;
-	int pf2_base = state->m_video_control_data[6] & 0x3;
+	UINT8 pf1_base = state->m_video_control_data[5] & 0x3;
+	UINT8 pf2_base = state->m_video_control_data[6] & 0x3;
 	int i,pf1_enable,pf2_enable, video_enable;
 
 	if (state->m_video_control_data[7]&0x04) video_enable=0; else video_enable=1;

@@ -14,14 +14,6 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk, thanks to Chris Hardy!
 
-Notes:
-
-- Samples are not played in bbmanw/atompunk.
-
-- Not sure about the clock speeds. In hasamu and quizf1 service mode, the
-  selection moves too fast with the clock set at 16 MHz. It's still fast at
-  8 MHz, but at least it's usable.
-
 *****************************************************************************/
 
 #include "emu.h"
@@ -38,15 +30,10 @@ Notes:
 
 /***************************************************************************/
 
-static void set_m90_bank(running_machine &machine)
+static MACHINE_START( m90 )
 {
 	m90_state *state = machine.driver_data<m90_state>();
-	UINT8 *rom = machine.region("user1")->base();
-
-	if (!rom)
-		popmessage("bankswitch with no banked ROM!");
-	else
-		memory_set_bankptr(machine, "bank1",rom + state->m_bankaddress);
+	state->m_audio = machine.device("m72");
 }
 
 /***************************************************************************/
@@ -55,20 +42,25 @@ static WRITE16_HANDLER( m90_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(space->machine(), 1, data & 0x02);
 
-		if (data&0xfe) logerror("Coin counter %02x\n",data);
+		if (data & 0xfc) logerror("Coin counter %02x\n",data);
 	}
 }
 
 static WRITE16_HANDLER( quizf1_bankswitch_w )
 {
-	m90_state *state = space->machine().driver_data<m90_state>();
+	if (ACCESSING_BITS_0_7)
+		memory_set_bank(space->machine(), "bank1", data & 0xf);
+}
+
+static WRITE16_HANDLER( dynablsb_sound_command_w )
+{
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_bankaddress = 0x10000 * (data & 0x0f);
-		set_m90_bank(space->machine());
+		soundlatch_w(space, offset, data);
+		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -113,18 +105,17 @@ static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x04, 0x05) AM_WRITE(quizf1_bankswitch_w)
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_cpu_io_map, AS_IO, 16 )
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+static ADDRESS_MAP_START( dynablsb_main_cpu_io_map, AS_IO, 16 )
+	AM_RANGE(0x00, 0x01) AM_WRITE(dynablsb_sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuosly 0x6000 */
+//  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
@@ -148,13 +139,19 @@ static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbmanw_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_signed_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-//  AM_RANGE(0x40, 0x41) AM_WRITE(rtype2_sample_addr_w)
-//  AM_RANGE(0x41, 0x41) AM_DEVREAD("m72", m72_sample_r)
-//  AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_sample_w)
+	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -246,7 +243,7 @@ static INPUT_PORTS_START( dynablst )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, "2 Player Upright" )
-	PORT_DIPSETTING(      0x0600, "4 Player Upright A" ) /* Seperate Coin Slots */
+	PORT_DIPSETTING(      0x0600, "4 Player Upright A" ) /* Separate Coin Slots */
 	PORT_DIPSETTING(      0x0200, "4 Player Upright B" ) /* Shared Coin Slots */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )  /* This setting shows screen with offset, no cocktail support :-( */
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
@@ -264,7 +261,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynablsb )
 	PORT_START("P1_P2")
-	IREM_GENERIC_JOYSTICKS_4_BUTTONS(2, 1)
+	IREM_GENERIC_JOYSTICKS_2_BUTTONS(2, 1)
 
 	PORT_START("SYSTEM")
 	IREM_COINS
@@ -296,7 +293,7 @@ static INPUT_PORTS_START( dynablsb )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, "2 Player Upright" )
-	PORT_DIPSETTING(      0x0600, "4 Player Upright A" ) /* Seperate Coin Slots */
+	PORT_DIPSETTING(      0x0600, "4 Player Upright A" ) /* Separate Coin Slots */
 	PORT_DIPSETTING(      0x0200, "4 Player Upright B" ) /* Shared Coin Slots */
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )  /* This setting shows screen with offset, no cocktail support :-( */
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
@@ -400,7 +397,7 @@ static INPUT_PORTS_START( bbmanw )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(      0x0400, "2 Player" )
-	PORT_DIPSETTING(      0x0600, "4 Player Seprate Coins" )		/* Each player has a seperate Coin Slot */
+	PORT_DIPSETTING(      0x0600, "4 Player Separate Coins" )		/* Each player has a separate Coin Slot */
 	PORT_DIPSETTING(      0x0200, "4 Player Shared Coins" )		/* All 4 players Share coin 1&2 */
 	PORT_DIPSETTING(      0x0000, "4 Player 1&2 3&4 Share Coins" )	/* Players 1&2 share coin 1&2, Players 3&4 share coin 3&4 */
 	PORT_DIPNAME( 0x0800, 0x0800, "Coin Mode" ) PORT_DIPLOCATION("SW2:4")
@@ -447,9 +444,9 @@ static INPUT_PORTS_START( quizf1 )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, "Input Device" )	 PORT_DIPLOCATION("SW1:6") /* input related (joystick/buttons select?) */
-	PORT_DIPSETTING(      0x0020, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(      0x0000, "Buttons" )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Joystick ) )	/* for quiz cabinets with buttons connected to the JAMMA "joystick" pins */
+	PORT_DIPSETTING(      0x0000, "Buttons" )			/* for non-quiz cabinet conversions */
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -676,12 +673,31 @@ static const ym2151_interface ym2151_config =
 	m72_ym2151_irq_handler
 };
 
+/* this bootleg polls the YM2151 instead of taking interrupts from it */
+static const ym2151_interface dynablsb_ym2151_config =
+{
+	NULL
+};
+
+static INTERRUPT_GEN( fake_nmi )
+{
+	m90_state *state = device->machine().driver_data<m90_state>();
+	int sample = m72_sample_r(state->m_audio,0);
+	if (sample)
+		m72_sample_w(state->m_audio,0,sample);
+}
+
+static INTERRUPT_GEN( bomblord_fake_nmi )
+{
+	m90_state *state = device->machine().driver_data<m90_state>();
+	int sample = m72_sample_r(state->m_audio,0);
+	if (sample != 0x80)
+		m72_sample_w(state->m_audio,0,sample);
+}
+
 static INTERRUPT_GEN( m90_interrupt )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
-	else
-		device_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+	generic_pulse_irq_line(device, NEC_INPUT_LINE_INTP0);
 }
 
 static INTERRUPT_GEN( dynablsb_interrupt )
@@ -698,16 +714,18 @@ static INTERRUPT_GEN( bomblord_interrupt )
 /* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_CONFIG_START( m90, m90_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", V35, XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(m90_interrupt, 2)
+	MCFG_CPU_VBLANK_INT("screen", m90_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
 	MCFG_CPU_IO_MAP(m90_sound_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse, 128)	/* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
+
+	MCFG_MACHINE_START(m90)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -786,18 +804,20 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbmanw, bbmanwj )
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(bbmanw_sound_io_map)
+	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(fake_nmi, 128)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bomblord, m90 )
-	MCFG_CPU_REPLACE("maincpu", V30,32000000/4)
+	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(bomblord_main_cpu_map)
-	MCFG_CPU_IO_MAP(dynablsb_cpu_io_map)
+	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", bomblord_interrupt)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_IO_MAP(bbmanw_sound_io_map)
+	MCFG_CPU_IO_MAP(m99_sound_cpu_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(bomblord_fake_nmi, 128)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
@@ -806,11 +826,16 @@ static MACHINE_CONFIG_DERIVED( bomblord, m90 )
 	MCFG_VIDEO_START(bomblord)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
-	MCFG_CPU_REPLACE("maincpu", V30,32000000/4)
+	MCFG_CPU_REPLACE("maincpu", V30, 32000000/4)
 	MCFG_CPU_PROGRAM_MAP(dynablsb_main_cpu_map)
-	MCFG_CPU_IO_MAP(dynablsb_cpu_io_map)
+	MCFG_CPU_IO_MAP(dynablsb_main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", dynablsb_interrupt)
+
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(dynablsb_sound_cpu_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 64)	/* half the sample rate of the original */
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
@@ -818,7 +843,13 @@ static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
 	MCFG_SCREEN_UPDATE(dynablsb)
 
 	MCFG_VIDEO_START(dynablsb)
+
+	MCFG_DEVICE_REMOVE("m72")
+
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_CONFIG(dynablsb_ym2151_config)
 MACHINE_CONFIG_END
+
 
 /***************************************************************************/
 
@@ -916,7 +947,7 @@ ROM_START( dynablstb )
 	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
 
 	ROM_REGION( 0x20000, "samples", ROMREGION_ERASE00 )	/* samples */
-	/* Does this have a sample rom? */
+	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
 
@@ -1041,8 +1072,8 @@ ROM_START( quizf1 )
 	ROM_LOAD16_BYTE( "qf1-l0-.79",   0x000000, 0x40000, CRC(94588a6f) SHA1(ee912739c7719fc2b099da0c63f7473eedcfc718) )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x100000, "user1", 0 )
-	ROM_LOAD16_BYTE( "qf1-h1-.78",   0x000001, 0x80000, CRC(c6c2eb2b) SHA1(83de08b0c72da8c3e4786063802d83cb1015032a) )	/* banked at 80000-8FFFF */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* banked at 80000-8FFFF */
+	ROM_LOAD16_BYTE( "qf1-h1-.78",   0x000001, 0x80000, CRC(c6c2eb2b) SHA1(83de08b0c72da8c3e4786063802d83cb1015032a) )
 	ROM_LOAD16_BYTE( "qf1-l1-.80",   0x000000, 0x80000, CRC(3132c144) SHA1(de3ae35cdfbb1231cab343142ac700df00f9b77a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -1097,7 +1128,7 @@ ROM_START( gussun )
 ROM_END
 
 ROM_START( matchit2 )
-	ROM_REGION( CODE_SIZE * 2, "maincpu", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sis2-h0-b.bin", 0x00001, 0x40000, CRC(9a2556ac) SHA1(3e4d5ac2869c703c5d5b769c2a09e501b5e6462e) ) /* Actually labeled as "SIS2-H0-B" */
 	ROM_LOAD16_BYTE( "sis2-l0-b.bin", 0x00000, 0x40000, CRC(d35d948a) SHA1(e4f119fa00fd8ede2533323e14d94ad4d5fabbc5) ) /* Actually labeled as "SIS2-L0-B" */
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
@@ -1136,57 +1167,42 @@ ROM_END
 
 
 
-
-static STATE_POSTLOAD( quizf1_postload )
-{
-	set_m90_bank(machine);
-}
-
 static DRIVER_INIT( quizf1 )
 {
-	m90_state *state = machine.driver_data<m90_state>();
-	state->m_bankaddress = 0;
-	set_m90_bank(machine);
-
-	state_save_register_global(machine, state->m_bankaddress);
-	machine.save().register_postload(quizf1_postload, NULL);
+	memory_configure_bank(machine, "bank1", 0, 16, machine.region("user1")->base(), 0x10000);
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x04, 0x05, FUNC(quizf1_bankswitch_w));
 }
 
 
 
 static DRIVER_INIT( bomblord )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)(machine.region("maincpu")->base());
 
-	int i;
-	for (i=0; i<0x100000; i+=8)
+	for (int i = 0; i < 0x100000 / 2; i += 4)
 	{
-		RAM[i+0]=BITSWAP8(RAM[i+0], 6, 4, 7, 3, 1, 2, 0, 5);
-		RAM[i+1]=BITSWAP8(RAM[i+1], 4, 0, 5, 6, 7, 3, 2, 1);
-		RAM[i+2]=BITSWAP8(RAM[i+2], 0, 6, 1, 5, 3, 4, 2, 7);
-		RAM[i+3]=BITSWAP8(RAM[i+3], 4, 3, 5, 2, 6, 1, 7, 0);
-		RAM[i+4]=BITSWAP8(RAM[i+4], 4, 7, 3, 2, 5, 6, 1, 0);
-		RAM[i+5]=BITSWAP8(RAM[i+5], 5, 1, 4, 0, 6, 7, 2, 3);
-		RAM[i+6]=BITSWAP8(RAM[i+6], 6, 3, 7, 5, 0, 1, 4, 2);
-		RAM[i+7]=BITSWAP8(RAM[i+7], 6, 5, 7, 0, 3, 2, 1, 4);
+		ROM[i+0]=BITSWAP16(ROM[i+0],0xc,0x8,0xd,0xe,0xf,0xb,0xa,0x9,0x6,0x4,0x7,0x3,0x1,0x2,0x0,0x5);
+		ROM[i+1]=BITSWAP16(ROM[i+1],0xc,0xb,0xd,0xa,0xe,0x9,0xf,0x8,0x0,0x6,0x1,0x5,0x3,0x4,0x2,0x7);
+		ROM[i+2]=BITSWAP16(ROM[i+2],0xd,0x9,0xc,0x8,0xe,0xf,0xa,0xb,0x4,0x7,0x3,0x2,0x5,0x6,0x1,0x0);
+		ROM[i+3]=BITSWAP16(ROM[i+3],0xe,0xd,0xf,0x8,0xb,0xa,0x9,0xc,0x6,0x3,0x7,0x5,0x0,0x1,0x4,0x2);
 	}
 }
 
 
 
-GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
-GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL )
-GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL )
-GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
-GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )
+GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster / Bomber Man (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F1 1-2 Finish (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 
 

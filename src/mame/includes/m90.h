@@ -4,7 +4,6 @@ public:
 	m90_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT32 m_bankaddress;
 	UINT16 *m_video_data;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
@@ -13,8 +12,9 @@ public:
 	tilemap_t *m_pf2_layer;
 	tilemap_t *m_pf1_wide_layer;
 	tilemap_t *m_pf2_wide_layer;
-	int m_last_pf1;
-	int m_last_pf2;
+	UINT8 m_last_pf1;
+	UINT8 m_last_pf2;
+	device_t *m_audio;
 };
 
 
