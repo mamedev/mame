@@ -9,6 +9,7 @@ Video Fruit Machine
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
 
 
 class buster_state : public driver_device
@@ -53,8 +54,8 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(buster_state, m_rom)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, m_vram)
-//  AM_RANGE(0x6000, 0x6000) MC6845 address
-//  AM_RANGE(0x6001, 0x6001) MC6845 data
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x7000, 0xafff) AM_ROM
 ADDRESS_MAP_END
 
@@ -78,6 +79,20 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
 static MACHINE_CONFIG_START( buster, buster_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
@@ -92,6 +107,7 @@ static MACHINE_CONFIG_START( buster, buster_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE(buster)
+	MCFG_MC6845_ADD("crtc", MC6845, XTAL_3_579545MHz/4, mc6845_intf) //unknown clock / type
 
 	MCFG_GFXDECODE(buster)
 	MCFG_PALETTE_LENGTH(0x100)
