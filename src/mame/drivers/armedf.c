@@ -1698,8 +1698,8 @@ ROM_START( terrafb )
 	ROM_LOAD16_BYTE( "tfb-3.bin", 0x00001, 0x10000, CRC(6c6aa7ed) SHA1(ee5fdeb5411034ce0fd1c883ee25bf1fe9a3ec52) )
 	ROM_LOAD16_BYTE( "tfb-7.bin", 0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
 	ROM_LOAD16_BYTE( "tfb-2.bin", 0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
-	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, BAD_DUMP CRC(1de681a1) SHA1(bddf404988226698d65e075b4c21de736a862df1) ) // - one bit is bit-rotted, there might be more ...
-	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, BAD_DUMP CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) ) // /
+	ROM_LOAD16_BYTE( "tfb-6.bin", 0x40000, 0x08000, CRC(552c3c63) SHA1(82d930b7fcdf4879c4644c47ecce58fd2645f10f) )
+	ROM_LOAD16_BYTE( "tfb-1.bin", 0x40001, 0x08000, CRC(6a0b94c7) SHA1(55fb32ab859bf51a1c79bf962bb677fa557216ed) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
@@ -2048,12 +2048,6 @@ static DRIVER_INIT( terrafb )
 	state->m_scroll_type = 0;
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terrafb_io_w) );
-
-	{
-		UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
-
-		ROM[0x41ca0 / 2] = 0x209a; //0x249a, almost surely a bitrot
-	}
 }
 
 static DRIVER_INIT( armedf )
