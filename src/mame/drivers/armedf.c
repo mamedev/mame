@@ -22,7 +22,7 @@ actually bootlegs.
 
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
-- time over doesn't kill the player in Kozure Ookami;
+- time over doesn't kill the player in Kozure Ookami, check (1) note;
 
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
@@ -33,6 +33,20 @@ Notes:
   - ship rays on Armed F title screen;
   - gameplay in Armed F abuses of this effect (shots, player ship lights etc.);
   - Terra Force helmet during the intro;
+- (1) Kozure Ookami timer over bug:
+      010118: lea     $63510.l, A0
+      01011E: tst.w   (A0) ;check time variable, in BCD format
+      010120: beq     $10152
+      010156: cmpi.w  #$4, D0
+      01015A: beq     $f992
+      01015E: cmpi.w  #$10, D0
+      010162: beq     $f992
+      010166: tst.b   $60626.l ;fails there, this location is never enabled!
+      01016C: beq     $1017e
+      01016E: btst    #$7, $60621.l ;check dsw2 ram copy bit 15 (debug feature?)
+      010176: bne     $1017e
+      010178: bra     $f9f0 ;timer over event occurs
+  btanb perhaps?
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -925,7 +939,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 1*8, 31*8-1 ) // vertical res confirmed by a real HW video
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 ) // 320 x 240, trusted
 	MCFG_SCREEN_UPDATE(armedf)
 	MCFG_SCREEN_EOF(armedf)
 
