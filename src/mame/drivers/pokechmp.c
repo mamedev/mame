@@ -294,4 +294,4 @@ ROM_START( pokechmp )
 	ROM_LOAD( "pokechamp_10_27c040.bin",	   0x00000, 0x80000, CRC(b54806ed) SHA1(c6e1485c263ebd9102ff1e8c09b4c4ca5f63c3da) )
 ROM_END
 
-GAME( 1995, pokechmp, 0, pokechmp, pokechmp, pokechmp, ROT0, "DGRM", "Poke Champ", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1995, pokechmp, 0, pokechmp, pokechmp, pokechmp, ROT0, "D.G.R.M.", "Poke Champ", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
