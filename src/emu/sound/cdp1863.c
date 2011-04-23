@@ -15,128 +15,149 @@
 
 */
 
-#include "emu.h"
 #include "cdp1863.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
 
 #define CDP1863_DEFAULT_LATCH	0x35
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _cdp1863_t cdp1863_t;
-struct _cdp1863_t
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type CDP1863 = cdp1863_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1863_device_config - constructor
+//-------------------------------------------------
+
+cdp1863_device_config::cdp1863_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "CDP1863", tag, owner, clock),
+	  device_config_sound_interface(mconfig, *this)
 {
-	int clock1;						/* clock 1 */
-	int clock2;						/* clock 2 */
-
-	sound_stream *stream;			/* sound output */
-
-	/* sound state */
-	int oe;							/* output enable */
-	int latch;						/* sound latch */
-	INT16 signal;					/* current signal */
-	int incr;						/* initial wave state */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE cdp1863_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	return (cdp1863_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-INLINE cdp1863_config *get_safe_config(device_t *device)
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *cdp1863_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	assert(device != NULL);
-	return (cdp1863_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return global_alloc(cdp1863_device_config(mconfig, tag, owner, clock));
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-/*-------------------------------------------------
-    cdp1863_str_w - tone latch write
--------------------------------------------------*/
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( cdp1863_str_w )
+device_t *cdp1863_device_config::alloc_device(running_machine &machine) const
 {
-	cdp1863_t *cdp1863 = get_safe_token(device);
-
-	cdp1863->latch = data;
+	return auto_alloc(machine, cdp1863_device(machine, *this));
 }
 
-/*-------------------------------------------------
-    cdp1863_oe_w - output enable write
-------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( cdp1863_oe_w )
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void cdp1863_device_config::static_set_config(device_config *device, int clock2)
 {
-	cdp1863_t *cdp1863 = get_safe_token(device);
-
-	cdp1863->oe = state;
+	cdp1863_device_config *cdp1863 = downcast<cdp1863_device_config *>(device);
+	
+	cdp1863->m_clock2 = clock2;
 }
 
-/*-------------------------------------------------
-    cdp1863_set_clk1 - set clock 1 frequency
-------------------------------------------------*/
 
-void cdp1863_set_clk1(device_t *device, int frequency)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1863_device - constructor
+//-------------------------------------------------
+
+cdp1863_device::cdp1863_device(running_machine &_machine, const cdp1863_device_config &config)
+    : device_t(_machine, config),
+	  device_sound_interface(_machine, config, *this),
+	  m_stream(NULL),
+	  m_clock1(clock()),
+	  m_clock2(config.m_clock2),
+      m_config(config)
 {
-	cdp1863_t *cdp1863 = get_safe_token(device);
-
-	cdp1863->clock1 = frequency;
 }
 
-/*-------------------------------------------------
-    cdp1863_set_clk2 - set clock 2 frequency
-------------------------------------------------*/
 
-void cdp1863_set_clk2(device_t *device, int frequency)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cdp1863_device::device_start()
 {
-	cdp1863_t *cdp1863 = get_safe_token(device);
+	// create sound stream
+	m_stream = machine().sound().stream_alloc(*this, 0, 1, machine().sample_rate());
 
-	cdp1863->clock2 = frequency;
+	// register for state saving
+	save_item(NAME(m_clock1));
+	save_item(NAME(m_clock2));
+	save_item(NAME(m_oe));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_signal));
+	save_item(NAME(m_incr));
 }
 
-/*-------------------------------------------------
-    STREAM_UPDATE( cdp1863_stream_update )
--------------------------------------------------*/
 
-static STREAM_UPDATE( cdp1863_stream_update )
+//-------------------------------------------------
+//  sound_stream_update - handle update requests for
+//  our sound stream
+//-------------------------------------------------
+
+void cdp1863_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	cdp1863_t *cdp1863 = get_safe_token(device);
+	// reset the output stream
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
-	INT16 signal = cdp1863->signal;
+	INT16 signal = m_signal;
 	stream_sample_t *buffer = outputs[0];
 
 	memset( buffer, 0, samples * sizeof(*buffer) );
 
-	if (cdp1863->oe)
+	if (m_oe)
 	{
 		double frequency;
-		int rate = device->machine().sample_rate() / 2;
+		int rate = machine().sample_rate() / 2;
 
-		/* get progress through wave */
-		int incr = cdp1863->incr;
+		// get progress through wave
+		int incr = m_incr;
 
-		if (cdp1863->clock1 > 0)
+		if (m_clock1 > 0)
 		{
-			/* CLK1 is pre-divided by 4 */
-			frequency = cdp1863->clock1 / 4 / (cdp1863->latch + 1) / 2;
+			// CLK1 is pre-divided by 4
+			frequency = m_clock1 / 4 / (m_latch + 1) / 2;
 		}
 		else
 		{
-			/* CLK2 is pre-divided by 8 */
-			frequency = cdp1863->clock2 / 8 / (cdp1863->latch + 1) / 2;
+			// CLK2 is pre-divided by 8
+			frequency = m_clock2 / 8 / (m_latch + 1) / 2;
 		}
 
 		if (signal < 0)
@@ -159,72 +180,58 @@ static STREAM_UPDATE( cdp1863_stream_update )
 			}
 		}
 
-		/* store progress through wave */
-		cdp1863->incr = incr;
-		cdp1863->signal = signal;
-	}
-}
-
-/*-------------------------------------------------
-    DEVICE_START( cdp1863 )
--------------------------------------------------*/
-
-static DEVICE_START( cdp1863 )
-{
-	cdp1863_t *cdp1863 = get_safe_token(device);
-	const cdp1863_config *config = get_safe_config(device);
-
-	/* set initial values */
-	cdp1863->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->machine().sample_rate(), cdp1863, cdp1863_stream_update);
-	cdp1863->clock1 = device->clock();
-	cdp1863->clock2 = config->clock2;
-	cdp1863->oe = 1;
-
-	/* register for state saving */
-	device->save_item(NAME(cdp1863->clock1));
-	device->save_item(NAME(cdp1863->clock2));
-	device->save_item(NAME(cdp1863->oe));
-	device->save_item(NAME(cdp1863->latch));
-	device->save_item(NAME(cdp1863->signal));
-	device->save_item(NAME(cdp1863->incr));
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( cdp1863 )
--------------------------------------------------*/
-
-static DEVICE_RESET( cdp1863 )
-{
-	cdp1863_t *cdp1863 = get_safe_token(device);
-
-	cdp1863->latch = CDP1863_DEFAULT_LATCH;
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( cdp1863 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( cdp1863 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1863_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(cdp1863_config);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1863);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1863);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1863");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
+		// store progress through wave
+		m_incr = incr;
+		m_signal = signal;
 	}
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(CDP1863, cdp1863);
+//-------------------------------------------------
+//  str_w - latch write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1863_device::str_w )
+{
+	m_latch = data;
+}
+
+
+//-------------------------------------------------
+//  str_w - latch write
+//-------------------------------------------------
+
+void cdp1863_device::str_w(UINT8 data)
+{
+	m_latch = data;
+}
+
+
+//-------------------------------------------------
+//  oe_w - output enable write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( cdp1863_device::oe_w )
+{
+	m_oe = state;
+}
+
+
+//-------------------------------------------------
+//  set_clk1 - set clock 1
+//-------------------------------------------------
+
+void cdp1863_device::set_clk1(int clock)
+{
+	m_clock1 = clock;
+}
+
+
+//-------------------------------------------------
+//  set_clk2 - set clock 2
+//-------------------------------------------------
+
+void cdp1863_device::set_clk2(int clock)
+{
+	m_clock2 = clock;
+}

@@ -18,46 +18,97 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __CDP1863__
 #define __CDP1863__
 
-#include "devlegcy.h"
+#include "emu.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_SOUND_DEVICE(CDP1863, cdp1863);
 
-#define MCFG_CDP1863_ADD(_tag, _clock1, _clock2) \
-	MCFG_SOUND_ADD(_tag, CDP1863, _clock1) \
-	MCFG_DEVICE_CONFIG_DATA32(cdp1863_config, clock2, _clock2)
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
-#define CDP1863_INTERFACE(name) \
-	const cdp1863_interface (name) =
+#define MCFG_CDP1863_ADD(_tag, _clock, _clock2) \
+	MCFG_DEVICE_ADD(_tag, CDP1863, _clock) \
+	cdp1863_device_config::static_set_config(device, _clock2);
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _cdp1863_config cdp1863_config;
-struct _cdp1863_config
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> cdp1863_device_config
+
+class cdp1863_device_config :   public device_config,
+								public device_config_sound_interface
 {
-	int clock2;				/* the clock 2 (pin 2) of the chip */
+    friend class cdp1863_device;
+
+    // construction/destruction
+    cdp1863_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	static void static_set_config(device_config *device, int clock2);
+
+private:
+	int m_clock2;
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* load tone latch */
-WRITE8_DEVICE_HANDLER( cdp1863_str_w );
+// ======================> cdp1863_device
 
-/* output enable */
-WRITE_LINE_DEVICE_HANDLER( cdp1863_oe_w );
+class cdp1863_device :	public device_t,
+						public device_sound_interface
+{
+    friend class cdp1863_device_config;
 
-/* clock setters */
-void cdp1863_set_clk1(device_t *device, int frequency) ATTR_NONNULL(1);
-void cdp1863_set_clk2(device_t *device, int frequency) ATTR_NONNULL(1);
+    // construction/destruction
+    cdp1863_device(running_machine &_machine, const cdp1863_device_config &_config);
+
+public:
+	DECLARE_WRITE8_MEMBER( str_w );
+	void str_w(UINT8 data);
+	
+	DECLARE_WRITE_LINE_MEMBER( oe_w );
+	
+	void set_clk1(int clock);
+	void set_clk2(int clock);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+
+	// internal callbacks
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	sound_stream *m_stream;
+
+	int m_clock1;					// clock 1
+	int m_clock2;					// clock 2
+
+	// sound state
+	int m_oe;						// output enable
+	int m_latch;					// sound latch
+	INT16 m_signal;					// current signal
+	int m_incr;						// initial wave state
+	
+	const cdp1863_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type CDP1863;
+
+
 
 #endif
