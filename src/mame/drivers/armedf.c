@@ -23,17 +23,16 @@ actually bootlegs.
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
 - time over doesn't kill the player in Kozure Ookami;
-- sprites use a RAM clut for colors, used for color cycling effects. Examples are:
-  - "2" logo in Crazy Climber 2 title screen;
-  - ship rays on Armed F title screen;
-  - gameplay in Armed F abuses of this effect (shots, player ship lights etc.);
-  - Terra Force helmet during the intro;
 
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
   red to blue;
 - Crazy Climber 2 does use the 1414M4 chip, but the data used gets overwritten by the m68k code.
-
+- sprites use a RAM clut for colors, used for color cycling effects. Examples are:
+  - "2" logo in Crazy Climber 2 title screen;
+  - ship rays on Armed F title screen;
+  - gameplay in Armed F abuses of this effect (shots, player ship lights etc.);
+  - Terra Force helmet during the intro;
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -1619,14 +1618,14 @@ static DRIVER_INIT( cclimbr2 )
  *************************************/
 
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) /* bootleg? */
-GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "bootleg",        "Terra Force (bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) //world bootleg?
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS ) //world?
-GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",     "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE| GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
+GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "bootleg",        "Terra Force (bootleg)", GAME_SUPPORTS_SAVE ) //world bootleg?
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafb,  ROT0,   "bootleg",        "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US set 2)", GAME_SUPPORTS_SAVE ) //world?
+GAME( 1987, kozure,   0,        kozure,   kozure,   kozure,   ROT0,   "Nichibutsu",     "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )

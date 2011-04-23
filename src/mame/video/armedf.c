@@ -220,6 +220,81 @@ WRITE16_HANDLER( armedf_bg_scrolly_w )
 
 ***************************************************************************/
 
+/* custom code to handle color cycling effect, handled by m_spr_pal_clut */
+void armedf_drawgfx(running_machine &machine, bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
+							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
+							int transparent_color)
+{
+	armedf_state *state = machine.driver_data<armedf_state>();
+	const pen_t *pal = &gfx->machine().pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
+	int x_index_base, y_index, sx, sy, ex, ey;
+	int xinc, yinc;
+
+	xinc = flipx ? -1 : 1;
+	yinc = flipy ? -1 : 1;
+
+	x_index_base = flipx ? gfx->width-1 : 0;
+	y_index = flipy ? gfx->height-1 : 0;
+
+	/* start coordinates */
+	sx = offsx;
+	sy = offsy;
+
+	/* end coordinates */
+	ex = sx + gfx->width;
+	ey = sy + gfx->height;
+
+	if (clip)
+	{
+		if (sx < clip->min_x)
+		{ /* clip left */
+			int pixels = clip->min_x-sx;
+			sx += pixels;
+			x_index_base += xinc*pixels;
+		}
+		if (sy < clip->min_y)
+		{ /* clip top */
+			int pixels = clip->min_y-sy;
+			sy += pixels;
+			y_index += yinc*pixels;
+		}
+		/* NS 980211 - fixed incorrect clipping */
+		if (ex > clip->max_x+1)
+		{ /* clip right */
+			ex = clip->max_x+1;
+		}
+		if (ey > clip->max_y+1)
+		{ /* clip bottom */
+			ey = clip->max_y+1;
+		}
+	}
+
+	if (ex > sx)
+	{ /* skip if inner loop doesn't draw anything */
+		int x, y;
+
+		{
+			for (y = sy; y < ey; y++)
+			{
+				const UINT8 *source = source_base + y_index*gfx->line_modulo;
+				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+				int x_index = x_index_base;
+				for (x = sx; x < ex; x++)
+				{
+					int c = (source[x_index] & ~0xf) | ((state->m_spr_pal_clut[clut*0x10+(source[x_index] & 0xf)]) & 0xf);
+					if (c != transparent_color)
+						dest[x] = pal[c];
+
+					x_index += xinc;
+				}
+				y_index += yinc;
+			}
+		}
+	}
+}
+
+
 static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	UINT16 *buffered_spriteram = machine.generic.buffered_spriteram.u16;
@@ -232,6 +307,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
 		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
+		int clut = (buffered_spriteram[offs + 2]) & 0x7f;
 		int sx = buffered_spriteram[offs + 3];
 		int sy = state->m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
@@ -245,9 +321,9 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 
 		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			armedf_drawgfx(machine,bitmap,cliprect,machine.gfx[3],
 				code & 0xfff,
-				color,
+				color,clut,
 				flipx,flipy,
 				sx,sy,15);
 		}
