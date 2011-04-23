@@ -23,6 +23,8 @@ actually bootlegs.
 TODO:
 - identify and decap the NB1414M4 chip, it could be either a MCU or a fancy blitter chip;
 - time over doesn't kill the player in Kozure Ookami, check (1) note;
+- Fix Armed F and Tatakae Big Fighter text tilemap usage, they both doesn't use the NB1414M4
+  (as shown by the per-game kludge)
 
 Notes:
 - the initial level color fade in effect in Armed F is confirmed on real HW, i.e. goes from
@@ -169,6 +171,116 @@ Stephh's notes (based on the games M68000 code and some tests) :
   -cclimbr2
   -legion
   -terraf
+
+========================================================================
+
+Tatakae! Big Fighter (c)1989 Nichibutsu
+
+ based on armedf.c
+
+ TODO:
+ - scroll
+ - controls
+ - dips
+
+    $80600($80000 ?? ) - $80fff  = shared ram with 8751 MCU
+
+    controls :
+
+    02E3E8: move.w  $8c000.l, $8064a.l
+    02E3F2: move.w  $8c002.l, $8064c.l
+    02E3FC: move.b  #$1, $80640.l
+    02E404: move.w  $400000.l, D0
+    02E40A: tst.b   $80640.l
+    02E410: bne     2e3fc
+    02E412: move.w  $80642.l, $8064e.l
+    02E41C: move.w  $80644.l, $80650.l
+    02E426: move.w  $80646.l, $80652.l - input 1 (80646)
+    02E430: move.w  $80648.l, $80654.l
+    02E43A: rts
+
+
+------------------------------------------------------------------------
+Tatakae! Big Fighter
+Nichibutsu, 1989
+
+This is a horizontal shoot'em-up similar to R-Type.
+
+It appears this PCB is re-used? Sticker says PCB number is 1706 and (C) 1989
+On the PCB under the sticker is written 1605 and (C) 1988
+
+
+PCB Layout
+----------
+
+
+1605A-1 (1706-1)
+-------------------------------------------------------------------
+|                     2018                                        |
+|              6.15F  2018                                        |
+|  PROM.13H    5.13F                                              |
+|                                                                 |
+|                                                                 |
+|                            5814                                 |
+|                            5814                                 |
+|                                                                 |
+|                     5814                                        |
+|                     5814                                        |
+|                                           7.11C                 |
+|                                                                 |
+|                     6264   6264                                 |
+|                     6264   6264                                 |
+|                   ----------------                              |
+|                   |1706-3        |                              |
+|                   |              |                  PAL         |
+|                   | PAL  8751    |                              |
+|                   |          PAL |                              |
+|                   |              |                              |
+|                   |              |                  PAL         |
+|                   | 2.IC4  4.IC5 |                              |
+|                   | 1.IC2  3.IC3 |                              |
+| DSW2              |              |                              |
+| DSW1              |    68000     |    16MHz         PAL         |
+|                   ----------------                              |
+-------------------------------------------------------------------
+
+
+1605B (1706-2)
+-------------------------------------------------------------------
+|                                                                 |
+| 8.17K  Z80A                2018                                 |
+|                            2018                                 |
+| YM3812  2018               2018                                 |
+| Y3014B                                                          |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                  2018                           |
+|                          10.9D   2018                           |
+|                           9.8D                          12.8A   |
+|                           PAL                           11.6A   |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+|                                                                 |
+| 2018  2018                                                      |
+| 2018  2018                                                      |
+|                                                                 |
+|               24MHz                                             |
+|                                                                 |
+-------------------------------------------------------------------
+
+
+Notes:
+      Horizontal Sync: 15.08kHz
+        Vertical Sync: 60Hz
+            68K Clock: 7.998MHz
+            Z80 Clock: ? (unstable, probably 6MHz or less)
+
 
 ***********************************************************************/
 
@@ -411,6 +523,184 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
+static READ16_HANDLER( latch_r )
+{
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
+
+	state->m_read_latch = 1;
+	return 0;
+}
+
+static WRITE16_HANDLER( sharedram_w )
+{
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
+	COMBINE_DATA(&state->m_sharedram[offset]);
+
+	switch(offset)
+	{
+		case 0x40/2:
+			state->m_mcu_input_snippet = (data == 0x100);
+			state->m_mcu_jsr_snippet = (data == 0x300);
+			break;
+	}
+}
+
+static READ16_HANDLER(sharedram_r)
+{
+	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
+
+	if(state->m_mcu_input_snippet)
+	{
+		switch(offset+0x600/2)
+		{
+			case 0x640/2:
+				if(state->m_read_latch)
+				{
+					state->m_read_latch = 0;
+					return space->machine().rand(); // TODO
+				}
+				break;
+
+			case 0x642/2:
+				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
+
+			case 0x644/2:
+				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
+
+			case 0x646/2:
+				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
+
+			case 0x648/2:
+				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
+		}
+	}
+
+	if(state->m_mcu_jsr_snippet)
+	{
+		switch(offset+0x600/2)
+		{
+			case 0x640/2:
+				if(state->m_read_latch)
+				{
+					state->m_read_latch = 0;
+					return space->machine().rand(); // TODO
+				}
+				break;
+			case 0x642/2:
+				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
+
+			case 0x644/2:
+				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
+
+			case 0x646/2:
+				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
+
+			case 0x648/2:
+				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
+
+			/*
+            protection controls where the program code should jump to.
+
+            example snippet:
+            00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
+            00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
+            00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
+            00DB3A: 6100 00F0                  bsr     $dc2c
+            */
+
+			/* bp daee, A0 = 0xdd02, A6 = 0x808ca, D0 = 0x80902 */
+			//case 0x902/2:
+			//  return 0x0001;
+			//case (0x90a+0x24)/2:
+			//  return 0x0001;
+			//case (0x902+8)/2:
+			//  return 0x0004; // 0xf86a
+
+			/* bp db02, A0 = 0xdc2e, A6 = 0x80912, D0 = 0x8094a */
+			//case 0x94a/2:
+			//  return 1;
+			//case (0x94a+8)/2:
+			//  return 0x00dc; // 0xd62e
+
+			/* bp db16, A0 = 0xda86, A6 = 0x80c22, D0 = 0x80c5a */
+			//case 0xc5a/2:
+			//  return 1;
+			//case (0xc5a+8)/2:
+			//  return 0x0288; // 0x345f4
+
+			/* bp db2a, A0 = 0xd9b2, A6 = 0x80e2a, D0 = 0x80e62 */
+
+			/* bp db3e, A0 = 0xd8da, A6 = 0x81132, D0 = 0x8116a */
+
+			/* bp db52, A0 = 0xd806, A6 = 0x8133a, D0 = 0x81372 */
+
+			/* bp db66, A0 = 0xd7aa, A6 = 0x81742, D0 = 0x8177a */
+
+			/* bp db7a, A0 = 0xd746, A6 = 0x81b4a, D0 = 0x81b82 */
+
+			/* bp db8e, A0 = 0xd672, A6 = 0x81f52, D0 = 0x81f8a */
+
+			/* bp dba4, A0 = 0xd5ae, A6 = 0x8205a, D0 = 0x82092 */
+
+			/* bp dbba, A0 = 0xd5be, A6 = 0x82862, D0 = 0x8289a */
+
+			/* bp dbd0, A0 = 0xd512, A6 = 0x8296a, D0 = 0x829a2 */
+
+			/* bp dbe6, A0 = 0xd466, A6 = 0x82d72, D0 = 0x82daa */
+
+			/* bp dbfc, A0 = 0xd43e, A6 = 0x8357a, D0 = 0x835b2 */
+
+			/* following is separated from the others, dunno why ... */
+			/* bp dc14, A0 = 0xd3aa, A6 = 0x835a2, D0 = 0x835b2 */
+
+
+			/*case 0x
+            case 0x94a/2:
+                return 0x0002*4;
+            case (0x90a+2*0x40)/2:
+            case (0x90a+3*0x40)/2:
+                return 0x0003*4;
+            case (0x90a+4*0x40)/2:
+                return 0x000c*4; // 0x13d74
+            case (0x90a+5*0x40)/2:
+                return 0x000d*4; // 0x130f6
+            case (0x90a+6*0x40)/2:
+                return 0x000e*4; // 0x1817e
+            case (0x90a+7*0x40)/2:
+                return 0x0010*4; // 0x15924
+            //case (0x90a+0x25)/2:
+            //  return 2;*/
+		}
+	}
+
+	return state->m_sharedram[offset];
+}
+
+static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, m_sharedram)
+	AM_RANGE(0x084000, 0x085fff) AM_RAM //work ram
+	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, m_bg_videoram)
+	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, m_fg_videoram)
+	AM_RANGE(0x088000, 0x089fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, m_text_videoram)
+	AM_RANGE(0x08a000, 0x08afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_MEMBER(armedf_state, m_spr_pal_clut)
+	AM_RANGE(0x08c000, 0x08c001) AM_READ_PORT("P1")
+	AM_RANGE(0x08c002, 0x08c003) AM_READ_PORT("P2")
+	AM_RANGE(0x08c004, 0x08c005) AM_READ_PORT("DSW0")
+	AM_RANGE(0x08c006, 0x08c007) AM_READ_PORT("DSW1")
+	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(terraf_io_w) 	//807b0
+	AM_RANGE(0x08d002, 0x08d003) AM_WRITE(armedf_bg_scrollx_w)
+	AM_RANGE(0x08d004, 0x08d005) AM_WRITE(armedf_bg_scrolly_w)
+	AM_RANGE(0x08d006, 0x08d007) AM_WRITE(armedf_fg_scrollx_w)
+	AM_RANGE(0x08d008, 0x08d009) AM_WRITE(armedf_fg_scrolly_w)
+	AM_RANGE(0x08d00a, 0x08d00b) AM_WRITE(sound_command_w)
+	AM_RANGE(0x08d00c, 0x08d00d) AM_WRITENOP //watchdog
+	AM_RANGE(0x08d00e, 0x08d00f) AM_WRITE(irq_lv1_ack_w)
+
+	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
@@ -732,6 +1022,82 @@ static INPUT_PORTS_START( cclimbr2 )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )					/* Listed as "Unused" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bigfghtr )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
+	PORT_DIPSETTING(    0x04, "20k then every 80k" )
+	PORT_DIPSETTING(    0x08, "40k then every 60k" )
+	PORT_DIPSETTING(    0x00, "40k then every 80k" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, "3 Times" )
+	PORT_DIPSETTING(    0x10, "5 Times" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -1141,6 +1507,65 @@ static MACHINE_CONFIG_START( legiono, armedf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
+static MACHINE_START( bigfghtr )
+{
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
+
+	MACHINE_START_CALL(armedf);
+	state->save_item(NAME(state->m_read_latch));
+}
+
+static MACHINE_RESET( bigfghtr )
+{
+	bigfghtr_state *state = machine.driver_data<bigfghtr_state>();
+
+	MACHINE_RESET_CALL(armedf);
+	state->m_read_latch = 0;
+}
+
+static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
+
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// verified
+	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_assert)
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+
+	MCFG_MACHINE_START(bigfghtr)
+	MCFG_MACHINE_RESET(bigfghtr)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_UPDATE(armedf)
+	MCFG_SCREEN_EOF(armedf)
+
+	MCFG_GFXDECODE(armedf)
+	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_VIDEO_START(armedf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1528,6 +1953,69 @@ ROM_START( armedff )
 	ROM_LOAD( "af_12.rom", 0x20000, 0x20000, CRC(23cb6bfe) SHA1(34cb013827206bea71f5336b308ba92bee688506) )
 ROM_END
 
+ROM_START( skyrobo )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "3", 0x00000, 0x20000, CRC(02d8ba9f) SHA1(7622cc17561e5d1c069341b5f412f732f901d4a8) ) /* Rom location IC3 */
+	ROM_LOAD16_BYTE( "1", 0x00001, 0x20000, CRC(fcfd9e2e) SHA1(c69b34653f04af8d488e323bc2db89656f76c332) ) /* Rom location IC2 */
+	ROM_LOAD16_BYTE( "4", 0x40000, 0x20000, CRC(37ced4b7) SHA1(9ded66f795d3c0886f48e52de632e6edb8c57e84) ) /* Rom location IC5 */
+	ROM_LOAD16_BYTE( "2", 0x40001, 0x20000, CRC(88d52f8e) SHA1(33b0d2b3cd38a13d8580694e7c50c059914eebe2) ) /* Rom location IC4 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
+	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "7", 0x00000, 0x08000, CRC(f556ef28) SHA1(2acb83cdf23356091056f2cfbbc2b9828ee25b6f) ) /* Rom location 11C */
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "5.13f", 0x00000, 0x20000, CRC(d440a29f) SHA1(9e6ea7c9903e5e3e8e10ac7680c6120e1aa27250) )
+	ROM_LOAD( "6.15f", 0x20000, 0x10000, CRC(27469a76) SHA1(ebf2c60e1f70a589680c05adf10771ac2097b9d0) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "12.8a", 0x00000, 0x10000, CRC(a5694ea9) SHA1(ea94174495b3a65b3797932074a94df3b55fa0a2) )
+	ROM_LOAD( "11.6a", 0x10000, 0x10000, CRC(10b74e2c) SHA1(e3ec68726e7f277dc2043424f2e4d863eb01b3dc) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
+	ROM_LOAD( "10.9d", 0x20000, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
+ROM_END
+
+ROM_START( bigfghtr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "3.ic3", 0x00000, 0x20000, CRC(e1e1f291) SHA1(dbbd707be6250d9ffcba3fee265869b72f790e26) )
+	ROM_LOAD16_BYTE( "1.ic2", 0x00001, 0x20000, CRC(1100d991) SHA1(3c79398804b3a26b3df0c5734b270c37e1ba6a60) )
+	ROM_LOAD16_BYTE( "4.ic5", 0x40000, 0x20000, CRC(2464a83b) SHA1(00f5ac81bc33148daafeab757647b63894e0e0ca) )
+	ROM_LOAD16_BYTE( "2.ic4", 0x40001, 0x20000, CRC(b47bbcd5) SHA1(811bd4bc8fb662abf4734ab51e24c863d5cc3df3) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )	/* Intel C8751 read protected MCU */
+	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "7.11c", 0x00000, 0x08000, CRC(1809e79f) SHA1(730547771f803857acb552a84a8bc21bd3bda33f) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_LOAD( "5.13f", 0x00000, 0x20000, CRC(d440a29f) SHA1(9e6ea7c9903e5e3e8e10ac7680c6120e1aa27250) )
+	ROM_LOAD( "6.15f", 0x20000, 0x10000, CRC(27469a76) SHA1(ebf2c60e1f70a589680c05adf10771ac2097b9d0) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "12.8a", 0x00000, 0x10000, CRC(a5694ea9) SHA1(ea94174495b3a65b3797932074a94df3b55fa0a2) )
+	ROM_LOAD( "11.6a", 0x10000, 0x10000, CRC(10b74e2c) SHA1(e3ec68726e7f277dc2043424f2e4d863eb01b3dc) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
+	ROM_LOAD( "10.9d", 0x20000, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
+ROM_END
 
 /*************************************
  *
@@ -1626,6 +2114,11 @@ static DRIVER_INIT( cclimbr2 )
 	state->m_scroll_type = 3;
 }
 
+static DRIVER_INIT( bigfghtr )
+{
+	armedf_state *state = machine.driver_data<armedf_state>();
+	state->m_scroll_type = 1;
+}
 
 /*************************************
  *
@@ -1645,3 +2138,5 @@ GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibuts
 GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

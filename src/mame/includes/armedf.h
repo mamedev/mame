@@ -30,6 +30,19 @@ public:
 	int      m_waiting_msb;
 };
 
+class bigfghtr_state : public armedf_state
+{
+public:
+	bigfghtr_state(running_machine &machine, const driver_device_config_base &config)
+		: armedf_state(machine, config) { }
+
+	UINT16 *      m_sharedram;
+
+	/* misc */
+	int           m_read_latch;
+	UINT8		  m_mcu_input_snippet;
+	UINT8		  m_mcu_jsr_snippet;
+};
 
 /*----------- defined in video/armedf.c -----------*/
 
