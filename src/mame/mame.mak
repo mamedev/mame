@@ -377,7 +377,6 @@ $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/upscope.o \
 
 $(MAMEOBJ)/aristocr.a: \
-	$(DRIVERS)/86lions.o \
 	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/aristmk5.o \
 	$(DRIVERS)/caswin.o \

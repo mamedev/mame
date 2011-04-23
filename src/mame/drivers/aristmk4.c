@@ -5,6 +5,8 @@
         Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
         Driver by Palindrome & FraSher
 
+        original 86lions.c driver by Chris Hardy, Angelo Salese & Roberto Fresca
+
         ***************** INITIALISATION *********************************************************************
 
         Method 1 :
@@ -146,6 +148,8 @@
         10. rewrite video emulation by using custom drawing code.
 
         11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+
+        12. fix 86 Lions (pre-Aristocrat Mk-4 HW, without prom and dunno what else)
 
         ***************** POKER GAMES ************************************************************************
 
@@ -817,7 +821,7 @@ ADDRESS_MAP_END
 
 Poker card style games seem to have different address mapping
 
-The graphics rom is mapped from 0x4000 - 0x4ffff
+The graphics rom is mapped from 0x4000 - 0x4fff
 
 The U87 personality rom is not required, therefore game rom code mapping is from 0x8000-0xffff
 
@@ -832,7 +836,6 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
@@ -850,7 +853,8 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0",pia6821_r,pia6821_w)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
 	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
-	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
+	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
+	AM_RANGE(0x8000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(aristmk4)
@@ -1549,6 +1553,33 @@ static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
+/* same as Aristocrat Mark-IV HW color offset 7 */
+static PALETTE_INIT( lions )
+{
+	int i;
+
+	for (i = 0;i < machine.total_colors();i++)
+	{
+		int bit0,bit1,r,g,b;
+
+		bit0 = (i >> 0) & 0x01;
+		bit1 = (i >> 1) & 0x01;
+		b = 0x4f * bit0 + 0xa8 * bit1;
+		bit0 = (i >> 2) & 0x01;
+		bit1 = (i >> 3) & 0x01;
+		g = 0x4f * bit0 + 0xa8 * bit1;
+		bit0 = (i >> 4) & 0x01;
+		bit1 = (i >> 5) & 0x01;
+		r = 0x4f * bit0 + 0xa8 * bit1;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
+static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
+	MCFG_PALETTE_INIT(lions)
+MACHINE_CONFIG_END
+
 ROM_START( 3bagflvt )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
@@ -2123,6 +2154,24 @@ ROM_START( gldnpkr )
 	ROM_LOAD("2cm07.u40", 0x0000, 0x0200,  CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
 ROM_END
 
+ROM_START( 86lions )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lion_std.u9", 0xe000, 0x2000, CRC(994842b0) SHA1(72fc31c577ee70b07ce9a4f2e864fe113d32affe) )
+
+	ROM_REGION( 0xc000, "tile_gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "bl0.u8",  0x00000, 0x1000, CRC(00ef4724) SHA1(714fafd035e2befbb35c6d00df52845745e58a93) )
+	ROM_LOAD( "gn0.u10", 0x02000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
+	ROM_LOAD( "rd1.u12", 0x04000, 0x1000, CRC(350dd017) SHA1(ba273d4231e7e4c44922898cf5a70e8b1d6e2f9d) )
+	ROM_LOAD( "bl1.u9",  0x06000, 0x1000, CRC(675e164a) SHA1(99346ca70bfe673b31d71dc6b3bbc3b8f961e87f) )
+	ROM_LOAD( "gn1.u11", 0x08000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
+	ROM_LOAD( "rd0.u13", 0x0a000, 0x1000, CRC(38c57504) SHA1(cc3ac1df644abc4586fc9f0e88531ba146b86b48) )
+
+// 	ROM_REGION( 0x200, "proms", 0 )
+// 	ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
+ROM_END
+
+
+GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4, ROT0, "Aristocrat", "86 Lions",                                       GAME_NOT_WORKING, layout_aristmk4 )
 GAMEL( 1996, eforest,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",              GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
 GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",               0,                layout_aristmk4 ) // 10c, $1 = 10 credits
 GAMEL( 1996, eforestb, eforest,  aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",      0,                layout_aristmk4 ) // 5c, $2 = 40 credits
