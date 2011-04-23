@@ -43,8 +43,15 @@
 #define __ASTRING_H__
 
 #include <stdarg.h>
+#include <ctype.h>
 #include "osdcomm.h"
 
+#ifdef toupper
+#undef toupper
+#endif
+#ifdef tolower
+#undef tolower
+#endif
 
 /***************************************************************************
     TYPE DEFINITIONS
