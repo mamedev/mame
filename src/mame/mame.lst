@@ -10257,7 +10257,16 @@ fb6sed1			// (c) 2006 Amcoe
 fb6sev1			// (c) 2006 Amcoe
 fb6sed2			// (c) 2006 Amcoe
 fb6sev2			// (c) 2006 Amcoe
-version4		// (c) 2006 Amcoe - Version 4 ?
+version4		// (c) 2006 Amcoe - Version 4
+version4v		// (c) 2006 Amcoe
+version4d2		// (c) 2006 Amcoe
+version4v2		// (c) 2006 Amcoe
+version4d3		// (c) 2006 Amcoe
+version4v3		// (c) 2006 Amcoe
+version4o		// (c) 2006 Amcoe
+spooky			// (c) 200? Amcoe - Spooky Night (2nd Edition)
+fb3g			// (c) 200? Amcoe - Fruit Bonus 3G
+getrich			// (c) 200? Amcoe - Get Rich
 bugfever		// (c) 2006 Amcoe - Bug Fever
 bugfevero		// (c) 2006 Amcoe
 bugfeverd		// (c) 2006 Amcoe
@@ -10269,8 +10278,10 @@ dvisland		// (c) 2006 Amcoe - Devil's Island
 dvislando		// (c) 2006 Amcoe
 atworld			// (c) 2007 Amcoe - Around The World
 atworldd1		// (c) 2007 Amcoe
+atworlde1		// (c) 2007 Amcoe
 amclink			// (c) 200? Amcoe - Amcoe Link Control Box?
-fbdeluxe		// (c) 200? Amcoe - Amcoe Link Control Box?
+fbdeluxe		// (c) 200? Amcoe
+fbdeluxeo		// (c) 200? Amcoe
 
 act2000			// (c) 1999 Amcoe - Action 2000
 act2000v1		// (c) 1999 Amcoe

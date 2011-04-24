@@ -5323,6 +5323,26 @@ ROM_END
 /* Around The World */
 ROM_START( atworld )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "awd14r.bin", 0x00000, 0x80000, CRC(9a40be4f) SHA1(30353d58190c54c6c51e62d6ce101396aba3717a) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
+	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
+	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "aw13ex.id", 0x00, 0x1000, CRC(c26305c9) SHA1(ee3aea8926ee4890d45896cf0be175c2262c7341) )
+ROM_END
+
+
+ROM_START( atworlde1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -5434,6 +5454,22 @@ ROM_START( spooky )
 ROM_END
 
 ROM_START( fbdeluxe )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fbd109r.bin", 0x00000, 0x80000, CRC(e5e83752) SHA1(7fb53de0ea24ce402298fba59eb14208cf266f3e) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fbrom3.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fbrom4.bin", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, NO_DUMP )
+ROM_END
+
+ROM_START( fbdeluxeo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fbd107r.bin", 0x00000, 0x80000, CRC(b29be47d) SHA1(bd3098fa6b914b2f9dcbe36e2cf36f90c67c1424) )
 
@@ -5945,19 +5981,39 @@ GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfever,      
 GAME( 2006, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.4R CGA)", 0)
 GAME( 2006, dvislando,   dvisland, sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.0R CGA)", 0)
 
-GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
+GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.4R CGA)", 0) /* Year according to Amcoe web site */
+// 1.4E also exists, but dump is corrupt
+GAME( 2007, atworlde1,   atworld,  sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
 GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
 GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
 GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
-GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
-GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
-GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
+
+GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  GAME_NOT_WORKING)
+GAME( 2006, version4v,   version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", GAME_NOT_WORKING) // wrong prg decode
+GAME( 2006, version4d2,  version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  GAME_NOT_WORKING) // wrong prg decode
+GAME( 2006, version4v2,  version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3E Dual)", GAME_NOT_WORKING) // wrong prg decode
+GAME( 2006, version4d3,  version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3LT CGA)", GAME_NOT_WORKING)
+GAME( 2006, version4v3,  version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3LT Dual)",GAME_NOT_WORKING) // wrong prg decode
+GAME( 2006, version4o,   version4, sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R CGA)", GAME_NOT_WORKING)
+
+GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (2nd edition) (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
+
+GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.9)", GAME_NOT_WORKING) /* After Around The World */
+GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
+
+GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", GAME_NOT_WORKING) /* After Around The World */
+
+GAME( 200?, getrich,     0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", GAME_NOT_WORKING) /* After Around The World */
+
 
 // Known sets but no roms dumped at all for these:
 // Merry Circus
-// Fruit Bonus 3G
+// Super Ball (skill game)
+// Devil Island - 14 Liner version
+// Fruit Bonus 2010 (or is this on the older goldstar.c style hardware)
+
 
 // ?? what is this
 GAME( 200?, amclink,     0,        sfbonus,    amcoe1_reels3,    sfbonus_common,  ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING)
