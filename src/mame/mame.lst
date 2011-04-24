@@ -8948,7 +8948,7 @@ mquake			// (c) 1987
 // Other Amiga-based games
 upscope			// (c) 1986 Grand products
 
-cd32			// (c) 1993
+//cd32			// Base unit (enabled below, see MESS drivers)
 cndypuzl		// (c) 1995
 haremchl		// (c) 1995
 lsrquiz			// (c) 1995
@@ -10618,8 +10618,8 @@ gnomed			// bootleg
 gnomee			// bootleg
 gnome_2a		// bootleg
 
-// Disney
-cdimono1		// Base unit
+// TAB Austria
+//cdimono1		// Base unit (enabled below, see MESS drivers)
 quizard			// (c) Disney 1996
 quizrd22		// (c) Disney 1995
 quizrd17		// (c) Disney 1996
@@ -12244,3 +12244,53 @@ zankor
 skijump
 spacecty
 strike
+
+// MESS related sets
+// the sets below are primarily for MESS, however they exist in MAME due to the code being shared
+// most are commented out for now, the exceptions being sets which act as the parents to actual MAME drivers
+// due to the arcade units being based on stock retail console units.
+
+// Sega Megadrive / Genesis and related systems
+// (hardware used by Megatech, Megaplay + many standalone boards)
+//genesis		// (c)1989 Sega
+//gensvp		// (c)1993 Sega (Genesis with SVP for Virtua Racing cart)
+//megadriv	// (c)1990 Sega
+//megadrij	// (c)1988 Sega
+//pico		// (c)1994 Sega
+//picou		// (c)1994 Sega
+//picoj		// (c)1993 Sega
+//32x			// (c)1994 Sega
+//segacd		// (c)1992 Sega
+//megacd		// (c)1993 Sega
+//megacdj		// (c)1991 Sega
+//megacda		// (c)1991 Sega
+//segacd2		// (c)1993 Sega
+//megacd2		// (c)1993 Sega
+//megacd2j	// (c)1993 Sega
+//laseract	// (c)1993 Sega/Pioneer
+//laseractj	// (c)1993 Sega/Pioneer
+//xeye		// (c)1993 Sega/JVC
+//cdx			// (c)1994 Sega
+//multmega	// (c)1994 Sega
+//32x_scd		// (c)1994 Sega
+
+// Atari Jaguar
+// (hardware used by CoJag)
+//jaguar		// (c)1993 Atari
+//jaguarcd	// (c)1995 Atari
+
+// Capcom CPS Changer
+// (hardware is the same as CPS1)
+//sfzch		// (c)1995 Capcom
+//sfach		// (c)1995 Capcom
+//sfzbch		// (c)1995 Capcom
+//wofch		// (c)1995 Capcom
+
+// Phillips CDI
+// (parent to Quizzard sets)
+cdimono1	// (c)1991 Philips
+
+// Commodore CD32
+// (parent to Cubo32 sets)
+cd32		// (c)1993 Commodore
+
