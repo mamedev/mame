@@ -56,7 +56,7 @@ Mighty Guy board layout:
 
 
 #define MIGHTGUY_HACK	 0
-#define TIMER_RATE       12000	/* total guess */
+#define TIMER_RATE       11475	/* unknown, hand-tuned to match audio reference */
 
 #define MAINCPU_CLOCK    XTAL_12MHz
 #define AUDIOCPU_CLOCK   XTAL_8MHz
@@ -455,12 +455,12 @@ static MACHINE_RESET( cop01 )
 static MACHINE_CONFIG_START( cop01, cop01_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown divider */
+	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)	/* unknown clock / divider */
 	MCFG_CPU_PROGRAM_MAP(cop01_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2)	/* unknown divider */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3MHz)	/* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
@@ -485,14 +485,14 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mightguy, cop01_state )
