@@ -26,6 +26,7 @@ public:
 	int            m_timer;	// kludge for ym3526 in mightguy
 
 	/* devices */
+	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
 };
 
