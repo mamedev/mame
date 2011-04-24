@@ -5379,8 +5379,124 @@ ROM_START( atworldd1 )
 	ROM_LOAD_OPTIONAL( "aw13re.id", 0x00, 0x1000,  CRC(0f9991fb) SHA1(5ea9e49c6b8b00c2c3638cc39e479d6e5e112b7a) )
 ROM_END
 
+
+
 /* Not working sets (due to incomplete dumps) */
 ROM_START( version4 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96d43r.bin", 0x00000, 0x40000, CRC(51971502) SHA1(7767a98da2b75d9289b665c648036adb8f31f3dd) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4v )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96v43r.bin", 0x00000, 0x40000, CRC(83d69d2a) SHA1(99da2b2b67e51980779cdb5213c062f7d0488271) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4d2 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96d43e.bin", 0x00000, 0x40000, CRC(b84469fe) SHA1(bdfafe1c70a449333ce19d4076004e9541ff0355) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4v2 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96v43e.bin", 0x00000, 0x40000, CRC(d34a500c) SHA1(404219d4d5875615f10241fc2ba8483b1e58d3ee) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4d3 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96d43lt.bin", 0x00000, 0x40000, CRC(b424fda6) SHA1(bf1bb9adb52e5c34c6608d41a00000e49ceec59a) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4v3 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "96v43lt.bin", 0x00000, 0x40000, CRC(a22c28da) SHA1(2a6347adc0a03074e24e4a929aeab37371cc588f) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "96rom3.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom4.bin", 0x00001, 0x40000, NO_DUMP)
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
+ROM_END
+
+ROM_START( version4o )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "96d42r.bin", 0x00000, 0x40000, CRC(dab5706c) SHA1(9fc37b66942a5e7535b4590f132727d793f9d705) )
 
@@ -5484,6 +5600,39 @@ ROM_START( fbdeluxeo )
 	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, NO_DUMP )
 ROM_END
+
+ROM_START( fb3g )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fb3gd103.bin", 0x00000, 0x80000, CRC(5133e739) SHA1(736989716bb5c1821b133e986ba5986425371814) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb3grom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb3grom3.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb3grom4.bin", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb3grom5.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb3grom6.bin", 0x00001, 0x80000, NO_DUMP )
+ROM_END
+
+ROM_START( getrich )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "grd101r.bin", 0x00000, 0x80000, CRC(4cc1142c) SHA1(321aacea819c43ef0ad38b11286e6d388fb6a179) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "grrom2.bin", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "grrom3.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "grrom4.bin", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "grrom5.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "grrom6.bin", 0x00001, 0x80000, NO_DUMP )
+ROM_END
+
 
 // diagnostics?
 ROM_START( amclink )
