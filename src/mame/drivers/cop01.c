@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/4)	/* unknown divider */
+	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2)	/* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 	MCFG_CPU_IO_MAP(mightguy_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/4)	/* unknown divider */
+	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2)	/* unknown divider */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
