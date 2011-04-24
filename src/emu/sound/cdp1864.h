@@ -6,42 +6,45 @@
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
-                            ________________
-            INLACE   1  ---|       \/       |---  40  Vdd
-           CLK IN_   2  ---|                |---  39  AUD
-          CLR OUT_   3  ---|                |---  38  CLR IN_
-               AOE   4  ---|                |---  37  DMA0_
-               SC1   5  ---|                |---  36  INT_
-               SC0   6  ---|                |---  35  TPA
-              MRD_   7  ---|                |---  34  TPB
-             BUS 7   8  ---|                |---  33  EVS
-             BUS 6   9  ---|                |---  32  V SYNC
-             BUS 5  10  ---|    CDP1864C    |---  31  H SYNC
-             BUS 4  11  ---|    top view    |---  30  C SYNC_
-             BUS 3  12  ---|                |---  29  RED
-             BUS 2  13  ---|                |---  28  BLUE
-             BUS 1  14  ---|                |---  27  GREEN
-             BUS 0  15  ---|                |---  26  BCK GND_
-              CON_  16  ---|                |---  25  BURST
-                N2  17  ---|                |---  24  ALT
-               EF_  18  ---|                |---  23  R DATA
-                N0  19  ---|                |---  22  G DATA
-               Vss  20  ---|________________|---  21  B DATA
+							_____   _____
+				INLACE   1 |*    \_/     | 40  Vdd
+			   CLK IN_   2 |             | 39  AUD
+			  CLR OUT_   3 |             | 38  CLR IN_
+				   AOE   4 |             | 37  DMA0_
+				   SC1   5 |             | 36  INT_
+				   SC0   6 |             | 35  TPA
+				  MRD_   7 |             | 34  TPB
+				 BUS 7   8 |             | 33  EVS
+				 BUS 6   9 |             | 32  V SYNC
+				 BUS 5  10 |   CDP1864   | 31  H SYNC
+				 BUS 4  11 |             | 30  C SYNC_
+				 BUS 3  12 |             | 29  RED
+				 BUS 2  13 |             | 28  BLUE
+				 BUS 1  14 |             | 27  GREEN
+				 BUS 0  15 |             | 26  BCK GND_
+				  CON_  16 |             | 25  BURST
+					N2  17 |             | 24  ALT
+				   EF_  18 |             | 23  R DATA
+					N0  19 |             | 22  G DATA
+				   Vss  20 |_____________| 21  B DATA
 
 
            http://homepage.mac.com/ruske/cosmacelf/cdp1864.pdf
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __CDP1864__
 #define __CDP1864__
 
-#include "devlegcy.h"
+#include "emu.h"
 
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
 
 #define CDP1864_CLOCK	XTAL_1_75MHz
 
@@ -71,87 +74,170 @@
 #define CDP1864_SCANLINE_EFX_BOTTOM_START	CDP1864_SCANLINE_DISPLAY_END - 4
 #define CDP1864_SCANLINE_EFX_BOTTOM_END		CDP1864_SCANLINE_DISPLAY_END
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
 
-DECLARE_LEGACY_SOUND_DEVICE(CDP1864, cdp1864);
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MCFG_CDP1864_ADD(_tag, _clock, _config) \
 	MCFG_SOUND_ADD(_tag, CDP1864, _clock) \
 	MCFG_DEVICE_CONFIG(_config)
+
 
 #define MCFG_CDP1864_SCREEN_ADD(_tag, _clock) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16) \
 	MCFG_SCREEN_RAW_PARAMS(_clock, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
+
 #define CDP1864_INTERFACE(name) \
 	const cdp1864_interface (name) =
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-enum _cdp1864_format {
-	CDP1864_NON_INTERLACED = 0,
-	CDP1864_INTERLACED
-};
-typedef enum _cdp1864_format cdp1864_format;
+#define CDP1864_NON_INTERLACED \
+	DEVCB_LINE_VCC
 
-typedef struct _cdp1864_interface cdp1864_interface;
-struct _cdp1864_interface
+
+#define CDP1864_INTERLACED \
+	DEVCB_LINE_GND
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> cdp1864_interface
+
+struct cdp1864_interface
 {
-	const char *cpu_tag;		/* cpu we are working with */
-	const char *screen_tag;		/* screen we are acting on */
+	const char *m_cpu_tag;
+	const char *m_screen_tag;
 
-	cdp1864_format interlace;	/* interlace */
+	devcb_read_line				m_in_inlace_func;
 
-	devcb_read_line				in_rdata_func;
-	devcb_read_line				in_bdata_func;
-	devcb_read_line				in_gdata_func;
+	devcb_read_line				m_in_rdata_func;
+	devcb_read_line				m_in_bdata_func;
+	devcb_read_line				m_in_gdata_func;
 
-	/* this gets called for every change of the INT pin (pin 36) */
-	devcb_write_line			out_int_func;
+	devcb_write_line			m_out_int_func;
+	devcb_write_line			m_out_dmao_func;
+	devcb_write_line			m_out_efx_func;
+	devcb_write_line			m_out_hsync_func;
 
-	/* this gets called for every change of the DMAO pin (pin 37) */
-	devcb_write_line			out_dmao_func;
-
-	/* this gets called for every change of the EFX pin (pin 18) */
-	devcb_write_line			out_efx_func;
-
-	double res_r;				/* red output resistor value */
-	double res_g;				/* green output resistor value */
-	double res_b;				/* blue output resistor value */
-	double res_bkg;				/* background output resistor value */
+	double m_res_r;				// red output resistor value
+	double m_res_g;				// green output resistor value
+	double m_res_b;				// blue output resistor value
+	double m_res_bkg;			// background output resistor value
 };
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
-/* display on (0x69) */
-READ8_DEVICE_HANDLER( cdp1864_dispon_r ) ATTR_NONNULL(1);
 
-/* display off (0x6c) */
-READ8_DEVICE_HANDLER( cdp1864_dispoff_r ) ATTR_NONNULL(1);
+// ======================> cdp1864_device_config
 
-/* step background color (0x61) */
-WRITE8_DEVICE_HANDLER( cdp1864_step_bgcolor_w ) ATTR_NONNULL(1);
+class cdp1864_device_config :   public device_config,
+								public device_config_sound_interface,
+                                public cdp1864_interface
+{
+    friend class cdp1864_device;
 
-/* color on */
-WRITE_LINE_DEVICE_HANDLER( cdp1864_con_w ) ATTR_NONNULL(1);
+    // construction/destruction
+    cdp1864_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-/* load tone latch (0x64) */
-WRITE8_DEVICE_HANDLER( cdp1864_tone_latch_w ) ATTR_NONNULL(1);
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
 
-/* audio output enable */
-WRITE_LINE_DEVICE_HANDLER( cdp1864_aoe_w ) ATTR_NONNULL(1);
+protected:
+	// device_config overrides
+	virtual void device_config_complete();
+};
 
-/* DMA write */
-WRITE8_DEVICE_HANDLER( cdp1864_dma_w ) ATTR_NONNULL(1);
 
-/* screen update */
-void cdp1864_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect) ATTR_NONNULL(1) ATTR_NONNULL(2) ATTR_NONNULL(3);
+
+// ======================> cdp1864_device
+
+class cdp1864_device :	public device_t,
+						public device_sound_interface
+{
+    friend class cdp1864_device_config;
+
+    // construction/destruction
+    cdp1864_device(running_machine &_machine, const cdp1864_device_config &_config);
+
+public:
+	DECLARE_READ8_MEMBER( dispon_r );
+	DECLARE_READ8_MEMBER( dispoff_r );
+
+	DECLARE_WRITE8_MEMBER( step_bgcolor_w );
+	DECLARE_WRITE8_MEMBER( tone_latch_w );
+
+	DECLARE_WRITE8_MEMBER( dma_w );
+
+	DECLARE_WRITE_LINE_MEMBER( con_w );
+	DECLARE_WRITE_LINE_MEMBER( aoe_w );
+	DECLARE_WRITE_LINE_MEMBER( evs_w );
+
+	void update_screen(bitmap_t *bitmap, const rectangle *cliprect);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// internal callbacks
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	inline void initialize_palette();
+
+	static const device_timer_id TIMER_INT = 0;
+	static const device_timer_id TIMER_EFX = 1;
+	static const device_timer_id TIMER_DMA = 2;
+	static const device_timer_id TIMER_HSYNC = 3;
+
+	devcb_resolved_read_line		m_in_inlace_func;
+	devcb_resolved_read_line		m_in_rdata_func;
+	devcb_resolved_read_line		m_in_bdata_func;
+	devcb_resolved_read_line		m_in_gdata_func;
+	devcb_resolved_write_line		m_out_int_func;
+	devcb_resolved_write_line		m_out_dmao_func;
+	devcb_resolved_write_line		m_out_efx_func;
+	devcb_resolved_write_line		m_out_hsync_func;
+
+	cpu_device *m_cpu;
+	screen_device *m_screen;		// screen
+	bitmap_t *m_bitmap;				// bitmap
+	sound_stream *m_stream;			// sound output
+
+	// video state
+	int m_disp;						// display on
+	int m_dmaout;					// DMA request active
+	int m_bgcolor;					// background color
+	int m_con;						// color on
+
+	// sound state
+	int m_aoe;						// audio on
+	int m_latch;					// sound latch
+	INT16 m_signal;					// current signal
+	int m_incr;						// initial wave state
+
+	// timers
+	emu_timer *m_int_timer;
+	emu_timer *m_efx_timer;
+	emu_timer *m_dma_timer;
+	emu_timer *m_hsync_timer;
+
+	const cdp1864_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type CDP1864;
+
+
 
 #endif
