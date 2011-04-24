@@ -482,7 +482,7 @@ WRITE8_DEVICE_HANDLER( es5503_w )
 				break;
 
 			case 0xe1:	// oscillator enable
-				chip->oscsenabled = (data>>1);
+				chip->oscsenabled = (data>>1) & 0x1f;
 
 				chip->output_rate = (chip->clock/8)/(2+chip->oscsenabled);
 				chip->stream->set_sample_rate(chip->output_rate);
