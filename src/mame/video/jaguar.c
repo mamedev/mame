@@ -221,12 +221,9 @@ static void blitter_09800009_000020_000020(running_machine &machine, UINT32 comm
 static void blitter_01800009_000028_000028(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 static void blitter_01800001_000018_000018(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 static void blitter_01c00001_000018_000018(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-
-#ifdef MESS
 static void blitter_00010000_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 static void blitter_01800001_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine &machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
-#endif
 
 
 
@@ -545,7 +542,6 @@ static void blitter_run(running_machine &machine)
 		}
 	}
 
-#ifdef MESS
 	if (command == 0x00010000)
 	{
 		blitter_00010000_xxxxxx_xxxxxx(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
@@ -563,8 +559,6 @@ static void blitter_run(running_machine &machine)
 		blitter_x1800x01_xxxxxx_xxxxxx(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 		return;
 	}
-#endif
-
 
 if (LOG_BLITTER_STATS)
 {
@@ -1028,7 +1022,6 @@ SCREEN_UPDATE( cojag )
 #undef COMMAND
 #undef FUNCNAME
 
-#ifdef MESS
 
 #define FUNCNAME	blitter_00010000_xxxxxx_xxxxxx
 #define COMMAND		0x00010000
@@ -1060,4 +1053,3 @@ SCREEN_UPDATE( cojag )
 #undef COMMAND
 #undef FUNCNAME
 
-#endif /* MESS */
