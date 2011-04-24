@@ -1,6 +1,5 @@
-/* Sega ST-V (Sega Titan Video)
-
-a.k.a. known as a Sega Saturn for the Arcades.
+/* 
+   Sega Saturn & Sega ST-V (Sega Titan Video)
 
 Driver by David Haywood,Angelo Salese,Olivier Galibert & Mariusz Wojcieszek
 SCSP driver provided by R.Belmont,based on ElSemi's SCSP sound chip emulator
@@ -159,6 +158,9 @@ ToDo / Notes:
 #include "sound/scsp.h"
 #include "machine/stvprot.h"
 #include "includes/stv.h"
+#include "imagedev/chd_cd.h"
+#include "imagedev/cartslot.h"
+#include "coreutil.h"
 
 #define USE_SLAVE 1
 
@@ -195,6 +197,7 @@ static UINT32* stv_backupram;
 static UINT32* ioga;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
+static int saturn_region;
 
 int stv_enable_slave_sh2;
 /*VDP2 stuff*/
@@ -441,11 +444,15 @@ static UINT8 EXLE1;
 static UINT8 EXLE2;
 static UINT8 PDR1;
 static UINT8 PDR2;
+static int intback_stage = 0, smpcSR, pmode;
+static UINT8 SMEM[4];
 
 #define SH2_DIRECT_MODE_PORT_1 IOSEL1 = 1
 #define SH2_DIRECT_MODE_PORT_2 IOSEL2 = 1
 #define SMPC_CONTROL_MODE_PORT_1 IOSEL1 = 0
 #define SMPC_CONTROL_MODE_PORT_2 IOSEL2 = 0
+
+
 
 static void system_reset()
 {
@@ -718,6 +725,330 @@ static void stv_SMPC_w8 (address_space *space, int offset, UINT8 data)
 }
 
 
+static void smpc_intbackhelper(running_machine &machine)
+{
+	int pad;
+	static const char *const padnames[] = { "JOY1", "JOY2" };
+
+	if (intback_stage == 1)
+	{
+		intback_stage++;
+		return;
+	}
+
+	pad = input_port_read(machine, padnames[intback_stage-2]);
+
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+	smpc_ram[33] = 0xf1;	// no tap, direct connect
+	smpc_ram[35] = 0x02;	// saturn pad
+	smpc_ram[37] = pad>>8;
+	smpc_ram[39] = pad & 0xff;
+
+	if (intback_stage == 3)
+	{
+		smpcSR = (0x80 | pmode);	// pad 2, no more data, echo back pad mode set by intback
+	}
+	else
+	{
+		smpcSR = (0xe0 | pmode);	// pad 1, more data, echo back pad mode set by intback
+	}
+
+	intback_stage++;
+}
+
+static UINT8 saturn_SMPC_r8(address_space *space, int offset)
+{
+	int return_data;
+
+	return_data = smpc_ram[offset];
+
+	if ((offset == 0x61))
+		return_data = smpcSR;
+
+	if (offset == 0x75)//PDR1 read
+	{
+		if (IOSEL1)
+		{
+			int hshake;
+
+			hshake = (PDR1>>5) & 3;
+
+			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
+
+			return_data = 0x9f;
+
+			switch (hshake)
+			{
+				case 0:
+					return_data = 0x90;
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>4) & 0xf);
+					break;
+
+				case 1:
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>12) & 0xf);
+					break;
+
+				case 2:
+//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>8) & 0xf);
+					break;
+
+				case 3:
+					return_data = 0x94;
+//                  return_data = 0xf0 | (input_port_read(space->machine(), "JOY1")&0x8) | 0x4;
+					break;
+			}
+		}
+	}
+
+	if (offset == 0x77)//PDR2 read
+	{
+		return_data =  0xff; // | EEPROM_read_bit());
+	}
+
+	if (offset == 0x33) return_data = saturn_region;
+
+	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
+
+
+	return return_data;
+}
+
+static void saturn_SMPC_w8(address_space *space, int offset, UINT8 data)
+{
+	system_time systime;
+	UINT8 last;
+	running_machine &machine = space->machine();
+
+	/* get the current date/time from the core */
+	machine.current_datetime(systime);
+
+  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
+
+//  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
+
+	last = smpc_ram[offset];
+
+	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
+	{
+      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
+		if (intback_stage != 3)
+		{
+			intback_stage = 2;
+		}
+		smpc_intbackhelper(machine);
+		cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
+	}
+
+	if ((offset == 1) && (data & 0x40))
+	{
+      if (LOG_SMPC) logerror("SMPC: BREAK request\n");
+		intback_stage = 0;
+	}
+
+	smpc_ram[offset] = data;
+
+	if (offset == 0x75)	// PDR1
+	{
+		PDR1 = (data & smpc_ram[0x79]);
+	}
+
+	if (offset == 0x77)	// PDR2
+	{
+		PDR2 = (data & smpc_ram[0x7b]);
+	}
+
+	if(offset == 0x7d)
+	{
+		if(smpc_ram[0x7d] & 1)
+			SH2_DIRECT_MODE_PORT_1;
+		else
+			SMPC_CONTROL_MODE_PORT_1;
+
+		if(smpc_ram[0x7d] & 2)
+			SH2_DIRECT_MODE_PORT_2;
+		else
+			SMPC_CONTROL_MODE_PORT_2;
+	}
+
+	if(offset == 0x7f)
+	{
+		//enable PAD irq & VDP2 external latch for port 1/2
+		EXLE1 = smpc_ram[0x7f] & 1 ? 1 : 0;
+		EXLE2 = smpc_ram[0x7f] & 2 ? 1 : 0;
+		if(EXLE1 || EXLE2)
+			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
+			{
+				if(LOG_SMPC) logerror ("Interrupt: PAD irq, Vector 0x48 Level 0x08\n");
+				cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x48);
+			}
+	}
+
+	if (offset == 0x1f)
+	{
+		switch (data)
+		{
+			case 0x00:
+				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
+				smpc_ram[0x5f]=0x00;
+				break;
+			//in theory 0x01 is for Master OFF,but obviously is not used.
+			case 0x02:
+				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
+				smpc_ram[0x5f]=0x02;
+				stv_enable_slave_sh2 = 1;
+				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, CLEAR_LINE);
+				break;
+			case 0x03:
+				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
+				smpc_ram[0x5f]=0x03;
+				stv_enable_slave_sh2 = 0;
+				machine.scheduler().trigger(1000);
+				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
+				break;
+			case 0x06:
+				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
+				/* wrong? */
+				smpc_ram[0x5f]=0x06;
+				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+				en_68k = 1;
+				break;
+			case 0x07:
+				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
+				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+				en_68k = 0;
+				smpc_ram[0x5f]=0x07;
+				break;
+			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
+			//case 0x08:
+			//case 0x09:
+			case 0x0d:
+				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
+				smpc_ram[0x5f]=0x0d;
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+				system_reset();
+				break;
+			case 0x0e:
+				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
+				smpc_ram[0x5f]=0x0e;
+				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				break;
+			case 0x0f:
+				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
+				smpc_ram[0x5f]=0x0f;
+				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				break;
+			/*"Interrupt Back"*/
+			case 0x10:
+		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
+				smpc_ram[0x5f]=0x10;
+				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+			    	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+		    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+			    	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+			    	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+			    	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+			    	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+
+				smpc_ram[0x31]=0x00;  //?
+
+
+				smpc_ram[0x35]=0x00;
+				smpc_ram[0x37]=0x00;
+
+				smpc_ram[0x39] = SMEM[0];
+				smpc_ram[0x3b] = SMEM[1];
+				smpc_ram[0x3d] = SMEM[2];
+				smpc_ram[0x3f] = SMEM[3];
+
+				smpc_ram[0x41]=0xff;
+				smpc_ram[0x43]=0xff;
+				smpc_ram[0x45]=0xff;
+				smpc_ram[0x47]=0xff;
+				smpc_ram[0x49]=0xff;
+				smpc_ram[0x4b]=0xff;
+				smpc_ram[0x4d]=0xff;
+				smpc_ram[0x4f]=0xff;
+				smpc_ram[0x51]=0xff;
+				smpc_ram[0x53]=0xff;
+				smpc_ram[0x55]=0xff;
+				smpc_ram[0x57]=0xff;
+				smpc_ram[0x59]=0xff;
+				smpc_ram[0x5b]=0xff;
+				smpc_ram[0x5d]=0xff;
+
+				smpcSR = 0x60;		// peripheral data ready, no reset, etc.
+				pmode = smpc_ram[1]>>4;
+
+				intback_stage = 1;
+
+			//  /*This is for RTC,cartridge code and similar stuff...*/
+			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
+				{
+//                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+					smpc_intbackhelper(machine);
+					cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
+				}
+			break;
+			/* RTC write*/
+			case 0x16:
+				if(LOG_SMPC) logerror("SMPC: RTC write\n");
+				smpc_ram[0x2f] = smpc_ram[0x0d];
+				smpc_ram[0x2d] = smpc_ram[0x0b];
+				smpc_ram[0x2b] = smpc_ram[0x09];
+				smpc_ram[0x29] = smpc_ram[0x07];
+				smpc_ram[0x27] = smpc_ram[0x05];
+				smpc_ram[0x25] = smpc_ram[0x03];
+				smpc_ram[0x23] = smpc_ram[0x01];
+				smpc_ram[0x5f]=0x16;
+			break;
+			/* SMPC memory setting*/
+			case 0x17:
+				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
+		    		SMEM[0] = smpc_ram[1];
+		    		SMEM[1] = smpc_ram[3];
+		    		SMEM[2] = smpc_ram[5];
+		    		SMEM[3] = smpc_ram[7];
+
+				smpc_ram[0x5f]=0x17;
+			break;
+			case 0x18:
+				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
+				smpc_ram[0x5f]=0x18;
+				/*NMI is unconditionally requested?*/
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+				break;
+			case 0x19:
+				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
+				smpc_ram[0x5f]=0x19;
+				NMI_reset = 0;
+				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				break;
+			case 0x1a:
+				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
+				smpc_ram[0x5f]=0x1a;
+				NMI_reset = 1;
+				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+
+				break;
+			default:
+				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+		}
+
+		// we've processed the command, clear status flag
+		smpc_ram[0x63] = 0x00;
+		/*TODO:emulate the timing of each command...*/
+	}
+}
+
+
+
 static READ32_HANDLER ( stv_SMPC_r32 )
 {
 	int byte = 0;
@@ -751,6 +1082,42 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	offset += byte;
 
 	stv_SMPC_w8(space, offset,writedata);
+}
+
+
+static READ32_HANDLER ( saturn_SMPC_r32 )
+{
+	int byte = 0;
+	int readdata = 0;
+	/* registers are all byte accesses, convert here */
+	offset = offset << 2; // multiply offset by 4
+
+	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = saturn_SMPC_r8(space, offset+byte) << 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = saturn_SMPC_r8(space, offset+byte) << 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = saturn_SMPC_r8(space, offset+byte) << 8;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = saturn_SMPC_r8(space, offset+byte) << 0;  }
+
+	return readdata;
+}
+
+
+static WRITE32_HANDLER ( saturn_SMPC_w32 )
+{
+	int byte = 0;
+	int writedata = 0;
+	/* registers are all byte accesses, convert here so we can use the data more easily later */
+	offset = offset << 2; // multiply offset by 4
+
+	if (ACCESSING_BITS_24_31)	{ byte = 0; writedata = data >> 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; writedata = data >> 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; writedata = data >> 8;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; writedata = data >> 0;  }
+
+	writedata &= 0xff;
+
+	offset += byte;
+
+	saturn_SMPC_w8(space, offset,writedata);
 }
 
 /*
@@ -1989,6 +2356,80 @@ static READ32_HANDLER( stv_sh2_random_r )
 }
 #endif
 
+
+static UINT32 backup[64*1024/4];
+
+static READ32_HANDLER(satram_r)
+{
+	return backup[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
+}
+
+static WRITE32_HANDLER(satram_w)
+{
+	COMBINE_DATA(&backup[offset]);
+}
+
+static NVRAM_HANDLER(saturn)
+{
+	static const UINT32 init[8] =
+	{
+		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
+	};
+	int i;
+
+	if (read_or_write)
+		file->write(backup, 64*1024/4);
+	else
+	{
+		if (file)
+		{
+			file->read(backup, 64*1024/4);
+		}
+		else
+		{
+			memset(backup, 0, 64*1024/4);
+			for (i = 0; i < 8; i++)
+			{
+				backup[i] = init[i];
+				backup[i+8] = init[i];
+				backup[i+16] = init[i];
+				backup[i+24] = init[i];
+			}
+		}
+	}
+}
+
+static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
+	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(saturn_SMPC_r32, saturn_SMPC_w32)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(satram_r, satram_w)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE(&stv_workram_l)
+	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
+	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
+	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
+	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
+	/* Sound */
+	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
+	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_r, scsp_w, 0xffffffff)
+	/* VDP1 */
+	/*0x05c00000-0x05c7ffff VRAM*/
+	/*0x05c80000-0x05c9ffff Frame Buffer 0*/
+	/*0x05ca0000-0x05cbffff Frame Buffer 1*/
+	/*0x05d00000-0x05d7ffff VDP1 Regs */
+	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
+	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
+	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(stv_vdp2_vram_r, stv_vdp2_vram_w)
+	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(stv_vdp2_cram_r, stv_vdp2_cram_w)
+	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
+	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(stv_scu_r32, stv_scu_w32)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE(&stv_workram_h)
+	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
+	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
@@ -2022,6 +2463,91 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( saturn )
+	PORT_START("PDR1")
+	PORT_DIPNAME( 0x01, 0x01, "PDR1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PDR2")
+	PORT_DIPNAME( 0x01, 0x01, "PDR2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("JOY1")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)	// START
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)	// A
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)	// B
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)	// C
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1)	// X
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1)	// Y
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1)	// Z
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
+
+	PORT_START("JOY2")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)	// START
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)	// A
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)	// B
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)	// C
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 X") PORT_PLAYER(2)	// X
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Y") PORT_PLAYER(2)	// Y
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Z") PORT_PLAYER(2)	// Z
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 L") PORT_PLAYER(2)	// L
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
+INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_)							\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_##_b1_ ) PORT_PLAYER(_n_)			\
@@ -2636,6 +3162,40 @@ static MACHINE_START( stv )
 	stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
+
+static MACHINE_START( saturn )
+{
+	scsp_set_ram_base(machine.device("scsp"), sound_ram);
+
+	// save states
+	state_save_register_global_pointer(machine, smpc_ram, 0x80);
+	state_save_register_global_pointer(machine, stv_scu, 0x100/4);
+	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
+	state_save_register_global(machine, stv_vblank);
+	state_save_register_global(machine, stv_hblank);
+	state_save_register_global(machine, stv_enable_slave_sh2);
+	state_save_register_global(machine, NMI_reset);
+	state_save_register_global(machine, en_68k);
+	state_save_register_global(machine, timer_0);
+	state_save_register_global(machine, timer_1);
+	state_save_register_global(machine, IOSEL1);
+	state_save_register_global(machine, IOSEL2);
+	state_save_register_global(machine, EXLE1);
+	state_save_register_global(machine, EXLE2);
+	state_save_register_global(machine, PDR1);
+	state_save_register_global(machine, PDR2);
+//  state_save_register_global(machine, port_sel);
+//  state_save_register_global(machine, mux_data);
+	state_save_register_global(machine, scsp_last_line);
+	state_save_register_global(machine, intback_stage);
+	state_save_register_global(machine, pmode);
+	state_save_register_global(machine, smpcSR);
+	state_save_register_global_array(machine, SMEM);
+
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
+}
+
+
 /*
 (Preliminary) explaination about this:
 VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
@@ -2819,6 +3379,42 @@ static INTERRUPT_GEN( stv_interrupt )
 	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(vdp1_irq));
 }
 
+
+static MACHINE_RESET( saturn )
+{
+	// don't let the slave cpu and the 68k go anywhere
+	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
+	stv_enable_slave_sh2 = 0;
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+
+	smpcSR = 0x40;	// this bit is always on according to docs
+
+	timer_0 = 0;
+	timer_1 = 0;
+	en_68k = 0;
+	NMI_reset = 1;
+	smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+
+	DMA_STATUS = 0;
+
+	memset(stv_workram_l, 0, 0x100000);
+	memset(stv_workram_h, 0, 0x100000);
+
+	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
+
+	stvcd_reset( machine );
+
+	/* set the first scanline 0 timer to go off */
+	scan_timer = machine.device<timer_device>("scan_timer");
+	t1_timer = machine.device<timer_device>("t1_timer");
+	vblank_out_timer = machine.device<timer_device>("vbout_timer");
+	vblank_out_timer->adjust(machine.primary_screen->time_until_pos(0));
+	scan_timer->adjust(machine.primary_screen->time_until_pos(224, 352));
+}
+
+
 static MACHINE_RESET( stv )
 {
 	// don't let the slave cpu and the 68k go anywhere
@@ -2850,6 +3446,58 @@ static MACHINE_RESET( stv )
 
 	stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
+
+
+
+static MACHINE_CONFIG_START( saturn, driver_device )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_PROGRAM_MAP(saturn_mem)
+	MCFG_CPU_VBLANK_INT("screen",stv_interrupt)
+	MCFG_CPU_CONFIG(sh2_conf_master)
+
+	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MCFG_CPU_PROGRAM_MAP(saturn_mem)
+	MCFG_CPU_CONFIG(sh2_conf_slave)
+
+	MCFG_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MCFG_CPU_PROGRAM_MAP(sound_mem)
+
+	MCFG_MACHINE_START(saturn)
+	MCFG_MACHINE_RESET(saturn)
+
+	MCFG_NVRAM_HANDLER(saturn)
+
+	MCFG_TIMER_ADD("scan_timer", hblank_in_irq)
+	MCFG_TIMER_ADD("t1_timer", timer1_irq)
+	MCFG_TIMER_ADD("vbout_timer", vblank_out_irq)
+	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_SIZE(704*2, 512*2)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
+	MCFG_SCREEN_UPDATE(stv_vdp2)
+
+	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
+	MCFG_GFXDECODE(stv)
+
+	MCFG_VIDEO_START(stv_vdp2)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("scsp", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CARTSLOT_ADD("cart")
+MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( stv, driver_device )
@@ -2897,6 +3545,112 @@ static MACHINE_CONFIG_START( stv, driver_device )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
+
+
+
+static void saturn_init_driver(running_machine &machine, int rgn)
+{
+	system_time systime;
+
+	saturn_region = rgn;
+
+	// set compatible options
+	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+
+	/* get the current date/time from the core */
+	machine.current_datetime(systime);
+
+	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
+	minit_boost = 400;
+	sinit_boost = 400;
+	minit_boost_timeslice = attotime::zero;
+	sinit_boost_timeslice = attotime::zero;
+
+	smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
+	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);
+	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
+
+	smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+	smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
+//  smpc_ram[0x33] = input_port_read(machine, "???");
+	smpc_ram[0x5f] = 0x10;
+}
+
+static DRIVER_INIT( saturnus )
+{
+	saturn_init_driver(machine, 4);
+}
+
+static DRIVER_INIT( saturneu )
+{
+	saturn_init_driver(machine, 12);
+}
+
+static DRIVER_INIT( saturnjp )
+{
+	saturn_init_driver(machine, 1);
+}
+
+
+/* Japanese Saturn */
+ROM_START(saturnjp)
+	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
+	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
+	ROMX_LOAD("sega1003.bin", 0x00000000, 0x00080000, CRC(b3c63c25) SHA1(7b23b53d62de0f29a23e423d0fe751dfb469c2fa), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "100", "Japan v1.00 (940921)")
+	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(3))
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
+	ROM_COPY( "maincpu",0,0,0x080000)
+ROM_END
+
+/* Overseas Saturn */
+ROM_START(saturn)
+	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
+	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
+	ROM_COPY( "maincpu",0,0,0x080000)
+ROM_END
+
+ROM_START(saturneu)
+	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
+	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "100a", "Overseas v1.00a (941115)")
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
+	ROM_COPY( "maincpu",0,0,0x080000)
+ROM_END
+
+ROM_START(vsaturn)
+	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
+	ROM_COPY( "maincpu",0,0,0x080000)
+ROM_END
+
+ROM_START(hisaturn)
+	ROM_REGION( 0x480000, "maincpu", ROMREGION_ERASEFF ) /* SH2 code */
+	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
+	ROM_CART_LOAD("cart", 0x080000, 0x400000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
+	ROM_COPY( "maincpu",0,0,0x080000)
+ROM_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
@@ -4033,6 +4787,15 @@ static DRIVER_INIT( sanjeon )
 
 	DRIVER_INIT_CALL(sasissu);
 }
+
+
+
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT        COMPANY     FULLNAME            FLAGS */
+CONS( 1994, saturn,     0,      0,      saturn, saturn, saturnus,   "Sega",     "Saturn (USA)",     GAME_NOT_WORKING )
+CONS( 1994, saturnjp,   saturn, 0,      saturn, saturn, saturnjp,   "Sega",     "Saturn (Japan)",   GAME_NOT_WORKING )
+CONS( 1994, saturneu,   saturn, 0,      saturn, saturn, saturneu,   "Sega",     "Saturn (PAL)",     GAME_NOT_WORKING )
+CONS( 1995, vsaturn,    saturn, 0,      saturn, saturn, saturnjp,   "JVC",      "V-Saturn",         GAME_NOT_WORKING )
+CONS( 1995, hisaturn,   saturn, 0,      saturn, saturn, saturnjp,   "Hitachi",  "HiSaturn",         GAME_NOT_WORKING )
 
 GAME( 1996, stvbios,   0, stv, stv,  stv,       ROT0,   "Sega",                      "ST-V Bios", GAME_IS_BIOS_ROOT )
 

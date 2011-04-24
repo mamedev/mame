@@ -12274,6 +12274,14 @@ strike
 //multmega	// (c)1994 Sega
 //32x_scd		// (c)1994 Sega
 
+// Sega Saturn
+// (hardware used by ST-V)
+//saturn		// (c)1994 Sega
+//saturnjp	// (c)1994 Sega
+//saturneu	// (c)1994 Sega
+//vsaturn		// (c)1995 Sega/JVC
+//hisaturn	// (c)1995 Sega/Hitachi
+
 // Atari Jaguar
 // (hardware used by CoJag)
 //jaguar		// (c)1993 Atari
@@ -12293,4 +12301,3 @@ cdimono1	// (c)1991 Philips
 // Commodore CD32
 // (parent to Cubo32 sets)
 cd32		// (c)1993 Commodore
-
