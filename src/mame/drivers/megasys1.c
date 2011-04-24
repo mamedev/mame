@@ -3376,6 +3376,42 @@ ROM_START( stdragon )
 ROM_END
 
 
+ROM_START( stdragona )
+	ROM_REGION( 0x60000, "maincpu", 0 )		/* Main CPU Code */
+	ROM_LOAD16_BYTE( "jsda-02.bin", 0x000000, 0x020000, CRC(d65d4154) SHA1(f77886590a092743c829fb52b5de0ca8ef51c122) )
+	ROM_LOAD16_BYTE( "jsda-01.bin", 0x000001, 0x020000, CRC(c40c8ee1) SHA1(346b16519f35d7bdb283d87f6f89f54d3b7eefe2) )
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )		/* Sound CPU Code */
+	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
+	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) /* M50747 MCU Code */
+	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 - scrambled */
+	ROM_LOAD( "e71-14.bin", 0x000000, 0x080000, CRC(8e26ff92) SHA1(06985056027facb1d3df08cf04277492c1be6102) )
+	
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
+	ROM_LOAD( "e72-18.bin", 0x000000, 0x080000, CRC(0b234711) SHA1(1c5a8db28cef84434c526eab9cf9c4c123cebeea) )
+
+	ROM_REGION( 0x020000, "gfx3", 0 ) /* Scroll 2 */
+	ROM_LOAD( "jsd-19.bin", 0x000000, 0x010000, CRC(25ce807d) SHA1(64accb923e9727093790c8ae8296e9ff2d04af06) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Sprites - scrambled */
+	ROM_LOAD( "e73-23.bin", 0x000000, 0x080000,  CRC(00ca3e04) SHA1(ea11007fc8e0b4fa702f24dd740bc0194624836c) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
+	ROM_LOAD( "jsd-09.bin", 0x000000, 0x020000, CRC(e366bc5a) SHA1(c97bc1f25357366b4ff1343dfc9d0808a2630b28) )
+	ROM_LOAD( "jsd-10.bin", 0x020000, 0x020000, CRC(4a8f4fe6) SHA1(4f13f0149aa29b7cbddcd782f043bb71b3d27ede) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
+	ROM_LOAD( "jsd-07.bin", 0x000000, 0x020000, CRC(6a48e979) SHA1(617281d9fe3c3927f94bf2f66d0a08923a92a6ab) )
+	ROM_LOAD( "jsd-08.bin", 0x020000, 0x020000, CRC(40704962) SHA1(4efd8c4d406600aa486c8b84b6f9882cca5970a4) )
+
+	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
+	ROM_LOAD( "prom.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
 /***************************************************************************
 
                                 [ Soldam ]
@@ -3609,6 +3645,11 @@ static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 	auto_free(machine, buffer);
 }
 
+static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
+{
+	/* todo */
+}
+
 /*************************************
  *
  *  Game-specific driver inits
@@ -3836,6 +3877,19 @@ static DRIVER_INIT( stdragon )
 	RAM[0x00045e/2] = 0x0098;	// protection
 }
 
+static DRIVER_INIT( stdragona )
+{
+	UINT16 *RAM;
+
+	phantasm_rom_decode(machine, "maincpu");
+
+	stdragona_gfx_unmangle(machine, "gfx1");
+	stdragona_gfx_unmangle(machine, "gfx4");
+
+	RAM  = (UINT16 *) machine.region("maincpu")->base();
+	RAM[0x000458/2] = 0x0098;	// protection
+}
+
 static READ16_HANDLER( monkelf_input_r )
 {
 	return 0xffff;
@@ -3873,7 +3927,8 @@ GAME( 1989, lordofk,  astyanax, system_A,          astyanax, astyanax, ROT0,   "
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   hachoo,   ROT0,   "Jaleco", "Hachoo!", 0 )
 GAME( 1989, jitsupro, 0,        system_A,          jitsupro, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", 0 )
 GAME( 1989, plusalph, 0,        system_A,          plusalph, plusalph, ROT270, "Jaleco", "Plus Alpha", 0 )
-GAME( 1989, stdragon, 0,        system_A,          stdragon, stdragon, ROT0,   "Jaleco", "Saint Dragon", 0 )
+GAME( 1989, stdragon, 0,        system_A,          stdragon, stdragon, ROT0,   "Jaleco", "Saint Dragon (set 1)", 0 )
+GAME( 1989, stdragona,stdragon, system_A,          stdragon, stdragona,ROT0,   "Jaleco", "Saint Dragon (set 2)", GAME_NOT_WORKING ) // gfx scramble
 GAME( 1990, rodland,  0,        system_A,          rodland,  rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
