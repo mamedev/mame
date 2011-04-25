@@ -415,7 +415,6 @@ static WRITE8_HANDLER( qsound_banksw_w )
 *
 ********************************************************************/
 
-#ifndef MESS
 static const eeprom_interface qsound_eeprom_interface =
 {
 	7,		/* address bits */
@@ -433,7 +432,6 @@ static const eeprom_interface pang3_eeprom_interface =
 	"0101",	/* write command */
 	"0111"	/* erase command */
 };
-#endif
 
 
 /*
@@ -3065,7 +3063,6 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-#ifndef MESS
 static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
@@ -3317,7 +3314,6 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 MACHINE_CONFIG_END
 
 
-#endif
 
 
 /***************************************************************************
@@ -10158,7 +10154,6 @@ ROM_START( wofch )
 	ROM_LOAD( "tk2_q4.rom",     0x180000, 0x80000, CRC(36642e88) SHA1(8ab25b19e2b67215a5cb1f3aa81b9d26009cfeb8) )
 ROM_END
 
-#ifndef MESS
 
 static DRIVER_INIT( forgottn )
 {
@@ -10261,7 +10256,6 @@ static DRIVER_INIT( pang3 )
 
 	DRIVER_INIT_CALL(pang3n);
 }
-#endif
 
 static READ16_HANDLER( sf2mdt_r )
 {
