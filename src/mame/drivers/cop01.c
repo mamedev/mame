@@ -570,12 +570,13 @@ ROM_START( cop01 )
 	ROM_LOAD( "cop12.6e",     0x0c000, 0x2000, CRC(257a6706) SHA1(9e7ef1f40630b94849bdc3fd13ee6e7311fffd45) )
 	ROM_LOAD( "cop13.8e",     0x0e000, 0x2000, CRC(07c4ea66) SHA1(12665c0fb648fd208805e81d056ab377d65b267a) )
 
-	ROM_REGION( 0x0500, "proms", 0 )
+	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "copproma.13d", 0x0000, 0x0100, CRC(97f68a7a) SHA1(010eaca95eeb5caec083bd184ec31e0f433fff8c) )	/* red */
 	ROM_LOAD( "coppromb.14d", 0x0100, 0x0100, CRC(39a40b4c) SHA1(456b7f97fbd1cb4beb756033ec76a89ffe8de168) )	/* green */
 	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
 	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
 	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
+	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
 ROM_START( cop01a )
