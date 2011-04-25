@@ -40,6 +40,8 @@ TODO:
 - Text Plane colours are only right in Cuby Bop once you've started a game
   & reset
 - Scrolling in Cuby Bop's Game seems incorrect.
+- Repeated SFXs in Evil Stone (with previous hack, it was used to die at level 1 boss)
+- Evil Stone audio NMI source is unknown.
 
 puzznici note
 - this set is a bootleg, it uses a converted board without the MCU and has
@@ -555,18 +557,6 @@ static WRITE8_HANDLER( sound_w )
 }
 #endif
 
-static READ8_HANDLER( shared_r )
-{
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_shared_ram[offset];
-}
-
-static WRITE8_HANDLER( shared_w )
-{
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_shared_ram[offset] = data;
-}
-
 static READ8_HANDLER( mux_r )
 {
 	taitol_state *state = space->machine().driver_data<taitol_state>();
@@ -724,7 +714,7 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 static ADDRESS_MAP_START( fhawk_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -741,7 +731,7 @@ static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
 	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
 	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8 )
@@ -756,7 +746,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
@@ -767,7 +757,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 
@@ -797,13 +787,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP	// Watchdog
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
@@ -834,7 +824,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
@@ -842,7 +832,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 #if 0
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
@@ -926,17 +916,10 @@ static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER (evilston_snd_w)
-{
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_shared_ram[0x7fe] = data & 0x7f;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static ADDRESS_MAP_START( evilston_map, AS_PROGRAM, 8 )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(taitol_state, m_shared_ram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP	//watchdog ?
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
@@ -948,7 +931,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
@@ -2268,6 +2251,7 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -2293,9 +2277,9 @@ static MACHINE_CONFIG_START( evilston, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
-	MCFG_SOUND_ROUTE(0, "mono", 0.00)
-	MCFG_SOUND_ROUTE(1, "mono", 0.00)
-	MCFG_SOUND_ROUTE(2, "mono", 0.00)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
@@ -2894,13 +2878,6 @@ static DRIVER_INIT( plottinga )
 	}
 }
 
-static DRIVER_INIT( evilston )
-{
-	UINT8 *ROM = machine.region("audiocpu")->base();
-	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa7fe, 0xa7fe, FUNC(evilston_snd_w));
-}
-
 
 GAME( 1988, raimais,   0,        raimais,  raimais,  0,        ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
 GAME( 1988, raimaisj,  raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
@@ -2932,4 +2909,4 @@ GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B", 
 GAME( 1992, lagirl,    plgirls,  cachat,   plgirls,  0,        ROT270, "bootleg", "LA Girl", 0 ) /* bootleg hardware with changed title & backgrounds */
 GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B",   "Play Girls 2", 0 )
 
-GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
+GAME( 1990, evilston,  0,        evilston, evilston, 0,        ROT270, "Spacy Industrial, Ltd.", "Evil Stone", GAME_IMPERFECT_SOUND )
