@@ -159,8 +159,8 @@ public:
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	//UINT8 *m_spriteram;
+	//size_t m_spriteram_size;
 };
 
 
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(expro02_state, m_layers_0_regs) // sprite regs? tileregs?
 
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(expro02_state, m_spriteram, m_spriteram_size)	 // sprites? 0x72f words tested
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	 // sprites? 0x72f words tested
 
 	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE_MEMBER(expro02_state, m_sprites_regs) // sprite regs? tileregs?
 
