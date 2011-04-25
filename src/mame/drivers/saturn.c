@@ -1,4 +1,4 @@
-/* 
+/*
    Sega Saturn & Sega ST-V (Sega Titan Video)
 
 Driver by David Haywood,Angelo Salese,Olivier Galibert & Mariusz Wojcieszek

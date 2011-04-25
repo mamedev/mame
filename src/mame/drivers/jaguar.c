@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Atari Jaguar (Home) & Atari CoJag (Arcade) hardware
+    Atari Jaguar (Home) & Atari CoJag (Arcade) hardware
 
-	The CoJag arcade system is based on the Jaguar system, but with an upgraded
-	main CPU (68020 or MIPS instead of the plain 68000 found in the Jaguar)
+    The CoJag arcade system is based on the Jaguar system, but with an upgraded
+    main CPU (68020 or MIPS instead of the plain 68000 found in the Jaguar)
 
     driver by Aaron Giles
-	console support originally by Nathan Woods
+    console support originally by Nathan Woods
 
     CoJag Games supported:
         * Area 51 (3 Sets)
@@ -18,14 +18,14 @@
 
     To do:
         * (CoJag) map out unused RAM per-game via memory_nop_read/write
-		* (Jaguar) support is very poor, most games aren't properly playable
-		  or have severe performance issues or crashes related to the unsafe
-		  blitter code.  Only Pinball Fantasies is fully playable albeit
-		  without sound.
-	    * The code (GPU/DSP access) should probably be refactored around the
-		  16-bit interface from the plain 68k, the driver currently uses
-		  trampoline functions due to the original driver being entirely
-		  32-bit due to the CPUs on CoJag.
+        * (Jaguar) support is very poor, most games aren't properly playable
+          or have severe performance issues or crashes related to the unsafe
+          blitter code.  Only Pinball Fantasies is fully playable albeit
+          without sound.
+        * The code (GPU/DSP access) should probably be refactored around the
+          16-bit interface from the plain 68k, the driver currently uses
+          trampoline functions due to the original driver being entirely
+          32-bit due to the CPUs on CoJag.
 
     Note: There is believed to be a 68020 version of Maximum Force
             (not confirmed or dumped)
@@ -299,33 +299,33 @@ Notes:
 
   Jaguar System Notes:
 
-	Protection Check
+    Protection Check
 
-	At power on, a checksum is performed on the cart to ensure it has been
-	certified by Atari. The actual checksum calculation is performed by the GPU,
-	the result being left in GPU RAM at address f03000. The GPU is instructed to
-	do the calculation when the bios sends a 1 to f02114 while it is in the
-	initialisation stage. The bios then loops, waiting for the GPU to finish the
-	calculation. When it does, it sets bit 15 of f02114 high. The bios then does
-	the compare of the checksum. The checksum algorithm is unknown, but the
-	final result must be 03d0dead. The bios checks for this particular result,
-	and if found, the cart is allowed to start. Otherwise, the background turns
-	red, and the console freezes.
-
-
-	Jaguar Logo
-
-	A real Jaguar will show the red Jaguar logo, the falling white Atari letters,
-	and the turning jaguar's head, accompanied by the sound of a flushing toilet.
-	The cart will then start. All Jaguar emulators (including this one) skip the
-	logo with the appropriate memory hack. The cart can also instruct the logo
-	be skipped by placing non-zero at location 800408. We do the same thing when
-	the cart is loaded (see the DEVICE_IMAGE_LOAD section below).
+    At power on, a checksum is performed on the cart to ensure it has been
+    certified by Atari. The actual checksum calculation is performed by the GPU,
+    the result being left in GPU RAM at address f03000. The GPU is instructed to
+    do the calculation when the bios sends a 1 to f02114 while it is in the
+    initialisation stage. The bios then loops, waiting for the GPU to finish the
+    calculation. When it does, it sets bit 15 of f02114 high. The bios then does
+    the compare of the checksum. The checksum algorithm is unknown, but the
+    final result must be 03d0dead. The bios checks for this particular result,
+    and if found, the cart is allowed to start. Otherwise, the background turns
+    red, and the console freezes.
 
 
-	Start Address
+    Jaguar Logo
 
-	The start address of a cart may be found at 800404. It is normally 802000.
+    A real Jaguar will show the red Jaguar logo, the falling white Atari letters,
+    and the turning jaguar's head, accompanied by the sound of a flushing toilet.
+    The cart will then start. All Jaguar emulators (including this one) skip the
+    logo with the appropriate memory hack. The cart can also instruct the logo
+    be skipped by placing non-zero at location 800408. We do the same thing when
+    the cart is loaded (see the DEVICE_IMAGE_LOAD section below).
+
+
+    Start Address
+
+    The start address of a cart may be found at 800404. It is normally 802000.
 
 ***************************************************************************/
 

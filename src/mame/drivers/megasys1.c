@@ -3390,7 +3390,7 @@ ROM_START( stdragona )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* Scroll 0 - scrambled */
 	ROM_LOAD( "e71-14.bin", 0x000000, 0x080000, CRC(8e26ff92) SHA1(06985056027facb1d3df08cf04277492c1be6102) )
-	
+
 	ROM_REGION( 0x080000, "gfx2", 0 ) /* Scroll 1 */
 	ROM_LOAD( "e72-18.bin", 0x000000, 0x080000, CRC(0b234711) SHA1(1c5a8db28cef84434c526eab9cf9c4c123cebeea) )
 

@@ -9,7 +9,7 @@
     - Altera ACEX 1K PLD
     - M48T35Y timekeeper device
     - CF interface
-	- YMZ770B-F
+    - YMZ770B-F
 
 ***********************************************************************************/
 

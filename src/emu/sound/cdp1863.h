@@ -77,9 +77,9 @@ class cdp1863_device :	public device_t,
 public:
 	DECLARE_WRITE8_MEMBER( str_w );
 	void str_w(UINT8 data);
-	
+
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	
+
 	void set_clk1(int clock);
 	void set_clk2(int clock);
 
@@ -101,7 +101,7 @@ private:
 	int m_latch;					// sound latch
 	INT16 m_signal;					// current signal
 	int m_incr;						// initial wave state
-	
+
 	const cdp1863_device_config &m_config;
 };
 

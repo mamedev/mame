@@ -82,7 +82,7 @@ device_t *cdp1863_device_config::alloc_device(running_machine &machine) const
 void cdp1863_device_config::static_set_config(device_config *device, int clock2)
 {
 	cdp1863_device_config *cdp1863 = downcast<cdp1863_device_config *>(device);
-	
+
 	cdp1863->m_clock2 = clock2;
 }
 
