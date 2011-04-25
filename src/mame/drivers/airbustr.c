@@ -218,7 +218,6 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -389,7 +388,7 @@ static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x28, 0x28) AM_WRITE(airbustr_coin_counter_w)
-	AM_RANGE(0x38, 0x38) AM_WRITENOP // ???
+	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
@@ -557,18 +556,23 @@ static const ym2203_interface ym2203_config =
 
 /* Interrupt Generators */
 
-static INTERRUPT_GEN( master_interrupt )
+/* Main Z80 uses IM2 */
+static TIMER_DEVICE_CALLBACK( airbustr_scanline )
 {
-	airbustr_state *state = device->machine().driver_data<airbustr_state>();
-	state->m_master_addr ^= 0x02;
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_master_addr);
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xfd);
+
+	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
+	if(scanline == 64)
+		cputag_set_input_line_and_vector(timer.machine(), "master", 0, HOLD_LINE, 0xff);
 }
 
+/* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
 static INTERRUPT_GEN( slave_interrupt )
 {
-	airbustr_state *state = device->machine().driver_data<airbustr_state>();
-	state->m_slave_addr ^= 0x02;
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->m_slave_addr);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfd);
 }
 
 /* Machine Initialization */
@@ -636,12 +640,12 @@ static MACHINE_CONFIG_START( airbustr, airbustr_state )
 	MCFG_CPU_ADD("master", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
+	MCFG_TIMER_ADD_SCANLINE("scantimer", airbustr_scanline, "screen", 0, 1) /* nmi signal from slave cpu */
 
 	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
+	MCFG_CPU_VBLANK_INT("screen", slave_interrupt) /* nmi signal from master cpu */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	// ???
 	MCFG_CPU_PROGRAM_MAP(sound_map)
