@@ -10,7 +10,6 @@ XX Mission (c) 1986 UPL
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/xxmissio.h"
 
@@ -300,7 +299,7 @@ static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	MCFG_CPU_ADD("sub", Z80,12000000/4)	/* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map2)
-	MCFG_CPU_VBLANK_INT_HACK(xxmissio_interrupt_s,2)
+	MCFG_CPU_PERIODIC_INT(xxmissio_interrupt_s,2*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
