@@ -18,6 +18,7 @@ public:
 	tilemap_t   *m_fg_tilemap;
 
 	/* sound-related */
+	UINT8     m_nmi_enable;
 	UINT8     m_sound_nmi_enabled;
 
 	/* misc */

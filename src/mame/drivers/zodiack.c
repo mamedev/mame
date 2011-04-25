@@ -1,4 +1,31 @@
-/*
+/***************************************************************************
+
+Zodiack/Dogfight (c) 1983 Orca
+
+driver by Zsolt Vasvari
+
+Notes:
+- Moguchan and The Percussor triggers this code:
+  2DD6: D1            pop  de
+  2DD7: D1            pop  de
+  2DD8: D1            pop  de
+  2DD9: D1            pop  de
+  2DDA: D1            pop  de
+  2DDB: D1            pop  de
+  2DDC: 32 00 70      ld   ($7000),a
+  2DDF: 0B            dec  bc
+  2DE0: 78            ld   a,b
+  2DE1: B1            or   c
+  2DE2: 20 F2         jr   nz,$2DD6
+  2DE4: E9            jp   (hl)
+  All it does is scanning the whole 64k z80 space via all those pop opcodes ...
+  DE register values are always discarded ... bug in coding or ROM patch?
+
+TODO:
+
+- Verify Z80 and AY8910 clock speeds
+
+============================================================================
 
 Zodiack
 Orca, 1983
@@ -56,55 +83,41 @@ Notes:
       ALL ROMs 2732
       ALL PROMs MMI 6331
 
-*/
-
-/***************************************************************************
-
-Zodiack/Dogfight Memory Map (preliminary)
-
-driver by Zsolt Vasvari
-
-Memory Mapped:
-
-
-I/O Ports:
-
-00-01       W   AY8910 #0
-
-
-TODO:
-
-- Verify Z80 and AY8910 clock speeds
-
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/zodiack.h"
 
 
-static TIMER_CALLBACK( interrupt_disable )
+static WRITE8_HANDLER( zodiack_nmi_mask_w )
 {
-	zodiack_state *state = machine.driver_data<zodiack_state>();
-	//interrupt_enable = 0;
-	cpu_interrupt_enable(state->m_maincpu, 0);
+	zodiack_state *state = space->machine().driver_data<zodiack_state>();
+
+	state->m_nmi_enable = (data & 1) ^ 1;
 }
 
-static WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
-{
-	interrupt_enable_w(space, offset, ~data & 1);
-}
-
-static WRITE8_HANDLER( zodiac_sound_nmi_enable_w )
+static WRITE8_HANDLER( zodiack_sound_nmi_enable_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 	state->m_sound_nmi_enabled = data & 1;
 }
 
 
-static INTERRUPT_GEN( zodiac_sound_nmi_gen )
+static TIMER_DEVICE_CALLBACK( zodiack_scanline )
+{
+	zodiack_state *state = timer.machine().driver_data<zodiack_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_nmi_enable) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+
+	if(scanline == 0 ) // vblank-in irq
+		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+}
+
+static INTERRUPT_GEN( zodiack_sound_nmi_gen )
 {
 	zodiack_state *state = device->machine().driver_data<zodiack_state>();
 
@@ -112,15 +125,8 @@ static INTERRUPT_GEN( zodiac_sound_nmi_gen )
 		nmi_line_pulse(device);
 }
 
-static INTERRUPT_GEN( zodiac_master_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		nmi_line_pulse(device);
-	else
-		irq0_line_hold(device);
-}
 
-static WRITE8_HANDLER( zodiac_master_soundlatch_w )
+static WRITE8_HANDLER( zodiack_master_soundlatch_w )
 {
 	zodiack_state *state = space->machine().driver_data<zodiack_state>();
 	soundlatch_w(space, offset, data);
@@ -143,7 +149,6 @@ static MACHINE_RESET( zodiack )
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
 	/* we must start with NMI interrupts disabled */
-	machine.scheduler().synchronize(FUNC(interrupt_disable));
 	state->m_sound_nmi_enabled = FALSE;
 }
 
@@ -174,9 +179,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiac_master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiack_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
-	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiack_nmi_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(zodiack_state, m_attributeram)
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, m_spriteram, m_spriteram_size)
@@ -190,7 +195,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(zodiac_sound_nmi_enable_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(zodiack_sound_nmi_enable_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
 ADDRESS_MAP_END
 
@@ -575,12 +580,12 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", zodiack_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_HACK(zodiac_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT(zodiack_sound_nmi_gen,8*60)	/* IRQs are triggered by the main CPU */
 
 	MCFG_MACHINE_RESET(zodiack)
 	MCFG_MACHINE_START(zodiack)
@@ -718,8 +723,8 @@ ROM_START( bounty )
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-GAME( 1983, zodiack,  0, zodiack, zodiack,  0, ROT270, "Orca (Esco Trading Co)", "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, 0, ROT270, "Orca / Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, percuss, moguchan, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  /* this is in the ROM at $0b5c */ "Moguchan", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, percuss,  0, percuss, percuss,  0, ROT270, "Orca", "The Percussor", GAME_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, percuss, bounty,   0, ROT180, "Orca", "The Bounty", GAME_SUPPORTS_SAVE )
+GAME( 1983, zodiack,  0, zodiack, zodiack,  0, ROT270, "Orca (Esco Trading Co)",                           "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
+GAME( 1983, dogfight, 0, zodiack, dogfight, 0, ROT270, "Orca / Thunderbolt",                               "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )	/* bullet color needs to be verified */
+GAME( 1982, moguchan, 0, percuss, moguchan, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  "Moguchan", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0, percuss, percuss,  0, ROT270, "Orca (bootleg?)",                                  "The Percussor", GAME_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0, percuss, bounty,   0, ROT180, "Orca",                                             "The Bounty", GAME_SUPPORTS_SAVE )
