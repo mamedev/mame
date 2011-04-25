@@ -6,6 +6,9 @@ Ikki (c) 1985 Sun Electronics
 
     20/Jun/2001 -
 
+TODO:
+- understand proper CPU communications and irq firing;
+
 *****************************************************************************/
 
 #include "emu.h"
