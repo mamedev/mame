@@ -229,6 +229,7 @@ SOUNDS += MOS656X
 SOUNDS += S2636
 SOUNDS += ASC
 SOUNDS += MAS3507D
+SOUNDS += LMC1992
 
 
 #-------------------------------------------------
