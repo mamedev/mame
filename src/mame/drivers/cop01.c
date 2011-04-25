@@ -9,6 +9,8 @@ TODO:
 ----
 mightguy:
 - missing emulation of the 1412M2 protection chip, used by the sound CPU.
+  This is probably an extra CPU (program rom is the ic2 one), presumably
+  with data / address line scrambling
 
 
 Mighty Guy board layout:
@@ -608,7 +610,7 @@ ROM_START( cop01a )
 	ROM_LOAD( "coppromc.15d", 0x0200, 0x0100, CRC(8181748b) SHA1(0098ae250095b4ac8af1811b4e41d86e3f587c7b) )	/* blue */
 	ROM_LOAD( "coppromd.19d", 0x0300, 0x0100, CRC(6a63dbb8) SHA1(50f971f173147203cd24dc4fa7f0a27d2179f1cc) )	/* tile lookup table */
 	ROM_LOAD( "copprome.2e",  0x0400, 0x0100, CRC(214392fa) SHA1(59d235c3e584e7fd484edf5c78c43d2597c1c3a8) )	/* sprite lookup table */
-	/* a timing PROM (13B?) is probably missing */
+	ROM_LOAD( "13b",          0x0500, 0x0100, NO_DUMP ) /* state machine data used for video signals generation (not used in emulation)*/
 ROM_END
 
 ROM_START( mightguy )
@@ -620,7 +622,7 @@ ROM_START( mightguy )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound cpu) */
 	ROM_LOAD( "11.15b",     0x0000, 0x4000, CRC(576183ea) SHA1(e3f28e8e8c34ab396d158da122584ed226729c99) )
 
-	ROM_REGION( 0x8000, "user1", 0 ) /* 1412M2 protection data */
+	ROM_REGION( 0x8000, "user1", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
 	ROM_LOAD( "10.ic2",     0x0000, 0x8000, CRC(1a5d2bb1) SHA1(0fd4636133a980ba9ffa076f9010474586d37635) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) /* alpha */
