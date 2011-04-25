@@ -7,6 +7,7 @@ driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
 ----
+- Fix priority kludge (see video/cop01.c)
 mightguy:
 - missing emulation of the 1412M2 protection chip, used by the sound CPU.
   This is probably an extra CPU (program rom is the ic2 one), presumably
