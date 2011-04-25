@@ -7,6 +7,9 @@
  Notes:
   - In gfx data banking function, some strange gfx are shown. Timing issue?
 
+ TODO:
+ - irq sources are unknown at current time
+
 
 Gals Panic
 Kaneko, 1990
@@ -146,7 +149,6 @@ the layer is misplaced however, different scroll regs?
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 
@@ -442,9 +444,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static INTERRUPT_GEN( galsnew_interrupt )
+static TIMER_DEVICE_CALLBACK( expro02_scanline )
 {
-	device_set_input_line(device, cpu_getiloops(device) + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
+	int scanline = param;
+
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+	else if(scanline == 0) // vblank-in irq?
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+	else if(scanline == 112) // VDP end task? (controls sprite colors in gameplay)
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
 }
 
 static MACHINE_RESET( galsnew )
@@ -496,7 +505,7 @@ static MACHINE_CONFIG_START( galsnew, expro02_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(galsnew_map)
-	MCFG_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", expro02_scanline, "screen", 0, 1)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 
@@ -780,4 +789,4 @@ GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gal
 GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewk, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Inter license)", "Gals Panic (Korea, EXPRO-02 PCB)", 0 )
 
-GAME( 1994, fantasia, 0,       fantasia,fantasia, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )
+GAME( 1994, fantasia, 0,       fantasia,fantasia, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
