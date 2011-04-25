@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/z80/z80.h"
 #include "includes/psx.h"
@@ -758,7 +757,7 @@ static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET( coh1000c )
 
@@ -772,7 +771,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET( coh1000c )
 
@@ -952,7 +951,7 @@ static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
 	MCFG_CPU_PROGRAM_MAP( qsound_map)
 	MCFG_CPU_IO_MAP( qsound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_PERIODIC_INT( qsound_interrupt, 60*4 ) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET( coh3002c )
 
