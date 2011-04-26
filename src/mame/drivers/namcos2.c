@@ -445,7 +445,6 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "deprecat.h"
 #include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/namcoic.h"
@@ -1617,7 +1616,7 @@ static MACHINE_CONFIG_START( default, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
@@ -1694,7 +1693,7 @@ static MACHINE_CONFIG_START( gollygho, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
@@ -1744,7 +1743,7 @@ static MACHINE_CONFIG_START( finallap, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
@@ -1794,7 +1793,7 @@ static MACHINE_CONFIG_START( sgunner, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
@@ -1844,7 +1843,7 @@ static MACHINE_CONFIG_START( luckywld, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
@@ -1894,7 +1893,7 @@ static MACHINE_CONFIG_START( metlhawk, driver_device )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
 	MCFG_CPU_PROGRAM_MAP(sound_default_am)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */

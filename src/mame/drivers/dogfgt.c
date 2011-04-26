@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,16)	/* ? controls music tempo */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,16*60)	/* ? controls music tempo */
 
 	MCFG_CPU_ADD("sub", M6502, 1500000)	/* 1.5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(sub_map)

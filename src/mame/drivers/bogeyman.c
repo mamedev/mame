@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "includes/bogeyman.h"
@@ -247,7 +246,7 @@ static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* Verified */
 	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 16) // Controls sound
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 16*60) // Controls sound
 
 	MCFG_MACHINE_START(bogeyman)
 	MCFG_MACHINE_RESET(bogeyman)

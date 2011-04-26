@@ -71,7 +71,6 @@ The End
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 
@@ -401,7 +400,7 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

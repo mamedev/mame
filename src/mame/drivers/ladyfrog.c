@@ -48,7 +48,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "includes/ladyfrog.h"
@@ -318,7 +317,7 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
 	MCFG_MACHINE_START(ladyfrog)
 	MCFG_MACHINE_RESET(ladyfrog)

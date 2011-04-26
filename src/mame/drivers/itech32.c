@@ -347,7 +347,6 @@ Notes:
 #include "emu.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/m6800/m6800.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
@@ -1773,7 +1772,7 @@ static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
+	MCFG_CPU_PERIODIC_INT(irq1_line_assert,4*60)
 
 	/* via */
 	MCFG_DEVICE_REMOVE("via6522_0")

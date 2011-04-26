@@ -153,7 +153,6 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
@@ -602,7 +601,7 @@ static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 8*60)
 
 	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)

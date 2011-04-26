@@ -1,14 +1,11 @@
 /****************************************************************************
 
-    Preliminary driver for Samurai, Nunchackun, Yuke Yuke Yamaguchi-kun
-    (c) Taito 1985
+    Samurai, Nunchackun, Yuke Yuke Yamaguchi-kun (c) Taito 1985
 
-    Known Issues:
-    - some color problems (need screenshots)
-    - Nunchackun has wrong colors; sprites look better if you subtract sprite color from 0x2d
-    - Yuke Yuke Yamaguchi-kun isn't playable (sprite problem only?)
+    TODO:
+    - colors for this HW are a complete mystery and probably needs HW tests.
 
-driver by Phil Stroffolino
+    driver by Phil Stroffolino
 
 Mission 660 extensions by Paul Swan (swan@easynet.co.uk)
 --------------------------------------------------------
@@ -35,14 +32,9 @@ used this same value on the original M660 and it seems to work.
 I'm guessing the bootleg is of a "world" release and the original is from
 the "America" release.
 
-TODO:
-1) Colours.
-2) A few unknown regs.
-
 ****************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -749,7 +741,7 @@ static MACHINE_CONFIG_START( vsgongf, tsamurai_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
 	MCFG_CPU_IO_MAP(vsgongf_audio_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)
+	MCFG_CPU_PERIODIC_INT(vsgongf_sound_interrupt,3*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1213,8 +1205,8 @@ ROM_START( ringfgt2 )
 ROM_END
 
 GAME( 1984, vsgongf,  0,        vsgongf,  vsgongf,  0, ROT90, "Kaneko", "VS Gong Fight", GAME_IMPERFECT_COLORS )
-GAME( 1984, ringfgt,  vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", 0 )
-GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", 0 )
+GAME( 1984, ringfgt,  vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 1)", GAME_IMPERFECT_COLORS )
+GAME( 1984, ringfgt2, vsgongf,  vsgongf,  vsgongf,  0, ROT90, "Kaneko (Taito license)", "Ring Fighter (set 2)", GAME_IMPERFECT_COLORS )
 
 GAME( 1985, tsamurai, 0,        tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 1)", 0 )
 GAME( 1985, tsamurai2,tsamurai, tsamurai, tsamurai, 0, ROT90, "Kaneko / Taito", "Samurai Nihon-ichi (set 2)", 0 )

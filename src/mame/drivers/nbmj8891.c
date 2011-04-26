@@ -2612,7 +2612,6 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gionbana_map)
 	MCFG_CPU_IO_MAP(gionbana_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 132)    // nmiclock = 60
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MCFG_MACHINE_RESET(nb1413m3)
@@ -2674,7 +2673,6 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // ?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2689,7 +2687,6 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2705,7 +2702,6 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hanamomo_map)
 	MCFG_CPU_IO_MAP(hanamomo_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2720,7 +2716,6 @@ static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gionbana_map)
 	MCFG_CPU_IO_MAP(msjiken_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 MACHINE_CONFIG_END
 
 
@@ -2728,22 +2723,9 @@ MACHINE_CONFIG_END
 /* NBMJDRV3 */
 static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
-
 	/* video hardware */
 	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
-MACHINE_CONFIG_END
-
 
 /* NBMJDRV4 */
 static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
@@ -2846,7 +2828,6 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scandalm_map)
 	MCFG_CPU_IO_MAP(scandalm_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3871,7 +3852,7 @@ GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, mmcamera, ROT0,   "Miki Syo
 GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, mmcamera, ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", 0 )
 GAME( 1989, scandal,   0,        scandal,  scandal,  scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", 0 )
 GAME( 1989, scandalm,  scandal,  mjfocusm, scandalm, scandalm, ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", 0 )
-GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", 0 )
+GAME( 1989, mgmen89,   0,        telmahjn, mgmen89,  mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", 0 )
 GAME( 1989, mjnanpas,  0,        mjnanpas, mjnanpas, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890713)", 0 )
 GAME( 1989, mjnanpaa,  mjnanpas, mjnanpas, mjnanpaa, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890712)", 0 )
 GAME( 1989, mjnanpau,  mjnanpas, mjnanpas, mjnanpas, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Ura) (Japan 890805)", 0 )

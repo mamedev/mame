@@ -72,7 +72,6 @@ CHIP #  POSITION   TYPE
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "includes/flower.h"
 
 
@@ -244,13 +243,11 @@ static MACHINE_CONFIG_START( flower, flower_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(flower_cpu1_2)
-//  MCFG_CPU_VBLANK_INT_HACK(flower_cpu0_interrupt,10)
 	MCFG_CPU_VBLANK_INT("screen", flower_cpu0_interrupt) //nmis stuff up the writes to shared ram
 
 	MCFG_CPU_ADD("sub", Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(flower_cpu1_2)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(flower_sound_cpu)

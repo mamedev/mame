@@ -52,7 +52,6 @@ c1  ??
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/3812intf.h"
 #include "includes/speedbal.h"
 #include "machine/nvram.h"
@@ -229,7 +228,7 @@ static MACHINE_CONFIG_START( speedbal, speedbal_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,8*60)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

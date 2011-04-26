@@ -654,7 +654,6 @@ static MACHINE_CONFIG_START( megaplay, mplay_state )
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
 	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
-	//MCFG_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
 	MCFG_MACHINE_RESET( megaplay )
 

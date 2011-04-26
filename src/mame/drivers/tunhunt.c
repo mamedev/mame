@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)		/* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ? probably wrong */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* ? probably wrong */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

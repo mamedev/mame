@@ -121,7 +121,6 @@ Known issues :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/argus.h"
 
@@ -132,12 +131,26 @@ Known issues :
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( argus_interrupt )
+static TIMER_DEVICE_CALLBACK( argus_scanline )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xd7); /* RST 10h */
+
+	if(scanline == 16) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf); /* RST 08h */
+}
+
+static TIMER_DEVICE_CALLBACK( butasan_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 248) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xd7); /* RST 10h */
+
+	if(scanline == 8) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
@@ -534,15 +547,11 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(argus_map)
-	MCFG_CPU_VBLANK_INT_HACK(argus_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", argus_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
-#if 0
-	MCFG_CPU_IO_MAP(sound_portmap_1)
-#else
 	MCFG_CPU_IO_MAP(sound_portmap_2)
-#endif
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -564,14 +573,6 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-#if 0
-	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
-	MCFG_SOUND_CONFIG(ym2203_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-#else
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -584,7 +585,6 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-#endif
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( valtric, argus_state )
@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(valtric_map)
-	MCFG_CPU_VBLANK_INT_HACK(argus_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", argus_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_a)
@@ -637,7 +637,7 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MCFG_CPU_PROGRAM_MAP(butasan_map)
-	MCFG_CPU_VBLANK_INT_HACK(argus_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", butasan_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map_b)

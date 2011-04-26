@@ -338,7 +338,6 @@ Boards:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "includes/pacman.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/namco.h"
@@ -396,23 +395,6 @@ static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
 	device_set_input_line_vector(space->machine().device("maincpu"), 0, data);
 	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-}
-
-
-static INTERRUPT_GEN( pacman_interrupt )
-{
-	/* always signal a normal VBLANK */
-	if (cpu_getiloops(device) == 0)
-		irq0_line_hold(device);
-
-	/* on other "VBLANK" opportunities, check to make sure the cheat is enabled */
-	/* and that the speedup button is pressed */
-	else
-	{
-		UINT8 value = input_port_read_safe(device->machine(), "FAKE", 0);
-		if ((value & 7) == 5 || (value & 6) == 2)
-			irq0_line_hold(device);
-	}
 }
 
 
@@ -1348,14 +1330,6 @@ static INPUT_PORTS_START( pacman )
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("FAKE")
-	/* This fake input port is used to get the status of the fire button */
-	/* and activate the speedup cheat if it is. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "2x Speed (Cheat)" )
-	PORT_CONFNAME( 0x06, 0x00, "2x Speed Cheat" )
-	PORT_CONFSETTING(    0x00, "Disabled" )
-	PORT_CONFSETTING(    0x02, "Enabled Always" )
-	PORT_CONFSETTING(    0x04, "Enabled with Button" )
 INPUT_PORTS_END
 
 
@@ -1410,18 +1384,9 @@ static INPUT_PORTS_START( mspacman )
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("FAKE")
-	/* This fake input port is used to get the status of the fire button */
-	/* and activate the speedup cheat if it is. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "2x Speed (Cheat)" )
-	PORT_CONFNAME( 0x06, 0x00, "2x Speed Cheat" )
-	PORT_CONFSETTING(    0x00, "Disabled" )
-	PORT_CONFSETTING(    0x02, "Enabled Always" )
-	PORT_CONFSETTING(    0x04, "Enabled with Button" )
 INPUT_PORTS_END
 
 
-/* Same as 'mspacman', but no fake input port */
 static INPUT_PORTS_START( mspacpls )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -3147,7 +3112,7 @@ static MACHINE_CONFIG_START( pacman, pacman_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pacman_map)
 	MCFG_CPU_IO_MAP(writeport)
-	MCFG_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
@@ -3276,7 +3241,7 @@ static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
 	MCFG_CPU_IO_MAP(bigbucks_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,20*60)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)

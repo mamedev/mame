@@ -2985,7 +2985,6 @@ static MACHINE_CONFIG_DERIVED( crystalg, NBMJDRV_256 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(crystalg_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 96) // nmiclock = 2f
 MACHINE_CONFIG_END
 
 
@@ -2995,7 +2994,6 @@ static MACHINE_CONFIG_DERIVED( apparel, NBMJDRV_256 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(secolove_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_CONFIG_END
 
 
@@ -3005,7 +3003,6 @@ static MACHINE_CONFIG_DERIVED( mbmj_h12bit, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(secolove_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	/* video hardware */
 	MCFG_VIDEO_START(mbmj8688_hybrid_12bit)
@@ -3017,7 +3014,6 @@ static MACHINE_CONFIG_DERIVED( barline, mbmj_h12bit )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(barline_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	MCFG_SOUND_REPLACE("psg", YM3812, 20000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
@@ -3031,7 +3027,6 @@ static MACHINE_CONFIG_DERIVED( mbmj_p16bit, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(secolove_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60/40
 
 	/* video hardware */
 	MCFG_VIDEO_START(mbmj8688_pure_16bit)
@@ -3099,7 +3094,6 @@ static MACHINE_CONFIG_DERIVED( seiha, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(seiha_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjgaiden, NBMJDRV_4096 )
@@ -3117,7 +3111,6 @@ static MACHINE_CONFIG_DERIVED( iemoto, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_CONFIG_END
 
 
@@ -3127,7 +3120,6 @@ static MACHINE_CONFIG_DERIVED( ojousan, NBMJDRV_65536 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ojousan_map)
 	MCFG_CPU_IO_MAP(iemoto_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mbmj_p12bit, NBMJDRV_4096 )
@@ -3136,7 +3128,6 @@ static MACHINE_CONFIG_DERIVED( mbmj_p12bit, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjsikaku_map)
 	MCFG_CPU_IO_MAP(kaguya_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_CONFIG_END
 
 
@@ -3146,7 +3137,6 @@ static MACHINE_CONFIG_DERIVED( mjsikaku, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjsikaku_map)
 	MCFG_CPU_IO_MAP(mjsikaku_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 144)    // nmiclock = 70
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("psg", YM3812, 20000000/8)
@@ -3160,7 +3150,6 @@ static MACHINE_CONFIG_DERIVED( mmsikaku, NBMJDRV_4096 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(secolove_map)
 	MCFG_CPU_IO_MAP(mmsikaku_io_map)
-//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_CONFIG_END
 
 

@@ -49,7 +49,6 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "includes/sonson.h"
@@ -252,7 +251,7 @@ static MACHINE_CONFIG_START( sonson, sonson_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* FIRQs are triggered by the main CPU */
 
 	MCFG_MACHINE_START(sonson)
 	MCFG_MACHINE_RESET(sonson)

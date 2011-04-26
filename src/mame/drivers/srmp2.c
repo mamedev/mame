@@ -38,7 +38,7 @@ Known issues :
 ===============
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
- - IOX might be a MCU of some sort.
+   Could also be that's a MCU of some sort.
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.

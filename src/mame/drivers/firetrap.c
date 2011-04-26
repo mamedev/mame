@@ -574,11 +574,11 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 7.8125kHz          */
 };
 
-static INTERRUPT_GEN( firetrap )
+static INTERRUPT_GEN( firetrap_irq )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 	UINT8 coin = 0;
-	UINT8 port = input_port_read(device->machine(), "COIN") & 0x07;
+	UINT8 port = input_port_read(device->machine(), "COIN") & 0x07; /* TODO: remove me */
 
 	/* Check for coin IRQ */
 	if (cpu_getiloops(device))
@@ -611,7 +611,7 @@ static INTERRUPT_GEN( firetrap )
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static INTERRUPT_GEN( bootleg )
+static INTERRUPT_GEN( bootleg_irq )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_map)
-	MCFG_CPU_VBLANK_INT_HACK(firetrap,2)
+	MCFG_CPU_VBLANK_INT_HACK(firetrap_irq,2)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
 	MCFG_CPU_PROGRAM_MAP(firetrap_bootleg_map)
-	MCFG_CPU_VBLANK_INT("screen", bootleg)
+	MCFG_CPU_VBLANK_INT("screen", bootleg_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)	// 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)

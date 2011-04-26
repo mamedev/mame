@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "video/konicdev.h"
 #include "sound/k007232.h"
@@ -370,7 +369,7 @@ static MACHINE_CONFIG_START( bottom9, bottom9_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_VBLANK_INT_HACK(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT(bottom9_sound_interrupt,8*60)	/* irq is triggered by the main CPU */
 
 	MCFG_MACHINE_START(bottom9)
 	MCFG_MACHINE_RESET(bottom9)

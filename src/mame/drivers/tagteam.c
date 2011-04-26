@@ -220,7 +220,7 @@ static MACHINE_CONFIG_START( tagteam, tagteam_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, 975000)  /* 975 kHz ?? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)   /* IRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,16*57)   /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

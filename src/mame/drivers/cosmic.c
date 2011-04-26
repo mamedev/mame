@@ -8,6 +8,8 @@ Magical Spot    - 8013
 Magical Spot II - 8013
 Devil Zone      - 8022
 
+TODO:
+- use CUSTOM_INPUT in place of the fake input ports in INTERRUPT_GEN functions
 
 2008-08
 Dip locations verified with manuals for all the games.
@@ -1060,7 +1062,6 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-
 	MCFG_CPU_PROGRAM_MAP(panic_map)
 	MCFG_CPU_VBLANK_INT_HACK(panic_interrupt,2)
 

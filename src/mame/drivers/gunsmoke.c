@@ -68,7 +68,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/gunsmoke.h"
 
@@ -304,7 +303,7 @@ static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	// 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
 	MCFG_MACHINE_START(gunsmoke)
 	MCFG_MACHINE_RESET(gunsmoke)

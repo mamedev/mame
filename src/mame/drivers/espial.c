@@ -334,7 +334,7 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
 	MCFG_CPU_PROGRAM_MAP(espial_sound_map)
 	MCFG_CPU_IO_MAP(espial_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
+	MCFG_CPU_PERIODIC_INT(espial_sound_nmi_gen,4*60)
 
 	MCFG_MACHINE_RESET(espial)
 	MCFG_MACHINE_START(espial)

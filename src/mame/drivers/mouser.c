@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/mouser.h"
 
@@ -217,7 +216,7 @@ static MACHINE_CONFIG_START( mouser, mouser_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
 	MCFG_CPU_IO_MAP(mouser_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(mouser_sound_nmi_assert, 4) /* ??? This controls the sound tempo */
+	MCFG_CPU_PERIODIC_INT(mouser_sound_nmi_assert, 4*60) /* ??? This controls the sound tempo */
 
 	MCFG_MACHINE_START(mouser)
 	MCFG_MACHINE_RESET(mouser)

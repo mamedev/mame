@@ -53,7 +53,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 1:
-			if (~input_port_read(device->machine(), "IN2") & 0x03)
+			if (~input_port_read(device->machine(), "IN2") & 0x03) //TODO: remove me
 			{
 				if (!state->m_coin)
 				{
@@ -66,7 +66,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 2:
-			if (input_port_read(device->machine(), "IN3"))
+			if (input_port_read(device->machine(), "IN3")) // TODO: remove me
 				device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}

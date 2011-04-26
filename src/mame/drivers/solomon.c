@@ -5,8 +5,8 @@ Solomon's Key
 driver by Mirko Buffoni
 
 ***************************************************************************/
+
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/solomon.h"
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( solomon, solomon_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */

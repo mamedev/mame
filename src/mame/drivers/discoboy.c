@@ -37,7 +37,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 
@@ -472,9 +471,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-//  MCFG_CPU_IO_MAP(sound_io_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,32*60)
 
 	MCFG_MACHINE_START( discoboy )
 	MCFG_MACHINE_RESET( discoboy )

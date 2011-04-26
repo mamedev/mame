@@ -6,6 +6,9 @@ Strength & Skill (c) 1984 Sun Electronics
 
     19/Jun/2001 -
 
+TODO:
+- needs merging with Ikki driver;
+
 Notes:
  Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
  Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.

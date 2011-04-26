@@ -869,7 +869,7 @@ static MACHINE_CONFIG_START( polepos, polepos_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
+	MCFG_CPU_PERIODIC_INT(irq0_line_assert,2*60)	/* 64V */
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)
@@ -955,7 +955,7 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
+	MCFG_CPU_PERIODIC_INT(irq0_line_assert,2*60)	/* 64V */
 
 	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(z8002_map)

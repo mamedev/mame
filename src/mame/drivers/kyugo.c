@@ -23,7 +23,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/kyugo.h"
 
@@ -490,7 +489,7 @@ static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)
 	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

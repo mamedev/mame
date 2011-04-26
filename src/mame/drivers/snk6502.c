@@ -725,7 +725,7 @@ static INTERRUPT_GEN( satansat_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(device->machine(), "IN2");
+		UINT8 val = input_port_read(device->machine(), "IN2"); /* TODO: use CUSTOM_INPUT */
 
 		coin_counter_w(device->machine(), 0, val & 1);
 
@@ -741,7 +741,7 @@ static INTERRUPT_GEN( snk6502_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(device->machine(), "IN2");
+		UINT8 val = input_port_read(device->machine(), "IN2"); /* TODO: use CUSTOM_INPUT */
 
 		coin_counter_w(device->machine(), 0, val & 1);
 		coin_counter_w(device->machine(), 1, val & 2);

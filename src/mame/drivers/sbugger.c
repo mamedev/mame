@@ -99,7 +99,6 @@ Sound PCB
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "includes/sbugger.h"
 
@@ -217,7 +216,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sbugger_map)
 	MCFG_CPU_IO_MAP(sbugger_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq3_line_hold,NUM_INTS_FRAME)
+	MCFG_CPU_PERIODIC_INT(irq3_line_hold,NUM_INTS_FRAME*60)
 
 	MCFG_GFXDECODE(sbugger)
 

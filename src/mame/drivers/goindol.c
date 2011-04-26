@@ -19,7 +19,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/goindol.h"
 
@@ -252,7 +251,7 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)	/* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MCFG_MACHINE_START(goindol)
 	MCFG_MACHINE_RESET(goindol)

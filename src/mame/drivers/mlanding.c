@@ -13,7 +13,7 @@ TODO:
 - Comms between the five CPUs;
 - Gameplay looks stiff;
 - Needs a custom artwork for the cloche status;
-- Current dump is weird, a mix between German, English, and Japanese?
+- Current dump is weird, a mix between German, English and Japanese?
 - clean-ups!
 
 ************************************************************************************************************/
@@ -22,7 +22,6 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
@@ -752,12 +751,12 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_PROGRAM_MAP(mlanding_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )		/* 4 MHz ??? (guess) */
-	MCFG_CPU_PROGRAM_MAP(mlanding_z80_mem)
-
 	MCFG_CPU_ADD("sub", M68000, 12000000 )		/* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_sub_mem)
-	MCFG_CPU_VBLANK_INT_HACK(irq6_line_hold,7)
+	MCFG_CPU_PERIODIC_INT(irq6_line_hold,7*60) /* ??? */
+
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )		/* 4 MHz ??? (guess) */
+	MCFG_CPU_PROGRAM_MAP(mlanding_z80_mem)
 
 	MCFG_CPU_ADD("z80sub", Z80, 4000000 )		/* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)

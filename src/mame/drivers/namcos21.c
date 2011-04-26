@@ -291,7 +291,6 @@ CPU68 PCB:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
-#include "deprecat.h"
 #include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
@@ -1535,7 +1534,7 @@ static MACHINE_CONFIG_START( s21base, namcos21_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
@@ -1612,7 +1611,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
@@ -1667,7 +1666,7 @@ static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 	MCFG_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */

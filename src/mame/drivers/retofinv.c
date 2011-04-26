@@ -30,7 +30,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/sn76496.h"
 #include "includes/retofinv.h"
@@ -350,7 +349,7 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,2*60)
 
 	MCFG_CPU_ADD("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)

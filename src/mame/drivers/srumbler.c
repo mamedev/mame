@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(srumbler_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MCFG_MACHINE_RESET(srumbler)
 

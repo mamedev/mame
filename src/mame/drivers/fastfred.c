@@ -3,11 +3,13 @@
   Fast Freddie/Jump Coaster hardware
   driver by Zsolt Vasvari
 
+  TODO:
+  - remove protection hack
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "includes/fastfred.h"
 #include "sound/ay8910.h"
 
@@ -626,7 +628,7 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

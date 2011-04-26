@@ -83,7 +83,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/popper.h"
 
@@ -334,7 +333,7 @@ static MACHINE_CONFIG_START( popper, popper_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,18432000/12)
 	MCFG_CPU_PROGRAM_MAP(popper_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)		//NMIs caused by the main CPU
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800))
 

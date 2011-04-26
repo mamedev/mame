@@ -104,7 +104,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "includes/atarifb.h"
 #include "sound/discrete.h"
 
@@ -558,7 +557,7 @@ static MACHINE_CONFIG_START( atarifb, atarifb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)
 	MCFG_CPU_PROGRAM_MAP(atarifb_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MCFG_MACHINE_START(atarifb)
 	MCFG_MACHINE_RESET(atarifb)

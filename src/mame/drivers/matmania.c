@@ -30,7 +30,6 @@ The driver has been updated accordingly.
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
@@ -317,7 +316,7 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,15*60)	/* ???? */
 								/* IRQs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 

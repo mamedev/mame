@@ -47,7 +47,6 @@
 
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/blueprnt.h"
@@ -306,7 +305,7 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)	// IRQs connected to 32V
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)	// IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 	MCFG_MACHINE_START(blueprnt)

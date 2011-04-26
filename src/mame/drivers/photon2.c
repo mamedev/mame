@@ -310,7 +310,6 @@ static MACHINE_CONFIG_START( photon2, photon2_state )
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
 	MCFG_CPU_IO_MAP(spectrum_io)
 	MCFG_CPU_VBLANK_INT_HACK(spec_interrupt_hack, 2)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_RESET( photon2 )
 

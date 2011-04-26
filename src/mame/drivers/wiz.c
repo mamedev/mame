@@ -159,7 +159,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "includes/wiz.h"
@@ -690,7 +689,7 @@ static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)	/* ??? */
 
 	MCFG_MACHINE_RESET( wiz )
 

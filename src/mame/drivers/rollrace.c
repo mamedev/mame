@@ -8,7 +8,6 @@ Issues:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/rollrace.h"
@@ -52,7 +51,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w) /* TODO: check me ... */
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
@@ -205,7 +204,7 @@ static MACHINE_CONFIG_START( rollrace, rollrace_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,4*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

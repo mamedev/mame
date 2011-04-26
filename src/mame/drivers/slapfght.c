@@ -798,7 +798,7 @@ static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 6000000)
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,6*60)    /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,6*60)    /* ??? */
 
 	MCFG_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)

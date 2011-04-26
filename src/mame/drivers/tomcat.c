@@ -23,7 +23,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/m6502/m6502.h"
@@ -337,15 +336,6 @@ static INPUT_PORTS_START( tomcat )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
-ROM_START( tomcat )
-	ROM_REGION( 0x10000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "rom1k.bin", 0x00001, 0x8000, CRC(5535a1ff) SHA1(b9807c749a8e6b5ddec3ff494130abda09f0baab) )
-	ROM_LOAD16_BYTE( "rom2k.bin", 0x00000, 0x8000, CRC(021a01d2) SHA1(01d99aab54ad57a664e8aaa91296bb879fc6e422) )
-
-	ROM_REGION( 0x100, "user1", 0 )
-	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
-ROM_END
-
 static MACHINE_START(tomcat)
 {
 	tomcat_state *state = machine.driver_data<tomcat_state>();
@@ -388,7 +378,7 @@ static const riot6532_interface tomcat_riot6532_intf =
 static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)
+	MCFG_CPU_PERIODIC_INT(irq1_line_assert, 5*60)
 	//MCFG_CPU_PERIODIC_INT(irq1_line_assert, (double)XTAL_12MHz / 16 / 16 / 16 / 12)
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
@@ -433,5 +423,14 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
+
+ROM_START( tomcat )
+	ROM_REGION( 0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "rom1k.bin", 0x00001, 0x8000, CRC(5535a1ff) SHA1(b9807c749a8e6b5ddec3ff494130abda09f0baab) )
+	ROM_LOAD16_BYTE( "rom2k.bin", 0x00000, 0x8000, CRC(021a01d2) SHA1(01d99aab54ad57a664e8aaa91296bb879fc6e422) )
+
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
+ROM_END
 
 GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", GAME_SUPPORTS_SAVE )

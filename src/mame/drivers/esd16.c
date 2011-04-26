@@ -44,7 +44,6 @@ Head Panic
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
@@ -547,7 +546,7 @@ static MACHINE_CONFIG_START( multchmp, esd16_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,32*60)	/* IRQ By Main CPU */
 
 	MCFG_MACHINE_START(esd16)
 	MCFG_MACHINE_RESET(esd16)

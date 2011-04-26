@@ -6,7 +6,6 @@ Atari Drag Race Driver
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "deprecat.h"
 #include "includes/dragrace.h"
 #include "sound/discrete.h"
 
@@ -338,7 +337,7 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 12096000 / 12)
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
 
 	MCFG_MACHINE_START(dragrace)

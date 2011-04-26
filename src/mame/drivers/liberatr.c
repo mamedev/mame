@@ -136,7 +136,6 @@
 #define ADDRESS_MAP_MODERN
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/liberatr.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
@@ -391,7 +390,7 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MCFG_CPU_PROGRAM_MAP(liberatr_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
 

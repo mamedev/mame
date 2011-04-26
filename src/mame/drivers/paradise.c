@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( paradise, paradise_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* No nmi routine */
 
 	MCFG_MACHINE_START(paradise)
 	MCFG_MACHINE_RESET(paradise)

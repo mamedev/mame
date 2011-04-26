@@ -857,7 +857,7 @@ static MACHINE_CONFIG_DERIVED( tripool, jack )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60) /* tripool needs 2 or the palette is broken */
 MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( joinem_interrupts )
@@ -866,7 +866,7 @@ static INTERRUPT_GEN( joinem_interrupts )
 		device_set_input_line(device, 0, HOLD_LINE);
 	else
 	{
-		if (!(input_port_read(device->machine(), "IN2") & 0x80))
+		if (!(input_port_read(device->machine(), "IN2") & 0x80)) /* TODO: remove me */
 			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }

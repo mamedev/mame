@@ -10,7 +10,6 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 
 
 #define NUM_PENS	(8)
@@ -244,7 +243,7 @@ static MACHINE_CONFIG_START( dorachan, dorachan_state )
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(dorachan_map)
 	MCFG_CPU_IO_MAP(dorachan_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
 	MCFG_MACHINE_START(dorachan)
 	MCFG_MACHINE_RESET(dorachan)

@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 
@@ -502,7 +501,7 @@ static MACHINE_CONFIG_START( mjsister, mjsister_state )
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(mjsister_map)
 	MCFG_CPU_IO_MAP(mjsister_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,2*60)
 
 	MCFG_MACHINE_START(mjsister)
 	MCFG_MACHINE_RESET(mjsister)

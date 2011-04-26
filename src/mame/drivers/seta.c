@@ -7166,7 +7166,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 
 	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
 
 	MCFG_MACHINE_RESET(calibr50)

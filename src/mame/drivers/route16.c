@@ -676,7 +676,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,48)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,48*60)
 MACHINE_CONFIG_END
 
 

@@ -350,7 +350,7 @@ static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(meijinsn_sound_map)
 	MCFG_CPU_IO_MAP(meijinsn_sound_io_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 160)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 160*60)
 
 	MCFG_MACHINE_START(meijinsn)
 	MCFG_MACHINE_RESET(meijinsn)

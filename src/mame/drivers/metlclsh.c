@@ -269,7 +269,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 	if (cpu_getiloops(device) == 0)
 		return;
 	/* generate NMI on coin insertion */
-	if ((~input_port_read(device->machine(), "IN2") & 0xc0) || (~input_port_read(device->machine(), "DSW") & 0x40))
+	if ((~input_port_read(device->machine(), "IN2") & 0xc0) || (~input_port_read(device->machine(), "DSW") & 0x40)) /* TODO: remove me */
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
