@@ -545,7 +545,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "includes/norautp.h"
 
@@ -817,9 +817,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
-	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
+//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
@@ -1201,25 +1201,25 @@ GFXDECODE_END
 *      PPI 8255 (x3) Interface      *
 ************************************/
 
-static I8255A_INTERFACE (ppi8255_intf_0)
+static I8255_INTERFACE (ppi8255_intf_0)
 {
 	/* (60-63) Mode 0 - Port A set as input */
 	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B read */
 	DEVCB_HANDLER(mainlamps_w),		/* Port B write */
+	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(counterlamps_w)	/* Port C write */
 };
 
-static I8255A_INTERFACE (ppi8255_intf_1)
+static I8255_INTERFACE (ppi8255_intf_1)
 {
 	/* (a0-a3) Mode 0 - Ports A & B set as input */
 	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-	DEVCB_NULL,						/* Port C read */
 	DEVCB_NULL,						/* Port A write */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(soundlamps_w)		/* Port C write */
 };
 
@@ -1228,10 +1228,10 @@ static I8255A_INTERFACE (ppi8255_intf_1)
     /* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
                Group B Mode 0, output;  (see below for lines PC0-PC2) */
 //  DEVCB_HANDLER(vram_data_r),     /* Port A read (VRAM data read)*/
-//  DEVCB_NULL,                     /* Port B read */
-//  DEVCB_HANDLER(ppi2_portc_r),    /* Port C read */
 //  DEVCB_HANDLER(vram_data_w),     /* Port A write (VRAM data write) */
+//  DEVCB_NULL,                     /* Port B read */
 //  DEVCB_HANDLER(vram_addr_w),     /* Port B write (VRAM address write) */
+//  DEVCB_HANDLER(ppi2_portc_r),    /* Port C read */
 //  DEVCB_HANDLER(ppi2_portc_w)     /* Port C write */
 
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
@@ -1255,9 +1255,9 @@ static MACHINE_CONFIG_START( noraut_base, norautp_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")	/* doesn't work if placed at derivative drivers */
 
 	/* 3x 8255 */
-	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-//  MCFG_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+//  MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

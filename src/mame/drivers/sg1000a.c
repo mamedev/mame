@@ -115,7 +115,7 @@ CN4               CN5
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt.h"
 
 
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /*************************************
@@ -257,13 +257,13 @@ static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 	coin_counter_w(device->machine(), 0, data & 0x01);
 }
 
-static I8255A_INTERFACE( ppi8255_intf )
+static I8255_INTERFACE( ppi8255_intf )
 {
 	DEVCB_INPUT_PORT("P1"),
+	DEVCB_NULL,
 	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
 	DEVCB_INPUT_PORT("DSW"),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_HANDLER(sg1000a_coin_counter_w)
 };
 
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT("screen", sg1000a_interrupt)
 
-	MCFG_I8255A_ADD( "ppi8255", ppi8255_intf )
+	MCFG_I8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(tms9928a)

@@ -23,7 +23,7 @@ NOTE! switches 1, 3 & 5 must be ON or the game will not boot.
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
-#include "machine/i8255a.h"
+#include "machine/i8255.h"
 
 
 class pengadvb_state : public driver_device
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
 	AM_RANGE(0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255a_r, i8255a_w)
+	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pengadvb )
@@ -219,7 +219,9 @@ static WRITE8_DEVICE_HANDLER ( pengadvb_ppi_port_a_w )
 
 static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 {
-	if ((i8255a_r(device, 2) & 0x0f) == 0)
+	i8255_device *ppi = device->machine().device<i8255_device>("ppi8255");
+	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
+	if ((ppi->read(*space, 2) & 0x0f) == 0)
 		return input_port_read(device->machine(), "IN1");
 
 	return 0xff;
@@ -228,9 +230,9 @@ static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 {
 	DEVCB_NULL,
+	DEVCB_HANDLER(pengadvb_ppi_port_a_w),
 	DEVCB_HANDLER(pengadvb_ppi_port_b_r),
 	DEVCB_NULL,
-	DEVCB_HANDLER(pengadvb_ppi_port_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -291,7 +293,7 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_MACHINE_START( pengadvb )
 	MCFG_MACHINE_RESET( pengadvb )
 
-    MCFG_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
+    MCFG_I8255_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(tms9928a)
