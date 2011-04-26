@@ -837,7 +837,7 @@ INLINE UINT8 POP8(i386_state *cpustate)
 		value = READ8(cpustate, ea );
 	} else {
 		REG16(SP) += 1;
-		ea = i386_translate(cpustate, SS, REG16(SP) - 1);
+		ea = i386_translate(cpustate, SS, (REG16(SP) - 1) & 0xffff);
 		value = READ8(cpustate, ea );
 	}
 	return value;
@@ -852,7 +852,7 @@ INLINE UINT16 POP16(i386_state *cpustate)
 		value = READ16(cpustate, ea );
 	} else {
 		REG16(SP) += 2;
-		ea = i386_translate(cpustate, SS, REG16(SP) - 2);
+		ea = i386_translate(cpustate, SS, (REG16(SP) - 2) & 0xffff);
 		value = READ16(cpustate, ea );
 	}
 	return value;
@@ -867,7 +867,7 @@ INLINE UINT32 POP32(i386_state *cpustate)
 		value = READ32(cpustate, ea );
 	} else {
 		REG16(SP) += 4;
-		ea = i386_translate(cpustate, SS, REG16(SP) - 4);
+		ea = i386_translate(cpustate, SS, (REG16(SP) - 4) & 0xffff);
 		value = READ32(cpustate, ea );
 	}
 	return value;
