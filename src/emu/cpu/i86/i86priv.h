@@ -118,7 +118,7 @@ typedef enum {
 #define FETCHWORD(var)			{ var = cpustate->direct->read_raw_byte(cpustate->pc, cpustate->fetch_xor); var += (cpustate->direct->read_raw_byte(cpustate->pc + 1, cpustate->fetch_xor) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)
 #define PUSH(val)				{ cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
-#define POP(var)				{ var = ReadWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK)); cpustate->regs.w[SP] += 2; }
+#define POP(var)				{ cpustate->regs.w[SP] += 2; var = ReadWord(((cpustate->base[SS] + (cpustate->regs.w[SP]-2)) & AMASK)); }
 
 /************************************************************************/
 

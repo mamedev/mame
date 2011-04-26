@@ -832,13 +832,13 @@ INLINE UINT8 POP8(i386_state *cpustate)
 	UINT8 value;
 	UINT32 ea;
 	if( STACK_32BIT ) {
-		ea = i386_translate(cpustate, SS, REG32(ESP) );
-		value = READ8(cpustate, ea );
 		REG32(ESP) += 1;
-	} else {
-		ea = i386_translate(cpustate, SS, REG16(SP) );
+		ea = i386_translate(cpustate, SS, REG32(ESP) - 1);
 		value = READ8(cpustate, ea );
+	} else {
 		REG16(SP) += 1;
+		ea = i386_translate(cpustate, SS, REG16(SP) - 1);
+		value = READ8(cpustate, ea );
 	}
 	return value;
 }
@@ -847,13 +847,13 @@ INLINE UINT16 POP16(i386_state *cpustate)
 	UINT16 value;
 	UINT32 ea;
 	if( STACK_32BIT ) {
-		ea = i386_translate(cpustate, SS, REG32(ESP) );
-		value = READ16(cpustate, ea );
 		REG32(ESP) += 2;
-	} else {
-		ea = i386_translate(cpustate, SS, REG16(SP) );
+		ea = i386_translate(cpustate, SS, REG32(ESP) - 2);
 		value = READ16(cpustate, ea );
+	} else {
 		REG16(SP) += 2;
+		ea = i386_translate(cpustate, SS, REG16(SP) - 2);
+		value = READ16(cpustate, ea );
 	}
 	return value;
 }
@@ -862,13 +862,13 @@ INLINE UINT32 POP32(i386_state *cpustate)
 	UINT32 value;
 	UINT32 ea;
 	if( STACK_32BIT ) {
-		ea = i386_translate(cpustate, SS, REG32(ESP) );
-		value = READ32(cpustate, ea );
 		REG32(ESP) += 4;
-	} else {
-		ea = i386_translate(cpustate, SS, REG16(SP) );
+		ea = i386_translate(cpustate, SS, REG32(ESP) - 4);
 		value = READ32(cpustate, ea );
+	} else {
 		REG16(SP) += 4;
+		ea = i386_translate(cpustate, SS, REG16(SP) - 4);
+		value = READ32(cpustate, ea );
 	}
 	return value;
 }
