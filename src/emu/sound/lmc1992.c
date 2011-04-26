@@ -195,7 +195,7 @@ void lmc1992_device::device_start()
 	// register for state saving
 	save_item(NAME(m_enable));
 	save_item(NAME(m_data));
-	save_item(NAME(m_clock));
+	save_item(NAME(m_clk));
 	save_item(NAME(m_si));
 	save_item(NAME(m_input));
 	save_item(NAME(m_bass));
@@ -224,7 +224,7 @@ void lmc1992_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 WRITE_LINE_MEMBER( lmc1992_device::clock_w )
 {
-	if ((m_enable == 0) && ((m_clock == 0) && (state == 1)))
+	if ((m_enable == 0) && ((m_clk == 0) && (state == 1)))
 	{
 		m_si >>= 1;
 		m_si = m_si & 0x7fff;
@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER( lmc1992_device::clock_w )
 		}
 	}
 
-	m_clock = state;
+	m_clk = state;
 }
 
 

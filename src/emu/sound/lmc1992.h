@@ -114,7 +114,7 @@ private:
 	
 	int m_enable;					// enable latch
 	int m_data;						// data latch
-	int m_clock;					// clock latch
+	int m_clk;						// clock latch
 	UINT16 m_si;					// serial in shift register
 
 	int m_input;					// input select
