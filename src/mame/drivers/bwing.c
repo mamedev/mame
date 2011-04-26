@@ -3,10 +3,7 @@
 B-Wings  (c) 1984 Data East Corporation
 Zaviga   (c) 1984 Data East Corporation
 
-drivers by Acho A. Tang
-
-
-JUL-2003
+driver by Acho A. Tang
 
 Known issues:
 
@@ -19,11 +16,14 @@ Known issues:
 
 - Zaviga's DIPs are incomplete. (manual missing)
 
+- Main to Sound communications are kludgy at best;
+
+- Ditto for the "RGB dip-switch" ...
+
 *****************************************************************************/
 // Directives
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
@@ -39,36 +39,14 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 	bwing_state *state = device->machine().driver_data<bwing_state>();
 	UINT8 latch_data;
 
-	switch (cpu_getiloops(device))
+	/* TODO: Ok, let me guess ... main CPU sends a FIFO byte packet to the sound CPU at every vblank??? */
+	if (state->m_ffcount)
 	{
-		case 0:
-			if (state->m_ffcount)
-			{
-				state->m_ffcount--;
-				latch_data = state->m_sound_fifo[state->m_fftail];
-				state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
-				soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
-				device_set_input_line(state->m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
-			}
-		break;
-
-		case 1:
-			if (~input_port_read(device->machine(), "IN2") & 0x03) //TODO: remove me
-			{
-				if (!state->m_coin)
-				{
-					state->m_coin = 1;
-					device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-				}
-			}
-			else
-				state->m_coin = 0;
-		break;
-
-		case 2:
-			if (input_port_read(device->machine(), "IN3")) // TODO: remove me
-				device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
-		break;
+		state->m_ffcount--;
+		latch_data = state->m_sound_fifo[state->m_fftail];
+		state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
+		soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
+		device_set_input_line(state->m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 	}
 }
 
@@ -240,6 +218,16 @@ ADDRESS_MAP_END
 //****************************************************************************
 // I/O Port Maps
 
+static INPUT_CHANGED( coin_inserted )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static INPUT_CHANGED( tilt_pressed )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", M6809_FIRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( bwing )
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
@@ -311,8 +299,8 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -321,7 +309,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED(tilt_pressed,0)
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -419,7 +407,7 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp1_map)
-	MCFG_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
+	MCFG_CPU_VBLANK_INT("screen", bwp1_interrupt)
 
 	MCFG_CPU_ADD("sub", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp2_map)
@@ -629,10 +617,10 @@ static void fix_bwp3( running_machine &machine )
 	bwing_state *state = machine.driver_data<bwing_state>();
 	UINT8 *rom = state->m_bwp3_rombase;
 	int i, j = state->m_bwp3_romsize;
-	UINT8 ah, al;
 
 	// swap nibbles
-	for (i = 0; i < j; i++) { ah = al = rom[i]; rom[i] = (ah >> 4) | (al << 4); }
+	for (i = 0; i < j; i++)
+		rom[i] = ((rom[i] & 0xf0) >> 4) | ((rom[i] & 0xf) << 4);
 
 	// relocate vectors
 	rom[j - (0x10 - 0x4)] = rom[j - (0x10 - 0xb)] = rom[j - (0x10 - 0x6)];

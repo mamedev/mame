@@ -46,7 +46,6 @@ public:
 
 	/* misc */
 	UINT8 *m_bwp123_membase[3];
-	int m_coin;
 
 	/* device */
 	device_t *m_maincpu;
