@@ -9,7 +9,6 @@ driver by Nicola Salmoria
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "includes/dogfgt.h"
 #include "sound/ay8910.h"
 

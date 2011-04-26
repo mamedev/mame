@@ -2013,7 +2013,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,3*60) /* fixes slow down problems */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
