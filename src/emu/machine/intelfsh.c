@@ -47,6 +47,7 @@ enum
 // 8-bit variants
 DEFINE_TRIVIAL_DERIVED_DEVICE(intel_28f016s5_device_config, intelfsh8_device_config, intel_28f016s5_device, intelfsh8_device, "Sharp LH28F400 Flash", intelfsh_device_config::FLASH_SHARP_LH28F400)
 DEFINE_TRIVIAL_DERIVED_DEVICE(fujitsu_29f016a_device_config, intelfsh8_device_config, fujitsu_29f016a_device, intelfsh8_device, "Fujitsu 29F016A Flash", intelfsh_device_config::FLASH_FUJITSU_29F016A)
+DEFINE_TRIVIAL_DERIVED_DEVICE(fujitsu_29dl16x_device_config, intelfsh8_device_config, fujitsu_29dl16x_device, intelfsh8_device, "Fujitsu 29DL16X Flash", intelfsh_device_config::FLASH_FUJITSU_29DL16X)
 DEFINE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f016s_device_config, intelfsh8_device_config, sharp_lh28f016s_device, intelfsh8_device, "Sharp LH28F016S Flash", intelfsh_device_config::FLASH_SHARP_LH28F016S)
 DEFINE_TRIVIAL_DERIVED_DEVICE(intel_e28f008sa_device_config, intelfsh8_device_config, intel_e28f008sa_device, intelfsh8_device, "Intel E28F008SA Flash", intelfsh_device_config::FLASH_INTEL_E28F008SA)
 DEFINE_TRIVIAL_DERIVED_DEVICE(macronix_29l001mc_device_config, intelfsh8_device_config, macronix_29l001mc_device, intelfsh8_device, "Macronix 29L001MC Flash", intelfsh_device_config::FLASH_MACRONIX_29L001MC)
@@ -56,6 +57,7 @@ DEFINE_TRIVIAL_DERIVED_DEVICE(sanyo_le26fv10n1ts_device_config, intelfsh8_device
 const device_type INTEL_28F016S5 = intel_28f016s5_device_config::static_alloc_device_config;
 const device_type SHARP_LH28F016S = sharp_lh28f016s_device_config::static_alloc_device_config;
 const device_type FUJITSU_29F016A = fujitsu_29f016a_device_config::static_alloc_device_config;
+const device_type FUJITSU_29DL16X = fujitsu_29dl16x_device_config::static_alloc_device_config;
 const device_type INTEL_E28F008SA = intel_e28f008sa_device_config::static_alloc_device_config;
 const device_type MACRONIX_29L001MC = macronix_29l001mc_device_config::static_alloc_device_config;
 const device_type PANASONIC_MN63F805MNP = panasonic_mn63f805mnp_device_config::static_alloc_device_config;
@@ -154,6 +156,13 @@ intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, de
 		m_size = 0x200000;
 		m_maker_id = 0x04;
 		m_device_id = 0xad;
+		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
+		break;
+	case FLASH_FUJITSU_29DL16X:
+		m_bits = 8;
+		m_size = 0x200000;
+		m_maker_id = 0x04;
+		m_device_id = 0x35;
 		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
 		break;
 	case FLASH_INTEL_E28F008SA:
@@ -389,11 +398,24 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		data = m_status;
 		break;
 	case FM_READAMDID3:
-		switch (address)
+		if (m_config.m_maker_id == 0x04 && m_config.m_device_id == 0x35)
 		{
-			case 0:	data = m_config.m_maker_id; break;
-			case 1: data = m_config.m_device_id; break;
-			case 2: data = 0; break;
+			//used in Fujitsu 29DL16X 8bits mode
+			switch (address)
+			{
+				case 0:	data = m_config.m_maker_id; break;
+				case 2: data = m_config.m_device_id; break;
+				case 4: data = 0; break;
+			}
+		}
+		else
+		{
+			switch (address)
+			{
+				case 0:	data = m_config.m_maker_id; break;
+				case 1: data = m_config.m_device_id; break;
+				case 2: data = 0; break;
+			}
 		}
 		break;
 	case FM_READID:
@@ -500,6 +522,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			{
 				m_flash_mode = FM_READAMDID1;
 			}
+			else if( ( address & 0xfff ) == 0xaaa )
+			{
+				m_flash_mode = FM_READAMDID1;
+			}
 			break;
 		default:
 			logerror( "Unknown flash mode byte %x\n", data & 0xff );
@@ -512,6 +538,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			m_flash_mode = FM_READAMDID2;
 		}
 		else if( ( address & 0xffff ) == 0x2aaa && ( data & 0xff ) == 0x55 )
+		{
+			m_flash_mode = FM_READAMDID2;
+		}
+		else if( ( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x55 )
 		{
 			m_flash_mode = FM_READAMDID2;
 		}
@@ -530,11 +560,19 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_READAMDID3;
 		}
+		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x90 )
+		{
+			m_flash_mode = FM_READAMDID3;
+		}
 		else if( ( address & 0xffff ) == 0x555 && ( data & 0xff ) == 0x80 )
 		{
 			m_flash_mode = FM_ERASEAMD1;
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0x80 )
+		{
+			m_flash_mode = FM_ERASEAMD1;
+		}
+		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x80 )
 		{
 			m_flash_mode = FM_ERASEAMD1;
 		}
@@ -546,11 +584,19 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_BYTEPROGRAM;
 		}
+		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0xa0 )
+		{
+			m_flash_mode = FM_BYTEPROGRAM;
+		}
 		else if( ( address & 0xffff ) == 0x555 && ( data & 0xff ) == 0xf0 )
 		{
 			m_flash_mode = FM_NORMAL;
 		}
 		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xf0 )
+		{
+			m_flash_mode = FM_NORMAL;
+		}
+		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0xf0 )
 		{
 			m_flash_mode = FM_NORMAL;
 		}
@@ -569,6 +615,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_ERASEAMD2;
 		}
+		else if( ( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0xaa )
+		{
+			m_flash_mode = FM_ERASEAMD2;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD1\n", address, data & 0xff );
@@ -583,13 +633,18 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			m_flash_mode = FM_ERASEAMD3;
 		}
+		else if( ( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x55 )
+		{
+			m_flash_mode = FM_ERASEAMD3;
+		}
 		else
 		{
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD2\n", address, data & 0xff );
 		}
 		break;
 	case FM_ERASEAMD3:
-		if( ( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x10 )
+		if( (( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x10 ) ||
+		    (( address & 0xfff ) == 0xaaa && ( data & 0xff ) == 0x10 ) )
 		{
 			// chip erase
 			for (offs_t offs = 0; offs < m_config.m_size; offs++)

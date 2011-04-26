@@ -19,6 +19,9 @@
 #define MCFG_FUJITSU_29F016A_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, FUJITSU_29F016A, 0)
 
+#define MCFG_FUJITSU_29DL16X_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FUJITSU_29DL16X, 0)
+
 #define MCFG_INTEL_E28F400_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTEL_E28F400, 0)
 
@@ -67,6 +70,7 @@ protected:
 		// 8-bit variants
 		FLASH_INTEL_28F016S5 = 0x0800,
 		FLASH_FUJITSU_29F016A,
+		FLASH_FUJITSU_29DL16X,
 		FLASH_SHARP_LH28F016S,
 		FLASH_INTEL_E28F008SA,
 		FLASH_MACRONIX_29L001MC,
@@ -154,6 +158,7 @@ class intelfsh8_device : public intelfsh_device
 	friend class intelfsh8_device_config;
 	friend class intel_28f016s5_device_config;
 	friend class fujitsu_29f016a_device_config;
+	friend class fujitsu_29dl16x_device_config;
 	friend class sharp_lh28f016s_device_config;
 	friend class intel_e28f008sa_device_config;
 	friend class macronix_29l001mc_device_config;
@@ -215,6 +220,7 @@ public:
 // 8-bit variants
 DECLARE_TRIVIAL_DERIVED_DEVICE(intel_28f016s5_device_config, intelfsh8_device_config, intel_28f016s5_device, intelfsh8_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(fujitsu_29f016a_device_config, intelfsh8_device_config, fujitsu_29f016a_device, intelfsh8_device)
+DECLARE_TRIVIAL_DERIVED_DEVICE(fujitsu_29dl16x_device_config, intelfsh8_device_config, fujitsu_29dl16x_device, intelfsh8_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f016s_device_config, intelfsh8_device_config, sharp_lh28f016s_device, intelfsh8_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(intel_e28f008sa_device_config, intelfsh8_device_config, intel_e28f008sa_device, intelfsh8_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(macronix_29l001mc_device_config, intelfsh8_device_config, macronix_29l001mc_device, intelfsh8_device)
@@ -234,6 +240,7 @@ DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_unk128mbit_device_config, intelfsh16_device
 extern const device_type INTEL_28F016S5;
 extern const device_type SHARP_LH28F016S;
 extern const device_type FUJITSU_29F016A;
+extern const device_type FUJITSU_29DL16X;
 extern const device_type INTEL_E28F400;
 extern const device_type MACRONIX_29L001MC;
 extern const device_type PANASONIC_MN63F805MNP;
