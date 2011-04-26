@@ -185,7 +185,6 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/mb14241.h"
 #include "sound/speaker.h"
-#include "deprecat.h"
 #include "includes/8080bw.h"
 
 #include "invrvnge.lh"
@@ -1210,7 +1209,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
 	MCFG_MACHINE_START(mw8080bw)
 
 	/* add shifter */
