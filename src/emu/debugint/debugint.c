@@ -921,7 +921,7 @@ void debugint_init(running_machine &machine)
 	debug_font_width++;
 	/* FIXME: above does not really work */
 	debug_font_width = 10;
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, debugint_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugint_exit), &machine));
 }
 
 #if 0

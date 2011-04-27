@@ -2715,7 +2715,7 @@ VIDEO_START(model2)
 	state->m_sys24_bitmap = auto_alloc(machine, bitmap_t(width, height+4, BITMAP_FORMAT_INDEXED16));
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, model2_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model2_exit), &machine));
 
 	/* initialize the hardware rasterizer */
 	model2_3d_init( machine, (UINT16*)machine.region("user3")->base() );

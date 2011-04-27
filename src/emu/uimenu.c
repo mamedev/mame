@@ -413,7 +413,7 @@ void ui_menu_init(running_machine &machine)
 	arrow_texture = machine.render().texture_alloc(menu_render_triangle);
 
 	/* add an exit callback to free memory */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, ui_menu_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_menu_exit), &machine));
 }
 
 

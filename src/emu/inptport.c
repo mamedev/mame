@@ -984,8 +984,8 @@ time_t input_port_init(running_machine &machine, const input_port_token *tokens,
 	//portdata = machine.input_port_data;
 
 	/* add an exit callback and a frame callback */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, input_port_exit);
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, frame_update_callback);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(input_port_exit), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(frame_update_callback), &machine));
 
 	/* initialize the default port info from the OSD */
 	init_port_types(machine);
@@ -1010,7 +1010,7 @@ time_t input_port_init(running_machine &machine, const input_port_token *tokens,
 
 	init_port_state(machine);
 	/* register callbacks for when we load configurations */
-	config_register(machine, "input", load_config_callback, save_config_callback);
+	config_register(machine, "input", config_saveload_delegate(FUNC(load_config_callback), &machine), config_saveload_delegate(FUNC(save_config_callback), &machine));
 
 	/* open playback and record files if specified */
 	basetime = playback_init(machine);
@@ -5051,7 +5051,7 @@ static void setup_keybuffer(running_machine &machine)
 	input_port_private *portdata = machine.input_port_data;
 	portdata->inputx_timer = machine.scheduler().timer_alloc(FUNC(inputx_timerproc));
 	portdata->keybuffer = auto_alloc_clear(machine, key_buffer);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, clear_keybuffer);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(clear_keybuffer), &machine));
 }
 
 

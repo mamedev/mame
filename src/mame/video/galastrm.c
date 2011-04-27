@@ -37,7 +37,7 @@ VIDEO_START( galastrm )
 	state->m_polybitmap = machine.primary_screen->alloc_compatible_bitmap();
 
 	state->m_poly = poly_alloc(machine, 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, galastrm_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_exit), &machine));
 }
 
 /************************************************************

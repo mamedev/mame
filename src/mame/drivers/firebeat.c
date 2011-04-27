@@ -936,7 +936,7 @@ static void atapi_init(running_machine &machine)
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->m_atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &state->m_atapi_device_data[1], "scsi1" );
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
 }
 
 static void atapi_reset(running_machine &machine)

@@ -278,7 +278,7 @@ void image_postdevice_init(running_machine &machine)
 	}
 
 	/* add a callback for when we shut down */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, image_unload_all);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_unload_all), &machine));
 }
 /***************************************************************************
     INITIALIZATION
@@ -291,7 +291,7 @@ void image_postdevice_init(running_machine &machine)
 void image_init(running_machine &machine)
 {
 	image_device_init(machine);
-	config_register(machine, "image_directories", image_dirs_load, image_dirs_save);
+	config_register(machine, "image_directories", config_saveload_delegate(FUNC(image_dirs_load), &machine), config_saveload_delegate(FUNC(image_dirs_save), &machine));
 }
 
 

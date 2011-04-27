@@ -109,7 +109,7 @@ void ui_gfx_init(running_machine &machine)
 	int gfx;
 
 	/* make sure we clean up after ourselves */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, ui_gfx_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_gfx_exit), &machine));
 
 	/* initialize our global state */
 	memset(state, 0, sizeof(*state));

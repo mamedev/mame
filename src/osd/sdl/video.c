@@ -110,7 +110,7 @@ int sdlvideo_init(running_machine &machine)
 	extract_video_config(machine);
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, video_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_exit), &machine));
 
 	// set up monitors first
 	init_monitors();

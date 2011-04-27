@@ -149,7 +149,7 @@ private:
 	void emit_smart_call_r64(x86code *&dst, x86code *target, UINT8 reg);
 	void emit_smart_call_m64(x86code *&dst, x86code **target);
 
-	static void fixup_label(void *parameter, drccodeptr labelcodeptr);
+	void fixup_label(void *parameter, drccodeptr labelcodeptr);
 	void fixup_exception(drccodeptr *codeptr, void *param1, void *param2);
 
 	static void debug_log_hashjmp(offs_t pc, int mode);
@@ -332,6 +332,9 @@ private:
 	x86_entry_point_func	m_entry;				// entry point
 	x86code *				m_exit;					// exit point
 	x86code *				m_nocode;				// nocode handler
+
+	drc_label_fixup_delegate m_fixup_label;			// precomputed delegate for fixups
+	drc_oob_delegate		m_fixup_exception;		// precomputed delegate for exception fixups
 
 	// state to live in the near cache
 	struct near_state

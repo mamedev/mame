@@ -259,7 +259,7 @@ VIDEO_START( midzeus )
 	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, exit_handler);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit_handler), &machine));
 
 	yoffs = 0;
 	texel_width = 256;

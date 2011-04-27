@@ -124,8 +124,8 @@ void device_list::set_machine_all(running_machine &machine)
 void device_list::start_all()
 {
 	// add exit and reset callbacks
-	machine().add_notifier(MACHINE_NOTIFY_RESET, static_reset);
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(device_list::reset_all), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(device_list::exit), this));
 
 	// add pre-save and post-load callbacks
 	machine().save().register_presave(static_pre_save, this);
@@ -178,7 +178,7 @@ void device_list::start_new_devices()
 //  reset_all - reset all devices in the list
 //-------------------------------------------------
 
-void device_list::reset_all() const
+void device_list::reset_all()
 {
 	// iterate over devices and reset them
 	for (device_t *device = first(); device != NULL; device = device->next())
@@ -267,31 +267,20 @@ device_t *device_list::find(device_type type, int index) const
 
 
 //-------------------------------------------------
-//  static_reset - internal callback for resetting
-//  all devices
-//-------------------------------------------------
-
-void device_list::static_reset(running_machine &machine)
-{
-	machine.devicelist().reset_all();
-}
-
-
-//-------------------------------------------------
 //  static_exit - tear down all the devices
 //-------------------------------------------------
 
-void device_list::static_exit(running_machine &machine)
+void device_list::exit()
 {
 	// first let the debugger save comments
-	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_comment_save(machine);
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_comment_save(machine());
 
 	// stop all the devices before we go away
-	const_cast<device_list &>(machine.devicelist()).stop_all();
+	stop_all();
 
 	// then nuke the devices
-	const_cast<device_list &>(machine.devicelist()).reset();
+	reset();
 }
 
 

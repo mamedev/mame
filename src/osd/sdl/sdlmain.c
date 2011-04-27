@@ -622,7 +622,7 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_sdl_info();
 	}
 	// must be before sdlvideo_init!
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_exit), &machine));
 
 	defines_verbose();
 

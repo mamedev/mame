@@ -93,7 +93,7 @@ void sdlaudio_init(running_machine &machine)
 		if (sdl_init(machine))
 			return;
 
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, sdl_cleanup_audio);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdl_cleanup_audio), &machine));
 		// set the startup volume
 		machine.osd().set_mastervolume(attenuation);
 	}

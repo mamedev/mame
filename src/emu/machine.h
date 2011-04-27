@@ -306,6 +306,8 @@ public:
 
 // ======================> running_machine
 
+typedef delegate<void ()> machine_notify_delegate;
+
 // description of the currently-running machine
 class running_machine : public bindable_object
 {
@@ -314,7 +316,6 @@ class running_machine : public bindable_object
 	friend void debugger_init(running_machine &machine);
 	friend class sound_manager;
 
-	typedef void (*notify_callback)(running_machine &machine);
 	typedef void (*logerror_callback)(running_machine &machine, const char *string);
 
 	// must be at top of member variables
@@ -371,7 +372,7 @@ public:
 	int run(bool firstrun);
 	void pause();
 	void resume();
-	void add_notifier(machine_notification event, notify_callback callback);
+	void add_notifier(machine_notification event, machine_notify_delegate callback);
 	void call_notifiers(machine_notification which);
 	void add_logerror_callback(logerror_callback callback);
 	void set_ui_active(bool active) { m_ui_active = active; }
@@ -440,7 +441,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
-	void soft_reset(running_machine &machine, int param = 0);
+	void soft_reset(void *ptr = NULL, INT32 param = 0);
 
 	// internal callbacks
 	static void logfile_callback(running_machine &machine, const char *buffer);
@@ -499,14 +500,14 @@ private:
 	struct notifier_callback_item
 	{
 		// construction/destruction
-		notifier_callback_item(notify_callback func);
+		notifier_callback_item(machine_notify_delegate func);
 
 		// getters
 		notifier_callback_item *next() const { return m_next; }
 
 		// state
 		notifier_callback_item *	m_next;
-		notify_callback				m_func;
+		machine_notify_delegate		m_func;
 	};
 	simple_list<notifier_callback_item> m_notifier_list[MACHINE_NOTIFY_COUNT];
 

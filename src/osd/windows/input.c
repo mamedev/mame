@@ -507,9 +507,9 @@ INLINE INT32 normalize_absolute_axis(INT32 raw, INT32 rawmin, INT32 rawmax)
 void wininput_init(running_machine &machine)
 {
 	// we need pause and exit callbacks
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, wininput_pause);
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, wininput_resume);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, wininput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(wininput_pause), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(wininput_resume), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wininput_exit), &machine));
 
 	// allocate a lock for input synchronizations, since messages sometimes come from another thread
 	input_lock = osd_lock_alloc();
@@ -952,7 +952,7 @@ static void win32_init(running_machine &machine)
 		return;
 
 	// we need an exit callback
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, win32_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(win32_exit), &machine));
 
 	// allocate two lightgun devices
 	for (gunnum = 0; gunnum < 2; gunnum++)
@@ -1120,7 +1120,7 @@ static void dinput_init(running_machine &machine)
 	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// we need an exit callback
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, dinput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(dinput_exit), &machine));
 
 	// initialize keyboard devices, but only if we don't have any yet
 	if (keyboard_list == NULL)
@@ -1660,7 +1660,7 @@ static void rawinput_init(running_machine &machine)
 	HMODULE user32;
 
 	// we need pause and exit callbacks
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, rawinput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(rawinput_exit), &machine));
 
 	// look in user32 for the raw input APIs
 	user32 = LoadLibrary(TEXT("user32.dll"));

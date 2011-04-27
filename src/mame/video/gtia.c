@@ -68,7 +68,7 @@ void gtia_init(running_machine &machine, const gtia_interface *intf)
 	memset(&gtia, 0, sizeof(gtia));
 	gtia.intf = *intf;
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, gtia_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(gtia_reset), &machine));
 
 	/* state saves */
 	gtia_state(machine);

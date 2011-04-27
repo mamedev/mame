@@ -287,9 +287,8 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
     change of the VBLANK signal
 -------------------------------------------------*/
 
-static void vblank_state_changed(screen_device &screen, void *param, bool vblank_state)
+static void vblank_state_changed(device_t *device, screen_device &screen, bool vblank_state)
 {
-	device_t *device = (device_t *)param;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	attotime curtime = screen.machine().time();
@@ -1393,7 +1392,7 @@ static void init_video(device_t *device)
 	int index;
 
 	/* register for VBLANK callbacks */
-	ld->screen->register_vblank_callback(vblank_state_changed, (void *)device);
+	ld->screen->register_vblank_callback(vblank_state_delegate(FUNC(vblank_state_changed), device));
 
 	/* allocate video frames */
 	for (index = 0; index < ARRAY_LENGTH(ldcore->frame); index++)
@@ -1517,7 +1516,7 @@ static DEVICE_START( laserdisc )
 	init_audio(device);
 
 	/* register callbacks */
-	config_register(device->machine(), "laserdisc", configuration_load, configuration_save);
+	config_register(device->machine(), "laserdisc", config_saveload_delegate(FUNC(configuration_load), &device->machine()), config_saveload_delegate(FUNC(configuration_save), &device->machine()));
 }
 
 

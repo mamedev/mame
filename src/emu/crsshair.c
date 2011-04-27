@@ -135,7 +135,7 @@ static void crosshair_exit(running_machine &machine);
 static void crosshair_load(running_machine &machine, int config_type, xml_data_node *parentnode);
 static void crosshair_save(running_machine &machine, int config_type, xml_data_node *parentnode);
 
-static void animate(screen_device &device, void *param, bool vblank_state);
+static void animate(running_machine &machine, screen_device &device, bool vblank_state);
 
 
 /***************************************************************************
@@ -211,7 +211,7 @@ static void create_bitmap(running_machine &machine, int player)
 void crosshair_init(running_machine &machine)
 {
 	/* request a callback upon exiting */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, crosshair_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(crosshair_exit), &machine));
 
 	/* clear all the globals */
 	memset(&global, 0, sizeof(global));
@@ -242,11 +242,11 @@ void crosshair_init(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (global.usage)
-		config_register(machine, "crosshairs", crosshair_load, crosshair_save);
+		config_register(machine, "crosshairs", config_saveload_delegate(FUNC(crosshair_load), &machine), config_saveload_delegate(FUNC(crosshair_save), &machine));
 
 	/* register the animation callback */
 	if (machine.primary_screen != NULL)
-		machine.primary_screen->register_vblank_callback(animate, NULL);
+		machine.primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(animate), &machine));
 }
 
 
@@ -325,7 +325,7 @@ void crosshair_set_user_settings(running_machine &machine, UINT8 player, crossha
     animate - animates the crosshair once a frame
 -------------------------------------------------*/
 
-static void animate(screen_device &device, void *param, bool vblank_state)
+static void animate(running_machine &machine, screen_device &device, bool vblank_state)
 {
 	int player;
 

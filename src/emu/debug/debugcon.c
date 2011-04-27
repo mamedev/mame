@@ -99,7 +99,7 @@ void debug_console_init(running_machine &machine)
 	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine.system().name, machine.system().description);
 
 	/* request callback upon exiting */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, debug_console_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_console_exit), &machine));
 }
 
 

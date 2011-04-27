@@ -135,7 +135,7 @@ video_manager::video_manager(running_machine &machine)
 	  m_movie_frame(0)
 {
 	// request a callback upon exiting
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, exit_static);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
 	machine.save().register_postload(state_postload_stub<video_manager, &video_manager::postload>, this);
 
 	// extract initial execution state from global configuration settings
@@ -180,7 +180,7 @@ video_manager::video_manager(running_machine &machine)
 	// if no screens, create a periodic timer to drive updates
 	if (machine.primary_screen == NULL)
 	{
-		m_screenless_frame_timer = machine.scheduler().timer_alloc(FUNC(screenless_update_callback), this);
+		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
 	}
 }
@@ -535,11 +535,6 @@ void video_manager::add_sound_to_recording(const INT16 *sound, int numsamples)
 //  video_exit - close down the video system
 //-------------------------------------------------
 
-void video_manager::exit_static(running_machine &machine)
-{
-	machine.video().exit();
-}
-
 void video_manager::exit()
 {
 	// stop recording any movie
@@ -570,10 +565,10 @@ void video_manager::exit()
 //  when there are no screens to drive it
 //-------------------------------------------------
 
-TIMER_CALLBACK( video_manager::screenless_update_callback )
+void video_manager::screenless_update_callback(void *ptr, int param)
 {
 	// force an update
-	reinterpret_cast<video_manager *>(ptr)->frame_update(false);
+	frame_update(false);
 }
 
 

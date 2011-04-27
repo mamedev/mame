@@ -305,7 +305,7 @@ void tilemap_init(running_machine &machine)
 	if (screen_width != 0 && screen_height != 0)
 	{
 		machine.priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, tilemap_exit);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tilemap_exit), &machine));
 	}
 }
 

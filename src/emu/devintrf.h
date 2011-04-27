@@ -126,7 +126,7 @@ typedef void (*write_line_device_func)(device_t *device, int state);
 // ======================> tagged_device_list
 
 // tagged_device_list is a tagged_list with additional searching based on type
-class device_list : public tagged_list<device_t>
+class device_list : public tagged_list<device_t>, public bindable_object
 {
 	typedef tagged_list<device_t> super;
 
@@ -141,7 +141,7 @@ public:
 	void set_machine_all(running_machine &machine);
 	void start_all();
 	void start_new_devices();
-	void reset_all() const;
+	void reset_all();
 	void stop_all();
 
 	// pull the generic forms forward
@@ -163,8 +163,7 @@ public:
 	
 private:
 	// internal helpers
-	static void static_reset(running_machine &machine);
-	static void static_exit(running_machine &machine);
+	void exit();
 	static void static_pre_save(running_machine &machine, void *param);
 	static void static_post_load(running_machine &machine, void *param);
 
@@ -177,7 +176,7 @@ private:
 // ======================> device_t
 
 // device_t represents a device
-class device_t : public bindable_object
+class device_t : public virtual bindable_object
 {
 	DISABLE_COPYING(device_t);
 
@@ -460,7 +459,7 @@ private:
 // ======================> device_interface
 
 // device_interface represents runtime information for a particular device interface
-class device_interface
+class device_interface : public virtual bindable_object
 {
 	DISABLE_COPYING(device_interface);
 

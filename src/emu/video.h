@@ -70,7 +70,7 @@ typedef struct _avi_file avi_file;
 
 // ======================> video_manager
 
-class video_manager
+class video_manager : public bindable_object
 {
 	friend class screen_device;
 
@@ -118,9 +118,8 @@ public:
 
 private:
 	// internal helpers
-	static void exit_static(running_machine &machine);
 	void exit();
-	static TIMER_CALLBACK( screenless_update_callback );
+	void screenless_update_callback(void *ptr, int param);
 	void postload();
 
 	// effective value helpers

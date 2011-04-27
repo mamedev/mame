@@ -3149,7 +3149,7 @@ static MACHINE_START( stv )
 
 	stv_register_protection_savestates(machine); // machine/stvprot.c
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 
 	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
     smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
@@ -3192,7 +3192,7 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, smpcSR);
 	state_save_register_global_array(machine, SMEM);
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 }
 
 

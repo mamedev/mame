@@ -621,6 +621,8 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, U
 	  m_entry(NULL),
 	  m_exit(NULL),
 	  m_nocode(NULL),
+	  m_fixup_label(FUNC(drcbe_x64::fixup_label), this),
+	  m_fixup_exception(FUNC(drcbe_x64::fixup_exception), this),
 	  m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
 	// build up necessary arrays
@@ -2931,7 +2933,7 @@ void drcbe_x64::op_jmp(x86code *&dst, const instruction &inst)
 	assert(labelp.is_code_label());
 
 	// look up the jump target and jump there
-	x86code *jmptarget = (x86code *)m_labels.get_codeptr(labelp.label(), fixup_label, dst);
+	x86code *jmptarget = (x86code *)m_labels.get_codeptr(labelp.label(), m_fixup_label, dst);
 	if (jmptarget == NULL)
 		jmptarget = dst + 0x7ffffff0;
 	if (inst.condition() == uml::COND_ALWAYS)
@@ -2975,7 +2977,7 @@ void drcbe_x64::op_exh(x86code *&dst, const instruction &inst)
 	else
 	{
 		emit_jcc(dst, X86_CONDITION(inst.condition()), dst + 0x7ffffff0);				// jcc   exception
-		m_cache.request_oob_codegen(oob_func_stub<drcbe_x64, &drcbe_x64::fixup_exception>, dst, &const_cast<instruction &>(inst), this);
+		m_cache.request_oob_codegen(m_fixup_exception, dst, &const_cast<instruction &>(inst));
 	}
 }
 

@@ -463,7 +463,8 @@ UINT32 drc_map_variables::get_last_value(UINT32 mapvar)
 //-------------------------------------------------
 
 drc_label_list::drc_label_list(drc_cache &cache)
-	: m_cache(cache)
+	: m_cache(cache),
+	  m_oob_callback_delegate(FUNC(drc_label_list::oob_callback), this)
 {
 }
 
@@ -497,6 +498,14 @@ void drc_label_list::block_begin(drcuml_block &block)
 
 void drc_label_list::block_end(drcuml_block &block)
 {
+	// can't free until the cache is clean of our OOB requests
+	assert(!m_cache.generating_code());
+
+	// free all of the pending fixup requests
+	label_fixup *fixup;
+	while ((fixup = m_fixup_list.detach_head()) != NULL)
+		m_cache.dealloc(fixup, sizeof(*fixup));
+	
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
 }
@@ -508,13 +517,19 @@ void drc_label_list::block_end(drcuml_block &block)
 //  undefined
 //-------------------------------------------------
 
-drccodeptr drc_label_list::get_codeptr(uml::code_label label, fixup_func fixup, void *param)
+drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_delegate callback, void *param)
 {
 	label_entry *curlabel = find_or_allocate(label);
 
 	// if no code pointer, request an OOB callback
-	if (curlabel->m_codeptr == NULL && fixup != NULL)
-		m_cache.request_oob_codegen(oob_callback, curlabel, (void *)fixup, param);
+	if (curlabel->m_codeptr == NULL && !callback.isnull())
+	{
+		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
+		fixup->m_callback = callback;
+		fixup->m_label = curlabel;
+		m_fixup_list.append(*fixup);
+		m_cache.request_oob_codegen(m_oob_callback_delegate, fixup, param);
+	}
 
 	return curlabel->m_codeptr;
 }
@@ -584,10 +599,8 @@ drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label la
 //  for labels
 //-------------------------------------------------
 
-void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3)
+void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2)
 {
-	label_entry *label = (label_entry *)param1;
-	fixup_func callback = (fixup_func)param2;
-
-	(*callback)(param3, label->m_codeptr);
+	label_fixup *fixup = reinterpret_cast<label_fixup *>(param1);
+	fixup->m_callback(param2, fixup->m_label->m_codeptr);
 }

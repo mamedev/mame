@@ -111,7 +111,7 @@ void palette_init(running_machine &machine)
 
 	/* request cleanup */
 	machine.palette_data = palette;
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, palette_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(palette_exit), &machine));
 
 	/* reset all our data */
 	palette->format = format;

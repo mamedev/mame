@@ -68,7 +68,7 @@ VIDEO_START( midvunit )
 	midvunit_state *state = machine.driver_data<midvunit_state>();
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_timer_cb));
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, midvunit_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midvunit_exit), &machine));
 
 	state_save_register_global_array(machine, state->m_video_regs);
 	state_save_register_global_array(machine, state->m_dma_data);

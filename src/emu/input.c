@@ -595,7 +595,7 @@ void input_init(running_machine &machine)
 	code_pressed_memory_reset(machine);
 
 	/* request a per-frame callback for bookkeeping */
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, input_frame);
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(input_frame), &machine));
 
 	/* read input enable options */
 	device_list[DEVICE_CLASS_KEYBOARD].enabled = TRUE;

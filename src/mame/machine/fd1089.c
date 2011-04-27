@@ -410,7 +410,7 @@ static void sys16_decrypt(running_machine &machine, const UINT8 *key,int cputype
 	int A;
 	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, clear_decrypted);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(clear_decrypted), &machine));
 	space->set_decrypted_region(0x000000, size - 1, decrypted);
 
 	for (A = 0;A < size;A+=2)

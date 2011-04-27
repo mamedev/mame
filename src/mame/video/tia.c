@@ -1995,6 +1995,6 @@ void tia_init(running_machine &machine, const struct tia_interface* ti)
 
 	tia_reset( machine );
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, tia_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tia_reset), &machine));
 }
 

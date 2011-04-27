@@ -1264,7 +1264,7 @@ static void install_speedups(running_machine &machine, const speedup_entry *entr
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, speedup_handlers[i].func, speedup_handlers[i].name);
 
 #ifdef MAME_DEBUG
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(report_speedups), &machine));
 #endif
 }
 

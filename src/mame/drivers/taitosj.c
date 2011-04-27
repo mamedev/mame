@@ -2729,7 +2729,7 @@ static void init_common(running_machine &machine)
 	state->save_item(NAME(state->m_dac_out));
 	state->save_item(NAME(state->m_dac_vol));
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, reset_common);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(reset_common), &machine));
 }
 
 static DRIVER_INIT( taitosj )

@@ -314,7 +314,7 @@ private:
 // ======================> cheat_manager
 
 // private machine-global data
-class cheat_manager
+class cheat_manager : public bindable_object
 {
 public:
 	// construction/destruction
@@ -343,7 +343,6 @@ public:
 
 private:
 	// internal helpers
-	static void frame_update_static(running_machine &machine);
 	void frame_update();
 	void load_cheats(const char *filename);
 

@@ -230,7 +230,7 @@ void winwindow_init(running_machine &machine)
 	main_threadid = GetCurrentThreadId();
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, winwindow_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winwindow_exit), &machine));
 
 	// set up window class and register it
 	create_window_class();

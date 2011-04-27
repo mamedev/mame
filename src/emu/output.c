@@ -147,11 +147,11 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
 void output_init(running_machine &machine)
 {
 	/* add pause callback */
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, output_pause);
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, output_resume);
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_pause), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(output_resume), &machine));
 
 	/* get a callback when done */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, output_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(output_exit), &machine));
 
 	/* reset the lists */
 	memset(itemtable, 0, sizeof(itemtable));

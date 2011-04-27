@@ -213,7 +213,7 @@ int sdlwindow_init(running_machine &machine)
 	main_threadid = SDL_ThreadID();
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, sdlwindow_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdlwindow_exit), &machine));
 
 	// if multithreading, create a thread to run the windows
 	if (multithreading_enabled)

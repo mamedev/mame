@@ -120,7 +120,7 @@ VIDEO_START( model3 )
 	int width, height;
 
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 
 	width = machine.primary_screen->width();
 	height = machine.primary_screen->height();

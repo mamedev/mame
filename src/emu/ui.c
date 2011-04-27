@@ -237,7 +237,7 @@ INLINE int is_breakable_char(unicode_char ch)
 int ui_init(running_machine &machine)
 {
 	/* make sure we clean up after ourselves */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, ui_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_exit), &machine));
 
 	/* initialize the other UI bits */
 	ui_menu_init(machine);

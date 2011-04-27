@@ -77,7 +77,7 @@ void debugger_init(running_machine &machine)
 		debugint_init(machine);
 
 		/* allocate a new entry for our global list */
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, debugger_exit);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debugger_exit), &machine));
 		entry = global_alloc(machine_entry);
 		entry->next = machine_list;
 		entry->machine = &machine;

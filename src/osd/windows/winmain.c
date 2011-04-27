@@ -560,7 +560,7 @@ void windows_osd_interface::init(running_machine &machine)
 		SetThreadPriority(GetCurrentThread(), options.priority());
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_exit), &machine));
 
 	// get number of processors
 	stemp = options.numprocessors();

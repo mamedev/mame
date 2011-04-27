@@ -1197,13 +1197,13 @@ static void configure_fast_ram(running_machine &machine)
 static MACHINE_START(model3_10)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_15)
 {
 	lsi53c810_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, model3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine));
 	configure_fast_ram(machine);
 }
 static MACHINE_START(model3_20)

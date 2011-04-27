@@ -106,8 +106,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	  m_scanline0_timer(NULL),
 	  m_scanline_timer(NULL),
 	  m_frame_number(0),
-	  m_partial_updates_this_frame(0),
-	  m_callback_list(NULL)
+	  m_partial_updates_this_frame(0)
 {
 	m_visarea.min_x = m_visarea.min_y = 0;
 	m_visarea.max_x = m_width - 1;
@@ -756,25 +755,20 @@ attotime screen_device::time_until_vblank_end() const
 //  callback
 //-------------------------------------------------
 
-void screen_device::register_vblank_callback(vblank_state_changed_func vblank_callback, void *param)
+void screen_device::register_vblank_callback(vblank_state_delegate vblank_callback)
 {
 	// validate arguments
-	assert(vblank_callback != NULL);
+	assert(!vblank_callback.isnull());
 
 	// check if we already have this callback registered
-	callback_item **itemptr;
-	for (itemptr = &m_callback_list; *itemptr != NULL; itemptr = &(*itemptr)->m_next)
-		if ((*itemptr)->m_callback == vblank_callback)
+	callback_item *item;
+	for (item = m_callback_list.first(); item != NULL; item = item->next())
+		if (item->m_callback == vblank_callback)
 			break;
 
 	// if not found, register
-	if (*itemptr == NULL)
-	{
-		*itemptr = auto_alloc(machine(), callback_item);
-		(*itemptr)->m_next = NULL;
-		(*itemptr)->m_callback = vblank_callback;
-		(*itemptr)->m_param = param;
-	}
+	if (item == NULL)
+		m_callback_list.append(*global_alloc(callback_item(vblank_callback)));
 }
 
 
@@ -790,8 +784,8 @@ void screen_device::vblank_begin_callback()
 	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
 
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list; item != NULL; item = item->m_next)
-		(*item->m_callback)(*this, item->m_param, true);
+	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
+		item->m_callback(*this, true);
 
 	// if this is the primary screen and we need to update now
 	if (this == machine().primary_screen && !(machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -816,8 +810,8 @@ void screen_device::vblank_begin_callback()
 void screen_device::vblank_end_callback()
 {
 	// call the screen specific callbacks
-	for (callback_item *item = m_callback_list; item != NULL; item = item->m_next)
-		(*item->m_callback)(*this, item->m_param, false);
+	for (callback_item *item = m_callback_list.first(); item != NULL; item = item->next())
+		item->m_callback(*this, false);
 
 	// if this is the primary screen and we need to update now
 	if (this == machine().primary_screen && (machine().config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1100,4 +1094,3 @@ void screen_device::screen_eof()
 		machine().driver_data<driver_device>()->screen_eof();
 	}
 }
-

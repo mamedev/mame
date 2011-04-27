@@ -243,7 +243,7 @@ drccodeptr drc_cache::end_codegen()
 	while ((oob = m_ooblist.detach_head()) != NULL)
 	{
 		// call the callback
-		(*oob->m_callback)(&m_top, oob->m_param1, oob->m_param2, oob->m_param3);
+		oob->m_callback(&m_top, oob->m_param1, oob->m_param2);
 		assert(m_top - m_codegen < CODEGEN_MAX_BYTES);
 
 		// release our memory
@@ -263,7 +263,7 @@ drccodeptr drc_cache::end_codegen()
 //  out-of-band codegen
 //-------------------------------------------------
 
-void drc_cache::request_oob_codegen(oob_func callback, void *param1, void *param2, void *param3)
+void drc_cache::request_oob_codegen(drc_oob_delegate callback, void *param1, void *param2)
 {
 	assert(m_codegen != NULL);
 
@@ -275,7 +275,6 @@ void drc_cache::request_oob_codegen(oob_func callback, void *param1, void *param
 	oob->m_callback = callback;
 	oob->m_param1 = param1;
 	oob->m_param2 = param2;
-	oob->m_param3 = param3;
 
 	// add to the tail
 	m_ooblist.append(*oob);

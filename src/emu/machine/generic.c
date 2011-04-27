@@ -108,17 +108,17 @@ void generic_machine_init(running_machine &machine)
 	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(interrupt_reset), &machine));
 	machine.save().save_item(NAME(state->interrupt_enable));
 
 	/* register for configuration */
-	config_register(machine, "counters", counters_load, counters_save);
+	config_register(machine, "counters", config_saveload_delegate(FUNC(counters_load), &machine), config_saveload_delegate(FUNC(counters_save), &machine));
 
 	/* for memory cards, request save state and an exit callback */
 	if (machine.config().m_memcard_handler != NULL)
 	{
 		state_save_register_global(machine, state->memcard_inserted);
-		machine.add_notifier(MACHINE_NOTIFY_EXIT, memcard_eject);
+		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(memcard_eject), &machine));
 	}
 }
 

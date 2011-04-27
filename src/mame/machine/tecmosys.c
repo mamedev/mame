@@ -121,7 +121,7 @@ void tecmosys_prot_init(running_machine &machine, int which)
 	case 2: state->m_device_data = &tkdensha_data; break;
 	}
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, tecmosys_prot_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_prot_reset), &machine));
 }
 
 READ16_HANDLER(tecmosys_prot_status_r)

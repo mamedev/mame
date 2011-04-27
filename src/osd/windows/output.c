@@ -119,7 +119,7 @@ void winoutput_init(running_machine &machine)
 	int result;
 
 	// ensure we get cleaned up
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, winoutput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winoutput_exit), &machine));
 
 	// reset globals
 	clientlist = NULL;

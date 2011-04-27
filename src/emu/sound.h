@@ -199,7 +199,7 @@ private:
 
 // ======================> sound_manager
 
-class sound_manager
+class sound_manager : public bindable_object
 {
 	friend class sound_stream;
 
@@ -242,11 +242,11 @@ public:
 private:
 	// internal helpers
 	void mute(bool mute, UINT8 reason);
-	static void reset(running_machine &machine);
-	static void pause(running_machine &machine);
-	static void resume(running_machine &machine);
-	static void config_load(running_machine &machine, int config_type, xml_data_node *parentnode);
-	static void config_save(running_machine &machine, int config_type, xml_data_node *parentnode);
+	void reset();
+	void pause();
+	void resume();
+	void config_load(int config_type, xml_data_node *parentnode);
+	void config_save(int config_type, xml_data_node *parentnode);
 
 	static TIMER_CALLBACK( update_static ) { reinterpret_cast<sound_manager *>(ptr)->update(); }
 	void update();

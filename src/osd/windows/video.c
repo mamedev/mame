@@ -111,7 +111,7 @@ void winvideo_init(running_machine &machine)
 	int index;
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, winvideo_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(winvideo_exit), &machine));
 
 	// extract data from the options
 	extract_video_config(machine);

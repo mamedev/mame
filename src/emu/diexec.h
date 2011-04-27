@@ -306,8 +306,7 @@ private:
 	// callbacks
 	static void static_timed_trigger_callback(running_machine &machine, void *ptr, int param);
 
-	static void static_on_vblank(screen_device &screen, void *param, bool vblank_state);
-	void on_vblank_start(screen_device &screen);
+	void on_vblank(screen_device &screen, bool vblank_state);
 
 	static void static_trigger_partial_frame_interrupt(running_machine &machine, void *ptr, int param);
 	void trigger_partial_frame_interrupt();

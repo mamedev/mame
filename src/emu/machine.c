@@ -264,7 +264,7 @@ void running_machine::start()
 	generic_sound_init(*this);
 
 	// allocate a soft_reset timer
-	m_soft_reset_timer = m_scheduler.timer_alloc(MSTUB(timer_expired, running_machine, soft_reset), this);
+	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
 
 	// init the osd layer
 	m_osd.init(*this);
@@ -403,7 +403,7 @@ int running_machine::run(bool firstrun)
 		ui_display_startup_screens(*this, firstrun, !settingsloaded);
 
 		// perform a soft reset -- this takes us to the running phase
-		soft_reset(*this);
+		soft_reset();
 
 		// run the CPUs until a reset or exit
 		m_hard_reset_pending = false;
@@ -656,7 +656,7 @@ void running_machine::region_free(const char *name)
 //  given type
 //-------------------------------------------------
 
-void running_machine::add_notifier(machine_notification event, notify_callback callback)
+void running_machine::add_notifier(machine_notification event, machine_notify_delegate callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_notifier at init time!");
 
@@ -767,7 +767,7 @@ UINT32 running_machine::rand()
 void running_machine::call_notifiers(machine_notification which)
 {
 	for (notifier_callback_item *cb = m_notifier_list[which].first(); cb != NULL; cb = cb->next())
-		(*cb->m_func)(*this);
+		cb->m_func();
 }
 
 
@@ -859,7 +859,7 @@ cancel:
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(running_machine &machine, int param)
+void running_machine::soft_reset(void *ptr, INT32 param)
 {
 	logerror("Soft reset\n");
 
@@ -927,7 +927,7 @@ memory_region::~memory_region()
 //  notifier_callback_item - constructor
 //-------------------------------------------------
 
-running_machine::notifier_callback_item::notifier_callback_item(notify_callback func)
+running_machine::notifier_callback_item::notifier_callback_item(machine_notify_delegate func)
 	: m_next(NULL),
 	  m_func(func)
 {

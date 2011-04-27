@@ -349,10 +349,10 @@ void atari_machine_start(running_machine &machine)
 	gtia_init(machine, &gtia_intf);
 
 	/* pokey */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, pokey_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(pokey_reset), &machine));
 
 	/* ANTIC */
-	machine.add_notifier(MACHINE_NOTIFY_RESET, _antic_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(_antic_reset), &machine));
 
 	/* save states */
 	state_save_register_global_pointer(machine, ((UINT8 *) &antic.r), sizeof(antic.r));

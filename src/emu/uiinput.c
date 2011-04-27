@@ -80,7 +80,7 @@ void ui_input_init(running_machine &machine)
 	machine.ui_input_data->current_mouse_y = -1;
 
 	/* add a frame callback to poll inputs */
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, ui_input_frame_update);
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_frame_update), &machine));
 }
 
 

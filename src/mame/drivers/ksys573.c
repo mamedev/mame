@@ -1032,7 +1032,7 @@ static void atapi_init(running_machine &machine)
 			state->m_available_cdroms[ i ] = NULL;
 		}
 	}
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
 
 
 	state->save_item( NAME(state->m_atapi_regs) );

@@ -151,7 +151,7 @@ private:
 	bool can_skip_upper_load(x86code *&dst, UINT32 *memref, UINT8 reghi);
 	void track_resolve_link(x86code *&destptr, const emit_link &linkinfo);
 
-	static void fixup_label(void *parameter, drccodeptr labelcodeptr);
+	void fixup_label(void *parameter, drccodeptr labelcodeptr);
 	void fixup_exception(drccodeptr *codeptr, void *param1, void *param2);
 
 	static void debug_log_hashjmp(int mode, offs_t pc);
@@ -355,6 +355,9 @@ private:
 	void *					m_hashstacksave;		// saved stack pointer for hashjmp
 	UINT64					m_reslo;				// extended low result
 	UINT64					m_reshi;				// extended high result
+	
+	drc_label_fixup_delegate m_fixup_label;			// precomputed delegate for fixups
+	drc_oob_delegate		m_fixup_exception;		// precomputed delegate for exception fixups
 
 	// globals
 	typedef void (drcbe_x86::*opcode_generate_func)(x86code *&dst, const uml::instruction &inst);

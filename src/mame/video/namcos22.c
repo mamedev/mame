@@ -2230,8 +2230,8 @@ static VIDEO_START( common )
 #else
 	state->m_poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 #endif
-	machine.add_notifier(MACHINE_NOTIFY_RESET, namcos22_reset);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, namcos22_exit);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
 
 	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram);
 }

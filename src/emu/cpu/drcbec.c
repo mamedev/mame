@@ -319,7 +319,8 @@ drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, UINT3
 	: drcbe_interface(drcuml, cache, device),
 	  m_hash(cache, modes, addrbits, ignorebits),
 	  m_map(cache, 0),
-	  m_labels(cache)
+	  m_labels(cache),
+	  m_fixup_delegate(FUNC(drcbe_c::fixup_label), this)
 {
 }
 
@@ -403,7 +404,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, UINT32 
 			// JMP instructions need to resolve their labels
 			case OP_JMP:
 				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst.size(), inst.condition(), inst.flags(), 1);
-				dst->inst = (drcbec_instruction *)m_labels.get_codeptr(inst.param(0).label(), fixup_label, dst);
+				dst->inst = (drcbec_instruction *)m_labels.get_codeptr(inst.param(0).label(), m_fixup_delegate, dst);
 				dst++;
 				break;
 

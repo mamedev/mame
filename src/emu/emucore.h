@@ -205,12 +205,6 @@ inline void operator--(_Type &value, int) { value = (_Type)((int)value - 1); }
 #define FUNC(x) &x, #x
 #define FUNC_NULL NULL, "(null)"
 
-// this macro wraps a member function 'x' from class 'c'
-#define MFUNC(c,x) &c::x, #c "::" #x
-
-// this macro wraps a member function 'x' from class 'c' using a templatized stub of type 's'
-#define MSTUB(s,c,x) s##_stub<c, &c::x>, #c "::" #x
-
 
 // standard assertion macros
 #undef assert

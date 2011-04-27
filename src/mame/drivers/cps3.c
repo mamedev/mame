@@ -2318,7 +2318,7 @@ static void cps3_exit(running_machine &machine)
 static MACHINE_START( cps3 )
 {
 	wd33c93_init(machine, &scsi_intf);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, cps3_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cps3_exit), &machine));
 }
 
 static MACHINE_RESET( cps3 )

@@ -166,7 +166,7 @@ private:
 
 
 // interface structure for a back-end
-class drcbe_interface
+class drcbe_interface : public bindable_object
 {
 public:
 	// construction/destruction

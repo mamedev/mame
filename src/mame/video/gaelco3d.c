@@ -62,7 +62,7 @@ VIDEO_START( gaelco3d )
 	int width, height;
 
 	state->m_poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, gaelco3d_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gaelco3d_exit), &machine));
 
 	state->m_screenbits = machine.primary_screen->alloc_compatible_bitmap();
 

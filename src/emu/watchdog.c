@@ -41,7 +41,7 @@ void watchdog_init(running_machine &machine)
 	/* allocate a timer for the watchdog */
 	watchdog_timer = machine.scheduler().timer_alloc(FUNC(watchdog_callback));
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, watchdog_internal_reset);
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(watchdog_internal_reset), &machine));
 
 	/* save some stuff in the default tag */
 	machine.save().save_item(NAME(watchdog_enabled));
@@ -84,7 +84,7 @@ static TIMER_CALLBACK( watchdog_callback )
     timers
 -------------------------------------------------*/
 
-static void on_vblank(screen_device &screen, void *param, bool vblank_state)
+static void on_vblank(running_machine &machine, screen_device &screen, bool vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state && watchdog_enabled)
@@ -118,7 +118,7 @@ void watchdog_reset(running_machine &machine)
 
 		/* register a VBLANK callback for the primary screen */
 		if (machine.primary_screen != NULL)
-			machine.primary_screen->register_vblank_callback(on_vblank, NULL);
+			machine.primary_screen->register_vblank_callback(vblank_state_delegate(FUNC(on_vblank), &machine));
 	}
 
 	/* timer-based watchdog? */

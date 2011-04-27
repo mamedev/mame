@@ -72,7 +72,8 @@ class screen_device;
 
 
 // callback that is called to notify of a change in the VBLANK state
-typedef void (*vblank_state_changed_func)(screen_device &device, void *param, bool vblank_state);
+typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
+
 typedef UINT32 (*screen_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
 typedef void (*screen_eof_func)(screen_device *screen, running_machine &machine);
 
@@ -147,7 +148,7 @@ public:
 	void update_now();
 
 	// additional helpers
-	void register_vblank_callback(vblank_state_changed_func vblank_callback, void *param);
+	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	bitmap_t *alloc_compatible_bitmap(int width = 0, int height = 0) { return auto_bitmap_alloc(machine(), (width == 0) ? m_width : width, (height == 0) ? m_height : height, format()); }
 
 	// internal to the video system
@@ -230,13 +231,18 @@ private:
 	UINT64				m_frame_number;				// the current frame number
 	UINT32				m_partial_updates_this_frame;// partial update counter this frame
 
-	struct callback_item
+	class callback_item
 	{
+	public:
+		callback_item(vblank_state_delegate callback)
+			: m_next(NULL),
+			  m_callback(callback) { }
+		callback_item *next() const { return m_next; }
+		
 		callback_item *				m_next;
-		vblank_state_changed_func	m_callback;
-		void *						m_param;
+		vblank_state_delegate		m_callback;
 	};
-	callback_item *		m_callback_list;		// list of VBLANK callbacks
+	simple_list<callback_item> m_callback_list;		// list of VBLANK callbacks
 };
 
 // device type definition

@@ -2465,7 +2465,7 @@ render_manager::render_manager(running_machine &machine)
 	  m_screen_container_list(machine.respool())
 {
 	// register callbacks
-	config_register(machine, "video", config_load_static, config_save_static);
+	config_register(machine, "video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
 
 	// create one container per screen
 	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
@@ -2684,11 +2684,6 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load_static(running_machine &machine, int config_type, xml_data_node *parentnode)
-{
-	machine.render().config_load(config_type, parentnode);
-}
-
 void render_manager::config_load(int config_type, xml_data_node *parentnode)
 {
 	// we only care about game files
@@ -2747,11 +2742,6 @@ void render_manager::config_load(int config_type, xml_data_node *parentnode)
 //  config_save - save data to the configuration
 //  file
 //-------------------------------------------------
-
-void render_manager::config_save_static(running_machine &machine, int config_type, xml_data_node *parentnode)
-{
-	machine.render().config_save(config_type, parentnode);
-}
 
 void render_manager::config_save(int config_type, xml_data_node *parentnode)
 {

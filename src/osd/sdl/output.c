@@ -75,7 +75,7 @@ void sdloutput_init(running_machine &machine)
 {
 	int fildes;
 
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, sdloutput_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdloutput_exit), &machine));
 
 	fildes = open(SDLMAME_OUTPUT, O_RDWR | O_NONBLOCK);
 

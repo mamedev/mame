@@ -119,7 +119,7 @@ void winsound_init(running_machine &machine)
 		return;
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, sound_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sound_exit), &machine));
 
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound

@@ -1513,7 +1513,7 @@ void rom_init(running_machine &machine)
 	machine.romload_data = romdata = auto_alloc_clear(machine, romload_private);
 
 	/* make sure we get called back on the way out */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, rom_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(rom_exit), &machine));
 
 	/* reset the romdata struct */
 	romdata->m_machine = &machine;

@@ -607,7 +607,7 @@ void device_execute_interface::interface_post_reset()
 			screen = device().machine().first_screen();
 
 		assert(screen != NULL);
-		screen->register_vblank_callback(static_on_vblank, NULL);
+		screen->register_vblank_callback(vblank_state_delegate(FUNC(device_execute_interface::on_vblank), this));
 	}
 
 	// reconfigure periodic interrupts
@@ -707,46 +707,27 @@ TIMER_CALLBACK( device_execute_interface::static_timed_trigger_callback )
 //  for this screen
 //-------------------------------------------------
 
-void device_execute_interface::static_on_vblank(screen_device &screen, void *param, bool vblank_state)
+void device_execute_interface::on_vblank(screen_device &screen, bool vblank_state)
 {
-	// VBLANK starting
-	if (vblank_state)
-	{
-		device_execute_interface *exec = NULL;
-		for (bool gotone = screen.machine().devicelist().first(exec); gotone; gotone = exec->next(exec))
-			exec->on_vblank_start(screen);
-	}
-}
+	// ignore VBLANK end
+	if (!vblank_state)
+		return;
 
-void device_execute_interface::on_vblank_start(screen_device &screen)
-{
 	// start the interrupt counter
 	if (!suspended(SUSPEND_REASON_DISABLE))
 		m_iloops = 0;
 	else
 		m_iloops = -1;
 
-	// the hack style VBLANK decleration always uses the first screen
-	bool interested = false;
-	if (m_vblank_interrupts_per_frame > 1)
-		interested = true;
+	// generate the interrupt callback
+	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+		(*m_vblank_interrupt)(&m_device);
 
-	// for new style declaration, we need to compare the tags
-	else if (m_vblank_interrupt_screen != NULL)
-		interested = (strcmp(screen.tag(), m_vblank_interrupt_screen) == 0);
-
-	// if interested, call the interrupt handler
-	if (interested)
+	// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
+	if (m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
 	{
-		if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
-			(*m_vblank_interrupt)(&m_device);
-
-		// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
-		if (m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
-		{
-			m_partial_frame_period = device().machine().primary_screen->frame_period() / m_vblank_interrupts_per_frame;
-			m_partial_frame_timer->adjust(m_partial_frame_period);
-		}
+		m_partial_frame_period = device().machine().primary_screen->frame_period() / m_vblank_interrupts_per_frame;
+		m_partial_frame_timer->adjust(m_partial_frame_period);
 	}
 }
 

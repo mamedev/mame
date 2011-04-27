@@ -78,10 +78,8 @@ emu_timer::emu_timer()
 	: m_machine(NULL),
 	  m_next(NULL),
 	  m_prev(NULL),
-	  m_callback(NULL),
 	  m_param(0),
 	  m_ptr(NULL),
-	  m_func(NULL),
 	  m_enabled(false),
 	  m_temporary(false),
 	  m_period(attotime::zero),
@@ -107,7 +105,7 @@ emu_timer::~emu_timer()
 //  re-allocated as a non-device timer
 //-------------------------------------------------
 
-emu_timer &emu_timer::init(running_machine &machine, timer_expired_func callback, const char *name, void *ptr, bool temporary)
+emu_timer &emu_timer::init(running_machine &machine, timer_expired_delegate callback, void *ptr, bool temporary)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
@@ -116,7 +114,6 @@ emu_timer &emu_timer::init(running_machine &machine, timer_expired_func callback
 	m_callback = callback;
 	m_param = 0;
 	m_ptr = ptr;
-	m_func = (name != NULL) ? name : "?";
 	m_enabled = false;
 	m_temporary = temporary;
 	m_period = attotime::never;
@@ -146,10 +143,9 @@ emu_timer &emu_timer::init(device_t &device, device_timer_id id, void *ptr, bool
 	m_machine = &device.machine();
 	m_next = NULL;
 	m_prev = NULL;
-	m_callback = NULL;
+	m_callback = timer_expired_delegate();
 	m_param = 0;
 	m_ptr = ptr;
-	m_func = NULL;
 	m_enabled = false;
 	m_temporary = temporary;
 	m_period = attotime::never;
@@ -274,9 +270,9 @@ void emu_timer::register_save()
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == NULL)
 	{
-		name = m_func;
+		name = m_callback.name();
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != NULL; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device == NULL && strcmp(curtimer->m_func, m_func) == 0)
+			if (!curtimer->m_temporary && curtimer->m_device == NULL && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
 				index++;
 	}
 
@@ -340,7 +336,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// append a single never-expiring timer so there is always one in the list
-	m_timer_list = &m_timer_allocator.alloc()->init(machine, NULL, NULL, NULL, true);
+	m_timer_list = &m_timer_allocator.alloc()->init(machine, timer_expired_delegate(), NULL, true);
 	m_timer_list->adjust(attotime::never);
 
 	// register global states
@@ -532,7 +528,7 @@ void device_scheduler::trigger(int trigid, attotime after)
 
 	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
-		timer_set(after, MSTUB(timer_expired, device_scheduler, timed_trigger), trigid, this);
+		timer_set(after, timer_expired_delegate(FUNC(device_scheduler::timed_trigger), this), trigid);
 
 	// send the trigger to everyone who cares
 	else
@@ -560,9 +556,9 @@ void device_scheduler::boost_interleave(attotime timeslice_time, attotime boost_
 //  timer and return a pointer
 //-------------------------------------------------
 
-emu_timer *device_scheduler::timer_alloc(timer_expired_func callback, const char *name, void *ptr)
+emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *ptr)
 {
-	return &m_timer_allocator.alloc()->init(machine(), callback, name, ptr, false);
+	return &m_timer_allocator.alloc()->init(machine(), callback, ptr, false);
 }
 
 
@@ -572,9 +568,9 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_func callback, const char
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(attotime duration, timer_expired_func callback, const char *name, int param, void *ptr)
+void device_scheduler::timer_set(attotime duration, timer_expired_delegate callback, int param, void *ptr)
 {
-	m_timer_allocator.alloc()->init(machine(), callback, name, ptr, true).adjust(duration, param);
+	m_timer_allocator.alloc()->init(machine(), callback, ptr, true).adjust(duration, param);
 }
 
 
@@ -584,9 +580,9 @@ void device_scheduler::timer_set(attotime duration, timer_expired_func callback,
 //  frequency
 //-------------------------------------------------
 
-void device_scheduler::timer_pulse(attotime period, timer_expired_func callback, const char *name, int param, void *ptr)
+void device_scheduler::timer_pulse(attotime period, timer_expired_delegate callback, int param, void *ptr)
 {
-	m_timer_allocator.alloc()->init(machine(), callback, name, ptr, false).adjust(period, param, period);
+	m_timer_allocator.alloc()->init(machine(), callback, ptr, false).adjust(period, param, period);
 }
 
 
@@ -630,7 +626,7 @@ void device_scheduler::eat_all_cycles()
 //  given amount of time
 //-------------------------------------------------
 
-void device_scheduler::timed_trigger(running_machine &machine, INT32 param)
+void device_scheduler::timed_trigger(void *ptr, INT32 param)
 {
 	trigger(param);
 }
@@ -874,8 +870,8 @@ void device_scheduler::execute_timers()
 
 			if (timer.m_device != NULL)
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
-			else if (timer.m_callback != NULL)
-				(*timer.m_callback)(machine(), timer.m_ptr, timer.m_param);
+			else if (!timer.m_callback.isnull())
+				timer.m_callback(timer.m_ptr, timer.m_param);
 
 			g_profiler.stop();
 		}

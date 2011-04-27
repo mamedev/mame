@@ -144,12 +144,11 @@ private:
 
 // ======================> drc_label_list
 
-// structure holding a live list of labels
-class drc_label_list
-{
-	// callback function for forward-referenced labels
-	typedef void (*fixup_func)(void *parameter, drccodeptr labelcodeptr);
+typedef delegate<void (void *, drccodeptr)> drc_label_fixup_delegate;
 
+// structure holding a live list of labels
+class drc_label_list : public bindable_object
+{
 public:
 	// construction/destruction
 	drc_label_list(drc_cache &cache);
@@ -160,7 +159,7 @@ public:
 	void block_end(drcuml_block &block);
 
 	// get/set values
-	drccodeptr get_codeptr(uml::code_label label, fixup_func fixup, void *param);
+	drccodeptr get_codeptr(uml::code_label label, drc_label_fixup_delegate fixup, void *param);
 	void set_codeptr(uml::code_label label, drccodeptr codeptr);
 
 private:
@@ -171,15 +170,25 @@ private:
 		uml::code_label		m_label;		// the label specified
 		drccodeptr			m_codeptr;		// pointer to the relevant code
 	};
+	
+	struct label_fixup
+	{
+		label_fixup *next() const { return m_next; }
+		label_fixup *		m_next;			// pointer to the next oob
+		label_entry *		m_label;		// the label in question
+		drc_label_fixup_delegate m_callback; // callback
+	};
 
 	// internal helpers
 	void reset(bool fatal_on_leftovers);
 	label_entry *find_or_allocate(uml::code_label label);
-	static void oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3);
+	void oob_callback(drccodeptr *codeptr, void *param1, void *param2);
 
 	// internal state
 	drc_cache &			m_cache;			// pointer to the cache
 	simple_list<label_entry> m_list;		// head of the live list
+	simple_list<label_fixup> m_fixup_list;	// list of pending oob fixups
+	drc_oob_delegate	m_oob_callback_delegate; // pre-computed delegate
 };
 
 
