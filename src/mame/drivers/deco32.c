@@ -1782,7 +1782,7 @@ static const deco16ic_interface captaven_deco16ic_tilegen1_intf =
 	"screen",
 	0, 1, // pf12only, split, fullwidth12 / fullwidth34
 	0x0f, 0x0f, /* trans masks (default values) */
-	0x20, 0x20, /* color base */
+	0x20, 0x30, /* color base */
 	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	NULL,
