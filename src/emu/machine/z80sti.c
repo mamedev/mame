@@ -148,8 +148,18 @@ static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Z80STI, "Mostek MK3801", tag, owner, clock),
-	  device_z80daisy_interface(mconfig, *this)
+	  device_z80daisy_interface(mconfig, *this),
+	  m_gpip(0),
+	  m_aer(0),
+	  m_ier(0),
+	  m_ipr(0),
+	  m_isr(0),
+	  m_imr(0)
 {
+	for (int i = 0; i < 16; i++)
+	{
+		m_int_state[i] = 0;
+	}
 }
 
 
