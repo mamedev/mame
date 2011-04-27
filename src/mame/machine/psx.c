@@ -292,6 +292,7 @@ static void dma_interrupt_update( psx_machine *p_psx )
 	{
 		verboselog( p_psx, 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
 	}
+	p_psx->n_dicr &= 0x00ffffff | ( p_psx->n_dicr << 8 );
 }
 
 static void dma_finished(psx_machine *p_psx, int n_channel)
