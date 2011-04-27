@@ -116,7 +116,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 #include "includes/cloak.h"

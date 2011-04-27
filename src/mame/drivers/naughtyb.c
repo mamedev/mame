@@ -282,10 +282,9 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static INTERRUPT_GEN( naughtyb_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	if (input_port_read(device->machine(), "FAKE") & 1)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )
@@ -333,12 +332,7 @@ static INPUT_PORTS_START( naughtyb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START( "FAKE" )
-	// The coin slots are not memory mapped.
-	// This fake input port is used by the interrupt
-	// handler to be notified of coin insertions. We use IMPULSE to
-	// trigger exactly one interrupt, without having to check when the
-	// user releases the key.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
@@ -386,12 +380,7 @@ static INPUT_PORTS_START( trvmstr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START( "FAKE" )
-	// The coin slots are not memory mapped.
-	// This fake input port is used by the interrupt
-	// handler to be notified of coin insertions. We use IMPULSE to
-	// trigger exactly one interrupt, without having to check when the
-	// user releases the key.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	// when reading DSW0, bit 7 doesn't read cabinet, but vblank
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
@@ -438,7 +427,6 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MCFG_CPU_PROGRAM_MAP(naughtyb_map)
-	MCFG_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -474,7 +462,6 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MCFG_CPU_PROGRAM_MAP(popflame_map)
-	MCFG_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

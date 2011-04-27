@@ -205,7 +205,7 @@ static INPUT_CHANGED( coin_inserted )
 
 static INPUT_CHANGED( tilt_pressed )
 {
-	cputag_set_input_line(field->port->machine(), "maincpu", M6809_FIRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine(), "maincpu", M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( bwing )
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED(tilt_pressed,0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED(tilt_pressed,0)
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )

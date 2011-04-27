@@ -1375,7 +1375,13 @@ static DRIVER_INIT( loverboy )
        I replace the startup jump with another jump to what appears to be
        the start of the game code.
 
-       ToDo: Figure out what's really going on */
+       ToDo: Figure out what's really going on
+       EDIT: this is fun, it's in im0 and trips ei ... my best guess is that
+       there's a protection device enabled at 0xf000-0xf001-0xf002-0xf008 that
+       sends a custom irq (either ld hl,$019d or jp $019d). After the initial
+       code, the protection device is disabled or changes behaviour via
+       writes at 0xf000 and 0xf008. -AS
+       */
 	UINT8 *ROM = machine.region("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
