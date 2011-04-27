@@ -47,7 +47,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "includes/psx.h"
 #include "includes/konamigx.h"
 #include "machine/eeprom.h"

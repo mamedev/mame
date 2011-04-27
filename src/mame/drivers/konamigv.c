@@ -114,7 +114,7 @@ Notes:
 
 #include "emu.h"
 #include "cdrom.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "includes/psx.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"

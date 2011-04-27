@@ -267,7 +267,7 @@ Notes:
 
 #include "emu.h"
 #include "deprecat.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "cpu/m37710/m37710.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"

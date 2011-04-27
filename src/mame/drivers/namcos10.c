@@ -265,7 +265,7 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 */
 
 #include "emu.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "includes/psx.h"
 
 WRITE32_HANDLER( namcos10_bank_w )

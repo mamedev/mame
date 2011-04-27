@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "cpu/z80/z80.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"

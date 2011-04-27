@@ -1023,7 +1023,7 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "cpu/h83002/h8.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
