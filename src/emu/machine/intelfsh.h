@@ -172,6 +172,12 @@ public:
 	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class fujitsu_29dl16x_device : public intelfsh8_device
+{
+public:
+	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class sharp_lh28f016s_device : public intelfsh8_device
 {
 public:

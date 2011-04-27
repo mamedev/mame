@@ -33,7 +33,7 @@
 
 #define MCFG_CDP1863_ADD(_tag, _clock, _clock2) \
 	MCFG_DEVICE_ADD(_tag, CDP1863, _clock) \
-	cdp1863_device_config::static_set_config(*device, _clock2);
+	cdp1863_device::static_set_config(*device, _clock2);
 
 
 

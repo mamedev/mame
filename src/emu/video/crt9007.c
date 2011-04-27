@@ -520,7 +520,7 @@ void crt9007_device::device_start()
 	assert(m_screen != NULL);
 
 	// set horizontal pixels per column
-	m_hpixels_per_column = m_hpixels_per_column;
+	m_hpixels_per_column = hpixels_per_column;
 
 	// register for state saving
 //  state_save_register_device_item(this, 0, );

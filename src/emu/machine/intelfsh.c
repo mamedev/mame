@@ -48,6 +48,7 @@ enum
 const device_type INTEL_28F016S5 = &device_creator<intel_28f016s5_device>;
 const device_type SHARP_LH28F016S = &device_creator<sharp_lh28f016s_device>;
 const device_type FUJITSU_29F016A = &device_creator<fujitsu_29f016a_device>;
+const device_type FUJITSU_29DL16X = &device_creator<fujitsu_29dl16x_device>;
 const device_type INTEL_E28F400 = &device_creator<intel_e28f400_device>;
 const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
 const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
@@ -214,6 +215,9 @@ intel_28f016s5_device::intel_28f016s5_device(const machine_config &mconfig, cons
 
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, "Fujitsu 29F016A Flash", tag, owner, clock, FLASH_FUJITSU_29F016A) { }
+
+fujitsu_29dl16x_device::fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, FUJITSU_29DL16X, "Fujitsu 29DL16X Flash", tag, owner, clock, FLASH_FUJITSU_29DL16X) { }
 
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, "Sharp LH28F016S Flash", tag, owner, clock, FLASH_SHARP_LH28F016S) { }
