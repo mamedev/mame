@@ -64,9 +64,9 @@ struct cdp1862_interface
 {
 	const char *m_screen_tag;
 
-	devcb_read_line				m_in_rd_func;
-	devcb_read_line				m_in_bd_func;
-	devcb_read_line				m_in_gd_func;
+	devcb_read_line				m_in_rd_cb;
+	devcb_read_line				m_in_bd_cb;
+	devcb_read_line				m_in_gd_cb;
 
 	double m_lum_r;				// red luminance resistor value
 	double m_lum_b;				// blue luminance resistor value
@@ -81,38 +81,15 @@ struct cdp1862_interface
 
 
 
-// ======================> cdp1862_device_config
-
-class cdp1862_device_config :   public device_config,
-                                public cdp1862_interface
-{
-    friend class cdp1862_device;
-
-    // construction/destruction
-    cdp1862_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-
-
 // ======================> cdp1862_device
 
-class cdp1862_device :	public device_t
+class cdp1862_device :	public device_t,
+                        public cdp1862_interface
 {
-    friend class cdp1862_device_config;
-
-    // construction/destruction
-    cdp1862_device(running_machine &_machine, const cdp1862_device_config &_config);
-
 public:
+    // construction/destruction
+    cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
@@ -121,6 +98,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 
@@ -136,8 +114,6 @@ private:
 
 	int m_bgcolor;					// background color
 	int m_con;						// color on
-
-	const cdp1862_device_config &m_config;
 };
 
 

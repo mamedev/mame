@@ -200,7 +200,7 @@ static STREAM_UPDATE( seta_update )
 static DEVICE_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = (const x1_010_interface *)device->baseconfig().static_config();
+	const x1_010_interface *intf = (const x1_010_interface *)device->static_config();
 	x1_010_state *info = get_safe_token(device);
 
 	info->region		= *device->region();

@@ -29,8 +29,8 @@ Protection TODO:
 class dblewing_state : public driver_device
 {
 public:
-	dblewing_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	dblewing_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT16 *  m_pf1_rowscroll;
@@ -661,9 +661,9 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_GFXDECODE(dblewing)
 
 	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 2);
-	decospr_device_config::set_pri_callback(device, dblwings_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 2);
+	decospr_device::set_pri_callback(*device, dblwings_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

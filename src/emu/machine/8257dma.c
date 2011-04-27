@@ -48,10 +48,30 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8257, "DMA8257")
+// device type definition
+const device_type I8257 = &device_creator<i8257_device>;
+
+//-------------------------------------------------
+//  i8257_device - constructor
+//-------------------------------------------------
+
+i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, I8257, "DMA8257", tag, owner, clock),
+      m_mode(0),
+      m_rr(0),
+      m_msb(0),
+      m_drq(0),
+      m_status(0x0f)
+{
+	memset(m_registers, 0, sizeof(m_registers));
+	memset(m_address, 0, sizeof(m_address));
+	memset(m_count, 0, sizeof(m_count));
+	memset(m_rwmode, 0, sizeof(m_rwmode));
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -59,7 +79,7 @@ GENERIC_DEVICE_CONFIG_SETUP(i8257, "DMA8257")
 //  complete
 //-------------------------------------------------
 
-void i8257_device_config::device_config_complete()
+void i8257_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const i8257_interface *intf = reinterpret_cast<const i8257_interface *>(static_config());
@@ -71,48 +91,22 @@ void i8257_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_hrq_func, 0, sizeof(m_out_hrq_func));
-    	memset(&m_out_tc_func, 0, sizeof(m_out_tc_func));
-    	memset(&m_out_mark_func, 0, sizeof(m_out_mark_func));
-    	memset(&m_in_memr_func, 0, sizeof(m_in_memr_func));
-    	memset(&m_out_memw_func, 0, sizeof(m_out_memw_func));
-    	memset(&m_in_ior_func[0], 0, sizeof(m_in_ior_func[0]));
-    	memset(&m_in_ior_func[1], 0, sizeof(m_in_ior_func[1]));
-    	memset(&m_in_ior_func[2], 0, sizeof(m_in_ior_func[2]));
-    	memset(&m_in_ior_func[3], 0, sizeof(m_in_ior_func[3]));
-    	memset(&m_out_iow_func[0], 0, sizeof(m_out_iow_func[0]));
-    	memset(&m_out_iow_func[1], 0, sizeof(m_out_iow_func[1]));
-    	memset(&m_out_iow_func[2], 0, sizeof(m_out_iow_func[2]));
-    	memset(&m_out_iow_func[3], 0, sizeof(m_out_iow_func[3]));
+    	memset(&m_out_hrq_cb, 0, sizeof(m_out_hrq_cb));
+    	memset(&m_out_tc_cb, 0, sizeof(m_out_tc_cb));
+    	memset(&m_out_mark_cb, 0, sizeof(m_out_mark_cb));
+    	memset(&m_in_memr_cb, 0, sizeof(m_in_memr_cb));
+    	memset(&m_out_memw_cb, 0, sizeof(m_out_memw_cb));
+    	memset(&m_in_ior_cb[0], 0, sizeof(m_in_ior_cb[0]));
+    	memset(&m_in_ior_cb[1], 0, sizeof(m_in_ior_cb[1]));
+    	memset(&m_in_ior_cb[2], 0, sizeof(m_in_ior_cb[2]));
+    	memset(&m_in_ior_cb[3], 0, sizeof(m_in_ior_cb[3]));
+    	memset(&m_out_iow_cb[0], 0, sizeof(m_out_iow_cb[0]));
+    	memset(&m_out_iow_cb[1], 0, sizeof(m_out_iow_cb[1]));
+    	memset(&m_out_iow_cb[2], 0, sizeof(m_out_iow_cb[2]));
+    	memset(&m_out_iow_cb[3], 0, sizeof(m_out_iow_cb[3]));
 	}
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type I8257 = i8257_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  i8257_device - constructor
-//-------------------------------------------------
-
-i8257_device::i8257_device(running_machine &_machine, const i8257_device_config &config)
-    : device_t(_machine, config),
-      m_mode(0),
-      m_rr(0),
-      m_msb(0),
-      m_drq(0),
-      m_status(0x0f),
-      m_config(config)
-{
-	memset(m_registers, 0, sizeof(m_registers));
-	memset(m_address, 0, sizeof(m_address));
-	memset(m_count, 0, sizeof(m_count));
-	memset(m_rwmode, 0, sizeof(m_rwmode));
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -124,16 +118,16 @@ void i8257_device::device_start()
 	assert(this != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&m_out_hrq_func, &m_config.m_out_hrq_func, this);
-	devcb_resolve_write_line(&m_out_tc_func, &m_config.m_out_tc_func, this);
-	devcb_resolve_write_line(&m_out_mark_func, &m_config.m_out_mark_func, this);
-	devcb_resolve_read8(&m_in_memr_func, &m_config.m_in_memr_func, this);
-	devcb_resolve_write8(&m_out_memw_func, &m_config.m_out_memw_func, this);
+	devcb_resolve_write_line(&m_out_hrq_func, &m_out_hrq_cb, this);
+	devcb_resolve_write_line(&m_out_tc_func, &m_out_tc_cb, this);
+	devcb_resolve_write_line(&m_out_mark_func, &m_out_mark_cb, this);
+	devcb_resolve_read8(&m_in_memr_func, &m_in_memr_cb, this);
+	devcb_resolve_write8(&m_out_memw_func, &m_out_memw_cb, this);
 
 	for (int i = 0; i < I8257_NUM_CHANNELS; i++)
 	{
-		devcb_resolve_read8(&m_in_ior_func[i], &m_config.m_in_ior_func[i], this);
-		devcb_resolve_write8(&m_out_iow_func[i], &m_config.m_out_iow_func[i], this);
+		devcb_resolve_read8(&m_in_ior_func[i], &m_in_ior_cb[i], this);
+		devcb_resolve_write8(&m_out_iow_func[i], &m_out_iow_cb[i], this);
 	}
 
 	/* set initial values */

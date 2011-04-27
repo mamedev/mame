@@ -9,8 +9,8 @@ extern const char layout_pinball[];
 class atari_s2_state : public driver_device
 {
 public:
-	atari_s2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	atari_s2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 

@@ -684,7 +684,7 @@ static STREAM_UPDATE( nes_psg_update_sound )
 /* INITIALIZE APU SYSTEM */
 static DEVICE_START( nesapu )
 {
-	const nes_interface *intf = (const nes_interface *)device->baseconfig().static_config();
+	const nes_interface *intf = (const nes_interface *)device->static_config();
 	nesapu_state *info = get_safe_token(device);
 	int rate = device->clock() / 4;
 	int i;

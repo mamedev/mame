@@ -461,7 +461,7 @@ static STATE_POSTLOAD( samples_postload )
 static DEVICE_START( samples )
 {
 	int i;
-	const samples_interface *intf = (const samples_interface *)device->baseconfig().static_config();
+	const samples_interface *intf = (const samples_interface *)device->static_config();
 	samples_info *info = get_safe_token(device);
 
 	info->device = device;

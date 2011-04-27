@@ -43,8 +43,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// devices
-const device_type OKIM6295 = okim6295_device_config::static_alloc_device_config;
+// device type definition
+const device_type OKIM6295 = &device_creator<okim6295_device>;
 
 // ADPCM state and tables
 bool adpcm_state::s_tables_computed = false;
@@ -82,40 +82,25 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  okim6295_device_config - constructor
+//  okim6295_device - constructor
 //-------------------------------------------------
 
-okim6295_device_config::okim6295_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "OKI6295", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295))
+okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("samples", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(okim6295)),
+	  m_command(-1),
+	  m_bank_installed(false),
+	  m_bank_offs(0),
+	  m_stream(NULL),
+	  m_pin7_state(0),
+	  m_direct(NULL)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *okim6295_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(okim6295_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *okim6295_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, okim6295_device(machine, *this));
 }
 
 
@@ -124,45 +109,10 @@ device_t *okim6295_device_config::alloc_device(running_machine &machine) const
 //  the pin 7 state
 //-------------------------------------------------
 
-void okim6295_device_config::static_set_pin7(device_config *device, int pin7)
+void okim6295_device::static_set_pin7(device_t &device, int pin7)
 {
-	okim6295_device_config *okim6295 = downcast<okim6295_device_config *>(device);
-	okim6295->m_pin7 = pin7;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *okim6295_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  okim6295_device - constructor
-//-------------------------------------------------
-
-okim6295_device::okim6295_device(running_machine &_machine, const okim6295_device_config &config)
-	: device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  device_memory_interface(_machine, config, *this),
-	  m_config(config),
-	  m_command(-1),
-	  m_bank_installed(false),
-	  m_bank_offs(0),
-	  m_stream(NULL),
-	  m_pin7_state(m_config.m_pin7),
-	  m_direct(NULL)
-{
+	okim6295_device &okim6295 = downcast<okim6295_device &>(device);
+	okim6295.m_pin7_state = pin7;
 }
 
 
@@ -176,7 +126,7 @@ void okim6295_device::device_start()
 	m_direct = &space()->direct();
 
 	// create the stream
-	int divisor = m_config.m_pin7 ? 132 : 165;
+	int divisor = m_pin7_state ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
 
 	save_item(NAME(m_command));
@@ -225,6 +175,17 @@ void okim6295_device::device_clock_changed()
 {
 	int divisor = m_pin7_state ? 132 : 165;
 	m_stream->set_sample_rate(clock() / divisor);
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *okim6295_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 

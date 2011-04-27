@@ -5,8 +5,8 @@
 class seibuspi_state : public driver_device
 {
 public:
-	seibuspi_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_spimainram;
 	UINT32 *m_spi_scrollram;

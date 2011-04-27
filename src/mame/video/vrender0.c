@@ -102,7 +102,7 @@ INLINE const vr0video_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == VIDEO_VRENDER0);
-	return (const vr0video_interface *) device->baseconfig().static_config();
+	return (const vr0video_interface *) device->static_config();
 }
 
 /*****************************************************************************

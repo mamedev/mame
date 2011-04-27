@@ -238,8 +238,8 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 class gticlub_state : public driver_device
 {
 public:
-	gticlub_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_work_ram;
 	UINT32 *m_sharc_dataram_0;

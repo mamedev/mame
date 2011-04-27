@@ -78,8 +78,7 @@
 // define machine_config_constructor here due to circular dependency
 // between devices and the machine config
 class machine_config;
-class device_config;
-typedef device_config * (*machine_config_constructor)(machine_config &config, device_config *owner);
+typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner);
 
 // devices and callbacks
 #include "devintrf.h"

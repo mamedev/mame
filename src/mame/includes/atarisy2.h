@@ -9,8 +9,8 @@
 class atarisy2_state : public atarigen_state
 {
 public:
-	atarisy2_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	atarisy2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16 *		m_slapstic_base;
 

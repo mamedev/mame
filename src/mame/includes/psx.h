@@ -45,8 +45,8 @@ typedef struct _psx_gpu psx_gpu;
 class psx_state : public driver_device
 {
 public:
-	psx_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	psx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	psx_machine *m_p_psx;
 	psx_gpu *m_p_psxgpu;

@@ -7,8 +7,8 @@
 class yunsung8_state : public driver_device
 {
 public:
-	yunsung8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	yunsung8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
 	tilemap_t     *m_tilemap_0;

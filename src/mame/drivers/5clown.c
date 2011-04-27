@@ -454,8 +454,8 @@
 class _5clown_state : public driver_device
 {
 public:
-	_5clown_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_main_latch_d800;
 	UINT8 m_snd_latch_0800;

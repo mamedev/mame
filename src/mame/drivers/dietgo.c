@@ -232,8 +232,8 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", dietgo_deco16ic_tilegen1_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 2);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 2);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

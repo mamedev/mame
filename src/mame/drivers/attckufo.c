@@ -49,8 +49,8 @@ LOIPOIO-B
 class attckufo_state : public driver_device
 {
 public:
-	attckufo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	attckufo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_mos6560(*this, "mos6560") { }
 

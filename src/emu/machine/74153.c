@@ -136,7 +136,7 @@ int ttl74153_output_r(device_t *device, int section)
 
 static DEVICE_START( ttl74153 )
 {
-	ttl74153_config *config = (ttl74153_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	ttl74153_config *config = (ttl74153_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	ttl74153_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

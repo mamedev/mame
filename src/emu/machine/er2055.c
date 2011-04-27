@@ -45,61 +45,12 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ER2055 = er2055_device_config::static_alloc_device_config;
+// device type definition
+const device_type ER2055 = &device_creator<er2055_device>;
 
 static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  er2055_device_config - constructor
-//-------------------------------------------------
-
-er2055_device_config::er2055_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "ER2055", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  device_config_nvram_interface(mconfig, *this),
-	  m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *er2055_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(er2055_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *er2055_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, er2055_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *er2055_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}
 
 
 
@@ -111,11 +62,11 @@ const address_space_config *er2055_device_config::memory_space_config(address_sp
 //  er2055_device - constructor
 //-------------------------------------------------
 
-er2055_device::er2055_device(running_machine &_machine, const er2055_device_config &config)
-	: device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
-	  device_nvram_interface(_machine, config, *this),
-	  m_config(config),
+er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ER2055, "ER2055", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  device_nvram_interface(mconfig, *this),
+	  m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map)),
 	  m_control_state(0),
 	  m_address(0),
 	  m_data(0)
@@ -134,6 +85,17 @@ void er2055_device::device_start()
 	save_item(NAME(m_data));
 
 	m_control_state = 0;
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *er2055_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 

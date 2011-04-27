@@ -3,8 +3,8 @@
 class beezer_state : public driver_device
 {
 public:
-	beezer_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	beezer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	int m_pbus;

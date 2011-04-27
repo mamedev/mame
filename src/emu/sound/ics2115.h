@@ -17,7 +17,7 @@
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	ics2115_device_config::static_set_irqf(device, _irqf); \
+	ics2115_device::static_set_irqf(*device, _irqf); \
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -87,38 +87,17 @@ struct ics2115_voice {
     void update_ramp();
 };
 
-// ======================> ics2115_device_config
-
-class ics2115_device_config :	public device_config, public device_config_sound_interface
-{
-	friend class ics2115_device;
-
-	// construction/destruction
-	ics2115_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state));
-
-protected:
-	// inline data
-	void (*m_irq_func)(device_t *device, int state);
-};
-
 // ======================> ics2115_device
 
 class ics2115_device : public device_t, public device_sound_interface
 {
-	friend class ics2115_device_config;
-
-	// construction/destruction
-	ics2115_device(running_machine &_machine, const ics2115_device_config &config);
-
 public:
+	// construction/destruction
+	ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
+
 	static READ8_DEVICE_HANDLER(read);
     static WRITE8_DEVICE_HANDLER(write);
 	//UINT8 read(offs_t offset);
@@ -140,8 +119,6 @@ protected:
 	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
-	const ics2115_device_config &m_config;
-
 	void (*m_irq_cb)(device_t *device, int state);
 
 	UINT8 *m_rom;

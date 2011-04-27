@@ -34,92 +34,29 @@ class upd96050_device;
 
 struct necdsp_interface
 {
-	devcb_read_line		m_in_int_func;
-	//devcb_read8       m_in_si_func;
-	//devcb_read_line   m_in_sck_func;
-	//devcb_read_line   m_in_sien_func;
-	//devcb_read_line   m_in_soen_func;
-	//devcb_read_line   m_in_dack_func;
-	devcb_write_line	m_out_p0_func;
-	devcb_write_line	m_out_p1_func;
-	//devcb_write8      m_out_so_func;
-	//devcb_write_line  m_out_sorq_func;
-	//devcb_write_line  m_out_drq_func;
+	devcb_read_line		m_in_int_cb;
+	//devcb_read8       m_in_si_cb;
+	//devcb_read_line   m_in_sck_cb;
+	//devcb_read_line   m_in_sien_cb;
+	//devcb_read_line   m_in_soen_cb;
+	//devcb_read_line   m_in_dack_cb;
+	devcb_write_line	m_out_p0_cb;
+	devcb_write_line	m_out_p1_cb;
+	//devcb_write8      m_out_so_cb;
+	//devcb_write_line  m_out_sorq_cb;
+	//devcb_write_line  m_out_drq_cb;
 };
 
 #define NECDSP_INTERFACE(name) \
 	const necdsp_interface (name) =
 
-// ======================> necdsp_device_config
-
-class necdsp_device_config :	public cpu_device_config, public necdsp_interface
-{
-	friend class necdsp_device;
-
-protected:
-	// construction/destruction
-	necdsp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// inline data
-	const address_space_config m_program_config, m_data_config;
-};
-
-class upd7725_device_config :	public necdsp_device_config
-{
-	friend class upd7725_device;
-
-	// construction/destruction
-	upd7725_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-class upd96050_device_config :	public necdsp_device_config
-{
-	friend class upd96050_device;
-
-	// construction/destruction
-	upd96050_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 // ======================> necdsp_device
 
-class necdsp_device : public cpu_device
+class necdsp_device : public cpu_device, public necdsp_interface
 {
-	friend class necdsp_device_config;
-
 protected:
 	// construction/destruction
-	necdsp_device(running_machine &_machine, const necdsp_device_config &config);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name);
 
 public:
 	UINT8 snesdsp_read(bool mode);
@@ -127,12 +64,19 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+	virtual UINT32 execute_input_lines() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -140,7 +84,12 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	// inline data
+	const address_space_config m_program_config, m_data_config;
 
 	UINT16 dataRAM[2048];
 
@@ -232,26 +181,21 @@ protected:
 	//devcb_resolved_write8     m_out_so_func;
 	//devcb_resolved_write_line m_out_sorq_func;
 	//devcb_resolved_write_line m_out_drq_func;
-
-  const necdsp_device_config &m_config;
 };
 
 class upd7725_device : public necdsp_device
 {
-	friend class upd7725_device_config;
-
+public:
 	// construction/destruction
-	upd7725_device(running_machine &_machine, const upd7725_device_config &config);
+	upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 class upd96050_device : public necdsp_device
 {
-	friend class upd96050_device_config;
-
-	// construction/destruction
-	upd96050_device(running_machine &_machine, const upd96050_device_config &config);
-
 public:
+	// construction/destruction
+	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	UINT16 dataram_r(UINT16 addr) { return dataRAM[addr]; }
 	void dataram_w(UINT16 addr, UINT16 data) { dataRAM[addr] = data; }
 };

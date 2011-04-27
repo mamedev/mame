@@ -13,8 +13,8 @@ typedef struct _cached_texture cached_texture;
 class model3_state : public driver_device
 {
 public:
-	model3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	model3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;

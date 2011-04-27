@@ -95,29 +95,24 @@ resource_pool &machine_get_pool(running_machine &machine)
 //-------------------------------------------------
 
 device_list::device_list(resource_pool &pool)
-	: tagged_device_list<device_t>(pool),
-	  m_machine(NULL)
+	: tagged_list<device_t>(pool)
 {
 }
 
 
 //-------------------------------------------------
-//  import_config_list - import a list of device
-//  configs and allocate new devices
+//  set_machine_all - once the machine is created,
+//  tell every device about it
 //-------------------------------------------------
 
-void device_list::import_config_list(const device_config_list &list, running_machine &machine)
+void device_list::set_machine_all(running_machine &machine)
 {
-	// remember the machine for later use
+	// add exit and reset callbacks
 	m_machine = &machine;
-
-	// append each device from the configuration list
-	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
-	{
-		device_t *newdevice = devconfig->alloc_device(machine);
-		append(devconfig->tag(), *newdevice);
-		newdevice->find_interfaces();
-	}
+	
+	// iterate over devices and set their machines as well
+	for (device_t *device = first(); device != NULL; device = device->next())
+		device->set_machine(machine);
 }
 
 
@@ -129,7 +124,6 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 void device_list::start_all()
 {
 	// add exit and reset callbacks
-	assert(m_machine != NULL);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, static_reset);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
 
@@ -137,27 +131,44 @@ void device_list::start_all()
 	machine().save().register_presave(static_pre_save, this);
 	machine().save().register_postload(static_post_load, this);
 
-	// iterate over devices to start them
+	// start_new_devices does all the necessary work
+	start_new_devices();
+}
+
+
+//-------------------------------------------------
+//  start_new_devices - start any unstarted devices
+//-------------------------------------------------
+
+void device_list::start_new_devices()
+{
+	assert(m_machine != NULL);
+	
+	// iterate through the devices
 	device_t *nextdevice;
 	for (device_t *device = first(); device != NULL; device = nextdevice)
 	{
-		// attempt to start the device, catching any expected exceptions
+		// see if this device is what we want
 		nextdevice = device->next();
-		try
+		if (!device->started())
 		{
-			mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
-			device->start();
-		}
+			// attempt to start the device, catching any expected exceptions
+			try
+			{
+				mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
+				device->start();
+			}
 
-		// handle missing dependencies by moving the device to the end
-		catch (device_missing_dependencies &)
-		{
-			// if we're the end, fail
-			mame_printf_verbose("  (missing dependencies; rescheduling)\n");
-			if (nextdevice == NULL)
-				throw emu_fatalerror("Circular dependency in device startup; unable to start %s '%s'\n", device->name(), device->tag());
-			detach(*device);
-			append(device->tag(), *device);
+			// handle missing dependencies by moving the device to the end
+			catch (device_missing_dependencies &)
+			{
+				// if we're the end, fail
+				mame_printf_verbose("  (missing dependencies; rescheduling)\n");
+				if (nextdevice == NULL)
+					throw emu_fatalerror("Circular dependency in device startup; unable to start %s '%s'\n", device->name(), device->tag());
+				detach(*device);
+				append(device->tag(), *device);
+			}
 		}
 	}
 }
@@ -167,17 +178,102 @@ void device_list::start_all()
 //  reset_all - reset all devices in the list
 //-------------------------------------------------
 
-void device_list::reset_all()
+void device_list::reset_all() const
 {
-	// iterate over devices and stop them
+	// iterate over devices and reset them
 	for (device_t *device = first(); device != NULL; device = device->next())
 		device->reset();
 }
 
 
+//-------------------------------------------------
+//  stop_all - stop all the devices in the
+//  list
+//-------------------------------------------------
+
+void device_list::stop_all()
+{
+	// iterate over devices and stop them
+	for (device_t *device = first(); device != NULL; device = device->next())
+		device->stop();
+
+	// leave with no machine
+	m_machine = NULL;
+}
+
+
+//-------------------------------------------------
+//  first - return the first device of the given
+//  type
+//-------------------------------------------------
+
+device_t *device_list::first(device_type type) const
+{
+	device_t *cur;
+	for (cur = super::first(); cur != NULL && cur->type() != type; cur = cur->next()) ;
+	return cur;
+}
+
+
+//-------------------------------------------------
+//  count - count the number of devices of the 
+//  given type
+//-------------------------------------------------
+
+int device_list::count(device_type type) const
+{
+	int num = 0;
+	for (const device_t *curdev = first(type); curdev != NULL; curdev = curdev->typenext()) num++;
+	return num;
+}
+
+
+//-------------------------------------------------
+//  indexof - return the index of the given device
+//  among its kind
+//-------------------------------------------------
+
+int device_list::indexof(device_type type, device_t &object) const
+{
+	int num = 0;
+	for (device_t *cur = first(type); cur != NULL; cur = cur->typenext(), num++)
+		if (cur == &object) return num;
+	return -1;
+}
+
+
+//-------------------------------------------------
+//  indexof - return the index of the given device
+//  among its kind
+//-------------------------------------------------
+
+int device_list::indexof(device_type type, const char *tag) const
+{
+	device_t *object = find(tag);
+	return (object != NULL && object->type() == type) ? indexof(type, *object) : -1;
+}
+
+
+//-------------------------------------------------
+//  find - find a device by type + index
+//-------------------------------------------------
+
+device_t *device_list::find(device_type type, int index) const
+{
+	for (device_t *cur = first(type); cur != NULL; cur = cur->typenext())
+		if (index-- == 0) return cur;
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  static_reset - internal callback for resetting
+//  all devices
+//-------------------------------------------------
+
 void device_list::static_reset(running_machine &machine)
 {
-	machine.m_devicelist.reset_all();
+	machine.devicelist().reset_all();
 }
 
 
@@ -191,8 +287,11 @@ void device_list::static_exit(running_machine &machine)
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_comment_save(machine);
 
+	// stop all the devices before we go away
+	const_cast<device_list &>(machine.devicelist()).stop_all();
+
 	// then nuke the devices
-	machine.m_devicelist.reset();
+	const_cast<device_list &>(machine.devicelist()).reset();
 }
 
 
@@ -224,341 +323,6 @@ void device_list::static_post_load(running_machine &machine, void *param)
 
 
 //**************************************************************************
-//  DEVICE INTERFACE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_interface - constructor
-//-------------------------------------------------
-
-device_config_interface::device_config_interface(const machine_config &mconfig, device_config &devconfig)
-	: m_device_config(devconfig),
-	  m_machine_config(mconfig),
-	  m_interface_next(NULL)
-{
-	device_config_interface **tailptr;
-	for (tailptr = &devconfig.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
-	*tailptr = this;
-}
-
-
-//-------------------------------------------------
-//  ~device_config_interface - destructor
-//-------------------------------------------------
-
-device_config_interface::~device_config_interface()
-{
-}
-
-
-//-------------------------------------------------
-//  interface_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void device_config_interface::interface_config_complete()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_validity_check - default validation
-//  for a device after the configuration has been
-//  constructed
-//-------------------------------------------------
-
-bool device_config_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
-{
-	return false;
-}
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config - constructor for a new
-//  device configuration
-//-------------------------------------------------
-
-device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 param)
-	: m_next(NULL),
-	  m_owner(const_cast<device_config *>(owner)),
-	  m_interface_list(NULL),
-	  m_type(type),
-	  m_clock(clock),
-	  m_machine_config(mconfig),
-	  m_static_config(NULL),
-	  m_input_defaults(NULL),
-	  m_name(name),
-	  m_tag(tag),
-	  m_config_complete(false)
-{
-	// derive the clock from our owner if requested
-	if ((m_clock & 0xff000000) == 0xff000000)
-	{
-		assert(m_owner != NULL);
-		m_clock = m_owner->m_clock * ((m_clock >> 12) & 0xfff) / ((m_clock >> 0) & 0xfff);
-	}
-}
-
-
-device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, const device_config *owner, UINT32 clock, UINT32 param)
-	: m_next(NULL),
-	  m_owner(const_cast<device_config *>(owner)),
-	  m_interface_list(NULL),
-	  m_type(type),
-	  m_clock(clock),
-	  m_machine_config(mconfig),
-	  m_static_config(NULL),
-	  m_input_defaults(NULL),
-	  m_name(name),
-	  m_shortname(shortname),
-	  m_searchpath(shortname),
-	  m_tag(tag),
-	  m_config_complete(false)
-{
-	// derive the clock from our owner if requested
-	if ((m_clock & 0xff000000) == 0xff000000)
-	{
-		assert(m_owner != NULL);
-		m_clock = m_owner->m_clock * ((m_clock >> 12) & 0xfff) / ((m_clock >> 0) & 0xfff);
-	}
-}
-
-
-//-------------------------------------------------
-//  ~device_config - destructor
-//-------------------------------------------------
-
-device_config::~device_config()
-{
-}
-
-
-//-------------------------------------------------
-//  config_complete - called when the
-//  configuration of a device is complete
-//-------------------------------------------------
-
-void device_config::config_complete()
-{
-	// first notify the interfaces
-	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		intf->interface_config_complete();
-
-	// then notify the device itself
-	device_config_complete();
-}
-
-
-//-------------------------------------------------
-//  validity_check - validate a device after the
-//  configuration has been constructed
-//-------------------------------------------------
-
-bool device_config::validity_check(emu_options &options, const game_driver &driver) const
-{
-	bool error = false;
-
-	// validate via the interfaces
-	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		if (intf->interface_validity_check(options, driver))
-			error = true;
-
-	// let the device itself validate
-	if (device_validity_check(options, driver))
-		error = true;
-
-	return error;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void device_config::device_config_complete()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - validate a device after
-//  the configuration has been constructed
-//-------------------------------------------------
-
-bool device_config::device_validity_check(emu_options &options, const game_driver &driver) const
-{
-	// indicate no error by default
-	return false;
-}
-
-
-//-------------------------------------------------
-//  rom_region - return a pointer to the implicit
-//  rom region description for this device
-//-------------------------------------------------
-
-const rom_entry *device_config::device_rom_region() const
-{
-	return NULL;
-}
-
-
-//-------------------------------------------------
-//  machine_config - return a pointer to a machine
-//  config constructor describing sub-devices for
-//  this device
-//-------------------------------------------------
-
-machine_config_constructor device_config::device_mconfig_additions() const
-{
-	return NULL;
-}
-
-
-
-//-------------------------------------------------
-//  input_ports - return a pointer to the implicit
-//  input ports description for this device
-//-------------------------------------------------
-
-const input_port_token *device_config::device_input_ports() const
-{
-	return NULL;
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE INTERFACES
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_interface - constructor
-//-------------------------------------------------
-
-device_interface::device_interface(running_machine &machine, const device_config &config, device_t &device)
-	: m_interface_next(NULL),
-	  m_device(device)
-{
-	device_interface **tailptr;
-	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
-	*tailptr = this;
-}
-
-
-//-------------------------------------------------
-//  ~device_interface - destructor
-//-------------------------------------------------
-
-device_interface::~device_interface()
-{
-}
-
-
-//-------------------------------------------------
-//  interface_pre_start - called before the
-//  device's own start function
-//-------------------------------------------------
-
-void device_interface::interface_pre_start()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_post_start - called after the
-//  device's own start function
-//-------------------------------------------------
-
-void device_interface::interface_post_start()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_pre_reset - called before the
-//  device's own reset function
-//-------------------------------------------------
-
-void device_interface::interface_pre_reset()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_post_reset - called after the
-//  device's own reset function
-//-------------------------------------------------
-
-void device_interface::interface_post_reset()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_pre_save - called prior to saving the
-//  state, so that registered variables can be
-//  properly normalized
-//-------------------------------------------------
-
-void device_interface::interface_pre_save()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_post_load - called after the loading a
-//  saved state, so that registered variables can
-//  be expaneded as necessary
-//-------------------------------------------------
-
-void device_interface::interface_post_load()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_clock_changed - called when the
-//  device clock is altered in any way; designed
-//  to be overridden by the actual device
-//  implementation
-//-------------------------------------------------
-
-void device_interface::interface_clock_changed()
-{
-	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  interface_debug_setup - called to allow
-//  interfaces to set up any debugging for this
-//  device
-//-------------------------------------------------
-
-void device_interface::interface_debug_setup()
-{
-	// do nothing by default
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE MANAGEMENT
 //**************************************************************************
 
@@ -568,25 +332,75 @@ void device_interface::interface_debug_setup()
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(running_machine &_machine, const device_config &config)
-	: m_save_manager(_machine.save()),
-	  m_debug(NULL),
+device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: m_debug(NULL),
 	  m_execute(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
 	  m_next(NULL),
-	  m_owner((config.m_owner != NULL) ? _machine.m_devicelist.find(config.m_owner->tag()) : NULL),
+	  m_owner(owner),
 	  m_interface_list(NULL),
+	  m_type(type),
+	  m_configured_clock(clock),
+	  m_machine_config(mconfig),
+	  m_static_config(NULL),
+	  m_input_defaults(NULL),
+	  m_name(name),
 	  m_started(false),
-	  m_clock(config.m_clock),
+	  m_clock(clock),
 	  m_region(NULL),
-	  m_baseconfig(config),
-	  m_unscaled_clock(config.m_clock),
+	  m_unscaled_clock(clock),
 	  m_clock_scale(1.0),
-	  m_attoseconds_per_clock((config.m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(config.m_clock)),
+	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
 	  m_auto_finder_list(NULL),
-	  m_machine(_machine)
+	  m_machine(NULL),
+	  m_save(NULL),
+	  m_tag(tag),
+	  m_config_complete(false)
 {
+	// derive the clock from our owner if requested
+	if ((m_configured_clock & 0xff000000) == 0xff000000)
+	{
+		assert(m_owner != NULL);
+		m_clock = m_unscaled_clock = m_configured_clock = m_owner->m_configured_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff);
+	}
+}
+
+
+device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
+	: m_debug(NULL),
+	  m_execute(NULL),
+	  m_memory(NULL),
+	  m_state(NULL),
+	  m_next(NULL),
+	  m_owner(owner),
+	  m_interface_list(NULL),
+	  m_type(type),
+	  m_configured_clock(clock),
+	  m_machine_config(mconfig),
+	  m_static_config(NULL),
+	  m_input_defaults(NULL),
+	  m_name(name),
+	  m_shortname(shortname),
+	  m_searchpath(shortname),
+	  m_started(false),
+	  m_clock(clock),
+	  m_region(NULL),
+	  m_unscaled_clock(clock),
+	  m_clock_scale(1.0),
+	  m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock)),
+	  m_auto_finder_list(NULL),
+	  m_machine(NULL),
+	  m_save(NULL),
+	  m_tag(tag),
+	  m_config_complete(false)
+{
+	// derive the clock from our owner if requested
+	if ((m_configured_clock & 0xff000000) == 0xff000000)
+	{
+		assert(m_owner != NULL);
+		m_clock = m_unscaled_clock = m_configured_clock = m_owner->m_configured_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff);
+	}
 }
 
 
@@ -596,7 +410,6 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 
 device_t::~device_t()
 {
-	auto_free(machine(), m_debug);
 }
 
 
@@ -652,7 +465,68 @@ device_t *device_t::siblingdevice(const char *_tag) const
 
 
 //-------------------------------------------------
-//  set_clock - sets the given device's raw clock
+//  config_complete - called when the
+//  configuration of a device is complete
+//-------------------------------------------------
+
+void device_t::config_complete()
+{
+	// first notify the interfaces
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_config_complete();
+
+	// then notify the device itself
+	device_config_complete();
+	
+	// then mark ourselves complete
+	m_config_complete = true;
+}
+
+
+//-------------------------------------------------
+//  validity_check - validate a device after the
+//  configuration has been constructed
+//-------------------------------------------------
+
+bool device_t::validity_check(emu_options &options, const game_driver &driver) const
+{
+	bool error = false;
+
+	// validate via the interfaces
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		if (intf->interface_validity_check(options, driver))
+			error = true;
+
+	// let the device itself validate
+	if (device_validity_check(options, driver))
+		error = true;
+
+	return error;
+}
+
+
+//-------------------------------------------------
+//  reset - reset a device
+//-------------------------------------------------
+
+void device_t::reset()
+{
+	// let the interfaces do their pre-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_pre_reset();
+
+	// reset the device
+	device_reset();
+
+	// let the interfaces do their post-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_post_reset();
+}
+
+
+//-------------------------------------------------
+//  set_unscaled_clock - sets the given device's 
+//  unscaled clock
 //-------------------------------------------------
 
 void device_t::set_unscaled_clock(UINT32 clock)
@@ -665,7 +539,7 @@ void device_t::set_unscaled_clock(UINT32 clock)
 
 
 //-------------------------------------------------
-//  set_clockscale - sets a scale factor for the
+//  set_clock_scale - sets a scale factor for the
 //  device's clock
 //-------------------------------------------------
 
@@ -730,15 +604,14 @@ void device_t::timer_set(attotime duration, device_timer_id id, int param, void 
 
 
 //-------------------------------------------------
-//  find_interfaces - locate fast interfaces
+//  set_machine - notify that the machine now
+//  exists
 //-------------------------------------------------
 
-void device_t::find_interfaces()
+void device_t::set_machine(running_machine &machine)
 {
-	// look up the common interfaces
-	m_execute = dynamic_cast<device_execute_interface *>(this);
-	m_memory = dynamic_cast<device_memory_interface *>(this);
-	m_state = dynamic_cast<device_state_interface *>(this);
+	m_machine = &machine;
+	m_save = &machine.save();
 }
 
 
@@ -748,7 +621,7 @@ void device_t::find_interfaces()
 
 void device_t::start()
 {
-	// populate the region field
+	// populate the machine and the region field
 	m_region = machine().region(tag());
 
 	// find all the registered devices
@@ -801,6 +674,32 @@ void device_t::start()
 
 
 //-------------------------------------------------
+//  stop - stop a device
+//-------------------------------------------------
+
+void device_t::stop()
+{
+	// let the interfaces do their pre-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_pre_stop();
+
+	// stop the device
+	device_stop();
+
+	// let the interfaces do their post-work
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_post_stop();
+
+	// free any debugging info
+	auto_free(machine(), m_debug);
+
+	// we're now officially stopped, and the machine is off-limits
+	m_started = false;
+	m_machine = NULL;
+}
+
+
+//-------------------------------------------------
 //  debug_setup - set up for debugging
 //-------------------------------------------------
 
@@ -812,25 +711,6 @@ void device_t::debug_setup()
 
 	// notify the device
 	device_debug_setup();
-}
-
-
-//-------------------------------------------------
-//  reset - reset a device
-//-------------------------------------------------
-
-void device_t::reset()
-{
-	// let the interfaces do their pre-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		intf->interface_pre_reset();
-
-	// reset the device
-	device_reset();
-
-	// let the interfaces do their post-work
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		intf->interface_post_reset();
 }
 
 
@@ -867,12 +747,101 @@ void device_t::post_load()
 
 
 //-------------------------------------------------
+//  notify_clock_changed - notify all interfaces
+//  that the clock has changed
+//-------------------------------------------------
+
+void device_t::notify_clock_changed()
+{
+	// first notify interfaces
+	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
+		intf->interface_clock_changed();
+
+	// then notify the device
+	device_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void device_t::device_config_complete()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_validity_check - validate a device after
+//  the configuration has been constructed
+//-------------------------------------------------
+
+bool device_t::device_validity_check(emu_options &options, const game_driver &driver) const
+{
+	// indicate no error by default
+	return false;
+}
+
+
+//-------------------------------------------------
+//  rom_region - return a pointer to the implicit
+//  rom region description for this device
+//-------------------------------------------------
+
+const rom_entry *device_t::device_rom_region() const
+{
+	// none by default
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  machine_config - return a pointer to a machine
+//  config constructor describing sub-devices for
+//  this device
+//-------------------------------------------------
+
+machine_config_constructor device_t::device_mconfig_additions() const
+{
+	// none by default
+	return NULL;
+}
+
+
+
+//-------------------------------------------------
+//  input_ports - return a pointer to the implicit
+//  input ports description for this device
+//-------------------------------------------------
+
+const input_port_token *device_t::device_input_ports() const
+{
+	// none by default
+	return NULL;
+}
+
+
+//-------------------------------------------------
 //  device_reset - actually handle resetting of
 //  a device; designed to be overriden by the
 //  actual device implementation
 //-------------------------------------------------
 
 void device_t::device_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_stop - clean up anything that needs to
+//  happen before the running_machine goes away
+//-------------------------------------------------
+
+void device_t::device_stop()
 {
 	// do nothing by default
 }
@@ -934,22 +903,6 @@ void device_t::device_debug_setup()
 void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// do nothing by default
-}
-
-
-//-------------------------------------------------
-//  notify_clock_changed - notify all interfaces
-//  that the clock has changed
-//-------------------------------------------------
-
-void device_t::notify_clock_changed()
-{
-	// first notify interfaces
-	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		intf->interface_clock_changed();
-
-	// then notify the device
-	device_clock_changed();
 }
 
 
@@ -1019,4 +972,171 @@ size_t device_t::auto_finder_base::find_shared_size(device_t &base, const char *
 	size_t result = 0;
 	memory_get_shared(base.machine(), tag, result);
 	return result;
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE INTERFACES
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_interface - constructor
+//-------------------------------------------------
+
+device_interface::device_interface(device_t &device)
+	: m_interface_next(NULL),
+	  m_device(device)
+{
+	device_interface **tailptr;
+	for (tailptr = &device.m_interface_list; *tailptr != NULL; tailptr = &(*tailptr)->m_interface_next) ;
+	*tailptr = this;
+}
+
+
+//-------------------------------------------------
+//  ~device_interface - destructor
+//-------------------------------------------------
+
+device_interface::~device_interface()
+{
+}
+
+
+//-------------------------------------------------
+//  interface_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void device_interface::interface_config_complete()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_validity_check - default validation
+//  for a device after the configuration has been
+//  constructed
+//-------------------------------------------------
+
+bool device_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
+{
+	return false;
+}
+
+
+//-------------------------------------------------
+//  interface_pre_start - called before the
+//  device's own start function
+//-------------------------------------------------
+
+void device_interface::interface_pre_start()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_start - called after the
+//  device's own start function
+//-------------------------------------------------
+
+void device_interface::interface_post_start()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_pre_reset - called before the
+//  device's own reset function
+//-------------------------------------------------
+
+void device_interface::interface_pre_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_reset - called after the
+//  device's own reset function
+//-------------------------------------------------
+
+void device_interface::interface_post_reset()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_pre_stop - called before the
+//  device's own stop function
+//-------------------------------------------------
+
+void device_interface::interface_pre_stop()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_stop - called after the
+//  device's own stop function
+//-------------------------------------------------
+
+void device_interface::interface_post_stop()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_pre_save - called prior to saving the
+//  state, so that registered variables can be
+//  properly normalized
+//-------------------------------------------------
+
+void device_interface::interface_pre_save()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_post_load - called after the loading a
+//  saved state, so that registered variables can
+//  be expaneded as necessary
+//-------------------------------------------------
+
+void device_interface::interface_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_clock_changed - called when the
+//  device clock is altered in any way; designed
+//  to be overridden by the actual device
+//  implementation
+//-------------------------------------------------
+
+void device_interface::interface_clock_changed()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_debug_setup - called to allow
+//  interfaces to set up any debugging for this
+//  device
+//-------------------------------------------------
+
+void device_interface::interface_debug_setup()
+{
+	// do nothing by default
 }

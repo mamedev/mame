@@ -13,27 +13,39 @@
 #include "devhelpr.h"
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(i8243, "I8243")
+// device type definition
+const device_type I8243 = &device_creator<i8243_device>;
+
+//-------------------------------------------------
+//  i8243_device - constructor
+//-------------------------------------------------
+
+i8243_device::i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, I8243, "I8243", tag, owner, clock)
+{
+
+}
+
 
 //-------------------------------------------------
 //  static_set_read_handler - configuration helper
 //  to set the read handler
 //-------------------------------------------------
 
-void i8243_device_config::static_set_read_handler(device_config *device, read8_device_func callback)
+void i8243_device::static_set_read_handler(device_t &device, read8_device_func callback)
 {
-	i8243_device_config *i8243 = downcast<i8243_device_config *>(device);
+	i8243_device &i8243 = downcast<i8243_device &>(device);
 	if(callback != NULL)
 	{
-		i8243->m_readhandler.type = DEVCB_TYPE_SELF;
-		i8243->m_readhandler.readdevice = callback;
+		i8243.m_readhandler_cb.type = DEVCB_TYPE_SELF;
+		i8243.m_readhandler_cb.readdevice = callback;
 	}
 	else
 	{
-		i8243->m_readhandler.type = DEVCB_TYPE_NULL;
+		i8243.m_readhandler_cb.type = DEVCB_TYPE_NULL;
 	}
 }
 
@@ -43,42 +55,20 @@ void i8243_device_config::static_set_read_handler(device_config *device, read8_d
 //  to set the write handler
 //-------------------------------------------------
 
-void i8243_device_config::static_set_write_handler(device_config *device, write8_device_func callback)
+void i8243_device::static_set_write_handler(device_t &device, write8_device_func callback)
 {
-	i8243_device_config *i8243 = downcast<i8243_device_config *>(device);
+	i8243_device &i8243 = downcast<i8243_device &>(device);
 	if(callback != NULL)
 	{
-		i8243->m_writehandler.type = DEVCB_TYPE_SELF;
-		i8243->m_writehandler.writedevice = callback;
+		i8243.m_writehandler_cb.type = DEVCB_TYPE_SELF;
+		i8243.m_writehandler_cb.writedevice = callback;
 	}
 	else
 	{
-		i8243->m_writehandler.type = DEVCB_TYPE_NULL;
+		i8243.m_writehandler_cb.type = DEVCB_TYPE_NULL;
 	}
 }
 
-
-
-/***************************************************************************
-    LIVE DEVICE
-***************************************************************************/
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type I8243 = i8243_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  i8243_device - constructor
-//-------------------------------------------------
-
-i8243_device::i8243_device(running_machine &_machine, const i8243_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -86,8 +76,8 @@ i8243_device::i8243_device(running_machine &_machine, const i8243_device_config 
 
 void i8243_device::device_start()
 {
-	devcb_resolve_read8(&m_readhandler, &m_config.m_readhandler, this);
-	devcb_resolve_write8(&m_writehandler, &m_config.m_writehandler, this);
+	devcb_resolve_read8(&m_readhandler, &m_readhandler_cb, this);
+	devcb_resolve_write8(&m_writehandler, &m_writehandler_cb, this);
 }
 
 

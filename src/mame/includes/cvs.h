@@ -19,8 +19,8 @@ struct cvs_star
 class cvs_state : public driver_device
 {
 public:
-	cvs_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	cvs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT8 *    m_video_ram;
@@ -70,8 +70,8 @@ public:
 class quasar_state : public cvs_state
 {
 public:
-	quasar_state(running_machine &machine, const driver_device_config_base &config)
-		: cvs_state(machine, config) { }
+	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cvs_state(mconfig, type, tag) { }
 
 	UINT8 *    m_effectram;
 	UINT8      m_effectcontrol;

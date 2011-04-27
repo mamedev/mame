@@ -94,11 +94,24 @@
 #include "8255ppi.h"
 #include "devhelpr.h"
 
+
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(ppi8255, "Intel PPI8255")
+// device type definition
+const device_type PPI8255 = &device_creator<ppi8255_device>;
+
+//-------------------------------------------------
+//  ppi8255_device - constructor
+//-------------------------------------------------
+
+ppi8255_device::ppi8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, PPI8255, "Intel PPI8255", tag, owner, clock)
+{
+
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -106,7 +119,7 @@ GENERIC_DEVICE_CONFIG_SETUP(ppi8255, "Intel PPI8255")
 //  complete
 //-------------------------------------------------
 
-void ppi8255_device_config::device_config_complete()
+void ppi8255_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const ppi8255_interface *intf = reinterpret_cast<const ppi8255_interface *>(static_config());
@@ -128,37 +141,19 @@ void ppi8255_device_config::device_config_complete()
 }
 
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type PPI8255 = ppi8255_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  ppi8255_device - constructor
-//-------------------------------------------------
-
-ppi8255_device::ppi8255_device(running_machine &_machine, const ppi8255_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ppi8255_device::device_start()
 {
-	devcb_resolve_read8(&m_port_read[0], &m_config.m_port_a_read, this);
-	devcb_resolve_read8(&m_port_read[1], &m_config.m_port_b_read, this);
-	devcb_resolve_read8(&m_port_read[2], &m_config.m_port_c_read, this);
+	devcb_resolve_read8(&m_port_read[0], &m_port_a_read, this);
+	devcb_resolve_read8(&m_port_read[1], &m_port_b_read, this);
+	devcb_resolve_read8(&m_port_read[2], &m_port_c_read, this);
 
-	devcb_resolve_write8(&m_port_write[0], &m_config.m_port_a_write, this);
-	devcb_resolve_write8(&m_port_write[1], &m_config.m_port_b_write, this);
-	devcb_resolve_write8(&m_port_write[2], &m_config.m_port_c_write, this);
+	devcb_resolve_write8(&m_port_write[0], &m_port_a_write, this);
+	devcb_resolve_write8(&m_port_write[1], &m_port_b_write, this);
+	devcb_resolve_write8(&m_port_write[2], &m_port_c_write, this);
 
 	/* register for state saving */
 	save_item(NAME(m_group_a_mode));

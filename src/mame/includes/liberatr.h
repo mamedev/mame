@@ -11,8 +11,8 @@
 class liberatr_state : public atarigen_state
 {
 public:
-	liberatr_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config),
+	liberatr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag),
 		  m_base_ram(*this, "base_ram"),
 		  m_planet_frame(*this, "planet_frame"),
 		  m_planet_select(*this, "planet_select"),

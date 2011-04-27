@@ -1,8 +1,8 @@
 class system1_state : public driver_device
 {
 public:
-	system1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	system1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);

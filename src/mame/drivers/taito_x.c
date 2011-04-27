@@ -324,8 +324,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 class taitox_state : public seta_state
 {
 public:
-	taitox_state(running_machine &machine, const driver_device_config_base &config)
-		: seta_state(machine, config) { }
+	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: seta_state(mconfig, type, tag) { }
 
 	int m_banknum;
 };

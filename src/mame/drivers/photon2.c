@@ -17,8 +17,8 @@
 class photon2_state : public driver_device
 {
 public:
-	photon2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_spectrum_video_ram;
 	int m_spectrum_frame_number;

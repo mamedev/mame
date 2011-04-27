@@ -204,7 +204,7 @@ INLINE ide_state *get_safe_token(device_t *device)
 
 INLINE void signal_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)downcast<const legacy_device_config_base &>(ide->device->baseconfig()).inline_config();
+	const ide_config *config = (const ide_config *)downcast<const legacy_device_base *>(ide->device)->inline_config();
 
 	LOG(("IDE interrupt assert\n"));
 
@@ -218,7 +218,7 @@ INLINE void signal_interrupt(ide_state *ide)
 
 INLINE void clear_interrupt(ide_state *ide)
 {
-	const ide_config *config = (const ide_config *)downcast<const legacy_device_config_base &>(ide->device->baseconfig()).inline_config();
+	const ide_config *config = (const ide_config *)downcast<const legacy_device_base *>(ide->device)->inline_config();
 
 	LOG(("IDE interrupt clear\n"));
 
@@ -1807,14 +1807,14 @@ static DEVICE_START( ide_controller )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* store a pointer back to the device */
 	ide->device = device;
 
 	/* set MAME harddisk handle */
-	config = (const ide_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	config = (const ide_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	ide->handle = get_disk_handle(device->machine(), (config->master != NULL) ? config->master : device->tag());
 	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");

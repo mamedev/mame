@@ -138,10 +138,10 @@ void tms3203x_device::update_special(int dreg)
 	}
 	else if (dreg == TMR_IOF)
 	{
-		if (m_config.m_xf0_w != NULL && IREG(TMR_IOF) & 0x002)
-			(*m_config.m_xf0_w)(*this, (IREG(TMR_IOF) >> 2) & 1);
-		if (m_config.m_xf1_w != NULL && IREG(TMR_IOF) & 0x020)
-			(*m_config.m_xf1_w)(*this, (IREG(TMR_IOF) >> 6) & 1);
+		if (m_xf0_w != NULL && IREG(TMR_IOF) & 0x002)
+			(*m_xf0_w)(*this, (IREG(TMR_IOF) >> 2) & 1);
+		if (m_xf1_w != NULL && IREG(TMR_IOF) & 0x020)
+			(*m_xf1_w)(*this, (IREG(TMR_IOF) >> 6) & 1);
 	}
 	else if (dreg == TMR_ST || dreg == TMR_IF || dreg == TMR_IE)
 		check_irqs();
@@ -3142,21 +3142,21 @@ void tms3203x_device::xor_imm(UINT32 op)
 void tms3203x_device::iack_dir(UINT32 op)
 {
 	offs_t addr = DIRECT(op);
-	if (m_config.m_iack_w)
-		(*m_config.m_iack_w)(*this, ASSERT_LINE, addr);
+	if (m_iack_w)
+		(*m_iack_w)(*this, ASSERT_LINE, addr);
 	RMEM(addr);
-	if (m_config.m_iack_w)
-		(*m_config.m_iack_w)(*this, CLEAR_LINE, addr);
+	if (m_iack_w)
+		(*m_iack_w)(*this, CLEAR_LINE, addr);
 }
 
 void tms3203x_device::iack_ind(UINT32 op)
 {
 	offs_t addr = INDIRECT_D(op, op >> 8);
-	if (m_config.m_iack_w)
-		(*m_config.m_iack_w)(*this, ASSERT_LINE, addr);
+	if (m_iack_w)
+		(*m_iack_w)(*this, ASSERT_LINE, addr);
 	RMEM(addr);
-	if (m_config.m_iack_w)
-		(*m_config.m_iack_w)(*this, CLEAR_LINE, addr);
+	if (m_iack_w)
+		(*m_iack_w)(*this, CLEAR_LINE, addr);
 }
 
 /*-----------------------------------------------------*/
@@ -5671,7 +5671,7 @@ void tms3203x_device::trap(int trapnum)
 {
 	WMEM(++IREG(TMR_SP), m_pc);
 	IREG(TMR_ST) &= ~GIEFLAG;
-	if (m_config.m_chip_type == tms3203x_device_config::CHIP_TYPE_TMS32032)
+	if (m_chip_type == CHIP_TYPE_TMS32032)
 		m_pc = RMEM(((IREG(TMR_IF) >> 16) << 8) + trapnum);
 	else if (m_mcu_mode)
 		m_pc = 0x809fc0 + trapnum;

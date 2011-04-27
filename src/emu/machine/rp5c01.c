@@ -20,6 +20,9 @@
 #include "rp5c01.h"
 
 
+// device type definition
+const device_type RP5C01 = &device_creator<rp5c01_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -93,74 +96,6 @@ enum
 #define RESET_TIMER			0x04
 #define RESET_16_HZ			0x02
 #define RESET_1_HZ			0x01
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type RP5C01 = rp5c01_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  rp5c01_device_config - constructor
-//-------------------------------------------------
-
-rp5c01_device_config::rp5c01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "RP5C01", tag, owner, clock),
-	  device_config_rtc_interface(mconfig, *this),
-	  device_config_nvram_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *rp5c01_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(rp5c01_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *rp5c01_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, rp5c01_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void rp5c01_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const rp5c01_interface *intf = reinterpret_cast<const rp5c01_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<rp5c01_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_alarm_func, 0, sizeof(m_out_alarm_func));
-	}
-}
 
 
 
@@ -342,16 +277,36 @@ inline void rp5c01_device::check_alarm()
 //  rp5c01_device - constructor
 //-------------------------------------------------
 
-rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_config &config)
-    : device_t(_machine, config),
-	  device_rtc_interface(_machine, config, *this),
-	  device_nvram_interface(_machine, config, *this),
+rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this),
+	  device_nvram_interface(mconfig, *this),
 	  m_alarm(1),
 	  m_alarm_on(1),
 	  m_1hz(1),
-	  m_16hz(1),
-      m_config(config)
+	  m_16hz(1)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void rp5c01_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const rp5c01_interface *intf = reinterpret_cast<const rp5c01_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<rp5c01_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_alarm_cb, 0, sizeof(m_out_alarm_cb));
+	}
 }
 
 
@@ -362,7 +317,7 @@ rp5c01_device::rp5c01_device(running_machine &_machine, const rp5c01_device_conf
 void rp5c01_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_alarm_func, &m_config.m_out_alarm_func, this);
+	devcb_resolve_write_line(&m_out_alarm_func, &m_out_alarm_cb, this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);

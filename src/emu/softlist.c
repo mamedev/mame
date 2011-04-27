@@ -1343,7 +1343,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	software_name_split( image->device().machine(), path, &swlist_name, &swname, &swpart );
 	swname_bckp = swname;
 
-	const char *interface = image->image_config().image_interface();
+	const char *interface = image->image_interface();
 
 	if ( swlist_name )
 	{
@@ -1363,12 +1363,12 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	else
 	{
 		/* Loop through all the software lists named in the driver */
-		for (device_t *swlists = image->device().machine().m_devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
 			if ( swlists )
 			{
 
-				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
+				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
 				UINT32 i = DEVINFO_STR_SWLIST_0;
 
 				while ( ! software_part_ptr && i <= DEVINFO_STR_SWLIST_MAX )
@@ -1459,15 +1459,15 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	if (software_info_ptr == NULL)
 	{
 		// check if there is at least a software list
-		if (image->device().machine().m_devicelist.first(SOFTWARE_LIST))
+		if (image->device().machine().devicelist().first(SOFTWARE_LIST))
 		{
 			mame_printf_error("\n\"%s\" approximately matches the following\n"
 							  "supported software items (best match first):\n\n", swname_bckp);
 		}
 
-		for (device_t *swlists = image->device().machine().m_devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		for (device_t *swlists = image->device().machine().devicelist().first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(swlists)->inline_config();
 
 			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 			{
@@ -1482,7 +1482,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 
 						software_list_parse(list, list->error_proc, NULL);
 						// get the top 5 approximate matches for the selected device interface (i.e. only carts for cartslot, etc.)
-						software_list_find_approx_matches(list, swname_bckp, ARRAY_LENGTH(matches), matches, image->image_config().image_interface());
+						software_list_find_approx_matches(list, swname_bckp, ARRAY_LENGTH(matches), matches, image->image_interface());
 
 						if (matches[0] != 0)
 						{
@@ -1609,7 +1609,7 @@ static DEVICE_START( software_list )
 
 static DEVICE_VALIDITY_CHECK( software_list )
 {
-	software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+	software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	int error = FALSE;
 	softlist_map names;
 	softlist_map descriptions;
@@ -1790,7 +1790,7 @@ DEVICE_GET_INFO( software_list )
 
 	if ( state >= DEVINFO_STR_SWLIST_0 && state <= DEVINFO_STR_SWLIST_MAX )
 	{
-		software_list_config *config = (software_list_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+		software_list_config *config = (software_list_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 		if ( config->list_name[ state - DEVINFO_STR_SWLIST_0 ] )
 			strcpy(info->s, config->list_name[ state - DEVINFO_STR_SWLIST_0 ]);

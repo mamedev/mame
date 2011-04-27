@@ -204,7 +204,7 @@ void debug_cpu_flush_traces(running_machine &machine)
 {
 	/* this can be called on exit even when no debugging is enabled, so
      make sure the devdebug is valid before proceeding */
-	for (device_t *device = machine.m_devicelist.first(); device != NULL; device = device->next())
+	for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
 		if (device->debug() != NULL)
 			device->debug()->trace_flush();
 }
@@ -341,7 +341,7 @@ bool debug_comment_save(running_machine &machine)
 
 		// for each device
 		bool found_comments = false;
-		for (device_t *device = machine.m_devicelist.first(); device != NULL; device = device->next())
+		for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
 			if (device->debug()->comment_count() > 0)
 			{
 				// create a node for this device
@@ -1084,7 +1084,7 @@ static void on_vblank(screen_device &device, void *param, bool vblank_state)
 static void reset_transient_flags(running_machine &machine)
 {
 	/* loop over CPUs and reset the transient flags */
-	for (device_t *device = machine.m_devicelist.first(); device != NULL; device = device->next())
+	for (device_t *device = machine.devicelist().first(); device != NULL; device = device->next())
 		device->debug()->reset_transient_flag();
 	machine.debugcpu_data->m_stop_when_not_device = NULL;
 }
@@ -1149,7 +1149,7 @@ static device_t *expression_get_device(running_machine &machine, const char *tag
 {
 	device_t *device;
 
-	for (device = machine.m_devicelist.first(); device != NULL; device = device->next())
+	for (device = machine.devicelist().first(); device != NULL; device = device->next())
 		if (mame_stricmp(device->tag(), tag) == 0)
 			return device;
 
@@ -1635,7 +1635,7 @@ static UINT64 get_cpunum(symbol_table &table, void *ref)
 
 	device_execute_interface *exec = NULL;
 	int index = 0;
-	for (bool gotone = machine.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = machine.devicelist().first(exec); gotone; gotone = exec->next(exec))
 	{
 		if (&exec->device() == target)
 			return index;

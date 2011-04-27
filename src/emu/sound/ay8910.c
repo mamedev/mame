@@ -929,7 +929,7 @@ static DEVICE_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->baseconfig().static_config() ? (const ay8910_interface *)device->baseconfig().static_config() : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config() ? (const ay8910_interface *)device->static_config() : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), AY8910, device, device->clock(), intf);
 }
 
@@ -941,7 +941,7 @@ static DEVICE_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->baseconfig().static_config() ? (const ay8910_interface *)device->baseconfig().static_config() : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config() ? (const ay8910_interface *)device->static_config() : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), YM2149, device, device->clock(), intf);
 }
 

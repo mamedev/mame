@@ -76,41 +76,46 @@ media_auditor::summary media_auditor::audit_media(const char *validation)
 
 // temporary hack until romload is update: get the driver path and support it for
 // all searches
-const char *driverpath = m_enumerator.config().m_devicelist.find("root")->searchpath();
+const char *driverpath = m_enumerator.config().devicelist().find("root")->searchpath();
 
 	// iterate over ROM sources and regions
 	int found = 0;
 	int required = 0;
-	int shared_found = 0;
-	int shared_required = 0;
+	int sharedFound = 0;
+	int sharedRequired = 0;
 	for (const rom_source *source = rom_first_source(m_enumerator.config()); source != NULL; source = rom_next_source(*source))
 	{
 		// determine the search path for this source and iterate through the regions
 		m_searchpath = source->searchpath();
 
 		// also determine if this is the driver's specific ROMs or not
-		bool source_is_gamedrv = (dynamic_cast<const driver_device_config_base *>(source) != NULL);
+		bool source_is_gamedrv = (dynamic_cast<const driver_device *>(source) != NULL);
 
 		// now iterate over regions and ROMs within
 		for (const rom_entry *region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 		{
 // temporary hack: add the driver path & region name
-astring combinedpath(source->searchpath(), ";", driverpath);
-if (ROMREGION_ISLOADBYNAME(region))
-	combinedpath.cat(";").cat(ROMREGION_GETTAG(region));
+astring combinedpath(m_searchpath, ";", driverpath);
+if(ROMREGION_ISLOADBYNAME(region))
+{
+	combinedpath=combinedpath.cat(";");
+	combinedpath=combinedpath.cat(ROMREGION_GETTAG(region));
+}
 m_searchpath = combinedpath;
 
 			for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 			{
 				hash_collection hashes(ROM_GETHASHDATA(rom));
-				bool shared = (also_used_by_parent(hashes) != -1);
+				bool shared = also_used_by_parent(hashes) >= 0;
 
 				// if a dump exists, then at least one entry is required
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					required++;
 					if (shared)
-						shared_required++;
+					{
+						sharedRequired++;
+					}
 				}
 
 				// audit a file
@@ -131,14 +136,16 @@ m_searchpath = combinedpath;
 				{
 					found++;
 					if (shared)
-						shared_found++;
+					{
+						sharedFound++;
+					}
 				}
 			}
 		}
 	}
 
 	// if we found nothing unique to this set & the set needs roms that aren't in the parent or the parent isn't found either, then we don't have the set at all
-	if (found == shared_found && required > 0 && (required != shared_required || shared_found == 0))
+	if (found == sharedFound && required > 0 && (required != sharedRequired || sharedFound == 0))
 		m_record_list.reset();
 
 	// return a summary
@@ -157,10 +164,10 @@ media_auditor::summary media_auditor::audit_samples()
 	m_record_list.reset();
 
 	// iterate over sample entries
-	for (const device_config *devconfig = m_enumerator.config().first_device(); devconfig != NULL; devconfig = devconfig->next())
-		if (devconfig->type() == SAMPLES)
+	for (const device_t *device = m_enumerator.config().first_device(); device != NULL; device = device->next())
+		if (device->type() == SAMPLES)
 		{
-			const samples_interface *intf = reinterpret_cast<const samples_interface *>(devconfig->static_config());
+			const samples_interface *intf = reinterpret_cast<const samples_interface *>(device->static_config());
 			if (intf->samplenames != NULL)
 			{
 				// by default we just search using the driver name

@@ -1,8 +1,8 @@
 class nmk16_state : public driver_device
 {
 public:
-	nmk16_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int mask[4*2];
 	UINT16* m_mainram;

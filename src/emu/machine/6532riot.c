@@ -16,16 +16,11 @@ The timer seems to follow these rules:
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type RIOT6532 = riot6532_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+// device type definition
+const device_type RIOT6532 = &device_creator<riot6532_device>;
 
 enum
 {
@@ -37,68 +32,6 @@ enum
 #define TIMER_FLAG		0x80
 #define PA7_FLAG		0x40
 
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  riot6532_device_config - constructor
-//-------------------------------------------------
-
-riot6532_device_config::riot6532_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "6532 (RIOT)", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *riot6532_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(riot6532_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *riot6532_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, riot6532_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void riot6532_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const riot6532_interface *intf = reinterpret_cast<const riot6532_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<riot6532_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_a_func, 0, sizeof(m_in_a_func));
-		memset(&m_in_b_func, 0, sizeof(m_in_b_func));
-		memset(&m_out_a_func, 0, sizeof(m_out_a_func));
-		memset(&m_out_b_func, 0, sizeof(m_out_b_func));
-		memset(&m_irq_func, 0, sizeof(m_irq_func));
-	}
-}
 
 
 
@@ -506,11 +439,38 @@ UINT8 riot6532_device::portb_out_get()
 //  riot6532_device - constructor
 //-------------------------------------------------
 
-riot6532_device::riot6532_device(running_machine &_machine, const riot6532_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config)
+riot6532_device::riot6532_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, RIOT6532, "6532 (RIOT)", tag, owner, clock)
 {
 }
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void riot6532_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const riot6532_interface *intf = reinterpret_cast<const riot6532_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<riot6532_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
+		memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
+		memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
+		memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
+		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
+	}
+}
+
 
 /*-------------------------------------------------
     device_start - device-specific startup
@@ -522,16 +482,16 @@ void riot6532_device::device_start()
 	assert(this != NULL);
 
 	/* set static values */
-	m_index = machine().m_devicelist.indexof(RIOT6532, tag());
+	m_index = machine().devicelist().indexof(RIOT6532, tag());
 
 	/* configure the ports */
-	devcb_resolve_read8(&m_port[0].m_in_func, &m_config.m_in_a_func, this);
-	devcb_resolve_write8(&m_port[0].m_out_func, &m_config.m_out_a_func, this);
-	devcb_resolve_read8(&m_port[1].m_in_func, &m_config.m_in_b_func, this);
-	devcb_resolve_write8(&m_port[1].m_out_func, &m_config.m_out_b_func, this);
+	devcb_resolve_read8(&m_port[0].m_in_func, &m_in_a_cb, this);
+	devcb_resolve_write8(&m_port[0].m_out_func, &m_out_a_cb, this);
+	devcb_resolve_read8(&m_port[1].m_in_func, &m_in_b_cb, this);
+	devcb_resolve_write8(&m_port[1].m_out_func, &m_out_b_cb, this);
 
 	/* resolve irq func */
-	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
+	devcb_resolve_write_line(&m_irq_func, &m_irq_cb, this);
 
 	/* allocate timers */
 	m_timer = machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);

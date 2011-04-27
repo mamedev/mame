@@ -274,7 +274,7 @@ static CPU_INIT( rsp )
 	rsp_state *rsp = get_safe_token(device);
 	int regIdx;
 	int accumIdx;
-	rsp->config = (const rsp_config *)device->baseconfig().static_config();
+	rsp->config = (const rsp_config *)device->static_config();
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		rsp->exec_output = fopen("rsp_execute.txt", "wt");

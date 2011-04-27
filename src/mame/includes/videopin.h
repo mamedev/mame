@@ -18,8 +18,8 @@
 class videopin_state : public driver_device
 {
 public:
-	videopin_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	videopin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	attotime m_time_pushed;
 	attotime m_time_released;

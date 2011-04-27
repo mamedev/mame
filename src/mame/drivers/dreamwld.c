@@ -93,8 +93,8 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 class dreamwld_state : public driver_device
 {
 public:
-	dreamwld_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT32 *  m_bg_videoram;

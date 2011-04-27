@@ -50,8 +50,8 @@ Notes:
 class k3_state : public driver_device
 {
 public:
-	k3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	k3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_oki1(*this, "oki1"),
 		  m_oki2(*this, "oki2") { }
 

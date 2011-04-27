@@ -65,7 +65,7 @@ INLINE const adc12138_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == ADC12130) || (device->type() == ADC12132) || (device->type() == ADC12138));
-	return (const adc12138_interface *) device->baseconfig().static_config();
+	return (const adc12138_interface *) device->static_config();
 }
 
 

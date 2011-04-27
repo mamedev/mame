@@ -188,49 +188,19 @@ struct cdp1869_interface
 	int color_clock;			// the chroma clock of the chip
 
 	// screen format
-	devcb_read_line					in_pal_ntsc_func;
+	devcb_read_line					in_pal_ntsc_cb;
 
 	// page memory color bit read function
-	cdp1869_pcb_read_func			in_pcb_func;
+	cdp1869_pcb_read_func			in_pcb_cb;
 
 	// character memory read function
-	cdp1869_char_ram_read_func		in_char_ram_func;
+	cdp1869_char_ram_read_func		in_char_ram_cb;
 
 	// character memory write function
-	cdp1869_char_ram_write_func		out_char_ram_func;
+	cdp1869_char_ram_write_func		out_char_ram_cb;
 
 	// if specified, this gets called for every change of the predisplay pin (CDP1870/76 pin 1)
-	devcb_write_line				out_prd_func;
-};
-
-
-
-// ======================> cdp1869_device_config
-
-class cdp1869_device_config :   public device_config,
-								public device_config_sound_interface,
-								public device_config_memory_interface,
-                                public cdp1869_interface
-{
-    friend class cdp1869_device;
-
-    // construction/destruction
-    cdp1869_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
+	devcb_write_line				out_prd_cb;
 };
 
 
@@ -239,14 +209,13 @@ protected:
 
 class cdp1869_device :	public device_t,
 						public device_sound_interface,
-						public device_memory_interface
+						public device_memory_interface,
+                        public cdp1869_interface
 {
-    friend class cdp1869_device_config;
-
-    // construction/destruction
-    cdp1869_device(running_machine &_machine, const cdp1869_device_config &_config);
-
 public:
+    // construction/destruction
+    cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE8_MEMBER( out3_w );
     DECLARE_WRITE8_MEMBER( out4_w );
     DECLARE_WRITE8_MEMBER( out5_w );
@@ -266,11 +235,15 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// internal callbacks
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// device_sound_interface callbacks
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	inline bool is_ntsc();
@@ -328,7 +301,7 @@ private:
 	UINT8 m_wnfreq;					// white noise range select
 	UINT8 m_wnamp;					// white noise output amplitude
 
-	const cdp1869_device_config &m_config;
+	const address_space_config		m_space_config;
 };
 
 

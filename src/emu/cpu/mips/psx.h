@@ -96,25 +96,13 @@ enum
 	PSXCPU_CP2CR30, PSXCPU_CP2CR31
 };
 
-extern const device_type PSXCPU;
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
 //#define MCFG_PSXCPU_CONFIG(_config)
-//  psxcpu_device_config::static_set_config(device, _config);
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
-extern const device_type PSXCPU;
-extern const device_type CXD8661R;
+//  psxcpu_device::static_set_config(*device, _config);
 
 
 
@@ -122,65 +110,21 @@ extern const device_type CXD8661R;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class psxcpu_device;
-
-
-// ======================> psxcpu_device_config
-
-class psxcpu_device_config :  public cpu_device_config
-{
-    friend class psxcpu_device;
-
-public:
-    // allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-    // construction/destruction
-	psxcpu_device_config(const machine_config &mconfig, device_type _type, const char *name, const char *tag, const device_config *owner, UINT32 clock, address_map_constructor internal_map);
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const { return 1; }
-	virtual UINT32 execute_max_cycles() const { return 40; }
-	virtual UINT32 execute_input_lines() const { return 6; }
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return ( clocks + 3 ) / 4; }
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * 4; }
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
-	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
-
-	// address spaces
-	const address_space_config m_program_config;
-};
-
-class cxd8661r_device_config : public psxcpu_device_config
-{
-public:
-    // allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 // ======================> psxcpu_device
 
 class psxcpu_device : public cpu_device
 {
-	friend class psxcpu_device_config;
-	friend class cxd8661r_device_config;
-
 public:
+	// construction/destruction
+	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// public interfaces
 	void set_berr();
 	void set_biu( UINT32 data, UINT32 mem_mask );
 	UINT32 get_biu();
 
 protected:
-	// construction/destruction
-	psxcpu_device(running_machine &_machine, const psxcpu_device_config &config);
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
 
 	// device-level overrides
 	virtual void device_start();
@@ -188,14 +132,24 @@ protected:
 	virtual void device_post_load();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 40; }
+	virtual UINT32 execute_input_lines() const { return 6; }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return ( clocks + 3 ) / 4; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * 4; }
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 
@@ -218,6 +172,7 @@ protected:
 	inline UINT32 opcode_read();
 
 	// address spaces
+	const address_space_config m_program_config;
 	address_space *m_program;
 	direct_read_data *m_direct;
 
@@ -310,6 +265,19 @@ protected:
 	UINT32 Lm_E( UINT32 result );
 	void docop2( int gteop );
 };
+
+class cxd8661r_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+// device type definition
+extern const device_type PSXCPU;
+extern const device_type CXD8661R;
+
+
 
 #define PSXCPU_DELAYR_PC ( 32 )
 #define PSXCPU_DELAYR_NOTPC ( 33 )

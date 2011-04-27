@@ -43,47 +43,23 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  LIVE DEVICE
 //**************************************************************************
 
-const device_type NVRAM = nvram_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
+// device type definition
+const device_type NVRAM = &device_creator<nvram_device>;
 
 //-------------------------------------------------
-//  nvram_device_config - constructor
+//  nvram_device - constructor
 //-------------------------------------------------
 
-nvram_device_config::nvram_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "NVRAM", tag, owner, clock),
-	  device_config_nvram_interface(mconfig, *this),
-	  m_default_value(DEFAULT_ALL_1)
+nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock),
+	  device_nvram_interface(mconfig, *this),
+	  m_default_value(DEFAULT_ALL_1),
+	  m_base(NULL),
+	  m_length(0)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *nvram_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(nvram_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *nvram_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, nvram_device(machine, *this));
 }
 
 
@@ -92,10 +68,10 @@ device_t *nvram_device_config::alloc_device(running_machine &machine) const
 //  to set the interface
 //-------------------------------------------------
 
-void nvram_device_config::static_set_default_value(device_config *device, default_value value)
+void nvram_device::static_set_default_value(device_t &device, default_value value)
 {
-	nvram_device_config *nvram = downcast<nvram_device_config *>(device);
-	nvram->m_default_value = value;
+	nvram_device &nvram = downcast<nvram_device &>(device);
+	nvram.m_default_value = value;
 }
 
 
@@ -104,30 +80,11 @@ void nvram_device_config::static_set_default_value(device_config *device, defaul
 //  helper to set a custom callback
 //-------------------------------------------------
 
-void nvram_device_config::static_set_custom_handler(device_config *device, nvram_init_delegate handler)
+void nvram_device::static_set_custom_handler(device_t &device, nvram_init_delegate handler)
 {
-	nvram_device_config *nvram = downcast<nvram_device_config *>(device);
-	nvram->m_default_value = DEFAULT_CUSTOM;
-	nvram->m_custom_handler = handler;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nvram_device - constructor
-//-------------------------------------------------
-
-nvram_device::nvram_device(running_machine &_machine, const nvram_device_config &config)
-	: device_t(_machine, config),
-	  device_nvram_interface(_machine, config, *this),
-	  m_config(config),
-	  m_base(NULL),
-	  m_length(0)
-{
+	nvram_device &nvram = downcast<nvram_device &>(device);
+	nvram.m_default_value = DEFAULT_CUSTOM;
+	nvram.m_custom_handler = handler;
 }
 
 
@@ -138,8 +95,8 @@ nvram_device::nvram_device(running_machine &_machine, const nvram_device_config 
 void nvram_device::device_start()
 {
 	// bind our handler
-	if (!m_config.m_custom_handler.isnull())
-		m_custom_handler = nvram_init_delegate(m_config.m_custom_handler, m_owner);
+	if (!m_custom_handler.isnull())
+		m_custom_handler = nvram_init_delegate(m_custom_handler, m_owner);
 }
 
 
@@ -161,21 +118,21 @@ void nvram_device::nvram_default()
 	}
 
 	// default values for other cases
-	switch (m_config.m_default_value)
+	switch (m_default_value)
 	{
 		// all-0's
-		case nvram_device_config::DEFAULT_ALL_0:
+		case DEFAULT_ALL_0:
 			memset(m_base, 0, m_length);
 			break;
 
 		// all 1's
 		default:
-		case nvram_device_config::DEFAULT_ALL_1:
+		case DEFAULT_ALL_1:
 			memset(m_base, 0xff, m_length);
 			break;
 
 		// random values
-		case nvram_device_config::DEFAULT_RANDOM:
+		case DEFAULT_RANDOM:
 		{
 			UINT8 *nvram = reinterpret_cast<UINT8 *>(m_base);
 			for (int index = 0; index < m_length; index++)
@@ -184,12 +141,12 @@ void nvram_device::nvram_default()
 		}
 
 		// custom handler
-		case nvram_device_config::DEFAULT_CUSTOM:
+		case DEFAULT_CUSTOM:
 			m_custom_handler(*this, m_base, m_length);
 			break;
 
 		// none - do nothing
-		case nvram_device_config::DEFAULT_NONE:
+		case DEFAULT_NONE:
 			break;
 	}
 }

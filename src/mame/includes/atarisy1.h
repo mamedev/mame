@@ -9,8 +9,8 @@
 class atarisy1_state : public atarigen_state
 {
 public:
-	atarisy1_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config),
+	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag),
 		  m_joystick_timer(*this, "joystick_timer"),
 		  m_yscroll_reset_timer(*this, "yreset_timer"),
 		  m_scanline_timer(*this, "scan_timer"),

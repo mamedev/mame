@@ -251,7 +251,7 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 static DEVICE_START( gaelco )
 {
 	int j, vol;
-	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->baseconfig().static_config();
+	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->static_config();
 
 	gaelco_sound_state *info = get_safe_token(device);
 

@@ -14,8 +14,8 @@ struct _lordgun_gun_data
 class lordgun_state : public driver_device
 {
 public:
-	lordgun_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	lordgun_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_old;
 	UINT8 m_aliencha_dip_sel;

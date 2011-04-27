@@ -32,6 +32,9 @@
 	#define debug_xa if (0)
 #endif
 
+// device type definition
+const device_type SPU = &device_creator<spu_device>;
+
 //
 //
 //
@@ -236,8 +239,6 @@ static const int filter_coef[5][2]=
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type SPU = spu_device_config::static_alloc_device_config;
-
 reverb_params *spu_reverb_cfg=NULL;
 
 float spu_device::freq_multiplier=1.0f;
@@ -245,48 +246,6 @@ float spu_device::freq_multiplier=1.0f;
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  static_set_irqf - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
-void spu_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, UINT32 state))
-{
-	spu_device_config *spu = downcast<spu_device_config *>(device);
-	spu->m_irq_func = irqf;
-}
-
-//-------------------------------------------------
-//  spu_device_config - constructor
-//-------------------------------------------------
-
-spu_device_config::spu_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "SPU", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *spu_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(spu_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *spu_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, spu_device(machine, *this));
-}
 
 class adpcm_decoder
 {
@@ -995,11 +954,10 @@ static int shift_register15(int &shift)
 //  spu_device - constructor
 //-------------------------------------------------
 
-spu_device::spu_device(running_machine &_machine, const spu_device_config &config)
-	: device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  m_config(config),
-	  m_irq_cb(m_config.m_irq_func),
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SPU, "SPU", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_irq_cb(NULL),
       dirty_flags(-1),
 	status_enabled(false),
 	xa_voll(0x8000),
@@ -1007,6 +965,17 @@ spu_device::spu_device(running_machine &_machine, const spu_device_config &confi
 	  changed_xa_vol(0)
 
 {
+}
+
+//-------------------------------------------------
+//  static_set_irqf - configuration helper to set
+//  the IRQ callback
+//-------------------------------------------------
+
+void spu_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, UINT32 state))
+{
+	spu_device &spu = downcast<spu_device &>(device);
+	spu.m_irq_cb = irqf;
 }
 
 void spu_device::device_start()

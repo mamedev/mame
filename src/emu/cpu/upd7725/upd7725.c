@@ -13,142 +13,35 @@
 #include "debugger.h"
 #include "upd7725.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type UPD7725 = upd7725_device_config::static_alloc_device_config;
-const device_type UPD96050 = upd96050_device_config::static_alloc_device_config;
 
 //**************************************************************************
-//  UPD7725 DEVICE CONFIG
+//  DEVICE INTERFACE
 //**************************************************************************
 
-//-------------------------------------------------
-//  necdsp_device_config - constructor
-//-------------------------------------------------
+// device type definition
+const device_type UPD7725 = &device_creator<upd7725_device>;
+const device_type UPD96050 = &device_creator<upd96050_device>;
 
-necdsp_device_config::necdsp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name)
-	: cpu_device_config(mconfig, static_alloc_device_config, name, tag, owner, clock),
+necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, UINT32 abits, UINT32 dbits, const char *name)
+	: cpu_device(mconfig, type, name, tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_BIG, 32, abits, -2),	// data bus width, address bus width, -2 means DWORD-addressable
-	  m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1)	// -1 for WORD-addressable
+	  m_data_config("data", ENDIANNESS_BIG, 16, dbits, -1),	// -1 for WORD-addressable
+	m_irq(0),
+	m_program(NULL),
+	m_data(NULL),
+	m_direct(NULL)
 {
 }
 
 
-upd7725_device_config::upd7725_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: necdsp_device_config(mconfig, tag, owner, clock, 11, 11, "uPD7725")
+upd7725_device::upd7725_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: necdsp_device(mconfig, UPD7725, tag, owner, clock, 11, 11, "uPD7725")
 {
 }
 
-upd96050_device_config::upd96050_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: necdsp_device_config(mconfig, tag, owner, clock, 14, 12, "uPD96050")
+upd96050_device::upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: necdsp_device(mconfig, UPD96050, tag, owner, clock, 14, 12, "uPD96050")
 {
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *necdsp_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(necdsp_device_config(mconfig, tag, owner, clock, 13, 11, "NECDSP"));
-}
-
-device_config *upd7725_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(upd7725_device_config(mconfig, tag, owner, clock));
-}
-
-device_config *upd96050_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(upd96050_device_config(mconfig, tag, owner, clock));
-}
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *necdsp_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, necdsp_device(machine, *this));
-}
-
-device_t *upd7725_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, upd7725_device(machine, *this));
-}
-
-device_t *upd96050_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, upd96050_device(machine, *this));
-}
-
-//-------------------------------------------------
-//  execute_min_cycles - return minimum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 necdsp_device_config::execute_min_cycles() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_max_cycles - return maximum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 necdsp_device_config::execute_max_cycles() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-UINT32 necdsp_device_config::execute_input_lines() const
-{
-	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *necdsp_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_PROGRAM) ? &m_program_config : &m_data_config;
-}
-
-
-//-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 necdsp_device_config::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 necdsp_device_config::disasm_max_opcode_bytes() const
-{
-	return 4;
 }
 
 //-------------------------------------------------
@@ -157,7 +50,7 @@ UINT32 necdsp_device_config::disasm_max_opcode_bytes() const
 //  complete
 //-------------------------------------------------
 
-void necdsp_device_config::device_config_complete()
+void necdsp_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const necdsp_interface *intf = reinterpret_cast<const necdsp_interface *>(static_config());
@@ -180,32 +73,6 @@ void necdsp_device_config::device_config_complete()
 		//memset(&m_out_drq_func, 0, sizeof(m_out_drq_func));
 	}
 }
-
-//**************************************************************************
-//  DEVICE INTERFACE
-//**************************************************************************
-
-necdsp_device::necdsp_device(running_machine &_machine, const necdsp_device_config &config)
-	: cpu_device(_machine, config),
-	m_irq(0),
-	m_program(NULL),
-	m_data(NULL),
-	m_direct(NULL),
-	m_config(config)
-{
-}
-
-
-upd7725_device::upd7725_device(running_machine &_machine, const upd7725_device_config &config)
-	: necdsp_device(_machine, config)
-{
-}
-
-upd96050_device::upd96050_device(running_machine &_machine, const upd96050_device_config &config)
-	: necdsp_device(_machine, config)
-{
-}
-
 //-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
@@ -238,17 +105,17 @@ void necdsp_device::device_start()
 	state_add(UPD7725_IDB, "IDB", regs.idb);
 
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_int_func, &m_config.m_in_int_func, this);
-	//devcb_resolve_read8(&m_in_si_func, &m_config.m_in_si_func, this);
-	//devcb_resolve_read_line(&m_in_sck_func, &m_config.m_in_sck_func, this);
-	//devcb_resolve_read_line(&m_in_sien_func, &m_config.m_in_sien_func, this);
-	//devcb_resolve_read_line(&m_in_soen_func, &m_config.m_in_soen_func, this);
-	//devcb_resolve_read_line(&m_in_dack_func, &m_config.m_in_dack_func, this);
-	devcb_resolve_write_line(&m_out_p0_func, &m_config.m_out_p0_func, this);
-	devcb_resolve_write_line(&m_out_p1_func, &m_config.m_out_p1_func, this);
-	//devcb_resolve_write8(&m_out_so_func, &m_config.m_out_so_func, this);
-	//devcb_resolve_write_line(&m_out_sorq_func, &m_config.m_out_sorq_func, this);
-	//devcb_resolve_write_line(&m_out_drq_func, &m_config.m_out_drq_func, this);
+	devcb_resolve_read_line(&m_in_int_func, &m_in_int_cb, this);
+	//devcb_resolve_read8(&m_in_si_func, &m_in_si_cb, this);
+	//devcb_resolve_read_line(&m_in_sck_func, &m_in_sck_cb, this);
+	//devcb_resolve_read_line(&m_in_sien_func, &m_in_sien_cb, this);
+	//devcb_resolve_read_line(&m_in_soen_func, &m_in_soen_cb, this);
+	//devcb_resolve_read_line(&m_in_dack_func, &m_in_dack_cb, this);
+	devcb_resolve_write_line(&m_out_p0_func, &m_out_p0_cb, this);
+	devcb_resolve_write_line(&m_out_p1_func, &m_out_p1_cb, this);
+	//devcb_resolve_write8(&m_out_so_func, &m_out_so_cb, this);
+	//devcb_resolve_write_line(&m_out_sorq_func, &m_out_sorq_cb, this);
+	//devcb_resolve_write_line(&m_out_drq_func, &m_out_drq_cb, this);
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -316,6 +183,18 @@ void necdsp_device::device_reset()
 }
 
 //-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *necdsp_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_PROGRAM) ? &m_program_config : &m_data_config;
+}
+
+
+//-------------------------------------------------
 //  state_import - import state into the device,
 //  after it has been set
 //-------------------------------------------------
@@ -367,6 +246,39 @@ void necdsp_device::state_string_export(const device_state_entry &entry, astring
 }
 
 //-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 necdsp_device::execute_min_cycles() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 necdsp_device::execute_max_cycles() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 necdsp_device::execute_input_lines() const
+{
+	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
+}
+
+
+//-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
 
@@ -380,6 +292,27 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 		break;
 	// add more when needed
 	}
+}
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 necdsp_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 necdsp_device::disasm_max_opcode_bytes() const
+{
+	return 4;
 }
 
 //-------------------------------------------------

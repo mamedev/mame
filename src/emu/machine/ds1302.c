@@ -40,53 +40,18 @@ INLINE UINT8 convert_to_bcd(int val)
 ***************************************************************************/
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  ds1302_device_config - constructor
-//-------------------------------------------------
-
-ds1302_device_config::ds1302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "Dallas DS1302 RTC", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ds1302_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(ds1302_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ds1302_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, ds1302_device(machine, *this));
-}
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type DS1302 = ds1302_device_config::static_alloc_device_config;
+// device type definition
+const device_type DS1302 = &device_creator<ds1302_device>;
 
 //-------------------------------------------------
 //  ds1302_device - constructor
 //-------------------------------------------------
 
-ds1302_device::ds1302_device(running_machine &_machine, const ds1302_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+ds1302_device::ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, DS1302, "Dallas DS1302 RTC", tag, owner, clock)
 {
 
 }

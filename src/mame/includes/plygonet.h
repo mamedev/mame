@@ -7,8 +7,8 @@ static const UINT16 dsp56k_bank04_size = 0x1fc0;
 class polygonet_state : public driver_device
 {
 public:
-	polygonet_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	polygonet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* 68k-side shared ram */
 	UINT32* m_shared_ram;

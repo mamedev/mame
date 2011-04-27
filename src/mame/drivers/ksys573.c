@@ -383,8 +383,8 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 class ksys573_state : public psx_state
 {
 public:
-	ksys573_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	ksys573_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 
 	int m_flash_bank;
 	fujitsu_29f016a_device *m_flash_device[5][16];

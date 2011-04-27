@@ -10,8 +10,8 @@
 class exidy440_state : public driver_device
 {
 public:
-	exidy440_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	exidy440_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_bank;
 	const UINT8 *m_showdown_bank_data[2];

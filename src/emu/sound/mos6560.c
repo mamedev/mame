@@ -132,7 +132,7 @@ INLINE const mos6560_interface *get_interface( device_t *device )
 	assert(device != NULL);
 	assert((device->type() == MOS656X));
 
-	return (const mos6560_interface *) device->baseconfig().static_config();
+	return (const mos6560_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -799,7 +799,7 @@ static void mos6560_sound_start( device_t *device )
 static DEVICE_START( mos6560 )
 {
 	mos6560_state *mos6560 = get_safe_token(device);
-	const mos6560_interface *intf = (mos6560_interface *)device->baseconfig().static_config();
+	const mos6560_interface *intf = (mos6560_interface *)device->static_config();
 	int width, height;
 
 	mos6560->screen = downcast<screen_device *>(device->machine().device(intf->screen));

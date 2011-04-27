@@ -3477,8 +3477,8 @@ static CPU_INIT( z80 )
 	z80->after_ldair = 0;
 	z80->ea = 0;
 
-	if (device->baseconfig().static_config() != NULL)
-		z80->daisy.init(device, (const z80_daisy_config *)device->baseconfig().static_config());
+	if (device->static_config() != NULL)
+		z80->daisy.init(device, (const z80_daisy_config *)device->static_config());
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	z80->program = device->space(AS_PROGRAM);

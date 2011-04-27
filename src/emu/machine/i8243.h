@@ -28,50 +28,28 @@
 	MCFG_I8243_WRITEHANDLER(_write) \
 
 #define MCFG_I8243_READHANDLER(_read) \
-	i8243_device_config::static_set_read_handler(device, _read); \
+	i8243_device::static_set_read_handler(*device, _read); \
 
 #define MCFG_I8243_WRITEHANDLER(_write) \
-	i8243_device_config::static_set_write_handler(device, _write); \
+	i8243_device::static_set_write_handler(*device, _write); \
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
 
-// ======================> i8243_device_config
-
-class i8243_device_config : public device_config
-{
-    friend class i8243_device;
-
-    // construction/destruction
-    i8243_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_read_handler(device_config *device, read8_device_func callback);
-	static void static_set_write_handler(device_config *device, write8_device_func callback);
-
-protected:
-	devcb_read8		m_readhandler;
-	devcb_write8	m_writehandler;
-};
-
-
 // ======================> i8243_device
 
 class i8243_device :  public device_t
 {
-    friend class i8243_device_config;
-
-    // construction/destruction
-    i8243_device(running_machine &_machine, const i8243_device_config &_config);
-
 public:
+    // construction/destruction
+    i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_read_handler(device_t &device, read8_device_func callback);
+	static void static_set_write_handler(device_t &device, write8_device_func callback);
+
 
 	UINT8 i8243_p2_r(UINT32 offset);
 	void i8243_p2_w(UINT32 offset, UINT8 data);
@@ -93,10 +71,11 @@ private:
 	UINT8		m_opcode;			/* latched opcode */
 	UINT8		m_prog;				/* previous PROG state */
 
+	devcb_read8		m_readhandler_cb;
+	devcb_write8	m_writehandler_cb;
+
 	devcb_resolved_read8	m_readhandler;
 	devcb_resolved_write8	m_writehandler;
-
-    const i8243_device_config &m_config;
 };
 
 

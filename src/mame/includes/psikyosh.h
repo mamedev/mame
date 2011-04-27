@@ -19,8 +19,8 @@
 class psikyosh_state : public driver_device
 {
 public:
-	psikyosh_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT32 *       m_bgram;

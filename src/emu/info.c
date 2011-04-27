@@ -249,9 +249,9 @@ void info_xml_creator::output_one()
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
 	input_port_list_init(portlist, driver.ipt, NULL, 0, FALSE, NULL);
-	for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
-		if (cfg->input_ports() != NULL)
-			input_port_list_init(portlist, cfg->input_ports(), NULL, 0, FALSE, cfg);
+	for (device_t *device = config.devicelist().first(); device != NULL; device = device->next())
+		if (device->input_ports() != NULL)
+			input_port_list_init(portlist, device->input_ports(), NULL, 0, FALSE, device);
 
 	// print the header and the game name
 	fprintf(m_output, "\t<" XML_TOP);
@@ -326,9 +326,9 @@ void info_xml_creator::output_one()
 void info_xml_creator::output_sampleof()
 {
 	// iterate over sample devices
-	for (const device_config *devconfig = m_drivlist.config().m_devicelist.first(SAMPLES); devconfig != NULL; devconfig = devconfig->typenext())
+	for (const device_t *device = m_drivlist.config().devicelist().first(SAMPLES); device != NULL; device = device->typenext())
 	{
-		const char *const *samplenames = ((const samples_interface *)devconfig->static_config())->samplenames;
+		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
 		if (samplenames != NULL)
 
 			// iterate over sample names
@@ -484,9 +484,9 @@ void info_xml_creator::output_rom()
 void info_xml_creator::output_sample()
 {
 	// iterate over sample devices
-	for (const device_config *devconfig = m_drivlist.config().m_devicelist.first(SAMPLES); devconfig != NULL; devconfig = devconfig->typenext())
+	for (const device_t *device = m_drivlist.config().devicelist().first(SAMPLES); device != NULL; device = device->typenext())
 	{
-		const char *const *samplenames = ((const samples_interface *)devconfig->static_config())->samplenames;
+		const char *const *samplenames = ((const samples_interface *)device->static_config())->samplenames;
 		if (samplenames != NULL)
 
 			// iterate over sample names
@@ -520,27 +520,27 @@ void info_xml_creator::output_sample()
 void info_xml_creator::output_chips()
 {
 	// iterate over executable devices
-	const device_config_execute_interface *exec = NULL;
-	for (bool gotone = m_drivlist.config().m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	device_execute_interface *exec = NULL;
+	for (bool gotone = m_drivlist.config().devicelist().first(exec); gotone; gotone = exec->next(exec))
 	{
 		fprintf(m_output, "\t\t<chip");
 		fprintf(m_output, " type=\"cpu\"");
-		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(exec->devconfig().tag()));
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->devconfig().name()));
-		fprintf(m_output, " clock=\"%d\"", exec->devconfig().clock());
+		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(exec->device().tag()));
+		fprintf(m_output, " name=\"%s\"", xml_normalize_string(exec->device().name()));
+		fprintf(m_output, " clock=\"%d\"", exec->device().clock());
 		fprintf(m_output, "/>\n");
 	}
 
 	// iterate over sound devices
-	const device_config_sound_interface *sound = NULL;
-	for (bool gotone = m_drivlist.config().m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	device_sound_interface *sound = NULL;
+	for (bool gotone = m_drivlist.config().devicelist().first(sound); gotone; gotone = sound->next(sound))
 	{
 		fprintf(m_output, "\t\t<chip");
 		fprintf(m_output, " type=\"audio\"");
-		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(sound->devconfig().tag()));
-		fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->devconfig().name()));
-		if (sound->devconfig().clock() != 0)
-			fprintf(m_output, " clock=\"%d\"", sound->devconfig().clock());
+		fprintf(m_output, " tag=\"%s\"", xml_normalize_string(sound->device().tag()));
+		fprintf(m_output, " name=\"%s\"", xml_normalize_string(sound->device().name()));
+		if (sound->device().clock() != 0)
+			fprintf(m_output, " clock=\"%d\"", sound->device().clock());
 		fprintf(m_output, "/>\n");
 	}
 }
@@ -554,11 +554,11 @@ void info_xml_creator::output_chips()
 void info_xml_creator::output_display()
 {
 	// iterate over screens
-	for (const screen_device_config *devconfig = m_drivlist.config().first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
+	for (const screen_device *device = m_drivlist.config().first_screen(); device != NULL; device = device->next_screen())
 	{
 		fprintf(m_output, "\t\t<display");
 
-		switch (devconfig->screen_type())
+		switch (device->screen_type())
 		{
 			case SCREEN_TYPE_RASTER:	fprintf(m_output, " type=\"raster\"");	break;
 			case SCREEN_TYPE_VECTOR:	fprintf(m_output, " type=\"vector\"");	break;
@@ -596,29 +596,29 @@ void info_xml_creator::output_display()
 		}
 
 		// output width and height only for games that are not vector
-		if (devconfig->screen_type() != SCREEN_TYPE_VECTOR)
+		if (device->screen_type() != SCREEN_TYPE_VECTOR)
 		{
-			const rectangle &visarea = devconfig->visible_area();
+			const rectangle &visarea = device->visible_area();
 			fprintf(m_output, " width=\"%d\"", visarea.max_x - visarea.min_x + 1);
 			fprintf(m_output, " height=\"%d\"", visarea.max_y - visarea.min_y + 1);
 		}
 
 		// output refresh rate
-		fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(devconfig->refresh()));
+		fprintf(m_output, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(device->refresh_attoseconds()));
 
 		// output raw video parameters only for games that are not vector
 		// and had raw parameters specified
-		if (devconfig->screen_type() != SCREEN_TYPE_VECTOR && !devconfig->oldstyle_vblank_supplied())
+		if (device->screen_type() != SCREEN_TYPE_VECTOR && !device->oldstyle_vblank_supplied())
 		{
-			int pixclock = devconfig->width() * devconfig->height() * ATTOSECONDS_TO_HZ(devconfig->refresh());
+			int pixclock = device->width() * device->height() * ATTOSECONDS_TO_HZ(device->refresh_attoseconds());
 
 			fprintf(m_output, " pixclock=\"%d\"", pixclock);
-			fprintf(m_output, " htotal=\"%d\"", devconfig->width());
-			fprintf(m_output, " hbend=\"%d\"", devconfig->visible_area().min_x);
-			fprintf(m_output, " hbstart=\"%d\"", devconfig->visible_area().max_x+1);
-			fprintf(m_output, " vtotal=\"%d\"", devconfig->height());
-			fprintf(m_output, " vbend=\"%d\"", devconfig->visible_area().min_y);
-			fprintf(m_output, " vbstart=\"%d\"", devconfig->visible_area().max_y+1);
+			fprintf(m_output, " htotal=\"%d\"", device->width());
+			fprintf(m_output, " hbend=\"%d\"", device->visible_area().min_x);
+			fprintf(m_output, " hbstart=\"%d\"", device->visible_area().max_x+1);
+			fprintf(m_output, " vtotal=\"%d\"", device->height());
+			fprintf(m_output, " vbend=\"%d\"", device->visible_area().min_y);
+			fprintf(m_output, " vbstart=\"%d\"", device->visible_area().max_y+1);
 		}
 		fprintf(m_output, " />\n");
 	}
@@ -632,11 +632,11 @@ void info_xml_creator::output_display()
 
 void info_xml_creator::output_sound()
 {
-	int speakers = m_drivlist.config().m_devicelist.count(SPEAKER);
+	int speakers = m_drivlist.config().devicelist().count(SPEAKER);
 
 	// if we have no sound, zero m_output the speaker count
-	const device_config_sound_interface *sound = NULL;
-	if (!m_drivlist.config().m_devicelist.first(sound))
+	const device_sound_interface *sound = NULL;
+	if (!m_drivlist.config().devicelist().first(sound))
 		speakers = 0;
 
 	fprintf(m_output, "\t\t<sound channels=\"%d\"/>\n", speakers);
@@ -1032,15 +1032,15 @@ void info_xml_creator::output_categories(const ioport_list &portlist)
 
 void info_xml_creator::output_images()
 {
-	const device_config_image_interface *dev = NULL;
-	for (bool gotone = m_drivlist.config().m_devicelist.first(dev); gotone; gotone = dev->next(dev))
+	const device_image_interface *dev = NULL;
+	for (bool gotone = m_drivlist.config().devicelist().first(dev); gotone; gotone = dev->next(dev))
 	{
 		// print m_output device type
 		fprintf(m_output, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
 
 		// does this device have a tag?
-		if (dev->devconfig().tag())
-			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(dev->devconfig().tag()));
+		if (dev->device().tag())
+			fprintf(m_output, " tag=\"%s\"", xml_normalize_string(dev->device().tag()));
 
 		// is this device mandatory?
 		if (dev->must_be_loaded())
@@ -1083,9 +1083,9 @@ void info_xml_creator::output_images()
 
 void info_xml_creator::output_software_list()
 {
-	for (const device_config *dev = m_drivlist.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_t *dev = m_drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 			if (swlist->list_name[i])
@@ -1105,9 +1105,9 @@ void info_xml_creator::output_software_list()
 
 void info_xml_creator::output_ramoptions()
 {
-	for (const device_config *device = m_drivlist.config().m_devicelist.first(RAM); device != NULL; device = device->typenext())
+	for (const device_t *device = m_drivlist.config().devicelist().first(RAM); device != NULL; device = device->typenext())
 	{
-		ram_config *ram = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+		ram_config *ram = (ram_config *)downcast<const legacy_device_base *>(device)->inline_config();
 		fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram_parse_string(ram->default_size));
 
 		if (ram->extra_options != NULL)

@@ -10,8 +10,8 @@
 class foodf_state : public atarigen_state
 {
 public:
-	foodf_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config),
+	foodf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag),
 		  m_nvram(*this, "nvram") { }
 
 	required_device<x2212_device> m_nvram;

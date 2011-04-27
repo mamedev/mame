@@ -67,27 +67,24 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	(*gamedrv.machine_config)(*this, NULL);
 
 	// when finished, set the game driver
-	device_config *config = m_devicelist.find("root");
-	if (config == NULL)
+	device_t *root = m_devicelist.find("root");
+	if (root == NULL)
 		throw emu_fatalerror("Machine configuration missing driver_device");
-	driver_device_config_base::static_set_game(config, &gamedrv);
+	driver_device::static_set_game(*root, gamedrv);
 
 	// process any device-specific machine configurations
-	for (device_config *devconfig = m_devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
-		if (!devconfig->m_config_complete)
+	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
+		if (!device->configured())
 		{
-			machine_config_constructor additions = devconfig->machine_config_additions();
+			machine_config_constructor additions = device->machine_config_additions();
 			if (additions != NULL)
-				(*additions)(*this, devconfig);
+				(*additions)(*this, device);
 		}
 
 	// then notify all devices that their configuration is complete
-	for (device_config *devconfig = m_devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
-		if (!devconfig->m_config_complete)
-		{
-			devconfig->config_complete();
-			devconfig->m_config_complete = true;
-		}
+	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
+		if (!device->configured())
+			device->config_complete();
 }
 
 
@@ -105,9 +102,9 @@ machine_config::~machine_config()
 //  screen device
 //-------------------------------------------------
 
-screen_device_config *machine_config::first_screen() const
+screen_device *machine_config::first_screen() const
 {
-	return downcast<screen_device_config *>(m_devicelist.first(SCREEN));
+	return downcast<screen_device *>(m_devicelist.first(SCREEN));
 }
 
 
@@ -116,7 +113,7 @@ screen_device_config *machine_config::first_screen() const
 //  new device
 //-------------------------------------------------
 
-device_config *machine_config::device_add(device_config *owner, const char *tag, device_type type, UINT32 clock)
+device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
@@ -129,7 +126,7 @@ device_config *machine_config::device_add(device_config *owner, const char *tag,
 //  replace one device with a new device
 //-------------------------------------------------
 
-device_config *machine_config::device_replace(device_config *owner, const char *tag, device_type type, UINT32 clock)
+device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, UINT32 clock)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
@@ -142,7 +139,7 @@ device_config *machine_config::device_replace(device_config *owner, const char *
 //  remove a device
 //-------------------------------------------------
 
-device_config *machine_config::device_remove(device_config *owner, const char *tag)
+device_t *machine_config::device_remove(device_t *owner, const char *tag)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
@@ -156,11 +153,11 @@ device_config *machine_config::device_remove(device_config *owner, const char *t
 //  locate a device
 //-------------------------------------------------
 
-device_config *machine_config::device_find(device_config *owner, const char *tag)
+device_t *machine_config::device_find(device_t *owner, const char *tag)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	device_config *device = m_devicelist.find(fulltag);
+	device_t *device = m_devicelist.find(fulltag);
 	if (device == NULL)
 		throw emu_fatalerror("Unable to find device: tag=%s\n", fulltag);
 	return device;

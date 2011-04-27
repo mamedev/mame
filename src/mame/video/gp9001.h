@@ -1,21 +1,5 @@
 /* GP9001 Video Controller */
 
-class gp9001vdp_device_config : public device_config,
-								 public device_config_memory_interface
-{
-	friend class gp9001vdp_device;
-	gp9001vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-public:
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-	static void static_set_gfx_region(device_config *device, int gfxregion);
-protected:
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-	address_space_config		m_space_config;
-	UINT8						m_gfxregion;
-};
-
 struct gp9001layeroffsets
 {
 	int normal;
@@ -49,9 +33,11 @@ struct gp9001spritelayer : gp9001layer
 class gp9001vdp_device : public device_t,
 						  public device_memory_interface
 {
-	friend class gp9001vdp_device_config;
-	gp9001vdp_device(running_machine &_machine, const gp9001vdp_device_config &config);
 public:
+	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static void static_set_gfx_region(device_t &device, int gfxregion);
+
 	UINT16 gp9001_voffs;
 	UINT16 gp9001_scroll_reg;
 
@@ -78,14 +64,17 @@ public:
 	bitmap_t *custom_priority_bitmap;
 
 protected:
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start();
 	virtual void device_reset();
-	const gp9001vdp_device_config &m_config;
-	UINT8						m_gfxregion;
 
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	address_space_config		m_space_config;
+	UINT8						m_gfxregion;
 };
 
-const device_type gp9001vdp_ = gp9001vdp_device_config::static_alloc_device_config;
+extern const device_type GP9001_VDP;
 
 #define GP9001_BG_VRAM_SIZE   0x1000	/* Background RAM size */
 #define GP9001_FG_VRAM_SIZE   0x1000	/* Foreground RAM size */
@@ -98,13 +87,13 @@ const device_type gp9001vdp_ = gp9001vdp_device_config::static_alloc_device_conf
 
 /* vdp map 0, gfx region 0 */
 #define MCFG_DEVICE_ADD_VDP0 \
-	MCFG_DEVICE_ADD("gp9001vdp0", gp9001vdp_, 0) \
-	gp9001vdp_device_config::static_set_gfx_region(device, 0); \
+	MCFG_DEVICE_ADD("gp9001vdp0", GP9001_VDP, 0) \
+	gp9001vdp_device::static_set_gfx_region(*device, 0); \
 
 /* vdp map 1, gfx region 2 */
 #define MCFG_DEVICE_ADD_VDP1 \
-	MCFG_DEVICE_ADD("gp9001vdp1", gp9001vdp_, 0) \
-	gp9001vdp_device_config::static_set_gfx_region(device, 2); \
+	MCFG_DEVICE_ADD("gp9001vdp1", GP9001_VDP, 0) \
+	gp9001vdp_device::static_set_gfx_region(*device, 2); \
 
 
 // access to VDP

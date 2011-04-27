@@ -104,7 +104,7 @@ static STREAM_UPDATE( SEGAPCM_update )
 
 static DEVICE_START( segapcm )
 {
-	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->baseconfig().static_config();
+	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->static_config();
 	int mask, rom_mask, len;
 	segapcm_state *spcm = get_safe_token(device);
 

@@ -49,7 +49,7 @@ void printer_output(device_t *printer, UINT8 data)
 
 static DEVICE_IMAGE_LOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_config_base &>(image.device().baseconfig()).inline_config();
+	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_base &>(image.device()).inline_config();
 
 	/* send notify that the printer is now online */
 	if (conf != NULL && conf->online != NULL)
@@ -66,7 +66,7 @@ static DEVICE_IMAGE_LOAD( printer )
 
 static DEVICE_IMAGE_UNLOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_config_base &>(image.device().baseconfig()).inline_config();
+	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_base &>(image.device()).inline_config();
 
 	/* send notify that the printer is now offline */
 	if (conf != NULL && conf->online != NULL)

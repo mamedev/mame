@@ -1,8 +1,8 @@
 class seicross_state : public driver_device
 {
 public:
-	seicross_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	seicross_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_nvram;
 	size_t m_nvram_size;

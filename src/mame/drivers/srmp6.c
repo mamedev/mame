@@ -74,8 +74,8 @@ Dumped 06/15/2000
 class srmp6_state : public driver_device
 {
 public:
-	srmp6_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	srmp6_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16* m_tileram;
 	UINT16* m_dmaram;

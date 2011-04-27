@@ -1941,8 +1941,8 @@ static void z180_write_iolines(z180_state *cpustate, UINT32 data)
 static CPU_INIT( z180 )
 {
 	z180_state *cpustate = get_safe_token(device);
-	if (device->baseconfig().static_config() != NULL)
-		cpustate->daisy.init(device, (const z80_daisy_config *)device->baseconfig().static_config());
+	if (device->static_config() != NULL)
+		cpustate->daisy.init(device, (const z80_daisy_config *)device->static_config());
 	cpustate->irq_callback = irqcallback;
 
 	SZHVC_add = auto_alloc_array(device->machine(), UINT8, 2*256*256);

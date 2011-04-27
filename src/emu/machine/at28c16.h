@@ -31,56 +31,18 @@ struct at28c16_interface
 };
 
 
-// ======================> at28c16_device_config
-
-class at28c16_device_config :
-	public device_config,
-	public device_config_memory_interface,
-	public device_config_nvram_interface,
-	public at28c16_interface
-{
-	friend class at28c16_device;
-
-	// construction/destruction
-	at28c16_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-	virtual device_t *alloc_device( running_machine &machine ) const;
-
-	// inline configuration indexes
-	enum
-	{
-		INLINE_INTERFACE
-	};
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
-
-	// device-specific configuration
-	address_space_config m_space_config;
-};
-
-
 // ======================> at28c16_device
 
 class at28c16_device :
 	public device_t,
 	public device_memory_interface,
-	public device_nvram_interface
+	public device_nvram_interface,
+	public at28c16_interface
 {
-	friend class at28c16_device_config;
-
-	// construction/destruction
-	at28c16_device( running_machine &_machine, const at28c16_device_config &config );
-
 public:
+	// construction/destruction
+	at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+
 	// I/O operations
 	void write( offs_t offset, UINT8 data );
 	UINT8 read( offs_t offset );
@@ -89,8 +51,13 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
+	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
 	virtual void device_start();
 	virtual void device_reset();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
@@ -101,7 +68,7 @@ protected:
 	static TIMER_CALLBACK( write_finished );
 
 	// internal state
-	const at28c16_device_config &m_config;
+	address_space_config m_space_config;
 	emu_timer *m_write_timer;
 	int m_a9_12v;
 	int m_oe_12v;

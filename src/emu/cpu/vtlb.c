@@ -66,7 +66,7 @@ vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries,
 	vtlb->space = space;
 	vtlb->dynamic = dynamic_entries;
 	vtlb->fixed = fixed_entries;
-	const address_space_config *spaceconfig = devconfig_get_space_config(cpu->baseconfig(), space);
+	const address_space_config *spaceconfig = device_get_space_config(*cpu, space);
 	assert(spaceconfig != NULL);
 	vtlb->pageshift = spaceconfig->m_page_shift;
 	vtlb->addrwidth = spaceconfig->m_logaddr_width;

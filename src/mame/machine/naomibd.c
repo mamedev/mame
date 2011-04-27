@@ -339,7 +339,7 @@ INLINE naomibd_state *get_safe_token(device_t *device)
 
 int naomibd_interrupt_callback(device_t *device, naomibd_interrupt_func callback)
 {
-	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	naomibd_config *config = (naomibd_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	config->interrupt = callback;
 	return 0;
 }
@@ -2007,13 +2007,13 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
 
 static DEVICE_START( naomibd )
 {
-	const naomibd_config *config = (const naomibd_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const naomibd_config *config = (const naomibd_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	naomibd_state *v = get_safe_token(device);
 	int i;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* validate configuration */
 	assert(config->type >= ROM_BOARD && config->type < MAX_NAOMIBD_TYPES);
@@ -2058,7 +2058,7 @@ static DEVICE_START( naomibd )
 	}
 
 	/* set the type */
-	v->index = device->machine().m_devicelist.indexof(device->type(), device->tag());
+	v->index = device->machine().devicelist().indexof(device->type(), device->tag());
 	v->type = config->type;
 
 	/* initialize some registers */
@@ -2104,7 +2104,7 @@ static DEVICE_RESET( naomibd )
 
 DEVICE_GET_INFO( naomibd )
 {
-	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)downcast<const legacy_device_config_base *>(device)->inline_config() : NULL;
+	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)downcast<const legacy_device_base *>(device)->inline_config() : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

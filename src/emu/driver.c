@@ -212,8 +212,22 @@ driver_enumerator::~driver_enumerator()
 machine_config &driver_enumerator::config(int index) const
 {
 	assert(index >= 0 && index < s_driver_count);
+	
+	// if we don't have it cached, add it
 	if (m_config[index] == NULL)
-		m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], m_options));
+	{
+		// if our cache is full, release the head entry
+		if (m_config_cache.count() == CONFIG_CACHE_COUNT)
+		{
+			config_entry *first = m_config_cache.first();
+			m_config[first->index()] = NULL;
+			m_config_cache.remove(*first);
+		}
+		
+		// allocate the config and add it to the end of the list
+		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], m_options));
+		m_config_cache.append(*global_alloc(config_entry(*config, index)));
+	}
 	return *m_config[index];
 }
 
@@ -399,4 +413,18 @@ void driver_enumerator::find_approximate_matches(const char *string, int count, 
 
 	// free our temp memory
 	global_free(penalty);
+}
+
+
+driver_enumerator::config_entry::config_entry(machine_config &config, int index)
+	: m_next(NULL),
+	  m_config(&config),
+	  m_index(index)
+{
+}
+
+
+driver_enumerator::config_entry::~config_entry()
+{
+	global_free(m_config);
 }

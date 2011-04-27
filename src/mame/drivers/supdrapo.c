@@ -68,8 +68,8 @@
 class supdrapo_state : public driver_device
 {
 public:
-	supdrapo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_char_bank;
 	UINT8 *m_col_line;

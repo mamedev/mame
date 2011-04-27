@@ -45,40 +45,14 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdicdic_device_config
-
-class cdicdic_device_config :  public device_config
-{
-    friend class cdicdic_device;
-
-    // construction/destruction
-    cdicdic_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-    // inline configuration indexes go here (none yet)
-
-protected:
-    // device_config overrides (none yet)
-
-    // internal state goes here (none yet)
-};
-
-
-
 // ======================> cdicdic_device
 
 class cdicdic_device : public device_t
 {
-    friend class cdicdic_device_config;
-
-    // construction/destruction
-    cdicdic_device(running_machine &_machine, const cdicdic_device_config &config);
-
 public:
+    // construction/destruction
+    cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     // non-static internal members
     void sample_trigger();
     void process_delayed_command();
@@ -98,10 +72,8 @@ protected:
     static TIMER_CALLBACK( audio_sample_trigger );
     static TIMER_CALLBACK( trigger_readback_int );
 
-    // internal state
-    const cdicdic_device_config &m_config;
-
 private:
+    // internal state
     UINT16 m_command;           // CDIC Command Register            (0x303c00)
     UINT32 m_time;              // CDIC Time Register               (0x303c02)
     UINT16 m_file;              // CDIC File Register               (0x303c06)

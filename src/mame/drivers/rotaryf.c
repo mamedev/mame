@@ -20,8 +20,8 @@ driver by Barry Rodewald
 class rotaryf_state : public driver_device
 {
 public:
-	rotaryf_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	rotaryf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	size_t m_videoram_size;

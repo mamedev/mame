@@ -136,7 +136,7 @@ INLINE speaker_state *get_safe_token(device_t *device)
 static DEVICE_START( speaker )
 {
 	speaker_state *sp = get_safe_token(device);
-	const speaker_interface *intf = (const speaker_interface *) device->baseconfig().static_config();
+	const speaker_interface *intf = (const speaker_interface *) device->static_config();
 	int i;
 	double x;
 

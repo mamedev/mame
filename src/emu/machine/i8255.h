@@ -69,46 +69,24 @@
 
 struct i8255_interface
 {
-	devcb_read8			m_in_pa_func;
-	devcb_write8		m_out_pa_func;
-	devcb_read8			m_in_pb_func;
-	devcb_write8		m_out_pb_func;
-	devcb_read8			m_in_pc_func;
-	devcb_write8		m_out_pc_func;
-};
-
-
-// ======================> i8255_device_config
-
-class i8255_device_config : public device_config,
-                             public i8255_interface
-{
-    friend class i8255_device;
-
-    // construction/destruction
-    i8255_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_read8			m_in_pa_cb;
+	devcb_write8		m_out_pa_cb;
+	devcb_read8			m_in_pb_cb;
+	devcb_write8		m_out_pb_cb;
+	devcb_read8			m_in_pc_cb;
+	devcb_write8		m_out_pc_cb;
 };
 
 
 // ======================> i8255_device
 
-class i8255_device :  public device_t
+class i8255_device :  public device_t,
+					  public i8255_interface
 {
-    friend class i8255_device_config;
-
-    // construction/destruction
-    i8255_device(running_machine &_machine, const i8255_device_config &_config);
-
 public:
+    // construction/destruction
+    i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -124,6 +102,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 
@@ -165,8 +144,6 @@ private:
 	int m_inte1;				// interrupt enable
 	int m_inte2;				// interrupt enable
 	int m_intr[2];				// interrupt
-
-    const i8255_device_config &m_config;
 };
 
 

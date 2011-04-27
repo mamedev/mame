@@ -51,7 +51,7 @@ static DEVICE_START( ym2151 )
 	ym2151_state *info = get_safe_token(device);
 	int rate;
 
-	info->intf = device->baseconfig().static_config() ? (const ym2151_interface *)device->baseconfig().static_config() : &dummy;
+	info->intf = device->static_config() ? (const ym2151_interface *)device->static_config() : &dummy;
 
 	rate = device->clock()/64;
 

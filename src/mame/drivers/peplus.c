@@ -178,8 +178,8 @@ Stephh's log (2007.11.28) :
 class peplus_state : public driver_device
 {
 public:
-	peplus_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_cmos_ram(*this, "cmos") { }
 
 	UINT8 *m_videoram;

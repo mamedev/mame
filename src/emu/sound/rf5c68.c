@@ -139,7 +139,7 @@ static STREAM_UPDATE( rf5c68_update )
 
 static DEVICE_START( rf5c68 )
 {
-	const rf5c68_interface* intf = (const rf5c68_interface*)device->baseconfig().static_config();
+	const rf5c68_interface* intf = (const rf5c68_interface*)device->static_config();
 
 	/* allocate memory for the chip */
 	rf5c68_state *chip = get_safe_token(device);

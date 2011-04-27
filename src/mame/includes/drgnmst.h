@@ -4,8 +4,8 @@
 class drgnmst_state : public driver_device
 {
 public:
-	drgnmst_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	drgnmst_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_oki_1(*this, "oki1"),
 		  m_oki_2(*this, "oki2") { }
 

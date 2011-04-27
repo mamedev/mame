@@ -6,8 +6,8 @@ extern const char layout_pinball[];
 class allied_state : public driver_device
 {
 public:
-	allied_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	allied_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8 )

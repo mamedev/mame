@@ -52,8 +52,8 @@ struct bt477_t
 class jpmimpct_state : public driver_device
 {
 public:
-	jpmimpct_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;

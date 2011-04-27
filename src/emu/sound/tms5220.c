@@ -1573,7 +1573,7 @@ static DEVICE_START( tms5220 )
 	static const tms5220_interface dummy = { DEVCB_NULL };
 	tms5220_state *tms = get_safe_token(device);
 
-	tms->intf = device->baseconfig().static_config() ? (const tms5220_interface *)device->baseconfig().static_config() : &dummy;
+	tms->intf = device->static_config() ? (const tms5220_interface *)device->static_config() : &dummy;
 	//tms->table = *device->region();
 
 	tms->device = device;

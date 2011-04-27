@@ -369,7 +369,7 @@ CPU_DISASSEMBLE( m6809 )
 	const UINT8 *operandarray;
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
-	const m6809_config *configdata = device ? (const m6809_config *)device->baseconfig().static_config() : NULL;
+	const m6809_config *configdata = device ? (const m6809_config *)device->static_config() : NULL;
 	int encrypt_only_first_byte = configdata ? configdata->encrypt_only_first_byte : 0;
 
 	int i, p = 0, page = 0, opcode_found = FALSE;

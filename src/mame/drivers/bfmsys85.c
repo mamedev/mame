@@ -71,8 +71,8 @@ ___________________________________________________________________________
 class bfmsys85_state : public driver_device
 {
 public:
-	bfmsys85_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_mmtr_latch;
 	int m_triac_latch;

@@ -121,7 +121,7 @@ WRITE8_DEVICE_HANDLER( ticket_dispenser_w )
 
 static DEVICE_START( ticket )
 {
-	const ticket_config *config = (const ticket_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const ticket_config *config = (const ticket_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	ticket_state *state = get_safe_token(device);
 
 	assert(config != NULL);

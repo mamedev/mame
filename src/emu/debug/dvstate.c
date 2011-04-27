@@ -105,7 +105,7 @@ void debug_view_state::enumerate_sources()
 	// iterate over devices that have state interfaces
 	device_state_interface *state = NULL;
 	astring name;
-	for (bool gotone = machine().m_devicelist.first(state); gotone; gotone = state->next(state))
+	for (bool gotone = machine().devicelist().first(state); gotone; gotone = state->next(state))
 	{
 		name.printf("%s '%s'", state->device().name(), state->device().tag());
 		m_source_list.append(*auto_alloc(machine(), debug_view_state_source(name, state->device())));

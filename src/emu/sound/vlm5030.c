@@ -685,7 +685,7 @@ static DEVICE_START( vlm5030 )
 	vlm5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->intf = (device->baseconfig().static_config() != NULL) ? (const vlm5030_interface *)device->baseconfig().static_config() : &defintrf;
+	chip->intf = (device->static_config() != NULL) ? (const vlm5030_interface *)device->static_config() : &defintrf;
 
 	emulation_rate = device->clock() / 440;
 

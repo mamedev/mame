@@ -101,7 +101,7 @@ static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) {
 static CPU_INIT( m65ce02 )
 {
 	m65ce02_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
+	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;

@@ -213,21 +213,7 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_CONFIG(_config) \
-	adsp21xx_device_config::static_set_config(device, _config); \
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
-extern const device_type ADSP2100;
-extern const device_type ADSP2101;
-extern const device_type ADSP2104;
-extern const device_type ADSP2105;
-extern const device_type ADSP2115;
-extern const device_type ADSP2181;
+	adsp21xx_device::static_set_config(*device, _config); \
 
 
 
@@ -236,9 +222,6 @@ extern const device_type ADSP2181;
 //**************************************************************************
 
 class adsp21xx_device;
-class adsp2100_device;
-class adsp2101_device;
-class adsp2181_device;
 
 // transmit and receive data callbacks types
 typedef INT32 (*adsp21xx_rx_func)(adsp21xx_device &device, int port);
@@ -257,13 +240,11 @@ struct adsp21xx_config
 
 
 
-// ======================> adsp21xx_device_config
+// ======================> adsp21xx_device
 
-class adsp21xx_device_config :	public cpu_device_config,
-								public adsp21xx_config
+class adsp21xx_device : public cpu_device,
+						public adsp21xx_config
 {
-	friend class adsp21xx_device;
-
 protected:
 	enum
 	{
@@ -276,43 +257,13 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
-
-public:
-	// inline configuration helpers
-	static void static_set_config(device_config *device, const adsp21xx_config &config);
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// address spaces
-	const address_space_config		m_program_config;
-	const address_space_config		m_data_config;
-
-	// internal state
-	UINT32							m_chip_type;
-};
-
-
-
-// ======================> adsp21xx_device
-
-class adsp21xx_device : public cpu_device
-{
-	friend class adsp21xx_device_config;
-
-protected:
-	// construction/destruction
-	adsp21xx_device(running_machine &_machine, const adsp21xx_device_config &config);
+	adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype);
 	virtual ~adsp21xx_device();
 
 public:
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const adsp21xx_config &config);
+
 	// public interfaces
 	void load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
@@ -322,6 +273,8 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
 
@@ -330,6 +283,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// helpers
@@ -458,7 +413,9 @@ protected:
 	};
 
 	// configuration
-	const adsp21xx_device_config &m_config;
+	const address_space_config		m_program_config;
+	const address_space_config		m_data_config;
+	UINT32							m_chip_type;
 
 	// other CPU registers
 	UINT32				m_pc;
@@ -559,65 +516,24 @@ protected:
 };
 
 
-// ======================> adsp2100_device_config
-
-class adsp2100_device_config : public adsp21xx_device_config
-{
-	friend class adsp2100_device;
-
-	// construction/destruction
-	adsp2100_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-};
-
-
 // ======================> adsp2100_device
 
 class adsp2100_device : public adsp21xx_device
 {
-	friend class adsp2100_device_config;
-
+public:
 	// construction/destruction
-	adsp2100_device(running_machine &_machine, const adsp2100_device_config &config);
+	adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device_execute_interface overrides
+	virtual UINT32 execute_input_lines() const;
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx);
 	virtual void check_irqs();
-};
-
-
-// ======================> adsp2101_device_config
-
-class adsp2101_device_config : public adsp21xx_device_config
-{
-	friend class adsp2101_device;
-
-protected:
-	// construction/destruction
-	adsp2101_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 };
 
 
@@ -625,44 +541,22 @@ protected:
 
 class adsp2101_device : public adsp21xx_device
 {
-	friend class adsp2101_device_config;
-	friend class adsp2104_device_config;
-	friend class adsp2105_device_config;
-	friend class adsp2115_device_config;
+public:
+	// construction/destruction
+	adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// construction/destruction
-	adsp2101_device(running_machine &_machine, const adsp2101_device_config &config);
+	adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype);
+
+	// device_execute_interface overrides
+	virtual UINT32 execute_input_lines() const;
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx);
 	virtual void check_irqs();
-};
-
-
-// ======================> adsp2181_device_config
-
-class adsp2181_device_config : public adsp21xx_device_config
-{
-	friend class adsp2181_device;
-
-	// construction/destruction
-	adsp2181_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// address spaces
-	const address_space_config		m_io_config;
 };
 
 
@@ -670,14 +564,23 @@ protected:
 
 class adsp2181_device : public adsp21xx_device
 {
-	friend class adsp2181_device_config;
-
+public:
 	// construction/destruction
-	adsp2181_device(running_machine &_machine, const adsp2181_device_config &config);
+	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device_execute_interface overrides
+	virtual UINT32 execute_input_lines() const;
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx);
 	virtual void check_irqs();
+
+	// address spaces
+	const address_space_config		m_io_config;
 
 public:
 	// public interfaces
@@ -690,9 +593,33 @@ public:
 
 // ======================> trivial variants
 
-DECLARE_TRIVIAL_DERIVED_DEVICE(adsp2104_device_config, adsp2101_device_config, adsp2104_device, adsp2101_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(adsp2105_device_config, adsp2101_device_config, adsp2105_device, adsp2101_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(adsp2115_device_config, adsp2101_device_config, adsp2115_device, adsp2101_device)
+class adsp2104_device : public adsp2101_device
+{
+public:
+	adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class adsp2105_device : public adsp2101_device
+{
+public:
+	adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class adsp2115_device : public adsp2101_device
+{
+public:
+	adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+
+// device type definition
+extern const device_type ADSP2100;
+extern const device_type ADSP2101;
+extern const device_type ADSP2104;
+extern const device_type ADSP2105;
+extern const device_type ADSP2115;
+extern const device_type ADSP2181;
 
 
 #endif /* __ADSP2100_H__ */

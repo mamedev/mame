@@ -47,7 +47,7 @@
 //**************************************************************************
 
 #define MCFG_DSP32C_CONFIG(_config) \
-	dsp32c_device_config::static_set_config(device, _config); \
+	dsp32c_device::static_set_config(*device, _config); \
 
 
 
@@ -121,14 +121,6 @@ enum
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-extern const device_type DSP32C;
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -144,53 +136,18 @@ struct dsp32_config
 
 
 
-// ======================> dsp32c_device_config
-
-class dsp32c_device_config :	public cpu_device_config,
-								public dsp32_config
-{
-	friend class dsp32c_device;
-
-	// construction/destruction
-	dsp32c_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, const dsp32_config &config);
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// inline data
-	const address_space_config		m_program_config;
-};
-
-
-
 // ======================> dsp32c_device
 
-class dsp32c_device : public cpu_device
+class dsp32c_device : public cpu_device,
+					  public dsp32_config
 {
-	friend class dsp32c_device_config;
-
-	// construction/destruction
-	dsp32c_device(running_machine &_machine, const dsp32c_device_config &config);
-
 public:
+	// construction/destruction
+	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const dsp32_config &config);
+
 	// public interfaces
 	void pio_w(int reg, int data);
 	int pio_r(int reg);
@@ -201,8 +158,14 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+	virtual UINT32 execute_input_lines() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -210,6 +173,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// memory accessors
@@ -456,7 +421,7 @@ protected:
 	void dma_store();
 
 	// configuration
-	const dsp32c_device_config &m_config;
+	const address_space_config		m_program_config;
 
 	// internal state
 	UINT32			m_r[32];
@@ -510,6 +475,10 @@ protected:
 	static void (dsp32c_device::*const s_dsp32ops[])(UINT32 op);
 	static const UINT32 s_regmap[4][16];
 };
+
+
+extern const device_type DSP32C;
+
 
 
 #endif /* __DSP32_H__ */

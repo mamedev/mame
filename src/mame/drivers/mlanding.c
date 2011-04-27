@@ -30,8 +30,8 @@ TODO:
 class mlanding_state : public driver_device
 {
 public:
-	mlanding_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 * m_ml_tileram;
 	UINT16 *m_g_ram;

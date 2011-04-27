@@ -200,16 +200,16 @@ static int get_variable_value(running_machine &machine, const char *string, char
 	char temp[100];
 
 	// screen 0 parameters
-	for (const screen_device_config *devconfig = machine.config().first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
+	for (const screen_device *device = machine.first_screen(); device != NULL; device = device->next_screen())
 	{
-		int scrnum = machine.config().m_devicelist.indexof(SCREEN, devconfig->tag());
+		int scrnum = machine.devicelist().indexof(SCREEN, device->tag());
 
 		// native X aspect factor
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			int num = devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x;
-			int den = devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y;
+			int num = device->visible_area().max_x + 1 - device->visible_area().min_x;
+			int den = device->visible_area().max_y + 1 - device->visible_area().min_y;
 			reduce_fraction(num, den);
 			*outputptr += sprintf(*outputptr, "%d", num);
 			return strlen(temp);
@@ -219,8 +219,8 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dnativeyaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			int num = devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x;
-			int den = devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y;
+			int num = device->visible_area().max_x + 1 - device->visible_area().min_x;
+			int den = device->visible_area().max_y + 1 - device->visible_area().min_y;
 			reduce_fraction(num, den);
 			*outputptr += sprintf(*outputptr, "%d", den);
 			return strlen(temp);
@@ -230,7 +230,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dwidth~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", devconfig->visible_area().max_x + 1 - devconfig->visible_area().min_x);
+			*outputptr += sprintf(*outputptr, "%d", device->visible_area().max_x + 1 - device->visible_area().min_x);
 			return strlen(temp);
 		}
 
@@ -238,7 +238,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 		sprintf(temp, "~scr%dheight~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", devconfig->visible_area().max_y + 1 - devconfig->visible_area().min_y);
+			*outputptr += sprintf(*outputptr, "%d", device->visible_area().max_y + 1 - device->visible_area().min_y);
 			return strlen(temp);
 		}
 	}
@@ -1868,7 +1868,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	// fetch common data
 	int index = xml_get_attribute_int_with_subst(machine, itemnode, "index", -1);
 	if (index != -1)
-		m_screen = downcast<screen_device *>(machine.m_devicelist.find(SCREEN, index));
+		m_screen = downcast<screen_device *>(machine.devicelist().find(SCREEN, index));
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != NULL)
 		output_set_value(m_output_name, m_element->default_state());

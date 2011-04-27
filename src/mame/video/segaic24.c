@@ -16,69 +16,20 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 #include "segaic24.h"
 
 
-const device_type S24TILE   = segas24_tile_config::static_alloc_device_config;
-const device_type S24SPRITE = segas24_sprite_config::static_alloc_device_config;
-const device_type S24MIXER  = segas24_mixer_config::static_alloc_device_config;
+const device_type S24TILE = &device_creator<segas24_tile>;
+const device_type S24SPRITE = &device_creator<segas24_sprite>;
+const device_type S24MIXER = &device_creator<segas24_mixer>;
 
-segas24_tile_config::segas24_tile_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "S24TILE", tag, owner, clock)
+
+segas24_tile::segas24_tile(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S24TILE, "S24TILE", tag, owner, clock)
 {
 }
 
-device_config *segas24_tile_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+void segas24_tile::static_set_tile_mask(device_t &device, UINT16 _tile_mask)
 {
-	return global_alloc(segas24_tile_config(mconfig, tag, owner, clock));
-}
-
-void segas24_tile_config::static_set_tile_mask(device_config *device, UINT16 _tile_mask)
-{
-	segas24_tile_config *dev = downcast<segas24_tile_config *>(device);
-	dev->tile_mask = _tile_mask;
-}
-
-device_t *segas24_tile_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, segas24_tile(machine, *this));
-}
-
-
-segas24_sprite_config::segas24_sprite_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "S24SPRITE", tag, owner, clock)
-{
-}
-
-device_config *segas24_sprite_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(segas24_sprite_config(mconfig, tag, owner, clock));
-}
-
-device_t *segas24_sprite_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, segas24_sprite(machine, *this));
-}
-
-
-segas24_mixer_config::segas24_mixer_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "S24MIXER", tag, owner, clock)
-{
-}
-
-device_config *segas24_mixer_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(segas24_mixer_config(mconfig, tag, owner, clock));
-}
-
-device_t *segas24_mixer_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, segas24_mixer(machine, *this));
-}
-
-
-
-segas24_tile::segas24_tile(running_machine &_machine, const segas24_tile_config &_config)
-	: device_t(_machine, _config),
-	  config(_config)
-{
+	segas24_tile &dev = downcast<segas24_tile &>(device);
+	dev.tile_mask = _tile_mask;
 }
 
 #define XOR(a) WORD_XOR_BE(a)
@@ -97,7 +48,7 @@ void segas24_tile::tile_info(int offset, tile_data *tileinfo, tilemap_memory_ind
 {
 	UINT16 val = tile_ram[tile_index|offset];
 	tileinfo->category = (val & 0x8000) != 0;
-	tileinfo_set(machine(), tileinfo, char_gfx_index, val & config.tile_mask, (val >> 7) & 0xff, 0);
+	tileinfo_set(machine(), tileinfo, char_gfx_index, val & tile_mask, (val >> 7) & 0xff, 0);
 }
 
 TILE_GET_INFO_DEVICE( segas24_tile::tile_info_0s )
@@ -626,9 +577,8 @@ WRITE32_MEMBER(segas24_tile::char32_w)
 }
 
 
-segas24_sprite::segas24_sprite(running_machine &_machine, const segas24_sprite_config &_config)
-	: device_t(_machine, _config),
-	  config(_config)
+segas24_sprite::segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S24SPRITE, "S24SPRITE", tag, owner, clock)
 {
 }
 
@@ -873,9 +823,8 @@ READ16_MEMBER(segas24_sprite::read)
 }
 
 
-segas24_mixer::segas24_mixer(running_machine &_machine, const segas24_mixer_config &_config)
-	: device_t(_machine, _config),
-	  config(_config)
+segas24_mixer::segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, S24MIXER, "S24MIXER", tag, owner, clock)
 {
 }
 

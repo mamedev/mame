@@ -234,7 +234,7 @@ int pci_add_sibling( running_machine &machine, char *pcitag, char *sibling )
 		return 0;
 	if (pcibus1->siblings_count == 8)
 		return 0;
-	config2 = (pci_bus_config *)downcast<const legacy_device_config_base &>(device2->baseconfig()).inline_config();
+	config2 = (pci_bus_config *)downcast<const legacy_device_base *>(device2)->inline_config();
 	pcibus1->siblings[pcibus1->siblings_count] = get_safe_token(device2);
 	pcibus1->siblings_busnum[pcibus1->siblings_count] = config2->busnum;
 	pcibus1->siblings_count++;
@@ -269,11 +269,11 @@ static DEVICE_START( pci_bus )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* store a pointer back to the device */
-	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	pcibus->busdevice = device;
 	pcibus->devicenum = -1;
 

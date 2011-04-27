@@ -64,37 +64,14 @@ struct f3853_interface
 };
 
 
-// ======================> f3853_device_config
-
-class f3853_device_config :   public device_config,
-							  public f3853_interface
-{
-    friend class f3853_device;
-
-    // construction/destruction
-    f3853_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
 // ======================> f3853_device
 
-class f3853_device :  public device_t
+class f3853_device :  public device_t,
+					  public f3853_interface
 {
-    friend class f3853_device_config;
-
-    // construction/destruction
-    f3853_device(running_machine &_machine, const f3853_device_config &_config);
-
 public:
+    // construction/destruction
+    f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 f3853_r(UINT32 offset);
 	void f3853_w(UINT32 offset, UINT8 data);
@@ -104,6 +81,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -130,8 +108,6 @@ private:
     emu_timer *m_timer;
 
 	UINT8 m_value_to_cycle[0x100];
-
-    const f3853_device_config &m_config;
 };
 
 

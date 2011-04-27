@@ -80,8 +80,8 @@ inline void adsp21xx_device::update_mstat()
 		m_alt = temp;
 	}
 	if ((m_mstat ^ m_mstat_prev) & MSTAT_TIMER)
-		if (m_config.m_timer_fired != NULL)
-			(*m_config.m_timer_fired)(*this, (m_mstat & MSTAT_TIMER) != 0);
+		if (m_timer_fired != NULL)
+			(*m_timer_fired)(*this, (m_mstat & MSTAT_TIMER) != 0);
 	if (m_mstat & MSTAT_STICKYV)
 		m_astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
@@ -419,11 +419,11 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 		case 0x05:	cntr_stack_push(); m_cntr = val & 0x3fff;		break;
 		case 0x06:	m_core.sb.s = (INT32)(val << 27) >> 27;			break;
 		case 0x07:	m_px = val;										break;
-		case 0x09:	if (m_config.m_sport_tx_callback != NULL) (*m_config.m_sport_tx_callback)(*this, 0, val); break;
-		case 0x0b:	if (m_config.m_sport_tx_callback != NULL) (*m_config.m_sport_tx_callback)(*this, 1, val); break;
+		case 0x09:	if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 0, val); break;
+		case 0x0b:	if (m_sport_tx_callback != NULL) (*m_sport_tx_callback)(*this, 1, val); break;
 		case 0x0c:
 			m_ifc = val;
-			if (m_config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2181)
+			if (m_chip_type >= CHIP_TYPE_ADSP2181)
 			{
 				/* clear timer */
 				if (val & 0x0002) m_irq_latch[ADSP2181_IRQ0] = 0;
@@ -500,8 +500,8 @@ INT32 adsp21xx_device::read_reg3(int regnum)
 		case 0x05:	return m_cntr;
 		case 0x06:	return m_core.sb.s;
 		case 0x07:	return m_px;
-		case 0x08:	if (m_config.m_sport_rx_callback) return (*m_config.m_sport_rx_callback)(*this, 0); else return 0;
-		case 0x0a:	if (m_config.m_sport_rx_callback) return (*m_config.m_sport_rx_callback)(*this, 1); else return 0;
+		case 0x08:	if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 0); else return 0;
+		case 0x0a:	if (m_sport_rx_callback) return (*m_sport_rx_callback)(*this, 1); else return 0;
 		case 0x0f:	return pc_stack_pop_val();
 		default:	logerror("ADSP %04x: Reading from an invalid register!\n", m_ppc); return 0;
 	}

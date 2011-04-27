@@ -105,7 +105,7 @@ static DEVICE_START( vrender0 )
 	const vr0_interface *intf;
 	vr0_state *VR0 = get_safe_token(device);
 
-	intf = (const vr0_interface *)device->baseconfig().static_config();
+	intf = (const vr0_interface *)device->static_config();
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));

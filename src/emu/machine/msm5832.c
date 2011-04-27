@@ -22,6 +22,9 @@
 #include "msm5832.h"
 
 
+// device type definition
+const device_type MSM5832 = &device_creator<msm5832_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -53,51 +56,6 @@ enum
 // days per month
 static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type MSM5832 = msm5832_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  msm5832_device_config - constructor
-//-------------------------------------------------
-
-msm5832_device_config::msm5832_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "MSM5832", tag, owner, clock),
-	  device_config_rtc_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *msm5832_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(msm5832_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *msm5832_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, msm5832_device(machine, *this));
-}
 
 
 //**************************************************************************
@@ -214,15 +172,14 @@ inline void msm5832_device::advance_minutes()
 //  msm5832_device - constructor
 //-------------------------------------------------
 
-msm5832_device::msm5832_device(running_machine &_machine, const msm5832_device_config &config)
-    : device_t(_machine, config),
-	  device_rtc_interface(_machine, config, *this),
+msm5832_device::msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MSM5832, "MSM5832", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this),
 	  m_hold(0),
 	  m_address(0),
 	  m_read(0),
 	  m_write(0),
-	  m_cs(0),
-      m_config(config)
+	  m_cs(0)
 {
 	for (int i = 0; i < 13; i++)
 		m_reg[i] = 0;

@@ -11,6 +11,9 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type CDP1852 = &device_creator<cdp1852_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -21,46 +24,6 @@ enum
 	MODE_INPUT = 0,
 	MODE_OUTPUT
 };
-
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type CDP1852 = cdp1852_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(cdp1852, "CDP1852")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1852_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1852_interface *intf = reinterpret_cast<const cdp1852_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1852_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_mode_func, 0, sizeof(m_in_mode_func));
-		memset(&m_out_sr_func, 0, sizeof(m_out_sr_func));
-		memset(&m_in_data_func, 0, sizeof(m_in_data_func));
-		memset(&m_out_data_func, 0, sizeof(m_out_data_func));
-	}
-}
 
 
 
@@ -102,10 +65,33 @@ void cdp1852_device::set_sr_line(int state)
 //  cdp1852_device - constructor
 //-------------------------------------------------
 
-cdp1852_device::cdp1852_device(running_machine &_machine, const cdp1852_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CDP1852, "CDP1852", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1852_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const cdp1852_interface *intf = reinterpret_cast<const cdp1852_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1852_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_mode_cb, 0, sizeof(m_in_mode_cb));
+		memset(&m_out_sr_cb, 0, sizeof(m_out_sr_cb));
+		memset(&m_in_data_cb, 0, sizeof(m_in_data_cb));
+		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
+	}
 }
 
 
@@ -116,10 +102,10 @@ cdp1852_device::cdp1852_device(running_machine &_machine, const cdp1852_device_c
 void cdp1852_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_mode_func, &m_config.m_in_mode_func, this);
-	devcb_resolve_write_line(&m_out_sr_func, &m_config.m_out_sr_func, this);
-	devcb_resolve_read8(&m_in_data_func, &m_config.m_in_data_func, this);
-	devcb_resolve_write8(&m_out_data_func, &m_config.m_out_data_func, this);
+	devcb_resolve_read_line(&m_in_mode_func, &m_in_mode_cb, this);
+	devcb_resolve_write_line(&m_out_sr_func, &m_out_sr_cb, this);
+	devcb_resolve_read8(&m_in_data_func, &m_in_data_cb, this);
+	devcb_resolve_write8(&m_out_data_func, &m_out_data_cb, this);
 
 	// allocate timers
 	if (clock() > 0)

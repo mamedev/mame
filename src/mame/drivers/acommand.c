@@ -63,8 +63,8 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 class acommand_state : public driver_device
 {
 public:
-	acommand_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;

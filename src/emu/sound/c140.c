@@ -463,7 +463,7 @@ static STREAM_UPDATE( update_stereo )
 
 static DEVICE_START( c140 )
 {
-	const c140_interface *intf = (const c140_interface *)device->baseconfig().static_config();
+	const c140_interface *intf = (const c140_interface *)device->static_config();
 	c140_state *info = get_safe_token(device);
 
 	info->sample_rate=info->baserate=device->clock();

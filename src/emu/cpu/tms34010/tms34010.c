@@ -620,7 +620,7 @@ static void check_interrupt(tms34010_state *tms)
 
 static CPU_INIT( tms34010 )
 {
-	const tms34010_config *configdata = device->baseconfig().static_config() ? (const tms34010_config *)device->baseconfig().static_config() : &default_config;
+	const tms34010_config *configdata = device->static_config() ? (const tms34010_config *)device->static_config() : &default_config;
 	tms34010_state *tms = get_safe_token(device);
 
 	tms->external_host_access = FALSE;
@@ -1087,7 +1087,7 @@ SCREEN_UPDATE( tms340x0 )
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen->machine().m_devicelist.first(); cpu != NULL; cpu = cpu->next())
+	for (cpu = screen->machine().devicelist().first(); cpu != NULL; cpu = cpu->next())
 	{
 		device_type type = cpu->type();
 		if (type == TMS34010 || type == TMS34020)

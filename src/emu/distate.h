@@ -137,19 +137,6 @@ protected:
 
 
 
-// ======================> device_config_state_interface
-
-// class representing interface-specific configuration state
-class device_config_state_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_state_interface(const machine_config &mconfig, device_config &device);
-	virtual ~device_config_state_interface();
-};
-
-
-
 // ======================> device_state_interface
 
 // class representing interface-specific live state
@@ -157,11 +144,10 @@ class device_state_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_state_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_state_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_state_interface();
 
 	// configuration access
-	const device_config_state_interface &state_config() const { return m_state_config; }
 	const device_state_entry *state_first() const { return m_state_list.first(); }
 
 	// state getters
@@ -204,7 +190,6 @@ protected:
 	static const int k_fast_state_max = 256;						// lookups
 
 	// state
-	const device_config_state_interface &	m_state_config;			// reference to configuration data
 	simple_list<device_state_entry>			m_state_list;			// head of state list
 	device_state_entry *					m_fast_state[k_fast_state_max  + 1 - k_fast_state_min];
 																	// fast access to common entries

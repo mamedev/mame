@@ -56,80 +56,23 @@
 
 
 
-/***************************************************************************
-    DEVICE DEFINITIONS
-***************************************************************************/
-
-const device_type SPEAKER = speaker_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  SPEAKER DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  speaker_device_config - constructor
-//-------------------------------------------------
-
-speaker_device_config::speaker_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Speaker", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this),
-	  m_x(0.0),
-	  m_y(0.0),
-	  m_z(0.0)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *speaker_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(speaker_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *speaker_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, speaker_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  static_set_position - configuration helper to
-//  set the speaker position
-//-------------------------------------------------
-
-void speaker_device_config::static_set_position(device_config *device, double x, double y, double z)
-{
-	speaker_device_config *speaker = downcast<speaker_device_config *>(device);
-	speaker->m_x = x;
-	speaker->m_y = y;
-	speaker->m_z = z;
-}
-
-
-
 //**************************************************************************
 //  LIVE SPEAKER DEVICE
 //**************************************************************************
+
+// device type definition
+const device_type SPEAKER = &device_creator<speaker_device>;
 
 //-------------------------------------------------
 //  speaker_device - constructor
 //-------------------------------------------------
 
-speaker_device::speaker_device(running_machine &_machine, const speaker_device_config &config)
-	: device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  m_config(config),
+speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_x(0.0),
+	  m_y(0.0),
+	  m_z(0.0),
 	  m_mixer_stream(NULL)
 #ifdef MAME_DEBUG
 	,
@@ -152,6 +95,20 @@ speaker_device::~speaker_device()
 	if (m_max_sample > 0)
 		mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", tag(), m_max_sample, 32767.0 / (m_max_sample ? m_max_sample : 1), (int)((double)m_clipped_samples * 100.0 / m_total_samples));
 #endif
+}
+
+
+//-------------------------------------------------
+//  static_set_position - configuration helper to
+//  set the speaker position
+//-------------------------------------------------
+
+void speaker_device::static_set_position(device_t &device, double x, double y, double z)
+{
+	speaker_device &speaker = downcast<speaker_device &>(device);
+	speaker.m_x = x;
+	speaker.m_y = y;
+	speaker.m_z = z;
 }
 
 
@@ -249,7 +206,7 @@ void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_upda
 	if (!suppress)
 	{
 		// if the speaker is centered, send to both left and right
-		if (m_config.m_x == 0)
+		if (m_x == 0)
 			for (int sample = 0; sample < samples_this_update; sample++)
 			{
 				leftmix[sample] += stream_buf[sample];
@@ -257,7 +214,7 @@ void speaker_device::mix(INT32 *leftmix, INT32 *rightmix, int &samples_this_upda
 			}
 
 		// if the speaker is to the left, send only to the left
-		else if (m_config.m_x < 0)
+		else if (m_x < 0)
 			for (int sample = 0; sample < samples_this_update; sample++)
 				leftmix[sample] += stream_buf[sample];
 

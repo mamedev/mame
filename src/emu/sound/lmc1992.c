@@ -64,44 +64,7 @@ enum
 //**************************************************************************
 
 // devices
-const device_type LMC1992 = lmc1992_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  lmc1992_device_config - constructor
-//-------------------------------------------------
-
-lmc1992_device_config::lmc1992_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "LMC1992", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *lmc1992_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(lmc1992_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *lmc1992_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, lmc1992_device(machine, *this));
-}
+const device_type LMC1992 = &device_creator<lmc1992_device>;
 
 
 
@@ -176,10 +139,9 @@ inline void lmc1992_device::execute_command(int addr, int data)
 //  lmc1992_device - constructor
 //-------------------------------------------------
 
-lmc1992_device::lmc1992_device(running_machine &_machine, const lmc1992_device_config &config)
-    : device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-      m_config(config)
+lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, LMC1992, "LMC1992", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
 {
 }
 

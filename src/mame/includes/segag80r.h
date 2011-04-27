@@ -9,8 +9,8 @@
 class segag80r_state : public driver_device
 {
 public:
-	segag80r_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;

@@ -46,6 +46,9 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type MC68901 = &device_creator<mc68901_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -258,44 +261,6 @@ static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 
 #define TXD(_data) devcb_call_write_line(&m_out_so_func, _data);
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type MC68901 = mc68901_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(mc68901, "Motorola MC68901")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc68901_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc68901_interface *intf = reinterpret_cast<const mc68901_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc68901_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-//      memset(&in_pa_func, 0, sizeof(in_pa_func));
-	}
-}
-
 
 
 //**************************************************************************
@@ -771,12 +736,32 @@ inline void mc68901_device::gpio_input(int bit, int state)
 //  mc68901_device - constructor
 //-------------------------------------------------
 
-mc68901_device::mc68901_device(running_machine &_machine, const mc68901_device_config &config)
-    : device_t(_machine, config),
+mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MC68901, "Motorola MC68901", tag, owner, clock),
 	  m_gpip(0),
-	  m_tsr(TSR_BUFFER_EMPTY),
-      m_config(config)
+	  m_tsr(TSR_BUFFER_EMPTY)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc68901_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mc68901_interface *intf = reinterpret_cast<const mc68901_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mc68901_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+//      memset(&in_pa_cb, 0, sizeof(in_pa_cb));
+	}
 }
 
 
@@ -787,18 +772,15 @@ mc68901_device::mc68901_device(running_machine &_machine, const mc68901_device_c
 void mc68901_device::device_start()
 {
 	/* resolve callbacks */
-	devcb_resolve_read8(&m_in_gpio_func, &m_config.in_gpio_func, this);
-	devcb_resolve_write8(&m_out_gpio_func, &m_config.out_gpio_func, this);
-	devcb_resolve_read_line(&m_in_si_func, &m_config.in_si_func, this);
-	devcb_resolve_write_line(&m_out_so_func, &m_config.out_so_func, this);
-	devcb_resolve_write_line(&m_out_tao_func, &m_config.out_tao_func, this);
-	devcb_resolve_write_line(&m_out_tbo_func, &m_config.out_tbo_func, this);
-	devcb_resolve_write_line(&m_out_tco_func, &m_config.out_tco_func, this);
-	devcb_resolve_write_line(&m_out_tdo_func, &m_config.out_tdo_func, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_config.out_irq_func, this);
-
-	/* set initial values */
-	m_timer_clock = m_config.timer_clock;
+	devcb_resolve_read8(&m_in_gpio_func, &m_in_gpio_cb, this);
+	devcb_resolve_write8(&m_out_gpio_func, &m_out_gpio_cb, this);
+	devcb_resolve_read_line(&m_in_si_func, &m_in_si_cb, this);
+	devcb_resolve_write_line(&m_out_so_func, &m_out_so_cb, this);
+	devcb_resolve_write_line(&m_out_tao_func, &m_out_tao_cb, this);
+	devcb_resolve_write_line(&m_out_tbo_func, &m_out_tbo_cb, this);
+	devcb_resolve_write_line(&m_out_tco_func, &m_out_tco_cb, this);
+	devcb_resolve_write_line(&m_out_tdo_func, &m_out_tdo_cb, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
 
 	/* create the timers */
 	m_timer[TIMER_A] = timer_alloc(TIMER_A);
@@ -806,16 +788,16 @@ void mc68901_device::device_start()
 	m_timer[TIMER_C] = timer_alloc(TIMER_C);
 	m_timer[TIMER_D] = timer_alloc(TIMER_D);
 
-	if (m_config.rx_clock > 0)
+	if (m_rx_clock > 0)
 	{
 		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.rx_clock));
+		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rx_clock));
 	}
 
-	if (m_config.tx_clock > 0)
+	if (m_tx_clock > 0)
 	{
 		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.tx_clock));
+		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_tx_clock));
 	}
 
 	/* register for state saving */

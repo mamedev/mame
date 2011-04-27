@@ -3,8 +3,8 @@
 class galaga_state : public driver_device
 {
 public:
-	galaga_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	galaga_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT8 *m_galaga_ram1;
@@ -33,8 +33,8 @@ public:
 class xevious_state : public galaga_state
 {
 public:
-	xevious_state(running_machine &machine, const driver_device_config_base &config)
-		: galaga_state(machine, config) { }
+	xevious_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaga_state(mconfig, type, tag) { }
 
 	UINT8 *m_xevious_fg_videoram;
 	UINT8 *m_xevious_fg_colorram;
@@ -51,8 +51,8 @@ public:
 class bosco_state : public galaga_state
 {
 public:
-	bosco_state(running_machine &machine, const driver_device_config_base &config)
-		: galaga_state(machine, config) { }
+	bosco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaga_state(mconfig, type, tag) { }
 
 	UINT8 *m_bosco_radarattr;
 
@@ -66,8 +66,8 @@ public:
 class digdug_state : public galaga_state
 {
 public:
-	digdug_state(running_machine &machine, const driver_device_config_base &config)
-		: galaga_state(machine, config) { }
+	digdug_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaga_state(mconfig, type, tag) { }
 
 	UINT8 *m_digdug_objram;
 	UINT8 *m_digdug_posram;

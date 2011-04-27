@@ -398,7 +398,7 @@ static CPU_DISASSEMBLE( v25 )
 
 static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
 {
-	const nec_config *config = device->baseconfig().static_config() ? (const nec_config *)device->baseconfig().static_config() : &default_config;
+	const nec_config *config = device->static_config() ? (const nec_config *)device->static_config() : &default_config;
 	v25_state_t *nec_state = get_safe_token(device);
 
 	unsigned int i, j, c;

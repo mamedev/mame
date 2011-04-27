@@ -1,8 +1,8 @@
 class nbmj8688_state : public driver_device
 {
 public:
-	nbmj8688_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_mjsikaku_scrolly;
 	int m_blitter_destx;

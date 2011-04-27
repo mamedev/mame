@@ -61,7 +61,7 @@ typedef double (*adc0808_analog_read) (device_t *device);
 
 struct adc0808_interface
 {
-	devcb_write_line		m_out_eoc_func;
+	devcb_write_line		m_out_eoc_cb;
 
 	adc0808_analog_read		m_in_vref_pos_func;
 	adc0808_analog_read		m_in_vref_neg_func;
@@ -70,37 +70,15 @@ struct adc0808_interface
 };
 
 
-// ======================> adc0808_device_config
-
-class adc0808_device_config :   public device_config,
-                                public adc0808_interface
-{
-    friend class adc0808_device;
-
-    // construction/destruction
-    adc0808_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
 // ======================> adc0808_device
 
-class adc0808_device :  public device_t
+class adc0808_device :  public device_t,
+						public adc0808_interface
 {
-    friend class adc0808_device_config;
-
-    // construction/destruction
-    adc0808_device(running_machine &_machine, const adc0808_device_config &_config);
-
 public:
+    // construction/destruction
+    adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( ale_w );
 
@@ -108,6 +86,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -126,8 +105,6 @@ private:
 
 	// timers
 	emu_timer *m_cycle_timer;
-
-	const adc0808_device_config &m_config;
 };
 
 

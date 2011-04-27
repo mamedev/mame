@@ -494,7 +494,7 @@ static void cpu_init_tms_common( legacy_cpu_device *device, const UINT32* decode
 {
 	tms0980_state *cpustate = get_safe_token( device );
 
-	cpustate->config = (const tms0980_config *) device->baseconfig().static_config();
+	cpustate->config = (const tms0980_config *) device->static_config();
 
 	assert( cpustate->config != NULL );
 

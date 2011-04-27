@@ -22,8 +22,8 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 class rgum_state : public driver_device
 {
 public:
-	rgum_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	rgum_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vram;
 	UINT8 *m_cram;

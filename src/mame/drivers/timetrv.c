@@ -30,8 +30,8 @@ CPU is an Intel 80188
 class timetrv_state : public driver_device
 {
 public:
-	timetrv_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	timetrv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_led_vram_lo;
 	UINT8 *m_led_vram_hi;

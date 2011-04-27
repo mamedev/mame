@@ -68,7 +68,7 @@ INLINE const saa5050_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == SAA5050));
-	return (const saa5050_interface *) device->baseconfig().static_config();
+	return (const saa5050_interface *) device->static_config();
 }
 
 /*************************************

@@ -115,8 +115,8 @@ PCB2  (Top board, CPU board)
 class sub_state : public driver_device
 {
 public:
-	sub_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sub_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8* m_vid;
 	UINT8* m_attr;

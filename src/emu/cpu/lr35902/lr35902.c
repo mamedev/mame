@@ -189,7 +189,7 @@ static CPU_INIT( lr35902 )
 {
 	lr35902_state *cpustate = get_safe_token(device);
 
-	cpustate->w.config = (const lr35902_cpu_core *) device->baseconfig().static_config();
+	cpustate->w.config = (const lr35902_cpu_core *) device->static_config();
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
 	cpustate->w.program = device->space(AS_PROGRAM);

@@ -9,8 +9,8 @@
 class mitchell_state : public driver_device
 {
 public:
-	mitchell_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_audiocpu(*this, "audiocpu"),
 		  m_oki(*this, "oki") { }
 

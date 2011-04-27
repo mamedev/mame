@@ -119,17 +119,7 @@ enum
 //**************************************************************************
 
 #define MCFG_TMS3203X_CONFIG(_config) \
-	tms3203x_device_config::static_set_config(device, _config); \
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
-extern const device_type TMS32031;
-extern const device_type TMS32032;
+	tms3203x_device::static_set_config(*device, _config); \
 
 
 
@@ -156,55 +146,11 @@ struct tms3203x_config
 
 
 
-// ======================> tms3203x_device_config
-
-class tms3203x_device_config :	public cpu_device_config,
-								public tms3203x_config
-{
-	friend class tms3203x_device;
-
-protected:
-	enum
-	{
-		CHIP_TYPE_TMS32031,
-		CHIP_TYPE_TMS32032,
-	};
-
-	// construction/destruction
-	tms3203x_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map);
-
-public:
-	// inline configuration helpers
-	static void static_set_config(device_config *device, const tms3203x_config &config);
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// address spaces
-	const address_space_config		m_program_config;
-
-	// internal state
-	UINT32							m_chip_type;
-};
-
-
-
 // ======================> tms3203x_device
 
-class tms3203x_device : public cpu_device
+class tms3203x_device : public cpu_device,
+						public tms3203x_config
 {
-	friend class tms3203x_device_config;
-
 	struct tmsreg
 	{
 		// constructors
@@ -230,11 +176,20 @@ class tms3203x_device : public cpu_device
 	};
 
 protected:
+	enum
+	{
+		CHIP_TYPE_TMS32031,
+		CHIP_TYPE_TMS32032,
+	};
+
 	// construction/destruction
-	tms3203x_device(running_machine &_machine, const tms3203x_device_config &config);
+	tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map);
 	virtual ~tms3203x_device();
 
 public:
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const tms3203x_config &config);
+
 	// public interfaces
 	static float fp_to_float(UINT32 floatdata);
 	static double fp_to_double(UINT32 floatdata);
@@ -247,8 +202,14 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+	virtual UINT32 execute_input_lines() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -256,6 +217,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// memory helpers
@@ -816,7 +779,8 @@ protected:
 	void xor3sti(UINT32 op);
 
 	// configuration
-	const tms3203x_device_config &m_config;
+	const address_space_config		m_program_config;
+	UINT32							m_chip_type;
 
 	union int_double
 	{
@@ -855,47 +819,13 @@ protected:
 };
 
 
-// ======================> tms32031_device_config
-
-class tms32031_device_config : public tms3203x_device_config
-{
-	friend class tms32031_device;
-
-	// construction/destruction
-	tms32031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
 // ======================> tms32031_device
 
 class tms32031_device : public tms3203x_device
 {
-	friend class tms32031_device_config;
-
-	// construction/destruction
-	tms32031_device(running_machine &_machine, const tms32031_device_config &config);
-};
-
-
-// ======================> tms32032_device_config
-
-class tms32032_device_config : public tms3203x_device_config
-{
-	friend class tms32032_device;
-
-protected:
-	// construction/destruction
-	tms32032_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
 public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
+	// construction/destruction
+	tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -903,12 +833,16 @@ public:
 
 class tms32032_device : public tms3203x_device
 {
-	friend class tms32032_device_config;
-
-protected:
+public:
 	// construction/destruction
-	tms32032_device(running_machine &_machine, const tms32032_device_config &config);
+	tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
+
+
+// device type definition
+extern const device_type TMS32031;
+extern const device_type TMS32032;
+
 
 
 #endif /* __TMS32031_H__ */

@@ -208,48 +208,33 @@ static ADDRESS_MAP_START( gp9001vdp_map, AS_0, 16 )
 ADDRESS_MAP_END
 
 
-gp9001vdp_device_config::gp9001vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "gp9001vdp_", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map))
+const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
+
+gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, GP9001_VDP, "GP9001_VDP", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, NULL, *ADDRESS_MAP_NAME(gp9001vdp_map)),
+	  m_gfxregion(0)
 {
 }
 
-device_config *gp9001vdp_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+void gp9001vdp_device::static_set_gfx_region(device_t &device, int gfxregion)
 {
-	return global_alloc(gp9001vdp_device_config(mconfig, tag, owner, clock));
+	gp9001vdp_device &vdp = downcast<gp9001vdp_device &>(device);
+	vdp.m_gfxregion = gfxregion;
 }
 
-device_t *gp9001vdp_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, gp9001vdp_device(machine, *this));
-}
-
-void gp9001vdp_device_config::static_set_gfx_region(device_config *device, int gfxregion)
-{
-	gp9001vdp_device_config *vdp = downcast<gp9001vdp_device_config *>(device);
-	vdp->m_gfxregion = gfxregion;
-}
-
-bool gp9001vdp_device_config::device_validity_check(emu_options &options, const game_driver &driver) const
+bool gp9001vdp_device::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 	return error;
 }
 
-const address_space_config *gp9001vdp_device_config::memory_space_config(address_spacenum spacenum) const
+const address_space_config *gp9001vdp_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
-
-gp9001vdp_device::gp9001vdp_device(running_machine &_machine, const gp9001vdp_device_config &config)
-	: device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
-	  m_config(config),
-	  m_gfxregion(m_config.m_gfxregion)
-{
-}
 
 
 

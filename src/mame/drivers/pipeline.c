@@ -75,8 +75,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class pipeline_state : public driver_device
 {
 public:
-	pipeline_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pipeline_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;

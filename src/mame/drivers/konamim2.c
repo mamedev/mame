@@ -203,8 +203,8 @@ typedef struct
 class konamim2_state : public driver_device
 {
 public:
-	konamim2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT64 *m_main_ram;
 	UINT32 m_vdl0_address;

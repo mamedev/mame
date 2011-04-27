@@ -126,7 +126,7 @@ INLINE const s2636_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == S2636));
-	return (const s2636_interface *) device->baseconfig().static_config();
+	return (const s2636_interface *) device->static_config();
 }
 
 

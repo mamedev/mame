@@ -10,8 +10,8 @@
 class ccastles_state : public driver_device
 {
 public:
-	ccastles_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	ccastles_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_nvram_4b(*this, "nvram_4b"),
 		  m_nvram_4a(*this, "nvram_4a") { }

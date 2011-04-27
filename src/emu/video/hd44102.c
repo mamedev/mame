@@ -35,38 +35,8 @@
 #define STATUS_RESET				0x10	/* not supported */
 
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type HD44102 = hd44102_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(hd44102, "HD44102")
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void hd44102_device_config::static_set_config(device_config *device, const char *screen_tag, int sx, int sy)
-{
-	hd44102_device_config *hd44102 = downcast<hd44102_device_config *>(device);
-
-	assert(screen_tag != NULL);
-
-	hd44102->m_screen_tag = screen_tag;
-	hd44102->m_sx = sx;
-	hd44102->m_sy = sy;
-}
-
+// device type definition
+const device_type HD44102 = &device_creator<hd44102_device>;
 
 
 //**************************************************************************
@@ -99,14 +69,29 @@ inline void hd44102_device::count_up_or_down()
 //  hd44102_device - constructor
 //-------------------------------------------------
 
-hd44102_device::hd44102_device(running_machine &_machine, const hd44102_device_config &config)
-    : device_t(_machine, config),
+hd44102_device::hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, HD44102, "HD44102", tag, owner, clock),
 	  m_cs2(0),
 	  m_page(0),
 	  m_x(0),
-	  m_y(0),
-      m_config(config)
+	  m_y(0)
 {
+}
+
+
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void hd44102_device::static_set_config(device_t &device, const char *screen_tag, int sx, int sy)
+{
+	hd44102_device &hd44102 = downcast<hd44102_device &>(device);
+
+	assert(screen_tag != NULL);
+
+	hd44102.m_screen_tag = screen_tag;
+	hd44102.m_sx = sx;
+	hd44102.m_sy = sy;
 }
 
 
@@ -117,7 +102,7 @@ hd44102_device::hd44102_device(running_machine &_machine, const hd44102_device_c
 void hd44102_device::device_start()
 {
 	// find screen
-	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ram[0]));
@@ -296,8 +281,8 @@ void hd44102_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 		{
 			UINT8 data = m_ram[z / 8][y];
 
-			int sy = m_config.m_sy + z;
-			int sx = m_config.m_sx + y;
+			int sy = m_sy + z;
+			int sx = m_sx + y;
 
 			if ((sy >= cliprect->min_y) && (sy <= cliprect->max_y) && (sx >= cliprect->min_x) && (sx <= cliprect->max_x))
 			{

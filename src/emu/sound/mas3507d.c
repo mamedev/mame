@@ -5,29 +5,12 @@
 #include "emu.h"
 #include "mas3507d.h"
 
-const device_type MAS3507D = mas3507d_device_config::static_alloc_device_config;
+// device type definition
+const device_type MAS3507D = &device_creator<mas3507d_device>;
 
-
-mas3507d_device_config::mas3507d_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "MAS3507D", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-device_config *mas3507d_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(mas3507d_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *mas3507d_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, mas3507d_device(machine, *this));
-}
-
-mas3507d_device::mas3507d_device(running_machine &machine, const mas3507d_device_config &_config)
-	: device_t(machine, _config),
-	  device_sound_interface(machine, _config, *this),
-	  config(_config)
+mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MAS3507D, "MAS3507D", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
 {
 }
 

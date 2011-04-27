@@ -7,8 +7,8 @@
 class lethalj_state : public driver_device
 {
 public:
-	lethalj_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	lethalj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_blitter_data[8];
 	UINT16 *m_screenram;

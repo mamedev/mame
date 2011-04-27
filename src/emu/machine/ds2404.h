@@ -24,49 +24,18 @@
 	MCFG_DS2404_REF_DAY(_ref_day)
 
 #define MCFG_DS2404_REF_YEAR(_ref_year) \
-	ds2404_device_config::static_set_ref_year(device, _ref_year);
+	ds2404_device::static_set_ref_year(*device, _ref_year);
 
 #define MCFG_DS2404_REF_MONTH(_ref_month) \
-	ds2404_device_config::static_set_ref_month(device, _ref_month);
+	ds2404_device::static_set_ref_month(*device, _ref_month);
 
 #define MCFG_DS2404_REF_DAY(_ref_day) \
-	ds2404_device_config::static_set_ref_day(device, _ref_day);
+	ds2404_device::static_set_ref_day(*device, _ref_day);
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> ds2404_device_config
-
-class ds2404_device_config :  public device_config,
-							  public device_config_nvram_interface
-{
-    friend class ds2404_device;
-
-    // construction/destruction
-    ds2404_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_ref_year(device_config *device, UINT32 m_ref_year);
-	static void static_set_ref_month(device_config *device, UINT8 m_ref_month);
-	static void static_set_ref_day(device_config *device, UINT8 m_ref_day);
-
-protected:
-    // internal state goes here
-	UINT32	m_ref_year;
-	UINT8	m_ref_month;
-	UINT8	m_ref_day;
-};
-
 
 
 // ======================> ds2404_device
@@ -74,12 +43,14 @@ protected:
 class ds2404_device :  public device_t,
 					   public device_nvram_interface
 {
-    friend class ds2404_device_config;
-
-    // construction/destruction
-    ds2404_device(running_machine &_machine, const ds2404_device_config &_config);
-
 public:
+    // construction/destruction
+    ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_ref_year(device_t &device, UINT32 m_ref_year);
+	static void static_set_ref_month(device_t &device, UINT8 m_ref_month);
+	static void static_set_ref_day(device_t &device, UINT8 m_ref_day);
 
 	/* 1-wire interface reset  */
 	void ds2404_1w_reset_w(UINT32 offset, UINT8 data);
@@ -129,6 +100,11 @@ private:
 		DS2404_STATE_COPY_SCRATCHPAD		/* Copy Scratchpad command active */
 	};
 
+    // configuration state
+	UINT32	m_ref_year;
+	UINT8	m_ref_month;
+	UINT8	m_ref_day;
+
 	UINT16 m_address;
 	UINT16 m_offset;
 	UINT16 m_end_offset;
@@ -139,8 +115,6 @@ private:
 	UINT8 m_rtc[5];		/* 40-bit RTC counter */
 	DS2404_STATE m_state[8];
 	int m_state_ptr;
-
-    const ds2404_device_config &m_config;
 };
 
 

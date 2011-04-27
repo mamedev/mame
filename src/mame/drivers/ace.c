@@ -46,8 +46,8 @@ A1                   2101            2101
 class ace_state : public driver_device
 {
 public:
-	ace_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ace_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
 	UINT8 *  m_ram2;

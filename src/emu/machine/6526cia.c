@@ -45,85 +45,33 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  mos6526_device_config - constructor
-//-------------------------------------------------
-
-mos6526_device_config::mos6526_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "MOS6526", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *mos6526_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(mos6526_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *mos6526_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, mos6526_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6526_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos6526_interface *intf = reinterpret_cast<const mos6526_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mos6526_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_tod_clock = 0;
-    	memset(&m_out_irq_func, 0, sizeof(m_out_irq_func));
-    	memset(&m_out_pc_func, 0, sizeof(m_out_pc_func));
-    	memset(&m_out_cnt_func, 0, sizeof(m_out_cnt_func));
-    	memset(&m_out_sp_func, 0, sizeof(m_out_sp_func));
-    	memset(&m_in_pa_func, 0, sizeof(m_in_pa_func));
-    	memset(&m_out_pa_func, 0, sizeof(m_out_pa_func));
-    	memset(&m_in_pb_func, 0, sizeof(m_in_pb_func));
-    	memset(&m_out_pb_func, 0, sizeof(m_out_pb_func));
-	}
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type MOS6526R1 = mos6526_device_config::static_alloc_device_config;
-const device_type MOS6526R2 = mos6526_device_config::static_alloc_device_config;
-const device_type MOS8520 = mos6526_device_config::static_alloc_device_config;
+// device type definition
+const device_type MOS6526R1 = &device_creator<mos6526r1_device>;
+const device_type MOS6526R2 = &device_creator<mos6526r2_device>;
+const device_type MOS8520 = &device_creator<mos8520_device>;
 
 //-------------------------------------------------
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(running_machine &_machine, const mos6526_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, type, name, tag, owner, clock)
 {
-
 }
+
+mos6526r1_device::mos6526r1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : mos6526_device(mconfig, MOS6526R1, "MOS6526r1", tag, owner, clock) { }
+
+mos6526r2_device::mos6526r2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : mos6526_device(mconfig, MOS6526R2, "MOS6526r2", tag, owner, clock) { }
+
+mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -173,23 +121,52 @@ void mos6526_device::device_reset()
 
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mos6526_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mos6526_interface *intf = reinterpret_cast<const mos6526_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mos6526_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_tod_clock = 0;
+    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+    	memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
+    	memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
+    	memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
+    	memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+    	memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+    	memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+    	memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+	}
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mos6526_device::device_start()
 {
 	/* clear out CIA structure, and copy the interface */
-	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
-	devcb_resolve_write_line(&m_out_pc_func, &m_config.m_out_pc_func, this);
-	devcb_resolve_write_line(&m_out_cnt_func, &m_config.m_out_cnt_func, this);
-	devcb_resolve_write_line(&m_out_sp_func, &m_config.m_out_sp_func, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
+	devcb_resolve_write_line(&m_out_pc_func, &m_out_pc_cb, this);
+	devcb_resolve_write_line(&m_out_cnt_func, &m_out_cnt_cb, this);
+	devcb_resolve_write_line(&m_out_sp_func, &m_out_sp_cb, this);
 	m_flag = 1;
 
 	/* setup ports */
-	devcb_resolve_read8(&m_port[0].m_read, &m_config.m_in_pa_func, this);
-	devcb_resolve_write8(&m_port[0].m_write, &m_config.m_out_pa_func, this);
-	devcb_resolve_read8(&m_port[1].m_read, &m_config.m_in_pb_func, this);
-	devcb_resolve_write8(&m_port[1].m_write, &m_config.m_out_pb_func, this);
+	devcb_resolve_read8(&m_port[0].m_read, &m_in_pa_cb, this);
+	devcb_resolve_write8(&m_port[0].m_write, &m_out_pa_cb, this);
+	devcb_resolve_read8(&m_port[1].m_read, &m_in_pb_cb, this);
+	devcb_resolve_write8(&m_port[1].m_write, &m_out_pb_cb, this);
 
 	for (int p = 0; p < (sizeof(m_port) / sizeof(m_port[0])); p++)
 	{
@@ -206,9 +183,9 @@ void mos6526_device::device_start()
 	}
 
 	/* setup TOD timer, if appropriate */
-	if (m_config.m_tod_clock != 0)
+	if (m_tod_clock != 0)
 	{
-		machine().scheduler().timer_pulse(attotime::from_hz(m_config.m_tod_clock), FUNC(clock_tod_callback), 0, (void *)this);
+		machine().scheduler().timer_pulse(attotime::from_hz(m_tod_clock), FUNC(clock_tod_callback), 0, (void *)this);
 	}
 
 	/* state save support */

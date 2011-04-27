@@ -34,8 +34,8 @@ struct ssi263_t
 class thayers_state : public driver_device
 {
 public:
-	thayers_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_laserdisc;
 	UINT8 m_laserdisc_data;

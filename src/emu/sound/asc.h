@@ -49,52 +49,28 @@ enum
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_ASC_TYPE(_type) \
-	asc_device_config::static_set_type(device, _type); \
+	asc_device::static_set_type(*device, _type); \
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	asc_device_config::static_set_irqf(device, _irqf); \
+	asc_device::static_set_irqf(*device, _irqf); \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> asc_device_config
-
-class asc_device_config :	public device_config, public device_config_sound_interface
-{
-	friend class asc_device;
-
-	// construction/destruction
-	asc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_type(device_config *device, int type);
-	static void static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state));
-
-protected:
-	// inline data
-	UINT8			m_type;
-	void (*m_irq_func)(device_t *device, int state);
-};
-
-
-
 // ======================> asc_device
 
 class asc_device : public device_t, public device_sound_interface
 {
-	friend class asc_device_config;
-
-	// construction/destruction
-	asc_device(running_machine &_machine, const asc_device_config &config);
-
 public:
+	// construction/destruction
+	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_type(device_t &device, int type);
+	static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
+
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
@@ -127,9 +103,7 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
-	// internal state
-	const asc_device_config &m_config;
-
+	// inline data
 	UINT8	m_chip_type;
 	void (*m_irq_cb)(device_t *device, int state);
 

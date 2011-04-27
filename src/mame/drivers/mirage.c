@@ -43,8 +43,8 @@ MR_01-.3A    [a0b758aa]
 class mirage_state : public driver_device
 {
 public:
-	mirage_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	mirage_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_oki_sfx(*this, "oki_sfx"),
@@ -342,8 +342,8 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 2);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 2);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

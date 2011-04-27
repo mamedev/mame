@@ -10,123 +10,22 @@
 #include "debugger.h"
 #include "dsp16.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type DSP16 = dsp16_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DSP16 DEVICE CONFIG
-//**************************************************************************
-
-dsp16_device_config::dsp16_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "DSP16", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
-{ }
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *dsp16_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(dsp16_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *dsp16_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, dsp16_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  execute_min_cycles - return minimum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 dsp16_device_config::execute_min_cycles() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  execute_max_cycles - return maximum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 dsp16_device_config::execute_max_cycles() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-UINT32 dsp16_device_config::execute_input_lines() const
-{
-	return 1;   // TODO
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *dsp16_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 dsp16_device_config::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 dsp16_device_config::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
 
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
 
+// device type definition
+const device_type DSP16 = &device_creator<dsp16_device>;
+
+
 //-------------------------------------------------
 //  dsp16_device - constructor
 //-------------------------------------------------
 
-dsp16_device::dsp16_device(running_machine &_machine, const dsp16_device_config &config)
-	: cpu_device(_machine, config),
+dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, DSP16, "DSP16", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
       m_pc(0),
       m_ppc(0),
       m_icount(0)
@@ -167,6 +66,18 @@ void dsp16_device::device_reset()
 
 
 //-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *dsp16_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+}
+
+
+//-------------------------------------------------
 //  state_import - import state into the device,
 //  after it has been set
 //-------------------------------------------------
@@ -185,6 +96,28 @@ void dsp16_device::state_import(const device_state_entry &entry)
 void dsp16_device::state_string_export(const device_state_entry &entry, astring &string)
 {
     string.printf("");
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 dsp16_device::disasm_min_opcode_bytes() const
+{
+	return 2;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 dsp16_device::disasm_max_opcode_bytes() const
+{
+	return 4;
 }
 
 
@@ -224,6 +157,39 @@ inline UINT32 dsp16_device::opcode_read()
 /***************************************************************************
     CORE EXECUTION LOOP
 ***************************************************************************/
+
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 dsp16_device::execute_min_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 dsp16_device::execute_max_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 dsp16_device::execute_input_lines() const
+{
+	return 1;   // TODO
+}
+
 
 void dsp16_device::execute_set_input(int inputnum, int state)
 {

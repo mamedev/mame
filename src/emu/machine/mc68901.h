@@ -71,60 +71,37 @@
 
 struct mc68901_interface
 {
-	int	timer_clock;		/* timer clock */
-	int	rx_clock;			/* serial receive clock */
-	int	tx_clock;			/* serial transmit clock */
+	int	m_timer_clock;		/* timer clock */
+	int	m_rx_clock;			/* serial receive clock */
+	int	m_tx_clock;			/* serial transmit clock */
 
-	devcb_write_line		out_irq_func;
+	devcb_write_line		m_out_irq_cb;
 
-	devcb_read8				in_gpio_func;
-	devcb_write8			out_gpio_func;
+	devcb_read8				m_in_gpio_cb;
+	devcb_write8			m_out_gpio_cb;
 
-	devcb_write_line		out_tao_func;
-	devcb_write_line		out_tbo_func;
-	devcb_write_line		out_tco_func;
-	devcb_write_line		out_tdo_func;
+	devcb_write_line		m_out_tao_cb;
+	devcb_write_line		m_out_tbo_cb;
+	devcb_write_line		m_out_tco_cb;
+	devcb_write_line		m_out_tdo_cb;
 
-	devcb_read_line			in_si_func;
-	devcb_write_line		out_so_func;
-	devcb_write_line		out_rr_func;
-	devcb_write_line		out_tr_func;
-};
-
-
-
-// ======================> mc68901_device_config
-
-class mc68901_device_config :   public device_config,
-                                public mc68901_interface
-{
-    friend class mc68901_device;
-
-    // construction/destruction
-    mc68901_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read_line			m_in_si_cb;
+	devcb_write_line		m_out_so_cb;
+	devcb_write_line		m_out_rr_cb;
+	devcb_write_line		m_out_tr_cb;
 };
 
 
 
 // ======================> mc68901_device
 
-class mc68901_device :	public device_t
+class mc68901_device :	public device_t,
+                        public mc68901_interface
 {
-    friend class mc68901_device_config;
-
-    // construction/destruction
-    mc68901_device(running_machine &_machine, const mc68901_device_config &_config);
-
 public:
+    // construction/destruction
+    mc68901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -147,6 +124,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -188,7 +166,6 @@ private:
 	devcb_resolved_write_line	m_out_irq_func;
 
 	int m_device_type;						/* device type */
-	int m_timer_clock;						/* timer clock */
 
 	/* registers */
 	UINT8 m_gpip;							/* general purpose I/O register */
@@ -244,8 +221,6 @@ private:
 	emu_timer *m_timer[4]; /* counter timers */
 	emu_timer *m_rx_timer;					/* receive timer */
 	emu_timer *m_tx_timer;					/* transmit timer */
-
-	const mc68901_device_config &m_config;
 };
 
 

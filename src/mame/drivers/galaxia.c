@@ -32,8 +32,8 @@ TS 2008.08.12:
 class galaxia_state : public driver_device
 {
 public:
-	galaxia_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	galaxia_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_video;
 	UINT8 *m_color;

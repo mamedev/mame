@@ -223,8 +223,8 @@ U145        1Brown          PAL14H4CN
 class sms_state : public driver_device
 {
 public:
-	sms_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sms_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_communication_port[4];
 	UINT8 m_communication_port_status;

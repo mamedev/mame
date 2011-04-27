@@ -37,46 +37,24 @@
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  INLINE HELPERS
 //**************************************************************************
-
-// devices
-const device_type CRT9212 = crt9212_device_config::static_alloc_device_config;
-
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type CRT9212 = &device_creator<crt9212_device>;
+
 //-------------------------------------------------
-//  crt9212_device_config - constructor
+//  crt9212_device - constructor
 //-------------------------------------------------
 
-crt9212_device_config::crt9212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "SMC CRT9212", tag, owner, clock)
+crt9212_device::crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CRT9212, "SMC CRT9212", tag, owner, clock)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *crt9212_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(crt9212_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *crt9212_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, crt9212_device(machine, *this));
 }
 
 
@@ -86,7 +64,7 @@ device_t *crt9212_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void crt9212_device_config::device_config_complete()
+void crt9212_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const crt9212_interface *intf = reinterpret_cast<const crt9212_interface *>(static_config());
@@ -96,33 +74,12 @@ void crt9212_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&out_rof_func, 0, sizeof(out_rof_func));
-		memset(&out_wof_func, 0, sizeof(out_wof_func));
-		memset(&in_ren_func, 0, sizeof(in_ren_func));
-		memset(&in_wen_func, 0, sizeof(in_wen_func));
-		memset(&in_wen2_func, 0, sizeof(in_wen2_func));
+		memset(&m_out_rof_cb, 0, sizeof(m_out_rof_cb));
+		memset(&m_out_wof_cb, 0, sizeof(m_out_wof_cb));
+		memset(&m_in_ren_cb, 0, sizeof(m_in_ren_cb));
+		memset(&m_in_wen_cb, 0, sizeof(m_in_wen_cb));
+		memset(&m_in_wen2_cb, 0, sizeof(m_in_wen2_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  crt9212_device - constructor
-//-------------------------------------------------
-
-crt9212_device::crt9212_device(running_machine &_machine, const crt9212_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
 }
 
 
@@ -133,11 +90,11 @@ crt9212_device::crt9212_device(running_machine &_machine, const crt9212_device_c
 void crt9212_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_rof_func, &m_config.out_rof_func, this);
-	devcb_resolve_write_line(&m_out_wof_func, &m_config.out_wof_func, this);
-	devcb_resolve_read_line(&m_in_ren_func, &m_config.in_ren_func, this);
-	devcb_resolve_read_line(&m_in_wen_func, &m_config.in_wen_func, this);
-	devcb_resolve_read_line(&m_in_wen2_func, &m_config.in_wen2_func, this);
+	devcb_resolve_write_line(&m_out_rof_func, &m_out_rof_cb, this);
+	devcb_resolve_write_line(&m_out_wof_func, &m_out_wof_cb, this);
+	devcb_resolve_read_line(&m_in_ren_func, &m_in_ren_cb, this);
+	devcb_resolve_read_line(&m_in_wen_func, &m_in_wen_cb, this);
+	devcb_resolve_read_line(&m_in_wen2_func, &m_in_wen2_cb, this);
 
 	// register for state saving
 	save_item(NAME(m_input));

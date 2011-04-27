@@ -55,16 +55,13 @@
 class intelfsh_device;
 
 
-// ======================> intelfsh_device_config
+// ======================> intelfsh_device
 
-class intelfsh_device_config :	public device_config,
-								public device_config_memory_interface,
-								public device_config_nvram_interface
+class intelfsh_device :	public device_t,
+						public device_memory_interface,
+						public device_nvram_interface
 {
-	friend class intelfsh_device;
-
-protected:
-	// constants
+public:
 	enum
 	{
 		// 8-bit variants
@@ -84,41 +81,19 @@ protected:
 		FLASH_SHARP_UNK128MBIT
 	};
 
-	// construction/destruction
-	intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// internal state
-	address_space_config	m_space_config;
-	UINT32					m_type;
-	INT32					m_size;
-	UINT8					m_bits;
-	UINT8					m_device_id;
-	UINT8					m_maker_id;
-	bool					m_sector_is_4k;
-};
-
-
-// ======================> intelfsh_device
-
-class intelfsh_device :	public device_t,
-						public device_memory_interface,
-						public device_nvram_interface
-{
-	friend class intelfsh_device_config;
-
 protected:
 	// construction/destruction
-	intelfsh_device(running_machine &_machine, const intelfsh_device_config &config);
+	intelfsh_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// device_config_nvram_interface overrides
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
@@ -127,27 +102,22 @@ protected:
 	UINT32 read_full(UINT32 offset);
 	void write_full(UINT32 offset, UINT32 data);
 
+	// configuration state
+	address_space_config	m_space_config;
+	UINT32					m_type;
+	INT32					m_size;
+	UINT8					m_bits;
+	UINT8					m_device_id;
+	UINT8					m_maker_id;
+	bool					m_sector_is_4k;
+
 	// internal state
-	const intelfsh_device_config &	m_config;
-
-	UINT8						m_status;
-	INT32						m_erase_sector;
-	INT32						m_flash_mode;
-	bool						m_flash_master_lock;
-	emu_timer *					m_timer;
-	INT32						m_bank;
-};
-
-
-// ======================> intelfsh8_device_config
-
-class intelfsh8_device_config : public intelfsh_device_config
-{
-	friend class intelfsh8_device;
-
-protected:
-	// construction/destruction
-	intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
+	UINT8					m_status;
+	INT32					m_erase_sector;
+	INT32					m_flash_mode;
+	bool					m_flash_master_lock;
+	emu_timer *				m_timer;
+	INT32					m_bank;
 };
 
 
@@ -155,19 +125,9 @@ protected:
 
 class intelfsh8_device : public intelfsh_device
 {
-	friend class intelfsh8_device_config;
-	friend class intel_28f016s5_device_config;
-	friend class fujitsu_29f016a_device_config;
-	friend class fujitsu_29dl16x_device_config;
-	friend class sharp_lh28f016s_device_config;
-	friend class intel_e28f008sa_device_config;
-	friend class macronix_29l001mc_device_config;
-	friend class panasonic_mn63f805mnp_device_config;
-	friend class sanyo_le26fv10n1ts_device_config;
-
 protected:
 	// construction/destruction
-	intelfsh8_device(running_machine &_machine, const intelfsh_device_config &config);
+	intelfsh8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 public:
 	// public interface
@@ -179,31 +139,13 @@ public:
 };
 
 
-// ======================> intelfsh16_device_config
-
-class intelfsh16_device_config : public intelfsh_device_config
-{
-	friend class intelfsh16_device;
-
-protected:
-	// construction/destruction
-	intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
-};
-
-
 // ======================> intelfsh16_device
 
 class intelfsh16_device : public intelfsh_device
 {
-	friend class intelfsh16_device_config;
-	friend class sharp_lh28f400_device_config;
-	friend class intel_te28f160_device_config;
-	friend class intel_e28f400_device_config;
-	friend class sharp_unk128mbit_device_config;
-
 protected:
 	// construction/destruction
-	intelfsh16_device(running_machine &_machine, const intelfsh_device_config &config);
+	intelfsh16_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 public:
 	// public interface
@@ -218,21 +160,73 @@ public:
 // ======================> trivial variants
 
 // 8-bit variants
-DECLARE_TRIVIAL_DERIVED_DEVICE(intel_28f016s5_device_config, intelfsh8_device_config, intel_28f016s5_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(fujitsu_29f016a_device_config, intelfsh8_device_config, fujitsu_29f016a_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(fujitsu_29dl16x_device_config, intelfsh8_device_config, fujitsu_29dl16x_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f016s_device_config, intelfsh8_device_config, sharp_lh28f016s_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(intel_e28f008sa_device_config, intelfsh8_device_config, intel_e28f008sa_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(macronix_29l001mc_device_config, intelfsh8_device_config, macronix_29l001mc_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(panasonic_mn63f805mnp_device_config, intelfsh8_device_config, panasonic_mn63f805mnp_device, intelfsh8_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(sanyo_le26fv10n1ts_device_config, intelfsh8_device_config, sanyo_le26fv10n1ts_device, intelfsh8_device)
+class intel_28f016s5_device : public intelfsh8_device
+{
+public:
+	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fujitsu_29f016a_device : public intelfsh8_device
+{
+public:
+	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class sharp_lh28f016s_device : public intelfsh8_device
+{
+public:
+	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class intel_e28f008sa_device : public intelfsh8_device
+{
+public:
+	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class macronix_29l001mc_device : public intelfsh8_device
+{
+public:
+	macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class panasonic_mn63f805mnp_device : public intelfsh8_device
+{
+public:
+	panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class sanyo_le26fv10n1ts_device : public intelfsh8_device
+{
+public:
+	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 
 // 16-bit variants
-DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f400_device_config, intelfsh16_device_config, sharp_lh28f400_device, intelfsh16_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(intel_te28f160_device_config, intelfsh16_device_config, intel_te28f160_device, intelfsh16_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(intel_e28f400_device_config, intelfsh16_device_config, intel_e28f400_device, intelfsh16_device)
-DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_unk128mbit_device_config, intelfsh16_device_config, sharp_unk128mbit_device, intelfsh16_device)
+class sharp_lh28f400_device : public intelfsh16_device
+{
+public:
+	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class intel_te28f160_device : public intelfsh16_device
+{
+public:
+	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class intel_e28f400_device : public intelfsh16_device
+{
+public:
+	intel_e28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class sharp_unk128mbit_device : public intelfsh16_device
+{
+public:
+	sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 
 

@@ -14,27 +14,12 @@
 
 #include "emu.h"
 
-class ds2401_device_config : public device_config
-{
-	friend class ds2401_device;
-
-	// construction/destruction
-	ds2401_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 class ds2401_device : public device_t
 {
-	friend class ds2401_device_config;
-
-	// construction/destruction
-	ds2401_device(running_machine &_machine, const ds2401_device_config &config);
-
 public:
+	// construction/destruction
+	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	void write(bool line);
 	bool read();
 	UINT8 direct_read(int index);
@@ -66,8 +51,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// internal state
-	const ds2401_device_config &config;
-
 	int state, bit, shift;
 	UINT8 byte;
 	bool rx, tx;

@@ -102,8 +102,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class royalmah_state : public driver_device
 {
 public:
-	royalmah_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	royalmah_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	UINT8 m_input_port_select;

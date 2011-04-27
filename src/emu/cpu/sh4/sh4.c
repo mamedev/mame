@@ -3377,7 +3377,7 @@ static CPU_EXECUTE( sh4 )
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = (const struct sh4_config *)device->baseconfig().static_config();
+	const struct sh4_config *conf = (const struct sh4_config *)device->static_config();
 	sh4_state *sh4 = get_safe_token(device);
 
 	sh4_common_init(device);

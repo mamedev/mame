@@ -426,11 +426,11 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	MCFG_DECO16IC_ADD("tilegen1", sshangha_deco16ic_tilegen1_intf)
 
-	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 2);
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 2);
 
-	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 2);
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 2);
 
 
 	MCFG_VIDEO_START(sshangha)

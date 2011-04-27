@@ -67,51 +67,30 @@
 
 struct cdp1852_interface
 {
-	devcb_read_line			m_in_mode_func;
+	devcb_read_line			m_in_mode_cb;
 
-	devcb_read8				m_in_data_func;
-	devcb_write8			m_out_data_func;
+	devcb_read8				m_in_data_cb;
+	devcb_write8			m_out_data_cb;
 
-	devcb_write_line		m_out_sr_func;
-};
-
-
-// ======================> cdp1852_device_config
-
-class cdp1852_device_config :   public device_config,
-                                public cdp1852_interface
-{
-    friend class cdp1852_device;
-
-    // construction/destruction
-    cdp1852_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_write_line		m_out_sr_cb;
 };
 
 
 // ======================> cdp1852_device
 
-class cdp1852_device :  public device_t
+class cdp1852_device :  public device_t,
+                        public cdp1852_interface
 {
-    friend class cdp1852_device_config;
-
-    // construction/destruction
-    cdp1852_device(running_machine &_machine, const cdp1852_device_config &_config);
-
 public:
+    // construction/destruction
+    cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -134,8 +113,6 @@ private:
 
 	// timers
 	emu_timer *m_scan_timer;
-
-	const cdp1852_device_config &m_config;
 };
 
 

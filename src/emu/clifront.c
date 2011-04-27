@@ -485,11 +485,11 @@ void cli_frontend::listsamples(const char *gamename)
 	while (drivlist.next())
 	{
 		// see if we have samples
-		const device_config *devconfig;
-		for (devconfig = drivlist.config().first_device(); devconfig != NULL; devconfig = devconfig->next())
-			if (devconfig->type() == SAMPLES)
+		const device_t *device;
+		for (device = drivlist.config().first_device(); device != NULL; device = device->next())
+			if (device->type() == SAMPLES)
 				break;
-		if (devconfig == NULL)
+		if (device == NULL)
 			continue;
 
 		// print a header
@@ -499,11 +499,11 @@ void cli_frontend::listsamples(const char *gamename)
 		mame_printf_info("Samples required for driver \"%s\".\n", drivlist.driver().name);
 
 		// iterate over samples devices
-		for ( ; devconfig != NULL; devconfig = devconfig->next())
-			if (devconfig->type() == SAMPLES)
+		for ( ; device != NULL; device = device->next())
+			if (device->type() == SAMPLES)
 			{
 				// if the list is legit, walk it and print the sample info
-				const char *const *samplenames = reinterpret_cast<const samples_interface *>(devconfig->static_config())->samplenames;
+				const char *const *samplenames = reinterpret_cast<const samples_interface *>(device->static_config())->samplenames;
 				if (samplenames != NULL)
 					for (int sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
 						if (samplenames[sampnum][0] != '*')
@@ -536,11 +536,11 @@ void cli_frontend::listdevices(const char *gamename)
 		printf("Driver %s (%s):\n", drivlist.driver().name, drivlist.driver().description);
 
 		// iterate through devices
-		for (const device_config *devconfig = drivlist.config().first_device(); devconfig != NULL; devconfig = devconfig->next())
+		for (const device_t *device = drivlist.config().first_device(); device != NULL; device = device->next())
 		{
-			printf("   %s ('%s')", devconfig->name(), devconfig->tag());
+			printf("   %s ('%s')", device->name(), device->tag());
 
-			UINT32 clock = devconfig->clock();
+			UINT32 clock = device->clock();
 			if (clock >= 1000000000)
 				printf(" @ %d.%02d GHz\n", clock / 1000000000, (clock / 10000000) % 100);
 			else if (clock >= 1000000)
@@ -576,9 +576,9 @@ void cli_frontend::listmedia(const char *gamename)
 	while (drivlist.next())
 	{
 		// iterate
-		const device_config_image_interface *imagedev = NULL;
+		const device_image_interface *imagedev = NULL;
 		bool first = true;
-		for (bool gotone = drivlist.config().m_devicelist.first(imagedev); gotone; gotone = imagedev->next(imagedev))
+		for (bool gotone = drivlist.config().devicelist().first(imagedev); gotone; gotone = imagedev->next(imagedev))
 		{
 			// extract the shortname with parentheses
 			astring paren_shortname;
@@ -809,9 +809,9 @@ static void info_listsoftware(const char *gamename)
 	// first determine the maximum number of lists we might encounter
 	int list_count = 0;
 	while (drivlist.next())
-		for (const device_config *dev = drivlist.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+		for (const device_t *dev = drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 			for (int listnum = 0; listnum < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; listnum++)
 				if (swlist->list_name[listnum] && *swlist->list_name[listnum] && swlist->list_type == SOFTWARE_LIST_ORIGINAL_SYSTEM)
@@ -898,9 +898,9 @@ static void info_listsoftware(const char *gamename)
 	drivlist.reset();
 	list_count = 0;
 	while (drivlist.next())
-		for (const device_config *dev = drivlist.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+		for (const device_t *dev = drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 			for (int listnum = 0; listnum < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; listnum++)
 			{
@@ -1452,9 +1452,9 @@ int media_identifier::find_by_hash(const hash_collection &hashes, int length)
 				}
 
 		// next iterate over softlists
-		for (const device_config *dev = m_drivlist.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+		for (const device_t *dev = m_drivlist.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 			for (int listnum = 0; listnum < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; listnum++)
 				if (swlist->list_name[listnum] != NULL)

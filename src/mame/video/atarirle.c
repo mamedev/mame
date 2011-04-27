@@ -272,7 +272,7 @@ static DEVICE_START( atarirle )
 {
 	atarirle_data *mo = get_safe_token(device);
 	running_machine &machine = device->machine();
-	const atarirle_desc *desc = (const atarirle_desc *)device->baseconfig().static_config();
+	const atarirle_desc *desc = (const atarirle_desc *)device->static_config();
 	const UINT16 *base = (const UINT16 *)machine.region(desc->region)->base();
 	int i, width, height;
 

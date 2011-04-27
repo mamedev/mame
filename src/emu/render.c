@@ -1199,7 +1199,7 @@ int render_target::configured_view(const char *viewname, int targetindex, int nu
 	}
 
 	// if we don't have a match, default to the nth view
-	int scrcount = m_manager.machine().m_devicelist.count(SCREEN);
+	int scrcount = m_manager.machine().devicelist().count(SCREEN);
 	if (view == NULL && scrcount > 0)
 	{
 		// if we have enough targets to be one per screen, assign in order
@@ -1334,7 +1334,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 	int screens_considered = 0;
 
 	// early exit in case we are called between device teardown and render teardown
-	if (m_manager.machine().m_devicelist.count() == 0)
+	if (m_manager.machine().devicelist().count() == 0)
 	{
 		minwidth = 640;
 		minheight = 480;
@@ -1651,7 +1651,7 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 			load_layout_file(driver_list::driver(cloneof).name, "default");
 
 	// now do the built-in layouts for single-screen games
-	if (m_manager.machine().m_devicelist.count(SCREEN) == 1)
+	if (m_manager.machine().devicelist().count(SCREEN) == 1)
 	{
 		if (system.flags & ORIENTATION_SWAP_XY)
 			load_layout_file(NULL, layout_vertical);

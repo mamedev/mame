@@ -4,33 +4,17 @@
 #include "emu.h"
 #include "deckarn.h"
 
-deco_karnovsprites_device_config::deco_karnovsprites_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "karnovsprites_device", tag, owner, clock)
+void deco_karnovsprites_device::set_gfx_region(device_t &device, int region)
 {
-	m_gfxregion = 0;
+	deco_karnovsprites_device &dev = downcast<deco_karnovsprites_device &>(device);
+	dev.m_gfxregion = region;
 }
 
-device_config *deco_karnovsprites_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(deco_karnovsprites_device_config(mconfig, tag, owner, clock));
-}
+const device_type DECO_KARNOVSPRITES = &device_creator<deco_karnovsprites_device>;
 
-device_t *deco_karnovsprites_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, deco_karnovsprites_device(machine, *this));
-}
-
-void deco_karnovsprites_device_config::set_gfx_region(device_config *device, int region)
-{
-	deco_karnovsprites_device_config *dev = downcast<deco_karnovsprites_device_config *>(device);
-	dev->m_gfxregion = region;
-}
-
-
-deco_karnovsprites_device::deco_karnovsprites_device(running_machine &_machine, const deco_karnovsprites_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-	  m_gfxregion(m_config.m_gfxregion)
+deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO_KARNOVSPRITES, "karnovsprites_device", tag, owner, clock),
+	  m_gfxregion(0)
 {
 }
 

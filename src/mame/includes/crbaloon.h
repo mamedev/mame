@@ -11,8 +11,8 @@ Crazy Ballooon
 class crbaloon_state : public driver_device
 {
 public:
-	crbaloon_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	crbaloon_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_pc3092_data;
 	UINT8 *m_videoram;

@@ -102,8 +102,8 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 class murogem_state : public driver_device
 {
 public:
-	murogem_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	murogem_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 };

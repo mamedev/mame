@@ -16,8 +16,8 @@
 class namcofl_state : public driver_device
 {
 public:
-	namcofl_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	emu_timer *m_raster_interrupt_timer;
 	UINT32 *m_workram;

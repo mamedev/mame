@@ -509,13 +509,13 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 
 static DEVICE_START( smc91c9x )
 {
-	const smc91c9x_config *config = (const smc91c9x_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const smc91c9x_config *config = (const smc91c9x_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	smc91c9x_state *smc = get_safe_token(device);
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* store a pointer back to the device */
 	smc->device = device;

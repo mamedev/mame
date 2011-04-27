@@ -43,8 +43,8 @@
 class skimaxx_state : public driver_device
 {
 public:
-	skimaxx_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_bg_buffer;
 	UINT16 *m_fg_buffer;

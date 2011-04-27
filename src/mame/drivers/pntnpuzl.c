@@ -128,8 +128,8 @@ CN1 standard DB15 VGA connector (15KHz)
 class pntnpuzl_state : public driver_device
 {
 public:
-	pntnpuzl_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_eeprom;
 	UINT16* m_3a0000ram;

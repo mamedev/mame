@@ -56,89 +56,13 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// devices
-const device_type CDP1869 = cdp1869_device_config::static_alloc_device_config;
-
+// device type definition
+const device_type CDP1869 = &device_creator<cdp1869_device>;
 
 // default address map
 static ADDRESS_MAP_START( cdp1869, AS_0, 8 )
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdp1869_device_config - constructor
-//-------------------------------------------------
-
-cdp1869_device_config::cdp1869_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "RCA CDP1869", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cdp1869_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(cdp1869_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cdp1869_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, cdp1869_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *cdp1869_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1869_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1869_interface *intf = reinterpret_cast<const cdp1869_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1869_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&in_pal_ntsc_func, 0, sizeof(in_pal_ntsc_func));
-		memset(&out_prd_func, 0, sizeof(out_prd_func));
-		in_pcb_func = NULL;
-		in_char_ram_func = NULL;
-		out_char_ram_func = NULL;
-	}
-}
 
 
 
@@ -398,14 +322,39 @@ inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 //  cdp1869_device - constructor
 //-------------------------------------------------
 
-cdp1869_device::cdp1869_device(running_machine &_machine, const cdp1869_device_config &config)
-    : device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  device_memory_interface(_machine, config, *this),
+cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CDP1869, "RCA CDP1869", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
 	  m_stream(NULL),
-      m_config(config)
+	  m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
 
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1869_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const cdp1869_interface *intf = reinterpret_cast<const cdp1869_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1869_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&in_pal_ntsc_cb, 0, sizeof(in_pal_ntsc_cb));
+		memset(&out_prd_cb, 0, sizeof(out_prd_cb));
+		in_pcb_cb = NULL;
+		in_char_ram_cb = NULL;
+		out_char_ram_cb = NULL;
+	}
 }
 
 
@@ -416,15 +365,15 @@ cdp1869_device::cdp1869_device(running_machine &_machine, const cdp1869_device_c
 void cdp1869_device::device_start()
 {
 	// get the screen device
-	m_screen = machine().device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(screen_tag);
 	assert(m_screen != NULL);
 
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_pal_ntsc_func, &m_config.in_pal_ntsc_func, this);
-	devcb_resolve_write_line(&m_out_prd_func, &m_config.out_prd_func, this);
-	m_in_pcb_func = m_config.in_pcb_func;
-	m_in_char_ram_func = m_config.in_char_ram_func;
-	m_out_char_ram_func = m_config.out_char_ram_func;
+	devcb_resolve_read_line(&m_in_pal_ntsc_func, &in_pal_ntsc_cb, this);
+	devcb_resolve_write_line(&m_out_prd_func, &out_prd_cb, this);
+	m_in_pcb_func = in_pcb_cb;
+	m_in_char_ram_func = in_char_ram_cb;
+	m_out_char_ram_func = out_char_ram_cb;
 
 	// allocate timers
 	m_prd_timer = timer_alloc();
@@ -482,6 +431,17 @@ void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_prd = param;
 
 	update_prd_changed_timer();
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *cdp1869_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 

@@ -65,37 +65,18 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> lmc1992_device_config
-
-class lmc1992_device_config :   public device_config,
-								public device_config_sound_interface
-{
-    friend class lmc1992_device;
-
-    // construction/destruction
-    lmc1992_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int clock2);
-};
-
-
 // ======================> lmc1992_device
 
 class lmc1992_device :	public device_t,
 						public device_sound_interface
 {
-    friend class lmc1992_device_config;
-
-    // construction/destruction
-    lmc1992_device(running_machine &_machine, const lmc1992_device_config &_config);
-
 public:
+    // construction/destruction
+    lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, int clock2);
+
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
@@ -125,8 +106,6 @@ private:
 	int m_fader_lf;					// left front fader
 	int m_fader_rr;					// right rear fader
 	int m_fader_lr;					// left rear fader
-
-	const lmc1992_device_config &m_config;
 };
 
 

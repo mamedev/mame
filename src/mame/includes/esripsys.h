@@ -26,8 +26,8 @@ struct line_buffer_t
 class esripsys_state : public driver_device
 {
 public:
-	esripsys_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;

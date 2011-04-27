@@ -25,8 +25,8 @@
 class vicdual_state : public driver_device
 {
 public:
-	vicdual_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	vicdual_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 m_coin_status;
 	UINT8 *m_videoram;

@@ -28,14 +28,6 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type Z80DMA = z80dma_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -141,38 +133,20 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type Z80DMA = &device_creator<z80dma_device>;
+
 //-------------------------------------------------
-//  z80dma_device_config - constructor
+//  z80dma_device - constructor
 //-------------------------------------------------
 
-z80dma_device_config::z80dma_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Z8410", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
+z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, Z80DMA, "Z8410", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *z80dma_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(z80dma_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *z80dma_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, z80dma_device(machine, *this));
 }
 
 
@@ -182,7 +156,7 @@ device_t *z80dma_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void z80dma_device_config::device_config_complete()
+void z80dma_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const z80dma_interface *intf = reinterpret_cast<const z80dma_interface *>(static_config());
@@ -192,31 +166,14 @@ void z80dma_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_busreq_func, 0, sizeof(m_out_busreq_func));
-		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
-		memset(&m_out_bao_func, 0, sizeof(m_out_bao_func));
-		memset(&m_in_mreq_func, 0, sizeof(m_in_mreq_func));
-		memset(&m_out_mreq_func, 0, sizeof(m_out_mreq_func));
-		memset(&m_in_iorq_func, 0, sizeof(m_in_iorq_func));
-		memset(&m_out_iorq_func, 0, sizeof(m_out_iorq_func));
+		memset(&m_out_busreq_cb, 0, sizeof(m_out_busreq_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_bao_cb, 0, sizeof(m_out_bao_cb));
+		memset(&m_in_mreq_cb, 0, sizeof(m_in_mreq_cb));
+		memset(&m_out_mreq_cb, 0, sizeof(m_out_mreq_cb));
+		memset(&m_in_iorq_cb, 0, sizeof(m_in_iorq_cb));
+		memset(&m_out_iorq_cb, 0, sizeof(m_out_iorq_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80dma_device - constructor
-//-------------------------------------------------
-
-z80dma_device::z80dma_device(running_machine &_machine, const z80dma_device_config &_config)
-	: device_t(_machine, _config),
-	  device_z80daisy_interface(_machine, _config, *this),
-	  m_config(_config)
-{
 }
 
 
@@ -227,13 +184,13 @@ z80dma_device::z80dma_device(running_machine &_machine, const z80dma_device_conf
 void z80dma_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_busreq_func, &m_config.m_out_busreq_func, this);
-	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
-	devcb_resolve_write_line(&m_out_bao_func, &m_config.m_out_bao_func, this);
-	devcb_resolve_read8(&m_in_mreq_func, &m_config.m_in_mreq_func, this);
-	devcb_resolve_write8(&m_out_mreq_func, &m_config.m_out_mreq_func, this);
-	devcb_resolve_read8(&m_in_iorq_func, &m_config.m_in_iorq_func, this);
-	devcb_resolve_write8(&m_out_iorq_func, &m_config.m_out_iorq_func, this);
+	devcb_resolve_write_line(&m_out_busreq_func, &m_out_busreq_cb, this);
+	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	devcb_resolve_write_line(&m_out_bao_func, &m_out_bao_cb, this);
+	devcb_resolve_read8(&m_in_mreq_func, &m_in_mreq_cb, this);
+	devcb_resolve_write8(&m_out_mreq_func, &m_out_mreq_cb, this);
+	devcb_resolve_read8(&m_in_iorq_func, &m_in_iorq_cb, this);
+	devcb_resolve_write8(&m_out_iorq_func, &m_out_iorq_cb, this);
 
 	// allocate timer
 	m_timer = machine().scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);

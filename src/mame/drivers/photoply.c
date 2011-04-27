@@ -30,8 +30,8 @@ TODO:
 class photoply_state : public driver_device
 {
 public:
-	photoply_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_vga_vram;
 	UINT8 m_vga_regs[0x19];

@@ -56,8 +56,8 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 class wallc_state : public driver_device
 {
 public:
-	wallc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;

@@ -48,19 +48,19 @@
 //  set_tag - set the appropriate tag for a device
 //-------------------------------------------------
 
-inline void map_handler_data::set_tag(const device_config &devconfig, const char *tag)
+inline void map_handler_data::set_tag(const device_t &device, const char *tag)
 {
 	if (tag == NULL)
 		m_tag = NULL;
 	else if (strcmp(tag, DEVICE_SELF) == 0)
-		m_tag = devconfig.tag();
+		m_tag = device.tag();
 	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
 	{
-		assert(devconfig.owner() != NULL);
-		m_tag = devconfig.owner()->tag();
+		assert(device.owner() != NULL);
+		m_tag = device.owner()->tag();
 	}
 	else
-		m_tag = devconfig.siblingtag(m_derived_tag, tag);
+		m_tag = device.siblingtag(m_derived_tag, tag);
 }
 
 
@@ -131,10 +131,10 @@ void address_map_entry::set_mask(offs_t _mask)
 //  an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_read_port(const device_config &devconfig, const char *tag)
+void address_map_entry::set_read_port(const device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_PORT;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 }
 
 
@@ -143,10 +143,10 @@ void address_map_entry::set_read_port(const device_config &devconfig, const char
 //  an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_write_port(const device_config &devconfig, const char *tag)
+void address_map_entry::set_write_port(const device_t &device, const char *tag)
 {
 	m_write.m_type = AMH_PORT;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 }
 
 
@@ -155,12 +155,12 @@ void address_map_entry::set_write_port(const device_config &devconfig, const cha
 //  reading and writing an I/O port
 //-------------------------------------------------
 
-void address_map_entry::set_readwrite_port(const device_config &devconfig, const char *tag)
+void address_map_entry::set_readwrite_port(const device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_PORT;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_write.m_type = AMH_PORT;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 }
 
 
@@ -169,10 +169,10 @@ void address_map_entry::set_readwrite_port(const device_config &devconfig, const
 //  from a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_read_bank(const device_config &devconfig, const char *tag)
+void address_map_entry::set_read_bank(const device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_BANK;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 }
 
 
@@ -181,10 +181,10 @@ void address_map_entry::set_read_bank(const device_config &devconfig, const char
 //  to a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_write_bank(const device_config &devconfig, const char *tag)
+void address_map_entry::set_write_bank(const device_t &device, const char *tag)
 {
 	m_write.m_type = AMH_BANK;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 }
 
 
@@ -193,12 +193,12 @@ void address_map_entry::set_write_bank(const device_config &devconfig, const cha
 //  writing to a memory bank
 //-------------------------------------------------
 
-void address_map_entry::set_readwrite_bank(const device_config &devconfig, const char *tag)
+void address_map_entry::set_readwrite_bank(const device_t &device, const char *tag)
 {
 	m_read.m_type = AMH_BANK;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_write.m_type = AMH_BANK;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 }
 
 
@@ -238,7 +238,7 @@ void address_map_entry::internal_set_handler(read8_space_func rfunc, const char 
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
@@ -246,12 +246,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 8;
 	m_read.m_mask = unitmask;
 	m_read.m_name = string;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rdevice8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write8_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write8_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
@@ -259,19 +259,19 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 8;
 	m_write.m_mask = unitmask;
 	m_write.m_name = string;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wdevice8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_device_func rfunc, const char *rstring, write8_device_func wfunc, const char *wstring, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_device_func rfunc, const char *rstring, write8_device_func wfunc, const char *wstring, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, rstring, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, wstring, unitmask);
+	internal_set_handler(device, tag, rfunc, rstring, unitmask);
+	internal_set_handler(device, tag, wfunc, wstring, unitmask);
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -279,12 +279,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 8;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rproto8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write8_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write8_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -292,15 +292,15 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 8;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wproto8 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_delegate rfunc, write8_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read8_delegate rfunc, write8_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, unitmask);
+	internal_set_handler(device, tag, rfunc, unitmask);
+	internal_set_handler(device, tag, wfunc, unitmask);
 }
 
 
@@ -340,7 +340,7 @@ void address_map_entry::internal_set_handler(read16_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
@@ -348,12 +348,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 16;
 	m_read.m_mask = unitmask;
 	m_read.m_name = string;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rdevice16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write16_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write16_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
@@ -361,19 +361,19 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 16;
 	m_write.m_mask = unitmask;
 	m_write.m_name = string;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wdevice16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_device_func rfunc, const char *rstring, write16_device_func wfunc, const char *wstring, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_device_func rfunc, const char *rstring, write16_device_func wfunc, const char *wstring, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, rstring, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, wstring, unitmask);
+	internal_set_handler(device, tag, rfunc, rstring, unitmask);
+	internal_set_handler(device, tag, wfunc, wstring, unitmask);
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -381,12 +381,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 16;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rproto16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write16_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write16_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -394,15 +394,15 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 16;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wproto16 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_delegate rfunc, write16_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read16_delegate rfunc, write16_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, unitmask);
+	internal_set_handler(device, tag, rfunc, unitmask);
+	internal_set_handler(device, tag, wfunc, unitmask);
 }
 
 
@@ -442,7 +442,7 @@ void address_map_entry::internal_set_handler(read32_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
@@ -450,12 +450,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 32;
 	m_read.m_mask = unitmask;
 	m_read.m_name = string;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rdevice32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write32_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write32_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
@@ -463,19 +463,19 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 32;
 	m_write.m_mask = unitmask;
 	m_write.m_name = string;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wdevice32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_device_func rfunc, const char *rstring, write32_device_func wfunc, const char *wstring, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_device_func rfunc, const char *rstring, write32_device_func wfunc, const char *wstring, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, rstring, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, wstring, unitmask);
+	internal_set_handler(device, tag, rfunc, rstring, unitmask);
+	internal_set_handler(device, tag, wfunc, wstring, unitmask);
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -483,12 +483,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 32;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rproto32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write32_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write32_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -496,15 +496,15 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 32;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wproto32 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_delegate rfunc, write32_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read32_delegate rfunc, write32_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, unitmask);
+	internal_set_handler(device, tag, rfunc, unitmask);
+	internal_set_handler(device, tag, wfunc, unitmask);
 }
 
 
@@ -544,7 +544,7 @@ void address_map_entry::internal_set_handler(read64_space_func rfunc, const char
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
@@ -552,12 +552,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 64;
 	m_read.m_mask = 0;
 	m_read.m_name = string;
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rdevice64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write64_device_func func, const char *string, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write64_device_func func, const char *string, UINT64 unitmask)
 {
 	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
@@ -565,19 +565,19 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 64;
 	m_write.m_mask = 0;
 	m_write.m_name = string;
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wdevice64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_device_func rfunc, const char *rstring, write64_device_func wfunc, const char *wstring, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_device_func rfunc, const char *rstring, write64_device_func wfunc, const char *wstring, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, rstring, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, wstring, unitmask);
+	internal_set_handler(device, tag, rfunc, rstring, unitmask);
+	internal_set_handler(device, tag, wfunc, wstring, unitmask);
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -585,12 +585,12 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_read.m_bits = 64;
 	m_read.m_mask = 0;
 	m_read.m_name = func.name();
-	m_read.set_tag(devconfig, tag);
+	m_read.set_tag(device, tag);
 	m_rproto64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write64_delegate func, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, write64_delegate func, UINT64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -598,15 +598,15 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 	m_write.m_bits = 64;
 	m_write.m_mask = 0;
 	m_write.m_name = func.name();
-	m_write.set_tag(devconfig, tag);
+	m_write.set_tag(device, tag);
 	m_wproto64 = func;
 }
 
 
-void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_delegate rfunc, write64_delegate wfunc, UINT64 unitmask)
+void address_map_entry::internal_set_handler(const device_t &device, const char *tag, read64_delegate rfunc, write64_delegate wfunc, UINT64 unitmask)
 {
-	internal_set_handler(devconfig, tag, rfunc, unitmask);
-	internal_set_handler(devconfig, tag, wfunc, unitmask);
+	internal_set_handler(device, tag, rfunc, unitmask);
+	internal_set_handler(device, tag, wfunc, unitmask);
 }
 
 
@@ -696,33 +696,33 @@ address_map_entry64::address_map_entry64(address_map &map, offs_t start, offs_t 
 //  address_map - constructor
 //-------------------------------------------------
 
-address_map::address_map(const device_config &devconfig, address_spacenum spacenum)
+address_map::address_map(const device_t &device, address_spacenum spacenum)
 	: m_spacenum(spacenum),
 	  m_databits(0xff),
 	  m_unmapval(0),
 	  m_globalmask(0)
 {
 	// get our memory interface
-	const device_config_memory_interface *memintf;
-	if (!devconfig.interface(memintf))
-		throw emu_fatalerror("No memory interface defined for device '%s'\n", devconfig.tag());
+	const device_memory_interface *memintf;
+	if (!device.interface(memintf))
+		throw emu_fatalerror("No memory interface defined for device '%s'\n", device.tag());
 
 	// and then the configuration for the current address space
 	const address_space_config *spaceconfig = memintf->space_config(spacenum);
-	if (!devconfig.interface(memintf))
-		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", devconfig.tag(), spacenum);
+	if (!device.interface(memintf))
+		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag(), spacenum);
 
 	// append the internal device map (first so it takes priority) */
 	if (spaceconfig->m_internal_map != NULL)
-		(*spaceconfig->m_internal_map)(*this, devconfig);
+		(*spaceconfig->m_internal_map)(*this, device);
 
 	// construct the standard map */
 	if (memintf->address_map(spacenum) != NULL)
-		(*memintf->address_map(spacenum))(*this, devconfig);
+		(*memintf->address_map(spacenum))(*this, device);
 
 	// append the default device map (last so it can be overridden) */
 	if (spaceconfig->m_default_map != NULL)
-		(*spaceconfig->m_default_map)(*this, devconfig);
+		(*spaceconfig->m_default_map)(*this, device);
 }
 
 

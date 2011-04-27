@@ -2,8 +2,8 @@
 class bagman_state : public driver_device
 {
 public:
-	bagman_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bagman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_ls259_buf[8];
 	UINT8 m_p1_res;

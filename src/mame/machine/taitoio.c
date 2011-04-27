@@ -81,7 +81,7 @@ INLINE const tc0220ioc_interface *tc0220ioc_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0220IOC));
-	return (const tc0220ioc_interface *) device->baseconfig().static_config();
+	return (const tc0220ioc_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -238,7 +238,7 @@ INLINE const tc0510nio_interface *tc0510nio_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0510NIO));
-	return (const tc0510nio_interface *) device->baseconfig().static_config();
+	return (const tc0510nio_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -389,7 +389,7 @@ INLINE const tc0640fio_interface *tc0640fio_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0640FIO));
-	return (const tc0640fio_interface *) device->baseconfig().static_config();
+	return (const tc0640fio_interface *) device->static_config();
 }
 
 /*****************************************************************************

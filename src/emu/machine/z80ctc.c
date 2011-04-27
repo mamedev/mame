@@ -27,14 +27,6 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type Z80CTC = z80ctc_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -77,38 +69,20 @@ const int WAITING_FOR_TRIG	= 0x100;
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type Z80CTC = &device_creator<z80ctc_device>;
+
 //-------------------------------------------------
-//  z80ctc_device_config - constructor
+//  z80ctc_device - constructor
 //-------------------------------------------------
 
-z80ctc_device_config::z80ctc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 CTC", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
+z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, Z80CTC, "Zilog Z80 CTC", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *z80ctc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(z80ctc_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *z80ctc_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, z80ctc_device(machine, *this));
 }
 
 
@@ -118,7 +92,7 @@ device_t *z80ctc_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void z80ctc_device_config::device_config_complete()
+void z80ctc_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const z80ctc_interface *intf = reinterpret_cast<const z80ctc_interface *>(static_config());
@@ -129,28 +103,11 @@ void z80ctc_device_config::device_config_complete()
 	else
 	{
 		m_notimer = 0;
-		memset(&m_intr, 0, sizeof(m_intr));
-		memset(&m_zc0, 0, sizeof(m_zc0));
-		memset(&m_zc1, 0, sizeof(m_zc1));
-		memset(&m_zc2, 0, sizeof(m_zc2));
+		memset(&m_intr_cb, 0, sizeof(m_intr_cb));
+		memset(&m_zc0_cb, 0, sizeof(m_zc0_cb));
+		memset(&m_zc1_cb, 0, sizeof(m_zc1_cb));
+		memset(&m_zc2_cb, 0, sizeof(m_zc2_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80ctc_device - constructor
-//-------------------------------------------------
-
-z80ctc_device::z80ctc_device(running_machine &_machine, const z80ctc_device_config &_config)
-	: device_t(_machine, _config),
-	  device_z80daisy_interface(_machine, _config, *this),
-	  m_config(_config)
-{
 }
 
 
@@ -164,13 +121,13 @@ void z80ctc_device::device_start()
 	m_period256 = attotime::from_hz(m_clock) * 256;
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_intr, &m_config.m_intr, this);
+	devcb_resolve_write_line(&m_intr, &m_intr_cb, this);
 
 	// start each channel
-	m_channel[0].start(this, 0, (m_config.m_notimer & NOTIMER_0) != 0, &m_config.m_zc0);
-	m_channel[1].start(this, 1, (m_config.m_notimer & NOTIMER_1) != 0, &m_config.m_zc1);
-	m_channel[2].start(this, 2, (m_config.m_notimer & NOTIMER_2) != 0, &m_config.m_zc2);
-	m_channel[3].start(this, 3, (m_config.m_notimer & NOTIMER_3) != 0, NULL);
+	m_channel[0].start(this, 0, (m_notimer & NOTIMER_0) != 0, &m_zc0_cb);
+	m_channel[1].start(this, 1, (m_notimer & NOTIMER_1) != 0, &m_zc1_cb);
+	m_channel[2].start(this, 2, (m_notimer & NOTIMER_2) != 0, &m_zc2_cb);
+	m_channel[3].start(this, 3, (m_notimer & NOTIMER_3) != 0, NULL);
 
 	// register for save states
     save_item(NAME(m_vector));

@@ -18,8 +18,8 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 class intrscti_state : public driver_device
 {
 public:
-	intrscti_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	intrscti_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_ram;
 };

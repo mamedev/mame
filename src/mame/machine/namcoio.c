@@ -151,7 +151,7 @@ INLINE const namcoio_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == NAMCO56XX || device->type() == NAMCO58XX || device->type() == NAMCO59XX);
-	return (const namcoio_interface *) device->baseconfig().static_config();
+	return (const namcoio_interface *) device->static_config();
 }
 
 

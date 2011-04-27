@@ -36,7 +36,7 @@ INLINE const k056800_interface *k056800_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K056800));
-	return (const k056800_interface *) device->baseconfig().static_config();
+	return (const k056800_interface *) device->static_config();
 }
 
 /*****************************************************************************

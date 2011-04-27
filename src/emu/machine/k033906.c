@@ -11,10 +11,21 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(k033906, "Konami 033906")
+// device type definition
+const device_type K033906 = &device_creator<k033906_device>;
+
+//-------------------------------------------------
+//  k033906_device - constructor
+//-------------------------------------------------
+
+k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, K033906, "Konami 033906", tag, owner, clock)
+{
+
+}
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -22,7 +33,7 @@ GENERIC_DEVICE_CONFIG_SETUP(k033906, "Konami 033906")
 //  complete
 //-------------------------------------------------
 
-void k033906_device_config::device_config_complete()
+void k033906_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const k033906_interface *intf = reinterpret_cast<const k033906_interface *>(static_config());
@@ -39,31 +50,13 @@ void k033906_device_config::device_config_complete()
 }
 
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type K033906 = k033906_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  k033906_device - constructor
-//-------------------------------------------------
-
-k033906_device::k033906_device(running_machine &_machine, const k033906_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void k033906_device::device_start()
 {
-	m_voodoo = machine().device(m_config.m_voodoo_tag);
+	m_voodoo = machine().device(m_voodoo_tag);
 
 	m_reg = auto_alloc_array(machine(), UINT32, 256);
 	m_ram = auto_alloc_array(machine(), UINT32, 32768);

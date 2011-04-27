@@ -411,7 +411,7 @@ static STATE_POSTLOAD( jaguar_postload )
 
 static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->baseconfig().static_config();
+	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->static_config();
 	jaguar_state *jaguar = get_safe_token(device);
 
 	init_tables();

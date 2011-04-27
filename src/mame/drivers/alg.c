@@ -32,8 +32,8 @@
 class alg_state : public amiga_state
 {
 public:
-	alg_state(running_machine &machine, const driver_device_config_base &config)
-		: amiga_state(machine, config) { }
+	alg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag) { }
 
 
 	device_t *m_laserdisc;

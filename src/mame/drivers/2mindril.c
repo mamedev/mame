@@ -41,8 +41,8 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(running_machine &machine, const driver_device_config_base &config)
-		: taito_f3_state(machine, config) { }
+	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
+		: taito_f3_state(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT16 *      m_iodata;

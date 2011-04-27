@@ -158,6 +158,10 @@ static const char *const delayn[] =
 	"pc", "!pc"
 };
 
+// device type definition
+const device_type PSXCPU = &device_creator<psxcpu_device>;
+const device_type CXD8661R = &device_creator<cxd8661r_device>;
+
 static const UINT32 mtc0_writemask[]=
 {
 	0x00000000, /* !INDEX */
@@ -1557,60 +1561,6 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-const device_type PSXCPU = psxcpu_device_config::static_alloc_device_config;
-const device_type CXD8661R = cxd8661r_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  PSXCPU DEVICE CONFIG
-//**************************************************************************
-
-//-------------------------------------------------
-//  psxcpu_device_config - constructor
-//-------------------------------------------------
-
-psxcpu_device_config::psxcpu_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, address_map_constructor internal_map)
-	: cpu_device_config(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, internal_map)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *psxcpu_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(psxcpu_device_config(mconfig, PSXCPU, "PSXCPU", tag, owner, clock, ADDRESS_MAP_NAME(psxcpu_internal_map)));
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cxd8661r_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(psxcpu_device_config(mconfig, CXD8661R, "CXD8661R", tag, owner, clock, ADDRESS_MAP_NAME(cxd8661r_internal_map)));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *psxcpu_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, psxcpu_device(machine, *this));
-}
-
-device_t *cxd8661r_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, psxcpu_device(machine, *this));
-}
-
-
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
@@ -1619,8 +1569,20 @@ device_t *cxd8661r_device_config::alloc_device(running_machine &machine) const
 //  psxcpu_device - constructor
 //-------------------------------------------------
 
-psxcpu_device::psxcpu_device(running_machine &machine, const psxcpu_device_config &config)
-	: cpu_device(machine, config)
+psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, name, tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, internal_map)
+{
+}
+
+psxcpu_device::psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, PSXCPU, "PSXCPU", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(psxcpu_internal_map))
+{
+}
+
+cxd8661r_device::cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8661R, "CXD8661R", tag, owner, clock, ADDRESS_MAP_NAME(cxd8661r_internal_map))
 {
 }
 

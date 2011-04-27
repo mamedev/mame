@@ -34,7 +34,7 @@ struct _snapquick_token
 INLINE void assert_is_snapshot_or_quickload(device_t *device)
 {
 	assert(device != NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 	assert((device->type() == SNAPSHOT) || (device->type() == QUICKLOAD)
 		|| (device->type() == Z80BIN));
 }
@@ -60,15 +60,15 @@ INLINE snapquick_token *get_token(device_t *device)
 INLINE const snapquick_config *get_config(device_t *device)
 {
 	assert_is_snapshot_or_quickload(device);
-	return (const snapquick_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const snapquick_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
-INLINE const snapquick_config *get_config_dev(const device_config *device)
+INLINE const snapquick_config *get_config_dev(const device_t *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SNAPSHOT) || (device->type() == QUICKLOAD)
 		|| (device->type() == Z80BIN));
-	return (const snapquick_config *) downcast<const legacy_device_config_base *>(device)->inline_config();
+	return (const snapquick_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 /*-------------------------------------------------
@@ -323,7 +323,7 @@ static QUICKLOAD_LOAD( z80bin )
 	/* is this file executable? */
 	if (exec_addr != 0xffff)
 	{
-		config = (const z80bin_config *)downcast<const legacy_device_config_base &>(image.device().baseconfig()).inline_config();
+		config = (const z80bin_config *)downcast<const legacy_device_base &>(image.device()).inline_config();
 
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = input_port_read_safe(image.device().machine(), "CONFIG", 0xFF) & 1;

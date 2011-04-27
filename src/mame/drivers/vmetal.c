@@ -82,8 +82,8 @@ cleanup
 class vmetal_state : public metro_state
 {
 public:
-	vmetal_state(running_machine &machine, const driver_device_config_base &config)
-		: metro_state(machine, config) { }
+	vmetal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: metro_state(mconfig, type, tag) { }
 
 	UINT16 *m_texttileram;
 	UINT16 *m_mid1tileram;

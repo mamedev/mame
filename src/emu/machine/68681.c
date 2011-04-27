@@ -707,7 +707,7 @@ static DEVICE_START(duart68681)
 	/* validate arguments */
 	assert(device != NULL);
 
-	duart68681->duart_config = (const duart68681_config *)device->baseconfig().static_config();
+	duart68681->duart_config = (const duart68681_config *)device->static_config();
 	duart68681->device = device;
 
 	duart68681->channel[0].tx_timer = device->machine().scheduler().timer_alloc(FUNC(tx_timer_callback), (void*)device);

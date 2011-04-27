@@ -15,25 +15,11 @@
 #include "emu.h"
 #include "sknsspr.h"
 
+const device_type SKNS_SPRITE = &device_creator<sknsspr_device>;
 
-sknsspr_device_config::sknsspr_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "sknsspr_device", tag, owner, clock)
-{
-}
 
-device_config *sknsspr_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(sknsspr_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *sknsspr_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, sknsspr_device(machine, *this));
-}
-
-sknsspr_device::sknsspr_device(running_machine &_machine, const sknsspr_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config)
+sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SKNS_SPRITE, "sknsspr_device", tag, owner, clock)
 {
 }
 

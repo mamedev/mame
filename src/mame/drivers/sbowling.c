@@ -48,8 +48,8 @@ PROMs : NEC B406 (1kx4) x2
 class sbowling_state : public driver_device
 {
 public:
-	sbowling_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_bgmap;
 	UINT8 *m_videoram;

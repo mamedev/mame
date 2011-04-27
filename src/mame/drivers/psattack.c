@@ -82,8 +82,8 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 class psattack_state : public driver_device
 {
 public:
-	psattack_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	psattack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

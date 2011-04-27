@@ -299,7 +299,7 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->baseconfig().static_config();
+	const r3000_cpu_core *configdata = (const r3000_cpu_core *)device->static_config();
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* allocate memory */

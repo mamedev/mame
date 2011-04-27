@@ -55,47 +55,23 @@
 
 struct ins8154_interface
 {
-	devcb_read8			m_in_a_func;
-	devcb_write8		m_out_a_func;
-	devcb_read8			m_in_b_func;
-	devcb_write8		m_out_b_func;
-	devcb_write_line	m_out_irq_func;
-};
-
-
-
-// ======================> ins8154_device_config
-
-class ins8154_device_config : public device_config,
-                              public ins8154_interface
-{
-    friend class ins8154_device;
-
-    // construction/destruction
-    ins8154_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_read8			m_in_a_cb;
+	devcb_write8		m_out_a_cb;
+	devcb_read8			m_in_b_cb;
+	devcb_write8		m_out_b_cb;
+	devcb_write_line	m_out_irq_cb;
 };
 
 
 
 // ======================> ins8154_device
 
-class ins8154_device :  public device_t
+class ins8154_device :  public device_t,
+                        public ins8154_interface
 {
-    friend class ins8154_device_config;
-
-    // construction/destruction
-    ins8154_device(running_machine &_machine, const ins8154_device_config &_config);
-
 public:
+    // construction/destruction
+    ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 ins8154_r(UINT32 offset);
 	void ins8154_w(UINT32 offset, UINT8 data);
@@ -105,6 +81,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -127,8 +104,6 @@ private:
 	UINT8 m_mdr;   /* Mode Definition Register */
 	UINT8 m_odra;  /* Output Definition Register Port A */
 	UINT8 m_odrb;  /* Output Definition Register Port B */
-
-    const ins8154_device_config &m_config;
 };
 
 

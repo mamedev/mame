@@ -101,48 +101,26 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  LIVE DEVICE
 //**************************************************************************
 
-const device_type MC146818 = mc146818_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
+// device type definition
+const device_type MC146818 = &device_creator<mc146818_device>;
 
 //-------------------------------------------------
-//  mc146818_device_config - constructor
+//  mc146818_device - constructor
 //-------------------------------------------------
 
-mc146818_device_config::mc146818_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "NVRAM", tag, owner, clock),
-	  device_config_rtc_interface(mconfig, *this),
-	  device_config_nvram_interface(mconfig, *this),
-	  m_type(MC146818_STANDARD)
+mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, MC146818, "NVRAM", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this),
+	  device_nvram_interface(mconfig, *this),
+	  m_type(MC146818_STANDARD),
+	  m_index(0),
+	  m_eindex(0),
+	  m_updated(false),
+	  m_last_refresh(attotime::zero)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *mc146818_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(mc146818_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *mc146818_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, mc146818_device(machine, *this));
 }
 
 
@@ -151,31 +129,9 @@ device_t *mc146818_device_config::alloc_device(running_machine &machine) const
 //  to set the interface
 //-------------------------------------------------
 
-void mc146818_device_config::static_set_type(device_config *device, mc146818_type type)
+void mc146818_device::static_set_type(device_t &device, mc146818_type type)
 {
-	downcast<mc146818_device_config *>(device)->m_type = type;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mc146818_device - constructor
-//-------------------------------------------------
-
-mc146818_device::mc146818_device(running_machine &_machine, const mc146818_device_config &config)
-	: device_t(_machine, config),
-	  device_rtc_interface(_machine, config, *this),
-	  device_nvram_interface(_machine, config, *this),
-	  m_config(config),
-	  m_index(0),
-	  m_eindex(0),
-	  m_updated(false),
-	  m_last_refresh(attotime::zero)
-{
+	downcast<mc146818_device &>(device).m_type = type;
 }
 
 
@@ -187,7 +143,7 @@ void mc146818_device::device_start()
 {
 	m_last_refresh = machine().time();
 	emu_timer *timer = timer_alloc();
-	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
+	if (m_type == MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
 		timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
 	} else {
@@ -205,7 +161,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	int year/*, month*/;
 
-	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
+	if (m_type == MC146818_UTC) {
 		// hack: set correct real time even for overloaded emulation
 		// (at least for apollo)
 		static osd_ticks_t t0 = 0;
@@ -247,7 +203,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					DAY=bcd_adjust(DAY+1);
 					//month=bcd_2_dec(MONTH);
 					year=bcd_2_dec(YEAR);
-					if (m_config.m_type!=mc146818_device_config::MC146818_IGNORE_CENTURY) year+=bcd_2_dec(CENTURY)*100;
+					if (m_type!=MC146818_IGNORE_CENTURY) year+=bcd_2_dec(CENTURY)*100;
 					else year+=2000; // save for julian_days_in_month calculation
 					DAY=bcd_adjust(DAY+1);
 					if (DAY>gregorian_days_in_month(MONTH, year))
@@ -258,7 +214,7 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 						{
 							MONTH=1;
 							YEAR=year=bcd_adjust(YEAR+1);
-							if (m_config.m_type!=mc146818_device_config::MC146818_IGNORE_CENTURY)
+							if (m_type!=MC146818_IGNORE_CENTURY)
 							{
 								if (year>=0x100)
 								{
@@ -286,14 +242,14 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					m_data[4]=0;
 					WEEK_DAY=(WEEK_DAY+1)%7;
 					year=YEAR;
-					if (m_config.m_type!=mc146818_device_config::MC146818_IGNORE_CENTURY) year+=CENTURY*100;
+					if (m_type!=MC146818_IGNORE_CENTURY) year+=CENTURY*100;
 					else year+=2000; // save for julian_days_in_month calculation
 					if (++DAY>gregorian_days_in_month(MONTH, year)) {
 						DAY=1;
 						if (++MONTH>12) {
 							MONTH=1;
 							YEAR++;
-							if (m_config.m_type!=mc146818_device_config::MC146818_IGNORE_CENTURY) {
+							if (m_type!=MC146818_IGNORE_CENTURY) {
 								if (YEAR>=100) { CENTURY++;YEAR=0; }
 							} else {
 								YEAR%=100;
@@ -407,7 +363,7 @@ void mc146818_device::set_base_datetime()
 
 	machine().base_datetime(systime);
 
-	current_time = m_config.m_type == mc146818_device_config::MC146818_UTC ? systime.utc_time: systime.local_time;
+	current_time = m_type == MC146818_UTC ? systime.utc_time: systime.local_time;
 
 	// temporary hack to go back 20 year (e.g. from 2010 -> 1990)
 	// current_time.year -= 20;
@@ -421,7 +377,7 @@ void mc146818_device::set_base_datetime()
 	else
 		m_data[4] = dec_2_local(current_time.hour - 12) | 0x80;
 
-	if (m_config.m_type != mc146818_device_config::MC146818_IGNORE_CENTURY)
+	if (m_type != MC146818_IGNORE_CENTURY)
 		CENTURY = dec_2_local(current_time.year /100);
 
 	m_data[0]	= dec_2_local(current_time.second);

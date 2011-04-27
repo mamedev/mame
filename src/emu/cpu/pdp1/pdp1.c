@@ -537,7 +537,7 @@ static void pdp1_set_irq_line (pdp1_state *cpustate, int irqline, int state)
 
 static CPU_INIT( pdp1 )
 {
-	const pdp1_reset_param_t *param = (const pdp1_reset_param_t *)device->baseconfig().static_config();
+	const pdp1_reset_param_t *param = (const pdp1_reset_param_t *)device->static_config();
 	pdp1_state *cpustate = get_safe_token(device);
 	int i;
 

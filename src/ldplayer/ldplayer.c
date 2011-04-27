@@ -36,8 +36,8 @@ class ldplayer_state : public driver_device
 {
 public:
 	// construction/destruction
-	ldplayer_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	ldplayer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_last_controls(0),
 		  m_playing(false),
 		  m_laserdisc(*this, "laserdisc") { }
@@ -107,7 +107,7 @@ class pr8210_state : public ldplayer_state
 {
 public:
 	// construction/destruction
-	pr8210_state(running_machine &machine, const driver_device_config_base &config)
+	pr8210_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ldplayer_state(machine, config),
 		  m_bit_timer(timer_alloc(TIMER_ID_BIT)),
 		  m_command_buffer_in(0),
@@ -143,7 +143,7 @@ class ldv1000_state : public ldplayer_state
 {
 public:
 	// construction/destruction
-	ldv1000_state(running_machine &machine, const driver_device_config_base &config)
+	ldv1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ldplayer_state(machine, config) { }
 
 protected:

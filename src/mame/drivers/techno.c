@@ -9,8 +9,8 @@ extern const char layout_pinball[];
 class techno_state : public driver_device
 {
 public:
-	techno_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	techno_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 

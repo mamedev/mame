@@ -2398,7 +2398,7 @@ static DEVICE_START( sn76477 )
 
 
 #if TEST_MODE == 0
-	intf = (sn76477_interface *)device->baseconfig().static_config();
+	intf = (sn76477_interface *)device->static_config();
 #else
 	intf = &test_interface;
 #endif

@@ -1619,7 +1619,7 @@ INLINE const k007342_interface *k007342_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K007342));
-	return (const k007342_interface *) device->baseconfig().static_config();
+	return (const k007342_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -1903,7 +1903,7 @@ INLINE const k007420_interface *k007420_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K007420));
-	return (const k007420_interface *) device->baseconfig().static_config();
+	return (const k007420_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -2180,7 +2180,7 @@ INLINE const k052109_interface *k052109_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K052109));
-	return (const k052109_interface *) device->baseconfig().static_config();
+	return (const k052109_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -2815,7 +2815,7 @@ INLINE const k051960_interface *k051960_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K051960));
-	return (const k051960_interface *) device->baseconfig().static_config();
+	return (const k051960_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -3357,7 +3357,7 @@ INLINE const k05324x_interface *k05324x_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053244 || device->type() == K053245));
-	return (const k05324x_interface *) device->baseconfig().static_config();
+	return (const k05324x_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -4147,7 +4147,7 @@ INLINE const k053247_interface *k053247_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053246 || device->type() == K053247 || device->type() == K055673));
-	return (const k053247_interface *) device->baseconfig().static_config();
+	return (const k053247_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -5138,7 +5138,7 @@ INLINE const k051316_interface *k051316_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K051316);
-	return (const k051316_interface *) device->baseconfig().static_config();
+	return (const k051316_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -5426,7 +5426,7 @@ INLINE const k053936_interface *k053936_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K053936);
-	return (const k053936_interface *) device->baseconfig().static_config();
+	return (const k053936_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -6119,7 +6119,7 @@ INLINE const k056832_interface *k056832_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K056832);
-	return (const k056832_interface *) device->baseconfig().static_config();
+	return (const k056832_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -8165,7 +8165,7 @@ INLINE const k054338_interface *k054338_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == K054338);
-	return (const k054338_interface *) device->baseconfig().static_config();
+	return (const k054338_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -8468,7 +8468,7 @@ INLINE const k053250_interface *k053250_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K053250));
-	return (const k053250_interface *) device->baseconfig().static_config();
+	return (const k053250_interface *) device->static_config();
 }
 
 
@@ -9097,7 +9097,7 @@ INLINE const k001006_interface *k001006_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001006));
-	return (const k001006_interface *) device->baseconfig().static_config();
+	return (const k001006_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -9307,7 +9307,7 @@ INLINE const k001005_interface *k001005_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001005));
-	return (const k001005_interface *) device->baseconfig().static_config();
+	return (const k001005_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -10199,7 +10199,7 @@ INLINE const k001604_interface *k001604_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K001604));
-	return (const k001604_interface *) device->baseconfig().static_config();
+	return (const k001604_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -10612,7 +10612,7 @@ INLINE const k037122_interface *k037122_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == K037122));
-	return (const k037122_interface *) device->baseconfig().static_config();
+	return (const k037122_interface *) device->static_config();
 }
 
 /*****************************************************************************

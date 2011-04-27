@@ -50,8 +50,8 @@ MX29F1610MC 16M FlashROM (x7)
 class xtom3d_state : public driver_device
 {
 public:
-	xtom3d_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

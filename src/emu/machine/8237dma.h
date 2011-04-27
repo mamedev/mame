@@ -60,53 +60,29 @@
 
 struct i8237_interface
 {
-	devcb_write_line	m_out_hrq_func;
-	devcb_write_line	m_out_eop_func;
+	devcb_write_line	m_out_hrq_cb;
+	devcb_write_line	m_out_eop_cb;
 
 	/* accessors to main memory */
-	devcb_read8			m_in_memr_func;
-	devcb_write8		m_out_memw_func;
+	devcb_read8			m_in_memr_cb;
+	devcb_write8		m_out_memw_cb;
 
 	/* channel accessors */
-	devcb_read8			m_in_ior_func[4];
-	devcb_write8		m_out_iow_func[4];
-	devcb_write_line	m_out_dack_func[4];
-};
-
-
-
-// ======================> i8237_device_config
-
-class i8237_device_config : public device_config,
-                            public i8237_interface
-{
-    friend class i8237_device;
-
-    // construction/destruction
-    i8237_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_read8			m_in_ior_cb[4];
+	devcb_write8		m_out_iow_cb[4];
+	devcb_write_line	m_out_dack_cb[4];
 };
 
 
 
 // ======================> i8237_device
 
-class i8237_device :  public device_t
+class i8237_device :  public device_t,
+                      public i8237_interface
 {
-    friend class i8237_device_config;
-
-    // construction/destruction
-    i8237_device(running_machine &_machine, const i8237_device_config &_config);
-
 public:
+    // construction/destruction
+    i8237_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* register access */
 	UINT8 i8237_r(UINT32 offset);
@@ -122,6 +98,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -199,8 +176,6 @@ private:
 	dma8237_state m_state;		/* State the device is currently in */
 	int m_service_channel;		/* Channel we will be servicing */
 	int m_last_service_channel;	/* Previous channel we serviced; used to determine channel priority. */
-
-    const i8237_device_config &m_config;
 };
 
 

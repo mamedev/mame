@@ -33,8 +33,8 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(running_machine &machine, const driver_device_config_base &config)
-		: amiga_state(machine, config) { }
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag) { }
 
 	UINT8	m_nvram[0x100];
 	UINT8 m_prev_cia1_porta;

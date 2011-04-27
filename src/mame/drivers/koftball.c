@@ -37,8 +37,8 @@ ft5_v6_c4.u58 /
 class koftball_state : public driver_device
 {
 public:
-	koftball_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_bmc_1_videoram;
 	UINT16 *m_bmc_2_videoram;

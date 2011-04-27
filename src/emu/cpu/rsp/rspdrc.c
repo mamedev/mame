@@ -569,7 +569,7 @@ static void rspcom_init(rsp_state *rsp, legacy_cpu_device *device, device_irq_ca
 
 	memset(rsp, 0, sizeof(*rsp));
 
-	rsp->config = (const rsp_config *)device->baseconfig().static_config();
+	rsp->config = (const rsp_config *)device->static_config();
 	rsp->irq_callback = irqcallback;
 	rsp->device = device;
 	rsp->program = device->space(AS_PROGRAM);

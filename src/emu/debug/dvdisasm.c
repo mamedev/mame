@@ -134,7 +134,7 @@ void debug_view_disasm::enumerate_sources()
 	// iterate over devices with disassembly interfaces
 	device_disasm_interface *dasm = NULL;
 	astring name;
-	for (bool gotone = machine().m_devicelist.first(dasm); gotone; gotone = dasm->next(dasm))
+	for (bool gotone = machine().devicelist().first(dasm); gotone; gotone = dasm->next(dasm))
 	{
 		name.printf("%s '%s'", dasm->device().name(), dasm->device().tag());
 		m_source_list.append(*auto_alloc(machine(), debug_view_disasm_source(name, dasm->device())));

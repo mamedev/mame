@@ -35,44 +35,20 @@ struct ptm6840_interface
 	double m_internal_clock;
 	double m_external_clock[3];
 
-	devcb_write8 m_out_func[3];		// function to call when output[idx] changes
-	devcb_write_line m_irq_func;	// function called if IRQ line changes
-};
-
-
-
-// ======================> ptm6840_device_config
-
-class ptm6840_device_config : public device_config,
-                               public ptm6840_interface
-{
-    friend class ptm6840_device;
-
-    // construction/destruction
-    ptm6840_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_write8 m_out_cb[3];		// function to call when output[idx] changes
+	devcb_write_line m_irq_cb;	// function called if IRQ line changes
 };
 
 
 
 // ======================> ptm6840_device
 
-class ptm6840_device :  public device_t
+class ptm6840_device :  public device_t,
+                        public ptm6840_interface
 {
-    friend class ptm6840_device_config;
-
-    // construction/destruction
-    ptm6840_device(running_machine &_machine, const ptm6840_device_config &_config);
-
 public:
+    // construction/destruction
+    ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	int ptm6840_get_status(int clock);		// get whether timer is enabled
 	int ptm6840_get_irq();					// get IRQ state
@@ -97,6 +73,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -129,9 +106,6 @@ private:
 		PTM_6840_LSB3    = 7,
 	};
 
-	double m_internal_clock;
-	double m_external_clock[3];
-
 	devcb_resolved_write8 m_out_func[3];	// function to call when output[idx] changes
 	devcb_resolved_write_line m_irq_func;	// function called if IRQ line changes
 
@@ -155,8 +129,6 @@ private:
 
 	UINT16 m_latch[3];
 	UINT16 m_counter[3];
-
-    const ptm6840_device_config &m_config;
 
 	static const char *const opmode[];
 };

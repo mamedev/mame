@@ -62,53 +62,29 @@
 
 struct i8257_interface
 {
-	devcb_write_line	m_out_hrq_func;
-	devcb_write_line	m_out_tc_func;
-	devcb_write_line	m_out_mark_func;
+	devcb_write_line	m_out_hrq_cb;
+	devcb_write_line	m_out_tc_cb;
+	devcb_write_line	m_out_mark_cb;
 
 	/* accessors to main memory */
-	devcb_read8			m_in_memr_func; // TODO m_in_memr_func[I8257_NUM_CHANNELS];
-	devcb_write8		m_out_memw_func; // TODO m_out_memw_func[I8257_NUM_CHANNELS];
+	devcb_read8			m_in_memr_cb; // TODO m_in_memr_cb[I8257_NUM_CHANNELS];
+	devcb_write8		m_out_memw_cb; // TODO m_out_memw_cb[I8257_NUM_CHANNELS];
 
 	/* channel accesors */
-	devcb_read8			m_in_ior_func[I8257_NUM_CHANNELS];
-	devcb_write8		m_out_iow_func[I8257_NUM_CHANNELS];
-};
-
-
-
-// ======================> i8257_device_config
-
-class i8257_device_config : public device_config,
-                            public i8257_interface
-{
-    friend class i8257_device;
-
-    // construction/destruction
-    i8257_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_read8			m_in_ior_cb[I8257_NUM_CHANNELS];
+	devcb_write8		m_out_iow_cb[I8257_NUM_CHANNELS];
 };
 
 
 
 // ======================> i8257_device
 
-class i8257_device :  public device_t
+class i8257_device :  public device_t,
+                      public i8257_interface
 {
-    friend class i8257_device_config;
-
-    // construction/destruction
-    i8257_device(running_machine &_machine, const i8257_device_config &_config);
-
 public:
+    // construction/destruction
+    i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* register access */
 	UINT8 i8257_r(UINT32 offset);
@@ -119,6 +95,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -157,8 +134,6 @@ private:
 
 	/* bits  0- 3 :  Terminal count for channels 0-3 */
 	UINT8 m_status;
-
-    const i8257_device_config &m_config;
 };
 
 

@@ -124,7 +124,7 @@ void ccpu_wdt_timer_trigger(device_t *device)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config();
+	const ccpu_config *configdata = (const ccpu_config *)device->static_config();
 	ccpu_state *cpustate = get_safe_token(device);
 
 	/* copy input params */

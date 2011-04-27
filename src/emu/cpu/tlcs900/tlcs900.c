@@ -217,7 +217,7 @@ static CPU_INIT( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config();
+	cpustate->intf = (const tlcs900_interface *)device->static_config();
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space( AS_PROGRAM );

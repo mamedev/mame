@@ -252,7 +252,7 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				string.catprintf("'%s'", machine.m_devicelist.find(curtype - PROFILER_DEVICE_FIRST)->tag());
+				string.catprintf("'%s'", machine.devicelist().find(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
 				for (int nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)

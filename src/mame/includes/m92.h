@@ -16,8 +16,8 @@ struct _pf_layer_info
 class m92_state : public driver_device
 {
 public:
-	m92_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	m92_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_irqvector;
 	UINT16 m_sound_status;

@@ -1,17 +1,12 @@
 #include "emu.h"
 #include "machine/secflash.h"
 
-device_secure_serial_flash_config::device_secure_serial_flash_config(const machine_config &mconfig,
+device_secure_serial_flash::device_secure_serial_flash(const machine_config &mconfig,
 																	 device_type type,
 																	 const char *name, const char *tag,
-																	 const device_config *owner, UINT32 clock, UINT32 param)
-	: device_config(mconfig, type, name, tag, owner, clock, param),
-	  device_config_nvram_interface(mconfig, *this)
-{
-}
-
-device_secure_serial_flash::device_secure_serial_flash(running_machine &_machine, const device_secure_serial_flash_config &config) : device_t(_machine, config),
-																																	 device_nvram_interface(_machine, config, *this)
+																	 device_t *owner, UINT32 clock) : 
+	device_t(mconfig, type, name, tag, owner, clock),
+	device_nvram_interface(mconfig, *this)
 {
 }
 

@@ -116,7 +116,7 @@ static CPU_INIT( lh5801 )
 	lh5801_state *cpustate = get_safe_token(device);
 
 	memset(cpustate, 0, sizeof(*cpustate));
-	cpustate->config = (const lh5801_cpu_core *) device->baseconfig().static_config();
+	cpustate->config = (const lh5801_cpu_core *) device->static_config();
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);

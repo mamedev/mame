@@ -13,8 +13,8 @@
 class _8080bw_state : public mw8080bw_state
 {
 public:
-	_8080bw_state(running_machine &machine, const driver_device_config_base &config)
-		: mw8080bw_state(machine, config) { }
+	_8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
+		: mw8080bw_state(mconfig, type, tag) { }
 
 	/* misc game specific */
 	emu_timer   *m_schaser_effect_555_timer;

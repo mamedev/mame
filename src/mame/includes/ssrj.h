@@ -1,8 +1,8 @@
 class ssrj_state : public driver_device
 {
 public:
-	ssrj_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ssrj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_oldport;
 	tilemap_t *m_tilemap1;

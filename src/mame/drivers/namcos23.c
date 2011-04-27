@@ -1070,8 +1070,8 @@ typedef struct
 class namcos23_state : public driver_device
 {
 public:
-	namcos23_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	namcos23_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	c361_t m_c361;
 	c417_t m_c417;

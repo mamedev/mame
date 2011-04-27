@@ -96,7 +96,7 @@ INLINE c6280_t *get_safe_token(device_t *device)
 
 static void c6280_init(device_t *device, c6280_t *p, double clk, double rate)
 {
-	const c6280_interface *intf = (const c6280_interface *)device->baseconfig().static_config();
+	const c6280_interface *intf = (const c6280_interface *)device->static_config();
     int i;
     double step;
 

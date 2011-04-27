@@ -404,8 +404,8 @@ typedef UINT8 (*snes_oldjoy_read)(running_machine &machine);
 class snes_state : public driver_device
 {
 public:
-	snes_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	snes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* misc */
 	UINT16                m_htmult;		/* in 512 wide, we run HTOTAL double and halve it on latching */

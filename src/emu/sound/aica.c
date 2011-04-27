@@ -1274,7 +1274,7 @@ static DEVICE_START( aica )
 
 	aica_state *AICA = get_safe_token(device);
 
-	intf = (const aica_interface *)device->baseconfig().static_config();
+	intf = (const aica_interface *)device->static_config();
 
 	// init the emulation
 	AICA_Init(device, AICA, intf);

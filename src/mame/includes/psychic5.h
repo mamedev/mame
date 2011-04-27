@@ -1,8 +1,8 @@
 class psychic5_state : public driver_device
 {
 public:
-	psychic5_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	psychic5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_bank_latch;
 	UINT8 m_ps5_vram_page;

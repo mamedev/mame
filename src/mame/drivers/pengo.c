@@ -71,8 +71,8 @@
 class pengo_state : public pacman_state
 {
 public:
-	pengo_state(running_machine &machine, const driver_device_config_base &config)
-		: pacman_state(machine, config) { }
+	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag) { }
 };
 
 

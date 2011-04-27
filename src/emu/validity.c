@@ -416,8 +416,8 @@ static bool validate_driver(driver_enumerator &drivlist, game_driver_map &names,
 	}
 
 	/* make sure sound-less drivers are flagged */
-	const device_config_sound_interface *sound;
-	if ((driver.flags & GAME_IS_BIOS_ROOT) == 0 && !config.m_devicelist.first(sound) && (driver.flags & GAME_NO_SOUND) == 0 && (driver.flags & GAME_NO_SOUND_HW) == 0)
+	const device_sound_interface *sound;
+	if ((driver.flags & GAME_IS_BIOS_ROOT) == 0 && !config.devicelist().first(sound) && (driver.flags & GAME_NO_SOUND) == 0 && (driver.flags & GAME_NO_SOUND_HW) == 0)
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver.source_file, driver.name);
 		error = true;
@@ -586,7 +586,7 @@ static bool validate_display(driver_enumerator &drivlist)
 	bool palette_modes = false;
 	bool error = false;
 
-	for (const screen_device_config *scrconfig = config.first_screen(); scrconfig != NULL; scrconfig = scrconfig->next_screen())
+	for (const screen_device *scrconfig = config.first_screen(); scrconfig != NULL; scrconfig = scrconfig->next_screen())
 		if (scrconfig->format() == BITMAP_FORMAT_INDEXED16)
 			palette_modes = true;
 
@@ -963,7 +963,7 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf);
 		error = true;
 	}
-	for (device_config *cfg = config.m_devicelist.first(); cfg != NULL; cfg = cfg->next())
+	for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
 	{
 		if (cfg->input_ports() != NULL)
 		{
@@ -1097,25 +1097,25 @@ static bool validate_devices(driver_enumerator &drivlist, const ioport_list &por
 	const game_driver &driver = drivlist.driver();
 	const machine_config &config = drivlist.config();
 
-	for (const device_config *devconfig = config.m_devicelist.first(); devconfig != NULL; devconfig = devconfig->next())
+	for (const device_t *device = config.devicelist().first(); device != NULL; device = device->next())
 	{
 		/* validate the device tag */
-		if (!validate_tag(driver, devconfig->name(), devconfig->tag()))
+		if (!validate_tag(driver, device->name(), device->tag()))
 			error = true;
 
 		/* look for duplicates */
-		for (const device_config *scanconfig = config.m_devicelist.first(); scanconfig != devconfig; scanconfig = scanconfig->next())
-			if (strcmp(scanconfig->tag(), devconfig->tag()) == 0)
+		for (const device_t *scandevice = config.devicelist().first(); scandevice != device; scandevice = scandevice->next())
+			if (strcmp(scandevice->tag(), device->tag()) == 0)
 			{
-				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver.source_file, driver.name, devconfig->tag());
+				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver.source_file, driver.name, device->tag());
 				break;
 			}
 
-		if (devconfig->rom_region() != NULL && (strcmp(devconfig->shortname(),"") == 0)) {
-			mame_printf_warning("Device %s does not have short name defined\n", devconfig->name());
+		if (device->rom_region() != NULL && (strcmp(device->shortname(),"") == 0)) {
+			mame_printf_warning("Device %s does not have short name defined\n", device->name());
 		}
 		/* check for device-specific validity check */
-		if (devconfig->validity_check(config.options(), driver))
+		if (device->validity_check(config.options(), driver))
 			error = true;
 
 	}

@@ -50,54 +50,31 @@
 
 struct mos6529_interface
 {
-	devcb_read8				m_in_p_func;
-	devcb_write8			m_out_p_func;
-};
-
-
-// ======================> mos6529_device_config
-
-class mos6529_device_config :   public device_config,
-                                public mos6529_interface
-{
-    friend class mos6529_device;
-
-    // construction/destruction
-    mos6529_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read8				m_in_p_cb;
+	devcb_write8			m_out_p_cb;
 };
 
 
 // ======================> mos6529_device
 
-class mos6529_device :	public device_t
+class mos6529_device :	public device_t,
+                        public mos6529_interface
 {
-    friend class mos6529_device_config;
-
-    // construction/destruction
-    mos6529_device(running_machine &_machine, const mos6529_device_config &_config);
-
 public:
+    // construction/destruction
+    mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 
 private:
 	devcb_resolved_read8		m_in_p_func;
 	devcb_resolved_write8		m_out_p_func;
-
-	const mos6529_device_config &m_config;
 };
 
 

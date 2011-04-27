@@ -57,8 +57,8 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 class merit_state : public driver_device
 {
 public:
-	merit_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	merit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	pen_t m_pens[NUM_PENS];

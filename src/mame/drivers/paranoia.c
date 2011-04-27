@@ -46,8 +46,8 @@ HuC6280A (Hudson)
 class paranoia_state : public driver_device
 {
 public:
-	paranoia_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

@@ -22,19 +22,20 @@
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  LIVE DEVICE
 //**************************************************************************
 
-// devices
-const device_type COM8116 = com8116_device_config::static_alloc_device_config;
+// device type definition
+const device_type COM8116 = &device_creator<com8116_device>;
 
+//-------------------------------------------------
+//  com8116_device - constructor
+//-------------------------------------------------
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(com8116, "COM8116")
+com8116_device::com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, COM8116, "COM8116", tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
@@ -43,7 +44,7 @@ GENERIC_DEVICE_CONFIG_SETUP(com8116, "COM8116")
 //  complete
 //-------------------------------------------------
 
-void com8116_device_config::device_config_complete()
+void com8116_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const com8116_interface *intf = reinterpret_cast<const com8116_interface *>(static_config());
@@ -53,26 +54,10 @@ void com8116_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_fx4_func, 0, sizeof(m_out_fx4_func));
-		memset(&m_out_fr_func, 0, sizeof(m_out_fr_func));
-		memset(&m_out_ft_func, 0, sizeof(m_out_ft_func));
+		memset(&m_out_fx4_cb, 0, sizeof(m_out_fx4_cb));
+		memset(&m_out_fr_cb, 0, sizeof(m_out_fr_cb));
+		memset(&m_out_ft_cb, 0, sizeof(m_out_ft_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  com8116_device - constructor
-//-------------------------------------------------
-
-com8116_device::com8116_device(running_machine &_machine, const com8116_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
 }
 
 
@@ -83,9 +68,9 @@ com8116_device::com8116_device(running_machine &_machine, const com8116_device_c
 void com8116_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_fx4_func, &m_config.m_out_fx4_func, this);
-	devcb_resolve_write_line(&m_out_fr_func, &m_config.m_out_fr_func, this);
-	devcb_resolve_write_line(&m_out_ft_func, &m_config.m_out_ft_func, this);
+	devcb_resolve_write_line(&m_out_fx4_func, &m_out_fx4_cb, this);
+	devcb_resolve_write_line(&m_out_fr_func, &m_out_fr_cb, this);
+	devcb_resolve_write_line(&m_out_ft_func, &m_out_ft_cb, this);
 
 	// allocate timers
 	m_fx4_timer = timer_alloc(TIMER_FX4);
@@ -132,7 +117,7 @@ WRITE8_MEMBER( com8116_device::str_w )
 
 	m_fr = data & 0x0f;
 
-	m_fr_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_config.m_fr_divisors[m_fr] / 2));
+	m_fr_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_fr_divisors[m_fr] / 2));
 }
 
 
@@ -146,5 +131,5 @@ WRITE8_MEMBER( com8116_device::stt_w )
 
 	m_ft = data & 0x0f;
 
-	m_ft_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_config.m_ft_divisors[m_ft] / 2));
+	m_ft_timer->adjust(attotime::zero, 0, attotime::from_hz(clock() / m_ft_divisors[m_ft] / 2));
 }

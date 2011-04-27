@@ -71,8 +71,8 @@ Dumped by Uki
 class galpani3_state : public kaneko16_state
 {
 public:
-	galpani3_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	UINT16* m_priority_buffer;
 	UINT16* m_framebuffer1;
@@ -964,7 +964,7 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 
 	MCFG_VIDEO_START(galpani3)
 
-	MCFG_DEVICE_ADD("spritegen", sknsspr_, 0)
+	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -93,8 +93,8 @@ Custom: Imagetek 15000 (2ch video & 2ch sound)
 class rabbit_state : public driver_device
 {
 public:
-	rabbit_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_viewregs0;
 	UINT32 *m_viewregs6;

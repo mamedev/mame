@@ -81,7 +81,7 @@ static DEVICE_START( ymf262 )
 	ymf262_state *info = get_safe_token(device);
 	int rate = device->clock()/288;
 
-	info->intf = device->baseconfig().static_config() ? (const ymf262_interface *)device->baseconfig().static_config() : &dummy;
+	info->intf = device->static_config() ? (const ymf262_interface *)device->static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

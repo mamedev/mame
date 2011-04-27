@@ -1830,9 +1830,9 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_DECO16IC_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", captaven_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
-	decospr_device_config::set_pri_callback(device, captaven_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+	decospr_device::set_pri_callback(*device, captaven_pri_callback);
 
 
 	MCFG_VIDEO_START(captaven)
@@ -1881,8 +1881,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
 	MCFG_VIDEO_START(fghthist)
 
@@ -1928,8 +1928,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
 	MCFG_VIDEO_START(fghthist)
 
@@ -2180,11 +2180,11 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
-	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 4);
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
 
 
 	MCFG_GFXDECODE(tattass)
@@ -2226,11 +2226,11 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
-	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 4);
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
 
 	MCFG_GFXDECODE(nslasher)
 	MCFG_PALETTE_LENGTH(2048)

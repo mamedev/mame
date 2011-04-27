@@ -57,54 +57,30 @@
 
 struct pia6821_interface
 {
-    devcb_read8 m_in_a_func;
-    devcb_read8 m_in_b_func;
-    devcb_read_line m_in_ca1_func;
-    devcb_read_line m_in_cb1_func;
-    devcb_read_line m_in_ca2_func;
-    devcb_read_line m_in_cb2_func;
-    devcb_write8 m_out_a_func;
-    devcb_write8 m_out_b_func;
-    devcb_write_line m_out_ca2_func;
-    devcb_write_line m_out_cb2_func;
-    devcb_write_line m_irq_a_func;
-    devcb_write_line m_irq_b_func;
-};
-
-
-
-// ======================> pia6821_device_config
-
-class pia6821_device_config : public device_config,
-                              public pia6821_interface
-{
-    friend class pia6821_device;
-
-    // construction/destruction
-    pia6821_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+    devcb_read8 m_in_a_cb;
+    devcb_read8 m_in_b_cb;
+    devcb_read_line m_in_ca1_cb;
+    devcb_read_line m_in_cb1_cb;
+    devcb_read_line m_in_ca2_cb;
+    devcb_read_line m_in_cb2_cb;
+    devcb_write8 m_out_a_cb;
+    devcb_write8 m_out_b_cb;
+    devcb_write_line m_out_ca2_cb;
+    devcb_write_line m_out_cb2_cb;
+    devcb_write_line m_irq_a_cb;
+    devcb_write_line m_irq_b_cb;
 };
 
 
 
 // ======================> pia6821_device
 
-class pia6821_device :  public device_t
+class pia6821_device :  public device_t,
+                        public pia6821_interface
 {
-    friend class pia6821_device_config;
-
-    // construction/destruction
-    pia6821_device(running_machine &_machine, const pia6821_device_config &_config);
-
 public:
+    // construction/destruction
+    pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
     UINT8 reg_r(UINT8 offset);
     void reg_w(UINT8 offset, UINT8 data);
@@ -145,6 +121,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -238,8 +215,6 @@ private:
     UINT8 m_logged_ca2_not_connected;
     UINT8 m_logged_cb1_not_connected;
     UINT8 m_logged_cb2_not_connected;
-
-    const pia6821_device_config &m_config;
 };
 
 

@@ -119,7 +119,7 @@ static DEVICE_START( y8950 )
 	y8950_state *info = get_safe_token(device);
 	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config() ? (const y8950_interface *)device->baseconfig().static_config() : &dummy;
+	info->intf = device->static_config() ? (const y8950_interface *)device->static_config() : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

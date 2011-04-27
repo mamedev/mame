@@ -354,8 +354,8 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_DECO16IC_ADD("tilegen1", twocrude_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", twocrude_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

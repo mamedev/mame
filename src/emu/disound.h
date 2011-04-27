@@ -76,13 +76,13 @@ const int AUTO_ALLOC_INPUT	= 65535;
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	device_config_sound_interface::static_add_route(device, _output, _target, _gain, _input); \
+	device_sound_interface::static_add_route(*device, _output, _target, _gain, _input); \
 
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
 	MCFG_SOUND_ROUTE_EX(_output, _target, _gain, AUTO_ALLOC_INPUT)
 
 #define MCFG_SOUND_ROUTES_RESET() \
-	device_config_sound_interface::static_reset_routes(device); \
+	device_sound_interface::static_reset_routes(*device); \
 
 
 
@@ -93,13 +93,11 @@ const int AUTO_ALLOC_INPUT	= 65535;
 class sound_stream;
 
 
-// ======================> device_config_sound_interface
+// ======================> device_sound_interface
 
-// device_config_sound_interface represents configuration information for a sound device
-class device_config_sound_interface : public device_config_interface
+class device_sound_interface : public device_interface
 {
 public:
-	// sound route
 	class sound_route
 	{
 	public:
@@ -115,36 +113,15 @@ public:
 	};
 
 	// construction/destruction
-	device_config_sound_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_sound_interface();
-
-	// getters
-	const sound_route *first_route() const { return m_route_list.first(); }
-
-	// static inline helpers
-	static void static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT);
-	static void static_reset_routes(device_config *device);
-
-protected:
-	// optional operation overrides
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
-
-	// internal state
-	simple_list<sound_route> m_route_list;		// list of sound routes
-};
-
-
-// ======================> device_sound_interface
-
-class device_sound_interface : public device_interface
-{
-public:
-	// construction/destruction
-	device_sound_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_sound_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sound_interface();
 
 	// configuration access
-	const device_config_sound_interface &sound_config() const { return m_sound_config; }
+	const sound_route *first_route() const { return m_route_list.first(); }
+
+	// static inline configuration helpers
+	static void static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT);
+	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
@@ -158,13 +135,13 @@ public:
 
 protected:
 	// optional operation overrides
+	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 	virtual void interface_pre_reset();
 
 	// internal state
-	const device_config_sound_interface &m_sound_config;
-
+	simple_list<sound_route> m_route_list;		// list of sound routes
 	int				m_outputs;					// number of outputs from this instance
 	int				m_auto_allocated_inputs;	// number of auto-allocated inputs targeting us
 };

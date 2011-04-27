@@ -262,7 +262,7 @@ WRITE8_DEVICE_HANDLER( tlc34076_w )
 
 static DEVICE_START( tlc34076 )
 {
-	tlc34076_config *config = (tlc34076_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	tlc34076_config *config = (tlc34076_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	tlc34076_state *state = get_safe_token(device);
 
 	state->dacbits = config->res_sel ? 8 : 6;

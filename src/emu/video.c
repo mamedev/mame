@@ -1066,7 +1066,7 @@ void video_manager::create_snapshot_bitmap(device_t *screen)
 	// select the appropriate view in our dummy target
 	if (m_snap_native && screen != NULL)
 	{
-		int view_index = machine().m_devicelist.indexof(SCREEN, screen->tag());
+		int view_index = machine().devicelist().indexof(SCREEN, screen->tag());
 		assert(view_index != -1);
 		m_snap_target->set_view(view_index);
 	}
@@ -1154,10 +1154,10 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 
 			// verify that there is such a device for this system
 			device_image_interface *image = NULL;
-			for (bool gotone = machine().m_devicelist.first(image); gotone; gotone = image->next(image))
+			for (bool gotone = machine().devicelist().first(image); gotone; gotone = image->next(image))
 			{
 				// get the device name
-				astring tempdevname(image->image_config().brief_instance_name());
+				astring tempdevname(image->brief_instance_name());
 				//printf("check device: %s\n", tempdevname.cstr());
 
 				if (snapdevname.cmp(tempdevname) == 0)

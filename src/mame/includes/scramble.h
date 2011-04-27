@@ -4,8 +4,8 @@
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(running_machine &machine, const driver_device_config_base &config)
-		: galaxold_state(machine, config) { }
+	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxold_state(mconfig, type, tag) { }
 
 	UINT8 *m_soundram;
 	UINT8 m_cavelon_bank;

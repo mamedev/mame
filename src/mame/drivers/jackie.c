@@ -52,8 +52,8 @@ Note
 class jackie_state : public driver_device
 {
 public:
-	jackie_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	jackie_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_exp_bank;
 	UINT8 *m_fg_tile_ram;

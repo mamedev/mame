@@ -26,7 +26,7 @@
 
 #define MCFG_I2CMEM_ADD( _tag, _interface ) \
 	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 ) \
-	i2cmem_device_config::static_set_interface(device, _interface);
+	i2cmem_device::static_set_interface(*device, _interface);
 
 
 //**************************************************************************
@@ -43,54 +43,21 @@ struct i2cmem_interface
 };
 
 
-// ======================> i2cmem_device_config
-
-class i2cmem_device_config :
-	public device_config,
-	public device_config_memory_interface,
-	public device_config_nvram_interface,
-	public i2cmem_interface
-{
-	friend class i2cmem_device;
-
-	// construction/destruction
-	i2cmem_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
-	virtual device_t *alloc_device( running_machine &machine ) const;
-
-	// inline configuration
-	static void static_set_interface(device_config *device, const i2cmem_interface &interface);
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
-
-	// device-specific configuration
-	address_space_config m_space_config;
-	int m_address_bits;
-};
-
-
 // ======================> i2cmem_device
 
 class i2cmem_device :
 	public device_t,
 	public device_memory_interface,
-	public device_nvram_interface
+	public device_nvram_interface,
+	public i2cmem_interface
 {
-	friend class i2cmem_device_config;
-
-	// construction/destruction
-	i2cmem_device( running_machine &_machine, const i2cmem_device_config &config );
-
 public:
+	// construction/destruction
+	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+
+	// inline configuration
+	static void static_set_interface(device_t &device, const i2cmem_interface &interface);
+
 	// I/O operations
 	void set_e0_line( int state );
 	void set_e1_line( int state );
@@ -102,8 +69,13 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
+	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
 	virtual void device_start();
 	virtual void device_reset();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
@@ -115,9 +87,11 @@ protected:
 	int select_device();
 	int data_offset();
 
-	// internal state
-	const i2cmem_device_config &m_config;
+	// device-specific configuration
+	address_space_config m_space_config;
+	int m_address_bits;
 
+	// internal state
 	int m_scl;
 	int m_sdaw;
 	int m_e0;

@@ -6,8 +6,8 @@ extern const char layout_pinball[];
 class inder_state : public driver_device
 {
 public:
-	inder_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	inder_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 static ADDRESS_MAP_START( inder_map, AS_PROGRAM, 8 )

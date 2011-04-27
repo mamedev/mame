@@ -24,7 +24,7 @@ INLINE const sega16sp_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == SEGA16SP));
-	return (const sega16sp_interface *) device->baseconfig().static_config();
+	return (const sega16sp_interface *) device->static_config();
 }
 
 /*******************************************************************************************

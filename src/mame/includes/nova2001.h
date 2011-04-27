@@ -1,8 +1,8 @@
 class nova2001_state : public driver_device
 {
 public:
-	nova2001_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nova2001_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_ninjakun_io_a002_ctrl;
 	UINT8 *m_fg_videoram;

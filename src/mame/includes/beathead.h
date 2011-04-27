@@ -11,8 +11,8 @@
 class beathead_state : public atarigen_state
 {
 public:
-	beathead_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config),
+	beathead_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_nvram(*this, "nvram") { }
 

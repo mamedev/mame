@@ -9,8 +9,8 @@
 class cchasm_state : public driver_device
 {
 public:
-	cchasm_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	cchasm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_sound_flags;
 	int m_coin_flag;

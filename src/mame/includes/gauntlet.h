@@ -9,8 +9,8 @@
 class gauntlet_state : public atarigen_state
 {
 public:
-	gauntlet_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	gauntlet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16			m_sound_reset_val;
 	UINT8			m_vindctr2_screen_refresh;

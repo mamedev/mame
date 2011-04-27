@@ -1,8 +1,8 @@
 class tetrisp2_state : public driver_device
 {
 public:
-	tetrisp2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_systemregs[0x10];
 	UINT16 *m_vram_bg;

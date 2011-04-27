@@ -71,8 +71,8 @@ typedef struct
 class kaneko16_state : public driver_device
 {
 public:
-	kaneko16_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	kaneko16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_mcu_ram;
 	UINT8 m_nvram_save[128];

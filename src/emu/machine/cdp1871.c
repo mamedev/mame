@@ -13,6 +13,9 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type CDP1871 = &device_creator<cdp1871_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -84,18 +87,23 @@ static const UINT8 CDP1871_KEY_CODES[4][11][8] =
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  LIVE DEVICE
 //**************************************************************************
 
-const device_type CDP1871 = cdp1871_device_config::static_alloc_device_config;
+//-------------------------------------------------
+//  cdp1871_device - constructor
+//-------------------------------------------------
 
+cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CDP1871, "RCA CDP1871", tag, owner, clock),
+	  m_inhibit(false),
+	  m_sense(0),
+	  m_drive(0),
+	  m_next_da(CLEAR_LINE),
+	  m_next_rpt(CLEAR_LINE)
+{
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(cdp1871, "RCA CDP1871")
+}
 
 
 //-------------------------------------------------
@@ -104,7 +112,7 @@ GENERIC_DEVICE_CONFIG_SETUP(cdp1871, "RCA CDP1871")
 //  complete
 //-------------------------------------------------
 
-void cdp1871_device_config::device_config_complete()
+void cdp1871_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const cdp1871_interface *intf = reinterpret_cast<const cdp1871_interface *>(static_config());
@@ -114,35 +122,13 @@ void cdp1871_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&out_da_func, 0, sizeof(out_da_func));
-		memset(&out_rpt_func, 0, sizeof(out_rpt_func));
-		// m_in_d_func[]
-		memset(&in_shift_func, 0, sizeof(in_shift_func));
-		memset(&in_control_func, 0, sizeof(in_control_func));
-		memset(&in_alpha_func, 0, sizeof(in_alpha_func));
+		memset(&out_da_cb, 0, sizeof(out_da_cb));
+		memset(&out_rpt_cb, 0, sizeof(out_rpt_cb));
+		// m_in_d_cb[]
+		memset(&in_shift_cb, 0, sizeof(in_shift_cb));
+		memset(&in_control_cb, 0, sizeof(in_control_cb));
+		memset(&in_alpha_cb, 0, sizeof(in_alpha_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdp1871_device - constructor
-//-------------------------------------------------
-
-cdp1871_device::cdp1871_device(running_machine &_machine, const cdp1871_device_config &config)
-    : device_t(_machine, config),
-	  m_inhibit(false),
-	  m_sense(0),
-	  m_drive(0),
-	  m_next_da(CLEAR_LINE),
-	  m_next_rpt(CLEAR_LINE),
-      m_config(config)
-{
-
 }
 
 
@@ -153,22 +139,22 @@ cdp1871_device::cdp1871_device(running_machine &_machine, const cdp1871_device_c
 void cdp1871_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_da_func, &m_config.out_da_func, this);
-	devcb_resolve_write_line(&m_out_rpt_func, &m_config.out_rpt_func, this);
-	devcb_resolve_read8(&m_in_d_func[0], &m_config.in_d1_func, this);
-	devcb_resolve_read8(&m_in_d_func[1], &m_config.in_d2_func, this);
-	devcb_resolve_read8(&m_in_d_func[2], &m_config.in_d3_func, this);
-	devcb_resolve_read8(&m_in_d_func[3], &m_config.in_d4_func, this);
-	devcb_resolve_read8(&m_in_d_func[4], &m_config.in_d5_func, this);
-	devcb_resolve_read8(&m_in_d_func[5], &m_config.in_d6_func, this);
-	devcb_resolve_read8(&m_in_d_func[6], &m_config.in_d7_func, this);
-	devcb_resolve_read8(&m_in_d_func[7], &m_config.in_d8_func, this);
-	devcb_resolve_read8(&m_in_d_func[8], &m_config.in_d9_func, this);
-	devcb_resolve_read8(&m_in_d_func[9], &m_config.in_d10_func, this);
-	devcb_resolve_read8(&m_in_d_func[10], &m_config.in_d11_func, this);
-	devcb_resolve_read_line(&m_in_shift_func, &m_config.in_shift_func, this);
-	devcb_resolve_read_line(&m_in_control_func, &m_config.in_control_func, this);
-	devcb_resolve_read_line(&m_in_alpha_func, &m_config.in_alpha_func, this);
+	devcb_resolve_write_line(&m_out_da_func, &out_da_cb, this);
+	devcb_resolve_write_line(&m_out_rpt_func, &out_rpt_cb, this);
+	devcb_resolve_read8(&m_in_d_func[0], &in_d1_cb, this);
+	devcb_resolve_read8(&m_in_d_func[1], &in_d2_cb, this);
+	devcb_resolve_read8(&m_in_d_func[2], &in_d3_cb, this);
+	devcb_resolve_read8(&m_in_d_func[3], &in_d4_cb, this);
+	devcb_resolve_read8(&m_in_d_func[4], &in_d5_cb, this);
+	devcb_resolve_read8(&m_in_d_func[5], &in_d6_cb, this);
+	devcb_resolve_read8(&m_in_d_func[6], &in_d7_cb, this);
+	devcb_resolve_read8(&m_in_d_func[7], &in_d8_cb, this);
+	devcb_resolve_read8(&m_in_d_func[8], &in_d9_cb, this);
+	devcb_resolve_read8(&m_in_d_func[9], &in_d10_cb, this);
+	devcb_resolve_read8(&m_in_d_func[10], &in_d11_cb, this);
+	devcb_resolve_read_line(&m_in_shift_func, &in_shift_cb, this);
+	devcb_resolve_read_line(&m_in_control_func, &in_control_cb, this);
+	devcb_resolve_read_line(&m_in_alpha_func, &in_alpha_cb, this);
 
 	// set initial values
 	change_output_lines();

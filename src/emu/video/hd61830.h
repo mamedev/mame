@@ -47,39 +47,7 @@ struct hd61830_interface
 {
 	const char *screen_tag;
 
-    devcb_read8 m_in_rd_func;
-};
-
-
-
-// ======================> hd61830_device_config
-
-class hd61830_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public hd61830_interface
-{
-    friend class hd61830_device;
-
-    // construction/destruction
-    hd61830_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
+    devcb_read8 m_in_rd_cb;
 };
 
 
@@ -87,14 +55,13 @@ protected:
 // ======================> hd61830_device
 
 class hd61830_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+                        public hd61830_interface
 {
-    friend class hd61830_device_config;
-
-    // construction/destruction
-    hd61830_device(running_machine &_machine, const hd61830_device_config &_config);
-
 public:
+    // construction/destruction
+    hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( status_r );
     DECLARE_WRITE8_MEMBER( control_w );
 
@@ -105,9 +72,14 @@ public:
 
 protected:
     // device-level overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 data);
@@ -144,7 +116,8 @@ private:
     int m_blink;					// blink counter
 	int m_cursor;					// cursor visible
 
-	const hd61830_device_config &m_config;
+    // address space configurations
+	const address_space_config		m_space_config;
 };
 
 

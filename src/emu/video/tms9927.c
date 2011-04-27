@@ -259,7 +259,7 @@ static DEVICE_START( tms9927 )
 	/* validate arguments */
 	assert(device != NULL);
 
-	tms->intf = (const tms9927_interface *)device->baseconfig().static_config();
+	tms->intf = (const tms9927_interface *)device->static_config();
 
 	if (tms->intf != NULL)
 	{

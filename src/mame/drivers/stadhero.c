@@ -234,11 +234,11 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_GFXDECODE(stadhero)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 1,1,2);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 1,1,2);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 2);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 2);
 
 	MCFG_VIDEO_START(stadhero)
 

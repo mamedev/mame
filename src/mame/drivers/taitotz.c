@@ -75,8 +75,8 @@ IC7 Panasonic MN1020819DA E68-01
 class taitotz_state : public driver_device
 {
 public:
-	taitotz_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	taitotz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

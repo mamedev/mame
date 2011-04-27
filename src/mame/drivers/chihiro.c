@@ -464,13 +464,13 @@ static READ32_HANDLER( chihiro_jamtable )
 
 static UINT32 dummy_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
 {
-	logerror("  bus:%d function:%d register:%d mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_config_base &>(busdevice->baseconfig()).inline_config())->busnum,function,reg,mem_mask);
+	logerror("  bus:%d function:%d register:%d mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_base *>(busdevice)->inline_config())->busnum,function,reg,mem_mask);
 	return 0;
 }
 
 static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	logerror("  bus:%d function:%d register:%d data:%08X mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_config_base &>(busdevice->baseconfig()).inline_config())->busnum,function,reg,data,mem_mask);
+	logerror("  bus:%d function:%d register:%d data:%08X mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_base *>(busdevice)->inline_config())->busnum,function,reg,data,mem_mask);
 }
 
 static READ32_HANDLER( dummy_r )

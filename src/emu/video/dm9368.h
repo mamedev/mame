@@ -52,50 +52,28 @@ struct dm9368_interface
 {
 	int	m_digit;
 
-	devcb_read_line			m_in_rbi_func;
-	devcb_write_line		m_out_rbo_func;
-};
-
-
-
-// ======================> dm9368_device_config
-
-class dm9368_device_config :   public device_config,
-                               public dm9368_interface
-{
-    friend class dm9368_device;
-
-    // construction/destruction
-    dm9368_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read_line			m_in_rbi_cb;
+	devcb_write_line		m_out_rbo_cb;
 };
 
 
 
 // ======================> dm9368_device
 
-class dm9368_device :	public device_t
+class dm9368_device :	public device_t,
+                        public dm9368_interface
 {
-    friend class dm9368_device_config;
-
-    // construction/destruction
-    dm9368_device(running_machine &_machine, const dm9368_device_config &_config);
-
 public:
+    // construction/destruction
+    dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     void a_w(UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER( rbi_w );
 	DECLARE_READ_LINE_MEMBER( rbo_r );
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 
 private:
@@ -107,8 +85,6 @@ private:
 
 	int m_rbi;
 	int m_rbo;
-
-	const dm9368_device_config &m_config;
 };
 
 

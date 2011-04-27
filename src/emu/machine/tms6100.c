@@ -141,7 +141,7 @@ static DEVICE_START( tms6100 )
 
 	assert_always(tms != NULL, "Error creating TMS6100 chip");
 
-	//tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
+	//tms->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
 	tms->rom = *device->region();
 
 	tms->device = device;

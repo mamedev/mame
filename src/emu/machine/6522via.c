@@ -105,44 +105,6 @@
 
 
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(via6522, "6522 VIA")
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void via6522_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const via6522_interface *intf = reinterpret_cast<const via6522_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<via6522_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-    	memset(&m_in_a_func, 0, sizeof(m_in_a_func));
-    	memset(&m_in_b_func, 0, sizeof(m_in_b_func));
-    	memset(&m_in_ca1_func, 0, sizeof(m_in_ca1_func));
-    	memset(&m_in_cb1_func, 0, sizeof(m_in_cb1_func));
-    	memset(&m_in_ca2_func, 0, sizeof(m_in_ca2_func));
-    	memset(&m_in_cb2_func, 0, sizeof(m_in_cb2_func));
-    	memset(&m_out_a_func, 0, sizeof(m_out_a_func));
-    	memset(&m_out_b_func, 0, sizeof(m_out_b_func));
-    	memset(&m_out_ca2_func, 0, sizeof(m_out_ca2_func));
-    	memset(&m_out_cb2_func, 0, sizeof(m_out_cb2_func));
-    	memset(&m_irq_func, 0, sizeof(m_irq_func));
-	}
-}
-
-
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
@@ -180,18 +142,50 @@ UINT16 via6522_device::get_counter1_value()
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type VIA6522 = via6522_device_config::static_alloc_device_config;
+// device type definition
+const device_type VIA6522 = &device_creator<via6522_device>;
 
 //-------------------------------------------------
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(running_machine &_machine, const via6522_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock)
 {
 
 }
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void via6522_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const via6522_interface *intf = reinterpret_cast<const via6522_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<via6522_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
+    	memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
+    	memset(&m_in_ca1_cb, 0, sizeof(m_in_ca1_cb));
+    	memset(&m_in_cb1_cb, 0, sizeof(m_in_cb1_cb));
+    	memset(&m_in_ca2_cb, 0, sizeof(m_in_ca2_cb));
+    	memset(&m_in_cb2_cb, 0, sizeof(m_in_cb2_cb));
+    	memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
+    	memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
+    	memset(&m_out_ca2_cb, 0, sizeof(m_out_ca2_cb));
+    	memset(&m_out_cb2_cb, 0, sizeof(m_out_cb2_cb));
+    	memset(&m_irq_cb, 0, sizeof(m_irq_cb));
+	}
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -199,19 +193,19 @@ via6522_device::via6522_device(running_machine &_machine, const via6522_device_c
 
 void via6522_device::device_start()
 {
-    devcb_resolve_read8(&m_in_a_func, &m_config.m_in_a_func, this);
-    devcb_resolve_read8(&m_in_b_func, &m_config.m_in_b_func, this);
-    devcb_resolve_read_line(&m_in_ca1_func, &m_config.m_in_ca1_func, this);
-    devcb_resolve_read_line(&m_in_cb1_func, &m_config.m_in_cb1_func, this);
-    devcb_resolve_read_line(&m_in_ca2_func, &m_config.m_in_ca2_func, this);
-    devcb_resolve_read_line(&m_in_cb2_func, &m_config.m_in_cb2_func, this);
-    devcb_resolve_write8(&m_out_a_func, &m_config.m_out_a_func, this);
-    devcb_resolve_write8(&m_out_b_func, &m_config.m_out_b_func, this);
-    devcb_resolve_write_line(&m_out_ca1_func, &m_config.m_out_ca1_func, this);
-    devcb_resolve_write_line(&m_out_cb1_func, &m_config.m_out_cb1_func, this);
-    devcb_resolve_write_line(&m_out_ca2_func, &m_config.m_out_ca2_func, this);
-    devcb_resolve_write_line(&m_out_cb2_func, &m_config.m_out_cb2_func, this);
-    devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
+    devcb_resolve_read8(&m_in_a_func, &m_in_a_cb, this);
+    devcb_resolve_read8(&m_in_b_func, &m_in_b_cb, this);
+    devcb_resolve_read_line(&m_in_ca1_func, &m_in_ca1_cb, this);
+    devcb_resolve_read_line(&m_in_cb1_func, &m_in_cb1_cb, this);
+    devcb_resolve_read_line(&m_in_ca2_func, &m_in_ca2_cb, this);
+    devcb_resolve_read_line(&m_in_cb2_func, &m_in_cb2_cb, this);
+    devcb_resolve_write8(&m_out_a_func, &m_out_a_cb, this);
+    devcb_resolve_write8(&m_out_b_func, &m_out_b_cb, this);
+    devcb_resolve_write_line(&m_out_ca1_func, &m_out_ca1_cb, this);
+    devcb_resolve_write_line(&m_out_cb1_func, &m_out_cb1_cb, this);
+    devcb_resolve_write_line(&m_out_ca2_func, &m_out_ca2_cb, this);
+    devcb_resolve_write_line(&m_out_cb2_func, &m_out_cb2_cb, this);
+    devcb_resolve_write_line(&m_irq_func, &m_irq_cb, this);
 
     m_t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
     m_t1lh = 0xb5; /* ports are not written by kernel! */

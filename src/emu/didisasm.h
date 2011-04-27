@@ -74,28 +74,6 @@ const UINT32 DASMFLAG_LENGTHMASK	= 0x0000ffff;	// the low 16-bits contain the ac
 //**************************************************************************
 
 
-// ======================> device_config_disasm_interface
-
-// class representing interface-specific configuration disasm
-class device_config_disasm_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_disasm_interface(const machine_config &mconfig, device_config &device);
-	virtual ~device_config_disasm_interface();
-
-	// required configuration overrides
-	UINT32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
-	UINT32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
-
-protected:
-	// required configuration overrides
-	virtual UINT32 disasm_min_opcode_bytes() const = 0;
-	virtual UINT32 disasm_max_opcode_bytes() const = 0;
-};
-
-
-
 // ======================> device_disasm_interface
 
 // class representing interface-specific live disasm
@@ -103,22 +81,21 @@ class device_disasm_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_disasm_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_disasm_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_disasm_interface();
 
 	// configuration access
-	const device_config_disasm_interface &disasm_config() const { return m_disasm_config; }
-	UINT32 min_opcode_bytes() const { return m_disasm_config.min_opcode_bytes(); }
-	UINT32 max_opcode_bytes() const { return m_disasm_config.max_opcode_bytes(); }
+	UINT32 min_opcode_bytes() const { return disasm_min_opcode_bytes(); }
+	UINT32 max_opcode_bytes() const { return disasm_max_opcode_bytes(); }
 
 	// interface for disassembly
 	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options = 0) { return disasm_disassemble(buffer, pc, oprom, opram, options); }
 
 protected:
 	// required operation overrides
+	virtual UINT32 disasm_min_opcode_bytes() const = 0;
+	virtual UINT32 disasm_max_opcode_bytes() const = 0;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options) = 0;
-
-	const device_config_disasm_interface &	m_disasm_config;		// reference to configuration data
 };
 
 

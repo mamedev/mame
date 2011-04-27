@@ -61,54 +61,33 @@
 
 struct via6522_interface
 {
-    devcb_read8 m_in_a_func;
-    devcb_read8 m_in_b_func;
-    devcb_read_line m_in_ca1_func;
-    devcb_read_line m_in_cb1_func;
-    devcb_read_line m_in_ca2_func;
-    devcb_read_line m_in_cb2_func;
-    devcb_write8 m_out_a_func;
-    devcb_write8 m_out_b_func;
-    devcb_write_line m_out_ca1_func;
-    devcb_write_line m_out_cb1_func;
-    devcb_write_line m_out_ca2_func;
-    devcb_write_line m_out_cb2_func;
-    devcb_write_line m_irq_func;
-};
-
-
-// ======================> via6522_device_config
-
-class via6522_device_config :   public device_config,
-                                public via6522_interface
-{
-    friend class via6522_device;
-
-    // construction/destruction
-    via6522_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+    devcb_read8 m_in_a_cb;
+    devcb_read8 m_in_b_cb;
+    devcb_read_line m_in_ca1_cb;
+    devcb_read_line m_in_cb1_cb;
+    devcb_read_line m_in_ca2_cb;
+    devcb_read_line m_in_cb2_cb;
+    devcb_write8 m_out_a_cb;
+    devcb_write8 m_out_b_cb;
+    devcb_write_line m_out_ca1_cb;
+    devcb_write_line m_out_cb1_cb;
+    devcb_write_line m_out_ca2_cb;
+    devcb_write_line m_out_cb2_cb;
+    devcb_write_line m_irq_cb;
 };
 
 
 // ======================> via6522_device
 
-class via6522_device :  public device_t
+class via6522_device :  public device_t,
+                        public via6522_interface
 {
-    friend class via6522_device_config;
     friend class dart_channel;
 
-    // construction/destruction
-    via6522_device(running_machine &_machine, const via6522_device_config &_config);
-
 public:
+    // construction/destruction
+    via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -131,6 +110,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -200,8 +180,6 @@ private:
 
     emu_timer *m_shift_timer;
     UINT8 m_shift_counter;
-
-    const via6522_device_config &m_config;
 };
 
 

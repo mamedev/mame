@@ -220,7 +220,7 @@ static CPU_INIT( i80186 )
 	CPU_INIT_CALL(i8086);
 
 	/* resolve callbacks */
-	i80186_interface *intf = (i80186_interface *) device->baseconfig().static_config();
+	i80186_interface *intf = (i80186_interface *) device->static_config();
 
 	if (intf != NULL)
 	{

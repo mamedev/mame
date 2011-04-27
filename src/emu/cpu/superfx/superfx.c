@@ -754,9 +754,9 @@ static CPU_INIT( superfx )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 
-	if (device->baseconfig().static_config() != NULL)
+	if (device->static_config() != NULL)
 	{
-		cpustate->config = *(superfx_config *)device->baseconfig().static_config();
+		cpustate->config = *(superfx_config *)device->static_config();
 	}
 
 	devcb_resolve_write_line(&cpustate->out_irq_func, &cpustate->config.out_irq_func, device);

@@ -14,8 +14,8 @@
 class gaelco3d_state : public driver_device
 {
 public:
-	gaelco3d_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_adsp_ram_base;
 	UINT16 *m_m68k_ram_base;

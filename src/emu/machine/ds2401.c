@@ -20,30 +20,15 @@ inline void ATTR_PRINTF(3,4) ds2401_device::verboselog(int n_level, const char *
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("ds2401 %s %s: %s", config.tag(), machine().describe_context(), buf);
+		logerror("ds2401 %s %s: %s", tag(), machine().describe_context(), buf);
 	}
 }
 
-const device_type DS2401 = ds2401_device_config::static_alloc_device_config;
+// device type definition
+const device_type DS2401 = &device_creator<ds2401_device>;
 
-ds2401_device_config::ds2401_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "DS2401", tag, owner, clock)
-{
-}
-
-device_config *ds2401_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(ds2401_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *ds2401_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, ds2401_device(machine, *this));
-}
-
-ds2401_device::ds2401_device(running_machine &_machine, const ds2401_device_config &_config)
-	: device_t(_machine, _config),
-	  config(_config)
+ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DS2401, "DS2401", tag, owner, clock)
 {
 }
 
@@ -80,7 +65,7 @@ void ds2401_device::device_reset()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_DATA)
 			logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n",
-					 config.tag(),
+					 tag(),
 					 SIZE_DATA,
 					 m_region->bytes());
 		else {
@@ -92,7 +77,7 @@ void ds2401_device::device_reset()
 
 	// That chip is useless without an id, so bitch if there
 	// isn't one
-	logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", config.tag());
+	logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
 	memset(data, 0, SIZE_DATA);
 }
 

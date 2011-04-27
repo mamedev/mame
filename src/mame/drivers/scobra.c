@@ -43,8 +43,8 @@ Notes/Tidbits:
 class scobra_state : public scramble_state
 {
 public:
-	scobra_state(running_machine &machine, const driver_device_config_base &config)
-		: scramble_state(machine, config) { }
+	scobra_state(const machine_config &mconfig, device_type type, const char *tag)
+		: scramble_state(mconfig, type, tag) { }
 
 	UINT8 *m_soundram;
 };

@@ -3,8 +3,8 @@
 class coolpool_state : public driver_device
 {
 public:
-	coolpool_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	coolpool_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_nvram(*this, "nvram") { }
 
 	UINT16 *m_vram_base;

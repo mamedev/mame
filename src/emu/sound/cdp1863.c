@@ -35,56 +35,7 @@
 //**************************************************************************
 
 // devices
-const device_type CDP1863 = cdp1863_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdp1863_device_config - constructor
-//-------------------------------------------------
-
-cdp1863_device_config::cdp1863_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "CDP1863", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cdp1863_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(cdp1863_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cdp1863_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, cdp1863_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void cdp1863_device_config::static_set_config(device_config *device, int clock2)
-{
-	cdp1863_device_config *cdp1863 = downcast<cdp1863_device_config *>(device);
-
-	cdp1863->m_clock2 = clock2;
-}
+const device_type CDP1863 = &device_creator<cdp1863_device>;
 
 
 
@@ -96,14 +47,25 @@ void cdp1863_device_config::static_set_config(device_config *device, int clock2)
 //  cdp1863_device - constructor
 //-------------------------------------------------
 
-cdp1863_device::cdp1863_device(running_machine &_machine, const cdp1863_device_config &config)
-    : device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
+cdp1863_device::cdp1863_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CDP1863, "CDP1863", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
 	  m_stream(NULL),
-	  m_clock1(clock()),
-	  m_clock2(config.m_clock2),
-      m_config(config)
+	  m_clock1(clock),
+	  m_clock2(0)
 {
+}
+
+
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void cdp1863_device::static_set_config(device_t &device, int clock2)
+{
+	cdp1863_device &cdp1863 = downcast<cdp1863_device &>(device);
+
+	cdp1863.m_clock2 = clock2;
 }
 
 

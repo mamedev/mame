@@ -53,43 +53,19 @@
 
 struct i8214_interface
 {
-	devcb_write_line	m_out_int_func;
-	devcb_write_line	m_out_enlg_func;
+	devcb_write_line	m_out_int_cb;
+	devcb_write_line	m_out_enlg_cb;
 };
-
-
-// ======================> i8214_device_config
-
-class i8214_device_config :   public device_config,
-                              public i8214_interface
-{
-    friend class i8214_device;
-
-    // construction/destruction
-    i8214_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
 
 
 // ======================> i8214_device
 
-class i8214_device :	public device_t
+class i8214_device :	public device_t, public i8214_interface
 {
-    friend class i8214_device_config;
-
-    // construction/destruction
-    i8214_device(running_machine &_machine, const i8214_device_config &_config);
-
 public:
+    // construction/destruction
+    i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );
 	DECLARE_WRITE_LINE_MEMBER( inte_w );
@@ -100,6 +76,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 
 private:
@@ -116,8 +93,6 @@ private:
 	UINT8 m_r;					// interrupt request latch
 	int m_sgs;					// status group select
 	int m_etlg;					// enable this level group
-
-	const i8214_device_config &m_config;
 };
 
 

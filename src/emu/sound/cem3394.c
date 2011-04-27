@@ -324,7 +324,7 @@ static STREAM_UPDATE( cem3394_update )
 
 static DEVICE_START( cem3394 )
 {
-	const cem3394_interface *intf = (const cem3394_interface *)device->baseconfig().static_config();
+	const cem3394_interface *intf = (const cem3394_interface *)device->static_config();
 	cem3394_state *chip = get_safe_token(device);
 
 	chip->device = device;

@@ -685,7 +685,7 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 
 static DEVICE_START( rtc65271 )
 {
-	rtc65271_config *config = (rtc65271_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	rtc65271_config *config = (rtc65271_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	rtc65271_state *state = get_safe_token(device);
 
 	state->update_timer = device->machine().scheduler().timer_alloc(FUNC(rtc_begin_update_callback), (void *)device);

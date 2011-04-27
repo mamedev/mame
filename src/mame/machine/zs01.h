@@ -10,37 +10,18 @@
 
 #define MCFG_ZS01_ADD(_tag, ds2401_tag) \
 	MCFG_DEVICE_ADD(_tag, ZS01, 0) \
-	zs01_device_config::static_set_ds2401_tag(device, ds2401_tag); \
+	zs01_device::static_set_ds2401_tag(*device, ds2401_tag); \
 
 #include "machine/secflash.h"
 
-class zs01_device_config : public device_secure_serial_flash_config
-{
-	friend class zs01_device;
-
-	// construction/destruction
-	zs01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-	// inline configuration helpers
-	static void static_set_ds2401_tag(device_config *device, const char *ds2401_tag);
-
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// internal state
-	const char *ds2401_tag;
-};
-
 class zs01_device : public device_secure_serial_flash
 {
-	friend class zs01_device_config;
-
+public:
 	// construction/destruction
-	zs01_device(running_machine &_machine, const zs01_device_config &config);
+	zs01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_ds2401_tag(device_t &device, const char *ds2401_tag);
 
 protected:
 	// device-level overrides
@@ -63,7 +44,7 @@ protected:
 	virtual void sda_1();
 
 	// internal state
-	const zs01_device_config &config;
+	const char *ds2401_tag;
 
 	enum {
 		SIZE_WRITE_BUFFER = 12,

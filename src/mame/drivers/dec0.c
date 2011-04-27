@@ -1309,15 +1309,15 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_GFXDECODE(dec0)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
-	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,1,0);
-	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,1,0);
+	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,2,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 3);
 
 	MCFG_VIDEO_START(dec0)
 MACHINE_CONFIG_END

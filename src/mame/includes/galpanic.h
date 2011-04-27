@@ -3,8 +3,8 @@
 class galpanic_state : public kaneko16_state
 {
 public:
-	galpanic_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	galpanic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	UINT16 *m_bgvideoram;
 	UINT16 *m_fgvideoram;

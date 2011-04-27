@@ -95,15 +95,15 @@ extern int megadrive_region_pal;
 class md_base_state : public driver_device
 {
 public:
-	md_base_state(running_machine &machine, const driver_device_config_base &config)
-	: driver_device(machine, config) { }
+	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag) { }
 };
 
 class md_boot_state : public md_base_state
 {
 public:
-	md_boot_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 
 	// bootleg specific
 	int m_aladmdb_mcu_port;
@@ -112,8 +112,8 @@ public:
 class segac2_state : public md_base_state
 {
 public:
-	segac2_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 
 	// for Print Club only
 	int m_cam_data;
@@ -143,8 +143,8 @@ public:
 class mplay_state : public md_base_state
 {
 public:
-	mplay_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
 	// is to read from 0x8000-0xffff
@@ -169,8 +169,8 @@ public:
 class mtech_state : public md_base_state
 {
 public:
-	mtech_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	mtech_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 
 	UINT8 m_mt_cart_select_reg;
 	UINT32 m_bios_port_ctrl;
@@ -216,8 +216,8 @@ struct _megadriv_cart
 class md_cons_state : public md_base_state
 {
 public:
-	md_cons_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 
 	emu_timer *m_mess_io_timeout[3];
 	int m_mess_io_stage[3];
@@ -229,8 +229,8 @@ public:
 class pico_state : public md_cons_state
 {
 public:
-	pico_state(running_machine &machine, const driver_device_config_base &config)
-	: md_cons_state(machine, config) { }
+	pico_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_cons_state(mconfig, type, tag) { }
 
 	UINT8 m_page_register;
 };
@@ -238,8 +238,8 @@ public:
 class mdsvp_state : public md_cons_state
 {
 public:
-	mdsvp_state(running_machine &machine, const driver_device_config_base &config)
-	: md_cons_state(machine, config) { }
+	mdsvp_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_cons_state(mconfig, type, tag) { }
 
 	UINT8 *m_iram; // IRAM (0-0x7ff)
 	UINT8 *m_dram; // [0x20000];
@@ -254,15 +254,15 @@ public:
 class _32x_state : public md_base_state
 {
 public:
-	_32x_state(running_machine &machine, const driver_device_config_base &config)
-	: md_base_state(machine, config) { }
+	_32x_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag) { }
 };
 
 class segacd_state : public _32x_state	// use _32x_state as base to make easier the combo 32X + SCD
 {
 public:
-	segacd_state(running_machine &machine, const driver_device_config_base &config)
-	: _32x_state(machine, config) { }
+	segacd_state(const machine_config &mconfig, device_type type, const char *tag)
+	: _32x_state(mconfig, type, tag) { }
 };
 
 

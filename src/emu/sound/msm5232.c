@@ -787,7 +787,7 @@ static STATE_POSTLOAD( msm5232_postload )
 
 static DEVICE_START( msm5232 )
 {
-	const msm5232_interface *intf = (const msm5232_interface *)device->baseconfig().static_config();
+	const msm5232_interface *intf = (const msm5232_interface *)device->static_config();
 	int rate = device->clock()/CLOCK_RATE_DIVIDER;
 	msm5232_state *chip = get_safe_token(device);
 	int voicenum;

@@ -756,7 +756,7 @@ void device_scheduler::rebuild_execute_list()
 
 	// iterate over all devices
 	device_execute_interface *exec = NULL;
-	for (bool gotone = machine().m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = machine().devicelist().first(exec); gotone; gotone = exec->next(exec))
 	{
 		// append to the appropriate list
 		exec->m_nextexec = NULL;

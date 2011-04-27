@@ -418,7 +418,7 @@ void sharc_external_dma_write(device_t *device, UINT32 address, UINT64 data)
 static CPU_INIT( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	const sharc_config *cfg = (const sharc_config *)device->baseconfig().static_config();
+	const sharc_config *cfg = (const sharc_config *)device->static_config();
 	int saveindex;
 
 	cpustate->boot_mode = cfg->boot_mode;

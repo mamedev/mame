@@ -48,8 +48,8 @@
 class itgambl3_state : public driver_device
 {
 public:
-	itgambl3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	itgambl3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_test_x;
 	int m_test_y;

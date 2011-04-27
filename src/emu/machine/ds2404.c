@@ -11,43 +11,22 @@
 #include <time.h>
 #include "devhelpr.h"
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type DS2404 = &device_creator<ds2404_device>;
+
 //-------------------------------------------------
-//  ds2404_device_config - constructor
+//  ds2404_device - constructor
 //-------------------------------------------------
 
-ds2404_device_config::ds2404_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "DS2404", tag, owner, clock),
-      device_config_nvram_interface(mconfig, *this)
+ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, DS2404, "DS2404", tag, owner, clock),
+	  device_nvram_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ds2404_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(ds2404_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ds2404_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, ds2404_device(machine, *this));
 }
 
 
@@ -56,10 +35,10 @@ device_t *ds2404_device_config::alloc_device(running_machine &machine) const
 //  to set the reference year
 //-------------------------------------------------
 
-void ds2404_device_config::static_set_ref_year(device_config *device, UINT32 year)
+void ds2404_device::static_set_ref_year(device_t &device, UINT32 year)
 {
-	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
-	ds2404->m_ref_year = year;
+	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
+	ds2404.m_ref_year = year;
 }
 
 
@@ -68,10 +47,10 @@ void ds2404_device_config::static_set_ref_year(device_config *device, UINT32 yea
 //  to set the reference month
 //-------------------------------------------------
 
-void ds2404_device_config::static_set_ref_month(device_config *device, UINT8 month)
+void ds2404_device::static_set_ref_month(device_t &device, UINT8 month)
 {
-	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
-	ds2404->m_ref_month = month;
+	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
+	ds2404.m_ref_month = month;
 }
 
 
@@ -80,29 +59,12 @@ void ds2404_device_config::static_set_ref_month(device_config *device, UINT8 mon
 //  to set the reference day
 //-------------------------------------------------
 
-void ds2404_device_config::static_set_ref_day(device_config *device, UINT8 day)
+void ds2404_device::static_set_ref_day(device_t &device, UINT8 day)
 {
-	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
-	ds2404->m_ref_day = day;
+	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
+	ds2404.m_ref_day = day;
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type DS2404 = ds2404_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  ds2404_device - constructor
-//-------------------------------------------------
-
-ds2404_device::ds2404_device(running_machine &_machine, const ds2404_device_config &config)
-    : device_t(_machine, config),
-	  device_nvram_interface(_machine, config, *this),
-      m_config(config)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -113,9 +75,9 @@ void ds2404_device::device_start()
 	struct tm ref_tm;
 
 	memset(&ref_tm, 0, sizeof(ref_tm));
-	ref_tm.tm_year = m_config.m_ref_year - 1900;
-	ref_tm.tm_mon = m_config.m_ref_month - 1;
-	ref_tm.tm_mday = m_config.m_ref_day;
+	ref_tm.tm_year = m_ref_year - 1900;
+	ref_tm.tm_mon = m_ref_month - 1;
+	ref_tm.tm_mday = m_ref_day;
 
 	time_t ref_time = mktime(&ref_tm);
 

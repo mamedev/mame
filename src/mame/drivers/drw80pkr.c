@@ -34,8 +34,8 @@
 class drw80pkr_state : public driver_device
 {
 public:
-	drw80pkr_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_t0;

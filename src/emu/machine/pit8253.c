@@ -1071,7 +1071,7 @@ static void common_start( device_t *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
 	int			timerno;
 
-	pit8253->config = (const struct pit8253_config *)device->baseconfig().static_config();
+	pit8253->config = (const struct pit8253_config *)device->static_config();
 	pit8253->device_type = device_type;
 
 	/* register for state saving */

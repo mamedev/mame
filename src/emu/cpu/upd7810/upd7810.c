@@ -1700,7 +1700,7 @@ static CPU_INIT( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
 
-	cpustate->config = *(const UPD7810_CONFIG*) device->baseconfig().static_config();
+	cpustate->config = *(const UPD7810_CONFIG*) device->static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

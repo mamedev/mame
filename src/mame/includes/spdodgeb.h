@@ -1,8 +1,8 @@
 class spdodgeb_state : public driver_device
 {
 public:
-	spdodgeb_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	spdodgeb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_toggle;
 	int m_adpcm_pos[2];

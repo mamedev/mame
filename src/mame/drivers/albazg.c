@@ -64,8 +64,8 @@ Code disassembling
 class albazg_state : public driver_device
 {
 public:
-	albazg_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT8 *  m_cus_ram;

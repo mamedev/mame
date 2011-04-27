@@ -1,8 +1,8 @@
 class deco32_state : public driver_device
 {
 public:
-	deco32_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_ram;
 	int m_raster_enable;
@@ -50,8 +50,8 @@ public:
 class dragngun_state : public deco32_state
 {
 public:
-	dragngun_state(running_machine &machine, const driver_device_config_base &config)
-		: deco32_state(machine, config) { }
+	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
+		: deco32_state(mconfig, type, tag) { }
 
 	UINT32 *m_dragngun_sprite_layout_0_ram;
 	UINT32 *m_dragngun_sprite_layout_1_ram;

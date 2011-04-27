@@ -1,8 +1,8 @@
 class mainsnk_state : public driver_device
 {
 public:
-	mainsnk_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mainsnk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;

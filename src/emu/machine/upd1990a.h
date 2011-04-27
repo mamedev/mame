@@ -54,31 +54,8 @@
 
 struct upd1990a_interface
 {
-	devcb_write_line		m_out_data_func;
-	devcb_write_line		m_out_tp_func;
-};
-
-
-
-// ======================> upd1990a_device_config
-
-class upd1990a_device_config :   public device_config,
-                                 public upd1990a_interface,
-								 public device_config_rtc_interface
-{
-    friend class upd1990a_device;
-
-    // construction/destruction
-    upd1990a_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line		m_out_data_cb;
+	devcb_write_line		m_out_tp_cb;
 };
 
 
@@ -86,14 +63,13 @@ protected:
 // ======================> upd1990a_device
 
 class upd1990a_device :	public device_t,
-						public device_rtc_interface
+						public device_rtc_interface,
+                        public upd1990a_interface
 {
-    friend class upd1990a_device_config;
-
-    // construction/destruction
-    upd1990a_device(running_machine &_machine, const upd1990a_device_config &_config);
-
 public:
+    // construction/destruction
+    upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( stb_w );
@@ -107,6 +83,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -143,8 +120,6 @@ private:
 	emu_timer *m_timer_clock;
 	emu_timer *m_timer_tp;
 	emu_timer *m_timer_data_out;
-
-	const upd1990a_device_config &m_config;
 };
 
 

@@ -110,7 +110,7 @@ static DEVICE_START( snkwave )
 {
 	snkwave_state *chip = get_safe_token(device);
 
-	assert(device->baseconfig().static_config() == 0);
+	assert(device->static_config() == 0);
 
 	/* adjust internal clock */
 	chip->external_clock = device->clock();

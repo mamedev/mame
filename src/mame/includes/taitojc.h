@@ -3,8 +3,8 @@
 class taitojc_state : public driver_device
 {
 public:
-	taitojc_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	taitojc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_texture_x;
 	int m_texture_y;

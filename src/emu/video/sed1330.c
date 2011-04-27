@@ -61,8 +61,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// devices
-const device_type SED1330 = sed1330_device_config::static_alloc_device_config;
+// device type definition
+const device_type SED1330 = &device_creator<sed1330_device>;
 
 
 // default address map
@@ -76,80 +76,6 @@ ROM_START( sed1330 )
 	ROM_REGION( 0x5c0, "gfx1", 0 ) // internal chargen ROM
 	ROM_LOAD( "sed1330.bin", 0x000, 0x5c0, NO_DUMP )
 ROM_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  sed1330_device_config - constructor
-//-------------------------------------------------
-
-sed1330_device_config::sed1330_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Seiko-Epson SED1330", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
-{
-	m_shortname = "sed1330";
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *sed1330_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(sed1330_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *sed1330_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, sed1330_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void sed1330_device_config::static_set_config(device_config *device, const char *screen_tag)
-{
-	sed1330_device_config *sed1330 = downcast<sed1330_device_config *>(device);
-
-	assert(screen_tag != NULL);
-
-	sed1330->m_screen_tag = screen_tag;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *sed1330_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_0) ? &m_space_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const rom_entry *sed1330_device_config::device_rom_region() const
-{
-	return ROM_NAME( sed1330 );
-}
 
 
 
@@ -213,12 +139,37 @@ inline void sed1330_device::increment_csr()
 //  sed1330_device - constructor
 //-------------------------------------------------
 
-sed1330_device::sed1330_device(running_machine &_machine, const sed1330_device_config &config)
-    : device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
+sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SED1330, "Seiko-Epson SED1330", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
 	  m_bf(0),
-      m_config(config)
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))
 {
+	m_shortname = "sed1330";
+}
+
+
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void sed1330_device::static_set_config(device_t &device, const char *screen_tag)
+{
+	sed1330_device &sed1330 = downcast<sed1330_device &>(device);
+
+	assert(screen_tag != NULL);
+
+	sed1330.m_screen_tag = screen_tag;
+}
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *sed1330_device::device_rom_region() const
+{
+	return ROM_NAME( sed1330 );
 }
 
 
@@ -274,6 +225,17 @@ void sed1330_device::device_start()
 
 void sed1330_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *sed1330_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 

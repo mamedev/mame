@@ -75,8 +75,8 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 class igspoker_state : public driver_device
 {
 public:
-	igspoker_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	igspoker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_nmi_enable;
 	int m_bg_enable;

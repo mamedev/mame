@@ -40,40 +40,13 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cdislave_device_config
-
-class cdislave_device_config :  public device_config
-{
-    friend class cdislave_device;
-
-    // construction/destruction
-    cdislave_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-    // inline configuration indexes go here (none yet)
-
-protected:
-    // device_config overrides (none yet)
-
-    // internal state goes here (none yet)
-};
-
-
-
 // ======================> cdislave_device
 
 class cdislave_device : public device_t
 {
-    friend class cdislave_device_config;
-
-    // construction/destruction
-    cdislave_device(running_machine &_machine, const cdislave_device_config &config);
-
 public:
+    // construction/destruction
+    cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
     // external callbacks
     static INPUT_CHANGED( mouse_update );
@@ -93,10 +66,8 @@ protected:
     // internal callbacks
     static TIMER_CALLBACK( trigger_readback_int );
 
-    // internal state
-    const cdislave_device_config &m_config;
-
 private:
+    // internal state
     class channel_state
     {
     public:

@@ -68,8 +68,8 @@ Technology = NMOS
 class trvmadns_state : public driver_device
 {
 public:
-	trvmadns_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	trvmadns_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_gfxram;

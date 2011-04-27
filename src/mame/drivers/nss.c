@@ -301,8 +301,8 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 class nss_state : public snes_state
 {
 public:
-	nss_state(running_machine &machine, const driver_device_config_base &config)
-		: snes_state(machine, config) { }
+	nss_state(const machine_config &mconfig, device_type type, const char *tag)
+		: snes_state(mconfig, type, tag) { }
 
 	UINT8 m_m50458_rom_bank;
 	UINT8 m_vblank_bit;

@@ -77,48 +77,25 @@ struct upd3301_interface
 	const char *m_screen_tag;		// screen we are acting on
 	int m_width;					// char width in pixels
 
-	upd3301_display_pixels_func	m_display_func;
+	upd3301_display_pixels_func	m_display_cb;
 
-	devcb_write_line		m_out_int_func;
-	devcb_write_line		m_out_drq_func;
-	devcb_write_line		m_out_hrtc_func;
-	devcb_write_line		m_out_vrtc_func;
-};
-
-
-
-// ======================> upd3301_device_config
-
-class upd3301_device_config :   public device_config,
-								public upd3301_interface
-{
-    friend class upd3301_device;
-
-    // construction/destruction
-    upd3301_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line		m_out_int_cb;
+	devcb_write_line		m_out_drq_cb;
+	devcb_write_line		m_out_hrtc_cb;
+	devcb_write_line		m_out_vrtc_cb;
 };
 
 
 
 // ======================> upd3301_device
 
-class upd3301_device :	public device_t
+class upd3301_device :	public device_t,
+						public upd3301_interface
 {
-    friend class upd3301_device_config;
-
-    // construction/destruction
-    upd3301_device(running_machine &_machine, const upd3301_device_config &_config);
-
 public:
+    // construction/destruction
+    upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
     DECLARE_WRITE8_MEMBER( dack_w );
@@ -130,6 +107,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_clock_changed();
@@ -209,8 +187,6 @@ private:
 	emu_timer *m_hrtc_timer;
 	emu_timer *m_vrtc_timer;
 	emu_timer *m_drq_timer;
-
-	const upd3301_device_config &m_config;
 };
 
 

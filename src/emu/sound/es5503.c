@@ -232,7 +232,7 @@ static DEVICE_START( es5503 )
 	int osc;
 	ES5503Chip *chip = get_safe_token(device);
 
-	intf = (const es5503_interface *)device->baseconfig().static_config();
+	intf = (const es5503_interface *)device->static_config();
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;

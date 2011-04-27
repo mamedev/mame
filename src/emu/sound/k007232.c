@@ -304,7 +304,7 @@ static DEVICE_START( k007232 )
 	int i;
 	KDAC_A_PCM *info = get_safe_token(device);
 
-	info->intf = (device->baseconfig().static_config() != NULL) ? (const k007232_interface *)device->baseconfig().static_config() : &defintrf;
+	info->intf = (device->static_config() != NULL) ? (const k007232_interface *)device->static_config() : &defintrf;
 
 	/* Set up the chips */
 

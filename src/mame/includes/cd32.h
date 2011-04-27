@@ -12,8 +12,8 @@ CuboCD32 definitions
 class cd32_state : public amiga_state
 {
 public:
-	cd32_state(running_machine &machine, const driver_device_config_base &config)
-		: amiga_state(machine, config) { }
+	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag) { }
 
 	UINT16 m_potgo_value;
 	int m_cd32_shifter[2];

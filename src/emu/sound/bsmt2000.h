@@ -56,7 +56,7 @@
 	MCFG_DEVICE_REPLACE(_tag, BSMT2000, _clock) \
 
 #define MCFG_BSMT2000_READY_CALLBACK(_callback) \
-	bsmt2000_device_config::static_set_ready_callback(device, _callback); \
+	bsmt2000_device::static_set_ready_callback(*device, _callback); \
 
 
 
@@ -67,67 +67,38 @@
 class bsmt2000_device;
 
 
-// ======================> bsmt2000_device_config
-
-class bsmt2000_device_config :	public device_config,
-								public device_config_sound_interface,
-								public device_config_memory_interface
-{
-	friend class bsmt2000_device;
-
-	typedef void (*ready_callback)(bsmt2000_device &device);
-
-	// construction/destruction
-	bsmt2000_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_ready_callback(device_config *device, ready_callback callback);
-
-protected:
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-	virtual machine_config_constructor device_mconfig_additions() const;
-
-	// device_config overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// internal state
-	const address_space_config  m_space_config;
-
-	// inline data
-	ready_callback				m_ready_callback;
-};
-
-
-
 // ======================> bsmt2000_device
 
 class bsmt2000_device : public device_t,
 						public device_sound_interface,
 						public device_memory_interface
 {
-	friend class bsmt2000_device_config;
-
-	// construction/destruction
-	bsmt2000_device(running_machine &_machine, const bsmt2000_device_config &config);
+	typedef void (*ready_callback)(bsmt2000_device &device);
 
 public:
+	// construction/destruction
+	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_ready_callback(device_t &device, ready_callback callback);
+
+	// public interface
 	UINT16 read_status();
 	void write_reg(UINT16 data);
 	void write_data(UINT16 data);
 
 protected:
 	// device-level overrides
+	const rom_entry *device_rom_region() const;
+	machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	// sound interface overrides
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
@@ -150,8 +121,11 @@ private:
 		TIMER_ID_DATA_WRITE
 	};
 
+	// configuration state
+	const address_space_config  m_space_config;
+	ready_callback				m_ready_callback;
+
 	// internal state
-	const bsmt2000_device_config &m_config;
 	sound_stream *				m_stream;
 	direct_read_data *			m_direct;
 	tms32015_device *			m_cpu;

@@ -58,38 +58,15 @@
 
 struct z80pio_interface
 {
-	devcb_write_line	m_out_int_func;
+	devcb_write_line	m_out_int_cb;
 
-	devcb_read8			m_in_pa_func;
-	devcb_write8		m_out_pa_func;
-	devcb_write_line	m_out_ardy_func;
+	devcb_read8			m_in_pa_cb;
+	devcb_write8		m_out_pa_cb;
+	devcb_write_line	m_out_ardy_cb;
 
-	devcb_read8			m_in_pb_func;
-	devcb_write8		m_out_pb_func;
-	devcb_write_line	m_out_brdy_func;
-};
-
-
-
-// ======================> z80pio_device_config
-
-class z80pio_device_config :	public device_config,
-								public device_config_z80daisy_interface,
-								public z80pio_interface
-{
-	friend class z80pio_device;
-
-	// construction/destruction
-	z80pio_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read8			m_in_pb_cb;
+	devcb_write8		m_out_pb_cb;
+	devcb_write_line	m_out_brdy_cb;
 };
 
 
@@ -97,13 +74,9 @@ protected:
 // ======================> z80pio_device
 
 class z80pio_device :	public device_t,
-						public device_z80daisy_interface
+						public device_z80daisy_interface,
+						public z80pio_interface
 {
-	friend class z80pio_device_config;
-
-	// construction/destruction
-	z80pio_device(running_machine &_machine, const z80pio_device_config &config);
-
 public:
 	enum
 	{
@@ -111,6 +84,9 @@ public:
 		PORT_B,
 		PORT_COUNT
 	};
+
+	// construction/destruction
+	z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O line access
 	int rdy(int which) { return m_port[which].rdy(); }
@@ -130,6 +106,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -197,7 +174,6 @@ private:
 	};
 
 	// internal state
-	const z80pio_device_config &m_config;
 	pio_port					m_port[2];
 	devcb_resolved_write_line	m_out_int_func;
 };

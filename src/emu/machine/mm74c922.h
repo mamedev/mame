@@ -47,13 +47,13 @@
 #define MCFG_MM74C922_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, MM74C922, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mm74c922_device_config::static_set_config(device, 4);
+	mm74c922_device::static_set_config(*device, 4);
 
 
 #define MCFG_MM74C923_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, MM74C923, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	mm74c922_device_config::static_set_config(device, 5);
+	mm74c922_device::static_set_config(*device, 5);
 
 
 #define MM74C922_INTERFACE(name) \
@@ -76,57 +76,33 @@ struct mm74c922_interface
 	double				m_cap_osc;
 	double				m_cap_debounce;
 
-	devcb_write_line	m_out_da_func;
+	devcb_write_line	m_out_da_cb;
 
-	devcb_read8			m_in_x1_func;
-	devcb_read8			m_in_x2_func;
-	devcb_read8			m_in_x3_func;
-	devcb_read8			m_in_x4_func;
-	devcb_read8			m_in_x5_func;
-};
-
-
-// ======================> mm74c922_device_config
-
-class mm74c922_device_config :   public device_config,
-                                 public mm74c922_interface
-{
-    friend class mm74c922_device;
-
-    // construction/destruction
-    mm74c922_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, int max_y);
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
-private:
-	int m_max_y;
+	devcb_read8			m_in_x1_cb;
+	devcb_read8			m_in_x2_cb;
+	devcb_read8			m_in_x3_cb;
+	devcb_read8			m_in_x4_cb;
+	devcb_read8			m_in_x5_cb;
 };
 
 
 // ======================> mm74c922_device
 
-class mm74c922_device :  public device_t
+class mm74c922_device :  public device_t,
+						 public mm74c922_interface
 {
-    friend class mm74c922_device_config;
-
-    // construction/destruction
-    mm74c922_device(running_machine &_machine, const mm74c922_device_config &_config);
-
 public:
+    // construction/destruction
+    mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, int max_y);
+
     UINT8 data_out_r();
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -134,6 +110,8 @@ private:
 	inline void change_output_lines();
 	inline void clock_scan_counters();
 	inline void detect_keypress();
+
+	int m_max_y;
 
 	devcb_resolved_write_line	m_out_da_func;
 	devcb_resolved_read8		m_in_x_func[5];
@@ -149,8 +127,6 @@ private:
 
 	// timers
 	emu_timer *m_scan_timer;	// keyboard scan timer
-
-	const mm74c922_device_config &m_config;
 };
 
 

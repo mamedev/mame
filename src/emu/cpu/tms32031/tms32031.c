@@ -115,9 +115,9 @@ const int GIEFLAG	= 0x2000;
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// device definitions
-const device_type TMS32031 = tms32031_device_config::static_alloc_device_config;
-const device_type TMS32032 = tms32032_device_config::static_alloc_device_config;
+// device type definition
+const device_type TMS32031 = &device_creator<tms32031_device>;
+const device_type TMS32032 = &device_creator<tms32032_device>;
 
 // internal memory maps
 static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32 )
@@ -127,143 +127,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32 )
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
-
-
-
-//**************************************************************************
-//  TMS3203X DEVICE CONFIG
-//**************************************************************************
-
-//-------------------------------------------------
-//  tms3203x_device_config - constructor
-//-------------------------------------------------
-
-tms3203x_device_config::tms3203x_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map)
-	: cpu_device_config(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
-	  m_chip_type(chiptype)
-{
-	m_bootoffset = 0;
-	m_xf0_w = NULL;
-	m_xf1_w = NULL;
-	m_iack_w = NULL;
-}
-
-tms32031_device_config::tms32031_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: tms3203x_device_config(mconfig, static_alloc_device_config, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031)) { }
-
-tms32032_device_config::tms32032_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: tms3203x_device_config(mconfig, static_alloc_device_config, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032)) { }
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *tms32031_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(tms32031_device_config(mconfig, tag, owner, clock));
-}
-
-device_config *tms32032_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(tms32032_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *tms32031_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, tms32031_device(machine, *this));
-}
-
-device_t *tms32032_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, tms32032_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void tms3203x_device_config::static_set_config(device_config *device, const tms3203x_config &config)
-{
-	tms3203x_device_config *tms = downcast<tms3203x_device_config *>(device);
-	*static_cast<tms3203x_config *>(tms) = config;
-}
-
-
-//-------------------------------------------------
-//  execute_min_cycles - return minimum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 tms3203x_device_config::execute_min_cycles() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  execute_max_cycles - return maximum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 tms3203x_device_config::execute_max_cycles() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-UINT32 tms3203x_device_config::execute_input_lines() const
-{
-	return 11;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *tms3203x_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 tms3203x_device_config::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 tms3203x_device_config::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
 
 
 
@@ -403,9 +266,10 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(running_machine &_machine, const tms3203x_device_config &config)
-	: cpu_device(_machine, config),
-	  m_config(config),
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map)
+	: cpu_device(mconfig, type, name, tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
+	  m_chip_type(chiptype),
 	  m_pc(0),
 	  m_bkmask(0),
 	  m_irq_state(0),
@@ -418,6 +282,11 @@ tms3203x_device::tms3203x_device(running_machine &_machine, const tms3203x_devic
 	  m_program(0),
 	  m_direct(0)
 {
+	m_bootoffset = 0;
+	m_xf0_w = NULL;
+	m_xf1_w = NULL;
+	m_iack_w = NULL;
+
 	// initialize remaining state
 	memset(&m_r, 0, sizeof(m_r));
 
@@ -429,11 +298,11 @@ tms3203x_device::tms3203x_device(running_machine &_machine, const tms3203x_devic
 #endif
 }
 
-tms32031_device::tms32031_device(running_machine &_machine, const tms32031_device_config &config)
-	: tms3203x_device(_machine, config) { }
+tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031)) { }
 
-tms32032_device::tms32032_device(running_machine &_machine, const tms32032_device_config &config)
-	: tms3203x_device(_machine, config) { }
+tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032)) { }
 
 
 //-------------------------------------------------
@@ -447,6 +316,18 @@ tms3203x_device::~tms3203x_device()
 		if (m_hits[i] != 0)
 			printf("%10d - %03X.%X\n", m_hits[i], i / 4, i % 4);
 #endif
+}
+
+
+//-------------------------------------------------
+//  static_set_config - set the configuration
+//  structure
+//-------------------------------------------------
+
+void tms3203x_device::static_set_config(device_t &device, const tms3203x_config &config)
+{
+	tms3203x_device &tms = downcast<tms3203x_device &>(device);
+	static_cast<tms3203x_config &>(tms) = config;
 }
 
 
@@ -551,10 +432,10 @@ void tms3203x_device::device_start()
 void tms3203x_device::device_reset()
 {
 	// if we have a config struct, get the boot ROM address
-	if (m_config.m_bootoffset != 0)
+	if (m_bootoffset != 0)
 	{
 		m_mcu_mode = true;
-		m_pc = boot_loader(m_config.m_bootoffset);
+		m_pc = boot_loader(m_bootoffset);
 	}
 	else
 	{
@@ -570,6 +451,18 @@ void tms3203x_device::device_reset()
 
 	// reset internal stuff
 	m_delayed = m_irq_pending = m_is_idling = false;
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *tms3203x_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
 }
 
 
@@ -660,6 +553,28 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, astri
                 (temp & 0x01) ? 'c':'.');
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 tms3203x_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 tms3203x_device::disasm_max_opcode_bytes() const
+{
+	return 4;
 }
 
 
@@ -766,11 +681,44 @@ void tms3203x_device::check_irqs()
 
 		// after auto-clearing the interrupt bit, we need to re-trigger
         // level-sensitive interrupts
-		if (m_config.m_chip_type == tms3203x_device_config::CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
+		if (m_chip_type == CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
 			IREG(TMR_IF) |= m_irq_state & 0x0f;
 	}
 	else
 		m_irq_pending = true;
+}
+
+
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 tms3203x_device::execute_min_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 tms3203x_device::execute_max_cycles() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 tms3203x_device::execute_input_lines() const
+{
+	return 11;
 }
 
 
@@ -797,7 +745,7 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	// external interrupts are level-sensitive on the '31 and can be
     // configured as such on the '32; in that case, if the external
     // signal is high, we need to update the value in IF accordingly
-	if (m_config.m_chip_type == tms3203x_device_config::CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
+	if (m_chip_type == CHIP_TYPE_TMS32031 || (IREG(TMR_ST) & 0x4000) == 0)
 		IREG(TMR_IF) |= m_irq_state & 0x0f;
 }
 

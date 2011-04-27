@@ -56,39 +56,15 @@ struct msm6255_interface
 };
 
 
-// ======================> msm6255_device_config
-
-class msm6255_device_config :   public device_config,
-                                public msm6255_interface
-{
-    friend class msm6255_device;
-
-    // construction/destruction
-    msm6255_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	msm6255_char_ram_read_func		m_char_ram_r;
-};
-
-
 // ======================> msm6255_device
 
-class msm6255_device :	public device_t
+class msm6255_device :	public device_t,
+						public msm6255_interface
 {
-    friend class msm6255_device_config;
-
-    // construction/destruction
-    msm6255_device(running_machine &_machine, const msm6255_device_config &_config);
-
 public:
+    // construction/destruction
+    msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -96,6 +72,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 
@@ -121,8 +98,6 @@ private:
 
 	int m_cursor;					// is cursor displayed
 	int m_frame;					// frame counter
-
-	const msm6255_device_config &m_config;
 };
 
 

@@ -199,7 +199,7 @@ static STREAM_UPDATE( sp0250_update )
 
 static DEVICE_START( sp0250 )
 {
-	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->baseconfig().static_config();
+	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->static_config();
 	sp0250_state *sp = get_safe_token(device);
 
 	sp->device = device;

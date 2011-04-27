@@ -24,19 +24,20 @@
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  LIVE DEVICE
 //**************************************************************************
 
-// devices
-const device_type CDP1861 = cdp1861_device_config::static_alloc_device_config;
+// device type definition
+const device_type CDP1861 = &device_creator<cdp1861_device>;
 
+//-------------------------------------------------
+//  cdp1861_device - constructor
+//-------------------------------------------------
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(cdp1861, "CDP1861")
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock)
+{
+}
 
 
 //-------------------------------------------------
@@ -45,7 +46,7 @@ GENERIC_DEVICE_CONFIG_SETUP(cdp1861, "CDP1861")
 //  complete
 //-------------------------------------------------
 
-void cdp1861_device_config::device_config_complete()
+void cdp1861_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const cdp1861_interface *intf = reinterpret_cast<const cdp1861_interface *>(static_config());
@@ -55,26 +56,10 @@ void cdp1861_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
-		memset(&m_out_dmao_func, 0, sizeof(m_out_dmao_func));
-		memset(&m_out_efx_func, 0, sizeof(m_out_efx_func));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_dmao_cb, 0, sizeof(m_out_dmao_cb));
+		memset(&m_out_efx_cb, 0, sizeof(m_out_efx_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdp1861_device - constructor
-//-------------------------------------------------
-
-cdp1861_device::cdp1861_device(running_machine &_machine, const cdp1861_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
 }
 
 
@@ -85,9 +70,9 @@ cdp1861_device::cdp1861_device(running_machine &_machine, const cdp1861_device_c
 void cdp1861_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
-	devcb_resolve_write_line(&m_out_dmao_func, &m_config.m_out_dmao_func, this);
-	devcb_resolve_write_line(&m_out_efx_func, &m_config.m_out_efx_func, this);
+	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	devcb_resolve_write_line(&m_out_dmao_func, &m_out_dmao_cb, this);
+	devcb_resolve_write_line(&m_out_efx_func, &m_out_efx_cb, this);
 
 	// allocate timers
 	m_int_timer = timer_alloc(TIMER_INT);
@@ -95,8 +80,8 @@ void cdp1861_device::device_start()
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// find devices
-	m_cpu = machine().device<cpu_device>(m_config.m_cpu_tag);
-	m_screen =  machine().device<screen_device>(m_config.m_screen_tag);
+	m_cpu = machine().device<cpu_device>(m_cpu_tag);
+	m_screen =  machine().device<screen_device>(m_screen_tag);
 	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
 
 	// register for state saving

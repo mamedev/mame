@@ -1,8 +1,8 @@
 class ms32_state : public driver_device
 {
 public:
-	ms32_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ms32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_nvram_8;
 	UINT32 *m_mahjong_input_select;

@@ -109,13 +109,13 @@ enum
 //**************************************************************************
 
 #define MCFG_DEVICE_DISABLE() \
-	device_config_execute_interface::static_set_disable(device); \
+	device_execute_interface::static_set_disable(*device); \
 
 #define MCFG_DEVICE_VBLANK_INT(_tag, _func) \
-	device_config_execute_interface::static_set_vblank_int(device, _func, _tag); \
+	device_execute_interface::static_set_vblank_int(*device, _func, _tag); \
 
 #define MCFG_DEVICE_PERIODIC_INT(_func, _rate)	\
-	device_config_execute_interface::static_set_periodic_int(device, _func, attotime::from_hz(_rate)); \
+	device_execute_interface::static_set_periodic_int(*device, _func, attotime::from_hz(_rate)); \
 
 
 
@@ -135,60 +135,6 @@ typedef int (*device_irq_callback)(device_t *device, int irqnum);
 
 
 
-// ======================> device_config_execute_interface
-
-// class representing interface-specific configuration state
-class device_config_execute_interface : public device_config_interface
-{
-	friend class device_execute_interface;
-
-public:
-	// construction/destruction
-	device_config_execute_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_execute_interface();
-
-	// basic information getters
-	bool disabled() const { return m_disabled; }
-
-	// clock and cycle information getters
-	UINT64 clocks_to_cycles(UINT64 clocks) const { return execute_clocks_to_cycles(clocks); }
-	UINT64 cycles_to_clocks(UINT64 cycles) const { return execute_cycles_to_clocks(cycles); }
-	UINT32 min_cycles() const { return execute_min_cycles(); }
-	UINT32 max_cycles() const { return execute_max_cycles(); }
-
-	// input line information getters
-	UINT32 input_lines() const { return execute_input_lines(); }
-	UINT32 default_irq_vector() const { return execute_default_irq_vector(); }
-
-	// static inline helpers
-	static void static_set_disable(device_config *device);
-	static void static_set_vblank_int(device_config *device, device_interrupt_func function, const char *tag, int rate = 0);
-	static void static_set_periodic_int(device_config *device, device_interrupt_func function, attotime rate);
-
-protected:
-	// clock and cycle information getters
-	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
-	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-
-	// input line information getters
-	virtual UINT32 execute_input_lines() const;
-	virtual UINT32 execute_default_irq_vector() const;
-
-	// optional operation overrides
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
-
-	bool					m_disabled;
-	device_interrupt_func	m_vblank_interrupt;				// for interrupts tied to VBLANK
-	int 					m_vblank_interrupts_per_frame;	// usually 1
-	const char *			m_vblank_interrupt_screen;		// the screen that causes the VBLANK interrupt
-	device_interrupt_func	m_timed_interrupt;				// for interrupts not tied to VBLANK
-	attotime				m_timed_interrupt_period;		// period for periodic interrupts
-};
-
-
-
 // ======================> device_execute_interface
 
 class device_execute_interface : public device_interface
@@ -197,14 +143,24 @@ class device_execute_interface : public device_interface
 
 public:
 	// construction/destruction
-	device_execute_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_execute_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_execute_interface();
 
 	// configuration access
-	const device_config_execute_interface &execute_config() const { return m_execute_config; }
+	bool disabled() const { return m_disabled; }
+	UINT64 clocks_to_cycles(UINT64 clocks) const { return execute_clocks_to_cycles(clocks); }
+	UINT64 cycles_to_clocks(UINT64 cycles) const { return execute_cycles_to_clocks(cycles); }
+	UINT32 min_cycles() const { return execute_min_cycles(); }
+	UINT32 max_cycles() const { return execute_max_cycles(); }
+	attotime cycles_to_attotime(UINT64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
+	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
+	UINT32 input_lines() const { return execute_input_lines(); }
+	UINT32 default_irq_vector() const { return execute_default_irq_vector(); }
 
-	// basic information getters
-	bool disabled() const { return m_execute_config.disabled(); }
+	// static inline configuration helpers
+	static void static_set_disable(device_t &device);
+	static void static_set_vblank_int(device_t &device, device_interrupt_func function, const char *tag, int rate = 0);
+	static void static_set_periodic_int(device_t &device, device_interrupt_func function, attotime rate);
 
 	// execution management
 	bool executing() const;
@@ -242,28 +198,27 @@ public:
 	attotime local_time() const;
 	UINT64 total_cycles() const;
 
-	// clock and cycle information getters ... pass through to underlying config
-	UINT64 clocks_to_cycles(UINT64 clocks) const { return m_execute_config.clocks_to_cycles(clocks); }
-	UINT64 cycles_to_clocks(UINT64 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
-	UINT32 min_cycles() const { return m_execute_config.min_cycles(); }
-	UINT32 max_cycles() const { return m_execute_config.max_cycles(); }
-	attotime cycles_to_attotime(UINT64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
-	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
-
-	// input line information getters
-	UINT32 input_lines() const { return m_execute_config.input_lines(); }
-	UINT32 default_irq_vector() const { return m_execute_config.default_irq_vector(); }
-
 	// required operation overrides
 	void run() { execute_run(); }
 
 protected:
+	// clock and cycle information getters
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+
+	// input line information getters
+	virtual UINT32 execute_input_lines() const;
+	virtual UINT32 execute_default_irq_vector() const;
+
 	// optional operation overrides
 	virtual void execute_run() = 0;
 	virtual void execute_burn(INT32 cycles);
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides
+	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void interface_pre_start();
 	virtual void interface_post_start();
 	virtual void interface_pre_reset();
@@ -305,7 +260,12 @@ protected:
 	};
 
 	// configuration
-	const device_config_execute_interface &m_execute_config;	// reference to our device_config_execute_interface
+	bool					m_disabled;					// disabled from executing?
+	device_interrupt_func	m_vblank_interrupt;			// for interrupts tied to VBLANK
+	int 					m_vblank_interrupts_per_frame;	// usually 1
+	const char *			m_vblank_interrupt_screen;	// the screen that causes the VBLANK interrupt
+	device_interrupt_func	m_timed_interrupt;			// for interrupts not tied to VBLANK
+	attotime				m_timed_interrupt_period;	// period for periodic interrupts
 
 	// execution lists
 	device_execute_interface *m_nextexec;				// pointer to the next device to execute, in order

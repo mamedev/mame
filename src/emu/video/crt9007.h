@@ -70,51 +70,21 @@
 
 struct crt9007_interface
 {
-	const char *screen_tag;		/* screen we are acting on */
-	int hpixels_per_column;		/* number of pixels per video memory address */
+	const char *m_screen_tag;		/* screen we are acting on */
 
-	devcb_write_line		out_int_func;
-	devcb_write_line		out_dmar_func;
+	devcb_write_line		m_out_int_cb;
+	devcb_write_line		m_out_dmar_cb;
 
-	devcb_write_line		out_vs_func;
-	devcb_write_line		out_hs_func;
+	devcb_write_line		m_out_vs_cb;
+	devcb_write_line		m_out_hs_cb;
 
-	devcb_write_line        out_vlt_func;
-    devcb_write_line        out_curs_func;
-    devcb_write_line        out_drb_func;
-    devcb_write_line        out_cblank_func;
+	devcb_write_line        m_out_vlt_cb;
+    devcb_write_line        m_out_curs_cb;
+    devcb_write_line        m_out_drb_cb;
+    devcb_write_line        m_out_cblank_cb;
 
-	devcb_write_line        out_slg_func;
-	devcb_write_line        out_sld_func;
-};
-
-
-
-// ======================> crt9007_device_config
-
-class crt9007_device_config :   public device_config,
-								public device_config_memory_interface,
-                                public crt9007_interface
-{
-    friend class crt9007_device;
-
-    // construction/destruction
-    crt9007_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
+	devcb_write_line        m_out_slg_cb;
+	devcb_write_line        m_out_sld_cb;
 };
 
 
@@ -122,14 +92,13 @@ protected:
 // ======================> crt9007_device
 
 class crt9007_device :	public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+                        public crt9007_interface
 {
-    friend class crt9007_device_config;
-
-    // construction/destruction
-    crt9007_device(running_machine &_machine, const crt9007_device_config &_config);
-
 public:
+    // construction/destruction
+    crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
@@ -141,10 +110,14 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_clock_changed();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 private:
 	static const device_timer_id TIMER_HSYNC = 0;
@@ -221,7 +194,8 @@ private:
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
 
-	const crt9007_device_config &m_config;
+    // address space configurations
+	const address_space_config		m_space_config;
 };
 
 

@@ -1,8 +1,8 @@
 class punchout_state : public driver_device
 {
 public:
-	punchout_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_rp5c01_mode_sel;
 	int m_rp5c01_mem[16*4];

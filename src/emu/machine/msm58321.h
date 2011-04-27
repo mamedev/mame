@@ -48,30 +48,7 @@
 
 struct msm58321_interface
 {
-	devcb_write_line	m_out_busy_func;
-};
-
-
-
-// ======================> msm58321_device_config
-
-class msm58321_device_config :   public device_config,
-                                 public msm58321_interface,
-								 public device_config_rtc_interface
-{
-    friend class msm58321_device;
-
-    // construction/destruction
-    msm58321_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line	m_out_busy_cb;
 };
 
 
@@ -79,14 +56,13 @@ protected:
 // ======================> msm58321_device
 
 class msm58321_device :	public device_t,
-						public device_rtc_interface
+						public device_rtc_interface,
+                        public msm58321_interface
 {
-    friend class msm58321_device_config;
-
-    // construction/destruction
-    msm58321_device(running_machine &_machine, const msm58321_device_config &_config);
-
 public:
+    // construction/destruction
+    msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -101,6 +77,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -133,8 +110,6 @@ private:
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_busy_timer;
-
-	const msm58321_device_config &m_config;
 };
 
 

@@ -42,40 +42,16 @@ struct z80sio_interface
 
 
 
-// ======================> z80sio_device_config
-
-class z80sio_device_config :	public device_config,
-								public device_config_z80daisy_interface,
-								public z80sio_interface
-{
-	friend class z80sio_device;
-
-	// construction/destruction
-	z80sio_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-
-
 // ======================> z80sio_device
 
 class z80sio_device :	public device_t,
-						public device_z80daisy_interface
+						public device_z80daisy_interface,
+						public z80sio_interface
 {
-	friend class z80sio_device_config;
-
-	// construction/destruction
-	z80sio_device(running_machine &_machine, const z80sio_device_config &config);
-
 public:
+	// construction/destruction
+	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// control register I/O
 	UINT8 control_read(int ch) { return m_channel[ch].control_read(); }
 	void control_write(int ch, UINT8 data) { m_channel[ch].control_write(data); }
@@ -93,6 +69,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -152,7 +129,6 @@ private:
 	};
 
 	// internal state
-	const z80sio_device_config &m_config;
 	sio_channel					m_channel[2];			// 2 channels
 	UINT8						m_int_state[8];			// interrupt states
 

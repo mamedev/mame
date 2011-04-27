@@ -8,8 +8,8 @@
 class cinemat_state : public driver_device
 {
 public:
-	cinemat_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	cinemat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_sound_control;
 	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);

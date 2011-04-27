@@ -24,8 +24,8 @@
 class backfire_state : public driver_device
 {
 public:
-	backfire_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	backfire_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT16 *  m_spriteram_1;
@@ -499,13 +499,13 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 4);
-	decospr_device_config::set_pri_callback(device, backfire_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
+	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 
-	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 5);
-	decospr_device_config::set_pri_callback(device, backfire_pri_callback);
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 5);
+	decospr_device::set_pri_callback(*device, backfire_pri_callback);
 
 
 	/* sound hardware */

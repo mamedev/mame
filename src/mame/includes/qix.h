@@ -22,8 +22,8 @@
 class qix_state : public driver_device
 {
 public:
-	qix_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	qix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* machine state */
 	UINT8 *m_68705_port_out;

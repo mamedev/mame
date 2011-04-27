@@ -327,6 +327,7 @@ public:
 
 	// getters
 	const machine_config &config() const { return m_config; }
+	const device_list &devicelist() const { return m_config.devicelist(); }
 	const game_driver &system() const { return m_system; }
 	osd_interface &osd() const { return m_osd; }
 	resource_pool &respool() { return m_respool; }
@@ -363,6 +364,7 @@ public:
 	inline const memory_region *region(const char *tag);
 
 	// configuration helpers
+	device_t &add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock);
 	UINT32 total_colors() const { return m_config.m_total_colors; }
 
 	// immediate operations
@@ -397,7 +399,6 @@ public:
 	const char *describe_context();
 
 	// internals
-	device_list				m_devicelist;		// list of running devices
 	ioport_list				m_portlist;			// points to a list of input port configurations
 
 	// CPU information
@@ -528,18 +529,16 @@ private:
 
 
 
-// ======================> driver_device_config_base
+// ======================> driver_device
 
-// a base class with common functionality for the (mostly stub) driver_device_configs
-class driver_device_config_base : public device_config
+// base class for machine driver-specific devices
+class driver_device : public device_t
 {
-	friend class driver_device;
-
-protected:
-	// construction/destruction
-	driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner);
-
 public:
+	// construction/destruction
+	driver_device(const machine_config &mconfig, device_type type, const char *tag);
+	virtual ~driver_device();
+
 	// indexes into our generic callbacks
 	enum callback_type
 	{
@@ -553,60 +552,9 @@ public:
 	};
 
 	// inline configuration helpers
-	static void static_set_game(device_config *device, const game_driver *game);
-	static void static_set_callback(device_config *device, callback_type type, legacy_callback_func callback);
-	static void static_set_palette_init(device_config *device, palette_init_func callback);
-
-protected:
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
-	// internal state
-	const game_driver *		m_system;						// pointer to the game driver
-
-	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
-	palette_init_func		m_palette_init;				// one-time palette init callback
-};
-
-
-
-// ======================> driver_device_config
-
-// this provides a minimal config class for driver devices, which don't
-// explicitly declare their own
-template<class _DeviceClass>
-class driver_device_config : public driver_device_config_base
-{
-	// construction/destruction
-	driver_device_config(const machine_config &mconfig, const char *tag, const device_config *owner)
-		: driver_device_config_base(mconfig, static_alloc_device_config, tag, owner) { }
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	{
-		return global_alloc(driver_device_config(mconfig, tag, owner));
-	}
-
-	virtual device_t *alloc_device(running_machine &machine) const
-	{
-		// we clear here for historical reasons, as many existing driver states
-		// assume everything is NULL before starting
-		return auto_alloc_clear(machine, _DeviceClass(machine, *this));
-	}
-};
-
-
-
-// ======================> driver_device
-
-// base class for machine driver-specific devices
-class driver_device : public device_t
-{
-public:
-	// construction/destruction
-	driver_device(running_machine &machine, const driver_device_config_base &config);
-	virtual ~driver_device();
+	static void static_set_game(device_t &device, const game_driver &game);
+	static void static_set_callback(device_t &device, callback_type type, legacy_callback_func callback);
+	static void static_set_palette_init(device_t &device, palette_init_func callback);
 
 	// additional video helpers
 	virtual bool screen_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
@@ -626,12 +574,26 @@ protected:
 	virtual void video_reset();
 
 	// device-level overrides
+	virtual const rom_entry *device_rom_region() const;
 	virtual void device_start();
 	virtual void device_reset();
 
 	// internal state
-	const driver_device_config_base &m_config;
+	const game_driver *		m_system;					// pointer to the game driver
+
+	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
+	palette_init_func		m_palette_init;				// one-time palette init callback
 };
+
+
+// this template function creates a stub which constructs a device
+template<class T>
+device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+{
+	assert(owner == NULL);
+	assert(clock == 0);
+	return global_alloc_clear(T(mconfig, &driver_device_creator<T>, tag));
+}
 
 
 
@@ -641,7 +603,7 @@ protected:
 
 inline device_t *running_machine::device(const char *tag)
 {
-	return m_devicelist.find(tag);
+	return devicelist().find(tag);
 }
 
 inline const input_port_config *running_machine::port(const char *tag)

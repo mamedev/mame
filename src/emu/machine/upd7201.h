@@ -60,63 +60,40 @@
 
 struct upd7201_interface
 {
-	devcb_write_line	m_out_int_func;
+	devcb_write_line	m_out_int_cb;
 
 	struct
 	{
 		int	m_rx_clock;
 		int	m_tx_clock;
 
-		devcb_write_line	m_out_drqrx_func;
-		devcb_write_line	m_out_drqtx_func;
+		devcb_write_line	m_out_drqrx_cb;
+		devcb_write_line	m_out_drqtx_cb;
 
-		devcb_read_line		m_in_rxd_func;
-		devcb_write_line	m_out_txd_func;
+		devcb_read_line		m_in_rxd_cb;
+		devcb_write_line	m_out_txd_cb;
 
-		devcb_read_line		m_in_cts_func;
-		devcb_read_line		m_in_dcd_func;
-		devcb_write_line	m_out_rts_func;
-		devcb_write_line	m_out_dtr_func;
+		devcb_read_line		m_in_cts_cb;
+		devcb_read_line		m_in_dcd_cb;
+		devcb_write_line	m_out_rts_cb;
+		devcb_write_line	m_out_dtr_cb;
 
-		devcb_write_line	m_out_wait_func;
-		devcb_write_line	m_out_sync_func;
+		devcb_write_line	m_out_wait_cb;
+		devcb_write_line	m_out_sync_cb;
 	} m_channel[2];
-};
-
-
-
-// ======================> upd7201_device_config
-
-class upd7201_device_config :   public device_config,
-                                public upd7201_interface
-{
-    friend class upd7201_device;
-
-    // construction/destruction
-    upd7201_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
 };
 
 
 
 // ======================> upd7201_device
 
-class upd7201_device :	public device_t
+class upd7201_device :	public device_t,
+                        public upd7201_interface
 {
-    friend class upd7201_device_config;
-
-    // construction/destruction
-    upd7201_device(running_machine &_machine, const upd7201_device_config &_config);
-
 public:
+    // construction/destruction
+    upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
@@ -142,6 +119,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int m_param, void *ptr);
@@ -162,8 +140,6 @@ private:
 	emu_timer *m_tx_a_timer;
 	emu_timer *m_rx_b_timer;
 	emu_timer *m_tx_b_timer;
-
-	const upd7201_device_config &m_config;
 };
 
 

@@ -295,8 +295,8 @@
 class blitz_state : public driver_device
 {
 public:
-	blitz_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;

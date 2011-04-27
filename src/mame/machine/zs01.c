@@ -22,36 +22,21 @@ inline void ATTR_PRINTF(3,4) zs01_device::verboselog(int n_level, const char *s_
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("zs01 %s %s: %s", config.tag(), machine().describe_context(), buf);
+		logerror("zs01 %s %s: %s", tag(), machine().describe_context(), buf);
 	}
 }
 
-const device_type ZS01 = zs01_device_config::static_alloc_device_config;
+// device type definition
+const device_type ZS01 = &device_creator<zs01_device>;
 
-zs01_device_config::zs01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_secure_serial_flash_config(mconfig, static_alloc_device_config, "ZS01", tag, owner, clock)
+void zs01_device::static_set_ds2401_tag(device_t &device, const char *ds2401_tag)
 {
+	zs01_device &zs01 = downcast<zs01_device &>(device);
+	zs01.ds2401_tag = ds2401_tag;
 }
 
-void zs01_device_config::static_set_ds2401_tag(device_config *device, const char *ds2401_tag)
-{
-	zs01_device_config *zs01 = downcast<zs01_device_config *>(device);
-	zs01->ds2401_tag = ds2401_tag;
-}
-
-device_config *zs01_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(zs01_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *zs01_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, zs01_device(machine, *this));
-}
-
-zs01_device::zs01_device(running_machine &_machine, const zs01_device_config &_config)
-	: device_secure_serial_flash(_machine, _config),
-	  config(_config)
+zs01_device::zs01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_secure_serial_flash(mconfig, ZS01, "ZS01", tag, owner, clock)
 {
 }
 
@@ -90,7 +75,7 @@ void zs01_device::nvram_default()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA)
 			logerror("zs01 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-					 config.tag(),
+					 tag(),
 					 SIZE_RESPONSE_TO_RESET+SIZE_KEY+SIZE_KEY+SIZE_DATA,
 					 m_region->bytes());
 		else {
@@ -106,7 +91,7 @@ void zs01_device::nvram_default()
 
 	// That chip isn't really usable without the passwords, so bitch
 	// if there's no region
-	logerror("zs01 %s: Warning, no default data provided, chip is unusable.\n", config.tag());
+	logerror("zs01 %s: Warning, no default data provided, chip is unusable.\n", tag());
 	memset(response_to_reset, 0, SIZE_RESPONSE_TO_RESET);
 	memset(command_key,       0, SIZE_KEY);
 	memset(data_key,          0, SIZE_KEY);
@@ -427,7 +412,7 @@ void zs01_device::scl_1()
 								switch(write_buffer[1]) {
 								case 0xfd: {
 									/* TODO: use read/write to talk to the ds2401, which will require a timer. */
-									ds2401_device *ds2401 = machine().device<ds2401_device>(config.ds2401_tag);
+									ds2401_device *ds2401 = machine().device<ds2401_device>(ds2401_tag);
 									for(int i = 0; i < SIZE_DATA_BUFFER; i++)
 										read_buffer[2+i] = ds2401->direct_read(SIZE_DATA_BUFFER-i-1);
 									break;

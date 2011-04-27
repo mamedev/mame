@@ -11,8 +11,8 @@
 class simpl156_state : public driver_device
 {
 public:
-	simpl156_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	simpl156_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_deco_tilegen1(*this, "tilegen1"),
 		  m_eeprom(*this, "eeprom"),

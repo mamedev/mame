@@ -27,6 +27,9 @@ TODO:
 #include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
 
+// device type definition
+const device_type MACHINE_CDICDIC = &device_creator<cdicdic_device>;
+
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
@@ -89,42 +92,6 @@ const INT32 cdicdic_device::s_cdic_adpcm_filter_coef[5][2] =
 	{ 98,-55 },
 	{ 122,-60 },
 };
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdicdic_device_config - constructor
-//-------------------------------------------------
-
-cdicdic_device_config::cdicdic_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "CDICDIC", tag, owner, clock)
-{
-
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cdicdic_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(cdicdic_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cdicdic_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, cdicdic_device(machine, *this));
-}
-
 
 //**************************************************************************
 //  INLINES
@@ -1201,9 +1168,8 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 //  cdicdic_device - constructor
 //-------------------------------------------------
 
-cdicdic_device::cdicdic_device(running_machine &_machine, const cdicdic_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MACHINE_CDICDIC, "CDICDIC", tag, owner, clock)
 {
     init();
 }
@@ -1308,5 +1274,3 @@ UINT16 cdicdic_device::ram_read(const UINT32 offset, const UINT16 mem_mask)
     verboselog(machine(), 5, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset * 2, m_ram[offset], mem_mask);
     return m_ram[offset];
 }
-
-const device_type MACHINE_CDICDIC = cdicdic_device_config::static_alloc_device_config;

@@ -136,9 +136,9 @@ static CPU_INIT( mb88 )
 {
 	mb88_state *cpustate = get_safe_token(device);
 
-	if ( device->baseconfig().static_config() )
+	if ( device->static_config() )
 	{
-		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->baseconfig().static_config();
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->static_config();
 		cpustate->PLA = _config->PLA_config;
 	}
 

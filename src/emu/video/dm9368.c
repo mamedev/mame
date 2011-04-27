@@ -19,50 +19,14 @@
 
 #define LOG 1
 
+// device type definition
+const device_type DM9368 = &device_creator<dm9368_device>;
+
 
 static const UINT8 OUTPUT[16] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type DM9368 = dm9368_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(dm9368, "DM9368")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void dm9368_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const dm9368_interface *intf = reinterpret_cast<const dm9368_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<dm9368_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_rbi_func, 0, sizeof(m_in_rbi_func));
-		memset(&m_out_rbo_func, 0, sizeof(m_out_rbo_func));
-	}
-}
 
 
 
@@ -106,12 +70,33 @@ inline void dm9368_device::set_rbo(int state)
 //  dm9368_device - constructor
 //-------------------------------------------------
 
-dm9368_device::dm9368_device(running_machine &_machine, const dm9368_device_config &config)
-    : device_t(_machine, config),
+dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, DM9368, "DM9368", tag, owner, clock),
 	  m_rbi(1),
-	  m_rbo(1),
-      m_config(config)
+	  m_rbo(1)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void dm9368_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const dm9368_interface *intf = reinterpret_cast<const dm9368_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<dm9368_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_rbi_cb, 0, sizeof(m_in_rbi_cb));
+		memset(&m_out_rbo_cb, 0, sizeof(m_out_rbo_cb));
+	}
 }
 
 
@@ -122,8 +107,8 @@ dm9368_device::dm9368_device(running_machine &_machine, const dm9368_device_conf
 void dm9368_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rbi_func, &m_config.m_in_rbi_func, this);
-	devcb_resolve_write_line(&m_out_rbo_func, &m_config.m_out_rbo_func, this);
+	devcb_resolve_read_line(&m_in_rbi_func, &m_in_rbi_cb, this);
+	devcb_resolve_write_line(&m_out_rbo_func, &m_out_rbo_cb, this);
 
 	// register for state saving
 	save_item(NAME(m_rbi));
@@ -143,7 +128,7 @@ void dm9368_device::a_w(UINT8 data)
 		if (LOG) logerror("DM9368 '%s' Blanked Rippling Zero\n", tag());
 
 		// blank rippling 0
-		output_set_digit_value(m_config.m_digit, 0);
+		output_set_digit_value(m_digit, 0);
 
 		set_rbo(0);
 	}
@@ -151,7 +136,7 @@ void dm9368_device::a_w(UINT8 data)
 	{
 		if (LOG) logerror("DM9368 '%s' Output Data: %u = %02x\n", tag(), a, OUTPUT[a]);
 
-		output_set_digit_value(m_config.m_digit, OUTPUT[a]);
+		output_set_digit_value(m_digit, OUTPUT[a]);
 
 		set_rbo(1);
 	}

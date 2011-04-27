@@ -19,6 +19,9 @@
 #include "i8155.h"
 
 
+// device type definition
+const device_type I8155 = &device_creator<i8155_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -94,90 +97,10 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// devices
-const device_type I8155 = i8155_device_config::static_alloc_device_config;
-
-
 // default address map
 static ADDRESS_MAP_START( i8155, AS_0, 8 )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  i8155_device_config - constructor
-//-------------------------------------------------
-
-i8155_device_config::i8155_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Intel 8155", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *i8155_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(i8155_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *i8155_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, i8155_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *i8155_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_0) ? &m_space_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8155_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8155_interface *intf = reinterpret_cast<const i8155_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8155_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&in_pa_func, 0, sizeof(in_pa_func));
-		memset(&out_pa_func, 0, sizeof(out_pa_func));
-		memset(&in_pb_func, 0, sizeof(in_pb_func));
-		memset(&out_pb_func, 0, sizeof(out_pb_func));
-		memset(&in_pc_func, 0, sizeof(in_pc_func));
-		memset(&out_pc_func, 0, sizeof(out_pc_func));
-		memset(&out_to_func, 0, sizeof(out_to_func));
-	}
-}
 
 
 
@@ -291,12 +214,39 @@ inline void i8155_device::write_port(int port, UINT8 data)
 //  i8155_device - constructor
 //-------------------------------------------------
 
-i8155_device::i8155_device(running_machine &_machine, const i8155_device_config &config)
-    : device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
-      m_config(config)
+i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, I8155, "Intel 8155", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {
 
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8155_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const i8155_interface *intf = reinterpret_cast<const i8155_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8155_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&in_pa_cb, 0, sizeof(in_pa_cb));
+		memset(&out_pa_cb, 0, sizeof(out_pa_cb));
+		memset(&in_pb_cb, 0, sizeof(in_pb_cb));
+		memset(&out_pb_cb, 0, sizeof(out_pb_cb));
+		memset(&in_pc_cb, 0, sizeof(in_pc_cb));
+		memset(&out_pc_cb, 0, sizeof(out_pc_cb));
+		memset(&out_to_cb, 0, sizeof(out_to_cb));
+	}
 }
 
 
@@ -307,13 +257,13 @@ i8155_device::i8155_device(running_machine &_machine, const i8155_device_config 
 void i8155_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_port_func[0], &m_config.in_pa_func, this);
-	devcb_resolve_read8(&m_in_port_func[1], &m_config.in_pb_func, this);
-	devcb_resolve_read8(&m_in_port_func[2], &m_config.in_pc_func, this);
-	devcb_resolve_write8(&m_out_port_func[0], &m_config.out_pa_func, this);
-	devcb_resolve_write8(&m_out_port_func[1], &m_config.out_pb_func, this);
-	devcb_resolve_write8(&m_out_port_func[2], &m_config.out_pc_func, this);
-	devcb_resolve_write_line(&m_out_to_func, &m_config.out_to_func, this);
+	devcb_resolve_read8(&m_in_port_func[0], &in_pa_cb, this);
+	devcb_resolve_read8(&m_in_port_func[1], &in_pb_cb, this);
+	devcb_resolve_read8(&m_in_port_func[2], &in_pc_cb, this);
+	devcb_resolve_write8(&m_out_port_func[0], &out_pa_cb, this);
+	devcb_resolve_write8(&m_out_port_func[1], &out_pb_cb, this);
+	devcb_resolve_write8(&m_out_port_func[2], &out_pc_cb, this);
+	devcb_resolve_write_line(&m_out_to_func, &out_to_cb, this);
 
 	// allocate timers
 	m_timer = timer_alloc();
@@ -413,6 +363,17 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// reload timer counter
 		m_counter = m_count_length & 0x3fff;
 	}
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *i8155_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 

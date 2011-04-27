@@ -147,8 +147,8 @@ Iron PCB (same as Final Fight 2?)
 class snesb_state : public snes_state
 {
 public:
-	snesb_state(running_machine &machine, const driver_device_config_base &config)
-		: snes_state(machine, config) { }
+	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: snes_state(mconfig, type, tag) { }
 
 	INT8 *m_shared_ram;
 	UINT8 m_ffight2b_coins;

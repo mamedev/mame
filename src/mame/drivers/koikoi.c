@@ -48,8 +48,8 @@ static const int input_tab[]= { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 
 class koikoi_state : public driver_device
 {
 public:
-	koikoi_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	koikoi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT8 *  m_videoram;

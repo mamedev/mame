@@ -239,8 +239,8 @@ struct fdc_t
 class bfcobra_state : public driver_device
 {
 public:
-	bfcobra_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bfcobra_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_bank_data[4];
 	UINT8 *m_work_ram;

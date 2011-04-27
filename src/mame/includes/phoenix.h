@@ -6,8 +6,8 @@
 class phoenix_state : public driver_device
 {
 public:
-	phoenix_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	phoenix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram_pg[2];
 	UINT8 m_videoram_pg_index;

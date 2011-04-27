@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #define MCFG_K056230_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, K0506230, 0) \
+	MCFG_DEVICE_ADD(_tag, K056230, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
 
@@ -31,44 +31,20 @@
 
 struct k056230_interface
 {
-	const char         *m_cpu;
-	int                m_is_thunderh;
-};
-
-
-
-// ======================> k056230_device_config
-
-class k056230_device_config : public device_config,
-                              public k056230_interface
-{
-    friend class k056230_device;
-
-    // construction/destruction
-    k056230_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	const char         *m_cpu_tag;
+	bool                m_is_thunderh;
 };
 
 
 
 // ======================> k056230_device
 
-class k056230_device :  public device_t
+class k056230_device :  public device_t,
+                        public k056230_interface
 {
-    friend class k056230_device_config;
-
-    // construction/destruction
-    k056230_device(running_machine &_machine, const k056230_device_config &_config);
-
 public:
+    // construction/destruction
+    k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT32 lanc_ram_r(UINT32 offset);
 	void lanc_ram_w(UINT32 offset, UINT32 data, UINT32 mem_mask);
@@ -80,6 +56,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset() { }
     virtual void device_post_load() { }
@@ -90,16 +67,12 @@ private:
 	void network_irq_clear();
 
 	UINT32 *m_ram;
-	int		m_is_thunderh;
-
 	device_t *m_cpu;
-
-    const k056230_device_config &m_config;
 };
 
 
 // device type definition
-extern const device_type K0506230;
+extern const device_type K056230;
 
 
 

@@ -1240,7 +1240,7 @@ static DEVICE_START( scsp )
 
 	scsp_state *scsp = get_safe_token(device);
 
-	intf = (const scsp_interface *)device->baseconfig().static_config();
+	intf = (const scsp_interface *)device->static_config();
 
 	// init the emulation
 	SCSP_Init(device, scsp, intf);

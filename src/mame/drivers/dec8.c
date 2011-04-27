@@ -2008,13 +2008,13 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
-	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 3,3,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
+	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 3,3,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 1);
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2064,11 +2064,11 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2121,11 +2121,11 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2219,8 +2219,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2270,8 +2270,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2320,8 +2320,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2371,8 +2371,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2422,8 +2422,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MCFG_DEVICE_ADD("spritegen", deco_karnovsprites_, 0)
-	deco_karnovsprites_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
+	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

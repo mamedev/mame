@@ -371,7 +371,7 @@ static CPU_INIT( m6809 )
 		0
 	};
 
-	const m6809_config *configdata = device->baseconfig().static_config() ? (const m6809_config *)device->baseconfig().static_config() : &default_config;
+	const m6809_config *configdata = device->static_config() ? (const m6809_config *)device->static_config() : &default_config;
 	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->config = configdata;

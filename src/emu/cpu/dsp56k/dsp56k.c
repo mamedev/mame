@@ -229,7 +229,7 @@ static CPU_INIT( dsp56k )
 	device->save_item(NAME(cpustate->HI.trxl));
 	device->save_item(NAME(cpustate->HI.bootstrap_offset));
 
-	//cpustate->config = device->baseconfig().static_config();
+	//cpustate->config = device->static_config();
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

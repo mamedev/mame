@@ -74,8 +74,8 @@ the main program is 9th October 1990.
 class pcxt_state : public driver_device
 {
 public:
-	pcxt_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vga_vram;
 	UINT8 *m_work_ram;

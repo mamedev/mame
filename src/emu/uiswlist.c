@@ -170,7 +170,7 @@ static software_entry_state *append_software_entry(ui_menu *menu, software_menu_
 {
 	software_entry_state *entry = NULL;
 	software_entry_state **entryptr;
-	const char *interface = image->image_config().image_interface();
+	const char *interface = image->image_interface();
 
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
@@ -280,12 +280,12 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 			software_info *tmp_info = software_list_find(tmp_list, entry->short_name, NULL);
 
 			// if the selected software has multiple parts that can be loaded, open the submenu
-			if (swinfo_has_multiple_parts(tmp_info, image->image_config().image_interface()))
+			if (swinfo_has_multiple_parts(tmp_info, image->image_interface()))
 			{
 				ui_menu *child_menu = ui_menu_alloc(machine, &machine.render().ui_container(), ui_mess_menu_software_parts, entry);
 				software_entry_state *child_menustate = (software_entry_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 				child_menustate->short_name = entry->short_name;
-				child_menustate->interface = image->image_config().image_interface();
+				child_menustate->interface = image->image_interface();
 				child_menustate->list_name = sw_state->list_name;
 				child_menustate->image = image;
 				ui_menu_stack_push(child_menu);
@@ -401,12 +401,12 @@ void ui_mess_menu_software_list(running_machine &machine, ui_menu *menu, void *p
 static void ui_mess_menu_populate_software_list(running_machine &machine, ui_menu *menu, device_image_interface* image)
 {
 	bool haveCompatible = FALSE;
-	const char *interface = image->image_config().image_interface();
+	const char *interface = image->image_interface();
 
 	// Add original software lists for this system
-	for (const device_config *dev = machine.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_t *dev = machine.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 		{
@@ -435,9 +435,9 @@ static void ui_mess_menu_populate_software_list(running_machine &machine, ui_men
 	}
 
 	// Add compatible software lists for this system
-	for (const device_config *dev = machine.config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_t *dev = machine.config().devicelist().first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_base *>(dev)->inline_config();
 
 		for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
 		{

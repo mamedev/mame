@@ -54,50 +54,26 @@ struct acia6850_interface
 	int	m_tx_clock;
 	int	m_rx_clock;
 
-	devcb_read_line		m_in_rx_func;
-	devcb_write_line	m_out_tx_func;
+	devcb_read_line		m_in_rx_cb;
+	devcb_write_line	m_out_tx_cb;
 
-	devcb_read_line		m_in_cts_func;
-	devcb_write_line	m_out_rts_func;
-	devcb_read_line		m_in_dcd_func;
+	devcb_read_line		m_in_cts_cb;
+	devcb_write_line	m_out_rts_cb;
+	devcb_read_line		m_in_dcd_cb;
 
-	devcb_write_line	m_out_irq_func;
-};
-
-
-
-// ======================> acia6850_device_config
-
-class acia6850_device_config : public device_config,
-                               public acia6850_interface
-{
-    friend class acia6850_device;
-
-    // construction/destruction
-    acia6850_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_write_line	m_out_irq_cb;
 };
 
 
 
 // ======================> acia6850_device
 
-class acia6850_device :  public device_t
+class acia6850_device :  public device_t,
+                         public acia6850_interface
 {
-    friend class acia6850_device_config;
-
-    // construction/destruction
-    acia6850_device(running_machine &_machine, const acia6850_device_config &_config);
-
 public:
+    // construction/destruction
+    acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void acia6850_tx_clock_in();
 	void acia6850_rx_clock_in();
@@ -120,6 +96,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -172,9 +149,6 @@ private:
 	UINT8		m_rx_counter;
 	UINT8		m_tx_counter;
 
-	int			m_rx_clock;
-	int			m_tx_clock;
-
 	int			m_divide;
 
 	/* Counters */
@@ -202,8 +176,6 @@ private:
 
 	emu_timer	*m_rx_timer;
 	emu_timer	*m_tx_timer;
-
-    const acia6850_device_config &m_config;
 
 	static const int ACIA6850_DIVIDE[3];
 	static const int ACIA6850_WORD[8][3];

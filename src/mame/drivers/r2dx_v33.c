@@ -28,8 +28,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 class r2dx_v33_state : public driver_device
 {
 public:
-	r2dx_v33_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_spriteram;
 };

@@ -494,8 +494,8 @@ static CPU_INIT( scmp )
 {
 	scmp_state *cpustate = get_safe_token(device);
 
-	if (device->baseconfig().static_config() != NULL)
-		cpustate->config = *(scmp_config *)device->baseconfig().static_config();
+	if (device->static_config() != NULL)
+		cpustate->config = *(scmp_config *)device->static_config();
 
 	/* set up the state table */
 	{

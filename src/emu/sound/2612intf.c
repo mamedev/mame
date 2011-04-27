@@ -103,7 +103,7 @@ static DEVICE_START( ym2612 )
 	ym2612_state *info = get_safe_token(device);
 	int rate = device->clock()/72;
 
-	info->intf = device->baseconfig().static_config() ? (const ym2612_interface *)device->baseconfig().static_config() : &dummy;
+	info->intf = device->static_config() ? (const ym2612_interface *)device->static_config() : &dummy;
 	info->device = device;
 
 	/* FM init */

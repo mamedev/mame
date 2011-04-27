@@ -989,7 +989,7 @@ static void es5506_start_common(device_t *device, const void *config, device_typ
 
 static DEVICE_START( es5506 )
 {
-	es5506_start_common(device, device->baseconfig().static_config(), ES5506);
+	es5506_start_common(device, device->static_config(), ES5506);
 }
 
 
@@ -1554,7 +1554,7 @@ void es5506_voice_bank_w(device_t *device, int voice, int bank)
 
 static DEVICE_START( es5505 )
 {
-	const es5505_interface *intf = (const es5505_interface *)device->baseconfig().static_config();
+	const es5505_interface *intf = (const es5505_interface *)device->static_config();
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));

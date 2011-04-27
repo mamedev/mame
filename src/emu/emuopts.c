@@ -224,10 +224,10 @@ void emu_options::add_device_options()
 	machine_config config(*cursystem, *this);
 
 	// iterate through all image devices
-	const device_config_image_interface *image = NULL;
+	const device_image_interface *image = NULL;
 	bool first = true;
 	options_entry entry[2] = { { 0 }, { 0 } };
-	for (bool gotone = config.m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
 	{
 		// first device? add the header as to be pretty
 		if (first)
@@ -331,8 +331,8 @@ void emu_options::parse_standard_inis(astring &error_string)
 	// parse "vector.ini" for vector games
 	{
 		machine_config config(*cursystem, *this);
-		for (const screen_device_config *devconfig = config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
-			if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
+		for (const screen_device *device = config.first_screen(); device != NULL; device = device->next_screen())
+			if (device->screen_type() == SCREEN_TYPE_VECTOR)
 			{
 				parse_one_ini("vector", OPTION_PRIORITY_VECTOR_INI, &error_string);
 				break;
@@ -402,7 +402,7 @@ void emu_options::set_system_name(const char *name)
 
 const char *emu_options::device_option(device_image_interface &image)
 {
-	return image.device().machine().options().value(image.image_config().instance_name());
+	return value(image.instance_name());
 }
 
 

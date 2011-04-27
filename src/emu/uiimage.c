@@ -700,7 +700,7 @@ static file_error menu_file_selector_populate(running_machine &machine, ui_menu 
 	/* add the "[empty slot]" entry */
 	append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_EMPTY, NULL, NULL);
 
-	if (device->image_config().is_creatable() && !zippath_is_zip(directory))
+	if (device->is_creatable() && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
 		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
@@ -992,12 +992,12 @@ static void menu_file_manager_populate(running_machine &machine, ui_menu *menu, 
 	astring tmp_name;
 
 	/* cycle through all devices for this system */
-	for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine.devicelist().first(image); gotone; gotone = image->next(image))
 	{
 		/* get the image type/id */
 		snprintf(buffer, ARRAY_LENGTH(buffer),
 			"%s (%s)",
-			image->image_config().devconfig().name(), image->image_config().brief_instance_name());
+			image->device().name(), image->brief_instance_name());
 
 		/* get the base name */
 		if (image->basename() != NULL)
@@ -1174,7 +1174,7 @@ struct _bitbanger_control_menu_state
 INLINE int cassette_count( running_machine &machine )
 {
 	int count = 0;
-	device_t *device = machine.m_devicelist.first(CASSETTE);
+	device_t *device = machine.devicelist().first(CASSETTE);
 
 	while ( device )
 	{
@@ -1192,7 +1192,7 @@ INLINE int cassette_count( running_machine &machine )
 INLINE int bitbanger_count( running_machine &machine )
 {
 	int count = 0;
-	device_t *device = machine.m_devicelist.first(BITBANGER);
+	device_t *device = machine.devicelist().first(BITBANGER);
 
 	while ( device )
 	{
@@ -1266,7 +1266,7 @@ static void menu_tape_control_populate(running_machine &machine, ui_menu *menu, 
 		}
 
 		/* name of tape */
-		ui_menu_item_append(menu, menustate->device->image_config().devconfig().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
+		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
 
 		/* state */
 		tapecontrol_gettime(&timepos, &menustate->device->device(), NULL, NULL);
@@ -1346,7 +1346,7 @@ static void menu_bitbanger_control_populate(running_machine &machine, ui_menu *m
 	if (menustate->device->exists())
 	{
 		/* name of bitbanger file */
-		ui_menu_item_append(menu, menustate->device->image_config().devconfig().name(), menustate->device->filename(), flags, BITBANGERCMD_SELECT);
+		ui_menu_item_append(menu, menustate->device->device().name(), menustate->device->filename(), flags, BITBANGERCMD_SELECT);
 		ui_menu_item_append(menu, "Device Mode:", bitbanger_mode_string(&menustate->device->device()), mode_flags, BITBANGERCMD_MODE);
 		ui_menu_item_append(menu, "Baud:", bitbanger_baud_string(&menustate->device->device()), baud_flags, BITBANGERCMD_BAUD);
 		ui_menu_item_append(menu, "Baud Tune:", bitbanger_tune_string(&menustate->device->device()), tune_flags, BITBANGERCMD_TUNE);
@@ -1379,7 +1379,7 @@ void ui_mess_menu_tape_control(running_machine &machine, ui_menu *menu, void *pa
 	{
 		int index = menustate->index;
 		device_image_interface *device = NULL;
-		for (bool gotone = machine.m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = machine.devicelist().first(device); gotone; gotone = device->next(device))
 		{
 			if(device->device().type() == CASSETTE) {
 				if (index==0) break;
@@ -1476,7 +1476,7 @@ void ui_mess_menu_bitbanger_control(running_machine &machine, ui_menu *menu, voi
 	{
 		int index = menustate->index;
 		device_image_interface *device = NULL;
-		for (bool gotone = machine.m_devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = machine.devicelist().first(device); gotone; gotone = device->next(device))
 		{
 			if(device->device().type() == BITBANGER) {
 				if (index==0) break;

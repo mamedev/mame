@@ -54,44 +54,15 @@ struct timekeeper_config
 	const UINT8 *m_data;
 };
 
-// ======================> timekeeper_device_config
-
-class timekeeper_device_config :	public device_config,
-									public device_config_nvram_interface,
-									public timekeeper_config
-{
-	friend class timekeeper_device;
-	friend class m48t02_device_config;
-	friend class m48t35_device_config;
-	friend class m48t37_device_config;
-	friend class m48t58_device_config;
-	friend class mk48t08_device_config;
-
-protected:
-	// construction/destruction
-	timekeeper_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 
 // ======================> timekeeper_device
 
 class timekeeper_device :	public device_t,
 							public device_nvram_interface
 {
-	friend class timekeeper_device_config;
-	friend class m48t02_device;
-	friend class m48t35_device;
-	friend class m48t37_device;
-	friend class m48t58_device;
-	friend class mk48t08_device;
-
+protected:
 	// construction/destruction
-	timekeeper_device(running_machine &_machine, const timekeeper_device_config &config);
+	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
 	void write(UINT16 offset, UINT8 data);
@@ -108,13 +79,11 @@ protected:
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
 
-	// internal state
-	const timekeeper_device_config &m_config;
-
 private:
 	void counters_to_ram();
 	void counters_from_ram();
 
+	// internal state
 	UINT8 m_control;
 	UINT8 m_seconds;
 	UINT8 m_minutes;
@@ -128,6 +97,7 @@ private:
 	UINT8 *m_data;
 	UINT8 *m_default_data;
 
+protected:
 	int m_size;
 	int m_offset_control;
 	int m_offset_seconds;
@@ -141,11 +111,35 @@ private:
 	int m_offset_flags;
 };
 
-GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t02)
-GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t35)
-GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t37)
-GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t58)
-GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, mk48t08)
+class m48t02_device : public timekeeper_device
+{
+public:
+	m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class m48t35_device : public timekeeper_device
+{
+public:
+	m48t35_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class m48t37_device : public timekeeper_device
+{
+public:
+	m48t37_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class m48t58_device : public timekeeper_device
+{
+public:
+	m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class mk48t08_device : public timekeeper_device
+{
+public:
+	mk48t08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 // device type definition
 extern const device_type M48T02;

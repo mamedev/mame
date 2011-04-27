@@ -65,33 +65,10 @@ const int NOTIMER_3 = (1<<3);
 struct z80ctc_interface
 {
 	UINT8				m_notimer;	// timer disabler mask
-	devcb_write_line	m_intr;		// callback when change interrupt status
-	devcb_write_line	m_zc0;		// ZC/TO0 callback
-	devcb_write_line	m_zc1;		// ZC/TO1 callback
-	devcb_write_line	m_zc2;		// ZC/TO2 callback
-};
-
-
-
-// ======================> z80ctc_device_config
-
-class z80ctc_device_config :	public device_config,
-								public device_config_z80daisy_interface,
-								public z80ctc_interface
-{
-	friend class z80ctc_device;
-
-	// construction/destruction
-	z80ctc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line	m_intr_cb;	// callback when change interrupt status
+	devcb_write_line	m_zc0_cb;	// ZC/TO0 callback
+	devcb_write_line	m_zc1_cb;	// ZC/TO1 callback
+	devcb_write_line	m_zc2_cb;	// ZC/TO2 callback
 };
 
 
@@ -99,14 +76,13 @@ protected:
 // ======================> z80ctc_device
 
 class z80ctc_device :	public device_t,
-						public device_z80daisy_interface
+						public device_z80daisy_interface,
+						public z80ctc_interface
 {
-	friend class z80ctc_device_config;
-
-	// construction/destruction
-	z80ctc_device(running_machine &_machine, const z80ctc_device_config &_config);
-
 public:
+	// construction/destruction
+	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// state getters
 	attotime period(int ch) const { return m_channel[ch].period(); }
 
@@ -117,6 +93,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -161,7 +138,6 @@ private:
 	};
 
 	// internal state
-	const z80ctc_device_config &m_config;
 	devcb_resolved_write_line m_intr;			// interrupt callback
 
 	UINT8				m_vector;				// interrupt vector

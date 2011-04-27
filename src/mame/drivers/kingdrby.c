@@ -76,8 +76,8 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 class kingdrby_state : public driver_device
 {
 public:
-	kingdrby_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_sound_cmd;
 	UINT8 *m_vram;

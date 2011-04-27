@@ -355,8 +355,8 @@ Super Missile Attack Board Layout
 class missile_state : public driver_device
 {
 public:
-	missile_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	missile_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	const UINT8 *m_writeprom;

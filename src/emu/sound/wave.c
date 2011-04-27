@@ -22,7 +22,7 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 	device_image_interface *image = (device_image_interface *)param;
-	int speakers = image->device().machine().m_devicelist.count(SPEAKER);
+	int speakers = image->device().machine().devicelist().count(SPEAKER);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -70,9 +70,9 @@ static DEVICE_START( wave )
 	device_image_interface *image = NULL;
 
 	assert( device != NULL );
-	assert( device->baseconfig().static_config() != NULL );
-	int speakers = device->machine().config().m_devicelist.count(SPEAKER);
-	image = dynamic_cast<device_image_interface *>(device->machine().device( (const char *)device->baseconfig().static_config()));
+	assert( device->static_config() != NULL );
+	int speakers = device->machine().config().devicelist().count(SPEAKER);
+	image = dynamic_cast<device_image_interface *>(device->machine().device( (const char *)device->static_config()));
 	if (speakers > 1)
 		device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), (void *)image, wave_sound_update);
 	else

@@ -87,38 +87,14 @@ struct ttl74123_interface
 
 
 
-// ======================> ttl74123_device_config
-
-class ttl74123_device_config : public device_config,
-                              public ttl74123_interface
-{
-    friend class ttl74123_device;
-
-    // construction/destruction
-    ttl74123_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
-
 // ======================> ttl74123_device
 
-class ttl74123_device :  public device_t
+class ttl74123_device :  public device_t,
+						 public ttl74123_interface
 {
-    friend class ttl74123_device_config;
-
-    // construction/destruction
-    ttl74123_device(running_machine &_machine, const ttl74123_device_config &_config);
-
 public:
+    // construction/destruction
+    ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
     void a_w(UINT8 data);
     void b_w(UINT8 data);
@@ -127,6 +103,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -144,12 +121,7 @@ private:
     attotime compute_duration();
     void clear();
 
-    UINT8 m_a;            /* pin 1/9 */
-    UINT8 m_b;            /* pin 2/10 */
-    UINT8 m_clear;        /* pin 3/11 */
     emu_timer *m_timer;
-
-    const ttl74123_device_config &m_config;
 };
 
 

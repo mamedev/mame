@@ -13,50 +13,15 @@
 
 
 
+// device type definition
+const device_type I8214 = &device_creator<i8214_device>;
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type I8214 = i8214_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(i8214, "I8214")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8214_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8214_interface *intf = reinterpret_cast<const i8214_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8214_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
-		memset(&m_out_enlg_func, 0, sizeof(m_out_enlg_func));
-	}
-}
 
 
 
@@ -125,10 +90,31 @@ inline void i8214_device::check_interrupt()
 //  i8214_device - constructor
 //-------------------------------------------------
 
-i8214_device::i8214_device(running_machine &_machine, const i8214_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+i8214_device::i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, I8214, "I8214", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8214_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const i8214_interface *intf = reinterpret_cast<const i8214_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8214_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_enlg_cb, 0, sizeof(m_out_enlg_cb));
+	}
 }
 
 
@@ -139,8 +125,8 @@ i8214_device::i8214_device(running_machine &_machine, const i8214_device_config 
 void i8214_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
-	devcb_resolve_write_line(&m_out_enlg_func, &m_config.m_out_enlg_func, this);
+	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	devcb_resolve_write_line(&m_out_enlg_func, &m_out_enlg_cb, this);
 
 	// register for state saving
 	save_item(NAME(m_inte));

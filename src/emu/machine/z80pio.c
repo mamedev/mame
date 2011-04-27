@@ -13,14 +13,6 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type Z80PIO = z80pio_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -53,38 +45,20 @@ const int ICW_MASK_FOLLOWS	= 0x10;
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type Z80PIO = &device_creator<z80pio_device>;
+
 //-------------------------------------------------
-//  z80pio_device_config - constructor
+//  z80pio_device - constructor
 //-------------------------------------------------
 
-z80pio_device_config::z80pio_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Z8420", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
+z80pio_device::z80pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, Z80PIO, "Z8420", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *z80pio_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(z80pio_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *z80pio_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, z80pio_device(machine, *this));
 }
 
 
@@ -94,7 +68,7 @@ device_t *z80pio_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void z80pio_device_config::device_config_complete()
+void z80pio_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const z80pio_interface *intf = reinterpret_cast<const z80pio_interface *>(static_config());
@@ -104,31 +78,14 @@ void z80pio_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
-		memset(&m_in_pa_func, 0, sizeof(m_in_pa_func));
-		memset(&m_out_pa_func, 0, sizeof(m_out_pa_func));
-		memset(&m_out_ardy_func, 0, sizeof(m_out_ardy_func));
-		memset(&m_in_pb_func, 0, sizeof(m_in_pb_func));
-		memset(&m_out_pb_func, 0, sizeof(m_out_pb_func));
-		memset(&m_out_brdy_func, 0, sizeof(m_out_brdy_func));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+		memset(&m_out_ardy_cb, 0, sizeof(m_out_ardy_cb));
+		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+		memset(&m_out_brdy_cb, 0, sizeof(m_out_brdy_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80pio_device - constructor
-//-------------------------------------------------
-
-z80pio_device::z80pio_device(running_machine &_machine, const z80pio_device_config &config)
-	: device_t(_machine, config),
-	  device_z80daisy_interface(_machine, config, *this),
-	  m_config(config)
-{
 }
 
 
@@ -138,11 +95,11 @@ z80pio_device::z80pio_device(running_machine &_machine, const z80pio_device_conf
 
 void z80pio_device::device_start()
 {
-	m_port[PORT_A].start(this, PORT_A, m_config.m_in_pa_func, m_config.m_out_pa_func, m_config.m_out_ardy_func);
-	m_port[PORT_B].start(this, PORT_B, m_config.m_in_pb_func, m_config.m_out_pb_func, m_config.m_out_brdy_func);
+	m_port[PORT_A].start(this, PORT_A, m_in_pa_cb, m_out_pa_cb, m_out_ardy_cb);
+	m_port[PORT_B].start(this, PORT_B, m_in_pb_cb, m_out_pb_cb, m_out_brdy_cb);
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
+	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
 }
 
 

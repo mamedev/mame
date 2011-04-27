@@ -61,9 +61,18 @@ const char *const ptm6840_device::opmode[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-GENERIC_DEVICE_CONFIG_SETUP(ptm6840, "6840 PTM")
+// device type definition
+const device_type PTM6840 = &device_creator<ptm6840_device>;
 
-const device_type PTM6840 = ptm6840_device_config::static_alloc_device_config;
+//-------------------------------------------------
+//  ptm6840_device - constructor
+//-------------------------------------------------
+
+ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock)
+{
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -71,7 +80,7 @@ const device_type PTM6840 = ptm6840_device_config::static_alloc_device_config;
 //  complete
 //-------------------------------------------------
 
-void ptm6840_device_config::device_config_complete()
+void ptm6840_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const ptm6840_interface *intf = reinterpret_cast<const ptm6840_interface *>(static_config());
@@ -87,22 +96,11 @@ void ptm6840_device_config::device_config_complete()
 		m_external_clock[0] = 0.0;
 		m_external_clock[1] = 0.0;
 		m_external_clock[2] = 0.0;
-		memset(&m_irq_func, 0, sizeof(m_irq_func));
-    	memset(&m_out_func[0], 0, sizeof(m_out_func[0]));
-    	memset(&m_out_func[1], 0, sizeof(m_out_func[1]));
-    	memset(&m_out_func[2], 0, sizeof(m_out_func[2]));
+		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
+    	memset(&m_out_cb[0], 0, sizeof(m_out_cb[0]));
+    	memset(&m_out_cb[1], 0, sizeof(m_out_cb[1]));
+    	memset(&m_out_cb[2], 0, sizeof(m_out_cb[2]));
 	}
-}
-
-
-//-------------------------------------------------
-//  ptm6840_device - constructor
-//-------------------------------------------------
-
-ptm6840_device::ptm6840_device(running_machine &_machine, const ptm6840_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
 }
 
 
@@ -112,18 +110,18 @@ ptm6840_device::ptm6840_device(running_machine &_machine, const ptm6840_device_c
 
 void ptm6840_device::device_start()
 {
-	m_internal_clock = m_config.m_internal_clock;
+	m_internal_clock = m_internal_clock;
 	/* resolve callbacks */
 	for (int i = 0; i < 3; i++)
 	{
-		devcb_resolve_write8(&m_out_func[i], &m_config.m_out_func[i], this);
+		devcb_resolve_write8(&m_out_func[i], &m_out_cb[i], this);
 	}
 
 	for (int i = 0; i < 3; i++)
 	{
-		if ( m_config.m_external_clock[i] )
+		if ( m_external_clock[i] )
 		{
-			m_external_clock[i] = m_config.m_external_clock[i];
+			m_external_clock[i] = m_external_clock[i];
 		}
 		else
 		{
@@ -141,7 +139,7 @@ void ptm6840_device::device_start()
 		m_timer[i]->enable(false);
 	}
 
-	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
+	devcb_resolve_write_line(&m_irq_func, &m_irq_cb, this);
 
 	/* register for state saving */
 	save_item(NAME(m_lsb_buffer));

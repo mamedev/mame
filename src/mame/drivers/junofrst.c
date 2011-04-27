@@ -92,8 +92,8 @@ Blitter source graphics
 class junofrst_state : public tutankhm_state
 {
 public:
-	junofrst_state(running_machine &machine, const driver_device_config_base &config)
-		: tutankhm_state(machine, config) { }
+	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tutankhm_state(mconfig, type, tag) { }
 
 	UINT8     m_blitterdata[4];
 	int      m_i8039_status;

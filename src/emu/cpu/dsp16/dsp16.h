@@ -17,16 +17,7 @@
 //**************************************************************************
 
 //#define MCFG_DSP16_CONFIG(_config)
-//  dsp16_device_config::static_set_config(device, _config);
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
-extern const device_type DSP16;
+//  dsp16_device::static_set_config(*device, _config);
 
 
 
@@ -34,52 +25,14 @@ extern const device_type DSP16;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dsp16_device;
-
-
-// ======================> dsp16_device_config
-
-class dsp16_device_config :  public cpu_device_config
-{
-    friend class dsp16_device;
-
-    // construction/destruction
-    dsp16_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// address spaces
-	const address_space_config m_program_config;
-};
-
-
-
 // ======================> dsp16_device
 
 class dsp16_device : public cpu_device
 {
-	friend class dsp16_device_config;
-
-	// construction/destruction
-	dsp16_device(running_machine &_machine, const dsp16_device_config &config);
-
 public:
+	// construction/destruction
+	dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// public interfaces
 
 protected:
@@ -88,8 +41,14 @@ protected:
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+	virtual UINT32 execute_input_lines() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -97,9 +56,12 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
-
+	// address spaces
+	const address_space_config m_program_config;
 
 	// CPU registers
 	UINT16 m_pc;
@@ -119,6 +81,10 @@ protected:
 	// other internal states
     int m_icount;
 };
+
+
+// device type definition
+extern const device_type DSP16;
 
 
 /***************************************************************************

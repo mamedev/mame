@@ -1034,8 +1034,8 @@ Notes:
 class namcos12_state : public psx_state
 {
 public:
-	namcos12_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 
 	UINT32 *m_sharedram;
 	UINT32 m_n_bankoffset;

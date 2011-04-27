@@ -198,7 +198,7 @@ static void default_wrmem_id(address_space *space, offs_t address, UINT8 data)
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
+	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;

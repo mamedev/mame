@@ -65,8 +65,8 @@ Dip sw.2
 class littlerb_state : public driver_device
 {
 public:
-	littlerb_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_vdp_address_low;
 	UINT16 m_vdp_address_high;
@@ -151,37 +151,15 @@ ADDRESS_MAP_END
 
 /* VDP device to give us our own memory map */
 class littlerb_vdp_device;
-class littlerb_vdp_device_config;
 
 
 class littlerb_vdp_device : public device_t,
 						  public device_memory_interface
 {
-	friend class littlerb_vdp_device_config;
-	littlerb_vdp_device(running_machine &_machine, const littlerb_vdp_device_config &config);
 public:
+	littlerb_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	virtual void device_start() { }
-	const littlerb_vdp_device_config &m_config;
-};
-
-class littlerb_vdp_device_config : public device_config,
-								 public device_config_memory_interface
-{
-	friend class littlerb_vdp_device;
-	littlerb_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-public:
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	{
-		return global_alloc(littlerb_vdp_device_config(mconfig, tag, owner, clock));
-	}
-
-	virtual device_t *alloc_device(running_machine &machine) const
-	{
-		return auto_alloc(machine, littlerb_vdp_device(machine, *this));
-	}
-
-protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
 		return (spacenum == 0) ? &m_space_config : NULL;
@@ -190,21 +168,15 @@ protected:
 	address_space_config		m_space_config;
 };
 
-littlerb_vdp_device::littlerb_vdp_device(running_machine &_machine, const littlerb_vdp_device_config &config)
-	: device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
-	  m_config(config)
-{
-}
+const device_type LITTLERBVDP = &device_creator<littlerb_vdp_device>;
 
-littlerb_vdp_device_config::littlerb_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "LITTLERBVDP", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
+littlerb_vdp_device::littlerb_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, LITTLERBVDP, "LITTLERBVDP", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
 	  m_space_config("littlerb_vdp", ENDIANNESS_LITTLE, 16,32, 0, NULL, *ADDRESS_MAP_NAME(littlerb_vdp_map8))
 {
 }
 
-const device_type LITTLERBVDP = littlerb_vdp_device_config::static_alloc_device_config;
 
 
 /* end VDP device to give us our own memory map */

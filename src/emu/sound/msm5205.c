@@ -179,7 +179,7 @@ static DEVICE_START( msm5205 )
 	msm5205_state *voice = get_safe_token(device);
 
 	/* save a global pointer to our interface */
-	voice->intf = (const msm5205_interface *)device->baseconfig().static_config();
+	voice->intf = (const msm5205_interface *)device->static_config();
 	voice->device = device;
 	voice->clock = device->clock();
 

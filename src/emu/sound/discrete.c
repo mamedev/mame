@@ -39,6 +39,9 @@
 
 
 
+// device type definition
+const device_type DISCRETE = &device_creator<discrete_sound_device>;
+
 /*************************************
  *
  *  Performance
@@ -805,12 +808,6 @@ int discrete_device::same_module_index(const discrete_base_node &node)
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type DISCRETE = discrete_sound_device_config::static_alloc_device_config;
-
-//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -819,99 +816,39 @@ const device_type DISCRETE = discrete_sound_device_config::static_alloc_device_c
 //  the interface
 //-------------------------------------------------
 
-void discrete_device_config::static_set_intf(device_config *device, const discrete_block *intf)
+void discrete_device::static_set_intf(device_t &device, const discrete_block *intf)
 {
-	discrete_device_config *disc = downcast<discrete_device_config *>(device);
-	disc->m_intf = intf;
+	discrete_device &disc = downcast<discrete_device &>(device);
+	disc.m_intf = intf;
 }
-
-//-------------------------------------------------
-//  discrete_device_config - constructor
-//-------------------------------------------------
-discrete_device_config::discrete_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, type, name, tag, owner, clock), m_intf(NULL)
-{
-}
-
-discrete_sound_device_config::discrete_sound_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: discrete_device_config(mconfig, static_alloc_device_config, "DISCRETE", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *discrete_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(discrete_device_config(mconfig, static_alloc_device_config, "PUREDISC", tag, owner, clock));
-}
-
-device_config *discrete_sound_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(discrete_sound_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *discrete_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, discrete_device(machine, *this));
-}
-
-device_t *discrete_sound_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, discrete_sound_device(machine, *this));
-}
-
 
 //-------------------------------------------------
 //  discrete_device - constructor
 //-------------------------------------------------
 
-discrete_device::discrete_device(running_machine &_machine, const discrete_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config)
+discrete_device::discrete_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  m_intf(NULL),
+	  m_sample_rate(0),
+	  m_sample_time(0),
+	  m_neg_sample_time(0),
+	  m_indexed_node(NULL),
+	  m_disclogfile(NULL),
+	  m_queue(NULL),
+	  m_profiling(0),
+	  m_total_samples(0),
+	  m_total_stream_updates(0)
 {
 }
 
-discrete_sound_device::discrete_sound_device(running_machine &_machine, const discrete_sound_device_config &config)
-	: discrete_device(_machine, config),
-	  device_sound_interface(_machine, config, *this)
+discrete_sound_device::discrete_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: discrete_device(mconfig, DISCRETE, "DISCRETE", tag, owner, clock),
+	  device_sound_interface(mconfig, *this)
 {
 }
 
 discrete_device::~discrete_device(void)
 {
-	if (m_queue)
-	{
-		osd_work_queue_free(m_queue);
-	}
-
-	if (m_profiling)
-	{
-		display_profiling();
-	}
-
-	/* Process nodes which have a stop func */
-
-	for_each(discrete_base_node **, node, &m_node_list)
-	{
-		(*node)->stop();
-	}
-
-	if (DISCRETE_DEBUGLOG)
-	{
-		/* close the debug log */
-	    if (m_disclogfile)
-	    	fclose(m_disclogfile);
-		m_disclogfile = NULL;
-	}
 }
 
 //-------------------------------------------------
@@ -923,7 +860,7 @@ void discrete_device::device_start()
 	// create the stream
 	//m_stream = machine().sound().stream_alloc(*this, 0, 2, 22257);
 
-	const discrete_block *intf_start = (m_config.m_intf != NULL) ? m_config.m_intf : (discrete_block *) baseconfig().static_config();
+	const discrete_block *intf_start = (m_intf != NULL) ? m_intf : (discrete_block *) static_config();
 	char name[32];
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
@@ -986,6 +923,34 @@ void discrete_device::device_start()
 			if ((*task)->task_group > (*dest_task)->task_group)
 				(*dest_task)->check((*task));
 		}
+	}
+}
+
+void discrete_device::device_stop()
+{
+	if (m_queue)
+	{
+		osd_work_queue_free(m_queue);
+	}
+
+	if (m_profiling)
+	{
+		display_profiling();
+	}
+
+	/* Process nodes which have a stop func */
+
+	for_each(discrete_base_node **, node, &m_node_list)
+	{
+		(*node)->stop();
+	}
+
+	if (DISCRETE_DEBUGLOG)
+	{
+		/* close the debug log */
+	    if (m_disclogfile)
+	    	fclose(m_disclogfile);
+		m_disclogfile = NULL;
 	}
 }
 

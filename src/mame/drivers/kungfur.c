@@ -40,8 +40,8 @@ http://www.youtube.com/watch?v=ssEfw-RbSjs
 class kungfur_state : public driver_device
 {
 public:
-	kungfur_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	kungfur_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_led[0x10];
 	UINT8 m_mux_data;

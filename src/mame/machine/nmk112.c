@@ -41,7 +41,7 @@ INLINE const nmk112_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == NMK112));
-	return (const nmk112_interface *) device->baseconfig().static_config();
+	return (const nmk112_interface *) device->static_config();
 }
 
 /*****************************************************************************

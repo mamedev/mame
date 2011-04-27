@@ -249,7 +249,7 @@ static void make_ops(esrip_state *cpustate)
 static CPU_INIT( esrip )
 {
 	esrip_state *cpustate = get_safe_token(device);
-	esrip_config* _config = (esrip_config*)device->baseconfig().static_config();
+	esrip_config* _config = (esrip_config*)device->static_config();
 
 	memset(cpustate, 0, sizeof(cpustate));
 

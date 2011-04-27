@@ -49,8 +49,8 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 class cb2001_state : public driver_device
 {
 public:
-	cb2001_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_vram_fg;
 	UINT16* m_vram_bg;

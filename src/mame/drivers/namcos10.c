@@ -276,8 +276,8 @@ WRITE32_HANDLER( namcos10_bank_w )
 class namcos10_state : public psx_state
 {
 public:
-	namcos10_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 };
 
 static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32 )

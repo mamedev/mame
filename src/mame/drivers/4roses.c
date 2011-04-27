@@ -183,8 +183,8 @@
 class _4roses_state : public funworld_state
 {
 public:
-	_4roses_state(running_machine &machine, const driver_device_config_base &config)
-		: funworld_state(machine, config) { }
+	_4roses_state(const machine_config &mconfig, device_type type, const char *tag)
+		: funworld_state(mconfig, type, tag) { }
 
 };
 

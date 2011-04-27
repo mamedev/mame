@@ -9,8 +9,8 @@
 class shuuz_state : public atarigen_state
 {
 public:
-	shuuz_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	shuuz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	int m_cur[2];
 };

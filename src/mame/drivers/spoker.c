@@ -25,8 +25,8 @@ TODO:
 class spoker_state : public driver_device
 {
 public:
-	spoker_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8   *m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;

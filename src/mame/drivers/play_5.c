@@ -9,8 +9,8 @@ extern const char layout_pinball[];
 class play_5_state : public driver_device
 {
 public:
-	play_5_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	play_5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 

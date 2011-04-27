@@ -33,8 +33,8 @@
 class slotcarn_state : public driver_device
 {
 public:
-	slotcarn_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	slotcarn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	pen_t m_pens[NUM_PENS];
 	UINT8 *m_ram_attr;

@@ -281,8 +281,8 @@ uPC1352C @ N3
 class dwarfd_state : public driver_device
 {
 public:
-	dwarfd_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
 	int m_bank;

@@ -635,7 +635,7 @@ static STREAM_UPDATE( ymz280b_update )
 static DEVICE_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
-	const ymz280b_interface *intf = (device->baseconfig().static_config() != NULL) ? (const ymz280b_interface *)device->baseconfig().static_config() : &defintrf;
+	const ymz280b_interface *intf = (device->static_config() != NULL) ? (const ymz280b_interface *)device->static_config() : &defintrf;
 	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;

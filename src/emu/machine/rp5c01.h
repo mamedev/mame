@@ -50,31 +50,7 @@
 
 struct rp5c01_interface
 {
-	devcb_write_line		m_out_alarm_func;
-};
-
-
-
-// ======================> rp5c01_device_config
-
-class rp5c01_device_config :   public device_config,
-                               public rp5c01_interface,
-							   public device_config_rtc_interface,
-							   public device_config_nvram_interface
-{
-    friend class rp5c01_device;
-
-    // construction/destruction
-    rp5c01_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line		m_out_alarm_cb;
 };
 
 
@@ -83,20 +59,20 @@ protected:
 
 class rp5c01_device :	public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface
+						public device_nvram_interface,
+                        public rp5c01_interface
 {
-    friend class rp5c01_device_config;
-
-    // construction/destruction
-    rp5c01_device(running_machine &_machine, const rp5c01_device_config &_config);
-
 public:
+    // construction/destruction
+    rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( adj_w );
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -136,8 +112,6 @@ private:
 	// timers
 	emu_timer *m_clock_timer;
 	emu_timer *m_16hz_timer;
-
-	const rp5c01_device_config &m_config;
 };
 
 

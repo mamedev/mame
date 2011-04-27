@@ -133,7 +133,7 @@ static void default_wdmem_id(address_space *space, offs_t offset, UINT8 data) { 
 static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
+	const m6502_interface *intf = (const m6502_interface *)device->static_config();
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

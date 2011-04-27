@@ -26,8 +26,8 @@
 class tank8_state : public driver_device
 {
 public:
-	tank8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_collision_index;
 	UINT8 *m_video_ram;

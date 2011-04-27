@@ -25,6 +25,10 @@ TODO:
 #include "machine/cdi070.h"
 #include "includes/cdi.h"
 
+// device type definition
+const device_type MACHINE_CDISLAVE = &device_creator<cdislave_device>;
+
+
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
 {
@@ -41,42 +45,6 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 #else
 #define verboselog(x,y,z,...)
 #endif
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  cdislave_device_config - constructor
-//-------------------------------------------------
-
-cdislave_device_config::cdislave_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "CDISLAVE", tag, owner, clock)
-{
-
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *cdislave_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(cdislave_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *cdislave_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, cdislave_device(machine, *this));
-}
-
 
 //**************************************************************************
 //  MEMBER FUNCTIONS
@@ -459,9 +427,8 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
 //  cdislave_device - constructor
 //-------------------------------------------------
 
-cdislave_device::cdislave_device(running_machine &_machine, const cdislave_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MACHINE_CDISLAVE, "CDISLAVE", tag, owner, clock)
 {
     init();
 }
@@ -564,5 +531,3 @@ void cdislave_device::register_globals()
     save_item(NAME(m_fake_mouse_x));
     save_item(NAME(m_fake_mouse_y));
 }
-
-const device_type MACHINE_CDISLAVE = cdislave_device_config::static_alloc_device_config;

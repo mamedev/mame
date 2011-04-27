@@ -45,7 +45,7 @@ INLINE const adc1038_interface *adc1038_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == ADC1038));
-	return (const adc1038_interface *) device->baseconfig().static_config();
+	return (const adc1038_interface *) device->static_config();
 }
 
 /*****************************************************************************

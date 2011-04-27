@@ -71,14 +71,6 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type DSP32C = dsp32c_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -170,133 +162,18 @@ const device_type DSP32C = dsp32c_device_config::static_alloc_device_config;
 
 
 //**************************************************************************
-//  DSP32C DEVICE CONFIG
-//**************************************************************************
-
-//-------------------------------------------------
-//  dsp32c_device_config - constructor
-//-------------------------------------------------
-
-dsp32c_device_config::dsp32c_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "DSP32C", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24)
-{
-	m_output_pins_changed = NULL;
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *dsp32c_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(dsp32c_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *dsp32c_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, dsp32c_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  static_set_config - set the configuration
-//  structure
-//-------------------------------------------------
-
-void dsp32c_device_config::static_set_config(device_config *device, const dsp32_config &config)
-{
-	dsp32c_device_config *dsp = downcast<dsp32c_device_config *>(device);
-	*static_cast<dsp32_config *>(dsp) = config;
-}
-
-
-//-------------------------------------------------
-//  execute_min_cycles - return minimum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 dsp32c_device_config::execute_min_cycles() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_max_cycles - return maximum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 dsp32c_device_config::execute_max_cycles() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-UINT32 dsp32c_device_config::execute_input_lines() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *dsp32c_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 dsp32c_device_config::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 dsp32c_device_config::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-
-//**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
+
+const device_type DSP32C = &device_creator<dsp32c_device>;
 
 //-------------------------------------------------
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
-dsp32c_device::dsp32c_device(running_machine &_machine, const dsp32c_device_config &config)
-	: cpu_device(_machine, config),
-	  m_config(config),
+dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, DSP32C, "DSP32C", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 	  m_pin(0),
 	  m_pout(0),
 	  m_ivtp(0),
@@ -328,8 +205,22 @@ dsp32c_device::dsp32c_device(running_machine &_machine, const dsp32c_device_conf
 	  m_program(NULL),
 	  m_direct(NULL)
 {
+	m_output_pins_changed = NULL;
+
 	// set our instruction counter
 	m_icountptr = &m_icount;
+}
+
+
+//-------------------------------------------------
+//  static_set_config - set the configuration
+//  structure
+//-------------------------------------------------
+
+void dsp32c_device::static_set_config(device_t &device, const dsp32_config &config)
+{
+	dsp32c_device &dsp = downcast<dsp32c_device &>(device);
+	static_cast<dsp32_config &>(dsp) = config;
 }
 
 
@@ -448,6 +339,18 @@ void dsp32c_device::device_reset()
 
 
 //-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *dsp32c_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+}
+
+
+//-------------------------------------------------
 //  state_import - import state into the device,
 //  after it has been set
 //-------------------------------------------------
@@ -529,6 +432,28 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, astring
 			string.printf("%8g", *(double *)entry.dataptr());
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 dsp32c_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 dsp32c_device::disasm_max_opcode_bytes() const
+{
+	return 4;
 }
 
 
@@ -630,13 +555,13 @@ void dsp32c_device::update_pcr(UINT16 newval)
 		reset();
 
 	// track the state of the output pins
-	if (m_config.m_output_pins_changed != NULL)
+	if (m_output_pins_changed != NULL)
 	{
 		UINT16 newoutput = ((newval & (PCR_PIFs | PCR_ENI)) == (PCR_PIFs | PCR_ENI)) ? DSP32_OUTPUT_PIF : 0;
 		if (newoutput != m_lastpins)
 		{
 			m_lastpins = newoutput;
-			(*m_config.m_output_pins_changed)(*this, newoutput);
+			(*m_output_pins_changed)(*this, newoutput);
 		}
 	}
 }
@@ -654,6 +579,39 @@ void dsp32c_device::update_pcr(UINT16 newval)
 //**************************************************************************
 //  CORE EXECUTION LOOP
 //**************************************************************************
+
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 dsp32c_device::execute_min_cycles() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 dsp32c_device::execute_max_cycles() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 dsp32c_device::execute_input_lines() const
+{
+	return 2;
+}
+
 
 void dsp32c_device::execute_set_input(int inputnum, int state)
 {

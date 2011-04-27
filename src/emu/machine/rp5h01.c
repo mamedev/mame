@@ -173,7 +173,7 @@ static DEVICE_START( rp5h01 )
 {
 	rp5h01_state *rp5h01 = get_safe_token(device);
 
-	assert(device->baseconfig().static_config() == NULL);
+	assert(device->static_config() == NULL);
 
 	rp5h01->data = *device->region();
 

@@ -55,8 +55,8 @@ struct prot_t {
 class quizpun2_state : public driver_device
 {
 public:
-	quizpun2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	struct prot_t m_prot;
 	UINT8 *m_bg_ram;

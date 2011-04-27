@@ -2172,8 +2172,8 @@ static DEVICE_START( decocass_tape )
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() == NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() == NULL);
 
 	/* fetch the data pointer */
 	tape->timer = device->machine().scheduler().timer_alloc(FUNC(tape_clock_callback), (void *)device);

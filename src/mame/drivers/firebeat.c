@@ -146,8 +146,8 @@ typedef struct
 class firebeat_state : public driver_device
 {
 public:
-	firebeat_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -518,7 +518,7 @@ static SCREEN_UPDATE(firebeat)
 	firebeat_state *state = screen->machine().driver_data<firebeat_state>();
 	int chip;
 
-	if (screen == screen->machine().m_devicelist.find(SCREEN, 0))
+	if (screen == screen->machine().devicelist().find(SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -649,7 +649,7 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &state->m_gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				screen_device *screen = downcast<screen_device *>(machine.m_devicelist.find(SCREEN, chip));
+				screen_device *screen = downcast<screen_device *>(machine.devicelist().find(SCREEN, chip));
 
 				if (screen != NULL)
 				{

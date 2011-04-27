@@ -41,6 +41,9 @@
 #include "crt9021.h"
 
 
+// device type definition
+const device_type CRT9021 = &device_creator<crt9021_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -63,73 +66,6 @@ enum
 };
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type CRT9021 = crt9021_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  crt9021_device_config - constructor
-//-------------------------------------------------
-
-crt9021_device_config::crt9021_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "SMC CRT9021", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *crt9021_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(crt9021_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *crt9021_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, crt9021_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void crt9021_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const crt9021_interface *intf = reinterpret_cast<const crt9021_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<crt9021_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&in_data_func, 0, sizeof(in_data_func));
-		memset(&in_attr_func, 0, sizeof(in_attr_func));
-		memset(&in_atten_func, 0, sizeof(in_atten_func));
-	}
-}
-
-
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -145,10 +81,32 @@ void crt9021_device_config::device_config_complete()
 //  crt9021_device - constructor
 //-------------------------------------------------
 
-crt9021_device::crt9021_device(running_machine &_machine, const crt9021_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, CRT9021, "SMC CRT9021", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void crt9021_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const crt9021_interface *intf = reinterpret_cast<const crt9021_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<crt9021_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&in_data_cb, 0, sizeof(in_data_cb));
+		memset(&in_attr_cb, 0, sizeof(in_attr_cb));
+		memset(&in_atten_cb, 0, sizeof(in_atten_cb));
+	}
 }
 
 
@@ -161,12 +119,12 @@ void crt9021_device::device_start()
 	// allocate timers
 
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_data_func, &m_config.in_data_func, this);
-	devcb_resolve_read8(&m_in_attr_func, &m_config.in_attr_func, this);
-	devcb_resolve_read_line(&m_in_atten_func, &m_config.in_atten_func, this);
+	devcb_resolve_read8(&m_in_data_func, &in_data_cb, this);
+	devcb_resolve_read8(&m_in_attr_func, &in_attr_cb, this);
+	devcb_resolve_read_line(&m_in_atten_func, &in_atten_cb, this);
 
 	// get the screen device
-	m_screen = machine().device<screen_device>(m_config.screen_tag);
+	m_screen = machine().device<screen_device>(screen_tag);
 	assert(m_screen != NULL);
 
 	// register for state saving

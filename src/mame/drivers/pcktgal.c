@@ -243,8 +243,8 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	MCFG_PALETTE_INIT(pcktgal)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

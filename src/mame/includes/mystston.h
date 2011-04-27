@@ -13,8 +13,8 @@
 class mystston_state : public driver_device
 {
 public:
-	mystston_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mystston_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* machine state */
 	UINT8 *m_ay8910_data;

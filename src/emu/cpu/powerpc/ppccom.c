@@ -304,7 +304,7 @@ INLINE int sign_double(double x)
 
 void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	const powerpc_config *config = (const powerpc_config *)device->baseconfig().static_config();
+	const powerpc_config *config = (const powerpc_config *)device->static_config();
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));

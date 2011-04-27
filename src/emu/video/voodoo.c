@@ -4477,7 +4477,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 
 static DEVICE_START( voodoo )
 {
-	const voodoo_config *config = (const voodoo_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const voodoo_config *config = (const voodoo_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	voodoo_state *v = get_safe_token(device);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
@@ -4485,8 +4485,8 @@ static DEVICE_START( voodoo )
 	int val;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config() == NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert(device->static_config() == NULL);
+	assert(downcast<const legacy_device_base *>(device)->inline_config() != NULL);
 
 	/* validate configuration */
 	assert(config->screen != NULL);
@@ -4573,7 +4573,7 @@ static DEVICE_START( voodoo )
 	}
 
 	/* set the type, and initialize the chip mask */
-	v->index = device->machine().m_devicelist.indexof(device->type(), device->tag());
+	v->index = device->machine().devicelist().indexof(device->type(), device->tag());
 	v->screen = downcast<screen_device *>(device->machine().device(config->screen));
 	assert_always(v->screen != NULL, "Unable to find screen attached to voodoo");
 	v->cpu = device->machine().device(config->cputag);
@@ -4680,9 +4680,9 @@ static DEVICE_RESET( voodoo )
     device definition
 -------------------------------------------------*/
 
-INLINE const char *get_voodoo_name(const device_config *devconfig)
+INLINE const char *get_voodoo_name(const device_t *device)
 {
-	const voodoo_config *config = (devconfig != NULL) ? (const voodoo_config *)downcast<const legacy_device_config_base *>(devconfig)->inline_config() : NULL;
+	const voodoo_config *config = (device != NULL) ? (const voodoo_config *)downcast<const legacy_device_base *>(device)->inline_config() : NULL;
 	switch (config->type)
 	{
 		default:

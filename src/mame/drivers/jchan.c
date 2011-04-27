@@ -178,8 +178,8 @@ there are 9 PALS on the pcb (not dumped)
 class jchan_state : public kaneko16_state
 {
 public:
-	jchan_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	bitmap_t *m_sprite_bitmap_1;
 	bitmap_t *m_sprite_bitmap_2;
@@ -688,8 +688,8 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 
 	MCFG_VIDEO_START(jchan)
 
-	MCFG_DEVICE_ADD("spritegen1", sknsspr_, 0)
-	MCFG_DEVICE_ADD("spritegen2", sknsspr_, 0)
+	MCFG_DEVICE_ADD("spritegen1", SKNS_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen2", SKNS_SPRITE, 0)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

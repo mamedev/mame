@@ -24,7 +24,7 @@
 // to fire on power-down, effectively creating an "auto-save" functionality
 #define MCFG_X2212_ADD_AUTOSAVE(_tag) \
 	MCFG_DEVICE_ADD(_tag, X2212, 0) \
-	x2212_device_config::static_set_auto_save(device); \
+	x2212_device::static_set_auto_save(*device); \
 
 
 
@@ -33,50 +33,19 @@
 //**************************************************************************
 
 
-// ======================> x2212_device_config
-
-class x2212_device_config :	public device_config,
-							public device_config_memory_interface,
-							public device_config_nvram_interface
-{
-	friend class x2212_device;
-
-	// construction/destruction
-	x2212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_auto_save(device_config *device);
-
-protected:
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device-specific configuration
-	address_space_config		m_sram_space_config;
-	address_space_config		m_e2prom_space_config;
-
-	// internal state
-	bool						m_auto_save;
-};
-
-
 // ======================> x2212_device
 
 class x2212_device :	public device_t,
 						public device_memory_interface,
 						public device_nvram_interface
 {
-	friend class x2212_device_config;
-
-	// construction/destruction
-	x2212_device(running_machine &_machine, const x2212_device_config &config);
-
 public:
+	// construction/destruction
+	x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_auto_save(device_t &device);
+
 	// I/O operations
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -92,6 +61,9 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
 	// device_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
@@ -99,9 +71,14 @@ protected:
 
 	static const int SIZE_DATA = 0x100;
 
-	// internal state
-	const x2212_device_config &m_config;
+	// configuration state
+	bool						m_auto_save;
 
+	// device-specific configuration
+	address_space_config		m_sram_space_config;
+	address_space_config		m_e2prom_space_config;
+
+	// internal state
 	address_space *	m_sram;
 	address_space *	m_e2prom;
 

@@ -9,8 +9,8 @@
 class vindictr_state : public atarigen_state
 {
 public:
-	vindictr_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	vindictr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT8			m_playfield_tile_bank;
 	UINT16			m_playfield_xscroll;

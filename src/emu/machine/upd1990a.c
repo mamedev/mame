@@ -19,6 +19,9 @@
 #include "upd1990a.h"
 
 
+// device type definition
+const device_type UPD1990A = &device_creator<upd1990a_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -39,73 +42,6 @@ enum
 	MODE_TP_2048HZ_SET,
 	MODE_TEST,
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type UPD1990A = upd1990a_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  upd1990a_device_config - constructor
-//-------------------------------------------------
-
-upd1990a_device_config::upd1990a_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "uPD1990A", tag, owner, clock),
-	  device_config_rtc_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *upd1990a_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(upd1990a_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *upd1990a_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, upd1990a_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd1990a_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd1990a_interface *intf = reinterpret_cast<const upd1990a_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd1990a_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-//      memset(&in_pa_func, 0, sizeof(in_pa_func));
-	}
-}
 
 
 
@@ -202,11 +138,31 @@ inline void upd1990a_device::advance_seconds()
 //  upd1990a_device - constructor
 //-------------------------------------------------
 
-upd1990a_device::upd1990a_device(running_machine &_machine, const upd1990a_device_config &config)
-    : device_t(_machine, config),
-	  device_rtc_interface(_machine, config, *this),
-      m_config(config)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, UPD1990A, "uPD1990A", tag, owner, clock),
+      device_rtc_interface(mconfig, *this)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void upd1990a_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const upd1990a_interface *intf = reinterpret_cast<const upd1990a_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<upd1990a_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+//      memset(&in_pa_cb, 0, sizeof(in_pa_cb));
+	}
 }
 
 
@@ -217,8 +173,8 @@ upd1990a_device::upd1990a_device(running_machine &_machine, const upd1990a_devic
 void upd1990a_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_data_func, &m_config.m_out_data_func, this);
-	devcb_resolve_write_line(&m_out_tp_func, &m_config.m_out_tp_func, this);
+	devcb_resolve_write_line(&m_out_data_func, &m_out_data_cb, this);
+	devcb_resolve_write_line(&m_out_tp_func, &m_out_tp_cb, this);
 
 	// allocate timers
 	m_timer_clock = timer_alloc(TIMER_CLOCK);

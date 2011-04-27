@@ -289,8 +289,8 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 class tempest_state : public driver_device
 {
 public:
-	tempest_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	tempest_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_player_select;
 };

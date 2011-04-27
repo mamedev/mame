@@ -220,7 +220,7 @@ WRITE8_DEVICE_HANDLER( namco_06xx_ctrl_w )
 
 static DEVICE_START( namco_06xx )
 {
-	const namco_06xx_config *config = (const namco_06xx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const namco_06xx_config *config = (const namco_06xx_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	namco_06xx_state *state = get_safe_token(device);
 	int devnum;
 

@@ -24,10 +24,8 @@ typedef struct _am2901
 class vector_generator
 {
 public:
-	vector_generator(running_machine &machine)
-		: m_machine(machine) { }
-
-	running_machine &machine() const { return m_machine; }
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+	void set_machine(running_machine &machine) { m_machine = &machine; }
 
 	UINT32 sreg;	  /* shift register */
 	UINT32 l1;		  /* latch 1 adder operand only */
@@ -49,7 +47,7 @@ public:
 	UINT32 ven;       /* vector intensity enable */
 
 private:
-	running_machine &m_machine;
+	running_machine *m_machine;
 };
 
 typedef struct _microcode
@@ -86,9 +84,8 @@ typedef struct _vproc
 class vertigo_state : public driver_device
 {
 public:
-	vertigo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
-		  m_vgen(machine) { }
+	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_vectorram;
 	device_t *m_ttl74148;

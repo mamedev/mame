@@ -13,25 +13,26 @@
 
 
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  LIVE DEVICE
 //**************************************************************************
 
-const device_type ADC0808 = adc0808_device_config::static_alloc_device_config;
+// device type definition
+const device_type ADC0808 = &device_creator<adc0808_device>;
 
+//-------------------------------------------------
+//  adc0808_device - constructor
+//-------------------------------------------------
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(adc0808, "ADC0808")
+adc0808_device::adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ADC0808, "ADC0808", tag, owner, clock),
+	  m_address(0),
+	  m_start(0),
+	  m_next_eoc(0),
+	  m_cycle(0)
+{
+}
 
 
 //-------------------------------------------------
@@ -40,7 +41,7 @@ GENERIC_DEVICE_CONFIG_SETUP(adc0808, "ADC0808")
 //  complete
 //-------------------------------------------------
 
-void adc0808_device_config::device_config_complete()
+void adc0808_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const adc0808_interface *intf = reinterpret_cast<const adc0808_interface *>(static_config());
@@ -50,28 +51,8 @@ void adc0808_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_eoc_func, 0, sizeof(m_out_eoc_func));
+		memset(&m_out_eoc_cb, 0, sizeof(m_out_eoc_cb));
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  adc0808_device - constructor
-//-------------------------------------------------
-
-adc0808_device::adc0808_device(running_machine &_machine, const adc0808_device_config &config)
-    : device_t(_machine, config),
-	  m_address(0),
-	  m_start(0),
-	  m_next_eoc(0),
-	  m_cycle(0),
-      m_config(config)
-{
 }
 
 
@@ -82,7 +63,7 @@ adc0808_device::adc0808_device(running_machine &_machine, const adc0808_device_c
 void adc0808_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_eoc_func, &m_config.m_out_eoc_func, this);
+	devcb_resolve_write_line(&m_out_eoc_func, &m_out_eoc_cb, this);
 
 	// allocate timers
 	m_cycle_timer = timer_alloc();
@@ -114,10 +95,10 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			if (m_bit == 8)
 			{
 				/* sample input */
-				double vref_pos = m_config.m_in_vref_pos_func(this);
-				double vref_neg = m_config.m_in_vref_neg_func(this);
+				double vref_pos = m_in_vref_pos_func(this);
+				double vref_neg = m_in_vref_neg_func(this);
 
-				double input = m_config.m_in_in_func[m_address](this);
+				double input = m_in_in_func[m_address](this);
 
 				m_sar = (255 * (input - vref_neg)) / (vref_pos - vref_neg);
 

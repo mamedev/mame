@@ -52,8 +52,8 @@ RAM = 4116 (x11)
 class r2dtank_state : public driver_device
 {
 public:
-	r2dtank_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	r2dtank_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;

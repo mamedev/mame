@@ -46,7 +46,7 @@
 //**************************************************************************
 //  DEVICE CONFIG IMAGE INTERFACE
 //**************************************************************************
-const image_device_type_info device_config_image_interface::m_device_info_array[] =
+const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
 		{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
 		{ IO_FLOPPY,	"floppydisk",	"flop" }, /*  1 */
@@ -64,94 +64,6 @@ const image_device_type_info device_config_image_interface::m_device_info_array[
 		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 		{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
 	};
-
-//-------------------------------------------------
-//  device_config_image_interface - constructor
-//-------------------------------------------------
-
-device_config_image_interface::device_config_image_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_image_interface - destructor
-//-------------------------------------------------
-
-device_config_image_interface::~device_config_image_interface()
-{
-}
-
-
-//-------------------------------------------------
-//  find_device_type - search trough list of
-//  device types to extact data
-//-------------------------------------------------
-
-const image_device_type_info *device_config_image_interface::find_device_type(iodevice_t type)
-{
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(device_config_image_interface::m_device_info_array); i++)
-	{
-		if (m_device_info_array[i].m_type == type)
-			return &m_device_info_array[i];
-	}
-	return NULL;
-}
-
-//-------------------------------------------------
-//  device_typename - retrieves device type name
-//-------------------------------------------------
-
-const char *device_config_image_interface::device_typename(iodevice_t type)
-{
-	const image_device_type_info *info = find_device_type(type);
-	return (info != NULL) ? info->m_name : NULL;
-}
-
-//-------------------------------------------------
-//  device_brieftypename - retrieves device
-//  brief type name
-//-------------------------------------------------
-
-const char *device_config_image_interface::device_brieftypename(iodevice_t type)
-{
-	const image_device_type_info *info = find_device_type(type);
-	return (info != NULL) ? info->m_shortname : NULL;
-}
-
-//-------------------------------------------------
-//  device_typeid - retrieves device type id
-//-------------------------------------------------
-
-iodevice_t device_config_image_interface::device_typeid(const char *name)
-{
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(device_config_image_interface::m_device_info_array); i++)
-	{
-		if (!mame_stricmp(name, m_device_info_array[i].m_name) || !mame_stricmp(name, m_device_info_array[i].m_shortname))
-			return m_device_info_array[i].m_type;
-	}
-	return (iodevice_t)-1;
-}
-
-/*-------------------------------------------------
-    device_compute_hash - compute a hash,
-    using this device's partial hash if appropriate
--------------------------------------------------*/
-
-void device_config_image_interface::device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const
-{
-	/* retrieve the partial hash func */
-	device_image_partialhash_func partialhash = get_partial_hash();
-
-	/* compute the hash */
-	if (partialhash)
-		partialhash(hashes, (const unsigned char*)data, length, types);
-	else
-		hashes.compute(reinterpret_cast<const UINT8 *>(data), length, types);
-}
 
 
 //**************************************************************************
@@ -172,9 +84,8 @@ static void memory_error(const char *message)
 //  device_image_interface - constructor
 //-------------------------------------------------
 
-device_image_interface::device_image_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_image_config(dynamic_cast<const device_config_image_interface &>(config)),
+device_image_interface::device_image_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device),
 	  m_file(NULL),
 	  m_mame_file(NULL),
 	  m_full_software_name(NULL),
@@ -194,6 +105,75 @@ device_image_interface::~device_image_interface()
     pool_free_lib(m_mempool);
 }
 
+//-------------------------------------------------
+//  find_device_type - search trough list of
+//  device types to extact data
+//-------------------------------------------------
+
+const image_device_type_info *device_image_interface::find_device_type(iodevice_t type)
+{
+	int i;
+	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
+	{
+		if (m_device_info_array[i].m_type == type)
+			return &m_device_info_array[i];
+	}
+	return NULL;
+}
+
+//-------------------------------------------------
+//  device_typename - retrieves device type name
+//-------------------------------------------------
+
+const char *device_image_interface::device_typename(iodevice_t type)
+{
+	const image_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->m_name : NULL;
+}
+
+//-------------------------------------------------
+//  device_brieftypename - retrieves device
+//  brief type name
+//-------------------------------------------------
+
+const char *device_image_interface::device_brieftypename(iodevice_t type)
+{
+	const image_device_type_info *info = find_device_type(type);
+	return (info != NULL) ? info->m_shortname : NULL;
+}
+
+//-------------------------------------------------
+//  device_typeid - retrieves device type id
+//-------------------------------------------------
+
+iodevice_t device_image_interface::device_typeid(const char *name)
+{
+	int i;
+	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
+	{
+		if (!mame_stricmp(name, m_device_info_array[i].m_name) || !mame_stricmp(name, m_device_info_array[i].m_shortname))
+			return m_device_info_array[i].m_type;
+	}
+	return (iodevice_t)-1;
+}
+
+/*-------------------------------------------------
+    device_compute_hash - compute a hash,
+    using this device's partial hash if appropriate
+-------------------------------------------------*/
+
+void device_image_interface::device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const
+{
+	/* retrieve the partial hash func */
+	device_image_partialhash_func partialhash = get_partial_hash();
+
+	/* compute the hash */
+	if (partialhash)
+		partialhash(hashes, (const unsigned char*)data, length, types);
+	else
+		hashes.compute(reinterpret_cast<const UINT8 *>(data), length, types);
+}
+
 /*-------------------------------------------------
     set_image_filename - specifies the filename of
     an image
@@ -201,13 +181,13 @@ device_image_interface::~device_image_interface()
 
 image_error_t device_image_interface::set_image_filename(const char *filename)
 {
-    m_name = filename;
+    m_image_name = filename;
     zippath_parent(&m_working_directory, filename);
-	m_basename = m_name.cpy(m_name);
+	m_basename.cpy(m_image_name);
 
-	int loc1 = m_name.rchr(0,'\\');
-	int loc2 = m_name.rchr(0,'/');
-	int loc3 = m_name.rchr(0,':');
+	int loc1 = m_image_name.rchr(0,'\\');
+	int loc2 = m_image_name.rchr(0,'/');
+	int loc3 = m_image_name.rchr(0,':');
 	int loc = MAX(loc1,MAX(loc2,loc3));
 	if (loc!=-1) {
 		m_basename = m_basename.substr(loc + 1,m_basename.len()-loc);
@@ -540,7 +520,7 @@ void device_image_interface::image_checkhash()
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */
-        if (m_image_config.image_type() == IO_CDROM)
+        if (image_type() == IO_CDROM)
             return;
 
 		/* Skip calculating the hash when we have an image mounted through a software list */

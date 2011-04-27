@@ -180,7 +180,7 @@ int ttl74148_enable_output_r(device_t *device)
 
 static DEVICE_START( ttl74148 )
 {
-	ttl74148_config *config = (ttl74148_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	ttl74148_config *config = (ttl74148_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	ttl74148_state *state = get_safe_token(device);
     state->output_cb = config->output_cb;
 

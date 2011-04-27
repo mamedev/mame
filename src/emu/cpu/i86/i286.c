@@ -296,8 +296,8 @@ static CPU_INIT( i80286 )
 	cpustate->direct = &cpustate->program->direct();
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
-	if( device->baseconfig().static_config() )
-		cpustate->amask = *(unsigned*)device->baseconfig().static_config();
+	if( device->static_config() )
+		cpustate->amask = *(unsigned*)device->static_config();
 	else
 		cpustate->amask = 0x00ffff;
 

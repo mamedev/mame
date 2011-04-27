@@ -665,7 +665,7 @@ INLINE const ic_315_5250_interface *_315_5250_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == _315_5250));
-	return (const ic_315_5250_interface *) device->baseconfig().static_config();
+	return (const ic_315_5250_interface *) device->static_config();
 }
 
 /*****************************************************************************

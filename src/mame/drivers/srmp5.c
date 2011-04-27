@@ -64,8 +64,8 @@ This is not a bug (real machine behaves the same).
 class srmp5_state : public driver_device
 {
 public:
-	srmp5_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	srmp5_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 m_databank;
 	UINT16 *m_tileram;

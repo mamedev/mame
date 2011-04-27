@@ -6,8 +6,8 @@ enum {MAT_STACK_SIZE = 32};
 class model1_state : public driver_device
 {
 public:
-	model1_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	model1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	struct view *m_view;
 	struct point *m_pointdb;

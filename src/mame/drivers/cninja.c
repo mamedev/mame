@@ -946,9 +946,9 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
-	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1003,9 +1003,9 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", cninja_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", cninja_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
-	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1102,9 +1102,9 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", edrandy_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", edrandy_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
-	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1157,9 +1157,9 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", robocop2_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", robocop2_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
-	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
+	decospr_device::set_pri_callback(*device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1215,11 +1215,11 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_DECO16IC_ADD("tilegen1", mutantf_deco16ic_tilegen1_intf)
 	MCFG_DECO16IC_ADD("tilegen2", mutantf_deco16ic_tilegen2_intf)
 
-	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 3);
 
-	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 4);
+	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 4);
 
 
 	/* sound hardware */

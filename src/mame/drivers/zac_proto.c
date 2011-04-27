@@ -9,8 +9,8 @@ extern const char layout_pinball[];
 class zac_proto_state : public driver_device
 {
 public:
-	zac_proto_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 };
 
 

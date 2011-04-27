@@ -95,7 +95,7 @@ UINT32 ram_parse_string(const char *s)
 static DEVICE_START( ram )
 {
 	ram_state *ram = get_safe_token(device);
-	ram_config *config = (ram_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	ram_config *config = (ram_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 	/* the device named 'ram' can get ram options from command line */
 	if (strcmp(device->tag(), RAM_TAG) == 0)
@@ -123,7 +123,7 @@ static DEVICE_START( ram )
 
 static DEVICE_VALIDITY_CHECK( ram )
 {
-	ram_config *config = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+	ram_config *config = (ram_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
 	UINT32 specified_ram = 0;

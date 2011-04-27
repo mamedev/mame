@@ -228,8 +228,8 @@ struct scroll_info
 class wheelfir_state : public driver_device
 {
 public:
-	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_maincpu;
 	device_t *m_subcpu;

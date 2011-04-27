@@ -58,8 +58,8 @@
 class arcadia_state : public amiga_state
 {
 public:
-	arcadia_state(running_machine &machine, const driver_device_config_base &config)
-		: amiga_state(machine, config) { }
+	arcadia_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag) { }
 
 	UINT8 coin_counter[2];
 };

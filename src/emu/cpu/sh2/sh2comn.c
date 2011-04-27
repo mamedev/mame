@@ -920,7 +920,7 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 
 void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->baseconfig().static_config();
+	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config();
 	int i;
 
 	sh2->timer = device->machine().scheduler().timer_alloc(FUNC(sh2_timer_callback), sh2);

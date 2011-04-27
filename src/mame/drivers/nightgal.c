@@ -30,8 +30,8 @@ TODO:
 class nightgal_state : public driver_device
 {
 public:
-	nightgal_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
 	UINT8 m_blit_raw_data[3];

@@ -26,8 +26,8 @@ NVRAM   :   Battery for main RAM
 class igs009_state : public driver_device
 {
 public:
-	igs009_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	igs009_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_gp98_reel1_tilemap;
 	UINT8 *m_gp98_reel1_ram;

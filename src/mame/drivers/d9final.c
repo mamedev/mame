@@ -27,8 +27,8 @@
 class d9final_state : public driver_device
 {
 public:
-	d9final_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_lo_vram;
 	UINT8 *m_hi_vram;

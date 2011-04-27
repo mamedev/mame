@@ -24,8 +24,8 @@ driver by Chris Moore
 class gameplan_state : public driver_device
 {
 public:
-	gameplan_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_via_0(*this, "via6522_0"),
 		  m_via_1(*this, "via6522_1"),
 		  m_via_2(*this, "via6522_2") { }

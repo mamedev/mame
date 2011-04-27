@@ -117,8 +117,8 @@ OSC:    12.000MHz
 class jalmah_state : public driver_device
 {
 public:
-	jalmah_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_sc0_tilemap_0;
 	tilemap_t *m_sc0_tilemap_1;

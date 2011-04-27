@@ -98,8 +98,8 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 class bnstars_state : public driver_device
 {
 public:
-	bnstars_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bnstars_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];

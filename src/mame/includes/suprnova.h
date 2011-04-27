@@ -17,8 +17,8 @@ typedef struct
 class skns_state : public driver_device
 {
 public:
-	skns_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	skns_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	sknsspr_device* m_spritegen;
 	UINT32 *m_tilemapA_ram;

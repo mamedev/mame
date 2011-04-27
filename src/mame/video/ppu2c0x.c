@@ -150,7 +150,7 @@ INLINE const ppu2c0x_interface *get_interface( device_t *device )
 		 || (device->type() == PPU_2C04) || (device->type() == PPU_2C05_01)
 		 || (device->type() == PPU_2C05_02) || (device->type() == PPU_2C05_03)
 		 || (device->type() == PPU_2C05_04) || (device->type() == PPU_2C07));
-	return (const ppu2c0x_interface *) device->baseconfig().static_config();
+	return (const ppu2c0x_interface *) device->static_config();
 }
 
 

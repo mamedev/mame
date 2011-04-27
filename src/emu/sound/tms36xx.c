@@ -498,7 +498,7 @@ static DEVICE_START( tms36xx )
 	tms_state *tms = get_safe_token(device);
 	int enable;
 
-	tms->intf = (const tms36xx_interface *)device->baseconfig().static_config();
+	tms->intf = (const tms36xx_interface *)device->static_config();
 
    tms->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
 	tms->samplerate = device->clock() * 64;

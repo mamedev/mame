@@ -20,8 +20,8 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 class pkscram_state : public driver_device
 {
 public:
-	pkscram_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_out;
 	UINT8 m_interrupt_line_active;

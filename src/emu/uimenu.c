@@ -1548,7 +1548,7 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 	ui_menu_item_append(menu, CAPSTARTGAMENOUN " Information", NULL, 0, (void *)menu_game_info);
 
 	device_image_interface *image = NULL;
-	if (machine.m_devicelist.first(image))
+	if (machine.devicelist().first(image))
 	{
 		/* add image info menu */
 		ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_image_menu_image_info);
@@ -1557,11 +1557,11 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 		ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_image_menu_file_manager);
 
 		/* add tape control menu */
-		if (machine.m_devicelist.first(CASSETTE))
+		if (machine.devicelist().first(CASSETTE))
 			ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
 
 		/* add bitbanger control menu */
-		if (machine.m_devicelist.first(BITBANGER))
+		if (machine.devicelist().first(BITBANGER))
 			ui_menu_item_append(menu, "Bitbanger Control", NULL, 0, (void*)ui_mess_menu_bitbanger_control);
 	}
 	/* add keyboard mode menu */

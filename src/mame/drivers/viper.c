@@ -114,8 +114,8 @@ static SCREEN_UPDATE(viper)
 class viper_state : public driver_device
 {
 public:
-	viper_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	viper_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 
 	UINT32 m_epic_iack;
@@ -982,7 +982,7 @@ static INTERRUPT_GEN(viper_vblank)
 	//mpc8240_interrupt(device->machine, MPC8240_IRQ3);
 }
 
-static void voodoo_vblank(const device_config *device, int param)
+static void voodoo_vblank(const device_t *device, int param)
 {
 	//mpc8240_interrupt(device->machine, MPC8240_IRQ4);
 }

@@ -1177,7 +1177,7 @@ static STREAM_UPDATE( sp0256_update )
 
 static DEVICE_START( sp0256 )
 {
-	const sp0256_interface *intf = (const sp0256_interface *)device->baseconfig().static_config();
+	const sp0256_interface *intf = (const sp0256_interface *)device->static_config();
 	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;

@@ -41,59 +41,34 @@
 #include "7474.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_config;
-
-
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
+
+// device type definition
+const device_type MACHINE_TTL7474 = &device_creator<ttl7474_device>;
 
 //-------------------------------------------------
-//  ttl7474_device_config - constructor
+//  ttl7474_device - constructor
 //-------------------------------------------------
 
-ttl7474_device_config::ttl7474_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "7474", tag, owner, clock)
+ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock)
 {
+    init();
 }
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ttl7474_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(ttl7474_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, ttl7474_device(machine, *this));
-}
-
 
 //-------------------------------------------------
 //  static_set_target_tag - configuration helper
 //  to set the target tag
 //-------------------------------------------------
 
-void ttl7474_device_config::static_set_target_tag(device_config *device, const char *tag)
+void ttl7474_device::static_set_target_tag(device_t &device, const char *tag)
 {
-	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
-	ttl7474->m_output_cb.tag = tag;
-	ttl7474->m_comp_output_cb.tag = tag;
+	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
+	ttl7474.m_output_cb.tag = tag;
+	ttl7474.m_comp_output_cb.tag = tag;
 }
 
 
@@ -102,16 +77,16 @@ void ttl7474_device_config::static_set_target_tag(device_config *device, const c
 //  to set the output callback
 //-------------------------------------------------
 
-void ttl7474_device_config::static_set_output_cb(device_config *device, write_line_device_func callback)
+void ttl7474_device::static_set_output_cb(device_t &device, write_line_device_func callback)
 {
-	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
+	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
 	if (callback != NULL)
 	{
-		ttl7474->m_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474->m_output_cb.writeline = callback;
+		ttl7474.m_output_cb.type = DEVCB_TYPE_DEVICE;
+		ttl7474.m_output_cb.writeline = callback;
 	}
 	else
-		ttl7474->m_output_cb.type = DEVCB_TYPE_NULL;
+		ttl7474.m_output_cb.type = DEVCB_TYPE_NULL;
 }
 
 
@@ -120,34 +95,18 @@ void ttl7474_device_config::static_set_output_cb(device_config *device, write_li
 //  helper to set the comp. output callback
 //-------------------------------------------------
 
-void ttl7474_device_config::static_set_comp_output_cb(device_config *device, write_line_device_func callback)
+void ttl7474_device::static_set_comp_output_cb(device_t &device, write_line_device_func callback)
 {
-	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
+	ttl7474_device &ttl7474 = downcast<ttl7474_device &>(device);
 	if (callback != NULL)
 	{
-		ttl7474->m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474->m_comp_output_cb.writeline = callback;
+		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
+		ttl7474.m_comp_output_cb.writeline = callback;
 	}
 	else
-		ttl7474->m_comp_output_cb.type = DEVCB_TYPE_NULL;
+		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_NULL;
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ttl7474_device - constructor
-//-------------------------------------------------
-
-ttl7474_device::ttl7474_device(running_machine &_machine, const ttl7474_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-    init();
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -165,8 +124,8 @@ void ttl7474_device::device_start()
     save_item(NAME(m_last_output));
     save_item(NAME(m_last_output_comp));
 
-	devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
-	devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
+	devcb_resolve_write_line(&m_output_func, &m_output_cb, this);
+	devcb_resolve_write_line(&m_comp_output_func, &m_comp_output_cb, this);
 }
 
 //-------------------------------------------------
@@ -213,13 +172,13 @@ void ttl7474_device::update()
     if (m_output != m_last_output)
 	{
         m_last_output = m_output;
-		devcb_call_write_line(&m_output_cb, m_output);
+		devcb_call_write_line(&m_output_func, m_output);
 	}
 	/* call callback if any of the outputs changed */
     if (m_output_comp != m_last_output_comp)
 	{
         m_last_output_comp = m_output_comp;
-		devcb_call_write_line(&m_comp_output_cb, m_output_comp);
+		devcb_call_write_line(&m_comp_output_func, m_output_comp);
 	}
 }
 

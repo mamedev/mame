@@ -64,47 +64,24 @@ const int CRT9212_RAM_SIZE	= 135;
 
 struct crt9212_interface
 {
-	devcb_write_line		out_rof_func;
-	devcb_write_line		out_wof_func;
-	devcb_read_line			in_ren_func;
-	devcb_read_line			in_wen_func;
-	devcb_read_line			in_wen2_func;
-};
-
-
-
-// ======================> crt9212_device_config
-
-class crt9212_device_config :   public device_config,
-                                public crt9212_interface
-{
-    friend class crt9212_device;
-
-    // construction/destruction
-    crt9212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line		m_out_rof_cb;
+	devcb_write_line		m_out_wof_cb;
+	devcb_read_line			m_in_ren_cb;
+	devcb_read_line			m_in_wen_cb;
+	devcb_read_line			m_in_wen2_cb;
 };
 
 
 
 // ======================> crt9212_device
 
-class crt9212_device :	public device_t
+class crt9212_device :	public device_t,
+						public crt9212_interface
 {
-    friend class crt9212_device_config;
-
-    // construction/destruction
-    crt9212_device(running_machine &_machine, const crt9212_device_config &_config);
-
 public:
+    // construction/destruction
+    crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
@@ -114,6 +91,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
 
 private:
@@ -135,8 +113,6 @@ private:
 	int m_clrcnt;
 	int m_rclk;
 	int m_wclk;
-
-	const crt9212_device_config &m_config;
 };
 
 

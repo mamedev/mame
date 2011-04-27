@@ -1775,7 +1775,7 @@ static DEVICE_START( ymf271 )
 	chip->device = device;
 	chip->clock = device->clock();
 
-	intf = (device->baseconfig().static_config() != NULL) ? (const ymf271_interface *)device->baseconfig().static_config() : &defintrf;
+	intf = (device->static_config() != NULL) ? (const ymf271_interface *)device->static_config() : &defintrf;
 
 	ymf271_init(device, chip, *device->region(), intf->irq_callback, &intf->ext_read, &intf->ext_write);
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/384, chip, ymf271_update);

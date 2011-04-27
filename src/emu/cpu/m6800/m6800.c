@@ -1208,9 +1208,9 @@ static CPU_INIT( m6801 )
 
 	state_register(cpustate, "m6801");
 
-	if (device->baseconfig().static_config() != NULL)
+	if (device->static_config() != NULL)
 	{
-		m6801_interface *intf = (m6801_interface *) device->baseconfig().static_config();
+		m6801_interface *intf = (m6801_interface *) device->static_config();
 
 		devcb_resolve_write_line(&cpustate->out_sc2_func, &intf->out_sc2_func, device);
 	}
@@ -1258,9 +1258,9 @@ static CPU_INIT( m6803 )
 
 	state_register(cpustate, "m6803");
 
-	if (device->baseconfig().static_config() != NULL)
+	if (device->static_config() != NULL)
 	{
-		m6801_interface *intf = (m6801_interface *) device->baseconfig().static_config();
+		m6801_interface *intf = (m6801_interface *) device->static_config();
 
 		devcb_resolve_write_line(&cpustate->out_sc2_func, &intf->out_sc2_func, device);
 	}

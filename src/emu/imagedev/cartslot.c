@@ -35,19 +35,13 @@ INLINE cartslot_t *get_token(device_t *device)
 }
 
 
-INLINE const cartslot_config *get_config(device_t *device)
+INLINE const cartslot_config *get_config(const device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CARTSLOT);
-	return (const cartslot_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	return (const cartslot_config *) downcast<const legacy_device_base *>(device)->inline_config();
 }
 
-INLINE const cartslot_config *get_config_dev(const device_config *device)
-{
-	assert(device != NULL);
-	assert(device->type() == CARTSLOT);
-	return (const cartslot_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
-}
 
 /***************************************************************************
     IMPLEMENTATION
@@ -436,8 +430,8 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_INT_IMAGE_CREATABLE:			info->i = 0; break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:		info->i = 1; break;
 		case DEVINFO_INT_IMAGE_MUST_BE_LOADED:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config()) {
-				info->i = get_config_dev(device)->must_be_loaded;
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config()) {
+				info->i = get_config(device)->must_be_loaded;
 			} else {
 				info->i = 0;
 			}
@@ -450,15 +444,15 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_FCT_IMAGE_GET_DEVICES:			info->f = (genf *) DEVICE_IMAGE_GET_DEVICES_NAME(cartslot);	break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cartslot);	break;
 		case DEVINFO_FCT_IMAGE_PARTIAL_HASH:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_partialhash) {
-				info->f = (genf *) get_config_dev(device)->device_partialhash;
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->device_partialhash) {
+				info->f = (genf *) get_config(device)->device_partialhash;
 			} else {
 				info->f = NULL;
 			}
 			break;
 		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
-				info->f = (genf *) get_config_dev(device)->device_displayinfo;
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->device_displayinfo) {
+				info->f = (genf *) get_config(device)->device_displayinfo;
 			} else {
 				info->f = NULL;
 			}
@@ -469,9 +463,9 @@ DEVICE_GET_INFO( cartslot )
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cartslot"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->extensions )
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->extensions )
 			{
-				strcpy(info->s, get_config_dev(device)->extensions);
+				strcpy(info->s, get_config(device)->extensions);
 			}
 			else
 			{
@@ -479,39 +473,15 @@ DEVICE_GET_INFO( cartslot )
 			}
 			break;
 		case DEVINFO_STR_IMAGE_INTERFACE:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->interface )
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config(device)->interface )
 			{
-				strcpy(info->s, get_config_dev(device)->interface );
+				strcpy(info->s, get_config(device)->interface );
 			}
 			break;
 	}
 }
 
 DEFINE_LEGACY_IMAGE_DEVICE(CARTSLOT, cartslot);
-
-
-//**************************************************************************
-//  DEVICE CONFIG CARTSLOT INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_cart_slot_interface - constructor
-//-------------------------------------------------
-
-device_config_cart_slot_interface::device_config_cart_slot_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_cart_slot_interface - destructor
-//-------------------------------------------------
-
-device_config_cart_slot_interface::~device_config_cart_slot_interface()
-{
-}
-
 
 
 //**************************************************************************
@@ -522,9 +492,8 @@ device_config_cart_slot_interface::~device_config_cart_slot_interface()
 //  device_cart_slot_interface - constructor
 //-------------------------------------------------
 
-device_cart_slot_interface::device_cart_slot_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_cart_slot_config(dynamic_cast<const device_config_cart_slot_interface &>(config))
+device_cart_slot_interface::device_cart_slot_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device)
 {
 }
 
@@ -538,21 +507,6 @@ device_cart_slot_interface::~device_cart_slot_interface()
 }
 
 //**************************************************************************
-//  LEGACY cart_slot DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  legacy_cart_slot_device_config_base - constructor
-//-------------------------------------------------
-
-legacy_cart_slot_device_config_base::legacy_cart_slot_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config)
-	: legacy_device_config_base(mconfig, type, tag, owner, clock, get_config),
-	  device_config_cart_slot_interface(mconfig, *this)
-{
-}
-
-
-//**************************************************************************
 //  LIVE LEGACY cart_slot DEVICE
 //**************************************************************************
 
@@ -560,8 +514,8 @@ legacy_cart_slot_device_config_base::legacy_cart_slot_device_config_base(const m
 //  legacy_cart_slot_device_base - constructor
 //-------------------------------------------------
 
-legacy_cart_slot_device_base::legacy_cart_slot_device_base(running_machine &machine, const device_config &config)
-	: legacy_device_base(machine, config),
-	  device_cart_slot_interface(machine, config, *this)
+legacy_cart_slot_device_base::legacy_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config)
+	: legacy_device_base(mconfig, type, tag, owner, clock, get_config),
+	  device_cart_slot_interface(mconfig, *this)
 {
 }

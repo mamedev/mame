@@ -9,8 +9,8 @@
 class cyberbal_state : public atarigen_state
 {
 public:
-	cyberbal_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16 *		m_paletteram_0;
 	UINT16 *		m_paletteram_1;

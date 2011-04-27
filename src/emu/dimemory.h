@@ -73,7 +73,7 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 //**************************************************************************
 
 #define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
-	device_config_memory_interface::static_set_addrmap(device, _space, ADDRESS_MAP_NAME(_map));
+	device_memory_interface::static_set_addrmap(*device, _space, ADDRESS_MAP_NAME(_map));
 
 #define MCFG_DEVICE_PROGRAM_MAP(_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
@@ -90,37 +90,6 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> device_config_memory_interface
-
-// class representing interface-specific configuration state
-class device_config_memory_interface : public device_config_interface
-{
-	friend class device_memory_interface;
-
-public:
-	// construction/destruction
-	device_config_memory_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_memory_interface();
-
-	// basic information getters
-	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
-	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return memory_space_config(spacenum); }
-
-	// static inline helpers
-	static void static_set_addrmap(device_config *device, address_spacenum spacenum, address_map_constructor map);
-
-protected:
-	// required overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const = 0;
-
-	// optional operation overrides
-	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
-
-	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
-};
-
-
-
 // ======================> device_memory_interface
 
 class device_memory_interface : public device_interface
@@ -129,14 +98,17 @@ class device_memory_interface : public device_interface
 
 public:
 	// construction/destruction
-	device_memory_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_memory_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_memory_interface();
 
 	// configuration access
-	const device_config_memory_interface &memory_config() const { return m_memory_config; }
+	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
+	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return memory_space_config(spacenum); }
+
+	// static inline configuration helpers
+	static void static_set_addrmap(device_t &device, address_spacenum spacenum, address_map_constructor map);
 
 	// basic information getters
-	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return m_memory_config.space_config(spacenum); }
 	address_space *space(int index = 0) const { return m_addrspace[index]; }
 	address_space *space(address_spacenum index) const { return m_addrspace[static_cast<int>(index)]; }
 
@@ -152,6 +124,9 @@ public:
 	bool readop(offs_t offset, int size, UINT64 &value) { return memory_readop(offset, size, value); }
 
 protected:
+	// required overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const = 0;
+
 	// optional operation overrides
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
 	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
@@ -159,9 +134,10 @@ protected:
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
 
 	// interface-level overrides
+	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
 
 	// configuration
-	const device_config_memory_interface &m_memory_config;	// reference to our device_config_execute_interface
+	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
 	address_space *		m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 
@@ -172,15 +148,15 @@ protected:
 //**************************************************************************
 
 //-------------------------------------------------
-//  devconfig_get_space_config - return a pointer
+//  device_get_space_config - return a pointer
 //  to sthe given address space's configuration
 //-------------------------------------------------
 
-inline const address_space_config *devconfig_get_space_config(const device_config &devconfig, address_spacenum spacenum = AS_0)
+inline const address_space_config *device_get_space_config(const device_t &device, address_spacenum spacenum = AS_0)
 {
-	const device_config_memory_interface *intf;
-	if (!devconfig.interface(intf))
-		throw emu_fatalerror("Device '%s' does not have memory interface", devconfig.tag());
+	const device_memory_interface *intf;
+	if (!device.interface(intf))
+		throw emu_fatalerror("Device '%s' does not have memory interface", device.tag());
 	return intf->space_config(spacenum);
 }
 

@@ -1001,8 +1001,8 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_callback irqc
 		state->state_add(I8085_INTE,   "INTE",   cpustate->ietemp).mask(0x1).callimport().callexport();
 	}
 
-	if (device->baseconfig().static_config() != NULL)
-		cpustate->config = *(i8085_config *)device->baseconfig().static_config();
+	if (device->static_config() != NULL)
+		cpustate->config = *(i8085_config *)device->static_config();
 	cpustate->cputype = type;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

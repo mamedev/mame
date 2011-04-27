@@ -1,8 +1,8 @@
 class lucky74_state : public driver_device
 {
 public:
-	lucky74_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	lucky74_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_ym2149_portb;
 	UINT8 m_usart_8251;

@@ -100,8 +100,8 @@ Notes:
 class sigmab98_state : public driver_device
 {
 public:
-	sigmab98_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sigmab98_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;

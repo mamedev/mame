@@ -77,8 +77,8 @@ struct nand_t
 class ghosteo_state : public driver_device
 {
 public:
-	ghosteo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_system_memory;
 	UINT32 *m_steppingstone;

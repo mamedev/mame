@@ -136,8 +136,8 @@ better notes (complete chip lists) for each board still needed
 class gal3_state : public driver_device
 {
 public:
-	gal3_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	gal3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT32 *m_mpSharedRAM0;
 	//UINT32 *m_mpSharedRAM1;

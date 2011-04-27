@@ -3,8 +3,8 @@
 class sshangha_state : public driver_device
 {
 public:
-	sshangha_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	sshangha_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		 m_deco_tilegen1(*this, "tilegen1")
 		{ }
 

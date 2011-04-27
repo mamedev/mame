@@ -164,7 +164,7 @@ ROM_END
 
 static DEVICE_START( namco_54xx )
 {
-	namco_54xx_config *config = (namco_54xx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	namco_54xx_config *config = (namco_54xx_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	namco_54xx_state *state = get_safe_token(device);
 	astring tempstring;
 

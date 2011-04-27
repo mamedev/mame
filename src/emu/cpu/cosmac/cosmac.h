@@ -105,9 +105,6 @@ enum cosmac_state_code
 };
 
 
-// device type definition
-extern const device_type COSMAC;
-
 
 
 //**************************************************************************
@@ -122,83 +119,51 @@ typedef void (*cosmac_out_sc_func)(device_t *device, cosmac_state_code sc);
 
 struct cosmac_interface
 {
-	devcb_read_line		m_in_wait_func;
-	devcb_read_line		m_in_clear_func;
-	devcb_read_line		m_in_ef1_func;
-	devcb_read_line		m_in_ef2_func;
-	devcb_read_line		m_in_ef3_func;
-	devcb_read_line		m_in_ef4_func;
-	devcb_write_line	m_out_q_func;
-	devcb_read8			m_in_dma_func;
-	devcb_write8		m_out_dma_func;
-	cosmac_out_sc_func	m_out_sc_func;
-	devcb_write_line	m_out_tpa_func;
-	devcb_write_line	m_out_tpb_func;
+	devcb_read_line		m_in_wait_cb;
+	devcb_read_line		m_in_clear_cb;
+	devcb_read_line		m_in_ef1_cb;
+	devcb_read_line		m_in_ef2_cb;
+	devcb_read_line		m_in_ef3_cb;
+	devcb_read_line		m_in_ef4_cb;
+	devcb_write_line	m_out_q_cb;
+	devcb_read8			m_in_dma_cb;
+	devcb_write8		m_out_dma_cb;
+	cosmac_out_sc_func	m_out_sc_cb;
+	devcb_write_line	m_out_tpa_cb;
+	devcb_write_line	m_out_tpb_cb;
 };
 
 #define COSMAC_INTERFACE(name) \
 	const cosmac_interface (name) =
 
 
-// ======================> cosmac_device_config
-
-class cosmac_device_config :	public cpu_device_config,
-                                public cosmac_interface
-{
-	friend class cosmac_device;
-
-	// construction/destruction
-	cosmac_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_execute_interface overrides
-	virtual UINT32 execute_min_cycles() const;
-	virtual UINT32 execute_max_cycles() const;
-	virtual UINT32 execute_input_lines() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device_config_disasm_interface overrides
-	virtual UINT32 disasm_min_opcode_bytes() const;
-	virtual UINT32 disasm_max_opcode_bytes() const;
-
-	// inline data
-	const address_space_config		m_program_config;
-	const address_space_config		m_io_config;
-};
-
-
-
 // ======================> cosmac_device
 
-class cosmac_device : public cpu_device
+class cosmac_device : public cpu_device,
+					  public cosmac_interface
 {
-	friend class cosmac_device_config;
-
-	// construction/destruction
-	cosmac_device(running_machine &_machine, const cosmac_device_config &config);
-
 public:
+	// construction/destruction
+	cosmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// public interfaces
 	offs_t get_memory_address();
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 	// device_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const;
+	virtual UINT32 execute_max_cycles() const;
+	virtual UINT32 execute_input_lines() const;
 	virtual void execute_run();
 	virtual void execute_set_input(int inputnum, int state);
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry);
@@ -206,6 +171,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 	// device_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const;
+	virtual UINT32 disasm_max_opcode_bytes() const;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// helpers
@@ -336,6 +303,9 @@ protected:
 	void out();
 	void inp();
 
+	const address_space_config		m_program_config;
+	const address_space_config		m_io_config;
+
 	// device callbacks
 	devcb_resolved_read_line	m_in_wait_func;
 	devcb_resolved_read_line	m_in_clear_func;
@@ -404,9 +374,11 @@ protected:
 	typedef void (cosmac_device::*ophandler)();
 
 	static const ophandler s_opcodetable[256];
-
-	const cosmac_device_config &m_config;
 };
+
+
+// device type definition
+extern const device_type COSMAC;
 
 
 #endif /* __COSMAC_H__ */

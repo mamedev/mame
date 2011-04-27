@@ -37,11 +37,11 @@ static const char *const error_strings[] =
 	"unsupported CHD version"
 };
 
-INLINE const cdrom_config *get_config_dev(const device_config *device)
+INLINE const cdrom_config *get_config_dev(const device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == CDROM);
-	return (const cdrom_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
+	return (const cdrom_config *)downcast<const legacy_device_base *>(device)->inline_config();
 }
 
 static const char *chd_get_error_string(int chderr)
@@ -174,7 +174,7 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cdrom); break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cdrom);	break;
 		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
 				info->f = (genf *) get_config_dev(device)->device_displayinfo;
 			} else {
 				info->f = NULL;
@@ -193,7 +193,7 @@ DEVICE_GET_INFO(cdrom)
 		case DEVINFO_STR_IMAGE_CREATE_OPTEXTS+0:	strcpy(info->s, "chd"); break;
 
 		case DEVINFO_STR_IMAGE_INTERFACE:
-			if ( device && downcast<const legacy_image_device_config_base *>(device)->inline_config() && get_config_dev(device)->interface )
+			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config_dev(device)->interface )
 			{
 				strcpy(info->s, get_config_dev(device)->interface );
 			}

@@ -459,7 +459,7 @@
 class majorpkr_state : public driver_device
 {
 public:
-	majorpkr_state(running_machine &machine, const driver_device_config_base &config) : driver_device(machine, config), oki(*this, "oki") { }
+	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag), oki(*this, "oki") { }
 
 	int m_mux_data;
 	int	m_palette_bank;

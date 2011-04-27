@@ -738,7 +738,7 @@ static DEVICE_START( ymf278b )
 	YMF278BChip *chip = get_safe_token(device);
 
 	chip->device = device;
-	intf = (device->baseconfig().static_config() != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config() : &defintrf;
+	intf = (device->static_config() != NULL) ? (const ymf278b_interface *)device->static_config() : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);

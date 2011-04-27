@@ -176,10 +176,6 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* forward declarations */
-class device_config;
-
-
 /* static structure used for device configuration when the desired callback type is a read_line_device_func */
 typedef struct _devcb_read_line devcb_read_line;
 struct _devcb_read_line

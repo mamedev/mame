@@ -46,14 +46,6 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type ASAP = asap_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -163,119 +155,19 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 
 
 //**************************************************************************
-//  ASAP DEVICE CONFIG
-//**************************************************************************
-
-//-------------------------------------------------
-//  asap_device_config - constructor
-//-------------------------------------------------
-
-asap_device_config::asap_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, static_alloc_device_config, "ASAP", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *asap_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(asap_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *asap_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, asap_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  execute_min_cycles - return minimum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 asap_device_config::execute_min_cycles() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  execute_max_cycles - return maximum number of
-//  cycles it takes for one instruction to execute
-//-------------------------------------------------
-
-UINT32 asap_device_config::execute_max_cycles() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-UINT32 asap_device_config::execute_input_lines() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
-//  the space doesn't exist
-//-------------------------------------------------
-
-const address_space_config *asap_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
-}
-
-
-//-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 asap_device_config::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-UINT32 asap_device_config::disasm_max_opcode_bytes() const
-{
-	return 12;
-}
-
-
-
-//**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
+
+// device type definition
+const device_type ASAP = &device_creator<asap_device>;
 
 //-------------------------------------------------
 //  asap_device - constructor
 //-------------------------------------------------
 
-asap_device::asap_device(running_machine &_machine, const asap_device_config &config)
-	: cpu_device(_machine, config),
+asap_device::asap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, ASAP, "ASAP", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32),
 	  m_pc(0),
 	  m_pflag(0),
 	  m_iflag(0),
@@ -368,6 +260,18 @@ void asap_device::device_reset()
 
 
 //-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *asap_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+}
+
+
+//-------------------------------------------------
 //  state_import - import state into the device,
 //  after it has been set
 //-------------------------------------------------
@@ -420,6 +324,28 @@ void asap_device::state_string_export(const device_state_entry &entry, astring &
 							m_cflag ? 'C' : '.');
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 asap_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 asap_device::disasm_max_opcode_bytes() const
+{
+	return 12;
 }
 
 
@@ -620,6 +546,39 @@ inline void asap_device::execute_instruction()
 {
 	// parse the instruction
 	(this->*m_opcode[m_op >> 21])();
+}
+
+
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 asap_device::execute_min_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 asap_device::execute_max_cycles() const
+{
+	return 2;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 asap_device::execute_input_lines() const
+{
+	return 1;
 }
 
 

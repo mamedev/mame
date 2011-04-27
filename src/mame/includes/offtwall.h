@@ -9,8 +9,8 @@
 class offtwall_state : public atarigen_state
 {
 public:
-	offtwall_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	offtwall_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16 *m_bankswitch_base;
 	UINT16 *m_bankrom_base;

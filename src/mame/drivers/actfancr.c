@@ -355,13 +355,13 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_GFXDECODE(actfan)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,1);
-	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,1);
+	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 1);
 
 	MCFG_VIDEO_START(actfancr)
 
@@ -409,13 +409,13 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_GFXDECODE(triothep)
 	MCFG_PALETTE_LENGTH(768)
 
-	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
-	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
-	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
+	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
+	deco_bac06_device::set_gfx_region_wide(*device, 0,0,0);
 
-	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
-	deco_mxc06_device_config::set_gfx_region(device, 1);
+	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
+	deco_mxc06_device::set_gfx_region(*device, 1);
 
 	MCFG_VIDEO_START(actfancr)
 

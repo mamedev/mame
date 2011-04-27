@@ -615,8 +615,8 @@ static DEVICE_START( pokey )
 	int sample_rate = device->clock();
 	int i;
 
-	if (device->baseconfig().static_config())
-		memcpy(&chip->intf, device->baseconfig().static_config(), sizeof(pokey_interface));
+	if (device->static_config())
+		memcpy(&chip->intf, device->static_config(), sizeof(pokey_interface));
 	chip->device = device;
 	chip->clock_period = attotime::from_hz(device->clock());
 

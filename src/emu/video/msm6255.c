@@ -65,19 +65,36 @@ enum
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
+//  INLINE HELPERS
 //**************************************************************************
 
-// devices
-const device_type MSM6255 = msm6255_device_config::static_alloc_device_config;
+//-------------------------------------------------
+//  read_video_data - read video ROM/RAM
+//-------------------------------------------------
+
+inline UINT8 msm6255_device::read_video_data(UINT16 ma, UINT8 ra)
+{
+	return m_char_ram_r(this, ma, ra);
+}
 
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(msm6255, "MSM6255")
+// device type definition
+const device_type MSM6255 = &device_creator<msm6255_device>;
+
+//-------------------------------------------------
+//  msm6255_device - constructor
+//-------------------------------------------------
+
+msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock),
+	  m_cursor(0)
+{
+}
 
 
 //-------------------------------------------------
@@ -86,7 +103,7 @@ GENERIC_DEVICE_CONFIG_SETUP(msm6255, "MSM6255")
 //  complete
 //-------------------------------------------------
 
-void msm6255_device_config::device_config_complete()
+void msm6255_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const msm6255_interface *intf = reinterpret_cast<const msm6255_interface *>(static_config());
@@ -104,38 +121,6 @@ void msm6255_device_config::device_config_complete()
 }
 
 
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_video_data - read video ROM/RAM
-//-------------------------------------------------
-
-inline UINT8 msm6255_device::read_video_data(UINT16 ma, UINT8 ra)
-{
-	return m_config.m_char_ram_r(this, ma, ra);
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  msm6255_device - constructor
-//-------------------------------------------------
-
-msm6255_device::msm6255_device(running_machine &_machine, const msm6255_device_config &config)
-    : device_t(_machine, config),
-	  m_cursor(0),
-      m_config(config)
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -143,7 +128,7 @@ msm6255_device::msm6255_device(running_machine &_machine, const msm6255_device_c
 void msm6255_device::device_start()
 {
 	// find screen
-	m_screen = machine().device<screen_device>(m_config.m_screen_tag);
+	m_screen = machine().device<screen_device>(m_screen_tag);
 
 	// register for state saving
 	save_item(NAME(m_ir));

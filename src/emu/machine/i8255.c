@@ -64,42 +64,8 @@ enum
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8255 = i8255_device_config::static_alloc_device_config;
-const device_type I8255A = i8255_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(i8255, "I8255")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void i8255_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const i8255_interface *intf = reinterpret_cast<const i8255_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<i8255_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_pa_func, 0, sizeof(m_in_pa_func));
-		memset(&m_out_pa_func, 0, sizeof(m_out_pa_func));
-		memset(&m_in_pb_func, 0, sizeof(m_in_pb_func));
-		memset(&m_out_pb_func, 0, sizeof(m_out_pb_func));
-		memset(&m_in_pc_func, 0, sizeof(m_in_pc_func));
-		memset(&m_out_pc_func, 0, sizeof(m_out_pc_func));
-	}
-}
+const device_type I8255 = &device_creator<i8255_device>;
+const device_type I8255A = &device_creator<i8255_device>;
 
 
 
@@ -311,10 +277,35 @@ inline int i8255_device::port_c_upper_mode()
 //  i8255_device - constructor
 //-------------------------------------------------
 
-i8255_device::i8255_device(running_machine &_machine, const i8255_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+i8255_device::i8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, I8255, "I8255", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void i8255_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const i8255_interface *intf = reinterpret_cast<const i8255_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8255_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+		memset(&m_in_pc_cb, 0, sizeof(m_in_pc_cb));
+		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
+	}
 }
 
 
@@ -325,12 +316,12 @@ i8255_device::i8255_device(running_machine &_machine, const i8255_device_config 
 void i8255_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_port_func[PORT_A], &m_config.m_in_pa_func, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_A], &m_config.m_out_pa_func, this);
-	devcb_resolve_read8(&m_in_port_func[PORT_B], &m_config.m_in_pb_func, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_B], &m_config.m_out_pb_func, this);
-	devcb_resolve_read8(&m_in_port_func[PORT_C], &m_config.m_in_pc_func, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_C], &m_config.m_out_pc_func, this);
+	devcb_resolve_read8(&m_in_port_func[PORT_A], &m_in_pa_cb, this);
+	devcb_resolve_write8(&m_out_port_func[PORT_A], &m_out_pa_cb, this);
+	devcb_resolve_read8(&m_in_port_func[PORT_B], &m_in_pb_cb, this);
+	devcb_resolve_write8(&m_out_port_func[PORT_B], &m_out_pb_cb, this);
+	devcb_resolve_read8(&m_in_port_func[PORT_C], &m_in_pc_cb, this);
+	devcb_resolve_write8(&m_out_port_func[PORT_C], &m_out_pc_cb, this);
 
 	// register for state saving
 	save_item(NAME(m_control));

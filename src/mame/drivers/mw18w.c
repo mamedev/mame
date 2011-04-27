@@ -22,8 +22,8 @@ To diagnose game, turn on service mode and:
 class mw18w_state : public driver_device
 {
 public:
-	mw18w_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 };
 

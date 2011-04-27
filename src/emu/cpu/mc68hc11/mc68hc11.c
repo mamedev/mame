@@ -369,7 +369,7 @@ static CPU_INIT( hc11 )
 	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
-	const hc11_config *conf = (const hc11_config *)device->baseconfig().static_config();
+	const hc11_config *conf = (const hc11_config *)device->static_config();
 
 	/* clear the opcode tables */
 	for(i=0; i < 256; i++) {

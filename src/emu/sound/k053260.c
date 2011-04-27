@@ -217,7 +217,7 @@ static DEVICE_START( k053260 )
 
 	/* Initialize our chip structure */
 	ic->device = device;
-	ic->intf = (device->baseconfig().static_config() != NULL) ? (const k053260_interface *)device->baseconfig().static_config() : &defintrf;
+	ic->intf = (device->static_config() != NULL) ? (const k053260_interface *)device->static_config() : &defintrf;
 
 	ic->mode = 0;
 

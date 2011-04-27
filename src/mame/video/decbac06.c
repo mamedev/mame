@@ -63,37 +63,21 @@ Priority word (Midres):
 #include "emu.h"
 #include "decbac06.h"
 
-deco_bac06_device_config::deco_bac06_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "decbac06_device", tag, owner, clock)
+void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int region16x16, int wide)
 {
-	m_gfxregion8x8 = m_gfxregion16x16 = m_wide = 0;
+	deco_bac06_device &dev = downcast<deco_bac06_device &>(device);
+	dev.m_gfxregion8x8 = region8x8;
+	dev.m_gfxregion16x16 = region16x16;
+	dev.m_wide = wide;
 }
 
-device_config *deco_bac06_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(deco_bac06_device_config(mconfig, tag, owner, clock));
-}
+const device_type DECO_BAC06 = &device_creator<deco_bac06_device>;
 
-device_t *deco_bac06_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, deco_bac06_device(machine, *this));
-}
-
-void deco_bac06_device_config::set_gfx_region_wide(device_config *device, int region8x8, int region16x16, int wide)
-{
-	deco_bac06_device_config *dev = downcast<deco_bac06_device_config *>(device);
-	dev->m_gfxregion8x8 = region8x8;
-	dev->m_gfxregion16x16 = region16x16;
-	dev->m_wide = wide;
-}
-
-
-deco_bac06_device::deco_bac06_device(running_machine &_machine, const deco_bac06_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-	  m_gfxregion8x8(m_config.m_gfxregion8x8),
-	  m_gfxregion16x16(m_config.m_gfxregion16x16),
-	  m_wide(m_config.m_wide)
+deco_bac06_device::deco_bac06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO_BAC06, "decbac06_device", tag, owner, clock),
+	  m_gfxregion8x8(0),
+	  m_gfxregion16x16(0),
+	  m_wide(0)
 {
 }
 

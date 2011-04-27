@@ -182,74 +182,57 @@ enum
 //**************************************************************************
 
 // macro for declaring the configuration and device classes of a legacy device
-#define _DECLARE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass)		\
+#define _DECLARE_LEGACY_DEVICE(name, basename, deviceclass, basedeviceclass)	\
 																				\
 DEVICE_GET_INFO( basename );													\
 																				\
-class configclass;																\
-																				\
 class deviceclass : public basedeviceclass										\
 {																				\
-	friend class configclass;													\
-	deviceclass(running_machine &_machine, const configclass &config);			\
-};																				\
-																				\
-class configclass : public baseconfigclass										\
-{																				\
-	configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock); \
-																				\
 public:																			\
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock); \
-	virtual device_t *alloc_device(running_machine &machine) const; 			\
+	deviceclass(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);	\
 };																				\
 																				\
 extern const device_type name
 
 // macro for defining the implementation needed for configuration and device classes
-#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) \
+#define _DEFINE_LEGACY_DEVICE(name, basename, deviceclass, basedeviceclass) 	\
 																				\
-deviceclass::deviceclass(running_machine &_machine, const configclass &config)	\
-	: basedeviceclass(_machine, config)											\
+deviceclass::deviceclass(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)	\
+	: basedeviceclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename))	\
 {																				\
 }																				\
 																				\
-configclass::configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock) \
-	: baseconfigclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename)) \
-{																				\
-}																				\
-																				\
-device_config *configclass::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
-{																				\
-	return global_alloc(configclass(mconfig, static_alloc_device_config, tag, owner, clock)); \
-}																				\
-																				\
-device_t *configclass::alloc_device(running_machine &machine) const 			\
-{																				\
-	return pool_alloc(machine_get_pool(machine), deviceclass(machine, *this));	\
-}																				\
-const device_type name = configclass::static_alloc_device_config
+const device_type name = &legacy_device_creator<deviceclass>
+
+// this template function creates a stub which constructs a device
+template<class T>
+device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+{
+	return global_alloc(T(mconfig, &legacy_device_creator<T>, tag, owner, clock));
+}
+
 
 // reduced macros that are easier to use, and map to the above two macros
-#define DECLARE_LEGACY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_device_config_base, legacy_device_base)
-#define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_sound_device_config_base, legacy_sound_device_base)
-#define DECLARE_LEGACY_MEMORY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
-#define DECLARE_LEGACY_NVRAM_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
-#define DECLARE_LEGACY_IMAGE_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_image_device_config_base, legacy_image_device_base)
+#define DECLARE_LEGACY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
+#define DECLARE_LEGACY_SOUND_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
+#define DECLARE_LEGACY_MEMORY_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_memory_device_base)
+#define DECLARE_LEGACY_NVRAM_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_nvram_device_base)
+#define DECLARE_LEGACY_IMAGE_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device, legacy_image_device_base)
 
-#define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_device_config_base, legacy_device_base)
-#define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_sound_device_config_base, legacy_sound_device_base)
-#define DEFINE_LEGACY_MEMORY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_memory_device_config_base, legacy_memory_device_base)
-#define DEFINE_LEGACY_NVRAM_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_nvram_device_config_base, legacy_nvram_device_base)
-#define DEFINE_LEGACY_IMAGE_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_image_device_config_base, legacy_image_device_base)
+#define DEFINE_LEGACY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_device_base)
+#define DEFINE_LEGACY_SOUND_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_sound_device_base)
+#define DEFINE_LEGACY_MEMORY_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_memory_device_base)
+#define DEFINE_LEGACY_NVRAM_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_nvram_device_base)
+#define DEFINE_LEGACY_IMAGE_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device, legacy_image_device_base)
 
 
 // macros to wrap legacy device functions
 #define DEVICE_GET_INFO_NAME(name)	device_get_config_##name
-#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_config *device, UINT32 state, deviceinfo *info)
+#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_t *device, UINT32 state, deviceinfo *info)
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
-#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device, emu_options &options)
+#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_t *device, emu_options &options)
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_START_NAME(name)		device_start_##name
@@ -282,7 +265,7 @@ const device_type name = configclass::static_alloc_device_config
 
 // inline device configurations that require 32 bits of storage in the token
 #define MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
-	legacy_device_config_base::static_set_inline32(device, _offset, _size, (UINT32)(_val));
+	legacy_device_base::static_set_inline32(*device, _offset, _size, (UINT32)(_val));
 
 #define MCFG_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
 	MCFG_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
@@ -305,7 +288,7 @@ const device_type name = configclass::static_alloc_device_config
 
 // inline device configurations that require 32 bits of fixed-point storage in the token
 #define MCFG_DEVICE_CONFIG_DATAFP32_EXPLICIT(_size, _offset, _val, _fixbits) \
-	legacy_device_config_base::static_set_inline_float(device, _offset, _size, (float)(_val));
+	legacy_device_base::static_set_inline_float(*device, _offset, _size, (float)(_val));
 
 #define MCFG_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
 	MCFG_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val, _fixbits)
@@ -328,7 +311,7 @@ const device_type name = configclass::static_alloc_device_config
 
 // inline device configurations that require 64 bits of storage in the token
 #define MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
-	legacy_device_config_base::static_set_inline64(device, _offset, _size, (UINT64)(_val));
+	legacy_device_base::static_set_inline64(*device, _offset, _size, (UINT64)(_val));
 
 #define MCFG_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
 	MCFG_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
@@ -376,15 +359,15 @@ const device_type name = configclass::static_alloc_device_config
 
 union deviceinfo;
 class machine_config;
-class device_config;
+class device_t;
 
 char *get_temp_string_buffer(void);
 resource_pool &machine_get_pool(running_machine &machine);
 
 
 // device interface function types
-typedef void (*device_get_config_func)(const device_config *device, UINT32 state, deviceinfo *info);
-typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device, emu_options &options);
+typedef void (*device_get_config_func)(const device_t *device, UINT32 state, deviceinfo *info);
+typedef int (*device_validity_check_func)(const game_driver *driver, const device_t *device, emu_options &options);
 
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
@@ -419,52 +402,6 @@ union deviceinfo
 };
 
 
-// ======================> legacy_device_config_base
-
-// legacy_device_config_base describes a base configuration class for legacy devices
-class legacy_device_config_base : public device_config
-{
-	friend class legacy_device_base;
-	friend class legacy_nvram_device_base;
-	friend class legacy_image_device_base;
-
-protected:
-	// construction/destruction
-	legacy_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
-	virtual ~legacy_device_config_base();
-
-	// allocators - defined in derived classes
-
-	// basic information getters
-public:
-	// access to legacy inline configuartion
-	void *inline_config() const { return m_inline_config; }
-
-	// inline configuration helpers
-	static void static_set_inline32(device_config *device, UINT32 offset, UINT32 size, UINT32 value);
-	static void static_set_inline64(device_config *device, UINT32 offset, UINT32 size, UINT64 value);
-	static void static_set_inline_float(device_config *device, UINT32 offset, UINT32 size, float value);
-
-protected:
-	// overrides
-	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
-	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
-	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
-	virtual const input_port_token *device_input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_config_ptr(DEVINFO_PTR_INPUT_PORTS)); }
-
-	// access to legacy configuration info
-	INT64 get_legacy_config_int(UINT32 state) const;
-	void *get_legacy_config_ptr(UINT32 state) const;
-	genf *get_legacy_config_fct(UINT32 state) const;
-	const char *get_legacy_config_string(UINT32 state) const;
-
-	// internal state
-	device_get_config_func	m_get_config_func;
-	void *					m_inline_config;
-};
-
-
-
 // ======================> legacy_device_base
 
 // legacy_device_base serves as a common base class for legacy devices
@@ -472,34 +409,42 @@ class legacy_device_base : public device_t
 {
 protected:
 	// construction/destruction
-	legacy_device_base(running_machine &_machine, const device_config &config);
+	legacy_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
 	virtual ~legacy_device_base();
 
 public:
+	// access to legacy inline configuartion
+	void *inline_config() const { return m_inline_config; }
+
+	// inline configuration helpers
+	static void static_set_inline32(device_t &device, UINT32 offset, UINT32 size, UINT32 value);
+	static void static_set_inline64(device_t &device, UINT32 offset, UINT32 size, UINT64 value);
+	static void static_set_inline_float(device_t &device, UINT32 offset, UINT32 size, float value);
+
 	// access to legacy token
-	void *token() const { return m_token; }
+	void *token() const { assert(m_token != NULL); return m_token; }
 
 protected:
 	// device-level overrides
+	virtual const rom_entry *device_rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_ptr(DEVINFO_PTR_ROM_REGION)); }
+	virtual machine_config_constructor device_mconfig_additions() const { return reinterpret_cast<machine_config_constructor>(get_legacy_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
+	virtual const input_port_token *device_input_ports() const { return reinterpret_cast<const input_port_token *>(get_legacy_ptr(DEVINFO_PTR_INPUT_PORTS)); }
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start();
 	virtual void device_reset();
 
+	// access to legacy configuration info
+	INT64 get_legacy_int(UINT32 state) const;
+	void *get_legacy_ptr(UINT32 state) const;
+	genf *get_legacy_fct(UINT32 state) const;
+	const char *get_legacy_string(UINT32 state) const;
+
+	// configuration state
+	device_get_config_func		m_get_config_func;
+	void *						m_inline_config;
+
 	// internal state
-	const legacy_device_config_base &	m_config;
-	void *								m_token;
-};
-
-
-
-// ======================> legacy_sound_device_config_base
-
-// legacy_sound_device_config is a device_config with a sound interface
-class legacy_sound_device_config_base :	public legacy_device_config_base,
-										public device_config_sound_interface
-{
-protected:
-	// construction/destruction
-	legacy_sound_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
+	void *						m_token;
 };
 
 
@@ -512,32 +457,10 @@ class legacy_sound_device_base :	public legacy_device_base,
 {
 protected:
 	// construction/destruction
-	legacy_sound_device_base(running_machine &machine, const device_config &config);
+	legacy_sound_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-};
-
-
-
-// ======================> legacy_memory_device_config_base
-
-// legacy_memory_device_config is a device_config with a memory interface
-class legacy_memory_device_config_base : public legacy_device_config_base,
-										 public device_config_memory_interface
-{
-protected:
-	// construction/destruction
-	legacy_memory_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
-
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_space_config : NULL; }
-
-	// internal state
-	address_space_config m_space_config;
 };
 
 
@@ -550,20 +473,16 @@ class legacy_memory_device_base :	public legacy_device_base,
 {
 protected:
 	// construction/destruction
-	legacy_memory_device_base(running_machine &machine, const device_config &config);
-};
+	legacy_memory_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
 
+	// device overrides
+	virtual void device_config_complete();
 
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum == 0) ? &m_space_config : NULL; }
 
-// ======================> legacy_nvram_device_config
-
-// legacy_nvram_device_config is a device_config with a nvram interface
-class legacy_nvram_device_config_base : 	public legacy_device_config_base,
-											public device_config_nvram_interface
-{
-protected:
-	// construction/destruction
-	legacy_nvram_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
+	// internal state
+	address_space_config m_space_config;
 };
 
 
@@ -576,7 +495,7 @@ class legacy_nvram_device_base :	public legacy_device_base,
 {
 protected:
 	// construction/destruction
-	legacy_nvram_device_base(running_machine &machine, const device_config &config);
+	legacy_nvram_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
@@ -584,16 +503,18 @@ protected:
 	virtual void nvram_write(emu_file &file);
 };
 
-// ======================> legacy_image_device_config
 
-// legacy_image_device_config is a device_config with a image interface
-class legacy_image_device_config_base : 	public legacy_device_config_base,
-											public device_config_image_interface
+
+// ======================> legacy_image_device
+
+// legacy_image_device is a legacy_device_base with a image interface
+class legacy_image_device_base :	public legacy_device_base,
+									public device_image_interface
 {
 public:
 	virtual iodevice_t image_type()  const { return m_type; }
 	virtual const char *image_type_name()  const { return device_typename(m_type); }
-	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }
+	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_int(DEVINFO_INT_IMAGE_TYPE)); }
 	virtual bool is_readable()  const { return m_readable; }
 	virtual bool is_writeable() const { return m_writeable; }
 	virtual bool is_creatable() const { return m_creatable; }
@@ -608,12 +529,24 @@ public:
 	virtual const option_guide *create_option_guide() const { return m_create_option_guide; }
     virtual image_device_format *formatlist() const { return m_formatlist; }
 	virtual device_image_partialhash_func get_partial_hash() const;
-protected:
-	// construction/destruction
-	legacy_image_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
-	virtual ~legacy_image_device_config_base();
 
-	// device_config overrides
+	virtual bool load(const char *path);
+	virtual bool finish_load();
+	virtual void unload();
+	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+	virtual bool load_software(char *swlist, char *swname, rom_entry *entry);
+
+	virtual int call_load();
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
+	virtual int call_create(int format_type, option_resolution *format_options);
+	virtual void call_unload();
+	virtual void call_display();
+	virtual void call_display_info();
+	virtual device_image_partialhash_func get_partial_hash();
+	virtual void call_get_devices();
+	virtual void *get_device_specific_call();
+protected:
+	// device overrides
 	virtual void device_config_complete();
 
     iodevice_t   m_type;
@@ -631,34 +564,10 @@ protected:
     /* creation info */
     const option_guide *m_create_option_guide;
     image_device_format *m_formatlist;
-};
 
-
-// ======================> legacy_image_device
-
-// legacy_image_device is a legacy_device_base with a image interface
-class legacy_image_device_base :	public legacy_device_base,
-									public device_image_interface
-{
-public:
-	virtual bool load(const char *path);
-	virtual bool finish_load();
-	virtual void unload();
-	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
-	virtual bool load_software(char *swlist, char *swname, rom_entry *entry);
-
-	virtual int call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
-	virtual int call_create(int format_type, option_resolution *format_options);
-	virtual void call_unload();
-	virtual void call_display();
-	virtual void call_display_info();
-	virtual device_image_partialhash_func get_partial_hash();
-	virtual void call_get_devices();
-	virtual void *get_device_specific_call();
-protected:
 	// construction/destruction
-	legacy_image_device_base(running_machine &machine, const device_config &config);
+	legacy_image_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config);
+	~legacy_image_device_base();
 	// device_image_interface overrides
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
@@ -668,8 +577,6 @@ protected:
 
 	bool m_is_loading;
 };
-
-
 
 
 #endif	/* __DEVLEGCY_H__ */

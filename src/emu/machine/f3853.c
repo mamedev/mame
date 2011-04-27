@@ -38,37 +38,20 @@
 ***************************************************************************/
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type F3853 = &device_creator<f3853_device>;
+
 //-------------------------------------------------
-//  f3853_device_config - constructor
+//  f3853_device - constructor
 //-------------------------------------------------
 
-f3853_device_config::f3853_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "F3853", tag, owner, clock)
+f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, F3853, "F3853", tag, owner, clock)
 {
-}
 
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *f3853_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(f3853_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *f3853_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, f3853_device(machine, *this));
 }
 
 
@@ -78,7 +61,7 @@ device_t *f3853_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void f3853_device_config::device_config_complete()
+void f3853_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const f3853_interface *intf = reinterpret_cast<const f3853_interface *>(static_config());
@@ -94,24 +77,6 @@ void f3853_device_config::device_config_complete()
 	}
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type F3853 = f3853_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  f3853_device - constructor
-//-------------------------------------------------
-
-f3853_device::f3853_device(running_machine &_machine, const f3853_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -166,22 +131,22 @@ void f3853_device::device_reset()
 
 void f3853_device::f3853_set_interrupt_request_line()
 {
-    if(!m_config.m_interrupt_request)
+    if(!m_interrupt_request)
     {
 		return;
 	}
 
 	if(m_external_enable && !m_priority_line)
 	{
-		m_config.m_interrupt_request(this, INTERRUPT_VECTOR(TRUE), TRUE);
+		m_interrupt_request(this, INTERRUPT_VECTOR(TRUE), TRUE);
 	}
 	else if( m_timer_enable && !m_priority_line && m_request_flipflop)
 	{
-		m_config.m_interrupt_request(this, INTERRUPT_VECTOR(FALSE), TRUE);
+		m_interrupt_request(this, INTERRUPT_VECTOR(FALSE), TRUE);
 	}
 	else
 	{
-		m_config.m_interrupt_request(this, 0, FALSE);
+		m_interrupt_request(this, 0, FALSE);
 	}
 }
 

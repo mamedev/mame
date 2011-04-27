@@ -46,37 +46,14 @@ struct ppi8255_interface
 };
 
 
-// ======================> ppi8255_device_config
-
-class ppi8255_device_config : public device_config,
-                              public ppi8255_interface
-{
-    friend class ppi8255_device;
-
-    // construction/destruction
-    ppi8255_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
-};
-
-
 // ======================> ppi8255_device
 
-class ppi8255_device :  public device_t
+class ppi8255_device :  public device_t,
+						public ppi8255_interface
 {
-    friend class ppi8255_device_config;
-
-    // construction/destruction
-    ppi8255_device(running_machine &_machine, const ppi8255_device_config &_config);
-
 public:
+    // construction/destruction
+    ppi8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 ppi8255_r(UINT32 offset);
 	void ppi8255_w(UINT32 offset, UINT8 data);
@@ -97,6 +74,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
     virtual void device_post_load() { }
@@ -141,8 +119,6 @@ private:
 	UINT8 m_latch[3];		/* data written to ports */
 	UINT8 m_output[3];		/* actual output data */
 	UINT8 m_control;		/* mode control word */
-
-    const ppi8255_device_config &m_config;
 };
 
 

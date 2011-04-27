@@ -63,13 +63,13 @@
     MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
 #define MCFG_7474_TARGET_TAG(_target_tag) \
-	ttl7474_device_config::static_set_target_tag(device, _target_tag); \
+	ttl7474_device::static_set_target_tag(*device, _target_tag); \
 
 #define MCFG_7474_OUTPUT_CB(_cb) \
-	ttl7474_device_config::static_set_output_cb(device, _cb); \
+	ttl7474_device::static_set_output_cb(*device, _cb); \
 
 #define MCFG_7474_COMP_OUTPUT_CB(_cb) \
-	ttl7474_device_config::static_set_comp_output_cb(device, _cb); \
+	ttl7474_device::static_set_comp_output_cb(*device, _cb); \
 
 
 
@@ -77,43 +77,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ttl7474_device_config
-
-class ttl7474_device_config :  public device_config
-{
-    friend class ttl7474_device;
-
-    // construction/destruction
-    ttl7474_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_target_tag(device_config *device, const char *tag);
-	static void static_set_output_cb(device_config *device, write_line_device_func callback);
-	static void static_set_comp_output_cb(device_config *device, write_line_device_func callback);
-
-protected:
-    // internal state goes here
-    devcb_write_line m_output_cb;
-    devcb_write_line m_comp_output_cb;
-};
-
-
-
 // ======================> ttl7474_device
 
 class ttl7474_device : public device_t
 {
-    friend class ttl7474_device_config;
-
-    // construction/destruction
-    ttl7474_device(running_machine &_machine, const ttl7474_device_config &config);
-
 public:
+    // construction/destruction
+    ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_target_tag(device_t &device, const char *tag);
+	static void static_set_output_cb(device_t &device, write_line_device_func callback);
+	static void static_set_comp_output_cb(device_t &device, write_line_device_func callback);
+
+	// public interfaces
     void clear_w(UINT8 state);
     void preset_w(UINT8 state);
     void clock_w(UINT8 state);
@@ -128,13 +105,14 @@ protected:
     virtual void device_post_load() { }
     virtual void device_clock_changed() { }
 
-    // internal state
-    const ttl7474_device_config &m_config;
+    // configuration state
+    devcb_write_line m_output_cb;
+    devcb_write_line m_comp_output_cb;
 
 private:
     /* callbacks */
-    devcb_resolved_write_line m_output_cb;
-    devcb_resolved_write_line m_comp_output_cb;
+    devcb_resolved_write_line m_output_func;
+    devcb_resolved_write_line m_comp_output_func;
 
     /* inputs */
     UINT8 m_clear;              /* pin 1/13 */

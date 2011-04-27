@@ -137,7 +137,7 @@ static DEVICE_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = device->baseconfig().static_config() ? (const ym2608_interface *)device->baseconfig().static_config() : &generic_2608;
+	const ym2608_interface *intf = device->static_config() ? (const ym2608_interface *)device->static_config() : &generic_2608;
 	int rate = device->clock()/72;
 	void *pcmbufa;
 	int  pcmsizea;

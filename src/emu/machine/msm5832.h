@@ -41,35 +41,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> msm5832_device_config
-
-class msm5832_device_config :   public device_config,
-								public device_config_rtc_interface
-{
-    friend class msm5832_device;
-
-    // construction/destruction
-    msm5832_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-
 // ======================> msm5832_device
 
 class msm5832_device :	public device_t,
 						public device_rtc_interface
 {
-    friend class msm5832_device_config;
-
-    // construction/destruction
-    msm5832_device(running_machine &_machine, const msm5832_device_config &_config);
-
 public:
+    // construction/destruction
+    msm5832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
@@ -111,8 +91,6 @@ private:
 
 	// timers
 	emu_timer *m_clock_timer;
-
-	const msm5832_device_config &m_config;
 };
 
 

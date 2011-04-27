@@ -23,7 +23,7 @@
 #define MCFG_SED1330_ADD(_tag, _clock, _screen_tag, _map) \
 	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _map) \
-	sed1330_device_config::static_set_config(device, _screen_tag);
+	sed1330_device::static_set_config(*device, _screen_tag);
 
 
 
@@ -31,51 +31,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sed1330_device_config
-
-class sed1330_device_config :   public device_config,
-								public device_config_memory_interface
-{
-    friend class sed1330_device;
-
-    // construction/destruction
-    sed1330_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, const char *screen_tag);
-
-protected:
-	// optional information overrides
-	virtual const rom_entry *device_rom_region() const;
-
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-    // address space configurations
-	const address_space_config		m_space_config;
-
-private:
-	const char *m_screen_tag;
-};
-
-
-
 // ======================> sed1330_device
 
 class sed1330_device :	public device_t,
 						public device_memory_interface
 {
-    friend class sed1330_device_config;
-
-    // construction/destruction
-    sed1330_device(running_machine &_machine, const sed1330_device_config &_config);
-
 public:
+    // construction/destruction
+    sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const char *screen_tag);
+
     DECLARE_READ8_MEMBER( status_r );
     DECLARE_WRITE8_MEMBER( command_w );
 
@@ -86,8 +53,12 @@ public:
 
 protected:
     // device-level overrides
+	virtual const rom_entry *device_rom_region() const;
     virtual void device_start();
     virtual void device_reset();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	inline UINT8 readbyte(offs_t address);
 	inline void writebyte(offs_t address, UINT8 m_data);
@@ -146,7 +117,9 @@ private:
 	// devices
 	screen_device *m_screen;
 
-	const sed1330_device_config &m_config;
+    // address space configurations
+	const address_space_config		m_space_config;
+	const char *m_screen_tag;
 };
 
 

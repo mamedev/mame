@@ -12,35 +12,19 @@
 //#define ICS2115_DEBUG
 //#define ICS2115_ISOLATE 6
 
-const device_type ICS2115 = ics2115_device_config::static_alloc_device_config;
+// device type definition
+const device_type ICS2115 = &device_creator<ics2115_device>;
 
-void ics2115_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state))
+void ics2115_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
 {
-	ics2115_device_config *ics2115 = downcast<ics2115_device_config *>(device);
-	ics2115->m_irq_func = irqf;
+	ics2115_device &ics2115 = downcast<ics2115_device &>(device);
+	ics2115.m_irq_cb = irqf;
 }
 
-ics2115_device_config::ics2115_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "ICS2115", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-device_config *ics2115_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(ics2115_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *ics2115_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, ics2115_device(machine, *this));
-}
-
-ics2115_device::ics2115_device(running_machine &machine, const ics2115_device_config &config)
-	: device_t(machine, config),
-	  device_sound_interface(machine, config, *this),
-	  m_config(config),
-	  m_irq_cb(m_config.m_irq_func)
+ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_irq_cb(NULL)
 {
 }
 

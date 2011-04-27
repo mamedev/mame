@@ -1286,7 +1286,7 @@ static void register_for_save_state(device_t *device)
 
 static CPU_INIT( tms99xx )
 {
-	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->baseconfig().static_config();
+	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->static_config();
 	tms99xx_state *cpustate = get_safe_token(device);
 
 	register_for_save_state(device);
@@ -4630,7 +4630,7 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(const device_config *devconfig, legacy_cpu_device *device, UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(legacy_cpu_device *device, UINT32 state, cpuinfo *info)
 {
 	tms99xx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)

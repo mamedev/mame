@@ -130,7 +130,7 @@ static void tx0_init_common(legacy_cpu_device *device, device_irq_callback irqca
 	tx0_state *cpustate = get_safe_token(device);
 
 	/* clean-up */
-	cpustate->iface = (const tx0_reset_param_t *)device->baseconfig().static_config();
+	cpustate->iface = (const tx0_reset_param_t *)device->static_config();
 
 	cpustate->address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
 	cpustate->ir_mask = is_64kw ? 03 : 037;

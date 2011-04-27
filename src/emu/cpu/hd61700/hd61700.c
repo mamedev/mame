@@ -90,45 +90,20 @@
 static const UINT16 irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  HD61700 DEVICE
 //**************************************************************************
 
-const device_type HD61700 = hd61700_cpu_device_config::static_alloc_device_config;
-
-
-//**************************************************************************
-//  HD61700 DEVICE CONFIG
-//**************************************************************************
+const device_type HD61700 = &device_creator<hd61700_cpu_device>;
 
 //-------------------------------------------------
-//  hd61700_cpu_device_config - constructor
+//  hd61700_cpu_device - constructor
 //-------------------------------------------------
 
-hd61700_cpu_device_config::hd61700_cpu_device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock)
-	: cpu_device_config(mconfig, type, "HD61700", tag, owner, clock),
+hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock),
 	 m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *hd61700_cpu_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc(hd61700_cpu_device_config(mconfig, HD61700, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *hd61700_cpu_device_config::alloc_device(running_machine &machine) const
-{
-	return pool_alloc(machine_get_pool(machine), hd61700_cpu_device(machine, *this));
+	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
 }
 
 
@@ -137,28 +112,11 @@ device_t *hd61700_cpu_device_config::alloc_device(running_machine &machine) cons
 //  structure
 //-------------------------------------------------
 
-void hd61700_cpu_device_config::static_set_config(device_config *device, const hd61700_config &config)
+void hd61700_cpu_device::static_set_config(device_t &device, const hd61700_config &config)
 {
-	hd61700_cpu_device_config *conf = downcast<hd61700_cpu_device_config *>(device);
-	*static_cast<hd61700_config *>(conf) = config;
+	hd61700_cpu_device &conf = downcast<hd61700_cpu_device &>(device);
+	static_cast<hd61700_config &>(conf) = config;
 }
-
-
-//**************************************************************************
-//  HD61700 DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  hd61700_cpu_device - constructor
-//-------------------------------------------------
-
-hd61700_cpu_device::hd61700_cpu_device(running_machine &machine, const hd61700_cpu_device_config &config)
-	: cpu_device(machine, config),
-	  m_cpu_config(config)
-{
-	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
-}
-
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -498,8 +456,8 @@ void hd61700_cpu_device::execute_run()
 					{
 						UINT8 arg = read_op();
 
-						if (m_cpu_config.m_lcd_data_w)
-							(*m_cpu_config.m_lcd_data_w)(*this, READ_REG(arg));
+						if (m_lcd_data_w)
+							(*m_lcd_data_w)(*this, READ_REG(arg));
 
 						check_optional_jr(arg);
 						m_icount -= 11;
@@ -511,8 +469,8 @@ void hd61700_cpu_device::execute_run()
 						UINT8 arg = read_op();
 						UINT8 res = 0xff;
 
-						if (m_cpu_config.m_lcd_data_r)
-							res = (*m_cpu_config.m_lcd_data_r)(*this);
+						if (m_lcd_data_r)
+							res = (*m_lcd_data_r)(*this);
 
 						WRITE_REG(arg, res);
 
@@ -531,8 +489,8 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_cpu_config.m_lcd_control)
-								(*m_cpu_config.m_lcd_control)(*this, READ_REG(arg));
+							if (m_lcd_control)
+								(*m_lcd_control)(*this, READ_REG(arg));
 						}
 
 						check_optional_jr(arg);
@@ -562,8 +520,8 @@ void hd61700_cpu_device::execute_run()
 							case 0:		//PE
 							case 1:		//PD
 								WRITE_REG8(idx, src);
-								if (m_cpu_config.m_port_w)
-									(*m_cpu_config.m_port_w)(*this, REG_PD & REG_PE);
+								if (m_port_w)
+									(*m_port_w)(*this, REG_PD & REG_PE);
 								break;
 							case 2:		//IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -572,8 +530,8 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:		//IA
-								if (m_cpu_config.m_kb_w)
-									(*m_cpu_config.m_kb_w)(*this, src);
+								if (m_kb_w)
+									(*m_kb_w)(*this, src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:		//IE
@@ -706,8 +664,8 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_cpu_config.m_port_r)
-								src = (*m_cpu_config.m_port_r)(*this);
+							if (m_port_r)
+								src = (*m_port_r)(*this);
 
 							src&=(~REG_PE);
 						}
@@ -1051,8 +1009,8 @@ void hd61700_cpu_device::execute_run()
 					{
 						UINT8 arg = read_op();
 
-						if (m_cpu_config.m_lcd_data_w)
-							(*m_cpu_config.m_lcd_data_w)(*this, arg);
+						if (m_lcd_data_w)
+							(*m_lcd_data_w)(*this, arg);
 
 						m_icount -= 12;
 					}
@@ -1069,8 +1027,8 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_cpu_config.m_lcd_control)
-								(*m_cpu_config.m_lcd_control)(*this, src);
+							if (m_lcd_control)
+								(*m_lcd_control)(*this, src);
 						}
 
 						m_icount -= 3;
@@ -1098,8 +1056,8 @@ void hd61700_cpu_device::execute_run()
 							case 0:		//PE
 							case 1:		//PD
 								WRITE_REG8(idx, src);
-								if (m_cpu_config.m_port_w)
-									(*m_cpu_config.m_port_w)(*this, REG_PD & REG_PE);
+								if (m_port_w)
+									(*m_port_w)(*this, REG_PD & REG_PE);
 								break;
 							case 2:		//IB
 								REG_IB = (REG_IB & 0x1f) | (src & 0xe0);
@@ -1108,8 +1066,8 @@ void hd61700_cpu_device::execute_run()
 								WRITE_REG8(idx, src);
 								break;
 							case 4:		//IA
-								if (m_cpu_config.m_kb_w)
-									(*m_cpu_config.m_kb_w)(*this, src);
+								if (m_kb_w)
+									(*m_kb_w)(*this, src);
 								WRITE_REG8(idx, src);
 								break;
 							case 5:		//IE
@@ -1482,10 +1440,10 @@ void hd61700_cpu_device::execute_run()
 					{
 						UINT8 arg = read_op();
 
-						if (m_cpu_config.m_lcd_data_w)
+						if (m_lcd_data_w)
 						{
-							(*m_cpu_config.m_lcd_data_w)(*this, READ_REG(arg));
-							(*m_cpu_config.m_lcd_data_w)(*this, READ_REG(arg+1));
+							(*m_lcd_data_w)(*this, READ_REG(arg));
+							(*m_lcd_data_w)(*this, READ_REG(arg+1));
 						}
 
 						check_optional_jr(arg);
@@ -1498,10 +1456,10 @@ void hd61700_cpu_device::execute_run()
 						UINT8 arg = read_op();
 						UINT8 reg0, reg1;
 
-						if (m_cpu_config.m_lcd_data_r)
+						if (m_lcd_data_r)
 						{
-							reg0 = (*m_cpu_config.m_lcd_data_r)(*this);
-							reg1 = (*m_cpu_config.m_lcd_data_r)(*this);
+							reg0 = (*m_lcd_data_r)(*this);
+							reg1 = (*m_lcd_data_r)(*this);
 						}
 						else
 							reg0 = reg1 = 0xff;
@@ -1666,10 +1624,10 @@ void hd61700_cpu_device::execute_run()
 						}
 						else
 						{
-							if (m_cpu_config.m_port_r)
+							if (m_port_r)
 							{
-								reg0 = (*m_cpu_config.m_port_r)(*this);
-								reg1 = (*m_cpu_config.m_port_r)(*this);
+								reg0 = (*m_port_r)(*this);
+								reg1 = (*m_port_r)(*this);
 							}
 							else
 								reg0 = reg1 = 0xff;
@@ -1698,8 +1656,8 @@ void hd61700_cpu_device::execute_run()
 						{
 							UINT16 port = 0xff;
 
-							if (m_cpu_config.m_kb_r)
-								port = (*m_cpu_config.m_kb_r)(*this);
+							if (m_kb_r)
+								port = (*m_kb_r)(*this);
 
 							src = (REG_KY & 0x0f00) | (port & 0xf0ff);
 						}
@@ -2158,8 +2116,8 @@ void hd61700_cpu_device::execute_run()
 
 						for (int n=GET_IM3(arg1); n>0; n--)
 						{
-							if (m_cpu_config.m_lcd_data_w)
-								(*m_cpu_config.m_lcd_data_w)(*this, READ_REG(arg));
+							if (m_lcd_data_w)
+								(*m_lcd_data_w)(*this, READ_REG(arg));
 
 							arg++;
 							m_icount -= 8;
@@ -2177,8 +2135,8 @@ void hd61700_cpu_device::execute_run()
 
 						for (int n=GET_IM3(arg1); n>0; n--)
 						{
-							if (m_cpu_config.m_lcd_data_r)
-								src = (*m_cpu_config.m_lcd_data_r)(*this);
+							if (m_lcd_data_r)
+								src = (*m_lcd_data_r)(*this);
 							else
 								src = 0xff;
 
@@ -2674,11 +2632,11 @@ void hd61700_cpu_device::execute_run()
 						m_state |= CPU_SLP;
 
 						m_irq_status = 0;
-						if (m_cpu_config.m_lcd_control)
-							(*m_cpu_config.m_lcd_control)(*this, 0);
+						if (m_lcd_control)
+							(*m_lcd_control)(*this, 0);
 
-						if (m_cpu_config.m_kb_w)
-							(*m_cpu_config.m_kb_w)(*this, 0);
+						if (m_kb_w)
+							(*m_kb_w)(*this, 0);
 						m_icount -= 3;
 					}
 					break;

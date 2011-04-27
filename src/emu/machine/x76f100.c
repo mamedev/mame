@@ -23,30 +23,15 @@ inline void ATTR_PRINTF(3,4) x76f100_device::verboselog(int n_level, const char 
 		va_start(v, s_fmt);
 		vsprintf(buf, s_fmt, v);
 		va_end(v);
-		logerror("x76f100 %s %s: %s", config.tag(), machine().describe_context(), buf);
+		logerror("x76f100 %s %s: %s", tag(), machine().describe_context(), buf);
 	}
 }
 
-const device_type X76F100 = x76f100_device_config::static_alloc_device_config;
+// device type definition
+const device_type X76F100 = &device_creator<x76f100_device>;
 
-x76f100_device_config::x76f100_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_secure_serial_flash_config(mconfig, static_alloc_device_config, "X76F100", tag, owner, clock)
-{
-}
-
-device_config *x76f100_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(x76f100_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *x76f100_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, x76f100_device(machine, *this));
-}
-
-x76f100_device::x76f100_device(running_machine &_machine, const x76f100_device_config &_config)
-	: device_secure_serial_flash(_machine, _config),
-	  config(_config)
+x76f100_device::x76f100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_secure_serial_flash(mconfig, X76F100, "X76F100", tag, owner, clock)
 {
 }
 
@@ -84,7 +69,7 @@ void x76f100_device::nvram_default()
 		// Ensure the size is correct though
 		if(m_region->bytes() != SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA)
 			logerror("x76f100 %s: Wrong region length for initialization data, expected 0x%x, got 0x%x\n",
-					 config.tag(),
+					 tag(),
 					 SIZE_RESPONSE_TO_RESET+SIZE_WRITE_PASSWORD+SIZE_READ_PASSWORD+SIZE_DATA,
 					 m_region->bytes());
 		else {
@@ -100,7 +85,7 @@ void x76f100_device::nvram_default()
 
 	// That chip isn't really usable without the passwords, so bitch
 	// if there's no region
-	logerror("x76f100 %s: Warning, no default data provided, chip is unusable.\n", config.tag());
+	logerror("x76f100 %s: Warning, no default data provided, chip is unusable.\n", tag());
 	memset(response_to_reset, 0, SIZE_RESPONSE_TO_RESET);
 	memset(write_password,    0, SIZE_WRITE_PASSWORD);
 	memset(read_password,     0, SIZE_READ_PASSWORD);

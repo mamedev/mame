@@ -208,8 +208,8 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 class halleys_state : public driver_device
 {
 public:
-	halleys_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];

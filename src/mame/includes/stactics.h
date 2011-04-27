@@ -10,8 +10,8 @@
 class stactics_state : public driver_device
 {
 public:
-	stactics_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	stactics_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* machine state */
 	int    m_vert_pos;

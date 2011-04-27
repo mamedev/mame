@@ -22,7 +22,7 @@
 
 #define MCFG_HD44102_ADD(_tag, _screen_tag, _sx, _sy) \
 	MCFG_DEVICE_ADD(_tag, HD44102, 0) \
-	hd44102_device_config::static_set_config(device, _screen_tag, _sx, _sy);
+	hd44102_device::static_set_config(*device, _screen_tag, _sx, _sy);
 
 
 
@@ -30,40 +30,17 @@
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> hd44102_device_config
-
-class hd44102_device_config :   public device_config
-{
-    friend class hd44102_device;
-
-    // construction/destruction
-    hd44102_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_config(device_config *device, const char *screen_tag, int sx, int sy);
-
-private:
-	const char *m_screen_tag;
-	int m_sx;
-	int m_sy;
-};
-
-
 // ======================> hd44102_device
 
 class hd44102_device :	public device_t
 {
-    friend class hd44102_device_config;
-
-    // construction/destruction
-    hd44102_device(running_machine &_machine, const hd44102_device_config &_config);
-
 public:
+    // construction/destruction
+    hd44102_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_config(device_t &device, const char *screen_tag, int sx, int sy);
+
     DECLARE_READ8_MEMBER( read );
     DECLARE_WRITE8_MEMBER( write );
 
@@ -97,7 +74,9 @@ private:
 	int m_x;						// X address
 	int m_y;						// Y address
 
-	const hd44102_device_config &m_config;
+	const char *m_screen_tag;
+	int m_sx;
+	int m_sy;
 };
 
 

@@ -37,35 +37,19 @@ struct z80_daisy_config
 
 
 
-// ======================> device_config_z80daisy_interface
-
-// device_config_z80daisy_interface represents configuration information for a z80daisy device
-class device_config_z80daisy_interface : public device_config_interface
-{
-public:
-	// construction/destruction
-	device_config_z80daisy_interface(const machine_config &mconfig, device_config &devconfig);
-	virtual ~device_config_z80daisy_interface();
-};
-
-
-
 // ======================> device_z80daisy_interface
 
 class device_z80daisy_interface : public device_interface
 {
 public:
 	// construction/destruction
-	device_z80daisy_interface(running_machine &machine, const device_config &config, device_t &device);
+	device_z80daisy_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_z80daisy_interface();
 
 	// required operation overrides
 	virtual int z80daisy_irq_state() = 0;
 	virtual int z80daisy_irq_ack() = 0;
 	virtual void z80daisy_irq_reti() = 0;
-
-protected:
-	const device_config_z80daisy_interface &m_z80daisy_config;
 };
 
 

@@ -1003,7 +1003,7 @@ static astring &warnings_string(running_machine &machine, astring &string)
 
 astring &game_info_astring(running_machine &machine, astring &string)
 {
-	int scrcount = machine.m_devicelist.count(SCREEN);
+	int scrcount = machine.devicelist().count(SCREEN);
 	int found_sound = FALSE;
 
 	/* print description, manufacturer, and CPU: */
@@ -1011,7 +1011,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 	/* loop over all CPUs */
 	device_execute_interface *exec = NULL;
-	for (bool gotone = machine.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = machine.devicelist().first(exec); gotone; gotone = exec->next(exec))
 	{
 		/* get cpu specific clock that takes internal multiplier/dividers into account */
 		int clock = exec->device().clock();
@@ -1041,7 +1041,7 @@ astring &game_info_astring(running_machine &machine, astring &string)
 
 	/* loop over all sound chips */
 	device_sound_interface *sound = NULL;
-	for (bool gotone = machine.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = machine.devicelist().first(sound); gotone; gotone = sound->next(sound))
 	{
 		/* append the Sound: string */
 		if (!found_sound)
@@ -1262,7 +1262,7 @@ void ui_image_handler_ingame(running_machine &machine)
 	/* run display routine for devices */
 	if (machine.phase() == MACHINE_PHASE_RUNNING)
 	{
-		for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine.devicelist().first(image); gotone; gotone = image->next(image))
 		{
 			image->call_display();
 		}
@@ -1637,7 +1637,7 @@ static slider_state *slider_init(running_machine &machine)
 	if (machine.options().cheat())
 	{
 		device_execute_interface *exec = NULL;
-		for (bool gotone = machine.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+		for (bool gotone = machine.devicelist().first(exec); gotone; gotone = exec->next(exec))
 		{
 			void *param = (void *)&exec->device();
 			string.printf("Overclock CPU %s", exec->device().tag());
@@ -1649,10 +1649,10 @@ static slider_state *slider_init(running_machine &machine)
 	/* add screen parameters */
 	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
 	{
-		int defxscale = floor(screen->config().xscale() * 1000.0f + 0.5f);
-		int defyscale = floor(screen->config().yscale() * 1000.0f + 0.5f);
-		int defxoffset = floor(screen->config().xoffset() * 1000.0f + 0.5f);
-		int defyoffset = floor(screen->config().yoffset() * 1000.0f + 0.5f);
+		int defxscale = floor(screen->xscale() * 1000.0f + 0.5f);
+		int defyscale = floor(screen->yscale() * 1000.0f + 0.5f);
+		int defxoffset = floor(screen->xoffset() * 1000.0f + 0.5f);
+		int defyoffset = floor(screen->yoffset() * 1000.0f + 0.5f);
 		void *param = (void *)screen;
 
 		/* add refresh rate tweaker */
@@ -1689,9 +1689,9 @@ static slider_state *slider_init(running_machine &machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	for (device = machine.m_devicelist.first(LASERDISC); device != NULL; device = device->typenext())
+	for (device = machine.devicelist().first(LASERDISC); device != NULL; device = device->typenext())
 	{
-		const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+		const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
 		if (config->overupdate != NULL)
 		{
 			int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
@@ -1828,7 +1828,7 @@ static INT32 slider_overclock(running_machine &machine, void *arg, astring *stri
 static INT32 slider_refresh(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(arg);
-	double defrefresh = ATTOSECONDS_TO_HZ(screen->config().refresh());
+	double defrefresh = ATTOSECONDS_TO_HZ(screen->refresh_attoseconds());
 	double refresh;
 
 	if (newval != SLIDER_NOCHANGE)
@@ -2123,7 +2123,7 @@ static INT32 slider_beam(running_machine &machine, void *arg, astring *string, I
 
 static char *slider_get_screen_desc(screen_device &screen)
 {
-	int scrcount = screen.machine().m_devicelist.count(SCREEN);
+	int scrcount = screen.machine().devicelist().count(SCREEN);
 	static char descbuf[256];
 
 	if (scrcount > 1)
@@ -2142,7 +2142,7 @@ static char *slider_get_screen_desc(screen_device &screen)
 
 static char *slider_get_laserdisc_desc(device_t *laserdisc)
 {
-	int ldcount = laserdisc->machine().m_devicelist.count(LASERDISC);
+	int ldcount = laserdisc->machine().devicelist().count(LASERDISC);
 	static char descbuf[256];
 
 	if (ldcount > 1)

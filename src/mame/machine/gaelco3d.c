@@ -215,7 +215,7 @@ INLINE const gaelco_serial_interface *get_interface(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == GAELCO_SERIAL);
-	return (gaelco_serial_interface *) downcast<legacy_device_base *>(device)->baseconfig().static_config();
+	return (gaelco_serial_interface *) downcast<legacy_device_base *>(device)->static_config();
 }
 
 INLINE void shmem_lock(shmem_t *shmem)

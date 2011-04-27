@@ -36,37 +36,21 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type PIA6821 = &device_creator<pia6821_device>;
+
+
 //-------------------------------------------------
-//  pia6821_device_config - constructor
+//  pia6821_device - constructor
 //-------------------------------------------------
 
-pia6821_device_config::pia6821_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "6822 PIA", tag, owner, clock)
+pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, PIA6821, "6822 PIA", tag, owner, clock)
 {
-}
 
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *pia6821_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(pia6821_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *pia6821_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(machine, pia6821_device(machine, *this));
 }
 
 
@@ -76,7 +60,7 @@ device_t *pia6821_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void pia6821_device_config::device_config_complete()
+void pia6821_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const pia6821_interface *intf = reinterpret_cast<const pia6821_interface *>(static_config());
@@ -88,39 +72,21 @@ void pia6821_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_in_a_func, 0, sizeof(m_in_a_func));
-    	memset(&m_in_b_func, 0, sizeof(m_in_b_func));
-    	memset(&m_in_ca1_func, 0, sizeof(m_in_ca1_func));
-    	memset(&m_in_cb1_func, 0, sizeof(m_in_cb1_func));
-    	memset(&m_in_ca2_func, 0, sizeof(m_in_ca2_func));
-    	memset(&m_in_cb2_func, 0, sizeof(m_in_cb2_func));
-    	memset(&m_out_a_func, 0, sizeof(m_out_a_func));
-    	memset(&m_out_b_func, 0, sizeof(m_out_b_func));
-    	memset(&m_out_ca2_func, 0, sizeof(m_out_ca2_func));
-    	memset(&m_out_cb2_func, 0, sizeof(m_out_cb2_func));
-    	memset(&m_irq_a_func, 0, sizeof(m_irq_a_func));
-    	memset(&m_irq_b_func, 0, sizeof(m_irq_b_func));
+    	memset(&m_in_a_cb, 0, sizeof(m_in_a_cb));
+    	memset(&m_in_b_cb, 0, sizeof(m_in_b_cb));
+    	memset(&m_in_ca1_cb, 0, sizeof(m_in_ca1_cb));
+    	memset(&m_in_cb1_cb, 0, sizeof(m_in_cb1_cb));
+    	memset(&m_in_ca2_cb, 0, sizeof(m_in_ca2_cb));
+    	memset(&m_in_cb2_cb, 0, sizeof(m_in_cb2_cb));
+    	memset(&m_out_a_cb, 0, sizeof(m_out_a_cb));
+    	memset(&m_out_b_cb, 0, sizeof(m_out_b_cb));
+    	memset(&m_out_ca2_cb, 0, sizeof(m_out_ca2_cb));
+    	memset(&m_out_cb2_cb, 0, sizeof(m_out_cb2_cb));
+    	memset(&m_irq_a_cb, 0, sizeof(m_irq_a_cb));
+    	memset(&m_irq_b_cb, 0, sizeof(m_irq_b_cb));
 	}
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type PIA6821 = pia6821_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  pia6821_device - constructor
-//-------------------------------------------------
-
-pia6821_device::pia6821_device(running_machine &_machine, const pia6821_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -129,18 +95,18 @@ pia6821_device::pia6821_device(running_machine &_machine, const pia6821_device_c
 void pia6821_device::device_start()
 {
 	/* resolve callbacks */
-    devcb_resolve_read8(&m_in_a_func, &m_config.m_in_a_func, this);
-    devcb_resolve_read8(&m_in_b_func, &m_config.m_in_b_func, this);
-    devcb_resolve_read_line(&m_in_ca1_func, &m_config.m_in_ca1_func, this);
-    devcb_resolve_read_line(&m_in_cb1_func, &m_config.m_in_cb1_func, this);
-    devcb_resolve_read_line(&m_in_ca2_func, &m_config.m_in_ca2_func, this);
-    devcb_resolve_read_line(&m_in_cb2_func, &m_config.m_in_cb2_func, this);
-    devcb_resolve_write8(&m_out_a_func, &m_config.m_out_a_func, this);
-    devcb_resolve_write8(&m_out_b_func, &m_config.m_out_b_func, this);
-    devcb_resolve_write_line(&m_out_ca2_func, &m_config.m_out_ca2_func, this);
-    devcb_resolve_write_line(&m_out_cb2_func, &m_config.m_out_cb2_func, this);
-    devcb_resolve_write_line(&m_irq_a_func, &m_config.m_irq_a_func, this);
-    devcb_resolve_write_line(&m_irq_b_func, &m_config.m_irq_b_func, this);
+    devcb_resolve_read8(&m_in_a_func, &m_in_a_cb, this);
+    devcb_resolve_read8(&m_in_b_func, &m_in_b_cb, this);
+    devcb_resolve_read_line(&m_in_ca1_func, &m_in_ca1_cb, this);
+    devcb_resolve_read_line(&m_in_cb1_func, &m_in_cb1_cb, this);
+    devcb_resolve_read_line(&m_in_ca2_func, &m_in_ca2_cb, this);
+    devcb_resolve_read_line(&m_in_cb2_func, &m_in_cb2_cb, this);
+    devcb_resolve_write8(&m_out_a_func, &m_out_a_cb, this);
+    devcb_resolve_write8(&m_out_b_func, &m_out_b_cb, this);
+    devcb_resolve_write_line(&m_out_ca2_func, &m_out_ca2_cb, this);
+    devcb_resolve_write_line(&m_out_cb2_func, &m_out_cb2_cb, this);
+    devcb_resolve_write_line(&m_irq_a_func, &m_irq_a_cb, this);
+    devcb_resolve_write_line(&m_irq_b_func, &m_irq_b_cb, this);
 
     save_item(NAME(m_in_a));
     save_item(NAME(m_in_ca1));

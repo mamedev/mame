@@ -189,7 +189,7 @@ static void okim6258_state_save_register(okim6258_state *info, device_t *device)
 
 static DEVICE_START( okim6258 )
 {
-	const okim6258_interface *intf = (const okim6258_interface *)device->baseconfig().static_config();
+	const okim6258_interface *intf = (const okim6258_interface *)device->static_config();
 	okim6258_state *info = get_safe_token(device);
 
 	compute_tables();

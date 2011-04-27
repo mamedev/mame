@@ -1,8 +1,8 @@
 class tceptor_state : public driver_device
 {
 public:
-	tceptor_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;

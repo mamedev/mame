@@ -52,9 +52,19 @@ const int acia6850_device::ACIA6850_WORD[8][3] =
     LIVE DEVICE
 ***************************************************************************/
 
-const device_type ACIA6850 = acia6850_device_config::static_alloc_device_config;
+// device type definition
+const device_type ACIA6850 = &device_creator<acia6850_device>;
 
-GENERIC_DEVICE_CONFIG_SETUP(acia6850, "6850 ACIA")
+//-------------------------------------------------
+//  acia6850_device - constructor
+//-------------------------------------------------
+
+acia6850_device::acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, ACIA6850, "6850 ACIA", tag, owner, clock)
+{
+
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -62,7 +72,7 @@ GENERIC_DEVICE_CONFIG_SETUP(acia6850, "6850 ACIA")
 //  complete
 //-------------------------------------------------
 
-void acia6850_device_config::device_config_complete()
+void acia6850_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const acia6850_interface *intf = reinterpret_cast<const acia6850_interface *>(static_config());
@@ -76,25 +86,13 @@ void acia6850_device_config::device_config_complete()
 	{
 		m_tx_clock = 0;
 		m_rx_clock = 0;
-    	memset(&m_in_rx_func, 0, sizeof(m_in_rx_func));
-    	memset(&m_out_tx_func, 0, sizeof(m_out_tx_func));
-    	memset(&m_in_cts_func, 0, sizeof(m_in_cts_func));
-    	memset(&m_out_rts_func, 0, sizeof(m_out_rts_func));
-    	memset(&m_in_dcd_func, 0, sizeof(m_in_dcd_func));
-    	memset(&m_out_irq_func, 0, sizeof(m_out_irq_func));
+    	memset(&m_in_rx_cb, 0, sizeof(m_in_rx_cb));
+    	memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
+    	memset(&m_in_cts_cb, 0, sizeof(m_in_cts_cb));
+    	memset(&m_out_rts_cb, 0, sizeof(m_out_rts_cb));
+    	memset(&m_in_dcd_cb, 0, sizeof(m_in_dcd_cb));
+    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
 	}
-}
-
-
-//-------------------------------------------------
-//  acia6850_device - constructor
-//-------------------------------------------------
-
-acia6850_device::acia6850_device(running_machine &_machine, const acia6850_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
 }
 
 
@@ -105,15 +103,13 @@ acia6850_device::acia6850_device(running_machine &_machine, const acia6850_devic
 void acia6850_device::device_start()
 {
 	/* resolve callbacks */
-	devcb_resolve_read_line(&m_in_rx_func, &m_config.m_in_rx_func, this);
-	devcb_resolve_write_line(&m_out_tx_func, &m_config.m_out_tx_func, this);
-	devcb_resolve_read_line(&m_in_cts_func, &m_config.m_in_cts_func, this);
-	devcb_resolve_write_line(&m_out_rts_func, &m_config.m_out_rts_func, this);
-	devcb_resolve_read_line(&m_in_dcd_func, &m_config.m_in_dcd_func, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
+	devcb_resolve_read_line(&m_in_rx_func, &m_in_rx_cb, this);
+	devcb_resolve_write_line(&m_out_tx_func, &m_out_tx_cb, this);
+	devcb_resolve_read_line(&m_in_cts_func, &m_in_cts_cb, this);
+	devcb_resolve_write_line(&m_out_rts_func, &m_out_rts_cb, this);
+	devcb_resolve_read_line(&m_in_dcd_func, &m_in_dcd_cb, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
 
-	m_rx_clock = m_config.m_rx_clock;
-	m_tx_clock = m_config.m_tx_clock;
 	m_tx_counter = 0;
 	m_rx_counter = 0;
 	m_rx_timer = machine().scheduler().timer_alloc(FUNC(receive_event_callback), (void *)this);

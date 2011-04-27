@@ -27,6 +27,9 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type MC6852 = &device_creator<mc6852_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -81,50 +84,6 @@
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type MC6852 = mc6852_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(mc6852, "MC6852")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mc6852_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mc6852_interface *intf = reinterpret_cast<const mc6852_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mc6852_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_rx_data_func, 0, sizeof(m_in_rx_data_func));
-		memset(&m_out_tx_data_func, 0, sizeof(m_out_tx_data_func));
-		memset(&m_out_irq_func, 0, sizeof(m_out_irq_func));
-		memset(&m_in_cts_func, 0, sizeof(m_in_cts_func));
-		memset(&m_in_dcd_func, 0, sizeof(m_in_dcd_func));
-		memset(&m_out_sm_dtr_func, 0, sizeof(m_out_sm_dtr_func));
-		memset(&m_out_tuf_func, 0, sizeof(m_out_tuf_func));
-	}
-}
-
-
-
-//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
@@ -146,10 +105,36 @@ inline void mc6852_device::transmit()
 //  mc6852_device - constructor
 //-------------------------------------------------
 
-mc6852_device::mc6852_device(running_machine &_machine, const mc6852_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+mc6852_device::mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MC6852, "MC6852", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mc6852_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mc6852_interface *intf = reinterpret_cast<const mc6852_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mc6852_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_rx_data_cb, 0, sizeof(m_in_rx_data_cb));
+		memset(&m_out_tx_data_cb, 0, sizeof(m_out_tx_data_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_in_cts_cb, 0, sizeof(m_in_cts_cb));
+		memset(&m_in_dcd_cb, 0, sizeof(m_in_dcd_cb));
+		memset(&m_out_sm_dtr_cb, 0, sizeof(m_out_sm_dtr_cb));
+		memset(&m_out_tuf_cb, 0, sizeof(m_out_tuf_cb));
+	}
 }
 
 
@@ -160,24 +145,24 @@ mc6852_device::mc6852_device(running_machine &_machine, const mc6852_device_conf
 void mc6852_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rx_data_func, &m_config.m_in_rx_data_func, this);
-	devcb_resolve_write_line(&m_out_tx_data_func, &m_config.m_out_tx_data_func, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
-	devcb_resolve_read_line(&m_in_cts_func, &m_config.m_in_cts_func, this);
-	devcb_resolve_read_line(&m_in_dcd_func, &m_config.m_in_dcd_func, this);
-	devcb_resolve_write_line(&m_out_sm_dtr_func, &m_config.m_out_sm_dtr_func, this);
-	devcb_resolve_write_line(&m_out_tuf_func, &m_config.m_out_tuf_func, this);
+	devcb_resolve_read_line(&m_in_rx_data_func, &m_in_rx_data_cb, this);
+	devcb_resolve_write_line(&m_out_tx_data_func, &m_out_tx_data_cb, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
+	devcb_resolve_read_line(&m_in_cts_func, &m_in_cts_cb, this);
+	devcb_resolve_read_line(&m_in_dcd_func, &m_in_dcd_cb, this);
+	devcb_resolve_write_line(&m_out_sm_dtr_func, &m_out_sm_dtr_cb, this);
+	devcb_resolve_write_line(&m_out_tuf_func, &m_out_tuf_cb, this);
 
-	if (m_config.m_rx_clock > 0)
+	if (m_rx_clock > 0)
 	{
 		m_rx_timer = timer_alloc(TIMER_RX);
-		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.m_rx_clock));
+		m_rx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_rx_clock));
 	}
 
-	if (m_config.m_tx_clock > 0)
+	if (m_tx_clock > 0)
 	{
 		m_tx_timer = timer_alloc(TIMER_TX);
-		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_config.m_tx_clock));
+		m_tx_timer->adjust(attotime::zero, 0, attotime::from_hz(m_tx_clock));
 	}
 
 	// register for state saving

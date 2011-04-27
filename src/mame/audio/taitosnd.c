@@ -54,7 +54,7 @@ INLINE const tc0140syt_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0140SYT));
-	return (const tc0140syt_interface *) device->baseconfig().static_config();
+	return (const tc0140syt_interface *) device->static_config();
 }
 
 /*****************************************************************************

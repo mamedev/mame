@@ -70,8 +70,8 @@ Stephh's notes (based on the game Z80 code and some tests) :
 class roul_state : public driver_device
 {
 public:
-	roul_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	roul_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_reg[0x10];
 	UINT8 *m_videobuf;

@@ -69,7 +69,7 @@ INLINE const bitbanger_config *get_config(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == BITBANGER);
-	return (const bitbanger_config *) device->baseconfig().static_config();
+	return (const bitbanger_config *) device->static_config();
 }
 
 

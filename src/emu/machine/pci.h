@@ -71,5 +71,3 @@ int pci_add_sibling( running_machine &machine, char *pcitag, char *sibling );
 DECLARE_LEGACY_DEVICE(PCI_BUS, pci_bus);
 
 #endif /* PCI_H */
-
-

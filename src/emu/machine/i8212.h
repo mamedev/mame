@@ -64,46 +64,22 @@ enum
 
 struct i8212_interface
 {
-	devcb_write_line	out_int_func;
+	devcb_write_line	m_out_int_cb;
 
-	devcb_read8			in_di_func;
-	devcb_write8		out_do_func;
-};
-
-
-
-// ======================> i8212_device_config
-
-class i8212_device_config :   public device_config,
-                                public i8212_interface
-{
-    friend class i8212_device;
-
-    // construction/destruction
-    i8212_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read8			m_in_di_cb;
+	devcb_write8		m_out_do_cb;
 };
 
 
 
 // ======================> i8212_device
 
-class i8212_device :	public device_t
+class i8212_device :	public device_t, public i8212_interface
 {
-    friend class i8212_device_config;
-
-    // construction/destruction
-    i8212_device(running_machine &_machine, const i8212_device_config &_config);
-
 public:
+    // construction/destruction
+    i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( data_r );
     DECLARE_WRITE8_MEMBER( data_w );
 
@@ -112,6 +88,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 
@@ -123,8 +100,6 @@ private:
 	int m_md;					// mode
 	int m_stb;					// strobe
 	UINT8 m_data;				// data latch
-
-	const i8212_device_config &m_config;
 };
 
 

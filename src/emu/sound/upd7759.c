@@ -635,7 +635,7 @@ static void register_for_save(upd7759_state *chip, device_t *device)
 static DEVICE_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
-	const upd7759_interface *intf = (device->baseconfig().static_config() != NULL) ? (const upd7759_interface *)device->baseconfig().static_config() : &defintrf;
+	const upd7759_interface *intf = (device->static_config() != NULL) ? (const upd7759_interface *)device->static_config() : &defintrf;
 	upd7759_state *chip = get_safe_token(device);
 
 	chip->device = device;

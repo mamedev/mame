@@ -9,8 +9,8 @@
 class capbowl_state : public driver_device
 {
 public:
-	capbowl_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	void init_nvram(nvram_device &nvram, void *base, size_t size);
 

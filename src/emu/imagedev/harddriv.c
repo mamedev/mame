@@ -269,7 +269,7 @@ static DEVICE_START(hd)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
-	harddisk->config = (const harddisk_callback_config*)device->baseconfig().static_config();
+	harddisk->config = (const harddisk_callback_config*)device->static_config();
 	harddisk->chd = NULL;
 	harddisk->hard_disk_handle = NULL;
 }

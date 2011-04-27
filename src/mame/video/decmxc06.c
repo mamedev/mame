@@ -38,33 +38,18 @@ todo:
 #include "emu.h"
 #include "decmxc06.h"
 
-deco_mxc06_device_config::deco_mxc06_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "decmxc06_device", tag, owner, clock)
+void deco_mxc06_device::set_gfx_region(device_t &device, int region)
 {
-	m_gfxregion = 0;
-}
-
-device_config *deco_mxc06_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(deco_mxc06_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *deco_mxc06_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, deco_mxc06_device(machine, *this));
-}
-
-void deco_mxc06_device_config::set_gfx_region(device_config *device, int region)
-{
-	deco_mxc06_device_config *dev = downcast<deco_mxc06_device_config *>(device);
-	dev->m_gfxregion = region;
+	deco_mxc06_device &dev = downcast<deco_mxc06_device &>(device);
+	dev.m_gfxregion = region;
 }
 
 
-deco_mxc06_device::deco_mxc06_device(running_machine &_machine, const deco_mxc06_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-	  m_gfxregion(m_config.m_gfxregion)
+const device_type DECO_MXC06 = &device_creator<deco_mxc06_device>;
+
+deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO_MXC06, "decmxc06_device", tag, owner, clock),
+	  m_gfxregion(0)
 {
 }
 

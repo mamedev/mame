@@ -57,8 +57,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class dambustr_state : public galaxold_state
 {
 public:
-	dambustr_state(running_machine &machine, const driver_device_config_base &config)
-		: galaxold_state(machine, config) { }
+	dambustr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxold_state(mconfig, type, tag) { }
 
 	int m_noise_data;
 };

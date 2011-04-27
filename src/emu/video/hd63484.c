@@ -64,7 +64,7 @@ INLINE const hd63484_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert(device->type() == HD63484);
-	return (const hd63484_interface *) device->baseconfig().static_config();
+	return (const hd63484_interface *) device->static_config();
 }
 
 /*****************************************************************************

@@ -107,7 +107,7 @@ INLINE mb86233_state *get_safe_token(device_t *device)
 static CPU_INIT( mb86233 )
 {
 	mb86233_state *cpustate = get_safe_token(device);
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->baseconfig().static_config();
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config();
 	(void)irqcallback;
 
 	memset(cpustate, 0, sizeof( *cpustate ) );

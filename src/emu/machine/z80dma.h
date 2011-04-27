@@ -58,40 +58,17 @@
 
 struct z80dma_interface
 {
-	devcb_write_line	m_out_busreq_func;
-	devcb_write_line	m_out_int_func;
-	devcb_write_line	m_out_bao_func;
+	devcb_write_line	m_out_busreq_cb;
+	devcb_write_line	m_out_int_cb;
+	devcb_write_line	m_out_bao_cb;
 
 	// memory accessors
-	devcb_read8			m_in_mreq_func;
-	devcb_write8		m_out_mreq_func;
+	devcb_read8			m_in_mreq_cb;
+	devcb_write8		m_out_mreq_cb;
 
 	// I/O accessors
-	devcb_read8			m_in_iorq_func;
-	devcb_write8		m_out_iorq_func;
-};
-
-
-
-// ======================> z80dma_device_config
-
-class z80dma_device_config :	public device_config,
-								public device_config_z80daisy_interface,
-								public z80dma_interface
-{
-	friend class z80dma_device;
-
-	// construction/destruction
-	z80dma_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_read8			m_in_iorq_cb;
+	devcb_write8		m_out_iorq_cb;
 };
 
 
@@ -99,14 +76,13 @@ protected:
 // ======================> z80dma_device
 
 class z80dma_device :	public device_t,
-						public device_z80daisy_interface
+						public device_z80daisy_interface,
+						public z80dma_interface
 {
-	friend class z80dma_device_config;
-
-	// construction/destruction
-	z80dma_device(running_machine &_machine, const z80dma_device_config &_config);
-
 public:
+	// construction/destruction
+	z80dma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	UINT8 read();
 	void write(UINT8 data);
 
@@ -116,6 +92,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -140,8 +117,6 @@ private:
 	void rdy_write_callback(int state);
 
 	// internal state
-	const z80dma_device_config &m_config;
-
 	devcb_resolved_write_line	m_out_busreq_func;
 	devcb_resolved_write_line	m_out_int_func;
 	devcb_resolved_write_line	m_out_bao_func;

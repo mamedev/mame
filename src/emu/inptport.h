@@ -750,7 +750,7 @@ public:
 
 	/* these fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
-	device_config *				owner;			/* associated device, when appropriate */
+	device_t *					owner;			/* associated device, when appropriate */
 	input_port_value			active;			/* mask of active bits in the port */
 
 private:
@@ -1085,14 +1085,14 @@ struct _inp_header
 /* ----- core system management ----- */
 
 /* initialize the input ports, processing the given token list */
-time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_config_list &devicelist);
+time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_list &devicelist);
 
 
 
 /* ----- port configurations ----- */
 
 /* initialize an input port list structure and allocate ports according to the given tokens */
-void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_config *owner);
+void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_t *owner);
 
 /* return the field that matches the given tag and mask */
 const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlist, const char *tag, input_port_value mask);

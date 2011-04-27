@@ -278,8 +278,8 @@ Notes:
 class namcos11_state : public psx_state
 {
 public:
-	namcos11_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 
 	UINT32 *m_sharedram;
 	UINT32 *m_keycus;

@@ -200,7 +200,7 @@ ROM_END
 
 static DEVICE_START( namco_52xx )
 {
-	namco_52xx_interface *intf = (namco_52xx_interface *)device->baseconfig().static_config();
+	namco_52xx_interface *intf = (namco_52xx_interface *)device->static_config();
 	namco_52xx_state *state = get_safe_token(device);
 	astring tempstring;
 

@@ -21,6 +21,9 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type UPD7201 = &device_creator<upd7201_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -34,44 +37,6 @@ enum
 	CHANNEL_A = 0,
 	CHANNEL_B
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type UPD7201 = upd7201_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(upd7201, "UPD7201")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void upd7201_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const upd7201_interface *intf = reinterpret_cast<const upd7201_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<upd7201_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
-	}
-}
 
 
 
@@ -106,10 +71,30 @@ inline void upd7201_device::transmit(int channel)
 //  upd7201_device - constructor
 //-------------------------------------------------
 
-upd7201_device::upd7201_device(running_machine &_machine, const upd7201_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+upd7201_device::upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, UPD7201, "UPD7201", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void upd7201_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const upd7201_interface *intf = reinterpret_cast<const upd7201_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<upd7201_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+	}
 }
 
 
@@ -120,7 +105,7 @@ upd7201_device::upd7201_device(running_machine &_machine, const upd7201_device_c
 void upd7201_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
+	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
 }
 
 

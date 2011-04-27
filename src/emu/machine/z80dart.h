@@ -153,44 +153,21 @@ struct z80dart_interface
 	int m_rx_clock_b;			// channel B receive clock
 	int m_tx_clock_b;			// channel B transmit clock
 
-	devcb_read_line		m_in_rxda_func;
-	devcb_write_line	m_out_txda_func;
-	devcb_write_line	m_out_dtra_func;
-	devcb_write_line	m_out_rtsa_func;
-	devcb_write_line	m_out_wrdya_func;
-	devcb_write_line	m_out_synca_func;
+	devcb_read_line		m_in_rxda_cb;
+	devcb_write_line	m_out_txda_cb;
+	devcb_write_line	m_out_dtra_cb;
+	devcb_write_line	m_out_rtsa_cb;
+	devcb_write_line	m_out_wrdya_cb;
+	devcb_write_line	m_out_synca_cb;
 
-	devcb_read_line		m_in_rxdb_func;
-	devcb_write_line	m_out_txdb_func;
-	devcb_write_line	m_out_dtrb_func;
-	devcb_write_line	m_out_rtsb_func;
-	devcb_write_line	m_out_wrdyb_func;
-	devcb_write_line	m_out_syncb_func;
+	devcb_read_line		m_in_rxdb_cb;
+	devcb_write_line	m_out_txdb_cb;
+	devcb_write_line	m_out_dtrb_cb;
+	devcb_write_line	m_out_rtsb_cb;
+	devcb_write_line	m_out_wrdyb_cb;
+	devcb_write_line	m_out_syncb_cb;
 
-	devcb_write_line	m_out_int_func;
-};
-
-
-
-// ======================> z80dart_device_config
-
-class z80dart_device_config :	public device_config,
-								public device_config_z80daisy_interface,
-								public z80dart_interface
-{
-	friend class z80dart_device;
-
-	// construction/destruction
-	z80dart_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
+	devcb_write_line	m_out_int_cb;
 };
 
 
@@ -198,15 +175,15 @@ protected:
 // ======================> z80dart_device
 
 class z80dart_device :	public device_t,
-						public device_z80daisy_interface
+						public device_z80daisy_interface,
+						public z80dart_interface
 {
-	friend class z80dart_device_config;
 	friend class dart_channel;
 
-	// construction/destruction
-	z80dart_device(running_machine &_machine, const z80dart_device_config &_config);
-
 public:
+	// construction/destruction
+	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// control register access
 	UINT8 control_read(int which) { return m_channel[which].control_read(); }
 	void control_write(int which, UINT8 data) { return m_channel[which].control_write(data); }
@@ -228,6 +205,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -333,7 +311,6 @@ private:
 	};
 
 	// internal state
-	const z80dart_device_config &	m_config;
 	devcb_resolved_write_line		m_out_int_func;
 	dart_channel					m_channel[2];		// channels
 	int 							m_int_state[8];		// interrupt state

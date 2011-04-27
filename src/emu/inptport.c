@@ -788,7 +788,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down);
 
 /* port configuration helpers */
-static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_config *owner);
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_t *owner);
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits);
 static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen);
 static void field_config_free(input_field_config **fieldptr);
@@ -973,7 +973,7 @@ static WRITE_LINE_DEVICE_HANDLER( changed_write_line_device )
     system
 -------------------------------------------------*/
 
-time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_config_list &devicelist)
+time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_list &devicelist)
 {
 	//input_port_private *portdata;
 	char errorbuf[1024];
@@ -998,11 +998,11 @@ time_t input_port_init(running_machine &machine, const input_port_token *tokens,
 			mame_printf_error("Input port errors:\n%s", errorbuf);
 	}
 
-	for (device_config *config = devicelist.first(); config != NULL; config = config->next())
+	for (device_t *device = devicelist.first(); device != NULL; device = device->next())
 	{
-		if (config->input_ports() != NULL)
+		if (device->input_ports() != NULL)
 		{
-			input_port_list_init(machine.m_portlist, config->input_ports(), errorbuf, sizeof(errorbuf), TRUE, config);
+			input_port_list_init(machine.m_portlist, device->input_ports(), errorbuf, sizeof(errorbuf), TRUE, device);
 			if (errorbuf[0] != 0)
 				mame_printf_error("Input port errors:\n%s", errorbuf);
 		}
@@ -1044,7 +1044,7 @@ static void input_port_exit(running_machine &machine)
     according to the given tokens
 -------------------------------------------------*/
 
-void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_config *owner)
+void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_t *owner)
 {
 	/* no tokens, no list */
 	if (tokens == NULL)
@@ -1637,7 +1637,7 @@ input_port_value input_port_read(running_machine &machine, const char *tag)
 input_port_value input_port_read(device_t *device, const char *tag)
 {
 	astring tempstring;
-	const input_port_config *port = device->machine().port(device->baseconfig().subtag(tempstring, tag));
+	const input_port_config *port = device->machine().port(device->subtag(tempstring, tag));
 	if (port == NULL)
 		fatalerror("Unable to locate input port '%s'", tag);
 	return input_port_read_direct(port);
@@ -2937,7 +2937,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
     of port settings according to device settings
 -------------------------------------------------*/
 
-static UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval, device_config *owner)
+static UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval, device_t *owner)
 {
 	astring tempstring;
 	const input_device_default *def = NULL;
@@ -2960,7 +2960,7 @@ static UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval
     detokenize a series of input port tokens
 -------------------------------------------------*/
 
-static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_config *owner)
+static void port_config_detokenize(ioport_list &portlist, const input_port_token *ipt, char *errorbuf, int errorbuflen, device_t *owner)
 {
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
 	input_setting_config *cursetting = NULL;

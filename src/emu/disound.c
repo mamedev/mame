@@ -46,117 +46,11 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_config_sound_interface - constructor
-//-------------------------------------------------
-
-device_config_sound_interface::device_config_sound_interface(const machine_config &mconfig, device_config &devconfig)
-	: device_config_interface(mconfig, devconfig)
-{
-}
-
-
-//-------------------------------------------------
-//  ~device_config_sound_interface - destructor
-//-------------------------------------------------
-
-device_config_sound_interface::~device_config_sound_interface()
-{
-}
-
-
-//-------------------------------------------------
-//  static_add_route - configuration helper to add
-//  a new route to the device
-//-------------------------------------------------
-
-void device_config_sound_interface::static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input)
-{
-	// find our sound interface
-	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
-	if (sound == NULL)
-		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device->tag());
-
-	// append a new route to the list
-	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target)));
-}
-
-
-//-------------------------------------------------
-//  static_reset_routes - configuration helper to
-//  reset all existing routes to the device
-//-------------------------------------------------
-
-void device_config_sound_interface::static_reset_routes(device_config *device)
-{
-	// find our sound interface
-	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
-	if (sound == NULL)
-		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device->tag());
-
-	// reset the routine list
-	sound->m_route_list.reset();
-}
-
-
-//-------------------------------------------------
-//  interface_validity_check - validation for a
-//  device after the configuration has been
-//  constructed
-//-------------------------------------------------
-
-bool device_config_sound_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
-{
-	bool error = false;
-
-	// loop over all the routes
-	for (const sound_route *route = first_route(); route != NULL; route = route->next())
-	{
-		// find a device with the requested tag
-		const device_config *target = m_machine_config.m_devicelist.find(route->m_target);
-		if (target == NULL)
-		{
-			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target);
-			error = true;
-		}
-
-		// if it's not a speaker or a sound device, error
-		const device_config_sound_interface *sound;
-		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
-		{
-			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target, target->name());
-			error = true;
-		}
-	}
-	return error;
-}
-
-
-//-------------------------------------------------
-//  sound_route - constructor
-//-------------------------------------------------
-
-device_config_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target)
-	: m_next(NULL),
-	  m_output(output),
-	  m_input(input),
-	  m_gain(gain),
-	  m_target(target)
-{
-}
-
-
-
-//**************************************************************************
-//  DEVICE CONFIG SOUND INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
 //  device_sound_interface - constructor
 //-------------------------------------------------
 
-device_sound_interface::device_sound_interface(running_machine &machine, const device_config &config, device_t &device)
-	: device_interface(machine, config, device),
-	  m_sound_config(dynamic_cast<const device_config_sound_interface &>(config)),
+device_sound_interface::device_sound_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device),
 	  m_outputs(0),
 	  m_auto_allocated_inputs(0)
 {
@@ -169,6 +63,40 @@ device_sound_interface::device_sound_interface(running_machine &machine, const d
 
 device_sound_interface::~device_sound_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  static_add_route - configuration helper to add
+//  a new route to the device
+//-------------------------------------------------
+
+void device_sound_interface::static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input)
+{
+	// find our sound interface
+	device_sound_interface *sound;
+	if (!device.interface(sound))
+		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device.tag());
+
+	// append a new route to the list
+	sound->m_route_list.append(*global_alloc(sound_route(output, input, gain, target)));
+}
+
+
+//-------------------------------------------------
+//  static_reset_routes - configuration helper to
+//  reset all existing routes to the device
+//-------------------------------------------------
+
+void device_sound_interface::static_reset_routes(device_t &device)
+{
+	// find our sound interface
+	device_sound_interface *sound;
+	if (!device.interface(sound))
+		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device.tag());
+
+	// reset the routine list
+	sound->m_route_list.reset();
 }
 
 
@@ -286,6 +214,39 @@ void device_sound_interface::set_output_gain(int outputnum, float gain)
 
 
 //-------------------------------------------------
+//  interface_validity_check - validation for a
+//  device after the configuration has been
+//  constructed
+//-------------------------------------------------
+
+bool device_sound_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
+{
+	bool error = false;
+
+	// loop over all the routes
+	for (const sound_route *route = first_route(); route != NULL; route = route->next())
+	{
+		// find a device with the requested tag
+		const device_t *target = device().mconfig().devicelist().find(route->m_target);
+		if (target == NULL)
+		{
+			mame_printf_error("%s: %s attempting to route sound to non-existant device '%s'\n", driver.source_file, driver.name, route->m_target);
+			error = true;
+		}
+
+		// if it's not a speaker or a sound device, error
+		const device_sound_interface *sound;
+		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
+		{
+			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target, target->name());
+			error = true;
+		}
+	}
+	return error;
+}
+
+
+//-------------------------------------------------
 //  interface_pre_start - make sure all our input
 //  devices are started
 //-------------------------------------------------
@@ -294,10 +255,10 @@ void device_sound_interface::interface_pre_start()
 {
 	// scan all the sound devices
 	device_sound_interface *sound = NULL;
-	for (bool gotone = m_device.machine().m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
+		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// see if we are the target of this route; if we are, make sure the source device is started
 			device_t *target_device = m_device.machine().device(route->m_target);
@@ -308,16 +269,16 @@ void device_sound_interface::interface_pre_start()
 
 	// now iterate through devices again and assign any auto-allocated inputs
 	m_auto_allocated_inputs = 0;
-	for (bool gotone = m_device.machine().m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
+		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// see if we are the target of this route
 			device_t *target_device = m_device.machine().device(route->m_target);
 			if (target_device == &m_device && route->m_input == AUTO_ALLOC_INPUT)
 			{
-				const_cast<device_config_sound_interface::sound_route *>(route)->m_input = m_auto_allocated_inputs;
+				const_cast<sound_route *>(route)->m_input = m_auto_allocated_inputs;
 				m_auto_allocated_inputs += (route->m_output == ALL_OUTPUTS) ? sound->outputs() : 1;
 			}
 		}
@@ -334,10 +295,10 @@ void device_sound_interface::interface_post_start()
 {
 	// iterate over all the sound devices
 	device_sound_interface *sound = NULL;
-	for (bool gotone = m_device.machine().m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = m_device.machine().devicelist().first(sound); gotone; gotone = sound->next(sound))
 	{
 		// scan each route on the device
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().first_route(); route != NULL; route = route->next())
+		for (const sound_route *route = sound->first_route(); route != NULL; route = route->next())
 		{
 			// if we are the target of this route, hook it up
 			device_t *target_device = m_device.machine().device(route->m_target);
@@ -381,4 +342,23 @@ void device_sound_interface::interface_pre_reset()
 	for (sound_stream *stream = m_device.machine().sound().first_stream(); stream != NULL; stream = stream->next())
 		if (&stream->device() == &device())
 			stream->update();
+}
+
+
+
+//**************************************************************************
+//  SOUND ROUTE
+//**************************************************************************
+
+//-------------------------------------------------
+//  sound_route - constructor
+//-------------------------------------------------
+
+device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target)
+	: m_next(NULL),
+	  m_output(output),
+	  m_input(input),
+	  m_gain(gain),
+	  m_target(target)
+{
 }

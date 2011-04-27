@@ -19,25 +19,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class mas3507d_device_config : public device_config, public device_config_sound_interface
-{
-	friend class mas3507d_device;
-
-	mas3507d_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 class mas3507d_device : public device_t, public device_sound_interface
 {
-	friend class mas3507d_device_config;
-
-	// construction/destruction
-	mas3507d_device(running_machine &_machine, const mas3507d_device_config &config);
-
 public:
+	// construction/destruction
+	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	int i2c_scl_r();
 	int i2c_sda_r();
 	void i2c_scl_w(bool line);
@@ -47,8 +34,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-	const mas3507d_device_config &config;
 
 private:
 	enum { IDLE, STARTED, NAK, ACK, ACK2 } i2c_bus_state;

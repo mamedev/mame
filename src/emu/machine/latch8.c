@@ -187,7 +187,7 @@ static DEVICE_START( latch8 )
 	int i;
 
 	/* validate arguments */
-	latch8->intf = (latch8_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	latch8->intf = (latch8_config *)downcast<const legacy_device_base *>(device)->inline_config();
 
 	latch8->value = 0x0;
 

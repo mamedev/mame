@@ -29,8 +29,8 @@ found/dumped yet. */
 class forte2_state : public driver_device
 {
 public:
-	forte2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	forte2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_input_mask;
 };

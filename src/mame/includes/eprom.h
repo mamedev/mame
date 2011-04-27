@@ -9,8 +9,8 @@
 class eprom_state : public atarigen_state
 {
 public:
-	eprom_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	eprom_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	int 			m_screen_intensity;
 	int 			m_video_disable;

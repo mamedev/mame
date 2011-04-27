@@ -1015,9 +1015,9 @@ static DEVICE_START( tms5110 )
 
 	assert_always(tms != NULL, "Error creating TMS5110 chip");
 
-	assert_always(device->baseconfig().static_config() != NULL, "No config");
+	assert_always(device->static_config() != NULL, "No config");
 
-	tms->intf = device->baseconfig().static_config() ? (const tms5110_interface *)device->baseconfig().static_config() : &dummy;
+	tms->intf = device->static_config() ? (const tms5110_interface *)device->static_config() : &dummy;
 	tms->table = *device->region();
 
 	tms->device = device;
@@ -1406,7 +1406,7 @@ static DEVICE_START( tmsprom )
 
 	assert_always(tms != NULL, "Error creating TMSPROM chip");
 
-	tms->intf = (const tmsprom_interface *) device->baseconfig().static_config();
+	tms->intf = (const tmsprom_interface *) device->static_config();
 	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
 
 	/* resolve lines */

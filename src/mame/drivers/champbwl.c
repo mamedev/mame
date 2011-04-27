@@ -160,8 +160,8 @@ Notes:
 class champbwl_state : public tnzs_state
 {
 public:
-	champbwl_state(running_machine &machine, const driver_device_config_base &config)
-		: tnzs_state(machine, config) { }
+	champbwl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_state(mconfig, type, tag) { }
 
 	UINT8    m_last_trackball_val[2];
 //  UINT8 *  m_nvram; // currently this uses generic_nvram

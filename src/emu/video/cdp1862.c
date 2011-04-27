@@ -20,52 +20,15 @@
 #include "machine/devhelpr.h"
 
 
+// device type definition
+const device_type CDP1862 = &device_creator<cdp1862_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type CDP1862 = cdp1862_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(cdp1862, "CDP1862")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cdp1862_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cdp1862_interface *intf = reinterpret_cast<const cdp1862_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cdp1862_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_rd_func, 0, sizeof(m_in_rd_func));
-		memset(&m_in_bd_func, 0, sizeof(m_in_bd_func));
-		memset(&m_in_gd_func, 0, sizeof(m_in_gd_func));
-	}
-}
 
 
 
@@ -81,12 +44,12 @@ inline void cdp1862_device::initialize_palette()
 {
 	int i;
 
-	double res_total = m_config.m_chr_r + m_config.m_chr_g + m_config.m_chr_b + m_config.m_chr_bkg;
+	double res_total = m_chr_r + m_chr_g + m_chr_b + m_chr_bkg;
 
-	int weight_r = (m_config.m_chr_r / res_total) * 100;
-	int weight_g = (m_config.m_chr_g / res_total) * 100;
-	int weight_b = (m_config.m_chr_b / res_total) * 100;
-	int weight_bkg = (m_config.m_chr_bkg / res_total) * 100;
+	int weight_r = (m_chr_r / res_total) * 100;
+	int weight_g = (m_chr_g / res_total) * 100;
+	int weight_b = (m_chr_b / res_total) * 100;
+	int weight_bkg = (m_chr_bkg / res_total) * 100;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -117,10 +80,32 @@ inline void cdp1862_device::initialize_palette()
 //  cdp1862_device - constructor
 //-------------------------------------------------
 
-cdp1862_device::cdp1862_device(running_machine &_machine, const cdp1862_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock)
 {
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1862_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const cdp1862_interface *intf = reinterpret_cast<const cdp1862_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1862_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_rd_cb, 0, sizeof(m_in_rd_cb));
+		memset(&m_in_bd_cb, 0, sizeof(m_in_bd_cb));
+		memset(&m_in_gd_cb, 0, sizeof(m_in_gd_cb));
+	}
 }
 
 
@@ -131,12 +116,12 @@ cdp1862_device::cdp1862_device(running_machine &_machine, const cdp1862_device_c
 void cdp1862_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rd_func, &m_config.m_in_rd_func, this);
-	devcb_resolve_read_line(&m_in_bd_func, &m_config.m_in_bd_func, this);
-	devcb_resolve_read_line(&m_in_gd_func, &m_config.m_in_gd_func, this);
+	devcb_resolve_read_line(&m_in_rd_func, &m_in_rd_cb, this);
+	devcb_resolve_read_line(&m_in_bd_func, &m_in_bd_cb, this);
+	devcb_resolve_read_line(&m_in_gd_func, &m_in_gd_cb, this);
 
 	// find devices
-	m_screen =  machine().device<screen_device>(m_config.m_screen_tag);
+	m_screen =  machine().device<screen_device>(m_screen_tag);
 	m_bitmap = auto_bitmap_alloc(machine(), m_screen->width(), m_screen->height(), m_screen->format());
 
 	// init palette

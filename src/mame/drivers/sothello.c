@@ -46,8 +46,8 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 class sothello_state : public driver_device
 {
 public:
-	sothello_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	sothello_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_subcpu_status;
 	int m_soundcpu_busy;

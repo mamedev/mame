@@ -194,8 +194,8 @@ UINT8 crtc_reg = 0;
 class aristmk4_state : public driver_device
 {
 public:
-	aristmk4_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;

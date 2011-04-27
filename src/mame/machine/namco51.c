@@ -379,7 +379,7 @@ ROM_END
 
 static DEVICE_START( namco_51xx )
 {
-	const namco_51xx_interface *config = (const namco_51xx_interface *)device->baseconfig().static_config();
+	const namco_51xx_interface *config = (const namco_51xx_interface *)device->static_config();
 	namco_51xx_state *state = get_safe_token(device);
 	astring tempstring;
 

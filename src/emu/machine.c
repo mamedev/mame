@@ -139,8 +139,7 @@ static char giant_string_buffer[65536] = { 0 };
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, osd_interface &osd, bool exit_to_game_select)
-	: m_devicelist(m_respool),
-	  firstcpu(NULL),
+	: firstcpu(NULL),
 	  primary_screen(NULL),
 	  palette(NULL),
 	  pens(NULL),
@@ -192,20 +191,18 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
 	memset(&m_base_time, 0, sizeof(m_base_time));
+	
+	// set the machine on all devices
+	const_cast<device_list &>(devicelist()).set_machine_all(*this);
 
 	// find the driver device config and tell it which game
-	device_config *config = m_config.m_devicelist.find("root");
-	if (config == NULL)
+	m_driver_device = device<driver_device>("root");
+	if (m_driver_device == NULL)
 		throw emu_fatalerror("Machine configuration missing driver_device");
 
-	// attach this machine to all the devices in the configuration
-	m_devicelist.import_config_list(m_config.m_devicelist, *this);
-	m_driver_device = device<driver_device>("root");
-	assert(m_driver_device != NULL);
-
 	// find devices
-	primary_screen = downcast<screen_device *>(m_devicelist.first(SCREEN));
-	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
+	primary_screen = downcast<screen_device *>(devicelist().first(SCREEN));
+	for (device_t *device = devicelist().first(); device != NULL; device = device->next())
 		if (dynamic_cast<cpu_device *>(device) != NULL)
 		{
 			firstcpu = downcast<cpu_device *>(device);
@@ -282,7 +279,7 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(*this, m_system.ipt, m_config.m_devicelist);
+	time_t newbase = input_port_init(*this, m_system.ipt, devicelist());
 	if (newbase != 0)
 		m_base_time = newbase;
 
@@ -322,7 +319,7 @@ void running_machine::start()
 	ui_set_startup_text(*this, "Initializing...", true);
 
 	// start up the devices
-	m_devicelist.start_all();
+	const_cast<device_list &>(devicelist()).start_all();
 
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
@@ -338,6 +335,36 @@ void running_machine::start()
 
 	// disallow save state registrations starting here
 	m_save.allow_registration(false);
+}
+
+
+//-------------------------------------------------
+//  add_dynamic_device - dynamically add a device
+//-------------------------------------------------
+
+device_t &running_machine::add_dynamic_device(device_t &owner, device_type type, const char *tag, UINT32 clock)
+{
+	// allocate and append this device
+	astring tempstring;
+	device_t &device = const_cast<device_list &>(devicelist()).append(tag, *type(m_config, owner.subtag(tempstring, tag), &owner, clock));
+
+	// append any machine config additions from new devices
+	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
+		if (!curdevice->configured())
+		{
+			machine_config_constructor machconfig = curdevice->machine_config_additions();
+			if (machconfig != NULL)
+		    	(*machconfig)(const_cast<machine_config &>(m_config), curdevice);
+		}
+
+	// notify any new devices that their configurations are complete
+	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
+		if (!curdevice->configured())
+			curdevice->config_complete();
+
+	// start all the new devices
+	const_cast<device_list &>(devicelist()).start_new_devices();
+	return device;
 }
 
 
@@ -924,87 +951,15 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 //**************************************************************************
 
 //-------------------------------------------------
-//  driver_device_config_base - constructor
+//  driver_device - constructor
 //-------------------------------------------------
 
-driver_device_config_base::driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner)
-	: device_config(mconfig, type, "Driver Device", tag, owner, 0),
+driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
+	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
 	  m_system(NULL),
 	  m_palette_init(NULL)
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
-}
-
-
-//-------------------------------------------------
-//  static_set_game - set the game in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device_config_base::static_set_game(device_config *device, const game_driver *game)
-{
-	driver_device_config_base *base = downcast<driver_device_config_base *>(device);
-
-	base->m_system = game;
-
-	// set the short name to the game's name
-	base->m_shortname = game->name;
-
-	// and set the search path to include all parents
-	base->m_searchpath = game->name;
-	for (int parent = driver_list::clone(*game); parent != -1; parent = driver_list::clone(parent))
-		base->m_searchpath.cat(";").cat(driver_list::driver(parent).name);
-}
-
-
-//-------------------------------------------------
-//  static_set_machine_start - set the legacy
-//  machine start callback in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device_config_base::static_set_callback(device_config *device, callback_type type, legacy_callback_func callback)
-{
-	downcast<driver_device_config_base *>(device)->m_callbacks[type] = callback;
-}
-
-
-//-------------------------------------------------
-//  static_set_palette_init - set the legacy
-//  palette init callback in the device
-//  configuration
-//-------------------------------------------------
-
-void driver_device_config_base::static_set_palette_init(device_config *device, palette_init_func callback)
-{
-	downcast<driver_device_config_base *>(device)->m_palette_init = callback;
-}
-
-
-//-------------------------------------------------
-//  rom_region - return a pointer to the ROM
-//  regions specified for the current game
-//-------------------------------------------------
-
-const rom_entry *driver_device_config_base::device_rom_region() const
-{
-	return m_system->rom;
-}
-
-
-
-//**************************************************************************
-//  DRIVER DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  driver_device - constructor
-//-------------------------------------------------
-
-driver_device::driver_device(running_machine &machine, const driver_device_config_base &config)
-	: device_t(machine, config),
-	  m_config(config)
-{
 }
 
 
@@ -1014,6 +969,52 @@ driver_device::driver_device(running_machine &machine, const driver_device_confi
 
 driver_device::~driver_device()
 {
+}
+
+
+//-------------------------------------------------
+//  static_set_game - set the game in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_game(device_t &device, const game_driver &game)
+{
+	driver_device &driver = downcast<driver_device &>(device);
+
+	// set the system
+	driver.m_system = &game;
+
+	// set the short name to the game's name
+	driver.m_shortname = game.name;
+
+	// and set the search path to include all parents
+	driver.m_searchpath = game.name;
+	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
+		driver.m_searchpath.cat(";").cat(driver_list::driver(parent).name);
+}
+
+
+//-------------------------------------------------
+//  static_set_machine_start - set the legacy
+//  machine start callback in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_callback(device_t &device, callback_type type, legacy_callback_func callback)
+{
+	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  static_set_palette_init - set the legacy
+//  palette init callback in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_palette_init(device_t &device, palette_init_func callback)
+{
+	downcast<driver_device &>(device).m_palette_init = callback;
 }
 
 
@@ -1034,8 +1035,8 @@ void driver_device::driver_start()
 
 void driver_device::machine_start()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_MACHINE_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_START])(machine());
+	if (m_callbacks[CB_MACHINE_START] != NULL)
+		(*m_callbacks[CB_MACHINE_START])(machine());
 }
 
 
@@ -1046,8 +1047,8 @@ void driver_device::machine_start()
 
 void driver_device::sound_start()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_SOUND_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_START])(machine());
+	if (m_callbacks[CB_SOUND_START] != NULL)
+		(*m_callbacks[CB_SOUND_START])(machine());
 }
 
 
@@ -1058,8 +1059,8 @@ void driver_device::sound_start()
 
 void driver_device::video_start()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_VIDEO_START] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_START])(machine());
+	if (m_callbacks[CB_VIDEO_START] != NULL)
+		(*m_callbacks[CB_VIDEO_START])(machine());
 }
 
 
@@ -1080,8 +1081,8 @@ void driver_device::driver_reset()
 
 void driver_device::machine_reset()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_MACHINE_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_MACHINE_RESET])(machine());
+	if (m_callbacks[CB_MACHINE_RESET] != NULL)
+		(*m_callbacks[CB_MACHINE_RESET])(machine());
 }
 
 
@@ -1092,8 +1093,8 @@ void driver_device::machine_reset()
 
 void driver_device::sound_reset()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_SOUND_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_SOUND_RESET])(machine());
+	if (m_callbacks[CB_SOUND_RESET] != NULL)
+		(*m_callbacks[CB_SOUND_RESET])(machine());
 }
 
 
@@ -1104,8 +1105,8 @@ void driver_device::sound_reset()
 
 void driver_device::video_reset()
 {
-	if (m_config.m_callbacks[driver_device_config_base::CB_VIDEO_RESET] != NULL)
-		(*m_config.m_callbacks[driver_device_config_base::CB_VIDEO_RESET])(machine());
+	if (m_callbacks[CB_VIDEO_RESET] != NULL)
+		(*m_callbacks[CB_VIDEO_RESET])(machine());
 }
 
 
@@ -1131,6 +1132,17 @@ void driver_device::screen_eof()
 
 
 //-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  game's ROMs
+//-------------------------------------------------
+
+const rom_entry *driver_device::device_rom_region() const
+{
+	return m_system->rom;
+}
+
+
+//-------------------------------------------------
 //  device_start - device override which calls
 //  the various helpers
 //-------------------------------------------------
@@ -1142,15 +1154,15 @@ void driver_device::device_start()
 		throw device_missing_dependencies();
 
 	// call the game-specific init
-	if (m_config.m_system->driver_init != NULL)
-		(*m_config.m_system->driver_init)(machine());
+	if (m_system->driver_init != NULL)
+		(*m_system->driver_init)(machine());
 
 	// finish image devices init process
 	image_postdevice_init(machine());
 
 	// call palette_init if present
-	if (m_config.m_palette_init != NULL)
-		(*m_config.m_palette_init)(machine(), machine().region("proms")->base());
+	if (m_palette_init != NULL)
+		(*m_palette_init)(machine(), machine().region("proms")->base());
 
 	// start the various pieces
 	driver_start();

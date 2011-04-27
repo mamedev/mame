@@ -156,8 +156,8 @@ the layer is misplaced however, different scroll regs?
 class expro02_state : public kaneko16_state
 {
 public:
-	expro02_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	expro02_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	UINT16 m_vram_0_bank_num;
 	UINT16 m_vram_1_bank_num;

@@ -239,8 +239,8 @@ Notes:
 class twinkle_state : public psx_state
 {
 public:
-	twinkle_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	twinkle_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 
 	UINT16 m_spu_ctrl;		// SPU board control register
 	UINT8 m_spu_shared[0x400];	// SPU/PSX shared dual-ported RAM

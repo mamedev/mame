@@ -35,8 +35,8 @@ typedef void (*galaxian_draw_background_func)(running_machine &machine, bitmap_t
 class galaxian_state : public driver_device
 {
 public:
-	galaxian_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_videoram;
 	int m_counter_74ls161[2];

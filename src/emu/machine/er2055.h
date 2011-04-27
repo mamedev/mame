@@ -58,43 +58,16 @@
 //**************************************************************************
 
 
-// ======================> er2055_device_config
-
-class er2055_device_config :	public device_config,
-								public device_config_memory_interface,
-								public device_config_nvram_interface
-{
-	friend class er2055_device;
-
-	// construction/destruction
-	er2055_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// device-specific configuration
-	address_space_config		m_space_config;
-};
-
-
 // ======================> er2055_device
 
 class er2055_device :	public device_t,
 						public device_memory_interface,
 						public device_nvram_interface
 {
-	friend class er2055_device_config;
-
-	// construction/destruction
-	er2055_device(running_machine &_machine, const er2055_device_config &config);
-
 public:
+	// construction/destruction
+	er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// I/O operations
 	UINT8 data() const { return m_data; }
 	void set_address(UINT8 address) { m_address = address & 0x3f; }
@@ -106,6 +79,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default();
@@ -120,9 +96,10 @@ protected:
 	static const UINT8 CS1 = 0x08;
 	static const UINT8 CS2 = 0x10;
 
-	// internal state
-	const er2055_device_config &m_config;
+	// configuration state
+	address_space_config		m_space_config;
 
+	// internal state
 	UINT8		m_control_state;
 	UINT8		m_address;
 	UINT8		m_data;

@@ -96,7 +96,7 @@ void generic_machine_init(running_machine &machine)
 	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
 	device_execute_interface *exec = NULL;
 	int index = 0;
-	for (bool gotone = machine.m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
+	for (bool gotone = machine.devicelist().first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
 		state->interrupt_device[index++] = &exec->device();
 
 	/* register coin save state */
@@ -319,7 +319,7 @@ void nvram_load(running_machine &machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine.m_devicelist.first(nvram) && machine.config().m_nvram_handler == NULL)
+	if (!machine.devicelist().first(nvram) && machine.config().m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
@@ -357,7 +357,7 @@ void nvram_save(running_machine &machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine.m_devicelist.first(nvram) && machine.config().m_nvram_handler == NULL)
+	if (!machine.devicelist().first(nvram) && machine.config().m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it

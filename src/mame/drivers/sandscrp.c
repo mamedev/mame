@@ -83,8 +83,8 @@ Is there another alt program rom set labeled 9 & 10?
 class sandscrp_state : public kaneko16_state
 {
 public:
-	sandscrp_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	UINT8 m_sprite_irq;
 	UINT8 m_unknown_irq;

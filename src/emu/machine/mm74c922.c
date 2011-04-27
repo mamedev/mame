@@ -24,54 +24,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MM74C922 = mm74c922_device_config::static_alloc_device_config;
-const device_type MM74C923 = mm74c922_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-GENERIC_DEVICE_CONFIG_SETUP(mm74c922, "MM74C922")
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mm74c922_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mm74c922_interface *intf = reinterpret_cast<const mm74c922_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mm74c922_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_da_func, 0, sizeof(m_out_da_func));
-		memset(&m_in_x1_func, 0, sizeof(m_in_x1_func));
-		memset(&m_in_x2_func, 0, sizeof(m_in_x2_func));
-		memset(&m_in_x3_func, 0, sizeof(m_in_x3_func));
-		memset(&m_in_x4_func, 0, sizeof(m_in_x4_func));
-		memset(&m_in_x5_func, 0, sizeof(m_in_x5_func));
-	}
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void mm74c922_device_config::static_set_config(device_config *device, int max_y)
-{
-	mm74c922_device_config *mm74c922 = downcast<mm74c922_device_config *>(device);
-
-	mm74c922->m_max_y = max_y;
-}
+const device_type MM74C922 = &device_creator<mm74c922_device>;
+const device_type MM74C923 = &device_creator<mm74c922_device>;
 
 
 
@@ -134,7 +88,7 @@ inline void mm74c922_device::detect_keypress()
 	{
 		UINT8 data = devcb_call_read8(&m_in_x_func[m_x], 0);
 
-		for (int y = 0; y < m_config.m_max_y; y++)
+		for (int y = 0; y < m_max_y; y++)
 		{
 			if (!BIT(data, y))
 			{
@@ -161,13 +115,50 @@ inline void mm74c922_device::detect_keypress()
 //  mm74c922_device - constructor
 //-------------------------------------------------
 
-mm74c922_device::mm74c922_device(running_machine &_machine, const mm74c922_device_config &config)
-    : device_t(_machine, config),
+mm74c922_device::mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MM74C922, "MM74C922", tag, owner, clock),
 	  m_x(0),
 	  m_y(0),
-	  m_next_da(0),
-      m_config(config)
+	  m_next_da(0)
 {
+}
+
+
+//-------------------------------------------------
+//  static_set_config - configuration helper
+//-------------------------------------------------
+
+void mm74c922_device::static_set_config(device_t &device, int max_y)
+{
+	mm74c922_device &mm74c922 = downcast<mm74c922_device &>(device);
+
+	mm74c922.m_max_y = max_y;
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void mm74c922_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const mm74c922_interface *intf = reinterpret_cast<const mm74c922_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<mm74c922_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_da_cb, 0, sizeof(m_out_da_cb));
+		memset(&m_in_x1_cb, 0, sizeof(m_in_x1_cb));
+		memset(&m_in_x2_cb, 0, sizeof(m_in_x2_cb));
+		memset(&m_in_x3_cb, 0, sizeof(m_in_x3_cb));
+		memset(&m_in_x4_cb, 0, sizeof(m_in_x4_cb));
+		memset(&m_in_x5_cb, 0, sizeof(m_in_x5_cb));
+	}
 }
 
 
@@ -178,12 +169,12 @@ mm74c922_device::mm74c922_device(running_machine &_machine, const mm74c922_devic
 void mm74c922_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_da_func, &m_config.m_out_da_func, this);
-	devcb_resolve_read8(&m_in_x_func[0], &m_config.m_in_x1_func, this);
-	devcb_resolve_read8(&m_in_x_func[1], &m_config.m_in_x2_func, this);
-	devcb_resolve_read8(&m_in_x_func[2], &m_config.m_in_x3_func, this);
-	devcb_resolve_read8(&m_in_x_func[3], &m_config.m_in_x4_func, this);
-	devcb_resolve_read8(&m_in_x_func[4], &m_config.m_in_x5_func, this);
+	devcb_resolve_write_line(&m_out_da_func, &m_out_da_cb, this);
+	devcb_resolve_read8(&m_in_x_func[0], &m_in_x1_cb, this);
+	devcb_resolve_read8(&m_in_x_func[1], &m_in_x2_cb, this);
+	devcb_resolve_read8(&m_in_x_func[2], &m_in_x3_cb, this);
+	devcb_resolve_read8(&m_in_x_func[3], &m_in_x4_cb, this);
+	devcb_resolve_read8(&m_in_x_func[4], &m_in_x5_cb, this);
 
 	// set initial values
 	change_output_lines();

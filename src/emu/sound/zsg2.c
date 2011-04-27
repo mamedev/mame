@@ -218,7 +218,7 @@ READ16_DEVICE_HANDLER( zsg2_r )
 
 static DEVICE_START( zsg2 )
 {
-	const zsg2_interface *intf = (const zsg2_interface *)device->baseconfig().static_config();
+	const zsg2_interface *intf = (const zsg2_interface *)device->static_config();
 	zsg2_state *info = get_safe_token(device);
 
 	info->sample_rate = device->clock();

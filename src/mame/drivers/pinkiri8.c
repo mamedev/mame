@@ -39,8 +39,8 @@ Dumped by Chackn
 class pinkiri8_state : public driver_device
 {
 public:
-	pinkiri8_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8* m_janshi_vram1;
 	UINT8* m_janshi_vram2;
@@ -79,76 +79,40 @@ ADDRESS_MAP_END
 
 /* VDP device to give us our own memory map */
 
-class janshi_vdp_device_config : public device_config,
-								 public device_config_memory_interface
+class janshi_vdp_device : public device_t,
+						  public device_memory_interface
 {
-	friend class janshi_vdp_device;
-	janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 public:
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
+	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
+	virtual void device_start();
+	virtual void device_reset();
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config		m_space_config;
 };
 
-class janshi_vdp_device : public device_t,
-						  public device_memory_interface
-{
-	friend class janshi_vdp_device_config;
-	janshi_vdp_device(running_machine &_machine, const janshi_vdp_device_config &config);
-public:
-protected:
-	virtual void device_start();
-	virtual void device_reset();
-	const janshi_vdp_device_config &m_config;
-};
+const device_type JANSHIVDP = &device_creator<janshi_vdp_device>;
 
-const device_type JANSHIVDP = janshi_vdp_device_config::static_alloc_device_config;
-
-janshi_vdp_device_config::janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "JANSHIVDP", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
+janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, JANSHIVDP, "JANSHIVDP", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
 	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {
 }
 
-device_config *janshi_vdp_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(janshi_vdp_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *janshi_vdp_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, janshi_vdp_device(machine, *this));
-}
-
-void janshi_vdp_device_config::device_config_complete()
+void janshi_vdp_device::device_config_complete()
 {
 //  int address_bits = 24;
 
 //  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
 }
 
-bool janshi_vdp_device_config::device_validity_check(emu_options &options, const game_driver &driver) const
+bool janshi_vdp_device::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 	return error;
-}
-
-const address_space_config *janshi_vdp_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}
-
-
-janshi_vdp_device::janshi_vdp_device(running_machine &_machine, const janshi_vdp_device_config &config)
-	: device_t(_machine, config),
-	  device_memory_interface(_machine, config, *this),
-	  m_config(config)
-{
 }
 
 void janshi_vdp_device::device_start()
@@ -158,6 +122,12 @@ void janshi_vdp_device::device_start()
 void janshi_vdp_device::device_reset()
 {
 }
+
+const address_space_config *janshi_vdp_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
 
 /* end VDP device to give us our own memory map */
 

@@ -9,8 +9,8 @@
 class rampart_state : public atarigen_state
 {
 public:
-	rampart_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+	rampart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag) { }
 
 	UINT16 *		m_bitmap;
 	UINT8			m_has_mo;

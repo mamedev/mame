@@ -869,7 +869,7 @@ static void cop400_init(legacy_cpu_device *device, UINT8 g_mask, UINT8 d_mask, U
 {
 	cop400_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (cop400_interface *) device->baseconfig().static_config();
+	cpustate->intf = (cop400_interface *) device->static_config();
 
 	/* find address spaces */
 
@@ -1380,7 +1380,7 @@ static CPU_SET_INFO( cop400 )
 static CPU_GET_INFO( cop400 )
 {
 	cop400_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-	cop400_interface *intf = (devconfig->static_config() != NULL) ? (cop400_interface *)devconfig->static_config() : NULL;
+	cop400_interface *intf = (device->static_config() != NULL) ? (cop400_interface *)device->static_config() : NULL;
 
 	switch (state)
 	{

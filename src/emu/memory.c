@@ -1564,7 +1564,7 @@ void memory_init(running_machine &machine)
 
 	// loop over devices and spaces within each device
 	device_memory_interface *memory = NULL;
-	for (bool gotone = machine.m_devicelist.first(memory); gotone; gotone = memory->next(memory))
+	for (bool gotone = machine.devicelist().first(memory); gotone; gotone = memory->next(memory))
 		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			// if there is a configuration for this space, we need an address space
@@ -1940,7 +1940,7 @@ void address_space::prepare_map()
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
-	m_map = global_alloc(address_map(m_device.baseconfig(), m_spacenum));
+	m_map = global_alloc(address_map(m_device, m_spacenum));
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;

@@ -15,49 +15,20 @@
 
 
 //**************************************************************************
-//  DEVICE DEFINITIONS
+//  LIVE DEVICE
 //**************************************************************************
 
-const device_type MB3773 = mb3773_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
+// device type definition
+const device_type MB3773 = &device_creator<mb3773_device>;
 
 //-------------------------------------------------
-//  mb3773_device_config - constructor
+//  mb3773_device - constructor
 //-------------------------------------------------
 
-mb3773_device_config::mb3773_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-	: device_config(mconfig, static_alloc_device_config, "MB3773", tag, owner, clock)
+mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t(mconfig, MB3773, "MB3773", tag, owner, clock)
 {
 }
-
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *mb3773_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( mb3773_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *mb3773_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc( machine, mb3773_device( machine, *this ) );
-}
-
 
 
 //-------------------------------------------------
@@ -66,7 +37,7 @@ device_t *mb3773_device_config::alloc_device( running_machine &machine ) const
 //  complete
 //-------------------------------------------------
 
-void mb3773_device_config::device_config_complete()
+void mb3773_device::device_config_complete()
 {
 }
 
@@ -76,26 +47,9 @@ void mb3773_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool mb3773_device_config::device_validity_check( emu_options &options, const game_driver &driver ) const
+bool mb3773_device::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	return false;
-}
-
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mb3773_device - constructor
-//-------------------------------------------------
-
-mb3773_device::mb3773_device( running_machine &_machine, const mb3773_device_config &config ) :
-	device_t( _machine, config ),
-	m_config( config )
-{
 }
 
 

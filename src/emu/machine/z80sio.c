@@ -13,6 +13,9 @@
 #include "cpu/z80/z80daisy.h"
 
 
+// device type definition
+const device_type Z80SIO = &device_creator<z80sio_device>;
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -21,14 +24,6 @@
 #define VERBOSE		0
 
 #define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
-
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type Z80SIO = z80sio_device_config::static_alloc_device_config;
 
 
 
@@ -248,8 +243,8 @@ const UINT8 z80sio_device::k_int_priority[] =
 inline void z80sio_device::update_interrupt_state()
 {
 	// if we have a callback, update it with the current state
-	if (m_config.m_irq_cb != NULL)
-		(*m_config.m_irq_cb)(this, (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	if (m_irq_cb != NULL)
+		(*m_irq_cb)(this, (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -295,38 +290,19 @@ inline attotime z80sio_device::sio_channel::compute_time_per_character()
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  z80sio_device_config - constructor
+//  z80sio_device - constructor
 //-------------------------------------------------
 
-z80sio_device_config::z80sio_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "Zilog Z80 SIO", tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
+z80sio_device::z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, Z80SIO, "Zilog Z80 SIO", tag, owner, clock),
+	  device_z80daisy_interface(mconfig, *this)
 {
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *z80sio_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(z80sio_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *z80sio_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, z80sio_device(machine, *this));
+	for (int i = 0; i < 8; i++)
+		m_int_state[i] = 0;
 }
 
 
@@ -336,7 +312,7 @@ device_t *z80sio_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void z80sio_device_config::device_config_complete()
+void z80sio_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const z80sio_interface *intf = reinterpret_cast<const z80sio_interface *>(static_config());
@@ -353,25 +329,6 @@ void z80sio_device_config::device_config_complete()
 		m_transmit_cb = NULL;
 		m_receive_poll_cb = NULL;
 	}
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80sio_device - constructor
-//-------------------------------------------------
-
-z80sio_device::z80sio_device(running_machine &_machine, const z80sio_device_config &config)
-	: device_t(_machine, config),
-	  device_z80daisy_interface(_machine, config, *this),
-	  m_config(config)
-{
-	for (int i = 0; i < 8; i++)
-		m_int_state[i] = 0;
 }
 
 
@@ -609,12 +566,12 @@ void z80sio_device::sio_channel::control_write(UINT8 data)
 
 		// SIO write register 5
 		case 5:
-			if (((old ^ data) & SIO_WR5_DTR) && m_device->m_config.m_dtr_changed_cb)
-				(*m_device->m_config.m_dtr_changed_cb)(m_device, m_index, (data & SIO_WR5_DTR) != 0);
-			if (((old ^ data) & SIO_WR5_SEND_BREAK) && m_device->m_config.m_break_changed_cb)
-				(*m_device->m_config.m_break_changed_cb)(m_device, m_index, (data & SIO_WR5_SEND_BREAK) != 0);
-			if (((old ^ data) & SIO_WR5_RTS) && m_device->m_config.m_rts_changed_cb)
-				(*m_device->m_config.m_rts_changed_cb)(m_device, m_index, (data & SIO_WR5_RTS) != 0);
+			if (((old ^ data) & SIO_WR5_DTR) && m_device->m_dtr_changed_cb)
+				(*m_device->m_dtr_changed_cb)(m_device, m_index, (data & SIO_WR5_DTR) != 0);
+			if (((old ^ data) & SIO_WR5_SEND_BREAK) && m_device->m_break_changed_cb)
+				(*m_device->m_break_changed_cb)(m_device, m_index, (data & SIO_WR5_SEND_BREAK) != 0);
+			if (((old ^ data) & SIO_WR5_RTS) && m_device->m_rts_changed_cb)
+				(*m_device->m_rts_changed_cb)(m_device, m_index, (data & SIO_WR5_RTS) != 0);
 			break;
 	}
 }
@@ -784,8 +741,8 @@ void z80sio_device::sio_channel::serial_callback()
 		VPRINTF(("serial_callback(%c): Transmitting %02x\n", 'A' + m_index, m_outbuf));
 
 		// actually transmit the character
-		if (m_device->m_config.m_transmit_cb != NULL)
-			(*m_device->m_config.m_transmit_cb)(m_device, m_index, m_outbuf);
+		if (m_device->m_transmit_cb != NULL)
+			(*m_device->m_transmit_cb)(m_device, m_index, m_outbuf);
 
 		// update the status register
 		m_status[0] |= SIO_RR0_TX_BUFFER_EMPTY;
@@ -799,8 +756,8 @@ void z80sio_device::sio_channel::serial_callback()
 	}
 
 	// ask the polling callback if there is data to receive
-	if (m_device->m_config.m_receive_poll_cb != NULL)
-		data = (*m_device->m_config.m_receive_poll_cb)(m_device, m_index);
+	if (m_device->m_receive_poll_cb != NULL)
+		data = (*m_device->m_receive_poll_cb)(m_device, m_index);
 
 	// if we have buffered data, pull it
 	if (m_receive_inptr != m_receive_outptr)

@@ -1124,9 +1124,9 @@ static void configuration_save(running_machine &machine, int config_type, xml_da
 		return;
 
 	/* iterate over disc devices */
-	for (device = machine.m_devicelist.first(LASERDISC); device != NULL; device = device->typenext())
+	for (device = machine.devicelist().first(LASERDISC); device != NULL; device = device->typenext())
 	{
-		laserdisc_config *origconfig = (laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+		laserdisc_config *origconfig = (laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
 		laserdisc_state *ld = get_safe_token(device);
 		ldcore_data *ldcore = ld->core;
 		xml_data_node *overnode;
@@ -1214,7 +1214,7 @@ void laserdisc_overlay_enable(device_t *device, int enable)
 
 SCREEN_UPDATE( laserdisc )
 {
-	device_t *laserdisc = screen->machine().m_devicelist.first(LASERDISC);
+	device_t *laserdisc = screen->machine().devicelist().first(LASERDISC);
 	if (laserdisc != NULL)
 	{
 		const rectangle &visarea = screen->visible_area();
@@ -1322,7 +1322,7 @@ void laserdisc_set_config(device_t *device, const laserdisc_config *config)
 
 static void init_disc(device_t *device)
 {
-	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	chd_error err;
@@ -1473,7 +1473,7 @@ static void init_audio(device_t *device)
 
 static DEVICE_START( laserdisc )
 {
-	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore;
 	int statesize;
@@ -1616,12 +1616,12 @@ void laserdisc_set_type(device_t *device, int type)
     device get info callback
 -------------------------------------------------*/
 
-static const ldplayer_interface *get_interface(const device_config *devconfig)
+static const ldplayer_interface *get_interface(const device_t *device)
 {
-	if (devconfig == NULL)
+	if (device == NULL)
 		return NULL;
 
-	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_config_base *>(devconfig)->inline_config();
+	const laserdisc_config *config = (const laserdisc_config *)downcast<const legacy_device_base *>(device)->inline_config();
 	if (config == NULL)
 		return NULL;
 

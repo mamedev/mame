@@ -39,7 +39,7 @@ enum
 	MCFG_OKIM6295_PIN7(_pin7)
 
 #define MCFG_OKIM6295_PIN7(_pin7) \
-	okim6295_device_config::static_set_pin7(device, _pin7); \
+	okim6295_device::static_set_pin7(*device, _pin7); \
 
 
 
@@ -72,50 +72,20 @@ private:
 
 
 
-// ======================> okim6295_device_config
-
-class okim6295_device_config :	public device_config,
-								public device_config_sound_interface,
-								public device_config_memory_interface
-{
-	friend class okim6295_device;
-
-	// construction/destruction
-	okim6295_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// inline configuration helpers
-	static void static_set_pin7(device_config *device, int pin7);
-
-protected:
-	// device_config overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// internal state
-	const address_space_config  m_space_config;
-
-	// inline data
-	UINT8						m_pin7;
-};
-
-
-
 // ======================> okim6295_device
 
 class okim6295_device : public device_t,
 						public device_sound_interface,
 						public device_memory_interface
 {
-	friend class okim6295_device_config;
-
-	// construction/destruction
-	okim6295_device(running_machine &_machine, const okim6295_device_config &config);
-
 public:
+	// construction/destruction
+	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// inline configuration helpers
+	static void static_set_pin7(device_t &device, int pin7);
+
+	// runtime configuration
 	void set_bank_base(offs_t base);
 	void set_pin7(int pin7);
 
@@ -132,7 +102,10 @@ protected:
 	virtual void device_post_load();
 	virtual void device_clock_changed();
 
-	// sound interface overrides
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// a single voice
@@ -150,10 +123,11 @@ protected:
 		INT8		m_volume;			// output volume
 	};
 
+	// configuration state
+	const address_space_config  m_space_config;
+
 	// internal state
 	static const int OKIM6295_VOICES = 4;
-
-	const okim6295_device_config &m_config;
 
 	okim_voice			m_voice[OKIM6295_VOICES];
 	INT32				m_command;

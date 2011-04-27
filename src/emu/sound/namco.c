@@ -360,7 +360,7 @@ static STREAM_UPDATE( namco_update_stereo )
 static DEVICE_START( namco )
 {
 	sound_channel *voice;
-	const namco_interface *intf = (const namco_interface *)device->baseconfig().static_config();
+	const namco_interface *intf = (const namco_interface *)device->static_config();
 	int clock_multiple;
 	namco_sound *chip = get_safe_token(device);
 

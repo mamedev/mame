@@ -23,6 +23,9 @@
 #include "msm58321.h"
 
 
+// device type definition
+const device_type MSM58321 = &device_creator<msm58321_device>;
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -55,72 +58,6 @@ enum
 
 // days per month
 static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// devices
-const device_type MSM58321 = msm58321_device_config::static_alloc_device_config;
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  msm58321_device_config - constructor
-//-------------------------------------------------
-
-msm58321_device_config::msm58321_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "MSM58321", tag, owner, clock),
-	  device_config_rtc_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *msm58321_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(msm58321_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *msm58321_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, msm58321_device(machine, *this));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm58321_device_config::device_config_complete()
-{
-	// inherit a copy of the static data
-	const msm58321_interface *intf = reinterpret_cast<const msm58321_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<msm58321_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_busy_func, 0, sizeof(m_out_busy_func));
-	}
-}
 
 
 
@@ -238,13 +175,33 @@ inline void msm58321_device::advance_minutes()
 //  msm58321_device - constructor
 //-------------------------------------------------
 
-msm58321_device::msm58321_device(running_machine &_machine, const msm58321_device_config &config)
-    : device_t(_machine, config),
-	  device_rtc_interface(_machine, config, *this),
-      m_config(config)
+msm58321_device::msm58321_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, MSM58321, "MSM58321", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this)
 {
 	for (int i = 0; i < 13; i++)
 		m_reg[i] = 0;
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void msm58321_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const msm58321_interface *intf = reinterpret_cast<const msm58321_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<msm58321_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_busy_cb, 0, sizeof(m_out_busy_cb));
+	}
 }
 
 
@@ -255,7 +212,7 @@ msm58321_device::msm58321_device(running_machine &_machine, const msm58321_devic
 void msm58321_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_busy_func, &m_config.m_out_busy_func, this);
+	devcb_resolve_write_line(&m_out_busy_func, &m_out_busy_cb, this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);

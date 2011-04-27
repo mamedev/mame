@@ -814,7 +814,7 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_PALETTE_LENGTH(32768)
 	MCFG_GFXDECODE(skns_bg)
 
-	MCFG_DEVICE_ADD("spritegen", sknsspr_, 0)
+	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 
 	MCFG_VIDEO_START(skns)
 	MCFG_VIDEO_RESET(skns)

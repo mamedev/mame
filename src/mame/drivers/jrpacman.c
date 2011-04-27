@@ -107,8 +107,8 @@
 class jrpacman_state : public pacman_state
 {
 public:
-	jrpacman_state(running_machine &machine, const driver_device_config_base &config)
-		: pacman_state(machine, config) { }
+	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag) { }
 };
 
 

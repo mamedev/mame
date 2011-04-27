@@ -1,8 +1,8 @@
 class dec0_state : public driver_device
 {
 public:
-	dec0_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_automat_adpcm_byte;
 	int m_automat_msm5205_vclk_toggle;

@@ -281,7 +281,7 @@ static void cquestsnd_state_register(device_t *device)
 static CPU_INIT( cquestsnd )
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
-	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->baseconfig().static_config();
+	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->static_config();
 
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -354,7 +354,7 @@ static void cquestrot_state_register(device_t *device)
 
 static CPU_INIT( cquestrot )
 {
-	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->baseconfig().static_config();
+	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->static_config();
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -438,7 +438,7 @@ static void cquestlin_state_register(device_t *device)
 
 static CPU_INIT( cquestlin )
 {
-	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->baseconfig().static_config();
+	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->static_config();
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 

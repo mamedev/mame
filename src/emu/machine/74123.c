@@ -14,45 +14,22 @@
 #define	LOG		(0)
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type TTL74123 = ttl74123_device_config::static_alloc_device_config;
-
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
+
+// device type definition
+const device_type TTL74123 = &device_creator<ttl74123_device>;
 
 //-------------------------------------------------
-//  ttl74123_device_config - constructor
+//  ttl74123_device - constructor
 //-------------------------------------------------
 
-ttl74123_device_config::ttl74123_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "TTL74123", tag, owner, clock)
+ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TTL74123, "TTL74123", tag, owner, clock)
 {
-}
 
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *ttl74123_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(ttl74123_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *ttl74123_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, ttl74123_device(machine, *this));
 }
 
 
@@ -62,7 +39,7 @@ device_t *ttl74123_device_config::alloc_device(running_machine &machine) const
 //  complete
 //-------------------------------------------------
 
-void ttl74123_device_config::device_config_complete()
+void ttl74123_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const ttl74123_interface *intf = reinterpret_cast<const ttl74123_interface *>(static_config());
@@ -83,23 +60,6 @@ void ttl74123_device_config::device_config_complete()
 }
 
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ttl74123_device - constructor
-//-------------------------------------------------
-
-ttl74123_device::ttl74123_device(running_machine &_machine, const ttl74123_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config)
-{
-
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -107,11 +67,6 @@ ttl74123_device::ttl74123_device(running_machine &_machine, const ttl74123_devic
 void ttl74123_device::device_start()
 {
 	m_timer = machine().scheduler().timer_alloc(FUNC(clear_callback), (void *)this);
-
-	/* start with the defaults */
-	m_a = m_config.m_a;
-	m_b = m_config.m_b;
-	m_clear = m_config.m_clear;
 
 	/* register for state saving */
 	save_item(NAME(m_a));
@@ -139,26 +94,26 @@ attotime ttl74123_device::compute_duration()
 {
 	double duration;
 
-	switch (m_config.m_connection_type)
+	switch (m_connection_type)
 	{
 	case TTL74123_NOT_GROUNDED_NO_DIODE:
-		duration = 0.28 * m_config.m_res * m_config.m_cap * (1.0 + (700.0 / m_config.m_res));
+		duration = 0.28 * m_res * m_cap * (1.0 + (700.0 / m_res));
 		break;
 
 	case TTL74123_NOT_GROUNDED_DIODE:
-		duration = 0.25 * m_config.m_res * m_config.m_cap * (1.0 + (700.0 / m_config.m_res));
+		duration = 0.25 * m_res * m_cap * (1.0 + (700.0 / m_res));
 		break;
 
 	case TTL74123_GROUNDED:
 	default:
-		if (m_config.m_cap < CAP_U(0.1))
+		if (m_cap < CAP_U(0.1))
 		{
 			/* this is really a curve - a very flat one in the 0.1uF-.01uF range */
-			duration = 0.32 * m_config.m_res * m_config.m_cap;
+			duration = 0.32 * m_res * m_cap;
 		}
 		else
 		{
-			duration = 0.33 * m_config.m_res * m_config.m_cap;
+			duration = 0.33 * m_res * m_cap;
 		}
 		break;
 	}
@@ -190,7 +145,7 @@ TIMER_CALLBACK( ttl74123_device::output_callback )
 
 void ttl74123_device::output(INT32 param)
 {
-	m_config.m_output_changed_cb(this, 0, param);
+	m_output_changed_cb(this, 0, param);
 }
 
 
@@ -222,7 +177,7 @@ void ttl74123_device::clear()
 {
 	int output = timer_running();
 
-	m_config.m_output_changed_cb(this, 0, output);
+	m_output_changed_cb(this, 0, output);
 }
 
 
@@ -237,7 +192,7 @@ void ttl74123_device::start_pulse()
 	if(timer_running())
 	{
 		/* retriggering, but not if we are called to quickly */
-		attotime delay_time = attotime(0, ATTOSECONDS_PER_SECOND * m_config.m_cap * 220);
+		attotime delay_time = attotime(0, ATTOSECONDS_PER_SECOND * m_cap * 220);
 
 		if(m_timer->elapsed() >= delay_time)
 		{

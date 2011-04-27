@@ -20,8 +20,6 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type AT28C16 = at28c16_device_config::static_alloc_device_config;
-
 static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x081f) AM_RAM
 ADDRESS_MAP_END
@@ -29,41 +27,24 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
+// device type definition
+const device_type AT28C16 = &device_creator<at28c16_device>;
+
 //-------------------------------------------------
-//  at28c16_device_config - constructor
+//  at28c16_device - constructor
 //-------------------------------------------------
 
-at28c16_device_config::at28c16_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-	: device_config(mconfig, static_alloc_device_config, "AT28C16", tag, owner, clock),
-	  device_config_memory_interface(mconfig, *this),
-	  device_config_nvram_interface(mconfig, *this)
+at28c16_device::at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+	: device_t(mconfig, AT28C16, "AT28C16", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  device_nvram_interface(mconfig, *this),
+	  m_a9_12v( 0 ),
+	  m_oe_12v( 0 ),
+	  m_last_write( -1 )
 {
-}
-
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *at28c16_device_config::static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock )
-{
-	return global_alloc( at28c16_device_config( mconfig, tag, owner, clock ) );
-}
-
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *at28c16_device_config::alloc_device( running_machine &machine ) const
-{
-	return auto_alloc( machine, at28c16_device( machine, *this ) );
 }
 
 
@@ -73,7 +54,7 @@ device_t *at28c16_device_config::alloc_device( running_machine &machine ) const
 //  complete
 //-------------------------------------------------
 
-void at28c16_device_config::device_config_complete()
+void at28c16_device::device_config_complete()
 {
 	m_space_config = address_space_config( "at28c16", ENDIANNESS_BIG, 8,  12, 0, *ADDRESS_MAP_NAME( at28c16_map8 ) );
 }
@@ -84,7 +65,7 @@ void at28c16_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool at28c16_device_config::device_validity_check( emu_options &options, const game_driver &driver ) const
+bool at28c16_device::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	return false;
 }
@@ -95,31 +76,9 @@ bool at28c16_device_config::device_validity_check( emu_options &options, const g
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *at28c16_device_config::memory_space_config( address_spacenum spacenum ) const
+const address_space_config *at28c16_device::memory_space_config( address_spacenum spacenum ) const
 {
 	return ( spacenum == 0 ) ? &m_space_config : NULL;
-}
-
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  at28c16_device - constructor
-//-------------------------------------------------
-
-at28c16_device::at28c16_device( running_machine &_machine, const at28c16_device_config &config ) :
-	device_t( _machine, config ),
-	device_memory_interface( _machine, config, *this ),
-	device_nvram_interface( _machine, config, *this ),
-	m_config( config ),
-	m_a9_12v( 0 ),
-	m_oe_12v( 0 ),
-	m_last_write( -1 )
-{
 }
 
 

@@ -148,18 +148,18 @@ typedef void (*device_image_display_info_func)(device_image_interface &image);
 #define DEVICE_IMAGE_SOFTLIST_LOAD_NAME(name)        device_softlist_load_##name
 #define DEVICE_IMAGE_SOFTLIST_LOAD(name)             bool DEVICE_IMAGE_SOFTLIST_LOAD_NAME(name)(device_image_interface &image, char *swlist, char *swname, rom_entry *start_entry)
 
-// ======================> device_config_image_interface
 
-// class representing interface-specific configuration image
-class device_config_image_interface : public device_config_interface
+
+// ======================> device_image_interface
+
+// class representing interface-specific live image
+class device_image_interface : public device_interface
 {
-	friend class device_image_interface;
 public:
 	// construction/destruction
-	device_config_image_interface(const machine_config &mconfig, device_config &device);
-	virtual ~device_config_image_interface();
+	device_image_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_image_interface();
 
-	// public accessors... for now
 	virtual iodevice_t image_type()  const = 0;
 	virtual const char *image_type_name()  const = 0;
 	virtual iodevice_t image_type_direct() const = 0;
@@ -183,23 +183,6 @@ public:
 
 	virtual device_image_partialhash_func get_partial_hash() const = 0;
 	virtual void device_compute_hash(hash_collection &hashes, const void *data, size_t length, const char *types) const;
-protected:
-	static const image_device_type_info *find_device_type(iodevice_t type);
-	static const image_device_type_info m_device_info_array[];
-};
-
-
-
-// ======================> device_image_interface
-
-// class representing interface-specific live image
-class device_image_interface : public device_interface
-{
-	friend class device_config_image_interface;
-public:
-	// construction/destruction
-	device_image_interface(running_machine &machine, const device_config &config, device_t &device);
-	virtual ~device_image_interface();
 
 	virtual bool load(const char *path) = 0;
 	virtual bool finish_load() = 0;
@@ -212,14 +195,13 @@ public:
 	virtual void call_unload() = 0;
 	virtual void call_display() = 0;
 	virtual void call_display_info() = 0;
-	virtual device_image_partialhash_func get_partial_hash() = 0;
 	virtual void call_get_devices() = 0;
 	virtual void *get_device_specific_call() = 0;
 
 	virtual const image_device_format *device_get_indexed_creatable_format(int index);
 	virtual const image_device_format *device_get_named_creatable_format(const char *format_name);
-	const option_guide *device_get_creation_option_guide() { return m_image_config.create_option_guide(); }
-	const image_device_format *device_get_creatable_formats() { return m_image_config.formatlist(); }
+	const option_guide *device_get_creation_option_guide() { return create_option_guide(); }
+	const image_device_format *device_get_creatable_formats() { return formatlist(); }
 
 	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args) = 0;
 
@@ -227,8 +209,8 @@ public:
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...);
 
-	bool exists() { return m_name; }
-	const char *filename() { if (!m_name) return NULL; else return m_name; }
+	bool exists() { return m_image_name; }
+	const char *filename() { if (!m_image_name) return NULL; else return m_image_name; }
 	const char *basename() { if (!m_basename) return NULL; else return m_basename; }
 	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext; }
 	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
@@ -246,8 +228,6 @@ public:
 	int image_feof() { check_for_file(); return core_feof(m_file); }
 	void *ptr() {check_for_file(); return (void *) core_fbuffer(m_file); }
 	// configuration access
-	const device_config_image_interface &image_config() const { return m_image_config; }
-
 	void set_init_phase() { m_init_phase = TRUE; }
 
 	const char* longname() { return m_longname; }
@@ -291,7 +271,8 @@ protected:
 	// derived class overrides
 
 	// configuration
-	const device_config_image_interface &m_image_config;	// reference to our device_config_execute_interface
+	static const image_device_type_info *find_device_type(iodevice_t type);
+	static const image_device_type_info m_device_info_array[];
 
     /* error related info */
     image_error_t m_err;
@@ -300,7 +281,7 @@ protected:
     /* variables that are only non-zero when an image is mounted */
 	core_file *m_file;
 	emu_file *m_mame_file;
-	astring m_name;
+	astring m_image_name;
 	astring m_basename;
 	astring m_basename_noext;
 	astring m_filetype;

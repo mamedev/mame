@@ -41,8 +41,8 @@ cha3    $10d8
 class cchance_state : public tnzs_state
 {
 public:
-	cchance_state(running_machine &machine, const driver_device_config_base &config)
-		: tnzs_state(machine, config) { }
+	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tnzs_state(mconfig, type, tag) { }
 
 	UINT8 m_hop_io;
 	UINT8 m_bell_io;

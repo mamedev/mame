@@ -648,7 +648,7 @@ static DEVICE_START( k054539 )
 		info->k054539_gain[i] = 1.0;
 	info->k054539_flags = K054539_RESET_FLAGS;
 
-	info->intf = (device->baseconfig().static_config() != NULL) ? (const k054539_interface *)device->baseconfig().static_config() : &defintrf;
+	info->intf = (device->static_config() != NULL) ? (const k054539_interface *)device->static_config() : &defintrf;
 
 	/*
         I've tried various equations on volume control but none worked consistently.

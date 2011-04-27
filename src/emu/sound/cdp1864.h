@@ -115,16 +115,16 @@ struct cdp1864_interface
 	const char *m_cpu_tag;
 	const char *m_screen_tag;
 
-	devcb_read_line				m_in_inlace_func;
+	devcb_read_line				m_in_inlace_cb;
 
-	devcb_read_line				m_in_rdata_func;
-	devcb_read_line				m_in_bdata_func;
-	devcb_read_line				m_in_gdata_func;
+	devcb_read_line				m_in_rdata_cb;
+	devcb_read_line				m_in_bdata_cb;
+	devcb_read_line				m_in_gdata_cb;
 
-	devcb_write_line			m_out_int_func;
-	devcb_write_line			m_out_dmao_func;
-	devcb_write_line			m_out_efx_func;
-	devcb_write_line			m_out_hsync_func;
+	devcb_write_line			m_out_int_cb;
+	devcb_write_line			m_out_dmao_cb;
+	devcb_write_line			m_out_efx_cb;
+	devcb_write_line			m_out_hsync_cb;
 
 	double m_res_r;				// red output resistor value
 	double m_res_g;				// green output resistor value
@@ -134,40 +134,16 @@ struct cdp1864_interface
 
 
 
-// ======================> cdp1864_device_config
-
-class cdp1864_device_config :   public device_config,
-								public device_config_sound_interface,
-                                public cdp1864_interface
-{
-    friend class cdp1864_device;
-
-    // construction/destruction
-    cdp1864_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual void device_config_complete();
-};
-
-
-
 // ======================> cdp1864_device
 
 class cdp1864_device :	public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+                        public cdp1864_interface
 {
-    friend class cdp1864_device_config;
-
-    // construction/destruction
-    cdp1864_device(running_machine &_machine, const cdp1864_device_config &_config);
-
 public:
+    // construction/destruction
+    cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( dispoff_r );
 
@@ -184,6 +160,7 @@ public:
 
 protected:
     // device-level overrides
+	virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -230,8 +207,6 @@ private:
 	emu_timer *m_efx_timer;
 	emu_timer *m_dma_timer;
 	emu_timer *m_hsync_timer;
-
-	const cdp1864_device_config &m_config;
 };
 
 

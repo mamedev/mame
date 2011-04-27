@@ -32,69 +32,8 @@
 #include "emu.h"
 #include "asc.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type ASC = asc_device_config::static_alloc_device_config;
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the chip type
-//-------------------------------------------------
-
-void asc_device_config::static_set_type(device_config *device, int type)
-{
-	asc_device_config *asc = downcast<asc_device_config *>(device);
-	asc->m_type = type;
-}
-
-//-------------------------------------------------
-//  static_set_type - configuration helper to set
-//  the IRQ callback
-//-------------------------------------------------
-
-
-void asc_device_config::static_set_irqf(device_config *device, void (*irqf)(device_t *device, int state))
-{
-	asc_device_config *asc = downcast<asc_device_config *>(device);
-	asc->m_irq_func = irqf;
-}
-
-//-------------------------------------------------
-//  asc_device_config - constructor
-//-------------------------------------------------
-
-asc_device_config::asc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "ASC", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *asc_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(asc_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *asc_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, asc_device(machine, *this));
-}
+// device type definition
+const device_type ASC = &device_creator<asc_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -112,15 +51,37 @@ static TIMER_CALLBACK( sync_timer_cb )
 //  asc_device - constructor
 //-------------------------------------------------
 
-asc_device::asc_device(running_machine &_machine, const asc_device_config &config)
-	: device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  m_config(config),
-	  m_chip_type(m_config.m_type),
-	  m_irq_cb(m_config.m_irq_func)
+asc_device::asc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ASC, "ASC", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_chip_type(0),
+	  m_irq_cb(NULL)
 {
 }
 
+
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the chip type
+//-------------------------------------------------
+
+void asc_device::static_set_type(device_t &device, int type)
+{
+	asc_device &asc = downcast<asc_device &>(device);
+	asc.m_chip_type = type;
+}
+
+//-------------------------------------------------
+//  static_set_type - configuration helper to set
+//  the IRQ callback
+//-------------------------------------------------
+
+
+void asc_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
+{
+	asc_device &asc = downcast<asc_device &>(device);
+	asc.m_irq_cb = irqf;
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

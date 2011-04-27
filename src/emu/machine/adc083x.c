@@ -82,7 +82,7 @@ INLINE const adc083x_interface *get_interface( device_t *device )
 {
 	assert( device != NULL );
 	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
-	return (const adc083x_interface *) device->baseconfig().static_config();
+	return (const adc083x_interface *) device->static_config();
 }
 
 

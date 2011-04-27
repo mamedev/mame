@@ -10,10 +10,22 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
+//  LIVE DEVICE
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(k056230, "Konami 056230")
+// device type definition
+const device_type K056230 = &device_creator<k056230_device>;
+
+//-------------------------------------------------
+//  k056230_device - constructor
+//-------------------------------------------------
+
+k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, K056230, "Konami 056230", tag, owner, clock)
+{
+
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -21,7 +33,7 @@ GENERIC_DEVICE_CONFIG_SETUP(k056230, "Konami 056230")
 //  complete
 //-------------------------------------------------
 
-void k056230_device_config::device_config_complete()
+void k056230_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const k056230_interface *intf = reinterpret_cast<const k056230_interface *>(static_config());
@@ -33,29 +45,11 @@ void k056230_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		m_cpu = NULL;
-		m_is_thunderh = 0;
+		m_cpu_tag = NULL;
+		m_is_thunderh = false;
 	}
 }
 
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-const device_type K0506230 = k056230_device_config::static_alloc_device_config;
-
-//-------------------------------------------------
-//  k056230_device - constructor
-//-------------------------------------------------
-
-k056230_device::k056230_device(running_machine &_machine, const k056230_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
-{
-
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -63,16 +57,14 @@ k056230_device::k056230_device(running_machine &_machine, const k056230_device_c
 
 void k056230_device::device_start()
 {
-	if(m_config.m_cpu)
+	if(m_cpu_tag)
 	{
-		m_cpu = machine().device(m_config.m_cpu);
+		m_cpu = machine().device(m_cpu_tag);
 	}
 	else
 	{
 		m_cpu = NULL;
 	}
-
-	m_is_thunderh = m_config.m_is_thunderh;
 
 	m_ram = auto_alloc_array(machine(), UINT32, 0x2000);
 

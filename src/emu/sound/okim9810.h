@@ -62,44 +62,15 @@ enum
 //**************************************************************************
 
 
-// ======================> okim9810_device_config
-
-class okim9810_device_config :	public device_config,
-								public device_config_sound_interface,
-								public device_config_memory_interface
-{
-	friend class okim9810_device;
-
-	// construction/destruction
-	okim9810_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-	// device_config overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
-
-	// internal state
-	const address_space_config  m_space_config;
-};
-
-
-
 // ======================> okim9810_device
 
 class okim9810_device : public device_t,
 						public device_sound_interface,
 						public device_memory_interface
 {
-	friend class okim9810_device_config;
-
-	// construction/destruction
-	okim9810_device(running_machine &_machine, const okim9810_device_config &config);
-
 public:
+	// construction/destruction
+	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	UINT8 read_status();
 	void write_TMP_register(UINT8 command);
@@ -116,7 +87,10 @@ protected:
 	virtual void device_post_load();
 	virtual void device_clock_changed();
 
-	// sound interface overrides
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
+
+	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
     // a single voice
@@ -162,7 +136,7 @@ protected:
 
 
 	// internal state
-	const okim9810_device_config &m_config;
+	const address_space_config  m_space_config;
 
 	sound_stream* m_stream;
 	direct_read_data* m_direct;

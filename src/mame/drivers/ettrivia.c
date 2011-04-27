@@ -34,8 +34,8 @@ Notes:
 class ettrivia_state : public driver_device
 {
 public:
-	ettrivia_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_palreg;
 	int m_gfx_bank;

@@ -375,8 +375,8 @@ struct _autoconfig_device
 class amiga_state : public driver_device
 {
 public:
-	amiga_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_chip_ram;
 	size_t m_chip_ram_size;

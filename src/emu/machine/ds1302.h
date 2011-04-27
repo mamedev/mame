@@ -28,33 +28,13 @@
 ***************************************************************************/
 
 
-// ======================> ds1302_device_config
-
-class ds1302_device_config : public device_config
-{
-    friend class ds1302_device;
-
-    // construction/destruction
-    ds1302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-
 // ======================> ds1302_device
 
 class ds1302_device :  public device_t
 {
-    friend class ds1302_device_config;
-
-    // construction/destruction
-    ds1302_device(running_machine &_machine, const ds1302_device_config &_config);
-
 public:
+    // construction/destruction
+    ds1302_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	void ds1302_dat_w(UINT32 offset, UINT8 data);
 	void ds1302_clk_w(UINT32 offset, UINT8 data);
@@ -75,8 +55,6 @@ private:
 	UINT8  m_last_clk;
 	UINT8  m_last_cmd;
 	UINT8  m_sram[0x20];
-
-    const ds1302_device_config &m_config;
 };
 
 

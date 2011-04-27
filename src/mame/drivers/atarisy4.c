@@ -23,8 +23,8 @@
 class atarisy4_state : public driver_device
 {
 public:
-	atarisy4_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];

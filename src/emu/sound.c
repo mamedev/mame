@@ -788,7 +788,7 @@ sound_manager::sound_manager(running_machine &machine)
 		machine.m_sample_rate = 11025;
 
 	// count the speakers
-	VPRINTF(("total speakers = %d\n", machine.m_devicelist.count(SPEAKER)));
+	VPRINTF(("total speakers = %d\n", machine.devicelist().count(SPEAKER)));
 
 	// allocate memory for mix buffers
 	m_leftmix = auto_alloc_array(machine, INT32, machine.sample_rate());
@@ -862,7 +862,7 @@ void sound_manager::set_attenuation(int attenuation)
 bool sound_manager::indexed_speaker_input(int index, speaker_input &info) const
 {
 	// scan through the speakers until we find the indexed input
-	for (info.speaker = downcast<speaker_device *>(machine().m_devicelist.first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
+	for (info.speaker = downcast<speaker_device *>(machine().devicelist().first(SPEAKER)); info.speaker != NULL; info.speaker = info.speaker->next_speaker())
 	{
 		if (index < info.speaker->inputs())
 		{
@@ -900,7 +900,7 @@ void sound_manager::reset(running_machine &machine)
 {
 	// reset all the sound chips
 	device_sound_interface *sound = NULL;
-	for (bool gotone = machine.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = machine.devicelist().first(sound); gotone; gotone = sound->next(sound))
 		sound->device().reset();
 }
 
@@ -1003,7 +1003,7 @@ void sound_manager::update()
 
 	// force all the speaker streams to generate the proper number of samples
 	int samples_this_update = 0;
-	for (speaker_device *speaker = downcast<speaker_device *>(machine().m_devicelist.first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
+	for (speaker_device *speaker = downcast<speaker_device *>(machine().devicelist().first(SPEAKER)); speaker != NULL; speaker = speaker->next_speaker())
 		speaker->mix(m_leftmix, m_rightmix, samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// now downmix the final result

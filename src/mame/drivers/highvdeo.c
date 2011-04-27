@@ -93,8 +93,8 @@ Game is V30 based, with rom banking (2Mb)
 class highvdeo_state : public driver_device
 {
 public:
-	highvdeo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	highvdeo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 *m_blit_ram;
 	UINT16 m_vblank_bit;

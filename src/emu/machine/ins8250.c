@@ -547,7 +547,7 @@ static void common_start( device_t *device, int device_type )
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
-	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config();
+	ins8250->interface = (const ins8250_interface*)device->static_config();
 	ins8250->device_type = device_type;
 }
 

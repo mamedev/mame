@@ -2,8 +2,8 @@
 class armedf_state : public driver_device
 {
 public:
-	armedf_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	armedf_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
 	UINT16 *  m_text_videoram;
@@ -33,8 +33,8 @@ public:
 class bigfghtr_state : public armedf_state
 {
 public:
-	bigfghtr_state(running_machine &machine, const driver_device_config_base &config)
-		: armedf_state(machine, config) { }
+	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: armedf_state(mconfig, type, tag) { }
 
 	UINT16 *      m_sharedram;
 

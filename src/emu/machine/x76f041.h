@@ -13,25 +13,11 @@
 
 #include "machine/secflash.h"
 
-class x76f041_device_config : public device_secure_serial_flash_config
-{
-	friend class x76f041_device;
-
-	// construction/destruction
-	x76f041_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
 class x76f041_device : public device_secure_serial_flash
 {
-	friend class x76f041_device_config;
-
+public:
 	// construction/destruction
-	x76f041_device(running_machine &_machine, const x76f041_device_config &config);
+	x76f041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
 	// device-level overrides
@@ -54,8 +40,6 @@ protected:
 	virtual void sda_1();
 
 	// internal state
-	const x76f041_device_config &config;
-
 	enum {
 		SIZE_WRITE_BUFFER = 8,
 		SIZE_RESPONSE_TO_RESET = 4,

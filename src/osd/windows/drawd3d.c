@@ -1285,9 +1285,9 @@ static void pick_best_mode(win_window_info *window)
 	int modenum;
 
 	// determine the refresh rate of the primary screen
-	const screen_device_config *primary_screen = window->machine().config().first_screen();
+	const screen_device *primary_screen = window->machine().config().first_screen();
 	if (primary_screen != NULL)
-		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
+		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
 
 	// determine the minimum width/height for the selected target
 	// note: technically we should not be calling this from an alternate window

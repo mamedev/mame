@@ -93,8 +93,8 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 class vcombat_state : public driver_device
 {
 public:
-	vcombat_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];

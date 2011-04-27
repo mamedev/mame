@@ -18,8 +18,8 @@
 class atarifb_state : public driver_device
 {
 public:
-	atarifb_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	atarifb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	/* video-related */
 	UINT8 *  m_alphap1_videoram;

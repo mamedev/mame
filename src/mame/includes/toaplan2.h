@@ -12,8 +12,8 @@
 class toaplan2_state : public driver_device
 {
 public:
-	toaplan2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config)
+	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 	{
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;

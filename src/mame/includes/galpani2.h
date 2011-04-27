@@ -3,8 +3,8 @@
 class galpani2_state : public kaneko16_state
 {
 public:
-	galpani2_state(running_machine &machine, const driver_device_config_base &config)
-		: kaneko16_state(machine, config) { }
+	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kaneko16_state(mconfig, type, tag) { }
 
 	UINT16 *m_bg8[2];
 	UINT16 *m_palette[2];

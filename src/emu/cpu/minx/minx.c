@@ -120,7 +120,7 @@ static CPU_INIT( minx )
 	minx->irq_callback = irqcallback;
 	minx->device = device;
 	minx->program = device->space(AS_PROGRAM);
-	if ( device->baseconfig().static_config() != NULL )
+	if ( device->static_config() != NULL )
 	{
 	}
 	else

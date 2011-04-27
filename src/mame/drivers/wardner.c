@@ -135,8 +135,8 @@ out:
 class wardner_state : public twincobr_state
 {
 public:
-	wardner_state(running_machine &machine, const driver_device_config_base &config)
-		: twincobr_state(machine, config) { }
+	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
+		: twincobr_state(mconfig, type,tag) { }
 
 	UINT8 *m_rambase_ae00;
 	UINT8 *m_rambase_c000;

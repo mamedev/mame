@@ -166,8 +166,8 @@ Adder hardware:
 class bfm_sc2_state : public driver_device
 {
 public:
-	bfm_sc2_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	bfm_sc2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	int m_sc2gui_update_mmtr;
 	UINT8 *m_nvram;

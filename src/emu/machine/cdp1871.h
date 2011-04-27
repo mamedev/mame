@@ -67,61 +67,39 @@
 
 struct cdp1871_interface
 {
-	devcb_read8			in_d1_func;
-	devcb_read8			in_d2_func;
-	devcb_read8			in_d3_func;
-	devcb_read8			in_d4_func;
-	devcb_read8			in_d5_func;
-	devcb_read8			in_d6_func;
-	devcb_read8			in_d7_func;
-	devcb_read8			in_d8_func;
-	devcb_read8			in_d9_func;
-	devcb_read8			in_d10_func;
-	devcb_read8			in_d11_func;
+	devcb_read8			in_d1_cb;
+	devcb_read8			in_d2_cb;
+	devcb_read8			in_d3_cb;
+	devcb_read8			in_d4_cb;
+	devcb_read8			in_d5_cb;
+	devcb_read8			in_d6_cb;
+	devcb_read8			in_d7_cb;
+	devcb_read8			in_d8_cb;
+	devcb_read8			in_d9_cb;
+	devcb_read8			in_d10_cb;
+	devcb_read8			in_d11_cb;
 
-	devcb_read_line		in_shift_func;
-	devcb_read_line		in_control_func;
-	devcb_read_line		in_alpha_func;
+	devcb_read_line		in_shift_cb;
+	devcb_read_line		in_control_cb;
+	devcb_read_line		in_alpha_cb;
 
 	// this gets called for every change of the DA pin (pin 33)
-	devcb_write_line	out_da_func;
+	devcb_write_line	out_da_cb;
 
 	// this gets called for every change of the RPT pin (pin 35)
-	devcb_write_line	out_rpt_func;
-};
-
-
-// ======================> cdp1871_device_config
-
-class cdp1871_device_config :   public device_config,
-                                public cdp1871_interface
-{
-    friend class cdp1871_device;
-
-    // construction/destruction
-    cdp1871_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-    // allocators
-    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-    virtual device_t *alloc_device(running_machine &machine) const;
-
-protected:
-    // device_config overrides
-    virtual void device_config_complete();
+	devcb_write_line	out_rpt_cb;
 };
 
 
 // ======================> cdp1871_device
 
-class cdp1871_device :  public device_t
+class cdp1871_device :  public device_t,
+                        public cdp1871_interface
 {
-    friend class cdp1871_device_config;
-
-    // construction/destruction
-    cdp1871_device(running_machine &_machine, const cdp1871_device_config &_config);
-
 public:
+    // construction/destruction
+    cdp1871_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
     DECLARE_READ8_MEMBER( data_r );
 
 	DECLARE_READ_LINE_MEMBER( da_r );
@@ -129,6 +107,7 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -158,8 +137,6 @@ private:
 
 	// timers
 	emu_timer *m_scan_timer;		// keyboard scan timer
-
-	const cdp1871_device_config &m_config;
 };
 
 

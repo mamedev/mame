@@ -112,7 +112,7 @@ static CPU_INIT( saturn )
 {
 	saturn_state *cpustate = get_safe_token(device);
 
-	cpustate->config = (saturn_cpu_core *) device->baseconfig().static_config();
+	cpustate->config = (saturn_cpu_core *) device->static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);

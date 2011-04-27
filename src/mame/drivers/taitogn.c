@@ -331,8 +331,8 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 class taitogn_state : public psx_state
 {
 public:
-	taitogn_state(running_machine &machine, const driver_device_config_base &config)
-		: psx_state(machine, config) { }
+	taitogn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: psx_state(mconfig, type, tag) { }
 
 	intel_te28f160_device *m_biosflash;
 	intel_e28f400_device *m_pgmflash;

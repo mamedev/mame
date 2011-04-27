@@ -199,8 +199,8 @@ TODO :
 class witch_state : public driver_device
 {
 public:
-	witch_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	witch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;

@@ -202,12 +202,37 @@ public:
 	void find_approximate_matches(const char *string, int count, int *results);
 
 private:
+	// entry in the config cache
+	struct config_entry
+	{
+		friend class simple_list<config_entry>;
+		
+	public:
+		// construction/destruction
+		config_entry(machine_config &config, int index);
+		~config_entry();
+		
+		// getters
+		config_entry *next() const { return m_next; }
+		int index() const { return m_index; }
+		machine_config *config() const { return m_config; }
+	
+	private:
+		// internal state
+		config_entry *		m_next;
+		machine_config *	m_config;
+		int					m_index;
+	};
+	
+	static const int CONFIG_CACHE_COUNT = 100;
+
 	// internal state
 	int					m_current;
 	int					m_filtered_count;
 	emu_options &		m_options;
 	UINT8 *				m_included;
 	machine_config **	m_config;
+	mutable simple_list<config_entry> m_config_cache;
 };
 
 

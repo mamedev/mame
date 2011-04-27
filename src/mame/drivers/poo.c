@@ -49,8 +49,8 @@ Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
 class poo_state : public driver_device
 {
 public:
-	poo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+	poo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vram;
 	UINT8 *m_scrolly;

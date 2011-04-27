@@ -38,8 +38,8 @@
 class cidelsa_state : public driver_device
 {
 public:
-	cidelsa_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config),
+	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, CDP1802_TAG),
 		  m_vis(*this, CDP1869_TAG)
 	{ }
@@ -77,8 +77,8 @@ public:
 class draco_state : public cidelsa_state
 {
 public:
-	draco_state(running_machine &machine, const driver_device_config_base &config)
-		: cidelsa_state(machine, config),
+	draco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cidelsa_state(mconfig, type, tag),
 		  m_psg(*this, AY8910_TAG)
 	{ }
 

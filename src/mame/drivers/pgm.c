@@ -1494,8 +1494,8 @@ MACHINE_CONFIG_END
 class cavepgm_state : public pgm_state
 {
 public:
-	cavepgm_state(running_machine &machine, const driver_device_config_base &config)
-		: pgm_state(machine, config) {
+	cavepgm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
 
 		m_ddp3internal_slot = 0;
 	}

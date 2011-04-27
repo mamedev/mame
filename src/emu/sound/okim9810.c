@@ -14,9 +14,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// devices
-const device_type OKIM9810 = okim9810_device_config::static_alloc_device_config;
-
+// device type definition
+const device_type OKIM9810 = &device_creator<okim9810_device>;
 
 // volume lookup table. The manual lists a full 16 steps, 2dB per step.
 // Given the dB values, that seems to map to a 7-bit volume control.
@@ -67,55 +66,6 @@ static ADDRESS_MAP_START( okim9810, AS_0, 8 )
 ADDRESS_MAP_END
 
 
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  okim9810_device_config - constructor
-//-------------------------------------------------
-
-okim9810_device_config::okim9810_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "OKI9810", tag, owner, clock),
-	  device_config_sound_interface(mconfig, *this),
-	  device_config_memory_interface(mconfig, *this),
-	  m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(okim9810))
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *okim9810_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(okim9810_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *okim9810_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, okim9810_device(machine, *this));
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *okim9810_device_config::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : NULL;
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -125,11 +75,11 @@ const address_space_config *okim9810_device_config::memory_space_config(address_
 //  okim9810_device - constructor
 //-------------------------------------------------
 
-okim9810_device::okim9810_device(running_machine &_machine, const okim9810_device_config &config)
-	: device_t(_machine, config),
-	  device_sound_interface(_machine, config, *this),
-	  device_memory_interface(_machine, config, *this),
-	  m_config(config),
+okim9810_device::okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OKIM9810, "OKI9810", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("samples", ENDIANNESS_BIG, 8, 24, 0, NULL, *ADDRESS_MAP_NAME(okim9810)),
 	  m_stream(NULL),
 	  m_TMP_register(0x00),
       m_global_volume(0x00),
@@ -149,7 +99,7 @@ void okim9810_device::device_start()
 	m_direct = &space()->direct();
 
 	// create the stream
-	//int divisor = m_config.m_pin7 ? 132 : 165;
+	//int divisor = m_pin7 ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock());
 
     // save state stuff
@@ -186,6 +136,17 @@ void okim9810_device::device_post_load()
 
 void okim9810_device::device_clock_changed()
 {
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *okim9810_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 

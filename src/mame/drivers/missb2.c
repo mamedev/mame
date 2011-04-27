@@ -25,8 +25,8 @@ OKI M6295 sound ROM dump is bad.
 class missb2_state : public bublbobl_state
 {
 public:
-	missb2_state(running_machine &machine, const driver_device_config_base &config)
-		: bublbobl_state(machine, config) { }
+	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: bublbobl_state(mconfig, type, tag) { }
 
 	UINT8 *  m_bgvram;
 	UINT8 *  m_bg_paletteram;

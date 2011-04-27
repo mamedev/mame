@@ -208,7 +208,7 @@ INLINE const deco16ic_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == DECO16IC));
-	return (const deco16ic_interface *) device->baseconfig().static_config();
+	return (const deco16ic_interface *) device->static_config();
 }
 
 /*****************************************************************************************/

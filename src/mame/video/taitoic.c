@@ -579,7 +579,7 @@ INLINE const pc080sn_interface *pc080sn_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == PC080SN));
-	return (const pc080sn_interface *) device->baseconfig().static_config();
+	return (const pc080sn_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -1072,7 +1072,7 @@ INLINE const pc090oj_interface *pc090oj_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == PC090OJ));
-	return (const pc090oj_interface *) device->baseconfig().static_config();
+	return (const pc090oj_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -1280,7 +1280,7 @@ INLINE const tc0080vco_interface *tc0080vco_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0080VCO));
-	return (const tc0080vco_interface *) device->baseconfig().static_config();
+	return (const tc0080vco_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -1964,7 +1964,7 @@ INLINE const tc0100scn_interface *tc0100scn_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0100SCN));
-	return (const tc0100scn_interface *) device->baseconfig().static_config();
+	return (const tc0100scn_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -2570,7 +2570,7 @@ INLINE const tc0280grd_interface *tc0280grd_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0280GRD) || (device->type() == TC0430GRW));
-	return (const tc0280grd_interface *) device->baseconfig().static_config();
+	return (const tc0280grd_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -2832,7 +2832,7 @@ INLINE const tc0480scp_interface *tc0480scp_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0480SCP));
-	return (const tc0480scp_interface *) device->baseconfig().static_config();
+	return (const tc0480scp_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -3774,7 +3774,7 @@ INLINE const tc0150rod_interface *tc0150rod_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0150ROD));
-	return (const tc0150rod_interface *) device->baseconfig().static_config();
+	return (const tc0150rod_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -4584,7 +4584,7 @@ INLINE const tc0110pcr_interface *tc0110pcr_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0110PCR));
-	return (const tc0110pcr_interface *) device->baseconfig().static_config();
+	return (const tc0110pcr_interface *) device->static_config();
 }
 
 /*****************************************************************************
@@ -4814,7 +4814,7 @@ INLINE const tc0180vcu_interface *tc0180vcu_get_interface( device_t *device )
 {
 	assert(device != NULL);
 	assert((device->type() == TC0180VCU));
-	return (const tc0180vcu_interface *) device->baseconfig().static_config();
+	return (const tc0180vcu_interface *) device->static_config();
 }
 
 /*****************************************************************************

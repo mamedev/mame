@@ -117,42 +117,27 @@ todo: basic blend mixing
 #include "decospr.h"
 
 
-decospr_device_config::decospr_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "decospr_device", tag, owner, clock)
+void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 {
-	m_gfxregion = 0;
-	m_pricallback = NULL;
+	decospr_device &dev = downcast<decospr_device &>(device);
+	dev.m_gfxregion = gfxregion;
+//  printf("decospr_device::set_gfx_region()\n");
 }
 
-device_config *decospr_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+void decospr_device::set_pri_callback(device_t &device, decospr_priority_callback_func callback)
 {
-	return global_alloc(decospr_device_config(mconfig, tag, owner, clock));
+	decospr_device &dev = downcast<decospr_device &>(device);
+	dev.m_pricallback = callback;
+//  printf("decospr_device::set_pri_callback()\n");
 }
 
-device_t *decospr_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(machine, decospr_device(machine, *this));
-}
 
-void decospr_device_config::set_gfx_region(device_config *device, int gfxregion)
-{
-	decospr_device_config *dev = downcast<decospr_device_config *>(device);
-	dev->m_gfxregion = gfxregion;
-//  printf("decospr_device_config::set_gfx_region()\n");
-}
+const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
-void decospr_device_config::set_pri_callback(device_config *device, decospr_priority_callback_func callback)
-{
-	decospr_device_config *dev = downcast<decospr_device_config *>(device);
-	dev->m_pricallback = callback;
-//  printf("decospr_device_config::set_pri_callback()\n");
-}
-
-decospr_device::decospr_device(running_machine &_machine, const decospr_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-	  m_gfxregion(m_config.m_gfxregion),
-	  m_pricallback(m_config.m_pricallback)
+decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DECO_SPRITE, "decospr_device", tag, owner, clock),
+	  m_gfxregion(0),
+	  m_pricallback(NULL)
 {
 }
 
