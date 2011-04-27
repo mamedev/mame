@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/psx.h"
+#include "cpu/psx/psx.h"
 #include "includes/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
