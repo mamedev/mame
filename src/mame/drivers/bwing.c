@@ -16,9 +16,7 @@ Known issues:
 
 - Zaviga's DIPs are incomplete. (manual missing)
 
-- Main to Sound communications are kludgy at best;
-
-- Ditto for the "RGB dip-switch" ...
+- "RGB dip-switch" looks kludgy at best;
 
 *****************************************************************************/
 // Directives
@@ -33,23 +31,6 @@ Known issues:
 
 //****************************************************************************
 // Interrupt Handlers
-
-static INTERRUPT_GEN ( bwp1_interrupt )
-{
-	bwing_state *state = device->machine().driver_data<bwing_state>();
-	UINT8 latch_data;
-
-	/* TODO: Ok, let me guess ... main CPU sends a FIFO byte packet to the sound CPU at every vblank??? */
-	if (state->m_ffcount)
-	{
-		state->m_ffcount--;
-		latch_data = state->m_sound_fifo[state->m_fftail];
-		state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
-		soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
-		device_set_input_line(state->m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
-	}
-}
-
 
 static INTERRUPT_GEN ( bwp3_interrupt )
 {
@@ -126,11 +107,10 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 		case 5:
 			if (data == 0x80) // protection trick to screw CPU1 & 3
 				device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE); // SNMI
-			else if (state->m_ffcount < MAX_SOUNDS)
+			else
 			{
-				state->m_ffcount++;
-				state->m_sound_fifo[state->m_ffhead] = data;
-				state->m_ffhead = (state->m_ffhead + 1) & (MAX_SOUNDS - 1);
+				soundlatch_w(space, 0, data);
+				device_set_input_line(state->m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
 
@@ -368,38 +348,27 @@ static MACHINE_START( bwing )
 	state->m_subcpu = machine.device("sub");
 	state->m_audiocpu = machine.device("audiocpu");
 
-	state->save_item(NAME(state->m_coin));
 	state->save_item(NAME(state->m_palatch));
 	state->save_item(NAME(state->m_srbank));
 	state->save_item(NAME(state->m_mapmask));
 	state->save_item(NAME(state->m_mapflip));
 	state->save_item(NAME(state->m_bwp3_nmimask));
 	state->save_item(NAME(state->m_bwp3_u8F_d));
-	state->save_item(NAME(state->m_ffcount));
-	state->save_item(NAME(state->m_ffhead));
-	state->save_item(NAME(state->m_fftail));
 
 	state->save_item(NAME(state->m_sreg));
-	state->save_item(NAME(state->m_sound_fifo));
 }
 
 static MACHINE_RESET( bwing )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
-	int i;
 
-	state->m_coin = 0;
 	state->m_palatch = 0;
 	state->m_srbank = 0;
 	state->m_mapmask = 0;
 	state->m_mapflip = 0;
 
-	for (i = 0; i < MAX_SOUNDS; i++)
-		state->m_sound_fifo[i] = 0;
-
 	state->m_bwp3_nmimask = 0;
 	state->m_bwp3_u8F_d = 0;
-	state->m_fftail = state->m_ffhead = state->m_ffcount = 0;
 }
 
 static MACHINE_CONFIG_START( bwing, bwing_state )
@@ -407,11 +376,9 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp1_map)
-	MCFG_CPU_VBLANK_INT("screen", bwp1_interrupt)
 
 	MCFG_CPU_ADD("sub", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp2_map)
-//  MCFG_CPU_VBLANK_INT("screen", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
 	MCFG_CPU_ADD("audiocpu", DECO16, 2000000)
 	MCFG_CPU_PROGRAM_MAP(bwp3_map)
@@ -481,8 +448,7 @@ ROM_START( bwings )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", 0 )
-	ROM_FILL(0x00000, 0x08000, 0)
+	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -512,8 +478,7 @@ ROM_START( bwingso )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", 0 )
-	ROM_FILL(0x00000, 0x08000, 0)
+	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -544,8 +509,7 @@ ROM_START( bwingsa )
 	ROM_LOAD( "bw_bv-09.1h",  0x08000, 0x04000, CRC(a14c0b57) SHA1(5033354793d77922f5ef7f268cbe212e551efadf) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", 0 )
-	ROM_FILL(0x00000, 0x08000, 0)
+	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( zaviga )
@@ -574,8 +538,7 @@ ROM_START( zaviga )
 	ROM_LOAD( "as13.1h", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", 0 )
-	ROM_FILL(0x00000, 0x08000, 0)
+	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 
@@ -605,8 +568,7 @@ ROM_START( zavigaj )
 	ROM_LOAD( "as13.1h", 0x08000, 0x04000, CRC(15d0922b) SHA1(b8d715a9e610531472d516c19f6035adbce93c84) )
 
 	// GPU Banks
-	ROM_REGION( 0x08000, "gpu", 0 )
-	ROM_FILL(0x00000, 0x08000, 0)
+	ROM_REGION( 0x08000, "gpu", ROMREGION_ERASE00 )
 ROM_END
 
 //****************************************************************************

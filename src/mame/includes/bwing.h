@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #define BW_DEBUG 0
-#define MAX_SOUNDS 16
 
 class bwing_state : public driver_device
 {
@@ -37,12 +36,8 @@ public:
 	unsigned m_mapflip;
 
 	/* sound-related */
-	UINT8 m_sound_fifo[MAX_SOUNDS];
 	int m_bwp3_nmimask;
 	int m_bwp3_u8F_d;
-	int m_ffcount;
-	int m_ffhead;
-	int m_fftail;
 
 	/* misc */
 	UINT8 *m_bwp123_membase[3];
