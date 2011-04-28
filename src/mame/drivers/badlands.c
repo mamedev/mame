@@ -716,11 +716,11 @@ static MACHINE_RESET( badlandsb )
 static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 2800000/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)	/* Divisor estimated */
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_int)
 
-//  MCFG_CPU_ADD("audiocpu", Z80, 2800000/8)
+//  MCFG_CPU_ADD("audiocpu", Z80, XTAL_20MHz/12)	/* Divisor estimated */
 //  MCFG_CPU_PROGRAM_MAP(bootleg_soundmap)
 
 	MCFG_MACHINE_START(badlands)
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 2800000/4)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_20MHz/8)	/* Divisor estimated */
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 MACHINE_CONFIG_END
