@@ -34,7 +34,7 @@ TODO:
 
  - scroll (writes to $91800 and VIA port A - not used in game (only in test mode))
  - music - writes  ($20-$30 bytes) to $93000-$93003 range
- - VIA 6522(interrupt gen , ports)
+ - VIA 6522(ports)
  - Crt
  - interrupts
  - missing gfx elements
@@ -101,7 +101,6 @@ Main board:
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
@@ -246,9 +245,9 @@ static WRITE8_DEVICE_HANDLER(via_ca2_out)
 }
 
 
-static void via_irq(device_t *device, int state)
+static WRITE8_DEVICE_HANDLER(via_irq)
 {
-	//used
+       cputag_set_input_line(device->machine(), "maincpu", 4, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -481,26 +480,17 @@ static const via6522_interface via_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_HANDLER(via_a_out), DEVCB_HANDLER(via_b_out),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(via_ca2_out), DEVCB_NULL,
-	/*irq                  */ DEVCB_LINE(via_irq)
+	/*irq                  */ DEVCB_HANDLER(via_irq)
 };
 
 static MACHINE_RESET( bmcbowl )
 {
 }
 
-static INTERRUPT_GEN( bmc_interrupt )
-{
-	if (cpu_getiloops(device))
-		device_set_input_line(device, 4, HOLD_LINE);
-	else
-		device_set_input_line(device, 2, HOLD_LINE);
-}
-
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
-	MCFG_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
-
+	MCFG_CPU_VBLANK_INT("screen",irq2_line_hold)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -556,4 +546,4 @@ static DRIVER_INIT(bmcbowl)
 	state->m_bmc_colorram = auto_alloc_array(machine, UINT8, 768);
 }
 
-GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "BMC Bowling", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "Konkyuu no Hoshi", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

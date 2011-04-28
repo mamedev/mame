@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/bublbobl.h"
 
@@ -396,15 +395,16 @@ READ8_HANDLER( boblbobl_ic43_b_r )
  The following is ENTIRELY GUESSWORK!!!
 
 ***************************************************************************/
-
+static TIMER_CALLBACK( bublbobl_m68705_irq_ack )
+{
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+}
 
 INTERRUPT_GEN( bublbobl_m68705_interrupt )
 {
-	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops(device) & 1)
-		device_set_input_line(device, 0, CLEAR_LINE);
-	else
-		device_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
+
+	device->machine().scheduler().timer_set(attotime::from_msec(1000/60), FUNC(bublbobl_m68705_irq_ack)); /* TODO: understand how this is ack'ed */
 }
 
 

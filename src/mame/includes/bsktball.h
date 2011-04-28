@@ -28,7 +28,7 @@ public:
 
 	/* misc */
 	UINT32   m_nmi_on;
-	int      m_i256v;
+//	int      m_i256v;
 
 	/* input-related */
 	int m_ld1;
@@ -48,7 +48,7 @@ public:
 /*----------- defined in machine/bsktball.c -----------*/
 
 WRITE8_HANDLER( bsktball_nmion_w );
-INTERRUPT_GEN( bsktball_interrupt );
+TIMER_DEVICE_CALLBACK( bsktball_scanline );
 WRITE8_HANDLER( bsktball_ld1_w );
 WRITE8_HANDLER( bsktball_ld2_w );
 READ8_HANDLER( bsktball_in0_r );

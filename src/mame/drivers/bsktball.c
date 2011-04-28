@@ -25,7 +25,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "includes/bsktball.h"
 #include "sound/discrete.h"
 
@@ -215,7 +214,7 @@ static MACHINE_START( bsktball )
 	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->save_item(NAME(state->m_nmi_on));
-	state->save_item(NAME(state->m_i256v));
+//	state->save_item(NAME(state->m_i256v));
 	state->save_item(NAME(state->m_ld1));
 	state->save_item(NAME(state->m_ld2));
 	state->save_item(NAME(state->m_dir0));
@@ -233,7 +232,7 @@ static MACHINE_RESET( bsktball )
 	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->m_nmi_on = 0;
-	state->m_i256v = 0;
+//	state->m_i256v = 0;
 	state->m_ld1 = 0;
 	state->m_ld2 = 0;
 	state->m_dir0 = 0;
@@ -252,7 +251,7 @@ static MACHINE_CONFIG_START( bsktball, bsktball_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,750000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(bsktball_interrupt,8)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bsktball_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START(bsktball)
 	MCFG_MACHINE_RESET(bsktball)

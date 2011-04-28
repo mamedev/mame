@@ -20,18 +20,17 @@ WRITE8_HANDLER( bsktball_nmion_w )
     bsktball_interrupt
 ***************************************************************************/
 /* NMI every 32V, IRQ every VBLANK */
-INTERRUPT_GEN( bsktball_interrupt )
+TIMER_DEVICE_CALLBACK( bsktball_scanline )
 {
-	bsktball_state *state = device->machine().driver_data<bsktball_state>();
+	bsktball_state *state = timer.machine().driver_data<bsktball_state>();
+	int scanline = param;
 
-	/* We mod by 8 because we're interrupting 8x per frame, 1 per 32V */
-	state->m_i256v = (state->m_i256v + 1) % 8;
-
-	if (state->m_i256v == 0)
-		device_set_input_line(device, 0, HOLD_LINE);
-	else if (state->m_nmi_on)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if(scanline == 0) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+	else if(((scanline % 28) == 0) && (state->m_nmi_on)) // 32v timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
+
 
 /***************************************************************************
     bsktball_ld_w

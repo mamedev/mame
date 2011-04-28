@@ -269,7 +269,6 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "cpu/m6805/m6805.h"
@@ -958,7 +957,7 @@ static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
 
 	MCFG_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
-	MCFG_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
+	MCFG_CPU_VBLANK_INT("screen",bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
 
 	MCFG_MACHINE_START(bub68705)
 	MCFG_MACHINE_RESET(bub68705)
