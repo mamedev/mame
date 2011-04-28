@@ -9,7 +9,6 @@ Tomasz Slanina
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -420,21 +419,21 @@ static const ay8910_interface ay8910_interface_2 =
 };
 
 
-static INTERRUPT_GEN( chl_interrupt )
+TIMER_DEVICE_CALLBACK( changela_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 256) // vblank irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xdf);
+	else if(((scanline % 64) == 0)) // timer irq, 3 times per given vblank field
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf);
+}
+
+static INTERRUPT_GEN( chl_mcu_irq )
 {
 	changela_state *state = device->machine().driver_data<changela_state>();
-	int vector = device->machine().primary_screen->vblank() ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
-//    device->machine().primary_screen->update_partial(device->machine().primary_screen->vpos());
-
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
-
-	/* it seems the V8 == Vblank and it is connected to the INT on the 68705 */
-	//so we should cause an INT on the MCU cpu here, as well.
-	//but only once per frame !
-	if (vector == 0xdf) /* only on vblank */
-		generic_pulse_irq_line(state->m_mcu, 0);
-
+	generic_pulse_irq_line(state->m_mcu, 0);
 }
 
 static MACHINE_START(changela)
@@ -524,10 +523,11 @@ static MACHINE_CONFIG_START( changela, changela_state )
 
 	MCFG_CPU_ADD("maincpu", Z80,5000000)
 	MCFG_CPU_PROGRAM_MAP(changela_map)
-	MCFG_CPU_VBLANK_INT_HACK(chl_interrupt,4)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", changela_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("mcu", M68705,2500000)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_VBLANK_INT("screen",chl_mcu_irq)
 
 	MCFG_MACHINE_START(changela)
 	MCFG_MACHINE_RESET(changela)
