@@ -57,7 +57,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "includes/bionicc.h"
 
@@ -127,18 +126,19 @@ static READ16_HANDLER( hacked_soundcommand_r )
   IRQ 2 drives the game
   IRQ 4 processes the input ports
 
-  The game is very picky about timing. The following is the only
-  way I have found it to work.
-
 ********************************************************************/
 
-static INTERRUPT_GEN( bionicc_interrupt )
+static TIMER_DEVICE_CALLBACK( bionicc_scanline )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, 2, HOLD_LINE);
-	else
-		device_set_input_line(device, 4, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+
+	if(scanline == 0) // vblank-in or i8751 related irq
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
 }
+
 
 /*************************************
  *
@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(bionicc_interrupt,8)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bionicc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

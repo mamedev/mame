@@ -30,7 +30,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "sound/discrete.h"
 #include "includes/avalnche.h"
 
@@ -234,11 +233,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static INTERRUPT_GEN( avalnche_interrupt )
-{
-	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static MACHINE_START( avalnche )
 {
 	avalnche_state *state = machine.driver_data<avalnche_state>();
@@ -258,7 +252,7 @@ static MACHINE_CONFIG_START( avalnche, avalnche_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(avalnche_interrupt,8)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,8*60)
 
 	MCFG_MACHINE_START(avalnche)
 	MCFG_MACHINE_RESET(avalnche)

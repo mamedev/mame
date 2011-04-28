@@ -66,20 +66,13 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/blockout.h"
 
-
-static INTERRUPT_GEN( blockout_interrupt )
-{
-	/* interrupt 6 is vblank */
-	/* interrupt 5 reads coin inputs - might have to be triggered only */
-	/* when a coin is inserted */
-	device_set_input_line(device, 6 - cpu_getiloops(device), HOLD_LINE);
-}
+#define MAIN_CLOCK XTAL_10MHz
+#define AUDIO_CLOCK XTAL_3_579545MHz
 
 static WRITE16_HANDLER( blockout_sound_command_w )
 {
@@ -92,6 +85,19 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 	}
 }
 
+static WRITE16_HANDLER( blockout_irq6_ack_w )
+{
+	blockout_state *state = space->machine().driver_data<blockout_state>();
+
+	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( blockout_irq5_ack_w )
+{
+	blockout_state *state = space->machine().driver_data<blockout_state>();
+
+	device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+}
 
 /*************************************
  *
@@ -106,6 +112,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
+	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
+	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
@@ -132,6 +140,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static INPUT_CHANGED( coin_inserted )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", 5, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static INPUT_PORTS_START( blockout )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -154,9 +167,9 @@ static INPUT_PORTS_START( blockout )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted,0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted,0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED(coin_inserted,0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2")
@@ -257,6 +270,7 @@ static MACHINE_START( blockout )
 {
 	blockout_state *state = machine.driver_data<blockout_state>();
 
+	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
 
 	state->save_item(NAME(state->m_color));
@@ -269,14 +283,26 @@ static MACHINE_RESET( blockout )
 	state->m_color = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( blockout_scanline )
+{
+	blockout_state *state = timer.machine().driver_data<blockout_state>();
+	int scanline = param;
+
+	if(scanline == 248) // vblank-out irq
+		device_set_input_line(state->m_maincpu, 6, ASSERT_LINE);
+
+	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
+		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( blockout, blockout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(blockout_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", blockout_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	MCFG_MACHINE_START(blockout)
@@ -298,7 +324,7 @@ static MACHINE_CONFIG_START( blockout, blockout_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2151, AUDIO_CLOCK)
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)

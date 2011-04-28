@@ -84,7 +84,6 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
@@ -110,21 +109,18 @@ static WRITE16_HANDLER( control2_w )
 	COMBINE_DATA(&state->m_cur_control2);
 }
 
-static INTERRUPT_GEN(bishi_interrupt)
+static TIMER_DEVICE_CALLBACK( bishi_scanline )
 {
-	bishi_state *state = device->machine().driver_data<bishi_state>();
+	bishi_state *state = timer.machine().driver_data<bishi_state>();
+	int scanline = param;
+
 	if (state->m_cur_control & 0x800)
 	{
-		switch (cpu_getiloops(device))
-		{
-			case 0:
-				device_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
-				break;
+		if(scanline == 240) // vblank-out irq
+			cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_3, HOLD_LINE);
 
-			case 1:
-				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
-				break;
-		}
+		if(scanline == 0) // vblank-in irq
+			cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
@@ -370,10 +366,8 @@ INPUT_PORTS_END
 static void sound_irq_gen(device_t *device, int state)
 {
 	bishi_state *bishi = device->machine().driver_data<bishi_state>();
-	if (state)
-		device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, ASSERT_LINE);
-	else
-		device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, CLEAR_LINE);
+
+	device_set_input_line(bishi->m_maincpu, M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =
@@ -423,7 +417,7 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(bishi_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bishi_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START(bishi)
 	MCFG_MACHINE_RESET(bishi)

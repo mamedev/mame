@@ -22,11 +22,11 @@
         * The protection is not fully understood(Konami 051733). The
         game is playable, but is not 100% accurate.
         * Missing samples.
+        (both issues above are outdated?)
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/2203intf.h"
@@ -36,19 +36,16 @@
 #include "includes/bladestl.h"
 
 
-static INTERRUPT_GEN( bladestl_interrupt )
+static TIMER_DEVICE_CALLBACK( bladestl_scanline )
 {
-	bladestl_state *state = device->machine().driver_data<bladestl_state>();
+	bladestl_state *state = timer.machine().driver_data<bladestl_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device) == 0)
-	{
-		if (k007342_is_int_enabled(state->m_k007342))
-			device_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) % 2)
-	{
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
+	if(scanline == 240 && k007342_is_int_enabled(state->m_k007342)) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", HD6309_FIRQ_LINE, HOLD_LINE);
+
+	if(scanline == 0) // vblank-in or timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*************************************
@@ -338,7 +335,7 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 24000000/2)		/* 24MHz/2 (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(bladestl_interrupt,2) /* (1 IRQ + 1 NMI) */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", bladestl_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
