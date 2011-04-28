@@ -481,7 +481,7 @@ static MACHINE_RESET( namcos10 )
 
 static MACHINE_CONFIG_START( namcos10, namcos10_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_101_4912MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos10_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 

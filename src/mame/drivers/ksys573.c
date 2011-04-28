@@ -2978,7 +2978,7 @@ static const adc083x_interface konami573_adc_interface = {
 
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konami573_map)
 	MCFG_CPU_VBLANK_INT("screen", sys573_vblank)
 

@@ -382,7 +382,7 @@ static MACHINE_RESET( konamigq )
 
 static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konamigq_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 

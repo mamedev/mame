@@ -157,8 +157,12 @@ static const char *const delayn[] =
 };
 
 // device type definition
-const device_type PSXCPU = &device_creator<psxcpu_device>;
+const device_type CXD8530AQ = &device_creator<cxd8530aq_device>;
+const device_type CXD8530BQ = &device_creator<cxd8530bq_device>;
+const device_type CXD8530CQ = &device_creator<cxd8530cq_device>;
 const device_type CXD8661R = &device_creator<cxd8661r_device>;
+const device_type CXD8606BQ = &device_creator<cxd8606bq_device>;
+const device_type CXD8606CQ = &device_creator<cxd8606cq_device>;
 
 static const UINT32 mtc0_writemask[]=
 {
@@ -1559,9 +1563,18 @@ psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-psxcpu_device::psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, PSXCPU, "PSXCPU", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(psxcpu_internal_map))
+cxd8530aq_device::cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8661R, "CXD8530AQ", tag, owner, clock, ADDRESS_MAP_NAME(psxcpu_internal_map))
+{
+}
+
+cxd8530bq_device::cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8661R, "CXD8530BQ", tag, owner, clock, ADDRESS_MAP_NAME(psxcpu_internal_map))
+{
+}
+
+cxd8530cq_device::cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8661R, "CXD8530CQ", tag, owner, clock, ADDRESS_MAP_NAME(psxcpu_internal_map))
 {
 }
 
@@ -1570,6 +1583,15 @@ cxd8661r_device::cxd8661r_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+cxd8606bq_device::cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8606BQ, "CXD8606BQ", tag, owner, clock, ADDRESS_MAP_NAME(cxd8661r_internal_map))
+{
+}
+
+cxd8606cq_device::cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: psxcpu_device(mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock, ADDRESS_MAP_NAME(cxd8661r_internal_map))
+{
+}
 
 //-------------------------------------------------
 //  device_start - start up the device

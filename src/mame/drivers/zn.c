@@ -503,7 +503,7 @@ static void zn_machine_init( running_machine &machine )
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
@@ -539,7 +539,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 

@@ -266,6 +266,27 @@ protected:
 	void docop2( int gteop );
 };
 
+class cxd8530aq_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8530aq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class cxd8530bq_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8530bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class cxd8530cq_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8530cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 class cxd8661r_device : public psxcpu_device
 {
 public:
@@ -273,9 +294,27 @@ public:
 	cxd8661r_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class cxd8606bq_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8606bq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class cxd8606cq_device : public psxcpu_device
+{
+public:
+	// construction/destruction
+	cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // device type definition
-extern const device_type PSXCPU;
+extern const device_type CXD8530AQ;
+extern const device_type CXD8530BQ;
+extern const device_type CXD8530CQ;
 extern const device_type CXD8661R;
+extern const device_type CXD8606BQ;
+extern const device_type CXD8606CQ;
 
 
 

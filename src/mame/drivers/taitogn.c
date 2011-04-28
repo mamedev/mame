@@ -970,7 +970,7 @@ static void spu_irq(device_t *device, UINT32 data)
 
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 

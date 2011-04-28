@@ -919,7 +919,7 @@ static const i2cmem_interface i2cmem_interface =
 
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( main_map )
 	MCFG_CPU_VBLANK_INT( "mainscreen", psx_vblank )
 

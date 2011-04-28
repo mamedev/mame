@@ -999,8 +999,8 @@ static MACHINE_RESET( namcos11 )
 
 static MACHINE_CONFIG_START( coh100, namcos11_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map)
+	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
 
 	MCFG_CPU_ADD("c76", M37702, 16384000)
@@ -1035,6 +1035,10 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh110, coh100 )
+	MCFG_CPU_REPLACE( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
+
 	MCFG_VIDEO_START( psx_type2 )
 
 	MCFG_SCREEN_MODIFY("screen")
