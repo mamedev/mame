@@ -1105,7 +1105,7 @@ void sdlinput_init(running_machine &machine)
 	app_has_mouse_focus = 1;
 
 	// we need pause and exit callbacks
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sdlinput_pause), &machine);
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sdlinput_pause), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sdlinput_resume), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sdlinput_exit), &machine));
 
