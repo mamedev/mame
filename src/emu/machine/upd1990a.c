@@ -15,7 +15,6 @@
 
 */
 
-#include "emu.h"
 #include "upd1990a.h"
 
 
@@ -40,7 +39,7 @@ enum
 	MODE_TP_64HZ_SET,
 	MODE_TP_256HZ_SET,
 	MODE_TP_2048HZ_SET,
-	MODE_TEST,
+	MODE_TEST
 };
 
 
@@ -161,7 +160,8 @@ void upd1990a_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-//      memset(&in_pa_cb, 0, sizeof(in_pa_cb));
+		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
+		memset(&m_out_tp_cb, 0, sizeof(m_out_tp_cb));
 	}
 }
 
@@ -178,7 +178,7 @@ void upd1990a_device::device_start()
 
 	// allocate timers
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
-	m_timer_clock->adjust(attotime::zero, 0, attotime::from_hz(1));
+	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 	m_timer_tp = timer_alloc(TIMER_TP);
 	m_timer_data_out = timer_alloc(TIMER_DATA_OUT);
 
@@ -231,7 +231,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case TIMER_TP:
 		m_tp = !m_tp;
 
-		if (LOG) logerror("UPD1990A TP %u\n", m_tp);
+		if (LOG) logerror("uPD1990A '%s' TP %u\n", tag(), m_tp);
 
 		devcb_call_write_line(&m_out_tp_func, m_tp);
 		break;
@@ -239,7 +239,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case TIMER_DATA_OUT:
 		m_data_out = !m_data_out;
 
-		if (LOG) logerror("UPD1990A DATA OUT TICK %u\n", m_data_out);
+		if (LOG) logerror("uPD1990A '%s' DATA OUT TICK %u\n", tag(), m_data_out);
 
 		devcb_call_write_line(&m_out_data_func, m_data_out);
 		break;
@@ -268,7 +268,7 @@ void upd1990a_device::rtc_set_time(int year, int month, int day, int day_of_week
 
 WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 {
-	if (LOG) logerror("UPD1990A OE %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' OE %u\n", tag(), state);
 
 	m_oe = state;
 }
@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::cs_w )
 {
-	if (LOG) logerror("UPD1990A CS %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' CS %u\n", tag(), state);
 
 	m_cs = state;
 }
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER( upd1990a_device::cs_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 {
-	if (LOG) logerror("UPD1990A STB %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' STB %u\n", tag(), state);
 
 	m_stb = state;
 
@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		switch (m_c)
 		{
 		case MODE_REGISTER_HOLD:
-			if (LOG) logerror("UPD1990A Register Hold Mode\n");
+			if (LOG) logerror("uPD1990A '%s' Register Hold Mode\n", tag());
 
 			/* enable time counter */
 			m_timer_clock->enable(1);
@@ -315,7 +315,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			break;
 
 		case MODE_SHIFT:
-			if (LOG) logerror("UPD1990A Shift Mode\n");
+			if (LOG) logerror("uPD1990A '%s' Shift Mode\n", tag());
 
 			/* enable time counter */
 			m_timer_clock->enable(1);
@@ -332,11 +332,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			break;
 
 		case MODE_TIME_SET:
-			{
-			int i;
-
-			if (LOG) logerror("UPD1990A Time Set Mode\n");
-			if (LOG) logerror("UPD1990A Shift Register %02x%02x%02x%02x%02x\n", m_shift_reg[4], m_shift_reg[3], m_shift_reg[2], m_shift_reg[1], m_shift_reg[0]);
+			if (LOG) logerror("uPD1990A '%s' Time Set Mode\n", tag());
+			if (LOG) logerror("uPD1990A '%s' Shift Register %02x%02x%02x%02x%02x\n", tag(), m_shift_reg[4], m_shift_reg[3], m_shift_reg[2], m_shift_reg[1], m_shift_reg[0]);
 
 			/* disable time counter */
 			m_timer_clock->enable(0);
@@ -349,32 +346,28 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			devcb_call_write_line(&m_out_data_func, m_data_out);
 
 			/* load shift register data into time counter */
-			for (i = 0; i < 5; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				m_time_counter[i] = m_shift_reg[i];
 			}
 
 			/* 32 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(32*2));
-			}
 			break;
 
 		case MODE_TIME_READ:
-			{
-			int i;
-
-			if (LOG) logerror("UPD1990A Time Read Mode\n");
+			if (LOG) logerror("uPD1990A '%s' Time Read Mode\n", tag());
 
 			/* enable time counter */
 			m_timer_clock->enable(1);
 
 			/* load time counter data into shift register */
-			for (i = 0; i < 5; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				m_shift_reg[i] = m_time_counter[i];
 			}
 
-			if (LOG) logerror("UPD1990A Shift Register %02x%02x%02x%02x%02x\n", m_shift_reg[4], m_shift_reg[3], m_shift_reg[2], m_shift_reg[1], m_shift_reg[0]);
+			if (LOG) logerror("uPD1990A '%s' Shift Register %02x%02x%02x%02x%02x\n", tag(), m_shift_reg[4], m_shift_reg[3], m_shift_reg[2], m_shift_reg[1], m_shift_reg[0]);
 
 			/* 512 Hz data out pulse */
 			m_data_out = 1;
@@ -382,32 +375,31 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 			/* 32 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(32*2));
-			}
 			break;
 
 		case MODE_TP_64HZ_SET:
-			if (LOG) logerror("UPD1990A TP = 64 Hz Set Mode\n");
+			if (LOG) logerror("uPD1990A '%s' TP = 64 Hz Set Mode\n", tag());
 
 			/* 64 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(64*2));
 			break;
 
 		case MODE_TP_256HZ_SET:
-			if (LOG) logerror("UPD1990A TP = 256 Hz Set Mode\n");
+			if (LOG) logerror("uPD1990A '%s' TP = 256 Hz Set Mode\n", tag());
 
 			/* 256 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(256*2));
 			break;
 
 		case MODE_TP_2048HZ_SET:
-			if (LOG) logerror("UPD1990A TP = 2048 Hz Set Mode\n");
+			if (LOG) logerror("uPD1990A '%s' TP = 2048 Hz Set Mode\n", tag());
 
 			/* 2048 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(2048*2));
 			break;
 
 		case MODE_TEST:
-			if (LOG) logerror("UPD1990A Test Mode not supported!\n");
+			if (LOG) logerror("uPD1990A '%s' Test Mode not supported!\n", tag());
 
 			if (m_oe)
 			{
@@ -430,7 +422,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 {
-	if (LOG) logerror("UPD1990A CLK %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' CLK %u\n", tag(), state);
 
 	if (!m_clk && state) // rising edge
 	{
@@ -455,7 +447,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 			{
 				m_data_out = BIT(m_shift_reg[0], 0);
 
-				if (LOG) logerror("UPD1990A DATA OUT %u\n", m_data_out);
+				if (LOG) logerror("uPD1990A '%s' DATA OUT %u\n", tag(), m_data_out);
 
 				devcb_call_write_line(&m_out_data_func, m_data_out);
 			}
@@ -472,7 +464,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::c0_w )
 {
-	if (LOG) logerror("UPD1990A C0 %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' C0 %u\n", tag(), state);
 
 	m_c = (m_c & 0x06) | state;
 }
@@ -484,7 +476,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c0_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::c1_w )
 {
-	if (LOG) logerror("UPD1990A C1 %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' C1 %u\n", tag(), state);
 
 	m_c = (m_c & 0x05) | (state << 1);
 }
@@ -496,7 +488,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c1_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::c2_w )
 {
-	if (LOG) logerror("UPD1990A C2 %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' C2 %u\n", tag(), state);
 
 	m_c = (m_c & 0x03) | (state << 2);
 }
@@ -508,7 +500,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c2_w )
 
 WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
 {
-	if (LOG) logerror("UPD1990A DATA IN %u\n", state);
+	if (LOG) logerror("uPD1990A '%s' DATA IN %u\n", tag(), state);
 
 	m_data_in = state;
 }
