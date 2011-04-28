@@ -11,6 +11,7 @@
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
+#include "gte.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -158,8 +159,6 @@ protected:
 	UINT32 m_pc;
 	UINT32 m_r[ 32 ];
 	UINT32 m_cp0r[ 16 ];
-	PAIR m_cp2cr[ 32 ];
-	PAIR m_cp2dr[ 32 ];
 	UINT32 m_hi;
 	UINT32 m_lo;
 
@@ -256,14 +255,8 @@ protected:
 	void setcp3dr( int reg, UINT32 value );
 	UINT32 getcp3cr( int reg );
 	void setcp3cr( int reg, UINT32 value );
-	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
-	UINT32 getcp2dr( int reg );
-	void setcp2dr( int reg, UINT32 value );
-	UINT32 getcp2cr( int reg );
-	void setcp2cr( int reg, UINT32 value );
-	INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag );
-	UINT32 Lm_E( UINT32 result );
-	void docop2( int gteop );
+
+	gte m_gte;
 };
 
 class cxd8530aq_device : public psxcpu_device

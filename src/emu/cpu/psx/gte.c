@@ -9,20 +9,19 @@
 
 #include "emu.h"
 #include "gte.h"
-#include "psx.h"
 
 #if 0
-void ATTR_PRINTF(1,2) GTELOG(const char *a,...)
+void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a,...)
 {
 	va_list va;
 	char s_text[ 1024 ];
 	va_start( va, a );
 	vsprintf( s_text, a, va );
 	va_end( va );
-	logerror( "%08x: GTE: %08x %s\n", m_pc, INS_COFUN( m_op ), s_text );
+	logerror( "%08x: GTE: %s\n", pc, s_text );
 }
 #else
-INLINE void ATTR_PRINTF(1,2) GTELOG(const char *a, ...) {}
+INLINE void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...) {}
 #endif
 
 
@@ -150,7 +149,7 @@ INLINE void ATTR_PRINTF(1,2) GTELOG(const char *a, ...) {}
 #define ZSF4 ( m_cp2cr[ 30 ].sw.l )
 #define FLAG ( m_cp2cr[ 31 ].d )
 
-INT32 psxcpu_device::LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
+INT32 gte::LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
 {
 	if( value > max )
 	{
@@ -165,7 +164,7 @@ INT32 psxcpu_device::LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
 	return value;
 }
 
-UINT32 psxcpu_device::getcp2dr( int reg )
+UINT32 gte::getcp2dr( UINT32 pc, int reg )
 {
 	switch( reg )
 	{
@@ -197,13 +196,13 @@ UINT32 psxcpu_device::getcp2dr( int reg )
 		break;
 	}
 
-	GTELOG( "get CP2DR%u=%08x", reg, m_cp2dr[ reg ].d );
+	GTELOG( pc, "get CP2DR%u=%08x", reg, m_cp2dr[ reg ].d );
 	return m_cp2dr[ reg ].d;
 }
 
-void psxcpu_device::setcp2dr( int reg, UINT32 value )
+void gte::setcp2dr( UINT32 pc, int reg, UINT32 value )
 {
-	GTELOG( "set CP2DR%u=%08x", reg, value );
+	GTELOG( pc, "set CP2DR%u=%08x", reg, value );
 
 	switch( reg )
 	{
@@ -245,16 +244,16 @@ void psxcpu_device::setcp2dr( int reg, UINT32 value )
 	m_cp2dr[ reg ].d = value;
 }
 
-UINT32 psxcpu_device::getcp2cr( int reg )
+UINT32 gte::getcp2cr( UINT32 pc, int reg )
 {
-	GTELOG( "get CP2CR%u=%08x", reg, m_cp2cr[ reg ].d );
+	GTELOG( pc, "get CP2CR%u=%08x", reg, m_cp2cr[ reg ].d );
 
 	return m_cp2cr[ reg ].d;
 }
 
-void psxcpu_device::setcp2cr( int reg, UINT32 value )
+void gte::setcp2cr( UINT32 pc, int reg, UINT32 value )
 {
-	GTELOG( "set CP2CR%u=%08x", reg, value );
+	GTELOG( pc, "set CP2CR%u=%08x", reg, value );
 
 	switch( reg )
 	{
@@ -280,7 +279,7 @@ void psxcpu_device::setcp2cr( int reg, UINT32 value )
 	m_cp2cr[ reg ].d = value;
 }
 
-INT64 psxcpu_device::BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag )
+INT64 gte::BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag )
 {
 	if( n_value > n_max )
 	{
@@ -2379,7 +2378,7 @@ INLINE UINT32 gte_divide( INT16 numerator, UINT16 denominator )
 #define Lm_C3( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 19 ) )
 #define Lm_D( a ) LIM( ( a ), 0xffff, 0x0000, ( 1 << 31 ) | ( 1 << 18 ) )
 
-UINT32 psxcpu_device::Lm_E( UINT32 result )
+UINT32 gte::Lm_E( UINT32 result )
 {
 	if( result > 0x1ffff )
 	{
@@ -2395,7 +2394,7 @@ UINT32 psxcpu_device::Lm_E( UINT32 result )
 #define Lm_G2( a ) LIM( ( a ), 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 13 ) )
 #define Lm_H( a ) LIM( ( a ), 0xfff, 0x000, ( 1 << 12 ) )
 
-void psxcpu_device::docop2( int gteop )
+int gte::docop2( UINT32 pc, int gteop )
 {
 	int shift;
 	int v;
@@ -2410,7 +2409,7 @@ void psxcpu_device::docop2( int gteop )
 	case 0x01:
 		if( gteop == 0x0180001 )
 		{
-			GTELOG( "RTPS" );
+			GTELOG( pc, "%08x RTPS", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) TRX << 12 ) + ( R11 * VX0 ) + ( R12 * VY0 ) + ( R13 * VZ0 ) ) >> 12 );
@@ -2430,19 +2429,19 @@ void psxcpu_device::docop2( int gteop )
 			SY2 = Lm_G2( F( (INT64) OFY + ( (INT64) IR2 * h_over_sz3 ) ) >> 16 );
 			MAC0 = F( (INT64) DQB + ( (INT64) DQA * h_over_sz3 ) );
 			IR0 = Lm_H( MAC0 >> 12 );
-			return;
+			return 1;
 		}
 		break;
 
 	case 0x06:
-		GTELOG( "NCLIP" );
+		GTELOG( pc, "%08x NCLIP", gteop );
 		FLAG = 0;
 
 		MAC0 = F( (INT64)( SX0 * SY1 ) + ( SX1 * SY2 ) + ( SX2 * SY0 ) - ( SX0 * SY2 ) - ( SX1 * SY0 ) - ( SX2 * SY1 ) );
-		return;
+		return 1;
 
 	case 0x0c:
-		GTELOG( "OP" );
+		GTELOG( pc, "%08x OP", gteop );
 		FLAG = 0;
 
 		shift = 12 * GTE_SF( gteop );
@@ -2454,10 +2453,10 @@ void psxcpu_device::docop2( int gteop )
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
-		return;
+		return 1;
 
 	case 0x10:
-		GTELOG( "DPCS" );
+		GTELOG( pc, "%08x DPCS", gteop );
 		FLAG = 0;
 
 		shift = 12 * GTE_SF( gteop );
@@ -2475,10 +2474,10 @@ void psxcpu_device::docop2( int gteop )
 		R2 = Lm_C1( MAC1 >> 4 );
 		G2 = Lm_C2( MAC2 >> 4 );
 		B2 = Lm_C3( MAC3 >> 4 );
-		return;
+		return 1;
 
 	case 0x11:
-		GTELOG( "INTPL" );
+		GTELOG( pc, "%08x INTPL", gteop );
 		FLAG = 0;
 
 		shift = 12 * GTE_SF( gteop );
@@ -2496,12 +2495,12 @@ void psxcpu_device::docop2( int gteop )
 		R2 = Lm_C1( MAC1 >> 4 );
 		G2 = Lm_C2( MAC2 >> 4 );
 		B2 = Lm_C3( MAC3 >> 4 );
-		return;
+		return 1;
 
 	case 0x12:
 		if( GTE_OP( gteop ) == 0x04 )
 		{
-			GTELOG( "MVMVA" );
+			GTELOG( pc, "%08x MVMVA", gteop );
 			shift = 12 * GTE_SF( gteop );
 			mx = GTE_MX( gteop );
 			v = GTE_V( gteop );
@@ -2517,13 +2516,13 @@ void psxcpu_device::docop2( int gteop )
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
-			return;
+			return 1;
 		}
 		break;
 	case 0x13:
 		if( gteop == 0x0e80413 )
 		{
-			GTELOG( "NCDS" );
+			GTELOG( pc, "%08x NCDS", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
@@ -2556,13 +2555,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x14:
 		if( gteop == 0x1280414 )
 		{
-			GTELOG( "CDP" );
+			GTELOG( pc, "%08x CDP", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
@@ -2589,13 +2588,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x16:
 		if( gteop == 0x0f80416 )
 		{
-			GTELOG( "NCDT" );
+			GTELOG( pc, "%08x NCDT", gteop );
 			FLAG = 0;
 
 			for( v = 0; v < 3; v++ )
@@ -2631,13 +2630,13 @@ void psxcpu_device::docop2( int gteop )
 				B1 = B2;
 				B2 = Lm_C3( MAC3 >> 4 );
 			}
-			return;
+			return 1;
 		}
 		break;
 	case 0x1b:
 		if( gteop == 0x108041b || gteop == 0x118041b )
 		{
-			GTELOG( "NCCS" );
+			GTELOG( pc, "%08x NCCS", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
@@ -2670,13 +2669,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x1c:
 		if( gteop == 0x138041c )
 		{
-			GTELOG( "CC" );
+			GTELOG( pc, "%08x CC", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
@@ -2703,13 +2702,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x1e:
 		if( gteop == 0x0c8041e )
 		{
-			GTELOG( "NCS" );
+			GTELOG( pc, "%08x NCS", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
@@ -2736,13 +2735,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x20:
 		if( gteop == 0x0d80420 )
 		{
-			GTELOG( "NCT" );
+			GTELOG( pc, "%08x NCT", gteop );
 			FLAG = 0;
 
 			for( v = 0; v < 3; v++ )
@@ -2772,12 +2771,12 @@ void psxcpu_device::docop2( int gteop )
 				B1 = B2;
 				B2 = Lm_C3( MAC3 >> 4 );
 			}
-			return;
+			return 1;
 		}
 		break;
 
 	case 0x28:
-		GTELOG( "SQR" );
+		GTELOG( pc, "%08x SQR", gteop );
 		FLAG = 0;
 
 		shift = 12 * GTE_SF( gteop );
@@ -2789,13 +2788,13 @@ void psxcpu_device::docop2( int gteop )
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
-		return;
+		return 1;
 
 	// DCPL 0x29
 	case 0x2a:
 		if( gteop == 0x0f8002a )
 		{
-			GTELOG( "DPCT" );
+			GTELOG( pc, "%08x DPCT", gteop );
 			FLAG = 0;
 
 			for( v = 0; v < 3; v++ )
@@ -2819,34 +2818,34 @@ void psxcpu_device::docop2( int gteop )
 				B1 = B2;
 				B2 = Lm_C3( MAC3 >> 4 );
 			}
-			return;
+			return 1;
 		}
 		break;
 
 	case 0x2d:
-		GTELOG( "AVSZ3" );
+		GTELOG( pc, "%08x AVSZ3", gteop );
 		FLAG = 0;
 
 		mac0 = F( (INT64) ( ZSF3 * SZ1 ) + ( ZSF3 * SZ2 ) + ( ZSF3 * SZ3 ) );
 		OTZ = Lm_D( mac0 >> 12 );
 
 		MAC0 = mac0;
-		return;
+		return 1;
 
 	case 0x2e:
-		GTELOG( "AVSZ4" );
+		GTELOG( pc, "%08x AVSZ4", gteop );
 		FLAG = 0;
 
 		mac0 = F( (INT64) ( ZSF4 * SZ0 ) + ( ZSF4 * SZ1 ) + ( ZSF4 * SZ2 ) + ( ZSF4 * SZ3 ) );
 		OTZ = Lm_D( mac0 >> 12 );
 
 		MAC0 = mac0;
-		return;
+		return 1;
 
 	case 0x30:
 		if( gteop == 0x0280030 )
 		{
-			GTELOG( "RTPT" );
+			GTELOG( pc, "%08x RTPT", gteop );
 			FLAG = 0;
 
 			for( v = 0; v < 3; v++ )
@@ -2869,14 +2868,14 @@ void psxcpu_device::docop2( int gteop )
 				MAC0 = F( (INT64) DQB + ( (INT64) DQA * h_over_sz3 ) );
 				IR0 = Lm_H( MAC0 >> 12 );
 			}
-			return;
+			return 1;
 		}
 		break;
 	case 0x3d:
 		if( GTE_OP( gteop ) == 0x09 ||
 			GTE_OP( gteop ) == 0x19 )
 		{
-			GTELOG( "GPF" );
+			GTELOG( pc, "%08x GPF", gteop );
 			shift = 12 * GTE_SF( gteop );
 			FLAG = 0;
 
@@ -2898,13 +2897,13 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x3e:
 		if( GTE_OP( gteop ) == 0x1a )
 		{
-			GTELOG( "GPL" );
+			GTELOG( pc, "%08x GPL", gteop );
 			shift = 12 * GTE_SF( gteop );
 			FLAG = 0;
 
@@ -2926,14 +2925,14 @@ void psxcpu_device::docop2( int gteop )
 			B0 = B1;
 			B1 = B2;
 			B2 = Lm_C3( MAC3 >> 4 );
-			return;
+			return 1;
 		}
 		break;
 	case 0x3f:
 		if( gteop == 0x108043f ||
 			gteop == 0x118043f )
 		{
-			GTELOG( "NCCT" );
+			GTELOG( pc, "%08x NCCT", gteop );
 			FLAG = 0;
 
 			for( v = 0; v < 3; v++ )
@@ -2969,11 +2968,13 @@ void psxcpu_device::docop2( int gteop )
 				B1 = B2;
 				B2 = Lm_C3( MAC3 >> 4 );
 			}
-			return;
+			return 1;
 		}
 		break;
 	}
+
 	popmessage( "unknown GTE op %08x", gteop );
-	logerror( "%08x: unknown GTE op %08x\n", m_pc, gteop );
-	stop();
+	logerror( "%08x: unknown GTE op %08x\n", pc, gteop );
+
+	return 0;
 }

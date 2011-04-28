@@ -1214,7 +1214,10 @@ int psxcpu_device::execute_unstoppable_instructions( int executeCop2 )
 					return 0;
 				}
 
-				docop2( INS_COFUN( m_op ) );
+				if( !m_gte.docop2( m_pc, INS_COFUN( m_op ) ) )
+				{
+					stop();
+				}
 				break;
 			}
 		}
@@ -1612,8 +1615,8 @@ void psxcpu_device::device_start()
 	save_item( NAME(m_biu) );
 	save_item( NAME(m_r) );
 	save_item( NAME(m_cp0r) );
-	save_item( NAME(m_cp2cr) );
-	save_item( NAME(m_cp2dr) );
+	save_item( NAME(m_gte.m_cp2cr) );
+	save_item( NAME(m_gte.m_cp2dr) );
 	save_item( NAME(m_icacheTag) );
 	save_item( NAME(m_icache) );
 	save_item( NAME(m_dcache) );
@@ -1676,70 +1679,70 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP0R13, "Cause", m_cp0r[ 13 ] ).callimport();
 	state_add( PSXCPU_CP0R14, "EPC", m_cp0r[ 14 ] );
 	state_add( PSXCPU_CP0R15, "PRId", m_cp0r[ 15 ] );
-	state_add( PSXCPU_CP2DR0, "vxy0", m_cp2dr[ 0 ].d );
-	state_add( PSXCPU_CP2DR1, "vz0", m_cp2dr[ 1 ].d );
-	state_add( PSXCPU_CP2DR2, "vxy1", m_cp2dr[ 2 ].d );
-	state_add( PSXCPU_CP2DR3, "vz1", m_cp2dr[ 3 ].d );
-	state_add( PSXCPU_CP2DR4, "vxy2", m_cp2dr[ 4 ].d );
-	state_add( PSXCPU_CP2DR5, "vz2", m_cp2dr[ 5 ].d );
-	state_add( PSXCPU_CP2DR6, "rgb", m_cp2dr[ 6 ].d );
-	state_add( PSXCPU_CP2DR7, "otz", m_cp2dr[ 7 ].d );
-	state_add( PSXCPU_CP2DR8, "ir0", m_cp2dr[ 8 ].d );
-	state_add( PSXCPU_CP2DR9, "ir1", m_cp2dr[ 9 ].d );
-	state_add( PSXCPU_CP2DR10, "ir2", m_cp2dr[ 10 ].d );
-	state_add( PSXCPU_CP2DR11, "ir3", m_cp2dr[ 11 ].d );
-	state_add( PSXCPU_CP2DR12, "sxy0", m_cp2dr[ 12 ].d );
-	state_add( PSXCPU_CP2DR13, "sxy1", m_cp2dr[ 13 ].d );
-	state_add( PSXCPU_CP2DR14, "sxy2", m_cp2dr[ 14 ].d );
-	state_add( PSXCPU_CP2DR15, "sxyp", m_cp2dr[ 15 ].d );
-	state_add( PSXCPU_CP2DR16, "sz0", m_cp2dr[ 16 ].d );
-	state_add( PSXCPU_CP2DR17, "sz1", m_cp2dr[ 17 ].d );
-	state_add( PSXCPU_CP2DR18, "sz2", m_cp2dr[ 18 ].d );
-	state_add( PSXCPU_CP2DR19, "sz3", m_cp2dr[ 19 ].d );
-	state_add( PSXCPU_CP2DR20, "rgb0", m_cp2dr[ 20 ].d );
-	state_add( PSXCPU_CP2DR21, "rgb1", m_cp2dr[ 21 ].d );
-	state_add( PSXCPU_CP2DR22, "rgb2", m_cp2dr[ 22 ].d );
-	state_add( PSXCPU_CP2DR23, "res1", m_cp2dr[ 23 ].d );
-	state_add( PSXCPU_CP2DR24, "mac0", m_cp2dr[ 24 ].d );
-	state_add( PSXCPU_CP2DR25, "mac1", m_cp2dr[ 25 ].d );
-	state_add( PSXCPU_CP2DR26, "mac2", m_cp2dr[ 26 ].d );
-	state_add( PSXCPU_CP2DR27, "mac3", m_cp2dr[ 27 ].d );
-	state_add( PSXCPU_CP2DR28, "irgb", m_cp2dr[ 28 ].d );
-	state_add( PSXCPU_CP2DR29, "orgb", m_cp2dr[ 29 ].d );
-	state_add( PSXCPU_CP2DR30, "lzcs", m_cp2dr[ 30 ].d );
-	state_add( PSXCPU_CP2DR31, "lzcr", m_cp2dr[ 31 ].d );
-	state_add( PSXCPU_CP2CR0, "r11r12", m_cp2cr[ 0 ].d );
-	state_add( PSXCPU_CP2CR1, "r13r21", m_cp2cr[ 1 ].d );
-	state_add( PSXCPU_CP2CR2, "r22r23", m_cp2cr[ 2 ].d );
-	state_add( PSXCPU_CP2CR3, "r31r32", m_cp2cr[ 3 ].d );
-	state_add( PSXCPU_CP2CR4, "r33", m_cp2cr[ 4 ].d );
-	state_add( PSXCPU_CP2CR5, "trx", m_cp2cr[ 5 ].d );
-	state_add( PSXCPU_CP2CR6, "try", m_cp2cr[ 6 ].d );
-	state_add( PSXCPU_CP2CR7, "trz", m_cp2cr[ 7 ].d );
-	state_add( PSXCPU_CP2CR8, "l11l12", m_cp2cr[ 8 ].d );
-	state_add( PSXCPU_CP2CR9, "l13l21", m_cp2cr[ 9 ].d );
-	state_add( PSXCPU_CP2CR10, "l22l23", m_cp2cr[ 10 ].d );
-	state_add( PSXCPU_CP2CR11, "l31l32", m_cp2cr[ 11 ].d );
-	state_add( PSXCPU_CP2CR12, "l33", m_cp2cr[ 12 ].d );
-	state_add( PSXCPU_CP2CR13, "rbk", m_cp2cr[ 13 ].d );
-	state_add( PSXCPU_CP2CR14, "gbk", m_cp2cr[ 14 ].d );
-	state_add( PSXCPU_CP2CR15, "bbk", m_cp2cr[ 15 ].d );
-	state_add( PSXCPU_CP2CR16, "lr1lr2", m_cp2cr[ 16 ].d );
-	state_add( PSXCPU_CP2CR17, "lr31g1", m_cp2cr[ 17 ].d );
-	state_add( PSXCPU_CP2CR18, "lg2lg3", m_cp2cr[ 18 ].d );
-	state_add( PSXCPU_CP2CR19, "lb1lb2", m_cp2cr[ 19 ].d );
-	state_add( PSXCPU_CP2CR20, "lb3", m_cp2cr[ 20 ].d );
-	state_add( PSXCPU_CP2CR21, "rfc", m_cp2cr[ 21 ].d );
-	state_add( PSXCPU_CP2CR22, "gfc", m_cp2cr[ 22 ].d );
-	state_add( PSXCPU_CP2CR23, "bfc", m_cp2cr[ 23 ].d );
-	state_add( PSXCPU_CP2CR24, "ofx", m_cp2cr[ 24 ].d );
-	state_add( PSXCPU_CP2CR25, "ofy", m_cp2cr[ 25 ].d );
-	state_add( PSXCPU_CP2CR26, "h", m_cp2cr[ 26 ].d );
-	state_add( PSXCPU_CP2CR27, "dqa", m_cp2cr[ 27 ].d );
-	state_add( PSXCPU_CP2CR28, "dqb", m_cp2cr[ 28 ].d );
-	state_add( PSXCPU_CP2CR29, "zsf3", m_cp2cr[ 29 ].d );
-	state_add( PSXCPU_CP2CR30, "zsf4", m_cp2cr[ 30 ].d );
-	state_add( PSXCPU_CP2CR31, "flag", m_cp2cr[ 31 ].d );
+	state_add( PSXCPU_CP2DR0, "vxy0", m_gte.m_cp2dr[ 0 ].d );
+	state_add( PSXCPU_CP2DR1, "vz0", m_gte.m_cp2dr[ 1 ].d );
+	state_add( PSXCPU_CP2DR2, "vxy1", m_gte.m_cp2dr[ 2 ].d );
+	state_add( PSXCPU_CP2DR3, "vz1", m_gte.m_cp2dr[ 3 ].d );
+	state_add( PSXCPU_CP2DR4, "vxy2", m_gte.m_cp2dr[ 4 ].d );
+	state_add( PSXCPU_CP2DR5, "vz2", m_gte.m_cp2dr[ 5 ].d );
+	state_add( PSXCPU_CP2DR6, "rgb", m_gte.m_cp2dr[ 6 ].d );
+	state_add( PSXCPU_CP2DR7, "otz", m_gte.m_cp2dr[ 7 ].d );
+	state_add( PSXCPU_CP2DR8, "ir0", m_gte.m_cp2dr[ 8 ].d );
+	state_add( PSXCPU_CP2DR9, "ir1", m_gte.m_cp2dr[ 9 ].d );
+	state_add( PSXCPU_CP2DR10, "ir2", m_gte.m_cp2dr[ 10 ].d );
+	state_add( PSXCPU_CP2DR11, "ir3", m_gte.m_cp2dr[ 11 ].d );
+	state_add( PSXCPU_CP2DR12, "sxy0", m_gte.m_cp2dr[ 12 ].d );
+	state_add( PSXCPU_CP2DR13, "sxy1", m_gte.m_cp2dr[ 13 ].d );
+	state_add( PSXCPU_CP2DR14, "sxy2", m_gte.m_cp2dr[ 14 ].d );
+	state_add( PSXCPU_CP2DR15, "sxyp", m_gte.m_cp2dr[ 15 ].d );
+	state_add( PSXCPU_CP2DR16, "sz0", m_gte.m_cp2dr[ 16 ].d );
+	state_add( PSXCPU_CP2DR17, "sz1", m_gte.m_cp2dr[ 17 ].d );
+	state_add( PSXCPU_CP2DR18, "sz2", m_gte.m_cp2dr[ 18 ].d );
+	state_add( PSXCPU_CP2DR19, "sz3", m_gte.m_cp2dr[ 19 ].d );
+	state_add( PSXCPU_CP2DR20, "rgb0", m_gte.m_cp2dr[ 20 ].d );
+	state_add( PSXCPU_CP2DR21, "rgb1", m_gte.m_cp2dr[ 21 ].d );
+	state_add( PSXCPU_CP2DR22, "rgb2", m_gte.m_cp2dr[ 22 ].d );
+	state_add( PSXCPU_CP2DR23, "res1", m_gte.m_cp2dr[ 23 ].d );
+	state_add( PSXCPU_CP2DR24, "mac0", m_gte.m_cp2dr[ 24 ].d );
+	state_add( PSXCPU_CP2DR25, "mac1", m_gte.m_cp2dr[ 25 ].d );
+	state_add( PSXCPU_CP2DR26, "mac2", m_gte.m_cp2dr[ 26 ].d );
+	state_add( PSXCPU_CP2DR27, "mac3", m_gte.m_cp2dr[ 27 ].d );
+	state_add( PSXCPU_CP2DR28, "irgb", m_gte.m_cp2dr[ 28 ].d );
+	state_add( PSXCPU_CP2DR29, "orgb", m_gte.m_cp2dr[ 29 ].d );
+	state_add( PSXCPU_CP2DR30, "lzcs", m_gte.m_cp2dr[ 30 ].d );
+	state_add( PSXCPU_CP2DR31, "lzcr", m_gte.m_cp2dr[ 31 ].d );
+	state_add( PSXCPU_CP2CR0, "r11r12", m_gte.m_cp2cr[ 0 ].d );
+	state_add( PSXCPU_CP2CR1, "r13r21", m_gte.m_cp2cr[ 1 ].d );
+	state_add( PSXCPU_CP2CR2, "r22r23", m_gte.m_cp2cr[ 2 ].d );
+	state_add( PSXCPU_CP2CR3, "r31r32", m_gte.m_cp2cr[ 3 ].d );
+	state_add( PSXCPU_CP2CR4, "r33", m_gte.m_cp2cr[ 4 ].d );
+	state_add( PSXCPU_CP2CR5, "trx", m_gte.m_cp2cr[ 5 ].d );
+	state_add( PSXCPU_CP2CR6, "try", m_gte.m_cp2cr[ 6 ].d );
+	state_add( PSXCPU_CP2CR7, "trz", m_gte.m_cp2cr[ 7 ].d );
+	state_add( PSXCPU_CP2CR8, "l11l12", m_gte.m_cp2cr[ 8 ].d );
+	state_add( PSXCPU_CP2CR9, "l13l21", m_gte.m_cp2cr[ 9 ].d );
+	state_add( PSXCPU_CP2CR10, "l22l23", m_gte.m_cp2cr[ 10 ].d );
+	state_add( PSXCPU_CP2CR11, "l31l32", m_gte.m_cp2cr[ 11 ].d );
+	state_add( PSXCPU_CP2CR12, "l33", m_gte.m_cp2cr[ 12 ].d );
+	state_add( PSXCPU_CP2CR13, "rbk", m_gte.m_cp2cr[ 13 ].d );
+	state_add( PSXCPU_CP2CR14, "gbk", m_gte.m_cp2cr[ 14 ].d );
+	state_add( PSXCPU_CP2CR15, "bbk", m_gte.m_cp2cr[ 15 ].d );
+	state_add( PSXCPU_CP2CR16, "lr1lr2", m_gte.m_cp2cr[ 16 ].d );
+	state_add( PSXCPU_CP2CR17, "lr31g1", m_gte.m_cp2cr[ 17 ].d );
+	state_add( PSXCPU_CP2CR18, "lg2lg3", m_gte.m_cp2cr[ 18 ].d );
+	state_add( PSXCPU_CP2CR19, "lb1lb2", m_gte.m_cp2cr[ 19 ].d );
+	state_add( PSXCPU_CP2CR20, "lb3", m_gte.m_cp2cr[ 20 ].d );
+	state_add( PSXCPU_CP2CR21, "rfc", m_gte.m_cp2cr[ 21 ].d );
+	state_add( PSXCPU_CP2CR22, "gfc", m_gte.m_cp2cr[ 22 ].d );
+	state_add( PSXCPU_CP2CR23, "bfc", m_gte.m_cp2cr[ 23 ].d );
+	state_add( PSXCPU_CP2CR24, "ofx", m_gte.m_cp2cr[ 24 ].d );
+	state_add( PSXCPU_CP2CR25, "ofy", m_gte.m_cp2cr[ 25 ].d );
+	state_add( PSXCPU_CP2CR26, "h", m_gte.m_cp2cr[ 26 ].d );
+	state_add( PSXCPU_CP2CR27, "dqa", m_gte.m_cp2cr[ 27 ].d );
+	state_add( PSXCPU_CP2CR28, "dqb", m_gte.m_cp2cr[ 28 ].d );
+	state_add( PSXCPU_CP2CR29, "zsf3", m_gte.m_cp2cr[ 29 ].d );
+	state_add( PSXCPU_CP2CR30, "zsf4", m_gte.m_cp2cr[ 30 ].d );
+	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -1914,7 +1917,7 @@ void psxcpu_device::lwc( int cop, int sr_cu )
 				break;
 
 			case 2:
-				setcp2dr( reg, data );
+				m_gte.setcp2dr( m_pc, reg, data );
 				break;
 
 			case 3:
@@ -1985,7 +1988,7 @@ void psxcpu_device::swc( int cop, int sr_cu )
 			break;
 
 		case 2:
-			data = getcp2dr( INS_RT( m_op ) );
+			data = m_gte.getcp2dr( m_pc, INS_RT( m_op ) );
 			break;
 
 		case 3:
@@ -2507,20 +2510,20 @@ void psxcpu_device::execute_run()
 				switch( INS_RS( m_op ) )
 				{
 				case RS_MFC:
-					delayed_load( INS_RT( m_op ), getcp2dr( INS_RD( m_op ) ) );
+					delayed_load( INS_RT( m_op ), m_gte.getcp2dr( m_pc, INS_RD( m_op ) ) );
 					break;
 
 				case RS_CFC:
-					delayed_load( INS_RT( m_op ), getcp2cr( INS_RD( m_op ) ) );
+					delayed_load( INS_RT( m_op ), m_gte.getcp2cr( m_pc, INS_RD( m_op ) ) );
 					break;
 
 				case RS_MTC:
-					setcp2dr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+					m_gte.setcp2dr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
 					advance_pc();
 					break;
 
 				case RS_CTC:
-					setcp2cr( INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
+					m_gte.setcp2cr( m_pc, INS_RD( m_op ), m_r[ INS_RT( m_op ) ] );
 					advance_pc();
 					break;
 
@@ -2542,7 +2545,11 @@ void psxcpu_device::execute_run()
 					switch( INS_CO( m_op ) )
 					{
 					case 1:
-						docop2( INS_COFUN( m_op ) );
+						if( !m_gte.docop2( m_pc, INS_COFUN( m_op ) ) )
+						{
+							stop();
+						}
+
 						advance_pc();
 						break;
 
