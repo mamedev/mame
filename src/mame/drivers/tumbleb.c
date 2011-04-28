@@ -721,6 +721,7 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
 	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE_MEMBER(tumbleb_state, m_pf1_data)
 	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE_MEMBER(tumbleb_state, m_pf2_data)
+	AM_RANGE(0x323000, 0x331fff) AM_NOP // metal saver writes there when clearing the above tilemaps, flaw in the program routine
 	AM_RANGE(0x341000, 0x342fff) AM_RAM				// Extra ram?
 ADDRESS_MAP_END
 
