@@ -140,11 +140,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static INPUT_CHANGED( coin_inserted )
-{
-	cputag_set_input_line(field->port->machine(), "maincpu", 5, newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
 static INPUT_PORTS_START( blockout )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -167,9 +162,9 @@ static INPUT_PORTS_START( blockout )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted,0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted,0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED(coin_inserted,0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:1,2")
