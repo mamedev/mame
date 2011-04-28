@@ -1557,7 +1557,7 @@ SCREEN_UPDATE( cave )
 	{
 		if (state->m_tilemap[GFX])
 		{
-			state->m_tiledim[GFX] = state->m_vctrl[0][1] & 0x2000;
+			state->m_tiledim[GFX] = state->m_vctrl[GFX][1] & 0x2000;
 			if (state->m_tiledim[GFX] != state->m_old_tiledim[GFX])
 				tilemap_mark_all_tiles_dirty(state->m_tilemap[GFX]);
 			state->m_old_tiledim[GFX] = state->m_tiledim[GFX];
