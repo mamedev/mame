@@ -4702,56 +4702,53 @@ naomi
 naomigd
 naomi2
 
-hod2bios		// 1998.11 The House of the Dead 2
+hod2bios		// 1998.11 The House of the Dead 2 (BIOS)
 hotd2			// 1998.11 The House of the Dead 2
-hotd2o			// 1998.11 The House of the Dead 2
+hotd2o			// 1998.11 The House of the Dead 2 (original)
 dybbnao			// 1998.12 Dynamite Baseball NAOMI
-smlg99			// 1999.?? Super Major League '99
 pstone			// 1999.02 Power Stone
 crzytaxi		// 1999.02 Crazy Taxi
 zombrvn			// 1999.02 Zombie Revenge
-airlbios		// 1999.03 Airline Pilots
-alpiltdx
-alpilota
-ggram2			// 1999.04 Giant Gram Zen Nippon Pro-wres 2
+airlbios		// 1999.03 Airline Pilots (BIOS)
+alpilota		// 1999.03 Airline Pilots (Rev A)
+alpiltdx		// 1999.?? Airline Pilots Deluxe (Rev B)
+ggram2			// 1999.04 Giant Gram: All Japan Pro Wrestling 2
 				// 1999.05 Taisen Puzzle Kurutto Stone
-ringout			// 1999.06 Ringout 4x4
-f355bios		// 1999.07 F355 Challenge
-f355
+ringout			// 1999.06 Ring Out 4x4 (Rev A)
+f355bios		// 1999.07 F355 Challenge (BIOS)
+f355			// 1999.07 F355 Challenge
 f355twin		// 1999.07 F355 Challenge Twin
 shangril		// 1999.08 Dengen Tenshi Taisen Janshi Shangri-la
 				// 1999.08 Unou Nouryoku Check Machine Touch de UNO!
-vs2_2k			// 1999.08 Virtua Striker 2 version 2000
+vs2_2k			// 1999.08 Virtua Striker 2 version 2000 (Rev C)
 suchie3			// 1999.09 Idol Janshi Su-Chi-Pi 3
 toyfight		// 1999.09 Toy Fighter
-jambo			// 1999.09 Jambo! Safari
-				// 1999.09 Super Major League 99
+jambo			// 1999.09 Jambo! Safari (Rev A)
+smlg99			// 1999.09 Super Major League 99
 sgtetris		// 1999.10 Sega Tetris
-derbyoc			// 1999.10 Derby Owners Club
+derbyoc			// 1999.10 Derby Owners Club (Rev B)
 doa2			// 1999.11 Dead or Alive 2
-otrigger		// 1999.11 Out Trigger
-dybb99			// 1999.11 Dynamite Baseball '99
+otrigger		// 1999.11 OutTrigger
+dybb99			// 1999.11 Dynamite Baseball '99 (Rev B)
 				// 1999.12 Mars TV
-samba			// 1999.12 Samba de Amigo
+samba			// 1999.12 Samba de Amigo (Rev B)
 vtennis			// 1999.12 Virtua Tennis / Power Smash (ROM)
-vtennisg		// 1999.12 Virtua Tennis / Power Smash (GD-ROM)
-puyoda			// 1999.12 Puyopuyo DA!
-
-18wheelr		// 2000.01 18 Wheeler
-totd			// 2000.01 The Typing of the Dead
-spawn			// 2000.01 Spawn
+puyoda			// 1999.12 Puyo Puyo Da!
+spawn			// 1999.?? Spawn In the Demon's Hand
+18wheelr		// 2000.01 18 Wheeler Deluxe (Rev A)
+totd			// 2000.01 The Typing of the Dead (Rev A)
 doa2m			// 2000.01 Dead or Alive 2 Millenium
 				// 2000.02 Touch de UNO! 2
 virnba			// 2000.02 Virtua NBA
-virnbao
-mvsc2			// 2000.03 Marvel vs. Capcom 2
+virnbao			// 2000.02 Virtua NBA (original)
+mvsc2			// 2000.03 Marvel vs. Capcom 2 (Rev A)
 smarinef		// 2000.03 Sega Marine Fishing
 wldkicks		// 2000.03 World Kicks
 				// 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4
 pstone2			// 2000.04 Power Stone 2
 qmegamis		// 2000.05 Quiz Ah Megamisama
-vonot			// 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition
-derbyo2k		// 2000.06 Derby Owners Club 2000
+vonot			// 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 Edition
+derbyo2k		// 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
 ggx				// 2000.07 Guilty Gear X
 slasho			// 2000.07 Slashout
 slashout
@@ -4775,6 +4772,7 @@ sprtjam			// 2000.12 Sports Jam
 				// 2000.?? World Kicks New ver.
 derbyocw		// 2001.?? Derby Owners Club World Edition (Rev. D)
 drbyocwc		// 2001.?? Derby Owners Club World Edition (Rev. C)
+vtennisg		// 2001.?? Virtua Tennis / Power Smash (GD-ROM)
 f355twn2		// 2001.01 F355 Challenge 2
 gwing2			// 2001.01 Giga Wing 2
 csmash			// 2001.01 Cosmic Smash
