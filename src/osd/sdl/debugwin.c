@@ -545,7 +545,7 @@ static void configuration_save(running_machine &machine, int config_type, xml_da
 void sdl_osd_interface::init_debugger()
 {
 	/* register callbacks */
-	config_register(machine(), "debugger", config_saveload_delegate(FUNC(configuration_load), &machine), config_saveload_delegate(FUNC(configuration_save), &machine));
+	config_register(machine(), "debugger", config_saveload_delegate(FUNC(configuration_load), &machine()), config_saveload_delegate(FUNC(configuration_save), &machine()));
 }
 
 
