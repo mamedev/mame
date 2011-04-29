@@ -29,6 +29,7 @@
     * Witch Card (English, witch game, lamps).  1985, PlayMan.
     * Witch Card (Falcon, enhanced sound).      199?, Falcon.
     * Witch Card (German, WC3050, set 2 ).      1994, Proma.
+    * Witch Card (German, WC3050, 27-4-94),     1994, Proma.
     * Witch Game (Video Klein).                 1991, Video Klein.
     * Jolli Witch (Export, 6T/12T ver 1.57D).   1994, Video Klein?.
     * Wild Witch (Export, 6T/12T ver 1.74A).    1994, Video Klein.
@@ -263,6 +264,12 @@
     due to the lack or corrupt NVRAM. You must choose HOLD1 to create a new default
     NVRAM. In case you have corrupt NVRAM (not first boot), you can choose HOLD5 to
     attempt recover the old settings.
+
+
+    * Witch Card (Proma)
+	
+	For the first time: You must coin-up and play at least one hand, then Payout
+    to get the proper coinage settings. 
 
 
 *******************************************************************************
@@ -3596,6 +3603,56 @@ ROM_START( witchcdh )
 	ROM_LOAD( "tbp24s10n.7d",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/***************************************
+
+  Witch Card (German, WC3050, 27-4-94)
+
+  TV GAME ELEKTRONIK 1994
+         PROMA
+   CASINOVERSION WC3050
+
+****************************************
+
+01.a2                                           BADADDR           --xxxxxxxxxx
+02.a4                                           BADADDR           --xxxxxxxxxx
+03.a5                                           1ST AND 2ND HALF IDENTICAL
+27s21.d7                                        FIXED BITS (0000xxxx)
+                        tbp24s10n.7d            FIXED BITS (0000xxxx)
+                        ce-2-tvg.bin            BADADDR           --xxxxxxxxxx
+                        ce-1-tvg.bin            BADADDR           --xxxxxxxxxx
+01.a2                   ce-1-tvg.bin            IDENTICAL
+02.a4                   ce-2-tvg.bin            IDENTICAL
+27s21.d7                tbp24s10n.7d            IDENTICAL
+03.a5        [2/4]      ce-3-tvg.bin [2/4]      IDENTICAL
+04.a12       [2/4]      12a.bin      [2/4]      IDENTICAL
+03.a5        [2/4]      ce-3-tvg.bin [4/4]      IDENTICAL
+03.a5        [4/4]      ce-3-tvg.bin [2/4]      IDENTICAL
+03.a5        [4/4]      ce-3-tvg.bin [4/4]      IDENTICAL
+04.a12       [1/4]      12a.bin      [1/4]      99.609375%
+04.a12       [3/4]      12a.bin      [3/4]      99.414063%
+04.a12       [4/4]      12a.bin      [4/4]      96.020508%
+03.a5        [1/4]      ce-3-tvg.bin [1/4]      88.378906%
+03.a5        [3/4]      ce-3-tvg.bin [1/4]      88.378906%
+
+***************************************/
+
+	ROM_START( witchcdi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "04.a12",	0x0000, 0x8000, CRC(0f662e02) SHA1(71d7344f63c11082beb4fb4eeb20b04780a9b14c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(					0x0000, 0x4000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "03.a5",	0x4000, 0x2000, CRC(f181e5aa) SHA1(44a7696bd223effbc7542142a0c3c623c628071d) )    /* text layer */
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "01.a2",	0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "02.a4",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",	0x4800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "27s21.d7",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 /******************************************
 
   Witch Game (Video Klein)
@@ -4805,6 +4862,7 @@ GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma", 
 GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PlayMan",                  "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
 GAMEL( 199?, witchcdg, witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
 GAMEL( 1994, witchcdh, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
+GAMEL( 1994, witchcdi, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
 GAMEL( 1991, witchgme, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein)",                0,                layout_goldnpkr )
 GAMEL( 1994, witchjol, witchcrd, wcrdxtnd, witchjol, vkdlsa,   ROT0,   "Video Klein?",             "Jolli Witch (Export, 6T/12T ver 1.57D)",  GAME_IMPERFECT_COLORS, layout_goldnpkr )
 GAMEL( 1994, wldwitch, witchcrd, wcrdxtnd, wldwitch, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",   GAME_IMPERFECT_COLORS, layout_goldnpkr )
