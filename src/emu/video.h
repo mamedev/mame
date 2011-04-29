@@ -70,7 +70,7 @@ typedef struct _avi_file avi_file;
 
 // ======================> video_manager
 
-class video_manager : public bindable_object
+class video_manager
 {
 	friend class screen_device;
 

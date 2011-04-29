@@ -150,7 +150,7 @@ private:
 
 // ======================> device_scheduler
 
-class device_scheduler : public bindable_object
+class device_scheduler
 {
 	friend class device_execute_interface;
 	friend class emu_timer;

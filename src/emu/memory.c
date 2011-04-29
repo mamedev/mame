@@ -417,7 +417,7 @@ private:
 // ======================> handler_entry
 
 // a handler entry contains information about a memory handler
-class handler_entry : public bindable_object
+class handler_entry
 {
 	DISABLE_COPYING(handler_entry);
 
@@ -669,7 +669,7 @@ private:
 // ======================> address_table
 
 // address_table contains information about read/write accesses within an address space
-class address_table : public bindable_object
+class address_table
 {
 	// address map lookup table definitions
 	static const int LEVEL1_BITS	= 18;						// number of address bits in the level 1 table
@@ -2039,7 +2039,7 @@ void address_space::populate_from_map()
 void address_space::populate_map_entry(const address_map_entry &entry, read_or_write readorwrite)
 {
 	const map_handler_data &data = (readorwrite == ROW_READ) ? entry.m_read : entry.m_write;
-	bindable_object *object;
+	void *object;
 	device_t *device;
 
 	// based on the handler type, alter the bits, name, funcptr, and object

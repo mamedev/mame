@@ -714,7 +714,7 @@ private:
 // ======================> render_manager
 
 // contains machine-global information and operations
-class render_manager : public bindable_object
+class render_manager
 {
 	friend class render_target;
 

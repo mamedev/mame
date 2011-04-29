@@ -309,7 +309,7 @@ public:
 typedef delegate<void ()> machine_notify_delegate;
 
 // description of the currently-running machine
-class running_machine : public bindable_object
+class running_machine
 {
 	DISABLE_COPYING(running_machine);
 

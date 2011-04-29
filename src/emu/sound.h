@@ -199,7 +199,7 @@ private:
 
 // ======================> sound_manager
 
-class sound_manager : public bindable_object
+class sound_manager
 {
 	friend class sound_stream;
 

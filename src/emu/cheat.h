@@ -314,7 +314,7 @@ private:
 // ======================> cheat_manager
 
 // private machine-global data
-class cheat_manager : public bindable_object
+class cheat_manager
 {
 public:
 	// construction/destruction

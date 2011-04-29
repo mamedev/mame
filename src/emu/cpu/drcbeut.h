@@ -147,7 +147,7 @@ private:
 typedef delegate<void (void *, drccodeptr)> drc_label_fixup_delegate;
 
 // structure holding a live list of labels
-class drc_label_list : public bindable_object
+class drc_label_list
 {
 public:
 	// construction/destruction

@@ -554,7 +554,7 @@ typedef delegate<void (offs_t, UINT8)> m68k_write8_delegate;
 typedef delegate<void (offs_t, UINT16)> m68k_write16_delegate;
 typedef delegate<void (offs_t, UINT32)> m68k_write32_delegate;
 
-class m68k_memory_interface : public bindable_object
+class m68k_memory_interface
 {
 public:
 	void init8(address_space &space);
