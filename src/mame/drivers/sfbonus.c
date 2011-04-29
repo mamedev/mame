@@ -278,7 +278,7 @@ class sfbonus_state : public driver_device
 {
 public:
 	sfbonus_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(mconfig, type, tag) { }
 
 	bitmap_t *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
