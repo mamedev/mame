@@ -5374,6 +5374,40 @@ ROM_START( atworldd1 )
 	ROM_LOAD_OPTIONAL( "aw13re.id", 0x00, 0x1000,  CRC(0f9991fb) SHA1(5ea9e49c6b8b00c2c3638cc39e479d6e5e112b7a) )
 ROM_END
 
+/* Fruit Bonus 3G */
+/* 
+
+Version 1.0.1 roms need dumping. Board was reflashed (updated) to v1.0.3
+
+   ROM    SUM16 printed on rom label
+   --------------------------------------------
+   ROM1   CDE8  <-- V1.0.1
+   ROM2   65AF
+   ROM3   BEE1  <-- Different then V1.0.3 ROM3?
+   ROM4   D329  <-- Different then V1.0.3 ROM4?
+   ROM5   B0AD
+   ROM6   8660
+*/
+
+ROM_START( fb3g )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "fb3gd103.bin", 0x00000, 0x80000, CRC(5133e739) SHA1(736989716bb5c1821b133e986ba5986425371814) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb3grom2.bin", 0x00000, 0x40000, CRC(15b7ec5b) SHA1(8aa4e7744f220c2feeae04fbc93f8e0ef333b062) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb3grom3.bin", 0x00000, 0x80000, CRC(a00404dd) SHA1(cb196e24b493eb1f3e9e234b965f24d1bf99be86) ) /* SUM16 B43A */
+	ROM_LOAD16_BYTE( "fb3grom4.bin", 0x00001, 0x80000, CRC(b9e0fed7) SHA1(1d47cf1e9757d86f3d4b2c30c1c113d87816b66c) ) /* SUM16 D6BE */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb3grom5.bin", 0x00000, 0x80000, CRC(c3121482) SHA1(c0688f28a44f0b9b3406147dd547979ff3b2674a) )
+	ROM_LOAD16_BYTE( "fb3grom6.bin", 0x00001, 0x80000, CRC(41d042b6) SHA1(13139d961dbad1f0743b181ca4692e35ed0909ea) )
+
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD( "fb3g103.id", 0x0000, 0x1000, CRC(9d87e807) SHA1(a1eae917a652604deac46b140e31d827672b60d6) )
+ROM_END
+
 
 
 /* Not working sets (due to incomplete dumps) */
@@ -5594,25 +5628,6 @@ ROM_START( fbdeluxeo )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, NO_DUMP )
-ROM_END
-
-ROM_START( fb3g )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "fb3gd103.bin", 0x00000, 0x80000, CRC(5133e739) SHA1(736989716bb5c1821b133e986ba5986425371814) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "fb3grom2", 0x00000, 0x40000, CRC(15b7ec5b) SHA1(8aa4e7744f220c2feeae04fbc93f8e0ef333b062) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb3grom3", 0x00000, 0x80000, CRC(a00404dd) SHA1(cb196e24b493eb1f3e9e234b965f24d1bf99be86) )
-	ROM_LOAD16_BYTE( "fb3grom4", 0x00001, 0x80000, CRC(b9e0fed7) SHA1(1d47cf1e9757d86f3d4b2c30c1c113d87816b66c) )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "fb3grom5", 0x00000, 0x80000, CRC(c3121482) SHA1(c0688f28a44f0b9b3406147dd547979ff3b2674a) )
-	ROM_LOAD16_BYTE( "fb3grom6", 0x00001, 0x80000, CRC(41d042b6) SHA1(13139d961dbad1f0743b181ca4692e35ed0909ea) )
-
-	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
-	ROM_LOAD( "fb3g.nv", 0x0000, 0x1000, CRC(9d87e807) SHA1(a1eae917a652604deac46b140e31d827672b60d6) )
 ROM_END
 
 ROM_START( getrich )
@@ -6121,9 +6136,11 @@ GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworldd,      
 GAME( 2007, atworlde1,   atworld,  sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
 GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site */
 
+GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0) /* After Around The World */
+
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
-GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
-GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
+GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", GAME_NOT_WORKING)
+GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", GAME_NOT_WORKING)
 
 GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  GAME_NOT_WORKING)
 GAME( 2006, version4v,   version4, sfbonus,    amcoe1_reels3,    version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", GAME_NOT_WORKING)
@@ -6137,8 +6154,6 @@ GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,        
 
 GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.9)", GAME_NOT_WORKING) /* After Around The World */
 GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
-
-GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0) /* After Around The World */
 
 GAME( 200?, getrich,     0,        sfbonus,    amcoe1_reels3,    getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", GAME_NOT_WORKING) /* After Around The World */
 
