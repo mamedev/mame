@@ -64,6 +64,8 @@
 #include "emu.h"
 #include "debugger.h"
 #include "psx.h"
+#include "includes/psx.h"
+#include "sound/spu.h"
 
 #define LOG_BIOSCALL ( 0 )
 
@@ -1533,7 +1535,21 @@ int psxcpu_device::store_data_address_breakpoint( UINT32 address )
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00800000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
+	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
+	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
+	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
+	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
+	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
+	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
+	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
+	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
+	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
+	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
+	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x80800000, 0x9effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0xa0800000, 0xbeffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
@@ -1543,7 +1559,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x01000000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
+	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
+	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
+	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
+	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
+	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
+	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
+	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
+	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
+	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
+	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x81000000, 0x9effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0xa1000000, 0xbeffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)

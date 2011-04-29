@@ -254,25 +254,6 @@ public:
 
 /* RTC */
 
-static WRITE32_HANDLER( twinkle_unknown_w )
-{
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
-
-/*  printf( "set unknown data=%08x\n", data ); */
-
-	state->m_unknown = data;
-}
-
-static READ32_HANDLER( twinkle_unknown_r )
-{
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
-	UINT32 data = state->m_unknown;
-
-/*  printf( "get unknown data=%08x\n", data ); */
-
-	return data;
-}
-
 #define LED_A1 0x0001
 #define LED_A2 0x0002
 #define LED_B 0x0004
@@ -637,31 +618,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
 	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
 	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITENOP
-
-
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
 	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
 	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
-	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
-	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
-	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
-	AM_RANGE(0x1f80100c, 0x1f80100f) AM_WRITENOP
-	AM_RANGE(0x1f801010, 0x1f801013) AM_READNOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_RAM
-	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(twinkle_unknown_r, twinkle_unknown_w)
-	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
-	AM_RANGE(0x1f801060, 0x1f80106f) AM_WRITENOP
-	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
-	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
-	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
-	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
-	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */

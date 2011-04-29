@@ -3112,6 +3112,11 @@ READ16_HANDLER( spu_r )
 {
 	spu_device *spu = space->machine().device<spu_device>("spu");
 
+	if (spu == NULL )
+	{
+		return 0;
+	}
+
 	if (!spu->installed_dma_hooks)
 	{
 		psx_dma_install_read_handler(space->machine(), 4, spu_dma_read);
@@ -3125,6 +3130,11 @@ READ16_HANDLER( spu_r )
 WRITE16_HANDLER( spu_w )
 {
 	spu_device *spu = space->machine().device<spu_device>("spu");
+
+	if (spu == NULL)
+	{
+		return;
+	}
 
 	if (!spu->installed_dma_hooks)
 	{

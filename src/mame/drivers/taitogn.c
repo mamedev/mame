@@ -921,17 +921,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
 	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE(flash_s2_r, flash_s2_w)
 	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE(flash_s3_r, flash_s3_w)
-	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
-	AM_RANGE(0x1f801000, 0x1f80100f) AM_RAM /* ?? */
-	AM_RANGE(0x1f801014, 0x1f801017) AM_RAM
-	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
-	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
-	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
-	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
-	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
-	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
