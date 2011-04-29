@@ -3,9 +3,9 @@
     Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
     Notes:
-    - Position counter doesn't behave correctly because of the K051733
-      protection.
     - 007232 volume & panning control is almost certainly wrong.
+    - Needs HW tests or side-by-side tests to determine if the protection
+      is 100% ok now;
 
     2008-07
     Dip locations and recommended settings verified with manual
@@ -502,5 +502,5 @@ ROM_START( chqflagj )
 ROM_END
 
 
-GAMEL( 1988, chqflag,  0,       chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
-GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflag,  0,       chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, 0, ROT90, "Konami", "Chequered Flag (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_chqflag )
