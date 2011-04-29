@@ -277,8 +277,8 @@ MH86171 Color Pallete RAMDAC
 class sfbonus_state : public driver_device
 {
 public:
-	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+	sfbonus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	bitmap_t *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
@@ -5601,15 +5601,18 @@ ROM_START( fb3g )
 	ROM_LOAD( "fb3gd103.bin", 0x00000, 0x80000, CRC(5133e739) SHA1(736989716bb5c1821b133e986ba5986425371814) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "fb3grom2.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "fb3grom2", 0x00000, 0x40000, CRC(15b7ec5b) SHA1(8aa4e7744f220c2feeae04fbc93f8e0ef333b062) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb3grom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb3grom4.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb3grom3", 0x00000, 0x80000, CRC(a00404dd) SHA1(cb196e24b493eb1f3e9e234b965f24d1bf99be86) )
+	ROM_LOAD16_BYTE( "fb3grom4", 0x00001, 0x80000, CRC(b9e0fed7) SHA1(1d47cf1e9757d86f3d4b2c30c1c113d87816b66c) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "fb3grom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "fb3grom6.bin", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fb3grom5", 0x00000, 0x80000, CRC(c3121482) SHA1(c0688f28a44f0b9b3406147dd547979ff3b2674a) )
+	ROM_LOAD16_BYTE( "fb3grom6", 0x00001, 0x80000, CRC(41d042b6) SHA1(13139d961dbad1f0743b181ca4692e35ed0909ea) )
+
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD( "fb3g.nv", 0x0000, 0x1000, CRC(9d87e807) SHA1(a1eae917a652604deac46b140e31d827672b60d6) )
 ROM_END
 
 ROM_START( getrich )
@@ -6135,7 +6138,7 @@ GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,        
 GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.9)", GAME_NOT_WORKING) /* After Around The World */
 GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
 
-GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", GAME_NOT_WORKING) /* After Around The World */
+GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0) /* After Around The World */
 
 GAME( 200?, getrich,     0,        sfbonus,    amcoe1_reels3,    getrich,         ROT0,  "Amcoe", "Get Rich (Version 1.0.1)", GAME_NOT_WORKING) /* After Around The World */
 
