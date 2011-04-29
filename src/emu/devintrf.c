@@ -155,6 +155,11 @@ void device_list::start_new_devices()
 			// attempt to start the device, catching any expected exceptions
 			try
 			{
+				// if the device doesn't have a machine yet, set it first
+				if (device->m_machine == NULL)
+					device->set_machine(machine());
+			
+				// now start the device
 				mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
 				device->start();
 			}
