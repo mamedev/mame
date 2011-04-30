@@ -166,7 +166,7 @@ public:
 public:	// protected eventually
 
 	// add a new state item
-	template<class T> device_state_entry &state_add(int index, const char *symbol, T &data)
+	template<class _ItemType> device_state_entry &state_add(int index, const char *symbol, _ItemType &data)
 	{
 		return state_add(index, symbol, &data, sizeof(data));
 	}

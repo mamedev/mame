@@ -258,7 +258,7 @@ namespace uml
 	class code_handle
 	{
 		friend class ::drcuml_state;
-		template<class T> friend class ::simple_list;
+		friend class ::simple_list<code_handle>;
 
 		// construction/destruction
 		code_handle(drcuml_state &drcuml, const char *name);

@@ -51,7 +51,7 @@
 
 // a simple_list is a singly-linked list whose 'next' pointer is owned
 // by the object
-template<class T>
+template<class _ElementType>
 class simple_list
 {
 	// we don't support deep copying
@@ -69,8 +69,8 @@ public:
 
 	// simple getters
 	resource_pool &pool() const { return m_pool; }
-	T *first() const { return m_head; }
-	T *last() const { return m_tail; }
+	_ElementType *first() const { return m_head; }
+	_ElementType *last() const { return m_tail; }
 	int count() const { return m_count; }
 
 	// remove (free) all objects in the list, leaving an empty list
@@ -81,7 +81,7 @@ public:
 	}
 
 	// add the given object to the head of the list
-	T &prepend(T &object)
+	_ElementType &prepend(_ElementType &object)
 	{
 		object.m_next = m_head;
 		m_head = &object;
@@ -92,13 +92,13 @@ public:
 	}
 
 	// add the given list to the head of the list
-	void prepend_list(simple_list<T> &list)
+	void prepend_list(simple_list<_ElementType> &list)
 	{
 		int count = list.count();
 		if (count == 0)
 			return;
-		T *tail = list.last();
-		T *head = list.detach_all();
+		_ElementType *tail = list.last();
+		_ElementType *head = list.detach_all();
 		tail->m_next = m_head;
 		m_head = head;
 		if (m_tail == NULL)
@@ -107,7 +107,7 @@ public:
 	}
 
 	// add the given object to the tail of the list
-	T &append(T &object)
+	_ElementType &append(_ElementType &object)
 	{
 		object.m_next = NULL;
 		if (m_tail != NULL)
@@ -119,13 +119,13 @@ public:
 	}
 
 	// add the given list to the tail of the list
-	void append_list(simple_list<T> &list)
+	void append_list(simple_list<_ElementType> &list)
 	{
 		int count = list.count();
 		if (count == 0)
 			return;
-		T *tail = list.last();
-		T *head = list.detach_all();
+		_ElementType *tail = list.last();
+		_ElementType *head = list.detach_all();
 		if (m_tail != NULL)
 			m_tail->m_next = head;
 		else
@@ -135,7 +135,7 @@ public:
 	}
 
 	// insert the given object after a particular object (NULL means prepend)
-	T &insert_after(T &object, T *insert_after)
+	_ElementType &insert_after(_ElementType &object, _ElementType *insert_after)
 	{
 		if (insert_after == NULL)
 			return prepend(object);
@@ -146,10 +146,10 @@ public:
 	}
 
 	// replace an item in the list at the same location, and remove it
-	T &replace_and_remove(T &object, T &toreplace)
+	_ElementType &replace_and_remove(_ElementType &object, _ElementType &toreplace)
 	{
-		T *prev = NULL;
-		for (T *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = NULL;
+		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
 			if (cur == &toreplace)
 			{
 				if (prev != NULL)
@@ -166,9 +166,9 @@ public:
 	}
 
 	// detach the head item from the list, but don't free its memory
-	T *detach_head()
+	_ElementType *detach_head()
 	{
-		T *result = m_head;
+		_ElementType *result = m_head;
 		if (result != NULL)
 		{
 			m_head = result->m_next;
@@ -180,10 +180,10 @@ public:
 	}
 
 	// detach the given item from the list, but don't free its memory
-	T &detach(T &object)
+	_ElementType &detach(_ElementType &object)
 	{
-		T *prev = NULL;
-		for (T *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+		_ElementType *prev = NULL;
+		for (_ElementType *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
 			if (cur == &object)
 			{
 				if (prev != NULL)
@@ -199,35 +199,35 @@ public:
 	}
 
 	// deatch the entire list, returning the head, but don't free memory
-	T *detach_all()
+	_ElementType *detach_all()
 	{
-		T *result = m_head;
+		_ElementType *result = m_head;
 		m_head = m_tail = NULL;
 		m_count = 0;
 		return result;
 	}
 
 	// remove the given object and free its memory
-	void remove(T &object)
+	void remove(_ElementType &object)
 	{
 		detach(object);
 		pool_free(m_pool, &object);
 	}
 
 	// find an object by index in the list
-	T *find(int index) const
+	_ElementType *find(int index) const
 	{
-		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
 			if (index-- == 0)
 				return cur;
 		return NULL;
 	}
 
 	// return the index of the given object in the list
-	int indexof(const T &object) const
+	int indexof(const _ElementType &object) const
 	{
 		int index = 0;
-		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
+		for (_ElementType *cur = m_head; cur != NULL; cur = cur->m_next)
 		{
 			if (cur == &object)
 				return index;
@@ -238,8 +238,8 @@ public:
 
 private:
 	// internal state
-	T *				m_head;			// head of the singly-linked list
-	T *				m_tail;			// tail of the singly-linked list
+	_ElementType *	m_head;			// head of the singly-linked list
+	_ElementType *	m_tail;			// tail of the singly-linked list
 	resource_pool &	m_pool;			// resource pool where objects are freed
 	int 			m_count;		// number of objects in the list
 };
@@ -250,36 +250,36 @@ private:
 // a simple_list_wrapper wraps an existing object with a next pointer so it
 // can live in a simple_list without requiring the object to have a next
 // pointer
-template<class T>
+template<class _ObjectType>
 class simple_list_wrapper
 {
 public:
 	// construction/destruction
-	simple_list_wrapper(T *object)
+	simple_list_wrapper(_ObjectType *object)
 		: m_next(NULL),
 		  m_object(object) { }
 
 	// operators
-	operator T *() { return m_object; }
-	operator T *() const { return m_object; }
-	T *operator *() { return m_object; }
-	T *operator *() const { return m_object; }
+	operator _ObjectType *() { return m_object; }
+	operator _ObjectType *() const { return m_object; }
+	_ObjectType *operator *() { return m_object; }
+	_ObjectType *operator *() const { return m_object; }
 
 	// getters
 	simple_list_wrapper *next() const { return m_next; }
-	T *object() const { return m_object; }
+	_ObjectType *object() const { return m_object; }
 
 private:
 	// internal state
 	simple_list_wrapper *	m_next;
-	T *						m_object;
+	_ObjectType *			m_object;
 };
 
 
 // ======================> fixed_allocator
 
 // a fixed_allocator is a simple class that maintains a free pool of objects
-template<class T>
+template<class _ItemType>
 class fixed_allocator
 {
 	// we don't support deep copying
@@ -291,31 +291,31 @@ public:
 		: m_freelist(pool) { }
 
 	// allocate a new item, either by recycling an old one, or by allocating a new one
-	T *alloc()
+	_ItemType *alloc()
 	{
-		T *result = m_freelist.detach_head();
+		_ItemType *result = m_freelist.detach_head();
 		if (result == NULL)
-			result = m_freelist.pool().add_object(new T);
+			result = m_freelist.pool().add_object(new _ItemType);
 		return result;
 	}
 
 	// reclaim an item by adding it to the free list
-	void reclaim(T *item) { if (item != NULL) m_freelist.append(*item); }
-	void reclaim(T &item) { m_freelist.append(item); }
+	void reclaim(_ItemType *item) { if (item != NULL) m_freelist.append(*item); }
+	void reclaim(_ItemType &item) { m_freelist.append(item); }
 
 	// reclaim all items from a list
-	void reclaim_all(simple_list<T> &list) { m_freelist.append_list(list); }
+	void reclaim_all(simple_list<_ItemType> &list) { m_freelist.append_list(list); }
 
 private:
 	// internal state
-	simple_list<T>	m_freelist;		// list of free objects
+	simple_list<_ItemType>	m_freelist;		// list of free objects
 };
 
 
 // ======================> tagged_list
 
 // a tagged_list is a class that maintains a list of objects that can be quickly looked up by tag
-template<class T>
+template<class _ElementType>
 class tagged_list
 {
 	// we don't support deep copying
@@ -328,15 +328,15 @@ public:
 
 	// simple getters
 	resource_pool &pool() const { return m_list.pool(); }
-	T *first() const { return m_list.first(); }
-	T *last() const { return m_list.last(); }
+	_ElementType *first() const { return m_list.first(); }
+	_ElementType *last() const { return m_list.last(); }
 	int count() const { return m_list.count(); }
 
 	// remove (free) all objects in the list, leaving an empty list
 	void reset() { m_list.reset(); m_map.reset(); }
 
 	// add the given object to the head of the list
-	T &prepend(const char *tag, T &object)
+	_ElementType &prepend(const char *tag, _ElementType &object)
 	{
 		if (m_map.add_unique_hash(tag, &object, false) != TMERR_NONE)
 			throw emu_fatalerror("Error adding object named '%s'", tag);
@@ -344,7 +344,7 @@ public:
 	}
 
 	// add the given object to the tail of the list
-	T &append(const char *tag, T &object)
+	_ElementType &append(const char *tag, _ElementType &object)
 	{
 		if (m_map.add_unique_hash(tag, &object, false) != TMERR_NONE)
 			throw emu_fatalerror("Error adding object named '%s'", tag);
@@ -352,7 +352,7 @@ public:
 	}
 
 	// insert the given object after a particular object (NULL means prepend)
-	T &insert_after(const char *tag, T &object, T *insert_after)
+	_ElementType &insert_after(const char *tag, _ElementType &object, _ElementType *insert_after)
 	{
 		if (m_map.add_unique_hash(tag, &object, false) != TMERR_NONE)
 			throw emu_fatalerror("Error adding object named '%s'", tag);
@@ -360,7 +360,7 @@ public:
 	}
 
 	// replace an item in the list at the same location, and remove it
-	T &replace_and_remove(const char *tag, T &object, T &toreplace)
+	_ElementType &replace_and_remove(const char *tag, _ElementType &object, _ElementType &toreplace)
 	{
 		m_map.remove(&toreplace);
 		m_list.replace_and_remove(object, toreplace);
@@ -370,41 +370,41 @@ public:
 	}
 
 	// detach the given item from the list, but don't free its memory
-	T &detach(T &object)
+	_ElementType &detach(_ElementType &object)
 	{
 		m_map.remove(&object);
 		return m_list.detach(object);
 	}
 
 	// remove the given object and free its memory
-	void remove(T &object)
+	void remove(_ElementType &object)
 	{
 		m_map.remove(&object);
 		return m_list.remove(object);
 	}
 
 	// find an object by index in the list
-	T *find(int index) const
+	_ElementType *find(int index) const
 	{
 		return m_list.find(index);
 	}
 
 	// return the index of the given object in the list
-	int indexof(const T &object) const
+	int indexof(const _ElementType &object) const
 	{
 		return m_list.indexof(object);
 	}
 
 	// operations by tag
-	T &replace_and_remove(const char *tag, T &object) { T *existing = find(tag); return (existing == NULL) ? append(tag, object) : replace_and_remove(tag, object, *existing); }
-	void remove(const char *tag) { T *object = find(tag); if (object != NULL) remove(*object); }
-	T *find(const char *tag) const { return m_map.find_hash_only(tag); }
-	int indexof(const char *tag) const { T *object = find(tag); return (object != NULL) ? m_list.indexof(*object) : NULL; }
+	_ElementType &replace_and_remove(const char *tag, _ElementType &object) { _ElementType *existing = find(tag); return (existing == NULL) ? append(tag, object) : replace_and_remove(tag, object, *existing); }
+	void remove(const char *tag) { _ElementType *object = find(tag); if (object != NULL) remove(*object); }
+	_ElementType *find(const char *tag) const { return m_map.find_hash_only(tag); }
+	int indexof(const char *tag) const { _ElementType *object = find(tag); return (object != NULL) ? m_list.indexof(*object) : NULL; }
 
 private:
 	// internal state
-	simple_list<T>		m_list;
-	tagmap_t<T *>		m_map;
+	simple_list<_ElementType>	m_list;
+	tagmap_t<_ElementType *>	m_map;
 };
 
 

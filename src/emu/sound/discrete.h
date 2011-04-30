@@ -3751,23 +3751,23 @@ enum
  * add and delete may be slow - the focus is on access!
  */
 
-template<class T> struct dynamic_array_t
+template<class _ElementType> struct dynamic_array_t
 {
 public:
 	dynamic_array_t(int initial) {
 		m_count = 0;
 		m_allocated = initial;
-		m_arr = global_alloc_array_clear(T, m_allocated);
+		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
 	dynamic_array_t()  {
 		m_count = 0;
 		m_allocated = 16;
-		m_arr = global_alloc_array_clear(T, m_allocated);
+		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 	}
 	~dynamic_array_t() {
 		global_free(m_arr);
 	}
-	T& operator [] (unsigned int index) const // get array item
+	_ElementType& operator [] (unsigned int index) const // get array item
 	{
 		return m_arr[index];
 	}
@@ -3778,7 +3778,7 @@ public:
 		if (m_allocated < 16)
 			m_allocated = 16;
 		m_count = a.count();
-		m_arr = global_alloc_array_clear(T, m_allocated);
+		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 	}
@@ -3789,18 +3789,18 @@ public:
 		if (m_allocated < 16)
 			m_allocated = 16;
 		m_count = a.count();
-		m_arr = global_alloc_array_clear(T, m_allocated);
+		m_arr = global_alloc_array_clear(_ElementType, m_allocated);
 		for (int i=0; i < m_count; i++)
 			m_arr[i] = a[i];
 	    return *this;
 	}
 
-	inline T* add(T object)
+	inline _ElementType* add(_ElementType object)
 	{
 		if (m_count >= m_allocated)
 		{
 			m_allocated *= 2;
-			T *newarr = global_alloc_array_clear(T, m_allocated);
+			_ElementType *newarr = global_alloc_array_clear(_ElementType, m_allocated);
 			for (int i=0; i < m_count; i++)
 				newarr[i] = m_arr[i];
 			global_free(m_arr);
@@ -3818,10 +3818,10 @@ public:
 	}
 	inline void clear(void) { m_count = 0;	}
 	inline int count(void) const { return m_count; }
-	inline T *begin_ptr(void) const { return m_arr; }
-	inline T *end_ptr(void) const { return m_arr + (m_count - 1); }
+	inline _ElementType *begin_ptr(void) const { return m_arr; }
+	inline _ElementType *end_ptr(void) const { return m_arr + (m_count - 1); }
 private:
-	T	*m_arr;
+	_ElementType	*m_arr;
 	int	m_count;
 	int m_allocated;
 };

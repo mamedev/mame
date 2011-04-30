@@ -121,7 +121,7 @@ struct drcbe_info
 // a drcuml_block describes a basic block of instructions
 class drcuml_block
 {
-	template<class T> friend class simple_list;
+	friend class simple_list<drcuml_block>;
 
 public:
 	// construction/destruction
@@ -232,7 +232,7 @@ private:
 	class symbol
 	{
 		friend class drcuml_state;
-		template<class T> friend class simple_list;
+		friend class simple_list<symbol>;
 
 		// construction/destruction
 		symbol(void *base, UINT32 length, const char *name)

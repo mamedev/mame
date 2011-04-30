@@ -340,7 +340,7 @@ public:
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 	driver_device *driver_data() const { return m_driver_device; }
-	template<class T> T *driver_data() const { return downcast<T *>(m_driver_device); }
+	template<class _DriverClass> _DriverClass *driver_data() const { return downcast<_DriverClass *>(m_driver_device); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
@@ -360,7 +360,7 @@ public:
 
 	// fetch items by name
 	inline device_t *device(const char *tag);
-	template<class T> inline T *device(const char *tag) { return downcast<T *>(device(tag)); }
+	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
 	inline const input_port_config *port(const char *tag);
 	inline const memory_region *region(const char *tag);
 
@@ -588,12 +588,12 @@ protected:
 
 
 // this template function creates a stub which constructs a device
-template<class T>
+template<class _DriverClass>
 device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
 	assert(owner == NULL);
 	assert(clock == 0);
-	return global_alloc_clear(T(mconfig, &driver_device_creator<T>, tag));
+	return global_alloc_clear(_DriverClass(mconfig, &driver_device_creator<_DriverClass>, tag));
 }
 
 

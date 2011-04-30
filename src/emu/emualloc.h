@@ -231,40 +231,41 @@ public:
 
 
 // a resource_pool_object is a simple object wrapper for the templatized type
-template<class T> class resource_pool_object : public resource_pool_item
+template<class _ObjectClass>
+class resource_pool_object : public resource_pool_item
 {
 private:
-	resource_pool_object<T>(const resource_pool_object<T> &);
-	resource_pool_object<T> &operator=(const resource_pool_object<T> &);
+	resource_pool_object<_ObjectClass>(const resource_pool_object<_ObjectClass> &);
+	resource_pool_object<_ObjectClass> &operator=(const resource_pool_object<_ObjectClass> &);
 
 public:
-	resource_pool_object(T *object)
-		: resource_pool_item(reinterpret_cast<void *>(object), sizeof(T)),
+	resource_pool_object(_ObjectClass *object)
+		: resource_pool_item(reinterpret_cast<void *>(object), sizeof(_ObjectClass)),
 		  m_object(object) { }
 	virtual ~resource_pool_object() { delete m_object; }
 
 private:
-	T *						m_object;
+	_ObjectClass *			m_object;
 };
 
 
 // a resource_pool_array is a simple object wrapper for an allocated array of
 // the templatized type
-template<class T> class resource_pool_array : public resource_pool_item
+template<class _ObjectClass> class resource_pool_array : public resource_pool_item
 {
 private:
-	resource_pool_array<T>(const resource_pool_array<T> &);
-	resource_pool_array<T> &operator=(const resource_pool_array<T> &);
+	resource_pool_array<_ObjectClass>(const resource_pool_array<_ObjectClass> &);
+	resource_pool_array<_ObjectClass> &operator=(const resource_pool_array<_ObjectClass> &);
 
 public:
-	resource_pool_array(T *array, int count)
-		: resource_pool_item(reinterpret_cast<void *>(array), sizeof(T) * count),
+	resource_pool_array(_ObjectClass *array, int count)
+		: resource_pool_item(reinterpret_cast<void *>(array), sizeof(_ObjectClass) * count),
 		  m_array(array),
 		  m_count(count) { }
 	virtual ~resource_pool_array() { delete[] m_array; }
 
 private:
-	T *						m_array;
+	_ObjectClass *			m_array;
 	int 					m_count;
 };
 
@@ -288,8 +289,8 @@ public:
 	bool contains(void *ptrstart, void *ptrend);
 	void clear();
 
-	template<class T> T *add_object(T* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<T>(object)); return object; }
-	template<class T> T *add_array(T* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<T>(array, count)); return array; }
+	template<class _ObjectClass> _ObjectClass *add_object(_ObjectClass* object) { add(*EMUALLOC_SELF_NEW resource_pool_object<_ObjectClass>(object)); return object; }
+	template<class _ObjectClass> _ObjectClass *add_array(_ObjectClass* array, int count) { add(*EMUALLOC_SELF_NEW resource_pool_array<_ObjectClass>(array, count)); return array; }
 
 private:
 	int						m_hash_size;

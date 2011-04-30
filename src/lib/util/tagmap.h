@@ -128,7 +128,7 @@ void tagmap_remove_object(tagmap *map, void *object);
 #ifdef __cplusplus
 
 /* derived class for C++ */
-template<class T> class tagmap_t : public tagmap
+template<class _ElementType> class tagmap_t : public tagmap
 {
 private:
 	tagmap_t(const tagmap &);
@@ -140,14 +140,14 @@ public:
 
 	void reset() { tagmap_reset(this); }
 
-	tagmap_error add(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add(this, tag, (void *)object, replace_if_duplicate); }
-	tagmap_error add_unique_hash(const char *tag, T object, bool replace_if_duplicate = false) { return tagmap_add_unique_hash(this, tag, (void *)object, replace_if_duplicate); }
+	tagmap_error add(const char *tag, _ElementType object, bool replace_if_duplicate = false) { return tagmap_add(this, tag, (void *)object, replace_if_duplicate); }
+	tagmap_error add_unique_hash(const char *tag, _ElementType object, bool replace_if_duplicate = false) { return tagmap_add_unique_hash(this, tag, (void *)object, replace_if_duplicate); }
 	void remove(const char *tag) { tagmap_remove(this, tag); }
-	void remove(T object) { tagmap_remove_object(this, object); }
+	void remove(_ElementType object) { tagmap_remove_object(this, object); }
 
-	T find(const char *tag) const { return reinterpret_cast<T>(tagmap_find(this, tag)); }
-	T find(const char *tag, UINT32 hash) const { return reinterpret_cast<T>(tagmap_find_prehashed(this, tag, hash)); }
-	T find_hash_only(const char *tag) const { return reinterpret_cast<T>(tagmap_find_hash_only(this, tag)); }
+	_ElementType find(const char *tag) const { return reinterpret_cast<_ElementType>(tagmap_find(this, tag)); }
+	_ElementType find(const char *tag, UINT32 hash) const { return reinterpret_cast<_ElementType>(tagmap_find_prehashed(this, tag, hash)); }
+	_ElementType find_hash_only(const char *tag) const { return reinterpret_cast<_ElementType>(tagmap_find_hash_only(this, tag)); }
 };
 
 #endif

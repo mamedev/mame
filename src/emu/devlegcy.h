@@ -205,10 +205,10 @@ deviceclass::deviceclass(const machine_config &mconfig, device_type type, const 
 const device_type name = &legacy_device_creator<deviceclass>
 
 // this template function creates a stub which constructs a device
-template<class T>
+template<class _DeviceClass>
 device_t *legacy_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
-	return global_alloc(T(mconfig, &legacy_device_creator<T>, tag, owner, clock));
+	return global_alloc(_DeviceClass(mconfig, &legacy_device_creator<_DeviceClass>, tag, owner, clock));
 }
 
 

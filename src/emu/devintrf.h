@@ -106,10 +106,10 @@ typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag,
 
 
 // this template function creates a stub which constructs a device
-template<class T>
+template<class _DeviceClass>
 device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 {
-	return global_alloc(T(mconfig, tag, owner, clock));
+	return global_alloc(_DeviceClass(mconfig, tag, owner, clock));
 }
 
 
@@ -158,8 +158,8 @@ public:
 	device_t *find(device_type type, int index) const;
 
 	// provide interface-specific overrides
-	template<class I>
-	bool first(I *&intf) const;
+	template<class _InterfaceClass>
+	bool first(_InterfaceClass *&intf) const;
 	
 private:
 	// internal helpers
@@ -215,9 +215,9 @@ public:
 	device_t *owner() const { return m_owner; }
 
 	// interface helpers
-	template<class T> bool interface(T *&intf) { intf = dynamic_cast<T *>(this); return (intf != NULL); }
-	template<class T> bool interface(T *&intf) const { intf = dynamic_cast<const T *>(this); return (intf != NULL); }
-	template<class T> bool next(T *&intf) const
+	template<class _DeviceClass> bool interface(_DeviceClass *&intf) { intf = dynamic_cast<_DeviceClass *>(this); return (intf != NULL); }
+	template<class _DeviceClass> bool interface(_DeviceClass *&intf) const { intf = dynamic_cast<const _DeviceClass *>(this); return (intf != NULL); }
+	template<class _DeviceClass> bool next(_DeviceClass *&intf) const
 	{
 		for (device_t *cur = m_next; cur != NULL; cur = cur->m_next)
 			if (cur->interface(intf))
@@ -241,8 +241,8 @@ public:
 	const memory_region *subregion(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class T> inline T *subdevice(const char *tag) { return downcast<T *>(subdevice(tag)); }
-	template<class T> inline T *siblingdevice(const char *tag) { return downcast<T *>(siblingdevice(tag)); }
+	template<class _DeviceClass> inline _DeviceClass *subdevice(const char *tag) { return downcast<_DeviceClass *>(subdevice(tag)); }
+	template<class _DeviceClass> inline _DeviceClass *siblingdevice(const char *tag) { return downcast<_DeviceClass *>(siblingdevice(tag)); }
 	const memory_region *region() const { return m_region; }
 
 	// configuration helpers
@@ -273,10 +273,10 @@ public:
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// state saving interfaces
-	template<typename T>
-	void save_item(T &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(name(), tag(), index, value, valname); }
-	template<typename T>
-	void save_pointer(T *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(name(), tag(), index, value, valname, count); }
+	template<typename _ItemType>
+	void save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != NULL); m_save->save_item(name(), tag(), index, value, valname); }
+	template<typename _ItemType>
+	void save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != NULL); m_save->save_pointer(name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
@@ -477,7 +477,7 @@ public:
 
 	// iteration helpers
 	device_interface *interface_next() const { return m_interface_next; }
-	template<class T> bool next(T *&intf) const { return m_device.next(intf); }
+	template<class _InterfaceClass> bool next(_InterfaceClass *&intf) const { return m_device.next(intf); }
 
 	// optional operation overrides
 	virtual void interface_config_complete();
@@ -530,8 +530,8 @@ inline astring &device_t::siblingtag(astring &dest, const char *_tag) const
 }
 
 
-template<class I>
-bool device_list::first(I *&intf) const
+template<class _InterfaceClass>
+bool device_list::first(_InterfaceClass *&intf) const
 {
 	for (device_t *cur = super::first(); cur != NULL; cur = cur->next())
 		if (cur->interface(intf))
