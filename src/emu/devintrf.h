@@ -164,8 +164,8 @@ public:
 private:
 	// internal helpers
 	void exit();
-	static void static_pre_save(running_machine &machine, void *param);
-	static void static_post_load(running_machine &machine, void *param);
+	void presave_all();
+	void postload_all();
 
 	// internal state
 	running_machine *m_machine;

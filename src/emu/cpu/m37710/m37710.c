@@ -877,10 +877,8 @@ static CPU_DISASSEMBLE( m37710 )
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
 
-static STATE_POSTLOAD( m37710_restore_state )
+static void m37710_restore_state(m37710i_cpu_struct *cpustate)
 {
-	m37710i_cpu_struct *cpustate = (m37710i_cpu_struct *)param;
-
 	// restore proper function pointers
 	m37710i_set_execution_mode(cpustate, (FLAG_M>>4) | (FLAG_X>>4));
 
@@ -949,7 +947,7 @@ static CPU_INIT( m37710 )
 	device->save_item(NAME(cpustate->reload[6]));
 	device->save_item(NAME(cpustate->reload[7]));
 
-	device->machine().save().register_postload(m37710_restore_state, cpustate);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(m37710_restore_state), cpustate));
 }
 
 /**************************************************************************

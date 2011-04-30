@@ -153,7 +153,7 @@ struct _mc6845_t
 };
 
 
-static STATE_POSTLOAD( mc6845_state_save_postload );
+static void mc6845_state_save_postload(mc6845_t *mc6845);
 static void recompute_parameters(mc6845_t *mc6845, int postload);
 static void update_upd_adr_timer(mc6845_t *mc6845);
 static void update_cursor_state(mc6845_t *mc6845);
@@ -179,9 +179,9 @@ INLINE mc6845_t *get_safe_token(device_t *device)
 }
 
 
-static STATE_POSTLOAD( mc6845_state_save_postload )
+static void mc6845_state_save_postload(mc6845_t *mc6845)
 {
-	recompute_parameters((mc6845_t *)param, TRUE);
+	recompute_parameters(mc6845, TRUE);
 }
 
 
@@ -924,7 +924,7 @@ static void common_start(device_t *device, int device_type)
 	mc6845->vert_char_total = 0x7f;
 
 	/* register for state saving */
-	device->machine().save().register_postload(mc6845_state_save_postload, mc6845);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(mc6845_state_save_postload), mc6845));
 
 	device->save_item(NAME(mc6845->clock));
 	device->save_item(NAME(mc6845->hpixels_per_column));

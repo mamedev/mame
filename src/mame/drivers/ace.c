@@ -317,7 +317,7 @@ static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( NULL          , 0x8000, scorelayout, 0, 2 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
-static STATE_POSTLOAD( ace_postload )
+static void ace_postload(running_machine &machine)
 {
 	gfx_element_mark_dirty(machine.gfx[1], 0);
 	gfx_element_mark_dirty(machine.gfx[2], 0);
@@ -329,7 +329,7 @@ static MACHINE_START( ace )
 {
 	ace_state *state = machine.driver_data<ace_state>();
 	state->save_item(NAME(state->m_objpos));
-	machine.save().register_postload(ace_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(ace_postload), &machine));
 }
 
 static MACHINE_RESET( ace )

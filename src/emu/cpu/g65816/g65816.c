@@ -318,10 +318,8 @@ static CPU_DISASSEMBLE( g65816 )
 	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
 
-static STATE_POSTLOAD( g65816_restore_state )
+static void g65816_restore_state(g65816i_cpu_struct *cpustate)
 {
-	g65816i_cpu_struct *cpustate = (g65816i_cpu_struct *)param;
-
 	// restore proper function pointers
 	g65816i_set_execution_mode(cpustate, (FLAG_M>>4) | (FLAG_X>>4));
 
@@ -365,7 +363,7 @@ static CPU_INIT( g65816 )
 	device->save_item(NAME(cpustate->irq_delay));
 	device->save_item(NAME(cpustate->stopped));
 
-	device->machine().save().register_postload(g65816_restore_state, cpustate);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(g65816_restore_state), cpustate));
 }
 
 /**************************************************************************

@@ -67,25 +67,8 @@ enum save_error
 //  MACROS
 //**************************************************************************
 
-// macros to declare presave/postload functions with the appropriate parameters
-#define STATE_PRESAVE(name) void name(running_machine &machine, void *param)
-#define STATE_POSTLOAD(name) void name(running_machine &machine, void *param)
-
-
-// templates to assume the 'param' of a presave/postload function is a class pointer
-template<class T, void (T::*func)()>
-void state_presave_stub(running_machine &machine, void *param)
-{
-	T *target = reinterpret_cast<T *>(param);
-	(target->*func)();
-}
-
-template<class T, void (T::*func)()>
-void state_postload_stub(running_machine &machine, void *param)
-{
-	T *target = reinterpret_cast<T *>(param);
-	(target->*func)();
-}
+// callback delegate for presave/postload
+typedef delegate<void ()> save_prepost_delegate;
 
 
 // use this to declare a given type is a simple, non-pointer type that can be
@@ -142,8 +125,6 @@ class save_manager
 	template<typename T> struct type_checker<T*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
 public:
-	typedef void (*prepost_func)(running_machine &machine, void *param);
-
 	// construction/destruction
 	save_manager(running_machine &machine);
 
@@ -157,8 +138,8 @@ public:
 	const char *indexed_item(int index, void *&base, UINT32 &valsize, UINT32 &valcount) const;
 
 	// function registration
-	void register_presave(prepost_func func, void *param);
-	void register_postload(prepost_func func, void *param);
+	void register_presave(save_prepost_delegate func);
+	void register_postload(save_prepost_delegate func);
 
 	// generic memory registration
 	void save_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount = 1);
@@ -218,15 +199,14 @@ private:
 	{
 	public:
 		// construction/destruction
-		state_callback(prepost_func callback, void *param);
+		state_callback(save_prepost_delegate callback);
 
 		// getters
 		state_callback *next() const { return m_next; }
 
 		// state
 		state_callback *	m_next;					// pointer to next entry
-		void *				m_param;				// function parameter
-		prepost_func		m_func;					// pointer to the function
+		save_prepost_delegate m_func;				// delegate
 	};
 
 	class state_entry

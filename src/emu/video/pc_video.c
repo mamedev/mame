@@ -29,7 +29,7 @@ static const UINT16 dummy_palette[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
 /**************************************************************************/
 
-static STATE_POSTLOAD( pc_video_postload )
+static void pc_video_postload(running_machine &machine)
 {
 	pc_anythingdirty = 1;
 	pc_current_height = -1;
@@ -53,7 +53,7 @@ void pc_video_start(running_machine &machine,
 		video_start_generic_bitmapped(machine);
 	}
 
-	machine.save().register_postload(pc_video_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(pc_video_postload), &machine));
 }
 
 

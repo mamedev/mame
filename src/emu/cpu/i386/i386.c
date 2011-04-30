@@ -516,10 +516,8 @@ static CPU_DEBUG_INIT( i386 )
 
 /*************************************************************************/
 
-static STATE_POSTLOAD( i386_postload )
+static void i386_postload(i386_state *cpustate)
 {
-	legacy_cpu_device *device = (legacy_cpu_device *)param;
-	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)
 		i386_load_segment_descriptor(cpustate,i);
@@ -614,7 +612,7 @@ static CPU_INIT( i386 )
 	device->save_item(NAME(cpustate->ldtr.flags));
 	device->save_item(NAME(cpustate->irq_state));
 	device->save_item(NAME(cpustate->performed_intersegment_jump));
-	device->machine().save().register_postload(i386_postload, (void *)device);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(i386_postload), cpustate));
 }
 
 static void build_opcode_table(i386_state *cpustate, UINT32 features)

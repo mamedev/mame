@@ -2071,11 +2071,6 @@ static void cps1_update_transmasks( running_machine &machine )
 	}
 }
 
-static STATE_POSTLOAD( cps_postload )
-{
-	cps1_get_video_base(machine);
-}
-
 static VIDEO_START( cps )
 {
 	cps_state *state = machine.driver_data<cps_state>();
@@ -2172,7 +2167,7 @@ static VIDEO_START( cps )
 		state->save_pointer(NAME(state->m_cps2_buffered_obj), state->m_cps2_obj_size / 2);
 	}
 
-	machine.save().register_postload(cps_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(cps1_get_video_base), &machine));
 }
 
 VIDEO_START( cps1 )

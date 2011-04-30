@@ -1631,9 +1631,8 @@ void psx_machine_init( running_machine &machine )
 	psx_gpu_reset(machine);
 }
 
-static STATE_POSTLOAD( psx_postload )
+static void psx_postload(psx_machine *p_psx)
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 	int n;
 
 	psx_irq_update(p_psx);
@@ -1759,5 +1758,5 @@ void psx_driver_init( running_machine &machine )
 	state_save_register_global_array( machine, p_psx->mdec.p_n_quantize_uv );
 	state_save_register_global_array( machine, p_psx->mdec.p_n_cos );
 
-	machine.save().register_postload( psx_postload, NULL );
+	machine.save().register_postload( save_prepost_delegate(FUNC(psx_postload), p_psx ));
 }

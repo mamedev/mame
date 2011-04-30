@@ -1972,7 +1972,7 @@ static void K056832_change_rombank(void)
 	K056832_CurGfxBank = bank % K056832_NumGfxBanks;
 }
 
-static STATE_POSTLOAD( K056832_postload )
+static void K056832_postload(running_machine &machine)
 {
 	K056832_UpdatePageLayout();
 	K056832_change_rambank();
@@ -2204,7 +2204,7 @@ void K056832_vh_start(running_machine &machine, const char *gfx_memory_region, i
 	state_save_register_global_array(machine, K056832_dy);
 	state_save_register_global_array(machine, K056832_LayerTileMode);
 
-	machine.save().register_postload(K056832_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(K056832_postload), &machine));
 }
 
 

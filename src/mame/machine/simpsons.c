@@ -71,7 +71,7 @@ static KONAMI_SETLINES_CALLBACK( simpsons_banking )
 	memory_set_bank(device->machine(), "bank1", lines & 0x3f);
 }
 
-static STATE_POSTLOAD( simpsons_postload )
+static void simpsons_postload(running_machine &machine)
 {
 	simpsons_state *state = machine.driver_data<simpsons_state>();
 
@@ -101,7 +101,7 @@ MACHINE_START( simpsons )
 	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 	state->save_pointer(NAME(state->m_xtraram), 0x1000);
 	state->save_pointer(NAME(state->m_spriteram), 0x1000 / 2);
-	machine.save().register_postload(simpsons_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(simpsons_postload), &machine));
 }
 
 MACHINE_RESET( simpsons )

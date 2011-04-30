@@ -53,7 +53,7 @@ public:
 
 /*----------- defined in drivers/wardner.c -----------*/
 
-STATE_POSTLOAD( wardner_restore_bank );
+void wardner_restore_bank(running_machine &machine);
 
 /*----------- defined in machine/twincobr.c -----------*/
 

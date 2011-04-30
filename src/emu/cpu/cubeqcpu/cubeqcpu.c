@@ -250,11 +250,6 @@ READ16_DEVICE_HANDLER( cubeqcpu_rotram_r )
     SOUND INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static STATE_POSTLOAD( cquestsnd_postload )
-{
-
-}
-
 static void cquestsnd_state_register(device_t *device)
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
@@ -274,8 +269,6 @@ static void cquestsnd_state_register(device_t *device)
 	device->save_item(NAME(cpustate->ramwlatch));
 	device->save_item(NAME(cpustate->prev_ipram));
 	device->save_item(NAME(cpustate->prev_ipwrt));
-
-	device->machine().save().register_postload(cquestsnd_postload, (void *)device);
 }
 
 static CPU_INIT( cquestsnd )
@@ -315,11 +308,6 @@ static CPU_EXIT( cquestsnd )
     ROTATE INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static STATE_POSTLOAD( cquestrot_postload )
-{
-
-}
-
 static void cquestrot_state_register(device_t *device)
 {
 	cquestrot_state *cpustate = get_safe_token_rot(device);
@@ -348,8 +336,6 @@ static void cquestrot_state_register(device_t *device)
 
 	device->save_pointer(NAME(cpustate->dram), 16384);
 	device->save_pointer(NAME(cpustate->sram), 2048);
-
-	device->machine().save().register_postload(cquestrot_postload, (void *)device);
 }
 
 static CPU_INIT( cquestrot )
@@ -394,11 +380,6 @@ static CPU_EXIT( cquestrot )
 #define ODD_FIELD		0
 #define EVEN_FIELD		1
 
-static STATE_POSTLOAD( cquestlin_postload )
-{
-
-}
-
 static void cquestlin_state_register(device_t *device)
 {
 	cquestlin_state *cpustate = get_safe_token_lin(device);
@@ -432,8 +413,6 @@ static void cquestlin_state_register(device_t *device)
 	device->save_pointer(NAME(cpustate->ptr_ram), 1024);
 	device->save_pointer(NAME(cpustate->e_stack), 32768);
 	device->save_pointer(NAME(cpustate->o_stack), 32768);
-
-	device->machine().save().register_postload(cquestlin_postload, (void *)device);
 }
 
 static CPU_INIT( cquestlin )

@@ -923,7 +923,7 @@ However sync to vblank is lacking, which is causing the
 graphics glitches.
 ***********************************************************/
 
-static STATE_POSTLOAD( wgp_postload )
+static void wgp_postload(running_machine &machine)
 {
 	parse_control(machine);
 	reset_sound_region(machine);
@@ -964,7 +964,7 @@ static MACHINE_START( wgp )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_port_sel));
-	machine.save().register_postload(wgp_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(wgp_postload), &machine));
 }
 
 static const tc0100scn_interface wgp_tc0100scn_intf =

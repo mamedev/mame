@@ -150,7 +150,7 @@ INLINE void update_bank(atarig1_state *state, int bank)
 }
 
 
-static STATE_POSTLOAD( pitfightb_state_postload )
+static void pitfightb_state_postload(running_machine &machine)
 {
 	atarig1_state *state = machine.driver_data<atarig1_state>();
 	int bank = state->m_bslapstic_bank;
@@ -1228,7 +1228,7 @@ static void init_g1_common(running_machine &machine, offs_t slapstic_base, int s
 		pitfightb_cheap_slapstic_init(machine);
 		state->save_item(NAME(state->m_bslapstic_bank));
 		state->save_item(NAME(state->m_bslapstic_primed));
-		machine.save().register_postload(pitfightb_state_postload, NULL);
+		machine.save().register_postload(save_prepost_delegate(FUNC(pitfightb_state_postload), &machine));
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(machine.device("maincpu"), slapstic_base, 0, slapstic);

@@ -203,10 +203,8 @@ static void h8_setreg32(h83xx_state *h8, UINT8 reg, UINT32 data)
 	h8->regs[reg] = data;
 }
 
-static STATE_POSTLOAD( h8_onstateload )
+static void h8_onstateload(h83xx_state *h8)
 {
-	h83xx_state *h8 = (h83xx_state *)param;
-
 	h8_set_ccr(h8, h8->ccr);
 }
 
@@ -237,7 +235,7 @@ static CPU_INIT(h8)
 	device->save_item(NAME(h8->h8TSTR));
 	device->save_item(NAME(h8->h8TCNT));
 
-	device->machine().save().register_postload(h8_onstateload, h8);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(h8_onstateload), h8));
 
 	h8_itu_init(h8);
 }

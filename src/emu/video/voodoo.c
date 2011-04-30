@@ -632,9 +632,8 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 }
 
 
-static STATE_POSTLOAD( voodoo_postload )
+static void voodoo_postload(voodoo_state *v)
 {
-	voodoo_state *v = (voodoo_state *)param;
 	int index, subindex;
 
 	v->fbi.clut_dirty = TRUE;
@@ -656,7 +655,7 @@ static void init_save_state(device_t *device)
 	voodoo_state *v = get_safe_token(device);
 	int index, subindex;
 
-	device->machine().save().register_postload(voodoo_postload, v);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_postload), v));
 
 	/* register states: core */
 	device->save_item(NAME(v->extra_cycles));

@@ -751,7 +751,7 @@ static const tc0140syt_interface ninjaw_tc0140syt_intf =
 };
 
 
-static STATE_POSTLOAD( ninjaw_postload )
+static void ninjaw_postload(running_machine &machine)
 {
 	parse_control(machine);
 	reset_sound_region(machine);
@@ -783,7 +783,7 @@ static MACHINE_START( ninjaw )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_pandata));
-	machine.save().register_postload(ninjaw_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(ninjaw_postload), &machine));
 }
 
 static MACHINE_RESET( ninjaw )

@@ -283,7 +283,7 @@ WRITE16_HANDLER( nemesis_charram_word_w )
 }
 
 
-static STATE_POSTLOAD( nemesis_postload )
+static void nemesis_postload(running_machine &machine)
 {
 	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int i, offs;
@@ -330,7 +330,7 @@ VIDEO_START( nemesis )
 	gfx_element_set_source(machine.gfx[7], (UINT8 *)state->m_charram);
 
 	/* Set up save state */
-	machine.save().register_postload(nemesis_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine));
 }
 
 

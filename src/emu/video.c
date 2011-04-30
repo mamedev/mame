@@ -136,7 +136,7 @@ video_manager::video_manager(running_machine &machine)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(video_manager::exit), this));
-	machine.save().register_postload(state_postload_stub<video_manager, &video_manager::postload>, this);
+	machine.save().register_postload(save_prepost_delegate(FUNC(video_manager::postload), this));
 
 	// extract initial execution state from global configuration settings
 	update_refresh_speed();

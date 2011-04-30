@@ -886,11 +886,6 @@ static TIMER_CALLBACK( cojag_scanline_update )
 	} while (!adjust_object_timer(machine, vc));
 }
 
-static STATE_POSTLOAD( cojag_postload )
-{
-	update_cpu_irq(machine);
-}
-
 VIDEO_START( cojag )
 {
 	memset(&blitter_regs, 0, sizeof(blitter_regs));
@@ -910,7 +905,7 @@ VIDEO_START( cojag )
 	state_save_register_global_array(machine, blitter_regs);
 	state_save_register_global_array(machine, gpu_regs);
 	state_save_register_global(machine, cpu_irq_state);
-	machine.save().register_postload(cojag_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(update_cpu_irq), &machine));
 	pixel_clock = COJAG_PIXEL_CLOCK;
 }
 

@@ -103,12 +103,6 @@ static void reset_bank(running_machine &machine)
 }
 
 
-static STATE_POSTLOAD( atetris_postload )
-{
-	reset_bank(machine);
-}
-
-
 static MACHINE_START( atetris )
 {
 	atetris_state *state = machine.driver_data<atetris_state>();
@@ -119,7 +113,7 @@ static MACHINE_START( atetris )
 	/* Set up save state */
 	state->save_item(NAME(state->m_current_bank));
 	state->save_item(NAME(state->m_nvram_write_enable));
-	machine.save().register_postload(atetris_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_bank), &machine));
 }
 
 

@@ -1541,7 +1541,7 @@ UINT8 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
 //**************************************************************************
 
 // banking helpers
-static STATE_POSTLOAD( bank_reattach );
+static void bank_reattach(running_machine &machine);
 
 // debugging
 static void generate_memdump(running_machine &machine);
@@ -1590,7 +1590,7 @@ void memory_init(running_machine &machine)
 		space->locate_memory();
 
 	// register a callback to reset banks when reloading state
-	machine.save().register_postload(bank_reattach, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(bank_reattach), &machine));
 
 	// dump the final memory configuration
 	generate_memdump(machine);
@@ -1773,7 +1773,7 @@ static void generate_memdump(running_machine &machine)
 //  bank_reattach - reconnect banks after a load
 //-------------------------------------------------
 
-static STATE_POSTLOAD( bank_reattach )
+static void bank_reattach(running_machine &machine)
 {
 	// for each non-anonymous bank, explicitly reset its entry
 	for (memory_bank *bank = machine.memory_data->banklist.first(); bank != NULL; bank = bank->next())

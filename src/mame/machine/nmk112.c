@@ -97,10 +97,8 @@ WRITE16_DEVICE_HANDLER( nmk112_okibank_lsb_w )
 	}
 }
 
-static STATE_POSTLOAD( nmk112_postload_bankswitch )
+static void nmk112_postload_bankswitch(nmk112_state *nmk112)
 {
-	nmk112_state *nmk112 = (nmk112_state *)param;
-
 	for (int i = 0; i < 8; i++)
 		do_bankswitch(nmk112, i, nmk112->current_bank[i]);
 }
@@ -140,7 +138,7 @@ static DEVICE_START( nmk112 )
 	nmk112->page_mask = ~intf->disable_page_mask;
 
 	device->save_item(NAME(nmk112->current_bank));
-	device->machine().save().register_postload(nmk112_postload_bankswitch, nmk112);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(nmk112_postload_bankswitch), nmk112));
 }
 
 static DEVICE_RESET( nmk112 )

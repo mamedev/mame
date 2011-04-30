@@ -137,7 +137,7 @@ void s24_fd1094_machine_init(running_machine &machine)
 	machine.device("sub")->reset();
 }
 
-static STATE_POSTLOAD( s24_fd1094_postload )
+static void s24_fd1094_postload(running_machine &machine)
 {
 	if (fd1094_state != -1)
 	{
@@ -179,5 +179,5 @@ void s24_fd1094_driver_init(running_machine &machine)
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
-	machine.save().register_postload(s24_fd1094_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(s24_fd1094_postload), &machine));
 }

@@ -303,7 +303,7 @@ class address_space
 protected:
 	// construction/destruction
 	address_space(device_memory_interface &memory, address_spacenum spacenum, bool large);
-	~address_space();
+	virtual ~address_space();
 
 public:
 	// public allocator

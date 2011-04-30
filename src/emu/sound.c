@@ -112,7 +112,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	astring state_tag;
 	state_tag.printf("%d", m_device.machine().sound().m_stream_list.count());
 	m_device.machine().save().save_item("stream", state_tag, 0, NAME(m_sample_rate));
-	m_device.machine().save().register_postload(state_postload_stub<sound_stream, &sound_stream::postload>, this);
+	m_device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// save the gain of each input and output
 	for (int inputnum = 0; inputnum < m_inputs; inputnum++)

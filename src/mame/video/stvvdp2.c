@@ -5401,7 +5401,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 	return stv_vdp2_regs[offset];
 }
 
-static STATE_POSTLOAD( stv_vdp2_state_save_postload )
+static void stv_vdp2_state_save_postload(running_machine &machine)
 {
 	UINT8 *stv_vdp2_vram_decode = stv_vdp2_gfx_decode;
 	int offset;
@@ -5462,7 +5462,7 @@ static int stv_vdp2_start (running_machine &machine)
 	state_save_register_global_pointer(machine, stv_vdp2_regs, 0x040000/4);
 	state_save_register_global_pointer(machine, stv_vdp2_vram, 0x100000/4);
 	state_save_register_global_pointer(machine, stv_vdp2_cram, 0x080000/4);
-	machine.save().register_postload(stv_vdp2_state_save_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(stv_vdp2_state_save_postload), &machine));
 
 	return 0;
 }

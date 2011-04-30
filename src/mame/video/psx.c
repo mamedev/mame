@@ -555,7 +555,7 @@ static int DebugTextureDisplay( psx_gpu *p_psxgpu, bitmap_t *bitmap )
 
 #endif
 
-static STATE_POSTLOAD( updatevisiblearea )
+static void updatevisiblearea(running_machine &machine)
 {
 	psx_gpu *p_psxgpu = machine.driver_data<psx_state>()->m_p_psxgpu;
 	rectangle visarea;
@@ -785,7 +785,7 @@ static void psx_gpu_init( running_machine &machine, int n_gputype )
 	state_save_register_global( machine, p_psxgpu->n_iy );
 	state_save_register_global( machine, p_psxgpu->n_ti );
 
-	machine.save().register_postload( updatevisiblearea, NULL );
+	machine.save().register_postload( save_prepost_delegate(FUNC(updatevisiblearea), &machine ) );
 	machine.driver_data<psx_state>()->m_p_psxgpu = p_psxgpu;
 }
 
@@ -3715,7 +3715,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			p_psxgpu->n_twy = 0;
 			p_psxgpu->n_twh = 255;
 			p_psxgpu->n_tww = 255;
-			updatevisiblearea(space->machine(), NULL);
+			updatevisiblearea(space->machine());
 			break;
 		case 0x01:
 			verboselog( p_psxgpu, 1, "not handled: reset command buffer\n" );
@@ -3769,7 +3769,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			{
 				p_psxgpu->b_reverseflag = ( data >> 7 ) & 1;
 			}
-			updatevisiblearea(space->machine(), NULL);
+			updatevisiblearea(space->machine());
 			break;
 		case 0x09:
 			verboselog( p_psxgpu, 1, "not handled: GPU Control 0x09: %08x\n", data );

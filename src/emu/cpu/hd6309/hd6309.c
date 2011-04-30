@@ -503,11 +503,8 @@ static void check_irq_lines( m68_state_t *m68_state )
 
 
 
-static STATE_POSTLOAD( hd6309_postload )
+static void hd6309_postload(m68_state_t *m68_state)
 {
-	device_t *device = (legacy_cpu_device *)param;
-	m68_state_t *m68_state = get_safe_token(device);
-
 	UpdateState(m68_state);
 }
 
@@ -541,7 +538,7 @@ static CPU_INIT( hd6309 )
 	device->save_item(NAME(DP));
 	device->save_item(NAME(CC));
 	device->save_item(NAME(MD));
-	device->machine().save().register_postload(hd6309_postload, (void *) device);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(hd6309_postload), m68_state));
 	device->save_item(NAME(m68_state->int_state));
 	device->save_item(NAME(m68_state->nmi_state));
 	device->save_item(NAME(m68_state->irq_state[0]));

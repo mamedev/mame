@@ -245,11 +245,6 @@ static void setbank(running_machine &machine)
 	memory_set_bankptr(machine, "bank1", &RAM[state->m_bank ? 0x10000 : 0x4000]);
 }
 
-static STATE_POSTLOAD( renegade_postload )
-{
-	setbank(machine);
-}
-
 static MACHINE_START( renegade )
 {
 	renegade_state *state = machine.driver_data<renegade_state>();
@@ -259,7 +254,7 @@ static MACHINE_START( renegade )
 	state_save_register_global(machine, state->m_mcu_key);
 
 	state_save_register_global(machine, state->m_bank);
-	machine.save().register_postload(renegade_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(setbank), &machine));
 }
 
 static DRIVER_INIT( renegade )

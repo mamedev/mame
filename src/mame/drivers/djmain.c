@@ -1425,11 +1425,6 @@ static const k054539_interface k054539_config =
  *
  *************************************/
 
-static STATE_POSTLOAD( djmain_postload )
-{
-	sndram_set_bank(machine);
-}
-
 static MACHINE_START( djmain )
 {
 	djmain_state *state = machine.driver_data<djmain_state>();
@@ -1445,7 +1440,7 @@ static MACHINE_START( djmain )
 	state_save_register_global(machine, state->m_v_ctrl);
 	state_save_register_global_array(machine, state->m_obj_regs);
 
-	machine.save().register_postload(djmain_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(sndram_set_bank), &machine));
 }
 
 

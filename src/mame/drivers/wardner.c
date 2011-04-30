@@ -185,7 +185,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 	}
 }
 
-STATE_POSTLOAD( wardner_restore_bank )
+void wardner_restore_bank(running_machine &machine)
 {
 	wardner_state *state = machine.driver_data<wardner_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);

@@ -640,7 +640,7 @@ static const msm5205_interface msm5205_config =
                      MACHINE DRIVERS
 ***********************************************************/
 
-static STATE_POSTLOAD( topspeed_postload )
+static void topspeed_postload(running_machine &machine)
 {
 	parse_control(machine);
 	reset_sound_region(machine);
@@ -662,7 +662,7 @@ static MACHINE_START( topspeed )
 	state->save_item(NAME(state->m_cpua_ctrl));
 	state->save_item(NAME(state->m_ioc220_port));
 	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(topspeed_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(topspeed_postload), &machine));
 }
 
 static MACHINE_RESET( topspeed )

@@ -664,7 +664,7 @@ MACHINE_RESET( jpopnics )
 	state->m_mcu_type = -1;
 }
 
-static STATE_POSTLOAD( tnzs_postload )
+static void tnzs_postload(running_machine &machine)
 {
 	tnzs_state *state = machine.driver_data<tnzs_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -713,7 +713,7 @@ MACHINE_START( tnzs )
 	state->save_item(NAME(state->m_bank1));
 	state->save_item(NAME(state->m_bank2));
 
-	machine.save().register_postload(tnzs_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
 }
 
 MACHINE_START( jpopnics )
@@ -735,7 +735,7 @@ MACHINE_START( jpopnics )
 	state->save_item(NAME(state->m_bank1));
 	state->save_item(NAME(state->m_bank2));
 
-	machine.save().register_postload(tnzs_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine));
 }
 
 

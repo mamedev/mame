@@ -871,7 +871,7 @@ MACHINE_CONFIG_END
 /* schematic says 12.5 Hz, but R/C values shown give 8.5Hz */
 #define MAZE_555_B1_PERIOD		PERIOD_OF_555_ASTABLE(RES_K(33) /* R200 */, RES_K(68) /* R201 */, CAP_U(1) /* C201 */)
 
-static STATE_POSTLOAD( maze_update_discrete )
+static void maze_update_discrete(running_machine &machine)
 {
 	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 	maze_write_discrete(machine.device("discrete"), state->m_maze_tone_timing_state);
@@ -898,7 +898,7 @@ static MACHINE_START( maze )
 
 	/* setup for save states */
 	state->save_item(NAME(state->m_maze_tone_timing_state));
-	machine.save().register_postload(maze_update_discrete, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(maze_update_discrete), &machine));
 
 	MACHINE_START_CALL(mw8080bw);
 }

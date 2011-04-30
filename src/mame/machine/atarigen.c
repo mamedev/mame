@@ -64,7 +64,7 @@
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
-static STATE_POSTLOAD( slapstic_postload );
+static void slapstic_postload(running_machine &machine);
 
 static TIMER_CALLBACK( scanline_interrupt_callback );
 
@@ -166,7 +166,7 @@ void atarigen_init(running_machine &machine)
 	state->save_item(NAME(state->m_playfield2_latch));
 
 	/* need a postload to reset the state */
-	machine.save().register_postload(slapstic_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(slapstic_postload), &machine));
 }
 
 
@@ -445,7 +445,7 @@ INLINE void update_bank(atarigen_state *state, int bank)
 }
 
 
-static STATE_POSTLOAD( slapstic_postload )
+static void slapstic_postload(running_machine &machine)
 {
 	atarigen_state *state = machine.driver_data<atarigen_state>();
 	update_bank(state, slapstic_bank());

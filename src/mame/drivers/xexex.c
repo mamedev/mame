@@ -455,7 +455,7 @@ static const k053247_interface xexex_k053246_intf =
 	xexex_sprite_callback
 };
 
-static STATE_POSTLOAD( xexex_postload )
+static void xexex_postload(running_machine &machine)
 {
 	parse_control2(machine);
 	reset_sound_region(machine);
@@ -493,7 +493,7 @@ static MACHINE_START( xexex )
 
 	state->save_item(NAME(state->m_cur_control2));
 	state->save_item(NAME(state->m_cur_sound_region));
-	machine.save().register_postload(xexex_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(xexex_postload), &machine));
 
 	state->m_dmadelay_timer = machine.scheduler().timer_alloc(FUNC(dmaend_callback));
 }

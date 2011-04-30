@@ -250,7 +250,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static STATE_POSTLOAD ( pengadvb )
+static void pengadvb_postload(running_machine &machine)
 {
 	TMS9928A_post_load(machine);
 	mem_map_banks(machine);
@@ -264,7 +264,7 @@ static MACHINE_START( pengadvb )
 	state_save_register_global_pointer(machine, state->m_main_mem, 0x4000);
 	state_save_register_global(machine, state->m_mem_map);
 	state_save_register_global_array(machine, state->m_mem_banks);
-	machine.save().register_postload(pengadvb, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(pengadvb_postload), &machine));
 }
 
 static MACHINE_RESET( pengadvb )

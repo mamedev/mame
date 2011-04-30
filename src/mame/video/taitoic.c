@@ -955,9 +955,8 @@ void pc080sn_tilemap_draw_special( device_t *device, bitmap_t *bitmap, const rec
 }
 
 
-static STATE_POSTLOAD( pc080sn_restore_scroll )
+static void pc080sn_restore_scroll(pc080sn_state *pc080sn)
 {
-	pc080sn_state *pc080sn = (pc080sn_state *)param;
 	int flip;
 
 	pc080sn->bgscrollx[0] = -pc080sn->ctrl[0];
@@ -1021,7 +1020,7 @@ static DEVICE_START( pc080sn )
 
 	device->save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
 	device->save_item(NAME(pc080sn->ctrl));
-	device->machine().save().register_postload(pc080sn_restore_scroll, pc080sn);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_restore_scroll), pc080sn));
 }
 
 
@@ -1830,9 +1829,8 @@ READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r )
 }
 
 
-static STATE_POSTLOAD( tc0080vco_postload )
+static void tc0080vco_postload(tc0080vco_state *tc0080vco)
 {
-	tc0080vco_state *tc0080vco = (tc0080vco_state *)param;
 	tc0080vco->flipscreen = tc0080vco->scroll_ram[0] & 0x0c00;
 
 	tilemap_set_flip(tc0080vco->tilemap[0], tc0080vco->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -1907,7 +1905,7 @@ static DEVICE_START( tc0080vco )
 	device->machine().gfx[tc0080vco->tx_gfx] = gfx_element_alloc(device->machine(), &tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0);
 
 	device->save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
-	device->machine().save().register_postload(tc0080vco_postload, tc0080vco);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_postload), tc0080vco));
 }
 
 /***************************************************************************/
@@ -2144,10 +2142,8 @@ static void tc0100scn_restore_scroll( tc0100scn_state *tc0100scn )
 }
 
 
-static STATE_POSTLOAD( tc0100scn_postload )
+static void tc0100scn_postload(tc0100scn_state *tc0100scn)
 {
-	tc0100scn_state *tc0100scn = (tc0100scn_state *)param;
-
 	tc0100scn_set_layer_ptrs(tc0100scn);
 	tc0100scn_restore_scroll(tc0100scn);
 
@@ -2517,7 +2513,7 @@ static DEVICE_START( tc0100scn )
 	device->save_item(NAME(tc0100scn->ctrl));
 	device->save_item(NAME(tc0100scn->dblwidth));
 	device->save_item(NAME(tc0100scn->gfxbank));
-	device->machine().save().register_postload(tc0100scn_postload, tc0100scn);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_postload), tc0100scn));
 }
 
 
@@ -3563,9 +3559,8 @@ READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r )
 	return tc0480scp->pri_reg;
 }
 
-static STATE_POSTLOAD( tc0480scp_postload )
+static void tc0480scp_postload(tc0480scp_state *tc0480scp)
 {
-	tc0480scp_state *tc0480scp = (tc0480scp_state *)param;
 	int reg;
 	int flip = tc0480scp->ctrl[0xf] & 0x40;
 
@@ -3727,7 +3722,7 @@ static DEVICE_START( tc0480scp )
 	device->save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
 	device->save_item(NAME(tc0480scp->ctrl));
 	device->save_item(NAME(tc0480scp->dblwidth));
-	device->machine().save().register_postload(tc0480scp_postload, tc0480scp);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_postload), tc0480scp));
 }
 
 static DEVICE_RESET( tc0480scp )
@@ -4560,10 +4555,12 @@ static DEVICE_START( tc0150rod )
 typedef struct _tc0110pcr_state tc0110pcr_state;
 struct _tc0110pcr_state
 {
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 	UINT16 *     ram;
 	int          type;
 	int          addr;
 	int          pal_offs;
+	running_machine *m_machine;
 };
 
 #define TC0110PCR_RAM_SIZE 0x2000
@@ -4591,9 +4588,8 @@ INLINE const tc0110pcr_interface *tc0110pcr_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-static STATE_POSTLOAD( tc0110pcr_restore_colors )
+static void tc0110pcr_restore_colors(tc0110pcr_state *tc0110pcr)
 {
-	tc0110pcr_state *tc0110pcr = (tc0110pcr_state *)param;
 	int i, color, r = 0, g = 0, b = 0;
 
 	for (i = 0; i < (256 * 16); i++)
@@ -4628,7 +4624,7 @@ static STATE_POSTLOAD( tc0110pcr_restore_colors )
 			}
 		}
 
-		palette_set_color(machine, i + (tc0110pcr->pal_offs << 12), MAKE_RGB(r, g, b));
+		palette_set_color(tc0110pcr->machine(), i + (tc0110pcr->pal_offs << 12), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -4753,6 +4749,8 @@ static DEVICE_START( tc0110pcr )
 {
 	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(device);
 	const tc0110pcr_interface *intf = tc0110pcr_get_interface(device);
+	
+	tc0110pcr->m_machine = &device->machine();
 
 	tc0110pcr->pal_offs = intf->pal_offs;
 
@@ -4760,7 +4758,7 @@ static DEVICE_START( tc0110pcr )
 
 	device->save_pointer(NAME(tc0110pcr->ram), TC0110PCR_RAM_SIZE);
 	device->save_item(NAME(tc0110pcr->type));
-	device->machine().save().register_postload(tc0110pcr_restore_colors, tc0110pcr);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_restore_colors), tc0110pcr));
 }
 
 static DEVICE_RESET( tc0110pcr )

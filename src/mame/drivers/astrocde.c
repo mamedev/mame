@@ -457,7 +457,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 }
 
 
-static STATE_POSTLOAD( profbank_banksw_restore )
+static void profbank_banksw_restore(running_machine &machine)
 {
 	astrocde_state *state = machine.driver_data<astrocde_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
@@ -1796,7 +1796,7 @@ static DRIVER_INIT( profpac )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.save().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(profbank_banksw_restore), &machine));
 }
 
 
@@ -1813,7 +1813,7 @@ static DRIVER_INIT( demndrgn )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.save().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(profbank_banksw_restore), &machine));
 }
 
 
@@ -1835,7 +1835,7 @@ static DRIVER_INIT( tenpindx )
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
-	machine.save().register_postload(profbank_banksw_restore, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(profbank_banksw_restore), &machine));
 }
 
 

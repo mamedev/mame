@@ -106,11 +106,6 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static STATE_POSTLOAD ( forte2 )
-{
-	TMS9928A_post_load(machine);
-}
-
 static MACHINE_START( forte2 )
 {
 	forte2_state *state = machine.driver_data<forte2_state>();
@@ -120,7 +115,7 @@ static MACHINE_START( forte2 )
 
 	/* register for save states */
 	state_save_register_global(machine, state->m_input_mask);
-	machine.save().register_postload(forte2, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(TMS9928A_post_load), &machine));
 }
 
 static MACHINE_RESET( forte2 )

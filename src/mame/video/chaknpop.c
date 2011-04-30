@@ -154,12 +154,6 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
   Initialize video hardware emulation
 ***************************************************************************/
 
-static STATE_POSTLOAD( chaknpop_postload )
-{
-	tx_tilemap_mark_all_dirty(machine);
-}
-
-
 VIDEO_START( chaknpop )
 {
 	chaknpop_state *state = machine.driver_data<chaknpop_state>();
@@ -181,7 +175,7 @@ VIDEO_START( chaknpop )
 	memory_set_bank(machine, "bank1", 0);
 	tx_tilemap_mark_all_dirty(machine);
 
-	machine.save().register_postload(chaknpop_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine));
 }
 
 

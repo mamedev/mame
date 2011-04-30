@@ -1381,9 +1381,8 @@ int ym2151_read_status( void *_chip )
 /*
 *   state save support for MAME
 */
-STATE_POSTLOAD( ym2151_postload )
+void ym2151_postload(YM2151 *YM2151_chip)
 {
-	YM2151 *YM2151_chip = (YM2151 *)param;
 	int j;
 
 	for (j=0; j<8; j++)
@@ -1485,10 +1484,10 @@ static void ym2151_state_save_register( YM2151 *chip, device_t *device )
 
 	device->save_item(NAME(chip->connect));
 
-	device->machine().save().register_postload(ym2151_postload, chip);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(ym2151_postload), chip));
 }
 #else
-STATE_POSTLOAD( ym2151_postload )
+void ym2151_postload(YM2151 *chip)
 {
 }
 

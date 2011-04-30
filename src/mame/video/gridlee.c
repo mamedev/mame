@@ -37,7 +37,7 @@ PALETTE_INIT( gridlee )
  *
  *************************************/
 
-static STATE_POSTLOAD( expand_pixels )
+static void expand_pixels(running_machine &machine)
 {
 	gridlee_state *state = machine.driver_data<gridlee_state>();
 	UINT8 *videoram = state->m_videoram;
@@ -69,7 +69,7 @@ VIDEO_START( gridlee )
 
     state_save_register_global(machine, state->m_cocktail_flip);
     state_save_register_global(machine, state->m_palettebank_vis);
-    machine.save().register_postload(expand_pixels, NULL);
+    machine.save().register_postload(save_prepost_delegate(FUNC(expand_pixels), &machine));
 }
 
 

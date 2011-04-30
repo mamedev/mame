@@ -527,11 +527,6 @@ static const tc0140syt_interface slapshot_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static STATE_POSTLOAD( slapshot_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( slapshot )
 {
 	slapshot_state *state = machine.driver_data<slapshot_state>();
@@ -547,7 +542,7 @@ static MACHINE_START( slapshot )
 
 	state->m_banknum = 0;
 	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(slapshot_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 

@@ -783,9 +783,8 @@ offs_t naomibd_get_dmaoffset(device_t *device)
 
 
 
-static STATE_POSTLOAD( naomibd_postload )
+static void naomibd_postload(naomibd_state *v)
 {
-	//naomibd_state *v = param;
 }
 
 
@@ -793,7 +792,7 @@ static void init_save_state(device_t *device)
 {
 	naomibd_state *v = get_safe_token(device);
 
-	device->machine().save().register_postload(naomibd_postload, v);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(naomibd_postload), v));
 
 	/* register states */
 	device->save_item(NAME(v->rom_offset));

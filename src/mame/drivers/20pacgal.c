@@ -175,11 +175,6 @@ static WRITE8_HANDLER( ram_48000_w )
 	}
 }
 
-static STATE_POSTLOAD( postload_20pacgal )
-{
-	set_bankptr(machine);
-}
-
 /*************************************
  *
  *  Memory handlers
@@ -338,7 +333,7 @@ static MACHINE_START( 20pacgal )
 
 	state->save_item(NAME(state->m_game_selected));
 	state->save_item(NAME(state->m_ram_48000));
-	machine.save().register_postload(postload_20pacgal, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(set_bankptr), &machine));
 }
 
 static MACHINE_RESET( 20pacgal )

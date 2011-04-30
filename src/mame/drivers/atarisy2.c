@@ -145,7 +145,7 @@
  *
  *************************************/
 
-static STATE_POSTLOAD( bankselect_postload );
+static void bankselect_postload(running_machine &machine);
 
 
 
@@ -230,7 +230,7 @@ static MACHINE_START( atarisy2 )
 	state->save_item(NAME(state->m_which_adc));
 	state->save_item(NAME(state->m_p2portwr_state));
 	state->save_item(NAME(state->m_p2portrd_state));
-	machine.save().register_postload(bankselect_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(bankselect_postload), &machine));
 	state->save_item(NAME(state->m_sound_reset_state));
 }
 
@@ -344,7 +344,7 @@ static WRITE16_HANDLER( bankselect_w )
 }
 
 
-static STATE_POSTLOAD( bankselect_postload )
+static void bankselect_postload(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	atarisy2_state *state = machine.driver_data<atarisy2_state>();

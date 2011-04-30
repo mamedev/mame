@@ -895,18 +895,13 @@ static const ym2151_interface ym2151_config =
 	irqhandler
 };
 
-static STATE_POSTLOAD( taitox_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( taitox )
 {
 	taitox_state *state = machine.driver_data<taitox_state>();
 
 	state->m_banknum = -1;
 	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(taitox_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 static const tc0140syt_interface taitox_tc0140syt_intf =

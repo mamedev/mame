@@ -323,7 +323,7 @@ public:
 	// comparison operator
 	bool operator==(const delegate_base &rhs) const
 	{
-		return (m_object == rhs.m_object && m_function == m_function && m_rawfunction == m_rawfunction);
+		return (m_object == rhs.m_object && m_function == rhs.m_function && m_rawfunction == rhs.m_rawfunction);
 	}
 
 	// getters
@@ -531,7 +531,7 @@ public:
 	// comparison operator
 	bool operator==(const delegate_base &rhs) const
 	{
-		return (m_object == rhs.m_object && m_function == m_function && m_rawfunction == m_rawfunction);
+		return (m_object == rhs.m_object && m_function == rhs.m_function && m_rawfunction == rhs.m_rawfunction);
 	}
 
 	// getters

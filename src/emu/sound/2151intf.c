@@ -38,13 +38,6 @@ static STREAM_UPDATE( ym2151_update )
 }
 
 
-static STATE_POSTLOAD( ym2151intf_postload )
-{
-	ym2151_state *info = (ym2151_state *)param;
-	ym2151_postload(machine, info->chip);
-}
-
-
 static DEVICE_START( ym2151 )
 {
 	static const ym2151_interface dummy = { 0 };
@@ -60,8 +53,6 @@ static DEVICE_START( ym2151 )
 
 	info->chip = ym2151_init(device,device->clock(),rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
-
-	device->machine().save().register_postload(ym2151intf_postload, info);
 
 	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
 	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);

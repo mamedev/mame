@@ -62,7 +62,6 @@ static void sprite_draw_cave(running_machine &machine, int priority);
 static void sprite_draw_cave_zbuf(running_machine &machine, int priority);
 static void sprite_draw_donpachi(running_machine &machine, int priority);
 static void sprite_draw_donpachi_zbuf(running_machine &machine, int priority);
-static STATE_POSTLOAD(cave_sprite_postload);
 
 /***************************************************************************
 
@@ -767,7 +766,7 @@ static void sprite_init_cave( running_machine &machine )
 	state->save_item(NAME(state->m_blit.clip_top));
 	state->save_item(NAME(state->m_blit.clip_bottom));
 
-	machine.save().register_postload(cave_sprite_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(cave_get_sprite_info), &machine));
 }
 
 static void cave_sprite_check( screen_device &screen, const rectangle *clip )
@@ -1675,11 +1674,4 @@ void cave_get_sprite_info( running_machine &machine )
 			(*state->m_get_sprite_info)(machine);
 		}
 	}
-}
-
-static STATE_POSTLOAD( cave_sprite_postload )
-{
-	/* FIXME: this is probably not the best way to restore the sprites,
-    but it seems to work more or less (sprites may be wrong for one frame) */
-	cave_get_sprite_info(machine);
 }

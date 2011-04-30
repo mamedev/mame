@@ -86,7 +86,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 ***************************************************************************/
 
-static STATE_POSTLOAD( redraw_pixels )
+static void redraw_pixels(running_machine &machine)
 {
 	fortyl_state *state = machine.driver_data<fortyl_state>();
 	state->m_pix_redraw = 1;
@@ -123,7 +123,7 @@ VIDEO_START( fortyl )
 	state->save_item(NAME(*state->m_tmp_bitmap1));
 	state->save_item(NAME(*state->m_tmp_bitmap2));
 	state->save_item(NAME(state->m_pixram_sel));
-	machine.save().register_postload(redraw_pixels, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(redraw_pixels), &machine));
 }
 
 

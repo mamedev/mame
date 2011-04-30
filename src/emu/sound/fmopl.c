@@ -1812,9 +1812,8 @@ static void OPLResetChip(FM_OPL *OPL)
 }
 
 
-static STATE_POSTLOAD( OPL_postload )
+static void OPL_postload(FM_OPL *OPL)
 {
-	FM_OPL *OPL = (FM_OPL *)param;
 	int slot, ch;
 
 	for( ch=0 ; ch < 9 ; ch++ )
@@ -1957,7 +1956,7 @@ static void OPL_save_state(FM_OPL *OPL, device_t *device)
 	device->save_item(NAME(OPL->statusmask));
 	device->save_item(NAME(OPL->mode));
 
-	device->machine().save().register_postload(OPL_postload, OPL);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(OPL_postload), OPL));
 }
 
 

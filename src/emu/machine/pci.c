@@ -247,10 +247,8 @@ int pci_add_sibling( running_machine &machine, char *pcitag, char *sibling )
 ***************************************************************************/
 
 
-static STATE_POSTLOAD( pci_bus_postload )
+static void pci_bus_postload(pci_bus_state *pcibus)
 {
-	pci_bus_state *pcibus = (pci_bus_state *)param;
-
 	if (pcibus->devicenum != -1)
 	{
 		pcibus->busnumaddr = pci_search_bustree(pcibus->busnum, pcibus->devicenum, pcibus);
@@ -290,7 +288,7 @@ static DEVICE_START( pci_bus )
 	device->save_item(NAME(pcibus->devicenum));
 	device->save_item(NAME(pcibus->busnum));
 
-	device->machine().save().register_postload(pci_bus_postload, pcibus);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(pci_bus_postload), pcibus));
 }
 
 

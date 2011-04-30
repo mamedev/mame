@@ -52,7 +52,7 @@ struct _tms9927_state
 };
 
 
-static STATE_POSTLOAD( tms9927_state_save_postload );
+static void tms9927_state_save_postload(tms9927_state *state);
 static void recompute_parameters(tms9927_state *tms, int postload);
 
 
@@ -68,9 +68,9 @@ INLINE tms9927_state *get_safe_token(device_t *device)
 }
 
 
-static STATE_POSTLOAD( tms9927_state_save_postload )
+static void tms9927_state_save_postload(tms9927_state *state)
 {
-	recompute_parameters((tms9927_state *)param, TRUE);
+	recompute_parameters(state, TRUE);
 }
 
 
@@ -283,7 +283,7 @@ static DEVICE_START( tms9927 )
 	}
 
 	/* register for state saving */
-	device->machine().save().register_postload(tms9927_state_save_postload, tms);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tms9927_state_save_postload), tms));
 
 	device->save_item(NAME(tms->clock));
 	device->save_item(NAME(tms->reg));

@@ -145,7 +145,7 @@ struct _tilemap_private
 /* system management helpers */
 static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 static void tilemap_exit(running_machine &machine);
-static STATE_POSTLOAD( tilemap_postload );
+static void tilemap_postload(tilemap_t *tmap);
 static void tilemap_dispose(tilemap_t *tmap);
 
 /* logical <-> memory index mapping */
@@ -418,7 +418,7 @@ static tilemap_t *tilemap_create_common(running_machine &machine, void *get_info
 	machine.tilemap_data->instance++;
 
 	/* reset everything after a load */
-	machine.save().register_postload(tilemap_postload, tmap);
+	machine.save().register_postload(save_prepost_delegate(FUNC(tilemap_postload), tmap));
 	return tmap;
 }
 
@@ -1146,10 +1146,8 @@ static void tilemap_exit(running_machine &machine)
     invalidate everything
 -------------------------------------------------*/
 
-static STATE_POSTLOAD( tilemap_postload )
+static void tilemap_postload(tilemap_t *tmap)
 {
-	/* recompute the mappings for this tilemap */
-	tilemap_t *tmap = (tilemap_t *)param;
 	mappings_update(tmap);
 }
 

@@ -387,7 +387,6 @@ static WRITE16_HANDLER( dcs_data_bank_select_w );
 static void sdrc_reset(running_machine &machine);
 static READ16_HANDLER( sdrc_r );
 static WRITE16_HANDLER( sdrc_w );
-static STATE_POSTLOAD( sdrc_postload );
 
 static void dsio_reset(running_machine &machine);
 static READ16_HANDLER( dsio_r );
@@ -420,6 +419,8 @@ static WRITE16_HANDLER( dcs_polling_w );
 
 static TIMER_DEVICE_CALLBACK( transfer_watchdog_callback );
 static int preprocess_write(running_machine &machine, UINT16 data);
+
+static void sdrc_remap_memory(running_machine &machine);
 
 
 
@@ -934,7 +935,7 @@ static void dcs_register_state(running_machine &machine)
 		state_save_register_global_pointer(machine, dcs.sram, 0x8000*4 / sizeof(dcs.sram[0]));
 
 	if (dcs.rev == 2)
-		machine.save().register_postload(sdrc_postload, NULL);
+		machine.save().register_postload(save_prepost_delegate(FUNC(sdrc_remap_memory), &machine));
 }
 
 void dcs_init(running_machine &machine)
@@ -1179,12 +1180,6 @@ static void sdrc_remap_memory(running_machine &machine)
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
 		dcs.polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
-}
-
-
-static STATE_POSTLOAD( sdrc_postload )
-{
-	sdrc_remap_memory(machine);
 }
 
 

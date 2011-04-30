@@ -167,13 +167,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
-static STATE_POSTLOAD( cloak_postload )
-{
-	cloak_state *state = machine.driver_data<cloak_state>();
-
-	set_current_bitmap_videoram_pointer(state);
-}
-
 VIDEO_START( cloak )
 {
 	cloak_state *state = machine.driver_data<cloak_state>();
@@ -192,7 +185,7 @@ VIDEO_START( cloak )
 	state->save_pointer(NAME(state->m_bitmap_videoram1), 256*256);
 	state->save_pointer(NAME(state->m_bitmap_videoram2), 256*256);
 	state->save_pointer(NAME(state->m_palette_ram), NUM_PENS);
-	machine.save().register_postload(cloak_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(set_current_bitmap_videoram_pointer), state));
 }
 
 static void draw_bitmap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)

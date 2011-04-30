@@ -29,7 +29,7 @@ gtia_struct gtia;
 
 static void gtia_reset(running_machine &machine);
 static void gtia_state(running_machine &machine);
-static STATE_POSTLOAD( gtia_state_postload );
+static void gtia_state_postload(running_machine &machine);
 
 /**********************************************
  * split a color into hue and luminance values
@@ -139,7 +139,7 @@ static void gtia_state(running_machine &machine)
 	state_save_register_global(machine, gtia.w.gractl);
 	state_save_register_global(machine, gtia.w.hitclr);
 	state_save_register_global(machine, gtia.w.cons);
-	machine.save().register_postload(gtia_state_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(gtia_state_postload), &machine));
 }
 
 
@@ -759,7 +759,7 @@ WRITE8_HANDLER( atari_gtia_w )
 
 
 
-static STATE_POSTLOAD( gtia_state_postload )
+static void gtia_state_postload(running_machine &machine)
 {
 	recalc_p0();
 	recalc_p1();

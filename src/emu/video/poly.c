@@ -202,7 +202,7 @@ struct _poly_manager
 
 static void **allocate_array(running_machine &machine, size_t *itemsize, UINT32 itemcount);
 static void *poly_item_callback(void *param, int threadid);
-static STATE_PRESAVE( poly_state_presave );
+static void poly_state_presave(poly_manager *poly);
 
 
 
@@ -347,7 +347,7 @@ poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_d
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
-	machine.save().register_presave(poly_state_presave, poly);
+	machine.save().register_presave(save_prepost_delegate(FUNC(poly_state_presave), poly));
 	return poly;
 }
 
@@ -1388,8 +1388,7 @@ static void *poly_item_callback(void *param, int threadid)
     ensure everything is synced before saving
 -------------------------------------------------*/
 
-static STATE_PRESAVE( poly_state_presave )
+static void poly_state_presave(poly_manager *poly)
 {
-	poly_manager *poly = (poly_manager *)param;
 	poly_wait(poly, "pre-save");
 }

@@ -440,10 +440,8 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static STATE_POSTLOAD( mjsister_redraw )
+static void mjsister_redraw(mjsister_state *state)
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
-
 	/* we can skip saving tmpbitmaps because we can redraw them from vram */
 	state->m_screen_redraw = 1;
 }
@@ -471,7 +469,7 @@ static MACHINE_START( mjsister )
 	state->save_item(NAME(state->m_dac_bank));
 	state->save_item(NAME(state->m_dac_adr_s));
 	state->save_item(NAME(state->m_dac_adr_e));
-	machine.save().register_postload(mjsister_redraw, 0);
+	machine.save().register_postload(save_prepost_delegate(FUNC(mjsister_redraw), state));
 }
 
 static MACHINE_RESET( mjsister )

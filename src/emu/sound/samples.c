@@ -423,9 +423,8 @@ static STREAM_UPDATE( sample_update_sound )
 }
 
 
-static STATE_POSTLOAD( samples_postload )
+static void samples_postload(samples_info *info)
 {
-	samples_info *info = (samples_info *)param;
 	int i;
 
 	/* loop over channels */
@@ -493,7 +492,7 @@ static DEVICE_START( samples )
         device->save_item(NAME(info->channel[i].loop), i);
         device->save_item(NAME(info->channel[i].paused), i);
 	}
-	device->machine().save().register_postload(samples_postload, info);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(samples_postload), info));
 
 	/* initialize any custom handlers */
 	if (intf->start)

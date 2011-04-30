@@ -2071,7 +2071,7 @@ void video_update_vdp1(running_machine &machine)
 	//popmessage("%04x %04x",STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3);
 }
 
-static STATE_POSTLOAD( stv_vdp1_state_save_postload )
+static void stv_vdp1_state_save_postload(running_machine &machine)
 {
 	UINT8 *vdp1 = stv_vdp1_gfx_decode;
 	int offset;
@@ -2130,6 +2130,6 @@ int stv_vdp1_start ( running_machine &machine )
 	state_save_register_global(machine, stv_vdp1_clear_framebuffer_on_next_frame);
 	state_save_register_global(machine, stvvdp1_local_x);
 	state_save_register_global(machine, stvvdp1_local_y);
-	machine.save().register_postload(stv_vdp1_state_save_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(stv_vdp1_state_save_postload), &machine));
 	return 0;
 }

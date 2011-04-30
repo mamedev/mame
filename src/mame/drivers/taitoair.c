@@ -603,11 +603,6 @@ static const tc0140syt_interface airsys_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static STATE_POSTLOAD( taitoair_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( taitoair )
 {
 	taitoair_state *state = machine.driver_data<taitoair_state>();
@@ -630,7 +625,7 @@ static MACHINE_START( taitoair )
 		state_save_register_item(machine, "globals", NULL, i, state->m_q.p[i].y);
 	}
 
-	machine.save().register_postload(taitoair_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 static MACHINE_RESET( taitoair )

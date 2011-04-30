@@ -222,18 +222,13 @@ static void set_m92_bank(running_machine &machine)
 	memory_set_bankptr(machine, "bank1",&RAM[state->m_bankaddress]);
 }
 
-static STATE_POSTLOAD( m92_postload )
-{
-	set_m92_bank(machine);
-}
-
 static MACHINE_START( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
 	state->save_item(NAME(state->m_irqvector));
 	state->save_item(NAME(state->m_sound_status));
 	state->save_item(NAME(state->m_bankaddress));
-	machine.save().register_postload(m92_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(set_m92_bank), &machine));
 
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(m92_scanline_interrupt));
 }

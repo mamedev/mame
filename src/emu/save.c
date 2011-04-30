@@ -144,7 +144,7 @@ const char *save_manager::indexed_item(int index, void *&base, UINT32 &valsize, 
 //  function callback
 //-------------------------------------------------
 
-void save_manager::register_presave(prepost_func func, void *param)
+void save_manager::register_presave(save_prepost_delegate func)
 {
 	// check for invalid timing
 	if (!m_reg_allowed)
@@ -152,11 +152,11 @@ void save_manager::register_presave(prepost_func func, void *param)
 
 	// scan for duplicates and push through to the end
 	for (state_callback *cb = m_presave_list.first(); cb != NULL; cb = cb->next())
-		if (cb->m_func == func && cb->m_param == param)
-			fatalerror("Duplicate save state function (%p, %p)", param, func);
+		if (cb->m_func == func)
+			fatalerror("Duplicate save state function (%s/%s)", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_presave_list.append(*auto_alloc(machine(), state_callback(func, param)));
+	m_presave_list.append(*auto_alloc(machine(), state_callback(func)));
 }
 
 
@@ -165,7 +165,7 @@ void save_manager::register_presave(prepost_func func, void *param)
 //  register a post-load function callback
 //-------------------------------------------------
 
-void save_manager::register_postload(prepost_func func, void *param)
+void save_manager::register_postload(save_prepost_delegate func)
 {
 	// check for invalid timing
 	if (!m_reg_allowed)
@@ -173,11 +173,11 @@ void save_manager::register_postload(prepost_func func, void *param)
 
 	// scan for duplicates and push through to the end
 	for (state_callback *cb = m_postload_list.first(); cb != NULL; cb = cb->next())
-		if (cb->m_func == func && cb->m_param == param)
-			fatalerror("Duplicate save state function (%p, %p)", param, func);
+		if (cb->m_func == func)
+			fatalerror("Duplicate save state function (%s/%s)", cb->m_func.name(), func.name());
 
 	// allocate a new entry
-	m_postload_list.append(*auto_alloc(machine(), state_callback(func, param)));
+	m_postload_list.append(*auto_alloc(machine(), state_callback(func)));
 }
 
 
@@ -293,7 +293,7 @@ save_error save_manager::read_file(emu_file &file)
 
 	// call the post-load functions
 	for (state_callback *func = m_postload_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(machine(), func->m_param);
+		func->m_func();
 
 	return STATERR_NONE;
 }
@@ -327,7 +327,7 @@ save_error save_manager::write_file(emu_file &file)
 
 	// call the pre-save functions
 	for (state_callback *func = m_presave_list.first(); func != NULL; func = func->next())
-		(*func->m_func)(machine(), func->m_param);
+		func->m_func();
 
 	// then write all the data
 	for (state_entry *entry = m_entry_list.first(); entry != NULL; entry = entry->next())
@@ -427,9 +427,8 @@ save_error save_manager::validate_header(const UINT8 *header, const char *gamena
 //  state_callback - constructor
 //-------------------------------------------------
 
-save_manager::state_callback::state_callback(prepost_func callback, void *param)
+save_manager::state_callback::state_callback(save_prepost_delegate callback)
 	: m_next(NULL),
-	  m_param(param),
 	  m_func(callback)
 {
 }

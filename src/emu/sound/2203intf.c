@@ -106,9 +106,8 @@ static STREAM_UPDATE( ym2203_stream_update )
 }
 
 
-static STATE_POSTLOAD( ym2203_intf_postload )
+static void ym2203_intf_postload (ym2203_state *info)
 {
-	ym2203_state *info = (ym2203_state *)param;
 	ym2203_postload(info->chip);
 }
 
@@ -144,7 +143,7 @@ static DEVICE_START( ym2203 )
 	info->chip = ym2203_init(info,device,device->clock(),rate,timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2203 chip");
 
-	device->machine().save().register_postload(ym2203_intf_postload, info);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(ym2203_intf_postload), info));
 }
 
 static DEVICE_STOP( ym2203 )

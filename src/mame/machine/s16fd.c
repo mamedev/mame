@@ -159,7 +159,7 @@ void fd1094_machine_init(device_t *device)
 	device->reset();
 }
 
-static STATE_POSTLOAD( fd1094_postload )
+static void fd1094_postload(running_machine &machine)
 {
 	if (fd1094_state != -1)
 	{
@@ -228,5 +228,5 @@ void fd1094_driver_init(running_machine &machine, const char* tag, void (*set_de
 
 	state_save_register_global(machine, fd1094_selected_state);
 	state_save_register_global(machine, fd1094_state);
-	machine.save().register_postload(fd1094_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(fd1094_postload), &machine));
 }

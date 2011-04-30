@@ -213,7 +213,7 @@ static void twincobr_dsp(running_machine &machine, int enable)
 	}
 }
 
-static STATE_POSTLOAD( twincobr_restore_dsp )
+static void twincobr_restore_dsp(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 	twincobr_dsp(machine, state->m_dsp_on);
@@ -354,7 +354,7 @@ void twincobr_driver_savestate(running_machine &machine)
 	state_save_register_global(machine, state->m_dsp_BIO);
 	state_save_register_global(machine, state->m_dsp_execute);
 	state_save_register_global(machine, state->m_fsharkbt_8741);
-	machine.save().register_postload(twincobr_restore_dsp, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_dsp), &machine));
 }
 
 MACHINE_RESET( wardner )
@@ -380,6 +380,6 @@ void wardner_driver_savestate(running_machine &machine)
 	state_save_register_global(machine, state->m_dsp_BIO);
 	state_save_register_global(machine, state->m_dsp_execute);
 	state_save_register_global(machine, state->m_wardner_membank);
-	machine.save().register_postload(wardner_restore_bank, NULL);	/* Restore the Main CPU bank */
-	machine.save().register_postload(twincobr_restore_dsp, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(wardner_restore_bank), &machine));	/* Restore the Main CPU bank */
+	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_dsp), &machine));
 }

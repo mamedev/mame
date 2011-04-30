@@ -128,8 +128,8 @@ void device_list::start_all()
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(device_list::exit), this));
 
 	// add pre-save and post-load callbacks
-	machine().save().register_presave(static_pre_save, this);
-	machine().save().register_postload(static_post_load, this);
+	machine().save().register_presave(save_prepost_delegate(FUNC(device_list::presave_all), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(device_list::postload_all), this));
 
 	// start_new_devices does all the necessary work
 	start_new_devices();
@@ -290,27 +290,25 @@ void device_list::exit()
 
 
 //-------------------------------------------------
-//  static_pre_save - tell all the devices we are
+//  presave_all - tell all the devices we are 
 //  about to save
 //-------------------------------------------------
 
-void device_list::static_pre_save(running_machine &machine, void *param)
+void device_list::presave_all()
 {
-	device_list *list = reinterpret_cast<device_list *>(param);
-	for (device_t *device = list->first(); device != NULL; device = device->next())
+	for (device_t *device = first(); device != NULL; device = device->next())
 		device->pre_save();
 }
 
 
 //-------------------------------------------------
-//  static_post_load - tell all the devices we just
+//  postload_all - tell all the devices we just 
 //  completed a load
 //-------------------------------------------------
 
-void device_list::static_post_load(running_machine &machine, void *param)
+void device_list::postload_all()
 {
-	device_list *list = reinterpret_cast<device_list *>(param);
-	for (device_t *device = list->first(); device != NULL; device = device->next())
+	for (device_t *device = first(); device != NULL; device = device->next())
 		device->post_load();
 }
 

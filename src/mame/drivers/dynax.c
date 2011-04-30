@@ -4925,16 +4925,11 @@ static const ay8910_interface tenkai_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(tenkai_dswsel_w)	// Write
 };
 
-static STATE_POSTLOAD( tenkai_bank_postload )
-{
-	tenkai_update_rombank(machine);
-}
-
 static MACHINE_START( tenkai )
 {
 	MACHINE_START_CALL(dynax);
 
-	machine.save().register_postload(tenkai_bank_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine));
 }
 
 static MACHINE_CONFIG_START( tenkai, dynax_state )
@@ -4986,7 +4981,7 @@ MACHINE_CONFIG_END
                                 Mahjong Gekisha
 ***************************************************************************/
 
-static STATE_POSTLOAD( gekisha_bank_postload )
+static void gekisha_bank_postload(running_machine &machine)
 {
 	dynax_state *state = machine.driver_data<dynax_state>();
 
@@ -4997,7 +4992,7 @@ static MACHINE_START( gekisha )
 {
 	MACHINE_START_CALL(dynax);
 
-	machine.save().register_postload(gekisha_bank_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(gekisha_bank_postload), &machine));
 }
 
 static MACHINE_RESET( gekisha )

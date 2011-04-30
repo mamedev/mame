@@ -907,9 +907,8 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 }
 
 
-static STATE_POSTLOAD( schaser_reinit_555_time_remain )
+static void schaser_reinit_555_time_remain(_8080bw_state *state)
 {
-	_8080bw_state *state = machine.driver_data<_8080bw_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 	state->m_schaser_effect_555_time_remain = attotime::from_double(state->m_schaser_effect_555_time_remain_savable);
 	schaser_sh_port_2_w(space, 0, state->m_port_2_last_extra);
@@ -926,7 +925,7 @@ MACHINE_START( schaser_sh )
 	state->save_item(NAME(state->m_schaser_effect_555_is_low));
 	state->save_item(NAME(state->m_schaser_effect_555_time_remain_savable));
 	state->save_item(NAME(state->m_port_2_last_extra));
-	machine.save().register_postload(schaser_reinit_555_time_remain, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(schaser_reinit_555_time_remain), state));
 }
 
 

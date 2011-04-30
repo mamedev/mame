@@ -2958,7 +2958,7 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
                    SAVE STATES
 ***********************************************************/
 
-static STATE_POSTLOAD( taitoz_postload )
+static void taitoz_postload(running_machine &machine)
 {
 	parse_control(machine);
 	reset_sound_region(machine);
@@ -2994,7 +2994,7 @@ static MACHINE_START( taitoz )
 
 	memory_configure_bank(machine, "bank10", 0, banks, machine.region("audiocpu")->base() + 0xc000, 0x4000);
 
-	machine.save().register_postload(taitoz_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(taitoz_postload), &machine));
 
 	MACHINE_START_CALL(bshark);
 }
@@ -4876,11 +4876,6 @@ static DRIVER_INIT( dblaxle )
 	state->m_dblaxle_vibration = 1;
 }
 
-static STATE_POSTLOAD( bshark_postload )
-{
-	parse_control(machine);
-}
-
 static DRIVER_INIT( bshark )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
@@ -4888,7 +4883,7 @@ static DRIVER_INIT( bshark )
 	state->m_dblaxle_vibration = 0;
 	state->m_eep_latch = 0;
 
-	machine.save().register_postload(bshark_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(parse_control), &machine));
 	state->save_item(NAME(state->m_eep_latch));
 }
 

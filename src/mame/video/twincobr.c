@@ -17,7 +17,7 @@
 #include "includes/twincobr.h"
 
 
-static STATE_POSTLOAD( twincobr_restore_screen );
+static void twincobr_restore_screen(running_machine &machine);
 
 /* 6845 used for video sync signals only */
 const mc6845_interface twincobr_mc6845_intf =
@@ -138,10 +138,10 @@ VIDEO_START( toaplan0 )
 	state_save_register_global(machine, state->m_bg_ram_bank);
 	state_save_register_global(machine, state->m_flip_screen);
 	state_save_register_global(machine, state->m_wardner_sprite_hack);
-	machine.save().register_postload(twincobr_restore_screen, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(twincobr_restore_screen), &machine));
 }
 
-static STATE_POSTLOAD( twincobr_restore_screen )
+static void twincobr_restore_screen(running_machine &machine)
 {
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 

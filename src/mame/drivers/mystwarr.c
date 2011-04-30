@@ -858,11 +858,6 @@ static GFXDECODE_START( dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
-static STATE_POSTLOAD( mystwarr_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( mystwarr )
 {
 	mystwarr_state *state = machine.driver_data<mystwarr_state>();
@@ -874,7 +869,7 @@ static MACHINE_START( mystwarr )
 
 	state_save_register_global(machine, state->m_mw_irq_control);
 	state_save_register_global(machine, state->m_cur_sound_region);
-	machine.save().register_postload(mystwarr_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 static MACHINE_RESET(mystwarr)

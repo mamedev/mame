@@ -196,16 +196,15 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 }
 
 
-static STATE_POSTLOAD( YMZ280B_state_save_update_step )
+static void YMZ280B_state_save_update_step(ymz280b_state *chip)
 {
-	ymz280b_state *chip = (ymz280b_state *)param;
 	int j;
 	for (j = 0; j < 8; j++)
 	{
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			machine.scheduler().timer_set(attotime::zero, update_irq_state_cb[j].func, update_irq_state_cb[j].name, 0, chip);
+			chip->device->machine().scheduler().timer_set(attotime::zero, update_irq_state_cb[j].func, update_irq_state_cb[j].name, 0, chip);
 	}
 }
 
@@ -694,7 +693,7 @@ static DEVICE_START( ymz280b )
 		}
 	}
 
-	device->machine().save().register_postload(YMZ280B_state_save_update_step, chip);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(YMZ280B_state_save_update_step), chip));
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

@@ -550,7 +550,7 @@ loop:
 #endif
 }
 
-static STATE_POSTLOAD( crystal_banksw_postload )
+static void crystal_banksw_postload(running_machine &machine)
 {
 	crystal_state *state = machine.driver_data<crystal_state>();
 
@@ -587,7 +587,7 @@ static MACHINE_START( crystal )
 	state->save_item(NAME(state->m_PIO));
 	state->save_item(NAME(state->m_DMActrl));
 	state->save_item(NAME(state->m_OldPort4));
-	machine.save().register_postload(crystal_banksw_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(crystal_banksw_postload), &machine));
 }
 
 static MACHINE_RESET( crystal )

@@ -105,7 +105,7 @@ static const tms34010_config default_config =
 
 static void check_interrupt(tms34010_state *tms);
 static TIMER_CALLBACK( scanline_callback );
-static STATE_POSTLOAD( tms34010_state_postload );
+static void tms34010_state_postload(tms34010_state *tms);
 
 
 
@@ -669,7 +669,7 @@ static CPU_INIT( tms34010 )
 	device->save_item(NAME(tms->pixelshift));
 	device->save_item(NAME(tms->gfxcycles));
 	device->save_pointer(NAME(&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
-	device->machine().save().register_postload(tms34010_state_postload, tms);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(tms34010_state_postload), tms));
 }
 
 static CPU_RESET( tms34010 )
@@ -1545,9 +1545,8 @@ READ16_HANDLER( tms34020_io_register_r )
     SAVE STATE
 ***************************************************************************/
 
-static STATE_POSTLOAD( tms34010_state_postload )
+static void tms34010_state_postload(tms34010_state *tms)
 {
-	tms34010_state *tms = (tms34010_state *)param;
 	set_raster_op(tms);
 	set_pixel_function(tms);
 }

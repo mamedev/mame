@@ -677,11 +677,6 @@ static const tc0140syt_interface othunder_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static STATE_POSTLOAD( othunder_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( othunder )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
@@ -706,7 +701,7 @@ static MACHINE_START( othunder )
 	state->save_item(NAME(state->m_ad_irq));
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_pan));
-	machine.save().register_postload(othunder_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 static MACHINE_RESET( othunder )

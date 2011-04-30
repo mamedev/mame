@@ -82,8 +82,8 @@ private:
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void palette_presave(running_machine &machine, void *param);
-static void palette_postload(running_machine &machine, void *param);
+static void palette_presave(running_machine &machine);
+static void palette_postload(running_machine &machine);
 static void palette_exit(running_machine &machine);
 static void allocate_palette(running_machine &machine, palette_private *palette);
 static void allocate_color_tables(running_machine &machine, palette_private *palette);
@@ -150,8 +150,8 @@ void palette_init(running_machine &machine)
 		palette->save_bright = auto_alloc_array(machine, float, numcolors);
 		state_save_register_global_pointer(machine, palette->save_pen, numcolors);
 		state_save_register_global_pointer(machine, palette->save_bright, numcolors);
-		machine.save().register_presave(palette_presave, palette);
-		machine.save().register_postload(palette_postload, palette);
+		machine.save().register_presave(save_prepost_delegate(FUNC(palette_presave), &machine));
+		machine.save().register_postload(save_prepost_delegate(FUNC(palette_postload), &machine));
 	}
 }
 
@@ -529,10 +529,10 @@ pen_t get_white_pen(running_machine &machine)
     for saving
 -------------------------------------------------*/
 
-static void palette_presave(running_machine &machine, void *param)
+static void palette_presave(running_machine &machine)
 {
 	int numcolors = palette_get_num_colors(machine.palette);
-	palette_private *palette = (palette_private *)param;
+	palette_private *palette = machine.palette_data;
 	int index;
 
 	/* fill the save arrays with updated pen and brightness information */
@@ -549,10 +549,10 @@ static void palette_presave(running_machine &machine, void *param)
     actually update the palette
 -------------------------------------------------*/
 
-static void palette_postload(running_machine &machine, void *param)
+static void palette_postload(running_machine &machine)
 {
 	int numcolors = palette_get_num_colors(machine.palette);
-	palette_private *palette = (palette_private *)param;
+	palette_private *palette = machine.palette_data;
 	int index;
 
 	/* reset the pen and brightness for each entry */

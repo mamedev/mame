@@ -5758,11 +5758,6 @@ static DRIVER_INIT( mjnquest )
 	state->save_item(NAME(state->m_mjnquest_input));
 }
 
-static STATE_POSTLOAD( driveout_postload )
-{
-	reset_driveout_sound_region(machine);
-}
-
 static DRIVER_INIT( driveout )
 {
 	taitof2_state *state = machine.driver_data<taitof2_state>();
@@ -5774,7 +5769,7 @@ static DRIVER_INIT( driveout )
 	state->save_item(NAME(state->m_driveout_sound_latch));
 	state->save_item(NAME(state->m_oki_bank));
 	state->save_item(NAME(state->m_nibble));
-	machine.save().register_postload(driveout_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_driveout_sound_region), &machine));
 }
 
 

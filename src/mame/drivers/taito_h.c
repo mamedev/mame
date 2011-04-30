@@ -511,11 +511,6 @@ static GFXDECODE_START( dleague )
 GFXDECODE_END
 
 
-static STATE_POSTLOAD( taitoh_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_RESET( taitoh )
 {
 	taitoh_state *state = machine.driver_data<taitoh_state>();
@@ -534,7 +529,7 @@ static MACHINE_START( taitoh )
 	state->m_tc0080vco = machine.device("tc0080vco");
 
 	state->save_item(NAME(state->m_banknum));
-	machine.save().register_postload(taitoh_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 

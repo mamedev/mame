@@ -2655,9 +2655,8 @@ static TILE_GET_INFO_DEVICE( k052109_get_tile_info2 )
 }
 
 
-static STATE_POSTLOAD( k052109_tileflip_reset )
+static void k052109_tileflip_reset(k052109_state *k052109)
 {
-	k052109_state *k052109 = (k052109_state *)param;
 	int data = k052109->ram[0x1e80];
 	tilemap_set_flip(k052109->tilemap[0], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_flip(k052109->tilemap[1], (data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2747,7 +2746,7 @@ static DEVICE_START( k052109 )
 	device->save_item(NAME(k052109->dx));
 	device->save_item(NAME(k052109->dy));
 	device->save_item(NAME(k052109->has_extra_video_ram));
-	device->machine().save().register_postload(k052109_tileflip_reset, k052109);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(k052109_tileflip_reset), k052109));
 }
 
 static DEVICE_RESET( k052109 )
@@ -5734,10 +5733,8 @@ void k053251_set_tmap_dirty( device_t *device, int tmap_num, int data )
 	k053251->dirty_tmap[tmap_num] = data ? 1 : 0;
 }
 
-static STATE_POSTLOAD( k053251_reset_indexes )
+static void k053251_reset_indexes(k053251_state *k053251)
 {
-	k053251_state *k053251 = (k053251_state *)param;
-
 	k053251->palette_index[0] = 32 * ((k053251->ram[9] >> 0) & 0x03);
 	k053251->palette_index[1] = 32 * ((k053251->ram[9] >> 2) & 0x03);
 	k053251->palette_index[2] = 32 * ((k053251->ram[9] >> 4) & 0x03);
@@ -5758,7 +5755,7 @@ static DEVICE_START( k053251 )
 	device->save_item(NAME(k053251->tilemaps_set));
 	device->save_item(NAME(k053251->dirty_tmap));
 
-	device->machine().save().register_postload(k053251_reset_indexes, k053251);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(k053251_reset_indexes), k053251));
 }
 
 static DEVICE_RESET( k053251 )
@@ -7744,10 +7741,8 @@ int k056832_read_register( device_t *device, int regnum )
 	return(k056832->regs[regnum]);
 }
 
-static STATE_POSTLOAD( k056832_postload )
+static void k056832_postload(k056832_state *k056832)
 {
-	k056832_state *k056832 = (k056832_state *)param;
-
 	k056832_update_page_layout(k056832);
 	k056832_change_rambank(k056832);
 	k056832_change_rombank(k056832);
@@ -8004,7 +7999,7 @@ static DEVICE_START( k056832 )
 		device->save_item(NAME(k056832->last_colorbase[i]), i);
 	}
 
-	device->machine().save().register_postload(k056832_postload, k056832);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(k056832_postload), k056832));
 }
 
 /***************************************************************************/

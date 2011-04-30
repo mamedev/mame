@@ -58,7 +58,7 @@ void gradius3_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-static STATE_POSTLOAD( gradius3_postload )
+static void gradius3_postload(running_machine &machine)
 {
 	int i;
 
@@ -88,7 +88,7 @@ VIDEO_START( gradius3 )
 
 	gfx_element_set_source(machine.gfx[0], (UINT8 *)state->m_gfxram);
 
-	machine.save().register_postload(gradius3_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine));
 }
 
 

@@ -304,11 +304,6 @@ static INTERRUPT_GEN( xmen_interrupt )
 		irq3_line_hold(device);
 }
 
-static STATE_POSTLOAD( xmen_postload )
-{
-	sound_reset_bank(machine);
-}
-
 static MACHINE_START( xmen )
 {
 	xmen_state *state = machine.driver_data<xmen_state>();
@@ -330,7 +325,7 @@ static MACHINE_START( xmen )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	machine.save().register_postload(xmen_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(sound_reset_bank), &machine));
 }
 
 static MACHINE_RESET( xmen )

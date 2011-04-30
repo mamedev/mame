@@ -531,11 +531,6 @@ static const tc0140syt_interface warriorb_tc0140syt_intf =
 };
 
 
-static STATE_POSTLOAD( warriorb_postload )
-{
-	reset_sound_region(machine);
-}
-
 static MACHINE_START( warriorb )
 {
 	warriorb_state *state = machine.driver_data<warriorb_state>();
@@ -558,7 +553,7 @@ static MACHINE_START( warriorb )
 
 	state->save_item(NAME(state->m_banknum));
 	state->save_item(NAME(state->m_pandata));
-	machine.save().register_postload(warriorb_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine));
 }
 
 static MACHINE_RESET( taito_dualscreen )

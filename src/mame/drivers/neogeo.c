@@ -1030,7 +1030,7 @@ static void set_output_data( running_machine &machine, UINT8 data )
  *
  *************************************/
 
-static STATE_POSTLOAD( neogeo_postload )
+static void neogeo_postload(running_machine &machine)
 {
 	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source(machine);
@@ -1090,7 +1090,7 @@ static MACHINE_START( neogeo )
 	state->save_item(NAME(state->m_led2_value));
 	state->save_item(NAME(state->m_recurse));
 
-	machine.save().register_postload(neogeo_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(neogeo_postload), &machine));
 }
 
 

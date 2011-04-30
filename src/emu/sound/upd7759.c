@@ -592,9 +592,8 @@ static DEVICE_RESET( upd7759 )
 }
 
 
-static STATE_POSTLOAD( upd7759_postload )
+static void upd7759_postload(upd7759_state *chip)
 {
-	upd7759_state *chip = (upd7759_state *)param;
 	chip->rom = chip->rombase + chip->romoffset;
 }
 
@@ -628,7 +627,7 @@ static void register_for_save(upd7759_state *chip, device_t *device)
 	device->save_item(NAME(chip->sample));
 
 	device->save_item(NAME(chip->romoffset));
-	device->machine().save().register_postload(upd7759_postload, chip);
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(upd7759_postload), chip));
 }
 
 

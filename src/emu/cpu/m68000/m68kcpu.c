@@ -539,17 +539,15 @@ static void set_irq_line(m68ki_cpu_core *m68k, int irqline, int state)
 		m68k->nmi_pending = TRUE;
 }
 
-static void m68k_presave(running_machine &machine, void *param)
+static void m68k_presave(m68ki_cpu_core *m68k)
 {
-	m68ki_cpu_core *m68k = (m68ki_cpu_core *)param;
 	m68k->save_sr = m68ki_get_sr(m68k);
 	m68k->save_stopped = (m68k->stopped & STOP_LEVEL_STOP) != 0;
 	m68k->save_halted  = (m68k->stopped & STOP_LEVEL_HALT) != 0;
 }
 
-static void m68k_postload(running_machine &machine, void *param)
+static void m68k_postload(m68ki_cpu_core *m68k)
 {
-	m68ki_cpu_core *m68k = (m68ki_cpu_core *)param;
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
 	m68k->stopped = m68k->save_stopped ? STOP_LEVEL_STOP : 0
 		        | m68k->save_halted  ? STOP_LEVEL_HALT : 0;
@@ -763,8 +761,8 @@ static CPU_INIT( m68k )
 	device->save_item(NAME(m68k->save_halted));
 	device->save_item(NAME(m68k->pref_addr));
 	device->save_item(NAME(m68k->pref_data));
-	device->machine().save().register_presave(m68k_presave, m68k);
-	device->machine().save().register_postload(m68k_postload, m68k);
+	device->machine().save().register_presave(save_prepost_delegate(FUNC(m68k_presave), m68k));
+	device->machine().save().register_postload(save_prepost_delegate(FUNC(m68k_postload), m68k));
 }
 
 /* Pulse the RESET line on the CPU */

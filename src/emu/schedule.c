@@ -341,7 +341,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 	// register global states
 	machine.save().save_item(NAME(m_basetime));
-	machine.save().register_postload(&state_postload_stub<device_scheduler, &device_scheduler::postload>, this);
+	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 }
 
 

@@ -1055,9 +1055,10 @@ PC  :000029F8: BT      $000029EC
 	return state->m_ram[0x00001c / 4];
 }
 
-static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
+static void hotgmck_pcm_bank_postload(running_machine &machine)
 {
-	set_hotgmck_pcm_bank(machine, (FPTR)param);
+	set_hotgmck_pcm_bank(machine, 0);
+	set_hotgmck_pcm_bank(machine, 1);
 }
 
 static void install_hotgmck_pcm_bank(running_machine &machine)
@@ -1073,8 +1074,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 	set_hotgmck_pcm_bank(machine, 1);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5800008, 0x580000b, FUNC(hotgmck_pcm_bank_w) );
-	machine.save().register_postload(hotgmck_pcm_bank_postload, (void *)0);
-	machine.save().register_postload(hotgmck_pcm_bank_postload, (void *)1);
+	machine.save().register_postload(save_prepost_delegate(FUNC(hotgmck_pcm_bank_postload), &machine));
 }
 
 static DRIVER_INIT( hotgmck )

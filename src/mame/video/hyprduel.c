@@ -333,7 +333,7 @@ static void alloc_empty_tiles( running_machine &machine )
 }
 
 
-static STATE_POSTLOAD( hyprduel_postload )
+static void hyprduel_postload(running_machine &machine)
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int i;
@@ -381,7 +381,7 @@ static VIDEO_START( common_14220 )
 	/* Set up save state */
 	state->save_item(NAME(state->m_sprite_xoffs));
 	state->save_item(NAME(state->m_sprite_yoffs));
-	machine.save().register_postload(hyprduel_postload, NULL);
+	machine.save().register_postload(save_prepost_delegate(FUNC(hyprduel_postload), &machine));
 }
 
 VIDEO_START( hyprduel_14220 )
