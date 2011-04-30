@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h"
 #include "video/konicdev.h"
@@ -26,20 +25,15 @@
 
 static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
 
-static INTERRUPT_GEN( chqflag_interrupt )
+static TIMER_DEVICE_CALLBACK( chqflag_scanline )
 {
-	chqflag_state *state = device->machine().driver_data<chqflag_state>();
+	chqflag_state *state = timer.machine().driver_data<chqflag_state>();
+	int scanline = param;
 
-	if (cpu_getiloops(device) == 0)
-	{
-		if (k051960_is_irq_enabled(state->m_k051960))
-			device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
-	}
-	else if (cpu_getiloops(device) % 2)
-	{
-		if (k051960_is_nmi_enabled(state->m_k051960))
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
+	if(scanline == 240 && k051960_is_irq_enabled(state->m_k051960)) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", KONAMI_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(state->m_k051960))) // timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( chqflag_bankswitch_w )
@@ -390,7 +384,7 @@ static MACHINE_CONFIG_START( chqflag, chqflag_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(chqflag_map)
-	MCFG_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", chqflag_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)

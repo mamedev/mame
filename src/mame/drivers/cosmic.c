@@ -9,7 +9,7 @@ Magical Spot II - 8013
 Devil Zone      - 8022
 
 TODO:
-- use CUSTOM_INPUT in place of the fake input ports in INTERRUPT_GEN functions
+- double check irq sources via schematics
 
 2008-08
 Dip locations verified with manuals for all the games.
@@ -30,7 +30,6 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
@@ -311,73 +310,9 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 }
 
 
-static INTERRUPT_GEN( panic_interrupt )
-{
-	if (cpu_getiloops(device) != 0)
-	{
-		/* Coin insert - Trigger Sample */
-
-		/* mostly not noticed since sound is */
-		/* only enabled if game in progress! */
-
-		if ((input_port_read(device->machine(), "SYSTEM") & 0xc0) != 0xc0)
-			panic_sound_output_w(device->memory().space(AS_PROGRAM), 17, 1);
-
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-	}
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
-}
-
-static INTERRUPT_GEN( cosmica_interrupt )
-{
-	cosmic_state *state = device->machine().driver_data<cosmic_state>();
-	state->m_pixel_clock = (state->m_pixel_clock + 2) & 0x3f;
-
-	if (state->m_pixel_clock == 0)
-	{
-		if (input_port_read(device->machine(), "FAKE") & 1)	/* Left Coin */
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-static INTERRUPT_GEN( cosmicg_interrupt )
-{
-	/* Insert Coin */
-
-	/* R Nabet : fixed to make this piece of code sensible.
-    I assumed that the interrupt request lasted for as long as the coin was "sensed".
-    It makes sense and works fine, but I cannot be 100% sure this is correct,
-    as I have no Cosmic Guerilla console :-) . */
-
-	if ((input_port_read(device->machine(), "IN2") & 1))	/* Coin */
-		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
-		device_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
-	else
-		device_set_input_line(device, 0, CLEAR_LINE);
-}
-
-static INTERRUPT_GEN( magspot_interrupt )
-{
-	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_read(device->machine(), "COINS") & 0x01)
-		device_set_input_line(device, 0, HOLD_LINE);
-	else if (input_port_read(device->machine(), "COINS") & 0x02)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static INTERRUPT_GEN( nomnlnd_interrupt )
-{
-	/* Coin causes an NMI */
-	if (input_port_read(device->machine(), "COIN") & 0x01)
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 static READ8_HANDLER( cosmica_pixel_clock_r )
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
-	return state->m_pixel_clock;
+	return (space->machine().primary_screen->vpos() >> 2) & 0x3f;
 }
 
 static READ8_HANDLER( cosmicg_port_0_r )
@@ -476,6 +411,12 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
+static INPUT_CHANGED( panic_coin_inserted )
+{
+	panic_sound_output_w(field->port->machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
+}
+
 static INPUT_PORTS_START( panic )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -528,10 +469,14 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(panic_coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(panic_coin_inserted, 0)
 INPUT_PORTS_END
+
+static INPUT_CHANGED( cosmica_coin_inserted )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( cosmica )
 	PORT_START("P1")
@@ -574,20 +519,19 @@ static INPUT_PORTS_START( cosmica )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	/* The coin slots are not memory mapped.  Coin causes a NMI, */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(cosmica_coin_inserted, 0)
 INPUT_PORTS_END
 
 /* These are used for the CR handling - This can be used to */
 /* from 1 to 16 bits from any bit offset between 0 and 4096 */
 
 /* Offsets are in BYTES, so bits 0-7 are at offset 0 etc.   */
+
+static INPUT_CHANGED( cosmicg_coin_inserted )
+{
+	cputag_set_input_line_and_vector(field->port->machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
+}
 
 static INPUT_PORTS_START( cosmicg )
 	PORT_START("IN0")	/* 4-7 */
@@ -615,11 +559,7 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPSETTING(    0x80, "5" )
 
 	PORT_START("IN2")	/* Hard wired settings */
-
-	/* The coin slots are not memory mapped. Coin causes INT 4  */
-	/* This fake input port is used by the interrupt handler    */
-	/* to be notified of coin insertions. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(cosmicg_coin_inserted, 0)
 
 	/* This dip switch is not read by the program at any time   */
 	/* but is wired to enable or disable the flip screen output */
@@ -635,6 +575,15 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW:6" )
 INPUT_PORTS_END
 
+static INPUT_CHANGED( coin_inserted_irq0 )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
+}
+
+static INPUT_CHANGED( coin_inserted_nmi )
+{
+	cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( magspot )
 	PORT_START("IN0")
@@ -692,8 +641,8 @@ static INPUT_PORTS_START( magspot )
 
 	/* Fake port to handle coins */
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq0, 0) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
 
 	/* Fake port to handle coinage dip switches. Each bit goes to 3800-3807 */
 	PORT_START("DSW")
@@ -776,8 +725,8 @@ static INPUT_PORTS_START( devzone )
 
 	/* Fake port to handle coins */
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq0, 0) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
@@ -873,7 +822,7 @@ static INPUT_PORTS_START( nomnlnd )
 
 	/* Fake port to handle coin */
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
 INPUT_PORTS_END
 
 
@@ -1057,13 +1006,24 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 MACHINE_CONFIG_END
 
+static TIMER_DEVICE_CALLBACK( panic_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xd7); /* RST 10h */
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf); /* RST 08h */
+}
+
 
 static MACHINE_CONFIG_DERIVED( panic, cosmic )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(panic_map)
-	MCFG_CPU_VBLANK_INT_HACK(panic_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", panic_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_GFXDECODE(panic)
@@ -1089,9 +1049,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-
 	MCFG_CPU_PROGRAM_MAP(cosmica_map)
-	MCFG_CPU_VBLANK_INT_HACK(cosmica_interrupt,32)
 
 	/* video hardware */
 	MCFG_GFXDECODE(cosmica)
@@ -1124,7 +1082,6 @@ static MACHINE_CONFIG_START( cosmicg, cosmic_state )
             1.5MHz.  So, if someone can check this... */
 	MCFG_CPU_PROGRAM_MAP(cosmicg_map)
 	MCFG_CPU_IO_MAP(cosmicg_io_map)
-	MCFG_CPU_VBLANK_INT("screen", cosmicg_interrupt)
 
 	MCFG_MACHINE_START(cosmic)
 	MCFG_MACHINE_RESET(cosmic)
@@ -1157,9 +1114,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
-	MCFG_CPU_VBLANK_INT("screen", magspot_interrupt)
 
 	/* video hardware */
 	MCFG_GFXDECODE(panic)
@@ -1191,9 +1146,7 @@ static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-
 	MCFG_CPU_PROGRAM_MAP(magspot_map)
-	MCFG_CPU_VBLANK_INT("screen", nomnlnd_interrupt)
 
 	/* video hardware */
 	MCFG_GFXDECODE(panic)

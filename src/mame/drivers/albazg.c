@@ -25,7 +25,7 @@ PCB:
 - NEC D8255AC-2
 - AY38910A/P
 - X1-009 (labeled 8732K5), X1-0198 (or X1-019B, can't read)
-- X2-004, X2-003, AX-014 (all with epoxy modulese apparently)
+- X2-004, X2-003, AX-014 (all with epoxy modules apparently)
 - X1-007
 - CR-203 lithium battery, near X1-009 and X1-0198. There is also a switch near it
 - Xtal 12 MHz at top right corner
@@ -424,6 +424,9 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg001005.u5", 0x4000, 0x4000, CRC(158b6cde) SHA1(3e335b7dc1bbae2edb02722025180f32ab91f69f))
 	ROM_LOAD("zg001004.u4", 0x8000, 0x4000, CRC(d8676435) SHA1(9b6df5378948f492717e1a4d9c833ddc5a9e8225))
 	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
 ROM_END
 
 GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

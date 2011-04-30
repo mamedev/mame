@@ -43,7 +43,6 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "includes/circus.h"
 
@@ -327,8 +326,6 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-
-	/* driver data */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 	// does not generate irq!
 
@@ -362,13 +359,20 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static TIMER_DEVICE_CALLBACK( crash_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 256 || scanline == 0) // vblank-out / in irq
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+}
+
 static MACHINE_CONFIG_START( crash, circus_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
-	// irq: one at vblank start, one at vblank end
-	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2) // but not like this :P
+	MCFG_TIMER_ADD_SCANLINE("scantimer", crash_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
@@ -378,7 +382,7 @@ static MACHINE_CONFIG_START( crash, circus_state )
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_SIZE(40*8, 40*8) //TODO
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(crash)
 
