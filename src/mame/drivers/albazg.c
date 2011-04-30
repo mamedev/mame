@@ -17,40 +17,19 @@ TODO:
  there's an heavy x offsetting with the flip screen right now due of that (sets register
  0x0d to 0x80 when the screen is upside-down)
 -You can actually configure the coin chutes / coin lockout active high/low (!), obviously
- MAME isn't really suitable for it at the current time;
+ MAME framework isn't really suitable for it at the current time;
 
-============================================================================================
-Code disassembling
-(anything that I don't know the meaning is in brackets):
-[0458]-> (Writes to ports 00 & 01)
-[04bd]-> Enables prot lock
-[04d9]-> Palette RAM init
-[0c55]-> Video Ram Init
-[04c3]-> Disables prot lock
-[2603]-> Custom Ram Math
-[008b]-> Custom Ram Check 1 [without prot lock]
-[009A]-> Custom Ram Check 2 [must be NZ]
-[010e]-> Video Ram Math 1 [$c000]
-[00A0]-> Video Ram Check 1 [must be Z]
-[013b]-> Video Ram Math 2 [$d000]
-[00A6]-> Video Ram Check 2 [must be Z]
-[0197]-> Eeprom Check 1
-    [2344] -> Eeprom sub check 1
-    [2318] -> Eeprom sub check 2
-    ...
-[0222]-> Back Up Check
-[047c]-> (Writes to ports 83 & 80)
-[0488]-> Multiple writes to sound ports 40 & 41
-[04b4]-> Disables prot lock
-[0810]->[08b5]->write & read to sound port 40
-[08dd]->
-    [079d]->(write to port c0)
-    [0985]->Nvram lock enable/disable
-    ...
-[0b44]-> Nvram Check
-[0b1a]-> Nvram Check
-[090a]-> (?)
-[0312]-> Eeprom init msg
+PCB:
+- HD46505SP-2 / HD68B45SP Japan
+- Mostek MK3880P CPU, Z80 clone
+- NEC D8255AC-2
+- AY38910A/P
+- X1-009 (labeled 8732K5), X1-0198 (or X1-019B, can't read)
+- X2-004, X2-003, AX-014 (all with epoxy modulese apparently)
+- X1-007
+- CR-203 lithium battery, near X1-009 and X1-0198. There is also a switch near it
+- Xtal 12 MHz at top right corner
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -58,8 +37,9 @@ Code disassembling
 #include "machine/eeprom.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "machine/8255ppi.h"
+#include "machine/i8255.h"
 
+#define MASTER_CLOCK XTAL_12MHz
 
 class albazg_state : public driver_device
 {
@@ -82,9 +62,6 @@ public:
 	int m_bank;
 	UINT8 m_prot_lock;
 };
-
-
-#define MASTER_CLOCK XTAL_12MHz
 
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
@@ -238,7 +215,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-static const ppi8255_interface ppi8255_intf =
+static I8255A_INTERFACE( ppi8255_intf )
 {
 	DEVCB_NULL,					/* Port A read */
 	DEVCB_INPUT_PORT("SYSTEM"),		/* Port B read */
@@ -269,7 +246,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -408,7 +385,7 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 
-	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf )
+	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
