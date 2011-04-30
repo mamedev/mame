@@ -909,7 +909,8 @@ SCREEN_UPDATE( psx )
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				UINT16 *p_n_src = p_psxgpu->p_p_vram[ n_y + p_psxgpu->n_displaystarty ] + n_x + n_displaystartx;
+				//UINT16 *p_n_src = p_psxgpu->p_p_vram[ n_y + p_psxgpu->n_displaystarty ] + n_x + n_displaystartx;
+				UINT16 *p_n_src = p_psxgpu->p_p_vram[ n_y + p_psxgpu->n_displaystarty ] + n_displaystartx;
 				UINT16 *p_n_dest = BITMAP_ADDR16(bitmap, n_y + n_top, n_x + n_left);
 
 				n_column = n_columns;
