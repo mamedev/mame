@@ -14,14 +14,14 @@ pbball96   Powerful Pro Baseball '96    GV999          GV017   JAPAN 1.03   96.0
 hyperath   Hyper Athlete                ZV610          GV021   JAPAN 1.00   96.06.09  19:00
 susume     Susume! Taisen Puzzle-Dama   ZV610          GV027   JAPAN 1.20   96.03.04  12:00
 btchamp    Beat the Champ               GV999          GV053   UAA01        ?
-kdeadeye   Dead Eye                     GV999          GV054   UA01         ?
+kdeadeye   Dead Eye                     GV999          GV054   UAA01        ?
 weddingr   Wedding Rhapsody             ?              GX624   JAA          97.05.29   9:12
 tokimosh   Tokimeki Memorial Oshiete    ?              GE755   JAA          97.08.06  11:52
            Your Heart
 tokimosp   Tokimeki Memorial Oshiete    ?              GE756   JAB          97.09.27   9:10
            Your Heart Seal version PLUS
 nagano98   Winter Olypmics in Nagano 98 GV999          GX720   EAA01 1.03   98.01.08  10:45
-simpbowl   Simpsons Bowling             ?              GQ829   UAA          ?
+simpbowl   Simpsons Bowling             GV999          GQ829   UAA          ?
 
 PCB Layouts
 -----------
@@ -681,7 +681,7 @@ static DRIVER_INIT( tokimosh )
 /*
 Dead Eye
 
-Top board:
+Top board (also used on Simpsons Bowling):
     PWB402610
     Xilinx XC3020A
     Xilinx 1718DPC
