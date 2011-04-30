@@ -346,7 +346,7 @@ device_t &running_machine::add_dynamic_device(device_t &owner, device_type type,
 {
 	// allocate and append this device
 	astring tempstring;
-	device_t &device = const_cast<device_list &>(devicelist()).append(tag, *type(m_config, owner.subtag(tempstring, tag), &owner, clock));
+	device_t &device = const_cast<device_list &>(devicelist()).append(owner.subtag(tempstring, tag), *type(m_config, owner.subtag(tempstring, tag), &owner, clock));
 
 	// append any machine config additions from new devices
 	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
@@ -361,9 +361,6 @@ device_t &running_machine::add_dynamic_device(device_t &owner, device_type type,
 	for (device_t *curdevice = devicelist().first(); curdevice != NULL; curdevice = curdevice->next())
 		if (!curdevice->configured())
 			curdevice->config_complete();
-
-	// start all the new devices
-	const_cast<device_list &>(devicelist()).start_new_devices();
 	return device;
 }
 
