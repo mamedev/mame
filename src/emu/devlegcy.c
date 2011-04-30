@@ -77,12 +77,6 @@ legacy_device_base::legacy_device_base(const machine_config &mconfig, device_typ
 
 legacy_device_base::~legacy_device_base()
 {
-	if (m_started)
-	{
-		device_stop_func stop_func = reinterpret_cast<device_stop_func>(get_legacy_fct(DEVINFO_FCT_STOP));
-		if (stop_func != NULL)
-			(*stop_func)(this);
-	}
 	global_free(m_token);
 	global_free(m_inline_config);
 }
@@ -237,6 +231,20 @@ void legacy_device_base::device_reset()
 		(*reset_func)(this);
 }
 
+
+//-------------------------------------------------
+//  device_stop - called to stop a device
+//-------------------------------------------------
+
+void legacy_device_base::device_stop()
+{
+	if (m_started)
+	{
+		device_stop_func stop_func = reinterpret_cast<device_stop_func>(get_legacy_fct(DEVINFO_FCT_STOP));
+		if (stop_func != NULL)
+			(*stop_func)(this);
+	}
+}
 
 
 //**************************************************************************
