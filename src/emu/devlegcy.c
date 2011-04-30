@@ -52,7 +52,8 @@
 legacy_device_base::legacy_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, device_get_config_func get_config)
 	: device_t(mconfig, type, "Legacy Device", tag, owner, clock),
 	  m_get_config_func(get_config),
-	  m_inline_config(NULL)
+	  m_inline_config(NULL),
+	  m_token(NULL)
 {
 	// allocate a buffer for the inline configuration
 	UINT32 configlen = (UINT32)get_legacy_int(DEVINFO_INT_INLINE_CONFIG_BYTES);
