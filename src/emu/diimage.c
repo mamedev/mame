@@ -90,7 +90,9 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	  m_mame_file(NULL),
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
-	  m_software_part_ptr(NULL)
+	  m_software_part_ptr(NULL),
+      m_writeable(false),
+      m_created(false)
 {
 	m_mempool = pool_alloc_lib(memory_error);
 }
