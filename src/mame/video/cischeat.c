@@ -620,7 +620,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 WRITE16_HANDLER( f1gpstr2_vregs_w )
 {
 	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-//  UINT16 old_data = state->m_vregs[offset];
+	UINT16 old_data = state->m_vregs[offset];
 	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
 
 	if ((offset >= 0x1000/2) && (offset < 0x2000/2))
@@ -631,8 +631,10 @@ WRITE16_HANDLER( f1gpstr2_vregs_w )
 		case 0x0000/2   :
 			if (ACCESSING_BITS_0_7)
 			{
-				cputag_set_input_line(space->machine(), "cpu5", 4, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE);
-				cputag_set_input_line(space->machine(), "cpu5", 2, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE);
+				if((old_data & 4) && ((new_data & 4) == 0))
+					cputag_set_input_line(space->machine(), "cpu5", 4, HOLD_LINE);
+				if((old_data & 2) && ((new_data & 2) == 0))
+					cputag_set_input_line(space->machine(), "cpu5", 2, HOLD_LINE);
 			}
 			break;
 

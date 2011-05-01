@@ -174,8 +174,8 @@ Cisco Heat.
 #include "machine/jalcrpt.h"
 #include "includes/cischeat.h"
 
-
-
+#include "cischeat.lh"
+#include "f1gpstar.lh"
 
 /**************************************************************************
 
@@ -1692,9 +1692,10 @@ static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MCFG_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
+	MCFG_CPU_ADD("cpu5", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 MACHINE_CONFIG_END
 
 
@@ -3041,11 +3042,11 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1989, bigrun,   0,        bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS )	// there's a 13th Rallye version (1991)
-GAME( 1990, cischeat, 0,        cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, armchmp2, 0,        armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, wildplt,  0,        f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, scudhamm, 0,        scudhamm, scudhamm, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1989, bigrun,   0,        bigrun,   bigrun,   bigrun,   ROT0,   "Jaleco", "Big Run (11th Rallye version)", GAME_IMPERFECT_GRAPHICS, layout_cischeat )	// there's a 13th Rallye version (1991)
+GAMEL( 1990, cischeat, 0,        cischeat, cischeat, cischeat, ROT0,   "Jaleco", "Cisco Heat",                    GAME_IMPERFECT_GRAPHICS, layout_cischeat )
+GAMEL( 1991, f1gpstar, 0,        f1gpstar, f1gpstar, f1gpstar, ROT0,   "Jaleco", "Grand Prix Star",               GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1992, armchmp2, 0,        armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v2.6",            GAME_IMPERFECT_GRAPHICS )
+GAME ( 1992, armchmp2o,armchmp2, armchmp2, armchmp2, 0,        ROT270, "Jaleco", "Arm Champs II v1.7",            GAME_IMPERFECT_GRAPHICS )
+GAME ( 1992, wildplt,  0,        f1gpstr2, wildplt,  wildplt,  ROT0,   "Jaleco", "Wild Pilot",                    GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1993, f1gpstr2, 0,        f1gpstr2, f1gpstar, f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",        GAME_IMPERFECT_GRAPHICS, layout_f1gpstar )
+GAME ( 1994, scudhamm, 0,        scudhamm, scudhamm, 0,        ROT270, "Jaleco", "Scud Hammer",                   GAME_IMPERFECT_GRAPHICS )

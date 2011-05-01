@@ -1855,6 +1855,9 @@ $(DRIVERS)/cinemat.o:	$(LAYOUT)/armora.lh \
 			$(LAYOUT)/solarq.lh \
 			$(LAYOUT)/starcas.lh
 
+$(DRIVERS)/cischeat.o:	$(LAYOUT)/cischeat.lh \
+			$(LAYOUT)/f1gpstar.lh
+
 $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 			$(LAYOUT)/crash.lh
 
