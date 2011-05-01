@@ -51,31 +51,25 @@ Notes:
 */
 
 #include "emu.h"
-#include "deprecat.h"
-
-#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/dbz.h"
+#include "video/konicdev.h"
 
 
-static INTERRUPT_GEN( dbz_interrupt )
+
+static TIMER_DEVICE_CALLBACK( dbz_scanline )
 {
-	dbz_state *state = device->machine().driver_data<dbz_state>();
+	dbz_state *state = timer.machine().driver_data<dbz_state>();
+	int scanline = param;
 
-	switch (cpu_getiloops(device))
-	{
-		case 0:
-			device_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
-			break;
+	if(scanline == 256) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_2, HOLD_LINE);
 
-		case 1:
-			if (k053246_is_irq_enabled(state->m_k053246))
-				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
-			break;
-	}
+	if(scanline == 0 && k053246_is_irq_enabled(state->m_k053246)) // vblank-in irq
+		cputag_set_input_line(timer.machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
 }
 
 #if 0
@@ -117,10 +111,7 @@ static void dbz_sound_irq( device_t *device, int irq )
 {
 	dbz_state *state = device->machine().driver_data<dbz_state>();
 
-	if (irq)
-		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
-	else
-		device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->m_audiocpu, 0, (irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16 )
@@ -374,7 +365,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dbz_map)
-	MCFG_CPU_VBLANK_INT_HACK(dbz_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", dbz_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(dbz_sound_map)
@@ -390,7 +381,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_SCREEN_REFRESH_RATE(55)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_SIZE(64*8, 40*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE(dbz)
 

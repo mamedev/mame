@@ -85,7 +85,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 
 
@@ -104,34 +103,6 @@ public:
 	size_t m_spriteram_size;
 };
 
-
-
-
-#if 0
-
-static void ar_coin_hack(running_machine &machine)
-{
-	cshooter_state *state = machine.driver_data<cshooter_state>();
-	if(input_port_read(machine, "COIN") & 1)
-	{
-		if(state->m_coin_stat==0)
-		{
-			state->m_coin_stat=1;
-			if(state->m_mainram[0]==0)
-			{
-				state->m_mainram[0]=0x80;
-			}
-
-			state->m_mainram[0x234]++;
-
-		}
-	}
-	else
-	{
-		state->m_coin_stat=0;
-	}
-}
-#endif
 
 static TILE_GET_INFO( get_cstx_tile_info )
 {
@@ -215,18 +186,17 @@ static SCREEN_UPDATE(cshooter)
 
 /* main cpu */
 
-static INTERRUPT_GEN( cshooter_interrupt )
+
+static TIMER_DEVICE_CALLBACK( cshooter_scanline )
 {
-	//cshooter_state *state = device->machine().driver_data<cshooter_state>();
-	if(cpu_getiloops(device))
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
-	else
-      device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
+	int scanline = param;
 
-//  if(state->m_mainram!=NULL)
-//      ar_coin_hack(device->machine());
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0x10); /* RST 10h */
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0x08); /* RST 08h */
 }
-
 
 
 static MACHINE_RESET( cshooter )
@@ -456,7 +426,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cshooter_map)
-	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", cshooter_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -485,7 +455,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
-	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", cshooter_scanline, "screen", 0, 1)
 
 	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)		 /* verified on pcb */
 

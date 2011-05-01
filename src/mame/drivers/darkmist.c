@@ -25,7 +25,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "audio/t5182.h"
 #include "includes/darkmist.h"
 
@@ -215,12 +214,15 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( darkmist_interrupt )
+static TIMER_DEVICE_CALLBACK( darkmist_scanline )
 {
-	if(cpu_getiloops(device))
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0x10); /* RST 10h */
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0x08); /* RST 08h */
 }
 
 
@@ -229,7 +231,7 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", darkmist_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(t5182_map)

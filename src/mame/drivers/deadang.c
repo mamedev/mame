@@ -38,7 +38,6 @@ Dip locations and factory settings verified with US manual
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
@@ -207,12 +206,26 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-static INTERRUPT_GEN( deadang_interrupt )
+static TIMER_DEVICE_CALLBACK( deadang_main_scanline )
 {
-	if (cpu_getiloops(device))
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);	/* VBL */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xc4/4);
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xc8/4);
+}
+
+static TIMER_DEVICE_CALLBACK( deadang_sub_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "sub", 0, HOLD_LINE,0xc4/4);
+
+	if(scanline == 0) // vblank-in irq
+		cputag_set_input_line_and_vector(timer.machine(), "sub", 0, HOLD_LINE,0xc8/4);
 }
 
 /* Machine Drivers */
@@ -222,11 +235,11 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer1", deadang_main_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer2", deadang_sub_scanline, "screen", 0, 1)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
