@@ -5894,6 +5894,7 @@ typedef struct _k051733_state k051733_state;
 struct _k051733_state
 {
 	UINT8    ram[0x20];
+	UINT8    rng;
 };
 
 /*****************************************************************************
@@ -5953,8 +5954,6 @@ READ8_DEVICE_HANDLER( k051733_r )
 	int yobj2c = (k051733->ram[0x0c] << 8) | k051733->ram[0x0d];
 	int xobj2c = (k051733->ram[0x0e] << 8) | k051733->ram[0x0f];
 
-	//logerror("%04x: read 051733 address %02x\n", cpu_get_pc(&space->device()), offset);
-
 	switch (offset)
 	{
 		case 0x00:
@@ -5987,7 +5986,8 @@ READ8_DEVICE_HANDLER( k051733_r )
 			return k051733_int_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			return k051733->ram[0x13]; //RNG read, used by Chequered Flag for differentiate cars, could be wrong
+			k051733->rng += k051733->ram[0x13];
+			return k051733->rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
 
 		case 0x07:{ /* note: Chequered Flag definitely wants all these bits to be enabled */
 			if (xobj1c + rad < xobj2c)
@@ -6022,6 +6022,7 @@ static DEVICE_START( k051733 )
 	k051733_state *k051733 = k051733_get_safe_token(device);
 
 	device->save_item(NAME(k051733->ram));
+	device->save_item(NAME(k051733->rng));
 }
 
 static DEVICE_RESET( k051733 )
@@ -6031,6 +6032,8 @@ static DEVICE_RESET( k051733 )
 
 	for (i = 0; i < 0x20; i++)
 		k051733->ram[i] = 0;
+
+	k051733->rng = 0;
 }
 
 

@@ -79,7 +79,6 @@ be verified on real PCB.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -1071,20 +1070,24 @@ static MACHINE_CONFIG_START( primella, dooyong_state )
 	MCFG_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static INTERRUPT_GEN( rshark_interrupt )
+static TIMER_DEVICE_CALLBACK( rshark_scanline )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, 5, HOLD_LINE);
-	else
-		device_set_input_line(device, 6, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 248) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+
+	if(scanline == 120) // timer irq?
+		cputag_set_input_line(timer.machine(), "maincpu", 6, HOLD_LINE);
 }
+
 
 static MACHINE_CONFIG_START( rshark, dooyong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(rshark_map)
-	MCFG_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1115,7 +1118,7 @@ static MACHINE_CONFIG_START( superx, dooyong_state ) // dif mem map
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(superx_map)
-	MCFG_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
@@ -1146,7 +1149,7 @@ static MACHINE_CONFIG_START( popbingo, dooyong_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(popbingo_map)
-	MCFG_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", rshark_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* measured on super-x */
 	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
