@@ -185,24 +185,6 @@ Cisco Heat.
 
 **************************************************************************/
 
-static READ16_HANDLER( rom_1_r )
-{
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	return state->m_rom_1[offset];
-}
-
-static READ16_HANDLER( rom_2_r )
-{
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	return state->m_rom_2[offset];
-}
-
-static READ16_HANDLER( rom_3_r )
-{
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	return state->m_rom_3[offset];
-}
-
 
 /**************************************************************************
                                 Big Run
@@ -244,7 +226,7 @@ static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x09c000, 0x09ffff) AM_WRITE(bigrun_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_ram)											// RAM
-	AM_RANGE(0x100000, 0x13ffff) AM_READ(rom_1_r)														// ROM
+	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("user1",0)														// ROM
 ADDRESS_MAP_END
 
 
@@ -305,7 +287,7 @@ static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(cischeat_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
 
@@ -359,7 +341,7 @@ static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
 
@@ -385,7 +367,7 @@ static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1",0)															// ROM
 ADDRESS_MAP_END
 
 
@@ -648,7 +630,7 @@ static ADDRESS_MAP_START( cischeat_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_roadram[0])	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM													// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP											// watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_2_r)										// ROM
+	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu2",0x40000)										// ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cischeat_map3, AS_PROGRAM, 16 )
@@ -657,7 +639,7 @@ static ADDRESS_MAP_START( cischeat_map3, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, m_roadram[1])	// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM													// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP											// watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_3_r)										// ROM
+	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("cpu3",0x40000)										// ROM
 ADDRESS_MAP_END
 
 
@@ -1956,10 +1938,6 @@ ROM_END
 
 static DRIVER_INIT( bigrun )
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
-	/* Split ROMs */
-	state->m_rom_1 = (UINT16 *) machine.region("user1")->base();
-
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
 }
@@ -2035,8 +2013,8 @@ ROM_START( cischeat )
 	ROM_REGION16_BE( 0x100000, "user1", 0 )	/* second halves of program ROMs */
 	ROM_LOAD16_BYTE( "ch9071.04",   0x000000, 0x040000, CRC(7fb48cbc) SHA1(7f0442ce37b39e830fe8bcb8230cf7da2103059d) )	// cpu #1
 	ROM_LOAD16_BYTE( "ch9071.02",   0x000001, 0x040000, CRC(a5d0f4dc) SHA1(2e7aaa915e27ab31e38ca6759301ffe33a12b427) )
-	// cpu #2 (0x40000 bytes will be copied here)
-	// cpu #3 (0x40000 bytes will be copied here)
+	ROM_COPY( "cpu2", 0x40000, 0x80000, 0x40000 )
+	ROM_COPY( "cpu3", 0x40000, 0xc0000, 0x40000 )
 
 	ROM_REGION( 0x040000, "gfx1", 0 )
 	ROM_LOAD( "ch9071.a14",  0x000000, 0x040000, CRC(7a6d147f) SHA1(8f52e012d9699311c2a2409130c6200c6d2e1c51) ) // scroll 0
@@ -2079,20 +2057,6 @@ ROM_END
 
 static DRIVER_INIT( cischeat )
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
-	/* Split ROMs */
-	state->m_rom_1 = (UINT16 *) (machine.region("user1")->base() + 0x00000);
-	state->m_rom_2 = (UINT16 *) (machine.region("cpu2")->base()  + 0x40000);
-	state->m_rom_3 = (UINT16 *) (machine.region("cpu3")->base()  + 0x40000);
-
-	memcpy(machine.region("user1")->base() + 0x80000, state->m_rom_2, 0x40000);
-	memset(state->m_rom_2, 0, 0x40000);
-	state->m_rom_2 = (UINT16 *) (machine.region("user1")->base() + 0x80000);
-
-	memcpy(machine.region("user1")->base() + 0xc0000, state->m_rom_3, 0x40000);
-	memset(state->m_rom_3, 0, 0x40000);
-	state->m_rom_3 = (UINT16 *) (machine.region("user1")->base() + 0xc0000);
-
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
 	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
 }
@@ -2307,10 +2271,6 @@ ROM_END
 
 static DRIVER_INIT( f1gpstar )
 {
-	cischeat_state *state = machine.driver_data<cischeat_state>();
-	/* Split ROMs */
-	state->m_rom_1 = (UINT16 *) machine.region("user1")->base();
-
 	cischeat_untangle_sprites(machine, "gfx4");
 }
 

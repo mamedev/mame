@@ -18,9 +18,6 @@ public:
 	int m_bits_per_color_code;
 	int m_scroll_flag[3];
 
-	UINT16 *m_rom_1;
-	UINT16 *m_rom_2;
-	UINT16 *m_rom_3;
 	int m_prev;
 	int m_armold;
 	UINT16 m_scudhamm_motor_command;
