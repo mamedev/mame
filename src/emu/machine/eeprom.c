@@ -91,7 +91,8 @@ eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, dev
 	  m_clock_line(CLEAR_LINE),
 	  m_sending(0),
 	  m_locked(false),
-	  m_reset_delay(0)
+	  m_reset_counter(0),
+	  m_data_buffer(0)
 {
 	m_default_data.u8 = NULL;
 	memset(downcast<eeprom_interface *>(this), 0, sizeof(eeprom_interface));
@@ -182,9 +183,9 @@ void eeprom_device::device_start()
 	save_item(NAME(m_locked));
 	save_item(NAME(m_serial_count));
 	save_item(NAME(m_latch));
-	save_item(NAME(m_reset_delay));
+	save_item(NAME(m_reset_counter));
 	save_item(NAME(m_clock_count));
-	save_item(NAME(m_data_bits));
+	save_item(NAME(m_data_buffer));
 	save_item(NAME(m_read_address));
 }
 
@@ -319,13 +320,13 @@ int eeprom_device::read_bit()
 	int res;
 
 	if (m_sending)
-		res = (m_data_bits >> m_data_bits) & 1;
+		res = (m_data_buffer >> m_data_bits) & 1;
 	else
 	{
-		if (m_reset_delay > 0)
+		if (m_reset_counter > 0)
 		{
 			/* this is needed by wbeachvl */
-			m_reset_delay--;
+			m_reset_counter--;
 			res = 0;
 		}
 		else
@@ -356,7 +357,7 @@ void eeprom_device::set_cs_line(int state)
 
 		m_serial_count = 0;
 		m_sending = 0;
-		m_reset_delay = m_reset_delay;	/* delay a little before returning setting data to 1 (needed by wbeachvl) */
+		m_reset_counter = m_reset_delay;	/* delay a little before returning setting data to 1 (needed by wbeachvl) */
 	}
 }
 
@@ -380,13 +381,13 @@ void eeprom_device::set_clock_line(int state)
 				{
 					m_read_address = (m_read_address + 1) & ((1 << m_address_bits) - 1);
 					if (m_data_bits == 16)
-						m_data_bits = m_addrspace[0]->read_word(m_read_address * 2);
+						m_data_buffer = m_addrspace[0]->read_word(m_read_address * 2);
 					else
-						m_data_bits = m_addrspace[0]->read_byte(m_read_address);
+						m_data_buffer = m_addrspace[0]->read_byte(m_read_address);
 					m_clock_count = 0;
-logerror("EEPROM read %04x from address %02x\n",m_data_bits,m_read_address);
+logerror("EEPROM read %04x from address %02x\n",m_data_buffer,m_read_address);
 				}
-				m_data_bits = (m_data_bits << 1) | 1;
+				m_data_buffer = (m_data_buffer << 1) | 1;
 				m_clock_count++;
 			}
 			else
@@ -428,14 +429,14 @@ void eeprom_device::write(int bit)
 			if (m_serial_buffer[i] == '1') address |= 1;
 		}
 		if (m_data_bits == 16)
-			m_data_bits = m_addrspace[0]->read_word(address * 2);
+			m_data_buffer = m_addrspace[0]->read_word(address * 2);
 		else
-			m_data_bits = m_addrspace[0]->read_byte(address);
+			m_data_buffer = m_addrspace[0]->read_byte(address);
 		m_read_address = address;
 		m_clock_count = 0;
 		m_sending = 1;
 		m_serial_count = 0;
-logerror("EEPROM read %04x from address %02x\n",m_data_bits,address);
+logerror("EEPROM read %04x from address %02x\n",m_data_buffer,address);
 	}
 	else if ( (m_serial_count > m_address_bits) &&
 	           command_match((char*)(m_serial_buffer),m_cmd_erase,strlen((char*)(m_serial_buffer))-m_address_bits) )

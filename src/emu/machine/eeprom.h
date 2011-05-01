@@ -117,7 +117,8 @@ protected:
 	int						m_clock_line;
 	int						m_sending;
 	int 					m_locked;
-	int 					m_reset_delay;
+	int 					m_reset_counter;
+	UINT16					m_data_buffer;
 };
 
 
