@@ -518,9 +518,11 @@ static MACHINE_CONFIG_START( cabal, cabal_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_SOUND_CONFIG(seibu_adpcm1_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
+	MCFG_SOUND_CONFIG(seibu_adpcm2_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -617,9 +619,11 @@ ROM_START( cabal )
 	ROM_LOAD16_BYTE( "sp_rom7.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
 	ROM_LOAD16_BYTE( "sp_rom8.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
-	ROM_LOAD( "1-1u",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 
 ROM_START( cabala )
@@ -644,9 +648,11 @@ ROM_START( cabala )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
 	ROM_LOAD( "epr-a-2.1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
-	ROM_LOAD( "epr-a-1.1u",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_LOAD( "epr-a-1.1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 
 ROM_START( cabalus )
@@ -669,9 +675,11 @@ ROM_START( cabalus )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples? */
+	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples? */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
-	ROM_LOAD( "1-1u",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* unknown */
 	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
@@ -698,9 +706,11 @@ ROM_START( cabalus2 )
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	ROM_LOAD( "tad-1.5e",       0x00000, 0x80000, CRC(8324a7fe) SHA1(aed4470df35ec18e65e35bddc9c217a5019fdcbf) ) /* sprites */
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples? */
+	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
 	ROM_LOAD( "2-1s",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
-	ROM_LOAD( "1-1u",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_LOAD( "1-1u",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* unknown */
 	ROM_LOAD( "prom05.8e",      0x0000, 0x0100, CRC(a94b18c2) SHA1(e7db4c1efc9e313e36eef3f53ae5b2e573a38920) )
@@ -828,9 +838,11 @@ ROM_START( cabalbl2 )
 	ROM_LOAD16_BYTE( "c21.bin",   0x60000, 0x10000, CRC(55c44764) SHA1(7fad1f2084664b5b4d1384c8081371b0c79c4f5e) )
 	ROM_LOAD16_BYTE( "c25.bin",   0x60001, 0x10000, CRC(702735c9) SHA1(e4ac799dc85ff5b7c8e578611605989c78f9e8b3) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 )	/* Samples */
+	ROM_REGION( 0x10000, "adpcm1", 0 )	/* Samples */
 	ROM_LOAD( "c2.bin",           0x00000, 0x10000, CRC(850406b4) SHA1(23ac1650c6d6f35607a5264b3aa89868401a645a) )
-	ROM_LOAD( "c1.bin",           0x10000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )	/* Samples */
+	ROM_LOAD( "c1.bin",           0x00000, 0x10000, CRC(8b3e0789) SHA1(b1450db1b1bada237c90930623e4def321099f13) )
 ROM_END
 
 
@@ -854,13 +866,15 @@ static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int len
 static DRIVER_INIT( cabal )
 {
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine,"adpcm");
+	seibu_adpcm_decrypt(machine,"adpcm1");
+	seibu_adpcm_decrypt(machine,"adpcm2");
 }
 
 static DRIVER_INIT( cabalbl2 )
 {
 	seibu_sound_bootleg(machine,"audiocpu",0x2000);
-	seibu_adpcm_decrypt(machine,"adpcm");
+	seibu_adpcm_decrypt(machine,"adpcm1");
+	seibu_adpcm_decrypt(machine,"adpcm2");
 }
 
 

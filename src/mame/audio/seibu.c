@@ -129,6 +129,16 @@ void seibu_sound_decrypt(running_machine &machine,const char *cpu,int length)
     Handlers for early Seibu/Tad games with dual channel ADPCM
 */
 
+const seibu_adpcm_interface seibu_adpcm1_intf =
+{
+	"adpcm1"
+};
+
+const seibu_adpcm_interface seibu_adpcm2_intf =
+{
+	"adpcm2"
+};
+
 typedef struct _seibu_adpcm_state seibu_adpcm_state;
 struct _seibu_adpcm_state
 {
@@ -173,10 +183,13 @@ static DEVICE_START( seibu_adpcm )
 {
 	running_machine &machine = device->machine();
 	seibu_adpcm_state *state = (seibu_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+	const seibu_adpcm_interface *intf;
+
+	intf = (const seibu_adpcm_interface *)device->static_config();
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, seibu_adpcm_callback);
-	state->m_base = machine.region("adpcm")->base();
+	state->m_base = machine.region(intf->rom_region)->base();
 
 	// because legacy device tokens are just allocated as a blob, the constructor for adpcm_state
 	// is not called, so use placement new to force it to set up; when this is converted to a

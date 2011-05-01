@@ -69,6 +69,15 @@ extern const ym3812_interface seibu_ym3812_interface;
 extern const ym2151_interface seibu_ym2151_interface;
 extern const ym2203_interface seibu_ym2203_interface;
 
+typedef struct _seibu_adpcm_interface seibu_adpcm_interface;
+struct _seibu_adpcm_interface
+{
+    const char *rom_region;
+};
+
+extern const seibu_adpcm_interface seibu_adpcm1_intf;
+extern const seibu_adpcm_interface seibu_adpcm2_intf;
+
 /**************************************************************************/
 
 #define SEIBU_COIN_INPUTS											\
@@ -174,9 +183,11 @@ extern const ym2203_interface seibu_ym2203_interface;
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE							\
 	MCFG_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)						\
+    MCFG_SOUND_CONFIG(seibu_adpcm1_intf)                                  \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) 					\
 																	\
 	MCFG_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)						\
+    MCFG_SOUND_CONFIG(seibu_adpcm2_intf)                                  \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 
