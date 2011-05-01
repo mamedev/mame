@@ -413,8 +413,45 @@ static SCREEN_UPDATE( amaticmg )
 
 static PALETTE_INIT( amaticmg )
 {
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x200; ++i)
+	{
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
 }
 
+
+static PALETTE_INIT( amaticmg3 )
+{
+	int	r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x20000; i+=2)
+	{
+		b = ((color_prom[1] & 0xf8) >> 3);
+		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
+		r = ((color_prom[0] & 0x3e) >> 1);
+
+		palette_set_color_rgb(machine, i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+		color_prom+=2;
+	}
+}
 
 /************************************
 *       Read/Write Handlers         *
@@ -531,14 +568,23 @@ INPUT_PORTS_END
 *         Graphics Layouts          *
 ************************************/
 
-static const gfx_layout charlayout =
+static const gfx_layout charlayout_4bpp =
 {
-/* Only 2 planes are hooked. This need to be fixed */
-
 	4,8,
 	RGN_FRAC(1,2),
-	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4 },
+	4,
+	{ RGN_FRAC(0,2) + 0, RGN_FRAC(0,2) + 4, RGN_FRAC(1,2) + 0, RGN_FRAC(1,2) + 4 }, //TODO: rom order is unknown
+	{ 3, 2, 1, 0 },	/* tiles are x-flipped */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*4*2
+};
+
+static const gfx_layout charlayout_6bpp =
+{
+	4,8,
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(0,3) + 0, RGN_FRAC(0,3) + 4, RGN_FRAC(1,3) + 0, RGN_FRAC(1,3) + 4,RGN_FRAC(2,3) + 0, RGN_FRAC(2,3) + 4, }, //TODO: rom order is unknown
 	{ 3, 2, 1, 0 },	/* tiles are x-flipped */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*4*2
@@ -550,9 +596,12 @@ static const gfx_layout charlayout =
 ************************************/
 
 static GFXDECODE_START( amaticmg )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_4bpp, 0, 0x20 )
 GFXDECODE_END
 
+static GFXDECODE_START( amaticmg3 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x20 )
+GFXDECODE_END
 
 /************************************
 *          Sound Interface          *
@@ -647,7 +696,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_GFXDECODE(amaticmg)
 
 	MCFG_PALETTE_INIT(amaticmg)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x200)
 	MCFG_VIDEO_START(amaticmg)
 
 	/* sound hardware */
@@ -662,6 +711,12 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( amaticmg3, amaticmg )
+
+	MCFG_GFXDECODE(amaticmg3)
+	MCFG_PALETTE_INIT(amaticmg3)
+	MCFG_PALETTE_LENGTH(0x10000)
+MACHINE_CONFIG_END
 
 /************************************
 *             Rom Load              *
@@ -671,9 +726,9 @@ ROM_START( am_uslot )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "u3.bin",  0x00000, 0x20000, CRC(29bf4a95) SHA1(a73873f7cd1fdf5accc3e79f4619949f261400b8) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )	/* There are only slots tiles. No chars inside */
+	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u9.bin",  0x00000, 0x10000, CRC(823a736a) SHA1(a5227e3080367736aac1198d9dbb55efc4114624) )
-	ROM_LOAD( "u10.bin", 0x00000, 0x10000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
+	ROM_LOAD( "u10.bin", 0x10000, 0x10000, CRC(6a811c81) SHA1(af01cd9b1ce6aca92df71febb05fe216b18cf42a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147a.bin", 0x0000, 0x0200, CRC(dfeabd11) SHA1(21e8bbcf4aba5e4d672e5585890baf8c5bc77c98) )
@@ -703,7 +758,7 @@ ROM_START( am_mg3 )
 	ROM_LOAD( "mg_iii_51_zg2.bin", 0x080000, 0x80000, CRC(4425e535) SHA1(726c322c5d0b391b82e49dd1797ebf0abfa4a65a) )
 	ROM_LOAD( "mg_iii_51_zg3.bin", 0x100000, 0x80000, CRC(36d4c0fa) SHA1(20352dbbb2ce2233be0f4f694ddf49b8f5d6a64f) )
 
-	ROM_REGION( 0x20000, "other", 0 )
+	ROM_REGION( 0x20000, "proms", 0 )
 	ROM_LOAD( "v.bin", 0x00000, 0x20000, CRC(524767e2) SHA1(03a108494f42365c820fdfbcba9496bda86f3081) )
 ROM_END
 
@@ -724,5 +779,5 @@ static DRIVER_INIT( amaticmg )
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY                FULLNAME                     FLAGS  */
 GAME( 1996, am_uslot, 0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Amatic Unknown Slots Game",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg24,  0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2000, am_mg3,   0,      amaticmg, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, am_mg24,  0,      amaticmg3, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, am_mg3,   0,      amaticmg3, amaticmg, amaticmg, ROT0, "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
