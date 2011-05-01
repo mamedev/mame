@@ -235,8 +235,6 @@ VIDEO_START( cischeat )
 	cischeat_state *state = machine.driver_data<cischeat_state>();
 	int i;
 
-	state->m_shift_ret = 1;
-
 	state->m_spriteram = &state->m_ram[0x8000/2];
 
 	create_tilemaps(machine);
@@ -285,39 +283,13 @@ VIDEO_START( bigrun )
 
 ***************************************************************************/
 
-/*  This function returns the status of the shift (ACTIVE_LOW):
-
-        1 - low  shift
-        0 - high shift
-
-    and allows the shift to be handled using two buttons */
-
-CUSTOM_INPUT( cischeat_shift_r )
-{
-	cischeat_state *state = field->port->machine().driver_data<cischeat_state>();
-	switch ( (input_port_read(field->port->machine(), "FAKE") >> 2) & 3 )
-	{
-		case 1 : state->m_shift_ret = 1;	break;	// low  shift: button 3
-		case 2 : state->m_shift_ret = 0;	break;	// high shift: button 4
-	}
-	return state->m_shift_ret;
-}
-
 /*
     F1 GP Star has a real pedal, while Cisco Heat's is connected to
     a switch. The Former game stores, during boot, the value that
     corresponds to the pedal not pressed, and compares against it:
 
     The value returned must decrease when the pedal is pressed.
-    We support just 2 values for now..
 */
-
-static int read_accelerator(running_machine &machine)
-{
-	if (input_port_read(machine, "FAKE") & 1)	return 0x00;	// pedal pressed
-	else						return 0xff;
-}
-
 
 /**************************************************************************
                                 Big Run
@@ -341,7 +313,7 @@ READ16_HANDLER( bigrun_vregs_r )
 				case 0 : return input_port_read(space->machine(), "IN6");		// Driving Wheel
 				case 1 : return 0xffff;					// Cockpit: Up / Down Position
 				case 2 : return 0xffff;					// Cockpit: Left / Right Position?
-				case 3 : return ~read_accelerator(space->machine());	// Accelerator (Pedal)
+				case 3 : return input_port_read(space->machine(), "PEDAL");	// Accelerator (Pedal)
 				default: return 0xffff;
 			}
 
@@ -534,7 +506,7 @@ READ16_HANDLER( f1gpstar_vregs_r )
 		case 0x000c/2 :	return input_port_read(space->machine(), "IN4");	// DSW 3
 
 		case 0x0010/2 :	// Accel + Driving Wheel
-			return (read_accelerator(space->machine()) & 0xff) + ((input_port_read(space->machine(), "IN5") & 0xff)<<8);
+			return (input_port_read(space->machine(), "PEDAL") & 0xff) + ((input_port_read(space->machine(), "IN5") & 0xff)<<8);
 
 		default:		SHOW_READ_ERROR("vreg %04X read!",offset*2);
 						return state->m_vregs[offset];

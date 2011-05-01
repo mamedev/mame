@@ -1,3 +1,5 @@
+/* TODO: some variables are per-game specifics */
+
 class cischeat_state : public driver_device
 {
 public:
@@ -19,15 +21,12 @@ public:
 	UINT16 *m_rom_1;
 	UINT16 *m_rom_2;
 	UINT16 *m_rom_3;
-	UINT16 *m_sharedram1;
-	UINT16 *m_sharedram2;
 	int m_prev;
 	int m_armold;
 	UINT16 m_scudhamm_motor_command;
 	UINT16 *m_roadram[2];
 	UINT16 *m_f1gpstr2_ioready;
 	int m_ip_select;
-	int m_shift_ret;
 	UINT8 m_drawmode_table[16];
 	int m_debugsprites;
 	int m_show_unknown;
@@ -59,8 +58,6 @@ WRITE16_HANDLER( cischeat_vregs_w );
 WRITE16_HANDLER( f1gpstar_vregs_w );
 WRITE16_HANDLER( f1gpstr2_vregs_w );
 WRITE16_HANDLER( scudhamm_vregs_w );
-
-CUSTOM_INPUT( cischeat_shift_r );
 
 VIDEO_START( bigrun );
 VIDEO_START( cischeat );
