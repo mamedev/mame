@@ -71,6 +71,7 @@ PALETTE_INIT( mrdo )
 		else pot[i] = 0;
 
 		weight[i] = 0xff * pot[i] / pot[0x0f];
+		if (weight[i] < 0) weight[i] = 0;
 	}
 
 	/* allocate the colortable */
