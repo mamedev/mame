@@ -143,6 +143,9 @@ void mc146818_device::device_start()
 {
 	m_last_refresh = machine().time();
 	emu_timer *timer = timer_alloc();
+
+	memset(m_data, 0, sizeof(m_data));
+
 	if (m_type == MC146818_UTC) {
 		// hack: for apollo we increase the update frequency to stay in sync with real time
 		timer->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
@@ -363,7 +366,7 @@ void mc146818_device::set_base_datetime()
 
 	machine().base_datetime(systime);
 
-	current_time = m_type == MC146818_UTC ? systime.utc_time: systime.local_time;
+	current_time = (m_type == MC146818_UTC) ? systime.utc_time: systime.local_time;
 
 	// temporary hack to go back 20 year (e.g. from 2010 -> 1990)
 	// current_time.year -= 20;
