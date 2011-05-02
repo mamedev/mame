@@ -1619,7 +1619,7 @@ MACHINE_CONFIG_END
                              Sammy Medal Games
 ***************************************************************************/
 
-static const eeprom_interface eeprom_interface_93C46_8bit =
+static const eeprom_interface eeprom_interface_93C46_8bit_delay =
 {
 	7,				// address bits 6
 	8,				// data bits    8

@@ -14,10 +14,6 @@ WRITE64_HANDLER( pvr_ctrl_w );
 
 READ64_HANDLER( dc_sysctrl_r );
 WRITE64_HANDLER( dc_sysctrl_w );
-READ64_HANDLER( dc_maple_r );
-WRITE64_HANDLER( dc_maple_w );
-READ64_HANDLER( naomi_maple_r );
-WRITE64_HANDLER( naomi_maple_w );
 READ64_HANDLER( dc_gdrom_r );
 WRITE64_HANDLER( dc_gdrom_w );
 READ64_HANDLER( dc_g1_ctrl_r );
@@ -40,11 +36,7 @@ MACHINE_RESET( dc );
 int dc_compute_interrupt_level(running_machine &machine);
 void dc_update_interrupt_status(running_machine &machine);
 
-INPUT_CHANGED( dc_coin_slots_callback );
-
 extern UINT32 dc_sysctrl_regs[0x200/4];
-extern UINT32 dc_coin_counts[2];
-extern UINT8 maple0x86data1[0x80];
 extern UINT32 g1bus_regs[0x100/4];
 
 /*--------- Ch2-DMA Control Registers ----------*/

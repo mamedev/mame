@@ -389,20 +389,6 @@ static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
 	}
 }
 
-static const eeprom_interface eeprom_interface_93C46_8bit =
-{
-	7,				// address bits 7
-	8,				// data bits    8
-	"*110",			// read         1 10 aaaaaa
-	"*101",			// write        1 01 aaaaaa dddddddddddddddd
-	"*111",			// erase        1 11 aaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 static const eeprom_interface eeprom_interface_93C46_pacslot =
 {
 	6,				// address bits 6
@@ -2184,7 +2170,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 
 	MCFG_MACHINE_START(cave)
 	MCFG_MACHINE_RESET(cave)
-	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
+	MCFG_EEPROM_93C46_8BIT_ADD("eeprom")
 
 	MCFG_TIMER_ADD("int_timer", cave_vblank_start)
 

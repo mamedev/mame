@@ -181,6 +181,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ins8154.o		\
 	$(EMUMACHINE)/ins8250.o		\
 	$(EMUMACHINE)/intelfsh.o	\
+	$(EMUMACHINE)/jvsdev.o		\
+	$(EMUMACHINE)/jvshost.o		\
 	$(EMUMACHINE)/k033906.o		\
 	$(EMUMACHINE)/k056230.o		\
 	$(EMUMACHINE)/latch8.o		\

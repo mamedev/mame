@@ -24,6 +24,9 @@
 #define MCFG_EEPROM_93C46_ADD(_tag) \
 	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46)
 
+#define MCFG_EEPROM_93C46_8BIT_ADD(_tag) \
+	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46_8bit)
+
 #define MCFG_EEPROM_93C66B_ADD(_tag) \
 	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
@@ -132,6 +135,7 @@ extern const device_type EEPROM;
 //**************************************************************************
 
 extern const eeprom_interface eeprom_interface_93C46;
+extern const eeprom_interface eeprom_interface_93C46_8bit;
 extern const eeprom_interface eeprom_interface_93C66B;
 
 

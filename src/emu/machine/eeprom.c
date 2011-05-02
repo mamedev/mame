@@ -42,6 +42,21 @@ const eeprom_interface eeprom_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
+const eeprom_interface eeprom_interface_93C46_8bit =
+{
+	7,				// address bits 7
+	8,				// data bits    8
+	"*110",			// read         1 10 aaaaaa
+	"*101",			// write        1 01 aaaaaa dddddddd
+	"*111",			// erase        1 11 aaaaaa
+	"*10000xxxx",	// lock         1 00 00xxxx
+	"*10011xxxx",	// unlock       1 00 11xxxx
+	1,				// enable_multi_read
+	0				// reset_delay
+//  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
+//  "*10010xxxx"    // erase all    1 00 10xxxx
+};
+
 const eeprom_interface eeprom_interface_93C66B =
 {
 	8,				// address bits
