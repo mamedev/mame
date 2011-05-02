@@ -284,7 +284,7 @@ mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag,
 	  m_pse(1),
 	  m_ce(0),
 	  m_sck(0),
-	  m_sdo(0),
+	  m_sdo(1),
 	  m_sdi(0),
 	  m_state(STATE_ADDRESS),
 	  m_bits(0)
@@ -450,12 +450,12 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 			if (m_bits == 8)
 			{
-				if (LOG) logerror("MCCS1850 '%s' %s Address %u\n", tag(), BIT(m_address, 7) ? "Read" : "Write", m_address & 0x7f);
+				if (LOG) logerror("MCCS1850 '%s' %s Address %u\n", tag(), BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
 				
 				m_bits = 0;
 				m_state = STATE_DATA;
 
-				if (BIT(m_address, 7))
+				if (!BIT(m_address, 7))
 				{
 					m_shift = read_register(m_address & 0x7f);
 
@@ -466,7 +466,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 		break;
 
 	case STATE_DATA:
-		if (!BIT(m_address, 7) && m_sck && !state)
+		if (BIT(m_address, 7) && m_sck && !state)
 		{
 			// shift data in
 			m_shift <<= 1;
@@ -486,7 +486,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 				m_address &= 0x7f;
 			}
 		}
-		else if (BIT(m_address, 7) && !m_sck && state)
+		else if (!BIT(m_address, 7) && !m_sck && state)
 		{
 			// shift data out
 			m_sdo = BIT(m_shift, 7);
@@ -516,7 +516,15 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 
 READ_LINE_MEMBER( mccs1850_device::sdo_r )
 {
-	return m_sdo;
+	if (!m_ce || BIT(m_address, 7))
+	{
+		// Hi-Z
+		return 1;
+	}
+	else
+	{
+		return m_sdo;
+	}
 }
 
 
