@@ -112,7 +112,7 @@ private:
 	public:
 		ctc_channel();
 
-		void start(z80ctc_device *device, int index, bool notimer, const devcb_write_line *write_line);
+		void start(z80ctc_device *device, int index, bool notimer, const devcb_write_line &write_line);
 		void reset();
 
 		UINT8 read();

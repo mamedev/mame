@@ -124,10 +124,11 @@ void z80ctc_device::device_start()
 	m_intr.resolve(m_intr_cb, *this);
 
 	// start each channel
-	m_channel[0].start(this, 0, (m_notimer & NOTIMER_0) != 0, &m_zc0_cb);
-	m_channel[1].start(this, 1, (m_notimer & NOTIMER_1) != 0, &m_zc1_cb);
-	m_channel[2].start(this, 2, (m_notimer & NOTIMER_2) != 0, &m_zc2_cb);
-	m_channel[3].start(this, 3, (m_notimer & NOTIMER_3) != 0, NULL);
+	devcb_write_line nullcb = DEVCB_NULL;
+	m_channel[0].start(this, 0, (m_notimer & NOTIMER_0) != 0, m_zc0_cb);
+	m_channel[1].start(this, 1, (m_notimer & NOTIMER_1) != 0, m_zc1_cb);
+	m_channel[2].start(this, 2, (m_notimer & NOTIMER_2) != 0, m_zc2_cb);
+	m_channel[3].start(this, 3, (m_notimer & NOTIMER_3) != 0, nullcb);
 
 	// register for save states
     save_item(NAME(m_vector));
@@ -285,13 +286,12 @@ z80ctc_device::ctc_channel::ctc_channel()
 //  start - set up at device start time
 //-------------------------------------------------
 
-void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool notimer, const devcb_write_line *write_line)
+void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool notimer, const devcb_write_line &write_line)
 {
 	// initialize state
 	m_device = device;
 	m_index = index;
-	if (write_line != NULL)
-		m_zc.resolve(*write_line, *m_device);
+	m_zc.resolve(write_line, *m_device);
 	m_notimer = notimer;
 	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
