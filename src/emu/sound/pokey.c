@@ -657,11 +657,11 @@ static DEVICE_START( pokey )
 	for (i=0; i<8; i++)
 	{
 		chip->ptimer[i] = device->machine().scheduler().timer_alloc(FUNC(pokey_pot_trigger), chip);
-		devcb_resolve_read8(&chip->pot_r[i], &chip->intf.pot_r[i], device);
+		chip->pot_r[i].resolve(chip->intf.pot_r[i], *device);
 	}
-	devcb_resolve_read8(&chip->allpot_r, &chip->intf.allpot_r, device);
-	devcb_resolve_read8(&chip->serin_r, &chip->intf.serin_r, device);
-	devcb_resolve_write8(&chip->serout_w, &chip->intf.serout_w, device);
+	chip->allpot_r.resolve(chip->intf.allpot_r, *device);
+	chip->serin_r.resolve(chip->intf.serin_r, *device);
+	chip->serout_w.resolve(chip->intf.serout_w, *device);
 	chip->interrupt_cb = chip->intf.interrupt_cb;
 
 	chip->channel = device->machine().sound().stream_alloc(*device, 0, 1, sample_rate, chip, pokey_update);
@@ -795,9 +795,9 @@ static void pokey_potgo(pokey_state *p)
     for( pot = 0; pot < 8; pot++ )
 	{
 		p->POTx[pot] = 0xff;
-		if( p->pot_r[pot].read )
+		if( !p->pot_r[pot].isnull() )
 		{
-			int r = devcb_call_read8(&p->pot_r[pot], pot);
+			int r = p->pot_r[pot](pot);
 
 			LOG(("POKEY %s pot_r(%d) returned $%02x\n", p->device->tag(), pot, r));
 			if( r != -1 )
@@ -824,7 +824,7 @@ READ8_DEVICE_HANDLER( pokey_r )
 	case POT0_C: case POT1_C: case POT2_C: case POT3_C:
 	case POT4_C: case POT5_C: case POT6_C: case POT7_C:
 		pot = offset & 7;
-		if( p->pot_r[pot].read )
+		if( !p->pot_r[pot].isnull() )
 		{
 			/*
              * If the conversion is not yet finished (ptimer running),
@@ -856,9 +856,9 @@ READ8_DEVICE_HANDLER( pokey_r )
 			data = 0;
 			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", p->device->tag(), data));
 		}
-		else if( p->allpot_r.read )
+		else if( !p->allpot_r.isnull() )
 		{
-			data = devcb_call_read8(&p->allpot_r, offset);
+			data = p->allpot_r(offset);
 			LOG(("POKEY '%s' ALLPOT callback $%02x\n", p->device->tag(), data));
 		}
 		else
@@ -910,8 +910,8 @@ READ8_DEVICE_HANDLER( pokey_r )
 		break;
 
 	case SERIN_C:
-		if( p->serin_r.read )
-			p->SERIN = devcb_call_read8(&p->serin_r, offset);
+		if( !p->serin_r.isnull() )
+			p->SERIN = p->serin_r(offset);
 		data = p->SERIN;
 		LOG(("POKEY '%s' SERIN  $%02x\n", p->device->tag(), data));
 		break;
@@ -1131,7 +1131,7 @@ WRITE8_DEVICE_HANDLER( pokey_w )
 
     case SEROUT_C:
 		LOG(("POKEY '%s' SEROUT $%02x\n", p->device->tag(), data));
-		devcb_call_write8(&p->serout_w, offset, data);
+		p->serout_w(offset, data);
 		p->SKSTAT |= SK_SEROUT;
         /*
          * These are arbitrary values, tested with some custom boot

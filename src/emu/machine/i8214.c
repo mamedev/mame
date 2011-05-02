@@ -43,11 +43,11 @@ inline void i8214_device::trigger_interrupt(int level)
 	m_int_dis = 1;
 
 	// disable next level group
-	devcb_call_write_line(&m_out_enlg_func, 0);
+	m_out_enlg_func(0);
 
 	// toggle interrupt line
-	devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+	m_out_int_func(ASSERT_LINE);
+	m_out_int_func(CLEAR_LINE);
 }
 
 
@@ -125,8 +125,8 @@ void i8214_device::device_config_complete()
 void i8214_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_enlg_func, &m_out_enlg_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_enlg_func.resolve(m_out_enlg_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_inte));
@@ -167,7 +167,7 @@ void i8214_device::b_w(UINT8 data)
 	m_int_dis = 0;
 
 	// enable next level group
-	devcb_call_write_line(&m_out_enlg_func, 1);
+	m_out_enlg_func(1);
 
 	check_interrupt();
 }

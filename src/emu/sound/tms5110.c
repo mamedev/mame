@@ -247,16 +247,16 @@ void tms5110_set_variant(tms5110_state *tms, int variant)
 
 static void new_int_write(tms5110_state *tms, UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
 {
-	if (tms->m0_func.write)
-		devcb_call_write_line(&tms->m0_func, m0);
-	if (tms->m1_func.write)
-		devcb_call_write_line(&tms->m1_func, m1);
-	if (tms->addr_func.write)
-		devcb_call_write8(&tms->addr_func, 0, addr);
-	if (tms->romclk_func.write)
+	if (!tms->m0_func.isnull())
+		tms->m0_func(m0);
+	if (!tms->m1_func.isnull())
+		tms->m1_func(m1);
+	if (!tms->addr_func.isnull())
+		tms->addr_func(0, addr);
+	if (!tms->romclk_func.isnull())
 	{
 		//printf("rc %d\n", rc);
-		devcb_call_write_line(&tms->romclk_func, rc);
+		tms->romclk_func(rc);
 	}
 }
 
@@ -274,8 +274,8 @@ static UINT8 new_int_read(tms5110_state *tms)
 	new_int_write(tms, 0, 1, 0, 0);
 	new_int_write(tms, 1, 0, 0, 0);
 	new_int_write(tms, 0, 0, 0, 0);
-	if (tms->data_func.read)
-		return devcb_call_read_line(&tms->data_func);
+	if (!tms->data_func.isnull())
+		return tms->data_func();
 	return 0;
 }
 
@@ -1024,11 +1024,11 @@ static DEVICE_START( tms5110 )
 	tms5110_set_variant(tms, TMS5110_IS_5110A);
 
 	/* resolve lines */
-	devcb_resolve_write_line(&tms->m0_func, &tms->intf->m0_func, device);
-	devcb_resolve_write_line(&tms->m1_func, &tms->intf->m1_func, device);
-	devcb_resolve_write_line(&tms->romclk_func, &tms->intf->romclk_func, device);
-	devcb_resolve_write8(&tms->addr_func, &tms->intf->addr_func, device);
-	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
+	tms->m0_func.resolve(tms->intf->m0_func, *device);
+	tms->m1_func.resolve(tms->intf->m1_func, *device);
+	tms->romclk_func.resolve(tms->intf->romclk_func, *device);
+	tms->addr_func.resolve(tms->intf->addr_func, *device);
+	tms->data_func.resolve(tms->intf->data_func, *device);
 
 	/* initialize a stream */
 	tms->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5110_update);
@@ -1394,10 +1394,10 @@ static TIMER_CALLBACK( tmsprom_step )
 	if (ctrl & (1 << tms->intf->reset_bit))
 		tms->address = 0;
 
-	devcb_call_write8(&tms->ctl_func, 0, BITSWAP8(ctrl,0,0,0,0,tms->intf->ctl8_bit,
+	tms->ctl_func(0, BITSWAP8(ctrl,0,0,0,0,tms->intf->ctl8_bit,
 			tms->intf->ctl4_bit,tms->intf->ctl2_bit,tms->intf->ctl1_bit));
 
-	devcb_call_write_line(&tms->pdc_func, (ctrl >> tms->intf->pdc_bit) & 0x01);
+	tms->pdc_func((ctrl >> tms->intf->pdc_bit) & 0x01);
 }
 
 static DEVICE_START( tmsprom )
@@ -1410,8 +1410,8 @@ static DEVICE_START( tmsprom )
 	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
 
 	/* resolve lines */
-	devcb_resolve_write_line(&tms->pdc_func, &tms->intf->pdc_func, device);
-	devcb_resolve_write8(&tms->ctl_func, &tms->intf->ctl_func, device);
+	tms->pdc_func.resolve(tms->intf->pdc_func, *device);
+	tms->ctl_func.resolve(tms->intf->ctl_func, *device);
 
 	tms->rom = *device->region();
 	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");

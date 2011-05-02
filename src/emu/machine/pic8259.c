@@ -108,12 +108,12 @@ static TIMER_CALLBACK( pic8259_timerproc )
 			if (LOG_GENERAL)
 				logerror("pic8259_timerproc(): PIC triggering IRQ #%d\n", irq);
 			if (!BIT(pic8259->ocw3, 2))
-				devcb_call_write_line(&pic8259->out_int_func, 1);
+				pic8259->out_int_func(1);
 			return;
 		}
 	}
 	if (!BIT(pic8259->ocw3, 2))
-		devcb_call_write_line(&pic8259->out_int_func, 0);
+		pic8259->out_int_func(0);
 }
 
 
@@ -186,7 +186,7 @@ int pic8259_acknowledge(device_t *device)
 
 			if ((pic8259->cascade!=0) && (pic8259->master!=0) && (mask & pic8259->slave)) {
 				// it's from slave device
-				return devcb_call_read8(&pic8259->read_slave_ack_func,irq);
+				return pic8259->read_slave_ack_func(irq);
 			} else {
 				if (pic8259->is_x86) {
 					/* For x86 mode*/
@@ -420,9 +420,9 @@ static DEVICE_START( pic8259 )
 	pic8259->timer = device->machine().scheduler().timer_alloc( FUNC(pic8259_timerproc), (void *)device );
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&pic8259->out_int_func, &intf->out_int_func, device);
-	devcb_resolve_read_line(&pic8259->sp_en_func, &intf->sp_en_func, device);
-	devcb_resolve_read8(&pic8259->read_slave_ack_func, &intf->read_slave_ack_func, device);
+	pic8259->out_int_func.resolve(intf->out_int_func, *device);
+	pic8259->sp_en_func.resolve(intf->sp_en_func, *device);
+	pic8259->read_slave_ack_func.resolve(intf->read_slave_ack_func, *device);
 }
 
 
@@ -451,7 +451,7 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259->vector_addr_low = 0;
 	pic8259->vector_addr_high = 0;
 
-	pic8259->master = devcb_call_read_line(&pic8259->sp_en_func);
+	pic8259->master = pic8259->sp_en_func();
 }
 
 

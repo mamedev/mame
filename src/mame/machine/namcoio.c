@@ -159,8 +159,8 @@ INLINE const namcoio_interface *get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-#define READ_PORT(n)	(devcb_call_read8(&namcoio->in[n], 0) & 0x0f)
-#define WRITE_PORT(n,d)	(devcb_call_write8(&namcoio->out[n], 0, (d) & 0x0f))
+#define READ_PORT(n)	(namcoio->in[n](0) & 0x0f)
+#define WRITE_PORT(n,d)	(namcoio->out[n](0, (d) & 0x0f))
 
 #define IORAM_READ(offset) (namcoio->ram[offset] & 0x0f)
 #define IORAM_WRITE(offset,data) {namcoio->ram[offset] = (data) & 0x0f;}
@@ -514,12 +514,12 @@ static DEVICE_START( namcoio )
 
 	namcoio->device = intf->device;
 
-	devcb_resolve_read8(&namcoio->in[0], &intf->in[0], device);
-	devcb_resolve_read8(&namcoio->in[1], &intf->in[1], device);
-	devcb_resolve_read8(&namcoio->in[2], &intf->in[2], device);
-	devcb_resolve_read8(&namcoio->in[3], &intf->in[3], device);
-	devcb_resolve_write8(&namcoio->out[0], &intf->out[0], device);
-	devcb_resolve_write8(&namcoio->out[1], &intf->out[1], device);
+	namcoio->in[0].resolve(intf->in[0], *device);
+	namcoio->in[1].resolve(intf->in[1], *device);
+	namcoio->in[2].resolve(intf->in[2], *device);
+	namcoio->in[3].resolve(intf->in[3], *device);
+	namcoio->out[0].resolve(intf->out[0], *device);
+	namcoio->out[1].resolve(intf->out[1], *device);
 
 	device->save_item(NAME(namcoio->ram));
 	device->save_item(NAME(namcoio->reset));

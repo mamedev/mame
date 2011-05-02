@@ -74,14 +74,14 @@ static DEVICE_START( namco_62xx )
 	assert(state->m_cpu != NULL);
 
 	/* resolve our read callbacks */
-	devcb_resolve_read8(&state->m_in[0], &config->in[0], device);
-	devcb_resolve_read8(&state->m_in[1], &config->in[1], device);
-	devcb_resolve_read8(&state->m_in[2], &config->in[2], device);
-	devcb_resolve_read8(&state->m_in[3], &config->in[3], device);
+	state->m_in[0].resolve(config->in[0], *device);
+	state->m_in[1].resolve(config->in[1], *device);
+	state->m_in[2].resolve(config->in[2], *device);
+	state->m_in[3].resolve(config->in[3], *device);
 
 	/* resolve our write callbacks */
-	devcb_resolve_write8(&state->m_out[0], &config->out[0], device);
-	devcb_resolve_write8(&state->m_out[1], &config->out[1], device);
+	state->m_out[0].resolve(config->out[0], *device);
+	state->m_out[1].resolve(config->out[1], *device);
 }
 
 

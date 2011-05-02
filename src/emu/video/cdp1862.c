@@ -116,9 +116,9 @@ void cdp1862_device::device_config_complete()
 void cdp1862_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rd_func, &m_in_rd_cb, this);
-	devcb_resolve_read_line(&m_in_bd_func, &m_in_bd_cb, this);
-	devcb_resolve_read_line(&m_in_gd_func, &m_in_gd_cb, this);
+	m_in_rd_func.resolve(m_in_rd_cb, *this);
+	m_in_bd_func.resolve(m_in_bd_cb, *this);
+	m_in_gd_func.resolve(m_in_gd_cb, *this);
 
 	// find devices
 	m_screen =  machine().device<screen_device>(m_screen_tag);
@@ -157,9 +157,9 @@ WRITE8_MEMBER( cdp1862_device::dma_w )
 
 	if (!m_con)
 	{
-		rd = devcb_call_read_line(&m_in_rd_func);
-		bd = devcb_call_read_line(&m_in_bd_func);
-		gd = devcb_call_read_line(&m_in_gd_func);
+		rd = m_in_rd_func();
+		bd = m_in_bd_func();
+		gd = m_in_gd_func();
 	}
 
 	for (x = 0; x < 8; x++)

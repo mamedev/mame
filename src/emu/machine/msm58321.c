@@ -212,7 +212,7 @@ void msm58321_device::device_config_complete()
 void msm58321_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_busy_func, &m_out_busy_cb, this);
+	m_out_busy_func.resolve(m_out_busy_cb, *this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
@@ -247,7 +247,7 @@ void msm58321_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	case TIMER_BUSY:
-		devcb_call_write_line(&m_out_busy_func, m_busy);
+		m_out_busy_func(m_busy);
 		m_busy = !m_busy;
 		break;
 	}

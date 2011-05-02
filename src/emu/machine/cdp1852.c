@@ -37,7 +37,7 @@ enum
 
 int cdp1852_device::get_mode()
 {
-	return devcb_call_read_line(&m_in_mode_func);
+	return m_in_mode_func();
 }
 
 
@@ -51,7 +51,7 @@ void cdp1852_device::set_sr_line(int state)
 	{
 		m_sr = state;
 
-		devcb_call_write_line(&m_out_sr_func, m_sr);
+		m_out_sr_func(m_sr);
 	}
 }
 
@@ -102,10 +102,10 @@ void cdp1852_device::device_config_complete()
 void cdp1852_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_mode_func, &m_in_mode_cb, this);
-	devcb_resolve_write_line(&m_out_sr_func, &m_out_sr_cb, this);
-	devcb_resolve_read8(&m_in_data_func, &m_in_data_cb, this);
-	devcb_resolve_write8(&m_out_data_func, &m_out_data_cb, this);
+	m_in_mode_func.resolve(m_in_mode_cb, *this);
+	m_out_sr_func.resolve(m_out_sr_cb, *this);
+	m_in_data_func.resolve(m_in_data_cb, *this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
 
 	// allocate timers
 	if (clock() > 0)
@@ -140,7 +140,7 @@ void cdp1852_device::device_reset()
 	else
 	{
 		// output data
-		devcb_call_write8(&m_out_data_func, 0, m_data);
+		m_out_data_func(0, m_data);
 
 		// reset service request flip-flop
 		set_sr_line(0);
@@ -158,7 +158,7 @@ void cdp1852_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case MODE_INPUT:
 		// input data into register
-		m_data = devcb_call_read8(&m_in_data_func, 0);
+		m_data = m_in_data_func(0);
 
 		// signal processor
 		set_sr_line(0);
@@ -173,7 +173,7 @@ void cdp1852_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_data = m_next_data;
 
 			// output data
-			devcb_call_write8(&m_out_data_func, 0, m_data);
+			m_out_data_func(0, m_data);
 
 			// signal peripheral device
 			set_sr_line(1);
@@ -198,7 +198,7 @@ READ8_MEMBER( cdp1852_device::read )
 	if ((get_mode() == MODE_INPUT) && (clock() == 0))
 	{
 		// input data into register
-		m_data = devcb_call_read8(&m_in_data_func, 0);
+		m_data = m_in_data_func(0);
 	}
 
 	set_sr_line(1);

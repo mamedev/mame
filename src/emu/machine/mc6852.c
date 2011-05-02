@@ -145,13 +145,13 @@ void mc6852_device::device_config_complete()
 void mc6852_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rx_data_func, &m_in_rx_data_cb, this);
-	devcb_resolve_write_line(&m_out_tx_data_func, &m_out_tx_data_cb, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
-	devcb_resolve_read_line(&m_in_cts_func, &m_in_cts_cb, this);
-	devcb_resolve_read_line(&m_in_dcd_func, &m_in_dcd_cb, this);
-	devcb_resolve_write_line(&m_out_sm_dtr_func, &m_out_sm_dtr_cb, this);
-	devcb_resolve_write_line(&m_out_tuf_func, &m_out_tuf_cb, this);
+	m_in_rx_data_func.resolve(m_in_rx_data_cb, *this);
+	m_out_tx_data_func.resolve(m_out_tx_data_cb, *this);
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_in_cts_func.resolve(m_in_cts_cb, *this);
+	m_in_dcd_func.resolve(m_in_dcd_cb, *this);
+	m_out_sm_dtr_func.resolve(m_out_sm_dtr_cb, *this);
+	m_out_tuf_func.resolve(m_out_tuf_cb, *this);
 
 	if (m_rx_clock > 0)
 	{

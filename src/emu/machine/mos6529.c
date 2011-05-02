@@ -66,8 +66,8 @@ void mos6529_device::device_config_complete()
 void mos6529_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_p_func, &m_in_p_cb, this);
-	devcb_resolve_write8(&m_out_p_func, &m_out_p_cb, this);
+	m_in_p_func.resolve(m_in_p_cb, *this);
+	m_out_p_func.resolve(m_out_p_cb, *this);
 }
 
 
@@ -77,7 +77,7 @@ void mos6529_device::device_start()
 
 READ8_MEMBER( mos6529_device::read )
 {
-	return devcb_call_read8(&m_in_p_func, 0);
+	return m_in_p_func(0);
 }
 
 
@@ -87,5 +87,5 @@ READ8_MEMBER( mos6529_device::read )
 
 WRITE8_MEMBER( mos6529_device::write )
 {
-	devcb_call_write8(&m_out_p_func, 0, data);
+	m_out_p_func(0, data);
 }

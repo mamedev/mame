@@ -40,9 +40,9 @@ static const UINT8 OUTPUT[16] =
 
 inline int dm9368_device::get_rbi()
 {
-	if (m_in_rbi_func.target != NULL)
+	if (!m_in_rbi_func.isnull())
 	{
-		m_rbi = devcb_call_read_line(&m_in_rbi_func);
+		m_rbi = m_in_rbi_func();
 	}
 
 	return m_rbi;
@@ -57,7 +57,7 @@ inline void dm9368_device::set_rbo(int state)
 {
 	m_rbo = state;
 
-	devcb_call_write_line(&m_out_rbo_func, m_rbo);
+	m_out_rbo_func(m_rbo);
 }
 
 
@@ -107,8 +107,8 @@ void dm9368_device::device_config_complete()
 void dm9368_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_rbi_func, &m_in_rbi_cb, this);
-	devcb_resolve_write_line(&m_out_rbo_func, &m_out_rbo_cb, this);
+	m_in_rbi_func.resolve(m_in_rbi_cb, *this);
+	m_out_rbo_func.resolve(m_out_rbo_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_rbi));

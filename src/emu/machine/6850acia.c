@@ -23,10 +23,10 @@
 #define CR7		0x80
 
 #define TXD(_data) \
-	devcb_call_write_line(&m_out_tx_func, _data)
+	m_out_tx_func(_data)
 
 #define RTS(_data) \
-	devcb_call_write_line(&m_out_rts_func, _data)
+	m_out_rts_func(_data)
 
 /***************************************************************************
     LOCAL VARIABLES
@@ -103,12 +103,12 @@ void acia6850_device::device_config_complete()
 void acia6850_device::device_start()
 {
 	/* resolve callbacks */
-	devcb_resolve_read_line(&m_in_rx_func, &m_in_rx_cb, this);
-	devcb_resolve_write_line(&m_out_tx_func, &m_out_tx_cb, this);
-	devcb_resolve_read_line(&m_in_cts_func, &m_in_cts_cb, this);
-	devcb_resolve_write_line(&m_out_rts_func, &m_out_rts_cb, this);
-	devcb_resolve_read_line(&m_in_dcd_func, &m_in_dcd_cb, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
+	m_in_rx_func.resolve(m_in_rx_cb, *this);
+	m_out_tx_func.resolve(m_out_tx_cb, *this);
+	m_in_cts_func.resolve(m_in_cts_cb, *this);
+	m_out_rts_func.resolve(m_out_rts_cb, *this);
+	m_in_dcd_func.resolve(m_in_dcd_cb, *this);
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
 
 	m_tx_counter = 0;
 	m_rx_counter = 0;
@@ -153,8 +153,8 @@ void acia6850_device::device_start()
 
 void acia6850_device::device_reset()
 {
-	int cts = devcb_call_read_line(&m_in_cts_func);
-	int dcd = devcb_call_read_line(&m_in_dcd_func);
+	int cts = m_in_cts_func();
+	int dcd = m_in_dcd_func();
 
 	m_status = (cts << 3) | (dcd << 2) | ACIA6850_STATUS_TDRE;
 	m_tdr = 0;
@@ -173,7 +173,7 @@ void acia6850_device::device_reset()
 	m_tx_state = START;
 	m_irq = 0;
 
-	devcb_call_write_line(&m_out_irq_func, 1);
+	m_out_irq_func(1);
 
 	if (m_first_reset)
 	{
@@ -318,12 +318,12 @@ void acia6850_device::check_interrupts()
 		if (irq)
 		{
 			m_status |= ACIA6850_STATUS_IRQ;
-			devcb_call_write_line(&m_out_irq_func, 0);
+			m_out_irq_func(0);
 		}
 		else
 		{
 			m_status &= ~ACIA6850_STATUS_IRQ;
-			devcb_call_write_line(&m_out_irq_func, 1);
+			m_out_irq_func(1);
 		}
 	}
 }
@@ -360,7 +360,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_data_r)
 
 	if (m_status_read)
 	{
-		int dcd = devcb_call_read_line(&m_in_dcd_func);
+		int dcd = m_in_dcd_func();
 
 		m_status_read = 0;
 		m_status &= ~(ACIA6850_STATUS_OVRN | ACIA6850_STATUS_DCD);
@@ -401,7 +401,7 @@ void acia6850_device::tx_tick()
 			}
 			else
 			{
-				int _cts = devcb_call_read_line(&m_in_cts_func);
+				int _cts = m_in_cts_func();
 
 				if (_cts)
 				{
@@ -520,7 +520,7 @@ void acia6850_tx_clock_in(device_t *device) { downcast<acia6850_device*>(device)
 
 void acia6850_device::tx_clock_in()
 {
-	int _cts = devcb_call_read_line(&m_in_cts_func);
+	int _cts = m_in_cts_func();
 
 	if (_cts)
 	{
@@ -548,7 +548,7 @@ void acia6850_device::tx_clock_in()
 
 void acia6850_device::rx_tick()
 {
-	int dcd = devcb_call_read_line(&m_in_dcd_func);
+	int dcd = m_in_dcd_func();
 
 	if (dcd)
 	{
@@ -566,7 +566,7 @@ void acia6850_device::rx_tick()
 	}
 	else
 	{
-		int rxd = devcb_call_read_line(&m_in_rx_func);
+		int rxd = m_in_rx_func();
 
 		switch (m_rx_state)
 		{
@@ -709,7 +709,7 @@ void acia6850_rx_clock_in(device_t *device) { downcast<acia6850_device*>(device)
 
 void acia6850_device::rx_clock_in()
 {
-	int dcd = devcb_call_read_line(&m_in_dcd_func);
+	int dcd = m_in_dcd_func();
 
 	if (dcd)
 	{

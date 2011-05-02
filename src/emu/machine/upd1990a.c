@@ -173,8 +173,8 @@ void upd1990a_device::device_config_complete()
 void upd1990a_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_data_func, &m_out_data_cb, this);
-	devcb_resolve_write_line(&m_out_tp_func, &m_out_tp_cb, this);
+	m_out_data_func.resolve(m_out_data_cb, *this);
+	m_out_tp_func.resolve(m_out_tp_cb, *this);
 
 	// allocate timers
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
@@ -233,7 +233,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 		if (LOG) logerror("uPD1990A '%s' TP %u\n", tag(), m_tp);
 
-		devcb_call_write_line(&m_out_tp_func, m_tp);
+		m_out_tp_func(m_tp);
 		break;
 
 	case TIMER_DATA_OUT:
@@ -241,7 +241,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 		if (LOG) logerror("uPD1990A '%s' DATA OUT TICK %u\n", tag(), m_data_out);
 
-		devcb_call_write_line(&m_out_data_func, m_data_out);
+		m_out_data_func(m_data_out);
 		break;
 	}
 }
@@ -325,7 +325,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 			/* output LSB of shift register */
 			m_data_out = BIT(m_shift_reg[0], 0);
-			devcb_call_write_line(&m_out_data_func, m_data_out);
+			m_out_data_func(m_data_out);
 
 			/* 32 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(32*2));
@@ -343,7 +343,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 			/* output LSB of shift register */
 			m_data_out = BIT(m_shift_reg[0], 0);
-			devcb_call_write_line(&m_out_data_func, m_data_out);
+			m_out_data_func(m_data_out);
 
 			/* load shift register data into time counter */
 			for (int i = 0; i < 5; i++)
@@ -449,7 +449,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 
 				if (LOG) logerror("uPD1990A '%s' DATA OUT %u\n", tag(), m_data_out);
 
-				devcb_call_write_line(&m_out_data_func, m_data_out);
+				m_out_data_func(m_data_out);
 			}
 		}
 	}

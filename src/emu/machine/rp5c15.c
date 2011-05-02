@@ -132,7 +132,7 @@ inline void rp5c15_device::set_alarm_line()
 	{
 		if (LOG) logerror("RP5C15 '%s' Alarm %u\n", tag(), alarm);
 
-		devcb_call_write_line(&m_out_alarm_func, alarm);
+		m_out_alarm_func(alarm);
 		m_alarm = alarm;
 	}
 }
@@ -333,8 +333,8 @@ void rp5c15_device::device_config_complete()
 void rp5c15_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_alarm_func, &m_out_alarm_cb, this);
-	devcb_resolve_write_line(&m_out_clkout_func, &m_out_clkout_cb, this);
+	m_out_alarm_func.resolve(m_out_alarm_cb, *this);
+	m_out_clkout_func.resolve(m_out_clkout_cb, *this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
@@ -383,7 +383,7 @@ void rp5c15_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 	case TIMER_CLKOUT:
 		m_clkout = !m_clkout;
-		devcb_call_write_line(&m_out_clkout_func, m_clkout);
+		m_out_clkout_func(m_clkout);
 		break;
 	}
 }

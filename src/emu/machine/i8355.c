@@ -63,7 +63,7 @@ inline UINT8 i8355_device::read_port(int port)
 
 	if (m_ddr[port] != 0xff)
 	{
-		data |= devcb_call_read8(&m_in_port_func[port], 0) & ~m_ddr[port];
+		data |= m_in_port_func[port](0) & ~m_ddr[port];
 	}
 
 	return data;
@@ -78,7 +78,7 @@ inline void i8355_device::write_port(int port, UINT8 data)
 {
 	m_output[port] = data;
 
-	devcb_call_write8(&m_out_port_func[port], 0, m_output[port] & m_ddr[port]);
+	m_out_port_func[port](0, m_output[port] & m_ddr[port]);
 }
 
 
@@ -131,10 +131,10 @@ void i8355_device::device_config_complete()
 void i8355_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_port_func[0], &m_in_pa_cb, this);
-	devcb_resolve_read8(&m_in_port_func[1], &m_in_pb_cb, this);
-	devcb_resolve_write8(&m_out_port_func[0], &m_out_pa_cb, this);
-	devcb_resolve_write8(&m_out_port_func[1], &m_out_pb_cb, this);
+	m_in_port_func[0].resolve(m_in_pa_cb, *this);
+	m_in_port_func[1].resolve(m_in_pb_cb, *this);
+	m_out_port_func[0].resolve(m_out_pa_cb, *this);
+	m_out_port_func[1].resolve(m_out_pb_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_output));

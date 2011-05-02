@@ -58,8 +58,8 @@ public:
 	UINT8 ppi8255_r(UINT32 offset);
 	void ppi8255_w(UINT32 offset, UINT8 data);
 
-	void ppi8255_set_port_read(int which, const devcb_read8 *config) { devcb_resolve_read8(&m_port_read[which], config, this); }
-	void ppi8255_set_port_write(int which, const devcb_write8 *config) { devcb_resolve_write8(&m_port_write[which], config, this); }
+	void ppi8255_set_port_read(int which, const devcb_read8 &config) { m_port_read[which].resolve(config, *this); }
+	void ppi8255_set_port_write(int which, const devcb_write8 &config) { m_port_write[which].resolve(config, *this); }
 
 	void ppi8255_set_port(int which, UINT8 data) { ppi8255_input(which, data); }
 	UINT8 ppi8255_get_port(int which) { return m_output[which]; }

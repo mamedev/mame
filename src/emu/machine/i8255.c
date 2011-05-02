@@ -300,12 +300,12 @@ void i8255_device::device_config_complete()
 void i8255_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_port_func[PORT_A], &m_in_pa_cb, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_A], &m_out_pa_cb, this);
-	devcb_resolve_read8(&m_in_port_func[PORT_B], &m_in_pb_cb, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_B], &m_out_pb_cb, this);
-	devcb_resolve_read8(&m_in_port_func[PORT_C], &m_in_pc_cb, this);
-	devcb_resolve_write8(&m_out_port_func[PORT_C], &m_out_pc_cb, this);
+	m_in_port_func[PORT_A].resolve(m_in_pa_cb, *this);
+	m_out_port_func[PORT_A].resolve(m_out_pa_cb, *this);
+	m_in_port_func[PORT_B].resolve(m_in_pb_cb, *this);
+	m_out_port_func[PORT_B].resolve(m_out_pb_cb, *this);
+	m_in_port_func[PORT_C].resolve(m_in_pc_cb, *this);
+	m_out_port_func[PORT_C].resolve(m_out_pc_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_control));
@@ -346,7 +346,7 @@ UINT8 i8255_device::read_mode0(int port)
 	else
 	{
 		// read data from port
-		data = devcb_call_read8(&m_in_port_func[port], 0);
+		data = m_in_port_func[port](0);
 	}
 
 	return data;
@@ -493,7 +493,7 @@ UINT8 i8255_device::read_pc()
 	if (mask)
 	{
 		// read data from port
-		data |= devcb_call_read8(&m_in_port_func[PORT_C], 0) & mask;
+		data |= m_in_port_func[PORT_C](0) & mask;
 	}
 
 	return data;
@@ -512,7 +512,7 @@ void i8255_device::write_mode0(int port, UINT8 data)
 		m_output[port] = data;
 
 		// write data to port
-		devcb_call_write8(&m_out_port_func[port], 0, data);
+		m_out_port_func[port](0, data);
 	}
 }
 
@@ -529,7 +529,7 @@ void i8255_device::write_mode1(int port, UINT8 data)
 		m_output[port] = data;
 
 		// write data to port
-		devcb_call_write8(&m_out_port_func[port], 0, data);
+		m_out_port_func[port](0, data);
 
 		// set output buffer full flag
 		set_obf(port, 0);
@@ -550,7 +550,7 @@ void i8255_device::write_mode2(UINT8 data)
 	m_output[PORT_A] = data;
 
 	// write data to port
-	devcb_call_write8(&m_out_port_func[PORT_A], 0, data);
+	m_out_port_func[PORT_A](0, data);
 
 	// set output buffer full flag
 	set_obf(PORT_A, 0);
@@ -668,7 +668,7 @@ void i8255_device::output_pc()
 
 	data |= m_output[PORT_C] & mask;
 
-	devcb_call_write8(&m_out_port_func[PORT_C], 0, data);
+	m_out_port_func[PORT_C](0, data);
 }
 
 
@@ -691,12 +691,12 @@ void i8255_device::set_mode(UINT8 data)
 
 	if (port_mode(PORT_A) == MODE_OUTPUT)
 	{
-		devcb_call_write8(&m_out_port_func[PORT_A], 0, m_output[PORT_A]);
+		m_out_port_func[PORT_A](0, m_output[PORT_A]);
 	}
 	else
 	{
 		// TTL inputs float high
-		devcb_call_write8(&m_out_port_func[PORT_A], 0, 0xff);
+		m_out_port_func[PORT_A](0, 0xff);
 	}
 
 	if (LOG)
@@ -718,12 +718,12 @@ void i8255_device::set_mode(UINT8 data)
 
 	if (port_mode(PORT_B) == MODE_OUTPUT)
 	{
-		devcb_call_write8(&m_out_port_func[PORT_B], 0, m_output[PORT_B]);
+		m_out_port_func[PORT_B](0, m_output[PORT_B]);
 	}
 	else
 	{
 		// TTL inputs float high
-		devcb_call_write8(&m_out_port_func[PORT_B], 0, 0xff);
+		m_out_port_func[PORT_B](0, 0xff);
 	}
 
 	m_output[PORT_C] = 0;
@@ -978,7 +978,7 @@ WRITE_LINE_MEMBER( i8255_device::pc2_w )
 				if (LOG) logerror("I8255 '%s' Port B Strobe\n", tag());
 
 				// read port into latch
-				m_input[PORT_B] = devcb_call_read8(&m_in_port_func[PORT_B], 0);
+				m_input[PORT_B] = m_in_port_func[PORT_B](0);
 
 				// set input buffer flag
 				set_ibf(PORT_B, 1);
@@ -1002,7 +1002,7 @@ WRITE_LINE_MEMBER( i8255_device::pc4_w )
 			if (LOG) logerror("I8255 '%s' Port A Strobe\n", tag());
 
 			// read port into latch
-			m_input[PORT_A] = devcb_call_read8(&m_in_port_func[PORT_A], 0);
+			m_input[PORT_A] = m_in_port_func[PORT_A](0);
 
 			// set input buffer flag
 			set_ibf(PORT_A, 1);

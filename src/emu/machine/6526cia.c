@@ -156,17 +156,17 @@ void mos6526_device::device_config_complete()
 void mos6526_device::device_start()
 {
 	/* clear out CIA structure, and copy the interface */
-	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
-	devcb_resolve_write_line(&m_out_pc_func, &m_out_pc_cb, this);
-	devcb_resolve_write_line(&m_out_cnt_func, &m_out_cnt_cb, this);
-	devcb_resolve_write_line(&m_out_sp_func, &m_out_sp_cb, this);
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_out_pc_func.resolve(m_out_pc_cb, *this);
+	m_out_cnt_func.resolve(m_out_cnt_cb, *this);
+	m_out_sp_func.resolve(m_out_sp_cb, *this);
 	m_flag = 1;
 
 	/* setup ports */
-	devcb_resolve_read8(&m_port[0].m_read, &m_in_pa_cb, this);
-	devcb_resolve_write8(&m_port[0].m_write, &m_out_pa_cb, this);
-	devcb_resolve_read8(&m_port[1].m_read, &m_in_pb_cb, this);
-	devcb_resolve_write8(&m_port[1].m_write, &m_out_pb_cb, this);
+	m_port[0].m_read.resolve(m_in_pa_cb, *this);
+	m_port[0].m_write.resolve(m_out_pa_cb, *this);
+	m_port[1].m_read.resolve(m_in_pb_cb, *this);
+	m_port[1].m_write.resolve(m_out_pb_cb, *this);
 
 	for (int p = 0; p < (sizeof(m_port) / sizeof(m_port[0])); p++)
 	{
@@ -241,8 +241,8 @@ void mos6526_device::set_port_mask_value(int port, int data)
 void mos6526_device::update_pc()
 {
 	/* this should really be one cycle long */
-	devcb_call_write_line(&m_out_pc_func, 0);
-	devcb_call_write_line(&m_out_pc_func, 1);
+	m_out_pc_func(0);
+	m_out_pc_func(1);
 }
 
 /*-------------------------------------------------
@@ -268,7 +268,7 @@ void mos6526_device::update_interrupts()
 	if (m_irq != new_irq)
 	{
 		m_irq = new_irq;
-		devcb_call_write_line(&m_out_irq_func, m_irq);
+		m_out_irq_func(m_irq);
 	}
 }
 
@@ -341,11 +341,11 @@ void mos6526_device::timer_underflow(int timer)
 
 					/* transmit MSB */
 					m_sp = BIT(m_serial, 7);
-					devcb_call_write_line(&m_out_sp_func, m_sp);
+					m_out_sp_func(m_sp);
 
 					/* toggle CNT */
 					m_cnt = !m_cnt;
-					devcb_call_write_line(&m_out_cnt_func, m_cnt);
+					m_out_cnt_func(m_cnt);
 
 					/* shift data */
 					m_serial <<= 1;
@@ -362,7 +362,7 @@ void mos6526_device::timer_underflow(int timer)
 				{
 					/* toggle CNT */
 					m_cnt = !m_cnt;
-					devcb_call_write_line(&m_out_cnt_func, m_cnt);
+					m_out_cnt_func(m_cnt);
 
 					if (m_shift == 8)
 					{
@@ -562,7 +562,7 @@ UINT8 mos6526_device::reg_r(UINT8 offset)
 		case CIA_PRA:
 		case CIA_PRB:
 			port = &m_port[offset & 1];
-			data = devcb_call_read8(&port->m_read, 0);
+			data = port->m_read(0);
 			data = ((data & ~port->m_ddr) | (port->m_latch & port->m_ddr)) & port->m_mask_value;
 
 			port->m_in = data;
@@ -702,7 +702,7 @@ void mos6526_device::reg_w(UINT8 offset, UINT8 data)
 			port = &m_port[offset & 1];
 			port->m_latch = data;
 			port->m_out = (data & port->m_ddr) | (port->m_in & ~port->m_ddr);
-			devcb_call_write8(&port->m_write, 0, port->m_out);
+			port->m_write(0, port->m_out);
 
 			/* pulse /PC following the write */
 			if (offset == CIA_PRB)

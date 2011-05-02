@@ -638,8 +638,8 @@ static DEVICE_START( ymz280b )
 	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	devcb_resolve_read8(&chip->ext_ram_read, &intf->ext_read, device);
-	devcb_resolve_write8(&chip->ext_ram_write, &intf->ext_write, device);
+	chip->ext_ram_read.resolve(intf->ext_read, *device);
+	chip->ext_ram_write.resolve(intf->ext_write, *device);
 
 	/* compute ADPCM tables */
 	compute_tables();
@@ -839,8 +839,8 @@ static void write_to_register(ymz280b_state *chip, int data)
 				break;
 
 			case 0x87:		/* RAM write */
-				if (chip->ext_ram_write.write)
-					devcb_call_write8(&chip->ext_ram_write, chip->rom_readback_addr, data);
+				if (!chip->ext_ram_write.isnull())
+					chip->ext_ram_write(chip->rom_readback_addr, data);
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
 				break;
@@ -925,7 +925,7 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 	ymz280b_state *chip = get_safe_token(device);
 
 	if ((offset & 1) == 0)
-		return devcb_call_read8(&chip->ext_ram_read, chip->rom_readback_addr++ - 1);
+		return chip->ext_ram_read(chip->rom_readback_addr++ - 1);
 	else
 		return compute_status(chip);
 }

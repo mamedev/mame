@@ -48,9 +48,9 @@ void riot6532_device::update_irqstate()
 {
 	int state = (m_irqstate & m_irqenable);
 
-	if (m_irq_func.write != NULL)
+	if (!m_irq_func.isnull())
 	{
-		devcb_call_write_line(&m_irq_func, (state != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_irq_func((state != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -229,9 +229,9 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 		else
 		{
 			port->m_out = data;
-			if (port->m_out_func.write != NULL)
+			if (!port->m_out_func.isnull())
 			{
-				devcb_call_write8(&port->m_out_func, 0, data);
+				port->m_out_func(0, data);
 			}
 			else
 			{
@@ -311,9 +311,9 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 		else
 		{
 			/* call the input callback if it exists */
-			if (port->m_in_func.read != NULL)
+			if (!port->m_in_func.isnull())
 			{
-				port->m_in = devcb_call_read8(&port->m_in_func, 0);
+				port->m_in = port->m_in_func(0);
 
 				/* changes to port A need to update the PA7 state */
 				if (port == &m_port[0])
@@ -485,13 +485,13 @@ void riot6532_device::device_start()
 	m_index = machine().devicelist().indexof(RIOT6532, tag());
 
 	/* configure the ports */
-	devcb_resolve_read8(&m_port[0].m_in_func, &m_in_a_cb, this);
-	devcb_resolve_write8(&m_port[0].m_out_func, &m_out_a_cb, this);
-	devcb_resolve_read8(&m_port[1].m_in_func, &m_in_b_cb, this);
-	devcb_resolve_write8(&m_port[1].m_out_func, &m_out_b_cb, this);
+	m_port[0].m_in_func.resolve(m_in_a_cb, *this);
+	m_port[0].m_out_func.resolve(m_out_a_cb, *this);
+	m_port[1].m_in_func.resolve(m_in_b_cb, *this);
+	m_port[1].m_out_func.resolve(m_out_b_cb, *this);
 
 	/* resolve irq func */
-	devcb_resolve_write_line(&m_irq_func, &m_irq_cb, this);
+	m_irq_func.resolve(m_irq_cb, *this);
 
 	/* allocate timers */
 	m_timer = machine().scheduler().timer_alloc(FUNC(timer_end_callback), (void *)this);

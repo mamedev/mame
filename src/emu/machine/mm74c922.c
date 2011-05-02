@@ -45,7 +45,7 @@ inline void mm74c922_device::change_output_lines()
 
 		if (LOG) logerror("MM74C922 '%s' Data Available: %u\n", tag(), m_da);
 
-		devcb_call_write_line(&m_out_da_func, m_da);
+		m_out_da_func(m_da);
 	}
 }
 
@@ -72,7 +72,7 @@ inline void mm74c922_device::detect_keypress()
 {
 	if (m_inhibit)
 	{
-		UINT8 data = devcb_call_read8(&m_in_x_func[m_x], 0);
+		UINT8 data = m_in_x_func[m_x](0);
 
 		if (BIT(data, m_y))
 		{
@@ -86,7 +86,7 @@ inline void mm74c922_device::detect_keypress()
 	}
 	else
 	{
-		UINT8 data = devcb_call_read8(&m_in_x_func[m_x], 0);
+		UINT8 data = m_in_x_func[m_x](0);
 
 		for (int y = 0; y < m_max_y; y++)
 		{
@@ -169,12 +169,12 @@ void mm74c922_device::device_config_complete()
 void mm74c922_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_da_func, &m_out_da_cb, this);
-	devcb_resolve_read8(&m_in_x_func[0], &m_in_x1_cb, this);
-	devcb_resolve_read8(&m_in_x_func[1], &m_in_x2_cb, this);
-	devcb_resolve_read8(&m_in_x_func[2], &m_in_x3_cb, this);
-	devcb_resolve_read8(&m_in_x_func[3], &m_in_x4_cb, this);
-	devcb_resolve_read8(&m_in_x_func[4], &m_in_x5_cb, this);
+	m_out_da_func.resolve(m_out_da_cb, *this);
+	m_in_x_func[0].resolve(m_in_x1_cb, *this);
+	m_in_x_func[1].resolve(m_in_x2_cb, *this);
+	m_in_x_func[2].resolve(m_in_x3_cb, *this);
+	m_in_x_func[3].resolve(m_in_x4_cb, *this);
+	m_in_x_func[4].resolve(m_in_x5_cb, *this);
 
 	// set initial values
 	change_output_lines();

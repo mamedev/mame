@@ -68,9 +68,9 @@ void com8116_device::device_config_complete()
 void com8116_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_fx4_func, &m_out_fx4_cb, this);
-	devcb_resolve_write_line(&m_out_fr_func, &m_out_fr_cb, this);
-	devcb_resolve_write_line(&m_out_ft_func, &m_out_ft_cb, this);
+	m_out_fx4_func.resolve(m_out_fx4_cb, *this);
+	m_out_fr_func.resolve(m_out_fr_cb, *this);
+	m_out_ft_func.resolve(m_out_ft_cb, *this);
 
 	// allocate timers
 	m_fx4_timer = timer_alloc(TIMER_FX4);
@@ -93,15 +93,15 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 	case TIMER_FX4:
-		devcb_call_write_line(&m_out_fx4_func, 1);
+		m_out_fx4_func(1);
 		break;
 
 	case TIMER_FR:
-		devcb_call_write_line(&m_out_fr_func, 1);
+		m_out_fr_func(1);
 		break;
 
 	case TIMER_FT:
-		devcb_call_write_line(&m_out_ft_func, 1);
+		m_out_ft_func(1);
 		break;
 	}
 }

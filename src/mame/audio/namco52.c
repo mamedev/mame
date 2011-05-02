@@ -86,19 +86,19 @@ static READ8_HANDLER( namco_52xx_K_r )
 static READ8_HANDLER( namco_52xx_SI_r )
 {
 	namco_52xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->m_si, 0) ? 1 : 0;
+	return state->m_si(0) ? 1 : 0;
 }
 
 static READ8_HANDLER( namco_52xx_R0_r )
 {
 	namco_52xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->m_romread, state->m_address) & 0x0f;
+	return state->m_romread(state->m_address) & 0x0f;
 }
 
 static READ8_HANDLER( namco_52xx_R1_r )
 {
 	namco_52xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->m_romread, state->m_address) >> 4;
+	return state->m_romread(state->m_address) >> 4;
 }
 
 
@@ -215,8 +215,8 @@ static DEVICE_START( namco_52xx )
 	state->m_basenode = intf->firstnode;
 
 	/* resolve our read/write callbacks */
-	devcb_resolve_read8(&state->m_romread, &intf->romread, device);
-	devcb_resolve_read8(&state->m_si, &intf->si, device);
+	state->m_romread.resolve(intf->romread, *device);
+	state->m_si.resolve(intf->si, *device);
 
 	/* start the external clock */
 	if (intf->extclock != 0)

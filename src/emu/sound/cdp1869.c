@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 
 inline bool cdp1869_device::is_ntsc()
 {
-	return devcb_call_read_line(&m_in_pal_ntsc_func) ? false : true;
+	return m_in_pal_ntsc_func() ? false : true;
 }
 
 
@@ -369,8 +369,8 @@ void cdp1869_device::device_start()
 	assert(m_screen != NULL);
 
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_pal_ntsc_func, &in_pal_ntsc_cb, this);
-	devcb_resolve_write_line(&m_out_prd_func, &out_prd_cb, this);
+	m_in_pal_ntsc_func.resolve(in_pal_ntsc_cb, *this);
+	m_out_prd_func.resolve(out_prd_cb, *this);
 	m_in_pcb_func = in_pcb_cb;
 	m_in_char_ram_func = in_char_ram_cb;
 	m_out_char_ram_func = out_char_ram_cb;
@@ -427,7 +427,7 @@ void cdp1869_device::device_post_load()
 
 void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	devcb_call_write_line(&m_out_prd_func, param);
+	m_out_prd_func(param);
 	m_prd = param;
 
 	update_prd_changed_timer();
@@ -899,7 +899,7 @@ READ_LINE_MEMBER( cdp1869_device::predisplay_r )
 
 READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 {
-	return devcb_call_read_line(&m_in_pal_ntsc_func);
+	return m_in_pal_ntsc_func();
 }
 
 

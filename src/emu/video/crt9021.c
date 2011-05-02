@@ -119,9 +119,9 @@ void crt9021_device::device_start()
 	// allocate timers
 
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_data_func, &in_data_cb, this);
-	devcb_resolve_read8(&m_in_attr_func, &in_attr_cb, this);
-	devcb_resolve_read_line(&m_in_atten_func, &in_atten_cb, this);
+	m_in_data_func.resolve(in_data_cb, *this);
+	m_in_attr_func.resolve(in_attr_cb, *this);
+	m_in_atten_func.resolve(in_atten_cb, *this);
 
 	// get the screen device
 	m_screen = machine().device<screen_device>(screen_tag);

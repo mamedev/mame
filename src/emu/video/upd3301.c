@@ -76,7 +76,7 @@ inline void upd3301_device::set_interrupt(int state)
 {
 	if (LOG) logerror("UPD3301 '%s' Interrupt: %u\n", tag(), state);
 
-	devcb_call_write_line(&m_out_int_func, state);
+	m_out_int_func(state);
 
 	if (!state)
 	{
@@ -93,7 +93,7 @@ inline void upd3301_device::set_drq(int state)
 {
 	if (LOG) logerror("UPD3301 '%s' DRQ: %u\n", tag(), state);
 
-	devcb_call_write_line(&m_out_drq_func, state);
+	m_out_drq_func(state);
 }
 
 
@@ -248,10 +248,10 @@ void upd3301_device::device_start()
 	m_drq_timer = timer_alloc(TIMER_DRQ);
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_drq_func, &m_out_drq_cb, this);
-	devcb_resolve_write_line(&m_out_hrtc_func, &m_out_hrtc_cb, this);
-	devcb_resolve_write_line(&m_out_vrtc_func, &m_out_vrtc_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_out_hrtc_func.resolve(m_out_hrtc_cb, *this);
+	m_out_vrtc_func.resolve(m_out_vrtc_cb, *this);
 
 	// get the screen device
 	m_screen = machine().device<screen_device>(m_screen_tag);
@@ -326,7 +326,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_HRTC:
 		if (LOG) logerror("UPD3301 '%s' HRTC: %u\n", tag(), param);
 
-		devcb_call_write_line(&m_out_hrtc_func, param);
+		m_out_hrtc_func(param);
 		m_hrtc = param;
 
 		update_hrtc_timer(param);
@@ -335,7 +335,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_VRTC:
 		if (LOG) logerror("UPD3301 '%s' VRTC: %u\n", tag(), param);
 
-		devcb_call_write_line(&m_out_vrtc_func, param);
+		m_out_vrtc_func(param);
 		m_vrtc = param;
 
 		if (param && !m_me)

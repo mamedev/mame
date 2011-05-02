@@ -259,7 +259,7 @@ static void floppy_drive_index_func(device_t *img)
 		drive->index_timer->adjust(attotime::from_double(ms/20/1000.0));
 	}
 
-	devcb_call_write_line(&drive->out_idx_func, drive->idx);
+	drive->out_idx_func(drive->idx);
 
 	if (drive->index_pulse_callback)
 		drive->index_pulse_callback(drive->controller, img, drive->idx);
@@ -298,7 +298,7 @@ void floppy_drive_set_flag_state(device_t *img, int flag, int state)
 		if (flag & FLOPPY_DRIVE_READY)
 		{
 			/* trigger state change callback */
-			devcb_call_write_line(&drv->out_rdy_func, new_state ? ASSERT_LINE : CLEAR_LINE);
+			drv->out_rdy_func(new_state ? ASSERT_LINE : CLEAR_LINE);
 
 			if (drv->ready_state_change_callback)
 				drv->ready_state_change_callback(drv->controller, img, new_state);
@@ -382,11 +382,11 @@ void floppy_drive_seek(device_t *img, signed int signed_tracks)
 
 	/* set track 0 flag */
 	pDrive->tk00 = (pDrive->current_track == 0) ? CLEAR_LINE : ASSERT_LINE;
-	devcb_call_write_line(&pDrive->out_tk00_func, pDrive->tk00);
+	pDrive->out_tk00_func(pDrive->tk00);
 
 	/* clear disk changed flag */
 	pDrive->dskchg = ASSERT_LINE;
-	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
+	//flopimg->out_dskchg_func(flopimg->dskchg);
 
 	/* inform disk image of step operation so it can cache information */
 	if (image->exists())
@@ -579,27 +579,27 @@ DEVICE_START( floppy )
 	floppy->active = FALSE;
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&floppy->out_idx_func, &floppy->config->out_idx_func, device);
-	devcb_resolve_read_line(&floppy->in_mon_func, &floppy->config->in_mon_func, device);
-	devcb_resolve_write_line(&floppy->out_tk00_func, &floppy->config->out_tk00_func, device);
-	devcb_resolve_write_line(&floppy->out_wpt_func, &floppy->config->out_wpt_func, device);
-	devcb_resolve_write_line(&floppy->out_rdy_func, &floppy->config->out_rdy_func, device);
-//  devcb_resolve_write_line(&floppy->out_dskchg_func, &floppy->config->out_dskchg_func, device);
+	floppy->out_idx_func.resolve(floppy->config->out_idx_func, *device);
+	floppy->in_mon_func.resolve(floppy->config->in_mon_func, *device);
+	floppy->out_tk00_func.resolve(floppy->config->out_tk00_func, *device);
+	floppy->out_wpt_func.resolve(floppy->config->out_wpt_func, *device);
+	floppy->out_rdy_func.resolve(floppy->config->out_rdy_func, *device);
+//  floppy->out_dskchg_func.resolve(floppy->config->out_dskchg_func, *device);
 
 	/* by default we are not write-protected */
 	floppy->wpt = ASSERT_LINE;
-	devcb_call_write_line(&floppy->out_wpt_func, floppy->wpt);
+	floppy->out_wpt_func(floppy->wpt);
 
 	/* not at track 0 */
 	floppy->tk00 = ASSERT_LINE;
-	devcb_call_write_line(&floppy->out_tk00_func, floppy->tk00);
+	floppy->out_tk00_func(floppy->tk00);
 
 	/* motor off */
 	floppy->mon = ASSERT_LINE;
 
 	/* disk changed */
 	floppy->dskchg = CLEAR_LINE;
-//  devcb_call_write_line(&floppy->out_dskchg_func, floppy->dskchg);
+//  floppy->out_dskchg_func(floppy->dskchg);
 }
 
 static int internal_floppy_device_load(device_image_interface *image, int create_format, option_resolution *create_args)
@@ -655,7 +655,7 @@ static TIMER_CALLBACK( set_wpt )
 	floppy_drive *flopimg = (floppy_drive *)ptr;
 
 	flopimg->wpt = param;
-	devcb_call_write_line(&flopimg->out_wpt_func, param);
+	flopimg->out_wpt_func(param);
 }
 
 DEVICE_IMAGE_LOAD( floppy )
@@ -671,7 +671,7 @@ DEVICE_IMAGE_LOAD( floppy )
 
 	/* push disk halfway into drive */
 	flopimg->wpt = CLEAR_LINE;
-	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
+	flopimg->out_wpt_func(flopimg->wpt);
 
 	/* set timer for disk load */
 	int next_wpt;
@@ -702,11 +702,11 @@ DEVICE_IMAGE_UNLOAD( floppy )
 
 	/* disk changed */
 	flopimg->dskchg = CLEAR_LINE;
-	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
+	//flopimg->out_dskchg_func(flopimg->dskchg);
 
 	/* pull disk halfway out of drive */
 	flopimg->wpt = CLEAR_LINE;
-	devcb_call_write_line(&flopimg->out_wpt_func, flopimg->wpt);
+	flopimg->out_wpt_func(flopimg->wpt);
 
 	/* set timer for disk eject */
 	image.device().machine().scheduler().timer_set(attotime::from_msec(250), FUNC(set_wpt), ASSERT_LINE, flopimg);
@@ -897,7 +897,7 @@ WRITE_LINE_DEVICE_HANDLER( floppy_stp_w )
 		}
 
 		/* update track 0 line with new status */
-		devcb_call_write_line(&drive->out_tk00_func, drive->tk00);
+		drive->out_tk00_func(drive->tk00);
 	}
 
 	drive->stp = state;

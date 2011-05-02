@@ -163,16 +163,16 @@ const int WR5_DTR					= 0x80;
 //**************************************************************************
 
 #define RXD \
-	devcb_call_read_line(&m_in_rxd_func)
+	m_in_rxd_func()
 
 #define TXD(_state) \
-	devcb_call_write_line(&m_out_txd_func, _state)
+	m_out_txd_func(_state)
 
 #define RTS(_state) \
-	devcb_call_write_line(&m_out_rts_func, _state)
+	m_out_rts_func(_state)
 
 #define DTR(_state) \
-	devcb_call_write_line(&m_out_dtr_func, _state)
+	m_out_dtr_func(_state)
 
 
 
@@ -242,7 +242,7 @@ void z80dart_device::device_config_complete()
 void z80dart_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
 
 	m_channel[CHANNEL_A].start(this, CHANNEL_A, m_in_rxda_cb, m_out_txda_cb, m_out_dtra_cb, m_out_rtsa_cb, m_out_wrdya_cb, m_out_synca_cb);
 	m_channel[CHANNEL_B].start(this, CHANNEL_B, m_in_rxdb_cb, m_out_txdb_cb, m_out_dtrb_cb, m_out_rtsb_cb, m_out_wrdyb_cb, m_out_syncb_cb);
@@ -404,7 +404,7 @@ void z80dart_device::z80daisy_irq_reti()
 void z80dart_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	devcb_call_write_line(&m_out_int_func, state);
+	m_out_int_func(state);
 }
 
 
@@ -476,12 +476,12 @@ void z80dart_device::dart_channel::start(z80dart_device *device, int index, cons
 	m_index = index;
 	m_device = device;
 
-	devcb_resolve_read_line(&m_in_rxd_func, &in_rxd, m_device);
-	devcb_resolve_write_line(&m_out_txd_func, &out_txd, m_device);
-	devcb_resolve_write_line(&m_out_dtr_func, &out_dtr, m_device);
-	devcb_resolve_write_line(&m_out_rts_func, &out_rts, m_device);
-	devcb_resolve_write_line(&m_out_wrdy_func, &out_wrdy, m_device);
-	devcb_resolve_write_line(&m_out_sync_func, &out_sync, m_device);
+	m_in_rxd_func.resolve(in_rxd, *m_device);
+	m_out_txd_func.resolve(out_txd, *m_device);
+	m_out_dtr_func.resolve(out_dtr, *m_device);
+	m_out_rts_func.resolve(out_rts, *m_device);
+	m_out_wrdy_func.resolve(out_wrdy, *m_device);
+	m_out_sync_func.resolve(out_sync, *m_device);
 
 	m_device->save_item(NAME(m_rr), m_index);
 	m_device->save_item(NAME(m_wr), m_index);

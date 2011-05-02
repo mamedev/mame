@@ -157,7 +157,7 @@ void hd61830_device::device_start()
 	m_busy_timer = timer_alloc();
 
 	// resolve callbacks
-    devcb_resolve_read8(&m_in_rd_func, &m_in_rd_cb, this);
+    m_in_rd_func.resolve(m_in_rd_cb, *this);
 
 	m_screen = machine().device<screen_device>(screen_tag);
 
@@ -456,7 +456,7 @@ void hd61830_device::draw_char(bitmap_t *bitmap, const rectangle *cliprect, UINT
 
 			if (m_mcr & MODE_EXTERNAL_CG)
 			{
-				data = devcb_call_read8(&m_in_rd_func, (cl << 12) | md);
+				data = m_in_rd_func((cl << 12) | md);
 			}
 			else
 			{

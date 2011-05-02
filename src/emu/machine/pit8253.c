@@ -122,8 +122,8 @@ static struct pit8253_timer	*get_timer(struct _pit8253_t *pit,int which)
 
 static int pit8253_gate(struct pit8253_timer *timer)
 {
-	if (timer->in_gate_func.read != NULL)
-		return devcb_call_read_line(&timer->in_gate_func);
+	if (!timer->in_gate_func.isnull())
+		return timer->in_gate_func();
 	else
 		return timer->gate;
 }
@@ -229,7 +229,7 @@ static void	set_output(device_t *device, struct pit8253_timer *timer,int output)
 	if (output != timer->output)
 	{
 		timer->output =	output;
-		devcb_call_write_line(&timer->out_out_func, timer->output);
+		timer->out_out_func(timer->output);
 	}
 }
 
@@ -991,7 +991,7 @@ static void pit8253_gate_w(device_t *device, int gate, int state)
 	if (timer == NULL)
 		return;
 
-	if (timer->in_gate_func.read != NULL)
+	if (!timer->in_gate_func.isnull())
 	{
 		logerror("pit8253_gate_w: write has no effect because a read handler is already defined!\n");
 	}
@@ -1085,8 +1085,8 @@ static void common_start( device_t *device, int device_type ) {
 		timer->updatetimer->adjust(attotime::never, timerno);
 
 		/* resolve callbacks */
-		devcb_resolve_read_line(&timer->in_gate_func, &pit8253->config->timer[timerno].in_gate_func, device);
-		devcb_resolve_write_line(&timer->out_out_func, &pit8253->config->timer[timerno].out_out_func, device);
+		timer->in_gate_func.resolve(pit8253->config->timer[timerno].in_gate_func, *device);
+		timer->out_out_func.resolve(pit8253->config->timer[timerno].out_out_func, *device);
 
 		/* set up state save values */
 		device->save_item(NAME(timer->clockin), timerno);
@@ -1137,8 +1137,8 @@ static DEVICE_RESET( pit8253 ) {
 		timer->count = timer->value = timer->latch = 0;
 		timer->lowcount = 0;
 
-		if (timer->in_gate_func.read != NULL)
-			timer->gate = devcb_call_read_line(&timer->in_gate_func);
+		if (!timer->in_gate_func.isnull())
+			timer->gate = timer->in_gate_func();
 		else
 			timer->gate = 1;
 

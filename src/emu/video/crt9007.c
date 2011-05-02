@@ -250,7 +250,7 @@ inline void crt9007_device::trigger_interrupt(int line)
 		if (!(status & STATUS_INTERRUPT_PENDING))
 		{
 			if (LOG) logerror("CRT9007 '%s' INT 1\n", tag());
-			devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
+			m_out_int_func(ASSERT_LINE);
 		}
 	}
 }
@@ -274,7 +274,7 @@ inline void crt9007_device::update_cblank_line()
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CBLANK %u\n", tag(), y, x, m_cblank);
 
-		devcb_call_write_line(&m_out_cblank_func, m_cblank);
+		m_out_cblank_func(m_cblank);
 	}
 }
 
@@ -504,16 +504,16 @@ void crt9007_device::device_start()
 	m_dma_timer = timer_alloc(TIMER_DMA);
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_dmar_func, &m_out_dmar_cb, this);
-	devcb_resolve_write_line(&m_out_hs_func, &m_out_hs_cb, this);
-	devcb_resolve_write_line(&m_out_vs_func, &m_out_vs_cb, this);
-	devcb_resolve_write_line(&m_out_vlt_func, &m_out_vlt_cb, this);
-	devcb_resolve_write_line(&m_out_curs_func, &m_out_curs_cb, this);
-	devcb_resolve_write_line(&m_out_drb_func, &m_out_drb_cb, this);
-	devcb_resolve_write_line(&m_out_cblank_func, &m_out_cblank_cb, this);
-	devcb_resolve_write_line(&m_out_slg_func, &m_out_slg_cb, this);
-	devcb_resolve_write_line(&m_out_sld_func, &m_out_sld_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_dmar_func.resolve(m_out_dmar_cb, *this);
+	m_out_hs_func.resolve(m_out_hs_cb, *this);
+	m_out_vs_func.resolve(m_out_vs_cb, *this);
+	m_out_vlt_func.resolve(m_out_vlt_cb, *this);
+	m_out_curs_func.resolve(m_out_curs_cb, *this);
+	m_out_drb_func.resolve(m_out_drb_cb, *this);
+	m_out_cblank_func.resolve(m_out_cblank_cb, *this);
+	m_out_slg_func.resolve(m_out_slg_cb, *this);
+	m_out_sld_func.resolve(m_out_sld_cb, *this);
 
 	// get the screen device
 	m_screen = machine().device<screen_device>(m_screen_tag);
@@ -536,36 +536,36 @@ void crt9007_device::device_reset()
 	m_disp = 0;
 
 	// HS = 1
-	devcb_call_write_line(&m_out_hs_func, 1);
+	m_out_hs_func(1);
 
 	// VS = 1
-	devcb_call_write_line(&m_out_vs_func, 1);
+	m_out_vs_func(1);
 
 	// CBLANK = 1
-	devcb_call_write_line(&m_out_cblank_func, 0);
+	m_out_cblank_func(0);
 
 	// CURS = 0
-	devcb_call_write_line(&m_out_curs_func, 0);
+	m_out_curs_func(0);
 
 	// VLT = 0
-	devcb_call_write_line(&m_out_vlt_func, 0);
+	m_out_vlt_func(0);
 
 	// DRB = 1
-	devcb_call_write_line(&m_out_drb_func, 1);
+	m_out_drb_func(1);
 
 	// INT = 0
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
 
 	// 28 (DMAR) = 0
-	devcb_call_write_line(&m_out_dmar_func, CLEAR_LINE);
+	m_out_dmar_func(CLEAR_LINE);
 
 	// 29 (WBEN) = 0
 
 	// 30 (SLG) = 0
-	devcb_call_write_line(&m_out_slg_func, 0);
+	m_out_slg_func(0);
 
 	// 31 (SLD) = 0
-	devcb_call_write_line(&m_out_sld_func, 0);
+	m_out_sld_func(0);
 
 	// 32 (LPSTB) = 0
 }
@@ -597,7 +597,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : HS %u\n", tag(), y, x, m_hs);
 
-		devcb_call_write_line(&m_out_hs_func, m_hs);
+		m_out_hs_func(m_hs);
 
 		update_cblank_line();
 
@@ -609,7 +609,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VS %u\n", tag(), y, x, m_vs);
 
-		devcb_call_write_line(&m_out_vs_func, param);
+		m_out_vs_func(param);
 
 		if (m_vs)
 		{
@@ -631,7 +631,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : VLT %u\n", tag(), y, x, m_vlt);
 
-		devcb_call_write_line(&m_out_vlt_func, param);
+		m_out_vlt_func(param);
 
 		update_vlt_timer(param);
 		break;
@@ -639,7 +639,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_CURS:
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : CURS %u\n", tag(), y, x, param);
 
-		devcb_call_write_line(&m_out_curs_func, param);
+		m_out_curs_func(param);
 
 		update_curs_timer(param);
 		break;
@@ -649,7 +649,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		if (LOG) logerror("CRT9007 '%s' y %03u x %04u : DRB %u\n", tag(), y, x, m_drb);
 
-		devcb_call_write_line(&m_out_drb_func, param);
+		m_out_drb_func(param);
 
 		if (!m_drb && !DMA_DISABLE)
 		{
@@ -660,7 +660,7 @@ void crt9007_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_dmar = 1;
 
 			if (LOG) logerror("CRT9007 '%s' DMAR 1\n", tag());
-			devcb_call_write_line(&m_out_dmar_func, ASSERT_LINE);
+			m_out_dmar_func(ASSERT_LINE);
 		}
 
 		update_drb_timer(param);
@@ -720,7 +720,7 @@ READ8_MEMBER( crt9007_device::read )
 		// reset interrupt pending bit
 		m_status &= ~STATUS_INTERRUPT_PENDING;
 		if (LOG) logerror("CRT9007 '%s' INT 0\n", tag());
-		devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+		m_out_int_func(CLEAR_LINE);
 		break;
 
 	case 0x3b:

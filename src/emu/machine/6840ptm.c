@@ -114,7 +114,7 @@ void ptm6840_device::device_start()
 	/* resolve callbacks */
 	for (int i = 0; i < 3; i++)
 	{
-		devcb_resolve_write8(&m_out_func[i], &m_out_cb[i], this);
+		m_out_func[i].resolve(m_out_cb[i], *this);
 	}
 
 	for (int i = 0; i < 3; i++)
@@ -139,7 +139,7 @@ void ptm6840_device::device_start()
 		m_timer[i]->enable(false);
 	}
 
-	devcb_resolve_write_line(&m_irq_func, &m_irq_cb, this);
+	m_irq_func.resolve(m_irq_cb, *this);
 
 	/* register for state saving */
 	save_item(NAME(m_lsb_buffer));
@@ -355,7 +355,7 @@ void ptm6840_device::update_interrupts()
 			m_status_reg &= ~0x80;
 		}
 
-		devcb_call_write_line(&m_irq_func, m_IRQ);
+		m_irq_func(m_IRQ);
 	}
 }
 
@@ -443,9 +443,9 @@ void ptm6840_device::reload_count(int idx)
 	if ((m_mode[idx] == 4) || (m_mode[idx] == 6))
 	{
 		m_output[idx] = 1;
-		if (m_out_func[idx].write != NULL)
+		if (!m_out_func[idx].isnull())
 		{
-			devcb_call_write8(&m_out_func[idx], 0, m_output[idx]);
+			m_out_func[idx](0, m_output[idx]);
 		}
 	}
 
@@ -569,7 +569,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ptm6840, ptm6840_write)
 			if (!(m_control_reg[idx] & 0x80 ))
 			{
 				/* Output cleared */
-				devcb_call_write8(&m_out_func[idx], 0, 0);
+				m_out_func[idx](0, 0);
 			}
 			/* Reset? */
 			if (idx == 0 && (diffs & 0x01))
@@ -658,7 +658,7 @@ void ptm6840_device::ptm6840_timeout(int idx)
 			m_output[idx] = m_output[idx] ? 0 : 1;
 			PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx + 1, m_output[idx]));
 
-			devcb_call_write8(&m_out_func[idx], 0, m_output[idx]);
+			m_out_func[idx](0, m_output[idx]);
 		}
 		if ((m_mode[idx] == 4)||(m_mode[idx] == 6))
 		{
@@ -667,7 +667,7 @@ void ptm6840_device::ptm6840_timeout(int idx)
 				m_output[idx] = 1;
 				PLOG(("**ptm6840 %s t%d output %d **\n", tag(), idx + 1, m_output[idx]));
 
-				devcb_call_write8(&m_out_func[idx], 0, m_output[idx]);
+				m_out_func[idx](0, m_output[idx]);
 
 				/* No changes in output until reinit */
 				m_fired[idx] = 1;

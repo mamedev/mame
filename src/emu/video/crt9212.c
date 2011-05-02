@@ -20,19 +20,19 @@
 
 
 #define REN \
-	devcb_call_read_line(&m_in_ren_func)
+	m_in_ren_func()
 
 #define WEN \
-	devcb_call_read_line(&m_in_wen_func)
+	m_in_wen_func()
 
 #define WEN2 \
-	devcb_call_read_line(&m_in_wen2_func)
+	m_in_wen2_func()
 
 #define ROF(_state) \
-	devcb_call_write_line(&m_out_rof_func, _state);
+	m_out_rof_func(_state);
 
 #define WOF(_state) \
-	devcb_call_write_line(&m_out_wof_func, _state);
+	m_out_wof_func(_state);
 
 
 
@@ -90,11 +90,11 @@ void crt9212_device::device_config_complete()
 void crt9212_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_rof_func, &m_out_rof_cb, this);
-	devcb_resolve_write_line(&m_out_wof_func, &m_out_wof_cb, this);
-	devcb_resolve_read_line(&m_in_ren_func, &m_in_ren_cb, this);
-	devcb_resolve_read_line(&m_in_wen_func, &m_in_wen_cb, this);
-	devcb_resolve_read_line(&m_in_wen2_func, &m_in_wen2_cb, this);
+	m_out_rof_func.resolve(m_out_rof_cb, *this);
+	m_out_wof_func.resolve(m_out_wof_cb, *this);
+	m_in_ren_func.resolve(m_in_ren_cb, *this);
+	m_in_wen_func.resolve(m_in_wen_cb, *this);
+	m_in_wen2_func.resolve(m_in_wen2_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_input));

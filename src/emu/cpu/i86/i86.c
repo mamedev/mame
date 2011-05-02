@@ -224,8 +224,8 @@ static CPU_INIT( i80186 )
 
 	if (intf != NULL)
 	{
-		devcb_resolve_write_line(&cpustate->out_tmrout0_func, &intf->out_tmrout0_func, device);
-		devcb_resolve_write_line(&cpustate->out_tmrout1_func, &intf->out_tmrout1_func, device);
+		cpustate->out_tmrout0_func.resolve(intf->out_tmrout0_func, *device);
+		cpustate->out_tmrout1_func.resolve(intf->out_tmrout1_func, *device);
 	}
 }
 

@@ -70,9 +70,9 @@ void cdp1861_device::device_config_complete()
 void cdp1861_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_dmao_func, &m_out_dmao_cb, this);
-	devcb_resolve_write_line(&m_out_efx_func, &m_out_efx_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_dmao_func.resolve(m_out_dmao_cb, *this);
+	m_out_efx_func.resolve(m_out_efx_cb, *this);
 
 	// allocate timers
 	m_int_timer = timer_alloc(TIMER_INT);
@@ -105,9 +105,9 @@ void cdp1861_device::device_reset()
 	m_disp = 0;
 	m_dmaout = 0;
 
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
+	m_out_dmao_func(CLEAR_LINE);
+	m_out_efx_func(CLEAR_LINE);
 }
 
 
@@ -126,7 +126,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
+				m_out_int_func(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0));
@@ -135,7 +135,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+				m_out_int_func(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0));
@@ -146,22 +146,22 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		switch (scanline)
 		{
 		case CDP1861_SCANLINE_EFX_TOP_START:
-			devcb_call_write_line(&m_out_efx_func, ASSERT_LINE);
+			m_out_efx_func(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_TOP_END:
-			devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+			m_out_efx_func(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_BOTTOM_START:
-			devcb_call_write_line(&m_out_efx_func, ASSERT_LINE);
+			m_out_efx_func(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
 		case CDP1861_SCANLINE_EFX_BOTTOM_END:
-			devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+			m_out_efx_func(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
@@ -174,7 +174,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 				{
-					devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
+					m_out_dmao_func(CLEAR_LINE);
 				}
 			}
 
@@ -188,7 +188,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
 				{
-					devcb_call_write_line(&m_out_dmao_func, ASSERT_LINE);
+					m_out_dmao_func(ASSERT_LINE);
 				}
 			}
 
@@ -242,8 +242,8 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 
 	m_dispoff = state;
 
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
+	m_out_dmao_func(CLEAR_LINE);
 }
 
 

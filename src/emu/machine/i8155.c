@@ -115,7 +115,7 @@ inline UINT8 i8155_device::get_timer_mode()
 
 inline void i8155_device::timer_output()
 {
-	devcb_call_write_line(&m_out_to_func, m_to);
+	m_out_to_func(m_to);
 
 	if (LOG) logerror("8155 '%s' Timer Output: %u\n", tag(), m_to);
 }
@@ -165,7 +165,7 @@ inline UINT8 i8155_device::read_port(int port)
 		switch (get_port_mode(port))
 		{
 		case PORT_MODE_INPUT:
-			data = devcb_call_read8(&m_in_port_func[port], 0);
+			data = m_in_port_func[port](0);
 			break;
 
 		case PORT_MODE_OUTPUT:
@@ -178,7 +178,7 @@ inline UINT8 i8155_device::read_port(int port)
 		switch (get_port_mode(PORT_C))
 		{
 		case PORT_MODE_INPUT:
-			data = devcb_call_read8(&m_in_port_func[port], 0) & 0x3f;
+			data = m_in_port_func[port](0) & 0x3f;
 			break;
 
 		case PORT_MODE_OUTPUT:
@@ -200,7 +200,7 @@ inline void i8155_device::write_port(int port, UINT8 data)
 	{
 	case PORT_MODE_OUTPUT:
 		m_output[port] = data;
-		devcb_call_write8(&m_out_port_func[port], 0, m_output[port]);
+		m_out_port_func[port](0, m_output[port]);
 		break;
 	}
 }
@@ -257,13 +257,13 @@ void i8155_device::device_config_complete()
 void i8155_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_port_func[0], &in_pa_cb, this);
-	devcb_resolve_read8(&m_in_port_func[1], &in_pb_cb, this);
-	devcb_resolve_read8(&m_in_port_func[2], &in_pc_cb, this);
-	devcb_resolve_write8(&m_out_port_func[0], &out_pa_cb, this);
-	devcb_resolve_write8(&m_out_port_func[1], &out_pb_cb, this);
-	devcb_resolve_write8(&m_out_port_func[2], &out_pc_cb, this);
-	devcb_resolve_write_line(&m_out_to_func, &out_to_cb, this);
+	m_in_port_func[0].resolve(in_pa_cb, *this);
+	m_in_port_func[1].resolve(in_pb_cb, *this);
+	m_in_port_func[2].resolve(in_pc_cb, *this);
+	m_out_port_func[0].resolve(out_pa_cb, *this);
+	m_out_port_func[1].resolve(out_pb_cb, *this);
+	m_out_port_func[2].resolve(out_pc_cb, *this);
+	m_out_to_func.resolve(out_to_cb, *this);
 
 	// allocate timers
 	m_timer = timer_alloc();

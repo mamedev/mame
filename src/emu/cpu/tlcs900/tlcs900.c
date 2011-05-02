@@ -222,8 +222,8 @@ static CPU_INIT( tlcs900 )
 	cpustate->device = device;
 	cpustate->program = device->space( AS_PROGRAM );
 
-	devcb_resolve_write8( &cpustate->to1, &cpustate->intf->to1, device );
-	devcb_resolve_write8( &cpustate->to3, &cpustate->intf->to3, device );
+	cpustate->to1.resolve(cpustate->intf->to1, *device );
+	cpustate->to3.resolve(cpustate->intf->to3, *device );
 
 	device->save_item( NAME(cpustate->xwa) );
 	device->save_item( NAME(cpustate->xbc) );
@@ -661,8 +661,8 @@ INLINE void tlcs900_change_tff( tlcs900_state *cpustate, int which, int change )
 			cpustate->tff1 ^= 1;
 			break;
 		}
-		if ( cpustate->to1.write != NULL )
-			devcb_call_write8( &cpustate->to1, 0, cpustate->tff1 );
+		if ( !cpustate->to1.isnull() )
+			cpustate->to1(0, cpustate->tff1 );
 		break;
 
 	case 3:
@@ -678,8 +678,8 @@ INLINE void tlcs900_change_tff( tlcs900_state *cpustate, int which, int change )
 			cpustate->tff3 ^= 1;
 			break;
 		}
-		if ( cpustate->to3.write != NULL )
-			devcb_call_write8( &cpustate->to3, 0, cpustate->tff3 );
+		if ( !cpustate->to3.isnull() )
+			cpustate->to3(0, cpustate->tff3 );
 		break;
 	}
 }

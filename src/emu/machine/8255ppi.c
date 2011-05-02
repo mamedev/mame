@@ -147,13 +147,13 @@ void ppi8255_device::device_config_complete()
 
 void ppi8255_device::device_start()
 {
-	devcb_resolve_read8(&m_port_read[0], &m_port_a_read, this);
-	devcb_resolve_read8(&m_port_read[1], &m_port_b_read, this);
-	devcb_resolve_read8(&m_port_read[2], &m_port_c_read, this);
+	m_port_read[0].resolve(m_port_a_read, *this);
+	m_port_read[1].resolve(m_port_b_read, *this);
+	m_port_read[2].resolve(m_port_c_read, *this);
 
-	devcb_resolve_write8(&m_port_write[0], &m_port_a_write, this);
-	devcb_resolve_write8(&m_port_write[1], &m_port_b_write, this);
-	devcb_resolve_write8(&m_port_write[2], &m_port_c_write, this);
+	m_port_write[0].resolve(m_port_a_write, *this);
+	m_port_write[1].resolve(m_port_b_write, *this);
+	m_port_write[2].resolve(m_port_c_write, *this);
 
 	/* register for state saving */
 	save_item(NAME(m_group_a_mode));
@@ -318,7 +318,7 @@ UINT8 ppi8255_device::ppi8255_read_port(int port)
 
 	if (m_in_mask[port])
 	{
-		ppi8255_input(port, devcb_call_read8(&m_port_read[port], 0));
+		ppi8255_input(port, m_port_read[port](0));
 		result |= m_read[port] & m_in_mask[port];
 	}
 	result |= m_latch[port] & m_out_mask[port];
@@ -382,7 +382,7 @@ void ppi8255_device::ppi8255_write_port(int port)
 	}
 
 	m_output[port] = write_data;
-	devcb_call_write8(&m_port_write[port], 0, write_data);
+	m_port_write[port](0, write_data);
 }
 
 
@@ -603,33 +603,33 @@ void ppi8255_device::set_mode(int data, int call_handlers)
 
 void ppi8255_set_port_a_read(device_t *device, const devcb_read8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(0, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(0, *config);
 }
 
 void ppi8255_set_port_b_read(device_t *device, const devcb_read8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(1, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(1, *config);
 }
 
 void ppi8255_set_port_c_read(device_t *device, const devcb_read8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(2, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(2, *config);
 }
 
 
 void ppi8255_set_port_a_write(device_t *device, const devcb_write8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(0, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(0, *config);
 }
 
 void ppi8255_set_port_b_write(device_t *device, const devcb_write8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(1, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(1, *config);
 }
 
 void ppi8255_set_port_c_write(device_t *device, const devcb_write8 *config)
 {
-	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(2, config);
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(2, *config);
 }
 
 

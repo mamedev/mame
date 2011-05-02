@@ -95,18 +95,18 @@ void pia6821_device::device_config_complete()
 void pia6821_device::device_start()
 {
 	/* resolve callbacks */
-    devcb_resolve_read8(&m_in_a_func, &m_in_a_cb, this);
-    devcb_resolve_read8(&m_in_b_func, &m_in_b_cb, this);
-    devcb_resolve_read_line(&m_in_ca1_func, &m_in_ca1_cb, this);
-    devcb_resolve_read_line(&m_in_cb1_func, &m_in_cb1_cb, this);
-    devcb_resolve_read_line(&m_in_ca2_func, &m_in_ca2_cb, this);
-    devcb_resolve_read_line(&m_in_cb2_func, &m_in_cb2_cb, this);
-    devcb_resolve_write8(&m_out_a_func, &m_out_a_cb, this);
-    devcb_resolve_write8(&m_out_b_func, &m_out_b_cb, this);
-    devcb_resolve_write_line(&m_out_ca2_func, &m_out_ca2_cb, this);
-    devcb_resolve_write_line(&m_out_cb2_func, &m_out_cb2_cb, this);
-    devcb_resolve_write_line(&m_irq_a_func, &m_irq_a_cb, this);
-    devcb_resolve_write_line(&m_irq_b_func, &m_irq_b_cb, this);
+    m_in_a_func.resolve(m_in_a_cb, *this);
+    m_in_b_func.resolve(m_in_b_cb, *this);
+    m_in_ca1_func.resolve(m_in_ca1_cb, *this);
+    m_in_cb1_func.resolve(m_in_cb1_cb, *this);
+    m_in_ca2_func.resolve(m_in_ca2_cb, *this);
+    m_in_cb2_func.resolve(m_in_cb2_cb, *this);
+    m_out_a_func.resolve(m_out_a_cb, *this);
+    m_out_b_func.resolve(m_out_b_cb, *this);
+    m_out_ca2_func.resolve(m_out_ca2_cb, *this);
+    m_out_cb2_func.resolve(m_out_cb2_cb, *this);
+    m_irq_a_func.resolve(m_irq_a_cb, *this);
+    m_irq_b_func.resolve(m_irq_b_cb, *this);
 
     save_item(NAME(m_in_a));
     save_item(NAME(m_in_ca1));
@@ -196,8 +196,8 @@ void pia6821_device::device_reset()
 
 
 	/* clear the IRQs */
-	devcb_call_write_line(&m_irq_a_func, FALSE);
-	devcb_call_write_line(&m_irq_b_func, FALSE);
+	m_irq_a_func(FALSE);
+	m_irq_b_func(FALSE);
 }
 
 
@@ -213,7 +213,7 @@ void pia6821_device::update_interrupts()
 	if (new_state != m_irq_a_state)
 	{
 		m_irq_a_state = new_state;
-		devcb_call_write_line(&m_irq_a_func, m_irq_a_state);
+		m_irq_a_func(m_irq_a_state);
 	}
 
 	/* then do IRQ B */
@@ -222,7 +222,7 @@ void pia6821_device::update_interrupts()
 	if (new_state != m_irq_b_state)
 	{
 		m_irq_b_state = new_state;
-		devcb_call_write_line(&m_irq_b_func, m_irq_b_state);
+		m_irq_b_func(m_irq_b_state);
 	}
 }
 
@@ -237,9 +237,9 @@ UINT8 pia6821_device::get_in_a_value()
 	UINT8 ret;
 
 	/* update the input */
-	if (m_in_a_func.read != NULL)
+	if (!m_in_a_func.isnull())
     {
-		port_a_data = devcb_call_read8(&m_in_a_func, 0);
+		port_a_data = m_in_a_func(0);
     }
 	else
 	{
@@ -289,9 +289,9 @@ UINT8 pia6821_device::get_in_b_value()
 		UINT8 port_b_data;
 
 		/* update the input */
-		if (m_in_b_func.read != NULL)
+		if (!m_in_b_func.isnull())
         {
-			port_b_data = devcb_call_read8(&m_in_b_func, 0);
+			port_b_data = m_in_b_func(0);
         }
 		else
 		{
@@ -365,9 +365,9 @@ void pia6821_device::set_out_ca2(int data)
 		m_out_ca2 = data;
 
 		/* send to output function */
-		if (m_out_ca2_func.write)
+		if (!m_out_ca2_func.isnull())
         {
-			devcb_call_write_line(&m_out_ca2_func, m_out_ca2);
+			m_out_ca2_func(m_out_ca2);
         }
 		else
 		{
@@ -396,9 +396,9 @@ void pia6821_device::set_out_cb2(int data)
 		m_last_out_cb2_z = z;
 
 		/* send to output function */
-		if (m_out_cb2_func.write)
+		if (!m_out_cb2_func.isnull())
         {
-			devcb_call_write_line(&m_out_cb2_func, m_out_cb2);
+			m_out_cb2_func(m_out_cb2);
         }
 		else
 		{
@@ -510,9 +510,9 @@ UINT8 pia6821_device::control_a_r()
 	UINT8 ret;
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
-	if (m_in_ca1_func.read != NULL)
+	if (!m_in_ca1_func.isnull())
     {
-		ca1_w(devcb_call_read_line(&m_in_ca1_func));
+		ca1_w(m_in_ca1_func());
     }
 	else if(!m_logged_ca1_not_connected && (!m_in_ca1_pushed))
 	{
@@ -520,9 +520,9 @@ UINT8 pia6821_device::control_a_r()
 		m_logged_ca1_not_connected = TRUE;
 	}
 
-	if (m_in_ca2_func.read != NULL)
+	if (!m_in_ca2_func.isnull())
     {
-		ca2_w(devcb_call_read_line(&m_in_ca2_func));
+		ca2_w(m_in_ca2_func());
     }
 	else if ( !m_logged_ca2_not_connected && C2_INPUT(m_ctl_a) && !m_in_ca2_pushed)
 	{
@@ -559,9 +559,9 @@ UINT8 pia6821_device::control_b_r()
 	UINT8 ret;
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
-	if(m_in_cb1_func.read != NULL)
+	if(!m_in_cb1_func.isnull())
     {
-		cb1_w(devcb_call_read_line(&m_in_cb1_func));
+		cb1_w(m_in_cb1_func());
     }
 	else if(!m_logged_cb1_not_connected && !m_in_cb1_pushed)
 	{
@@ -569,9 +569,9 @@ UINT8 pia6821_device::control_b_r()
 		m_logged_cb1_not_connected = TRUE;
 	}
 
-	if(m_in_cb2_func.read != NULL)
+	if(!m_in_cb2_func.isnull())
     {
-		cb2_w(devcb_call_read_line(&m_in_cb2_func));
+		cb2_w(m_in_cb2_func());
     }
 	else if(!m_logged_cb2_not_connected && C2_INPUT(m_ctl_b) && !m_in_cb2_pushed)
 	{
@@ -687,9 +687,9 @@ void pia6821_device::send_to_out_a_func(const char* message)
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
-	if(m_out_a_func.write != NULL)
+	if(!m_out_a_func.isnull())
     {
-		devcb_call_write8(&m_out_a_func, 0, data);
+		m_out_a_func(0, data);
     }
 	else
 	{
@@ -714,9 +714,9 @@ void pia6821_device::send_to_out_b_func(const char* message)
 
 	LOG(("PIA #%s: %s = %02X\n", tag(), message, data));
 
-	if(m_out_b_func.write != NULL)
+	if(!m_out_b_func.isnull())
     {
-		devcb_call_write8(&m_out_b_func, 0, data);
+		m_out_b_func(0, data);
     }
 	else
 	{
@@ -997,7 +997,7 @@ void pia6821_set_input_a(device_t *device, UINT8 data, UINT8 z_mask)
 
 void pia6821_device::set_input_a(UINT8 data, UINT8 z_mask)
 {
-	assert_always(m_in_a_func.read == NULL, "pia6821_porta_w() called when in_a_func implemented");
+	assert_always(m_in_a_func.isnull(), "pia6821_porta_w() called when in_a_func implemented");
 
 	LOG(("PIA #%s: set input port A = %02X\n", tag(), data));
 
@@ -1201,7 +1201,7 @@ WRITE8_DEVICE_HANDLER( pia6821_portb_w )
 
 void pia6821_device::portb_w(UINT8 data)
 {
-	assert_always(m_in_b_func.read == NULL, "pia_set_input_b() called when in_b_func implemented");
+	assert_always(m_in_b_func.isnull(), "pia_set_input_b() called when in_b_func implemented");
 
 	LOG(("PIA #%s: set input port B = %02X\n", tag(), data));
 

@@ -105,7 +105,7 @@ void upd7201_device::device_config_complete()
 void upd7201_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
 }
 
 

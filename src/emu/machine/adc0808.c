@@ -63,7 +63,7 @@ void adc0808_device::device_config_complete()
 void adc0808_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_eoc_func, &m_out_eoc_cb, this);
+	m_out_eoc_func.resolve(m_out_eoc_cb, *this);
 
 	// allocate timers
 	m_cycle_timer = timer_alloc();
@@ -113,7 +113,7 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		/* set end of conversion pin */
 		if (m_next_eoc != m_eoc)
 		{
-			devcb_call_write_line(&m_out_eoc_func, m_next_eoc);
+			m_out_eoc_func(m_next_eoc);
 			m_eoc = m_next_eoc;
 		}
 	}

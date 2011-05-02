@@ -118,16 +118,16 @@ void i8257_device::device_start()
 	assert(this != NULL);
 
 	/* resolve callbacks */
-	devcb_resolve_write_line(&m_out_hrq_func, &m_out_hrq_cb, this);
-	devcb_resolve_write_line(&m_out_tc_func, &m_out_tc_cb, this);
-	devcb_resolve_write_line(&m_out_mark_func, &m_out_mark_cb, this);
-	devcb_resolve_read8(&m_in_memr_func, &m_in_memr_cb, this);
-	devcb_resolve_write8(&m_out_memw_func, &m_out_memw_cb, this);
+	m_out_hrq_func.resolve(m_out_hrq_cb, *this);
+	m_out_tc_func.resolve(m_out_tc_cb, *this);
+	m_out_mark_func.resolve(m_out_mark_cb, *this);
+	m_in_memr_func.resolve(m_in_memr_cb, *this);
+	m_out_memw_func.resolve(m_out_memw_cb, *this);
 
 	for (int i = 0; i < I8257_NUM_CHANNELS; i++)
 	{
-		devcb_resolve_read8(&m_in_ior_func[i], &m_in_ior_cb[i], this);
-		devcb_resolve_write8(&m_out_iow_func[i], &m_out_iow_cb[i], this);
+		m_in_ior_func[i].resolve(m_in_ior_cb[i], *this);
+		m_out_iow_func[i].resolve(m_out_iow_cb[i], *this);
 	}
 
 	/* set initial values */
@@ -169,22 +169,22 @@ int i8257_device::i8257_do_operation(int channel)
 	{
 		m_status |=  (0x01 << channel);
 
-		devcb_call_write_line(&m_out_tc_func, ASSERT_LINE);
+		m_out_tc_func(ASSERT_LINE);
 	}
 	switch(mode) {
 	case 1:
-		if (&m_in_memr_func.target != NULL)
+		if (!m_in_memr_func.isnull())
 		{
-			data = devcb_call_read8(&m_in_memr_func, m_address[channel]);
+			data = m_in_memr_func(m_address[channel]);
 		}
 		else
 		{
 			data = 0;
 			logerror("8257: No memory read function defined.\n");
 		}
-		if (&m_out_iow_func[channel].target != NULL)
+		if (!m_out_iow_func[channel].isnull())
 		{
-			devcb_call_write8(&m_out_iow_func[channel], m_address[channel], data);
+			m_out_iow_func[channel](m_address[channel], data);
 		}
 		else
 		{
@@ -197,9 +197,9 @@ int i8257_device::i8257_do_operation(int channel)
 		break;
 
 	case 2:
-		if (&m_in_ior_func[channel].target != NULL)
+		if (!m_in_ior_func[channel].isnull())
 		{
-			data = devcb_call_read8(&m_in_ior_func[channel], m_address[channel]);
+			data = m_in_ior_func[channel](m_address[channel]);
 		}
 		else
 		{
@@ -207,9 +207,9 @@ int i8257_device::i8257_do_operation(int channel)
 			logerror("8257: No channel read function for channel %d defined.\n",channel);
 		}
 
-		if (&m_out_memw_func.target != NULL)
+		if (!m_out_memw_func.isnull())
 		{
-			devcb_call_write8(&m_out_memw_func, m_address[channel], data);
+			m_out_memw_func(m_address[channel], data);
 		}
 		else
 		{
@@ -238,7 +238,7 @@ int i8257_device::i8257_do_operation(int channel)
 			m_registers[5] = m_registers[7];
 		}
 
-		devcb_call_write_line(&m_out_tc_func, CLEAR_LINE);
+		m_out_tc_func(CLEAR_LINE);
 	}
 	return done;
 }
@@ -337,7 +337,7 @@ void i8257_device::i8257_update_status()
 	}
 
 	/* set the halt line */
-	devcb_call_write_line(&m_out_hrq_func, pending_transfer ? ASSERT_LINE : CLEAR_LINE);
+	m_out_hrq_func(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

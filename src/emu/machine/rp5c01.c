@@ -117,7 +117,7 @@ inline void rp5c01_device::set_alarm_line()
 	{
 		if (LOG) logerror("RP5C01 '%s' Alarm %u\n", tag(), alarm);
 
-		devcb_call_write_line(&m_out_alarm_func, alarm);
+		m_out_alarm_func(alarm);
 		m_alarm = alarm;
 	}
 }
@@ -317,7 +317,7 @@ void rp5c01_device::device_config_complete()
 void rp5c01_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_alarm_func, &m_out_alarm_cb, this);
+	m_out_alarm_func.resolve(m_out_alarm_cb, *this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);

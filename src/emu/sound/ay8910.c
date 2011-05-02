@@ -485,14 +485,14 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			    ((psg->last_enable & 0x40) != (psg->regs[AY_ENABLE] & 0x40)))
 			{
 				/* write out 0xff if port set to input */
-				devcb_call_write8(&psg->portAwrite, 0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
+				psg->portAwrite(0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
 			}
 
 			if ((psg->last_enable == -1) ||
 			    ((psg->last_enable & 0x80) != (psg->regs[AY_ENABLE] & 0x80)))
 			{
 				/* write out 0xff if port set to input */
-				devcb_call_write8(&psg->portBwrite, 0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
+				psg->portBwrite(0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
 			}
 
 			psg->last_enable = psg->regs[AY_ENABLE];
@@ -521,8 +521,8 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 		case AY_PORTA:
 			if (psg->regs[AY_ENABLE] & 0x40)
 			{
-				if (psg->portAwrite.write)
-					devcb_call_write8(&psg->portAwrite, 0, psg->regs[AY_PORTA]);
+				if (!psg->portAwrite.isnull())
+					psg->portAwrite(0, psg->regs[AY_PORTA]);
 				else
 					logerror("warning - write %02x to 8910 '%s' Port A\n",psg->regs[AY_PORTA],psg->device->tag());
 			}
@@ -534,8 +534,8 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 		case AY_PORTB:
 			if (psg->regs[AY_ENABLE] & 0x80)
 			{
-				if (psg->portBwrite.write)
-					devcb_call_write8(&psg->portBwrite, 0, psg->regs[AY_PORTB]);
+				if (!psg->portBwrite.isnull())
+					psg->portBwrite(0, psg->regs[AY_PORTB]);
 				else
 					logerror("warning - write %02x to 8910 '%s' Port B\n",psg->regs[AY_PORTB],psg->device->tag());
 			}
@@ -742,10 +742,10 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 
 	info->device = device;
 	info->intf = intf;
-	devcb_resolve_read8(&info->portAread, &intf->portAread, device);
-	devcb_resolve_read8(&info->portBread, &intf->portBread, device);
-	devcb_resolve_write8(&info->portAwrite, &intf->portAwrite, device);
-	devcb_resolve_write8(&info->portBwrite, &intf->portBwrite, device);
+	info->portAread.resolve(intf->portAread, *device);
+	info->portBread.resolve(intf->portBread, *device);
+	info->portAwrite.resolve(intf->portAwrite, *device);
+	info->portBwrite.resolve(intf->portBwrite, *device);
 	if ((info->intf->flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
 		logerror("AY-3-8910/YM2149 using single output!\n");
@@ -884,16 +884,16 @@ int ay8910_read_ym(void *chip)
            even if the port is set as output, we still need to return the external
            data. Some games, like kidniki, need this to work.
          */
-		if (psg->portAread.read)
-			psg->regs[AY_PORTA] = devcb_call_read8(&psg->portAread, 0);
+		if (!psg->portAread.isnull())
+			psg->regs[AY_PORTA] = psg->portAread(0);
 		else
 			logerror("%s: warning - read 8910 '%s' Port A\n",psg->device->machine().describe_context(),psg->device->tag());
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
 			logerror("warning: read from 8910 '%s' Port B set as output\n",psg->device->tag());
-		if (psg->portBread.read)
-			psg->regs[AY_PORTB] = devcb_call_read8(&psg->portBread, 0);
+		if (!psg->portBread.isnull())
+			psg->regs[AY_PORTB] = psg->portBread(0);
 		else
 			logerror("%s: warning - read 8910 '%s' Port B\n",psg->device->machine().describe_context(),psg->device->tag());
 		break;

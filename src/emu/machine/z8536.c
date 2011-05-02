@@ -253,15 +253,15 @@ inline UINT8 z8536_device::read_register(offs_t offset)
 	switch (offset)
 	{
 	case PORT_A_DATA:
-		data = devcb_call_read8(&m_in_pa_func, 0);
+		data = m_in_pa_func(0);
 		break;
 
 	case PORT_B_DATA:
-		data = devcb_call_read8(&m_in_pb_func, 0);
+		data = m_in_pb_func(0);
 		break;
 
 	case PORT_C_DATA:
-		data = 0xf0 | (devcb_call_read8(&m_in_pc_func, 0) & 0x0f);
+		data = 0xf0 | (m_in_pc_func(0) & 0x0f);
 		break;
 
 	default:
@@ -302,11 +302,11 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 		break;
 
 	case PORT_A_DATA:
-		devcb_call_write8(&m_out_pa_func, 0, data);
+		m_out_pa_func(0, data);
 		break;
 
 	case PORT_B_DATA:
-		devcb_call_write8(&m_out_pb_func, 0, data);
+		m_out_pb_func(0, data);
 		break;
 
 	case PORT_C_DATA:
@@ -315,7 +315,7 @@ inline void z8536_device::write_register(offs_t offset, UINT8 data)
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
-		devcb_call_write8(&m_out_pc_func, 0, m_output[PORT_C]);
+		m_out_pc_func(0, m_output[PORT_C]);
 		}
 		break;
 
@@ -420,13 +420,13 @@ void z8536_device::device_start()
 	m_timer[TIMER_3] = timer_alloc(TIMER_3);
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_read8(&m_in_pa_func, &m_in_pa_cb, this);
-	devcb_resolve_write8(&m_out_pa_func, &m_out_pa_cb, this);
-	devcb_resolve_read8(&m_in_pb_func, &m_in_pb_cb, this);
-	devcb_resolve_write8(&m_out_pb_func, &m_out_pb_cb, this);
-	devcb_resolve_read8(&m_in_pc_func, &m_in_pc_cb, this);
-	devcb_resolve_write8(&m_out_pc_func, &m_out_pc_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_in_pa_func.resolve(m_in_pa_cb, *this);
+	m_out_pa_func.resolve(m_out_pa_cb, *this);
+	m_in_pb_func.resolve(m_in_pb_cb, *this);
+	m_out_pb_func.resolve(m_out_pb_cb, *this);
+	m_in_pc_func.resolve(m_in_pc_cb, *this);
+	m_out_pc_func.resolve(m_out_pc_cb, *this);
 }
 
 

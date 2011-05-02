@@ -260,7 +260,7 @@ static const int GPIO_TIMER[] =
 static const int PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 
 
-#define TXD(_data) devcb_call_write_line(&m_out_so_func, _data);
+#define TXD(_data) m_out_so_func(_data);
 
 
 //**************************************************************************
@@ -271,11 +271,11 @@ inline void mc68901_device::check_interrupts()
 {
 	if (m_ipr & m_imr)
 	{
-		devcb_call_write_line(&m_out_irq_func, ASSERT_LINE);
+		m_out_irq_func(ASSERT_LINE);
 	}
 	else
 	{
-		devcb_call_write_line(&m_out_irq_func, CLEAR_LINE);
+		m_out_irq_func(CLEAR_LINE);
 	}
 }
 
@@ -340,7 +340,7 @@ inline void mc68901_device::serial_receive()
 
 	if (!(m_rsr & RSR_RCV_ENABLE)) return;
 
-	rxd = devcb_call_read_line(&m_in_si_func);
+	rxd = m_in_si_func();
 
 	switch (m_rx_state)
 	{
@@ -645,10 +645,10 @@ inline void mc68901_device::timer_count(int index)
 
 		switch (index)
 		{
-		case TIMER_A:	devcb_call_write_line(&m_out_tao_func, m_to[index]);	break;
-		case TIMER_B:	devcb_call_write_line(&m_out_tbo_func, m_to[index]);	break;
-		case TIMER_C:	devcb_call_write_line(&m_out_tco_func, m_to[index]);	break;
-		case TIMER_D:	devcb_call_write_line(&m_out_tdo_func, m_to[index]);	break;
+		case TIMER_A:	m_out_tao_func(m_to[index]);	break;
+		case TIMER_B:	m_out_tbo_func(m_to[index]);	break;
+		case TIMER_C:	m_out_tco_func(m_to[index]);	break;
+		case TIMER_D:	m_out_tdo_func(m_to[index]);	break;
 		}
 
 		if (m_ier & INT_MASK_TIMER[index])
@@ -772,15 +772,15 @@ void mc68901_device::device_config_complete()
 void mc68901_device::device_start()
 {
 	/* resolve callbacks */
-	devcb_resolve_read8(&m_in_gpio_func, &m_in_gpio_cb, this);
-	devcb_resolve_write8(&m_out_gpio_func, &m_out_gpio_cb, this);
-	devcb_resolve_read_line(&m_in_si_func, &m_in_si_cb, this);
-	devcb_resolve_write_line(&m_out_so_func, &m_out_so_cb, this);
-	devcb_resolve_write_line(&m_out_tao_func, &m_out_tao_cb, this);
-	devcb_resolve_write_line(&m_out_tbo_func, &m_out_tbo_cb, this);
-	devcb_resolve_write_line(&m_out_tco_func, &m_out_tco_cb, this);
-	devcb_resolve_write_line(&m_out_tdo_func, &m_out_tdo_cb, this);
-	devcb_resolve_write_line(&m_out_irq_func, &m_out_irq_cb, this);
+	m_in_gpio_func.resolve(m_in_gpio_cb, *this);
+	m_out_gpio_func.resolve(m_out_gpio_cb, *this);
+	m_in_si_func.resolve(m_in_si_cb, *this);
+	m_out_so_func.resolve(m_out_so_cb, *this);
+	m_out_tao_func.resolve(m_out_tao_cb, *this);
+	m_out_tbo_func.resolve(m_out_tbo_cb, *this);
+	m_out_tco_func.resolve(m_out_tco_cb, *this);
+	m_out_tdo_func.resolve(m_out_tdo_cb, *this);
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
 
 	/* create the timers */
 	m_timer[TIMER_A] = timer_alloc(TIMER_A);
@@ -894,7 +894,7 @@ READ8_MEMBER( mc68901_device::read )
 	switch (offset)
 	{
 	case REGISTER_GPIP:
-		m_gpip = devcb_call_read8(&m_in_gpio_func, 0);
+		m_gpip = m_in_gpio_func(0);
 		return m_gpip;
 
 	case REGISTER_AER:   return m_aer;
@@ -961,7 +961,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 		if (LOG) logerror("MC68901 '%s' General Purpose I/O : %x\n", tag(), data);
 		m_gpip = data & m_ddr;
 
-		devcb_call_write8(&m_out_gpio_func, 0, m_gpip);
+		m_out_gpio_func(0, m_gpip);
 		break;
 
 	case REGISTER_AER:
@@ -1092,7 +1092,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 			m_to[TIMER_A] = 0;
 
-			devcb_call_write_line(&m_out_tao_func, m_to[TIMER_A]);
+			m_out_tao_func(m_to[TIMER_A]);
 		}
 		break;
 
@@ -1147,7 +1147,7 @@ void mc68901_device::register_w(offs_t offset, UINT8 data)
 
 			m_to[TIMER_B] = 0;
 
-			devcb_call_write_line(&m_out_tbo_func, m_to[TIMER_B]);
+			m_out_tbo_func(m_to[TIMER_B]);
 		}
 		break;
 

@@ -145,14 +145,14 @@ void cdp1864_device::device_config_complete()
 void cdp1864_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_inlace_func, &m_in_inlace_cb, this);
-	devcb_resolve_read_line(&m_in_rdata_func, &m_in_rdata_cb, this);
-	devcb_resolve_read_line(&m_in_bdata_func, &m_in_bdata_cb, this);
-	devcb_resolve_read_line(&m_in_gdata_func, &m_in_gdata_cb, this);
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_dmao_func, &m_out_dmao_cb, this);
-	devcb_resolve_write_line(&m_out_efx_func, &m_out_efx_cb, this);
-	devcb_resolve_write_line(&m_out_hsync_func, &m_out_hsync_cb, this);
+	m_in_inlace_func.resolve(m_in_inlace_cb, *this);
+	m_in_rdata_func.resolve(m_in_rdata_cb, *this);
+	m_in_bdata_func.resolve(m_in_bdata_cb, *this);
+	m_in_gdata_func.resolve(m_in_gdata_cb, *this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_dmao_func.resolve(m_out_dmao_cb, *this);
+	m_out_efx_func.resolve(m_out_efx_cb, *this);
+	m_out_hsync_func.resolve(m_out_hsync_cb, *this);
 
 	// initialize palette
 	initialize_palette();
@@ -196,9 +196,9 @@ void cdp1864_device::device_reset()
 	m_disp = 0;
 	m_dmaout = 0;
 
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
+	m_out_dmao_func(CLEAR_LINE);
+	m_out_efx_func(CLEAR_LINE);
 }
 
 
@@ -217,7 +217,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
+				m_out_int_func(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos( CDP1864_SCANLINE_INT_END, 0));
@@ -226,7 +226,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+				m_out_int_func(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_INT_START, 0));
@@ -237,22 +237,22 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		switch (scanline)
 		{
 		case CDP1864_SCANLINE_EFX_TOP_START:
-			devcb_call_write_line(&m_out_efx_func, ASSERT_LINE);
+			m_out_efx_func(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_END, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_TOP_END:
-			devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+			m_out_efx_func(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_START, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_BOTTOM_START:
-			devcb_call_write_line(&m_out_efx_func, ASSERT_LINE);
+			m_out_efx_func(ASSERT_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_BOTTOM_END, 0));
 			break;
 
 		case CDP1864_SCANLINE_EFX_BOTTOM_END:
-			devcb_call_write_line(&m_out_efx_func, CLEAR_LINE);
+			m_out_efx_func(CLEAR_LINE);
 			m_efx_timer->adjust(m_screen->time_until_pos(CDP1864_SCANLINE_EFX_TOP_START, 0));
 			break;
 		}
@@ -265,7 +265,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 				{
-					devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
+					m_out_dmao_func(CLEAR_LINE);
 				}
 			}
 
@@ -279,7 +279,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
 				{
-					devcb_call_write_line(&m_out_dmao_func, ASSERT_LINE);
+					m_out_dmao_func(ASSERT_LINE);
 				}
 			}
 
@@ -362,8 +362,8 @@ READ8_MEMBER( cdp1864_device::dispoff_r )
 {
 	m_disp = 0;
 
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
-	devcb_call_write_line(&m_out_dmao_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
+	m_out_dmao_func(CLEAR_LINE);
 
 	return 0xff;
 }
@@ -408,9 +408,9 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 
 	if (!m_con)
 	{
-		rdata = devcb_call_read_line(&m_in_rdata_func);
-		bdata = devcb_call_read_line(&m_in_bdata_func);
-		gdata = devcb_call_read_line(&m_in_gdata_func);
+		rdata = m_in_rdata_func();
+		bdata = m_in_bdata_func();
+		gdata = m_in_gdata_func();
 	}
 
 	for (int x = 0; x < 8; x++)

@@ -139,22 +139,22 @@ void cdp1871_device::device_config_complete()
 void cdp1871_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_da_func, &out_da_cb, this);
-	devcb_resolve_write_line(&m_out_rpt_func, &out_rpt_cb, this);
-	devcb_resolve_read8(&m_in_d_func[0], &in_d1_cb, this);
-	devcb_resolve_read8(&m_in_d_func[1], &in_d2_cb, this);
-	devcb_resolve_read8(&m_in_d_func[2], &in_d3_cb, this);
-	devcb_resolve_read8(&m_in_d_func[3], &in_d4_cb, this);
-	devcb_resolve_read8(&m_in_d_func[4], &in_d5_cb, this);
-	devcb_resolve_read8(&m_in_d_func[5], &in_d6_cb, this);
-	devcb_resolve_read8(&m_in_d_func[6], &in_d7_cb, this);
-	devcb_resolve_read8(&m_in_d_func[7], &in_d8_cb, this);
-	devcb_resolve_read8(&m_in_d_func[8], &in_d9_cb, this);
-	devcb_resolve_read8(&m_in_d_func[9], &in_d10_cb, this);
-	devcb_resolve_read8(&m_in_d_func[10], &in_d11_cb, this);
-	devcb_resolve_read_line(&m_in_shift_func, &in_shift_cb, this);
-	devcb_resolve_read_line(&m_in_control_func, &in_control_cb, this);
-	devcb_resolve_read_line(&m_in_alpha_func, &in_alpha_cb, this);
+	m_out_da_func.resolve(out_da_cb, *this);
+	m_out_rpt_func.resolve(out_rpt_cb, *this);
+	m_in_d_func[0].resolve(in_d1_cb, *this);
+	m_in_d_func[1].resolve(in_d2_cb, *this);
+	m_in_d_func[2].resolve(in_d3_cb, *this);
+	m_in_d_func[3].resolve(in_d4_cb, *this);
+	m_in_d_func[4].resolve(in_d5_cb, *this);
+	m_in_d_func[5].resolve(in_d6_cb, *this);
+	m_in_d_func[6].resolve(in_d7_cb, *this);
+	m_in_d_func[7].resolve(in_d8_cb, *this);
+	m_in_d_func[8].resolve(in_d9_cb, *this);
+	m_in_d_func[9].resolve(in_d10_cb, *this);
+	m_in_d_func[10].resolve(in_d11_cb, *this);
+	m_in_shift_func.resolve(in_shift_cb, *this);
+	m_in_control_func.resolve(in_control_cb, *this);
+	m_in_alpha_func.resolve(in_alpha_cb, *this);
 
 	// set initial values
 	change_output_lines();
@@ -198,14 +198,14 @@ void cdp1871_device::change_output_lines()
 	{
 		m_da = m_next_da;
 
-		devcb_call_write_line(&m_out_da_func, m_da);
+		m_out_da_func(m_da);
 	}
 
 	if (m_next_rpt != m_rpt)
 	{
 		m_rpt = m_next_rpt;
 
-		devcb_call_write_line(&m_out_rpt_func, m_rpt);
+		m_out_rpt_func(m_rpt);
 	}
 }
 
@@ -243,14 +243,14 @@ void cdp1871_device::detect_keypress()
 {
 	UINT8 data = 0;
 
-	data = devcb_call_read8(&m_in_d_func[m_drive], 0);
+	data = m_in_d_func[m_drive](0);
 
 	if (data == (1 << m_sense))
 	{
 		if (!m_inhibit)
 		{
-			m_shift = devcb_call_read_line(&m_in_shift_func);
-			m_control = devcb_call_read_line(&m_in_control_func);
+			m_shift = m_in_shift_func();
+			m_control = m_in_control_func();
 			m_inhibit = true;
 			m_next_da = ASSERT_LINE;
 		}
@@ -274,7 +274,7 @@ void cdp1871_device::detect_keypress()
 READ8_MEMBER( cdp1871_device::data_r )
 {
 	int table = 0;
-	int alpha = devcb_call_read_line(&m_in_alpha_func);
+	int alpha = m_in_alpha_func();
 
 	if (m_control) table = 3; else if (m_shift) table = 2; else if (alpha) table = 1;
 

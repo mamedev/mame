@@ -266,18 +266,18 @@ void cosmac_device::device_start()
 	state_add(COSMAC_Q,		"Q",	m_q).mask(0x1).noshow();
 
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_wait_func, &m_in_wait_cb, this);
-	devcb_resolve_read_line(&m_in_clear_func, &m_in_clear_cb, this);
-	devcb_resolve_read_line(&m_in_ef_func[0], &m_in_ef1_cb, this);
-	devcb_resolve_read_line(&m_in_ef_func[1], &m_in_ef2_cb, this);
-	devcb_resolve_read_line(&m_in_ef_func[2], &m_in_ef3_cb, this);
-	devcb_resolve_read_line(&m_in_ef_func[3], &m_in_ef4_cb, this);
-	devcb_resolve_write_line(&m_out_q_func, &m_out_q_cb, this);
-    devcb_resolve_read8(&m_in_dma_func, &m_in_dma_cb, this);
-    devcb_resolve_write8(&m_out_dma_func, &m_out_dma_cb, this);
+	m_in_wait_func.resolve(m_in_wait_cb, *this);
+	m_in_clear_func.resolve(m_in_clear_cb, *this);
+	m_in_ef_func[0].resolve(m_in_ef1_cb, *this);
+	m_in_ef_func[1].resolve(m_in_ef2_cb, *this);
+	m_in_ef_func[2].resolve(m_in_ef3_cb, *this);
+	m_in_ef_func[3].resolve(m_in_ef4_cb, *this);
+	m_out_q_func.resolve(m_out_q_cb, *this);
+    m_in_dma_func.resolve(m_in_dma_cb, *this);
+    m_out_dma_func.resolve(m_out_dma_cb, *this);
 	m_out_sc_func = m_out_sc_cb;
-	devcb_resolve_write_line(&m_out_tpa_func, &m_out_tpa_cb, this);
-	devcb_resolve_write_line(&m_out_tpb_func, &m_out_tpb_cb, this);
+	m_out_tpa_func.resolve(m_out_tpa_cb, *this);
+	m_out_tpb_func.resolve(m_out_tpb_cb, *this);
 
 	// register our state for saving
 	save_item(NAME(m_op));
@@ -698,8 +698,8 @@ inline void cosmac_device::debug()
 
 inline void cosmac_device::sample_wait_clear()
 {
-	int wait = devcb_call_read_line(&m_in_wait_func);
-	int clear = devcb_call_read_line(&m_in_clear_func);
+	int wait = m_in_wait_func();
+	int clear = m_in_clear_func();
 
 	m_pmode = m_mode;
 	m_mode = (cosmac_mode) ((clear << 1) | wait);
@@ -714,9 +714,9 @@ inline void cosmac_device::sample_ef_lines()
 {
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_in_ef_func[i].target != NULL)
+		if (!m_in_ef_func[i].isnull())
 		{
-			EF[i] = devcb_call_read_line(&m_in_ef_func[i]);
+			EF[i] = m_in_ef_func[i]();
 		}
 	}
 }
@@ -743,7 +743,7 @@ inline void cosmac_device::set_q_flag(int state)
 {
 	Q = state;
 
-	devcb_call_write_line(&m_out_q_func, Q);
+	m_out_q_func(Q);
 }
 
 
@@ -846,7 +846,7 @@ inline void cosmac_device::execute_instruction()
 
 inline void cosmac_device::dma_input()
 {
-	RAM_W(R[0], devcb_call_read8(&m_in_dma_func, R[0]));
+	RAM_W(R[0], m_in_dma_func(R[0]));
 
 	R[0]++;
 
@@ -881,7 +881,7 @@ inline void cosmac_device::dma_input()
 
 inline void cosmac_device::dma_output()
 {
-	devcb_call_write8(&m_out_dma_func, R[0], RAM_R(R[0]));
+	m_out_dma_func(R[0], RAM_R(R[0]));
 
 	R[0]++;
 

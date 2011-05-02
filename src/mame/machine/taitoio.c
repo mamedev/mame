@@ -95,22 +95,22 @@ READ8_DEVICE_HANDLER( tc0220ioc_r )
 	switch (offset)
 	{
 		case 0x00:
-			return devcb_call_read8(&tc0220ioc->read_0, 0);
+			return tc0220ioc->read_0(0);
 
 		case 0x01:
-			return devcb_call_read8(&tc0220ioc->read_1, 0);
+			return tc0220ioc->read_1(0);
 
 		case 0x02:
-			return devcb_call_read8(&tc0220ioc->read_2, 0);
+			return tc0220ioc->read_2(0);
 
 		case 0x03:
-			return devcb_call_read8(&tc0220ioc->read_3, 0);
+			return tc0220ioc->read_3(0);
 
 		case 0x04:	/* coin counters and lockout */
 			return tc0220ioc->regs[4];
 
 		case 0x07:
-			return devcb_call_read8(&tc0220ioc->read_7, 0);
+			return tc0220ioc->read_7(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0220IOC address %02x\n",cpu_get_pc(&space->device()),offset);
@@ -182,11 +182,11 @@ static DEVICE_START( tc0220ioc )
 	tc0220ioc_state *tc0220ioc =  tc0220ioc_get_safe_token(device);
 	const tc0220ioc_interface *intf = tc0220ioc_get_interface(device);
 
-	devcb_resolve_read8(&tc0220ioc->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0220ioc->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0220ioc->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0220ioc->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0220ioc->read_7, &intf->read_7, device);
+	tc0220ioc->read_0.resolve(intf->read_0, *device);
+	tc0220ioc->read_1.resolve(intf->read_1, *device);
+	tc0220ioc->read_2.resolve(intf->read_2, *device);
+	tc0220ioc->read_3.resolve(intf->read_3, *device);
+	tc0220ioc->read_7.resolve(intf->read_7, *device);
 
 	device->save_item(NAME(tc0220ioc->regs));
 	device->save_item(NAME(tc0220ioc->port));
@@ -252,22 +252,22 @@ READ8_DEVICE_HANDLER( tc0510nio_r )
 	switch (offset)
 	{
 		case 0x00:
-			return devcb_call_read8(&tc0510nio->read_0, 0);
+			return tc0510nio->read_0(0);
 
 		case 0x01:
-			return devcb_call_read8(&tc0510nio->read_1, 0);
+			return tc0510nio->read_1(0);
 
 		case 0x02:
-			return devcb_call_read8(&tc0510nio->read_2, 0);
+			return tc0510nio->read_2(0);
 
 		case 0x03:
-			return devcb_call_read8(&tc0510nio->read_3, 0);
+			return tc0510nio->read_3(0);
 
 		case 0x04:	/* coin counters and lockout */
 			return tc0510nio->regs[4];
 
 		case 0x07:
-			return devcb_call_read8(&tc0510nio->read_7, 0);
+			return tc0510nio->read_7(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0510NIO address %02x\n",cpu_get_pc(&space->device()),offset);
@@ -337,11 +337,11 @@ static DEVICE_START( tc0510nio )
 	tc0510nio_state *tc0510nio =  tc0510nio_get_safe_token(device);
 	const tc0510nio_interface *intf = tc0510nio_get_interface(device);
 
-	devcb_resolve_read8(&tc0510nio->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0510nio->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0510nio->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0510nio->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0510nio->read_7, &intf->read_7, device);
+	tc0510nio->read_0.resolve(intf->read_0, *device);
+	tc0510nio->read_1.resolve(intf->read_1, *device);
+	tc0510nio->read_2.resolve(intf->read_2, *device);
+	tc0510nio->read_3.resolve(intf->read_3, *device);
+	tc0510nio->read_7.resolve(intf->read_7, *device);
 
 	device->save_item(NAME(tc0510nio->regs));
 }
@@ -403,22 +403,22 @@ READ8_DEVICE_HANDLER( tc0640fio_r )
 	switch (offset)
 	{
 		case 0x00:
-			return devcb_call_read8(&tc0640fio->read_0, 0);
+			return tc0640fio->read_0(0);
 
 		case 0x01:
-			return devcb_call_read8(&tc0640fio->read_1, 0);
+			return tc0640fio->read_1(0);
 
 		case 0x02:
-			return devcb_call_read8(&tc0640fio->read_2, 0);
+			return tc0640fio->read_2(0);
 
 		case 0x03:
-			return devcb_call_read8(&tc0640fio->read_3, 0);
+			return tc0640fio->read_3(0);
 
 		case 0x04:	/* coin counters and lockout */
 			return tc0640fio->regs[4];
 
 		case 0x07:
-			return devcb_call_read8(&tc0640fio->read_7, 0);
+			return tc0640fio->read_7(0);
 
 		default:
 //logerror("PC %06x: warning - read TC0640FIO address %02x\n",cpu_get_pc(&space->device()),offset);
@@ -492,11 +492,11 @@ static DEVICE_START( tc0640fio )
 	tc0640fio_state *tc0640fio =  tc0640fio_get_safe_token(device);
 	const tc0640fio_interface *intf = tc0640fio_get_interface(device);
 
-	devcb_resolve_read8(&tc0640fio->read_0, &intf->read_0, device);
-	devcb_resolve_read8(&tc0640fio->read_1, &intf->read_1, device);
-	devcb_resolve_read8(&tc0640fio->read_2, &intf->read_2, device);
-	devcb_resolve_read8(&tc0640fio->read_3, &intf->read_3, device);
-	devcb_resolve_read8(&tc0640fio->read_7, &intf->read_7, device);
+	tc0640fio->read_0.resolve(intf->read_0, *device);
+	tc0640fio->read_1.resolve(intf->read_1, *device);
+	tc0640fio->read_2.resolve(intf->read_2, *device);
+	tc0640fio->read_3.resolve(intf->read_3, *device);
+	tc0640fio->read_7.resolve(intf->read_7, *device);
 
 	device->save_item(NAME(tc0640fio->regs));
 }

@@ -518,7 +518,7 @@ UINT8 superfx_mmio_read(device_t *cpu, UINT32 addr)
 			UINT8 r = cpustate->sfr >> 8;
 			cpustate->sfr &= ~SUPERFX_SFR_IRQ;
 			cpustate->irq = 0;
-			devcb_call_write_line(&cpustate->out_irq_func, cpustate->irq);
+			cpustate->out_irq_func(cpustate->irq);
 			return r;
 		}
 
@@ -759,7 +759,7 @@ static CPU_INIT( superfx )
 		cpustate->config = *(superfx_config *)device->static_config();
 	}
 
-	devcb_resolve_write_line(&cpustate->out_irq_func, &cpustate->config.out_irq_func, device);
+	cpustate->out_irq_func.resolve(cpustate->config.out_irq_func, *device);
 
 	superfx_register_save(device);
 }
@@ -837,7 +837,7 @@ static CPU_EXECUTE( superfx )
 				{
 					cpustate->sfr |= SUPERFX_SFR_IRQ;
 					cpustate->irq = 1;
-					devcb_call_write_line(&cpustate->out_irq_func, cpustate->irq ? ASSERT_LINE : CLEAR_LINE );
+					cpustate->out_irq_func(cpustate->irq ? ASSERT_LINE : CLEAR_LINE );
 				}
 				cpustate->sfr &= ~SUPERFX_SFR_G;
 				cpustate->pipeline = 0x01;

@@ -105,16 +105,16 @@ void i8237_device::device_config_complete()
 void i8237_device::device_start()
 {
 	/* resolve callbacks */
-	devcb_resolve_write_line(&m_out_hrq_func, &m_out_hrq_cb, this);
-	devcb_resolve_write_line(&m_out_eop_func, &m_out_eop_cb, this);
-	devcb_resolve_read8(&m_in_memr_func, &m_in_memr_cb, this);
-	devcb_resolve_write8(&m_out_memw_func, &m_out_memw_cb, this);
+	m_out_hrq_func.resolve(m_out_hrq_cb, *this);
+	m_out_eop_func.resolve(m_out_eop_cb, *this);
+	m_in_memr_func.resolve(m_in_memr_cb, *this);
+	m_out_memw_func.resolve(m_out_memw_cb, *this);
 
 	for (int i = 0; i < 4; i++)
 	{
-		devcb_resolve_read8(&m_chan[i].m_in_ior_func, &m_in_ior_cb[i], this);
-		devcb_resolve_write8(&m_chan[i].m_out_iow_func, &m_out_iow_cb[i], this);
-		devcb_resolve_write_line(&m_chan[i].m_out_dack_func, &m_out_dack_cb[i], this);
+		m_chan[i].m_in_ior_func.resolve(m_in_ior_cb[i], *this);
+		m_chan[i].m_out_iow_func.resolve(m_out_iow_cb[i], *this);
+		m_chan[i].m_out_dack_func.resolve(m_out_dack_cb[i], *this);
 	}
 
 	m_timer = machine().scheduler().timer_alloc(FUNC(i8237_timerproc_callback), (void *)this);
@@ -154,10 +154,10 @@ void i8237_device::i8237_do_read()
 	switch( DMA_MODE_OPERATION( m_chan[ channel ].m_mode ) )
 	{
 	case DMA8237_WRITE_TRANSFER:
-		m_temporary_data = devcb_call_read8(&m_chan[channel].m_in_ior_func, 0);
+		m_temporary_data = m_chan[channel].m_in_ior_func(0);
 		break;
 	case DMA8237_READ_TRANSFER:
-		m_temporary_data = devcb_call_read8(&m_in_memr_func, m_chan[ channel ].m_address);
+		m_temporary_data = m_in_memr_func(m_chan[ channel ].m_address);
 		break;
 	case DMA8237_VERIFY_TRANSFER:
 	case DMA8237_ILLEGAL_TRANSFER:
@@ -173,10 +173,10 @@ void i8237_device::i8237_do_write()
 	switch( DMA_MODE_OPERATION( m_chan[ channel ].m_mode ) )
 	{
 	case DMA8237_WRITE_TRANSFER:
-		devcb_call_write8(&m_out_memw_func, m_chan[ channel ].m_address, m_temporary_data);
+		m_out_memw_func(m_chan[ channel ].m_address, m_temporary_data);
 		break;
 	case DMA8237_READ_TRANSFER:
-		devcb_call_write8(&m_chan[channel].m_out_iow_func, 0, m_temporary_data);
+		m_chan[channel].m_out_iow_func(0, m_temporary_data);
 		break;
 	case DMA8237_VERIFY_TRANSFER:
 	case DMA8237_ILLEGAL_TRANSFER:
@@ -245,7 +245,7 @@ void i8237_device::i8327_set_dack(int channel)
 	{
 		int state = (i == channel) ^ !BIT(m_command, 7);
 
-		devcb_call_write_line(&m_chan[i].m_out_dack_func, state);
+		m_chan[i].m_out_dack_func(state);
 	}
 }
 
@@ -273,7 +273,7 @@ void i8237_device::i8237_timerproc()
 		if ( !m_eop )
 		{
 			m_eop = 1;
-			devcb_call_write_line(&m_out_eop_func, m_eop ? ASSERT_LINE : CLEAR_LINE);
+			m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
 		}
 
 		/* Check if a new DMA request has been received. */
@@ -301,7 +301,7 @@ void i8237_device::i8237_timerproc()
 			m_last_service_channel = prio_channel;
 
 			m_hrq = 1;
-			devcb_call_write_line(&m_out_hrq_func, m_hrq);
+			m_out_hrq_func(m_hrq);
 			m_state = DMA8237_S0;
 
 			m_timer->enable( true );
@@ -353,7 +353,7 @@ void i8237_device::i8237_timerproc()
 		{
 			m_hrq = 0;
 			m_hlda = 0;
-			devcb_call_write_line(&m_out_hrq_func, m_hrq);
+			m_out_hrq_func(m_hrq);
 			m_state = DMA8237_SI;
 
 			/* Clear DACK */
@@ -365,7 +365,7 @@ void i8237_device::i8237_timerproc()
 		if ( m_status & ( 0x01 << m_service_channel ) )
 		{
 			m_eop = 0;
-			devcb_call_write_line(&m_out_eop_func, m_eop ? ASSERT_LINE : CLEAR_LINE);
+			m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
 		}
 		break;
 
@@ -418,7 +418,7 @@ void i8237_device::i8237_timerproc()
 				{
 					m_hrq = 0;
 					m_hlda = 0;
-					devcb_call_write_line(&m_out_hrq_func, m_hrq);
+					m_out_hrq_func(m_hrq);
 					m_state = DMA8237_SI;
 				}
 				else
@@ -430,7 +430,7 @@ void i8237_device::i8237_timerproc()
 			case DMA8237_SINGLE_MODE:
 				m_hrq = 0;
 				m_hlda = 0;
-				devcb_call_write_line(&m_out_hrq_func, m_hrq);
+				m_out_hrq_func(m_hrq);
 				m_state = DMA8237_SI;
 				break;
 
@@ -440,7 +440,7 @@ void i8237_device::i8237_timerproc()
 				{
 					m_hrq = 0;
 					m_hlda = 0;
-					devcb_call_write_line(&m_out_hrq_func, m_hrq);
+					m_out_hrq_func(m_hrq);
 					m_state = DMA8237_SI;
 				}
 				else
@@ -454,7 +454,7 @@ void i8237_device::i8237_timerproc()
 			if ( m_status & ( 0x01 << channel ) )
 			{
 				m_eop = 0;
-				devcb_call_write_line(&m_out_eop_func, m_eop ? ASSERT_LINE : CLEAR_LINE);
+				m_out_eop_func(m_eop ? ASSERT_LINE : CLEAR_LINE);
 			}
 		}
 
@@ -472,8 +472,8 @@ void i8237_device::i8237_timerproc()
 //              m_chan[1].m_address, m_chan[1].m_count);
 
 		// FIXME: this will copy bytes correct, but not 16 bit words
-		m_temporary_data = devcb_call_read8(&m_in_memr_func, m_chan[0].m_address);
-		devcb_call_write8(&m_out_memw_func, m_chan[1].m_address, m_temporary_data);
+		m_temporary_data = m_in_memr_func(m_chan[0].m_address);
+		m_out_memw_func(m_chan[1].m_address, m_temporary_data);
 
 		m_service_channel = 0;
 
@@ -487,7 +487,7 @@ void i8237_device::i8237_timerproc()
 		if (m_chan[0].m_count == 0xFFFF || m_chan[1].m_count == 0xFFFF) {
 			m_hrq = 0;
 			m_hlda = 0;
-			devcb_call_write_line(&m_out_hrq_func, m_hrq);
+			m_out_hrq_func(m_hrq);
 			m_state = DMA8237_SI;
 			m_status |= 3; // set TC for channel 0 and 1
 			m_drq &= ~3; // clear drq for channel 0 and 1

@@ -40,7 +40,8 @@ void i8243_device::static_set_read_handler(device_t &device, read8_device_func c
 	i8243_device &i8243 = downcast<i8243_device &>(device);
 	if(callback != NULL)
 	{
-		i8243.m_readhandler_cb.type = DEVCB_TYPE_SELF;
+		i8243.m_readhandler_cb.type = DEVCB_TYPE_DEVICE;
+		i8243.m_readhandler_cb.index = DEVCB_DEVICE_SELF;
 		i8243.m_readhandler_cb.readdevice = callback;
 	}
 	else
@@ -60,7 +61,8 @@ void i8243_device::static_set_write_handler(device_t &device, write8_device_func
 	i8243_device &i8243 = downcast<i8243_device &>(device);
 	if(callback != NULL)
 	{
-		i8243.m_writehandler_cb.type = DEVCB_TYPE_SELF;
+		i8243.m_writehandler_cb.type = DEVCB_TYPE_DEVICE;
+		i8243.m_writehandler_cb.index = DEVCB_DEVICE_SELF;
 		i8243.m_writehandler_cb.writedevice = callback;
 	}
 	else
@@ -76,8 +78,8 @@ void i8243_device::static_set_write_handler(device_t &device, write8_device_func
 
 void i8243_device::device_start()
 {
-	devcb_resolve_read8(&m_readhandler, &m_readhandler_cb, this);
-	devcb_resolve_write8(&m_writehandler, &m_writehandler_cb, this);
+	m_readhandler.resolve(m_readhandler_cb, *this);
+	m_writehandler.resolve(m_writehandler_cb, *this);
 }
 
 
@@ -131,9 +133,9 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
 		/* if this is a read opcode, copy result to p2out */
 		if((m_opcode >> 2) == MCS48_EXPANDER_OP_READ)
 		{
-			if (m_readhandler.read != NULL)
+			if (m_readhandler.isnull())
 			{
-				m_p[m_opcode & 3] = devcb_call_read8(&m_readhandler, m_opcode & 3);
+				m_p[m_opcode & 3] = m_readhandler(m_opcode & 3);
 			}
 			m_p2out = m_p[m_opcode & 3] & 0x0f;
 		}
@@ -146,17 +148,17 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
 		{
 			case MCS48_EXPANDER_OP_WRITE:
 				m_p[m_opcode & 3] = m_p2 & 0x0f;
-				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 
 			case MCS48_EXPANDER_OP_OR:
 				m_p[m_opcode & 3] |= m_p2 & 0x0f;
-				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 
 			case MCS48_EXPANDER_OP_AND:
 				m_p[m_opcode & 3] &= m_p2 & 0x0f;
-				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
+				m_writehandler(m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 		}
 	}

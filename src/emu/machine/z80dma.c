@@ -184,13 +184,13 @@ void z80dma_device::device_config_complete()
 void z80dma_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_busreq_func, &m_out_busreq_cb, this);
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_bao_func, &m_out_bao_cb, this);
-	devcb_resolve_read8(&m_in_mreq_func, &m_in_mreq_cb, this);
-	devcb_resolve_write8(&m_out_mreq_func, &m_out_mreq_cb, this);
-	devcb_resolve_read8(&m_in_iorq_func, &m_in_iorq_cb, this);
-	devcb_resolve_write8(&m_out_iorq_func, &m_out_iorq_cb, this);
+	m_out_busreq_func.resolve(m_out_busreq_cb, *this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_bao_func.resolve(m_out_bao_cb, *this);
+	m_in_mreq_func.resolve(m_in_mreq_cb, *this);
+	m_out_mreq_func.resolve(m_out_mreq_cb, *this);
+	m_in_iorq_func.resolve(m_in_iorq_cb, *this);
+	m_out_iorq_func.resolve(m_out_iorq_cb, *this);
 
 	// allocate timer
 	m_timer = machine().scheduler().timer_alloc(FUNC(static_timerproc), (void *)this);
@@ -344,7 +344,7 @@ int z80dma_device::is_ready()
 
 void z80dma_device::interrupt_check()
 {
-	devcb_call_write_line(&m_out_int_func, m_ip ? ASSERT_LINE : CLEAR_LINE);
+	m_out_int_func(m_ip ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -393,9 +393,9 @@ void z80dma_device::do_read()
 			if (PORTA_IS_SOURCE)
 			{
 				if (PORTA_MEMORY)
-					m_latch = devcb_call_read8(&m_in_mreq_func, m_addressA);
+					m_latch = m_in_mreq_func(m_addressA);
 				else
-					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressA);
+					m_latch = m_in_iorq_func(m_addressA);
 
 				if (LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
 				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
@@ -403,9 +403,9 @@ void z80dma_device::do_read()
 			else
 			{
 				if (PORTB_MEMORY)
-					m_latch = devcb_call_read8(&m_in_mreq_func, m_addressB);
+					m_latch = m_in_mreq_func(m_addressB);
 				else
-					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressB);
+					m_latch = m_in_iorq_func(m_addressB);
 
 				if (LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
 				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
@@ -440,9 +440,9 @@ int z80dma_device::do_write()
 			if (PORTA_IS_SOURCE)
 			{
 				if (PORTB_MEMORY)
-					devcb_call_write8(&m_out_mreq_func, m_addressB, m_latch);
+					m_out_mreq_func(m_addressB, m_latch);
 				else
-					devcb_call_write8(&m_out_iorq_func, m_addressB, m_latch);
+					m_out_iorq_func(m_addressB, m_latch);
 
 				if (LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
 				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
@@ -450,9 +450,9 @@ int z80dma_device::do_write()
 			else
 			{
 				if (PORTA_MEMORY)
-					devcb_call_write8(&m_out_mreq_func, m_addressA, m_latch);
+					m_out_mreq_func(m_addressA, m_latch);
 				else
-					devcb_call_write8(&m_out_iorq_func, m_addressA, m_latch);
+					m_out_iorq_func(m_addressA, m_latch);
 
 				if (LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
 				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
@@ -578,7 +578,7 @@ void z80dma_device::update_status()
 	}
 
 	// set the busreq line
-	devcb_call_write_line(&m_out_busreq_func, pending_transfer ? ASSERT_LINE : CLEAR_LINE);
+	m_out_busreq_func(pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

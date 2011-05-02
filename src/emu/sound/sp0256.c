@@ -55,7 +55,7 @@
 	if( sp->sby_line != line_state )           \
 	{                                          \
 		sp->sby_line = line_state;             \
-		devcb_call_write_line(&sp->sby, sp->sby_line);	\
+		sp->sby(sp->sby_line);	\
 	}                                          \
 }
 
@@ -773,7 +773,7 @@ static void sp0256_micro(sp0256_state *sp)
             sp->ald      = 0;
             for (i = 0; i < 16; i++)
                 sp->filt.r[i] = 0;
-            devcb_call_write_line(&sp->drq, 1);
+            sp->drq(1);
         }
 
         /* ---------------------------------------------------------------- */
@@ -1181,10 +1181,10 @@ static DEVICE_START( sp0256 )
 	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;
-	devcb_resolve_write_line(&sp->drq, &intf->lrq_callback, device);
-	devcb_resolve_write_line(&sp->sby, &intf->sby_callback, device);
-	devcb_call_write_line(&sp->drq, 1);
-	devcb_call_write_line(&sp->sby, 1);
+	sp->drq.resolve(intf->lrq_callback, *device);
+	sp->sby.resolve(intf->sby_callback, *device);
+	sp->drq(1);
+	sp->sby(1);
 
 	sp->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / CLOCK_DIVIDER, sp, sp0256_update);
 
@@ -1234,7 +1234,7 @@ static void sp0256_reset(sp0256_state *sp)
 	sp->mode     = 0;
 	sp->page     = 0x1000 << 3;
 	sp->silent   = 1;
-	devcb_call_write_line(&sp->drq, 1);
+	sp->drq(1);
 	SET_SBY(1)
 }
 
@@ -1263,7 +1263,7 @@ WRITE8_DEVICE_HANDLER( sp0256_ALD_w )
 	/* ---------------------------------------------------------------- */
 	sp->lrq = 0;
 	sp->ald = (0xFF & data) << 4;
-	devcb_call_write_line(&sp->drq, 0);
+	sp->drq(0);
 	SET_SBY(0)
 
 	return;

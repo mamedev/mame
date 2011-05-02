@@ -1539,8 +1539,8 @@ static void set_interrupt_state(tms5220_state *tms, int state)
 #ifdef DEBUG_PIN_READS
 	logerror("irq pin set to state %d\n", state);
 #endif
-    if (tms->irq_func.write && state != tms->irq_pin)
-    	devcb_call_write_line(&tms->irq_func, !state);
+    if (!tms->irq_func.isnull() && state != tms->irq_pin)
+    	tms->irq_func(!state);
     tms->irq_pin = state;
 }
 
@@ -1556,8 +1556,8 @@ static void update_ready_state(tms5220_state *tms)
 #ifdef DEBUG_PIN_READS
 	logerror("ready pin set to state %d\n", state);
 #endif
-    if (tms->readyq_func.write && state != tms->ready_pin)
-    	devcb_call_write_line(&tms->readyq_func, !state);
+    if (!tms->readyq_func.isnull() && state != tms->ready_pin)
+    	tms->readyq_func(!state);
     tms->ready_pin = state;
 }
 
@@ -1583,8 +1583,8 @@ static DEVICE_START( tms5220 )
 	assert_always(tms != NULL, "Error creating TMS5220 chip");
 
 	/* resolve irq and readyq line */
-	devcb_resolve_write_line(&tms->irq_func, &tms->intf->irq_func, device);
-	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
+	tms->irq_func.resolve(tms->intf->irq_func, *device);
+	tms->readyq_func.resolve(tms->intf->readyq_func, *device);
 
 	/* initialize a stream */
 	tms->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() / 80, tms, tms5220_update);

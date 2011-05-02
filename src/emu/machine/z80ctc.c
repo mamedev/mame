@@ -121,7 +121,7 @@ void z80ctc_device::device_start()
 	m_period256 = attotime::from_hz(m_clock) * 256;
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_intr, &m_intr_cb, this);
+	m_intr.resolve(m_intr_cb, *this);
 
 	// start each channel
 	m_channel[0].start(this, 0, (m_notimer & NOTIMER_0) != 0, &m_zc0_cb);
@@ -255,7 +255,7 @@ void z80ctc_device::z80daisy_irq_reti()
 void z80ctc_device::interrupt_check()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	devcb_call_write_line(&m_intr, state);
+	m_intr(state);
 }
 
 
@@ -291,7 +291,7 @@ void z80ctc_device::ctc_channel::start(z80ctc_device *device, int index, bool no
 	m_device = device;
 	m_index = index;
 	if (write_line != NULL)
-		devcb_resolve_write_line(&m_zc, write_line, m_device);
+		m_zc.resolve(*write_line, *m_device);
 	m_notimer = notimer;
 	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_timer_callback), this);
 
@@ -504,8 +504,8 @@ void z80ctc_device::ctc_channel::timer_callback()
 	}
 
 	// generate the clock pulse
-	devcb_call_write_line(&m_zc, 1);
-	devcb_call_write_line(&m_zc, 0);
+	m_zc(1);
+	m_zc(0);
 
 	// reset the down counter
 	m_down = m_tconst;

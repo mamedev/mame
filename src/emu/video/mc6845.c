@@ -474,8 +474,8 @@ INLINE void mc6845_set_de(mc6845_t *mc6845, int state)
 				update_upd_adr_timer(mc6845);
 		}
 
-		if ( mc6845->out_de_func.target != NULL )
-			devcb_call_write_line( &mc6845->out_de_func, mc6845->de );
+		if ( !mc6845->out_de_func.isnull() )
+			mc6845->out_de_func(mc6845->de );
 	}
 }
 
@@ -486,8 +486,8 @@ INLINE void mc6845_set_hsync(mc6845_t *mc6845, int state)
 	{
 		mc6845->hsync = state;
 
-		if ( mc6845->out_hsync_func.target != NULL )
-			devcb_call_write_line( &mc6845->out_hsync_func, mc6845->hsync );
+		if ( !mc6845->out_hsync_func.isnull() )
+			mc6845->out_hsync_func(mc6845->hsync );
 	}
 }
 
@@ -498,8 +498,8 @@ INLINE void mc6845_set_vsync(mc6845_t *mc6845, int state)
 	{
 		mc6845->vsync = state;
 
-		if ( mc6845->out_vsync_func.target != NULL )
-			devcb_call_write_line( &mc6845->out_vsync_func, mc6845->vsync );
+		if ( !mc6845->out_vsync_func.isnull() )
+			mc6845->out_vsync_func(mc6845->vsync );
 	}
 }
 
@@ -510,8 +510,8 @@ INLINE void mc6845_set_cur(mc6845_t *mc6845, int state)
 	{
 		mc6845->cur = state;
 
-		if ( mc6845->out_cur_func.target != NULL )
-			devcb_call_write_line( &mc6845->out_cur_func, mc6845->cur );
+		if ( !mc6845->out_cur_func.isnull() )
+			mc6845->out_cur_func(mc6845->cur );
 	}
 }
 
@@ -881,10 +881,10 @@ static void common_start(device_t *device, int device_type)
 		assert(mc6845->intf->hpixels_per_column > 0);
 
 		/* resolve callbacks */
-		devcb_resolve_write_line(&mc6845->out_de_func, &mc6845->intf->out_de_func, device);
-		devcb_resolve_write_line(&mc6845->out_cur_func, &mc6845->intf->out_cur_func, device);
-		devcb_resolve_write_line(&mc6845->out_hsync_func, &mc6845->intf->out_hsync_func, device);
-		devcb_resolve_write_line(&mc6845->out_vsync_func, &mc6845->intf->out_vsync_func, device);
+		mc6845->out_de_func.resolve(mc6845->intf->out_de_func, *device);
+		mc6845->out_cur_func.resolve(mc6845->intf->out_cur_func, *device);
+		mc6845->out_hsync_func.resolve(mc6845->intf->out_hsync_func, *device);
+		mc6845->out_vsync_func.resolve(mc6845->intf->out_vsync_func, *device);
 
 		/* copy the initial parameters */
 		mc6845->clock = device->clock();
@@ -1014,14 +1014,14 @@ static DEVICE_RESET( mc6845 )
 	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
-		if (mc6845->out_de_func.target != NULL)
-			devcb_call_write_line(&mc6845->out_de_func, FALSE);
+		if (!mc6845->out_de_func.isnull())
+			mc6845->out_de_func(FALSE);
 
-		if (mc6845->out_hsync_func.target != NULL)
-			devcb_call_write_line(&mc6845->out_hsync_func, FALSE);
+		if (!mc6845->out_hsync_func.isnull())
+			mc6845->out_hsync_func(FALSE);
 
-		if (mc6845->out_vsync_func.target != NULL)
-			devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
+		if (!mc6845->out_vsync_func.isnull())
+			mc6845->out_vsync_func(FALSE);
 	}
 
 	if ( ! mc6845->line_timer ->enabled( ) )

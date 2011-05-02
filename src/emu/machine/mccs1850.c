@@ -131,7 +131,7 @@ inline void mccs1850_device::check_interrupt()
 		m_ram[REGISTER_STATUS] &= ~STATUS_IT;
 	}
 
-	devcb_call_write_line(&m_out_int_func, interrupt ? ASSERT_LINE : CLEAR_LINE);
+	m_out_int_func(interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -143,7 +143,7 @@ inline void mccs1850_device::set_pse_line(int state)
 {
 	m_pse = state;
 
-	devcb_call_write_line(&m_out_pse_func, m_pse);
+	m_out_pse_func(m_pse);
 }
 
 
@@ -322,9 +322,9 @@ void mccs1850_device::device_config_complete()
 void mccs1850_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_write_line(&m_out_pse_func, &m_out_pse_cb, this);
-	devcb_resolve_write_line(&m_out_nuc_func, &m_out_nuc_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_out_pse_func.resolve(m_out_pse_cb, *this);
+	m_out_nuc_func.resolve(m_out_nuc_cb, *this);
 
 	// allocate timers
 	m_clock_timer = timer_alloc(TIMER_CLOCK);

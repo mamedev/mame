@@ -287,12 +287,12 @@ INLINE void set_sod(i8085_state *cpustate, int state)
 	if (state != 0 && cpustate->sod_state == 0)
 	{
 		cpustate->sod_state = 1;
-		devcb_call_write_line(&cpustate->out_sod_func, cpustate->sod_state);
+		cpustate->out_sod_func(cpustate->sod_state);
 	}
 	else if (state == 0 && cpustate->sod_state != 0)
 	{
 		cpustate->sod_state = 0;
-		devcb_call_write_line(&cpustate->out_sod_func, cpustate->sod_state);
+		cpustate->out_sod_func(cpustate->sod_state);
 	}
 }
 
@@ -302,12 +302,12 @@ INLINE void set_inte(i8085_state *cpustate, int state)
 	if (state != 0 && (cpustate->IM & IM_IE) == 0)
 	{
 		cpustate->IM |= IM_IE;
-		devcb_call_write_line(&cpustate->out_inte_func, 1);
+		cpustate->out_inte_func(1);
 	}
 	else if (state == 0 && (cpustate->IM & IM_IE) != 0)
 	{
 		cpustate->IM &= ~IM_IE;
-		devcb_call_write_line(&cpustate->out_inte_func, 0);
+		cpustate->out_inte_func(0);
 	}
 }
 
@@ -315,7 +315,7 @@ INLINE void set_inte(i8085_state *cpustate, int state)
 INLINE void set_status(i8085_state *cpustate, UINT8 status)
 {
 	if (status != cpustate->STATUS)
-		devcb_call_write8(&cpustate->out_status_func, 0, status);
+		cpustate->out_status_func(0, status);
 
 	cpustate->STATUS = status;
 }
@@ -324,7 +324,7 @@ INLINE void set_status(i8085_state *cpustate, UINT8 status)
 INLINE UINT8 get_rim_value(i8085_state *cpustate)
 {
 	UINT8 result = cpustate->IM;
-	int sid = devcb_call_read_line(&cpustate->in_sid_func);
+	int sid = cpustate->in_sid_func();
 
 	/* copy live RST5.5 and RST6.5 states */
 	result &= ~(IM_I65 | IM_I55);
@@ -1012,10 +1012,10 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_callback irqc
 	cpustate->io = device->space(AS_IO);
 
 	/* resolve callbacks */
-	devcb_resolve_write8(&cpustate->out_status_func, &cpustate->config.out_status_func, device);
-	devcb_resolve_write_line(&cpustate->out_inte_func, &cpustate->config.out_inte_func, device);
-	devcb_resolve_read_line(&cpustate->in_sid_func, &cpustate->config.in_sid_func, device);
-	devcb_resolve_write_line(&cpustate->out_sod_func, &cpustate->config.out_sod_func, device);
+	cpustate->out_status_func.resolve(cpustate->config.out_status_func, *device);
+	cpustate->out_inte_func.resolve(cpustate->config.out_inte_func, *device);
+	cpustate->in_sid_func.resolve(cpustate->config.in_sid_func, *device);
+	cpustate->out_sod_func.resolve(cpustate->config.out_sod_func, *device);
 
 	/* register for state saving */
 	device->save_item(NAME(cpustate->PC.w.l));
@@ -1107,7 +1107,7 @@ static CPU_EXPORT_STATE( i808x )
 	{
 		case I8085_SID:
 			{
-			int sid = devcb_call_read_line(&cpustate->in_sid_func);
+			int sid = cpustate->in_sid_func();
 
 			cpustate->ietemp = ((cpustate->IM & IM_SID) != 0);
 			cpustate->ietemp = (sid != 0);

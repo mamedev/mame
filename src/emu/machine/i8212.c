@@ -71,9 +71,9 @@ void i8212_device::device_config_complete()
 void i8212_device::device_start()
 {
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
-	devcb_resolve_read8(&m_in_di_func, &m_in_di_cb, this);
-	devcb_resolve_write8(&m_out_do_func, &m_out_do_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
+	m_in_di_func.resolve(m_in_di_cb, *this);
+	m_out_do_func.resolve(m_out_do_cb, *this);
 
 	// register for state saving
 	save_item(NAME(m_md));
@@ -93,7 +93,7 @@ void i8212_device::device_reset()
 	if (m_md == I8212_MODE_OUTPUT)
 	{
 		// output data
-		devcb_call_write8(&m_out_do_func, 0, m_data);
+		m_out_do_func(0, m_data);
 	}
 }
 
@@ -105,7 +105,7 @@ void i8212_device::device_reset()
 READ8_MEMBER( i8212_device::data_r )
 {
 	// clear interrupt line
-	devcb_call_write_line(&m_out_int_func, CLEAR_LINE);
+	m_out_int_func(CLEAR_LINE);
 
 	if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), CLEAR_LINE);
 
@@ -123,7 +123,7 @@ WRITE8_MEMBER( i8212_device::data_w )
 	m_data = data;
 
 	// output data
-	devcb_call_write8(&m_out_do_func, 0, m_data);
+	m_out_do_func(0, m_data);
 }
 
 
@@ -152,10 +152,10 @@ WRITE_LINE_MEMBER( i8212_device::stb_w )
 		if (m_stb && !state)
 		{
 			// input data
-			m_data = devcb_call_read8(&m_in_di_func, 0);
+			m_data = m_in_di_func(0);
 
 			// assert interrupt line
-			devcb_call_write_line(&m_out_int_func, ASSERT_LINE);
+			m_out_int_func(ASSERT_LINE);
 
 			if (LOG) logerror("I8212 '%s' INT: %u\n", tag(), ASSERT_LINE);
 		}

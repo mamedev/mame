@@ -216,8 +216,8 @@ static CPU_INIT( m4510 )
 		if ( intf->write_indexed_func )
 			cpustate->wrmem_id = intf->write_indexed_func;
 
-		devcb_resolve_read8(&cpustate->in_port_func, &intf->in_port_func, device);
-		devcb_resolve_write8(&cpustate->out_port_func, &intf->out_port_func, device);
+		cpustate->in_port_func.resolve(intf->in_port_func, *device);
+		cpustate->out_port_func.resolve(intf->out_port_func, *device);
 	}
 }
 
@@ -362,7 +362,7 @@ static READ8_HANDLER( m4510_read_0000 )
 			result = cpustate->ddr;
 			break;
 		case 0x0001:	/* Data Port */
-			result = devcb_call_read8(&cpustate->in_port_func, 0);
+			result = cpustate->in_port_func(0);
 			result = (cpustate->ddr & cpustate->port) | (~cpustate->ddr & result);
 			break;
 	}
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 			break;
 	}
 
-	devcb_call_write8(&cpustate->out_port_func, 0, m4510_get_port(downcast<legacy_cpu_device *>(&space->device())));
+	cpustate->out_port_func(0, m4510_get_port(downcast<legacy_cpu_device *>(&space->device())));
 }
 
 static ADDRESS_MAP_START(m4510_mem, AS_PROGRAM, 8)

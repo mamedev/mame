@@ -105,17 +105,17 @@ void necdsp_device::device_start()
 	state_add(UPD7725_IDB, "IDB", regs.idb);
 
 	// resolve callbacks
-	devcb_resolve_read_line(&m_in_int_func, &m_in_int_cb, this);
-	//devcb_resolve_read8(&m_in_si_func, &m_in_si_cb, this);
-	//devcb_resolve_read_line(&m_in_sck_func, &m_in_sck_cb, this);
-	//devcb_resolve_read_line(&m_in_sien_func, &m_in_sien_cb, this);
-	//devcb_resolve_read_line(&m_in_soen_func, &m_in_soen_cb, this);
-	//devcb_resolve_read_line(&m_in_dack_func, &m_in_dack_cb, this);
-	devcb_resolve_write_line(&m_out_p0_func, &m_out_p0_cb, this);
-	devcb_resolve_write_line(&m_out_p1_func, &m_out_p1_cb, this);
-	//devcb_resolve_write8(&m_out_so_func, &m_out_so_cb, this);
-	//devcb_resolve_write_line(&m_out_sorq_func, &m_out_sorq_cb, this);
-	//devcb_resolve_write_line(&m_out_drq_func, &m_out_drq_cb, this);
+	m_in_int_func.resolve(m_in_int_cb, *this);
+	//m_in_si_func.resolve(m_in_si_cb, *this);
+	//m_in_sck_func.resolve(m_in_sck_cb, *this);
+	//m_in_sien_func.resolve(m_in_sien_cb, *this);
+	//m_in_soen_func.resolve(m_in_soen_cb, *this);
+	//m_in_dack_func.resolve(m_in_dack_cb, *this);
+	m_out_p0_func.resolve(m_out_p0_cb, *this);
+	m_out_p1_func.resolve(m_out_p1_cb, *this);
+	//m_out_so_func.resolve(m_out_so_cb, *this);
+	//m_out_sorq_func.resolve(m_out_sorq_cb, *this);
+	//m_out_drq_func.resolve(m_out_drq_cb, *this);
 
 	// save state registrations
 	save_item(NAME(regs.pc));
@@ -563,8 +563,8 @@ void necdsp_device::exec_ld(UINT32 opcode) {
     case  5: regs.rp = id; break;
     case  6: regs.dr = id; regs.sr.rqm = 1; break;
     case  7: regs.sr = (regs.sr & 0x907c) | (id & ~0x907c);
-             devcb_call_write_line(&m_out_p0_func, regs.sr&0x1);
-             devcb_call_write_line(&m_out_p1_func, (regs.sr&0x2)>>1);
+             m_out_p0_func(regs.sr&0x1);
+             m_out_p1_func((regs.sr&0x2)>>1);
              break;
 	case  8: regs.so = id; break;  //LSB
 	case  9: regs.so = id; break;  //MSB

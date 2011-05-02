@@ -124,8 +124,8 @@ void ttl7474_device::device_start()
     save_item(NAME(m_last_output));
     save_item(NAME(m_last_output_comp));
 
-	devcb_resolve_write_line(&m_output_func, &m_output_cb, this);
-	devcb_resolve_write_line(&m_comp_output_func, &m_comp_output_cb, this);
+	m_output_func.resolve(m_output_cb, *this);
+	m_comp_output_func.resolve(m_comp_output_cb, *this);
 }
 
 //-------------------------------------------------
@@ -172,13 +172,13 @@ void ttl7474_device::update()
     if (m_output != m_last_output)
 	{
         m_last_output = m_output;
-		devcb_call_write_line(&m_output_func, m_output);
+		m_output_func(m_output);
 	}
 	/* call callback if any of the outputs changed */
     if (m_output_comp != m_last_output_comp)
 	{
         m_last_output_comp = m_output_comp;
-		devcb_call_write_line(&m_comp_output_func, m_output_comp);
+		m_comp_output_func(m_output_comp);
 	}
 }
 

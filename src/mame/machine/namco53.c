@@ -84,13 +84,13 @@ INLINE namco_53xx_state *get_safe_token(device_t *device)
 static READ8_HANDLER( namco_53xx_K_r )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->m_k, 0);
+	return state->m_k(0);
 }
 
 static READ8_HANDLER( namco_53xx_Rx_r )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	return devcb_call_read8(&state->m_in[offset], 0);
+	return state->m_in[offset](0);
 }
 
 static WRITE8_HANDLER( namco_53xx_O_w )
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( namco_53xx_O_w )
 static WRITE8_HANDLER( namco_53xx_P_w )
 {
 	namco_53xx_state *state = get_safe_token(space->device().owner());
-	devcb_call_write8(&state->m_p, 0, data);
+	state->m_p(0, data);
 }
 
 
@@ -181,12 +181,12 @@ static DEVICE_START( namco_53xx )
 	assert(state->m_cpu != NULL);
 
 	/* resolve our read/write callbacks */
-	devcb_resolve_read8(&state->m_k, &config->k, device);
-	devcb_resolve_read8(&state->m_in[0], &config->in[0], device);
-	devcb_resolve_read8(&state->m_in[1], &config->in[1], device);
-	devcb_resolve_read8(&state->m_in[2], &config->in[2], device);
-	devcb_resolve_read8(&state->m_in[3], &config->in[3], device);
-	devcb_resolve_write8(&state->m_p, &config->p, device);
+	state->m_k.resolve(config->k, *device);
+	state->m_in[0].resolve(config->in[0], *device);
+	state->m_in[1].resolve(config->in[1], *device);
+	state->m_in[2].resolve(config->in[2], *device);
+	state->m_in[3].resolve(config->in[3], *device);
+	state->m_p.resolve(config->p, *device);
 
 	device->save_item(NAME(state->m_portO));
 }

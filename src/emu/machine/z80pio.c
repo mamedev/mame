@@ -99,7 +99,7 @@ void z80pio_device::device_start()
 	m_port[PORT_B].start(this, PORT_B, m_in_pb_cb, m_out_pb_cb, m_out_brdy_cb);
 
 	// resolve callbacks
-	devcb_resolve_write_line(&m_out_int_func, &m_out_int_cb, this);
+	m_out_int_func.resolve(m_out_int_cb, *this);
 }
 
 
@@ -237,7 +237,7 @@ void z80pio_device::check_interrupts()
 		if (m_port[index].interrupt_signalled())
 			state = ASSERT_LINE;
 
-	devcb_call_write_line(&m_out_int_func, state);
+	m_out_int_func(state);
 }
 
 
@@ -284,9 +284,9 @@ void z80pio_device::pio_port::start(z80pio_device *device, int index, const devc
 	m_index = index;
 
 	// resolve callbacks
-	devcb_resolve_read8(&m_in_p_func, &infunc, m_device);
-	devcb_resolve_write8(&m_out_p_func, &outfunc, m_device);
-	devcb_resolve_write_line(&m_out_rdy_func, &rdyfunc, m_device);
+	m_in_p_func.resolve(infunc, *m_device);
+	m_out_p_func.resolve(outfunc, *m_device);
+	m_out_rdy_func.resolve(rdyfunc, *m_device);
 
 	// register for state saving
 	m_device->save_item(NAME(m_mode), m_index);
@@ -396,7 +396,7 @@ void z80pio_device::pio_port::set_rdy(bool state)
 	if (LOG) logerror("Z80PIO '%s' Port %c Ready: %u\n", m_device->tag(), 'A' + m_index, state);
 
 	m_rdy = state;
-	devcb_call_write_line(&m_out_rdy_func, state);
+	m_out_rdy_func(state);
 }
 
 
@@ -412,7 +412,7 @@ void z80pio_device::pio_port::set_mode(int mode)
 	{
 	case MODE_OUTPUT:
 		// enable data output
-		devcb_call_write8(&m_out_p_func, 0, m_output);
+		m_out_p_func(0, m_output);
 
 		// assert ready line
 		set_rdy(true);
@@ -477,9 +477,9 @@ void z80pio_device::pio_port::strobe(bool state)
 			if (m_stb && !state) // falling edge
 			{
 				if (m_index == PORT_A)
-					devcb_call_write8(&m_out_p_func, 0, m_output);
+					m_out_p_func(0, m_output);
 				else
-					m_device->m_port[PORT_A].m_input = devcb_call_read8(&m_device->m_port[PORT_A].m_in_p_func, 0);
+					m_device->m_port[PORT_A].m_input = m_device->m_port[PORT_A].m_in_p_func(0);
 			}
 			else if (!m_stb && state) // rising edge
 			{
@@ -511,7 +511,7 @@ void z80pio_device::pio_port::strobe(bool state)
 			if (!state)
 			{
 				// input port data
-				m_input = devcb_call_read8(&m_in_p_func, 0);
+				m_input = m_in_p_func(0);
 			}
 			else if (!m_stb && state) // rising edge
 			{
@@ -687,7 +687,7 @@ UINT8 z80pio_device::pio_port::data_read()
 		if (!m_stb)
 		{
 			// input port data
-			m_input = devcb_call_read8(&m_in_p_func, 0);
+			m_input = m_in_p_func(0);
 		}
 
 		data = m_input;
@@ -711,7 +711,7 @@ UINT8 z80pio_device::pio_port::data_read()
 
 	case MODE_BIT_CONTROL:
 		// input port data
-		m_input = devcb_call_read8(&m_in_p_func, 0);
+		m_input = m_in_p_func(0);
 
 		data = (m_input & m_ior) | (m_output & (m_ior ^ 0xff));
 		break;
@@ -737,7 +737,7 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		m_output = data;
 
 		// output data to port
-		devcb_call_write8(&m_out_p_func, 0, data);
+		m_out_p_func(0, data);
 
 		// assert ready line
 		set_rdy(true);
@@ -758,7 +758,7 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		if (!m_stb)
 		{
 			// output data to port
-			devcb_call_write8(&m_out_p_func, 0, data);
+			m_out_p_func(0, data);
 		}
 
 		// assert ready line
@@ -770,7 +770,7 @@ void z80pio_device::pio_port::data_write(UINT8 data)
 		m_output = data;
 
 		// output data to port
-		devcb_call_write8(&m_out_p_func, 0, m_ior | (m_output & (m_ior ^ 0xff)));
+		m_out_p_func(0, m_ior | (m_output & (m_ior ^ 0xff)));
 		break;
 	}
 }
