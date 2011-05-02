@@ -214,9 +214,9 @@ Self Test:
                                 [Hot Chase]
 ---------------------------------------------------------------------------
 
+- gameplay speed
 - Samples pitch is too low
 - No zoom and rotation of the layers
-
 
 ---------------------------------------------------------------------------
                                Common Issues
@@ -272,7 +272,6 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
@@ -547,7 +546,8 @@ static WRITE16_HANDLER( hotchase_soundlatch_w );
 
 static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x063fff) AM_RAM										// RAM (weird size!?)
+	AM_RANGE(0x040000, 0x041fff) AM_RAM									// RAM
+	AM_RANGE(0x060000, 0x063fff) AM_RAM									// RAM
 	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE_MEMBER(wecleman_state, m_blitter_regs)	// Blitter
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_r, k051316_w, 0x00ff)	// Background
 	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0x00ff)	// Background Ctrl
@@ -589,8 +589,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotchase_sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
 	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE_MEMBER(wecleman_state, m_roadram) AM_SIZE_MEMBER(wecleman_state, m_roadram_size)	// Road
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
-	AM_RANGE(0x060000, 0x060fff) AM_RAM				// RAM
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
+	AM_RANGE(0x060000, 0x060fff) AM_RAM // a table, presumably road related
+	AM_RANGE(0x061000, 0x06101f) AM_RAM // road vregs?
 ADDRESS_MAP_END
 
 
@@ -1018,13 +1019,27 @@ GFXDECODE_END
                         WEC Le Mans 24 Hardware Definitions
 ***************************************************************************/
 
-static INTERRUPT_GEN( wecleman_interrupt )
+
+static TIMER_DEVICE_CALLBACK( wecleman_scanline )
 {
-	if (cpu_getiloops(device) == 0)
-		device_set_input_line(device, 4, HOLD_LINE);	/* once */
-	else
-		device_set_input_line(device, 5, HOLD_LINE);	/* to read input ports */
+	int scanline = param;
+
+	if(scanline == 232) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+	else if(((scanline % 64) == 0)) // timer irq TODO: timings
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
 }
+
+static TIMER_DEVICE_CALLBACK( hotchase_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 224) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+	else if(((scanline % 64) == 0)) // timer irq TODO: timings
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
+}
+
 
 static MACHINE_RESET( wecleman )
 {
@@ -1036,7 +1051,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_map)
-	MCFG_CPU_VBLANK_INT_HACK(wecleman_interrupt,5 + 1)	/* in order to read the inputs once per frame */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", wecleman_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* Schems show 10MHz */
 	MCFG_CPU_PROGRAM_MAP(wecleman_sub_map)
@@ -1054,7 +1069,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(320 +16, 224 +16)
+	MCFG_SCREEN_SIZE(320 +16, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
 	MCFG_SCREEN_UPDATE(wecleman)
 
@@ -1107,7 +1122,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_map)
-	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", hotchase_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
@@ -1116,8 +1131,6 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MCFG_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
 
-	/* Amuse: every 2 ms */
-
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
@@ -1125,7 +1138,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_SIZE(320 +16, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE(hotchase)
 

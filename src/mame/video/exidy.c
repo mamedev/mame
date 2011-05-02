@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/exidy.h"
 
 
@@ -79,16 +78,6 @@ INTERRUPT_GEN( exidy_vblank_interrupt )
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
-
-INTERRUPT_GEN( teetert_vblank_interrupt )
-{
-	/* standard stuff */
-	if (cpu_getiloops(device) == 0)
-		exidy_vblank_interrupt(device);
-
-	/* plus a pulse on the NMI line */
-	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
 
 
 READ8_HANDLER( exidy_interrupt_r )

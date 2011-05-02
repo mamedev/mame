@@ -143,7 +143,6 @@ Fax                  1982  6502   FXL, FLA
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/targ.h"
@@ -883,7 +882,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,10*60)
 
 	MCFG_MACHINE_START( teetert )
 

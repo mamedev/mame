@@ -5,6 +5,8 @@
 Espial: The Orca logo is displayed, but looks to be "blacked out" via the
         color proms by having 0x1c & 0x1d set to black.
 
+TODO:
+- merge with zodiack.c
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -35,18 +37,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "includes/espial.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
 
-static TIMER_CALLBACK( interrupt_disable )
-{
-	espial_state *state = machine.driver_data<espial_state>();
-	//interrupt_enable = 0;
-	cpu_interrupt_enable(state->m_maincpu, 0);
-}
+
 
 static MACHINE_RESET( espial )
 {
@@ -54,8 +50,7 @@ static MACHINE_RESET( espial )
 
 	state->m_flipscreen = 0;
 
-	/* we must start with NMI interrupts disabled */
-	machine.scheduler().synchronize(FUNC(interrupt_disable));
+	state->m_main_nmi_enabled = FALSE;
 	state->m_sound_nmi_enabled = FALSE;
 }
 
@@ -73,7 +68,8 @@ static MACHINE_START( espial )
 
 static WRITE8_HANDLER( espial_master_interrupt_enable_w )
 {
-	interrupt_enable_w(space, offset, ~data & 1);
+	espial_state *state = space->machine().driver_data<espial_state>();
+	state->m_main_nmi_enabled = ~(data & 1);
 }
 
 
@@ -83,6 +79,18 @@ WRITE8_HANDLER( espial_sound_nmi_enable_w )
 	state->m_sound_nmi_enabled = data & 1;
 }
 
+static TIMER_DEVICE_CALLBACK( espial_scanline )
+{
+	espial_state *state = timer.machine().driver_data<espial_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_main_nmi_enabled) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+
+	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
+		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
+}
+
 
 INTERRUPT_GEN( espial_sound_nmi_gen )
 {
@@ -90,15 +98,6 @@ INTERRUPT_GEN( espial_sound_nmi_gen )
 
 	if (state->m_sound_nmi_enabled)
 		nmi_line_pulse(device);
-}
-
-
-static INTERRUPT_GEN( espial_master_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		nmi_line_pulse(device);
-	else
-		irq0_line_hold(device);
 }
 
 
@@ -117,7 +116,7 @@ static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, espial_master_soundlatch_w)	/* the main CPU reads the command back from the slave */
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch2_r, espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
@@ -142,7 +141,7 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, espial_master_soundlatch_w)	/* the main CPU reads the command back from the slave */
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch2_r, espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
@@ -160,7 +159,7 @@ static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( espial_sound_io_map, AS_IO, 8 )
@@ -329,7 +328,7 @@ static MACHINE_CONFIG_START( espial, espial_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(espial_map)
-	MCFG_CPU_VBLANK_INT_HACK(espial_master_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", espial_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
 	MCFG_CPU_PROGRAM_MAP(espial_sound_map)

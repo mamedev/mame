@@ -366,7 +366,6 @@ D                                                                               
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/alph8201/alph8201.h"
-#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
@@ -580,12 +579,26 @@ static void equites_msm5232_gate( device_t *device, int state )
 // Interrupt Handlers
 
 // Equites Hardware
-static INTERRUPT_GEN( equites_interrupt )
+static TIMER_DEVICE_CALLBACK( equites_scanline )
 {
-	if (cpu_getiloops(device))
-		device_set_input_line(device, 2, HOLD_LINE);
-	else
-		device_set_input_line(device, 1, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 232) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+
+	if(scanline == 24) // vblank-in irq
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
+}
+
+static TIMER_DEVICE_CALLBACK( splndrbt_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 1, HOLD_LINE);
+
+	if(scanline == 32) // vblank-in irq
+		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
 }
 
 static WRITE8_HANDLER(equites_8155_w)
@@ -1252,7 +1265,7 @@ static MACHINE_CONFIG_START( equites, equites_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
-	MCFG_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", equites_scanline, "screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
@@ -1290,7 +1303,7 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
-	MCFG_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", splndrbt_scanline, "screen", 0, 1)
 
 	MCFG_FRAGMENT_ADD(common_sound)
 

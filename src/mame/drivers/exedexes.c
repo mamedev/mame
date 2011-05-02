@@ -11,18 +11,20 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "includes/exedexes.h"
 
 
-static INTERRUPT_GEN( exedexes_interrupt )
+static TIMER_DEVICE_CALLBACK( exedexes_scanline )
 {
-	if (cpu_getiloops(device) != 0)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-	else
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+
+	if(scanline == 0) // unknown irq event
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -152,6 +154,7 @@ static const gfx_layout charlayout =
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8	/* every char takes 16 consecutive bytes */
 };
+
 static const gfx_layout spritelayout =
 {
 	16,16,	/* 16*16 sprites */
@@ -164,6 +167,7 @@ static const gfx_layout spritelayout =
 			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
 	64*8	/* every sprite takes 64 consecutive bytes */
 };
+
 static const gfx_layout tilelayout =
 {
 	32,32,  /* 32*32 tiles */
@@ -217,7 +221,7 @@ static MACHINE_CONFIG_START( exedexes, exedexes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(exedexes_map)
-	MCFG_CPU_VBLANK_INT_HACK(exedexes_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", exedexes_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

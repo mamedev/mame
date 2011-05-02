@@ -148,7 +148,6 @@ static MACHINE_RESET( zodiack )
 {
 	zodiack_state *state = machine.driver_data<zodiack_state>();
 
-	/* we must start with NMI interrupts disabled */
 	state->m_sound_nmi_enabled = FALSE;
 }
 

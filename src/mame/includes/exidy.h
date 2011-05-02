@@ -53,6 +53,5 @@ VIDEO_START( exidy );
 SCREEN_UPDATE( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
-INTERRUPT_GEN( teetert_vblank_interrupt );
 
 READ8_HANDLER( exidy_interrupt_r );

@@ -24,6 +24,7 @@ public:
 	int       m_flipscreen;
 
 	/* sound-related */
+	UINT8     m_main_nmi_enabled;
 	UINT8     m_sound_nmi_enabled;
 
 	/* devices */
