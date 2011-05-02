@@ -84,6 +84,7 @@ eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, dev
 	  m_default_data_size(0),
 	  m_default_value(0),
 	  m_serial_count(0),
+	  m_data_buffer(0),
 	  m_read_address(0),
 	  m_clock_count(0),
 	  m_latch(0),
@@ -91,8 +92,7 @@ eeprom_device::eeprom_device(const machine_config &mconfig, const char *tag, dev
 	  m_clock_line(CLEAR_LINE),
 	  m_sending(0),
 	  m_locked(false),
-	  m_reset_counter(0),
-	  m_data_buffer(0)
+	  m_reset_counter(0)
 {
 	m_default_data.u8 = NULL;
 	memset(downcast<eeprom_interface *>(this), 0, sizeof(eeprom_interface));
