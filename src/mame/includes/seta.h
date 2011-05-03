@@ -37,7 +37,6 @@ public:
 	UINT16 *m_vctrl_0;
 	UINT16 *m_vram_2;
 	UINT16 *m_vctrl_2;
-	UINT16 *m_spriteram;
 	UINT16 *m_spriteram2;
 	UINT16 *m_paletteram;
 	size_t m_paletteram_size;

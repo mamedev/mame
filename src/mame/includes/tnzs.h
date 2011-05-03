@@ -23,9 +23,6 @@ public:
 
 	/* memory pointers */
 	UINT8 *  m_objram;
-	UINT8 *  m_vdcram;
-	UINT8 *  m_scrollram;
-	UINT8 *  m_objctrl;
 	UINT8 *  m_bg_flag;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 

@@ -138,7 +138,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
-
+#include "video/seta001.h"
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
 static const game_offset game_offsets[] =
@@ -752,178 +752,6 @@ static void usclssic_set_pens(running_machine &machine)
 
 
 
-/***************************************************************************
-
-
-                                Sprites Drawing
-
-
-***************************************************************************/
-
-
-static void draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	seta_state *state = machine.driver_data<seta_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
-	int offs, col;
-	int xoffs, yoffs;
-
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
-
-	int ctrl	=	spriteram16[ 0x600/2 ];
-	int ctrl2	=	spriteram16[ 0x602/2 ];
-
-	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x000f;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = state->m_spriteram2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
-
-	int upper	=	( spriteram16[ 0x604/2 ] & 0xFF ) +
-					( spriteram16[ 0x606/2 ] & 0xFF ) * 256;
-
-	int max_y	=	0xf0;
-
-	int col0;		/* Kludge, needed for krzybowl and kiwame */
-	switch (ctrl & 0x0f)
-	{
-		case 0x01:	col0	=	0x4;	break;	// krzybowl
-		case 0x06:	col0	=	0x8;	break;	// kiwame
-
-		default:	col0	=	0x0;
-	}
-
-	xoffs = 0;
-	yoffs = flip ? 1 : -1;
-
-	/* Number of columns to draw - the value 1 seems special, meaning:
-       draw every column */
-	if (numcol == 1)
-		numcol = 16;
-
-
-	/* The first column is the frontmost, see twineagl test mode
-        BM 071204 - first column frontmost breaks superman.
-    */
-//  for ( col = numcol - 1 ; col >= 0; col -- )
-	for ( col = 0 ; col < numcol; col ++ )
-	{
-		int x	=	spriteram16[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
-		int y	=	spriteram16[(col * 0x20 + 0x00 + 0x400)/2] & 0xff;
-
-		/* draw this column */
-		for ( offs = 0 ; offs < 0x40/2; offs += 2/2 )
-		{
-			int	code	=	src[((col+col0)&0xf) * 0x40/2 + offs + 0x800/2];
-			int	color	=	src[((col+col0)&0xf) * 0x40/2 + offs + 0xc00/2];
-
-			int	flipx	=	code & 0x8000;
-			int	flipy	=	code & 0x4000;
-
-			int bank	=	(color & 0x0600) >> 9;
-
-/*
-twineagl:   010 02d 0f 10   (ship)
-tndrcade:   058 02d 07 18   (start of game - yes, flip on!)
-arbalest:   018 02d 0f 10   (logo)
-metafox :   018 021 0f f0   (bomb)
-zingzip :   010 02c 00 0f   (bomb)
-wrofaero:   010 021 00 ff   (test mode)
-thunderl:   010 06c 00 ff   (always?)
-krzybowl:   011 028 c0 ff   (game)
-kiwame  :   016 021 7f 00   (logo)
-oisipuzl:   059 020 00 00   (game - yes, flip on!)
-
-superman:   010 021 07 38   (game)
-twineagl:   000 027 00 0f   (test mode)
-*/
-
-			int sx		=	  x + xoffs  + (offs & 1) * 16;
-			int sy		=	-(y + yoffs) + (offs / 2) * 16;
-
-			if (upper & (1 << col))	sx += 256;
-
-			if (flip)
-			{
-				sy = max_y - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			color	=	( color >> (16-5) ) % total_color_codes;
-			code	=	(code & 0x3fff) + (bank * 0x4000);
-
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-					code,
-					color,
-					flipx, flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,0);
-		}
-	/* next column */
-	}
-
-}
-
-
-
-static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	seta_state *state = machine.driver_data<seta_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
-	int offs;
-	int xoffs, yoffs;
-
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
-
-	int ctrl	=	spriteram16[ 0x600/2 ];
-	int ctrl2	=	spriteram16[ 0x602/2 ];
-
-	int flip	=	ctrl & 0x40;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = state->m_spriteram2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
-
-	int max_y	=	0xf0;
-
-
-	draw_sprites_map(machine,bitmap,cliprect);
-
-
-	xoffs = state->m_global_offsets->sprite_offs[flip ? 1 : 0];
-	yoffs = -2;
-
-	for ( offs = (0x400-2)/2 ; offs >= 0/2; offs -= 2/2 )
-	{
-		int	code	=	src[offs + 0x000/2];
-		int	x		=	src[offs + 0x400/2];
-
-		int	y		=	spriteram16[offs + 0x000/2] & 0xff;
-
-		int	flipx	=	code & 0x8000;
-		int	flipy	=	code & 0x4000;
-
-		int bank	=	(x & 0x0600) >> 9;
-		int color	=	( x >> (16-5) ) % total_color_codes;
-
-		if (flip)
-		{
-			y = (0x100 - machine.primary_screen->height()) + max_y - y;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		code = (code & 0x3fff) + (bank * 0x4000);
-
-		y = max_y - y;
-
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8,0);
-	}
-
-}
 
 static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
@@ -984,9 +812,10 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 /* For games without tilemaps */
 SCREEN_UPDATE( seta_no_layers )
 {
+	seta_state *state = screen->machine().driver_data<seta_state>();
 	set_pens(screen->machine());
 	bitmap_fill(bitmap,cliprect,0x1f0);
-	draw_sprites(screen->machine(),bitmap,cliprect);
+	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 	return 0;
 }
 
@@ -999,7 +828,7 @@ static SCREEN_UPDATE( seta_layers )
 	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
 	int order	=	0;
-	int flip	=	(state->m_spriteram[ 0x600/2 ] & 0x40) >> 6;
+	int flip	=	0;//reenable (state->m_spriteram[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle &visarea = screen->visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -1109,7 +938,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	draw_sprites(screen->machine(),bitmap,cliprect);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 
 			if(order & 4)
 			{
@@ -1129,7 +958,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  0, 0);
 
-			if (layers_ctrl & 8)	draw_sprites(screen->machine(), bitmap,cliprect);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 		}
 	}
 	else
@@ -1139,7 +968,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	draw_sprites(screen->machine(), bitmap,cliprect);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
@@ -1193,7 +1022,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8)	draw_sprites(screen->machine(), bitmap,cliprect);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 		}
 	}
 	return 0;

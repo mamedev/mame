@@ -36,7 +36,7 @@ cha3    $10d8
 #include "cpu/z80/z80.h"
 #include "includes/tnzs.h"
 #include "sound/ay8910.h"
-
+#include "video/seta001.h"
 
 class cchance_state : public tnzs_state
 {
@@ -80,9 +80,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(cchance_state, m_vdcram)
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(cchance_state, m_scrollram) /* scrolling info */
-	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_BASE_MEMBER(cchance_state, m_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc)  AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(cchance_state, m_bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
@@ -224,6 +223,8 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_MACHINE_RESET(cchance)
 
 	MCFG_GFXDECODE(cchance)
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -26,7 +26,7 @@ public:
 	{
 		UINT8 *u8;
 		UINT16 *u16;
-	} m_spriteram1, m_spriteram2, m_spriteram3;
+	} m_spriteram2, m_spriteram3;
 
 	iox_t m_iox;
 };

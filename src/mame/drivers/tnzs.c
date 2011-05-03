@@ -628,6 +628,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "sound/samples.h"
 #include "includes/tnzs.h"
 #include "sound/2151intf.h"
+#include "video/seta001.h"
 
 static SAMPLES_START( kageki_init_samples )
 {
@@ -751,9 +752,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
@@ -767,9 +767,8 @@ static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tnzs_bankswitch_w)
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
@@ -889,9 +888,8 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_vdcram)	/* VDC RAM */
-	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, m_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
@@ -1623,6 +1621,8 @@ static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
 
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1662,6 +1662,8 @@ static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1706,6 +1708,8 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
 
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.15)   /* it should be the same as the newer pcb vsync */
@@ -1745,6 +1749,8 @@ static MACHINE_CONFIG_START( insectx, tnzs_state )
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
 
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1782,6 +1788,8 @@ static MACHINE_CONFIG_START( kageki, tnzs_state )
 
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1831,6 +1839,8 @@ static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 
 	MCFG_MACHINE_START(tnzs)
 	MCFG_MACHINE_RESET(tnzs)
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1893,6 +1903,8 @@ static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 
 	MCFG_MACHINE_START(jpopnics)
 	MCFG_MACHINE_RESET(jpopnics)
+
+	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
