@@ -518,6 +518,15 @@ VIDEO_START( twineagl_1_layer )
 	tilemap_set_transparent_pen(state->m_tilemap_1, 0);
 }
 
+int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
+{
+	//seta_state *state = machine.driver_data<seta_state>();
+
+	int bank	=	(color & 0x06) >> 1;
+	code = (code & 0x3fff) + (bank * 0x4000);
+
+	return code;
+}
 
 /* NO layers, only sprites */
 VIDEO_START( seta_no_layers )
@@ -538,6 +547,11 @@ VIDEO_START( seta_no_layers )
 
 	// position kludges
 	machine.device<seta001_device>("spritegen")->set_fg_xoffsets(state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+	machine.device<seta001_device>("spritegen")->set_fg_yoffsets( -0x0a, 0x0e );
+
+	// banking
+	machine.device<seta001_device>("spritegen")->set_gfxbank_callback( setac_gfxbank_callback );
+
 }
 
 VIDEO_START( oisipuzl_2_layers )
@@ -811,6 +825,10 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 
 
 ***************************************************************************/
+	
+
+
+
 
 /* For games without tilemaps */
 SCREEN_UPDATE( seta_no_layers )

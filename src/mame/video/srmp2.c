@@ -36,7 +36,7 @@ PALETTE_INIT( srmp3 )
 	}
 }
 
-int srmp3_gfxbank_callback( running_machine &machine, UINT16 code )
+int srmp3_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 {
 	srmp2_state *state = machine.driver_data<srmp2_state>();
 

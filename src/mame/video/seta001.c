@@ -279,63 +279,6 @@ twineagl:   000 027 00 0f   (test mode)
 
 }
 
-void seta001_device::setac_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size)
-{
-
-	int offs;
-	int xoffs, yoffs;
-
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
-
-	int ctrl	=	m_spritectrl[0];
-	int ctrl2	=	m_spritectrl[1];
-
-	int flip	=	ctrl & 0x40;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
-
-	int max_y	=	0xf0;
-
-
-
-	xoffs = flip ? m_fg_flipxoffs:m_fg_noflipxoffs;
-	yoffs = -2;
-
-	for ( offs = m_spritelimit ; offs >= 0; offs -= 1 )
-	{
-		int	code	=	(m_spritecodehigh[offs + 0x000 + bank]<<8) | (m_spritecodelow[offs + 0x000 + bank]);
-		int	x		=	(m_spritecodehigh[offs + 0x200 + bank]<<8) | (m_spritecodelow[offs + 0x200 + bank]);
-
-		int	y		=	m_spriteylow[offs] & 0xff;
-
-		int	flipx	=	code & 0x8000;
-		int	flipy	=	code & 0x4000;
-
-		int bank	=	(x & 0x0600) >> 9;
-		int color	=	( x >> (16-5) ) % total_color_codes;
-
-		if (flip)
-		{
-			y = (0x100 - machine.primary_screen->height()) + max_y - y;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		code = (code & 0x3fff) + (bank * 0x4000);
-
-		y = max_y - y;
-
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8, m_transpen);
-	}
-}
-
-
-
 
 void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag)
 {
@@ -453,6 +396,9 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 	int i;
 	int ctrl2 = m_spritectrl[1];
 	int xoffs, yoffs;
+
+	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
+
 	UINT8 *char_pointer = m_spritecodelow + 0x0000;
 	UINT8 *x_pointer = m_spritecodelow + 0x0200;
 	UINT8 *ctrl_pointer = m_spritecodehigh + 0x0000;
@@ -479,13 +425,17 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 
 		code = char_pointer[i] + ((ctrl_pointer[i] & 0x3f) << 8);
 		color = (color_pointer[i] & 0xf8) >> 3;
+	
+		
 		sx = x_pointer[i] - ((color_pointer[i] & 1) << 8);
 		sy =  (m_spriteylow[i] & 0xff);
 		flipx = ctrl_pointer[i] & 0x80;
 		flipy = ctrl_pointer[i] & 0x40;
 		
-		if (m_bankcallback) code = m_bankcallback(machine, code);
+		if (m_bankcallback) code = m_bankcallback(machine, code, color_pointer[i]);
 		
+		color %= total_color_codes;
+
 		color += m_colorbase;
 		
 		if (screenflip)
@@ -638,5 +588,5 @@ void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bi
 void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	setac_draw_background(machine,bitmap,cliprect, 0x1000);
-	setac_draw_foreground(machine, bitmap, cliprect, 0x1000);
+	tnzs_draw_foreground(machine, bitmap, cliprect, 0x1000);
 }

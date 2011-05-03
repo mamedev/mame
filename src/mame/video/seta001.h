@@ -1,5 +1,5 @@
 
-typedef int (*seta001_gfxbank_callback_func)(running_machine &machine, UINT16 code);
+typedef int (*seta001_gfxbank_callback_func)(running_machine &machine, UINT16 code, UINT8 color);
 
 class seta001_device : public device_t
 {
@@ -50,13 +50,12 @@ protected:
 
 private:
 	
-	void setac_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
 	void setac_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size );
-	
-	void tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
 	void tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag);
-	
 	void mjyuugi_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
+
+	void tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
+
 };
 
 READ16_DEVICE_HANDLER( spritectrl_r16 );
