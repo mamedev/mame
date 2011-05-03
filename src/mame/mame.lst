@@ -10465,6 +10465,8 @@ lhaunt_8		// (c) 2003
 // Rollfruit
 //rollfr		// (c) 2003
 rollfr_2		// (c) 2003
+rollfr_3		// (c) 2003
+rollfr_4		// (c) 2003 (bootleg?)
 
 // Garage
 //garage		// (c) 2004
@@ -10518,9 +10520,11 @@ keks_3			// (c) 2006
 // Gnome
 gnome			// (c) 2007
 gnome_2			// (c) 2007
+gnome_3			// (c) 2007
 
 // Sweet Life 2
 sweetl2			// (c) 2007
+sweetl2_2		// (c) 2007
 
 // Igrosoft bootleg sets
 
@@ -10616,6 +10620,13 @@ gnomec			// bootleg
 gnomed			// bootleg
 gnomee			// bootleg
 gnome_2a		// bootleg
+gnome_3a		// bootleg
+gnome_3b		// bootleg
+gnome_3c		// bootleg
+sweetl2_2a		// bootleg - Sweet Life 2
+sweetl2_2b		// bootleg
+sweetl2_2c		// bootleg
+sweetl2_2d		// bootleg
 
 // TAB Austria
 //cdimono1		// Base unit (enabled below, see MESS drivers)
