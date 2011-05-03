@@ -50,24 +50,26 @@ public:
     // construction/destruction
     ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	int ptm6840_get_status(int clock);		// get whether timer is enabled
-	int ptm6840_get_irq();					// get IRQ state
-	UINT16 ptm6840_get_count(int counter);	// get counter value
-	void ptm6840_set_ext_clock(int counter, double clock);	// set clock frequency
-	int ptm6840_get_ext_clock(int counter);	// get clock frequency
+	int status(int clock) const;		// get whether timer is enabled
+	int irq_state() const;					// get IRQ state
+	UINT16 count(int counter) const;	// get counter value
+	void set_ext_clock(int counter, double clock);	// set clock frequency
+	int ext_clock(int counter) const;	// get clock frequency
 
-	void ptm6840_set_g1(UINT32 offset, UINT8 data);	// set gate1 state
-	void ptm6840_set_g2(UINT32 offset, UINT8 data);	// set gate2 state
-	void ptm6840_set_g3(UINT32 offset, UINT8 data);	// set gate3 state
-	void ptm6840_set_c1(UINT32 offset, UINT8 data);	// set clock1 state
-	void ptm6840_set_c2(UINT32 offset, UINT8 data);	// set clock2 state
-	void ptm6840_set_c3(UINT32 offset, UINT8 data);	// set clock3 state
+	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, UINT8 data);
+	DECLARE_READ8_MEMBER( read );
+	UINT8 read(offs_t offset);
 
-	void ptm6840_write(UINT32 offset, UINT8 data);
-	UINT8 ptm6840_read(UINT32 offset);
+	void set_gate(int idx, int state);
+	DECLARE_WRITE_LINE_MEMBER( set_g1 );
+	DECLARE_WRITE_LINE_MEMBER( set_g2 );
+	DECLARE_WRITE_LINE_MEMBER( set_g3 );
 
-	void ptm6840_set_gate(int state, int idx);
-	void ptm6840_set_clock(int state, int idx);
+	void set_clock(int idx, int state);
+	DECLARE_WRITE_LINE_MEMBER( set_c1 );
+	DECLARE_WRITE_LINE_MEMBER( set_c2 );
+	DECLARE_WRITE_LINE_MEMBER( set_c3 );
 
 	void update_interrupts();
 
@@ -76,21 +78,14 @@ protected:
     virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
-
-	static TIMER_CALLBACK( ptm6840_timer1_cb );
-	static TIMER_CALLBACK( ptm6840_timer2_cb );
-	static TIMER_CALLBACK( ptm6840_timer3_cb );
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-
 	void subtract_from_counter(int counter, int count);
-	void ptm_tick(int counter, int count);
+	void tick(int counter, int count);
+	void timeout(int idx);
 
-	void ptm6840_timeout(int idx);
-
-	UINT16 compute_counter(int counter);
+	UINT16 compute_counter(int counter) const;
 	void reload_count(int idx);
 
 	enum
@@ -110,9 +105,9 @@ private:
 	devcb_resolved_write_line m_irq_func;	// function called if IRQ line changes
 
 	UINT8 m_control_reg[3];
-	UINT8 m_output[3]; /* Output states */
-	UINT8 m_gate[3];   /* Input gate states */
-	UINT8 m_clk[3];  /* Clock states */
+	UINT8 m_output[3]; // Output states
+	UINT8 m_gate[3];   // Input gate states
+	UINT8 m_clk[3];  // Clock states
 	UINT8 m_enabled[3];
 	UINT8 m_mode[3];
 	UINT8 m_fired[3];
@@ -124,7 +119,7 @@ private:
 	UINT8 m_lsb_buffer;
 	UINT8 m_msb_buffer;
 
-	/* Each PTM has 3 timers */
+	// Each PTM has 3 timers
 	emu_timer *m_timer[3];
 
 	UINT16 m_latch[3];
@@ -137,26 +132,5 @@ private:
 // device type definition
 extern const device_type PTM6840;
 
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-int ptm6840_get_status( device_t *device, int clock );	// get whether timer is enabled
-int ptm6840_get_irq( device_t *device );					// get IRQ state
-UINT16 ptm6840_get_count( device_t *device, int counter );// get counter value
-void ptm6840_set_ext_clock( device_t *device, int counter, double clock ); // set clock frequency
-int ptm6840_get_ext_clock( device_t *device, int counter );// get clock frequency
-
-WRITE8_DEVICE_HANDLER( ptm6840_set_g1 );	// set gate1 state
-WRITE8_DEVICE_HANDLER( ptm6840_set_g2 );	// set gate2 state
-WRITE8_DEVICE_HANDLER( ptm6840_set_g3 );	// set gate3 state
-WRITE8_DEVICE_HANDLER( ptm6840_set_c1 );	// set clock1 state
-WRITE8_DEVICE_HANDLER( ptm6840_set_c2 );	// set clock2 state
-WRITE8_DEVICE_HANDLER( ptm6840_set_c3 );	// set clock3 state
-
-WRITE8_DEVICE_HANDLER( ptm6840_write );
-READ8_DEVICE_HANDLER( ptm6840_read );
 
 #endif /* __6840PTM_H__ */

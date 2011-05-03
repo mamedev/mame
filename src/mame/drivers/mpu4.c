@@ -674,7 +674,7 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	device_t *pia6 = device->machine().device("pia_ic6");
 	device_t *pia7 = device->machine().device("pia_ic7");
 	device_t *pia8 = device->machine().device("pia_ic8");
-	device_t *ptm2 = device->machine().device("ptm_ic2");
+	ptm6840_device *ptm2 = device->machine().device<ptm6840_device>("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
@@ -683,7 +683,7 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 						 pia6821_get_irq_a(pia6) | pia6821_get_irq_b(pia6) |
 						 pia6821_get_irq_a(pia7) | pia6821_get_irq_b(pia7) |
 						 pia6821_get_irq_a(pia8) | pia6821_get_irq_b(pia8) |
-						 ptm6840_get_irq(ptm2);
+						 ptm2->irq_state();
 
 	if (!drvstate->m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
@@ -732,7 +732,7 @@ static WRITE8_HANDLER( bankset_w )
 /* IC2 6840 PTM handler */
 static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
 {
-	ptm6840_set_c2(device, 0, data);
+	downcast<ptm6840_device *>(device)->set_c2(data);
 
 	/* copy output value to IC2 c2
     this output is the clock for timer2 */
@@ -746,7 +746,7 @@ static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
 	pia6821_ca1_w(pia, data); /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
-	ptm6840_set_c3(device, 0, data);
+	downcast<ptm6840_device *>(device)->set_c3(data);
 }
 
 
@@ -755,7 +755,7 @@ static WRITE8_DEVICE_HANDLER( ic2_o3_callback )
 	/* the output from timer3 is used as a square wave for the alarm output
     and as an external clock source for timer 1! */
 	/* also runs lamp fade */
-	ptm6840_set_c1(device, 0, data);
+	downcast<ptm6840_device *>(device)->set_c1(data);
 }
 
 
@@ -1755,19 +1755,19 @@ The sample speed divisor is f/300
 //O3 -> G1  O1 -> c2 o2 -> c1
 static WRITE8_DEVICE_HANDLER( ic3ss_o1_callback )
 {
-	ptm6840_set_c2(device, 0, data);
+	downcast<ptm6840_device *>(device)->set_c2(data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( ic3ss_o2_callback )//Generates 'beep' tone
 {
-	ptm6840_set_c1(device, 0, data);//?
+	downcast<ptm6840_device *>(device)->set_c1(data);//?
 }
 
 
 static WRITE8_DEVICE_HANDLER( ic3ss_o3_callback )
 {
-	ptm6840_set_g1(device, 0, data); /* this output is the clock for timer1 */
+	downcast<ptm6840_device *>(device)->set_g1(data); /* this output is the clock for timer1 */
 }
 
 
@@ -2636,7 +2636,7 @@ static ADDRESS_MAP_START( mod2_memmap, AS_PROGRAM, 8 )
 
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -2659,7 +2659,7 @@ static ADDRESS_MAP_START( mod4_yam_map, AS_PROGRAM, 8 )
 
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -2680,11 +2680,11 @@ static ADDRESS_MAP_START( mod4_oki_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
-	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
 //  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -2707,11 +2707,11 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
-	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
 //  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
@@ -2734,11 +2734,11 @@ static ADDRESS_MAP_START( dutch_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
-	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
 //  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
 	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
