@@ -15,18 +15,19 @@
 
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
 
-#define MCFG_PTM6840_ADD(_tag, _config) \
+#define MCFG_PTM6840_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, PTM6840, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+	ptm6840_device::static_set_interface(*device, _interface);
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 // ======================> ptm6840_interface
 
@@ -49,6 +50,9 @@ class ptm6840_device :  public device_t,
 public:
     // construction/destruction
     ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// static configuration helpers
+	static void static_set_interface(device_t &device, const ptm6840_interface &interface);
 
 	int status(int clock) const;		// get whether timer is enabled
 	int irq_state() const;					// get IRQ state
@@ -75,7 +79,6 @@ public:
 
 protected:
     // device-level overrides
-    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

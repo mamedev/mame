@@ -71,36 +71,19 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock)
 {
+	memset(static_cast<ptm6840_interface *>(this), 0, sizeof(ptm6840_interface));
 }
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_interface - set the interface
+//  struct
 //-------------------------------------------------
 
-void ptm6840_device::device_config_complete()
+void ptm6840_device::static_set_interface(device_t &device, const ptm6840_interface &interface)
 {
-	// inherit a copy of the static data
-	const ptm6840_interface *intf = reinterpret_cast<const ptm6840_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<ptm6840_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		m_internal_clock = 0.0;
-		m_external_clock[0] = 0.0;
-		m_external_clock[1] = 0.0;
-		m_external_clock[2] = 0.0;
-		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
-    	memset(&m_out_cb[0], 0, sizeof(m_out_cb[0]));
-    	memset(&m_out_cb[1], 0, sizeof(m_out_cb[1]));
-    	memset(&m_out_cb[2], 0, sizeof(m_out_cb[2]));
-	}
+	ptm6840_device &ptm = downcast<ptm6840_device &>(device);
+	static_cast<ptm6840_interface &>(ptm) = interface;
 }
 
 
