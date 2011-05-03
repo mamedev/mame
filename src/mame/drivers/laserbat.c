@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 // the same as in zaccaria.c ?
 static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -673,7 +673,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	laserbat_state *state = device->machine().driver_data<laserbat_state>();
 
-	pia6821_cb1_w(state->m_pia, state->m_cb1_toggle & 1);
+	state->m_pia->cb1_w(state->m_cb1_toggle & 1);
 	state->m_cb1_toggle ^= 1;
 }
 
@@ -710,7 +710,7 @@ static MACHINE_START( laserbat )
 	state->m_s2636_1 = machine.device("s2636_1");
 	state->m_s2636_2 = machine.device("s2636_2");
 	state->m_s2636_3 = machine.device("s2636_3");
-	state->m_pia = machine.device("pia");
+	state->m_pia = machine.device<pia6821_device>("pia");
 	state->m_sn = machine.device("snsnd");
 	state->m_tms1 = machine.device("tms1");
 	state->m_tms2 = machine.device("tms2");

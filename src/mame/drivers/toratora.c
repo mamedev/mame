@@ -40,9 +40,9 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_pia_u1;
-	device_t *m_pia_u2;
-	device_t *m_pia_u3;
+	pia6821_device *m_pia_u1;
+	pia6821_device *m_pia_u2;
+	pia6821_device *m_pia_u3;
 };
 
 
@@ -113,7 +113,7 @@ static WRITE8_HANDLER( clear_tv_w )
 
 static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 {
-	if (pia6821_get_port_b_z_mask(device) & 0x20)
+	if (downcast<pia6821_device *>(device)->port_b_z_mask() & 0x20)
 		coin_counter_w(device->machine(), 0, 1);
 	else
 		coin_counter_w(device->machine(), 0, data & 0x20);
@@ -129,7 +129,8 @@ static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
 	toratora_state *toratora = device->machine().driver_data<toratora_state>();
-	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	logerror("GEN IRQ: %x\n", combined_state);
 	device_set_input_line(toratora->m_maincpu, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -150,9 +151,9 @@ static INTERRUPT_GEN( toratora_timer )
 		state->m_last = input_port_read(device->machine(), "INPUT") & 0x0f;
 		generic_pulse_irq_line(device, 0);
 	}
-	pia6821_set_input_a(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x0f, 0);
-	pia6821_ca1_w(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x10);
-	pia6821_ca2_w(state->m_pia_u1, input_port_read(device->machine(), "INPUT") & 0x20);
+	state->m_pia_u1->set_a_input(input_port_read(device->machine(), "INPUT") & 0x0f, 0);
+	state->m_pia_u1->ca1_w(input_port_read(device->machine(), "INPUT") & 0x10);
+	state->m_pia_u1->ca2_w(input_port_read(device->machine(), "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )
@@ -316,9 +317,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
 	AM_RANGE(0xa04c, 0xf09f) AM_NOP
-	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_r, pia6821_w)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u3", pia6821_r, pia6821_w)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u2", pia6821_r, pia6821_w)
+	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE_MODERN("pia_u1", pia6821_device, read, write)
+	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE_MODERN("pia_u3", pia6821_device, read, write)
+	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE_MODERN("pia_u2", pia6821_device, read, write)
 	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -376,9 +377,9 @@ static MACHINE_START( toratora )
 	toratora_state *state = machine.driver_data<toratora_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_pia_u1 = machine.device("pia_u1");
-	state->m_pia_u2 = machine.device("pia_u2");
-	state->m_pia_u3 = machine.device("pia_u3");
+	state->m_pia_u1 = machine.device<pia6821_device>("pia_u1");
+	state->m_pia_u2 = machine.device<pia6821_device>("pia_u2");
+	state->m_pia_u3 = machine.device<pia6821_device>("pia_u3");
 
 	state->save_item(NAME(state->m_timer));
 	state->save_item(NAME(state->m_last));

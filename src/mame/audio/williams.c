@@ -102,7 +102,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia6821_r, pia6821_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_MODERN("cvsdpia", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_WRITE(cvsd_bank_select_w)
@@ -293,7 +293,7 @@ void williams_cvsd_init(running_machine &machine)
 	memory_set_bank(machine, "bank5", 0);
 
 	/* reset the IRQ state */
-	pia6821_ca1_w(machine.device("cvsdpia"), 1);
+	machine.device<pia6821_device>("cvsdpia")->ca1_w(1);
 
 	/* register for save states */
 	state_save_register_global(machine, state->sound_int_state);
@@ -418,7 +418,7 @@ static void init_audio_state(running_machine &machine)
 
 static void cvsd_ym2151_irq(device_t *device, int state)
 {
-	pia6821_ca1_w(device->machine().device("cvsdpia"), !state);
+	device->machine().device<pia6821_device>("cvsdpia")->ca1_w(!state);
 }
 
 
@@ -490,10 +490,10 @@ static WRITE8_DEVICE_HANDLER( cvsd_clock_set_w )
 
 static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
-	device_t *pia = machine.device("cvsdpia");
-	pia6821_portb_w(pia, 0, param & 0xff);
-	pia6821_cb1_w(pia, (param >> 8) & 1);
-	pia6821_cb2_w(pia, (param >> 9) & 1);
+	pia6821_device *pia = machine.device<pia6821_device>("cvsdpia");
+	pia->portb_w(param & 0xff);
+	pia->cb1_w((param >> 8) & 1);
+	pia->cb2_w((param >> 9) & 1);
 }
 
 

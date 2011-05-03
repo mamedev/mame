@@ -174,8 +174,9 @@ DISCRETE_SOUND_END
 
 WRITE8_DEVICE_HANDLER( spiders_audio_command_w )
 {
-	pia6821_set_input_a(device, data & 0xf8, 0);
-	pia6821_ca1_w(device, data & 0x80 ? 1 : 0);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia->set_a_input(data & 0xf8, 0);
+	pia->ca1_w(data & 0x80 ? 1 : 0);
 }
 
 

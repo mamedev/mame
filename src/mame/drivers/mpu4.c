@@ -668,21 +668,21 @@ static MACHINE_RESET( mpu4 )
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 {
 	mpu4_state *drvstate = device->machine().driver_data<mpu4_state>();
-	device_t *pia3 = device->machine().device("pia_ic3");
-	device_t *pia4 = device->machine().device("pia_ic4");
-	device_t *pia5 = device->machine().device("pia_ic5");
-	device_t *pia6 = device->machine().device("pia_ic6");
-	device_t *pia7 = device->machine().device("pia_ic7");
-	device_t *pia8 = device->machine().device("pia_ic8");
+	pia6821_device *pia3 = device->machine().device<pia6821_device>("pia_ic3");
+	pia6821_device *pia4 = device->machine().device<pia6821_device>("pia_ic4");
+	pia6821_device *pia5 = device->machine().device<pia6821_device>("pia_ic5");
+	pia6821_device *pia6 = device->machine().device<pia6821_device>("pia_ic6");
+	pia6821_device *pia7 = device->machine().device<pia6821_device>("pia_ic7");
+	pia6821_device *pia8 = device->machine().device<pia6821_device>("pia_ic8");
 	ptm6840_device *ptm2 = device->machine().device<ptm6840_device>("ptm_ic2");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
-						 pia6821_get_irq_a(pia4) | pia6821_get_irq_b(pia4) |
-						 pia6821_get_irq_a(pia5) | pia6821_get_irq_b(pia5) |
-						 pia6821_get_irq_a(pia6) | pia6821_get_irq_b(pia6) |
-						 pia6821_get_irq_a(pia7) | pia6821_get_irq_b(pia7) |
-						 pia6821_get_irq_a(pia8) | pia6821_get_irq_b(pia8) |
+	int combined_state = pia3->irq_a_state() | pia3->irq_b_state() |
+						 pia4->irq_a_state() | pia4->irq_b_state() |
+						 pia5->irq_a_state() | pia5->irq_b_state() |
+						 pia6->irq_a_state() | pia6->irq_b_state() |
+						 pia7->irq_a_state() | pia7->irq_b_state() |
+						 pia8->irq_a_state() | pia8->irq_b_state() |
 						 ptm2->irq_state();
 
 	if (!drvstate->m_link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
@@ -742,8 +742,8 @@ static WRITE8_DEVICE_HANDLER( ic2_o1_callback )
 
 static WRITE8_DEVICE_HANDLER( ic2_o2_callback )
 {
-	device_t *pia = device->machine().device("pia_ic3");
-	pia6821_ca1_w(pia, data); /* copy output value to IC3 ca1 */
+	pia6821_device *pia = device->machine().device<pia6821_device>("pia_ic3");
+	pia->ca1_w(data); /* copy output value to IC3 ca1 */
 	/* the output from timer2 is the input clock for timer3 */
 	/* miscellaneous interrupts generated here */
 	downcast<ptm6840_device *>(device)->set_c3(data);
@@ -977,15 +977,16 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
+	pia6821_device *pia = downcast<pia6821_device *>(device);
 	if ( state->m_serial_data )
 	{
 		state->m_ic4_input_b |=  0x80;
-		pia6821_cb1_w(device, 1);
+		pia->cb1_w(1);
 	}
 	else
 	{
 		state->m_ic4_input_b &= ~0x80;
-		pia6821_cb1_w(device, 0);
+		pia->cb1_w(0);
 	}
 
 	if (!state->m_reel_mux)
@@ -1099,7 +1100,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
-	device_t *pia_ic4 = device->machine().device("pia_ic4");
+	pia6821_device *pia_ic4 = device->machine().device<pia6821_device>("pia_ic4");
 	if (state->m_hopper == HOPPER_NONDUART_A)
 	{
 		//hopper1_drive_sensor(data&0x10);
@@ -1109,7 +1110,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		case NO_EXTENDER:
 		if (state->m_led_extender == CARD_B)
 		{
-			led_write_latch(state, data & 0x1f, pia6821_get_output_a(pia_ic4),state->m_input_strobe);
+			led_write_latch(state, data & 0x1f, pia_ic4->a_output(),state->m_input_strobe);
 		}
 		else if ((state->m_led_extender != CARD_A)||(state->m_led_extender != NO_EXTENDER))
 		{
@@ -1255,7 +1256,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
-	device_t *pia_ic5 = device->machine().device("pia_ic5");
+	pia6821_device *pia_ic5 = device->machine().device<pia6821_device>("pia_ic5");
 	if (state->m_hopper == HOPPER_NONDUART_B)
 	{/*
         if (hopper1_active)
@@ -1269,10 +1270,10 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 	}
 
 	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",device->machine().describe_context()));
-	coin_lockout_w(device->machine(), 0, (pia6821_get_output_b(pia_ic5) & 0x01) );
-	coin_lockout_w(device->machine(), 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
-	coin_lockout_w(device->machine(), 2, (pia6821_get_output_b(pia_ic5) & 0x04) );
-	coin_lockout_w(device->machine(), 3, (pia6821_get_output_b(pia_ic5) & 0x08) );
+	coin_lockout_w(device->machine(), 0, (pia_ic5->b_output() & 0x01) );
+	coin_lockout_w(device->machine(), 1, (pia_ic5->b_output() & 0x02) );
+	coin_lockout_w(device->machine(), 2, (pia_ic5->b_output() & 0x04) );
+	coin_lockout_w(device->machine(), 3, (pia_ic5->b_output() & 0x08) );
 	return input_port_read(device->machine(), "AUX2") | state->m_aux2_input;
 }
 
@@ -1311,7 +1312,8 @@ BDIR BC1       |
 static void update_ay(device_t *device)
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
-	if (!pia6821_get_output_cb2(device))
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	if (!pia->cb2_output())
 	{
 		switch (state->m_ay8913_address)
 		{
@@ -1322,24 +1324,24 @@ static void update_ay(device_t *device)
 			}
 			case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-				device_t *pia_ic6 = device->machine().device("pia_ic6");
-				LOG(("AY8913 address = %d \n",pia6821_get_output_a(pia_ic6)&0x0f));
+				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
+				LOG(("AY8913 address = %d \n",pia_ic6->a_output()&0x0f));
 				break;
 			}
 			case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-				device_t *pia_ic6 = device->machine().device("pia_ic6");
+				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
 				device_t *ay = device->machine().device("ay8913");
-				ay8910_data_w(ay, 0, pia6821_get_output_a(pia_ic6));
+				ay8910_data_w(ay, 0, pia_ic6->a_output());
 				LOG(("AY Chip Write \n"));
 				break;
 			}
 			case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
-				device_t *pia_ic6 = device->machine().device("pia_ic6");
+				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
 				device_t *ay = device->machine().device("ay8913");
-				ay8910_address_w(ay, 0, pia6821_get_output_a(pia_ic6));
+				ay8910_address_w(ay, 0, pia_ic6->a_output());
 				LOG(("AY Chip Select \n"));
 				break;
 			}
@@ -1579,13 +1581,13 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 {
 	mpu4_state *state = device->machine().driver_data<mpu4_state>();
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
-	device_t *pia_ic5 = device->machine().device("pia_ic5");
+	pia6821_device *pia_ic5 = device->machine().device<pia6821_device>("pia_ic5");
 
 	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", device->machine().describe_context()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia6821_cb1_w(pia_ic5, (input_port_read(device->machine(), "AUX2") & 0x80));
+	pia_ic5->cb1_w(input_port_read(device->machine(), "AUX2") & 0x80);
 	return input_port_read(device->machine(), portnames[state->m_input_strobe]);
 }
 
@@ -2623,7 +2625,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
 	state->m_signal_50hz = state->m_signal_50hz?0:1;
-	pia6821_ca1_w(timer.machine().device("pia_ic4"), state->m_signal_50hz);	/* signal is connected to IC4 CA1 */
+	timer.machine().device<pia6821_device>("pia_ic4")->ca1_w(state->m_signal_50hz);	/* signal is connected to IC4 CA1 */
 
 	update_meters(state);//run at 100Hz to sync with PIAs
 }
@@ -2638,12 +2640,12 @@ static ADDRESS_MAP_START( mod2_memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
@@ -2661,12 +2663,12 @@ static ADDRESS_MAP_START( mod4_yam_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
@@ -2678,7 +2680,7 @@ static ADDRESS_MAP_START( mod4_oki_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
@@ -2686,12 +2688,12 @@ static ADDRESS_MAP_START( mod4_oki_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
@@ -2705,7 +2707,7 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
@@ -2713,12 +2715,12 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
@@ -2732,7 +2734,7 @@ static ADDRESS_MAP_START( dutch_memmap, AS_PROGRAM, 8 )
 //  AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE_MODERN("pia_ic4ss", pia6821_device, read, write)      // PIA6821 on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE_MODERN("ptm_ic3ss", ptm6840_device, read, write)  // 6840PTM on sampled sound board
 
@@ -2740,12 +2742,12 @@ static ADDRESS_MAP_START( dutch_memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k paged ROM (4 pages)
 ADDRESS_MAP_END

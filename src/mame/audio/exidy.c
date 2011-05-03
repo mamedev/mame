@@ -105,7 +105,7 @@ struct _exidy_sound_state
 	/* 5220/CVSD variables */
 	device_t *m_cvsd;
 	device_t *m_tms;
-	device_t *m_pia1;
+	pia6821_device *m_pia1;
 
 	/* sound streaming variables */
 	sound_stream *m_stream;
@@ -132,7 +132,7 @@ INLINE exidy_sound_state *get_safe_token(device_t *device)
 static WRITE_LINE_DEVICE_HANDLER( update_irq_state )
 {
 	exidy_sound_state *sndstate = get_safe_token(device);
-	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (pia6821_get_irq_b(sndstate->m_pia1) | sndstate->m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "audiocpu", M6502_IRQ_LINE, (sndstate->m_pia1->irq_b_state() | sndstate->m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -773,10 +773,10 @@ static const pia6821_interface venture_pia0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_portb_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_porta_w),		/* port B out */
-	DEVCB_DEVICE_LINE("pia1", pia6821_cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_LINE("pia1", pia6821_ca1_w),		/* port CB2 out */
+	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, portb_w),		/* port A out */
+	DEVCB_DEVICE_MEMBER("pia1", pia6821_device, porta_w),		/* port B out */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, cb1_w),		/* line CA2 out */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca1_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -790,10 +790,10 @@ static const pia6821_interface venture_pia1_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("pia0", pia6821_portb_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER("pia0", pia6821_porta_w),		/* port B out */
-	DEVCB_DEVICE_LINE("pia0", pia6821_cb1_w),		/* line CA2 out */
-	DEVCB_DEVICE_LINE("pia0", pia6821_ca1_w),		/* port CB2 out */
+	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, portb_w),		/* port A out */
+	DEVCB_DEVICE_MEMBER("pia0", pia6821_device, porta_w),		/* port B out */
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, cb1_w),		/* line CA2 out */
+	DEVCB_DEVICE_LINE_MEMBER("pia0", pia6821_device, ca1_w),		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_DEVICE_LINE("custom", update_irq_state)		/* IRQB */
 };
@@ -810,7 +810,7 @@ static DEVICE_START( venture_common_sh_start )
 
 	state->m_has_sh8253  = TRUE;
 	state->m_tms = NULL;
-	state->m_pia1 = device->machine().device("pia1");
+	state->m_pia1 = device->machine().device<pia6821_device>("pia1");
 
 	/* determine which sound hardware is installed */
 	state->m_cvsd = device->machine().device("cvsd");
@@ -870,7 +870,7 @@ static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x2000, 0x27ff) AM_DEVWRITE("custom", exidy_sound_filter_w)
 	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_DEVREADWRITE("custom", exidy_sh6840_r, exidy_sh6840_w)
@@ -974,11 +974,11 @@ MACHINE_CONFIG_END
 READ8_DEVICE_HANDLER( victory_sound_response_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 ret = pia6821_get_output_b(state->m_pia1);
+	UINT8 ret = state->m_pia1->b_output();
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(state->m_maincpu), ret);
 
-	pia6821_cb1_w(state->m_pia1, 0);
+	state->m_pia1->cb1_w(0);
 
 	return ret;
 }
@@ -987,7 +987,7 @@ READ8_DEVICE_HANDLER( victory_sound_response_r )
 READ8_DEVICE_HANDLER( victory_sound_status_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 ret = (pia6821_ca1_r(state->m_pia1) << 7) | (pia6821_cb1_r(state->m_pia1) << 6);
+	UINT8 ret = (state->m_pia1->ca1_r() << 7) | (state->m_pia1->cb1_r() << 6);
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(state->m_maincpu), ret);
 
@@ -997,9 +997,9 @@ READ8_DEVICE_HANDLER( victory_sound_status_r )
 
 static TIMER_CALLBACK( delayed_command_w )
 {
-	device_t *pia1 = (device_t *)ptr;
-	pia6821_set_input_a(pia1, param, 0);
-	pia6821_ca1_w(pia1, 0);
+	pia6821_device *pia1 = (pia6821_device *)ptr;
+	pia1->set_a_input(param, 0);
+	pia1->ca1_w(0);
 }
 
 WRITE8_DEVICE_HANDLER( victory_sound_command_w )
@@ -1018,7 +1018,7 @@ static WRITE8_DEVICE_HANDLER( victory_sound_irq_clear_w )
 
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", device->machine().describe_context(), data);
 
-	if (!data) pia6821_ca1_w(state->m_pia1, 1);
+	if (!data) state->m_pia1->ca1_w(1);
 }
 
 
@@ -1029,7 +1029,7 @@ static WRITE8_DEVICE_HANDLER( victory_main_ack_w )
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", device->machine().describe_context(), data);
 
 	if (state->m_victory_sound_response_ack_clk && !data)
-		pia6821_cb1_w(state->m_pia1, 1);
+		state->m_pia1->cb1_w(1);
 
 	state->m_victory_sound_response_ack_clk = data;
 }
@@ -1067,7 +1067,7 @@ static DEVICE_START( victory_sound )
 static DEVICE_RESET( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	device_t *pia1 = state->m_pia1;
+	pia6821_device *pia1 = state->m_pia1;
 
 	DEVICE_RESET_CALL(common_sh_reset);
 	pia1->reset();
@@ -1076,12 +1076,12 @@ static DEVICE_RESET( victory_sound )
 
 	/* the flip-flop @ F4 is reset */
 	state->m_victory_sound_response_ack_clk = 0;
-	pia6821_cb1_w(pia1, 1);
+	pia1->cb1_w(1);
 
 	/* these two lines shouldn't be needed, but it avoids the log entry
        as the sound CPU checks port A before the main CPU ever writes to it */
-	pia6821_set_input_a(pia1, 0, 0);
-	pia6821_ca1_w(pia1, 1);
+	pia1->set_a_input(0, 0);
+	pia1->ca1_w(1);
 }
 
 
@@ -1108,7 +1108,7 @@ DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
 static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
 	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("custom", exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
 	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_DEVREADWRITE("custom", exidy_sh6840_r, exidy_sh6840_w)

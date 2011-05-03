@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0",pia6821_r,pia6821_w)  // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
 	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0",pia6821_r,pia6821_w)  // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
 	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
 	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map

@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "machine/6821pia.h"
+
 class laserbat_state : public driver_device
 {
 public:
@@ -44,7 +46,7 @@ public:
 	device_t *m_s2636_1;
 	device_t *m_s2636_2;
 	device_t *m_s2636_3;
-	device_t *m_pia;
+	pia6821_device *m_pia;
 	device_t *m_sn;
 	device_t *m_tms1;
 	device_t *m_tms2;

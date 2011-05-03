@@ -336,9 +336,9 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
 	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(zwackery_6840_r, mcr68_6840_upper_w)
-	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_r, pia6821_w, 0xff00)
-	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_r, pia6821_w, 0x00ff)
-	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_r, pia6821_w, 0x00ff)
+	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8_MODERN("pia0", pia6821_device, read, write, 0xff00)
+	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8_MODERN("pia1", pia6821_device, read, write, 0x00ff)
+	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8_MODERN("pia2", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_BASE_MEMBER(mcr68_state, m_videoram)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(zwackery_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_BASE_SIZE_MEMBER(mcr68_state, m_spriteram, m_spriteram_size)

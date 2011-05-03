@@ -107,7 +107,8 @@ const device_type PPI8255 = &device_creator<ppi8255_device>;
 //-------------------------------------------------
 
 ppi8255_device::ppi8255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, PPI8255, "Intel PPI8255", tag, owner, clock)
+    : device_t(mconfig, PPI8255, "Intel PPI8255", tag, owner, clock),
+      m_control(0)
 {
 
 }

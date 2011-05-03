@@ -244,10 +244,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_r, pia6821_w)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREADWRITE("pia0", pia6821_r, qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia6821_r, pia6821_w)
+	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE_MODERN("sndpia0", pia6821_device, read, write)
+	AM_RANGE(0x9400, 0x97ff) AM_DEVREAD_MODERN("pia0", pia6821_device, read) AM_DEVWRITE("pia0", qix_pia_w)
+	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
+	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE_MODERN("pia2", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -258,10 +258,10 @@ static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia6821_r, pia6821_w)
-	AM_RANGE(0x1400, 0x17ff) AM_DEVREADWRITE("pia0", pia6821_r, qix_pia_w)
-	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE("pia2", pia6821_r, pia6821_w)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_MODERN("sndpia0", pia6821_device, read, write)
+	AM_RANGE(0x1400, 0x17ff) AM_DEVREAD_MODERN("pia0", pia6821_device, read) AM_DEVWRITE("pia0", qix_pia_w)
+	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE_MODERN("pia2", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

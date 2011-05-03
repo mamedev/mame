@@ -159,9 +159,9 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	zaccaria_state *state = device->machine().driver_data<zaccaria_state>();
-	device_t *pia0 = device->machine().device("pia0");
+	pia6821_device *pia0 = device->machine().device<pia6821_device>("pia0");
 
-	pia6821_cb1_w(pia0, state->m_toggle & 1);
+	pia0->cb1_w(state->m_toggle & 1);
 	state->m_toggle ^= 1;
 }
 
@@ -191,8 +191,8 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	device_t *pia0 = space->machine().device("pia0");
-	pia6821_ca1_w(pia0, data & 0x80);
+	pia6821_device *pia0 = space->machine().device<pia6821_device>("pia0");
+	pia0->ca1_w(data & 0x80);
 	soundlatch2_w(space, 0, data);
 }
 
@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( sound_map_1, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w) AM_MIRROR(0x1ff0)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) AM_MIRROR(0x1ff0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_MIRROR(0x2000) // rom 13
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) // rom 9
 ADDRESS_MAP_END
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) AM_MIRROR(0x8F6C)
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
@@ -573,8 +573,8 @@ static const pia6821_interface pia_1_config =
 
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_DEVICE_LINE("pia1", pia6821_cb1_w),	/* IRQ handler */
-	DEVCB_DEVICE_LINE("pia1", pia6821_ca2_w)		/* READYQ handler */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, cb1_w),	/* IRQ handler */
+	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca2_w)		/* READYQ handler */
 };
 
 

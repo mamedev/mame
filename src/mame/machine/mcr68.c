@@ -42,7 +42,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
 	UINT8 ret = input_port_read(device->machine(), "IN1");
 
-	pia6821_set_port_a_z_mask(device, ret);
+	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 
 	return ret;
 }
@@ -52,7 +52,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
 	UINT8 ret = input_port_read(device->machine(), "IN3");
 
-	pia6821_set_port_a_z_mask(device, ret);
+	downcast<pia6821_device *>(device)->set_port_a_z_mask(ret);
 
 	return ret;
 }
@@ -302,23 +302,24 @@ WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 {
 	mcr68_state *drvstate = device->machine().driver_data<mcr68_state>();
-	drvstate->m_v493_irq_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	drvstate->m_v493_irq_state = pia->irq_a_state() | pia->irq_b_state();
 	update_mcr68_interrupts(device->machine());
 }
 
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	device_t *pia = machine.device("pia0");
-	pia6821_ca1_w(pia, 0);
+	pia6821_device *pia = machine.device<pia6821_device>("pia0");
+	pia->ca1_w(0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	device_t *pia = machine.device("pia0");
+	pia6821_device *pia = machine.device<pia6821_device>("pia0");
 
-	pia6821_ca1_w(pia, 1);
+	pia->ca1_w(1);
 	machine.scheduler().timer_set(machine.primary_screen->scan_period(), FUNC(zwackery_493_off_callback));
 }
 

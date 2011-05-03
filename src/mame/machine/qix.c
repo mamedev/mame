@@ -252,8 +252,8 @@ MACHINE_START( qixmcu )
 
 WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed )
 {
-	device_t *pia = device->machine().device("sndpia0");
-	pia6821_cb1_w(pia, state);
+	pia6821_device *pia = device->machine().device<pia6821_device>("sndpia0");
+	pia->cb1_w(state);
 }
 
 
@@ -359,7 +359,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 	qix_state *state = device->machine().driver_data<qix_state>();
 
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
-	/* this is a callback called by pia6821_w(), so I don't need to synchronize */
+	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	state->m_68705_port_in[0] = data;
 }
@@ -380,7 +380,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 	else
 		cputag_set_input_line(device->machine(), "mcu", M68705_IRQ_LINE, CLEAR_LINE);
 
-	/* this is a callback called by pia6821_w(), so I don't need to synchronize */
+	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	state->m_coinctrl = data;
 	logerror("6809:qixmcu_coinctrl_w = %02X\n", data);
@@ -471,8 +471,8 @@ WRITE8_HANDLER( qix_68705_portC_w )
 
 static TIMER_CALLBACK( pia_w_callback )
 {
-	device_t *device = (device_t *)ptr;
-	pia6821_w(device, param >> 8, param & 0xff);
+	pia6821_device *device = (pia6821_device *)ptr;
+	device->write(*memory_nonspecific_space(device->machine()), param >> 8, param & 0xff);
 }
 
 
@@ -480,7 +480,7 @@ WRITE8_DEVICE_HANDLER( qix_pia_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	device->machine().scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)device);
+	device->machine().scheduler().synchronize(FUNC(pia_w_callback), data | (offset << 8), (void *)downcast<pia6821_device *>(device));
 }
 
 
@@ -511,8 +511,9 @@ static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 	sn76496_w(device->machine().device("sn1"), 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia6821_cb1_w(device, 0);
-	pia6821_cb1_w(device, 1);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia->cb1_w(0);
+	pia->cb1_w(1);
 }
 
 
@@ -522,8 +523,9 @@ static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 	sn76496_w(device->machine().device("sn2"), 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia6821_cb1_w(device, 0);
-	pia6821_cb1_w(device, 1);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	pia->cb1_w(0);
+	pia->cb1_w(1);
 }
 
 

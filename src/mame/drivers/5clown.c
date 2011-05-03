@@ -720,8 +720,8 @@ static ADDRESS_MAP_START( fclown_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(fclown_videoram_w) AM_BASE_MEMBER(_5clown_state, m_videoram)	/* Init'ed at $2042 */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(fclown_colorram_w) AM_BASE_MEMBER(_5clown_state, m_colorram)	/* Init'ed at $2054 */
 	AM_RANGE(0x2000, 0x7fff) AM_ROM					/* ROM space */

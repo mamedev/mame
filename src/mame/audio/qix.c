@@ -101,15 +101,15 @@ static WRITE8_DEVICE_HANDLER( sndpia_2_warning_w )
 
 static TIMER_CALLBACK( deferred_sndpia1_porta_w )
 {
-	device_t *device = (device_t *)ptr;
-	pia6821_porta_w(device, 0, param);
+	pia6821_device *device = (pia6821_device *)ptr;
+	device->porta_w(param);
 }
 
 
 static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	device->machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)device);
+	device->machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
 }
 
 
@@ -129,7 +129,8 @@ static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
 
 static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint )
 {
-	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* DINT is connected to the data CPU's IRQ line */
 	cputag_set_input_line(device->machine(), "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -138,7 +139,8 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_dint )
 
 static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
 {
-	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
+	pia6821_device *pia = downcast<pia6821_device *>(device);
+	int combined_state = pia->irq_a_state() | pia->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
 	cputag_set_input_line(device->machine(), "audiocpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -154,8 +156,8 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE("sndpia2", pia6821_r, pia6821_w)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("sndpia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE_MODERN("sndpia2", pia6821_device, read, write)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE_MODERN("sndpia1", pia6821_device, read, write)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -177,7 +179,7 @@ static const pia6821_interface qixsnd_pia_0_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DEVICE_HANDLER("sndpia1", sync_sndpia1_porta_w),			/* port A out */
 	DEVCB_DEVICE_HANDLER("discrete", qix_vol_w),					/* port B out */
-	DEVCB_DEVICE_LINE("sndpia1", pia6821_ca1_w),						/* line CA2 out */
+	DEVCB_DEVICE_LINE_MEMBER("sndpia1", pia6821_device, ca1_w),		/* line CA2 out */
 	DEVCB_HANDLER(qix_flip_screen_w),								/* port CB2 out */
 	DEVCB_LINE(qix_pia_dint),										/* IRQA */
 	DEVCB_LINE(qix_pia_dint)										/* IRQB */
@@ -191,9 +193,9 @@ static const pia6821_interface qixsnd_pia_1_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("sndpia0", pia6821_porta_w),			/* port A out */
-	DEVCB_DEVICE_HANDLER("discrete", qix_dac_w),			/* port B out */
-	DEVCB_DEVICE_LINE("sndpia0", pia6821_ca1_w),				/* line CA2 out */
+	DEVCB_DEVICE_MEMBER("sndpia0", pia6821_device, porta_w),			/* port A out */
+	DEVCB_DEVICE_HANDLER("discrete", qix_dac_w),				/* port B out */
+	DEVCB_DEVICE_LINE_MEMBER("sndpia0", pia6821_device, ca1_w),	/* line CA2 out */
 	DEVCB_NULL,		/* line CB2 out */
 	DEVCB_LINE(qix_pia_sint),								/* IRQA */
 	DEVCB_LINE(qix_pia_sint)								/* IRQB */
