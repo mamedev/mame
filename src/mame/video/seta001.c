@@ -20,7 +20,7 @@
 		main cpu.
 
 
- todo: unify implementation, there are currently 5 different ones when there should only be one!
+ todo: unify implementation, there are currently 3 different ones when there should only be one!
 
 
   'y' low bits are NEVER buffered?
@@ -40,7 +40,19 @@ seta001_device::seta001_device(const machine_config &mconfig, const char *tag, d
 
 void seta001_device::device_start()
 {
+	m_fg_flipxoffs = 0;
+	m_fg_noflipxoffs = 0;
+	
+	m_fg_flipyoffs = 0;
+	m_fg_noflipyoffs = 0;
 
+	m_bg_flipyoffs = 0;
+	m_bg_noflipyoffs = 0;
+
+	m_transpen = 0;
+	m_colorbase = 0;
+
+	m_bankcallback = NULL;
 }
 
 void seta001_device::device_reset()
@@ -258,7 +270,7 @@ twineagl:   000 027 00 0f   (test mode)
 					code,
 					color,
 					flipx, flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,0);
+					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8, m_transpen);
 		}
 	/* next column */
 	}
@@ -267,7 +279,7 @@ twineagl:   000 027 00 0f   (test mode)
 
 
 
-void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int flipxoffs, int noflipxoffs)
+void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int xoffs, yoffs;
@@ -287,7 +299,7 @@ void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitm
 
 	setac_draw_sprites_map(machine,bitmap,cliprect);
 
-	xoffs = flip ? flipxoffs:noflipxoffs;
+	xoffs = flip ? m_fg_flipxoffs:m_fg_noflipxoffs;
 	yoffs = -2;
 
 	for ( offs = 0x1ff ; offs >= 0; offs -= 1 )
@@ -318,7 +330,7 @@ void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitm
 				code,
 				color,
 				flipx, flipy,
-				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8,0);
+				((x + xoffs + 0x10) & 0x1ff) - 0x10,((y - yoffs + 8) & 0x0ff) - 8, m_transpen);
 	}
 
 }
@@ -326,13 +338,16 @@ void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitm
 
 
 
-void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m, UINT8 *m2, UINT8* scrollram, UINT8* bg_flag, int screenflip)
+void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* bg_flag, int screenflip)
 {
 	int x, y, column, tot, transpen;
 	int scrollx, scrolly;
 	UINT32 upperbits;
 	int ctrl2 = m_spritectrl[1];
 
+	UINT8* m = m_spritecodelow + 0x400;
+	UINT8* m2 = m_spritecodehigh + 0x400;
+	UINT8* scrollram = m_spriteylow+0x200;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
 		m += 0x800;
@@ -340,7 +355,7 @@ void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *b
 	if (bg_flag[0] & 0x80)
 		transpen = -1;
 	else
-		transpen = 0;
+		transpen = m_transpen;
 
 
 	/* The byte at f200 is the y-scroll value for the first column.
@@ -431,12 +446,16 @@ void seta001_device::setac_eof()
 	}
 }
 
-void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect,
-							 UINT8 *char_pointer, UINT8 *x_pointer, UINT8 *y_pointer, UINT8 *ctrl_pointer, UINT8 *color_pointer, int screenflip)
+void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int screenflip)
 {
 	int i;
 	int ctrl2 = m_spritectrl[1];
 
+	UINT8 *char_pointer = m_spritecodelow + 0x0000;
+	UINT8 *x_pointer = m_spritecodelow + 0x0200;
+	UINT8 *y_pointer = m_spriteylow;
+	UINT8 *ctrl_pointer = m_spritecodehigh + 0x0000;
+	UINT8 *color_pointer = m_spritecodehigh + 0x0200;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
 	{
@@ -471,14 +490,14 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 				code,
 				color,
 				flipx,flipy,
-				sx,sy+2,0);
+				sx,sy+2,m_transpen);
 
 		/* wrap around x */
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code,
 				color,
 				flipx,flipy,
-				sx + 512,sy+2,0);
+				sx + 512,sy+2,m_transpen);
 	}
 }
 
@@ -492,16 +511,10 @@ void seta001_device::tnzs_draw_sprites(running_machine &machine, bitmap_t *bitma
 	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
 
 	/* Redraw the background tiles (c400-c5ff) */
-	tnzs_draw_background(machine, bitmap, cliprect, m_spritecodelow + 0x400, m_spritecodehigh + 0x400, m_spriteylow+0x200, bg_flag, screenflip);
+	tnzs_draw_background(machine, bitmap, cliprect, bg_flag, screenflip);
 
 	/* Draw the sprites on top */
-	tnzs_draw_foreground(machine, bitmap, cliprect,
-					m_spritecodelow + 0x0000, /*  chars : c000 */
-					m_spritecodelow + 0x0200, /*      x : c200 */
-					m_spriteylow, /*      y : f000 */
-					m_spritecodehigh + 0x0000, /*   ctrl : d000 */
-					m_spritecodehigh + 0x0200, /* color : d200 */
-					screenflip); 
+	tnzs_draw_foreground(machine, bitmap, cliprect,	screenflip); 
 }
 
 void seta001_device::tnzs_eof( void )
@@ -530,233 +543,6 @@ void seta001_device::tnzs_eof( void )
 
 
 
-// no bgmap stuff?
-void seta001_device::srmp2_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int color_bank)
-{
-/*
-    Sprite RAM A:   spriteram16_2
-    ==============
-     + 0x000 - 0x3ff
-      x--- ----  ---- ---- : Flip X
-      -x-- ----  ---- ---- : Flip Y
-      --xx xxxx  xxxx xxxx : Tile number
-
-     + 0x400 - 0x7ff
-      xxxx x---  ---- ---- : Color
-      ---- ---x  xxxx xxxx : X coords
-
-    Sprite RAM B:   spriteram16
-    ==============
-     + 0x000 - 0x3ff
-      ---- ----  xxxx xxxx : Y coords
-
-     + 0x600
-      ---- ----  -x-- ---- : Flip screen
-*/
-
-	int offs;
-	int xoffs, yoffs;
-
-	int ctrl	=	m_spritectrl[ 0 ];
-	int ctrl2	=	m_spritectrl[ 1 ];
-
-	int flip	=	ctrl & 0x40;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x1000 : 0 );
-
-	int max_y = machine.primary_screen->height();
-
-	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? 0x05 : 0x07;
-
-	for (offs = 0x1ff; offs >= 0; offs -= 1)
-	{
-		int code	=	(((m_spritecodehigh[offs + 0x000 + bank] & 0xff) << 8) + (m_spritecodelow[offs + 0x000 + bank] & 0xff));
-
-		int color	=	((m_spritecodehigh[offs + 0x200 + bank] & 0xf8) >> 3);
-
-		int x		=	(((m_spritecodehigh[offs + 0x200 + bank] & 0x01) << 8) + (m_spritecodelow[offs + 0x200 + bank] & 0xff));
-		int y		=	  (m_spriteylow[offs + 0x000] & 0xff);
-
-		int flipx	=	code & 0x8000;
-		int flipy	=	code & 0x4000;
-
-		if (flip)
-		{
-			y = max_y - y;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		code = code & 0x3fff;
-
-		if (color_bank) color |= 0x20;
-
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff), 15);
-	}
-}
-
-
-void seta001_device::srmp3_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs, col;
-	int xoffs, yoffs;
-
-	int ctrl	=	m_spritectrl[ 0 ];
-	int ctrl2	=	m_spritectrl[ 1 ];
-
-	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x0f;
-
-	int upper	=	( m_spritectrl[ 2 ] ) +
-					( m_spritectrl[ 3 ] ) * 256;
-
-	int max_y	=	0xf0;
-
-	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? -0x01 : -0x01;
-
-	/* Number of columns to draw - the value 1 seems special, meaning:
-       draw every column */
-	if (numcol == 1)	numcol = 16;
-
-	/* The first column is the frontmost, see twineagl test mode */
-	for (col = numcol - 1; col >= 0; col--)
-	{
-		int x	=	m_spriteylow[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
-		int y	=	m_spriteylow[(col * 0x20 + 0x00 + 0x400)/2] & 0xff;
-
-		/* draw this column */
-		for (offs = 0; offs < 0x40/2; offs += 2/2)
-		{
-			int code	=	(((m_spritecodehigh[((col)&0x0f) * 0x40/2 + offs + 0x800/2] & 0xff) << 8) + (m_spritecodelow[((col)&0xf) * 0x40/2 + offs + 0x800/2] & 0xff));
-
-			int color   =	 ((m_spritecodehigh[((col)&0x0f) * 0x40/2 + offs + 0xc00/2] & 0xf8) >> 3);
-
-			int flipx	=	code & 0x8000;
-			int flipy	=	code & 0x4000;
-
-			int sx		=	  x + xoffs  + (offs & 1) * 16;
-			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine.primary_screen->height() - (machine.primary_screen->visible_area().max_y + 1));
-
-			if (upper & (1 << col))	sx += 256;
-
-			if (flip)
-			{
-				sy = max_y - 14 - sy - 0x100;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			code = code & 0x1fff;
-
-#define DRAWTILE(_x_, _y_)  \
-			drawgfx_transpen(bitmap, \
-					cliprect, machine.gfx[0], \
-					code, \
-					color, \
-					flipx, flipy, \
-					_x_, _y_, 0);
-
-			DRAWTILE(sx - 0x000, sy + 0x000)
-			DRAWTILE(sx - 0x200, sy + 0x000)
-			DRAWTILE(sx - 0x000, sy + 0x100)
-			DRAWTILE(sx - 0x200, sy + 0x100)
-
-		}
-		/* next column */
-	}
-}
-
-
-void seta001_device::srmp3_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx_bank)
-{
-/*
-    Sprite RAM A:   spriteram_2
-    ==============
-     + 0x000 - 0x1ff
-      xxxx xxxx : Tile number (low)
-
-     + 0x200 - 0x3ff
-      xxxx xxxx : X coords (low)
-
-
-    Sprite RAM B:   spriteram_3
-    ==============
-     + 0x000 - 0x1ff
-      x--- ---- : Flip X ?
-      -x-- ---- : Flip Y ?
-      --x- ---- : Use GFX bank flag
-      ---x xxxx : Tile number (high)
-
-     + 0x200 - 0x3ff
-      xxxx x--- : Color
-      ---- ---x : X coords (high)
-
-
-    Sprite RAM C:   spriteram
-    ==============
-     + 0x000 - 0x1ff
-      xxxx xxxx : Y coords (low)
-
-     + 0x300
-      -x-- ---- : Flip screen
-*/
-
-	int offs;
-	int xoffs, yoffs;
-
-	int max_y = machine.primary_screen->height();
-
-	int ctrl	=	m_spritectrl[ 0 ];
-	//int ctrl2   =   m_spritectrl[ 1 ];
-
-	int flip	=	ctrl & 0x40;
-
-	srmp3_draw_sprites_map(machine, bitmap, cliprect);
-
-	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? 0x06 : 0x06;
-
-	for (offs = 0x200 - 1; offs >= 0; offs--)
-	{
-		int code	=	(((m_spritecodehigh[offs + 0x000] & 0xff) << 8) + (m_spritecodelow[offs + 0x000] & 0xff));
-		int gfxbank	=	  (m_spritecodehigh[offs + 0x000] & 0x20);
-
-		int color	=	((m_spritecodehigh[offs + 0x200] & 0xf8) >> 3);
-
-		int x		=	(((m_spritecodehigh[offs + 0x200] & 0x01) << 8) + (m_spritecodelow[offs + 0x200] & 0xff));
-		int y		=	  (m_spriteylow[offs + 0x000] & 0xff);
-
-		int flipx	=	code & 0x8000;
-		int flipy	=	code & 0x4000;
-
-		code = (code & 0x1fff);
-		if (gfxbank) code += ((gfx_bank + 1) * 0x2000);
-
-		if (flip)
-		{
-			y = max_y - y;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-		drawgfx_transpen(bitmap,cliprect, machine.gfx[0],
-				code,
-				color,
-				flipx, flipy,
-				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff), 0);
-	}
-}
-
 
 void seta001_device::mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -780,7 +566,8 @@ void seta001_device::mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t
 	int max_y	=	0xf0;
 
 	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? 0x09 : 0x07;
+	yoffs	=	flip ? m_bg_flipyoffs : m_bg_noflipyoffs;
+
 
 	/* Number of columns to draw - the value 1 seems special, meaning:
        draw every column */
@@ -825,7 +612,7 @@ void seta001_device::mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t
 					code, \
 					color, \
 					flipx, flipy, \
-					_x_, _y_, 0);
+					_x_, _y_, m_transpen);
 
 			DRAWTILE(sx - 0x000, sy + 0x000)
 			DRAWTILE(sx - 0x200, sy + 0x000)
@@ -838,7 +625,7 @@ void seta001_device::mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t
 }
 
 
-void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int gfx_bank)
+void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -877,13 +664,12 @@ void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bi
 
 	mjyuugi_draw_sprites_map(machine, bitmap, cliprect);
 
-	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? 0x06 : 0x06;
+	xoffs	=	flip ? m_fg_flipxoffs : m_fg_noflipxoffs;
+	yoffs	=	flip ? m_fg_flipyoffs : m_fg_noflipyoffs;
 
-	for (offs = (0x400 - 6) / 2; offs >= 0 / 2; offs -= 2 / 2)
+	for (offs = 0x1ff; offs >= 0; offs--)
 	{
 		int code	=	(((m_spritecodehigh[offs + 0x000 + bank] & 0xff) << 8) + (m_spritecodelow[offs + 0x000 + bank] & 0xff));
-		int gfxbank	=	  (m_spritecodehigh[offs + 0x000 + bank] & 0x20);
 
 		int color	=	((m_spritecodehigh[offs + 0x200 + bank] & 0xf8) >> 3);
 
@@ -893,8 +679,9 @@ void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bi
 		int flipx	=	code & 0x8000;
 		int flipy	=	code & 0x4000;
 
-		code = (code & 0x1fff);
-		if (gfxbank) code += ((gfx_bank + 1) * 0x2000);
+		if (m_bankcallback) code = m_bankcallback(machine, code);
+		
+		color += m_colorbase;
 
 		if (flip)
 		{
@@ -909,7 +696,7 @@ void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bi
 				color,
 				flipx, flipy,
 				(x + xoffs) & 0x1ff,
-				max_y - ((y + yoffs) & 0x0ff), 0);
+				max_y - ((y + yoffs) & 0x0ff), m_transpen);
 	}
 }
 
