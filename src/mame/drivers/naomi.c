@@ -5188,12 +5188,12 @@ ROM_START( shikgam2 )
 ROM_END
 
 
-ROM_START( usagui )
+ROM_START( usagiym )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x80, "mie_eeprom", 0 )
-	ROM_LOAD("usagui-default-eeprom.bin", 0, 0x80, CRC(1fbdf0ca) SHA1(5854c693b7d6451cefeb737109aeaf64751fc4f7))
+	ROM_LOAD("usagiym-default-eeprom.bin", 0, 0x80, CRC(1fbdf0ca) SHA1(5854c693b7d6451cefeb737109aeaf64751fc4f7))
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0022", 0, SHA1(45deba05a12abbf6390c0fc0e4cdeaedfa7d2ca5) )
@@ -7253,7 +7253,7 @@ ROM_END
 /* 0019A */ GAME( 2003, ggxxrl,    naomigd,  naomigd, naomi,    ggxxrl,   ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd,  naomigd, naomi,    naomi,    ROT0,   "Success",      "Tetris Kiwamemichi (GDL-0020)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd,  naomigd, naomi,    naomi,    ROT270, "Alfa System",  "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0022  */ GAME( 2003, usagui,    naomigd,  naomigd, naomi_mp, naomi_mp, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0022  */ GAME( 2003, usagiym,   naomigd,  naomigd, naomi_mp, naomi_mp, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0023  Border Down
 /* 0023A */ GAME( 2004, bdrdown,   naomigd,  naomigd, naomi,    naomi,    ROT0,   "G-Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0024  */ GAME( 2003, psyvar2,   naomigd,  naomigd, naomi,    naomi,    ROT270, "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
