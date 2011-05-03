@@ -815,7 +815,7 @@ SCREEN_UPDATE( seta_no_layers )
 	seta_state *state = screen->machine().driver_data<seta_state>();
 	set_pens(screen->machine());
 	bitmap_fill(bitmap,cliprect,0x1f0);
-	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 	return 0;
 }
 
@@ -828,7 +828,7 @@ static SCREEN_UPDATE( seta_layers )
 	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
 	int order	=	0;
-	int flip	=	0;//reenable (state->m_spriteram[ 0x600/2 ] & 0x40) >> 6;
+	int flip	=	screen->machine().device<seta001_device>("spritegen")->is_flipped();
 
 	const rectangle &visarea = screen->visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
@@ -938,7 +938,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 
 			if(order & 4)
 			{
@@ -958,7 +958,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  0, 0);
 
-			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 		}
 	}
 	else
@@ -968,7 +968,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
@@ -1022,7 +1022,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_spriteram2, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
+			if (layers_ctrl & 8)	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(), bitmap,cliprect, state->m_global_offsets->sprite_offs[1], state->m_global_offsets->sprite_offs[0]);
 		}
 	}
 	return 0;

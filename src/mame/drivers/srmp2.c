@@ -394,7 +394,7 @@ static WRITE8_HANDLER( srmp2_irq4_ack_w )
 static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u16)		/* Sprites Code + X + Attr */
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_DEVREADWRITE("spritegen", spritecode_r16, spritecode_w16)		/* Sprites Code + X + Attr */
 	AM_RANGE(0x180000, 0x1805ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r16, spriteylow_w16)		/* Sprites Y */
 	AM_RANGE(0x180600, 0x180607) AM_RAM AM_DEVREADWRITE("spritegen", spritectrl_r16, spritectrl_w16) 
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", spritectrl_r16, spritectrl_w16) 
 
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u16)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", spritecode_r16, spritecode_w16)	/* Sprites Code + X + Attr */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", spritectrl_r8, spritectrl_w8) 
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u8)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram3.u8)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8 )
@@ -503,8 +503,8 @@ static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xb300, 0xb303) AM_RAM AM_DEVREADWRITE("spritegen", spritectrl_r8, spritectrl_w8) 
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram2.u8)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,m_spriteram3.u8)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( rmgoldyh_rombank_w )

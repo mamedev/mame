@@ -45,12 +45,12 @@ PALETTE_INIT( arknoid2 )
 SCREEN_UPDATE( tnzs )
 {
 	tnzs_state *state = screen->machine().driver_data<tnzs_state>();
-	screen->machine().device<seta001_device>("spritegen")->tnzs_draw_sprites(screen->machine(), bitmap, cliprect, state->m_objram, state->m_bg_flag );
+	screen->machine().device<seta001_device>("spritegen")->tnzs_draw_sprites(screen->machine(), bitmap, cliprect, state->m_bg_flag );
 	return 0;
 }
 
 SCREEN_EOF( tnzs )
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	machine.device<seta001_device>("spritegen")->tnzs_eof( state->m_objram);
+//	tnzs_state *state = machine.driver_data<tnzs_state>();
+	machine.device<seta001_device>("spritegen")->tnzs_eof();
 }

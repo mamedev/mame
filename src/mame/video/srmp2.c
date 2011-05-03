@@ -41,7 +41,7 @@ SCREEN_UPDATE( srmp2 )
 {
 	srmp2_state *state = screen->machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1ff);
-	screen->machine().device<seta001_device>("spritegen")->srmp2_draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram2.u16,  state->m_color_bank); 
+	screen->machine().device<seta001_device>("spritegen")->srmp2_draw_sprites(screen->machine(), bitmap, cliprect, state->m_color_bank); 
 	return 0;
 }
 
@@ -49,7 +49,7 @@ SCREEN_UPDATE( srmp3 )
 {
 	srmp2_state *state = screen->machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1f0);
-	screen->machine().device<seta001_device>("spritegen")->srmp3_draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram2.u8, state->m_spriteram3.u8, state->m_gfx_bank);
+	screen->machine().device<seta001_device>("spritegen")->srmp3_draw_sprites(screen->machine(), bitmap, cliprect, state->m_gfx_bank);
 	return 0;
 }
 
@@ -57,6 +57,6 @@ SCREEN_UPDATE( mjyuugi )
 {
 	srmp2_state *state = screen->machine().driver_data<srmp2_state>();
 	bitmap_fill(bitmap, cliprect, 0x1f0);
-	screen->machine().device<seta001_device>("spritegen")->mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect, state->m_spriteram2.u16, state->m_gfx_bank);
+	screen->machine().device<seta001_device>("spritegen")->mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect, state->m_gfx_bank);
 	return 0;
 }

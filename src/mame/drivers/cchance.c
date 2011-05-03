@@ -76,7 +76,8 @@ static WRITE8_HANDLER( output_1_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(cchance_state, m_objram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 

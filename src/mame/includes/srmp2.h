@@ -22,12 +22,6 @@ public:
 
 	int m_port_select;
 
-	union
-	{
-		UINT8 *u8;
-		UINT16 *u16;
-	} m_spriteram2, m_spriteram3;
-
 	iox_t m_iox;
 };
 

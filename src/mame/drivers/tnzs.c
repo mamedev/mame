@@ -750,7 +750,8 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
@@ -765,7 +766,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
@@ -883,10 +885,13 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 	palette_set_color_rgb(space->machine(), offset, r << 4, g << 4, b << 4);
 }
 
+
+
 static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, m_objram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
