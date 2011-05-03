@@ -217,11 +217,11 @@ static const mc6845_interface mc6845_intf =
 
 static I8255A_INTERFACE( ppi8255_intf )
 {
-	DEVCB_NULL,					/* Port A read */
-	DEVCB_INPUT_PORT("SYSTEM"),		/* Port B read */
-	DEVCB_HANDLER(mux_r),			/* Port C read */
+	DEVCB_NULL,						/* Port A read */
 	DEVCB_HANDLER(mux_w),			/* Port A write */
+	DEVCB_INPUT_PORT("SYSTEM"),		/* Port B read */
 	DEVCB_NULL,						/* Port B write */
+	DEVCB_HANDLER(mux_r),			/* Port C read */
 	DEVCB_NULL						/* Port C write */
 };
 
