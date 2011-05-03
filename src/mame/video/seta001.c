@@ -500,7 +500,7 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 				code,
 				color,
 				flipx,flipy,
-				(sx + xoffs) & 0x1ff,
+				sx,
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
@@ -508,7 +508,7 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 				code,
 				color,
 				flipx,flipy,
-				((sx + xoffs) & 0x1ff)+512,
+				sx+512,
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 	}
 }
