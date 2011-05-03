@@ -39,6 +39,9 @@ public:
 	void set_colorbase(int base) { m_colorbase = base; };
 	int m_colorbase;
 
+	void set_spritelimit(int limit) { m_spritelimit = limit; };
+	int m_spritelimit;
+
 
 protected:
 	virtual void device_start();
@@ -47,12 +50,13 @@ protected:
 
 private:
 	
-	void setac_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect );
+	void setac_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
+	void setac_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size );
 	
-	void tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int screenflip);
-	void tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* bg_flag, int screenflip);
+	void tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
+	void tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag);
 	
-	void mjyuugi_draw_sprites_map(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
+	void mjyuugi_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
 };
 
 READ16_DEVICE_HANDLER( spritectrl_r16 );

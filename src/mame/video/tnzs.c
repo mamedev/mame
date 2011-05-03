@@ -45,6 +45,11 @@ PALETTE_INIT( arknoid2 )
 SCREEN_UPDATE( tnzs )
 {
 	tnzs_state *state = screen->machine().driver_data<tnzs_state>();
+
+	bitmap_fill(bitmap, cliprect, 0x1f0);
+
+	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+
 	screen->machine().device<seta001_device>("spritegen")->tnzs_draw_sprites(screen->machine(), bitmap, cliprect, state->m_bg_flag );
 	return 0;
 }
