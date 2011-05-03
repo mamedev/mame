@@ -73,6 +73,7 @@ void jvs_device::message(UINT8 dest, const UINT8 *send_buffer, UINT32 send_size,
 			} else if(len == 0) {
 				// Incorrect parameter
 				*d++ = 0x02;
+				break;
 			} else
 				s += len;
 		}
@@ -149,6 +150,12 @@ int jvs_device::handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8
 		*recv_buffer++ = 0x01;
 		return analogs(recv_buffer, send_buffer[1]) ? 2 : 0;
 
+	case 0x32:
+		if(send_size < 2 || send_size < 2+send_buffer[1])
+			return 0;
+		*recv_buffer++ = 0x01;
+		return swoutputs(send_buffer[1], send_buffer+2) ? 2+send_buffer[1] : 0;
+
 	case 0x38:
 		if(send_size < 3)
 			return 0;
@@ -201,6 +208,11 @@ bool jvs_device::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_swit
 }
 
 bool jvs_device::analogs(UINT8 *&buf, UINT8 count)
+{
+	return false;
+}
+
+bool jvs_device::swoutputs(UINT8 count, const UINT8 *vals)
 {
 	return false;
 }

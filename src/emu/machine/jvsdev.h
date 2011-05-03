@@ -20,6 +20,8 @@ public:
 	bool get_address_set_line();
 
 protected:
+	UINT32 jvs_outputs;
+
 	void handle_output(const char *tag, UINT8 id, UINT8 val);
 
 	// device-level overrides
@@ -35,6 +37,7 @@ protected:
 	virtual bool switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch);
 	virtual bool coin_counters(UINT8 *&buf, UINT8 count);
 	virtual bool analogs(UINT8 *&buf, UINT8 count);
+	virtual bool swoutputs(UINT8 count, const UINT8 *vals);
 	virtual bool swoutputs(UINT8 id, UINT8 val);
 
 private:
@@ -42,7 +45,6 @@ private:
 	jvs_device *next_device;
 	UINT8 jvs_address;
 	UINT32 jvs_reset_counter;
-	UINT32 jvs_outputs;
 
 	int handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8 *&recv_buffer);
 };

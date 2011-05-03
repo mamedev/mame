@@ -132,6 +132,16 @@ bool sega_837_13551::analogs(UINT8 *&buf, UINT8 count)
 	return true;
 }
 
+bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
+{
+	if(count > 1)
+		return false;
+	jvs_outputs = vals[0] & 0x3f;
+	logerror("837-13551: output %02x\n", jvs_outputs);
+	input_port_write_safe(machine(), port_tag[11], jvs_outputs, 0x3f);
+	return true;
+}
+
 bool sega_837_13551::swoutputs(UINT8 id, UINT8 val)
 {
 	if(id > 6)
