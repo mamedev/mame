@@ -19,10 +19,6 @@
 		slightly between games depending on how the RAM is hooked up to the
 		main cpu.
 
-
- todo: unify implementation, there are currently 3 different ones when there should only be one!
-
-
   'y' low bits are NEVER buffered?
 
  */
@@ -49,10 +45,15 @@ void seta001_device::device_start()
 	m_bg_flipyoffs = 0;
 	m_bg_noflipyoffs = 0;
 
+	m_bg_flipxoffs = 0;
+	m_bg_noflipxoffs = 0;
+
 	m_transpen = 0;
 	m_colorbase = 0;
 
 	m_spritelimit = 0x1ff;
+
+	m_bgflag = 0x00;
 
 	m_bankcallback = NULL;
 }
@@ -169,6 +170,12 @@ WRITE16_DEVICE_HANDLER( spritecode_w16 )
 	dev->m_spritecodehigh[offset] = (data & 0xff00)>>8;
 }
 
+WRITE8_DEVICE_HANDLER( spritebgflag_w8 )
+{
+	seta001_device *dev = (seta001_device *)device;
+	dev->m_bgflag = data;
+}
+
 /***************************************************************************
 
 
@@ -177,9 +184,29 @@ WRITE16_DEVICE_HANDLER( spritecode_w16 )
 
 ***************************************************************************/
 
+/*
+twineagl:   010 02d 0f 10   (ship)
+tndrcade:   058 02d 07 18   (start of game - yes, flip on!)
+arbalest:   018 02d 0f 10   (logo)
+metafox :   018 021 0f f0   (bomb)
+zingzip :   010 02c 00 0f   (bomb)
+wrofaero:   010 021 00 ff   (test mode)
+thunderl:   010 06c 00 ff   (always?)
+krzybowl:   011 028 c0 ff   (game)
+kiwame  :   016 021 7f 00   (logo)
+oisipuzl:   059 020 00 00   (game - yes, flip on!)
 
-void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size)
+superman:   010 021 07 38   (game)
+twineagl:   000 027 00 0f   (test mode)
+*/
+
+
+
+
+void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac_type)
 {
+	int transpen;
+
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -200,9 +227,10 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
 
-
 	int max_y	=	0xf0;
 
+	// HACKS
+	// used in conjuntion with setac_type
 	int col0;		/* Kludge, needed for krzybowl and kiwame */
 	switch (ctrl & 0x0f)
 	{
@@ -212,29 +240,34 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 		default:	col0	=	0x0;
 	}
 
-	xoffs = 0;
-	yoffs = flip ? 1 : -1;
 
-	/* Number of columns to draw - the value 1 seems special, meaning:
-       draw every column */
+	xoffs = flip ? m_bg_flipxoffs : m_bg_noflipxoffs;
+	yoffs = flip ? m_bg_flipyoffs : m_bg_noflipyoffs;
+
+
+	if (m_bgflag & 0x80)
+		transpen = -1;
+	else
+		transpen = m_transpen;
+
 	if (numcol == 1)
 		numcol = 16;
 
 	upper = m_spritectrl[2] + m_spritectrl[3] * 256;
 
-	/* The first column is the frontmost, see twineagl test mode
-        BM 071204 - first column frontmost breaks superman.
-    */
-//  for ( col = numcol - 1 ; col >= 0; col -- )
-	for ( col = 0 ; col < numcol; col ++ )
+	for (col = 0; col < numcol; col++)
 	{
-		scrollx	=	scrollram[(col * 0x10 + 0x04)];
-		scrolly	=	scrollram[(col * 0x10 + 0x00)];
+
+		scrollx = scrollram[col * 0x10 + 4];
+		scrolly = scrollram[col * 0x10];
 
 		/* draw this column */
-		for ( offs = 0 ; offs < 0x40/2; offs += 2/2 )
+		for ( offs = 0 ; offs < 0x20; offs += 1 )
 		{
-			int i = ((col+col0)&0xf) * 0x40/2 + offs;
+			int i;
+			// HACKS
+			if (setac_type) i = ((col+col0)&0xf) * 32 + offs;
+			else i = 32 * (col ^ 8) + 2 * (offs>>1) + (offs&1);
 
 			int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
 			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank]; 
@@ -242,28 +275,10 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 			int	flipx	=	code & 0x8000;
 			int	flipy	=	code & 0x4000;
 
-			int gfx_bank	=	(color & 0x0600) >> 9;
-
-/*
-twineagl:   010 02d 0f 10   (ship)
-tndrcade:   058 02d 07 18   (start of game - yes, flip on!)
-arbalest:   018 02d 0f 10   (logo)
-metafox :   018 021 0f f0   (bomb)
-zingzip :   010 02c 00 0f   (bomb)
-wrofaero:   010 021 00 ff   (test mode)
-thunderl:   010 06c 00 ff   (always?)
-krzybowl:   011 028 c0 ff   (game)
-kiwame  :   016 021 7f 00   (logo)
-oisipuzl:   059 020 00 00   (game - yes, flip on!)
-
-superman:   010 021 07 38   (game)
-twineagl:   000 027 00 0f   (test mode)
-*/
-
 			int sx		=	  scrollx + xoffs  + (offs & 1) * 16;
 			int sy		=	-(scrolly + yoffs) + (offs / 2) * 16;
 
-			if (upper & (1 << col))	sx += 256;
+			if (upper & (1 << col))	sx -= 256;
 
 			if (flip)
 			{
@@ -273,113 +288,15 @@ twineagl:   000 027 00 0f   (test mode)
 			}
 
 			color	=	( color >> (16-5) ) % total_color_codes;
-			code	=	(code & 0x3fff) + (gfx_bank * 0x4000);
+			code &= 0x3fff;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 					code,
 					color,
-					flipx, flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8, m_transpen);
+					flipx,flipy,
+					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,
+					transpen);
 		}
-	/* next column */
-	}
-
-}
-
-
-void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag)
-{
-	int transpen;
-
-	int offs, col;
-
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
-
-	int ctrl	=	m_spritectrl[0];
-	int ctrl2	=	m_spritectrl[1];
-
-	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x1f;
-
-	int scrollx, scrolly;
-
-	UINT32 upper;
-
-	UINT8* scrollram = m_spriteylow+0x200;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
-
-
-	if (bg_flag[0] & 0x80)
-		transpen = -1;
-	else
-		transpen = m_transpen;
-
-
-	/* The byte at f200 is the y-scroll value for the first col.
-       The byte at f204 is the LSB of x-scroll value for the first col.
-
-       The other cols follow at 16-byte intervals.
-
-       The 9th bit of each x-scroll value is combined into 2 bytes
-       at f302-f303 */
-
-	/* f301 controls how many cols are drawn. */
-	if (numcol == 1)
-		numcol = 16;
-
-	upper = m_spritectrl[2] + m_spritectrl[3] * 256;
-
-	for (col = 0; col < numcol; col++)
-	{
-		scrollx = scrollram[col * 0x10 + 4] - ((upper & 0x01) * 256);
-		if (flip)
-			scrolly = scrollram[col * 0x10] + 1 - 256;
-		else
-			scrolly = -scrollram[col * 0x10] + 1;
-
-		/* draw this column */
-		for ( offs = 0 ; offs < 0x40/2; offs += 2/2 )
-		{
-				int i = 32 * (col ^ 8) + 2 * (offs>>1) + (offs&1);
-
-				int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
-				int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank]; 
-				
-				int	flipx	=	code & 0x8000;
-				int	flipy	=	code & 0x4000;
-
-				int sx		=	(offs & 1) * 16;
-				int sy		=	(offs / 2) * 16;
-
-				if (flip)
-				{
-					sy = 240 - sy;
-					flipx = !flipx;
-					flipy = !flipy;
-				}
-
-				color	=	( color >> (16-5) ) % total_color_codes;
-				code &= 0x3fff;
-
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						sx + scrollx,(sy + scrolly) & 0xff,
-						transpen);
-
-				/* wrap around x */
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
-						code,
-						color,
-						flipx,flipy,
-						sx + 512 + scrollx,(sy + scrolly) & 0xff,
-						transpen);
-		}
-
-		upper >>= 1;
 	}
 }
 
@@ -506,102 +423,20 @@ void seta001_device::tnzs_eof( void )
 }
 
 
-
-
-void seta001_device::mjyuugi_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size)
-{
-	int offs, col;
-	int xoffs, yoffs;
-
-	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
-
-	int ctrl	=	m_spritectrl[ 0 ];
-	int ctrl2	=	m_spritectrl[ 1 ];
-
-	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x000f;
-
-	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
-
-	int upper	=	( m_spritectrl[2] ) +
-					( m_spritectrl[3] ) * 256;
-
-	int max_y	=	0xf0;
-
-	xoffs	=	flip ? 0x10 : 0x10;
-	yoffs	=	flip ? m_bg_flipyoffs : m_bg_noflipyoffs;
-
-
-	/* Number of columns to draw - the value 1 seems special, meaning:
-       draw every column */
-	if (numcol == 1)	numcol = 16;
-
-	/* The first column is the frontmost, see twineagl test mode */
-	for (col = numcol - 1; col >= 0; col--)
-	{
-		int x	=	m_spriteylow[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
-		int y	=	m_spriteylow[(col * 0x20 + 0x00 + 0x400)/2] & 0xff;
-
-		/* draw this column */
-		for (offs = 0; offs < 0x40/2; offs += 2/2)
-		{
-			int code	=	(m_spritecodehigh[((col)&0xf) * 0x40/2 + offs + bank + 0x800/2]<<8) | (m_spritecodelow[((col)&0xf) * 0x40/2 + offs + bank + 0x800/2]);
-			int color	=	(m_spritecodehigh[((col)&0xf) * 0x40/2 + offs + bank + 0xc00/2]<<8) | (m_spritecodelow[((col)&0xf) * 0x40/2 + offs + bank + 0x800/2]);
-
-			int gfxbank	=	color & 0x0200;
-
-			int flipx	=	code & 0x8000;
-			int flipy	=	code & 0x4000;
-
-			int sx		=	  x + xoffs  + (offs & 1) * 16;
-			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine.primary_screen->height() - (machine.primary_screen->visible_area().max_y + 1));
-
-			if (upper & (1 << col))	sx += 256;
-
-			if (flip)
-			{
-				sy = max_y - 16 - sy - 0x100;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			color	=	((color >> (16-5)) % total_color_codes);
-			code	=	(code & 0x3fff) + (gfxbank ? 0x4000 : 0);
-
-#define DRAWTILE(_x_, _y_)  \
-			drawgfx_transpen(bitmap, \
-					cliprect, machine.gfx[0], \
-					code, \
-					color, \
-					flipx, flipy, \
-					_x_, _y_, m_transpen);
-
-			DRAWTILE(sx - 0x000, sy + 0x000)
-			DRAWTILE(sx - 0x200, sy + 0x000)
-			DRAWTILE(sx - 0x000, sy + 0x100)
-			DRAWTILE(sx - 0x200, sy + 0x100)
-
-		}
-		/* next column */
-	}
-}
-
 void seta001_device::tnzs_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* bg_flag )
 {
-	tnzs_draw_background(machine, bitmap, cliprect, 0x800, bg_flag);
+	tnzs_draw_background(machine, bitmap, cliprect, 0x800, 0);
 	tnzs_draw_foreground(machine, bitmap, cliprect,	0x800); 
 }
 
 void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mjyuugi_draw_background(machine, bitmap, cliprect, 0x1000);
+	tnzs_draw_background(machine, bitmap, cliprect, 0x1000, 1);
 	tnzs_draw_foreground(machine, bitmap, cliprect,	0x1000); 
 }
 
 void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	setac_draw_background(machine,bitmap,cliprect, 0x1000);
+	tnzs_draw_background(machine, bitmap, cliprect, 0x1000, 1);
 	tnzs_draw_foreground(machine, bitmap, cliprect, 0x1000);
 }

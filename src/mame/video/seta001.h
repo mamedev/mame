@@ -14,6 +14,8 @@ public:
 	
 	void mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
 
+	UINT8 m_bgflag;
+	
 	UINT8 m_spritectrl[4];
 	UINT8 m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
 
@@ -27,6 +29,8 @@ public:
 	int m_fg_flipyoffs, m_fg_noflipyoffs;
 	void set_bg_yoffsets( int flip, int noflip ) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; }; 
 	int m_bg_flipyoffs, m_bg_noflipyoffs;
+	void set_bg_xoffsets( int flip, int noflip ) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; }; 
+	int m_bg_flipxoffs, m_bg_noflipxoffs;
 
 	void set_transpen ( int pen ) { m_transpen = pen; };
 	int m_transpen;
@@ -50,13 +54,13 @@ protected:
 
 private:
 	
-	void setac_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size );
-	void tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag);
-	void mjyuugi_draw_background(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
-
+	void tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac_type);
 	void tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
 
 };
+
+WRITE8_DEVICE_HANDLER( spritebgflag_w8 );
+
 
 READ16_DEVICE_HANDLER( spritectrl_r16 );
 WRITE16_DEVICE_HANDLER( spritectrl_w16 );
