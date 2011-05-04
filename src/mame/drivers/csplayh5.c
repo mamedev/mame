@@ -5,15 +5,14 @@
     preliminary driver by Angelo Salese
 
     TODO:
+    - rewrite v9938/v9958 video chip;
     - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
-    - V9958 timings are screwed, some places have missing gfxs.
-    - game timings seem busted either, could be due of missing DVD hook-up
+    - game timings seem busted, could be due of missing DVD hook-up
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
 #include "video/v9938.h"
