@@ -6,7 +6,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
-	UINT16 *  m_text_videoram;
+	UINT8  *  m_text_videoram;
 	UINT16 *  m_bg_videoram;
 	UINT16 *  m_fg_videoram;
 	UINT16 *  m_spr_pal_clut;
@@ -49,10 +49,14 @@ public:
 SCREEN_UPDATE( armedf );
 SCREEN_EOF( armedf );
 VIDEO_START( armedf );
+VIDEO_START( terraf );
 
 WRITE16_HANDLER( armedf_bg_videoram_w );
 WRITE16_HANDLER( armedf_fg_videoram_w );
-WRITE16_HANDLER( armedf_text_videoram_w );
+READ8_HANDLER( armedf_text_videoram_r );
+WRITE8_HANDLER( armedf_text_videoram_w );
+READ8_HANDLER( nb1414m4_text_videoram_r );
+WRITE8_HANDLER( nb1414m4_text_videoram_w );
 WRITE16_HANDLER( terraf_fg_scrollx_w );
 WRITE16_HANDLER( terraf_fg_scrolly_w );
 WRITE16_HANDLER( terraf_fg_scroll_msb_arm_w );
@@ -61,4 +65,4 @@ WRITE16_HANDLER( armedf_fg_scrolly_w );
 WRITE16_HANDLER( armedf_bg_scrollx_w );
 WRITE16_HANDLER( armedf_bg_scrolly_w );
 
-void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd);
+void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd,UINT8 *vram,UINT16 &scrollx,UINT16 &scrolly,tilemap_t *tilemap);

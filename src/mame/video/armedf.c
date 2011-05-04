@@ -31,22 +31,49 @@ static TILEMAP_MAPPER( armedf_scan_type3 )
 	return (col & 0x1f) * 32 + row + 0x800 * (col / 32);
 }
 
-static TILE_GET_INFO( get_tx_tile_info )
+static TILE_GET_INFO( get_nb1414m4_tx_tile_info )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 	int tile_number = state->m_text_videoram[tile_index] & 0xff;
 	int attributes;
 
 	/* TODO: Armed F doesn't seem to use the NB1414M4! */
-	if (state->m_scroll_type == 1)
-		attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
-	else
+	//if (state->m_scroll_type == 1)
+	//	attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
+	//else
 	{
 		attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
 
 		if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
 			tile_number = attributes = 0x00;
 	}
+
+	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
+	tileinfo->category = (attributes & 0x8) >> 3;
+
+	SET_TILE_INFO(
+			0,
+			tile_number + 256 * (attributes & 0x3),
+			attributes >> 4,
+			0);
+}
+
+static TILE_GET_INFO( get_armedf_tx_tile_info )
+{
+	armedf_state *state = machine.driver_data<armedf_state>();
+	int tile_number = state->m_text_videoram[tile_index] & 0xff;
+	int attributes;
+
+	/* TODO: Armed F doesn't seem to use the NB1414M4! */
+	//if (state->m_scroll_type == 1)
+		attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
+	//else
+	//{
+	//	attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
+//
+	//	if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+	//		tile_number = attributes = 0x00;
+	//}
 
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */
 	tileinfo->category = (attributes & 0x8) >> 3;
@@ -90,6 +117,27 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 ***************************************************************************/
 
+VIDEO_START( terraf )
+{
+	armedf_state *state = machine.driver_data<armedf_state>();
+
+	state->m_sprite_offy = (state->m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
+
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
+	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
+
+	state->m_tx_tilemap = tilemap_create(machine, get_nb1414m4_tx_tile_info, (state->m_scroll_type == 2) ? armedf_scan_type3 : armedf_scan_type2, 8, 8, 64, 32);
+
+	tilemap_set_transparent_pen(state->m_bg_tilemap, 0xf);
+	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xf);
+	tilemap_set_transparent_pen(state->m_tx_tilemap, 0xf);
+
+	if (state->m_scroll_type != 1)
+		tilemap_set_scrollx(state->m_tx_tilemap, 0, -128);
+
+	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
+}
+
 VIDEO_START( armedf )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
@@ -99,20 +147,7 @@ VIDEO_START( armedf )
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
 
-	switch (state->m_scroll_type)
-	{
-		case 1: /* armed formation */
-			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type1, 8, 8, 64, 32);
-			break;
-
-		case 2: /* legion */
-			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
-			break;
-
-		default:
-			state->m_tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type2, 8, 8, 64, 32);
-			break;
-	}
+	state->m_tx_tilemap = tilemap_create(machine, get_armedf_tx_tile_info, armedf_scan_type1, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(state->m_bg_tilemap, 0xf);
 	tilemap_set_transparent_pen(state->m_fg_tilemap, 0xf);
@@ -120,6 +155,8 @@ VIDEO_START( armedf )
 
 	if (state->m_scroll_type != 1)
 		tilemap_set_scrollx(state->m_tx_tilemap, 0, -128);
+
+	state->m_text_videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 /***************************************************************************
@@ -128,14 +165,33 @@ VIDEO_START( armedf )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( armedf_text_videoram_w )
+READ8_HANDLER( nb1414m4_text_videoram_r )
 {
 	armedf_state *state = space->machine().driver_data<armedf_state>();
-	COMBINE_DATA(&state->m_text_videoram[offset]);
-	if (state->m_scroll_type == 1)
-		tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
-	else
-		tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0xbff);
+
+	return state->m_text_videoram[offset];
+}
+
+WRITE8_HANDLER( nb1414m4_text_videoram_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	state->m_text_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
+}
+
+READ8_HANDLER( armedf_text_videoram_r )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+
+	return state->m_text_videoram[offset];
+}
+
+WRITE8_HANDLER( armedf_text_videoram_w )
+{
+	armedf_state *state = space->machine().driver_data<armedf_state>();
+	state->m_text_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( armedf_fg_videoram_w )
