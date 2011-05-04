@@ -91,7 +91,7 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 	  m_full_software_name(NULL),
 	  m_software_info_ptr(NULL),
 	  m_software_part_ptr(NULL),
-      m_writeable(false),
+      m_readonly(false),
       m_created(false)
 {
 	m_mempool = pool_alloc_lib(memory_error);
@@ -518,7 +518,7 @@ void device_image_interface::image_checkhash()
     device_image_partialhash_func partialhash;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
-    if (m_hash.first() == NULL && !m_writeable && !m_created)
+    if (m_hash.first() == NULL && m_readonly && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */

@@ -225,7 +225,7 @@ image_error_t legacy_image_device_base::load_image_by_path(UINT32 open_flags, co
     {
         case FILERR_NONE:
             /* success! */
-            m_writeable = (open_flags & OPEN_FLAG_WRITE) ? 1 : 0;
+            m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
             m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
             err = IMAGE_ERROR_SUCCESS;
             break;
@@ -591,8 +591,8 @@ void legacy_image_device_base::clear()
 	}
 
     m_name.reset();
-    m_writeable = FALSE;
-    m_created = FALSE;
+    m_readonly = false;
+    m_created = false;
 
     m_longname.reset();
     m_manufacturer.reset();

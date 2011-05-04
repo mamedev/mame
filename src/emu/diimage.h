@@ -216,9 +216,9 @@ public:
 	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
-	bool is_writable() { return m_writeable; }
+	bool is_writable() { return !m_readonly; }
 	bool has_been_created() { return m_created; }
-	void make_readonly() { m_writeable = 0; }
+	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }
 	UINT32 fwrite(const void *buffer, UINT32 length) { check_for_file(); return core_fwrite(m_file, buffer, length); }
 	int fseek(INT64 offset, int whence) { check_for_file(); return core_fseek(m_file, offset, whence); }
@@ -301,7 +301,7 @@ protected:
 	UINT32  m_supported;
 
     /* flags */
-    bool m_writeable;
+    bool m_readonly;
     bool m_created;
 	bool m_init_phase;
 	bool m_from_swlist;
