@@ -1790,7 +1790,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
-	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o \
+	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o $(MACHINE)/vectrex.o \
 	$(DRIVERS)/videopkr.o \
 	$(DRIVERS)/vp101.o \
 	$(DRIVERS)/vpoker.o \
