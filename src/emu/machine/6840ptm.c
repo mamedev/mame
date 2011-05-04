@@ -181,28 +181,6 @@ void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  status - Get enabled status
-//-------------------------------------------------
-
-int ptm6840_device::status( int clock ) const
-{
-	return m_enabled[clock - 1];
-}
-
-
-
-//-------------------------------------------------
-//  irq - Get IRQ state
-//-------------------------------------------------
-
-int ptm6840_device::irq_state() const
-{
-	return m_IRQ;
-}
-
-
-
-//-------------------------------------------------
 //  subtract_from_counter - Subtract from Counter
 //-------------------------------------------------
 
@@ -463,11 +441,6 @@ void ptm6840_device::reload_count(int idx)
 
 READ8_MEMBER( ptm6840_device::read )
 {
-	return read(offset);
-}
-
-UINT8 ptm6840_device::read(offs_t offset)
-{
 	int val;
 
 	switch ( offset )
@@ -531,11 +504,6 @@ UINT8 ptm6840_device::read(offs_t offset)
 //-------------------------------------------------
 
 WRITE8_MEMBER( ptm6840_device::write )
-{
-	write(offset, data);
-}
-
-void ptm6840_device::write(offs_t offset, UINT8 data)
 {
 	switch ( offset )
 	{
@@ -714,16 +682,6 @@ WRITE_LINE_MEMBER( ptm6840_device::set_c3 ) { set_clock(2, state); }
 
 
 //-------------------------------------------------
-//  count - get count value
-//-------------------------------------------------
-
-UINT16 ptm6840_device::count(int counter) const
-{
-	return compute_counter(counter);
-}
-
-
-//-------------------------------------------------
 //  set_ext_clock - set external clock frequency
 //-------------------------------------------------
 
@@ -767,14 +725,4 @@ void ptm6840_device::set_ext_clock(int counter, double clock)
 		m_timer[counter]->adjust(duration);
 		m_timer[counter]->enable(true);
 	}
-}
-
-
-//-------------------------------------------------
-//  ext_clock - get external clock frequency
-//-------------------------------------------------
-
-int ptm6840_device::ext_clock(int counter) const
-{
-	return m_external_clock[counter];
 }

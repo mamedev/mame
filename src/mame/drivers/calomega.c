@@ -662,8 +662,9 @@ static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 	int trx_clk;
 	UINT8 dsw2 = input_port_read(device->machine(), "SW2");
 	trx_clk = UART_CLOCK * dsw2 / 128;
-	acia6850_set_rx_clock(device, trx_clk);
-	acia6850_set_tx_clock(device, trx_clk);
+	acia6850_device *acia = downcast<acia6850_device *>(device);
+	acia->set_rx_clock(trx_clk);
+	acia->set_tx_clock(trx_clk);
 }
 
 
@@ -842,8 +843,8 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
 	AM_RANGE(0x1800, 0x3fff) AM_ROM

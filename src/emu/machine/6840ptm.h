@@ -54,16 +54,16 @@ public:
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const ptm6840_interface &interface);
 
-	int status(int clock) const;		// get whether timer is enabled
-	int irq_state() const;					// get IRQ state
-	UINT16 count(int counter) const;	// get counter value
+	int status(int clock) const { return m_enabled[clock - 1]; } // get whether timer is enabled
+	int irq_state() const { return m_IRQ; }					// get IRQ state
+	UINT16 count(int counter) const { return compute_counter(counter); }	// get counter value
 	void set_ext_clock(int counter, double clock);	// set clock frequency
-	int ext_clock(int counter) const;	// get clock frequency
+	int ext_clock(int counter) const { return m_external_clock[counter]; }	// get clock frequency
 
 	DECLARE_WRITE8_MEMBER( write );
-	void write(offs_t offset, UINT8 data);
+	void write(offs_t offset, UINT8 data) { write(*memory_nonspecific_space(machine()), offset, data); }
 	DECLARE_READ8_MEMBER( read );
-	UINT8 read(offs_t offset);
+	UINT8 read(offs_t offset) { return read(*memory_nonspecific_space(machine()), offset); }
 
 	void set_gate(int idx, int state);
 	DECLARE_WRITE_LINE_MEMBER( set_g1 );

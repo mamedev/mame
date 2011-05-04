@@ -349,12 +349,12 @@ static WRITE8_DEVICE_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		device_t *acia_0 = device->machine().device("acia6850_0");
-		device_t *acia_1 = device->machine().device("acia6850_1");
-		acia6850_tx_clock_in(acia_0);
-		acia6850_rx_clock_in(acia_0);
-		acia6850_tx_clock_in(acia_1);
-		acia6850_rx_clock_in(acia_1);
+		acia6850_device *acia_0 = device->machine().device<acia6850_device>("acia6850_0");
+		acia6850_device *acia_1 = device->machine().device<acia6850_device>("acia6850_1");
+		acia_0->tx_clock_in();
+		acia_0->rx_clock_in();
+		acia_1->tx_clock_in();
+		acia_1->rx_clock_in();
 	}
 }
 
@@ -1969,8 +1969,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
 ADDRESS_MAP_END
@@ -1978,8 +1978,8 @@ ADDRESS_MAP_END
 /* TODO: Fix up MPU4 map*/
 static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)
@@ -2004,16 +2004,16 @@ static ADDRESS_MAP_START( vp_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 /*  AM_RANGE(0xe05000, 0xe05001) AM_READWRITE(adpcm_r, adpcm_w) */
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
 /*  AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w) Word-based version of old CHR??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid_6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0x0880, 0x0881) //AM_NOP //Read/write here
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)
@@ -2038,8 +2038,8 @@ static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16 )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
@@ -2055,8 +2055,8 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16 )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8_MODERN("pia_ic4ss", pia6821_device, read, write, 0xff)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREADWRITE8_MODERN("6840ptm_ic3ss", ptm6840_device, read, write, 0xff)

@@ -34,9 +34,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_ACIA6850_ADD(_tag, _config) \
+#define MCFG_ACIA6850_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, ACIA6850, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+	acia6850_device::static_set_interface(*device, _interface);
 
 #define ACIA6850_INTERFACE(_name) \
 	const acia6850_interface(_name) =
@@ -74,17 +74,14 @@ class acia6850_device :  public device_t,
 public:
     // construction/destruction
     acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    
+	// static configuration helpers
+	static void static_set_interface(device_t &device, const acia6850_interface &interface);
 
-	void acia6850_tx_clock_in();
-	void acia6850_rx_clock_in();
-
-	void acia6850_set_rx_clock(int clock);
-	void acia6850_set_tx_clock(int clock);
-
-	void acia6850_ctrl_w(UINT32 offset, UINT8 data);
-	UINT8 acia6850_stat_r(UINT32 offset);
-	void acia6850_data_w(UINT32 offset, UINT8 data);
-	UINT8 acia6850_data_r(UINT32 offset);
+	DECLARE_WRITE8_MEMBER( control_write );
+	DECLARE_READ8_MEMBER( status_read );
+	DECLARE_WRITE8_MEMBER( data_write );
+	DECLARE_READ8_MEMBER( data_read );
 
 	void tx_clock_in();
 	void rx_clock_in();
@@ -96,16 +93,16 @@ public:
 
 protected:
     // device-level overrides
-    virtual void device_config_complete();
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
-
-	static TIMER_CALLBACK( transmit_event_callback );
-	static TIMER_CALLBACK( receive_event_callback );
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	enum
+	{
+		TIMER_ID_TRANSMIT,
+		TIMER_ID_RECEIVE
+	};
 
 	void check_interrupts();
 
@@ -151,19 +148,19 @@ private:
 
 	int			m_divide;
 
-	/* Counters */
+	// Counters
 	int			m_tx_bits;
 	int			m_rx_bits;
 	int			m_tx_parity;
 	int			m_rx_parity;
 
-	/* TX/RX state */
+	// TX/RX state
 	int			m_bits;
 	parity_type	m_parity;
 	int			m_stopbits;
 	int			m_tx_int;
 
-	/* Signals */
+	// Signals
 	int			m_overrun;
 	int			m_reset;
 	int			m_rts;
@@ -186,22 +183,5 @@ private:
 extern const device_type ACIA6850;
 
 
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-void acia6850_tx_clock_in(device_t *device) ATTR_NONNULL(1);
-void acia6850_rx_clock_in(device_t *device) ATTR_NONNULL(1);
-
-void acia6850_set_rx_clock(device_t *device, int clock) ATTR_NONNULL(1);
-void acia6850_set_tx_clock(device_t *device, int clock) ATTR_NONNULL(1);
-
-void acia6850_receive_data(device_t *device, UINT8 data) ATTR_NONNULL(1);
-
-WRITE8_DEVICE_HANDLER( acia6850_ctrl_w );
-READ8_DEVICE_HANDLER( acia6850_stat_r );
-WRITE8_DEVICE_HANDLER( acia6850_data_w );
-READ8_DEVICE_HANDLER( acia6850_data_r );
 
 #endif /* __ACIA6850_H__ */
