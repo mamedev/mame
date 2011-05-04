@@ -190,34 +190,34 @@ void devcb_resolved_read_line::resolve(const devcb_read_line &desc, device_t &de
 		case DEVCB_TYPE_NULL:
 			m_object.constant = 0;
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read_line::from_constant, "(null)", this);
+			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_constant, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read_line::from_port, desc.tag, this);
+			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_port, desc.tag, this);
 			break;
 	
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readline != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.readline, NULL, m_object.device);
+				*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(desc.readline, desc.name, m_object.device);
 			else
 			{
 				m_helper.read8_device = desc.readdevice;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read_line::from_read8, NULL, this);
+				*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_read8, desc.name, this);
 			}
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			m_helper.read8_space = desc.readspace;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read_line::from_read8, NULL, this);
+			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_read8, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(FUNC(devcb_resolved_read_line::from_constant), this);
+			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_constant, "constant", this);
 			break;
 	}
 }
@@ -284,35 +284,35 @@ void devcb_resolved_write_line::resolve(const devcb_write_line &desc, device_t &
 		default:
 		case DEVCB_TYPE_NULL:
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write_line::to_null, "(null)", this);
+			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_null, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write_line::to_port, desc.tag, this);
+			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_port, desc.tag, this);
 			break;
 
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.writeline != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.writeline, "", m_object.device);
+				*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(desc.writeline, desc.name, m_object.device);
 			else
 			{
 				m_helper.write8_device = desc.writedevice;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write_line::to_write8, desc.tag, this);
+				*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_write8, desc.name, this);
 			}
 			break;
 		
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
 			m_helper.write8_space = desc.writespace;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write_line::to_write8, desc.tag, this);
+			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_write8, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
 			m_object.execute = devcb_resolver::resolve_execute_interface(desc.tag, device);
 			m_helper.input_line = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write_line::to_input, desc.tag, this);
+			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_input, desc.tag, this);
 			break;
 	}
 }
@@ -389,33 +389,33 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 		case DEVCB_TYPE_NULL:
 			m_object.constant = 0;
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read8::from_constant, "(null)", this);
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_constant, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read8::from_port, desc.tag, this);
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_port, desc.tag, this);
 			break;
 	
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readdevice != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.readdevice, NULL, m_object.device);
+				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(desc.readdevice, desc.name, m_object.device);
 			else
 			{
 				m_helper.read_line = desc.readline;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read8::from_readline, NULL, this);
+				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_readline, desc.name, this);
 			}
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.readspace, NULL, m_object.space);
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(desc.readspace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read8::from_constant, NULL, this);
+			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_constant, "constant", this);
 			break;
 	}
 }
@@ -482,34 +482,34 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 		default:
 		case DEVCB_TYPE_NULL:
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write8::to_null, "(null)", this);
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_null, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write8::to_port, desc.tag, this);
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_port, desc.tag, this);
 			break;
 
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.writedevice != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.writedevice, NULL, m_object.device);
+				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(desc.writedevice, desc.name, m_object.device);
 			else
 			{
 				m_helper.write_line = desc.writeline;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write8::to_writeline, desc.tag, this);
+				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_writeline, desc.name, this);
 			}
 			break;
 		
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.writespace, NULL, m_object.space);
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
 			m_object.execute = devcb_resolver::resolve_execute_interface(desc.tag, device);
 			m_helper.input_line = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write8::to_input, desc.tag, this);
+			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_input, desc.tag, this);
 			break;
 	}
 }
@@ -586,33 +586,33 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 		case DEVCB_TYPE_NULL:
 			m_object.constant = 0;
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read16::from_constant, "(null)", this);
+			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_constant, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read16::from_port, desc.tag, this);
+			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_port, desc.tag, this);
 			break;
 	
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.readdevice != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.readdevice, NULL, m_object.device);
+				*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(desc.readdevice, desc.name, m_object.device);
 			else
 			{
 				m_helper.read_line = desc.readline;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read16::from_readline, NULL, this);
+				*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_readline, desc.name, this);
 			}
 			break;
 
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.readspace, NULL, m_object.space);
+			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(desc.readspace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_read16::from_constant, NULL, this);
+			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_constant, "constant", this);
 			break;
 	}
 }
@@ -679,34 +679,34 @@ void devcb_resolved_write16::resolve(const devcb_write16 &desc, device_t &device
 		default:
 		case DEVCB_TYPE_NULL:
 			m_helper.null_indicator = &s_null;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write16::to_null, "(null)", this);
+			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_null, "(null)", this);
 			break;
 		
 		case DEVCB_TYPE_IOPORT:
 			m_object.port = devcb_resolver::resolve_port(desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write16::to_port, desc.tag, this);
+			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_port, desc.tag, this);
 			break;
 
 		case DEVCB_TYPE_DEVICE:
 			m_object.device = devcb_resolver::resolve_device(desc.index, desc.tag, device);
 			if (desc.writedevice != NULL)
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.writedevice, NULL, m_object.device);
+				*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(desc.writedevice, desc.name, m_object.device);
 			else
 			{
 				m_helper.write_line = desc.writeline;
-				*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write16::to_writeline, desc.tag, this);
+				*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_writeline, desc.name, this);
 			}
 			break;
 		
 		case DEVCB_TYPE_LEGACY_SPACE:
 			m_object.space = devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(desc.writespace, NULL, m_object.space);
+			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
 			m_object.execute = devcb_resolver::resolve_execute_interface(desc.tag, device);
 			m_helper.input_line = desc.index;
-			*static_cast<base_delegate_t *>(this) = base_delegate_t(&devcb_resolved_write16::to_input, desc.tag, this);
+			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_input, desc.tag, this);
 			break;
 	}
 }

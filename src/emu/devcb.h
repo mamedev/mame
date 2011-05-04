@@ -158,20 +158,20 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 #define DEVCB_NULL								{ DEVCB_TYPE_NULL }
 
 // standard line or read/write handlers with the calling device passed
-#define DEVCB_LINE(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, (func), NULL, NULL }
-#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, NULL, (func), NULL }
-#define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_LINE(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #func, func, NULL, NULL }
+#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #func, NULL, func, NULL }
+#define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_SELF, NULL, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for the driver device
-#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_DRIVER, NULL, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for another device
-#define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, (func), NULL, NULL }
-#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, NULL, (func), NULL }
-#define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #func, func, NULL, NULL }
+#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #func, NULL, func, NULL }
+#define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, DEVCB_DEVICE_OTHER, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 // constant values
 #define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
@@ -179,13 +179,13 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 #define DEVCB_LINE_VCC							DEVCB_CONSTANT(1)
 
 // read/write handlers for a given CPU's address space
-#define DEVCB_MEMORY_HANDLER(cpu,space,func) 	{ DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), NULL, NULL, (func) }
+#define DEVCB_MEMORY_HANDLER(cpu,space,func) 	{ DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), #func, NULL, NULL, func }
 
 // read handlers for an I/O port by tag
-#define DEVCB_INPUT_PORT(tag)					{ DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL }
+#define DEVCB_INPUT_PORT(tag)					{ DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL, NULL }
 
 // write handlers for a CPU input line
-#define DEVCB_CPU_INPUT_LINE(tag,line)			{ DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL }
+#define DEVCB_CPU_INPUT_LINE(tag,line)			{ DEVCB_TYPE_INPUT_LINE, (line), (tag), NULL, NULL, NULL, NULL }
 
 
 // macros for defining read_line/write_line functions
@@ -264,6 +264,7 @@ struct devcb_read_line
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	read_line_device_func	readline;		// read line function
 	read8_device_func		readdevice;		// read device function
 	read8_space_func		readspace;		// read space function
@@ -272,11 +273,13 @@ struct devcb_read_line
 
 // ======================> devcb_resolved_read_line
 
+// base delegate type for a read_line
+typedef delegate<int ()> devcb_read_line_delegate;
+
 // class which wraps resolving a devcb_read_line into a delegate
-class devcb_resolved_read_line : public delegate<int ()>
+class devcb_resolved_read_line : public devcb_read_line_delegate
 {
 	DISABLE_COPYING(devcb_resolved_read_line);
-	typedef delegate<int ()> base_delegate_t;
 
 public:
 	// construction/destruction
@@ -310,6 +313,7 @@ struct devcb_write_line
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	write_line_device_func	writeline;		// write line function
 	write8_device_func		writedevice;	// write device function
 	write8_space_func		writespace;		// write space function
@@ -318,11 +322,13 @@ struct devcb_write_line
 
 // ======================> devcb_resolved_write_line
 
+// base delegate type for a write_line
+typedef delegate<void (int)> devcb_write_line_delegate;
+
 // class which wraps resolving a devcb_write_line into a delegate
-class devcb_resolved_write_line : public delegate<void (int)>
+class devcb_resolved_write_line : public devcb_write_line_delegate
 {
 	DISABLE_COPYING(devcb_resolved_write_line);
-	typedef delegate<void (int)> base_delegate_t;
 
 public:
 	// construction/destruction
@@ -357,6 +363,7 @@ struct devcb_read8
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	read_line_device_func	readline;		// read line function
 	read8_device_func		readdevice;		// read device function
 	read8_space_func		readspace;		// read space function
@@ -365,11 +372,13 @@ struct devcb_read8
 
 // ======================> devcb_resolved_read8
 
+// base delegate type for a read8
+typedef delegate<UINT8 (offs_t)> devcb_read8_delegate;
+
 // class which wraps resolving a devcb_read8 into a delegate
-class devcb_resolved_read8 : public delegate<UINT8 (offs_t)>
+class devcb_resolved_read8 : public devcb_read8_delegate
 {
 	DISABLE_COPYING(devcb_resolved_read8);
-	typedef delegate<UINT8 (offs_t)> base_delegate_t;
 
 public:
 	// construction/destruction
@@ -403,6 +412,7 @@ struct devcb_write8
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	write_line_device_func	writeline;		// write line function
 	write8_device_func		writedevice;	// write device function
 	write8_space_func		writespace;		// write space function
@@ -411,11 +421,13 @@ struct devcb_write8
 
 // ======================> devcb_resolved_write8
 
+// base delegate type for a write8
+typedef delegate<void (offs_t, UINT8)> devcb_write8_delegate;
+
 // class which wraps resolving a devcb_write8 into a delegate
-class devcb_resolved_write8 : public delegate<void (offs_t, UINT8)>
+class devcb_resolved_write8 : public devcb_write8_delegate
 {
 	DISABLE_COPYING(devcb_resolved_write8);
-	typedef delegate<void (offs_t, UINT8)> base_delegate_t;
 
 public:
 	// construction/destruction
@@ -450,6 +462,7 @@ struct devcb_read16
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	read_line_device_func	readline;		// read line function
 	read16_device_func		readdevice;		// read device function
 	read16_space_func		readspace;		// read space function
@@ -458,11 +471,13 @@ struct devcb_read16
 
 // ======================> devcb_resolved_read16
 
+// base delegate type for a write8
+typedef delegate<UINT16 (offs_t, UINT16)> devcb_read16_delegate;
+
 // class which wraps resolving a devcb_read16 into a delegate
-class devcb_resolved_read16 : public delegate<UINT16 (offs_t, UINT16)>
+class devcb_resolved_read16 : public devcb_read16_delegate
 {
 	DISABLE_COPYING(devcb_resolved_read16);
-	typedef delegate<UINT16 (offs_t, UINT16)> base_delegate_t;
 
 public:
 	// construction/destruction
@@ -496,6 +511,7 @@ struct devcb_write16
 	UINT16					type;			// one of the special DEVCB_TYPE values
 	UINT16					index;			// index related to the above types
 	const char *			tag;			// tag of target, where appropriate
+	const char *			name;			// name of the target function
 	write_line_device_func	writeline;		// write line function
 	write16_device_func		writedevice;	// write device function
 	write16_space_func		writespace;		// write space function
@@ -504,11 +520,13 @@ struct devcb_write16
 
 // ======================> devcb_resolved_write16
 
+// base delegate type for a write8
+typedef delegate<void (offs_t, UINT16, UINT16)> devcb_write16_delegate;
+
 // class which wraps resolving a devcb_write16 into a delegate
-class devcb_resolved_write16 : public delegate<void (offs_t, UINT16, UINT16)>
+class devcb_resolved_write16 : public devcb_write16_delegate
 {
 	DISABLE_COPYING(devcb_resolved_write16);
-	typedef delegate<void (offs_t, UINT16, UINT16)> base_delegate_t;
 
 public:
 	// construction/destruction
