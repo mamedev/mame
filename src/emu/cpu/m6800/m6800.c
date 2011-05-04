@@ -1214,6 +1214,11 @@ static CPU_INIT( m6801 )
 
 		cpustate->out_sc2_func.resolve(intf->out_sc2_func, *device);
 	}
+	else
+	{
+		devcb_write_line nullcb = DEVCB_NULL;
+		cpustate->out_sc2_func.resolve(nullcb, *device);
+	}
 }
 
 /****************************************************************************
