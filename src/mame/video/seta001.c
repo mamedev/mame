@@ -189,13 +189,17 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 	int ctrl2	=	m_spritectrl[1];
 
 	int flip	=	ctrl & 0x40;
-	int numcol	=	ctrl2 & 0x000f;
+	int numcol	=	ctrl2 & 0x0f;
+
+	int scrollx, scrolly;
+
+	UINT32 upper;
+
+	UINT8* scrollram = m_spriteylow+0x200;
 
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
 
-	int upper	=	( m_spritectrl[2] ) +
-					( m_spritectrl[3] ) * 256;
 
 	int max_y	=	0xf0;
 
@@ -216,6 +220,7 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 	if (numcol == 1)
 		numcol = 16;
 
+	upper = m_spritectrl[2] + m_spritectrl[3] * 256;
 
 	/* The first column is the frontmost, see twineagl test mode
         BM 071204 - first column frontmost breaks superman.
@@ -223,15 +228,17 @@ void seta001_device::setac_draw_background(running_machine &machine, bitmap_t *b
 //  for ( col = numcol - 1 ; col >= 0; col -- )
 	for ( col = 0 ; col < numcol; col ++ )
 	{
-		int x	=	m_spriteylow[(col * 0x20 + 0x08 + 0x400)/2] & 0xff;
-		int y	=	m_spriteylow[(col * 0x20 + 0x00 + 0x400)/2] & 0xff;
+		scrollx	=	scrollram[(col * 0x10 + 0x04)];
+		scrolly	=	scrollram[(col * 0x10 + 0x00)];
 
 		/* draw this column */
 		for ( offs = 0 ; offs < 0x40/2; offs += 2/2 )
 		{
-			int	code	=	(m_spritecodehigh[((col+col0)&0xf) * 0x40/2 + offs + bank + 0x800/2]<<8) | (m_spritecodelow[((col+col0)&0xf) * 0x40/2 + offs + bank + 0x800/2]);
-			int	color	=	(m_spritecodehigh[((col+col0)&0xf) * 0x40/2 + offs + bank + 0xc00/2]<<8) | (m_spritecodelow[((col+col0)&0xf) * 0x40/2 + offs + bank + 0xc00/2]);
+			int i = ((col+col0)&0xf) * 0x40/2 + offs;
 
+			int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
+			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank]; 
+				
 			int	flipx	=	code & 0x8000;
 			int	flipy	=	code & 0x4000;
 
@@ -253,8 +260,8 @@ superman:   010 021 07 38   (game)
 twineagl:   000 027 00 0f   (test mode)
 */
 
-			int sx		=	  x + xoffs  + (offs & 1) * 16;
-			int sy		=	-(y + yoffs) + (offs / 2) * 16;
+			int sx		=	  scrollx + xoffs  + (offs & 1) * 16;
+			int sy		=	-(scrolly + yoffs) + (offs / 2) * 16;
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -282,22 +289,27 @@ twineagl:   000 027 00 0f   (test mode)
 
 void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, UINT8* bg_flag)
 {
-	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
+	int transpen;
 
-	int x, y, column, tot, transpen;
+	int offs, col;
+
+	int total_color_codes	=	machine.config().m_gfxdecodeinfo[0].total_color_codes;
+
+	int ctrl	=	m_spritectrl[0];
+	int ctrl2	=	m_spritectrl[1];
+
+	int flip	=	ctrl & 0x40;
+	int numcol	=	ctrl2 & 0x1f;
+
 	int scrollx, scrolly;
-	UINT32 upperbits;
-	int ctrl2 = m_spritectrl[1];
 
-	UINT8* m = m_spritecodelow + 0x400;
-	UINT8* m2 = m_spritecodehigh + 0x400;
+	UINT32 upper;
+
 	UINT8* scrollram = m_spriteylow+0x200;
 
-	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
-	{
-		m += bank_size;
-		m2 += bank_size;
-	}
+	/* Sprites Banking and/or Sprites Buffering */
+	UINT16 bank = ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? bank_size : 0 );
+
 
 	if (bg_flag[0] & 0x80)
 		transpen = -1;
@@ -305,50 +317,51 @@ void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *b
 		transpen = m_transpen;
 
 
-	/* The byte at f200 is the y-scroll value for the first column.
-       The byte at f204 is the LSB of x-scroll value for the first column.
+	/* The byte at f200 is the y-scroll value for the first col.
+       The byte at f204 is the LSB of x-scroll value for the first col.
 
-       The other columns follow at 16-byte intervals.
+       The other cols follow at 16-byte intervals.
 
        The 9th bit of each x-scroll value is combined into 2 bytes
        at f302-f303 */
 
-	/* f301 controls how many columns are drawn. */
-	tot = m_spritectrl[1] & 0x1f;
-	if (tot == 1)
-		tot = 16;
+	/* f301 controls how many cols are drawn. */
+	if (numcol == 1)
+		numcol = 16;
 
-	upperbits = m_spritectrl[2] + m_spritectrl[3] * 256;
+	upper = m_spritectrl[2] + m_spritectrl[3] * 256;
 
-	for (column = 0; column < tot; column++)
+	for (col = 0; col < numcol; col++)
 	{
-		scrollx = scrollram[column * 16 + 4] - ((upperbits & 0x01) * 256);
-		if (screenflip)
-			scrolly = scrollram[column * 16] + 1 - 256;
+		scrollx = scrollram[col * 0x10 + 4] - ((upper & 0x01) * 256);
+		if (flip)
+			scrolly = scrollram[col * 0x10] + 1 - 256;
 		else
-			scrolly = -scrollram[column * 16] + 1;
+			scrolly = -scrollram[col * 0x10] + 1;
 
-		for (y = 0; y < 16; y++)
+		/* draw this column */
+		for ( offs = 0 ; offs < 0x40/2; offs += 2/2 )
 		{
-			for (x = 0; x < 2; x++)
-			{
-				int code, color, flipx, flipy, sx, sy;
-				int i = 32 * (column ^ 8) + 2 * y + x;
+				int i = 32 * (col ^ 8) + 2 * (offs>>1) + (offs&1);
 
-				code  = m[i];
-				code +=(m2[i] & 0x3f) << 8;
-				flipx = m2[i] & 0x80;
-				flipy = m2[i] & 0x40;
-	
-				color = (m2[i + 0x200] & 0xf8) >> 3; /* colours at d600-d7ff */
-				sx = x * 16;
-				sy = y * 16;
-				if (screenflip)
+				int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
+				int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank]; 
+				
+				int	flipx	=	code & 0x8000;
+				int	flipy	=	code & 0x4000;
+
+				int sx		=	(offs & 1) * 16;
+				int sy		=	(offs / 2) * 16;
+
+				if (flip)
 				{
 					sy = 240 - sy;
 					flipx = !flipx;
 					flipy = !flipy;
 				}
+
+				color	=	( color >> (16-5) ) % total_color_codes;
+				code &= 0x3fff;
 
 				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 						code,
@@ -364,10 +377,9 @@ void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *b
 						flipx,flipy,
 						sx + 512 + scrollx,(sy + scrolly) & 0xff,
 						transpen);
-			}
 		}
 
-		upperbits >>= 1;
+		upper >>= 1;
 	}
 }
 
