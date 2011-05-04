@@ -376,6 +376,9 @@ protected:
 		operator _TargetType() { return m_target; }
 		operator _TargetType() const { return m_target; }
 		_TargetType operator->() { return m_target; }
+		
+		// getter for explicit fetching
+		_TargetType target() const { return m_target; }
 
 		// setter for setting the object
 		void set_target(_TargetType target)
