@@ -103,7 +103,7 @@ static int internal_load_hd(device_image_interface &image, const char *metadata)
 	/* open the CHD file */
 	do
 	{
-		is_writeable = image.is_writable();
+		is_writeable = !image.is_readonly();
 		harddisk->chd = NULL;
 		err = chd_open_file(image.image_core_file(), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &harddisk->chd);
 

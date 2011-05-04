@@ -216,7 +216,7 @@ public:
 	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
-	bool is_writable() { return !m_readonly; }
+	bool is_readonly() { return m_readonly; }
 	bool has_been_created() { return m_created; }
 	void make_readonly() { m_readonly = true; }
 	UINT32 fread(void *buffer, UINT32 length) { check_for_file(); return core_fread(m_file, buffer, length); }

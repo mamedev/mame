@@ -288,7 +288,7 @@ static DEVICE_IMAGE_LOAD( cassette )
 		/* opening an image */
 		do
 		{
-			is_writable = image.is_writable();
+			is_writable = !image.is_readonly();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
 			extension = image.filetype();
 			err = cassette_open_choices((void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);

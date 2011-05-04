@@ -627,7 +627,7 @@ static int internal_floppy_device_load(device_image_interface *image, int create
 	else
 	{
 		/* opening an image */
-		floppy_flags = image->is_writable() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
+		floppy_flags = !image->is_readonly() ? FLOPPY_FLAGS_READWRITE : FLOPPY_FLAGS_READONLY;
 		extension = image->filetype();
 		err = floppy_open_choices((void *) image, &image_ioprocs, extension, floppy_options, floppy_flags, &flopimg->floppy);
 		if (err)
@@ -676,7 +676,7 @@ DEVICE_IMAGE_LOAD( floppy )
 	/* set timer for disk load */
 	int next_wpt;
 
-	if (image.is_writable())
+	if (!image.is_readonly())
 		next_wpt = ASSERT_LINE;
 	else
 		next_wpt = CLEAR_LINE;
