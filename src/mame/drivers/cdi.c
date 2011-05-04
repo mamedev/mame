@@ -249,6 +249,16 @@ static MACHINE_RESET( quizrd32 )
     scc68070_set_quizard_mcu_ack(machine, 0x58);
 }
 
+/* Untested - copied from quizrr41 */
+static MACHINE_RESET( quizrr40 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+	//scc68070_set_quizard_mcu_value(machine, 0x0139);
+	scc68070_set_quizard_mcu_value(machine, 0x011f);
+	scc68070_set_quizard_mcu_ack(machine, 0x57);
+}
+
 static MACHINE_RESET( quizrr41 )
 {
 	MACHINE_RESET_CALL( cdi );
@@ -363,6 +373,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd32, quizard )
 	MCFG_MACHINE_RESET( quizrd32 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrr40, quizard )
+	MCFG_MACHINE_RESET( quizrr40 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrr41, quizard )
@@ -485,6 +499,21 @@ ROM_START( quizrr41 )
     DISK_IMAGE_READONLY( "quizrr41", 0, SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 ROM_END
 
+ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e) )
+
+    ROM_REGION(0x2000, "cdic", 0)
+    ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    ROM_REGION(0x2000, "slave", 0)
+    ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
+
+    DISK_REGION( "cdrom" )
+    DISK_IMAGE_READONLY( "quizrr40", 0, SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
+ROM_END
+
+
 /*************************
 *      Game driver(s)    *
 *************************/
@@ -501,6 +530,7 @@ GAME( 1995, quizrd22, cdimono1,      quizrd22,      quizard,      0, ROT0,     "
 
 // Partially working
 GAME( 1996, quizard,  cdimono1,      quizrd32,      quizard,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1997, quizrr40, cdimono1,      quizrr40,      quizard,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.0", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr41, cdimono1,      quizrr41,      quizard,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr42, cdimono1,      quizrr42,      quizard,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
