@@ -294,7 +294,10 @@ void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *b
 	UINT8* scrollram = m_spriteylow+0x200;
 
 	if ((ctrl2 ^ (~ctrl2 << 1)) & 0x40)
+	{
 		m += bank_size;
+		m2 += bank_size;
+	}
 
 	if (bg_flag[0] & 0x80)
 		transpen = -1;
