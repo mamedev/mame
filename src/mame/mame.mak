@@ -1613,8 +1613,9 @@ $(MAMEOBJ)/pinball.a: \
 #-------------------------------------------------
 
 $(MAMEOBJ)/misc.a: \
-	$(DRIVERS)/39in1.o \
 	$(DRIVERS)/1945kiii.o \
+	$(DRIVERS)/39in1.o \
+	$(DRIVERS)/3do.o $(MACHINE)/3do.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/5clown.o \
 	$(DRIVERS)/acefruit.o \

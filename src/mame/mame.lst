@@ -12268,6 +12268,10 @@ strike
 // most are commented out for now, the exceptions being sets which act as the parents to actual MAME drivers
 // due to the arcade units being based on stock retail console units.
 
+// 3DO
+3do
+3do_pal
+
 // Sega Megadrive / Genesis and related systems
 // (hardware used by Megatech, Megaplay + many standalone boards)
 //genesis		// (c)1989 Sega
