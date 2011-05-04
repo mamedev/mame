@@ -291,6 +291,7 @@ Notes:
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "includes/armedf.h"
+#include "includes/nb1414m4.h"
 
 #define LEGION_HACK	0
 

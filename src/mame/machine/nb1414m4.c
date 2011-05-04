@@ -27,7 +27,7 @@ Notes:
 ********************************************************************************************************************/
 
 #include "emu.h"
-#include "includes/armedf.h"
+#include "includes/nb1414m4.h"
 
 static void nichibutsu_1414m4_dma(address_space *space,UINT16 src,UINT16 dst,UINT16 size, UINT8 condition,UINT8 *vram)
 {

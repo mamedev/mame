@@ -64,5 +64,3 @@ WRITE16_HANDLER( armedf_fg_scrollx_w );
 WRITE16_HANDLER( armedf_fg_scrolly_w );
 WRITE16_HANDLER( armedf_bg_scrollx_w );
 WRITE16_HANDLER( armedf_bg_scrolly_w );
-
-void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd,UINT8 *vram,UINT16 &scrollx,UINT16 &scrolly,tilemap_t *tilemap);

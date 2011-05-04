@@ -1019,7 +1019,7 @@ $(MAMEOBJ)/neogeo.a: \
 	$(MACHINE)/neoprot.o \
 
 $(MAMEOBJ)/nichibut.a: \
-	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o $(MACHINE)/armedf.o \
+	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o \
 	$(DRIVERS)/cclimber.o $(MACHINE)/cclimber.o $(AUDIO)/cclimber.o $(VIDEO)/cclimber.o \
 	$(DRIVERS)/clshroad.o $(VIDEO)/clshroad.o \
 	$(DRIVERS)/csplayh5.o \
@@ -1043,6 +1043,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/tubep.o $(VIDEO)/tubep.o \
 	$(DRIVERS)/wiping.o $(AUDIO)/wiping.o $(VIDEO)/wiping.o \
 	$(MACHINE)/nb1413m3.o \
+	$(MACHINE)/nb1414m4.o \
 
 $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/cham24.o \
