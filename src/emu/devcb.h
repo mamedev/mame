@@ -197,21 +197,6 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 #define DECLARE_WRITE_LINE_MEMBER(name) 	void name(ATTR_UNUSED int state)
 #define WRITE_LINE_MEMBER(name)				void name(ATTR_UNUSED int state)
 
-// macros for inline device handler initialization
-
-#define MCFG_DEVICE_CONFIG_DEVCB_GENERIC(_access, _struct, _entry, _tag, _type, _linefunc, _devfunc, _spacefunc) \
-	MCFG_DEVICE_CONFIG_DATA32(_struct, _entry .type, DEVCB_TYPE_DEVICE) \
-	MCFG_DEVICE_CONFIG_DATAPTR(_struct, _entry .tag, _tag) \
-	MCFG_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## line, _linefunc) \
-	MCFG_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## device, _devfunc) \
-	MCFG_DEVICE_CONFIG_DATAPTR(_struct, _entry .  _access ## space, _spacefunc)
-
-#define MCFG_DEVICE_CONFIG_READ_LINE(_struct, _entry, _tag, _func) MCFG_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
-#define MCFG_DEVICE_CONFIG_WRITE_LINE(_struct, _entry, _tag, _func) MCFG_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
-
-#define MCFG_DEVICE_CONFIG_READ_HANDLER(_struct, _entry, _tag, _func) MCFG_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
-#define MCFG_DEVICE_CONFIG_WRITE_HANDLER(_struct, _entry, _tag, _func) MCFG_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
-
 
 
 //**************************************************************************

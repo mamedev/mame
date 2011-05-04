@@ -338,8 +338,20 @@ public:
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { return (*m_function)(m_callobject, p1, p2, p3); }
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { return (*m_function)(m_callobject, p1, p2, p3, p4); }
 
-	// static stub creator
+	// static stub creators
 	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::member_func_type _Function>
+	static delegate_base static_creator(const char *name)
+	{
+		return delegate_base(_Function, name, (_FunctionClass *)NULL);
+	}
+
+	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_func_type _Function>
+	static delegate_base static_creator(const char *name)
+	{
+		return delegate_base(_Function, name, (_FunctionClass *)NULL);
+	}
+
+	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_ref_func_type _Function>
 	static delegate_base static_creator(const char *name)
 	{
 		return delegate_base(_Function, name, (_FunctionClass *)NULL);
@@ -553,8 +565,20 @@ public:
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { return (*m_function)(m_object, p1, p2, p3); }
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { return (*m_function)(m_object, p1, p2, p3, p4); }
 
-	// static stub creator
+	// static stub creators
 	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::member_func_type _Function>
+	static delegate_base static_creator(const char *name)
+	{
+		return delegate_base(_Function, name, (_FunctionClass *)NULL);
+	}
+
+	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_func_type _Function>
+	static delegate_base static_creator(const char *name)
+	{
+		return delegate_base(_Function, name, (_FunctionClass *)NULL);
+	}
+
+	template<class _FunctionClass, typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>::static_ref_func_type _Function>
 	static delegate_base static_creator(const char *name)
 	{
 		return delegate_base(_Function, name, (_FunctionClass *)NULL);
