@@ -271,8 +271,8 @@ static void nichibutsu_1414m4_0e00(address_space *space,UINT16 mcu_cmd,UINT8 *vr
 void nb_1414m4_exec(address_space *space,UINT16 mcu_cmd,UINT8 *vram,UINT16 &scrollx,UINT16 &scrolly,tilemap_t *tilemap)
 {
 	/* latch fg scroll values */
-	scrollx = (vram[0x0d] & 0xff) | ((vram[0x0e] & 0x3) << 8);
-	scrolly = (vram[0x0b] & 0xff) | ((vram[0x0c] & 0x3) << 8);
+	scrollx = (vram[0x0d] & 0xff) | ((vram[0x0e] & 0xff) << 8);
+	scrolly = (vram[0x0b] & 0xff) | ((vram[0x0c] & 0xff) << 8);
 
 	/* process the command */
 	switch(mcu_cmd & 0xff00)

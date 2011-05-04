@@ -32,6 +32,7 @@ Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 #include "sound/dac.h"
 #include "sound/3526intf.h"
 #include "includes/galivan.h"
+#include "includes/nb1414m4.h"
 
 
 static WRITE8_HANDLER( galivan_sound_command_w )
@@ -51,37 +52,12 @@ static READ8_HANDLER( IO_port_c0_r )
 }
 
 
-/* the scroll registers are memory mapped in ninjemak, I/O ports in the others */
-static WRITE8_HANDLER( ninjemak_videoreg_w )
-{
-	switch (offset)
-	{
-		case	0x0b:
-			ninjemak_scrolly_w(space, 0, data);
-			break;
-		case	0x0c:
-			ninjemak_scrolly_w(space, 1, data);
-			break;
-		case	0x0d:
-			ninjemak_scrollx_w(space, 0, data);
-			break;
-		case	0x0e:
-			ninjemak_scrollx_w(space, 1, data);
-			break;
-		default:
-			break;
-	}
-}
-
-
 
 static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	// The next three entires need to be looked at.  It's ugly.
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, m_colorram)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
 
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
@@ -90,11 +66,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	// The next three entires need to be looked at.  It's ugly.
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xd81f) AM_WRITE(ninjemak_videoreg_w)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, m_colorram)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
 
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
@@ -116,6 +89,13 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( blit_trigger_w )
+{
+	galivan_state *state = space->machine().driver_data<galivan_state>();
+
+	nb_1414m4_exec(space,(state->m_videoram[0] << 8) | (state->m_videoram[1] & 0xff),state->m_videoram,state->m_scrollx,state->m_scrolly,state->m_tx_tilemap);
+}
+
 static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
@@ -124,7 +104,7 @@ static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8 )
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x84, 0x84) AM_READ_PORT("DSW1")
 	AM_RANGE(0x85, 0x85) AM_READ_PORT("DSW2") AM_WRITE(galivan_sound_command_w)
-//  AM_RANGE(0x86, 0x86) AM_WRITENOP         // ??
+	AM_RANGE(0x86, 0x86) AM_WRITE(blit_trigger_w)         // ??
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
@@ -438,8 +418,8 @@ static MACHINE_RESET( galivan )
 //  state->m_layers = 0x60;
 	state->m_layers = 0;
 	state->m_write_layers = 0;
-	state->m_scrollx[0] = state->m_scrollx[1] = 0;
-	state->m_scrolly[0] = state->m_scrolly[1] = 0;
+	state->m_galivan_scrollx[0] = state->m_galivan_scrollx[1] = 0;
+	state->m_galivan_scrolly[0] = state->m_galivan_scrolly[1] = 0;
 	state->m_flipscreen = 0;
 }
 
@@ -449,8 +429,8 @@ static MACHINE_RESET( ninjemak )
 
 	machine.device("maincpu")->reset();
 
-	state->m_scrollx[0] = state->m_scrollx[1] = 0;
-	state->m_scrolly[0] = state->m_scrolly[1] = 0;
+	state->m_scrollx = 0;
+	state->m_scrolly = 0;
 	state->m_flipscreen = 0;
 	state->m_ninjemak_dispdisable = 0;
 }
@@ -764,7 +744,7 @@ ROM_START( ninjemak )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter? */
 	ROM_LOAD( "ninjemak.5",   0x0000, 0x4000, CRC(5f91dd30) SHA1(3513c0a2e4ca83f602cacad6af9c07fe9e4b16a1) )	/* text layer data */
 
 	ROM_REGION( 0x0400, "proms", 0 )	/* Region 3 - color data */
@@ -806,7 +786,7 @@ ROM_START( youma )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter? */
 	ROM_LOAD( "ync-5.bin",    0x0000, 0x4000, CRC(993e4ab2) SHA1(aceafc83b36db4db923d27f77ad045e626678bae) )	/* text layer data */
 
 	ROM_REGION( 0x0400, "proms", 0 )	/* Region 3 - color data */
@@ -848,7 +828,7 @@ ROM_START( youma2 )
 	ROM_LOAD( "ninjemak.7",   0x0000, 0x4000, CRC(80c20d36) SHA1(f20724754824030d62059388f3ea2224f5b7a60e) )
 	ROM_LOAD( "ninjemak.6",   0x4000, 0x4000, CRC(1da7a651) SHA1(5307452058164a0bc39d144dd204627a9ead7543) )
 
-	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter? */
+	ROM_REGION( 0x4000, "blit_data", 0 )	/* data for mcu/blitter? */
 	ROM_LOAD( "5.15d",    0x0000, 0x4000, CRC(1b4f64aa) SHA1(2cb2db946bf93e0928d6aa2e2dd29acb92981567) )	/* text layer data x */
 
 	ROM_REGION( 0x0400, "proms", 0 )	/* Region 3 - color data */

@@ -12,7 +12,7 @@ public:
 
 	/* memory pointers */
 	UINT8 *     m_videoram;
-	UINT8 *     m_colorram;
+//	UINT8 *     m_colorram;
 	UINT8 *     m_spriteram;
 	size_t      m_videoram_size;
 	size_t      m_spriteram_size;
@@ -20,8 +20,9 @@ public:
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	UINT8       m_scrollx[2];
-	UINT8       m_scrolly[2];
+	UINT16       m_scrollx;
+	UINT16       m_scrolly;
+	UINT8 		m_galivan_scrollx[2],m_galivan_scrolly[2];
 	UINT8       m_flipscreen;
 	UINT8       m_write_layers;
 	UINT8       m_layers;
@@ -35,7 +36,6 @@ public:
 WRITE8_HANDLER( galivan_scrollx_w );
 WRITE8_HANDLER( galivan_scrolly_w );
 WRITE8_HANDLER( galivan_videoram_w );
-WRITE8_HANDLER( galivan_colorram_w );
 WRITE8_HANDLER( galivan_gfxbank_w );
 WRITE8_HANDLER( ninjemak_scrollx_w );
 WRITE8_HANDLER( ninjemak_scrolly_w );

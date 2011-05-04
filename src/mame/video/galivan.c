@@ -134,7 +134,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
-	int attr = state->m_colorram[tile_index];
+	int attr = state->m_videoram[tile_index + 0x400];
 	int code = state->m_videoram[tile_index] | ((attr & 0x01) << 8);
 	SET_TILE_INFO(
 			0,
@@ -159,7 +159,7 @@ static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 {
 	galivan_state *state = machine.driver_data<galivan_state>();
-	int attr = state->m_colorram[tile_index];
+	int attr = state->m_videoram[tile_index + 0x400];
 	int code = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
 			0,
@@ -208,14 +208,7 @@ WRITE8_HANDLER( galivan_videoram_w )
 {
 	galivan_state *state = space->machine().driver_data<galivan_state>();
 	state->m_videoram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
-}
-
-WRITE8_HANDLER( galivan_colorram_w )
-{
-	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_colorram[offset] = data;
-	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset);
+	tilemap_mark_tile_dirty(state->m_tx_tilemap, offset & 0x3ff);
 }
 
 /* Written through port 40 */
@@ -251,23 +244,7 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 	tilemap_set_flip (state->m_bg_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_flip (state->m_tx_tilemap, state->m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	/* bit 3 text bank flag ??? */
-	if (data & 0x08)
-	{
-		/* This is a temporary condition specification. */
-		int offs;
-
-		logerror("%04x: write %02x to port 80\n", cpu_get_pc(&space->device()), data);
-
-		for (offs = 0; offs < state->m_videoram_size; offs++)
-		{
-			galivan_videoram_w(space, offs, 0x20);
-		}
-		for (offs = 0; offs < state->m_videoram_size; offs++)
-		{
-			galivan_colorram_w(space, offs, 0x03);
-		}
-	}
+	/* bit 3 unknown */
 
 	/* bit 4 background disable flag */
 	state->m_ninjemak_dispdisable = data & 0x10;
@@ -307,27 +284,14 @@ WRITE8_HANDLER( galivan_scrollx_w )
 			state->m_write_layers = 0;
 		}
 	}
-	state->m_scrollx[offset] = data;
+	state->m_galivan_scrollx[offset] = data;
 }
 
 /* Written through port 43-44 */
 WRITE8_HANDLER( galivan_scrolly_w )
 {
 	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_scrolly[offset] = data;
-}
-
-
-WRITE8_HANDLER( ninjemak_scrollx_w )
-{
-	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_scrollx[offset] = data;
-}
-
-WRITE8_HANDLER( ninjemak_scrolly_w )
-{
-	galivan_state *state = space->machine().driver_data<galivan_state>();
-	state->m_scrolly[offset] = data;
+	state->m_galivan_scrolly[offset] = data;
 }
 
 
@@ -380,8 +344,8 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( galivan )
 {
 	galivan_state *state = screen->machine().driver_data<galivan_state>();
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * (state->m_scrollx[1] & 0x07));
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0] + 256 * (state->m_scrolly[1] & 0x07));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
 
 	if (state->m_layers & 0x40)
 		bitmap_fill(bitmap, cliprect, 0);
@@ -409,8 +373,8 @@ SCREEN_UPDATE( ninjemak )
 	galivan_state *state = screen->machine().driver_data<galivan_state>();
 
 	/* (scrollx[1] & 0x40) does something */
-	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx[0] + 256 * (state->m_scrollx[1] & 0x1f));
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly[0] + 256 * (state->m_scrolly[1] & 0xff));
+	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_scrollx);
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_scrolly);
 
 	if (state->m_ninjemak_dispdisable)
 		bitmap_fill(bitmap, cliprect, 0);
