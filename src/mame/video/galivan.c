@@ -161,6 +161,10 @@ static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 	galivan_state *state = machine.driver_data<galivan_state>();
 	int attr = state->m_videoram[tile_index + 0x400];
 	int code = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
+
+	if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+		code = attr = 0x01;
+
 	SET_TILE_INFO(
 			0,
 			code,
