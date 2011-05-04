@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include <ctype.h>
 
 
@@ -66,6 +67,22 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
 
+	// intialize slot devices
+	device_slot_interface *slot = NULL;	
+	/* make sure that any required devices have been allocated */
+    for (bool gotone = m_devicelist.first(slot); gotone; gotone = slot->next(slot))
+	{
+		device_t &owner = slot->device();
+		const char *selval = options.value(slot->device().tag());
+		const slot_interface *intf = slot->get_slot_interfaces();
+		if (intf != NULL && selval) {	
+			for (int i = 0; intf[i].name != NULL; i++) {
+				if (strcmp(selval,intf[i].name)==0) {
+					device_add(&owner,intf[i].name, intf[i].devtype, 0);
+				}
+			}			
+		}
+	}
 	// when finished, set the game driver
 	device_t *root = m_devicelist.find("root");
 	if (root == NULL)

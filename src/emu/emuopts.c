@@ -223,11 +223,44 @@ void emu_options::add_device_options()
 	// create the configuration
 	machine_config config(*cursystem, *this);
 
+	options_entry entry[2] = { { 0 }, { 0 } };
+	bool first = true;
+	const device_slot_interface *slot = NULL;
+	for (bool gotone = config.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	{
+		// first device? add the header as to be pretty
+		if (first)
+		{
+			first = false;
+			entry[0].name = NULL;
+			entry[0].description = "SLOT DEVICES";
+			entry[0].flags = OPTION_HEADER | OPTION_FLAG_DEVICE;
+			entry[0].defvalue = NULL;
+			add_entries(entry);
+		}
+
+		// retrieve info about the device instance
+		astring option_name;
+		option_name.printf("%s;%s", slot->device().tag(), slot->device().tag());
+
+		const slot_interface *intf = slot->get_slot_interfaces();		
+		if (intf != NULL) {
+			entry[0].defvalue = slot->get_default_card();
+		} else {
+			entry[0].defvalue = NULL;
+		}
+
+		// add the option
+		entry[0].name = option_name;
+		entry[0].description = NULL;
+		entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
+		add_entries(entry, true);
+	}
+
 	// iterate through all image devices
 	const device_image_interface *image = NULL;
-	bool first = true;
-	options_entry entry[2] = { { 0 }, { 0 } };
-	for (bool gotone = config.devicelist().first(image); gotone; gotone = image->next(image))
+	machine_config slot_config(*cursystem, *this);
+	for (bool gotone = slot_config.devicelist().first(image); gotone; gotone = image->next(image))
 	{
 		// first device? add the header as to be pretty
 		if (first)
@@ -236,6 +269,7 @@ void emu_options::add_device_options()
 			entry[0].name = NULL;
 			entry[0].description = "IMAGE DEVICES";
 			entry[0].flags = OPTION_HEADER | OPTION_FLAG_DEVICE;
+			entry[0].defvalue = NULL;
 			add_entries(entry);
 		}
 
@@ -247,6 +281,7 @@ void emu_options::add_device_options()
 		entry[0].name = option_name;
 		entry[0].description = NULL;
 		entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
+		entry[0].defvalue = NULL;
 		add_entries(entry, true);
 	}
 }
