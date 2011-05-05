@@ -1085,7 +1085,7 @@ struct _inp_header
 /* ----- core system management ----- */
 
 /* initialize the input ports, processing the given token list */
-time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_list &devicelist);
+time_t input_port_init(running_machine &machine, const device_list &devicelist);
 
 
 

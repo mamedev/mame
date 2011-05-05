@@ -248,7 +248,6 @@ void info_xml_creator::output_one()
 	// allocate input ports
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
-	input_port_list_init(portlist, driver.ipt, NULL, 0, FALSE, NULL);
 	for (device_t *device = config.devicelist().first(); device != NULL; device = device->next())
 		if (device->input_ports() != NULL)
 			input_port_list_init(portlist, device->input_ports(), NULL, 0, FALSE, device);

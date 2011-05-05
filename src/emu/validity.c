@@ -957,14 +957,7 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 		return FALSE;
 
 	/* allocate the input ports */
-	input_port_list_init(portlist, driver.ipt, errorbuf, sizeof(errorbuf), FALSE, NULL);
-	if (errorbuf[0] != 0)
-	{
-		mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf);
-		error = true;
-	}
 	for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
-	{
 		if (cfg->input_ports() != NULL)
 		{
 			input_port_list_init(portlist, cfg->input_ports(), errorbuf, sizeof(errorbuf), FALSE, cfg);
@@ -974,7 +967,6 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 				error = true;
 			}
 		}
-	}
 
 	/* check for duplicate tags */
 	for (port = portlist.first(); port != NULL; port = port->next())

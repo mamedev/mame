@@ -279,7 +279,7 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(*this, m_system.ipt, devicelist());
+	time_t newbase = input_port_init(*this, devicelist());
 	if (newbase != 0)
 		m_base_time = newbase;
 
@@ -1137,6 +1137,17 @@ void driver_device::screen_eof()
 const rom_entry *driver_device::device_rom_region() const
 {
 	return m_system->rom;
+}
+
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to the
+//  game's input ports
+//-------------------------------------------------
+
+const input_port_token *driver_device::device_input_ports() const
+{
+	return m_system->ipt;
 }
 
 

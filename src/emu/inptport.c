@@ -973,7 +973,7 @@ static WRITE_LINE_DEVICE_HANDLER( changed_write_line_device )
     system
 -------------------------------------------------*/
 
-time_t input_port_init(running_machine &machine, const input_port_token *tokens, const device_list &devicelist)
+time_t input_port_init(running_machine &machine, const device_list &devicelist)
 {
 	//input_port_private *portdata;
 	char errorbuf[1024];
@@ -991,22 +991,13 @@ time_t input_port_init(running_machine &machine, const input_port_token *tokens,
 	init_port_types(machine);
 
 	/* if we have a token list, proceed */
-	if (tokens != NULL)
-	{
-		input_port_list_init(machine.m_portlist, tokens, errorbuf, sizeof(errorbuf), TRUE, NULL);
-		if (errorbuf[0] != 0)
-			mame_printf_error("Input port errors:\n%s", errorbuf);
-	}
-
 	for (device_t *device = devicelist.first(); device != NULL; device = device->next())
-	{
 		if (device->input_ports() != NULL)
 		{
 			input_port_list_init(machine.m_portlist, device->input_ports(), errorbuf, sizeof(errorbuf), TRUE, device);
 			if (errorbuf[0] != 0)
 				mame_printf_error("Input port errors:\n%s", errorbuf);
 		}
-	}
 
 	init_port_state(machine);
 	/* register callbacks for when we load configurations */
