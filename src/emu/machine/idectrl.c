@@ -82,6 +82,7 @@
 #define IDE_COMMAND_ATAPI_IDENTIFY		0xa1
 #define IDE_COMMAND_RECALIBRATE			0x10
 #define IDE_COMMAND_IDLE_IMMEDIATE		0xe1
+#define IDE_COMMAND_IDLE				0xe3
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_1 0xfe
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_2 0xfc
 #define IDE_COMMAND_TAITO_GNET_UNLOCK_3 0x0f
@@ -1124,7 +1125,6 @@ static void handle_command(ide_state *ide, UINT8 command)
 			break;
 
 		case IDE_COMMAND_GET_INFO:
-		case IDE_COMMAND_ATAPI_IDENTIFY:
 			LOGPRINT(("IDE Read features\n"));
 
 			/* reset the buffer */
@@ -1161,6 +1161,16 @@ static void handle_command(ide_state *ide, UINT8 command)
 			/* clear the error too */
 			ide->error = IDE_ERROR_NONE;
 
+			/* signal an interrupt */
+			signal_interrupt(ide);
+			break;
+
+		case IDE_COMMAND_IDLE:
+			/* clear the error too */
+			ide->error = IDE_ERROR_NONE;
+
+			/* for timeout disabled value is 0 */
+			ide->sector_count = 0;
 			/* signal an interrupt */
 			signal_interrupt(ide);
 			break;
@@ -1241,7 +1251,10 @@ static void handle_command(ide_state *ide, UINT8 command)
 
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
-			debugger_break(ide->device->machine());
+			ide->status |= IDE_STATUS_ERROR;
+			ide->error = IDE_ERROR_UNKNOWN_COMMAND;			
+			signal_interrupt(ide);			
+			//debugger_break(ide->device->machine());
 			break;
 	}
 }
