@@ -155,6 +155,11 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irq
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
 	}
+	else
+	{
+		devcb_write8 nullcb = DEVCB_NULL;
+		cpustate->out_port_func.resolve(nullcb, *device);
+	}
 
 	device->save_item(NAME(cpustate->pc.w.l));
 	device->save_item(NAME(cpustate->sp.w.l));

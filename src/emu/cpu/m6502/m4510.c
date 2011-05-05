@@ -219,6 +219,11 @@ static CPU_INIT( m4510 )
 		cpustate->in_port_func.resolve(intf->in_port_func, *device);
 		cpustate->out_port_func.resolve(intf->out_port_func, *device);
 	}
+	else
+	{
+		devcb_write8 nullcb = DEVCB_NULL;
+		cpustate->out_port_func.resolve(nullcb, *device);
+	}
 }
 
 static CPU_RESET( m4510 )
