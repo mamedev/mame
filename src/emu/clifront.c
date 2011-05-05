@@ -84,6 +84,7 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_VERIFYSAMPLES,         "0",       OPTION_COMMAND,    "report samplesets that have problems" },
 	{ CLICOMMAND_ROMIDENT,              "0",       OPTION_COMMAND,    "compare files with known MAME roms" },
 	{ CLICOMMAND_LISTDEVICES ";ld",     "0",       OPTION_COMMAND,    "list available devices" },
+	{ CLICOMMAND_LISTSLOTS ";lslot",    "0",       OPTION_COMMAND,    "list available slots and slot devices" },
 	{ CLICOMMAND_LISTMEDIA ";lm",       "0",       OPTION_COMMAND,    "list available media for the system" },
 	{ CLICOMMAND_LISTSOFTWARE ";lsoft", "0",       OPTION_COMMAND,    "list known software for the system" },
 
@@ -552,6 +553,56 @@ void cli_frontend::listdevices(const char *gamename)
 			else
 				printf("\n");
 		}
+	}
+}
+
+
+//-------------------------------------------------
+//  listslots - output the list of slot devices
+//  referenced by a given game or set of games
+//-------------------------------------------------
+
+void cli_frontend::listslots(const char *gamename)
+{
+	// determine which drivers to output; return an error if none found
+	driver_enumerator drivlist(m_options, gamename);
+	if (drivlist.count() == 0)
+		throw emu_fatalerror(MAMERR_NO_SUCH_GAME, "No matching games found for '%s'", gamename);
+
+	// print header
+	printf(" SYSTEM      SLOT NAME             SLOT OPTIONS SUPPORTED     \n");
+	printf("----------  --------------------  ------------------------------------\n");
+
+	// iterate over drivers
+	while (drivlist.next())
+	{
+		// iterate
+		const device_slot_interface *slot = NULL;
+		bool first = true;
+		for (bool gotone = drivlist.config().devicelist().first(slot); gotone; gotone = slot->next(slot))
+		{
+			// output the line, up to the list of extensions
+			printf("%-13s%-20s   ", first ? drivlist.driver().name : "", slot->device().tag());
+			
+			// get the options and print them		
+			const slot_interface* intf = slot->get_slot_interfaces();
+			for (int i = 0; intf[i].name != NULL; i++)
+			{
+				if (i==0) {
+					printf("%s\n", intf[i].name);
+				} else {
+					printf("%-33s   %s\n", "",intf[i].name);
+				}
+			}
+
+			// end the line
+			printf("\n");
+			first = false;
+		}
+
+		// if we didn't get any at all, just print a none line
+		if (first)
+			printf("%-13s(none)\n", drivlist.driver().name);
 	}
 }
 
@@ -1169,6 +1220,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_LISTBROTHERS,	&cli_frontend::listbrothers },
 		{ CLICOMMAND_LISTCRC,		&cli_frontend::listcrc },
 		{ CLICOMMAND_LISTDEVICES,	&cli_frontend::listdevices },
+		{ CLICOMMAND_LISTSLOTS,	    &cli_frontend::listslots },
 		{ CLICOMMAND_LISTROMS,		&cli_frontend::listroms },
 		{ CLICOMMAND_LISTSAMPLES,	&cli_frontend::listsamples },
 		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
