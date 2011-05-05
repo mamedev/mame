@@ -644,7 +644,7 @@ void ptm6840_device::timeout(int idx)
 
 void ptm6840_device::set_gate(int idx, int state)
 {
-	if ( (m_mode[idx] == 0) || (m_mode[idx] == 2) || (m_mode[0] == 4) || (m_mode[idx] == 6) )
+	if ((m_mode[idx] & 1) == 0)
 	{
 		if (state == 0 && m_gate[idx])
 		{
