@@ -1021,6 +1021,11 @@ static WRITE8_HANDLER( youmab_84_w )
 	// ??
 }
 
+static WRITE8_HANDLER( youmab_86_w )
+{
+
+}
+
 static DRIVER_INIT( youmab )
 {
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x82, 0x82, FUNC(youmab_extra_bank_w)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
@@ -1037,6 +1042,8 @@ static DRIVER_INIT( youmab )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
 	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x8a, 0x8a, FUNC(youmab_8a_r)); // ???
+
+	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x86, 0x86, FUNC(youmab_86_w));
 
 }
 
