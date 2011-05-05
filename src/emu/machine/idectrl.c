@@ -1124,6 +1124,7 @@ static void handle_command(ide_state *ide, UINT8 command)
 			break;
 
 		case IDE_COMMAND_GET_INFO:
+		case IDE_COMMAND_ATAPI_IDENTIFY:
 			LOGPRINT(("IDE Read features\n"));
 
 			/* reset the buffer */
