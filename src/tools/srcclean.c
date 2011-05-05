@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	int removed_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0, added_newline = 0;
 	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE, in_c_string = FALSE;
 	int hichars = 0;
-	int is_c_file;
+	int is_c_file, is_xml_file;
 	const char *ext;
 	FILE *file;
 	int bytes;
@@ -97,14 +97,15 @@ int main(int argc, char *argv[])
 	/* determine if we are a C file */
 	ext = strrchr(argv[1], '.');
 	is_c_file = (ext && (core_stricmp(ext, ".c") == 0 || core_stricmp(ext, ".h") == 0 || core_stricmp(ext, ".cpp") == 0));
+	is_xml_file = (ext && core_stricmp(ext, ".xml") == 0);
 
 	/* rip through it */
 	for (src = 0; src < bytes; )
 	{
 		UINT8 ch = original[src++];
 
-		/* check for invalid upper-ASCII chars */
-		if (ch != 13 && ch != 10 && ch != 9 && (ch > 127 || ch < 32))
+		/* check for invalid upper-ASCII chars, but only for non-xml files (swlists might contain UTF-8 chars) */
+		if (!is_xml_file && ch != 13 && ch != 10 && ch != 9 && (ch > 127 || ch < 32))
 		{
 			ch = '?';
 			hichars++;
