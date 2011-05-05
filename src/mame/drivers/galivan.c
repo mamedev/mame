@@ -1016,14 +1016,35 @@ static WRITE8_HANDLER( youmab_81_w )
 	// ??
 }
 
+/* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
 static WRITE8_HANDLER( youmab_84_w )
 {
-	// ??
+	galivan_state *state = space->machine().driver_data<galivan_state>();
+
+	state->m_shift_val &= ~((0x80 >> 7) << state->m_shift_scroll);
+	state->m_shift_val |= (((data & 0x80) >> 7) << state->m_shift_scroll);
+
+	state->m_shift_scroll++;
+
+	//popmessage("%08x",state->m_shift_val);
+
+	//if(state->m_shift_scroll == 25)
 }
 
 static WRITE8_HANDLER( youmab_86_w )
 {
+	galivan_state *state = space->machine().driver_data<galivan_state>();
 
+	/* latch values */
+	{
+		state->m_scrolly = (state->m_shift_val & 0x0003ff);
+		state->m_scrollx = (state->m_shift_val & 0x7ffc00) >> 10;
+
+		//popmessage("%08x %08x %08x",state->m_scrollx,state->m_scrolly,state->m_shift_val);
+	}
+
+	state->m_shift_val = 0;
+	state->m_shift_scroll = 0;
 }
 
 static DRIVER_INIT( youmab )
