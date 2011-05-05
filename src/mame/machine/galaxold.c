@@ -32,7 +32,7 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_2_q_callback )
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
-	ttl7474_clock_w(device, state);
+	downcast<ttl7474_device *>(device)->clock_w(state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
@@ -44,20 +44,20 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
-    device_t *target = space->machine().device("7474_9m_1");
-	ttl7474_preset_w(target, data ? 1 : 0);
+    ttl7474_device *target = space->machine().device<ttl7474_device>("7474_9m_1");
+	target->preset_w(data ? 1 : 0);
 }
 
 
 TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    device_t *target = timer.machine().device("7474_9m_2");
+    ttl7474_device *target = timer.machine().device<ttl7474_device>("7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
-	ttl7474_d_w(target, ((param & 0xe0) != 0xe0) ? 1 : 0);
+	target->d_w(((param & 0xe0) != 0xe0) ? 1 : 0);
 
 	/* 16V clocks the flip-flop */
-	ttl7474_clock_w(target, ((param & 0x10) == 0x10) ? 1 : 0);
+	target->clock_w(((param & 0x10) == 0x10) ? 1 : 0);
 
 	param = (param + 0x10) & 0xff;
 
@@ -68,17 +68,17 @@ TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 static void machine_reset_common(running_machine &machine, int line)
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
-    device_t *ttl7474_9m_1 = machine.device("7474_9m_1");
-    device_t *ttl7474_9m_2 = machine.device("7474_9m_2");
+    ttl7474_device *ttl7474_9m_1 = machine.device<ttl7474_device>("7474_9m_1");
+    ttl7474_device *ttl7474_9m_2 = machine.device<ttl7474_device>("7474_9m_2");
 	state->m_irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
-	ttl7474_preset_w(ttl7474_9m_2, 1);
-	ttl7474_clear_w (ttl7474_9m_2, 1);
+	ttl7474_9m_2->preset_w(1);
+	ttl7474_9m_2->clear_w (1);
 
-	ttl7474_clear_w (ttl7474_9m_1, 1);
-	ttl7474_d_w     (ttl7474_9m_1, 0);
-	ttl7474_preset_w(ttl7474_9m_1, 0);
+	ttl7474_9m_1->clear_w (1);
+	ttl7474_9m_1->d_w     (0);
+	ttl7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
 	timer_device *int_timer = machine.device<timer_device>("int_timer");

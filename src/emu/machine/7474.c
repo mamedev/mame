@@ -56,8 +56,11 @@ const device_type MACHINE_TTL7474 = &device_creator<ttl7474_device>;
 ttl7474_device::ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, MACHINE_TTL7474, "7474", tag, owner, clock)
 {
+	memset(&m_output_cb, 0, sizeof(m_output_cb));
+	memset(&m_comp_output_cb, 0, sizeof(m_comp_output_cb));
     init();
 }
+
 
 //-------------------------------------------------
 //  static_set_target_tag - configuration helper
@@ -102,7 +105,7 @@ void ttl7474_device::static_set_comp_output_cb(device_t &device, write_line_devi
 	if (callback != NULL)
 	{
 		ttl7474.m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
-		ttl7474.m_output_cb.index = DEVCB_DEVICE_OTHER;
+		ttl7474.m_comp_output_cb.index = DEVCB_DEVICE_OTHER;
 		ttl7474.m_comp_output_cb.writeline = callback;
 	}
 	else
@@ -130,6 +133,7 @@ void ttl7474_device::device_start()
 	m_comp_output_func.resolve(m_comp_output_cb, *this);
 }
 
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -146,22 +150,22 @@ void ttl7474_device::device_reset()
 
 void ttl7474_device::update()
 {
-    if (!m_preset && m_clear)       	/* line 1 in truth table */
+    if (!m_preset && m_clear)       	// line 1 in truth table
 	{
         m_output    = 1;
         m_output_comp = 0;
 	}
-    else if (m_preset && !m_clear)      /* line 2 in truth table */
+    else if (m_preset && !m_clear)      // line 2 in truth table
 	{
         m_output    = 0;
         m_output_comp = 1;
 	}
-    else if (!m_preset && !m_clear)     /* line 3 in truth table */
+    else if (!m_preset && !m_clear)     // line 3 in truth table
 	{
         m_output    = 1;
         m_output_comp = 1;
 	}
-    else if (!m_last_clock && m_clk)	/* line 4 in truth table */
+    else if (!m_last_clock && m_clk)	// line 4 in truth table
 	{
         m_output    =  m_d;
         m_output_comp = !m_d;
@@ -170,13 +174,13 @@ void ttl7474_device::update()
     m_last_clock = m_clk;
 
 
-	/* call callback if any of the outputs changed */
+	// call callback if any of the outputs changed
     if (m_output != m_last_output)
 	{
         m_last_output = m_output;
 		m_output_func(m_output);
 	}
-	/* call callback if any of the outputs changed */
+	// call callback if any of the outputs changed
     if (m_output_comp != m_last_output_comp)
 	{
         m_last_output_comp = m_output_comp;
@@ -189,12 +193,7 @@ void ttl7474_device::update()
 //  clear_w - set the clear line state
 //-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w )
-{
-    downcast<ttl7474_device *>(device)->clear_w(state);
-}
-
-void ttl7474_device::clear_w(UINT8 state)
+WRITE_LINE_MEMBER( ttl7474_device::clear_w )
 {
     m_clear = state & 1;
 	update();
@@ -205,12 +204,7 @@ void ttl7474_device::clear_w(UINT8 state)
 //  clear_w - set the clear line state
 //-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w )
-{
-    downcast<ttl7474_device *>(device)->preset_w(state);
-}
-
-void ttl7474_device::preset_w(UINT8 state)
+WRITE_LINE_MEMBER( ttl7474_device::preset_w )
 {
     m_preset = state & 1;
 	update();
@@ -221,12 +215,7 @@ void ttl7474_device::preset_w(UINT8 state)
 //  clock_w - set the clock line state
 //-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w )
-{
-    downcast<ttl7474_device *>(device)->clock_w(state);
-}
-
-void ttl7474_device::clock_w(UINT8 state)
+WRITE_LINE_MEMBER( ttl7474_device::clock_w )
 {
     m_clk = state & 1;
 	update();
@@ -237,12 +226,7 @@ void ttl7474_device::clock_w(UINT8 state)
 //  d_w - set the d line state
 //-------------------------------------------------
 
-WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w )
-{
-    downcast<ttl7474_device *>(device)->d_w(state);
-}
-
-void ttl7474_device::d_w(UINT8 state)
+WRITE_LINE_MEMBER( ttl7474_device::d_w )
 {
     m_d = state & 1;
 	update();
@@ -253,12 +237,7 @@ void ttl7474_device::d_w(UINT8 state)
 //  output_r - get the output line state
 //-------------------------------------------------
 
-READ_LINE_DEVICE_HANDLER( ttl7474_output_r )
-{
-    return downcast<ttl7474_device *>(device)->output_r();
-}
-
-UINT8 ttl7474_device::output_r()
+READ_LINE_MEMBER( ttl7474_device::output_r )
 {
     return m_output;
 }
@@ -268,12 +247,7 @@ UINT8 ttl7474_device::output_r()
 //  output_comp_r - get the output-compare line state
 //-----------------------------------------------------
 
-READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r )
-{
-    return downcast<ttl7474_device *>(device)->output_comp_r();
-}
-
-UINT8 ttl7474_device::output_comp_r()
+READ_LINE_MEMBER( ttl7474_device::output_comp_r )
 {
     return m_output_comp;
 }

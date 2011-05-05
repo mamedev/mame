@@ -227,17 +227,17 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	/* check the coins here as well - they drive the clock of the flip-flops */
 	port_value = input_port_read(device->machine(), "IN0");
 
-	ttl7474_clock_w(state->m_ttl7474_2s_1, (port_value & 0x01) >> 0);
-	ttl7474_clock_w(state->m_ttl7474_2s_2, (port_value & 0x02) >> 1);
-	ttl7474_clock_w(state->m_ttl7474_2u_1, (port_value & 0x04) >> 2);
-	ttl7474_clock_w(state->m_ttl7474_2u_2, (port_value & 0x08) >> 3);
+	state->m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
+	state->m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
+	state->m_ttl7474_2u_1->clock_w((port_value & 0x04) >> 2);
+	state->m_ttl7474_2u_2->clock_w((port_value & 0x08) >> 3);
 
 	/* read the steering controls */
 	for (player = 0; player < 4; player++)
 	{
 		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
-		device_t *movement_flip_flop;
-		device_t *dir_flip_flop;
+		ttl7474_device *movement_flip_flop;
+		ttl7474_device *dir_flip_flop;
 
 		switch (player)
 		{
@@ -253,14 +253,14 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		if (port_value != state->m_last_wheel_value[player])
 		{
 			/* set the movement direction */
-			ttl7474_d_w(dir_flip_flop, ((port_value - state->m_last_wheel_value[player]) & 0x80) ? 1 : 0);
+			dir_flip_flop->d_w(((port_value - state->m_last_wheel_value[player]) & 0x80) ? 1 : 0);
 
 			state->m_last_wheel_value[player] = port_value;
 		}
 
 		/* as the wheel moves, both flip-flops are clocked */
-		ttl7474_clock_w(movement_flip_flop, port_value & 0x01);
-		ttl7474_clock_w(dir_flip_flop,      port_value & 0x01);
+		movement_flip_flop->clock_w(port_value & 0x01);
+		dir_flip_flop->clock_w(     port_value & 0x01);
 	}
 
 
@@ -299,25 +299,25 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 static WRITE_LINE_DEVICE_HANDLER( coin1_interrupt_clear_w )
 {
 	carpolo_state *drvstate = device->machine().driver_data<carpolo_state>();
-	ttl7474_clear_w(drvstate->m_ttl7474_2s_1, state);
+	drvstate->m_ttl7474_2s_1->clear_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin2_interrupt_clear_w )
 {
 	carpolo_state *drvstate = device->machine().driver_data<carpolo_state>();
-	ttl7474_clear_w(drvstate->m_ttl7474_2s_2, state);
+	drvstate->m_ttl7474_2s_2->clear_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin3_interrupt_clear_w )
 {
 	carpolo_state *drvstate = device->machine().driver_data<carpolo_state>();
-	ttl7474_clear_w(drvstate->m_ttl7474_2u_1, state);
+	drvstate->m_ttl7474_2u_1->clear_w(state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( coin4_interrupt_clear_w )
 {
 	carpolo_state *drvstate = device->machine().driver_data<carpolo_state>();
-	ttl7474_clear_w(drvstate->m_ttl7474_2u_2, state);
+	drvstate->m_ttl7474_2u_2->clear_w(state);
 }
 
 WRITE8_HANDLER( carpolo_ball_screen_interrupt_clear_w )
@@ -384,10 +384,10 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
 	coin_counter_w(device->machine(), 0, data & 0x01);
 
 
-	ttl7474_clear_w(state->m_ttl7474_1f_1, (data & 0x08) >> 3);
-	ttl7474_clear_w(state->m_ttl7474_1d_1, (data & 0x08) >> 3);
-	ttl7474_clear_w(state->m_ttl7474_1c_1, (data & 0x08) >> 3);
-	ttl7474_clear_w(state->m_ttl7474_1a_1, (data & 0x08) >> 3);
+	state->m_ttl7474_1f_1->clear_w((data & 0x08) >> 3);
+	state->m_ttl7474_1d_1->clear_w((data & 0x08) >> 3);
+	state->m_ttl7474_1c_1->clear_w((data & 0x08) >> 3);
+	state->m_ttl7474_1a_1->clear_w((data & 0x08) >> 3);
 }
 
 
@@ -432,10 +432,10 @@ static READ8_DEVICE_HANDLER( pia_1_port_a_r )
        bit 6 - Player 2 forward/reverse input
        bit 7 - Player 1 forward/reverse input */
 
-	ret = (ttl7474_output_r(state->m_ttl7474_1a_2) ? 0x01 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1c_2) ? 0x02 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1d_2) ? 0x04 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1f_2) ? 0x08 : 0x00) |
+	ret = (state->m_ttl7474_1a_2->output_r() ? 0x01 : 0x00) |
+		  (state->m_ttl7474_1c_2->output_r() ? 0x02 : 0x00) |
+		  (state->m_ttl7474_1d_2->output_r() ? 0x04 : 0x00) |
+		  (state->m_ttl7474_1f_2->output_r() ? 0x08 : 0x00) |
 		  (input_port_read(device->machine(), "IN2") & 0xf0);
 
 	return ret;
@@ -452,10 +452,10 @@ static READ8_DEVICE_HANDLER( pia_1_port_b_r )
        bit 6 - Player 2 steering input (wheel moving or stopped)
        bit 7 - Player 1 steering input (wheel moving or stopped) */
 
-	ret = (ttl7474_output_r(state->m_ttl7474_1a_1) ? 0x10 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1c_1) ? 0x20 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1d_1) ? 0x40 : 0x00) |
-		  (ttl7474_output_r(state->m_ttl7474_1f_1) ? 0x80 : 0x00);
+	ret = (state->m_ttl7474_1a_1->output_r() ? 0x10 : 0x00) |
+		  (state->m_ttl7474_1c_1->output_r() ? 0x20 : 0x00) |
+		  (state->m_ttl7474_1d_1->output_r() ? 0x40 : 0x00) |
+		  (state->m_ttl7474_1f_1->output_r() ? 0x80 : 0x00);
 
 	return ret;
 }
@@ -498,18 +498,18 @@ MACHINE_START( carpolo )
 {
 	carpolo_state *state = machine.driver_data<carpolo_state>();
 	/* find flip-flops */
-	state->m_ttl7474_2s_1 = machine.device("7474_2s_1");
-	state->m_ttl7474_2s_2 = machine.device("7474_2s_2");
-	state->m_ttl7474_2u_1 = machine.device("7474_2u_1");
-	state->m_ttl7474_2u_2 = machine.device("7474_2u_2");
-	state->m_ttl7474_1f_1 = machine.device("7474_1f_1");
-	state->m_ttl7474_1f_2 = machine.device("7474_1f_2");
-	state->m_ttl7474_1d_1 = machine.device("7474_1d_1");
-	state->m_ttl7474_1d_2 = machine.device("7474_1d_2");
-	state->m_ttl7474_1c_1 = machine.device("7474_1c_1");
-	state->m_ttl7474_1c_2 = machine.device("7474_1c_2");
-	state->m_ttl7474_1a_1 = machine.device("7474_1a_1");
-	state->m_ttl7474_1a_2 = machine.device("7474_1a_2");
+	state->m_ttl7474_2s_1 = machine.device<ttl7474_device>("7474_2s_1");
+	state->m_ttl7474_2s_2 = machine.device<ttl7474_device>("7474_2s_2");
+	state->m_ttl7474_2u_1 = machine.device<ttl7474_device>("7474_2u_1");
+	state->m_ttl7474_2u_2 = machine.device<ttl7474_device>("7474_2u_2");
+	state->m_ttl7474_1f_1 = machine.device<ttl7474_device>("7474_1f_1");
+	state->m_ttl7474_1f_2 = machine.device<ttl7474_device>("7474_1f_2");
+	state->m_ttl7474_1d_1 = machine.device<ttl7474_device>("7474_1d_1");
+	state->m_ttl7474_1d_2 = machine.device<ttl7474_device>("7474_1d_2");
+	state->m_ttl7474_1c_1 = machine.device<ttl7474_device>("7474_1c_1");
+	state->m_ttl7474_1c_2 = machine.device<ttl7474_device>("7474_1c_2");
+	state->m_ttl7474_1a_1 = machine.device<ttl7474_device>("7474_1a_1");
+	state->m_ttl7474_1a_2 = machine.device<ttl7474_device>("7474_1a_2");
 
 	state->m_ttl74148_3s = machine.device("74148_3s");
 	state->m_ttl74153_1k = machine.device("74153_1k");
@@ -532,43 +532,43 @@ MACHINE_RESET( carpolo )
 	ttl74148_enable_input_w(state->m_ttl74148_3s, 0);	/* always enabled */
 
 	/* set up the coin handling flip-flops */
-	ttl7474_d_w     (state->m_ttl7474_2s_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_2s_1, 1);
+	state->m_ttl7474_2s_1->d_w     (1);
+	state->m_ttl7474_2s_1->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_2s_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_2s_2, 1);
+	state->m_ttl7474_2s_2->d_w     (1);
+	state->m_ttl7474_2s_2->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_2u_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_2u_1, 1);
+	state->m_ttl7474_2u_1->d_w     (1);
+	state->m_ttl7474_2u_1->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_2u_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_2u_2, 1);
+	state->m_ttl7474_2u_2->d_w     (1);
+	state->m_ttl7474_2u_2->preset_w(1);
 
 
 	/* set up the steering handling flip-flops */
-	ttl7474_d_w     (state->m_ttl7474_1f_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_1f_1, 1);
+	state->m_ttl7474_1f_1->d_w     (1);
+	state->m_ttl7474_1f_1->preset_w(1);
 
-	ttl7474_clear_w (state->m_ttl7474_1f_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_1f_2, 1);
+	state->m_ttl7474_1f_2->clear_w (1);
+	state->m_ttl7474_1f_2->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_1d_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_1d_1, 1);
+	state->m_ttl7474_1d_1->d_w     (1);
+	state->m_ttl7474_1d_1->preset_w(1);
 
-	ttl7474_clear_w (state->m_ttl7474_1d_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_1d_2, 1);
+	state->m_ttl7474_1d_2->clear_w (1);
+	state->m_ttl7474_1d_2->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_1c_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_1c_1, 1);
+	state->m_ttl7474_1c_1->d_w     (1);
+	state->m_ttl7474_1c_1->preset_w(1);
 
-	ttl7474_clear_w (state->m_ttl7474_1c_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_1c_2, 1);
+	state->m_ttl7474_1c_2->clear_w (1);
+	state->m_ttl7474_1c_2->preset_w(1);
 
-	ttl7474_d_w     (state->m_ttl7474_1a_1, 1);
-	ttl7474_preset_w(state->m_ttl7474_1a_1, 1);
+	state->m_ttl7474_1a_1->d_w     (1);
+	state->m_ttl7474_1a_1->preset_w(1);
 
-	ttl7474_clear_w (state->m_ttl7474_1a_2, 1);
-	ttl7474_preset_w(state->m_ttl7474_1a_2, 1);
+	state->m_ttl7474_1a_2->clear_w (1);
+	state->m_ttl7474_1a_2->preset_w(1);
 
 
 	/* set up the pedal handling chips */

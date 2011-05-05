@@ -79,10 +79,10 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	device_t *target = device->machine().device("konami_7474");
+	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	ttl7474_clock_w(target, (~data & 0x08) >> 3);
+	target->clock_w((~data & 0x08) >> 3);
 
 	/* bit 4 is sound disable */
 	device->machine().sound().system_mute((data & 0x10) >> 4);
@@ -90,22 +90,22 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	device_t *target = device->machine().device("konami_7474");
+	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	ttl7474_clock_w(target, (~data & 0x08) >> 3);
+	target->clock_w((~data & 0x08) >> 3);
 }
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	device_t *target = device->machine().device("konami_7474");
+	ttl7474_device *target = device->machine().device<ttl7474_device>("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
        line, only asserts it */
-	ttl7474_clear_w(target, 0);
+	target->clear_w(0);
 
-	ttl7474_clear_w(target, 1);
+	target->clear_w(1);
 
 	return 0xff;
 }
@@ -164,7 +164,7 @@ void scramble_sh_init(running_machine &machine)
 	device_set_irq_callback(machine.device("audiocpu"), scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
-	ttl7474_d_w(machine.device("konami_7474"), 1);
+	machine.device<ttl7474_device>("konami_7474")->d_w(1);
 }
 
 

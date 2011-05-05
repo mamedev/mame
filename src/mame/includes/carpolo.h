@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "machine/6821pia.h"
+#include "machine/7474.h"
 
 class carpolo_state : public driver_device
 {
@@ -27,18 +28,18 @@ public:
 	UINT8 m_last_wheel_value[4];
 	device_t *m_ttl74148_3s;
 	device_t *m_ttl74153_1k;
-	device_t *m_ttl7474_2s_1;
-	device_t *m_ttl7474_2s_2;
-	device_t *m_ttl7474_2u_1;
-	device_t *m_ttl7474_2u_2;
-	device_t *m_ttl7474_1f_1;
-	device_t *m_ttl7474_1f_2;
-	device_t *m_ttl7474_1d_1;
-	device_t *m_ttl7474_1d_2;
-	device_t *m_ttl7474_1c_1;
-	device_t *m_ttl7474_1c_2;
-	device_t *m_ttl7474_1a_1;
-	device_t *m_ttl7474_1a_2;
+	ttl7474_device *m_ttl7474_2s_1;
+	ttl7474_device *m_ttl7474_2s_2;
+	ttl7474_device *m_ttl7474_2u_1;
+	ttl7474_device *m_ttl7474_2u_2;
+	ttl7474_device *m_ttl7474_1f_1;
+	ttl7474_device *m_ttl7474_1f_2;
+	ttl7474_device *m_ttl7474_1d_1;
+	ttl7474_device *m_ttl7474_1d_2;
+	ttl7474_device *m_ttl7474_1c_1;
+	ttl7474_device *m_ttl7474_1c_2;
+	ttl7474_device *m_ttl7474_1a_1;
+	ttl7474_device *m_ttl7474_1a_2;
 	bitmap_t *m_sprite_sprite_collision_bitmap1;
 	bitmap_t *m_sprite_sprite_collision_bitmap2;
 	bitmap_t *m_sprite_goal_collision_bitmap1;
