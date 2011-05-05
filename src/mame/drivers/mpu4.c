@@ -6,8 +6,9 @@
 
      04-2011: More accurate gamball code, fixed ROM banking (Project Amber), added BwB CHR simulator (Amber)
               This is still a hard coded system, but significantly different to Barcrest's version.
+              Started adding support for the Crystal Gaming program card, and the link keys for setting parameters.
      03-2011: Lamp timing fixes, support for all known expansion cards added.
-     01-2011: Adding the missing 'OKI' sound card, and documented it, but needs 6376 rewrite.
+     01-2011: Adding the missing 'OKI' sound card, and documented it, but it needs a 6376 rewrite.
      09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
                          Connect 4 now has the right sound.
@@ -52,7 +53,7 @@ sampled sound.
 The lamping and input handling side of the machine rely entirely on a column by column 'strobe' system, with lights and LEDs selected in turn.
 In the inputs there are two orange connectors (sampled every 8ms) and two black ones (sampled every 16ms), giving 32 multiplexed inputs.
 
-In addition there are two auxiliary ports taht can be accessed separately to these and are bidirectional
+In addition there are two auxiliary ports that can be accessed separately to these and are bidirectional
 
 --- Preliminary MPU4 Memorymap  ---
 
@@ -70,15 +71,14 @@ In addition there are two auxiliary ports taht can be accessed separately to the
  0880      |R/W| D D D D D D D D | PIA6821 on soundboard (Oki MSM6376@16MHz)
            |   |                 | port A = ??
            |   |                 | port B (882)
-           |   |                 |        b7 = 0 if OKI busy
-           |   |                 |             1 if OKI ready
-           |   |                 |        b6 = ??
+           |   |                 |        b7 = NAR
+           |   |                 |        b6 = 0 if OKI busy, 1 if OKI ready
            |   |                 |        b5 = volume control clock
            |   |                 |        b4 = volume control direction (0= up, 1 = down)
            |   |                 |        b3 = ??
            |   |                 |        b2 = ??
-           |   |                 |        b1 = ??
-           |   |                 |        b0 = ??
+           |   |                 |        b1 = CH2
+           |   |                 |        b0 = ST
 -----------+---+-----------------+--------------------------------------------------------------------------
  08C0      |   |                 | MC6840 on sound board
 -----------+---+-----------------+--------------------------------------------------------------------------
@@ -229,6 +229,7 @@ TODO: - Distinguish door switches using manual
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
 #include "sound/2413intf.h"
+#include "sound/upd7759.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
@@ -261,19 +262,19 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
 static const UINT8 bwb_chr_table_common[10]= {0x00,0x04,0x04,0x0c,0x0c,0x1c,0x14,0x2c,0x5c,0x2c};
 
-#define STANDARD_REEL  0	/* As originally designed 3/4 reels*/
-#define FIVE_REEL_5TO8 1	/* Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel*/
-#define FIVE_REEL_8TO5 2	/* Mounted backwards for space reasons, but different board*/
-#define FIVE_REEL_3TO6 3	/* Connected to the centre of the meter connector, taking up meters 3 to 6 */
-#define SIX_REEL_1TO8  4	/* Two reels on the meter drives*/
-#define SIX_REEL_5TO8  5	/* Like FIVE_REEL_5TO8, but with an extra reel elsewhere*/
-#define SEVEN_REEL     6	/* Mainly club machines, significant reworking of reel hardware*/
-#define FLUTTERBOX     7	/* Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel*/
+#define STANDARD_REEL  0	// As originally designed 3/4 reels
+#define FIVE_REEL_5TO8 1	// Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel
+#define FIVE_REEL_8TO5 2	// Mounted backwards for space reasons, but different board
+#define FIVE_REEL_3TO6 3	// Connected to the centre of the meter connector, taking up meters 3 to 6
+#define SIX_REEL_1TO8  4	// Two reels on the meter drives
+#define SIX_REEL_5TO8  5	// Like FIVE_REEL_5TO8, but with an extra reel elsewhere
+#define SEVEN_REEL     6	// Mainly club machines, significant reworking of reel hardware
+#define FLUTTERBOX     7	// Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel
 
-#define NO_EXTENDER			0	/* As originally designed */
+#define NO_EXTENDER			0 // As originally designed
 #define SMALL_CARD			1
 #define LARGE_CARD_A		2 //96 Lamps
-#define LARGE_CARD_B		3 // 96 Lamps, 16 LEDs - as used by BwB
+#define LARGE_CARD_B		3 //96 Lamps, 16 LEDs - as used by BwB
 #define LARGE_CARD_C		4 //Identical to B, no built in LED support
 
 #define CARD_A			1
@@ -295,12 +296,12 @@ struct mpu4_chr_table
 	UINT8 response;
 };
 
-struct bwb_chr_table//dynamic populated table
+struct bwb_chr_table//dynamically populated table for BwB protection
 {
 	UINT8 response;
 };
 
-/* Video stuff */
+/* Video stuff - see mpu4drvr.c */
 struct ef9369_t
 {
 	UINT32 addr;
@@ -372,6 +373,7 @@ public:
 	int m_pageval;
 	int m_pageset;
 	int m_hopper;
+	int m_reels;
 	const mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 	//Video
@@ -839,7 +841,6 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", device->machine().describe_context(),state));
 
 	drvstate->m_alpha_data_line = state;
-	ROC10937_draw_16seg(0);
 }
 
 
@@ -847,8 +848,10 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic3_cb2_w )
 {
 	LOG_IC3(("%s: IC3 PIA Write CB (alpha reset), %02X\n",device->machine().describe_context(),state));
 // DM Data pin A
-	if ( state ) ROC10937_reset(0);
-	ROC10937_draw_16seg(0);
+	if ( !state )
+	{
+		ROC10937_reset(0);
+	}
 }
 
 
@@ -1390,7 +1393,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 		awp_draw_reel(3);
 		awp_draw_reel(4);
 	}
-	else
+	else if (state->m_reels)
 	{
 		stepper_update(0, data & 0x0F );
 		stepper_update(1, (data>>4) & 0x0F );
@@ -1398,7 +1401,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 		awp_draw_reel(1);
 	}
 
-	if (state->m_reel_flag && (state->m_reel_mux == STANDARD_REEL))
+	if (state->m_reel_flag && (state->m_reel_mux == STANDARD_REEL) && state->m_reels)
 	{
 		if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
 		else                          state->m_optic_pattern &= ~0x01;
@@ -1476,7 +1479,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 		awp_draw_reel(5);
 		awp_draw_reel(6);
 	}
-	else
+	else if (state->m_reels)
 	{
 		stepper_update(2, data & 0x0F );
 		stepper_update(3, (data>>4) & 0x0F );
@@ -1484,7 +1487,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 		awp_draw_reel(3);
 	}
 
-	if (state->m_reel_flag && (state->m_reel_mux == STANDARD_REEL))
+	if (state->m_reel_flag && (state->m_reel_mux == STANDARD_REEL) && state->m_reels)
 	{
 		if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
 		else                          state->m_optic_pattern &= ~0x04;
@@ -1627,9 +1630,12 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine().describe_context(), state & 0xFF));
 
 	// DM Data pin B
-	if ( !drvstate->m_alpha_clock && (state) )
+	if (drvstate->m_alpha_clock != state)
 	{
-		ROC10937_shift_data(0, drvstate->m_alpha_data_line&0x01?0:1);
+		if (!drvstate->m_alpha_clock)//falling edge
+		{
+			ROC10937_shift_data(0, drvstate->m_alpha_data_line?0:1);
+		}
 	}
 	drvstate->m_alpha_clock = state;
 	ROC10937_draw_16seg(0);
@@ -1786,24 +1792,57 @@ static const ptm6840_interface ptm_ic3ss_intf =
 /* input ports for MPU4 board */
 static INPUT_PORTS_START( mpu4 )
 	PORT_START("ORANGE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")//  20p level
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")// 100p level
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")// Token 1 level
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")// Token 2 level
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
+	PORT_CONFNAME( 0xE0, 0x00, "Stake Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 5p"  )
+	PORT_CONFSETTING(    0x20, "10p" )
+	PORT_CONFSETTING(    0x40, "20p" )
+	PORT_CONFSETTING(    0x60, "25p" )
+	PORT_CONFSETTING(    0x80, "30p" )
+	PORT_CONFSETTING(    0xA0, "40p" )
+	PORT_CONFSETTING(    0xC0, "50p" )
+	PORT_CONFSETTING(    0xE0, "1 GBP" )
 
 	PORT_START("ORANGE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("15")
+	PORT_CONFNAME( 0x0F, 0x00, "Jackpot / Prize Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted"  )
+	PORT_CONFSETTING(    0x01, "3 GBP"  )
+	PORT_CONFSETTING(    0x02, "4 GBP"  )
+	PORT_CONFSETTING(    0x08, "5 GBP"  )
+	PORT_CONFSETTING(    0x03, "6 GBP"  )
+	PORT_CONFSETTING(    0x04, "6 GBP Token"  )
+	PORT_CONFSETTING(    0x05, "8 GBP"  )
+	PORT_CONFSETTING(    0x06, "8 GBP Token"  )
+	PORT_CONFSETTING(    0x07, "10 GBP"  )
+	PORT_CONFSETTING(    0x09, "15 GBP"  )
+	PORT_CONFSETTING(    0x0A, "25 GBP"  )
+	PORT_CONFSETTING(    0x0B, "25 GBP (Licensed Betting Office Profile)"  )
+	PORT_CONFSETTING(    0x0C, "35 GBP"  )
+	PORT_CONFSETTING(    0x0D, "70 GBP"  )
+	PORT_CONFSETTING(    0x0E, "Reserved"  )
+	PORT_CONFSETTING(    0x0F, "Reserved"  )
+
+	PORT_CONFNAME( 0xF0, 0x00, "Percentage Key" )
+	PORT_CONFSETTING(    0x00, "Not fitted / 68% (Invalid for UK Games)"  )
+	PORT_CONFSETTING(    0x10, "70" )
+	PORT_CONFSETTING(    0x20, "72" )
+	PORT_CONFSETTING(    0x30, "74" )
+	PORT_CONFSETTING(    0x40, "76" )
+	PORT_CONFSETTING(    0x50, "78" )
+	PORT_CONFSETTING(    0x60, "80" )
+	PORT_CONFSETTING(    0x70, "82" )
+	PORT_CONFSETTING(    0x80, "84" )
+	PORT_CONFSETTING(    0x90, "86" )
+	PORT_CONFSETTING(    0xA0, "88" )
+	PORT_CONFSETTING(    0xB0, "90" )
+	PORT_CONFSETTING(    0xC0, "92" )
+	PORT_CONFSETTING(    0xD0, "94" )
+	PORT_CONFSETTING(    0xE0, "96" )
+	PORT_CONFSETTING(    0xF0, "98" )
 
 	PORT_START("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Hi")
@@ -1813,7 +1852,7 @@ static INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)	PORT_NAME("20")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
@@ -2367,7 +2406,6 @@ The subsequent calls for each can be found based on the magic address
            (1) = ( (BWBMagicAddress + 1))
            (2) = ( (BWBMagicAddress + 2))
            (3) = ( (BWBMagicAddress + 4))
-
            (4) = ( (BWBMagicAddress - 5))
            (5) = ( (BWBMagicAddress - 4))
            (6) = ( (BWBMagicAddress - 3))
@@ -2536,6 +2574,7 @@ static DRIVER_INIT (m_oldtmr)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=SIX_REEL_1TO8;
+	state->m_reels = 6;
 
 	stepper_config(machine, 0, &barcrest_opto1_interface);
 	stepper_config(machine, 1, &barcrest_opto1_interface);
@@ -2552,6 +2591,7 @@ static DRIVER_INIT (m_ccelbr)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=STANDARD_REEL;
+	state->m_reels = 4;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
 
@@ -2562,6 +2602,7 @@ static DRIVER_INIT (m_gmball)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=STANDARD_REEL;
+	state->m_reels = 4;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
 
@@ -2572,6 +2613,7 @@ static DRIVER_INIT (m_grtecp)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=FIVE_REEL_5TO8;
+	state->m_reels = 5;
 	state->m_lamp_extender=SMALL_CARD;
 	// setup 4 default 96 half step reels with the mux board
 	mpu4_config_common_reels(machine,4);
@@ -2584,7 +2626,7 @@ static DRIVER_INIT (m_blsbys)
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_bwb_bank=1;
 	state->m_reel_mux=FIVE_REEL_5TO8;
-
+	state->m_reels = 5;
 	stepper_config(machine, 0, &bwb_opto1_interface);
 	stepper_config(machine, 1, &bwb_opto1_interface);
 	stepper_config(machine, 2, &bwb_opto1_interface);
@@ -2598,23 +2640,35 @@ static DRIVER_INIT (mpu4tst2)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=STANDARD_REEL;
-	// setup 5 default 96 half step reels with the mux board
+	state->m_reels = 4;
 	mpu4_config_common_reels(machine,4);
-
 }
 
 static DRIVER_INIT (mpu4utst)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	state->m_reel_mux=STANDARD_REEL;
-	// setup 4 default 96 half step reels ///////////////////////////////////
+	state->m_reels = 4;
 	mpu4_config_common_reels(machine,4);
 }
 
 static DRIVER_INIT (connect4)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0; //reel-free game
 	state->m_led_lamp=1;
+}
+
+static DRIVER_INIT (m_frkstn)
+{
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reel_mux=STANDARD_REEL;
+	state->m_reels = 4;
+
+	// setup 4 default 96 half step reels with the mux board
+	mpu4_config_common_reels(machine,4);
+
+	//This is a Crystal ROM, needs UPD chip and Project Amber's ROM swizzle.
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
@@ -2725,7 +2779,27 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
 
-// memory map for barcrest mpu4 board /////////////////////////////////////
+static ADDRESS_MAP_START( mpu4_crystal_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+
+	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+
+	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
+
+//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
+
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
+
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dutch_memmap, AS_PROGRAM, 8 )
 
@@ -2824,10 +2898,20 @@ static MACHINE_CONFIG_DERIVED( mpu4dutch, mod4oki )
 	MCFG_MACHINE_START(mpu4dutch)					// main mpu4 board initialisation
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(bwboki, mod4oki )
+static MACHINE_CONFIG_DERIVED( bwboki, mod4oki )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mpu4_bwb_map)				// setup read and write memorymap
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(mpu4crys, mpu4mod2 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mpu4_crystal_map)				// setup read and write memorymap
+
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_CONFIG_END
+
+
 
 ROM_START( m_oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2888,12 +2972,21 @@ ROM_START( m_blsbys )
 	ROM_LOAD( "bbsnd.p2",  0x080000, 0x080000,  CRC(594a87f8) SHA1(edfef7d08fab41fb5814c92930f08a565371eae1) )
 ROM_END
 
-//    year,  name,    parent,  machine,  input,   init,     monitor,company,        fullname,                     flags
-GAME( 198?,  m_oldtmr,0,      mpu4dutch,mpu4,	  m_oldtmr, ROT0,   "Barcrest",		"Old Timer",				  GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		"Club Celebration",			  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0,   "Barcrest",     "Gamball",					  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAMEL(198?,  m_grtecp,0,      mod4oki,  mpu4,	  m_grtecp, ROT0,   "Barcrest",		"Andy's Great Escape",		  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
-GAME(199?,   m_blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Barcrest",		"Blues Boys (Version 6)",	  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+ROM_START( m_frkstn )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
+	ROM_LOAD( "fr1.536",  0x8000, 0x8000,  CRC(422b7209) SHA1(3c3f942d375a83d2470467651bca20f0feabdd3b))
+
+	ROM_REGION( 0x40000, "upd", 0 )
+	ROM_LOAD("fr1snd.bin",	0x00000, 0x40000, CRC(2d77bbde) SHA1(0397ede538e913dc2972e260589022564fcd8fe4))
+ROM_END
+
+//    year,  name,    parent,  machine,  input,   init,     monitor,company,        fullname,                           flags
+GAME( 198?,  m_oldtmr,0,      mpu4dutch,mpu4,	  m_oldtmr, ROT0,   "Barcrest",		 "Old Timer",						GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		 "Club Celebration",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0, "Barcrest",       "Gamball",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
+GAMEL(198?,  m_grtecp,0,      mod4oki,  mpu4,	  m_grtecp, ROT0,   "Barcrest",		 "Andy's Great Escape",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
+GAME(199?,   m_blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Barcrest",		 "Blues Boys (Version 6)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAME(199?,   m_frkstn,0,	  mpu4crys, mpu4,	  m_frkstn, ROT0,   "Crystal Gaming","Frank 'n' Stein (unencrypted)",	GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )//hardware not connected
 
 //SWP
 GAMEL(1989?,connect4,        0, mpu4mod2,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

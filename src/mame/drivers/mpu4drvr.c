@@ -2807,30 +2807,41 @@ static const mpu4_chr_table prizeinv_data[8] = {
 static DRIVER_INIT (adders)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = adders_data;
 }
 
 static DRIVER_INIT (crmaze)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = crmaze_data;
 }
 
 static DRIVER_INIT (crmazea)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = crmazea_data;
 }
 
 static DRIVER_INIT (crmaze2)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = crmaze2_data;
+}
+
+static DRIVER_INIT (crmaze2a)
+{
+	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 }
 
 static DRIVER_INIT (crmaze3)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_reel_mux = FLUTTERBOX;
 	state->m_current_chr_table = crmaze3_data;
 }
@@ -2838,6 +2849,7 @@ static DRIVER_INIT (crmaze3)
 static DRIVER_INIT (crmaze3a)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_reel_mux = FLUTTERBOX;
 	state->m_current_chr_table = crmaze3a_data;
 }
@@ -2853,6 +2865,7 @@ static DRIVER_INIT (mating)
 
 	/* There is also an OKIM6376 present on the program card */
 	space->install_legacy_readwrite_handler(*device, 0xffa040, 0xffa0ff, FUNC(oki_r), FUNC(oki_w) );
+	state->m_reels = 0;//currently no hybrid games
 
 	state->m_current_chr_table = mating_data;
 }
@@ -2860,42 +2873,49 @@ static DRIVER_INIT (mating)
 static DRIVER_INIT (skiltrek)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = skiltrek_data;
 }
 
 static DRIVER_INIT (timemchn)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = timemchn_data;
 }
 
 static DRIVER_INIT (strikeit)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = strikeit_data;
 }
 
 static DRIVER_INIT (turnover)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = turnover_data;
 }
 
 static DRIVER_INIT (eyesdown)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = eyesdown_data;
 }
 
 static DRIVER_INIT (quidgrid)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = quidgrid_data;
 }
 
 static DRIVER_INIT (prizeinv)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
+	state->m_reels = 0;//currently no hybrid games
 	state->m_current_chr_table = prizeinv_data;
 }
 
@@ -3467,7 +3487,7 @@ GAME( 1993,  crmazea,   crmaze,   crmaze,   crmaze,   crmazea,  ROT0, "Barcrest"
 
 GAME( 1993,  crmaze2,   bctvidbs, crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2)",					GAME_NOT_WORKING )//SWP 1.0
 GAME( 1993,  crmaze2d,  crmaze2,  crmaze,   crmaze,   crmaze2,  ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v2.2, Datapak)",				GAME_NOT_WORKING )//SWP 1.0D
-GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   0,        ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? bootleg? */
+GAME( 1993,  crmaze2a,  crmaze2,  crmaze,   crmaze,   crmaze2a, ROT0, "Barcrest",		"The New Crystal Maze Featuring Ocean Zone (v0.1, AMLD)",			GAME_NOT_WORKING )//SWP 1.0 /* unprotected? bootleg? */
 
 GAME( 1994,  crmaze3,   bctvidbs, crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9)",							GAME_NOT_WORKING )//SWP 0.7
 GAME( 1994,  crmaze3d,  crmaze3,  crmaze,   crmaze,   crmaze3,  ROT0, "Barcrest",		"The Crystal Maze Team Challenge (v0.9, Datapak)",					GAME_NOT_WORKING )//SWP 0.7D
