@@ -1759,7 +1759,7 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 	/* compute the absolute cycle when the next one should fire */
 	/* we do this to avoid drifting */
 	dcs.timers_fired++;
-	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (dcs.timer_period + 1));
+	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (UINT64)(dcs.timer_period + 1));
 	target_cycles -= dcs.cpu->total_cycles();
 
 	/* set the next timer, but only if it's for a reasonable number */
