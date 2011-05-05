@@ -56,6 +56,12 @@ void seta001_device::device_start()
 	m_bgflag = 0x00;
 
 	m_bankcallback = NULL;
+
+	save_pointer(NAME(m_spriteylow), 0x300);
+	save_pointer(NAME(m_spritecodelow), 0x2000);
+	save_pointer(NAME(m_spritecodehigh), 0x2000);
+
+
 }
 
 void seta001_device::device_reset()
@@ -88,17 +94,6 @@ READ8_DEVICE_HANDLER( spritectrl_r8 )
 WRITE8_DEVICE_HANDLER( spritectrl_w8 )
 {
 	seta001_device *dev = (seta001_device *)device;
-	dev->m_spritectrl[offset] = data;
-}
-
-// why is this needed? bug in the rendering?
-WRITE8_DEVICE_HANDLER( spritectrl_w8_champbwl )
-{
-	seta001_device *dev = (seta001_device *)device;
-
-	// hack??
-	//if (offset!=0) data ^=0xff;
-
 	dev->m_spritectrl[offset] = data;
 }
 
@@ -294,8 +289,30 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t
 					code,
 					color,
 					flipx,flipy,
-					((sx + 0x10) & 0x1ff) - 0x10,((sy + 8) & 0x0ff) - 8,
+					((sx) & 0x1ff),((sy) & 0x0ff),
 					transpen);
+
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+					code,
+					color,
+					flipx,flipy,
+					((sx) & 0x1ff)-512,((sy) & 0x0ff),
+					transpen);
+
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+					code,
+					color,
+					flipx,flipy,
+					((sx) & 0x1ff),((sy) & 0x0ff)-256,
+					transpen);
+
+			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+					code,
+					color,
+					flipx,flipy,
+					((sx) & 0x1ff)-512,((sy) & 0x0ff)-256,
+					transpen);
+
 		}
 	}
 }
@@ -361,7 +378,7 @@ void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t
 				code,
 				color,
 				flipx,flipy,
-				sx,
+				((sx + xoffs)&0x1ff),
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
 
 		/* wrap around x */
@@ -369,8 +386,25 @@ void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t
 				code,
 				color,
 				flipx,flipy,
-				sx+512,
+				((sx + xoffs)&0x1ff) - 512,
 				max_y - ((sy + yoffs) & 0x0ff),m_transpen);
+
+
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+				code,
+				color,
+				flipx,flipy,
+				((sx + xoffs)&0x1ff),
+				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
+
+		/* wrap around x */
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+				code,
+				color,
+				flipx,flipy,
+				((sx + xoffs)&0x1ff) - 512,
+				max_y - ((sy + yoffs) & 0x0ff)-256,m_transpen);
+
 	}
 }
 

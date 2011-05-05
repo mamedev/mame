@@ -827,9 +827,6 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 ***************************************************************************/
 	
 
-
-
-
 /* For games without tilemaps */
 SCREEN_UPDATE( seta_no_layers )
 {
@@ -842,7 +839,7 @@ SCREEN_UPDATE( seta_no_layers )
 
 
 /* For games with 1 or 2 tilemaps */
-static SCREEN_UPDATE( seta_layers )
+void seta_layers_update(screen_device* screen, bitmap_t *bitmap, const rectangle *cliprect, int sprite_bank_size, int sprite_setac )
 {
 	seta_state *state = screen->machine().driver_data<seta_state>();
 	int layers_ctrl = -1;
@@ -959,7 +956,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if(order & 4)
 			{
@@ -979,7 +976,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  0, 0);
 
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
@@ -989,7 +986,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
@@ -1043,11 +1040,36 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
+
+}
+
+static SCREEN_UPDATE( seta_layers )
+{
+	seta_layers_update(screen, bitmap, cliprect, 0x1000, 1 );
 	return 0;
 }
+
+
+SCREEN_UPDATE( setaroul )
+{
+	bitmap_fill(bitmap, cliprect, 0x0);
+
+	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+
+	seta_layers_update(screen, bitmap, cliprect, 0x800, 1 );
+
+	return 0;
+}
+
+SCREEN_EOF( setaroul )
+{
+	machine.device<seta001_device>("spritegen")->tnzs_eof();
+}
+
 
 
 SCREEN_UPDATE( seta )

@@ -64,7 +64,6 @@ READ16_DEVICE_HANDLER( spritectrl_r16 );
 WRITE16_DEVICE_HANDLER( spritectrl_w16 );
 READ8_DEVICE_HANDLER( spritectrl_r8 );
 WRITE8_DEVICE_HANDLER( spritectrl_w8 );
-WRITE8_DEVICE_HANDLER( spritectrl_w8_champbwl );
 
 READ16_DEVICE_HANDLER( spriteylow_r16 );
 WRITE16_DEVICE_HANDLER( spriteylow_w16 );

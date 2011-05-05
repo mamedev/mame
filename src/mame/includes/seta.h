@@ -112,5 +112,7 @@ SCREEN_UPDATE( seta );
 SCREEN_UPDATE( seta_no_layers );
 SCREEN_UPDATE( usclssic );
 SCREEN_UPDATE( inttoote );
+SCREEN_UPDATE( setaroul );
 
+SCREEN_EOF( setaroul );
 

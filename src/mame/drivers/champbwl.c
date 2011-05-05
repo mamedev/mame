@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8_champbwl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)

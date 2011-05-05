@@ -1316,6 +1316,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "sound/x1_010.h"
 #include "sound/2151intf.h"
 #include "video/seta001.h"
+#include "machine/nvram.h"
 
 #if __uPD71054_TIMER
 
@@ -2230,89 +2231,67 @@ ADDRESS_MAP_END
         Seta Roulette
 ***************************************************************************/
 
-static READ16_HANDLER( setaroul_c0_r )
+// the spritey low bits are mapped to 1 in every 4 bytes here as if it were a 32-bit bus..which is weird
+// other ram is similar..
+
+static WRITE16_HANDLER( setaroul_spriteylow_w )
 {
-	return 0x00;//space->machine().rand();
+	seta001_device *dev = space->machine().device<seta001_device>("spritegen");
+	if ((offset&1)==0) spriteylow_w8(dev, offset>>1, (data & 0xff00) >> 8);
 }
 
-static READ16_HANDLER( setaroul_d4_0_r )
+static WRITE16_HANDLER( setaroul_spritectrl_w )
 {
-	return 0x00;//space->machine().rand();
+	seta001_device *dev = space->machine().device<seta001_device>("spritegen");
+	if ((offset&1)==0) spritectrl_w8(dev, offset>>1, (data & 0xff00) >> 8);
 }
 
-static READ16_HANDLER( setaroul_d4_4_r )
+static WRITE16_HANDLER( setaroul_spritecode_w )
 {
-	return 0x00;//space->machine().rand();
+	seta001_device *dev = space->machine().device<seta001_device>("spritegen");
+	if ((offset&1)==1) spritecodelow_w8(dev, offset>>1, (data & 0xff00) >> 8);
+	if ((offset&1)==0) spritecodehigh_w8(dev, offset>>1, (data & 0xff00) >> 8);
 }
 
-static READ16_HANDLER( setaroul_d4_6_r )
+static READ16_HANDLER( setaroul_spritecode_r )
 {
-	return 0xffff;//space->machine().rand();
+	UINT16 ret;
+	seta001_device *dev = space->machine().device<seta001_device>("spritegen");
+	if ((offset&1)==1) ret = spritecodelow_r8(dev, offset>>1);
+	if ((offset&1)==0) ret = spritecodehigh_r8(dev, offset>>1);
+	return ret << 8;
 }
 
-static READ16_HANDLER( setaroul_d4_8_r )
-{
-	return space->machine().rand()&0x000f;
-}
 
-static READ16_HANDLER( setaroul_d4_a_r )
-{
-	return 0x00;//space->machine().rand();
-}
 
-static READ16_HANDLER( setaroul_d4_10_r )
-{
-	return 0x00;// space->machine().rand();
-}
 
-#if 0
-// ?? looks like sprite ram access is 8-bit not 16?
-static WRITE16_HANDLER( setaroul_spr_w )
-{
-
-	seta_state *state = space->machine().driver_data<seta_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
-	int realoffs = offset;
-
-	realoffs >>=1;
-
-	if (!(offset & 1))
-	{
-		data = data >> 8;
-		mem_mask = mem_mask >> 8;
-	}
-
-	COMBINE_DATA(&spriteram16[realoffs]);
-
-}
-#endif
 
 static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
 
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr (maybe not)
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_RAM //AM_BASE_MEMBER(seta_state, m_vregs)
+	AM_RANGE(0xc40000, 0xc40001) AM_RAM
 	AM_RANGE(0xc80000, 0xc80001) AM_NOP
 
 
-	AM_RANGE(0xcc0000, 0xcc0019) AM_READ(setaroul_c0_r)
+	AM_RANGE(0xcc0000, 0xcc0019) AM_READ_PORT("UNK0") // rtc?
 
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP // watchdog?
-	AM_RANGE(0xd40000, 0xd40001) AM_READ(setaroul_d4_0_r)
-	AM_RANGE(0xd40004, 0xd40005) AM_READ(setaroul_d4_4_r)
-	AM_RANGE(0xd40006, 0xd40007) AM_READ(setaroul_d4_6_r)
-	AM_RANGE(0xd40008, 0xd40009) AM_READ(setaroul_d4_8_r)
-	AM_RANGE(0xd4000a, 0xd4000b) AM_READ(setaroul_d4_a_r)
-	AM_RANGE(0xd40010, 0xd40011) AM_READ(setaroul_d4_10_r) AM_WRITENOP // multiplex?
+	AM_RANGE(0xd40000, 0xd40001) AM_READ_PORT("UNK1")
+	AM_RANGE(0xd40004, 0xd40005) AM_READ_PORT("UNK2")
+	AM_RANGE(0xd40006, 0xd40007) AM_READ_PORT("UNK3")
+	AM_RANGE(0xd40008, 0xd40009) AM_READ_PORT("UNK4")
+	AM_RANGE(0xd4000a, 0xd4000b) AM_READ_PORT("UNK5")
+	AM_RANGE(0xd40010, 0xd40011) AM_READ_PORT("UNK6") AM_WRITENOP // multiplex?
 
 	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM
 
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE_MEMBER(seta_state, m_vram_0	)	// VRAM - draws wheel if you reset enough times..
 	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_BASE_MEMBER(seta_state, m_vctrl_0)		// VRAM Ctrl
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM
-	AM_RANGE(0xf40000, 0xf40bff) AM_RAM // AM_WRITE(setaroul_spr_w) AM_BASE_MEMBER(seta_state, m_spriteram)		// Sprites Y
-	AM_RANGE(0xf40c00, 0xf40c11) AM_RAM // AM_DEVREADWRITE("spritegen", spritectrl_r16, spritectrl_w16) // probably wrong hookup
+	AM_RANGE(0xf00000, 0xf03fff) AM_READWRITE(setaroul_spritecode_r, setaroul_spritecode_w)
+	AM_RANGE(0xf40000, 0xf40bff) AM_WRITE(setaroul_spriteylow_w)
+	AM_RANGE(0xf40c00, 0xf40c11) AM_WRITE(setaroul_spritectrl_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -3769,6 +3748,344 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( setaroul )
+	PORT_START("UNK0")
+    PORT_DIPNAME( 0x0001, 0x0001, "0" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+  	PORT_BIT( 0x000e, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // rtc?
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("UNK1")
+    PORT_DIPNAME( 0x0001, 0x0001, "1" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("UNK2")
+    PORT_DIPNAME( 0x0001, 0x0001, "2" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START("UNK3")
+    PORT_DIPNAME( 0x0001, 0x0001, "3" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START("UNK4")
+    PORT_DIPNAME( 0x0001, 0x0001, "4" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW) // 'reset switch'
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	// hold COIN1 and press COIN2 to get credits..  both bits must change! (coin must pass 2 sensors?)  gives a coinjam / timeout after a while if this doesn't happen..
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN2 ) //
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 ) // ^^
+
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START("UNK5")
+    PORT_DIPNAME( 0x0001, 0x0001, "5" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("UNK6")
+    PORT_DIPNAME( 0x0001, 0x0001, "6" )
+    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -6749,7 +7066,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( setaroul )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 2 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0x100, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp, 512*0, 2 ) // [1] Layer 1
 GFXDECODE_END
 
@@ -7567,6 +7884,8 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 
+	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -7574,8 +7893,8 @@ static MACHINE_CONFIG_START( setaroul, seta_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(seta)
-	MCFG_SCREEN_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MCFG_SCREEN_UPDATE(setaroul)
+	MCFG_SCREEN_EOF(setaroul)	/* qzkklogy uses sprite buffering */
 
 	MCFG_GFXDECODE(setaroul)
 	MCFG_PALETTE_LENGTH(512)
@@ -10087,10 +10406,10 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf1003.u16", 0x000001, 0x010000, CRC(a6afd769) SHA1(82c54c8a2219f20d08faf9f7afcf821d83511660) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )	/* Sprites */
-	ROM_LOAD16_BYTE( "uf0005.u3", 0x000000, 0x008000, CRC(383c2d57) SHA1(3bbf0464f80f657dfa275e885fbce064a0a08f4a) )
-	ROM_LOAD16_BYTE( "uf0006.u4", 0x000001, 0x008000, CRC(90c9dae6) SHA1(a226aab82f5b8174644281fa3efab4f8a8f8d827) )
-	ROM_LOAD16_BYTE( "uf0007.u5", 0x010000, 0x008000, CRC(e72c3dba) SHA1(aaebb484e76d8f3da0ecff26c3c1bad4f3f11ac0) )
-	ROM_LOAD16_BYTE( "uf0008.u6", 0x010001, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
+	ROM_LOAD16_BYTE( "uf0005.u3", 0x010001, 0x008000, CRC(383c2d57) SHA1(3bbf0464f80f657dfa275e885fbce064a0a08f4a) )
+	ROM_LOAD16_BYTE( "uf0006.u4", 0x010000, 0x008000, CRC(90c9dae6) SHA1(a226aab82f5b8174644281fa3efab4f8a8f8d827) )
+	ROM_LOAD16_BYTE( "uf0007.u5", 0x000001, 0x008000, CRC(e72c3dba) SHA1(aaebb484e76d8f3da0ecff26c3c1bad4f3f11ac0) )
+	ROM_LOAD16_BYTE( "uf0008.u6", 0x000000, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layer 1 - 8bpp? */
 	ROM_LOAD( "uf0010.u15",  0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
@@ -10404,7 +10723,7 @@ GAME( 1989, arbalest, 0,        metafox,  arbalest, arbalest, ROT270, "Seta",   
 GAME( 1989, metafox,  0,        metafox,  metafox,  metafox,  ROT270, "Seta",                   "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
-GAME( 198?, setaroul, 0,        setaroul, setaroul, 0,        ROT270, "Seta / Visco",           "Seta / Visco Roulette?", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  If you reset it enough times you'll get a flickery roulette wheel
+GAME( 198?, setaroul, 0,        setaroul, setaroul, 0,        ROT270, "Visco",           "Visco Roulette", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  Press F2 twice to boot..
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
