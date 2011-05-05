@@ -1500,6 +1500,125 @@ static void ui_menu_keyboard_mode(running_machine &machine, ui_menu *menu, void 
 	}
 }
 
+
+/*-------------------------------------------------
+    ui_slot_get_current_index - returns    
+-------------------------------------------------*/
+int ui_slot_get_current_index(running_machine &machine, device_slot_interface *slot)
+{
+	const char *current = machine.options().value(slot->device().tag());
+	const slot_interface* intf = slot->get_slot_interfaces();
+	int val = -1;
+	for (int i = 0; intf[i].name != NULL; i++) {
+		if (strcmp(current, intf[i].name) == 0) val = i;
+	}
+	return val;
+}
+
+/*-------------------------------------------------
+    ui_slot_get_length - returns    
+-------------------------------------------------*/
+int ui_slot_get_length(running_machine &machine, device_slot_interface *slot)
+{
+	const slot_interface* intf = slot->get_slot_interfaces();
+	int val = 0;
+	for (int i = 0; intf[i].name != NULL; i++) val++;
+	return val;
+}
+
+/*-------------------------------------------------
+    ui_slot_get_next - returns    
+-------------------------------------------------*/
+const char *ui_slot_get_next(running_machine &machine, device_slot_interface *slot)
+{
+	int idx = ui_slot_get_current_index(machine, slot) + 1;
+	if (idx==ui_slot_get_length(machine,slot)) return "";
+	return slot->get_slot_interfaces()[idx].name;
+}
+
+/*-------------------------------------------------
+    ui_slot_get_prev - returns    
+-------------------------------------------------*/
+const char *ui_slot_get_prev(running_machine &machine, device_slot_interface *slot)
+{
+	int idx = ui_slot_get_current_index(machine, slot) - 1;
+	if (idx==-1) return "";
+	if (idx==-2) idx = ui_slot_get_length(machine,slot) -1;	
+	return slot->get_slot_interfaces()[idx].name;
+}
+
+/*-------------------------------------------------
+    ui_get_slot_device - returns    
+-------------------------------------------------*/
+const char *ui_get_slot_device(running_machine &machine, device_slot_interface *slot)
+{
+	return machine.options().value(slot->device().tag());
+}
+
+
+/*-------------------------------------------------
+    ui_set_use_natural_keyboard - specifies
+    whether the natural keyboard is active
+-------------------------------------------------*/
+
+void ui_set_slot_device(running_machine &machine, device_slot_interface *slot, const char *val)
+{	
+	astring error;
+	machine.options().set_value(slot->device().tag(), val, OPTION_PRIORITY_CMDLINE, error);
+	assert(!error);
+}
+		
+/*-------------------------------------------------
+    menu_slot_devices_populate - populates the main
+    slot device menu
+-------------------------------------------------*/
+
+static void menu_slot_devices_populate(running_machine &machine, ui_menu *menu, void *state)
+{
+	device_slot_interface *slot = NULL;
+	
+	/* cycle through all devices for this system */
+	for (bool gotone = machine.devicelist().first(slot); gotone; gotone = slot->next(slot))
+	{
+		/* record the menu item */
+		const char *title = ui_get_slot_device(machine,slot);
+		ui_menu_item_append(menu, slot->device().tag(),  strcmp(title,"")==0 ? "------" : title, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)slot);
+	}
+	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	ui_menu_item_append(menu, "Reset",  NULL, 0, NULL);	
+}
+
+/*-------------------------------------------------
+    ui_menu_slot_devices - menu that
+-------------------------------------------------*/
+
+static void ui_menu_slot_devices(running_machine &machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *menu_event;
+
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+	{
+		menu_slot_devices_populate(machine, menu, state);		
+	}
+
+	/* process the menu */
+	menu_event = ui_menu_process(machine, menu, 0);
+
+	if (menu_event != NULL && menu_event->itemref != NULL)
+	{
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {		
+			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;		
+			const char *val = (menu_event->iptkey == IPT_UI_LEFT) ? ui_slot_get_prev(machine,slot) : ui_slot_get_next(machine,slot);
+			ui_set_slot_device(machine,slot,val);		
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);			
+		}
+	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
+		machine.schedule_hard_reset();
+	}
+}
+
+
 /*-------------------------------------------------
     menu_main_populate - populate the main menu
 -------------------------------------------------*/
@@ -1564,6 +1683,14 @@ static void menu_main_populate(running_machine &machine, ui_menu *menu, void *st
 		if (machine.devicelist().first(BITBANGER))
 			ui_menu_item_append(menu, "Bitbanger Control", NULL, 0, (void*)ui_mess_menu_bitbanger_control);
 	}
+	
+	device_slot_interface *slot = NULL;
+	if (machine.devicelist().first(slot))
+	{
+		/* add image info menu */
+		ui_menu_item_append(menu, "Slot Devices", NULL, 0, (void*)ui_menu_slot_devices);
+	}
+	
 	/* add keyboard mode menu */
 	if (input_machine_has_keyboard(machine) && inputx_can_post(machine))
 		ui_menu_item_append(menu, "Keyboard Mode", NULL, 0, (void *)ui_menu_keyboard_mode);
