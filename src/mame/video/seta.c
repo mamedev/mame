@@ -836,7 +836,7 @@ SCREEN_UPDATE( seta_no_layers )
 	set_pens(screen->machine());
 	bitmap_fill(bitmap,cliprect,0x1f0);
 
-	screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect);
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -959,7 +959,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 
 			if(order & 4)
 			{
@@ -979,7 +979,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, state->m_tilemap_1,  0, 0);
 
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 		}
 	}
 	else
@@ -989,7 +989,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 
 			if((order & 4) && state->m_paletteram2 != NULL)
 			{
@@ -1043,7 +1043,7 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 				}
 			}
 
-			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->setac_draw_sprites(screen->machine(),bitmap,cliprect);
+			if (layers_ctrl & 8)		screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 		}
 	}
 	return 0;

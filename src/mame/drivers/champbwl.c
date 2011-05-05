@@ -358,6 +358,23 @@ static MACHINE_RESET( champbwl )
 
 }
 
+SCREEN_UPDATE( champbwl )
+{
+	bitmap_fill(bitmap, cliprect, 0x1f0);
+
+	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( -0x12, 0x0e );
+	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x1, -0x1 );
+
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(), bitmap, cliprect, 0x800, 1 );
+	return 0;
+}
+
+SCREEN_EOF( champbwl )
+{
+	machine.device<seta001_device>("spritegen")->tnzs_eof();
+}
+
+
 static MACHINE_CONFIG_START( champbwl, champbwl_state )
 
 	/* basic machine hardware */
@@ -379,8 +396,8 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(tnzs)
-	MCFG_SCREEN_EOF(tnzs)
+	MCFG_SCREEN_UPDATE(champbwl)
+	MCFG_SCREEN_EOF(champbwl)
 
 	MCFG_GFXDECODE(champbwl)
 	MCFG_PALETTE_LENGTH(512)

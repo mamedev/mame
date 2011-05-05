@@ -97,7 +97,7 @@ WRITE8_DEVICE_HANDLER( spritectrl_w8_champbwl )
 	seta001_device *dev = (seta001_device *)device;
 
 	// hack??
-	if (offset!=0) data ^=0xff;
+	//if (offset!=0) data ^=0xff;
 
 	dev->m_spritectrl[offset] = data;
 }
@@ -203,7 +203,7 @@ twineagl:   000 027 00 0f   (test mode)
 
 
 
-void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac_type)
+void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac_type)
 {
 	int transpen;
 
@@ -300,29 +300,8 @@ void seta001_device::tnzs_draw_background( running_machine &machine, bitmap_t *b
 	}
 }
 
-void seta001_device::setac_eof()
-{
-	// is this handling right?
-	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification) 
 
-	int ctrl2	=	m_spritectrl[1];
-
-	if (~ctrl2 & 0x20)
-	{
-		if (ctrl2 & 0x40)
-		{
-			memcpy( &m_spritecodelow[0x0000], &m_spritecodelow[0x1000],0x800);
-			memcpy(&m_spritecodehigh[0x0000],&m_spritecodehigh[0x1000],0x800);
-		}
-		else
-		{
-			memcpy( &m_spritecodelow[0x1000], &m_spritecodelow[0x0000],0x800);
-			memcpy(&m_spritecodehigh[0x1000],&m_spritecodehigh[0x0000],0x800);
-		}
-	}
-}
-
-void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size)
+void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size)
 {
 	int screenflip = (m_spritectrl[0] & 0x40) >> 6;
 	int i;
@@ -397,6 +376,27 @@ void seta001_device::tnzs_draw_foreground( running_machine &machine, bitmap_t *b
 
 	
 
+void seta001_device::setac_eof()
+{
+	// is this handling right?
+	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification) 
+
+	int ctrl2	=	m_spritectrl[1];
+
+	if (~ctrl2 & 0x20)
+	{
+		if (ctrl2 & 0x40)
+		{
+			memcpy( &m_spritecodelow[0x0000], &m_spritecodelow[0x1000],0x800);
+			memcpy(&m_spritecodehigh[0x0000],&m_spritecodehigh[0x1000],0x800);
+		}
+		else
+		{
+			memcpy( &m_spritecodelow[0x1000], &m_spritecodelow[0x0000],0x800);
+			memcpy(&m_spritecodehigh[0x1000],&m_spritecodehigh[0x0000],0x800);
+		}
+	}
+}
 
 void seta001_device::tnzs_eof( void )
 {
@@ -422,21 +422,8 @@ void seta001_device::tnzs_eof( void )
 
 }
 
-
-void seta001_device::tnzs_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* bg_flag )
+void seta001_device::seta001_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac)
 {
-	tnzs_draw_background(machine, bitmap, cliprect, 0x800, 0);
-	tnzs_draw_foreground(machine, bitmap, cliprect,	0x800); 
-}
-
-void seta001_device::mjyuugi_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	tnzs_draw_background(machine, bitmap, cliprect, 0x1000, 1);
-	tnzs_draw_foreground(machine, bitmap, cliprect,	0x1000); 
-}
-
-void seta001_device::setac_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	tnzs_draw_background(machine, bitmap, cliprect, 0x1000, 1);
-	tnzs_draw_foreground(machine, bitmap, cliprect, 0x1000);
+	seta001_draw_background(machine, bitmap, cliprect, bank_size, setac);
+	seta001_draw_foreground(machine, bitmap, cliprect, bank_size);
 }

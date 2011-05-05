@@ -64,7 +64,7 @@ SCREEN_UPDATE( srmp2 )
 	screen->machine().device<seta001_device>("spritegen")->set_bg_xoffsets( 0x00, 0x00 ); // bg not used?
 	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x00, 0x00 ); // bg not used?
 
-	screen->machine().device<seta001_device>("spritegen")->mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect ); 
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -80,7 +80,7 @@ SCREEN_UPDATE( srmp3 )
 
 	screen->machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
 
-	screen->machine().device<seta001_device>("spritegen")->mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect);
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }
 
@@ -97,6 +97,6 @@ SCREEN_UPDATE( mjyuugi )
 
 	screen->machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );
 
-	screen->machine().device<seta001_device>("spritegen")->mjyuugi_draw_sprites(screen->machine(), bitmap, cliprect);
+	screen->machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen->machine(),bitmap,cliprect,0x1000, 1);
 	return 0;
 }

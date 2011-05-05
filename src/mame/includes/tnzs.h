@@ -22,7 +22,6 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	/* memory pointers */
-	UINT8 *  m_bg_flag;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
