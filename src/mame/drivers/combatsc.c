@@ -124,6 +124,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
+#include "sound/msm5205.h"
 #include "video/konicdev.h"
 #include "includes/combatsc.h"
 
@@ -152,7 +153,7 @@ static WRITE8_HANDLER( combatscb_sh_irqtrigger_w )
 {
 	combatsc_state *state = space->machine().driver_data<combatsc_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( combatscb_io_r )
@@ -419,19 +420,6 @@ static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
-	AM_RANGE(0x8000, 0x87ef) AM_RAM										/* RAM */
-	AM_RANGE(0x87f0, 0x87ff) AM_RAM										/* ??? */
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */
-	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_r)					/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)						/* soundlatch_r? */
-	AM_RANGE(0x8800, 0xfffb) AM_ROM										/* ROM? */
-	AM_RANGE(0xfffc, 0xffff) AM_RAM										/* ??? */
-ADDRESS_MAP_END
-#endif
-
 static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
@@ -445,6 +433,25 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", combatsc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
+static WRITE8_DEVICE_HANDLER( combatscb_dac_w )
+{
+	if(data & 0xe0)
+		printf("%02x\n",data);
+
+	//msm5205_reset_w(device, (data >> 4) & 1);
+	msm5205_data_w(device, (data & 0x0f));
+	msm5205_vclk_w(device, 1);
+	msm5205_vclk_w(device, 0);
+}
+
+static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM										/* RAM */
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */
+	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_r)					/* ??? */
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("msm5205",combatscb_dac_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)						/* soundlatch_r? */
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -677,6 +684,18 @@ static const ym2203_interface ym2203_config =
 	NULL
 };
 
+static const ym2203_interface ym2203_bootleg_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	NULL
+};
 
 static MACHINE_START( combatsc )
 {
@@ -776,6 +795,13 @@ static MACHINE_CONFIG_START( combatsc, combatsc_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
+
+static const msm5205_interface msm5205_config =
+{
+	0,				/* interrupt function */
+	MSM5205_SEX_4B	/* 8KHz playback ?    */
+};
+
 /* combat school (bootleg on different hardware) */
 static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
@@ -785,7 +811,8 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(combatsc_sound_map) /* FAKE */
+	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4800) // controls BGM tempo
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
@@ -807,15 +834,15 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 	MCFG_PALETTE_INIT(combatscb)
 	MCFG_VIDEO_START(combatscb)
 
-	/* We are using the original sound subsystem */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_CONFIG(ym2203_bootleg_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
@@ -953,7 +980,6 @@ ROM_START( combatscb )
 
 	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* sound CPU */
 	ROM_LOAD( "combat.001",  0x00000, 0x10000, CRC(61456b3b) SHA1(320db628283dd1bec465e95020d1a1158e6d6ae4) )
-	ROM_LOAD( "611g03.rom",  0x00000, 0x08000, CRC(2a544db5) SHA1(94a97c3c54bf13ccc665aa5057ac6b1d700fae2d) ) /* FAKE - from Konami set! */
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "combat.006",  0x00000, 0x10000, CRC(8dc29a1f) SHA1(564dd7c6acff34db93b8e300dda563f5f38ba159) ) /* tiles, bank 0 */
@@ -978,9 +1004,6 @@ ROM_START( combatscb )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "prom.d10",    0x0000, 0x0100, CRC(265f4c97) SHA1(76f1b75a593d3d77ef6173a1948f842d5b27d418) ) /* sprites lookup table */
 	ROM_LOAD( "prom.c11",    0x0100, 0x0100, CRC(a7a5c0b4) SHA1(48bfc3af40b869599a988ebb3ed758141bcfd4fc) ) /* priority? */
-
-	ROM_REGION( 0x20000, "upd", 0 )	/* uPD7759 data */
-	ROM_LOAD( "611g04.rom",  0x00000, 0x20000, CRC(2987e158) SHA1(87c5129161d3be29a339083349807e60b625c3f7) )	/* FAKE - from Konami set! */
 ROM_END
 
 
@@ -1007,4 +1030,4 @@ GAME( 1988, combatsc,  0,        combatsc,  combatsc,  combatsc,  ROT0, "Konami"
 GAME( 1987, combatsct, combatsc, combatsc,  combatsct, 0,         ROT0, "Konami",  "Combat School (trackball)", 0 )
 GAME( 1987, combatscj, combatsc, combatsc,  combatsct, 0,         ROT0, "Konami",  "Combat School (Japan trackball)", 0 )
 GAME( 1987, bootcamp,  combatsc, combatsc,  combatsct, 0,         ROT0, "Konami",  "Boot Camp", 0 )
-GAME( 1988, combatscb, combatsc, combatscb, combatscb, 0,         ROT0, "bootleg", "Combat School (bootleg)", GAME_IMPERFECT_COLORS )
+GAME( 1988, combatscb, combatsc, combatscb, combatscb, 0,         ROT0, "bootleg", "Combat School (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
