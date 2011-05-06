@@ -1,17 +1,18 @@
-/***************************************************************************
-
-    psx.h
-
-    Sony PlayStation CPU emulator.
-
-***************************************************************************/
+/*
+ * PlayStation CPU emulator
+ *
+ * Copyright 2003-2011 smf
+ *
+ */
 
 #pragma once
 
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
+#include "includes/psx.h"
 #include "gte.h"
+#include "dma.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -102,8 +103,11 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-//#define MCFG_PSXCPU_CONFIG(_config)
-//  psxcpu_device::static_set_config(*device, _config);
+#define MCFG_PSX_DMA_CHANNEL_READ( channel, handler ) \
+	psxcpu_device::install_dma_read_handler( *device, channel, handler ); \
+
+#define MCFG_PSX_DMA_CHANNEL_WRITE( channel, handler ) \
+	psxcpu_device::install_dma_write_handler( *device, channel, handler ); \
 
 
 
@@ -120,9 +124,13 @@ public:
 	psxcpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
-	void set_berr();
-	void set_biu( UINT32 data, UINT32 mem_mask );
-	UINT32 get_biu();
+	WRITE32_MEMBER( biu_w );
+	READ32_MEMBER( biu_r );
+	WRITE32_MEMBER( berr_w );
+	READ32_MEMBER( berr_r );
+
+	static void install_dma_read_handler( device_t &device, int channel, psx_dma_read_handler handler );
+	static void install_dma_write_handler( device_t &device, int channel, psx_dma_write_handler handler );
 
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
@@ -131,6 +139,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
+	machine_config_constructor device_mconfig_additions() const;
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const { return 1; }

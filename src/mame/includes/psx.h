@@ -6,6 +6,8 @@
 
 #if !defined( PSX_H )
 
+#include "cpu/psx/dma.h"
+
 #define PSX_RC_STOP ( 0x01 )
 #define PSX_RC_RESET ( 0x04 ) /* guess */
 #define PSX_RC_COUNTTARGET ( 0x08 )
@@ -35,11 +37,108 @@
 #define PSX_SIO_IN_DSR ( 2 )	/* ACK */
 #define PSX_SIO_IN_CTS ( 4 )
 
-typedef void ( *psx_dma_read_handler )( running_machine &, UINT32, INT32 );
-typedef void ( *psx_dma_write_handler )( running_machine &, UINT32, INT32 );
 typedef void ( *psx_sio_handler )( running_machine &, int );
 
+#define	DCTSIZE ( 8 )
+#define	DCTSIZE2 ( DCTSIZE * DCTSIZE )
+
+#define SIO_BUF_SIZE ( 8 )
+
+#define SIO_STATUS_TX_RDY ( 1 << 0 )
+#define SIO_STATUS_RX_RDY ( 1 << 1 )
+#define SIO_STATUS_TX_EMPTY ( 1 << 2 )
+#define SIO_STATUS_OVERRUN ( 1 << 4 )
+#define SIO_STATUS_DSR ( 1 << 7 )
+#define SIO_STATUS_IRQ ( 1 << 9 )
+
+#define SIO_CONTROL_TX_ENA ( 1 << 0 )
+#define SIO_CONTROL_IACK ( 1 << 4 )
+#define SIO_CONTROL_RESET ( 1 << 6 )
+#define SIO_CONTROL_TX_IENA ( 1 << 10 )
+#define SIO_CONTROL_RX_IENA ( 1 << 11 )
+#define SIO_CONTROL_DSR_IENA ( 1 << 12 )
+#define SIO_CONTROL_DTR ( 1 << 13 )
+
+#define MDEC_COS_PRECALC_BITS ( 21 )
+
+typedef struct _psx_root psx_root;
+struct _psx_root
+{
+	emu_timer *timer;
+	UINT16 n_count;
+	UINT16 n_mode;
+	UINT16 n_target;
+	UINT64 n_start;
+};
+
+typedef struct _psx_sio psx_sio;
+struct _psx_sio
+{
+	UINT32 n_status;
+	UINT32 n_mode;
+	UINT32 n_control;
+	UINT32 n_baud;
+	UINT32 n_tx;
+	UINT32 n_rx;
+	UINT32 n_tx_prev;
+	UINT32 n_rx_prev;
+	UINT32 n_tx_data;
+	UINT32 n_rx_data;
+	UINT32 n_tx_shift;
+	UINT32 n_rx_shift;
+	UINT32 n_tx_bits;
+	UINT32 n_rx_bits;
+
+	emu_timer *timer;
+	psx_sio_handler fn_handler;
+};
+
+typedef struct _psx_mdec psx_mdec;
+struct _psx_mdec
+{
+	UINT32 n_decoded;
+	UINT32 n_offset;
+	UINT16 p_n_output[ 24 * 16 ];
+
+	INT32 p_n_quantize_y[ DCTSIZE2 ];
+	INT32 p_n_quantize_uv[ DCTSIZE2 ];
+	INT32 p_n_cos[ DCTSIZE2 ];
+	INT32 p_n_cos_precalc[ DCTSIZE2 * DCTSIZE2 ];
+
+	UINT32 n_0_command;
+	UINT32 n_0_address;
+	UINT32 n_0_size;
+	UINT32 n_1_command;
+	UINT32 n_1_status;
+
+	UINT16 p_n_clamp8[ 256 * 3 ];
+	UINT16 p_n_r5[ 256 * 3 ];
+	UINT16 p_n_g5[ 256 * 3 ];
+	UINT16 p_n_b5[ 256 * 3 ];
+
+	INT32 p_n_unpacked[ DCTSIZE2 * 6 * 2 ];
+};
+
 typedef struct _psx_machine psx_machine;
+struct _psx_machine
+{
+	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
+
+	running_machine *m_machine;
+	UINT32 *p_n_psxram;
+	size_t n_psxramsize;
+
+	UINT32 n_com_delay;
+	UINT32 n_irqdata;
+	UINT32 n_irqmask;
+
+	psx_root root[3];
+
+	psx_sio sio[2];
+
+	psx_mdec mdec;
+};
+
 typedef struct _psx_gpu psx_gpu;
 
 class psx_state : public driver_device

@@ -1,5 +1,5 @@
 /*
- * Geometry Transformation Engine
+ * PlayStation Geometry Transformation Engine emulator
  *
  * Copyright 2003-2011 smf
  *
@@ -9,10 +9,10 @@
 
 #pragma once
 
-#include "emu.h"
+#ifndef __PSXGTE_H__
+#define __PSXGTE_H__
 
-#ifndef __GTE_H__
-#define __GTE_H__
+#include "emu.h"
 
 #define GTE_OP( op ) ( ( op >> 20 ) & 31 )
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )

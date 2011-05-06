@@ -1,5 +1,5 @@
 /*
- * Geometry Transformation Engine
+ * PlayStation Geometry Transformation Engine emulator
  *
  * Copyright 2003-2011 smf
  *

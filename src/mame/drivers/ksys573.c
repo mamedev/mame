@@ -1265,8 +1265,6 @@ static DRIVER_INIT( konami573 )
 
 	psx_driver_init(machine);
 	atapi_init(machine);
-	psx_dma_install_read_handler(machine, 5, cdrom_dma_read);
-	psx_dma_install_write_handler(machine, 5, cdrom_dma_write);
 
 	state->save_item( NAME(state->m_n_security_control) );
 
@@ -2963,7 +2961,9 @@ static const adc083x_interface konami573_adc_interface = {
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
-	MCFG_CPU_PROGRAM_MAP( konami573_map)
+	MCFG_PSX_DMA_CHANNEL_READ( 5, cdrom_dma_read )
+	MCFG_PSX_DMA_CHANNEL_WRITE( 5, cdrom_dma_write )
+	MCFG_CPU_PROGRAM_MAP( konami573_map )
 	MCFG_CPU_VBLANK_INT("screen", sys573_vblank)
 
 	MCFG_MACHINE_RESET( konami573 )

@@ -350,8 +350,6 @@ static MACHINE_START( konamigq )
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(konamigq_exit), &machine));
-	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
-	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
 	state->save_pointer(NAME(state->m_p_n_pcmram), 0x380000);
 	state->save_item(NAME(state->m_sndto000));
@@ -367,7 +365,9 @@ static MACHINE_RESET( konamigq )
 static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
-	MCFG_CPU_PROGRAM_MAP( konamigq_map)
+	MCFG_PSX_DMA_CHANNEL_READ( 5, scsi_dma_read )
+	MCFG_PSX_DMA_CHANNEL_WRITE( 5, scsi_dma_write )
+	MCFG_CPU_PROGRAM_MAP( konamigq_map )
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MCFG_CPU_ADD( "soundcpu", M68000, 8000000 )

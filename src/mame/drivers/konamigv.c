@@ -296,8 +296,6 @@ static DRIVER_INIT( konamigv )
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(konamigv_exit), &machine));
-	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
-	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 }
 
 static MACHINE_START( konamigv )
@@ -331,7 +329,9 @@ static void spu_irq(device_t *device, UINT32 data)
 static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
-	MCFG_CPU_PROGRAM_MAP( konamigv_map)
+	MCFG_PSX_DMA_CHANNEL_READ( 5, scsi_dma_read )
+	MCFG_PSX_DMA_CHANNEL_WRITE( 5, scsi_dma_write )
+	MCFG_CPU_PROGRAM_MAP( konamigv_map )
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MCFG_MACHINE_START( konamigv )

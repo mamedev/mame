@@ -157,6 +157,9 @@ public:
 	device_t *device_find(device_t *owner, const char *tag);
 
 private:
+	void device_add_subdevices(device_t *device);
+	void device_remove_subdevices(const device_t *device);
+
 	const game_driver &		m_gamedrv;
 	emu_options &			m_options;
 	device_list				m_devicelist;				// list of device configs

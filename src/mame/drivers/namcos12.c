@@ -1600,8 +1600,6 @@ static DRIVER_INIT( namcos12 )
 
 	psx_driver_init(machine);
 
-	psx_dma_install_read_handler( machine, 5, namcos12_rom_read );
-
 	memory_configure_bank(machine, "bank1", 0, machine.region( "user2" )->bytes() / 0x200000, machine.region( "user2" )->base(), 0x200000 );
 
 	state->m_s12_porta = 0;
@@ -1642,6 +1640,8 @@ static DRIVER_INIT( ghlpanic )
 static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
+	MCFG_PSX_DMA_CHANNEL_READ( 5, namcos12_rom_read )
+
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 

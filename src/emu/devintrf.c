@@ -435,7 +435,7 @@ device_t *device_t::subdevice(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return machine().device(subtag(tempstring, _tag));
+	return mconfig().devicelist().find((const char *)subtag(tempstring, _tag));
 }
 
 

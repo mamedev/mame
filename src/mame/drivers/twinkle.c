@@ -848,8 +848,6 @@ static DRIVER_INIT( twinkle )
 {
 	psx_driver_init(machine);
 	am53cf96_init(machine, &scsi_intf);
-	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
-	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
 	device_t *i2cmem = machine.device("security");
 	i2cmem_e0_write( i2cmem, 0 );
@@ -882,6 +880,8 @@ static const i2cmem_interface i2cmem_interface =
 static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_PSX_DMA_CHANNEL_READ( 5, scsi_dma_read )
+	MCFG_PSX_DMA_CHANNEL_WRITE( 5, scsi_dma_write )
 	MCFG_CPU_PROGRAM_MAP( main_map )
 	MCFG_CPU_VBLANK_INT( "mainscreen", psx_vblank )
 

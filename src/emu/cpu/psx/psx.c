@@ -1,7 +1,7 @@
 /*
- * PlayStation CPU emulator by smf
+ * PlayStation CPU emulator
  *
- * Licensed to the MAME Team for distribution under the MAME license.
+ * Copyright 2003-2011 smf
  *
  * Known chip id's
  *   CXD8530AQ
@@ -64,6 +64,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "psx.h"
+#include "dma.h"
 #include "includes/psx.h"
 #include "sound/spu.h"
 
@@ -186,33 +187,23 @@ static const UINT32 mtc0_writemask[]=
 	0x00000000  /* PRID */
 };
 
-static READ32_DEVICE_HANDLER( psx_berr_r )
+READ32_MEMBER( psxcpu_device::berr_r )
 {
-	downcast<psxcpu_device *>(device)->set_berr();
+	m_berr = 1;
 	return 0;
 }
 
-static WRITE32_DEVICE_HANDLER( psx_berr_w )
+WRITE32_MEMBER( psxcpu_device::berr_w )
 {
-	downcast<psxcpu_device *>(device)->set_berr();
+	m_berr = 1;
 }
 
-static READ32_DEVICE_HANDLER( psx_biu_r )
-{
-	return downcast<psxcpu_device *>(device)->get_biu();
-}
-
-static WRITE32_DEVICE_HANDLER( psx_biu_w )
-{
-	downcast<psxcpu_device *>(device)->set_biu( data, mem_mask );
-}
-
-UINT32 psxcpu_device::get_biu()
+READ32_MEMBER( psxcpu_device::biu_r )
 {
 	return m_biu;
 }
 
-void psxcpu_device::set_biu( UINT32 data, UINT32 mem_mask )
+WRITE32_MEMBER( psxcpu_device::biu_w )
 {
 	UINT32 old = m_biu;
 
@@ -1244,20 +1235,15 @@ void psxcpu_device::update_address_masks()
 	}
 }
 
-void psxcpu_device::set_berr()
-{
-	m_berr = 1;
-}
-
 void psxcpu_device::update_scratchpad()
 {
 	if( ( m_biu & BIU_RAM ) == 0 )
 	{
-		m_program->install_legacy_readwrite_handler( *this, 0x1f800000, 0x1f8003ff, FUNC(psx_berr_r), FUNC(psx_berr_w) );
+		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
 	}
 	else if( ( m_biu & BIU_DS ) == 0 )
 	{
-		m_program->install_legacy_read_handler( *this, 0x1f800000, 0x1f8003ff, FUNC(psx_berr_r) );
+		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC(psxcpu_device::berr_r), this ) );
 		m_program->nop_write( 0x1f800000, 0x1f8003ff);
 	}
 	else
@@ -1534,50 +1520,50 @@ int psxcpu_device::store_data_address_breakpoint( UINT32 address )
 
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00800000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x00800000, 0x1effffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
-	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
 	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
 	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
+	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE_MODERN("dma", psxdma_device, read, write)
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0x80800000, 0x9effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xa0800000, 0xbeffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xc0000000, 0xfffdffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_DEVREADWRITE(DEVICE_SELF,psx_biu_r, psx_biu_w)
+	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0x80800000, 0x9effffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xa0800000, 0xbeffffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xc0000000, 0xfffdffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xfffe0130, 0xfffe0133) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, biu_r, biu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x01000000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x01000000, 0x1effffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
-	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
+	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
 	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_READWRITE(psx_sio_r, psx_sio_w)
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
 	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE(psx_irq_r, psx_irq_w)
-	AM_RANGE(0x1f801080, 0x1f8010ff) AM_READWRITE(psx_dma_r, psx_dma_w)
+	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE_MODERN("dma", psxdma_device, read, write)
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff)
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0x81000000, 0x9effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xa1000000, 0xbeffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xc0000000, 0xfffdffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_DEVREADWRITE(DEVICE_SELF,psx_biu_r, psx_biu_w)
+	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0x81000000, 0x9effffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xa1000000, 0xbeffffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xc0000000, 0xfffdffff) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, berr_r, berr_w)
+	AM_RANGE(0xfffe0130, 0xfffe0133) AM_DEVREADWRITE_MODERN(DEVICE_SELF, psxcpu_device, biu_r, biu_w)
 ADDRESS_MAP_END
 
 
@@ -3156,4 +3142,28 @@ UINT32 psxcpu_device::getcp3cr( int reg )
 
 void psxcpu_device::setcp3cr( int reg, UINT32 value )
 {
+}
+
+void psxcpu_device::install_dma_read_handler( device_t &device, int channel, psx_dma_read_handler handler )
+{
+	(downcast<psxdma_device*>(device.subdevice("dma")))->install_read_handler( channel, handler );
+}
+
+void psxcpu_device::install_dma_write_handler( device_t &device, int channel, psx_dma_write_handler handler )
+{
+	(downcast<psxdma_device*>(device.subdevice("dma")))->install_write_handler( channel, handler );
+}
+
+static MACHINE_CONFIG_FRAGMENT( psx )
+	MCFG_DEVICE_ADD("dma", PSX_DMA, 0)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor psxcpu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( psx );
 }

@@ -88,15 +88,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		throw emu_fatalerror("Machine configuration missing driver_device");
 	driver_device::static_set_game(*root, gamedrv);
 
-	// process any device-specific machine configurations
-	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
-		if (!device->configured())
-		{
-			machine_config_constructor additions = device->machine_config_additions();
-			if (additions != NULL)
-				(*additions)(*this, device);
-		}
-
 	// then notify all devices that their configuration is complete
 	for (device_t *device = m_devicelist.first(); device != NULL; device = device->next())
 		if (!device->configured())
@@ -125,6 +116,43 @@ screen_device *machine_config::first_screen() const
 
 
 //-------------------------------------------------
+//  device_add_subdevices - helper to add
+//  devices owned by the device
+//-------------------------------------------------
+
+void machine_config::device_add_subdevices(device_t *device)
+{
+	machine_config_constructor additions = device->machine_config_additions();
+	if (additions != NULL)
+		(*additions)(*this, device);
+}
+
+
+//-------------------------------------------------
+//  device_remove_subdevices - helper to remove
+//  devices owned by the device
+//-------------------------------------------------
+
+void machine_config::device_remove_subdevices(const device_t *device)
+{
+	if (device != NULL)
+	{
+		device_t *sub_device = m_devicelist.first();
+		while (sub_device != NULL)
+		{
+			device_t *next_device = sub_device->next();
+			if (sub_device->owner() == device)
+			{
+				device_remove_subdevices(sub_device);
+				m_devicelist.remove(sub_device->tag());
+			}
+			sub_device = next_device;
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  device_add - configuration helper to add a
 //  new device
 //-------------------------------------------------
@@ -133,7 +161,9 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	return &m_devicelist.append(fulltag, *(*type)(*this, fulltag, owner, clock));
+	device_t *device = &m_devicelist.append(fulltag, *(*type)(*this, fulltag, owner, clock));
+	device_add_subdevices(device);
+	return device;
 }
 
 
@@ -146,7 +176,10 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	return &m_devicelist.replace_and_remove(fulltag, *(*type)(*this, fulltag, owner, clock));
+	device_remove_subdevices(m_devicelist.find(fulltag));
+	device_t *device = &m_devicelist.replace_and_remove(fulltag, *(*type)(*this, fulltag, owner, clock));
+	device_add_subdevices(device);
+	return device;
 }
 
 
@@ -159,6 +192,7 @@ device_t *machine_config::device_remove(device_t *owner, const char *tag)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
+	device_remove_subdevices(m_devicelist.find(fulltag));
 	m_devicelist.remove(fulltag);
 	return NULL;
 }

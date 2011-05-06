@@ -12,124 +12,6 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-#define	DCTSIZE ( 8 )
-#define	DCTSIZE2 ( DCTSIZE * DCTSIZE )
-
-#define SIO_BUF_SIZE ( 8 )
-
-#define SIO_STATUS_TX_RDY ( 1 << 0 )
-#define SIO_STATUS_RX_RDY ( 1 << 1 )
-#define SIO_STATUS_TX_EMPTY ( 1 << 2 )
-#define SIO_STATUS_OVERRUN ( 1 << 4 )
-#define SIO_STATUS_DSR ( 1 << 7 )
-#define SIO_STATUS_IRQ ( 1 << 9 )
-
-#define SIO_CONTROL_TX_ENA ( 1 << 0 )
-#define SIO_CONTROL_IACK ( 1 << 4 )
-#define SIO_CONTROL_RESET ( 1 << 6 )
-#define SIO_CONTROL_TX_IENA ( 1 << 10 )
-#define SIO_CONTROL_RX_IENA ( 1 << 11 )
-#define SIO_CONTROL_DSR_IENA ( 1 << 12 )
-#define SIO_CONTROL_DTR ( 1 << 13 )
-
-#define MDEC_COS_PRECALC_BITS ( 21 )
-
-
-typedef struct _psx_dma_channel psx_dma_channel;
-struct _psx_dma_channel
-{
-	UINT32 n_base;
-	UINT32 n_blockcontrol;
-	UINT32 n_channelcontrol;
-	emu_timer *timer;
-	psx_dma_read_handler fn_read;
-	psx_dma_write_handler fn_write;
-	UINT32 n_ticks;
-	UINT32 b_running;
-};
-
-typedef struct _psx_root psx_root;
-struct _psx_root
-{
-	emu_timer *timer;
-	UINT16 n_count;
-	UINT16 n_mode;
-	UINT16 n_target;
-	UINT64 n_start;
-};
-
-typedef struct _psx_sio psx_sio;
-struct _psx_sio
-{
-	UINT32 n_status;
-	UINT32 n_mode;
-	UINT32 n_control;
-	UINT32 n_baud;
-	UINT32 n_tx;
-	UINT32 n_rx;
-	UINT32 n_tx_prev;
-	UINT32 n_rx_prev;
-	UINT32 n_tx_data;
-	UINT32 n_rx_data;
-	UINT32 n_tx_shift;
-	UINT32 n_rx_shift;
-	UINT32 n_tx_bits;
-	UINT32 n_rx_bits;
-
-	emu_timer *timer;
-	psx_sio_handler fn_handler;
-};
-
-typedef struct _psx_mdec psx_mdec;
-struct _psx_mdec
-{
-	UINT32 n_decoded;
-	UINT32 n_offset;
-	UINT16 p_n_output[ 24 * 16 ];
-
-	INT32 p_n_quantize_y[ DCTSIZE2 ];
-	INT32 p_n_quantize_uv[ DCTSIZE2 ];
-	INT32 p_n_cos[ DCTSIZE2 ];
-	INT32 p_n_cos_precalc[ DCTSIZE2 * DCTSIZE2 ];
-
-	UINT32 n_0_command;
-	UINT32 n_0_address;
-	UINT32 n_0_size;
-	UINT32 n_1_command;
-	UINT32 n_1_status;
-
-	UINT16 p_n_clamp8[ 256 * 3 ];
-	UINT16 p_n_r5[ 256 * 3 ];
-	UINT16 p_n_g5[ 256 * 3 ];
-	UINT16 p_n_b5[ 256 * 3 ];
-
-	INT32 p_n_unpacked[ DCTSIZE2 * 6 * 2 ];
-};
-
-struct _psx_machine
-{
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-
-	running_machine *m_machine;
-	UINT32 *p_n_psxram;
-	size_t n_psxramsize;
-
-	UINT32 n_com_delay;
-	UINT32 n_irqdata;
-	UINT32 n_irqmask;
-
-	UINT32 n_dpcp;
-	UINT32 n_dicr;
-	psx_dma_channel channel[7];
-
-	psx_root root[3];
-
-	psx_sio sio[2];
-
-	psx_mdec mdec;
-};
-
-
 INLINE void ATTR_PRINTF(3,4) verboselog( psx_machine *p_psx, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -243,355 +125,15 @@ void psx_irq_set( running_machine &machine, UINT32 data )
 
 /* DMA */
 
-static void dma_start_timer( psx_machine *p_psx, int n_channel, UINT32 n_ticks )
-{
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	dma->timer->adjust( attotime::from_hz(33868800) * n_ticks, n_channel);
-	dma->n_ticks = n_ticks;
-	dma->b_running = 1;
-}
-
-static void dma_stop_timer( psx_machine *p_psx, int n_channel )
-{
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	dma->timer->adjust( attotime::never);
-	dma->b_running = 0;
-}
-
-static void dma_timer_adjust( psx_machine *p_psx, int n_channel )
-{
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	if( dma->b_running )
-	{
-		dma_start_timer( p_psx, n_channel, dma->n_ticks );
-	}
-	else
-	{
-		dma_stop_timer( p_psx, n_channel );
-	}
-}
-
-static void dma_interrupt_update( psx_machine *p_psx )
-{
-	int n_int;
-	int n_mask;
-
-	n_int = ( p_psx->n_dicr >> 24 ) & 0x7f;
-	n_mask = ( p_psx->n_dicr >> 16 ) & 0xff;
-
-	if( ( n_mask & 0x80 ) != 0 && ( n_int & n_mask ) != 0 )
-	{
-		verboselog( p_psx, 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
-		p_psx->n_dicr |= 0x80000000;
-		psx_irq_set( p_psx->machine(), PSX_IRQ_DMA );
-	}
-	else if( n_int != 0 )
-	{
-		verboselog( p_psx, 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
-	}
-	p_psx->n_dicr &= 0x00ffffff | ( p_psx->n_dicr << 8 );
-}
-
-static void dma_finished(psx_machine *p_psx, int n_channel)
-{
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	if( dma->n_channelcontrol == 0x01000401 && n_channel == 2 )
-	{
-		UINT32 n_size;
-		UINT32 n_total;
-		UINT32 n_address = ( dma->n_base & 0xffffff );
-		UINT32 n_adrmask = p_psx->n_psxramsize - 1;
-		UINT32 n_nextaddress;
-
-		if( n_address != 0xffffff )
-		{
-			n_total = 0;
-			for( ;; )
-			{
-				if( n_address == 0xffffff )
-				{
-					dma->n_base = n_address;
-					dma_start_timer( p_psx, n_channel, 19000 );
-					return;
-				}
-				if( n_total > 65535 )
-				{
-					dma->n_base = n_address;
-					//FIXME:
-					// 16000 below is based on try and error.
-					// Mametesters.org: sfex20103red
-					//dma_start_timer( p_psx, n_channel, 16 );
-					dma_start_timer( p_psx, n_channel, 16000 );
-					return;
-				}
-				n_address &= n_adrmask;
-				n_nextaddress = p_n_psxram[ n_address / 4 ];
-				n_size = n_nextaddress >> 24;
-				(*dma->fn_write)( p_psx->machine(), n_address + 4, n_size );
-				//FIXME:
-				// The following conditions will cause an endless loop.
-				// If stopping the transfer is correct I cannot judge
-				// The patch is meant as a hint for somebody who knows
-				// the hardware.
-				// Mametesters.org: psyforce0105u5red, raystorm0111u1red
-				if ((n_nextaddress & 0xffffff) != 0xffffff)
-					if (n_address == p_n_psxram[ (n_nextaddress & 0xffffff) / 4])
-						break;
-				if (n_address == (n_nextaddress & 0xffffff) )
-					break;
-				n_address = ( n_nextaddress & 0xffffff );
-
-				n_total += ( n_size + 1 );
-			}
-		}
-	}
-
-	dma->n_channelcontrol &= ~( ( 1L << 0x18 ) | ( 1L << 0x1c ) );
-
-	p_psx->n_dicr |= 1 << ( 24 + n_channel );
-	dma_interrupt_update(p_psx);
-	dma_stop_timer( p_psx, n_channel );
-}
-
-static TIMER_CALLBACK( dma_finished_callback )
-{
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
-
-	dma_finished(p_psx, param);
-}
-
 void psx_dma_install_read_handler( running_machine &machine, int n_channel, psx_dma_read_handler p_fn_dma_read )
-{
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
 
-	p_psx->channel[ n_channel ].fn_read = p_fn_dma_read;
+{
+	psxcpu_device::install_dma_read_handler( *machine.device("maincpu"), n_channel, p_fn_dma_read );
 }
 
 void psx_dma_install_write_handler( running_machine &machine, int n_channel, psx_dma_read_handler p_fn_dma_write )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
-
-	p_psx->channel[ n_channel ].fn_write = p_fn_dma_write;
-}
-
-WRITE32_HANDLER( psx_dma_w )
-{
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
-	int n_channel = offset / 4;
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	if( n_channel < 7 )
-	{
-		switch( offset % 4 )
-		{
-		case 0:
-			verboselog( p_psx, 2, "dmabase( %d ) = %08x\n", n_channel, data );
-			dma->n_base = data;
-			break;
-		case 1:
-			verboselog( p_psx, 2, "dmablockcontrol( %d ) = %08x\n", n_channel, data );
-			dma->n_blockcontrol = data;
-			break;
-		case 2:
-			verboselog( p_psx, 2, "dmachannelcontrol( %d ) = %08x\n", n_channel, data );
-			dma->n_channelcontrol = data;
-			if( ( dma->n_channelcontrol & ( 1L << 0x18 ) ) != 0 && ( p_psx->n_dpcp & ( 1 << ( 3 + ( n_channel * 4 ) ) ) ) != 0 )
-			{
-				INT32 n_size;
-				UINT32 n_address;
-				UINT32 n_nextaddress;
-				UINT32 n_adrmask;
-
-				n_adrmask = p_psx->n_psxramsize - 1;
-
-				n_address = ( dma->n_base & n_adrmask );
-				n_size = dma->n_blockcontrol;
-				if( ( dma->n_channelcontrol & 0x200 ) != 0 )
-				{
-					UINT32 n_ba;
-					n_ba = dma->n_blockcontrol >> 16;
-					if( n_ba == 0 )
-					{
-						n_ba = 0x10000;
-					}
-					n_size = ( n_size & 0xffff ) * n_ba;
-				}
-
-				if( dma->n_channelcontrol == 0x01000000 &&
-					dma->fn_read != NULL )
-				{
-					verboselog( p_psx, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
-					(*dma->fn_read)( space->machine(), n_address, n_size );
-					dma_finished( p_psx, n_channel );
-				}
-				else if (dma->n_channelcontrol == 0x11000000 &&	// CD DMA
-					dma->fn_read != NULL )
-				{
-					verboselog( p_psx, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
-
-					// pSX's CD DMA size calc formula
-					int oursize = (dma->n_blockcontrol>>16);
-					oursize = (oursize > 1) ? oursize : 1;
-					oursize *= (dma->n_blockcontrol&0xffff);
-
-					(*dma->fn_read)( space->machine(), n_address, oursize );
-					dma_finished( p_psx, n_channel );
-				}
-				else if( dma->n_channelcontrol == 0x01000200 &&
-					dma->fn_read != NULL )
-				{
-					verboselog( p_psx, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
-					(*dma->fn_read)( space->machine(), n_address, n_size );
-					if( n_channel == 1 )
-					{
-						dma_start_timer( p_psx, n_channel, 26000 );
-					}
-					else
-					{
-						dma_finished( p_psx, n_channel );
-					}
-				}
-				else if( dma->n_channelcontrol == 0x01000201 &&
-					dma->fn_write != NULL )
-				{
-					verboselog( p_psx, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					(*dma->fn_write)( space->machine(), n_address, n_size );
-					dma_finished( p_psx, n_channel );
-				}
-				else if( dma->n_channelcontrol == 0x11050100 &&
-					dma->fn_write != NULL )
-				{
-					/* todo: check this is a write not a read... */
-					verboselog( p_psx, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					(*dma->fn_write)( space->machine(), n_address, n_size );
-					dma_finished( p_psx, n_channel );
-				}
-				else if( dma->n_channelcontrol == 0x11150100 &&
-					dma->fn_write != NULL )
-				{
-					/* todo: check this is a write not a read... */
-					verboselog( p_psx, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					(*dma->fn_write)( space->machine(), n_address, n_size );
-					dma_finished( p_psx, n_channel );
-				}
-				else if( dma->n_channelcontrol == 0x01000401 &&
-					n_channel == 2 &&
-					dma->fn_write != NULL )
-				{
-					verboselog( p_psx, 1, "dma %d write linked list %08x\n",
-						n_channel, dma->n_base );
-
-					dma_finished( p_psx, n_channel );
-				}
-				else if( dma->n_channelcontrol == 0x11000002 &&
-					n_channel == 6 )
-				{
-					verboselog( p_psx, 1, "dma 6 reverse clear %08x %08x\n",
-						dma->n_base, dma->n_blockcontrol );
-					if( n_size > 0 )
-					{
-						n_size--;
-						while( n_size > 0 )
-						{
-							n_nextaddress = ( n_address - 4 ) & 0xffffff;
-							p_n_psxram[ n_address / 4 ] = n_nextaddress;
-							n_address = n_nextaddress;
-							n_size--;
-						}
-						p_n_psxram[ n_address / 4 ] = 0xffffff;
-					}
-					dma_start_timer( p_psx, n_channel, 2150 );
-				}
-				else
-				{
-					verboselog( p_psx, 1, "dma %d unknown mode %08x\n", n_channel, dma->n_channelcontrol );
-				}
-			}
-			else if( dma->n_channelcontrol != 0 )
-			{
-				verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", offset, dma->n_channelcontrol, mem_mask );
-			}
-			break;
-		default:
-			verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) Unknown dma channel register\n", offset, data, mem_mask );
-			break;
-		}
-	}
-	else
-	{
-		switch( offset % 4 )
-		{
-		case 0x0:
-			verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
-			p_psx->n_dpcp = ( p_psx->n_dpcp & ~mem_mask ) | data;
-			break;
-		case 0x1:
-
-			p_psx->n_dicr = ( p_psx->n_dicr & ( 0x80000000 | ~mem_mask ) ) |
-				( p_psx->n_dicr & ~data & 0x7f000000 & mem_mask ) |
-				( data & 0x00ffffff & mem_mask );
-
-			if( ( p_psx->n_dicr & 0x80000000 ) != 0 && ( p_psx->n_dicr & 0x7f000000 ) == 0 )
-			{
-				verboselog( p_psx, 2, "dma interrupt cleared\n" );
-				p_psx->n_dicr &= ~0x80000000;
-			}
-
-			verboselog( p_psx, 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, p_psx->n_dicr );
-			break;
-		default:
-			verboselog( p_psx, 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
-			break;
-		}
-	}
-}
-
-READ32_HANDLER( psx_dma_r )
-{
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
-	int n_channel = offset / 4;
-	psx_dma_channel *dma = &p_psx->channel[ n_channel ];
-
-	if( n_channel < 7 )
-	{
-		switch( offset % 4 )
-		{
-		case 0:
-			verboselog( p_psx, 1, "psx_dma_r dmabase[ %d ] ( %08x )\n", n_channel, dma->n_base );
-			return dma->n_base;
-		case 1:
-			verboselog( p_psx, 1, "psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", n_channel, dma->n_blockcontrol );
-			return dma->n_blockcontrol;
-		case 2:
-			verboselog( p_psx, 1, "psx_dma_r dmachannelcontrol[ %d ] ( %08x )\n", n_channel, dma->n_channelcontrol );
-			return dma->n_channelcontrol;
-		default:
-			verboselog( p_psx, 0, "psx_dma_r( %08x, %08x ) Unknown dma channel register\n", offset, mem_mask );
-			break;
-		}
-	}
-	else
-	{
-		switch( offset % 4 )
-		{
-		case 0x0:
-			verboselog( p_psx, 1, "psx_dma_r dpcp ( %08x )\n", p_psx->n_dpcp );
-			return p_psx->n_dpcp;
-		case 0x1:
-			verboselog( p_psx, 1, "psx_dma_r dicr ( %08x )\n", p_psx->n_dicr );
-			return p_psx->n_dicr;
-		default:
-			verboselog( p_psx, 0, "psx_dma_r( %08x, %08x ) Unknown dma control register\n", offset, mem_mask );
-			break;
-		}
-	}
-	return 0;
+	psxcpu_device::install_dma_write_handler( *machine.device("maincpu"), n_channel, p_fn_dma_write );
 }
 
 /* Root Counters */
@@ -1595,20 +1137,11 @@ void psx_machine_init( running_machine &machine )
 	p_psx->n_irqdata = 0;
 	p_psx->n_irqmask = 0;
 
-	/* dma */
-	p_psx->n_dpcp = 0;
-	p_psx->n_dicr = 0;
-
 	p_psx->mdec.n_0_command = 0;
 	p_psx->mdec.n_0_address = 0;
 	p_psx->mdec.n_0_size = 0;
 	p_psx->mdec.n_1_command = 0;
 	p_psx->mdec.n_1_status = 0;
-
-	for( n = 0; n < 7; n++ )
-	{
-		dma_stop_timer( p_psx, n );
-	}
 
 	for( n = 0; n < 2; n++ )
 	{
@@ -1637,11 +1170,6 @@ static void psx_postload(psx_machine *p_psx)
 
 	psx_irq_update(p_psx);
 
-	for( n = 0; n < 7; n++ )
-	{
-		dma_timer_adjust( p_psx, n );
-	}
-
 	for( n = 0; n < 3; n++ )
 	{
 		root_timer_adjust( p_psx, n );
@@ -1667,13 +1195,6 @@ void psx_driver_init( running_machine &machine )
 	p_psx->m_machine = &machine;
 	p_psx->p_n_psxram = state->m_p_n_psxram;
 	p_psx->n_psxramsize = state->m_n_psxramsize;
-
-	for( n = 0; n < 7; n++ )
-	{
-		p_psx->channel[ n ].timer = machine.scheduler().timer_alloc( FUNC(dma_finished_callback), &machine );
-		p_psx->channel[ n ].fn_read = NULL;
-		p_psx->channel[ n ].fn_write = NULL;
-	}
 
 	for( n = 0; n < 3; n++ )
 	{
@@ -1713,17 +1234,6 @@ void psx_driver_init( running_machine &machine )
 
 	state_save_register_global( machine, p_psx->n_irqdata );
 	state_save_register_global( machine, p_psx->n_irqmask );
-	for (n = 0; n < 7; n++ )
-	{
-		state_save_register_item( machine, "psxdma", NULL, n, p_psx->channel[n].n_base );
-		state_save_register_item( machine, "psxdma", NULL, n, p_psx->channel[n].n_blockcontrol );
-		state_save_register_item( machine, "psxdma", NULL, n, p_psx->channel[n].n_channelcontrol );
-		state_save_register_item( machine, "psxdma", NULL, n, p_psx->channel[n].n_ticks );
-		state_save_register_item( machine, "psxdma", NULL, n, p_psx->channel[n].b_running );
-	}
-
-	state_save_register_global( machine, p_psx->n_dpcp );
-	state_save_register_global( machine, p_psx->n_dicr );
 	for ( n = 0; n < 3; n++ )
 	{
 		state_save_register_item( machine, "psxroot", NULL, n, p_psx->root[n].n_count );
