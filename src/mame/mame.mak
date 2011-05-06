@@ -18,6 +18,7 @@ DRIVERS = $(MAMEOBJ)/drivers
 LAYOUT = $(MAMEOBJ)/layout
 MACHINE = $(MAMEOBJ)/machine
 VIDEO = $(MAMEOBJ)/video
+FORMATS = $(MAMEOBJ)/formats
 
 OBJDIRS += \
 	$(AUDIO) \
@@ -25,6 +26,7 @@ OBJDIRS += \
 	$(LAYOUT) \
 	$(MACHINE) \
 	$(VIDEO) \
+	$(FORMATS) \
 
 
 
@@ -335,6 +337,7 @@ DRVLIBS += \
 	$(MAMEOBJ)/misc.a \
 	$(MAMEOBJ)/pinball.a \
 	$(MAMEOBJ)/shared.a \
+	$(MAMEOBJ)/formats.a \
 
 
 
@@ -345,6 +348,7 @@ DRVLIBS += \
 
 $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/nmk112.o \
+	$(MACHINE)/ctronics.o \
 	$(MACHINE)/pckeybrd.o \
 	$(MACHINE)/pcshare.o \
 	$(MACHINE)/segacrpt.o \
@@ -352,7 +356,12 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
 
+#-------------------------------------------------
+# file formats, mostly used for MESS software
+#-------------------------------------------------
 
+$(MAMEOBJ)/formats.a: \
+	$(FORMATS)/basicdsk.o	\
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers
@@ -1219,6 +1228,13 @@ $(MAMEOBJ)/sega.a: \
 	$(VIDEO)/segaic16.o \
 	$(VIDEO)/sega16sp.o \
 	$(VIDEO)/segaic24.o \
+	$(VIDEO)/smsvdp.o \
+	$(MACHINE)/segasms.o \
+	$(DRIVERS)/segasms.o \
+	$(DRIVERS)/sg1000.o \
+	$(DRIVERS)/dc.o \
+	$(MACHINE)/dccons.o \
+	$(MACHINE)/gdrom.o \
 
 $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/bloodbro.o $(VIDEO)/bloodbro.o \
@@ -1975,6 +1991,8 @@ $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
 $(DRIVERS)/segaorun.o:	$(LAYOUT)/outrun.lh
 
 $(DRIVERS)/segas32.o:	$(LAYOUT)/radr.lh
+
+$(DRIVERS)/segasms.o:	$(LAYOUT)/sms1.lh
 
 $(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
 
