@@ -6,7 +6,7 @@
 
 #include "devcb.h"
 #include "image.h"
-#include "flopimg.h"
+#include "formats/flopimg.h"
 
 #define FLOPPY_TYPE_REGULAR 0
 #define FLOPPY_TYPE_APPLE	1

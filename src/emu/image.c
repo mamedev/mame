@@ -15,6 +15,7 @@
 #include "image.h"
 #include "config.h"
 #include "xmlfile.h"
+#include "formats/ioprocs.h"
 
 /* ----------------------------------------------------------------------- */
 

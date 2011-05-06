@@ -18,7 +18,6 @@ DRIVERS = $(MAMEOBJ)/drivers
 LAYOUT = $(MAMEOBJ)/layout
 MACHINE = $(MAMEOBJ)/machine
 VIDEO = $(MAMEOBJ)/video
-FORMATS = $(MAMEOBJ)/formats
 IMAGEDEV= $(MAMEOBJ)/imagedev
 
 OBJDIRS += \
@@ -27,7 +26,6 @@ OBJDIRS += \
 	$(LAYOUT) \
 	$(MACHINE) \
 	$(VIDEO) \
-	$(FORMATS) \
 	$(IMAGEDEV) \
 
 
@@ -340,7 +338,6 @@ DRVLIBS += \
 	$(MAMEOBJ)/misc.a \
 	$(MAMEOBJ)/pinball.a \
 	$(MAMEOBJ)/shared.a \
-	$(MAMEOBJ)/formats.a \
 
 
 
@@ -357,23 +354,6 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/segacrp2.o \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
-
-#-------------------------------------------------
-# file formats, mostly used for MESS software
-#-------------------------------------------------
-
-$(MAMEOBJ)/formats.a: \
-	$(FORMATS)/basicdsk.o	\
-	$(FORMATS)/ami_dsk.o \
-	$(FORMATS)/cqm_dsk.o \
-	$(FORMATS)/d88_dsk.o \
-	$(FORMATS)/dsk_dsk.o \
-	$(FORMATS)/fdi_dsk.o \
-	$(FORMATS)/fmsx_cas.o	\
-	$(FORMATS)/imd_dsk.o \
-	$(FORMATS)/msx_dsk.o	\
-	$(FORMATS)/nes_dsk.o \
-	$(FORMATS)/td0_dsk.o \
 
 #-------------------------------------------------
 # manufacturer-specific groupings for drivers

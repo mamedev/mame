@@ -45,7 +45,7 @@
 
 
 #include "emu.h"
-#include "imageutl.h"
+#include "formats/imageutl.h"
 #include "cpu/m68000/m68000.h"
 
 #include "imagedev/cartslot.h"

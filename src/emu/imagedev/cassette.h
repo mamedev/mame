@@ -10,7 +10,7 @@
 #define CASSETTE_H
 
 #include "image.h"
-#include "cassimg.h"
+#include "formats/cassimg.h"
 
 
 enum _cassette_state

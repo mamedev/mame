@@ -18,8 +18,6 @@
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
 
-#include "ioprocs.h"
-
 void image_init(running_machine &machine);
 void image_postdevice_init(running_machine &machine);
 

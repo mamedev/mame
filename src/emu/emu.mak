@@ -81,7 +81,6 @@ EMUOBJS = \
 	$(EMUOBJ)/input.o \
 	$(EMUOBJ)/inputseq.o \
 	$(EMUOBJ)/inptport.o \
-	$(EMUOBJ)/ioprocs.o \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/machine.o \
 	$(EMUOBJ)/mconfig.o \
@@ -287,15 +286,12 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/bitbngr.o	\
 	$(EMUIMAGEDEV)/cartslot.o	\
 	$(EMUIMAGEDEV)/cassette.o	\
-	$(EMUIMAGEDEV)/cassimg.o	\
 	$(EMUIMAGEDEV)/chd_cd.o		\
 	$(EMUIMAGEDEV)/flopdrv.o	\
-	$(EMUIMAGEDEV)/flopimg.o	\
 	$(EMUIMAGEDEV)/harddriv.o	\
 	$(EMUIMAGEDEV)/multcart.o	\
 	$(EMUIMAGEDEV)/printer.o	\
 	$(EMUIMAGEDEV)/snapquik.o	\
-	$(EMUIMAGEDEV)/wavfile.o	\
 
 
 LIBEMUOBJS = $(EMUOBJS) $(EMUSOUNDOBJS) $(EMUAUDIOOBJS) $(EMUDRIVEROBJS) $(EMUMACHINEOBJS) $(EMUIMAGEDEVOBJS) $(EMUVIDEOOBJS)
