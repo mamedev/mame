@@ -139,6 +139,7 @@ EMUDRIVEROBJS = \
 EMUMACHINEOBJS = \
 	$(EMUMACHINE)/53c810.o		\
 	$(EMUMACHINE)/6522via.o		\
+	$(EMUMACHINE)/6525tpi.o		\
 	$(EMUMACHINE)/6526cia.o		\
 	$(EMUMACHINE)/6532riot.o	\
 	$(EMUMACHINE)/6821pia.o		\
@@ -193,6 +194,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/ldpr8210.o	\
 	$(EMUMACHINE)/ldv1000.o		\
 	$(EMUMACHINE)/ldvp931.o		\
+	$(EMUMACHINE)/matsucd.o		\
 	$(EMUMACHINE)/mb14241.o		\
 	$(EMUMACHINE)/mb3773.o		\
 	$(EMUMACHINE)/mb87078.o		\
@@ -237,6 +239,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/upd4701.o		\
 	$(EMUMACHINE)/upd7201.o		\
 	$(EMUMACHINE)/upd765.o		\
+	$(EMUMACHINE)/wd17xx.o		\
 	$(EMUMACHINE)/wd33c93.o		\
 	$(EMUMACHINE)/x2212.o		\
 	$(EMUMACHINE)/x76f041.o		\

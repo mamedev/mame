@@ -12271,8 +12271,258 @@ strike
 // due to the arcade units being based on stock retail console units.
 
 // 3DO
+// (used by Orbatak prototype, and Beavis + Butthead prototype)
 3do
 3do_pal
+
+// Acorn Archimedies
+// (hardware used by erotictac, Aristokrat MK5 and others)
+//a310
+//a7000
+//a7000p
+
+// ASCII & Microsoft
+// (hardware used by Sangho Soft games, and some bootlegs)
+//msx	   // 1983 MSX
+//ax170
+//canonv10
+//canonv20
+//dpc100	// 1984 MSX Korea
+//dpc180	// 1984 MSX Korea
+//dpc200	// 1984 MSX Korea
+//gsfc200
+//expert10  // 1983 MSX Brazil
+//expert11  // 1984 MSX Brazil
+//expert13  // 1984 MSX Brazil
+//expertdp  // 1985 MSX Brazil
+//expertpl  // 1984 MSX Brazil
+//jvchc7gb
+//mlf80
+//mlfx1
+//cf1200	// 1984 MSX Japan
+//cf2000	// 1983 MSX Japan
+//cf2700	// 1984 MSX Japan
+//cf3000	// 1984 MSX Japan
+//cf3300	// 1985 MSX Japan
+//fs1300	// 1985 MSX Japan
+//fs4000	// 1985 MSX Japan
+//nms801
+//vg8000
+//vg8010
+//vg8010f
+//vg802000
+//vg802020  // 1985 MSX
+//piopx7
+//mpc100
+//hotbit11  // 1985 MSX Brazil
+//hotbit12  // 1985 MSX Brazil
+//hotbi13b  // 1985 MSX Brazil
+//hotbi13p  // 1985 MSX Brazil
+//hotbit20  // 1986 MSX2 Brazil
+//hb10p
+//hb20p
+//hb201	 // 1985 MSX Japan
+//hb201p	// 1985 MSX
+//hb501p	// 1984 MSX
+//hb55d	 // 1983 MSX Germany
+//hb55p	 // 1983 MSX
+//hb75d	 // 1983 MSX Germany
+//hb75p	 // 1983 MSX
+//svi728	// 1985 MSX
+//svi738	// 1985 MSX
+//svi738sw  // 1985 MSX
+//tadpc200
+//tadpc20a
+//hx10	  // 1984 MSX
+//hx10s	 // 1984 MSX
+//hx20	  // 1984 MSX
+//cx5m
+//cx5m128
+//cx5m2
+//yis303
+//yis503
+//yis503ii
+//y503iir
+//y503iir2
+//yis503m
+//yc64
+//bruc100
+
+//msx2	  // 1985 MSX2
+//ax350
+//ax370
+//hbf9p	 // 1985 MSX2
+//hbf9s	 // 1985 MSX2
+//hbf500p   // 1985 MSX2
+//hbf700d   // 1985 MSX2 Germany
+//hbf700f   // 1985 MSX2
+//hbf700p   // 1985 MSX2
+//hbf700s   // 1985 MSX2 Spain
+//hbg900ap  // 1986 MSX2
+//hbg900p   // 1986 MSX2
+//nms8220   // 1986 MSX2
+//nms8220a  // 1986 MSX2
+//vg8230	// 1986 MSX2
+//vg8235	// 1986 MSX2
+//vg8235f	// 1986 MSX2
+//vg8240 // 1986 MSX2
+//nms8245   // 1986 MSX2
+//nms8245f   // 1986 MSX2
+//nms8250   // 1986 MSX2
+//nms8255   // 1986 MSX2
+//nms8280   // 1986 MSX2
+//nms8280g   // 1986 MSX2
+//tpc310   // 1986 MSX2
+//hx23	   // 1986 MSX2
+//hx23f	// 1986 MSX2
+//cx7m	   // 1986 MSX2
+//cx7m128	// 1986 MSX2
+//fs5500	// 1985 MSX2 Japan
+//fs4500	// 1986 MSX2 Japan
+//fs4700	// 1986 MSX2 Japan
+//fs5000	// 1986 MSX2 Japan
+//fs4600	// 1986 MSX2 Japan
+//fsa1	  // 1986 MSX2 Japan
+//fsa1a	 // 1986 MSX2 Japan
+//fsa1mk2   // 1987 MSX2 Japan
+//fsa1f	 // 1987 MSX2 Japan
+//fsa1fm	// 1988 MSX2 Japan
+//hbf500	// 1986 MSX2 Japan
+//hbf900	// 1986 MSX2 Japan
+//hbf900a   // 1986 MSX2 Japan
+//hbf1	  // 1986 MSX2 Japan
+//hbf12	 // 1987 MSX2 Japan
+//hbf1xd	// 1987 MSX2 Japan
+//hbf1xdm2  // 1988 MSX2 Japan
+//phc23	 // 1986 MSX2 Japan
+//cpc300	// 1986 MSX2 Korea
+//cpc300e   // 1986 MSX2 Korea
+//cpc400	// 1986 MSX2 Korea
+//cpc400s   // 1986 MSX2 Korea
+//expert20 // 1986 MSX2 Korea
+
+//msx2p	 // 1988 MSX2+ Japan
+//fsa1fx	// 1988 MSX2+ Japan
+//fsa1wx	// 1988 MSX2+ Japan
+//fsa1wxa   // 1988 MSX2+ Japan
+//fsa1wsx   // 1989 MSX2+ Japan
+//hbf1xdj   // 1988 MSX2+ Japan
+//hbf1xv	// 1989 MSX2+ Japan
+//phc70fd   // 1988 MSX2+ Japan
+//phc70fd2  // 1988 MSX2+ Japan
+//phc35j	// 1989 MSX2+ Japan
+
+
+// Atari A400
+// (hardware used by Maxaflex and Barroom Baseball)
+//a400
+//a400pal
+//a800
+//a800pal
+//a1200xl
+//a600xl
+//a800xl
+//a800xlp
+//a65xe
+//a65xea
+//a130xe
+//a800xe
+//xegs
+//a5200
+
+
+// Atari Jaguar
+// (hardware used by CoJag)
+//jaguar		// (c)1993 Atari
+//jaguarcd	// (c)1995 Atari
+
+// Capcom CPS Changer
+// (hardware is the same as CPS1)
+//sfzch		// (c)1995 Capcom
+//sfach		// (c)1995 Capcom
+//sfzbch		// (c)1995 Capcom
+//wofch		// (c)1995 Capcom
+
+// Commodore Amiga
+// (hardware used by Arcadia and others)
+//a1000n
+//a1000p
+//a500n
+//a500p
+//cdtv
+//a3000
+//a1200n
+//a1200p
+
+// Commodore CD32
+// (parent to Cubo32 sets)
+cd32		// (c)1993 Commodore
+
+// GCE Vectrex
+// (parent to Spectrum I+)
+vectrex		// (c)1982 GCE
+
+// NEC PC Engine
+// Hardware used by uapce.c, and several others (implementations could be merged)
+//pce
+//tg16
+//sgx
+
+// Nintendo NES
+// (used by vsnes, pc10, and others)
+//nes
+//nespal
+//famicom
+//fami_key
+//famitwin
+//m82
+//drpcjr
+//dendy
+
+// Nintendo SNES
+// (used by Nintendo Super System and various bootlegs)
+//snes
+//snespal
+//snesdsp
+//snespdsp
+//snessfx
+//snespsfx
+//snesst10
+//snesst11
+//snesst
+//snesbsx
+
+// Nintendo N64
+// (used by Aleck64)
+//n64
+
+// Phillips CDI
+// (parent to Quizzard sets)
+cdimono1	// (c)1991 Philips
+
+// Sega SG1000
+// (hardware used by Doki Doki Penguin Land + others)
+//sg1000
+//sg1000m2
+//sc3000
+//sc3000h
+//sf7000
+//omv1000
+//omv2000
+
+// Sega SMS / Game Gear
+// (Megatech runs some SMS games in the Genesis compatibility mode, VDPs used by Megatech, Megaplay, System E)
+// (MAME currently uses it's own implementation)
+//sg1000m3
+//sms1
+//sms1pal
+//smssdisp
+//smsj
+//sms
+//smspal
+//sms2kr
+//gamegear
+//gamegeaj
 
 // Sega Megadrive / Genesis and related systems
 // (hardware used by Megatech, Megaplay + many standalone boards)
@@ -12306,26 +12556,14 @@ strike
 //vsaturn		// (c)1995 Sega/JVC
 //hisaturn	// (c)1995 Sega/Hitachi
 
-// Atari Jaguar
-// (hardware used by CoJag)
-//jaguar		// (c)1993 Atari
-//jaguarcd	// (c)1995 Atari
+// Sega Dreamcast
+// (hardware used by Naomi, Atomiswave etc.)
+//dc
+//dcjp
+//dceu
+//dcdev
 
-// Capcom CPS Changer
-// (hardware is the same as CPS1)
-//sfzch		// (c)1995 Capcom
-//sfach		// (c)1995 Capcom
-//sfzbch		// (c)1995 Capcom
-//wofch		// (c)1995 Capcom
-
-// Phillips CDI
-// (parent to Quizzard sets)
-cdimono1	// (c)1991 Philips
-
-// Commodore CD32
-// (parent to Cubo32 sets)
-cd32		// (c)1993 Commodore
-
-// GCE Vectrex
-// (parent to Spectrum I+)
-vectrex		// (c)1982 GCE
+// SNK NeoGeo AES
+//aes
+//neocd
+//neocdz
