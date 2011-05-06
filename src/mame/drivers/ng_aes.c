@@ -34,7 +34,7 @@
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
-#include "imagedev/aescart.h"
+#include "machine/aescart.h"
 #include "imagedev/cartslot.h"
 #ifdef MESS
 #include "neogeo.lh"

@@ -18,7 +18,6 @@ DRIVERS = $(MAMEOBJ)/drivers
 LAYOUT = $(MAMEOBJ)/layout
 MACHINE = $(MAMEOBJ)/machine
 VIDEO = $(MAMEOBJ)/video
-IMAGEDEV= $(MAMEOBJ)/imagedev
 
 OBJDIRS += \
 	$(AUDIO) \
@@ -26,7 +25,6 @@ OBJDIRS += \
 	$(LAYOUT) \
 	$(MACHINE) \
 	$(VIDEO) \
-	$(IMAGEDEV) \
 
 
 #-------------------------------------------------
@@ -1035,7 +1033,7 @@ $(MAMEOBJ)/neogeo.a: \
 	$(MACHINE)/neocrypt.o \
 	$(MACHINE)/neoprot.o \
 	$(DRIVERS)/ng_aes.o \
-	$(IMAGEDEV)/aescart.o \
+	$(MACHINE)/aescart.o \
 
 $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/armedf.o $(VIDEO)/armedf.o \
