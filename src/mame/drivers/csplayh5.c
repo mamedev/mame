@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
-	AM_RANGE(0xc80000, 0xcfffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x200000) // work RAM
+	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
@@ -749,6 +749,28 @@ ROM_START( csplayh5 )
 	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
+ROM_START( mjmaina )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(7b0f79c5) SHA1(73f23f68db4426b32583a7922abf773d67c76862) )
+	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(19192ae7) SHA1(4e9fca04b567c8ef9136a3ab87b21207a44a24c4) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f0c3bb11) SHA1(691a0ff53a9417e69051e9e2bdee7500bc6a746b) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(37dde764) SHA1(0530b63d8e682cdf01128057fdc3a8c23262afc9) )
+    ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(dea4a2d2) SHA1(0118eb1330c9da8fead99f64fc015fd343fed79b) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "mjmaina", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563) SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
+ROM_END
+
 ROM_START( bikiniko )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(b80b5484) SHA1(35769d9502cbe587dad6380c35e535cea1578227) )
@@ -769,28 +791,93 @@ ROM_START( bikiniko )
 	DISK_IMAGE( "bikiniko", 0, SHA1(2189b676746dd848b9b5eb69f9663d6dccd63787) )
 ROM_END
 
+ROM_START( thenanpa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(ab0b686f) SHA1(a5681dbacbc60f3eb40e079779967cf69d9cb292) )
+    ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(48b65f9a) SHA1(ce35475d3b0e9e8dc69892428f3957d8d3d5f22c) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+    ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f44c4095) SHA1(d43e464bd6d614c34791445f8fd4af2f62a4dfc2) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(ee6b88c4) SHA1(64ae66a24f1639801c7bdda7faa0d604bb97ceb1) )
+    ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(ce987845) SHA1(2f7dca32a79ad6afbc55ca1d492b582f952688ff) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "thenanpa", 0,  SHA1(72bf8c75189e877508c5a64d5591738d23ed7e96) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(daffd0ac)SHA1(cbeff914163d425a9cb30fe8d62f91fca281b11f) )
+ROM_END
+
+ROM_START( cspureh7 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(c5ce76a6) SHA1(f8878285d2318c1ec50ba98607eb3f15a7f69913) )
+	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(162f8cff) SHA1(8aa185fd1daa943d0b21fdf6e692f7782bc6dac4) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+    ROM_LOAD16_WORD_SWAP( "va1b102.u2", 0x000000, 0x020000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+    ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(5905b199) SHA1(9155455bc21d23d439c4732549ff1143ee17b9d3) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(1d67ca95) SHA1(9b45045b6fa67308bade324f91c21010aa8d121e) )
+    ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(b4f5f990) SHA1(88cccae04f89fef43d88f4e82b65de3de946e9af) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "cspureh7", 0, SHA1(f81e772745b0c62b17d91bd294993e49fe8da4d9) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+    ROM_LOAD( "mjdvd12.gal16v8b.ic8.bin", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563)SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
+ROM_END
+
+ROM_START( fudol )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+    ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(0cab2a72) SHA1(32d098bdd693a11f3cea6bbed3515c4217f40e23) )
+	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(b1fa335e) SHA1(8a881c9c511fb63b00a3a7e433bae12aa9c2c262) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+    ROM_LOAD16_WORD_SWAP( "va1b102.u2", 0x000000, 0x020000, CRC(67374715) SHA1(8767cbd81614c2686a1adb70159f909e8ffd634d) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(f6442026) SHA1(f49ddeeeaf6fffdccea9ba73bce3ca60c07a7647) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c9e8665) SHA1(2a1b040e5c72d4400d4b5c467c75ae99e9bb01e2) )
+	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(fdd79d8f) SHA1(f8bb82afaa28affb04b83270eb407129f1c7e611) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "fudol", 0, SHA1(fabab43543ed14da4fe7c63a2a2cc4e68936938a) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
+ROM_END
 
 // 1998
 // 01 : Mahjong Gal-pri (World Gal-con Grandprix) : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
-/* 03 */ GAME( 1998, jyunai,    0,   csplayh5,  csplayh5,  jyunai,   ROT0, "Nichibutsu/eic", "Jyunai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
-/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu", "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1998, jyunai,    0,   csplayh5,  csplayh5,  jyunai,   ROT0, "Nichibutsu/eic",   "Jyunai - Manatsu no First Kiss (Japan)", GAME_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu",       "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
 // 05 : Jyunai2 - White Love Story : Nichibutsu/eic
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
 
 // 1999
-// 07 : Mahjong Maina - Kairakukan he Youkoso : Sphinx/Just&Just
+/* 07 */ GAME( 1999, mjmaina,   0,   csplayh5,  csplayh5,  0,        ROT0, "Sphinx/Just&Just", "Mahjong Maina - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
 // 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
-/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic", "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
+/* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cospure Tengoko 6 - Jyunai hen : Nichibutsu/eic
-// 11 : The Nanpa : Nichibutsu/Love Factory/eic
-// 12 : PokoaPoka Onsen de CHU - Bijin 3 Simai ni kiwotukete : Nichibutsu/eic
-// 13 : Cospure Tengoku 7 - Super Co-gal Grandprix : Nichibutsu/eic
+/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa", GAME_NOT_WORKING )
+// 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Simai ni Kiwotukete (Japan)", GAME_NOT_WORKING )
+/* 13 */ GAME( 1999, cspureh7,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "Cospure Tengoku 7 - Super Co-gal Grandprix", GAME_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 
 // 2000
-// 15 : Fu-dol : Nichbutsu/eic
+/* 15 */ GAME( 2000, fudol,     0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "Fudol (Japan)", GAME_NOT_WORKING )
 // 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
 // 17 : Tuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
 // 18 : Toraretyattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
