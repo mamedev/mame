@@ -693,21 +693,13 @@ void general_init(running_machine &machine, int patchaddress)
 
 }
 
-static DRIVER_INIT( jyunai )
-{
-	general_init(machine,0x679C/2);
-}
-
-static DRIVER_INIT( csplayh5 )
-{
-	general_init(machine, 0x4cb4/2);
-}
-
-static DRIVER_INIT( bikiniko )
-{
-	general_init(machine,0x585C/2);
-}
-
+static DRIVER_INIT( jyunai )   { general_init(machine, 0x679c/2); }
+static DRIVER_INIT( mjmaina )  { general_init(machine, 0x6b96/2); }
+static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
+static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
+static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
+static DRIVER_INIT( cspureh7 ) { general_init(machine, 0x7a20/2); }
+static DRIVER_INIT( fudol )    { general_init(machine, 0x9166/2); }
 
 ROM_START( jyunai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
@@ -867,17 +859,17 @@ ROM_END
 
 
 // 1999
-/* 07 */ GAME( 1999, mjmaina,   0,   csplayh5,  csplayh5,  0,        ROT0, "Sphinx/Just&Just", "Mahjong Maina - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmaina,   0,   csplayh5,  csplayh5,  mjmaina,        ROT0, "Sphinx/Just&Just", "Mahjong Maina - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
 // 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
 /* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cospure Tengoko 6 - Jyunai hen : Nichibutsu/eic
-/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa", GAME_NOT_WORKING )
+/* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa", GAME_NOT_WORKING )
 // 12 GAME( 1999, pokoachu,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "PokoaPoka Onsen de CHU - Bijin 3 Simai ni Kiwotukete (Japan)", GAME_NOT_WORKING )
-/* 13 */ GAME( 1999, cspureh7,  0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "Cospure Tengoku 7 - Super Co-gal Grandprix", GAME_NOT_WORKING )
+/* 13 */ GAME( 1999, cspureh7,  0,   csplayh5,  csplayh5,  cspureh7,        ROT0, "Nichibutsu/eic", "Cospure Tengoku 7 - Super Co-gal Grandprix", GAME_NOT_WORKING )
 // 14 : Ai-mode - Pet Shiiku : Nichibutsu/eic
 
 // 2000
-/* 15 */ GAME( 2000, fudol,     0,   csplayh5,  csplayh5,  0,        ROT0, "Nichibutsu/eic", "Fudol (Japan)", GAME_NOT_WORKING )
+/* 15 */ GAME( 2000, fudol,     0,   csplayh5,  csplayh5,  fudol,        ROT0, "Nichibutsu/eic", "Fudol (Japan)", GAME_NOT_WORKING )
 // 16 : Nurete Mitaino... - Net Idol Hen : Nichibutsu/Love Factory
 // 17 : Tuugakuro no Yuuwaku : Nichibutsu/Love Factory/Just&Just
 // 18 : Toraretyattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
