@@ -2257,8 +2257,10 @@ static READ16_HANDLER( setaroul_spritecode_r )
 {
 	UINT16 ret;
 	seta001_device *dev = space->machine().device<seta001_device>("spritegen");
-	if ((offset&1)==1) ret = spritecodelow_r8(dev, offset>>1);
-	if ((offset&1)==0) ret = spritecodehigh_r8(dev, offset>>1);
+	if ((offset&1)==1)
+		ret = spritecodelow_r8(dev, offset>>1);
+	else
+		ret = spritecodehigh_r8(dev, offset>>1);
 	return ret << 8;
 }
 
