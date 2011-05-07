@@ -6,7 +6,7 @@
 
 *********************************************************************/
 
-
+#include <assert.h>
 #include <string.h>
 
 #include "imageutl.h"
@@ -452,7 +452,7 @@ casserr_t cassette_get_samples(cassette_image *cassette, int channel,
 	INT32 dword;
 	INT64 sum;
 
-//	assert(cassette);
+	assert(cassette);
 
 	err = compute_manipulation_ranges(cassette, channel, time_index, sample_period, &ranges);
 	if (err)
@@ -899,9 +899,9 @@ casserr_t cassette_legacy_construct(cassette_image *cassette,
 	struct CassetteLegacyWaveFiller args;
 
 	/* sanity check the args */
-	//assert(legacy_args->header_samples >= -1);
-	//assert(legacy_args->trailer_samples >= 0);
-	//assert(legacy_args->fill_wave);
+	assert(legacy_args->header_samples >= -1);
+	assert(legacy_args->trailer_samples >= 0);
+	assert(legacy_args->fill_wave);
 
 	size = cassette_image_size(cassette);
 

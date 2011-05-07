@@ -10,7 +10,6 @@
 #include <assert.h>
 #include <time.h>
 
-#include "osdepend.h"
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
 #include "imageutl.h"

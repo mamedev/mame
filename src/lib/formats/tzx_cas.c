@@ -416,10 +416,12 @@ static int tzx_cas_do_work( INT16 **buffer )
 			text_size = 0;
 			for (data_size = 0; data_size < cur_block[3]; data_size++)	// data_size = number of text blocks, in this case
 			{
-				if (cur_block[4 + text_size] < 0x09)
+				if (cur_block[4 + text_size] < 0x09) {
 					logerror("%s: \n", archive_ident[cur_block[4 + text_size]]);
-				else
+				}
+				else {
 					logerror("Comment(s): \n");
+				}
 
 				for (i = 0; i < cur_block[4 + text_size + 1]; i++)
 				{

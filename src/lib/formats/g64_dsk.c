@@ -275,10 +275,11 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 
 		if (LOG)
 		{
-			if (tag->speed_zone_offset[i] < 4)
+			if (tag->speed_zone_offset[i] < 4) {
 				logerror("G64 track %.1f speed zone: %u\n", get_dos_track(i), tag->speed_zone_offset[i]);
-			else
+			} else {
 				logerror("G64 track %.1f speed zone offset: %04x\n", get_dos_track(i), tag->speed_zone_offset[i]);
+			}
 		}
 	}
 

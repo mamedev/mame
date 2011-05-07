@@ -13,8 +13,12 @@
 #include "pool.h"
 #include "ioprocs.h"
 
+#ifndef LOG_FORMATS
+#define LOG_FORMATS 0
+#endif
+
 #ifndef logerror
-#define logerror printf
+#define logerror if (LOG_FORMATS) printf
 #endif
 
 /***************************************************************************

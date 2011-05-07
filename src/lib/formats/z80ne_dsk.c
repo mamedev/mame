@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include <assert.h>
 #include "z80ne_dsk.h"
 #include "basicdsk.h"
 #include "imageutl.h"
@@ -323,7 +324,7 @@ static floperr_t z80ne_dmk_format_track(floppy_image *floppy, int head, int trac
 	}
 
 	/* write track footer GAP4 */
-	//assert(max_track_size >= (UINT32)track_position);
+	assert(max_track_size >= (UINT32)track_position);
 	memset(&track_data[track_position], 0xFF, max_track_size - track_position);
 
 done:
