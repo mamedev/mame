@@ -684,7 +684,7 @@ class address_table
 public:
 	// construction/destruction
 	address_table(address_space &space, bool large);
-	~address_table();
+	virtual ~address_table();
 
 	// getters
 	virtual handler_entry &handler(UINT32 index) const = 0;
@@ -777,7 +777,7 @@ class address_table_read : public address_table
 public:
 	// construction/destruction
 	address_table_read(address_space &space, bool large);
-	~address_table_read();
+	virtual ~address_table_read();
 
 	// getters
 	virtual handler_entry &handler(UINT32 index) const;
@@ -833,7 +833,7 @@ class address_table_write : public address_table
 public:
 	// construction/destruction
 	address_table_write(address_space &space, bool large);
-	~address_table_write();
+	virtual ~address_table_write();
 
 	// getters
 	virtual handler_entry &handler(UINT32 index) const;
