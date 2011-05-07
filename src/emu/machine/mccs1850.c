@@ -350,8 +350,6 @@ void mccs1850_device::device_start()
 
 void mccs1850_device::device_reset()
 {
-	memset(m_ram, 0xff, RAM_SIZE);
-
 	m_ram[REGISTER_STATUS] = 0x80 | STATUS_FTU;
 	m_ram[REGISTER_CONTROL] = 0x00;
 }
@@ -390,6 +388,14 @@ void mccs1850_device::rtc_set_time(int year, int month, int day, int day_of_week
 void mccs1850_device::nvram_default()
 {
 	memset(m_ram, 0xff, RAM_SIZE);
+
+	if (machine().region(tag()) != NULL)
+	{
+		UINT8 *nvram = machine().region(tag())->base();
+
+		// initialize NVRAM
+		memcpy(m_ram, nvram, 0x20);
+	}
 }
 
 
