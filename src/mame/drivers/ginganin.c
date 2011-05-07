@@ -44,17 +44,23 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
                                 To Do
                                 -----
 
-- The sound section will benefit from proper MC6840 and YM8950 emulation
+- game doesn't init paletteram / tilemaps properly, ending up with MAME
+  palette defaults at start-up and missing text layer if you coin it up
+  too soon.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/8950intf.h"
 #include "includes/ginganin.h"
+#include "machine/6840ptm.h"
+
+
+#define MAIN_CLOCK XTAL_6MHz
+#define SOUND_CLOCK XTAL_3_579545MHz
 
 
 /*
@@ -84,66 +90,9 @@ ADDRESS_MAP_END
 **
 */
 
-static WRITE8_HANDLER( MC6840_control_port_0_w )
-{
-	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
-    (This routine hasn't been completed yet.) */
-
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->m_MC6840_index0 = data;
-
-	if (state->m_MC6840_index0 & 0x80)	/* enable timer output */
-	{
-		if ((state->m_MC6840_register0 != state->m_S_TEMPO) && (state->m_MC6840_register0 != 0))
-		{
-			state->m_S_TEMPO = state->m_MC6840_register0;
-#ifdef MAME_DEBUG
-			popmessage("I0:0x%02X R0:0x%02X I1:0x%02X R1:0x%02X", state->m_MC6840_index0, state->m_MC6840_register0, state->m_MC6840_index1, state->m_MC6840_register1);
-#endif
-		}
-		state->m_MC6809_FLAG = 1;
-	}
-	else
-		state->m_MC6809_FLAG = 0;
-
-#ifdef MAME_DEBUG
-	logerror("MC6840 Write:(0x%02X)0x%02X\n", state->m_MC6840_register0,  data);
-#endif
-}
-
-static WRITE8_HANDLER( MC6840_control_port_1_w )
-{
-	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
-    (This routine hasn't been completed yet.) */
-
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->m_MC6840_index1 = data;
-}
-
-static WRITE8_HANDLER( MC6840_write_port_0_w )
-{
-	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
-    (This routine hasn't been completed yet.) */
-
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->m_MC6840_register0 = data;
-}
-
-static WRITE8_HANDLER( MC6840_write_port_1_w )
-{
-	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
-    (This routine hasn't been completed yet.) */
-
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	state->m_MC6840_register1 = data;
-}
-
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(MC6840_control_port_0_w)	/* Takahiro Nogi. 1999/09/27 */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(MC6840_control_port_1_w)	/* Takahiro Nogi. 1999/09/27 */
-	AM_RANGE(0x0802, 0x0802) AM_WRITE(MC6840_write_port_0_w)		/* Takahiro Nogi. 1999/09/27 */
-	AM_RANGE(0x0803, 0x0803) AM_WRITE(MC6840_write_port_1_w)		/* Takahiro Nogi. 1999/09/27 */
+	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE_MODERN("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", y8950_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -272,31 +221,6 @@ GFXDECODE_END
 
 
 
-/* Modified by Takahiro Nogi. 1999/09/27 */
-static INTERRUPT_GEN( ginganin_sound_interrupt )
-{
-	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
-    (This routine hasn't been completed yet.) */
-
-	ginganin_state *state = device->machine().driver_data<ginganin_state>();
-
-	if (state->m_S_TEMPO_OLD != state->m_S_TEMPO)
-	{
-		state->m_S_TEMPO_OLD = state->m_S_TEMPO;
-		state->m_MC6809_CTR = 0;
-	}
-
-	if (state->m_MC6809_FLAG != 0)
-	{
-		if (state->m_MC6809_CTR > state->m_S_TEMPO)
-		{
-			state->m_MC6809_CTR = 0;
-			device_set_input_line(device, 0, HOLD_LINE);
-		}
-		else
-			state->m_MC6809_CTR++;
-	}
-}
 
 
 
@@ -337,19 +261,33 @@ static MACHINE_RESET( ginganin )
 }
 
 
+static WRITE8_DEVICE_HANDLER( ptm_irq )
+{
+	cputag_set_input_line(device->machine(), "audiocpu", 0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const ptm6840_interface ptm_intf =
+{
+	SOUND_CLOCK/2,
+	{ 0, 0, 0 },
+	{ DEVCB_HANDLER(ptm_irq), DEVCB_NULL, DEVCB_NULL },
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( ginganin, ginganin_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
+	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ginganin_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MCFG_CPU_ADD("audiocpu", M6809, 1000000)
+	MCFG_CPU_ADD("audiocpu", M6809, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
 	MCFG_MACHINE_START(ginganin)
 	MCFG_MACHINE_RESET(ginganin)
+
+	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -368,10 +306,10 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 3579545 / 2)
+	MCFG_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", Y8950, 3579545)	/* The Y8950 is basically a YM3526 with ADPCM built in */
+	MCFG_SOUND_ADD("ymsnd", Y8950, SOUND_CLOCK)	/* The Y8950 is basically a YM3526 with ADPCM built in */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
