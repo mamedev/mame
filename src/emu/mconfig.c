@@ -140,12 +140,14 @@ void machine_config::device_remove_subdevices(const device_t *device)
 		device_t *sub_device = m_devicelist.first();
 		while (sub_device != NULL)
 		{
-			device_t *next_device = sub_device->next();
 			if (sub_device->owner() == device)
-			{
 				device_remove_subdevices(sub_device);
-				m_devicelist.remove(sub_device->tag());
-			}
+
+			device_t *next_device = sub_device->next();
+
+			if (sub_device->owner() == device)
+				m_devicelist.remove(*sub_device);
+
 			sub_device = next_device;
 		}
 	}
@@ -192,8 +194,9 @@ device_t *machine_config::device_remove(device_t *owner, const char *tag)
 {
 	astring tempstring;
 	const char *fulltag = owner->subtag(tempstring, tag);
-	device_remove_subdevices(m_devicelist.find(fulltag));
-	m_devicelist.remove(fulltag);
+	device_t *device=m_devicelist.find(fulltag);
+	device_remove_subdevices(device);
+	m_devicelist.remove(*device);
 	return NULL;
 }
 
