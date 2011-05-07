@@ -2,6 +2,8 @@
 #define __SG1000__
 
 #include "machine/ram.h"
+#include "video/tms9928a.h"
+#include "imagedev/cassette.h"
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"z80"
@@ -25,6 +27,12 @@
 
 #define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
 	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
+
+extern const TMS9928a_interface tms9928a_interface;
+INPUT_PORTS_EXTERN( sk1100 );
+extern INTERRUPT_GEN( sg1000_int );
+extern const i8255_interface ( sc3000_ppi_intf );
+extern const cassette_config sc3000_cassette_config;
 
 class sg1000_state : public driver_device
 {
@@ -71,32 +79,6 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-};
-
-class sf7000_state : public sc3000_state
-{
-public:
-	sf7000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sc3000_state(mconfig, type, tag),
-		  m_fdc(*this, UPD765_TAG),
-		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy0(*this, FLOPPY_0)
-	{ }
-
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_centronics;
-	required_device<device_t> m_floppy0;
-
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-
-	/* floppy state */
-	int m_fdc_irq;
-	int m_fdc_index;
 };
 
 #endif
