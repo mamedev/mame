@@ -167,7 +167,7 @@ static INPUT_PORTS_START( ginganin )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	  0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Freeze (Cheat)")
+	PORT_DIPNAME( 0x8000, 0x8000, "Freeze" )
 	PORT_DIPSETTING(	  0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -234,14 +234,6 @@ static MACHINE_START( ginganin )
 
 	state->save_item(NAME(state->m_layers_ctrl));
 	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_MC6840_index0));
-	state->save_item(NAME(state->m_MC6840_register0));
-	state->save_item(NAME(state->m_MC6840_index1));
-	state->save_item(NAME(state->m_MC6840_register1));
-	state->save_item(NAME(state->m_S_TEMPO));
-	state->save_item(NAME(state->m_S_TEMPO_OLD));
-	state->save_item(NAME(state->m_MC6809_CTR));
-	state->save_item(NAME(state->m_MC6809_FLAG));
 }
 
 static MACHINE_RESET( ginganin )
@@ -250,14 +242,6 @@ static MACHINE_RESET( ginganin )
 
 	state->m_layers_ctrl = 0;
 	state->m_flipscreen = 0;
-	state->m_MC6840_index0 = 0;
-	state->m_MC6840_register0 = 0;
-	state->m_MC6840_index1 = 0;
-	state->m_MC6840_register1 = 0;
-	state->m_S_TEMPO = 0;
-	state->m_S_TEMPO_OLD = 0;
-	state->m_MC6809_CTR = 0;
-	state->m_MC6809_FLAG = 0;
 }
 
 

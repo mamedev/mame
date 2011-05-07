@@ -28,15 +28,6 @@ public:
 	int         m_posx;
 	int         m_posy;
 #endif
-	/* sound-related */
-	UINT8       m_MC6840_index0;
-	UINT8       m_MC6840_register0;
-	UINT8       m_MC6840_index1;
-	UINT8       m_MC6840_register1;
-	int         m_S_TEMPO;
-	int         m_S_TEMPO_OLD;
-	int         m_MC6809_CTR;
-	int         m_MC6809_FLAG;
 
 	/* devices */
 	device_t *m_audiocpu;
