@@ -378,20 +378,25 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc *outtoc, chdcd_track_
 				outinfo->idx0offs[track-1] = 0;
 				outinfo->idx1offs[track-1] = 0;
 
-				switch (mode)
+				switch (mode>>24)
 				{
-					case 1:	// 2048 byte data
+					case 0x00:	// 2048 byte data
 						outtoc->tracks[track-1].trktype = CD_TRACK_MODE1;
 						outinfo->swap[track-1] = 0;
 						break;
 
-					case 0x7000001:	// 2352 byte audio
+					case 0x06:	// 2352 byte mode 2 raw
+						outtoc->tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
+						outinfo->swap[track-1] = 0;
+						break;
+
+					case 0x07:	// 2352 byte audio
 						outtoc->tracks[track-1].trktype = CD_TRACK_AUDIO;
 						outinfo->swap[track-1] = 1;
 						break;
 
 					default:
-						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
+						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode>>24);
 						break;
 				}
 
