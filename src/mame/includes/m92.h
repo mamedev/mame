@@ -19,10 +19,7 @@ public:
 	m92_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT8 m_irqvector;
 	UINT16 m_sound_status;
-	UINT32 m_bankaddress;
-	emu_timer *m_scanline_timer;
 	UINT8 m_irq_vectorbase;
 	UINT32 m_raster_irq_position;
 	UINT16 *m_vram_data;
@@ -32,7 +29,7 @@ public:
 	pf_layer_info m_pf_layer[3];
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
-	int m_palette_bank;
+	UINT8 m_palette_bank;
 };
 
 

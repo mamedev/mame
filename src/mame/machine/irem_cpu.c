@@ -304,7 +304,7 @@ const UINT8 hook_decryption_table[256] = {
 // 0x87 (0x18) opcode is right but arguments could be swapped
 // 0xbb (0x2b) not sure, could be 0x1b
 
-// rtypeleo
+// rtypeleo, firebarr
 const UINT8 rtypeleo_decryption_table[256] = {
 	0x5d,xxxx,0xc6,xxxx,xxxx,xxxx,0x2a,0x3a,xxxx,xxxx,xxxx,0x86,xxxx,0x22,xxxx,0xf3, /* 00 */
 	xxxx,xxxx,xxxx,xxxx,xxxx,0x38,0xf7,0x42,0x04,xxxx,xxxx,0x1f,0x4b,xxxx,xxxx,0x58, /* 10 */
@@ -498,7 +498,7 @@ clc
 ret
 */
 
-// leagueman
+// leagueman, wpksoc
 const UINT8 leagueman_decryption_table[256] = {
 	xxxx,xxxx,xxxx,0x55,0xbb,xxxx,0x23,0x79, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x38,xxxx, /* 00 */
 	0x01,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x3d,xxxx,xxxx,xxxx,0xba,xxxx,0x1e,xxxx, /* 10 */
