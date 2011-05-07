@@ -2659,17 +2659,17 @@ static DRIVER_INIT (connect4)
 	state->m_led_lamp=1;
 }
 
-static DRIVER_INIT (m_frkstn)
-{
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	state->m_reel_mux=STANDARD_REEL;
-	state->m_reels = 4;
-
-	// setup 4 default 96 half step reels with the mux board
-	mpu4_config_common_reels(machine,4);
-
-	//This is a Crystal ROM, needs UPD chip and Project Amber's ROM swizzle.
-}
+//static DRIVER_INIT (m_frkstn)
+//{
+//	mpu4_state *state = machine.driver_data<mpu4_state>();
+//	state->m_reel_mux=STANDARD_REEL;
+//	state->m_reels = 4;
+//
+//	// setup 4 default 96 half step reels with the mux board
+//	mpu4_config_common_reels(machine,4);
+//
+//	//This is a Crystal ROM, needs UPD chip and Project Amber's ROM swizzle.
+//}
 
 /* generate a 50 Hz signal (based on an RC time) */
 static TIMER_DEVICE_CALLBACK( gen_50hz )
@@ -2779,27 +2779,28 @@ static ADDRESS_MAP_START( mpu4_bwb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpu4_crystal_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+//static ADDRESS_MAP_START( mpu4_crystal_map, AS_PROGRAM, 8 )
+//	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+//
+//	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+//
+//	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+//	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
+//
+////  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
+//
+//	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+//
+//	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+//	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+//	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+//	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+//	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+//	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
+//
+//	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
+//ADDRESS_MAP_END */
 
-	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
-
-	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
-	AM_RANGE(0x0878, 0x0878) AM_WRITE(bankset_w)	// write bank (rom page select)
-
-//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
-
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
-
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
-
-	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dutch_memmap, AS_PROGRAM, 8 )
 
@@ -2903,13 +2904,13 @@ static MACHINE_CONFIG_DERIVED( bwboki, mod4oki )
 	MCFG_CPU_PROGRAM_MAP(mpu4_bwb_map)				// setup read and write memorymap
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(mpu4crys, mpu4mod2 )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mpu4_crystal_map)				// setup read and write memorymap
-
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+//static MACHINE_CONFIG_DERIVED(mpu4crys, mpu4mod2 )
+//	MCFG_CPU_MODIFY("maincpu")
+//	MCFG_CPU_PROGRAM_MAP(mpu4_crystal_map)				// setup read and write memorymap
+//
+//	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//MACHINE_CONFIG_END
 
 
 
@@ -2986,7 +2987,7 @@ GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		 
 GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0, "Barcrest",       "Gamball",							GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
 GAMEL(198?,  m_grtecp,0,      mod4oki,  mpu4,	  m_grtecp, ROT0,   "Barcrest",		 "Andy's Great Escape",				GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
 GAME(199?,   m_blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Barcrest",		 "Blues Boys (Version 6)",			GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-GAME(199?,   m_frkstn,0,	  mpu4crys, mpu4,	  m_frkstn, ROT0,   "Crystal Gaming","Frank 'n' Stein (unencrypted)",	GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )//hardware not connected
+//GAME(199?,   m_frkstn,0,	  mpu4crys, mpu4,	  m_frkstn, ROT0,   "Crystal Gaming","Frank 'n' Stein (unencrypted)",	GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )//hardware not connected
 
 //SWP
 GAMEL(1989?,connect4,        0, mpu4mod2,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

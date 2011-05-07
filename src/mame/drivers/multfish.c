@@ -4294,10 +4294,10 @@ GAME( 2007, gnomed,      gnome_parent,    multfish, multfish,  customl,       RO
 GAME( 2007, gnomee,      gnome_parent,    multfish, multfish,  customl,       ROT0, "bootleg",  "Gnome (bootleg, 070906, LOTOS GN01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
 GAME( 2007, gnome_2a,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 071115, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
 GAME( 2007, gnome_3a,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, gnome_3b,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 45)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 45%
-GAME( 2007, gnome_3c,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 60%
+//GAME( 2007, gnome_3b,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 45)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 45%
+//GAME( 2007, gnome_3c,    gnome_parent,    multfish, multfish,  0,             ROT0, "bootleg",  "Gnome (bootleg, 080303, banking address hack, payout percentage 60)", GAME_SUPPORTS_SAVE ) // bank F9 payout percentage 60%
 
-GAME( 2007, sweetl2_2a,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
-GAME( 2007, sweetl2_2b,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, some fixes
+//GAME( 2007, sweetl2_2a,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 1)", GAME_SUPPORTS_SAVE ) // bank F9
+//GAME( 2007, sweetl2_2b,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, banking address hack set 2)", GAME_SUPPORTS_SAVE ) // bank F9, some fixes
 GAME( 2007, sweetl2_2c,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, VIDEO GAME-1 MD01)", GAME_SUPPORTS_SAVE ) // modified graphics, bank F9, changed version text to "VIDEO GAME-1 MD01"
 GAME( 2007, sweetl2_2d,  sweetl2_parent,  multfish, multfish,  0,             ROT0,  "bootleg", "Sweet Life 2 (bootleg, 080320, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
