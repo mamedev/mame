@@ -694,7 +694,7 @@ void general_init(running_machine &machine, int patchaddress)
 }
 
 static DRIVER_INIT( jyunai )   { general_init(machine, 0x679c/2); }
-static DRIVER_INIT( mjmaina )  { general_init(machine, 0x6b96/2); }
+static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2); }
 static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
 static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
 static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
@@ -741,7 +741,7 @@ ROM_START( csplayh5 )
 	DISK_IMAGE( "csplayh5", 0, SHA1(ce4883ce1351ce5299e41bfbd9a5ae8078b82b8c) )
 ROM_END
 
-ROM_START( mjmaina )
+ROM_START( mjmania )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
 	ROM_LOAD16_BYTE( "2.ic3", 0x000000, 0x020000, CRC(7b0f79c5) SHA1(73f23f68db4426b32583a7922abf773d67c76862) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x000001, 0x020000, CRC(19192ae7) SHA1(4e9fca04b567c8ef9136a3ab87b21207a44a24c4) )
@@ -757,7 +757,7 @@ ROM_START( mjmaina )
     ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(dea4a2d2) SHA1(0118eb1330c9da8fead99f64fc015fd343fed79b) )
 
 	DISK_REGION( "dvd" )
-	DISK_IMAGE( "mjmaina", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
+	DISK_IMAGE( "mjmania", 0, SHA1(7117f2045fd04a3d8f8e06a6a98e8f585c4da301) )
 
 	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, BAD_DUMP CRC(6a92b563) SHA1(a6c4305cf021f37845f99713427daa9394b6ec7d) )
@@ -859,7 +859,7 @@ ROM_END
 
 
 // 1999
-/* 07 */ GAME( 1999, mjmaina,   0,   csplayh5,  csplayh5,  mjmaina,        ROT0, "Sphinx/Just&Just", "Mahjong Maina - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
+/* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5,  mjmania,        ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan he Youkoso (Japan)", GAME_NOT_WORKING )
 // 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
 /* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko, ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shityaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cospure Tengoko 6 - Jyunai hen : Nichibutsu/eic
