@@ -21,6 +21,7 @@ public:
 	UINT8 *m_spriteram;
 	UINT8 *m_spriteram2;
 	size_t m_spriteram_size;
+	UINT8 m_nmi_mask;
 };
 
 

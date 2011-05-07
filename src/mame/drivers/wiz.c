@@ -213,6 +213,13 @@ static WRITE8_HANDLER( wiz_coin_counter_w )
 	coin_counter_w(space->machine(), offset,data);
 }
 
+static WRITE8_HANDLER( wiz_nmi_mask_w )
+{
+	wiz_state *state = space->machine().driver_data<wiz_state>();
+
+	state->m_nmi_mask = data & 1;
+}
+
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -220,7 +227,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd3ff) AM_BASE_MEMBER(wiz_state, m_videoram2)					/* Fallthrough */
 	AM_RANGE(0xd400, 0xd7ff) AM_BASE_MEMBER(wiz_state, m_colorram2)
 	AM_RANGE(0xd800, 0xd83f) AM_BASE_MEMBER(wiz_state, m_attributesram2)
-	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, m_spriteram2) AM_SIZE_MEMBER(wiz_state, m_spriteram)
+	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, m_spriteram2) AM_SIZE_MEMBER(wiz_state, m_spriteram_size)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, m_videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
@@ -229,7 +236,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE_MEMBER(wiz_state, m_sprite_bank)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_nmi_mask_w)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palettebank_w)
 	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_select_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(wiz_flipx_w)
@@ -680,12 +687,20 @@ static MACHINE_RESET( wiz )
 	state->m_dsc0 = state->m_dsc1 = 1;
 }
 
+static INTERRUPT_GEN( wiz_vblank_irq )
+{
+	wiz_state *state = device->machine().driver_data<wiz_state>();
+
+	if(state->m_nmi_mask & 1)
+		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT("screen", wiz_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
