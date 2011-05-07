@@ -240,7 +240,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 			{
 				if (data==ORIC_SYNC_BYTE)
 				{
-					logerror("found sync byte!\n");
+					LOG_FORMATS("found sync byte!\n");
 					/* found first sync byte */
 					oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
 				}
@@ -254,7 +254,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 					/* 0.25 second pause */
 					count += oric_seconds_to_samples(0.25);
 
-					logerror("found end of sync bytes!\n");
+					LOG_FORMATS("found end of sync bytes!\n");
 
 					/* oric writes approx 512 bytes */
 					/* found end of sync bytes */
@@ -265,7 +265,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 					if (data==0x024)
 					{
-						//logerror("reading header!\n");
+						//LOG_FORMATS("reading header!\n");
 						count+=oric_calculate_byte_size_in_samples(0x024);
 
 						oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
@@ -285,7 +285,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 				if (oric.data_count==oric.data_length)
 				{
-					//logerror("finished reading header!\n");
+					//LOG_FORMATS("finished reading header!\n");
 					oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
 				}
 			}
@@ -299,7 +299,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 				if (data==0)
 				{
 					UINT16 end, start;
-					logerror("got end of filename\n");
+					LOG_FORMATS("got end of filename\n");
 
 					/* 100 1 bits to seperate header from data */
                                         for (i=0; i<100; i++)
@@ -326,7 +326,7 @@ static int oric_cassette_calculate_size_in_samples(const UINT8 *bytes, int lengt
 
 				if (oric.data_count==oric.data_length)
 				{
-					logerror("finished writing data!\n");
+					LOG_FORMATS("finished writing data!\n");
 					oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 				}
 			}
@@ -380,7 +380,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			{
 				if (data==ORIC_SYNC_BYTE)
 				{
-					logerror("found sync byte!\n");
+					LOG_FORMATS("found sync byte!\n");
 					/* found first sync byte */
 					oric.cassette_state = ORIC_CASSETTE_GOT_SYNC_BYTE;
 				}
@@ -394,7 +394,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 					/* 0.25 second pause */
 					p = oric_fill_pause(p, oric_seconds_to_samples(0.25));
 
-					logerror("found end of sync bytes!\n");
+					LOG_FORMATS("found end of sync bytes!\n");
 					/* found end of sync bytes */
 					for (i=0; i<ORIC_LEADER_LENGTH; i++)
 					{
@@ -403,7 +403,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 					if (data==0x024)
 					{
-						//logerror("reading header!\n");
+						//LOG_FORMATS("reading header!\n");
 						p = oric_output_byte(p,data);
 						oric.cassette_state = ORIC_CASSETTE_READ_HEADER;
 						oric.data_count = 0;
@@ -421,7 +421,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 				if (oric.data_count==oric.data_length)
 				{
-					//logerror("finished reading header!\n");
+					//LOG_FORMATS("finished reading header!\n");
 					oric.cassette_state = ORIC_CASSETTE_READ_FILENAME;
 				}
 			}
@@ -435,7 +435,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 				if (data==0)
 				{
 					UINT16 end, start;
-					logerror("got end of filename\n");
+					LOG_FORMATS("got end of filename\n");
 
 					/* oric includes a small delay, but I don't see
                     it being 1 bits */
@@ -463,7 +463,7 @@ static int oric_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 
 				if (oric.data_count==oric.data_length)
 				{
-					logerror("finished writing data!\n");
+					LOG_FORMATS("finished writing data!\n");
 					oric.cassette_state = ORIC_CASSETTE_SEARCHING_FOR_SYNC_BYTE;
 				}
 			}

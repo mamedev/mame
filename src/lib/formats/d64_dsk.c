@@ -280,7 +280,7 @@ static int get_sector_error_code(floppy_image *floppy, int head, int dos_track, 
 
 	if (sector_error != ERROR_00)
 	{
-		logerror("D64 error %s head %u track %u sector %u\n", ERROR_CODE[sector_error], head, dos_track, sector);
+		LOG_FORMATS("D64 error %s head %u track %u sector %u\n", ERROR_CODE[sector_error], head, dos_track, sector);
 	}
 
 	return sector_error;
@@ -707,11 +707,11 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	if (LOG)
 	{
-		logerror("D64 size: %04x\n", (UINT32)floppy_image_size(floppy));
-		logerror("D64 heads: %u\n", heads);
-		logerror("D64 tracks: %u\n", dos_tracks);
-		logerror("D64 DOS version: %s\n", DOS_VERSION[dos]);
-		logerror("D64 error codes: %s\n", has_errors ? "yes" : "no");
+		LOG_FORMATS("D64 size: %04x\n", (UINT32)floppy_image_size(floppy));
+		LOG_FORMATS("D64 heads: %u\n", heads);
+		LOG_FORMATS("D64 tracks: %u\n", dos_tracks);
+		LOG_FORMATS("D64 DOS version: %s\n", DOS_VERSION[dos]);
+		LOG_FORMATS("D64 error codes: %s\n", has_errors ? "yes" : "no");
 	}
 
 	/* clear track data offsets */
@@ -746,8 +746,8 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 					if (LOG)
 					{
-						logerror("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
-						if (has_errors) logerror("D64 head %u track %u error offset: %04x\n", head, track + 1, tag->error_offset[head][track]);
+						LOG_FORMATS("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
+						if (has_errors) LOG_FORMATS("D64 head %u track %u error offset: %04x\n", head, track + 1, tag->error_offset[head][track]);
 					}
 				}
 			}
@@ -779,8 +779,8 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 					if (LOG)
 					{
-						logerror("D64 head %u track %.1f data offset: %04x\n", head, get_dos_track(track), tag->track_offset[head][track]);
-						if (has_errors) logerror("D64 head %u track %.1f error offset: %04x\n", head, get_dos_track(track), tag->error_offset[head][track]);
+						LOG_FORMATS("D64 head %u track %.1f data offset: %04x\n", head, get_dos_track(track), tag->track_offset[head][track]);
+						if (has_errors) LOG_FORMATS("D64 head %u track %.1f error offset: %04x\n", head, get_dos_track(track), tag->error_offset[head][track]);
 					}
 				}
 			}
@@ -794,13 +794,13 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 		{
 			tag->speed_zone[track] = DOS25_SPEED_ZONE[track];
 
-			if (LOG) logerror("D64 track %u speed zone: %u\n", track + 1, tag->speed_zone[track]);
+			if (LOG) LOG_FORMATS("D64 track %u speed zone: %u\n", track + 1, tag->speed_zone[track]);
 		}
 		else
 		{
 			tag->speed_zone[track] = DOS1_SPEED_ZONE[track / 2];
 
-			if (LOG) logerror("D64 track %.1f speed zone: %u\n", get_dos_track(track), tag->speed_zone[track]);
+			if (LOG) LOG_FORMATS("D64 track %.1f speed zone: %u\n", get_dos_track(track), tag->speed_zone[track]);
 		}
 	}
 
@@ -819,12 +819,12 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	tag->id1 = id[0];
 	tag->id2 = id[1];
 
-	if (LOG) logerror("D64 format ID: %02x%02x\n", id[0], id[1]);
+	if (LOG) LOG_FORMATS("D64 format ID: %02x%02x\n", id[0], id[1]);
 
 	/* read errors */
 	if (tag->has_errors)
 	{
-		if (LOG) logerror("D64 error blocks: %u %u\n", errors_size, track_offset);
+		if (LOG) LOG_FORMATS("D64 error blocks: %u %u\n", errors_size, track_offset);
 		floppy_image_read(floppy, tag->error, track_offset, errors_size);
 	}
 	else

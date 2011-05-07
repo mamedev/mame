@@ -126,17 +126,17 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 
 		err = inflateInit2( &d_stream, -MAX_WBITS );
 		if ( err != Z_OK ) {
-			logerror( "inflateInit2 error: %d\n", err );
+			LOG_FORMATS( "inflateInit2 error: %d\n", err );
 			goto cleanup;
 		}
 		err = inflate( &d_stream, Z_NO_FLUSH );
 		if ( err != Z_STREAM_END && err != Z_OK ) {
-			logerror( "inflate error: %d\n", err );
+			LOG_FORMATS( "inflate error: %d\n", err );
 			goto cleanup;
 		}
 		err = inflateEnd( &d_stream );
 		if ( err != Z_OK ) {
-			logerror( "inflateEnd error: %d\n", err );
+			LOG_FORMATS( "inflateEnd error: %d\n", err );
 			goto cleanup;
 		}
 		caslen = inflate_size;
@@ -144,15 +144,15 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 	}
 
 	if ( caslen < 18 ) {
-		logerror( "uef_cas_to_wav_size: cassette image too small\n" );
+		LOG_FORMATS( "uef_cas_to_wav_size: cassette image too small\n" );
 		goto cleanup;
 	}
 	if ( memcmp( casdata, UEF_HEADER, sizeof(UEF_HEADER) ) ) {
-		logerror( "uef_cas_to_wav_size: cassette image has incompatible header\n" );
+		LOG_FORMATS( "uef_cas_to_wav_size: cassette image has incompatible header\n" );
 		goto cleanup;
 	}
 
-	logerror( "UEF: Determinig tape size\n" );
+	LOG_FORMATS( "UEF: Determinig tape size\n" );
 	size = 0;
 	pos = sizeof(UEF_HEADER) + 2;
 	while( pos < caslen ) {
@@ -167,20 +167,20 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 			break;
 		case 0x0101:	/* multiplexed data block */
 		case 0x0103:
-			logerror( "Unsupported chunk type: %04x\n", chunk_type );
+			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0102:	/* explicit tape data block */
 			size += ( ( chunk_length * 10 ) - casdata[pos] ) * 4;
 			break;
 		case 0x0104:
-			logerror( "Unsupported chunk type: %04x\n", chunk_type );
+			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0110:
 			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
 			size += baud_length * 2;
 			break;
 		case 0x0111:
-			logerror( "Unsupported chunk type: %04x\n", chunk_type );
+			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0112:
 			baud_length = ( casdata[pos+1] << 8 ) | casdata[pos];
@@ -193,7 +193,7 @@ static int uef_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 		case 0x0114:
 		case 0x0115:
 		case 0x0120:
-			logerror( "Unsupported chunk type: %04x\n", chunk_type );
+			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		}
 		pos += chunk_length;
@@ -259,7 +259,7 @@ static int uef_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 			break;
 		case 0x0101:    /* multiplexed data block */
 		case 0x0103:
-			logerror( "Unsupported chunk type: %04x\n", chunk_type );
+			LOG_FORMATS( "Unsupported chunk type: %04x\n", chunk_type );
 			break;
 		case 0x0102:    /* explicit tape data block */
 			j = ( chunk_length * 10 ) - bytes[pos];

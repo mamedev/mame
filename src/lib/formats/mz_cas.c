@@ -6,7 +6,7 @@
 #endif
 
 //#define LOG(N,M,A)
-//  if(VERBOSE>=N){ if( M )logerror("%11.6f: %-24s",machine.time().as_double(), (const char*)M ); logerror A; }
+//  if(VERBOSE>=N){ if( M )LOG_FORMATS("%11.6f: %-24s",machine.time().as_double(), (const char*)M ); LOG_FORMATS A; }
 
 #define LOG(N,M,A)	\
 	if(VERBOSE>=N){ if( M )printf("%-24s",(const char*)M ); printf A; }

@@ -240,17 +240,17 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 
 	if (LOG)
 	{
-		logerror("FDI creator: %s\n", header.creator);
-		logerror("FDI comment: %s\n", header.comment);
-		logerror("FDI version: %u\n", tag->version);
-		logerror("FDI tracks: %u\n", tag->tracks);
-		logerror("FDI heads: %u\n", tag->heads);
-		logerror("FDI media type: %s\"\n", MEDIA_TYPE[header.type]);
-		logerror("FDI rotation speed: %u\n", header.rotspeed + 128);
-		if (header.flags & FLAGS_WRITE_PROTECTED) logerror("FDI is write protected\n");
-		if (header.flags & FLAGS_INDEX_SYNC) logerror("FDI is index synchronized\n");
-		logerror("FDI media TPI: %u\n", TRACKS_PER_INCH[header.tpi]);
-		logerror("FDI head TPI: %u\n", TRACKS_PER_INCH[header.headwidth]);
+		LOG_FORMATS("FDI creator: %s\n", header.creator);
+		LOG_FORMATS("FDI comment: %s\n", header.comment);
+		LOG_FORMATS("FDI version: %u\n", tag->version);
+		LOG_FORMATS("FDI tracks: %u\n", tag->tracks);
+		LOG_FORMATS("FDI heads: %u\n", tag->heads);
+		LOG_FORMATS("FDI media type: %s\"\n", MEDIA_TYPE[header.type]);
+		LOG_FORMATS("FDI rotation speed: %u\n", header.rotspeed + 128);
+		if (header.flags & FLAGS_WRITE_PROTECTED) LOG_FORMATS("FDI is write protected\n");
+		if (header.flags & FLAGS_INDEX_SYNC) LOG_FORMATS("FDI is index synchronized\n");
+		LOG_FORMATS("FDI media TPI: %u\n", TRACKS_PER_INCH[header.tpi]);
+		LOG_FORMATS("FDI head TPI: %u\n", TRACKS_PER_INCH[header.headwidth]);
 	}
 
 	/* find track offsets */
@@ -261,7 +261,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 		UINT8 type = header.track[track].type;
 		int size = header.track[track].size * 256;
 
-		if (LOG) logerror("FDI track %u type %02x size %u offset %u\n", track, type, size, offset);
+		if (LOG) LOG_FORMATS("FDI track %u type %02x size %u offset %u\n", track, type, size, offset);
 
 		tag->track_offset[track] = offset;
 		tag->track_type[track] = type;

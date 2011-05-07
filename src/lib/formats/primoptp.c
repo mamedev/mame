@@ -90,15 +90,15 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 	while (i < length)
 	{
 		size_in_samples += PRIMO_PAUSE_LENGTH;
-		logerror ("Samples (pause): %d\n", size_in_samples);
+		LOG_FORMATS ("Samples (pause): %d\n", size_in_samples);
 
 		size_in_samples += PRIMO_FILE_PILOT_LENGTH;
-		logerror ("Samples (file pilot): %d\n", size_in_samples);
+		LOG_FORMATS ("Samples (file pilot): %d\n", size_in_samples);
 
 		/* file size with header */
 		file_size = *(b+1) + *(b+2)*256;
 		b += 3;
-		logerror ("File size (with header): %d\n", file_size);
+		LOG_FORMATS ("File size (with header): %d\n", file_size);
 
 		/* b is now set on the first data byte of file
            it means first byte (type) of block */
@@ -107,7 +107,7 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 		while (j < file_size-3)
 		{
 			size_in_samples += PRIMO_BLOCK_PILOT_LENGTH;
-			logerror ("Samples (block pilot): %d\n", size_in_samples);
+			LOG_FORMATS ("Samples (block pilot): %d\n", size_in_samples);
 
 			/* block size without header but including CRC byte */
 			block_size = *(b+1) + *(b+2)*256;
@@ -121,9 +121,9 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 			size_in_samples += number_of_1 * PRIMO_BIT_1_LENGTH;
 			size_in_samples += number_of_0 * PRIMO_BIT_0_LENGTH;
 
-			logerror ("Samples (block data): %d\n", size_in_samples);
+			LOG_FORMATS ("Samples (block data): %d\n", size_in_samples);
 
-			logerror ("\tBlock size: %d\n", block_size);
+			LOG_FORMATS ("\tBlock size: %d\n", block_size);
 
 			b += block_size;
 
@@ -149,27 +149,27 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 	UINT32 file_size = 0;
 	UINT16 block_size = 0;
 
-	logerror ("Image size: %d\n", length);
+	LOG_FORMATS ("Image size: %d\n", length);
 
 	while (i < primo_tape_image_length)
 	{
-		logerror ("Beginning Primo file\n");
+		LOG_FORMATS ("Beginning Primo file\n");
 		/* pause */
 		p = primo_emit_level (p, PRIMO_PAUSE_LENGTH, PRIMO_WAVEENTRY_ZERO);
 
-		logerror ("Samples (pause): %ld\n", (long int)(p-buffer));
+		LOG_FORMATS ("Samples (pause): %ld\n", (long int)(p-buffer));
 
 		/* file pilot */
 		for (k=0; k<512; k++)
 			p = primo_output_byte (p, 0xaa);
 
-		logerror ("Samples (file pilot): %ld\n", (long int)(p-buffer));
+		LOG_FORMATS ("Samples (file pilot): %ld\n", (long int)(p-buffer));
 
 		/* file size with header */
 		file_size = *(b+1) + *(b+2)*256;
 		b += 3;
 
-		logerror ("File size: %d\n", file_size);
+		LOG_FORMATS ("File size: %d\n", file_size);
 
 		/* b is now set on the first data byte of file
            it means first byte (block type) of block header */
@@ -184,7 +184,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			for (k=0; k<3; k++)
 				p = primo_output_byte (p, 0xd3);
 
-			logerror ("Samples (block pilot): %ld\n", (long int)(p-buffer));
+			LOG_FORMATS ("Samples (block pilot): %ld\n", (long int)(p-buffer));
 
 			/* block size without header but including CRC byte */
 			block_size = *(b+1) + *(b+2)*256;
@@ -193,7 +193,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			for (k=0; k<block_size; k++)
 				p = primo_output_byte (p, *(b+k));
 
-			logerror ("Samples (block data): %ld\n", (long int)(p-buffer));
+			LOG_FORMATS ("Samples (block data): %ld\n", (long int)(p-buffer));
 
 			b += block_size;
 
@@ -202,13 +202,13 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 			j += block_size+3;
 		}
 
-		logerror ("Primo file finished\n");
-		logerror ("i = %d\n", i);
+		LOG_FORMATS ("Primo file finished\n");
+		LOG_FORMATS ("i = %d\n", i);
 		i += file_size;
-		logerror ("i = %d\n", i);
+		LOG_FORMATS ("i = %d\n", i);
 	}
 
-	logerror ("End of fill_wave/n");
+	LOG_FORMATS ("End of fill_wave/n");
 
 	return p - buffer;
 }

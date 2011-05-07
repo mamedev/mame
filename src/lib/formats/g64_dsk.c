@@ -154,7 +154,7 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 		memset(buffer, 0, buflen);
 	}
 
-	if (LOG) logerror("G64 track %.1f length %u\n", get_dos_track(track), track_length);
+	if (LOG) LOG_FORMATS("G64 track %.1f length %u\n", get_dos_track(track), track_length);
 
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -247,16 +247,16 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	/* version */
 	floppy_image_read(floppy, header, pos, 0x0c); pos += 0xc;
 	tag->version = header[8];
-	if (LOG) logerror("G64 version: %u\n", tag->version);
+	if (LOG) LOG_FORMATS("G64 version: %u\n", tag->version);
 
 	/* number of half tracks */
 	tag->heads = 1;
 	tag->tracks = header[9];
-	if (LOG) logerror("G64 tracks: %u\n", tag->tracks);
+	if (LOG) LOG_FORMATS("G64 tracks: %u\n", tag->tracks);
 
 	/* size of each stored half track */
 	tag->track_size = (header[11] << 8) | header[10];
-	if (LOG) logerror("G64 track size: %04x\n", tag->track_size);
+	if (LOG) LOG_FORMATS("G64 track size: %04x\n", tag->track_size);
 
 	/* data offsets */
 	for (i = 0; i < tag->tracks; i++)
@@ -264,7 +264,7 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 		floppy_image_read(floppy, header, pos, 4); pos += 4;
 		tag->track_offset[i] = (header[3] << 24) | (header[2] << 16) | (header[1] << 8) | header[0];
 
-		if (LOG) logerror("G64 track %.1f data offset: %04x\n", get_dos_track(i), tag->track_offset[i]);
+		if (LOG) LOG_FORMATS("G64 track %.1f data offset: %04x\n", get_dos_track(i), tag->track_offset[i]);
 	}
 
 	/* speed zone offsets */
@@ -276,9 +276,9 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 		if (LOG)
 		{
 			if (tag->speed_zone_offset[i] < 4) {
-				logerror("G64 track %.1f speed zone: %u\n", get_dos_track(i), tag->speed_zone_offset[i]);
+				LOG_FORMATS("G64 track %.1f speed zone: %u\n", get_dos_track(i), tag->speed_zone_offset[i]);
 			} else {
-				logerror("G64 track %.1f speed zone offset: %04x\n", get_dos_track(i), tag->speed_zone_offset[i]);
+				LOG_FORMATS("G64 track %.1f speed zone offset: %04x\n", get_dos_track(i), tag->speed_zone_offset[i]);
 			}
 		}
 	}

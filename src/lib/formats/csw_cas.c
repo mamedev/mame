@@ -57,37 +57,37 @@ UINT8		*in_ptr;
 int 		bsize=0;
 
 	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER) ) ) {
-		logerror( "csw_cas_to_wav_size: cassette image has incompatible header\n" );
+		LOG_FORMATS( "csw_cas_to_wav_size: cassette image has incompatible header\n" );
 		goto cleanup;
 	}
 
 	if (casdata[0x16]!=0x1a) {
-		logerror( "csw_cas_to_wav_size: Terminator Code Not Found\n" );
+		LOG_FORMATS( "csw_cas_to_wav_size: Terminator Code Not Found\n" );
 		goto cleanup;
 	}
 
 	MajorRevision=casdata[0x17];
 	MinorRevision=casdata[0x18];
 
-	logerror("Version %d : %d\n",MajorRevision,MinorRevision);
+	LOG_FORMATS("Version %d : %d\n",MajorRevision,MinorRevision);
 
 	if (casdata[0x17]!=2){
-		logerror( "csw_cas_to_wav_size: Unsuported Major Version\n" );
+		LOG_FORMATS( "csw_cas_to_wav_size: Unsuported Major Version\n" );
 		goto cleanup;
 	}
 
 	SampleRate=get_leuint32(casdata+0x19);
-	logerror("Sample rate %d\n",SampleRate);
+	LOG_FORMATS("Sample rate %d\n",SampleRate);
 
 	NumberOfPulses=get_leuint32(casdata+0x1d);
-	logerror("Number Of Pulses %d\n",NumberOfPulses);
+	LOG_FORMATS("Number Of Pulses %d\n",NumberOfPulses);
 
 
 	CompressionType=casdata[0x21];
 	Flags=casdata[0x22];
 	HeaderExtensionLength=casdata[0x23];
 
-	logerror("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
+	LOG_FORMATS("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
 
 	mycaslen=caslen;
 	//from here on down for now I am assuming it is compressed csw file.
@@ -111,7 +111,7 @@ int 		bsize=0;
 
 	err = inflateInit( &d_stream );
 	if ( err != Z_OK ) {
-		logerror( "inflateInit2 error: %d\n", err );
+		LOG_FORMATS( "inflateInit2 error: %d\n", err );
 		goto cleanup;
 	}
 
@@ -136,13 +136,13 @@ int 		bsize=0;
 	while (err==Z_OK);
 
 	if ( err != Z_STREAM_END ) {
-		logerror( "inflate error: %d\n", err );
+		LOG_FORMATS( "inflate error: %d\n", err );
 		goto cleanup;
 	}
 
 	err = inflateEnd( &d_stream );
 	if ( err != Z_OK ) {
-		logerror( "inflateEnd error: %d\n", err );
+		LOG_FORMATS( "inflateEnd error: %d\n", err );
 		goto cleanup;
 	}
 
@@ -186,13 +186,13 @@ int 		bsize=0;
 int		i;
 
 
-	logerror("Length %d\n",length);
+	LOG_FORMATS("Length %d\n",length);
 
 	SampleRate=get_leuint32(bytes+0x19);
-	logerror("Sample rate %d\n",SampleRate);
+	LOG_FORMATS("Sample rate %d\n",SampleRate);
 
 	NumberOfPulses=get_leuint32(bytes+0x1d);
-	logerror("Number Of Pulses %d\n",NumberOfPulses);
+	LOG_FORMATS("Number Of Pulses %d\n",NumberOfPulses);
 
 	CompressionType=bytes[0x21];
 	Flags=bytes[0x22];
@@ -205,7 +205,7 @@ int		i;
 		Bit=100;
 	}
 
-	logerror("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
+	LOG_FORMATS("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
 
 
 	//from here on down for now I am assuming it is compressed csw file.
@@ -229,7 +229,7 @@ int		i;
 
 	err = inflateInit( &d_stream );
 	if ( err != Z_OK ) {
-		logerror( "inflateInit2 error: %d\n", err );
+		LOG_FORMATS( "inflateInit2 error: %d\n", err );
 		goto cleanup;
 	}
 
@@ -258,13 +258,13 @@ int		i;
 	while (err==Z_OK);
 
 	if ( err != Z_STREAM_END ) {
-		logerror( "inflate error: %d\n", err );
+		LOG_FORMATS( "inflate error: %d\n", err );
 		goto cleanup;
 	}
 
 	err = inflateEnd( &d_stream );
 	if ( err != Z_OK ) {
-		logerror( "inflateEnd error: %d\n", err );
+		LOG_FORMATS( "inflateEnd error: %d\n", err );
 		goto cleanup;
 	}
 

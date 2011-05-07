@@ -331,10 +331,10 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		&& (geometry->density <= 4) && (totsecs >= 2) && (! memcmp(vib.id, "DSK", 3))
 		&& (file_size == totsecs*256))
 	{
-		logerror("SDF/VIB consistent; tracks = %d, heads = %d, sectors = %d\n", geometry->tracksperside, geometry->sides, geometry->secspertrack);
+		LOG_FORMATS("SDF/VIB consistent; tracks = %d, heads = %d, sectors = %d\n", geometry->tracksperside, geometry->sides, geometry->secspertrack);
 		return 100;
 	}
-	logerror("SDF/VIB not consistent; guessing format\n");
+	LOG_FORMATS("SDF/VIB not consistent; guessing format\n");
 
 	// So that was not consistent. We guess the size from the file size
 	// and assume that the VIB did not contain reliable data. For the
@@ -409,11 +409,11 @@ static int ti99_sdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		break;
 
 	default:
-		logerror("Unrecognized disk image geometry\n");
+		LOG_FORMATS("Unrecognized disk image geometry\n");
 		return 0;
 	}
 
-	logerror("SDF geometry guess: tracks = %d, heads = %d, sectors = %d\n", geometry->tracksperside, geometry->sides, geometry->secspertrack);
+	LOG_FORMATS("SDF geometry guess: tracks = %d, heads = %d, sectors = %d\n", geometry->tracksperside, geometry->sides, geometry->secspertrack);
 	return 100;
 }
 
@@ -663,7 +663,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 		if (current_pos==TI99DSK_BLOCKNOTFOUND)
 		{
 			/* If neither, forget about this process completely. */
-			logerror("Cannot find lead-in for track %d, head %d.\n", track, head);
+			LOG_FORMATS("Cannot find lead-in for track %d, head %d.\n", track, head);
 			return FLOPPY_ERROR_INVALIDIMAGE;
 		}
 		gap1 = 6;
@@ -682,7 +682,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 		{
 			/* Forget about the rest. */
 			if (found) break;  /* we were already successful, so all ok */
-			logerror("Cannot find gap1 for track %d, head %d.\n", track, head);
+			LOG_FORMATS("Cannot find gap1 for track %d, head %d.\n", track, head);
 			return FLOPPY_ERROR_INVALIDIMAGE;
 		}
 		found = TRUE;
@@ -703,7 +703,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 				new_pos = find_block(track_image, current_pos, buflen, 0x00, gap2);
 				if (current_pos==TI99DSK_BLOCKNOTFOUND)
 				{
-					logerror("Cannot find gap2 for track %d, head %d.\n", imgtrack, head);
+					LOG_FORMATS("Cannot find gap2 for track %d, head %d.\n", imgtrack, head);
 					return FLOPPY_ERROR_INVALIDIMAGE;
 				}
 				else
@@ -719,7 +719,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 						current_pos += SECTOR_SIZE;
 					}
 					else
-						logerror("DAM not found. Not writing write sector %d\n", sector);
+						LOG_FORMATS("DAM not found. Not writing write sector %d\n", sector);
 					/* else not found, ignore this sector. */
 				}
 			}
@@ -727,7 +727,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 			{
 				// else the sector head data do not match the
 				// current track and head. Ignore the sector.
-				logerror("Wrong track: wtrack=%d, imgtrack=%d, whead=%d, imghead=%d\n",wtrack,imgtrack, whead,head);
+				LOG_FORMATS("Wrong track: wtrack=%d, imgtrack=%d, whead=%d, imghead=%d\n",wtrack,imgtrack, whead,head);
 			}
 		}
 		else
@@ -924,7 +924,7 @@ static FLOPPY_IDENTIFY(ti99_sdf_identify)
 	UINT64 size;
 	size = floppy_image_size(floppy);
 	*vote = ti99_sdf_guess_geometry(floppy, size, NULL);
-	logerror("SDF voting %d\n", *vote);
+	LOG_FORMATS("SDF voting %d\n", *vote);
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -936,7 +936,7 @@ static FLOPPY_CONSTRUCT(ti99_sdf_construct)
 	struct ti99dsk_geometry geometry;
 	struct FloppyCallbacks *callbacks;
 	struct ti99dsk_tag *tag;
-	logerror("Reading image as SDF\n");
+	LOG_FORMATS("Reading image as SDF\n");
 
 	if (params)
 	{
@@ -1116,7 +1116,7 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 		current_pos = find_block(track, 0, 50, 0x00, 22);
 		if (current_pos==TI99DSK_BLOCKNOTFOUND)
 		{
-			logerror("Lead-in not found\n");
+			LOG_FORMATS("Lead-in not found\n");
 			retval = FLOPPY_ERROR_SEEKERROR;
 		}
 		else
@@ -1132,7 +1132,7 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 			}
 			else
 			{
-				logerror("IDAM or DAM not found\n");
+				LOG_FORMATS("IDAM or DAM not found\n");
 				retval = FLOPPY_ERROR_SEEKERROR;
 			}
 		}
@@ -1144,7 +1144,7 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 		int track_start = find_block(track, 0, 100, 0x4e, 40);
 		if (track_start==TI99DSK_BLOCKNOTFOUND)
 		{
-			logerror("Lead-in not found\n");
+			LOG_FORMATS("Lead-in not found\n");
 			retval = FLOPPY_ERROR_SEEKERROR;
 		}
 		else
@@ -1153,7 +1153,7 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 			current_pos = find_block(track, track_start, track_start+10, 0x00, 10);
 			if (current_pos==TI99DSK_BLOCKNOTFOUND)
 			{
-				logerror("Pre-gap not found\n");
+				LOG_FORMATS("Pre-gap not found\n");
 				retval = FLOPPY_ERROR_SEEKERROR;
 			}
 			else
@@ -1170,7 +1170,7 @@ static floperr_t determine_offset(int format, UINT8 *track, int *offset)
 				}
 				else
 				{
-					logerror("Sync/IDAM/DAM not found\n");
+					LOG_FORMATS("Sync/IDAM/DAM not found\n");
 					retval = FLOPPY_ERROR_SEEKERROR;
 				}
 			}
@@ -1378,7 +1378,7 @@ static floperr_t ti99_tdf_seek_sector_in_track(floppy_image *floppy, int head, i
 	{
 		if (determine_offset(tag->format, track_data, &tag->first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
-			logerror("could not determine offset\n");
+			LOG_FORMATS("could not determine offset\n");
 			return FLOPPY_ERROR_SEEKERROR;
 		}
 	}
@@ -1408,7 +1408,7 @@ static floperr_t ti99_tdf_seek_sector_in_track(floppy_image *floppy, int head, i
 			break;
 		}
 	}
-	logerror("Sector not found.\n");
+	LOG_FORMATS("Sector not found.\n");
 	return FLOPPY_ERROR_SEEKERROR;
 }
 
@@ -1764,7 +1764,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 		/* MFM failed. */
 		if (determine_offset(TI99_FM, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
 		{
-			logerror("IDAM not found. Unformatted disk.\n");
+			LOG_FORMATS("IDAM not found. Unformatted disk.\n");
 
 			// FM failed as well. Disk is not formatted. We assume
 			// a format that fits into the space provided by the file.
@@ -1774,7 +1774,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 			free(track_data);
 			if (size < 130120 || size > 2078720)
 			{
-				logerror("Unknown format size: %d\n", (int)size);
+				LOG_FORMATS("Unknown format size: %d\n", (int)size);
 				return 0;
 			}
 			if (size >= 130120 && size < 260240)
@@ -1888,7 +1888,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 			state = 0;
 		}
 	}
-	logerror("Determined %d sectors\n", idamcnt);
+	LOG_FORMATS("Determined %d sectors\n", idamcnt);
 
 	// Now calculate the geometry
 	// The track size, in theory, may change due to reformatting,
@@ -1912,7 +1912,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	if (determine_offset(format, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
 	{
 		/* error ... what now? */
-		logerror("Error when reading last track. Image broken.\n");
+		LOG_FORMATS("Error when reading last track. Image broken.\n");
 		free(track_data);
 		return 50;
 	}
@@ -1930,7 +1930,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 			}
 			else
 			{
-				logerror("Error: Last track has invalid first IDAM: head = %d.\n", track_data[first_idam+2]);
+				LOG_FORMATS("Error: Last track has invalid first IDAM: head = %d.\n", track_data[first_idam+2]);
 			}
 
 		}
@@ -1942,7 +1942,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 
 	if (geometry->tracksperside < 35 || geometry->tracksperside > 80)
 	{
-		logerror("Unsupported track count: %d\n", geometry->tracksperside);
+		LOG_FORMATS("Unsupported track count: %d\n", geometry->tracksperside);
 		free(track_data);
 		return 0;
 	}
@@ -1956,7 +1956,7 @@ static FLOPPY_IDENTIFY(ti99_tdf_identify)
 	UINT64 size;
 	size = floppy_image_size(floppy);
 	*vote = ti99_tdf_guess_geometry(floppy, size, NULL);
-	logerror("TDF voting %d\n", *vote);
+	LOG_FORMATS("TDF voting %d\n", *vote);
 	return FLOPPY_ERROR_SUCCESS;
 }
 
@@ -1965,7 +1965,7 @@ static FLOPPY_CONSTRUCT(ti99_tdf_construct)
 	struct ti99dsk_geometry geometry;
 	struct FloppyCallbacks *callbacks;
 	struct ti99dsk_tag *tag;
-	logerror("Reading image as TDF\n");
+	LOG_FORMATS("Reading image as TDF\n");
 	if (params)
 	{
 		/* create */

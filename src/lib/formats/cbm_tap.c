@@ -185,17 +185,17 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 	/* Log .TAP info but only once */
 	if (!(buffer == NULL))
 	{
-		logerror("TAP version    : %d\n", version);
-		logerror("Machine type   : %d\n", system);
-		logerror("Video standard : %d\n", video_standard);
-		logerror("Tape frequency : %d\n", (tap_frequency) << 3);
+		LOG_FORMATS("TAP version    : %d\n", version);
+		LOG_FORMATS("Machine type   : %d\n", system);
+		LOG_FORMATS("Video standard : %d\n", video_standard);
+		LOG_FORMATS("Tape frequency : %d\n", (tap_frequency) << 3);
 	}
 
 
 	/* is this a supported version? */
 	if ((version < 0) || (version > 2))
 	{
-		logerror("Unsupported .tap version: %d \n", version);
+		LOG_FORMATS("Unsupported .tap version: %d \n", version);
 		return -1;
 	}
 
@@ -285,9 +285,9 @@ static int cbm_tap_do_work( INT16 **buffer, int length, const UINT8 *data )
 					else
 					{
 						j += 1;
-						logerror("Found a 00 byte close to the end of the .tap file.\n");
-						logerror("This is not allowed by the format specs. \n");
-						logerror("Check if your .tap file got corrupted when you created it!\n");
+						LOG_FORMATS("Found a 00 byte close to the end of the .tap file.\n");
+						LOG_FORMATS("This is not allowed by the format specs. \n");
+						LOG_FORMATS("Check if your .tap file got corrupted when you created it!\n");
 					}
 				}
 				else j = 1;

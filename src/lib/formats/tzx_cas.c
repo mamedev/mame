@@ -222,7 +222,7 @@ static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, 
 	int size = 0;
 
 	/* Uncomment this to include into error.log a fully detailed analysis of each block */
-//  logerror("tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples);
+//  LOG_FORMATS("tzx_cas_block_size: pilot_length = %d, pilot_samples = %d, sync1_samples = %d, sync2_samples = %d, bit0_samples = %d, bit1_samples = %d\n", pilot_length, pilot_samples, sync1_samples, sync2_samples, bit0_samples, bit1_samples);
 
 	/* PILOT */
 	for ( ; pilot_length > 0; pilot_length--)
@@ -279,9 +279,9 @@ static int tzx_cas_handle_block( INT16 **buffer, const UINT8 *bytes, int pause, 
 
 static void ascii_block_common_log( const char *block_type_string, UINT8 block_type )
 {
-	logerror("%s (type %02x) encountered.\n", block_type_string, block_type);
-	logerror("This block contains info on the .tzx file you are loading.\n");
-	logerror("Please include the following info in your bug reports, if the image has issue in M.E.S.S.\n");
+	LOG_FORMATS("%s (type %02x) encountered.\n", block_type_string, block_type);
+	LOG_FORMATS("This block contains info on the .tzx file you are loading.\n");
+	LOG_FORMATS("Please include the following info in your bug reports, if the image has issue in M.E.S.S.\n");
 }
 
 static const char *const archive_ident[] =
@@ -324,7 +324,7 @@ static int tzx_cas_do_work( INT16 **buffer )
 		UINT8 block_type = cur_block[0];
 
 	/* Uncomment this to include into error.log a list of the types each block */
-//      logerror("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
+//      LOG_FORMATS("tzx_cas_fill_wave: block %d, block_type %02x\n", current_block, block_type);
 
 		switch (block_type)
 		{
@@ -386,28 +386,28 @@ static int tzx_cas_do_work( INT16 **buffer )
 		case 0x17:	/* C64 Turbo Tape Data Block */		// Deprecated in TZX 1.20
 		case 0x34:	/* Emulation Info */				// Deprecated in TZX 1.20
 		case 0x40:	/* Snapshot Block */				// Deprecated in TZX 1.20
-			logerror("Deprecated block type (%02x) encountered.\n", block_type);
-			logerror("Please look for an updated .tzx file.\n");
+			LOG_FORMATS("Deprecated block type (%02x) encountered.\n", block_type);
+			LOG_FORMATS("Please look for an updated .tzx file.\n");
 			current_block++;
 			break;
 		case 0x30:	/* Text Description */
 			ascii_block_common_log("Text Description Block", block_type);
 			for (data_size = 0; data_size < cur_block[1]; data_size++)
-				logerror("%c", cur_block[2 + data_size]);
-			logerror("\n");
+				LOG_FORMATS("%c", cur_block[2 + data_size]);
+			LOG_FORMATS("\n");
 			current_block++;
 			break;
 		case 0x31:	/* Message Block */
 			ascii_block_common_log("Message Block", block_type);
-			logerror("Expected duration of the message display: %02x\n", cur_block[1]);
-			logerror("Message: \n");
+			LOG_FORMATS("Expected duration of the message display: %02x\n", cur_block[1]);
+			LOG_FORMATS("Message: \n");
 			for (data_size = 0; data_size < cur_block[2]; data_size++)
 			{
-				logerror("%c", cur_block[3 + data_size]);
+				LOG_FORMATS("%c", cur_block[3 + data_size]);
 				if (cur_block[3 + data_size] == 0x0d)
-					logerror("\n");
+					LOG_FORMATS("\n");
 			}
-			logerror("\n");
+			LOG_FORMATS("\n");
 			current_block++;
 			break;
 		case 0x32:	/* Archive Info */
@@ -417,29 +417,29 @@ static int tzx_cas_do_work( INT16 **buffer )
 			for (data_size = 0; data_size < cur_block[3]; data_size++)	// data_size = number of text blocks, in this case
 			{
 				if (cur_block[4 + text_size] < 0x09) {
-					logerror("%s: \n", archive_ident[cur_block[4 + text_size]]);
+					LOG_FORMATS("%s: \n", archive_ident[cur_block[4 + text_size]]);
 				}
 				else {
-					logerror("Comment(s): \n");
+					LOG_FORMATS("Comment(s): \n");
 				}
 
 				for (i = 0; i < cur_block[4 + text_size + 1]; i++)
 				{
-					logerror("%c", cur_block[4 + text_size + 2 + i]);
+					LOG_FORMATS("%c", cur_block[4 + text_size + 2 + i]);
 				}
 				text_size += 2 + i;
 			}
-			logerror("\n");
+			LOG_FORMATS("\n");
 			if (text_size != total_size)
-				logerror("Malformed Archive Info Block (Text length different from the declared one).\n Please verify your tape image.\n");
+				LOG_FORMATS("Malformed Archive Info Block (Text length different from the declared one).\n Please verify your tape image.\n");
 			current_block++;
 			break;
 		case 0x33:	/* Hardware Type */
 			ascii_block_common_log("Hardware Type Block", block_type);
 			for (data_size = 0; data_size < cur_block[1]; data_size++)	// data_size = number of hardware blocks, in this case
 			{
-				logerror("Hardware Type %02x - Hardware ID %02x - ", cur_block[2 + data_size * 3], cur_block[2 + data_size * 3 + 1]);
-				logerror("%s \n ", hw_info[cur_block[2 + data_size * 3 + 2]]);
+				LOG_FORMATS("Hardware Type %02x - Hardware ID %02x - ", cur_block[2 + data_size * 3], cur_block[2 + data_size * 3 + 1]);
+				LOG_FORMATS("%s \n ", hw_info[cur_block[2 + data_size * 3 + 2]]);
 			}
 			current_block++;
 			break;
@@ -447,18 +447,18 @@ static int tzx_cas_do_work( INT16 **buffer )
 			ascii_block_common_log("Custom Info Block", block_type);
 			for (data_size = 0; data_size < 10; data_size++)
 			{
-				logerror("%c", cur_block[1 + data_size]);
+				LOG_FORMATS("%c", cur_block[1 + data_size]);
 			}
-			logerror(":\n");
+			LOG_FORMATS(":\n");
 			text_size = cur_block[11] + (cur_block[12] << 8) + (cur_block[13] << 16) + (cur_block[14] << 24);
 			for (data_size = 0; data_size < text_size; data_size++)
-				logerror("%c", cur_block[15 + data_size]);
-			logerror("\n");
+				LOG_FORMATS("%c", cur_block[15 + data_size]);
+			LOG_FORMATS("\n");
 			current_block++;
 			break;
 		case 0x5A:	/* "Glue" Block */
-			logerror("Glue Block (type %02x) encountered.\n", block_type);
-			logerror("Please use a .tzx handling utility to split the merged tape files.\n");
+			LOG_FORMATS("Glue Block (type %02x) encountered.\n", block_type);
+			LOG_FORMATS("Please use a .tzx handling utility to split the merged tape files.\n");
 			current_block++;
 			break;
 		case 0x15:	/* Direct Recording */
@@ -475,7 +475,7 @@ static int tzx_cas_do_work( INT16 **buffer )
 		case 0x2A:	/* Stop Tape if in 48K Mode */
 		case 0x2B:	/* Set signal level */
 		default:
-			logerror("Unsupported block type (%02x) encountered.\n", block_type);
+			LOG_FORMATS("Unsupported block type (%02x) encountered.\n", block_type);
 			current_block++;
 			break;
 		}
@@ -490,31 +490,31 @@ static int tzx_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	/* Header size plus major and minor version number */
 	if (caslen < 10)
 	{
-		logerror("tzx_cas_to_wav_size: cassette image too small\n");
+		LOG_FORMATS("tzx_cas_to_wav_size: cassette image too small\n");
 		goto cleanup;
 	}
 
 	/* Check for correct header */
 	if (memcmp(casdata, TZX_HEADER, sizeof(TZX_HEADER)))
 	{
-		logerror("tzx_cas_to_wav_size: cassette image has incompatible header\n");
+		LOG_FORMATS("tzx_cas_to_wav_size: cassette image has incompatible header\n");
 		goto cleanup;
 	}
 
 	/* Check major version number in header */
 	if (casdata[0x08] > SUPPORTED_VERSION_MAJOR)
 	{
-		logerror("tzx_cas_to_wav_size: unsupported version\n");
+		LOG_FORMATS("tzx_cas_to_wav_size: unsupported version\n");
 		goto cleanup;
 	}
 
 	tzx_cas_get_blocks(casdata, caslen);
 
-	logerror("tzx_cas_to_wav_size: %d blocks found\n", block_count);
+	LOG_FORMATS("tzx_cas_to_wav_size: %d blocks found\n", block_count);
 
 	if (block_count == 0)
 	{
-		logerror("tzx_cas_to_wav_size: no blocks found!\n");
+		LOG_FORMATS("tzx_cas_to_wav_size: no blocks found!\n");
 		goto cleanup;
 	}
 
@@ -554,10 +554,10 @@ static int tap_cas_to_wav_size( const UINT8 *casdata, int caslen )
 		int data_size = p[0] + (p[1] << 8);
 		int pilot_length = (p[2] == 0x00) ? 8064 : 3220;	/* TZX specification */
 //      int pilot_length = (p[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
-		logerror("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
+		LOG_FORMATS("tap_cas_to_wav_size: Handling TAP block containing 0x%X bytes", data_size);
 		p += 2;
 		size += tzx_cas_handle_block(NULL, p, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
-		logerror(", total size is now: %d\n", size);
+		LOG_FORMATS(", total size is now: %d\n", size);
 		p += data_size;
 	}
 	return size;
@@ -573,7 +573,7 @@ static int tap_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
 		int data_size = bytes[0] + (bytes[1] << 8);
 		int pilot_length = (bytes[2] == 0x00) ? 8064 : 3220;	/* TZX specification */
 //      int pilot_length = (bytes[2] == 0x00) ? 8063 : 3223;    /* worldofspectrum */
-		logerror("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
+		LOG_FORMATS("tap_cas_fill_wave: Handling TAP block containing 0x%X bytes\n", data_size);
 		bytes += 2;
 		size += tzx_cas_handle_block(&p, bytes, 1000, data_size, 2168, pilot_length, 667, 735, 855, 1710, 8);
 		bytes += data_size;

@@ -1074,7 +1074,7 @@ static floperr_t apple35_2img_decode(floppy_image *floppy, UINT32 *image_format,
 	// even though that's against the .2mg spec
 	if (header.data_length == 0x800c00)
 	{
-		logerror("ap_dsk35: corrected bad-endian data length\n");
+		LOG_FORMATS("ap_dsk35: corrected bad-endian data length\n");
 		header.data_length = 0x0c8000;
 	}
 

@@ -50,12 +50,12 @@ static int x1_handle_tap(INT16* buffer, const UINT8* casdata)
 
 	if(memcmp(casdata, "TAPE",4))  // header check
 	{
-		logerror("TAP: image is not a 'new' format TAP image\n");
+		LOG_FORMATS("TAP: image is not a 'new' format TAP image\n");
 		return -1;
 	}
 	if(samplerate != 8000)
 	{
-		logerror("TAP: images that are not 8000Hz are not yet supported\n");
+		LOG_FORMATS("TAP: images that are not 8000Hz are not yet supported\n");
 		return -1;
 	}
 

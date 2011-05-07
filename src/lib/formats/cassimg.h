@@ -14,11 +14,7 @@
 #include "ioprocs.h"
 
 #ifndef LOG_FORMATS
-#define LOG_FORMATS 0
-#endif
-
-#ifndef logerror
-#define logerror if (LOG_FORMATS) printf
+#define LOG_FORMATS if (0) printf
 #endif
 
 /***************************************************************************

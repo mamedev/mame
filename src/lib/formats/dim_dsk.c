@@ -87,7 +87,7 @@ FLOPPY_CONSTRUCT(dim_dsk_construct)
 	}
 	// TODO: expand on this basic implementation
 
-	logerror("FDD: DIM image loaded - type %i, %i tracks, %i sectors per track, %i bytes per sector\n", format_tmp,tracks, sectors,sectorlen);
+	LOG_FORMATS("FDD: DIM image loaded - type %i, %i tracks, %i sectors per track, %i bytes per sector\n", format_tmp,tracks, sectors,sectorlen);
 
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = heads;

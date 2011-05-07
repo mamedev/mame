@@ -154,14 +154,14 @@ static UINT32 d88_get_sector_offset(floppy_image* floppy, int head, int track, i
 		floppy_image_read(floppy,sector_hdr,offset,16);
 		if(sector == sector_hdr[2])
 		{
-			logerror("d88_get_sector_offset - track %i, side %i, sector %02x, returns %08x\n",track,head,sector,offset+16);
+			LOG_FORMATS("d88_get_sector_offset - track %i, side %i, sector %02x, returns %08x\n",track,head,sector,offset+16);
 			return offset + 16;
 		}
 		len = (sector_hdr[15] << 8) | sector_hdr[14];
 		len += 16;
 		offset += len;
 	}
-	logerror("d88_get_sector_offset - track %i, side %i, sector %02x, not found\n",track,head,sector);
+	LOG_FORMATS("d88_get_sector_offset - track %i, side %i, sector %02x, not found\n",track,head,sector);
 	return 0;
 }
 
