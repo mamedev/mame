@@ -212,13 +212,6 @@ psoldier dip locations still need veritication.
 
 /*****************************************************************************/
 
-static void set_m92_bank(running_machine &machine)
-{
-	m92_state *state = machine.driver_data<m92_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1",&RAM[state->m_bankaddress]);
-}
-
 static MACHINE_START( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
