@@ -161,8 +161,8 @@ READ16_DEVICE_HANDLER( spritecode_r16 )
 WRITE16_DEVICE_HANDLER( spritecode_w16 )
 {
 	seta001_device *dev = (seta001_device *)device;
-	dev->m_spritecodelow[offset] = data & 0x00ff;
-	dev->m_spritecodehigh[offset] = (data & 0xff00)>>8;
+	if (ACCESSING_BITS_0_7) dev->m_spritecodelow[offset] = data & 0x00ff;
+	if (ACCESSING_BITS_8_15)  dev->m_spritecodehigh[offset] = (data & 0xff00)>>8;
 }
 
 WRITE8_DEVICE_HANDLER( spritebgflag_w8 )
