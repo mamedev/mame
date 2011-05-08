@@ -63,12 +63,12 @@ ADDRESS_MAP_END
 
 // I/O map for the DSP
 static ADDRESS_MAP_START( tms_io_map, AS_IO, 16 )
-	AM_RANGE(0, 0) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_register_r, tms_rom_addr_w)
-	AM_RANGE(1, 1) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_data_r, tms_rom_bank_w)
-	AM_RANGE(2, 2) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_rom_r)
-	AM_RANGE(3, 3) AM_DEVWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_left_w)
-	AM_RANGE(7, 7) AM_DEVWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_right_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_write_pending_r)
+	AM_RANGE(0, 0) AM_DEVREADWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_register_r, tms_rom_addr_w)
+	AM_RANGE(1, 1) AM_DEVREADWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_data_r, tms_rom_bank_w)
+	AM_RANGE(2, 2) AM_DEVREAD_MODERN(DEVICE_SELF, bsmt2000_device, tms_rom_r)
+	AM_RANGE(3, 3) AM_DEVWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_left_w)
+	AM_RANGE(7, 7) AM_DEVWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_right_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_DEVREAD_MODERN(DEVICE_SELF, bsmt2000_device, tms_write_pending_r)
 ADDRESS_MAP_END
 
 
