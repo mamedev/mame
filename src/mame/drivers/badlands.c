@@ -720,7 +720,7 @@ static MACHINE_CONFIG_START( badlandsb, badlands_state )
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank_int)
 
-//  MCFG_CPU_ADD("audiocpu", Z80, XTAL_20MHz/12)	/* Divisor estimated */
+//  MCFG_CPU_ADD("audiocpu", Z80, XTAL_20MHz/12)    /* Divisor estimated */
 //  MCFG_CPU_PROGRAM_MAP(bootleg_soundmap)
 
 	MCFG_MACHINE_START(badlands)

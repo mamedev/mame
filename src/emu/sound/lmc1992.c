@@ -1,7 +1,7 @@
 /**********************************************************************
 
-    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with 
-	Four-Channel Input-Selector emulation
+    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with
+    Four-Channel Input-Selector emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -13,11 +13,11 @@
     TODO:
 
     - inputs
-	- outputs
-	- bass
-	- treble
-	- volume
-	- balance
+    - outputs
+    - bass
+    - treble
+    - volume
+    - balance
 
 */
 
@@ -73,7 +73,7 @@ const device_type LMC1992 = &device_creator<lmc1992_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  execute_command - 
+//  execute_command -
 //-------------------------------------------------
 
 inline void lmc1992_device::execute_command(int addr, int data)
@@ -181,7 +181,7 @@ void lmc1992_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 
 //-------------------------------------------------
-//  clock_w - 
+//  clock_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::clock_w )
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER( lmc1992_device::clock_w )
 
 
 //-------------------------------------------------
-//  data_w - 
+//  data_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::data_w )
@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER( lmc1992_device::data_w )
 
 
 //-------------------------------------------------
-//  enable_w - 
+//  enable_w -
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( lmc1992_device::enable_w )

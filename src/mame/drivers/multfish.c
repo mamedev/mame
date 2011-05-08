@@ -1129,7 +1129,7 @@ ROM_END
 ROM_START( mfish_3 ) // 021124
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021124.rom", 0x00000, 0x40000, CRC(59fd16f5) SHA1(ea132f68e9c09c40369d4cc02c670ee6e26bdcbe) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "multi_fish.001", 0x000000, 0x80000, CRC(2f2a7367) SHA1(ce7ee9ca4f374ec61edc3b89d4752f0edb64a910) )
 	ROM_LOAD( "multi_fish.002", 0x100000, 0x80000, CRC(606acd73) SHA1(ce5f7b1366dbb16d57fe4b7f395f08725e3cf756) )
@@ -1613,7 +1613,7 @@ ROM_END
 ROM_START( fcockt_11 ) // 070822
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc_070822.rom", 0x00000, 0x40000, CRC(f156657d) SHA1(bd538e714a87461bdf84df18ae3f8caeee876747) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "fruitcocktail.001",   0x000000, 0x80000, CRC(735FBE79) SHA1(6ab590e00043dcb6648fd942e11747486d497df1) ) /* Only this set is listed as official hashes */
 	ROM_LOAD( "fruitcocktail.002",   0x100000, 0x80000, CRC(28fc888e) SHA1(2b8c55675bf61203682d560c9b3f29568719113f) )
@@ -1769,10 +1769,10 @@ ROM_START( lhaunt_8 ) // 070604
 	ROM_LOAD( "luckyhaunter_m.008", 0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
 
-                   
+
 /*********************************************************
    Garage
-   
+
     "Russia" sets use different gfx roms 1-4.
         The official list of hashes shows only updated roms.
 
@@ -2199,7 +2199,7 @@ ROM_START( island_2 ) // 070409
 	ROM_LOAD( "island.008", 0x380000, 0x80000, CRC(ac6fba48) SHA1(64dd03d624f16da52bc7fa0702246e91ae39a806) )
 ROM_END
 
-                           
+
 /*********************************************************
    Island 2
 **********************************************************/

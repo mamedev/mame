@@ -170,7 +170,7 @@ private:
 		uml::code_label		m_label;		// the label specified
 		drccodeptr			m_codeptr;		// pointer to the relevant code
 	};
-	
+
 	struct label_fixup
 	{
 		label_fixup *next() const { return m_next; }

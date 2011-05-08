@@ -267,9 +267,9 @@
 
 
     * Witch Card (Proma)
-	
-	For the first time: You must coin-up and play at least one hand, then Payout
-    to get the proper coinage settings. 
+
+    For the first time: You must coin-up and play at least one hand, then Payout
+    to get the proper coinage settings.
 
 
 *******************************************************************************

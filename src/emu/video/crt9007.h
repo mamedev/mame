@@ -72,7 +72,7 @@ struct crt9007_interface
 {
 	const char *m_screen_tag;		/* screen we are acting on */
 	int hpixels_per_column;		/* number of pixels per video memory address */
-	
+
 	devcb_write_line		m_out_int_cb;
 	devcb_write_line		m_out_dmar_cb;
 

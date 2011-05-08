@@ -16,8 +16,8 @@
 
   note: the data bus is almost certainly 8-bit, dating back to the earliest
         hardware the games were used on.  the RAM arrangements changes
-		slightly between games depending on how the RAM is hooked up to the
-		main cpu.
+        slightly between games depending on how the RAM is hooked up to the
+        main cpu.
 
   'y' low bits are NEVER buffered?
 
@@ -38,7 +38,7 @@ void seta001_device::device_start()
 {
 	m_fg_flipxoffs = 0;
 	m_fg_noflipxoffs = 0;
-	
+
 	m_fg_flipyoffs = 0;
 	m_fg_noflipyoffs = 0;
 
@@ -78,7 +78,7 @@ READ16_DEVICE_HANDLER( spritectrl_r16 )
 WRITE16_DEVICE_HANDLER( spritectrl_w16 )
 {
 	seta001_device *dev = (seta001_device *)device;
-	
+
 	if (ACCESSING_BITS_0_7)
 	{
 		dev->m_spritectrl[offset] = data;
@@ -106,7 +106,7 @@ READ16_DEVICE_HANDLER( spriteylow_r16 )
 WRITE16_DEVICE_HANDLER( spriteylow_w16 )
 {
 	seta001_device *dev = (seta001_device *)device;
-	
+
 	if (ACCESSING_BITS_0_7)
 	{
 		dev->m_spriteylow[offset] = data;
@@ -265,8 +265,8 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t
 			else i = 32 * (col ^ 8) + 2 * (offs>>1) + (offs&1);
 
 			int code = ((m_spritecodehigh[i+0x400+bank]) << 8) | m_spritecodelow[i+0x400+bank];
-			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank]; 
-				
+			int color =((m_spritecodehigh[i+0x600+bank]) << 8) | m_spritecodelow[i+0x600+bank];
+
 			int	flipx	=	code & 0x8000;
 			int	flipy	=	code & 0x4000;
 
@@ -353,19 +353,19 @@ void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t
 
 		code = char_pointer[i] + ((ctrl_pointer[i] & 0x3f) << 8);
 		color = (color_pointer[i] & 0xf8) >> 3;
-	
-		
+
+
 		sx = x_pointer[i] - ((color_pointer[i] & 1) << 8);
 		sy =  (m_spriteylow[i] & 0xff);
 		flipx = ctrl_pointer[i] & 0x80;
 		flipy = ctrl_pointer[i] & 0x40;
-		
+
 		if (m_bankcallback) code = m_bankcallback(machine, code, color_pointer[i]);
-		
+
 		color %= total_color_codes;
 
 		color += m_colorbase;
-		
+
 		if (screenflip)
 		{
 			sy = max_y - sy
@@ -408,12 +408,12 @@ void seta001_device::seta001_draw_foreground( running_machine &machine, bitmap_t
 	}
 }
 
-	
+
 
 void seta001_device::setac_eof()
 {
 	// is this handling right?
-	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification) 
+	// it differs to tnzs, and thundercade has sprite flickering issues (not related to the devicification)
 
 	int ctrl2	=	m_spritectrl[1];
 

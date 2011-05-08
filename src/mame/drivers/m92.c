@@ -215,12 +215,12 @@ psoldier dip locations still need veritication.
 static MACHINE_START( m92 )
 {
 	m92_state *state = machine.driver_data<m92_state>();
-  	state->save_item(NAME(state->m_sound_status));
+	state->save_item(NAME(state->m_sound_status));
 }
 
 static MACHINE_RESET( m92 )
 {
-  	m92_state *state = machine.driver_data<m92_state>();
+	m92_state *state = machine.driver_data<m92_state>();
 
 	state->m_sprite_buffer_busy = 1;
 }
@@ -229,7 +229,7 @@ static MACHINE_RESET( m92 )
 
 static TIMER_DEVICE_CALLBACK( m92_scanline_interrupt )
 {
- 	running_machine &machine = timer.machine();
+	running_machine &machine = timer.machine();
 	m92_state *state = machine.driver_data<m92_state>();
 	int scanline = param;
 

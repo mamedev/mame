@@ -2165,8 +2165,8 @@ ROM_START( 86lions )
 	ROM_LOAD( "gn1.u11", 0x08000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
 	ROM_LOAD( "rd0.u13", 0x0a000, 0x1000, CRC(38c57504) SHA1(cc3ac1df644abc4586fc9f0e88531ba146b86b48) )
 
-// 	ROM_REGION( 0x200, "proms", 0 )
-// 	ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
+//  ROM_REGION( 0x200, "proms", 0 )
+//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 

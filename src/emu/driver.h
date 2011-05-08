@@ -206,24 +206,24 @@ private:
 	struct config_entry
 	{
 		friend class simple_list<config_entry>;
-		
+
 	public:
 		// construction/destruction
 		config_entry(machine_config &config, int index);
 		~config_entry();
-		
+
 		// getters
 		config_entry *next() const { return m_next; }
 		int index() const { return m_index; }
 		machine_config *config() const { return m_config; }
-	
+
 	private:
 		// internal state
 		config_entry *		m_next;
 		machine_config *	m_config;
 		int					m_index;
 	};
-	
+
 	static const int CONFIG_CACHE_COUNT = 100;
 
 	// internal state

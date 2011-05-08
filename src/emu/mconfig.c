@@ -68,7 +68,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	(*gamedrv.machine_config)(*this, NULL);
 
 	// intialize slot devices - make sure that any required devices have been allocated
-	device_slot_interface *slot = NULL;	
+	device_slot_interface *slot = NULL;
     for (bool gotone = m_devicelist.first(slot); gotone; gotone = slot->next(slot))
 	{
 		device_t &owner = slot->device();

@@ -67,7 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(read_78xx);
 
 	static IRQ_CALLBACK(irq_callback_1);
-	
+
 	void maple_w(const UINT32 *data, UINT32 in_size);
 
 protected:
@@ -78,7 +78,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	enum { TBUF_SIZE = 8 };
 

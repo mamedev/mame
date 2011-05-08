@@ -825,7 +825,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_t *bitm
 
 
 ***************************************************************************/
-	
+
 
 /* For games without tilemaps */
 SCREEN_UPDATE( seta_no_layers )

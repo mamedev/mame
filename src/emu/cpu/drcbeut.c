@@ -505,7 +505,7 @@ void drc_label_list::block_end(drcuml_block &block)
 	label_fixup *fixup;
 	while ((fixup = m_fixup_list.detach_head()) != NULL)
 		m_cache.dealloc(fixup, sizeof(*fixup));
-	
+
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
 }

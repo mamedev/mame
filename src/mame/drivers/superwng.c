@@ -1,14 +1,14 @@
 /****************************************************************************************
 Super Wing - (c) 1985 Wing (UPL?)
-	
+
 driver by Tomasz Slanina
-	 
+
 Hardware a bit (interrupts, sound) similar to mouser
-	 
+
 TODO:
-	 
+
  - unused rom 6.8s (located on the pcb near the gfx rom 7.8p, but contains
-   data (similar to the one in roms 4.5p and 5.5r). 
+   data (similar to the one in roms 4.5p and 5.5r).
    There are two possibilities: its bad dump of gfx rom (two extra bit layers
    of current gfx) or it's banked at 0x4000 - 0x7fff area.
   - missing color prom dump (missing on pcb)
@@ -17,9 +17,9 @@ TODO:
   - tile and sprite flipping (both h and v controlled by the same bit?)
   - sprite coords and tile num (is the >>2 correct ?) (name entry, flipped screen)
   - measure clocks
-  
+
   To enter initials - use tilt. It's probably separate button (?), not a tilt sensor.
-  
+
 *****************************************************************************************/
 
 #include "emu.h"
@@ -46,7 +46,7 @@ public:
 
 	device_t *	m_maincpu;
 	device_t *	m_audiocpu;
-	
+
 	tilemap_t *	m_bg_tilemap;
 	tilemap_t *	m_fg_tilemap;
 
@@ -60,11 +60,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
 	code|=state->m_tile_bank?0x200:0;
-	
+
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
-	SET_TILE_INFO( 	0, code, attr & 0xf, flipx|flipy);
+	SET_TILE_INFO(	0, code, attr & 0xf, flipx|flipy);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -74,9 +74,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int attr = state->m_colorram_fg[tile_index];
 
 	code= (code&0x7f) | ((attr&0x40)<<1) | ((code&0x80)<<1);
-	
+
 	code|=state->m_tile_bank?0x200:0;
-	
+
 	int flipx=(attr&0x80) ? TILE_FLIPX : 0;
 	int flipy=(attr&0x80) ? TILE_FLIPY : 0;
 
@@ -98,7 +98,7 @@ static VIDEO_START( superwng )
 	superwng_state *state = machine.driver_data<superwng_state>();
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	
+
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, 64);
 }
 
@@ -106,10 +106,10 @@ static SCREEN_UPDATE( superwng )
 {
 	superwng_state *state = screen->machine().driver_data<superwng_state>();
 	int flip=flip_screen_get(screen->machine());
-	
+
 	tilemap_draw(bitmap, cliprect, state->m_bg_tilemap, 0, 0);
 	rectangle tmp=*cliprect;
-	
+
 	if(flip)
 	{
 		tmp.min_x+=32;
@@ -120,17 +120,17 @@ static SCREEN_UPDATE( superwng )
 		tmp.max_x-=32;
 		tilemap_draw(bitmap, &tmp, state->m_fg_tilemap, 0, 0);
 	}
-	
+
 	{
 		//sprites
-		
+
 		for(int i=0x3e; i>=0; i-=2)
 		{
 			int code=(state->m_videoram_bg[i]>>2)+0x40;
 			int sx=256-state->m_videoram_bg[i+1]-8;
 			int sy = state->m_colorram_bg[i]+8;
 			int attr = state->m_colorram_bg[i+1];
-			
+
 			if (flip)
 			{
 				sy-=8;
@@ -169,7 +169,7 @@ PALETTE_INIT( superwng )
 	for (i = 0; i < machine.total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
-		
+
 		bit0 = BIT(*ptr, 0);
 		bit1 = BIT(*ptr, 1);
 		bit2 = BIT(*ptr, 2);
@@ -286,7 +286,7 @@ static WRITE8_HANDLER(superwng_cointcnt2_w)
 
 static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM 
+	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_bg)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_fg)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_BASE_MEMBER(superwng_state, m_colorram_bg)
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM 
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( superwng )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-	
+
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball" ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flipper" ) PORT_COCKTAIL
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( superwng )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x30, 0x00, 	DEF_STR( Unknown ) ) //causes writes to 0xa000 every frame
+	PORT_DIPNAME( 0x30, 0x00,	DEF_STR( Unknown ) ) //causes writes to 0xa000 every frame
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
@@ -391,7 +391,7 @@ static const gfx_layout charlayout =
 {
 	8,8,
 	RGN_FRAC(1,1),
-	2, 
+	2,
 	{ 0,4 },
 	{8*8+0,8*8+1,8*8+2,8*8+3,0,1,2,3},
 	{8*0, 8*1, 8*2, 8*3, 8*4, 8*5, 8*6, 8*7},
@@ -402,14 +402,14 @@ static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,1),
-	2, 
+	2,
 	{ 0,4 },
 	{8*8+0,8*8+1,8*8+2,8*8+3,0,1,2,3,
-	
+
 	16*8+8*8+0,16*8+8*8+1,16*8+8*8+2,16*8+8*8+3,16*8+0,16*8+1,16*8+2,16*8+3},
 	{8*0, 8*1, 8*2, 8*3, 8*4, 8*5, 8*6, 8*7,
 	16*8*2+8*0, 16*8*2+8*1, 16*8*2+8*2, 16*8*2+8*3, 16*8*2+8*4, 16*8*2+8*5, 16*8*2+8*6, 16*8*2+8*7,
-	
+
 	},
 	16*8*4
 };
@@ -513,7 +513,7 @@ ROM_START( superwng )
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "7.8p",        0x0000, 0x4000, CRC(b472603c) SHA1(96f477a47a5be3db1292fea4f5c91ab155013f74) )
 
-	ROM_REGION( 0x0040, "proms", 0 ) 
+	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "bprom.bin", 0x0000, 0x0040, NO_DUMP)
 ROM_END
 

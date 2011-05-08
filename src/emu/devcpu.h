@@ -412,7 +412,7 @@ protected:
 protected:
 	// internal state
 	cpu_get_info_func		m_get_info;
-	address_space_config 	m_space_config[3];			// array of address space configs
+	address_space_config	m_space_config[3];			// array of address space configs
 	void *					m_token;					// pointer to our state
 
 	cpu_set_info_func		m_set_info;					// extracted legacy function pointers

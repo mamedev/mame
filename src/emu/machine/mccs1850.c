@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- auto restart
-	- test mode
+    - auto restart
+    - test mode
 
 */
 
@@ -457,7 +457,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 			if (m_bits == 8)
 			{
 				if (LOG) logerror("MCCS1850 '%s' %s Address %u\n", tag(), BIT(m_address, 7) ? "Write" : "Read", m_address & 0x7f);
-				
+
 				m_bits = 0;
 				m_state = STATE_DATA;
 

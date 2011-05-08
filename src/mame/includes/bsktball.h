@@ -28,7 +28,7 @@ public:
 
 	/* misc */
 	UINT32   m_nmi_on;
-//	int      m_i256v;
+//  int      m_i256v;
 
 	/* input-related */
 	int m_ld1;

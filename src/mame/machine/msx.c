@@ -772,7 +772,7 @@ static WRITE8_DEVICE_HANDLER ( msx_ppi_port_a_w )
 static WRITE8_DEVICE_HANDLER ( msx_ppi_port_c_w )
 {
 	msx_state *state = device->machine().driver_data<msx_state>();
-	
+
 	state->keylatch = data & 0x0f;
 
 	/* caps lock */

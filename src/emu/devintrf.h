@@ -133,7 +133,7 @@ class device_list : public tagged_list<device_t>
 public:
 	// construction/destruction
 	device_list(resource_pool &pool = global_resource_pool);
-	
+
 	// getters
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -160,7 +160,7 @@ public:
 	// provide interface-specific overrides
 	template<class _InterfaceClass>
 	bool first(_InterfaceClass *&intf) const;
-	
+
 private:
 	// internal helpers
 	void exit();
@@ -307,7 +307,7 @@ protected:
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 	//------------------- end derived class overrides
 
 	device_debug *			m_debug;
@@ -376,7 +376,7 @@ protected:
 		operator _TargetType() { return m_target; }
 		operator _TargetType() const { return m_target; }
 		_TargetType operator->() { return m_target; }
-		
+
 		// getter for explicit fetching
 		_TargetType target() const { return m_target; }
 

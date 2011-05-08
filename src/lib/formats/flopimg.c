@@ -320,7 +320,7 @@ static void floppy_close_internal(floppy_image *floppy, int close_file)
 {
 	if (floppy) {
 		floppy_track_unload(floppy);
-		
+
 		if(floppy->floppy_option->destruct)
 			floppy->floppy_option->destruct(floppy, floppy->floppy_option);
 		if (close_file)

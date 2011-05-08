@@ -5375,7 +5375,7 @@ ROM_START( atworldd1 )
 ROM_END
 
 /* Fruit Bonus 3G */
-/* 
+/*
 
 Version 1.0.1 roms need dumping. Board was reflashed (updated) to v1.0.3
 

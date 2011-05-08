@@ -4,7 +4,7 @@
 device_secure_serial_flash::device_secure_serial_flash(const machine_config &mconfig,
 																	 device_type type,
 																	 const char *name, const char *tag,
-																	 device_t *owner, UINT32 clock) : 
+																	 device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {

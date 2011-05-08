@@ -109,7 +109,7 @@ void device_list::set_machine_all(running_machine &machine)
 {
 	// add exit and reset callbacks
 	m_machine = &machine;
-	
+
 	// iterate over devices and set their machines as well
 	for (device_t *device = first(); device != NULL; device = device->next())
 		device->set_machine(machine);
@@ -143,7 +143,7 @@ void device_list::start_all()
 void device_list::start_new_devices()
 {
 	assert(m_machine != NULL);
-	
+
 	// iterate through the devices
 	device_t *nextdevice;
 	for (device_t *device = first(); device != NULL; device = nextdevice)
@@ -158,7 +158,7 @@ void device_list::start_new_devices()
 				// if the device doesn't have a machine yet, set it first
 				if (device->m_machine == NULL)
 					device->set_machine(machine());
-			
+
 				// now start the device
 				mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
 				device->start();
@@ -221,7 +221,7 @@ device_t *device_list::first(device_type type) const
 
 
 //-------------------------------------------------
-//  count - count the number of devices of the 
+//  count - count the number of devices of the
 //  given type
 //-------------------------------------------------
 
@@ -290,7 +290,7 @@ void device_list::exit()
 
 
 //-------------------------------------------------
-//  presave_all - tell all the devices we are 
+//  presave_all - tell all the devices we are
 //  about to save
 //-------------------------------------------------
 
@@ -302,7 +302,7 @@ void device_list::presave_all()
 
 
 //-------------------------------------------------
-//  postload_all - tell all the devices we just 
+//  postload_all - tell all the devices we just
 //  completed a load
 //-------------------------------------------------
 
@@ -469,7 +469,7 @@ void device_t::config_complete()
 
 	// then notify the device itself
 	device_config_complete();
-	
+
 	// then mark ourselves complete
 	m_config_complete = true;
 }
@@ -517,7 +517,7 @@ void device_t::reset()
 
 
 //-------------------------------------------------
-//  set_unscaled_clock - sets the given device's 
+//  set_unscaled_clock - sets the given device's
 //  unscaled clock
 //-------------------------------------------------
 

@@ -92,7 +92,7 @@ SCREEN_UPDATE( mjyuugi )
 	screen->machine().device<seta001_device>("spritegen")->set_fg_xoffsets( 0x10, 0x10 );
 	screen->machine().device<seta001_device>("spritegen")->set_fg_yoffsets( 0x06, 0x06 );
 	screen->machine().device<seta001_device>("spritegen")->set_bg_yoffsets( 0x09, 0x07 );
-	
+
 	screen->machine().device<seta001_device>("spritegen")->set_spritelimit( 0x1ff-6 );
 
 	screen->machine().device<seta001_device>("spritegen")->set_gfxbank_callback( srmp3_gfxbank_callback );

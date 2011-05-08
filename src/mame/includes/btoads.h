@@ -71,7 +71,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_start();
 	virtual void video_start();
-	
+
 	// timer IDs
 	enum
 	{

@@ -355,7 +355,7 @@ private:
 	void *					m_hashstacksave;		// saved stack pointer for hashjmp
 	UINT64					m_reslo;				// extended low result
 	UINT64					m_reshi;				// extended high result
-	
+
 	drc_label_fixup_delegate m_fixup_label;			// precomputed delegate for fixups
 	drc_oob_delegate		m_fixup_exception;		// precomputed delegate for exception fixups
 

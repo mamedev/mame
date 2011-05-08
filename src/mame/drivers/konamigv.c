@@ -76,12 +76,12 @@ GV999 PWB301949A
 
 Notes:
       - Simpsons Bowling and Dead Eye use a GV999 with a daughtercard containing flash ROMs and CPLDs:
-		PWB402610
-		Xilinx XC3020A
-		Xilinx 1718DPC
-		74F244N (2 of these)
-		LVT245SS (2 of theses)
- 
+        PWB402610
+        Xilinx XC3020A
+        Xilinx 1718DPC
+        74F244N (2 of these)
+        LVT245SS (2 of theses)
+
       - 000180 is used for driving the RGB output. It's a very thin piece of very brittle ceramic
         containing a circuit, a LM1203 chip, some smt transistors/caps/resistors etc (let's just say
         placing this thing on the edge of the PCB wasn't a good design choice!)
@@ -685,7 +685,7 @@ static DRIVER_INIT( tokimosh )
 
 /*
 Dead Eye
- 
+
 CD:
     P/N 002715
     054

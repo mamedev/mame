@@ -212,7 +212,7 @@ driver_enumerator::~driver_enumerator()
 machine_config &driver_enumerator::config(int index) const
 {
 	assert(index >= 0 && index < s_driver_count);
-	
+
 	// if we don't have it cached, add it
 	if (m_config[index] == NULL)
 	{
@@ -223,7 +223,7 @@ machine_config &driver_enumerator::config(int index) const
 			m_config[first->index()] = NULL;
 			m_config_cache.remove(*first);
 		}
-		
+
 		// allocate the config and add it to the end of the list
 		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], m_options));
 		m_config_cache.append(*global_alloc(config_entry(*config, index)));

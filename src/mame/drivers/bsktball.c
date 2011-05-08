@@ -214,7 +214,7 @@ static MACHINE_START( bsktball )
 	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->save_item(NAME(state->m_nmi_on));
-//	state->save_item(NAME(state->m_i256v));
+//  state->save_item(NAME(state->m_i256v));
 	state->save_item(NAME(state->m_ld1));
 	state->save_item(NAME(state->m_ld2));
 	state->save_item(NAME(state->m_dir0));
@@ -232,7 +232,7 @@ static MACHINE_RESET( bsktball )
 	bsktball_state *state = machine.driver_data<bsktball_state>();
 
 	state->m_nmi_on = 0;
-//	state->m_i256v = 0;
+//  state->m_i256v = 0;
 	state->m_ld1 = 0;
 	state->m_ld2 = 0;
 	state->m_dir0 = 0;

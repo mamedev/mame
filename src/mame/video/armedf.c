@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_nb1414m4_tx_tile_info )
 
 	/* TODO: Armed F doesn't seem to use the NB1414M4! */
 	//if (state->m_scroll_type == 1)
-	//	attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
+	//  attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
 	//else
 	{
 		attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
@@ -69,10 +69,10 @@ static TILE_GET_INFO( get_armedf_tx_tile_info )
 		attributes = state->m_text_videoram[tile_index + 0x800] & 0xff;
 	//else
 	//{
-	//	attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
+	//  attributes = state->m_text_videoram[tile_index + 0x400] & 0xff;
 //
-	//	if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
-	//		tile_number = attributes = 0x00;
+	//  if(tile_index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+	//      tile_number = attributes = 0x00;
 	//}
 
 	/* bit 3 controls priority, (0) nb1414m4 has priority over all the other video layers */

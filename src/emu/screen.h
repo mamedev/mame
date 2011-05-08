@@ -83,7 +83,7 @@ typedef void (*screen_eof_func)(screen_device *screen, running_machine &machine)
 class screen_device : public device_t
 {
 	friend class render_manager;
-	
+
 public:
 	// construction/destruction
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -238,7 +238,7 @@ private:
 			: m_next(NULL),
 			  m_callback(callback) { }
 		callback_item *next() const { return m_next; }
-		
+
 		callback_item *				m_next;
 		vblank_state_delegate		m_callback;
 	};

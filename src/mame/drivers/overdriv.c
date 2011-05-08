@@ -358,7 +358,7 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 													/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
 
 	MCFG_CPU_ADD("audiocpu", M6809,3579545)		/* 1.789 MHz?? This might be the right speed, but ROM testing */
-	MCFG_CPU_PROGRAM_MAP(overdriv_sound_map) 	/* takes a little too much (the counter wraps from 0000 to 9999). */
+	MCFG_CPU_PROGRAM_MAP(overdriv_sound_map)	/* takes a little too much (the counter wraps from 0000 to 9999). */
 												/* This might just mean that the video refresh rate is less than */
 												/* 60 fps, that's how I fixed it for now. */
 

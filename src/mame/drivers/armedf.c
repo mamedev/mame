@@ -303,14 +303,14 @@ Notes:
  *************************************/
 
 /*
-	-x-- ---- ---- ---- trigger 1414M4 operation
-	---x ---- ---- ---- flip screen
-	---- x--- ---- ---- disable bg layer
-	---- -x-- ---- ---- disable fg layer
-	---- --x- ---- ---- disable sprite
-	---- ---x ---- ---- disable tx layer
-	---- ---- ---- --x- coin counter 1
-	---- ---- ---- ---x coin counter 0
+    -x-- ---- ---- ---- trigger 1414M4 operation
+    ---x ---- ---- ---- flip screen
+    ---- x--- ---- ---- disable bg layer
+    ---- -x-- ---- ---- disable fg layer
+    ---- --x- ---- ---- disable sprite
+    ---- ---x ---- ---- disable tx layer
+    ---- ---- ---- --x- coin counter 1
+    ---- ---- ---- ---x coin counter 0
 */
 
 static WRITE16_HANDLER( terraf_io_w )
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w) handled in DRIVER_INIT
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w) handled in DRIVER_INIT
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -416,9 +416,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
-//	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-//	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
+//  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
+//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
 	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(legion_io_w)
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(legion_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
@@ -691,7 +691,7 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x08c002, 0x08c003) AM_READ_PORT("P2")
 	AM_RANGE(0x08c004, 0x08c005) AM_READ_PORT("DSW0")
 	AM_RANGE(0x08c006, 0x08c007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(terraf_io_w) 	//807b0
+	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(terraf_io_w)	//807b0
 	AM_RANGE(0x08d002, 0x08d003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x08d004, 0x08d005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x08d006, 0x08d007) AM_WRITE(armedf_fg_scrollx_w)

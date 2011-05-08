@@ -130,7 +130,7 @@ void maple_dc_device::dma_step()
 
 				// the MIE seems too slow for the correct timeout
 				// it's rather strange though
-				//				timer->adjust(attotime::from_nsec(40000 + 20*(msys>>16))); // The 40us represent the sending and reception time
+				//              timer->adjust(attotime::from_nsec(40000 + 20*(msys>>16))); // The 40us represent the sending and reception time
 				timer->adjust(attotime::from_msec(5));
 				break;
 			case 2: // sdckb occupy permission (light gun protocol)

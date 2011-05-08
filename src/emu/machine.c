@@ -191,7 +191,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
 	memset(&m_base_time, 0, sizeof(m_base_time));
-	
+
 	// set the machine on all devices
 	const_cast<device_list &>(devicelist()).set_machine_all(*this);
 

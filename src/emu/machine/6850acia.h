@@ -74,7 +74,7 @@ class acia6850_device :  public device_t,
 public:
     // construction/destruction
     acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-    
+
 	// static configuration helpers
 	static void static_set_interface(device_t &device, const acia6850_interface &interface);
 

@@ -43,14 +43,14 @@ public:
 	// construction/destruction
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
-	
+
 	static void static_set_slot_info(device_t &device, const slot_interface *slots_info, const char *default_card);
 	const slot_interface* get_slot_interfaces() const { return m_slot_interfaces; };
 	const char * get_default_card() const { return m_default_card; };
 	device_t* get_card_device();
 protected:
 	const char *m_default_card;
-	const slot_interface *m_slot_interfaces;	
+	const slot_interface *m_slot_interfaces;
 };
 
 // ======================> device_slot_card_interface

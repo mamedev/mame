@@ -5,15 +5,15 @@ class seta001_device : public device_t
 {
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 
 	void seta001_draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac);
-	
+
 	void setac_eof( void );
 	void tnzs_eof( void );
-	
+
 	UINT8 m_bgflag;
-	
+
 	UINT8 m_spritectrl[4];
 	UINT8 m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
 
@@ -21,13 +21,13 @@ public:
 	UINT8 m_spritecodehigh[0x2000]; // ^
 
 	// position kludges for seta.c & srmp2.c
-	void set_fg_xoffsets( int flip, int noflip ) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; }; 
+	void set_fg_xoffsets( int flip, int noflip ) { m_fg_flipxoffs = flip; m_fg_noflipxoffs = noflip; };
 	int m_fg_flipxoffs, m_fg_noflipxoffs;
-	void set_fg_yoffsets( int flip, int noflip ) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; }; 
+	void set_fg_yoffsets( int flip, int noflip ) { m_fg_flipyoffs = flip; m_fg_noflipyoffs = noflip; };
 	int m_fg_flipyoffs, m_fg_noflipyoffs;
-	void set_bg_yoffsets( int flip, int noflip ) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; }; 
+	void set_bg_yoffsets( int flip, int noflip ) { m_bg_flipyoffs = flip; m_bg_noflipyoffs = noflip; };
 	int m_bg_flipyoffs, m_bg_noflipyoffs;
-	void set_bg_xoffsets( int flip, int noflip ) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; }; 
+	void set_bg_xoffsets( int flip, int noflip ) { m_bg_flipxoffs = flip; m_bg_noflipxoffs = noflip; };
 	int m_bg_flipxoffs, m_bg_noflipxoffs;
 
 	void set_transpen ( int pen ) { m_transpen = pen; };
@@ -51,7 +51,7 @@ protected:
 	private:
 
 private:
-	
+
 	void seta001_draw_background( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size, int setac_type);
 	void seta001_draw_foreground( running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_size);
 

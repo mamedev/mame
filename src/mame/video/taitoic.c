@@ -4749,7 +4749,7 @@ static DEVICE_START( tc0110pcr )
 {
 	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(device);
 	const tc0110pcr_interface *intf = tc0110pcr_get_interface(device);
-	
+
 	tc0110pcr->m_machine = &device->machine();
 
 	tc0110pcr->pal_offs = intf->pal_offs;

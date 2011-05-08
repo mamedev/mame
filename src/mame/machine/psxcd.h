@@ -162,7 +162,7 @@ private:
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
 	event *m_eventfortimer[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
-	
+
 	void add_system_event(event *ev);
 };
 

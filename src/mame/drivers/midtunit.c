@@ -183,7 +183,7 @@ static INPUT_PORTS_START( mk2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Block") PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 High Kick") PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( mk2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Low Kick") PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Block 2") PORT_PLAYER(2)
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	/*Note-the real MK2 board has a special cable designed for SF2 cab conversions that has the 2 SF2
           Medium punch/kick buttons as block buttons for MK2. The secondary block button registers in test mode,
           but does not have an indicator light show up. During gameplay, the second block only functions temporarily.

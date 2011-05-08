@@ -182,7 +182,7 @@ void acia6850_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			tx_tick();
 			m_tx_counter = 0;
 			break;
-		
+
 		case TIMER_ID_RECEIVE:
 			rx_tick();
 			m_rx_counter = 0;

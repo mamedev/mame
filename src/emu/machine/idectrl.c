@@ -1252,8 +1252,8 @@ static void handle_command(ide_state *ide, UINT8 command)
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			ide->status |= IDE_STATUS_ERROR;
-			ide->error = IDE_ERROR_UNKNOWN_COMMAND;			
-			signal_interrupt(ide);			
+			ide->error = IDE_ERROR_UNKNOWN_COMMAND;
+			signal_interrupt(ide);
 			//debugger_break(ide->device->machine());
 			break;
 	}

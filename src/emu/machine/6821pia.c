@@ -1058,7 +1058,7 @@ int pia6821_device::ca2_output()
 
 
 //-------------------------------------------------
-//  ca2_output_z - version of ca2_output which 
+//  ca2_output_z - version of ca2_output which
 //  takes account of internal pullup resistor
 //-------------------------------------------------
 

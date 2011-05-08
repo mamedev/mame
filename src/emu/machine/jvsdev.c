@@ -137,7 +137,7 @@ int jvs_device::handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8
 			return 0;
 		*recv_buffer++ = 0x01;
 		return switches(recv_buffer, send_buffer[1], send_buffer[2]) ? 3 : 0;
-		
+
 	case 0x21:
 		if(send_size < 2)
 			return 0;

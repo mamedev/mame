@@ -1,7 +1,7 @@
 /**********************************************************************
 
-    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with 
-	Four-Channel Input-Selector emulation
+    LMC1992 Digitally-Controlled Stereo Tone and Volume Circuit with
+    Four-Channel Input-Selector emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -92,7 +92,7 @@ private:
 	inline void execute_command(int addr, int data);
 
 	sound_stream *m_stream[4];
-	
+
 	int m_enable;					// enable latch
 	int m_data;						// data latch
 	int m_clk;						// clock latch

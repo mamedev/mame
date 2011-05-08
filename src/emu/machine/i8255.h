@@ -92,7 +92,7 @@ public:
 
     DECLARE_READ8_MEMBER( pa_r );
 	UINT8 pa_r();
-    
+
 	DECLARE_READ8_MEMBER( pb_r );
 	UINT8 pb_r();
 
@@ -130,7 +130,7 @@ private:
 	void output_pc();
 	void set_mode(UINT8 data);
 	void set_pc_bit(int bit, int state);
-	
+
 	devcb_resolved_read8		m_in_port_func[3];
 	devcb_resolved_write8		m_out_port_func[3];
 
