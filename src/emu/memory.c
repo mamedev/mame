@@ -2066,20 +2066,10 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			unmap_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, false);
 			break;
 
-		case AMH_DRIVER_DELEGATE:
 		case AMH_DEVICE_DELEGATE:
-			if (data.m_type == AMH_DRIVER_DELEGATE)
-			{
-				object = machine().driver_data<driver_device>();
-				if (object == NULL)
-					throw emu_fatalerror("Attempted to map a driver delegate in space %s of device '%s' when there is no driver data\n", m_name, m_device.tag());
-			}
-			else
-			{
-				object = machine().device(data.m_tag);
-				if (object == NULL)
-					throw emu_fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag, m_name, m_device.tag());
-			}
+			object = machine().device(data.m_tag);
+			if (object == NULL)
+				throw emu_fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", data.m_tag, m_name, m_device.tag());
 
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)

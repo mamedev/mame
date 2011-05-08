@@ -50,9 +50,7 @@
 
 inline void map_handler_data::set_tag(const device_t &device, const char *tag)
 {
-	if (tag == NULL)
-		m_tag = NULL;
-	else if (strcmp(tag, DEVICE_SELF) == 0)
+	if (strcmp(tag, DEVICE_SELF) == 0)
 		m_tag = device.tag();
 	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
 	{
@@ -275,7 +273,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
-	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;
+	m_read.m_type = AMH_DEVICE_DELEGATE;
 	m_read.m_bits = 8;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
@@ -288,7 +286,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
-	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_type = AMH_DEVICE_DELEGATE;
 	m_write.m_bits = 8;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
@@ -377,7 +375,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
-	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_type = AMH_DEVICE_DELEGATE;
 	m_read.m_bits = 16;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
@@ -390,7 +388,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
-	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_type = AMH_DEVICE_DELEGATE;
 	m_write.m_bits = 16;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
@@ -479,7 +477,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
-	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_type = AMH_DEVICE_DELEGATE;
 	m_read.m_bits = 32;
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
@@ -492,7 +490,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
-	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_type = AMH_DEVICE_DELEGATE;
 	m_write.m_bits = 32;
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
@@ -581,7 +579,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
-	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_type = AMH_DEVICE_DELEGATE;
 	m_read.m_bits = 64;
 	m_read.m_mask = 0;
 	m_read.m_name = func.name();
@@ -594,7 +592,7 @@ void address_map_entry::internal_set_handler(const device_t &device, const char 
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
-	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_type = AMH_DEVICE_DELEGATE;
 	m_write.m_bits = 64;
 	m_write.m_mask = 0;
 	m_write.m_name = func.name();

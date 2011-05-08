@@ -60,7 +60,6 @@ enum map_handler_type
 	AMH_ROM,
 	AMH_NOP,
 	AMH_UNMAP,
-	AMH_DRIVER_DELEGATE,
 	AMH_DEVICE_DELEGATE,
 	AMH_LEGACY_SPACE_HANDLER,
 	AMH_LEGACY_DEVICE_HANDLER,
@@ -858,86 +857,86 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 
 // driver data base reads
 #define AM_READ_BASE(_class, _handler) \
-	curentry->set_handler(device, NULL, read_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, read_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
 
 #define AM_READ8_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, read8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 #define AM_READ16_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, read16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 #define AM_READ32_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, read32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 
 // driver data base writes
 #define AM_WRITE_BASE(_class, _handler) \
-	curentry->set_handler(device, NULL, write_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, write_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
 
 #define AM_WRITE8_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, write8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 #define AM_WRITE16_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, write16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 #define AM_WRITE32_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, NULL, write32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
 
 
 // driver data base reads/writes
 #define AM_READWRITE_BASE(_class, _rhandler, _whandler) \
-	curentry->set_handler(device, NULL, read_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, read_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0)); \
 
 #define AM_READWRITE8_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read8_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write8_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write8_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
 
 #define AM_READWRITE16_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read16_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write16_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write16_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
 
 #define AM_READWRITE32_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read32_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write32_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write32_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
 
 
 // driver data reads
 #define AM_READ(_handler) \
-	curentry->set_handler(device, NULL, read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0)); \
 
 #define AM_READ8(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 #define AM_READ16(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 #define AM_READ32(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 
 // driver data writes
 #define AM_WRITE(_handler) \
-	curentry->set_handler(device, NULL, write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0)); \
 
 #define AM_WRITE8(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 #define AM_WRITE16(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 #define AM_WRITE32(_handler, _unitmask) \
-	curentry->set_handler(device, NULL, write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0), _unitmask); \
 
 
 // driver data reads/writes
 #define AM_READWRITE(_rhandler, _whandler) \
-	curentry->set_handler(device, NULL, read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0)); \
+	curentry->set_handler(device, DEVICE_SELF, read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0)); \
 
 #define AM_READWRITE8(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
 
 #define AM_READWRITE16(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
 
 #define AM_READWRITE32(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, NULL, read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
+	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, (drivdata_class *)0), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, (drivdata_class *)0), _unitmask); \
 
 
 // device reads

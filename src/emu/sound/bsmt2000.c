@@ -41,6 +41,7 @@
     Trivia: BSMT stands for "Brian Schmidt's Mouse Trap"
 
 ***************************************************************************/
+#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "bsmt2000.h"
@@ -55,20 +56,20 @@ const device_type BSMT2000 = &device_creator<bsmt2000_device>;
 //**************************************************************************
 
 // program map for the DSP (points to internal ROM)
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, bsmt2000_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
 // I/O map for the DSP
-static ADDRESS_MAP_START( tms_io_map, AS_IO, 16 )
-	AM_RANGE(0, 0) AM_DEVREADWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_register_r, tms_rom_addr_w)
-	AM_RANGE(1, 1) AM_DEVREADWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_data_r, tms_rom_bank_w)
-	AM_RANGE(2, 2) AM_DEVREAD_MODERN(DEVICE_SELF, bsmt2000_device, tms_rom_r)
-	AM_RANGE(3, 3) AM_DEVWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_left_w)
-	AM_RANGE(7, 7) AM_DEVWRITE_MODERN(DEVICE_SELF, bsmt2000_device, tms_right_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_DEVREAD_MODERN(DEVICE_SELF, bsmt2000_device, tms_write_pending_r)
+static ADDRESS_MAP_START( tms_io_map, AS_IO, 16, bsmt2000_device)
+	AM_RANGE(0, 0) AM_READWRITE(tms_register_r, tms_rom_addr_w)
+	AM_RANGE(1, 1) AM_READWRITE(tms_data_r, tms_rom_bank_w)
+	AM_RANGE(2, 2) AM_READ(tms_rom_r)
+	AM_RANGE(3, 3) AM_WRITE(tms_left_w)
+	AM_RANGE(7, 7) AM_WRITE(tms_right_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(tms_write_pending_r)
 ADDRESS_MAP_END
 
 
@@ -83,7 +84,7 @@ MACHINE_CONFIG_END
 
 // default address map for the external memory interface
 // the BSMT can address a full 32 bits but typically only 24 are used
-static ADDRESS_MAP_START( bsmt2000, AS_0, 8 )
+static ADDRESS_MAP_START( bsmt2000, AS_0, 8, bsmt2000_device)
 	AM_RANGE(0x00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
