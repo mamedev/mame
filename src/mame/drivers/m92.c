@@ -2090,6 +2090,23 @@ static DRIVER_INIT( majtitl2 )
 	state->m_irq_vectorbase = 0x80;
 }
 
+/* TODO: figure out actual address map and other differences from real Irem h/w */
+/* Based on the size of the program ROMs, this board might have bankswitching */
+static DRIVER_INIT( ppan )
+{
+	m92_state *state = machine.driver_data<m92_state>();
+	UINT8 *ROM = machine.region("maincpu")->base();
+
+	memory_set_bankptr(machine, "bank1", &ROM[0xa0000]);
+
+	state->m_game_kludge = 0;
+	state->m_irq_vectorbase = 0x80;
+
+	/* NOP out the sound comms */
+	machine.device("maincpu")->memory().space(AS_IO)->nop_write(0x00, 0x01);
+	machine.device("maincpu")->memory().space(AS_IO)->nop_write(0xc0, 0xc1);
+}
+
 /***************************************************************************/
 
 GAME( 1991, gunforce, 0,        gunforce,      gunforce, m92,      ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", GAME_SUPPORTS_SAVE )
@@ -2115,7 +2132,7 @@ GAME( 1992, skingame2,majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem
 GAME( 1992, hook,     0,        hook,          hook,     m92,      ROT0,   "Irem",         "Hook (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, hooku,    hook,     hook,          hook,     m92,      ROT0,   "Irem America", "Hook (US)", GAME_SUPPORTS_SAVE )
 GAME( 1992, hookj,    hook,     hook,          hook,     m92,      ROT0,   "Irem",         "Hook (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1992, ppan,     hook,     ppan,          hook,     m92,      ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", GAME_NOT_WORKING ) // PCB marked 'Peter Pan', no title screen, made in Italy?
+GAME( 1992, ppan,     hook,     ppan,          hook,     ppan,     ROT0,   "bootleg",      "Peter Pan (bootleg of Hook)", GAME_NOT_WORKING ) // PCB marked 'Peter Pan', no title screen, made in Italy?
 GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, m92_alt,  ROT0,   "Irem",         "R-Type Leo (World)", GAME_SUPPORTS_SAVE )
 GAME( 1992, rtypeleoj,rtypeleo, rtypeleo,      rtypeleo, m92_alt,  ROT0,   "Irem",         "R-Type Leo (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1993, inthunt,  0,        inthunt,       inthunt,  m92,      ROT0,   "Irem",         "In The Hunt (World)", GAME_SUPPORTS_SAVE )
