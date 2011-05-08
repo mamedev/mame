@@ -1817,6 +1817,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/sstrangr.o \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/supertnk.o \
+	$(DRIVERS)/superwng.o \
 	$(DRIVERS)/tattack.o \
 	$(DRIVERS)/taxidrvr.o $(VIDEO)/taxidrvr.o \
 	$(DRIVERS)/tcl.o \

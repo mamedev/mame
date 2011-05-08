@@ -2670,6 +2670,7 @@ src/mame/drivers/superchs.c svneol=native#text/plain
 src/mame/drivers/superdq.c svneol=native#text/plain
 src/mame/drivers/superqix.c svneol=native#text/plain
 src/mame/drivers/supertnk.c svneol=native#text/plain
+src/mame/drivers/superwng.c svneol=native#text/plain
 src/mame/drivers/suprgolf.c svneol=native#text/plain
 src/mame/drivers/suprloco.c svneol=native#text/plain
 src/mame/drivers/suprnova.c svneol=native#text/plain
