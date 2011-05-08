@@ -60,7 +60,7 @@ inline void map_handler_data::set_tag(const device_t &device, const char *tag)
 		m_tag = device.owner()->tag();
 	}
 	else
-		m_tag = device.subtag(m_derived_tag, tag);
+		m_tag = device.siblingtag(m_derived_tag, tag);
 }
 
 
@@ -718,7 +718,7 @@ address_map::address_map(const device_t &device, address_spacenum spacenum)
 
 	// construct the standard map */
 	if (memintf->address_map(spacenum) != NULL)
-		(*memintf->address_map(spacenum))(*this, *device.owner());
+		(*memintf->address_map(spacenum))(*this, device);
 
 	// append the default device map (last so it can be overridden) */
 	if (spaceconfig->m_default_map != NULL)

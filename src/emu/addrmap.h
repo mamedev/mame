@@ -1073,7 +1073,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 
 #endif
 
-
+#define AM_SUBDEVICE(_tag)					device.subdevice(_tag)->tag()
 
 //**************************************************************************
 //  GLOBAL VARIABLES
