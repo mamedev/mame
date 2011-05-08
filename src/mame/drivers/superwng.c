@@ -24,7 +24,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 #define MASTER_CLOCK XTAL_18_432MHz
@@ -468,7 +467,7 @@ static MACHINE_CONFIG_START( superwng, superwng_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(superwng_sound_map)
-	MCFG_CPU_VBLANK_INT_HACK(superwng_sound_nmi_assert, 4) 
+	MCFG_CPU_PERIODIC_INT(superwng_sound_nmi_assert, 4*60)
 
 	MCFG_MACHINE_START(superwng)
 	MCFG_MACHINE_RESET(superwng)
