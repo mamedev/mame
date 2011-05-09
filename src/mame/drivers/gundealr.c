@@ -48,28 +48,8 @@ Runs in interrupt mode 0, the interrupt vectors are 0xcf (RST 08h) and
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "includes/gundealr.h"
-
-
-static INTERRUPT_GEN( yamyam_interrupt )
-{
-	gundealr_state *state = device->machine().driver_data<gundealr_state>();
-
-	if (cpu_getiloops(device) == 0)
-	{
-		if (state->m_input_ports_hack)
-		{
-			state->m_rambase[0x004] = input_port_read(device->machine(), "IN2");
-			state->m_rambase[0x005] = input_port_read(device->machine(), "IN1");
-			state->m_rambase[0x006] = input_port_read(device->machine(), "IN0");
-		}
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
-	}
-	else if ((cpu_getiloops(device) & 1) == 1)
-		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h sound (hand tuned) */
-}
 
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
@@ -466,13 +446,45 @@ static MACHINE_RESET( gundealr )
 	state->m_scroll[3] = 0;
 }
 
+static TIMER_DEVICE_CALLBACK( gundealr_scanline )
+{
+	gundealr_state *state = timer.machine().driver_data<gundealr_state>();
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+	{
+		if (state->m_input_ports_hack)
+		{
+			state->m_rambase[0x004] = input_port_read(timer.machine(), "IN2");
+			state->m_rambase[0x005] = input_port_read(timer.machine(), "IN1");
+			state->m_rambase[0x006] = input_port_read(timer.machine(), "IN0");
+		}
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xd7); /* RST 10h */
+	}
+	else if((scanline == 0) || (scanline == 120) ) //timer irq
+		cputag_set_input_line_and_vector(timer.machine(), "maincpu", 0, HOLD_LINE,0xcf); /* RST 10h */
+}
+
+static const ym2203_interface ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	NULL
+};
+
 static MACHINE_CONFIG_START( gundealr, gundealr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000)	/* 8 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_HACK(yamyam_interrupt,4)	/* ? */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", gundealr_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START(gundealr)
 	MCFG_MACHINE_RESET(gundealr)
@@ -495,6 +507,7 @@ static MACHINE_CONFIG_START( gundealr, gundealr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
