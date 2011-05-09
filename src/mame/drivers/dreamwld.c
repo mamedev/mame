@@ -102,6 +102,7 @@ public:
 	UINT32 *  m_bg_scroll;
 	UINT32 *  m_paletteram;
 	UINT32 *  m_spriteram;
+	UINT32 *  m_workram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -252,7 +253,11 @@ static SCREEN_UPDATE( dreamwld )
 
 static READ32_HANDLER( dreamwld_protdata_r )
 {
+	//static int count = 0;
 	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
+
+	//printf("protection read %04x\n", count);
+	//count++;
 
 	UINT8 *protdata = space->machine().region("user1")->base();
 	size_t protsize = space->machine().region("user1")->bytes();
@@ -323,9 +328,29 @@ static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32 )
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM // work ram
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_workram) // work ram
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
+
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_spriteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM//_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, m_paletteram)  // real palette?
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg_videoram)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg2_videoram)
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_bg_scroll)  // scroll regs etc.
+
+	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
+
+	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0xff000000) // sfx
+
+	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
+
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_workram) // work ram
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dreamwld )
 	PORT_START("INPUTS")
@@ -455,6 +480,50 @@ static MACHINE_CONFIG_START( dreamwld, dreamwld_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
+static INTERRUPT_GEN( baryon_irq_hack )
+{
+	dreamwld_state *state = device->machine().driver_data<dreamwld_state>();
+	state->m_workram[0x3600/4] = 0x00000000;
+	state->m_workram[0x35d8/4] = 0x00000000;
+	// to run attract mode (without palette, scrolling or sprites)
+	// bp a644
+	// do pc = a646
+	// bp a67a
+	// do pc = a67c
+
+}
+
+
+static MACHINE_CONFIG_START( baryon, dreamwld_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(baryon_map)
+	MCFG_CPU_VBLANK_INT("screen", baryon_irq_hack /* irq4_line_hold */ ) // 4, 5, or 6, all point to the same place
+
+	MCFG_MACHINE_START(dreamwld)
+	MCFG_MACHINE_RESET(dreamwld)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512,256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE(dreamwld)
+
+	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(dreamwld)
+
+	MCFG_VIDEO_START(dreamwld)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/32, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+MACHINE_CONFIG_END
 
 
 ROM_START( dreamwld )
@@ -471,17 +540,17 @@ ROM_START( dreamwld )
 	/* The MCU supplies this data.
       The 68k reads it through a port, taking the size and destination write address from the level 1
       and level 2 irq positions in the 68k vector table (there is code to check that they haven't been
-      modofied!)  It then decodes the data using the rom checksum previously calculated and puts it in
+      modified!)  It then decodes the data using the rom checksum previously calculated and puts it in
       ram.  The interrupt vectors point at the code placed in RAM. */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
 	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/
 	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(9689570a) SHA1(4414233da8f46214ca7e9022df70953922a63aa4) )
-	ROM_RELOAD(0x80000,0x80000) // fot the banks
+	ROM_RELOAD(0x80000,0x80000) // for the banks
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* OKI Samples - 2nd chip*/
 	ROM_LOAD( "6.bin", 0x000000, 0x80000, CRC(c8b91f30) SHA1(706004ca56d0a74bc7a3dfd73a21cdc09eb90f05) )
-	ROM_RELOAD(0x80000,0x80000) // fot the banks
+	ROM_RELOAD(0x80000,0x80000) // for the banks
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "9.bin", 0x000000, 0x200000, CRC(fa84e3af) SHA1(5978737d348fd382f4ec004d29870656c864d137) )
@@ -498,4 +567,38 @@ ROM_START( dreamwld )
 ROM_END
 
 
+ROM_START( baryon )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD32_BYTE( "3.bin", 0x000002, 0x040000, CRC(046d4231) SHA1(05056efe5fec7f43c400f05278de516b01be0fdf) )
+	ROM_LOAD32_BYTE( "4.bin", 0x000000, 0x040000, CRC(59e0df20) SHA1(ff12f4adcf731f6984db7d0fbdd7fcc71ce66aa4) )
+	ROM_LOAD32_BYTE( "5.bin", 0x000003, 0x040000, CRC(63d5e7cb) SHA1(269bf5ffe10f2464f823c4d377921e19cfb8bc46) )
+	ROM_LOAD32_BYTE( "6.bin", 0x000001, 0x040000, CRC(abccbb3d) SHA1(01524f094543d872d775306024f51258a11e9240) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 ) /* 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
+
+	ROM_REGION( 0x6c9, "user1", 0 ) /* Protection data  */
+	//ROM_LOAD( "protdata.bin", 0x000, 0x6bc ,  CRC(1) SHA1(1) ) /* extracted */
+
+	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples */
+	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(e0349074) SHA1(f3d53d96dff586a0ad1632f52e5559cdce5ed0d8) )
+	ROM_RELOAD(0x80000,0x80000) // for the banks
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
+	ROM_LOAD( "9.bin",  0x000000, 0x200000, CRC(28bf828f) SHA1(271390cc4f4015a3b69976f0d0527947f13c971b) )
+	ROM_LOAD( "11.bin", 0x200000, 0x200000, CRC(d0ff1bc6) SHA1(4aeb795222eedeeba770cf725122e989f97119b2) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* BG Tiles - decoded */
+	ROM_LOAD( "2.bin",0x000000, 0x200000, CRC(684012e6) SHA1(4cb60907184b67be130b8385e4336320c0f6e4a7) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 ) /* Sprite Code Lookup ... */
+	ROM_LOAD16_BYTE( "8.bin", 0x000000, 0x020000, CRC(fdbb08b0) SHA1(4b3ac56c4c8370b1434fb6a481fce0d9c52313e0) )
+	ROM_LOAD16_BYTE( "10.bin",0x000001, 0x020000, CRC(c9d20480) SHA1(3f6170e8e08fb7508bd13c23f243ec6888a91f5e) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 ) /* ???? - not decoded seems to be in blocks of 0x41 bytes.. */
+	ROM_LOAD( "7.bin", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
+ROM_END
+
+
+GAME( 1997, baryon,   0, baryon,   dreamwld, 0, ROT270,  "SemiCom", "Baryon - Future Assault", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
 GAME( 2000, dreamwld, 0, dreamwld, dreamwld, 0, ROT0,  "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )
