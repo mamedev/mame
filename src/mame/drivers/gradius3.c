@@ -19,7 +19,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -115,20 +114,17 @@ static INTERRUPT_GEN( cpuA_interrupt )
 		device_set_input_line(device, 2, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( cpuB_interrupt )
-{
-	gradius3_state *state = device->machine().driver_data<gradius3_state>();
 
-	if (cpu_getiloops(device) & 1)	/* ??? */
-	{
-		if (state->m_irqBmask & 2)
-			device_set_input_line(device, 2, HOLD_LINE);
-	}
-	else
-	{
-		if (state->m_irqBmask & 1)
-			device_set_input_line(device, 1, HOLD_LINE);
-	}
+static TIMER_DEVICE_CALLBACK( gradius3_sub_scanline )
+{
+	gradius3_state *state = timer.machine().driver_data<gradius3_state>();
+	int scanline = param;
+
+	if(scanline == 240 && state->m_irqBmask & 1) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "sub", 1, HOLD_LINE);
+
+	if(scanline ==  16 && state->m_irqBmask & 2) // sprite end DMA irq
+		cputag_set_input_line(timer.machine(), "sub", 2, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( cpuB_irqtrigger_w )
@@ -336,9 +332,10 @@ static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	MCFG_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(gradius3_map2)
-	MCFG_CPU_VBLANK_INT_HACK(cpuB_interrupt,2)	/* has three interrupt vectors, 1 2 and 4 */
-								/* 4 is triggered by cpu A, the others are unknown but */
-								/* required for the game to run. */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", gradius3_sub_scanline, "screen", 0, 1) /* has three interrupt vectors, 1 2 and 4 */
+																				/* 4 is triggered by cpu A, the others are unknown but */
+																				/* required for the game to run. */
+
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(gradius3_s_map)
 

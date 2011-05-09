@@ -119,7 +119,6 @@ The current set of Super Model is an example of type C
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
@@ -131,23 +130,32 @@ static SCREEN_EOF( galpanic )
 	pandora_eof(pandora);
 }
 
-static INTERRUPT_GEN( galpanic_interrupt )
+static TIMER_DEVICE_CALLBACK( galpanic_scanline )
 {
-	/* IRQ 3 drives the game, IRQ 5 updates the palette */
-	if (cpu_getiloops(device) != 0)
-		device_set_input_line(device, 5, HOLD_LINE);
-	else
-		device_set_input_line(device, 3, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+
+	/* Pandora "sprite end dma" irq? */
+	if(scanline == 32)
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( galhustl_interrupt )
+
+static TIMER_DEVICE_CALLBACK( galhustl_scanline )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 2:  device_set_input_line(device, 5, HOLD_LINE); break;
-		case 1:  device_set_input_line(device, 4, HOLD_LINE); break;
-		case 0:  device_set_input_line(device, 3, HOLD_LINE); break;
-	}
+	int scanline = param;
+
+	if(scanline == 224) // vblank-out irq
+		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
+
+	/* Pandora "sprite end dma" irq? */
+	if(scanline == 32)
+		cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
+
+	if(scanline == 0) // timer irq?
+		cputag_set_input_line(timer.machine(), "maincpu", 5, HOLD_LINE);
 }
 
 
@@ -231,17 +239,18 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 ADDRESS_MAP_END
 
-static READ16_HANDLER( kludge )
+static READ16_HANDLER( comad_timer_r )
 {
-	return space->machine().rand() & 0x0700;
+	return (space->machine().primary_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */
 static READ8_DEVICE_HANDLER( comad_okim6295_r )
 {
 	UINT16 retvalue;
+//	okim6295_device *oki = downcast<okim6295_device *>(device);
 
-//  retvalue = okim6295_r(offset,mem_mask) << 8; // doesn't work, causes lockups when girls change..
+//  retvalue = oki->read_status(); // doesn't work, causes lockups when girls change..
 	retvalue = device->machine().rand();
 
 	return retvalue;
@@ -257,8 +266,8 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x80000a, 0x80000b) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x80000c, 0x80000d) AM_READ(kludge)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM				/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM				/* fantasia, newfant */
@@ -276,7 +285,7 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
-	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
+	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)	/* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* coin counters, + ? */
 	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)
@@ -343,8 +352,8 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800006, 0x800007) AM_READ(kludge)
-	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)
+	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
+	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
@@ -876,7 +885,7 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(galpanic_map)
-	MCFG_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", galpanic_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -933,7 +942,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
-	MCFG_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
+//	MCFG_TIMER_ADD_SCANLINE("scantimer", galpanic_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -965,7 +974,8 @@ static MACHINE_CONFIG_DERIVED( galhustl, comad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
-	MCFG_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(galhustl_scanline)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -983,7 +993,8 @@ static MACHINE_CONFIG_DERIVED( zipzap, comad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)
-	MCFG_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(galhustl_scanline)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
