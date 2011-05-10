@@ -1038,6 +1038,16 @@ static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
+// todo
+static MACHINE_CONFIG_DERIVED( brixian, arkanoid )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MCFG_DEVICE_REMOVE("mcu")
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 
@@ -1441,6 +1451,26 @@ ROM_START( hexa )
 	ROM_LOAD( "hexa.002",     0x0200, 0x0100, CRC(ff15366c) SHA1(7feaf1c768bfe76432fb80991585e13d95960b34) )
 ROM_END
 
+ROM_START( brixian )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "b1.bin",      0x00000, 0x8000, CRC(3d167d09) SHA1(1d5bd098b655b8d2f956cfcb718213915bee3e41) )
+	ROM_LOAD( "e7.bin",      0x08000, 0x2000, CRC(9e3707ab) SHA1(a04fb4824239f8ed1ef1de2f3c0f9d749320b2ba) ) // what is this? where does it map?
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "b4.bin",      0x00000, 0x8000, CRC(34a7a693) SHA1(793fa6dd065a158bedcd0fdc494cc8fc793ae8be) )
+	ROM_LOAD( "c4.bin",      0x08000, 0x8000, CRC(d422eda5) SHA1(4874b57ec8a8aa29937f5ccc2a734ffeb7834d8a) )
+	ROM_LOAD( "e4.bin",      0x10000, 0x8000, CRC(9b2e79d6) SHA1(8a40e0ef2a792efc37ea50eec01cf3fb5a3e3215) )
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "r",    0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "g",    0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "b",    0x0400, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "68705p5", 0x0000, 0x0800, NO_DUMP ) // this appears to be providing ~0x200 bytes of code at c600, like most semicom games.
+ROM_END
+
+
 
 /* Driver Initialization */
 
@@ -1587,3 +1617,4 @@ GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, 0,        ROT90, "bootleg 
 GAME( 1987, arkatour,   arkanoid, arkanoid, arkanoid, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
 GAME( 199?, hexa,       0,        hexa,     hexa,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, brixian,    0,        brixian,  tetrsark, 0,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
