@@ -72,7 +72,6 @@
 #include <assert.h>
 #include <time.h>
 
-#include "osdepend.h"
 #include "imageutl.h"
 #include "ti99_dsk.h"
 
