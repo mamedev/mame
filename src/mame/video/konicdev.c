@@ -8987,6 +8987,23 @@ static DEVICE_RESET( k053250 )
 /*                                                                         */
 /***************************************************************************/
 
+/*
+hexion:    02 FF 00 4D 00 73 00 00 01 1F 05 0E B7 7C 00 00 <- writes to e and f regs, in an irq ack fashion
+overdriv:  01 7F 00 22 00 0D 00 03 01 07 10 0F 73 00 00 00
+esckids:   01 7F 00 12 00 0D 00 01 01 07 08 07 73 00 00 00
+rollerg:   01 7F 00 23 00 1D 02 00 01 07 10 0F 73 00 02 00 <- writes to 6 and e regs, in an irq ack fashion
+gaiapols:  01 FB 00 19 00 37 00 00 01 06 10 0E 75 00 D1 00
+mmaulers:  01 7F 00 19 00 27 00 00 01 07 10 0F 73 00 00 00
+mystwarr:  01 7F 00 12 00 2E 00 00 01 07 11 0E 73 00 00 00
+metamrph:  01 7F 00 11 00 27 01 00 00 07 10 0F 74 00 00 00
+viostorm:  01 FF 00 16 00 39 00 00 01 07 11 0E 75 00 00 00
+mtlchamp:  01 FF 00 21 00 37 00 00 01 07 11 0E 74 00 00 00
+dbz:       01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
+dbz2:      01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
+(all konamigx, cowboys of moo mesa, run & gun, dj main)
+
+*/
+
 typedef struct _k053252_state k053252_state;
 struct _k053252_state
 {
