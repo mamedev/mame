@@ -8988,23 +8988,42 @@ static DEVICE_RESET( k053250 )
 /***************************************************************************/
 
 /*
-hexion:    02 FF 00 4D 00 73 00 00 01 1F 05 0E B7 7C 00 00 <- writes to e and f regs, in an irq ack fashion
-overdriv:  01 7F 00 22 00 0D 00 03 01 07 10 0F 73 00 00 00
-esckids:   01 7F 00 12 00 0D 00 01 01 07 08 07 73 00 00 00
-rollerg:   01 7F 00 23 00 1D 02 00 01 07 10 0F 73 00 02 00 <- writes to 6 and e regs, in an irq ack fashion
-gaiapols:  01 FB 00 19 00 37 00 00 01 06 10 0E 75 00 D1 00
-mmaulers:  01 7F 00 19 00 27 00 00 01 07 10 0F 73 00 00 00
-mystwarr:  01 7F 00 12 00 2E 00 00 01 07 11 0E 73 00 00 00
-metamrph:  01 7F 00 11 00 27 01 00 00 07 10 0F 74 00 00 00
-viostorm:  01 FF 00 16 00 39 00 00 01 07 11 0E 75 00 00 00
-mtlchamp:  01 FF 00 21 00 37 00 00 01 07 11 0E 74 00 00 00
-dbz:       01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
-dbz2:      01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
-xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 (*)
+
+left res = current in game, right res = computed
+
+hexion:    02 FF 00 4D 00 73 00 00 01 1F 05 0E B7 7C 00 00 512x256 ~ 512x256 <- writes to e and f regs, in an irq ack fashion
+overdriv:  01 7F 00 22 00 0D 00 03 01 07 10 0F 73 00 00 00 304x256 ~ 305x224
+esckids:   01 7F 00 12 00 0D 00 01 01 07 08 07 73 00 00 00 304x224 ~ 321x240
+rollerg:   01 7F 00 23 00 1D 02 00 01 07 10 0F 73 00 02 00 288x224 ~ 288x224 <- writes to 6 and e regs, in an irq ack fashion
+gaiapols:  01 FB 00 19 00 37 00 00 01 06 10 0E 75 00 D1 00 376x224 ~ 380x224
+mmaulers:  01 7F 00 19 00 27 00 00 01 07 10 0F 73 00 00 00 288x224 ~ 288x224
+mystwarr:  01 7F 00 12 00 2E 00 00 01 07 11 0E 73 00 00 00 288x224 ~ 288x224
+metamrph:  01 7F 00 11 00 27 01 00 01 07 10 0F 74 00 00 00 288x224 ~ 288x224
+viostorm:  01 FF 00 16 00 39 00 00 01 07 11 0E 75 00 00 00 384x224 ~ 385x224
+mtlchamp:  01 FF 00 21 00 37 00 00 01 07 11 0E 74 00 00 00 384x224 ~ 384x224
+dbz:       01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00 384x256 ~ 384x256
+dbz2:      01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00 384x256 ~ 384x256
+xexex:     01 FF 00 21 00 37 01 00 01 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 (all konamigx, cowboys of moo mesa, run & gun, dj main)
 
 (*) hblank duration 512 (0x200), hdisp 384 (0x180), vblank duration 288 (0x120), vdisp 256 (0x100)
 
+	 Definitions from GX, look similar, all values big-endian, write-only:
+
+	0-1: bits 9-0: HC        - Total hblank duration (-1)     Hres ~ (HC+1) - HFP - HBP - 8*(HSW+1)
+	2-3: bits 8-0: HFP       - HBlank front porch
+	4-5: bits 8-0: HBP       - HBlank back porch
+	8-9: bits 8-0: VC        - Total vblank duration
+	a  : bits 7-0: VFP       - VBlank front porch             Vres ~ VC - VFP - VBP - (VSW+1)
+	b  : bits 7-0: VBP       - VBlank back porch
+	c  : bits 7-4: VSW
+	c  : bits 3-0: HSW
+	d  : bits 7-0: INT-TIME
+	e  : bits 7-0: INT1ACK
+	f  : bits 7-0: INT2ACK
+
+	 Read-only:
+	e-f: vits 8-0: VCT
 */
 
 typedef struct _k053252_state k053252_state;
