@@ -452,7 +452,7 @@ device_t *device_t::siblingdevice(const char *_tag) const
 
 	// build a fully-qualified name
 	astring tempstring;
-	return machine().device(siblingtag(tempstring, _tag));
+	return mconfig().devicelist().find((const char *)siblingtag(tempstring, _tag));
 }
 
 

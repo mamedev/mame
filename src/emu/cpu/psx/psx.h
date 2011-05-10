@@ -103,11 +103,11 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PSX_DMA_CHANNEL_READ( channel, handler ) \
-	psxcpu_device::install_dma_read_handler( *device, channel, handler ); \
+#define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
+	psxcpu_device::install_dma_read_handler( *owner, cputag, channel, handler ); \
 
-#define MCFG_PSX_DMA_CHANNEL_WRITE( channel, handler ) \
-	psxcpu_device::install_dma_write_handler( *device, channel, handler ); \
+#define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
+	psxcpu_device::install_dma_write_handler( *owner, cputag, channel, handler ); \
 
 
 
@@ -129,8 +129,8 @@ public:
 	WRITE32_MEMBER( berr_w );
 	READ32_MEMBER( berr_r );
 
-	static void install_dma_read_handler( device_t &device, int channel, psx_dma_read_handler handler );
-	static void install_dma_write_handler( device_t &device, int channel, psx_dma_write_handler handler );
+	static void install_dma_read_handler( device_t &device, const char *cputag, int channel, psx_dma_read_delegate handler );
+	static void install_dma_write_handler( device_t &device, const char *cputag, int channel, psx_dma_write_delegate handler );
 
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);

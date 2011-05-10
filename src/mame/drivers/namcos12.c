@@ -1147,9 +1147,8 @@ static WRITE32_HANDLER( dmaoffset_w )
 	verboselog( space->machine(), 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, state->m_n_dmaoffset );
 }
 
-static void namcos12_rom_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void namcos12_rom_read( namcos12_state *state, UINT32 n_address, INT32 n_size )
 {
-	namcos12_state *state = machine.driver_data<namcos12_state>();
 	const char *n_region;
 	int n_offset;
 
@@ -1163,26 +1162,26 @@ static void namcos12_rom_read( running_machine &machine, UINT32 n_address, INT32
 	{
 		n_region = "user2";
 		n_offset = state->m_n_tektagdmaoffset & 0x7fffffff;
-		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
+		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
 	}
 	else if( ( state->m_n_dmaoffset >= 0x80000000 ) || ( state->m_n_dmabias == 0x1f300000 ) )
 	{
 		n_region = "user1";
 		n_offset = state->m_n_dmaoffset & 0x003fffff;
-		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
+		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
 	}
 	else
 	{
 		n_region = "user2";
 		n_offset = state->m_n_dmaoffset & 0x7fffffff;
-		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
+		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	source = (UINT16 *) machine.region( n_region )->base();
-	n_romleft = ( machine.region( n_region )->bytes() - n_offset ) / 4;
+	source = (UINT16 *) state->machine().region( n_region )->base();
+	n_romleft = ( state->machine().region( n_region )->bytes() - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
-		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
+		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
 		n_size = n_romleft;
 	}
 
@@ -1190,7 +1189,7 @@ static void namcos12_rom_read( running_machine &machine, UINT32 n_address, INT32
 	n_ramleft = ( state->m_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
-		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
+		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
 		n_size = n_ramleft;
 	}
 
@@ -1640,10 +1639,10 @@ static DRIVER_INIT( ghlpanic )
 static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
-	MCFG_PSX_DMA_CHANNEL_READ( 5, namcos12_rom_read )
-
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
+
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_rom_read ), (namcos12_state *) owner ) )
 
 	MCFG_CPU_ADD("sub", H83002, 16737350 )
 	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)

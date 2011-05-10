@@ -5,16 +5,17 @@
  *
  */
 
-#if !defined(PSXDMA_H)
+#pragma once
 
-#define PSXDMA_H (1)
+#ifndef __PSXDMA_H__
+#define __PSXDMA_H__
 
 #include "emu.h"
 
 extern const device_type PSX_DMA;
 
-typedef void ( *psx_dma_read_handler )( running_machine &, UINT32, INT32 );
-typedef void ( *psx_dma_write_handler )( running_machine &, UINT32, INT32 );
+typedef delegate<void (UINT32, INT32)> psx_dma_read_delegate;
+typedef delegate<void (UINT32, INT32)> psx_dma_write_delegate;
 
 typedef struct _psx_dma_channel psx_dma_channel;
 struct _psx_dma_channel
@@ -23,8 +24,10 @@ struct _psx_dma_channel
 	UINT32 n_blockcontrol;
 	UINT32 n_channelcontrol;
 	emu_timer *timer;
-	psx_dma_read_handler fn_read;
-	psx_dma_write_handler fn_write;
+	psx_dma_read_delegate fn_read;
+	bool read_set;
+	psx_dma_write_delegate fn_write;
+	bool write_set;
 	UINT32 n_ticks;
 	UINT32 b_running;
 };
@@ -34,8 +37,8 @@ class psxdma_device : public device_t
 public:
 	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void install_read_handler( int n_channel, psx_dma_read_handler p_fn_dma_read );
-	void install_write_handler( int n_channel, psx_dma_read_handler p_fn_dma_write );
+	void install_read_handler( int n_channel, psx_dma_read_delegate p_fn_dma_read );
+	void install_write_handler( int n_channel, psx_dma_read_delegate p_fn_dma_write );
 
 	WRITE32_MEMBER( write );
 	READ32_MEMBER( read );

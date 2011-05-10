@@ -39,9 +39,6 @@
 
 typedef void ( *psx_sio_handler )( running_machine &, int );
 
-#define	DCTSIZE ( 8 )
-#define	DCTSIZE2 ( DCTSIZE * DCTSIZE )
-
 #define SIO_BUF_SIZE ( 8 )
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )
@@ -58,8 +55,6 @@ typedef void ( *psx_sio_handler )( running_machine &, int );
 #define SIO_CONTROL_RX_IENA ( 1 << 11 )
 #define SIO_CONTROL_DSR_IENA ( 1 << 12 )
 #define SIO_CONTROL_DTR ( 1 << 13 )
-
-#define MDEC_COS_PRECALC_BITS ( 21 )
 
 typedef struct _psx_root psx_root;
 struct _psx_root
@@ -93,32 +88,6 @@ struct _psx_sio
 	psx_sio_handler fn_handler;
 };
 
-typedef struct _psx_mdec psx_mdec;
-struct _psx_mdec
-{
-	UINT32 n_decoded;
-	UINT32 n_offset;
-	UINT16 p_n_output[ 24 * 16 ];
-
-	INT32 p_n_quantize_y[ DCTSIZE2 ];
-	INT32 p_n_quantize_uv[ DCTSIZE2 ];
-	INT32 p_n_cos[ DCTSIZE2 ];
-	INT32 p_n_cos_precalc[ DCTSIZE2 * DCTSIZE2 ];
-
-	UINT32 n_0_command;
-	UINT32 n_0_address;
-	UINT32 n_0_size;
-	UINT32 n_1_command;
-	UINT32 n_1_status;
-
-	UINT16 p_n_clamp8[ 256 * 3 ];
-	UINT16 p_n_r5[ 256 * 3 ];
-	UINT16 p_n_g5[ 256 * 3 ];
-	UINT16 p_n_b5[ 256 * 3 ];
-
-	INT32 p_n_unpacked[ DCTSIZE2 * 6 * 2 ];
-};
-
 typedef struct _psx_machine psx_machine;
 struct _psx_machine
 {
@@ -135,8 +104,6 @@ struct _psx_machine
 	psx_root root[3];
 
 	psx_sio sio[2];
-
-	psx_mdec mdec;
 };
 
 typedef struct _psx_gpu psx_gpu;
@@ -176,10 +143,8 @@ READ32_HANDLER( psx_com_delay_r );
 WRITE32_HANDLER( psx_irq_w );
 READ32_HANDLER( psx_irq_r );
 extern void psx_irq_set( running_machine &, UINT32 );
-extern void psx_dma_install_read_handler( running_machine &, int, psx_dma_read_handler );
-extern void psx_dma_install_write_handler( running_machine &, int, psx_dma_read_handler );
-WRITE32_HANDLER( psx_dma_w );
-READ32_HANDLER( psx_dma_r );
+extern void psx_dma_install_read_handler( running_machine &, int, psx_dma_read_delegate );
+extern void psx_dma_install_write_handler( running_machine &, int, psx_dma_read_delegate );
 WRITE32_HANDLER( psx_counter_w );
 READ32_HANDLER( psx_counter_r );
 WRITE32_HANDLER( psx_sio_w );
@@ -187,8 +152,6 @@ READ32_HANDLER( psx_sio_r );
 extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
 extern void psx_sio_input( running_machine &, int, int, int );
 
-WRITE32_HANDLER( psx_mdec_w );
-READ32_HANDLER( psx_mdec_r );
 extern void psx_machine_init( running_machine &machine );
 extern void psx_driver_init( running_machine &machine );
 

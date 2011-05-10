@@ -1072,25 +1072,23 @@ static WRITE32_HANDLER( atapi_reset_w )
 	}
 }
 
-static void cdrom_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void cdrom_dma_read( ksys573_state *state, UINT32 n_address, INT32 n_size )
 {
-	verboselog( machine, 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( state->machine(), 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA read: address %08x size %08x\n", n_address, n_size);
 }
 
-static void cdrom_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void cdrom_dma_write( ksys573_state *state, UINT32 n_address, INT32 n_size )
 {
-	ksys573_state *state = machine.driver_data<ksys573_state>();
-
-	verboselog( machine, 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
+	verboselog( state->machine(), 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
 	state->m_atapi_xferbase = n_address;
 
-	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->m_atapi_xferlen, state->m_atapi_xfermod );
+	verboselog( state->machine(), 2, "atapi_xfer_end: %d %d\n", state->m_atapi_xferlen, state->m_atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	state->m_atapi_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->m_atapi_xferlen/2048))));
+	state->m_atapi_timer->adjust(state->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->m_atapi_xferlen/2048))));
 }
 
 static WRITE32_HANDLER( security_w )
@@ -2961,10 +2959,11 @@ static const adc083x_interface konami573_adc_interface = {
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
-	MCFG_PSX_DMA_CHANNEL_READ( 5, cdrom_dma_read )
-	MCFG_PSX_DMA_CHANNEL_WRITE( 5, cdrom_dma_write )
 	MCFG_CPU_PROGRAM_MAP( konami573_map )
 	MCFG_CPU_VBLANK_INT("screen", sys573_vblank)
+
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( cdrom_dma_read ), (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( cdrom_dma_write ), (ksys573_state *) owner ) )
 
 	MCFG_MACHINE_RESET( konami573 )
 

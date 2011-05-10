@@ -33,8 +33,8 @@ psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, dev
 	{
 		psx_dma_channel *dma = &channel[ index ];
 
-		dma->fn_read = NULL;
-		dma->fn_write = NULL;
+		dma->read_set = false;
+		dma->write_set = false;
 	}
 }
 
@@ -135,8 +135,8 @@ void psxdma_device::dma_interrupt_update()
 void psxdma_device::dma_finished( int index )
 {
 	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
-
 	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+
 	psx_dma_channel *dma = &channel[ index ];
 
 	if( dma->n_channelcontrol == 0x01000401 && index == 2 )
@@ -171,7 +171,7 @@ void psxdma_device::dma_finished( int index )
 				n_address &= n_adrmask;
 				n_nextaddress = p_n_psxram[ n_address / 4 ];
 				n_size = n_nextaddress >> 24;
-				(*dma->fn_write)( machine(), n_address + 4, n_size );
+				dma->fn_write( n_address + 4, n_size );
 				//FIXME:
 				// The following conditions will cause an endless loop.
 				// If stopping the transfer is correct I cannot judge
@@ -202,14 +202,16 @@ void psxdma_device::dma_finished_callback(void *ptr, int param)
 	dma_finished(param);
 }
 
-void psxdma_device::install_read_handler( int index, psx_dma_read_handler p_fn_dma_read )
+void psxdma_device::install_read_handler( int index, psx_dma_read_delegate p_fn_dma_read )
 {
 	channel[ index ].fn_read = p_fn_dma_read;
+	channel[ index ].read_set = true;
 }
 
-void psxdma_device::install_write_handler( int index, psx_dma_read_handler p_fn_dma_write )
+void psxdma_device::install_write_handler( int index, psx_dma_read_delegate p_fn_dma_write )
 {
 	channel[ index ].fn_write = p_fn_dma_write;
+	channel[ index ].write_set = true;
 }
 
 WRITE32_MEMBER( psxdma_device::write )
@@ -258,14 +260,14 @@ WRITE32_MEMBER( psxdma_device::write )
 				}
 
 				if( dma->n_channelcontrol == 0x01000000 &&
-					dma->fn_read != NULL )
+					dma->read_set )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
-					(*dma->fn_read)( machine(), n_address, n_size );
+					dma->fn_read( n_address, n_size );
 					dma_finished( index );
 				}
 				else if (dma->n_channelcontrol == 0x11000000 &&	// CD DMA
-					dma->fn_read != NULL )
+					dma->read_set )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
 
@@ -274,14 +276,14 @@ WRITE32_MEMBER( psxdma_device::write )
 					oursize = (oursize > 1) ? oursize : 1;
 					oursize *= (dma->n_blockcontrol&0xffff);
 
-					(*dma->fn_read)( machine(), n_address, oursize );
+					dma->fn_read( n_address, oursize );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x01000200 &&
-					dma->fn_read != NULL )
+					dma->read_set )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
-					(*dma->fn_read)( machine(), n_address, n_size );
+					dma->fn_read( n_address, n_size );
 					if( index == 1 )
 					{
 						dma_start_timer( index, 26000 );
@@ -292,31 +294,31 @@ WRITE32_MEMBER( psxdma_device::write )
 					}
 				}
 				else if( dma->n_channelcontrol == 0x01000201 &&
-					dma->fn_write != NULL )
+					dma->write_set )
 				{
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					(*dma->fn_write)( machine(), n_address, n_size );
+					dma->fn_write( n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11050100 &&
-					dma->fn_write != NULL )
+					dma->write_set )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					(*dma->fn_write)( machine(), n_address, n_size );
+					dma->fn_write( n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11150100 &&
-					dma->fn_write != NULL )
+					dma->write_set )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					(*dma->fn_write)( machine(), n_address, n_size );
+					dma->fn_write( n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x01000401 &&
 					index == 2 &&
-					dma->fn_write != NULL )
+					dma->write_set )
 				{
 					verboselog( machine(), 1, "dma %d write linked list %08x\n",
 						index, dma->n_base );

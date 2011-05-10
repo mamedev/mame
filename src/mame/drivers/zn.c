@@ -1447,11 +1447,10 @@ static void atpsx_interrupt(device_t *device, int state)
 	}
 }
 
-static void atpsx_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void atpsx_dma_read( zn_state *state, UINT32 n_address, INT32 n_size )
 {
-	zn_state *state = machine.driver_data<zn_state>();
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
-	device_t *ide = machine.device("ide");
+	device_t *ide = state->machine().device("ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1472,7 +1471,7 @@ static void atpsx_dma_read( running_machine &machine, UINT32 n_address, INT32 n_
 	}
 }
 
-static void atpsx_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void atpsx_dma_write( zn_state *state, UINT32 n_address, INT32 n_size )
 {
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
@@ -1496,8 +1495,8 @@ static MACHINE_RESET( coh1000w )
 	zn_machine_init(machine);
 
 	devtag_reset(machine, "ide");
-	psx_dma_install_read_handler(machine, 5, atpsx_dma_read);
-	psx_dma_install_write_handler(machine, 5, atpsx_dma_write);
+	psx_dma_install_read_handler( machine, 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), machine.driver_data<zn_state>() ) );
+	psx_dma_install_write_handler( machine, 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), machine.driver_data<zn_state>() ) );
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )

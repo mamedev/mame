@@ -1320,11 +1320,6 @@ $(MAMEOBJ)/snk.a: \
 
 $(MAMEOBJ)/sony.a: \
 	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
-	$(DRIVERS)/taitogn.o \
-	$(DRIVERS)/psx.o \
-	$(MACHINE)/psxcd.o \
-	$(MACHINE)/psxcddrv.o	\
-	$(MACHINE)/psxcard.o	\
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \
@@ -1423,6 +1418,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taito_z.o $(VIDEO)/taito_z.o \
 	$(DRIVERS)/taito_o.o $(VIDEO)/taito_o.o \
 	$(DRIVERS)/taitoair.o $(VIDEO)/taitoair.o \
+	$(DRIVERS)/taitogn.o \
 	$(DRIVERS)/taitojc.o $(VIDEO)/taitojc.o \
 	$(DRIVERS)/taitopjc.o $\
 	$(DRIVERS)/taitosj.o $(MACHINE)/taitosj.o $(VIDEO)/taitosj.o \

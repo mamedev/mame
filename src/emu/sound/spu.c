@@ -3090,18 +3090,16 @@ void spu_device::flush_cdda(const unsigned int sector)
 
 // MAME I/O stuff.  This can get cleaner when machine/psx.c does.
 
-static void spu_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void spu_dma_read( spu_device *spu, UINT32 n_address, INT32 n_size )
 {
-	spu_device *spu = machine.device<spu_device>("spu");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(spu->machine(), "share1");
 
 	spu->start_dma(psxram + n_address, false, n_size*4);
 }
 
-static void spu_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void spu_dma_write( spu_device *spu, UINT32 n_address, INT32 n_size )
 {
-	spu_device *spu = machine.device<spu_device>("spu");
-	UINT8 *psxram = (UINT8 *)memory_get_shared(machine, "share1");
+	UINT8 *psxram = (UINT8 *)memory_get_shared(spu->machine(), "share1");
 
 //  printf("SPU DMA write from %x, size %x\n", n_address, n_size);
 
@@ -3119,8 +3117,8 @@ READ16_HANDLER( spu_r )
 
 	if (!spu->installed_dma_hooks)
 	{
-		psx_dma_install_read_handler(space->machine(), 4, spu_dma_read);
-		psx_dma_install_write_handler(space->machine(), 4, spu_dma_write);
+		psx_dma_install_read_handler( space->machine(), 4, psx_dma_read_delegate( FUNC( spu_dma_read ), spu ) );
+		psx_dma_install_write_handler( space->machine(), 4, psx_dma_write_delegate( FUNC( spu_dma_write ), spu ) );
 		spu->installed_dma_hooks = true;
 	}
 
@@ -3138,8 +3136,8 @@ WRITE16_HANDLER( spu_w )
 
 	if (!spu->installed_dma_hooks)
 	{
-		psx_dma_install_read_handler(space->machine(), 4, spu_dma_read);
-		psx_dma_install_write_handler(space->machine(), 4, spu_dma_write);
+		psx_dma_install_read_handler( space->machine(), 4, psx_dma_read_delegate( FUNC( spu_dma_read ), spu ) );
+		psx_dma_install_write_handler( space->machine(), 4, psx_dma_write_delegate( FUNC( spu_dma_write ), spu ) );
 		spu->installed_dma_hooks = true;
 	}
 

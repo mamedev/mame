@@ -183,9 +183,8 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
-	konamigv_state *state = machine.driver_data<konamigv_state>();
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -229,9 +228,8 @@ static void scsi_dma_read( running_machine &machine, UINT32 n_address, INT32 n_s
 	}
 }
 
-static void scsi_dma_write( running_machine &machine, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_size )
 {
-	konamigv_state *state = machine.driver_data<konamigv_state>();
 	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
@@ -329,10 +327,11 @@ static void spu_irq(device_t *device, UINT32 data)
 static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
-	MCFG_PSX_DMA_CHANNEL_READ( 5, scsi_dma_read )
-	MCFG_PSX_DMA_CHANNEL_WRITE( 5, scsi_dma_write )
 	MCFG_CPU_PROGRAM_MAP( konamigv_map )
 	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
+
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigv_state *) owner ) )
 
 	MCFG_MACHINE_START( konamigv )
 	MCFG_MACHINE_RESET( konamigv )
