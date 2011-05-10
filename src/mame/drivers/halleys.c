@@ -19,6 +19,8 @@ Halley's Comet, 1986 Taito
       instead of costly bitmaps.
     - Ben Bero Beh has collision problems with the falling fireballs and a minor
       priority glitch with the "Elevator Action" baddies.
+    - IRQ system needs a complete rewrite
+    - De-achoize the blitter code
 
     * Halley's Comet's undocumented DIP switches only work if the player1 start button
       is depressed during boot-up.
@@ -160,7 +162,6 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
@@ -1526,88 +1527,57 @@ static READ8_HANDLER( debug_r )
 //**************************************************************************
 // Interrupt and Hardware Handlers
 
-static INTERRUPT_GEN( halleys_interrupt )
+
+static TIMER_DEVICE_CALLBACK( halleys_scanline )
 {
-	halleys_state *state = device->machine().driver_data<halleys_state>();
-	UINT8 latch_data;
+	halleys_state *state = timer.machine().driver_data<halleys_state>();
+	int scanline = param;
 
-	switch (cpu_getiloops(device))
+	/* TODO: fix this */
+	switch (scanline)
 	{
-		case 0:
-			/*
-                How the custom chips handle sound latching is largely unknown.
-                Halley's Comet dumps sound commands to register ff8a so
-                rapidly the AY8910 core sometimes fails to reset itself and
-                the music stops. Masking sound NMI is not enough to ensure
-                successive writes are processed properly so it is advisable to
-                queue sound commands or make the main CPU yield for a minimum
-                of 600 Z80 cycles. Furthermore, soundlatch NMI interval should
-                not be too much shorter than music IRQ's period(27306667ns),
-                and must be longer in case of a reset(00).
-
-                Current implementation is quite safe although not 100% foul-proof.
-            */
-			if (state->m_latch_delay) state->m_latch_delay--; else
-			if (state->m_ffcount)
-			{
-				state->m_ffcount--;
-				latch_data = state->m_sound_fifo[state->m_fftail];
-				state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
-				state->m_latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w( device->memory().space(AS_PROGRAM), 0, latch_data);
-				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-			}
-
+		case 248:
 			// clear collision list of this frame unconditionally
 			state->m_collision_count = 0;
-		break;
+			break;
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
-		case 1:
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		break;
+		case 56*3:
+			cputag_set_input_line(timer.machine(),"maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
-		case 2:
-			state->m_mVectorType = 1; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
-		break;
+		case 56*2:
+			state->m_mVectorType = 1; cputag_set_input_line(timer.machine(),"maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+			break;
 
-		case 3:
-			state->m_mVectorType = 0; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
-		break;
+		case 56:
+			state->m_mVectorType = 0; cputag_set_input_line(timer.machine(),"maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+			break;
 	}
 }
 
 
-static INTERRUPT_GEN( benberob_interrupt )
+static TIMER_DEVICE_CALLBACK( benberob_scanline )
 {
-	halleys_state *state = device->machine().driver_data<halleys_state>();
-	UINT8 latch_data;
+	halleys_state *state = timer.machine().driver_data<halleys_state>();
+	int scanline = param;
 
-	switch (cpu_getiloops(device))
+	/* TODO: fix this */
+	switch (scanline)
 	{
-		case 0:
-			if (state->m_latch_delay) state->m_latch_delay--; else
-			if (state->m_ffcount)
-			{
-				state->m_ffcount--;
-				latch_data = state->m_sound_fifo[state->m_fftail];
-				state->m_fftail = (state->m_fftail + 1) & (MAX_SOUNDS - 1);
-				state->m_latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(device->memory().space(AS_PROGRAM), 0, latch_data);
-				cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-			}
-		break;
+		case 248:
+			break;
 
-		case 1:
-			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		break;
+		case 56*3:
+			cputag_set_input_line(timer.machine(),"maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			break;
 
-		case 2:
-		case 3:
+		case 56*2:
+		case 56*1:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!state->m_blitter_busy) device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->m_firq_level++;
-		break;
+			if (!state->m_blitter_busy) cputag_set_input_line(timer.machine(),"maincpu", M6809_FIRQ_LINE, ASSERT_LINE); else state->m_firq_level++;
+			break;
 	}
 }
 
@@ -1639,12 +1609,10 @@ static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 static WRITE8_HANDLER( soundcommand_w )
 {
 	halleys_state *state = space->machine().driver_data<halleys_state>();
-	if (state->m_ffcount < MAX_SOUNDS)
-	{
-		state->m_ffcount++;
-		state->m_sound_fifo[state->m_ffhead] = state->m_io_ram[0x8a] = data;
-		state->m_ffhead = (state->m_ffhead + 1) & (MAX_SOUNDS - 1);
-	}
+
+	state->m_io_ram[0x8a] = data;
+	soundlatch_w(space,offset,data);
+	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1733,7 +1701,7 @@ static INPUT_PORTS_START( benberob )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x18, "5" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
 	PORT_DIPUNKNOWN( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )      /* TO DO : confirm OFF/ON when screen flipping emulated */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -1796,7 +1764,7 @@ static INPUT_PORTS_START( benberob )
 	PORT_DIPNAME( 0x20, 0x20, "Show Year" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)" )
+	PORT_DIPNAME( 0x40, 0x40, "No Hit" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Maximum Credits" )
@@ -1875,10 +1843,10 @@ static INPUT_PORTS_START( halleys )
        However, they enable debug features if you press START1 during the boot sequence. */
 	PORT_START("DSW3")	/* 0xff97 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
-	PORT_DIPNAME( 0x02, 0x02, "Free Play (Cheat)" )         PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Free_Play ) )         PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, "Start Area (Cheat)" )        PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x1c, "Start Area" )        PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING( 0x1c, "1 (Earth)" )
 	PORT_DIPSETTING( 0x18, "4 (Venus)" )
 	PORT_DIPSETTING( 0x14, "7 (Mercury)" )
@@ -1888,10 +1856,10 @@ static INPUT_PORTS_START( halleys )
 	PORT_DIPSETTING( 0x04, "19 (Uranus)" )
 	PORT_DIPSETTING( 0x00, "22 (Saturn)" )
 	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
-	PORT_DIPNAME( 0x40, 0x40, "Invincibility (Cheat)")      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Invincibility")      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)" )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives" )    PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1983,7 +1951,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( halleys, halleys_state )
 	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
-	MCFG_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", halleys_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -2027,7 +1995,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
-	MCFG_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_CALLBACK(benberob_scanline)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE(benberob)
