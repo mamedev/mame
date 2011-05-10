@@ -590,7 +590,7 @@ void legacy_image_device_base::clear()
 		}
 	}
 
-    m_name.reset();
+    m_image_name.reset();
     m_readonly = false;
     m_created = false;
 
