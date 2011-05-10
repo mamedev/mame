@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( snes_mouse_speed_input )
 {
-	snes_state *state = field->port->machine().driver_data<snes_state>();
+	snes_state *state = field->machine().driver_data<snes_state>();
 	int port = (FPTR)param;
 
 	if (snes_ram[OLDJOY1] & 0x1)
@@ -128,7 +128,7 @@ static CUSTOM_INPUT( snes_mouse_speed_input )
 
 static CUSTOM_INPUT( snes_superscope_offscreen_input )
 {
-	snes_state *state = field->port->machine().driver_data<snes_state>();
+	snes_state *state = field->machine().driver_data<snes_state>();
 	int port = (FPTR)param;
 	static const char *const portnames[2][3] =
 			{
@@ -136,8 +136,8 @@ static CUSTOM_INPUT( snes_superscope_offscreen_input )
 				{ "SUPERSCOPE2", "SUPERSCOPE2_X", "SUPERSCOPE2_Y" },
 			};
 
-	INT16 x = input_port_read(field->port->machine(), portnames[port][1]);
-	INT16 y = input_port_read(field->port->machine(), portnames[port][2]);
+	INT16 x = input_port_read(field->machine(), portnames[port][1]);
+	INT16 y = input_port_read(field->machine(), portnames[port][2]);
 
 	/* these are the theoretical boundaries, but we currently are always onscreen... */
 	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= snes_ppu.beam.last_visible_line)

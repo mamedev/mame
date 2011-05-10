@@ -692,7 +692,7 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 
 static CUSTOM_INPUT( korokoro_hopper_r )
 {
-	cave_state *state = field->port->machine().driver_data<cave_state>();
+	cave_state *state = field->machine().driver_data<cave_state>();
 	return state->m_hopper ? 1 : 0;
 }
 
@@ -928,8 +928,8 @@ static WRITE16_HANDLER( tjumpman_leds_w )
 
 static CUSTOM_INPUT( tjumpman_hopper_r )
 {
-	cave_state *state = field->port->machine().driver_data<cave_state>();
-	return (state->m_hopper && !(field->port->machine().primary_screen->frame_number() % 10)) ? 0 : 1;
+	cave_state *state = field->machine().driver_data<cave_state>();
+	return (state->m_hopper && !(field->machine().primary_screen->frame_number() % 10)) ? 0 : 1;
 }
 
 static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16 )

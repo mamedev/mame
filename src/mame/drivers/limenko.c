@@ -112,7 +112,7 @@ static WRITE32_HANDLER( spotty_soundlatch_w )
 
 static CUSTOM_INPUT( spriteram_bit_r )
 {
-	limenko_state *state = field->port->machine().driver_data<limenko_state>();
+	limenko_state *state = field->machine().driver_data<limenko_state>();
 	return state->m_spriteram_bit;
 }
 

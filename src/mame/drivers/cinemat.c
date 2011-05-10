@@ -99,7 +99,7 @@ static READ8_HANDLER( switches_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cinemat_state *state = field->port->machine().driver_data<cinemat_state>();
+	cinemat_state *state = field->machine().driver_data<cinemat_state>();
 	/* on the falling edge of a new coin, set the coin_detected flag */
 	if (newval == 0)
 		state->m_coin_detected = 1;

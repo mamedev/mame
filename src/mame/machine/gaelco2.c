@@ -223,7 +223,7 @@ INTERRUPT_GEN( bang_interrupt )
 
 CUSTOM_INPUT( wrally2_analog_bit_r )
 {
-	gaelco2_state *state = field->port->machine().driver_data<gaelco2_state>();
+	gaelco2_state *state = field->machine().driver_data<gaelco2_state>();
 	int which = (FPTR)param;
 	return (state->m_analog_ports[which] >> 7) & 0x01;
 }

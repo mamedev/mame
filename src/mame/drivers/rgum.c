@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( rgum_heartbeat_r )
 {
-	rgum_state *state = field->port->machine().driver_data<rgum_state>();
+	rgum_state *state = field->machine().driver_data<rgum_state>();
 
 	state->m_hbeat ^= 1;
 

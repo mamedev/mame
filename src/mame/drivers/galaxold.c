@@ -917,9 +917,9 @@ static CUSTOM_INPUT( vpool_lives_r )
 	switch (bit_mask)
 	{
 		case 0x40:  /* vpool : IN1 (0xa800) bit 6 */
-			return ((input_port_read(field->port->machine(), "LIVES") & bit_mask) >> 6);
+			return ((input_port_read(field->machine(), "LIVES") & bit_mask) >> 6);
 		case 0x01:  /* vpool : DSW (0xb000) bit 0 */
-			return ((input_port_read(field->port->machine(), "LIVES") & bit_mask) >> 0);
+			return ((input_port_read(field->machine(), "LIVES") & bit_mask) >> 0);
 
 		default:
 			logerror("vpool_lives_r : invalid %02X bit_mask\n",bit_mask);
@@ -1064,14 +1064,14 @@ static CUSTOM_INPUT( ckongg_coinage_r )
 	switch (bit_mask)
 	{
 		case 0x0c:  /* ckongg  : DSW (0xc800) bits 2 and 3 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 2);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 2);
 		case 0x40:  /* ckongg  : IN1 (0xc400) bit 6 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 6);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 6);
 
 		case 0xc0:  /* ckongmc : IN1 (0xa800) bits 6 and 7 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 6);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 6);
 		case 0x01:  /* ckongmc : DSW (0xb000) bit 0 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 0);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 0);
 
 		default:
 			logerror("ckongg_coinage_r : invalid %02X bit_mask\n",bit_mask);
@@ -1432,9 +1432,9 @@ static CUSTOM_INPUT( dkongjrm_coinage_r )
 	switch (bit_mask)
 	{
 		case 0xc0:  /* dkongjrm : IN1 (0xa8??) bits 6 and 7 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 6);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 6);
 		case 0x01:  /* dkongjrm : DSW (0xb0??) bit 0 */
-			return ((input_port_read(field->port->machine(), "COINAGE") & bit_mask) >> 0);
+			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 0);
 
 		default:
 			logerror("dkongjrm_coinage_r : invalid %02X bit_mask\n",bit_mask);

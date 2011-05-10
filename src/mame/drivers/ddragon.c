@@ -357,7 +357,7 @@ static void irq_handler( device_t *device, int irq )
 
 static CUSTOM_INPUT( sub_cpu_busy )
 {
-	ddragon_state *state = field->port->machine().driver_data<ddragon_state>();
+	ddragon_state *state = field->machine().driver_data<ddragon_state>();
 	return state->m_dd_sub_cpu_busy;
 }
 

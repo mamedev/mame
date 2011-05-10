@@ -248,9 +248,9 @@ void info_xml_creator::output_one()
 	// allocate input ports
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
+	astring errors;
 	for (device_t *device = config.devicelist().first(); device != NULL; device = device->next())
-		if (device->input_ports() != NULL)
-			input_port_list_init(portlist, device->input_ports(), NULL, 0, FALSE, device);
+		input_port_list_init(*device, portlist, errors);
 
 	// print the header and the game name
 	fprintf(m_output, "\t<" XML_TOP);
@@ -693,8 +693,8 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	bool keyboard = false;
 
 	// iterate over the ports
-	for (const input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
+	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
 			int analogtype = -1;
 
@@ -889,18 +889,18 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 void info_xml_creator::output_switches(const ioport_list &portlist, int type, const char *outertag, const char *innertag)
 {
 	// iterate looking for DIP switches
-	for (const input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
+	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == type)
 			{
 				// output the switch name information
 				fprintf(m_output, "\t\t<%s name=\"%s\"", outertag, xml_normalize_string(input_field_name(field)));
-				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(field->port->tag));
+				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(field->port().tag()));
 				fprintf(m_output, " mask=\"%u\"", field->mask);
 				fprintf(m_output, ">\n");
 
 				// loop over settings
-				for (const input_setting_config *setting = field->settinglist; setting != NULL; setting = setting->next)
+				for (input_setting_config *setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 				{
 					fprintf(m_output, "\t\t\t<%s name=\"%s\"", innertag, xml_normalize_string(setting->name));
 					fprintf(m_output, " value=\"%u\"", setting->value);
@@ -923,8 +923,8 @@ void info_xml_creator::output_switches(const ioport_list &portlist, int type, co
 void info_xml_creator::output_adjusters(const ioport_list &portlist)
 {
 	// iterate looking for Adjusters
-	for (const input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
+	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == IPT_ADJUSTER)
 				fprintf(m_output, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", xml_normalize_string(input_field_name(field)), field->defvalue);
 }
@@ -1002,15 +1002,15 @@ void info_xml_creator::output_driver()
 void info_xml_creator::output_categories(const ioport_list &portlist)
 {
 	// iterate looking for Categories
-	for (const input_port_config *port = portlist.first(); port != NULL; port = port->next())
-		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
+	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == IPT_CATEGORY)
 			{
 				// output the category name information
 				fprintf(m_output, "\t\t<category name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
 
 				// loop over item settings
-				for (const input_setting_config *setting = field->settinglist; setting != NULL; setting = setting->next)
+				for (input_setting_config *setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 				{
 					fprintf(m_output, "\t\t\t<item name=\"%s\"", xml_normalize_string(setting->name));
 					if (setting->value == field->defvalue)

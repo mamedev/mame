@@ -308,7 +308,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (field->port->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (field->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )

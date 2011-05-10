@@ -342,8 +342,8 @@ static SCREEN_UPDATE(jingbell)
 
 static CUSTOM_INPUT( hopper_r )
 {
-	igs009_state *state = field->port->machine().driver_data<igs009_state>();
-	return state->m_hopper && !(field->port->machine().primary_screen->frame_number()%10);
+	igs009_state *state = field->machine().driver_data<igs009_state>();
+	return state->m_hopper && !(field->machine().primary_screen->frame_number()%10);
 }
 
 

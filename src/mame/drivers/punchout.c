@@ -122,7 +122,7 @@ DIP locations verified for:
 static CUSTOM_INPUT( punchout_vlm5030_busy_r )
 {
 	/* bit 4 of DSW1 is busy pin level */
-	return (vlm5030_bsy(field->port->machine().device("vlm"))) ? 0x00 : 0x01;
+	return (vlm5030_bsy(field->machine().device("vlm"))) ? 0x00 : 0x01;
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )

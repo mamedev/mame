@@ -157,8 +157,8 @@ Fax                  1982  6502   FXL, FLA
 
 static CUSTOM_INPUT( teetert_input_r )
 {
-	exidy_state *state = field->port->machine().driver_data<exidy_state>();
-	UINT8 dial = input_port_read(field->port->machine(), "DIAL");
+	exidy_state *state = field->machine().driver_data<exidy_state>();
+	UINT8 dial = input_port_read(field->machine(), "DIAL");
 	int result = 0;
 
 	result = (dial != state->m_last_dial) << 4;

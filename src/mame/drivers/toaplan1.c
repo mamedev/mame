@@ -674,6 +674,7 @@ static INPUT_PORTS_START( toaplan1_2b )
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+#ifdef UNREFERENCED_CODE
 static INPUT_PORTS_START( toaplan1_3b )
 	PORT_INCLUDE( toaplan1_2b )
 
@@ -683,7 +684,7 @@ static INPUT_PORTS_START( toaplan1_3b )
 	PORT_MODIFY("P2")
 	TOAPLAN_JOY_UDLR_3_BUTTONS( 2 )
 INPUT_PORTS_END
-
+#endif
 
 #define  TOAPLAN1_PLAYER_INPUT( player, button3, options )										\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) options PORT_8WAY		\

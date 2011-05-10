@@ -1653,9 +1653,9 @@ static void gn845pwbb_clk_w( running_machine &machine, int offset, int data )
 
 static CUSTOM_INPUT( gn845pwbb_read )
 {
-	ksys573_state *state = field->port->machine().driver_data<ksys573_state>();
+	ksys573_state *state = field->machine().driver_data<ksys573_state>();
 
-	return input_port_read(field->port->machine(), "STAGE") & state->m_stage_mask;
+	return input_port_read(field->machine(), "STAGE") & state->m_stage_mask;
 }
 
 static void gn845pwbb_output_callback( running_machine &machine, int offset, int data )
@@ -2881,7 +2881,7 @@ static WRITE32_HANDLER( gunmania_w )
 
 static CUSTOM_INPUT( gunmania_tank_shutter_sensor )
 {
-	ksys573_state *state = field->port->machine().driver_data<ksys573_state>();
+	ksys573_state *state = field->machine().driver_data<ksys573_state>();
 
 	if( state->m_tank_shutter_position == 0 )
 	{
@@ -2893,7 +2893,7 @@ static CUSTOM_INPUT( gunmania_tank_shutter_sensor )
 
 static CUSTOM_INPUT( gunmania_cable_holder_sensor )
 {
-	ksys573_state *state = field->port->machine().driver_data<ksys573_state>();
+	ksys573_state *state = field->machine().driver_data<ksys573_state>();
 
 	return state->m_cable_holder_release;
 }

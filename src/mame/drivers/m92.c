@@ -289,7 +289,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 
 static CUSTOM_INPUT( m92_sprite_busy_r )
 {
-	m92_state *state = field->port->machine().driver_data<m92_state>();
+	m92_state *state = field->machine().driver_data<m92_state>();
 	return state->m_sprite_buffer_busy;
 }
 

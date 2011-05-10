@@ -106,7 +106,7 @@ WRITE8_HANDLER( arkanoid_68705_ddr_c_w )
 
 CUSTOM_INPUT( arkanoid_68705_input_r )
 {
-	arkanoid_state *state = field->port->machine().driver_data<arkanoid_state>();
+	arkanoid_state *state = field->machine().driver_data<arkanoid_state>();
 	int res = 0;
 
 	/* bit 0x40 of comes from the sticky bit */
@@ -122,10 +122,10 @@ CUSTOM_INPUT( arkanoid_68705_input_r )
 
 CUSTOM_INPUT( arkanoid_input_mux )
 {
-	arkanoid_state *state = field->port->machine().driver_data<arkanoid_state>();
+	arkanoid_state *state = field->machine().driver_data<arkanoid_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine(), (state->m_paddle_select == 0) ? tag1 : tag2);
+	return input_port_read(field->machine(), (state->m_paddle_select == 0) ? tag1 : tag2);
 }
 
 /*

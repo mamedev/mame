@@ -100,7 +100,7 @@ static READ8_HANDLER( cop01_sound_command_r )
 static CUSTOM_INPUT( mightguy_area_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
 static WRITE8_HANDLER( cop01_irq_ack_w )

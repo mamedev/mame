@@ -174,7 +174,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( country_sndpending_r )
 {
-	crshrace_state *state = field->port->machine().driver_data<crshrace_state>();
+	crshrace_state *state = field->machine().driver_data<crshrace_state>();
 	return state->m_pending_command;
 }
 

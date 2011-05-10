@@ -115,7 +115,7 @@ static WRITE8_HANDLER( inufuku_soundrombank_w )
 
 static CUSTOM_INPUT( soundflag_r )
 {
-	inufuku_state *state = field->port->machine().driver_data<inufuku_state>();
+	inufuku_state *state = field->machine().driver_data<inufuku_state>();
 	UINT16 soundflag = state->m_pending_command ? 0 : 1;
 
 	return soundflag;

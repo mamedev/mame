@@ -64,7 +64,6 @@
 #include "attotime.h"
 #include "hash.h"
 #include "fileio.h" // remove me once NVRAM is implemented as device
-#include "tokenize.h"
 #include "delegate.h"
 
 // memory and address spaces
@@ -80,6 +79,12 @@
 class machine_config;
 typedef device_t * (*machine_config_constructor)(machine_config &config, device_t *owner);
 
+// I/O
+#include "input.h"
+#include "inputseq.h"
+#include "inptport.h"
+#include "output.h"
+
 // devices and callbacks
 #include "devintrf.h"
 #include "distate.h"
@@ -94,12 +99,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 #include "didisasm.h"
 #include "schedule.h"
 #include "timer.h"
-
-// I/O
-#include "input.h"
-#include "inputseq.h"
-#include "inptport.h"
-#include "output.h"
 
 // timers, CPU and scheduling
 #include "devcpu.h"

@@ -466,8 +466,8 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 static CUSTOM_INPUT( igs_hopper_r )
 {
-	igs011_state *state = field->port->machine().driver_data<igs011_state>();
-	return (state->m_igs_hopper && ((field->port->machine().primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
+	igs011_state *state = field->machine().driver_data<igs011_state>();
+	return (state->m_igs_hopper && ((field->machine().primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
 static WRITE16_HANDLER( igs_dips_w )

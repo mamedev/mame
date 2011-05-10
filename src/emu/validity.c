@@ -75,9 +75,7 @@ public:
 
 INLINE const char *input_port_string_from_index(UINT32 index)
 {
-	input_port_token token;
-	token.i = index;
-	return input_port_string_from_token(token);
+	return input_port_string_from_token((const char *)index);
 }
 
 
@@ -741,7 +739,7 @@ static int get_defstr_index(int_map &defstr_map, const char *name, const game_dr
     analog input field
 -------------------------------------------------*/
 
-static void validate_analog_input_field(const input_field_config *field, const game_driver &driver, bool *error)
+static void validate_analog_input_field(input_field_config *field, const game_driver &driver, bool *error)
 {
 	INT32 analog_max = field->max;
 	INT32 analog_min = field->min;
@@ -850,7 +848,7 @@ static void validate_analog_input_field(const input_field_config *field, const g
     setting
 -------------------------------------------------*/
 
-static void validate_dip_settings(const input_field_config *field, const game_driver &driver, int_map &defstr_map, bool *error)
+static void validate_dip_settings(input_field_config *field, const game_driver &driver, int_map &defstr_map, bool *error)
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
@@ -859,7 +857,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 	int coin_error = FALSE;
 
 	/* iterate through the settings */
-	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+	for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 	{
 		int strindex = get_defstr_index(defstr_map, setting->name, driver, error);
 
@@ -889,9 +887,9 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 		}
 
 		/* if we have a neighbor, compare ourselves to him */
-		if (setting->next != NULL)
+		if (setting->next() != NULL)
 		{
-			int next_strindex = get_defstr_index(defstr_map, setting->next->name, driver, error);
+			int next_strindex = get_defstr_index(defstr_map, setting->next()->name, driver, error);
 
 			/* check for inverted off/on dispswitch order */
 			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
@@ -916,9 +914,9 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 
 			/* check for proper coin ordering */
 			else if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C && next_strindex >= INPUT_STRING_9C_1C && next_strindex <= INPUT_STRING_1C_9C &&
-					 strindex >= next_strindex && memcmp(&setting->condition, &setting->next->condition, sizeof(setting->condition)) == 0)
+					 strindex >= next_strindex && memcmp(&setting->condition, &setting->next()->condition, sizeof(setting->condition)) == 0)
 			{
-				mame_printf_error("%s: %s has unsorted coinage %s > %s\n", driver.source_file, driver.name, setting->name, setting->next->name);
+				mame_printf_error("%s: %s has unsorted coinage %s > %s\n", driver.source_file, driver.name, setting->name, setting->next()->name);
 				coin_error = *error = true;
 			}
 		}
@@ -943,14 +941,14 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 
 static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, ioport_list &portlist)
 {
-	const input_port_config *scanport;
-	const input_port_config *port;
-	const input_field_config *field;
+	input_port_config *scanport;
+	input_port_config *port;
+	input_field_config *field;
 	const game_driver &driver = drivlist.driver();
 	const machine_config &config = drivlist.config();
 	int empty_string_found = FALSE;
-	char errorbuf[1024];
 	bool error = false;
+	astring errorbuf;
 
 	/* skip if no ports */
 	if (driver.ipt == NULL)
@@ -958,31 +956,29 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 
 	/* allocate the input ports */
 	for (device_t *cfg = config.devicelist().first(); cfg != NULL; cfg = cfg->next())
-		if (cfg->input_ports() != NULL)
+	{
+		input_port_list_init(*cfg, portlist, errorbuf);
+		if (errorbuf)
 		{
-			input_port_list_init(portlist, cfg->input_ports(), errorbuf, sizeof(errorbuf), FALSE, cfg);
-			if (errorbuf[0] != 0)
-			{
-				mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf);
-				error = true;
-			}
+			mame_printf_error("%s: %s has input port errors:\n%s\n", driver.source_file, driver.name, errorbuf.cstr());
+			error = true;
 		}
+	}
 
 	/* check for duplicate tags */
 	for (port = portlist.first(); port != NULL; port = port->next())
-		if (port->tag != NULL)
-			for (scanport = port->next(); scanport != NULL; scanport = scanport->next())
-				if (scanport->tag != NULL && strcmp(port->tag, scanport->tag) == 0)
-				{
-					mame_printf_error("%s: %s has a duplicate input port tag '%s'\n", driver.source_file, driver.name, port->tag);
-					error = true;
-				}
+		for (scanport = port->next(); scanport != NULL; scanport = scanport->next())
+			if (strcmp(port->tag(), scanport->tag()) == 0)
+			{
+				mame_printf_error("%s: %s has a duplicate input port tag '%s'\n", driver.source_file, driver.name, port->tag());
+				error = true;
+			}
 
 	/* iterate over the results */
 	for (port = portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 		{
-			const input_setting_config *setting;
+			input_setting_config *setting;
 			//int strindex = 0;
 
 			/* verify analog inputs */
@@ -1043,7 +1039,7 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 			{
 				/* find a matching port */
 				for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next())
-					if (scanport->tag != NULL && strcmp(field->condition.tag, scanport->tag) == 0)
+					if (strcmp(field->condition.tag, scanport->tag()) == 0)
 						break;
 
 				/* if none, error */
@@ -1055,12 +1051,12 @@ static bool validate_inputs(driver_enumerator &drivlist, int_map &defstr_map, io
 			}
 
 			/* verify conditions on the settings */
-			for (setting = field->settinglist; setting != NULL; setting = setting->next)
+			for (setting = field->settinglist().first(); setting != NULL; setting = setting->next())
 				if (setting->condition.tag != NULL)
 				{
 					/* find a matching port */
 					for (scanport = portlist.first(); scanport != NULL; scanport = scanport->next())
-						if (scanport->tag != NULL && strcmp(setting->condition.tag, scanport->tag) == 0)
+						if (strcmp(setting->condition.tag, scanport->tag()) == 0)
 							break;
 
 					/* if none, error */

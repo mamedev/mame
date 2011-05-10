@@ -92,13 +92,13 @@ static WRITE32_HANDLER( galastrm_tc0610_1_w )
 
 static CUSTOM_INPUT( frame_counter_r )
 {
-	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
+	galastrm_state *state = field->machine().driver_data<galastrm_state>();
 	return state->m_frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	galastrm_state *state = field->port->machine().driver_data<galastrm_state>();
+	galastrm_state *state = field->machine().driver_data<galastrm_state>();
 	return state->m_coin_word;
 }
 

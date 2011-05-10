@@ -333,7 +333,7 @@ static READ8_HANDLER( marvins_soundlatch_r )
 
 static CUSTOM_INPUT( marvins_sound_busy )
 {
-	snk_state *state = field->port->machine().driver_data<snk_state>();
+	snk_state *state = field->machine().driver_data<snk_state>();
 
 	return state->m_marvins_sound_busy_flag;
 }
@@ -500,7 +500,7 @@ static WRITE8_HANDLER( snk_soundlatch_w )
 
 static CUSTOM_INPUT( snk_sound_busy )
 {
-	snk_state *state = field->port->machine().driver_data<snk_state>();
+	snk_state *state = field->machine().driver_data<snk_state>();
 
 	return (state->m_sound_status & 4) ? 1 : 0;
 }
@@ -752,10 +752,10 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 static CUSTOM_INPUT( gwar_rotary )
 {
-	snk_state *state = field->port->machine().driver_data<snk_state>();
+	snk_state *state = field->machine().driver_data<snk_state>();
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(FPTR)param;
-	int value = input_port_read(field->port->machine(), ports[which]);
+	int value = input_port_read(field->machine(), ports[which]);
 
 	if ((state->m_last_value[which] == 0x5 && value == 0x6) || (state->m_last_value[which] == 0x6 && value == 0x5))
 	{
@@ -770,9 +770,9 @@ static CUSTOM_INPUT( gwar_rotary )
 
 static CUSTOM_INPUT( gwarb_rotary )
 {
-	if (input_port_read(field->port->machine(), "JOYSTICK_MODE") == 1)
+	if (input_port_read(field->machine(), "JOYSTICK_MODE") == 1)
 	{
-		return gwar_rotary(field, param);
+		return gwar_rotary(device, field, param);
 	}
 	else
 	{
@@ -819,16 +819,16 @@ static WRITE8_HANDLER( countryc_trackball_w )
 
 static CUSTOM_INPUT( countryc_trackball_x )
 {
-	snk_state *state = field->port->machine().driver_data<snk_state>();
+	snk_state *state = field->machine().driver_data<snk_state>();
 
-	return input_port_read(field->port->machine(), state->m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
+	return input_port_read(field->machine(), state->m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
 }
 
 static CUSTOM_INPUT( countryc_trackball_y )
 {
-	snk_state *state = field->port->machine().driver_data<snk_state>();
+	snk_state *state = field->machine().driver_data<snk_state>();
 
-	return input_port_read(field->port->machine(), state->m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
+	return input_port_read(field->machine(), state->m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
 }
 
 
@@ -841,14 +841,14 @@ static CUSTOM_INPUT( snk_bonus_r )
 	switch (bit_mask)
 	{
 		case 0x01:  /* older games : "Occurence" Dip Switch (DSW2:1) */
-			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 0);
+			return ((input_port_read(field->machine(), "BONUS") & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 6);
+			return ((input_port_read(field->machine(), "BONUS") & bit_mask) >> 6);
 
 		case 0x04:  /* later games : "Occurence" Dip Switch (DSW1:3) */
-			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 2);
+			return ((input_port_read(field->machine(), "BONUS") & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((input_port_read(field->port->machine(), "BONUS") & bit_mask) >> 4);
+			return ((input_port_read(field->machine(), "BONUS") & bit_mask) >> 4);
 
 		default:
 			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);

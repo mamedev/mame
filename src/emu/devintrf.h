@@ -93,7 +93,6 @@ class device_state_interface;
 struct rom_entry;
 class machine_config;
 class emu_timer;
-typedef union _input_port_token input_port_token;
 typedef struct _input_device_default input_device_default;
 
 
@@ -207,7 +206,7 @@ public:
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const rom_entry *rom_region() const { return device_rom_region(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
-	const input_port_token *input_ports() const { return device_input_ports(); }
+	ioport_constructor input_ports() const { return device_input_ports(); }
 
 	// iteration helpers
 	device_t *next() const { return m_next; }
@@ -296,7 +295,7 @@ protected:
 	// device-level overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
-	virtual const input_port_token *device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual void device_start() = 0;

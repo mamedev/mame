@@ -258,7 +258,7 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( xmen_frame_r )
 {
-	xmen_state *state = field->port->machine().driver_data<xmen_state>();
+	xmen_state *state = field->machine().driver_data<xmen_state>();
 	return state->m_current_frame;
 }
 

@@ -78,7 +78,7 @@ ADDRESS_MAP_END
 */
 static INPUT_CHANGED( left_coin_inserted )
 {
-	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
+	ladybug_state *state = field->machine().driver_data<ladybug_state>();
 
 	if(newval)
 		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
@@ -86,7 +86,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	ladybug_state *state = field->port->machine().driver_data<ladybug_state>();
+	ladybug_state *state = field->machine().driver_data<ladybug_state>();
 
 	if(newval)
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);

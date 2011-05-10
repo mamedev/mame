@@ -450,8 +450,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	missile_state *state = field->port->machine().driver_data<missile_state>();
-	int v = scanline_to_v(state, field->port->machine().primary_screen->vpos());
+	missile_state *state = field->machine().driver_data<missile_state>();
+	int v = scanline_to_v(state, field->machine().primary_screen->vpos());
 	return v < 24;
 }
 

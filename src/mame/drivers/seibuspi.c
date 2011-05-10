@@ -936,21 +936,21 @@ static READ32_HANDLER( spi_controls2_r )
 
 static CUSTOM_INPUT( ejsakura_keyboard_r )
 {
-	seibuspi_state *state = field->port->machine().driver_data<seibuspi_state>();
+	seibuspi_state *state = field->machine().driver_data<seibuspi_state>();
 	switch(state->m_ejsakura_input_port)
 	{
 		case 0x01:
-			return input_port_read(field->port->machine(), "INPUT01");
+			return input_port_read(field->machine(), "INPUT01");
 		case 0x02:
-			return input_port_read(field->port->machine(), "INPUT02");
+			return input_port_read(field->machine(), "INPUT02");
 		case 0x04:
-			return input_port_read(field->port->machine(), "INPUT04");
+			return input_port_read(field->machine(), "INPUT04");
 		case 0x08:
-			return input_port_read(field->port->machine(), "INPUT08");
+			return input_port_read(field->machine(), "INPUT08");
 		case 0x10:
-			return input_port_read(field->port->machine(), "INPUT10");
+			return input_port_read(field->machine(), "INPUT10");
 		default:
-			return input_port_read(field->port->machine(), "SYSTEM");
+			return input_port_read(field->machine(), "SYSTEM");
 	}
 	return 0xffffffff;
 }
@@ -1295,7 +1295,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ejanhs_encode )
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(field->port->machine(), (const char *)param);
+	input_port_value state = input_port_read(field->machine(), (const char *)param);
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)

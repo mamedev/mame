@@ -176,25 +176,25 @@ Super Strong Warriors
 
 static CUSTOM_INPUT( mahjong_ctrl_r )
 {
-	ms32_state *state = field->port->machine().driver_data<ms32_state>();
+	ms32_state *state = field->machine().driver_data<ms32_state>();
 	UINT32 mj_input;
 
 	switch (state->m_mahjong_input_select[0])
 	{
 		case 0x01:
-			mj_input = input_port_read(field->port->machine(), "MJ0");
+			mj_input = input_port_read(field->machine(), "MJ0");
 			break;
 		case 0x02:
-			mj_input = input_port_read(field->port->machine(), "MJ1");
+			mj_input = input_port_read(field->machine(), "MJ1");
 			break;
 		case 0x04:
-			mj_input = input_port_read(field->port->machine(), "MJ2");
+			mj_input = input_port_read(field->machine(), "MJ2");
 			break;
 		case 0x08:
-			mj_input = input_port_read(field->port->machine(), "MJ3");
+			mj_input = input_port_read(field->machine(), "MJ3");
 			break;
 		case 0x10:
-			mj_input = input_port_read(field->port->machine(), "MJ4");
+			mj_input = input_port_read(field->machine(), "MJ4");
 			break;
 		default:
 			mj_input = 0;

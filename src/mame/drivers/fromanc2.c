@@ -75,19 +75,19 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 
 static CUSTOM_INPUT( subcpu_int_r )
 {
-	fromanc2_state *state = field->port->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
 	return state->m_subcpu_int_flag & 0x01;
 }
 
 static CUSTOM_INPUT( sndcpu_nmi_r )
 {
-	fromanc2_state *state = field->port->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
 	return state->m_sndcpu_nmi_flag & 0x01;
 }
 
 static CUSTOM_INPUT( subcpu_nmi_r )
 {
-	fromanc2_state *state = field->port->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
 	return state->m_subcpu_nmi_flag & 0x01;
 }
 
@@ -416,6 +416,7 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
+#ifdef UNREFERENCED_CODE
 static INPUT_PORTS_START( fromancr )
 	PORT_INCLUDE( fromanc2 )
 
@@ -424,6 +425,7 @@ static INPUT_PORTS_START( fromancr )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( fromanc4 )
 	PORT_INCLUDE( fromanc2 )

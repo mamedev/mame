@@ -106,7 +106,7 @@ static READ8_HANDLER( fgoal_analog_r )
 
 static CUSTOM_INPUT( fgoal_80_r )
 {
-	UINT8 ret = (field->port->machine().primary_screen->vpos() & 0x80) ? 1 : 0;
+	UINT8 ret = (field->machine().primary_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }

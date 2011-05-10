@@ -267,7 +267,7 @@ static WRITE16_HANDLER( rocknms_main2sub_w )
 
 static CUSTOM_INPUT( rocknms_main2sub_status_r )
 {
-	tetrisp2_state *state = field->port->machine().driver_data<tetrisp2_state>();
+	tetrisp2_state *state = field->machine().driver_data<tetrisp2_state>();
 	return  state->m_rocknms_sub2main & 0x0003;
 }
 

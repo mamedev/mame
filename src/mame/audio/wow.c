@@ -171,6 +171,6 @@ READ8_HANDLER( wow_speech_r )
 
 CUSTOM_INPUT( wow_speech_status_r )
 {
-	device_t *samples = field->port->machine().device("samples");
+	device_t *samples = field->machine().device("samples");
 	return !sample_playing(samples, 0);
 }

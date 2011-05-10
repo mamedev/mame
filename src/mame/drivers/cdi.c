@@ -81,49 +81,49 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( mcu_input )
 {
-    cdi_state *state = field->port->machine().driver_data<cdi_state>();
+    cdi_state *state = field->machine().driver_data<cdi_state>();
     scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
 	bool send = false;
 
 	switch((FPTR)param)
 	{
 		case 0x39:
-			if(input_port_read(field->port->machine(), "INPUT1") & 0x01) send = true;
+			if(input_port_read(field->machine(), "INPUT1") & 0x01) send = true;
 			break;
 		case 0x37:
-			if(input_port_read(field->port->machine(), "INPUT1") & 0x02) send = true;
+			if(input_port_read(field->machine(), "INPUT1") & 0x02) send = true;
 			break;
 		case 0x31:
-			if(input_port_read(field->port->machine(), "INPUT1") & 0x04) send = true;
+			if(input_port_read(field->machine(), "INPUT1") & 0x04) send = true;
 			break;
 		case 0x32:
-			if(input_port_read(field->port->machine(), "INPUT1") & 0x08) send = true;
+			if(input_port_read(field->machine(), "INPUT1") & 0x08) send = true;
 			break;
 		case 0x33:
-			if(input_port_read(field->port->machine(), "INPUT1") & 0x10) send = true;
+			if(input_port_read(field->machine(), "INPUT1") & 0x10) send = true;
 			break;
 
 		case 0x30:
-			if(input_port_read(field->port->machine(), "INPUT2") & 0x01) send = true;
+			if(input_port_read(field->machine(), "INPUT2") & 0x01) send = true;
 			break;
 		case 0x38:
-			if(input_port_read(field->port->machine(), "INPUT2") & 0x02) send = true;
+			if(input_port_read(field->machine(), "INPUT2") & 0x02) send = true;
 			break;
 		case 0x34:
-			if(input_port_read(field->port->machine(), "INPUT2") & 0x04) send = true;
+			if(input_port_read(field->machine(), "INPUT2") & 0x04) send = true;
 			break;
 		case 0x35:
-			if(input_port_read(field->port->machine(), "INPUT2") & 0x08) send = true;
+			if(input_port_read(field->machine(), "INPUT2") & 0x08) send = true;
 			break;
 		case 0x36:
-			if(input_port_read(field->port->machine(), "INPUT2") & 0x10) send = true;
+			if(input_port_read(field->machine(), "INPUT2") & 0x10) send = true;
 			break;
 	}
 
 	if(send)
 	{
 		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
-		scc68070_quizard_rx(field->port->machine(), scc68070, data);
+		scc68070_quizard_rx(field->machine(), scc68070, data);
 	}
 }
 

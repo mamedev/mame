@@ -92,7 +92,7 @@ static WRITE8_HANDLER( brkthru_soundlatch_w )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	brkthru_state *state = field->port->machine().driver_data<brkthru_state>();
+	brkthru_state *state = field->machine().driver_data<brkthru_state>();
 	/* coin insertion causes an IRQ */
 	device_set_input_line(state->m_maincpu, 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }

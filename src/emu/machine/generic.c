@@ -748,5 +748,5 @@ READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine()); return 
 CUSTOM_INPUT( custom_port_read )
 {
 	const char *tag = (const char *)param;
-	return input_port_read(field->port->machine(), tag);
+	return input_port_read(field->machine(), tag);
 }

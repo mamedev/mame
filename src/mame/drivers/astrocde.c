@@ -259,9 +259,9 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 
 static CUSTOM_INPUT( ebases_trackball_r )
 {
-	astrocde_state *state = field->port->machine().driver_data<astrocde_state>();
+	astrocde_state *state = field->machine().driver_data<astrocde_state>();
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return input_port_read(field->port->machine(), names[state->m_input_select]);
+	return input_port_read(field->machine(), names[state->m_input_select]);
 }
 
 
@@ -487,9 +487,9 @@ static READ8_HANDLER( demndrgn_io_r )
 
 static CUSTOM_INPUT( demndragn_joystick_r )
 {
-	astrocde_state *state = field->port->machine().driver_data<astrocde_state>();
+	astrocde_state *state = field->machine().driver_data<astrocde_state>();
 	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return input_port_read(field->port->machine(), names[state->m_input_select]);
+	return input_port_read(field->machine(), names[state->m_input_select]);
 }
 
 
@@ -841,7 +841,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( spacezap_monitor )
 {
-	astrocde_state *state = field->port->machine().driver_data<astrocde_state>();
+	astrocde_state *state = field->machine().driver_data<astrocde_state>();
 	if (newval)
 		state->m_video_config &= ~AC_MONITOR_BW;
 	else

@@ -142,7 +142,7 @@ static WRITE8_HANDLER( snd_ack_w )
 
 static CUSTOM_INPUT( snd_ack_r )
 {
-	dacholer_state *state = field->port->machine().driver_data<dacholer_state>();
+	dacholer_state *state = field->machine().driver_data<dacholer_state>();
 	return state->m_snd_ack;		//guess ...
 }
 

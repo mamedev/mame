@@ -244,7 +244,7 @@ static READ8_HANDLER( question_data_r )
 
 static CUSTOM_INPUT( latched_coin_r )
 {
-	statriv2_state *state = field->port->machine().driver_data<statriv2_state>();
+	statriv2_state *state = field->machine().driver_data<statriv2_state>();
 	return state->m_latched_coin;
 }
 

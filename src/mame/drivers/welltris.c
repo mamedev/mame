@@ -342,7 +342,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static CUSTOM_INPUT( pending_sound_r )
 {
-	welltris_state *state = field->port->machine().driver_data<welltris_state>();
+	welltris_state *state = field->machine().driver_data<welltris_state>();
 	return state->m_pending_command ? 1 : 0;
 }
 

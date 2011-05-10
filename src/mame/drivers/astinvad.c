@@ -275,7 +275,7 @@ static MACHINE_RESET( spaceint )
 
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
-	astinvad_state *state = field->port->machine().driver_data<astinvad_state>();
+	astinvad_state *state = field->machine().driver_data<astinvad_state>();
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }

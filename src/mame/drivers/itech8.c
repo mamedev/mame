@@ -728,7 +728,7 @@ static WRITE8_HANDLER( rimrockn_bank_w )
 
 static CUSTOM_INPUT( special_r )
 {
-	itech8_state *state = field->port->machine().driver_data<itech8_state>();
+	itech8_state *state = field->machine().driver_data<itech8_state>();
 	return state->m_pia_portb_data & 0x01;
 }
 
@@ -1102,7 +1102,7 @@ static CUSTOM_INPUT( gtg_mux )
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine(), tag1) & input_port_read(field->port->machine(), tag2);
+	return input_port_read(field->machine(), tag1) & input_port_read(field->machine(), tag2);
 }
 
 static INPUT_PORTS_START( gtg )

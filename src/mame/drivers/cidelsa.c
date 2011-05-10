@@ -272,14 +272,14 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( cdp1869_pcb_r )
 {
-	cidelsa_state *state = field->port->machine().driver_data<cidelsa_state>();
+	cidelsa_state *state = field->machine().driver_data<cidelsa_state>();
 
 	return state->m_cdp1869_pcb;
 }
 
 static INPUT_CHANGED( ef_w )
 {
-	cputag_set_input_line(field->port->machine(), CDP1802_TAG, (int)(FPTR)param, newval);
+	cputag_set_input_line(field->machine(), CDP1802_TAG, (int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( destryer )

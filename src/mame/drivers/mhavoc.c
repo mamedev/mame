@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( clock_r )
 {
 	/* 2.4kHz (divide 2.5MHz by 1024) */
-	return (field->port->machine().device<cpu_device>("alpha")->total_cycles() & 0x400) ? 0 : 1;
+	return (field->machine().device<cpu_device>("alpha")->total_cycles() & 0x400) ? 0 : 1;
 }
 
 

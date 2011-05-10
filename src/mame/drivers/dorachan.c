@@ -41,7 +41,7 @@ public:
 
 static CUSTOM_INPUT( dorachan_protection_r )
 {
-	dorachan_state *state = field->port->machine().driver_data<dorachan_state>();
+	dorachan_state *state = field->machine().driver_data<dorachan_state>();
 	UINT8 ret = 0;
 
 	switch (cpu_get_previouspc(state->m_main_cpu))
@@ -129,10 +129,10 @@ static WRITE8_HANDLER(dorachan_ctrl_w)
 
 static CUSTOM_INPUT( dorachan_v128_r )
 {
-	dorachan_state *state = field->port->machine().driver_data<dorachan_state>();
+	dorachan_state *state = field->machine().driver_data<dorachan_state>();
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
-	return ((field->port->machine().primary_screen->vpos() >> 7) & 0x01) ^ state->m_flip_screen;
+	return ((field->machine().primary_screen->vpos() >> 7) & 0x01) ^ state->m_flip_screen;
 }
 
 

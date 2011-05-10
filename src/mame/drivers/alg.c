@@ -185,30 +185,30 @@ static void alg_potgo_w(running_machine &machine, UINT16 data)
 
 static CUSTOM_INPUT( lightgun_pos_r )
 {
-	alg_state *state = field->port->machine().driver_data<alg_state>();
+	alg_state *state = field->machine().driver_data<alg_state>();
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*field->port->machine().primary_screen, state->m_input_select, &x, &y);
+	get_lightgun_pos(*field->machine().primary_screen, state->m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
 
 static CUSTOM_INPUT( lightgun_trigger_r )
 {
-	alg_state *state = field->port->machine().driver_data<alg_state>();
+	alg_state *state = field->machine().driver_data<alg_state>();
 
 	/* read the trigger control based on the input select */
-	return (input_port_read(field->port->machine(), "TRIGGERS") >> state->m_input_select) & 1;
+	return (input_port_read(field->machine(), "TRIGGERS") >> state->m_input_select) & 1;
 }
 
 
 static CUSTOM_INPUT( lightgun_holster_r )
 {
-	alg_state *state = field->port->machine().driver_data<alg_state>();
+	alg_state *state = field->machine().driver_data<alg_state>();
 
 	/* read the holster control based on the input select */
-	return (input_port_read(field->port->machine(), "TRIGGERS") >> (2 + state->m_input_select)) & 1;
+	return (input_port_read(field->machine(), "TRIGGERS") >> (2 + state->m_input_select)) & 1;
 }
 
 

@@ -126,13 +126,13 @@ static const eeprom_interface groundfx_eeprom_interface =
 
 static CUSTOM_INPUT( frame_counter_r )
 {
-	groundfx_state *state = field->port->machine().driver_data<groundfx_state>();
+	groundfx_state *state = field->machine().driver_data<groundfx_state>();
 	return state->m_frame_counter;
 }
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	groundfx_state *state = field->port->machine().driver_data<groundfx_state>();
+	groundfx_state *state = field->machine().driver_data<groundfx_state>();
 	return state->m_coin_word;
 }
 

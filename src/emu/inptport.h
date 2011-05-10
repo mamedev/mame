@@ -373,68 +373,6 @@ enum
 };
 
 
-/* token types */
-enum
-{
-	INPUT_TOKEN_INVALID,
-	INPUT_TOKEN_END,
-	INPUT_TOKEN_INCLUDE,
-	INPUT_TOKEN_START,
-	INPUT_TOKEN_MODIFY,
-	INPUT_TOKEN_FIELD,
-	INPUT_TOKEN_SPECIAL_ONOFF,
-	INPUT_TOKEN_CODE,
-	INPUT_TOKEN_CODE_DEC,
-	INPUT_TOKEN_CODE_INC,
-	INPUT_TOKEN_2WAY,
-	INPUT_TOKEN_4WAY,
-	INPUT_TOKEN_8WAY,
-	INPUT_TOKEN_16WAY,
-	INPUT_TOKEN_ROTATED,
-	INPUT_TOKEN_PLAYER1,
-	INPUT_TOKEN_PLAYER2,
-	INPUT_TOKEN_PLAYER3,
-	INPUT_TOKEN_PLAYER4,
-	INPUT_TOKEN_PLAYER5,
-	INPUT_TOKEN_PLAYER6,
-	INPUT_TOKEN_PLAYER7,
-	INPUT_TOKEN_PLAYER8,
-	INPUT_TOKEN_COCKTAIL,
-	INPUT_TOKEN_TOGGLE,
-	INPUT_TOKEN_NAME,
-	INPUT_TOKEN_IMPULSE,
-	INPUT_TOKEN_REVERSE,
-	INPUT_TOKEN_RESET,
-	INPUT_TOKEN_MINMAX,
-	INPUT_TOKEN_SENSITIVITY,
-	INPUT_TOKEN_KEYDELTA,
-	INPUT_TOKEN_CENTERDELTA,
-	INPUT_TOKEN_CROSSHAIR,
-	INPUT_TOKEN_CROSSHAIR_MAPPER,
-	INPUT_TOKEN_FULL_TURN_COUNT,
-	INPUT_TOKEN_POSITIONS,
-	INPUT_TOKEN_WRAPS,
-	INPUT_TOKEN_REMAP_TABLE,
-	INPUT_TOKEN_INVERT,
-	INPUT_TOKEN_UNUSED,
-	INPUT_TOKEN_CUSTOM,
-	INPUT_TOKEN_CHANGED,
-	INPUT_TOKEN_DIPNAME,
-	INPUT_TOKEN_DIPSETTING,
-	INPUT_TOKEN_DIPLOCATION,
-	INPUT_TOKEN_CONDITION,
-	INPUT_TOKEN_ADJUSTER,
-	INPUT_TOKEN_CONFNAME,
-	INPUT_TOKEN_CONFSETTING,
-	INPUT_TOKEN_CHAR,
-	INPUT_TOKEN_CATEGORY,
-	INPUT_TOKEN_CATEGORY_NAME,
-	INPUT_TOKEN_CATEGORY_SETTING,
-	INPUT_TOKEN_READ_LINE_DEVICE,
-	INPUT_TOKEN_WRITE_LINE_DEVICE,
-};
-
-
 /* default strings used in port definitions */
 enum
 {
@@ -595,35 +533,21 @@ typedef struct _input_field_state input_field_state;
 
 /* forward declarations */
 class input_port_config;
-typedef struct _input_field_config input_field_config;
+class input_field_config;
 
 
 /* template specializations */
 typedef tagged_list<input_port_config> ioport_list;
 
 
-/* custom input port callback function */
-typedef UINT32 (*input_field_custom_func)(const input_field_config *field, void *param);
+/* read input port callback function */
+typedef UINT32 (*input_field_read_func)(device_t &device, const input_field_config *field, void *param);
 
-/* input port changed callback function */
-typedef void (*input_field_changed_func)(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval);
+/* input port write callback function */
+typedef void (*input_field_write_func)(device_t &device, const input_field_config *field, void *param, UINT32 oldval, UINT32 newval);
 
 /* crosshair mapping function */
 typedef float (*input_field_crossmap_func)(const input_field_config *field, float linear_value);
-
-
-/* this type is used to encode input port definitions */
-typedef union _input_port_token input_port_token;
-union _input_port_token
-{
-	TOKEN_COMMON_FIELDS
-	const input_port_token *	tokenptr;
-	input_field_custom_func 	customptr;
-	input_field_changed_func	changedptr;
-	input_field_crossmap_func	crossmapptr;
-	read_line_device_func		read_line_device;
-	write_line_device_func		write_line_device;
-};
 
 
 /* encapsulates a condition on a port field or setting */
@@ -638,35 +562,63 @@ struct _input_condition
 
 
 /* a single setting for a configuration or DIP switch */
-typedef struct _input_setting_config input_setting_config;
-struct _input_setting_config
+class input_setting_config
 {
-	const input_setting_config *next;			/* pointer to next setting in sequence */
-	const input_field_config *	field;			/* pointer back to the field that owns us */
+	DISABLE_COPYING(input_setting_config);
+	friend class simple_list<input_setting_config>;
+
+public:
+	input_setting_config(input_field_config &field, input_port_value value, const char *name);
+	input_setting_config *next() const { return m_next; }
+
 	input_port_value			value;			/* value of the bits in this setting */
 	input_condition				condition;		/* condition under which this setting is valid */
 	const char *				name;			/* user-friendly name to display */
 	UINT16						category;		/* (MESS-specific) category */
+
+private:
+	input_field_config &		m_field;			/* pointer back to the field that owns us */
+	input_setting_config *		m_next;			/* pointer to next setting in sequence */
 };
 
 
 /* a mapping from a bit to a physical DIP switch description */
-typedef struct _input_field_diplocation input_field_diplocation;
-struct _input_field_diplocation
+class input_field_diplocation
 {
-	input_field_diplocation *	next;			/* pointer to the next bit */
-	const char *				swname;			/* name of the physical DIP switch */
+	DISABLE_COPYING(input_field_diplocation);
+	friend class simple_list<input_field_diplocation>;
+
+public:
+	input_field_diplocation(const char *string, UINT8 swnum, bool invert);
+	input_field_diplocation *next() const { return m_next; }
+
+	astring						swname;			/* name of the physical DIP switch */
 	UINT8						swnum;			/* physical switch number */
-	UINT8						invert;			/* is this an active-high DIP? */
+	bool						invert;			/* is this an active-high DIP? */
+
+private:
+	input_field_diplocation *	m_next;			/* pointer to the next bit */
 };
 
 
 /* a single bitfield within an input port */
-struct _input_field_config
+class input_field_config
 {
+	DISABLE_COPYING(input_field_config);
+	friend class simple_list<input_field_config>;
+
+public:
+	input_field_config(input_port_config &port, int type, input_port_value defvalue, input_port_value maskbits, const char *name = NULL);
+
+	input_field_config *next() const { return m_next; }
+	input_port_config &port() const { return m_port; }
+	running_machine &machine() const;
+	simple_list<input_setting_config> &settinglist() { return m_settinglist; }
+	const simple_list<input_setting_config> &settinglist() const { return m_settinglist; }
+	simple_list<input_field_diplocation> &diploclist() { return m_diploclist; }
+	int modcount() const { return m_modcount; }
+
 	/* generally-applicable data */
-	const input_field_config *	next;			/* pointer to next field in sequence */
-	const input_port_config *	port;			/* pointer back to the port that owns us */
 	input_port_value			mask;			/* mask of bits belonging to the field */
 	input_port_value			defvalue;		/* default value of these bits */
 	input_condition				condition;		/* condition under which this field is relevant */
@@ -677,14 +629,12 @@ struct _input_field_config
 	UINT8						impulse;		/* number of frames before reverting to defvalue */
 	const char *				name;			/* user-friendly name to display */
 	input_seq					seq[SEQ_TYPE_TOTAL];/* sequences of all types */
-	read_line_device_func		read_line_device;	/* input device handler */
-	const char *				read_device_name;	/* input device name */
-	write_line_device_func		write_line_device;	/* output device handler */
-	const char *				write_device_name;	/* input device name */
-	input_field_custom_func		custom;			/* custom callback routine */
-	void *						custom_param;	/* parameter for custom callback routine */
-	input_field_changed_func	changed;		/* changed callback routine */
-	void *						changed_param;	/* parameter for changed callback routine */
+	input_field_read_func		read;			/* read callback routine */
+	void *						read_param;		/* parameter for read callback routine */
+	const char *				read_device;	/* parameter for read callback routine */
+	input_field_write_func		write;			/* write callback routine */
+	void *						write_param;	/* parameter for write callback routine */
+	const char *				write_device;	/* parameter for write callback routine */
 
 	/* data relevant to analog control types */
 	INT32						min;			/* minimum value for absolute axes */
@@ -701,13 +651,18 @@ struct _input_field_config
 	const input_port_value *	remap_table;	/* pointer to an array that remaps the port value */
 
 	/* data relevant to other specific types */
-	const input_setting_config *settinglist;	/* list of input_setting_configs */
-	const input_field_diplocation *diploclist;	/* list of locations for various bits */
 	UINT8						way;			/* digital joystick 2/4/8-way descriptions */
 	unicode_char				chars[3];		/* (MESS-specific) unicode key data */
 
 	/* this field is only valid if the device is live */
 	input_field_state *			state;			/* live state of field (NULL if not live) */
+
+private:
+	input_field_config *		m_next;				/* pointer to next field in sequence */
+	input_port_config &			m_port;				/* pointer back to the port that owns us */
+	int							m_modcount;
+	simple_list<input_setting_config> m_settinglist;	/* list of input_setting_configs */
+	simple_list<input_field_diplocation> m_diploclist;	/* list of locations for various bits */
 };
 
 
@@ -731,30 +686,40 @@ struct _input_device_default
 	input_port_value			mask;			/* mask to apply to the port */
 	input_port_value			defvalue;		/* new default value */
 };
+
 /* a single input port configuration */
 class input_port_config
 {
 	DISABLE_COPYING(input_port_config);
+	friend class simple_list<input_port_config>;
 
 public:
-	input_port_config(const char *tag);
-	~input_port_config();
+	// construction/destruction
+	input_port_config(device_t &owner, const char *tag);
 
+	// getters
 	input_port_config *next() const { return m_next; }
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-	void set_machine(running_machine &machine) { m_machine = &machine; }
-
-	input_port_config *			m_next;			/* pointer to next port */
-	const char *				tag;			/* pointer to this port's tag */
-	const input_field_config *	fieldlist;		/* list of input_field_configs */
+	device_t &owner() const { return m_owner; }
+	running_machine &machine() const;
+	input_field_config *first_field() const { return m_fieldlist.first(); }
+	simple_list<input_field_config> &fieldlist() { return m_fieldlist; }
+	const char *tag() const { return m_tag; }
+	int modcount() const { return m_modcount; }
+	
+	void bump_modcount() { m_modcount++; }
+	
+	void collapse_fields(astring &errorbuf);
 
 	/* these fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
-	device_t *					owner;			/* associated device, when appropriate */
 	input_port_value			active;			/* mask of active bits in the port */
 
 private:
-	running_machine *			m_machine;		/* machine if port is live */
+	input_port_config *			m_next;			/* pointer to next port */
+	device_t &					m_owner;			/* associated device, when appropriate */
+	simple_list<input_field_config> m_fieldlist;		/* list of input_field_configs */
+	astring						m_tag;			/* pointer to this port's tag */
+	int							m_modcount;
 };
 
 
@@ -791,11 +756,11 @@ struct _inp_header
     MACROS
 ***************************************************************************/
 
-/* macro for a custom callback functions (PORT_CUSTOM) */
-#define CUSTOM_INPUT(name)	UINT32 name(const input_field_config *field, void *param)
+/* macro for a read callback function (PORT_CUSTOM) */
+#define CUSTOM_INPUT(name)	input_port_value name(device_t &device, const input_field_config *field, void *param)
 
-/* macro for port changed callback functions (PORT_CHANGED) */
-#define INPUT_CHANGED(name)	void name(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval)
+/* macro for port write callback functions (PORT_CHANGED) */
+#define INPUT_CHANGED(name)	void name(device_t &device, const input_field_config *field, void *param, input_port_value oldval, input_port_value newval)
 
 /* macro for port changed callback functions (PORT_CROSSHAIR_MAPPER) */
 #define CROSSHAIR_MAPPER(name)	float name(const input_field_config *field, float linear_value)
@@ -804,235 +769,255 @@ struct _inp_header
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
 
 
+template<int (*_ReadLine)(device_t *)>
+input_port_value ioport_read_line_wrapper(device_t &device, const input_field_config *field, void *param)
+{
+	return (*_ReadLine)(&device);
+}
+
+template<void (*_WriteLine)(device_t *, int)>
+void ioport_write_line_wrapper(device_t &device, const input_field_config *field, void *param, input_port_value oldval, input_port_value newval)
+{
+	return (*_WriteLine)(&device, newval);
+}
+
+
 
 /***************************************************************************
     MACROS FOR BUILDING INPUT PORTS
 ***************************************************************************/
 
+typedef void (*ioport_constructor)(device_t &owner, ioport_list &portlist, astring &errorbuf);
+
 /* so that "0" can be used for unneeded input ports */
-#define ipt_0 NULL
+#define construct_ioport_0 NULL
 
 /* name of table */
-#define INPUT_PORTS_NAME(_name) ipt_##_name
+#define INPUT_PORTS_NAME(_name) construct_ioport_##_name
 
 /* start of table */
 #define INPUT_PORTS_START(_name) \
-	const input_port_token INPUT_PORTS_NAME(_name)[] = {
+void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
+{ \
+	astring fulltag; \
+	input_setting_config *cursetting = NULL; \
+	input_field_config *curfield = NULL; \
+	input_port_config *curport = NULL; \
+	input_port_value maskbits = 0; \
+	(void)cursetting; (void)curfield; (void)curport; (void)maskbits; \
 
 /* end of table */
 #define INPUT_PORTS_END \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_END, 8) };
+}
 
 /* aliasing */
 #define INPUT_PORTS_EXTERN(_name) \
-	extern const input_port_token INPUT_PORTS_NAME(_name)[]
+	extern void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf)
 
 /* including */
 #define PORT_INCLUDE(_name) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_INCLUDE, 8), \
-	TOKEN_PTR(tokenptr, &INPUT_PORTS_NAME(_name)[0]),
+	INPUT_PORTS_NAME(_name)(owner, portlist, errorbuf); \
 
 /* start of a new input port (with included tag) */
 #define PORT_START(_tag) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_START, 8), \
-	TOKEN_STRING(_tag),
+	curport = ioconfig_alloc_port(portlist, owner, _tag); \
+	curfield = NULL; \
+	cursetting = NULL; \
+	maskbits = 0; \
 
 /* modify an existing port */
 #define PORT_MODIFY(_tag) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_MODIFY, 8), \
-	TOKEN_STRING(_tag),
+	curport = ioconfig_modify_port(portlist, owner, _tag); \
+	curfield = NULL; \
+	cursetting = NULL; \
+	maskbits = 0; \
 
 /* input bit definition */
 #define PORT_BIT(_mask, _default, _type) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_FIELD, 8, _type, 24), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
+	curfield = ioconfig_alloc_field(*curport, (_type), (_default), (_mask)); \
+	cursetting = NULL;
 
-#define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
-	TOKEN_UINT32_PACK3(INPUT_TOKEN_SPECIAL_ONOFF, 8, FALSE, 1, INPUT_STRING_##_strindex, 23), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
+#define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, NULL)
 
 #define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
-	TOKEN_UINT32_PACK3(INPUT_TOKEN_SPECIAL_ONOFF, 8, TRUE, 1, INPUT_STRING_##_strindex, 23), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
-	TOKEN_STRING(_diploc),
+	curfield = ioconfig_alloc_onoff(*curport, DEF_STR(_strindex), _default, _mask, _diploc, errorbuf); \
+	cursetting = NULL;
 
 /* append a code */
 #define PORT_CODE(_code) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE, 8, _code, 32),
+	ioconfig_add_code(*curfield, SEQ_TYPE_STANDARD, _code);
 
 #define PORT_CODE_DEC(_code) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE_DEC, 8, _code, 32),
+	ioconfig_add_code(*curfield, SEQ_TYPE_DECREMENT, _code);
 
 #define PORT_CODE_INC(_code) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE_INC, 8, _code, 32),
+	ioconfig_add_code(*curfield, SEQ_TYPE_INCREMENT, _code);
 
 /* joystick flags */
 #define PORT_2WAY \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_2WAY, 8),
+	curfield->way = 2;
 
 #define PORT_4WAY \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_4WAY, 8),
+	curfield->way = 4;
 
 #define PORT_8WAY \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_8WAY, 8),
+	curfield->way = 8;
 
 #define PORT_16WAY \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_16WAY, 8),
+	curfield->way = 16;
 
 #define PORT_ROTATED \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_ROTATED, 8),
+	curfield->flags |= FIELD_FLAG_ROTATED
 
 /* general flags */
 #define PORT_NAME(_name) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_NAME, 8), \
-	TOKEN_STRING(_name),
+	curfield->name = input_port_string_from_token(_name);
 
-#define PORT_PLAYER(player_) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_PLAYER1 + (((player_) - 1) % MAX_PLAYERS), 8),
+#define PORT_PLAYER(_player) \
+	curfield->player = (_player) - 1;
 
 #define PORT_COCKTAIL \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_COCKTAIL, 8),
+	curfield->flags |= FIELD_FLAG_COCKTAIL; \
+	curfield->player = 1;
 
 #define PORT_TOGGLE \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_TOGGLE, 8),
+	curfield->flags |= FIELD_FLAG_TOGGLE;
 
 #define PORT_IMPULSE(_duration) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_IMPULSE, 8, _duration, 24),
+	curfield->impulse = _duration;
 
 #define PORT_REVERSE \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_REVERSE, 8),
+	curfield->flags |= ANALOG_FLAG_REVERSE;
 
 #define PORT_RESET \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_RESET, 8),
+	curfield->flags |= ANALOG_FLAG_RESET;
 
 #define PORT_UNUSED \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_UNUSED, 8),
+	curfield->flags |= FIELD_FLAG_UNUSED;
 
 /* analog settings */
 /* if this macro is not used, the minimum defaluts to 0 and maximum defaults to the mask value */
 #define PORT_MINMAX(_min, _max) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_MINMAX, 8), \
-	TOKEN_UINT64_PACK2(_min, 32, _max, 32),
+	curfield->min = _min; \
+	curfield->max = _max;
 
 #define PORT_SENSITIVITY(_sensitivity) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_SENSITIVITY, 8, _sensitivity, 24),
+	curfield->sensitivity = _sensitivity;
 
 #define PORT_KEYDELTA(_delta) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_KEYDELTA, 8, _delta, 24),
+	curfield->delta = curfield->centerdelta = _delta;
 
 /* note that PORT_CENTERDELTA must appear after PORT_KEYDELTA */
 #define PORT_CENTERDELTA(_delta) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_CENTERDELTA, 8, _delta, 24),
+	curfield->delta = curfield->centerdelta = _delta;
 
 #define PORT_CROSSHAIR(axis, scale, offset, altaxis) \
-	TOKEN_UINT32_PACK3(INPUT_TOKEN_CROSSHAIR, 8, CROSSHAIR_AXIS_##axis, 4, (INT32)((altaxis) * 65536.0f), 20), \
-	TOKEN_UINT64_PACK2((INT32)((scale) * 65536.0f), 32, (INT32)((offset) * 65536.0f), 32),
+	curfield->crossaxis = CROSSHAIR_AXIS_##axis; \
+	curfield->crossaltaxis = altaxis; \
+	curfield->crossscale = scale; \
+	curfield->crossoffset = offset;
 
 #define PORT_CROSSHAIR_MAPPER(_callback) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_CROSSHAIR_MAPPER, 8), \
-	TOKEN_PTR(crossmapptr, _callback),
+	curfield->crossmapper = _callback;
 
 /* how many optical counts for 1 full turn of the control */
 #define PORT_FULL_TURN_COUNT(_count) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_FULL_TURN_COUNT, 8, _count, 24),
+	curfield->full_turn_count = _count;
 
 /* positional controls can be binary or 1 of X */
 /* 1 of X not completed yet */
 /* if it is specified as PORT_REMAP_TABLE then it is binary, but remapped */
 /* otherwise it is binary */
 #define PORT_POSITIONS(_positions) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_POSITIONS, 8, _positions, 24),
+	curfield->max = _positions;
 
 /* positional control wraps at min/max */
 #define PORT_WRAPS \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_WRAPS, 8),
+	curfield->flags |= ANALOG_FLAG_WRAPS;
 
 /* positional control uses this remap table */
 #define PORT_REMAP_TABLE(_table) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_REMAP_TABLE, 8), \
-	TOKEN_PTR(ui32ptr, _table),
+	curfield->remap_table = _table;
 
 /* positional control bits are active low */
 #define PORT_INVERT \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_INVERT, 8),
+	curfield->flags |= ANALOG_FLAG_INVERT;
 
-/* custom callbacks */
+/* read callbacks */
 #define PORT_CUSTOM(_callback, _param) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_CUSTOM, 8), \
-	TOKEN_PTR(customptr, _callback), \
-	TOKEN_PTR(voidptr, _param),
+	curfield->read = _callback; \
+	curfield->read_param = (void *)(_param); \
+	curfield->read_device = NULL;
 
-/* changed callbacks */
+/* write callbacks */
 #define PORT_CHANGED(_callback, _param) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_CHANGED, 8), \
-	TOKEN_PTR(changedptr, _callback), \
-	TOKEN_PTR(voidptr, _param),
+	curfield->write = _callback; \
+	curfield->write_param = (void *)(_param); \
+	curfield->write_device = NULL;
 
 /* input device handler */
 #define PORT_READ_LINE_DEVICE(_device, _read_line_device) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_READ_LINE_DEVICE, 8), \
-	TOKEN_STRING(_device), \
-	TOKEN_PTR(read_line_device, _read_line_device),
+	curfield->read = &ioport_read_line_wrapper<_read_line_device>; \
+	curfield->read_param = NULL; \
+	curfield->read_device = _device;
 
 /* output device handler */
 #define PORT_WRITE_LINE_DEVICE(_device, _write_line_device) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_WRITE_LINE_DEVICE, 8), \
-	TOKEN_STRING(_device), \
-	TOKEN_PTR(write_line_device, _write_line_device),
+	curfield->write = &ioport_write_line_wrapper<_write_line_device>; \
+	curfield->write_param = NULL; \
+	curfield->write_device = _device;
 
 /* dip switch definition */
 #define PORT_DIPNAME(_mask, _default, _name) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPNAME, 8), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
-	TOKEN_STRING(_name),
+	curfield = ioconfig_alloc_field(*curport, IPT_DIPSWITCH, (_default), (_mask), (_name)); \
+	cursetting = NULL;
 
 #define PORT_DIPSETTING(_default, _name) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_DIPSETTING, 8, _default, 32), \
-	TOKEN_STRING(_name),
+	cursetting = ioconfig_alloc_setting(*curfield, (_default) & curfield->mask, (_name));
 
 /* physical location, of the form: name:[!]sw,[name:][!]sw,... */
 /* note that these are specified LSB-first */
 #define PORT_DIPLOCATION(_location) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPLOCATION, 8), \
-	TOKEN_STRING(_location),
+	diplocation_list_alloc(*curfield, _location, errorbuf);
 
 /* conditionals for dip switch settings */
 #define PORT_CONDITION(_tag, _mask, _condition, _value) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_CONDITION, 8, _condition, 24), \
-	TOKEN_UINT64_PACK2(_mask, 32, _value, 32), \
-	TOKEN_STRING(_tag),
+{ \
+	input_condition &condition = (cursetting != NULL) ? cursetting->condition : curfield->condition; \
+	condition.tag = (_tag); \
+	condition.mask = (_mask); \
+	condition.condition = (_condition); \
+	condition.value = (_value); \
+}
 
 /* analog adjuster definition */
 #define PORT_ADJUSTER(_default, _name) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_ADJUSTER, 8, _default, 32), \
-	TOKEN_STRING(_name),
+	curfield = ioconfig_alloc_field(*curport, IPT_ADJUSTER, (_default), 0xff, (_name)); \
+	cursetting = NULL; \
 
 /* config definition */
 #define PORT_CONFNAME(_mask, _default, _name) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_CONFNAME, 8), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
-	TOKEN_STRING(_name),
+	curfield = ioconfig_alloc_field(*curport, IPT_CONFIG, (_default), (_mask), (_name)); \
+	cursetting = NULL; \
 
 #define PORT_CONFSETTING(_default, _name) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CONFSETTING, 8, _default, 32), \
-	TOKEN_STRING(_name),
+	cursetting = ioconfig_alloc_setting(*curfield, (_default) & curfield->mask, (_name));
 
 /* keyboard chars */
 #define PORT_CHAR(_ch) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CHAR, 8, _ch, 32), \
+	ioconfig_field_add_char(*curfield, _ch, errorbuf);
 
 /* categories */
 #define PORT_CATEGORY(_category) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_CATEGORY, 8, _category, 24),
+	curfield->category = (_category);
 
 #define PORT_CATEGORY_CLASS(_mask, _default, _name) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_CATEGORY_NAME, 8), \
-	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
-	TOKEN_STRING(_name),
+	curfield = ioconfig_alloc_field(*curport, IPT_CATEGORY, (_default), (_mask), (_name)); \
+	cursetting = NULL;
 
 #define PORT_CATEGORY_ITEM(_default, _name, _category) \
-	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 16), \
-	TOKEN_STRING(_name),
+	cursetting = ioconfig_alloc_setting(*curfield, (_default) & curfield->mask, (_name)); \
+	cursetting->category = (_category);
 
 
 /* name of table */
@@ -1085,14 +1070,14 @@ struct _inp_header
 /* ----- core system management ----- */
 
 /* initialize the input ports, processing the given token list */
-time_t input_port_init(running_machine &machine, const device_list &devicelist);
+time_t input_port_init(running_machine &machine);
 
 
 
 /* ----- port configurations ----- */
 
 /* initialize an input port list structure and allocate ports according to the given tokens */
-void input_port_list_init(ioport_list &portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap, device_t *owner);
+void input_port_list_init(device_t &device, ioport_list &portlist, astring &errorbuf);
 
 /* return the field that matches the given tag and mask */
 const input_field_config *input_field_by_tag_and_mask(const ioport_list &portlist, const char *tag, input_port_value mask);
@@ -1207,7 +1192,7 @@ void input_port_write_safe(running_machine &machine, const char *tag, input_port
 int input_condition_true(running_machine &machine, const input_condition *condition);
 
 /* convert an input_port_token to a default string */
-const char *input_port_string_from_token(const input_port_token token);
+const char *input_port_string_from_token(const char *token);
 
 /* return TRUE if machine use full keyboard emulation */
 int input_machine_has_keyboard(running_machine &machine);
@@ -1239,5 +1224,25 @@ int input_has_input_class(running_machine &machine, int inputclass);
 int input_player_number(const input_field_config *field);
 int input_count_players(running_machine &machine);
 int input_category_active(running_machine &machine, int category);
+
+
+inline running_machine &input_field_config::machine() const
+{
+	return m_port.machine();
+}
+
+
+// temporary construction helpers
+void field_config_insert(input_field_config &newfield, input_port_value &disallowedbits, astring &errorbuf);
+void diplocation_list_alloc(input_field_config &field, const char *location, astring &errorbuf);
+
+
+input_port_config *ioconfig_alloc_port(ioport_list &portlist, device_t &device, const char *tag);
+input_port_config *ioconfig_modify_port(ioport_list &portlist, device_t &device, const char *tag);
+input_field_config *ioconfig_alloc_field(input_port_config &port, int type, input_port_value defval, input_port_value mask, const char *name = NULL);
+input_field_config *ioconfig_alloc_onoff(input_port_config &port, const char *name, input_port_value defval, input_port_value mask, const char *diplocation, astring &errorbuf);
+input_setting_config *ioconfig_alloc_setting(input_field_config &field, input_port_value value, const char *name);
+void ioconfig_field_add_char(input_field_config &field, unicode_char ch, astring &errorbuf);
+void ioconfig_add_code(input_field_config &field, int which, input_code code);
 
 #endif	/* __INPTPORT_H__ */

@@ -134,7 +134,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const int gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
+static const input_port_value gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
 
 static INPUT_PORTS_START( copsnrob )
 	PORT_START("IN0")

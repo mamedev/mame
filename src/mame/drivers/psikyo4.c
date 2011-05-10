@@ -198,20 +198,20 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 
 static CUSTOM_INPUT( system_port_r )
 {
-	return input_port_read(field->port->machine(), "SYSTEM");
+	return input_port_read(field->machine(), "SYSTEM");
 }
 
 static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 {
-	psikyo4_state *state = field->port->machine().driver_data<psikyo4_state>();
+	psikyo4_state *state = field->machine().driver_data<psikyo4_state>();
 	int player = (FPTR)param;
 	int sel = (state->m_io_select[0] & 0x0000ff00) >> 8;
 	int ret = 0xff;
 
-	if (sel & 1) ret &= input_port_read(field->port->machine(), player ? "KEY4" : "KEY0" );
-	if (sel & 2) ret &= input_port_read(field->port->machine(), player ? "KEY5" : "KEY1" );
-	if (sel & 4) ret &= input_port_read(field->port->machine(), player ? "KEY6" : "KEY2" );
-	if (sel & 8) ret &= input_port_read(field->port->machine(), player ? "KEY7" : "KEY3" );
+	if (sel & 1) ret &= input_port_read(field->machine(), player ? "KEY4" : "KEY0" );
+	if (sel & 2) ret &= input_port_read(field->machine(), player ? "KEY5" : "KEY1" );
+	if (sel & 4) ret &= input_port_read(field->machine(), player ? "KEY6" : "KEY2" );
+	if (sel & 8) ret &= input_port_read(field->machine(), player ? "KEY7" : "KEY3" );
 
 	return ret;
 }

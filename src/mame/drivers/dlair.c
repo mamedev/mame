@@ -316,7 +316,7 @@ static WRITE8_HANDLER( led_den2_w )
 
 static CUSTOM_INPUT( laserdisc_status_r )
 {
-	dlair_state *state = field->port->machine().driver_data<dlair_state>();
+	dlair_state *state = field->machine().driver_data<dlair_state>();
 	switch (laserdisc_get_type(state->m_laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
@@ -334,7 +334,7 @@ static CUSTOM_INPUT( laserdisc_status_r )
 
 static CUSTOM_INPUT( laserdisc_command_r )
 {
-	dlair_state *state = field->port->machine().driver_data<dlair_state>();
+	dlair_state *state = field->machine().driver_data<dlair_state>();
 	switch (laserdisc_get_type(state->m_laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:

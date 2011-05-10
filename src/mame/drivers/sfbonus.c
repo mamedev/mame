@@ -927,7 +927,7 @@ static SCREEN_UPDATE(sfbonus)
 	int globalyscroll = (state->m_vregs[2] | state->m_vregs[3]<<8);
 	int globalxscroll = (state->m_vregs[0] | state->m_vregs[1]<<8);
 	UINT8* front_rowscroll = &state->m_videoram[0x200];
-	const input_port_token *ipt;
+	ioport_constructor ipt;
 	int i;
 
 	// align to 0

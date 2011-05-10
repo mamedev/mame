@@ -713,7 +713,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 
 static CUSTOM_INPUT( c2map_r )
 {
-	toaplan2_state *state = field->port->machine().driver_data<toaplan2_state>();
+	toaplan2_state *state = field->machine().driver_data<toaplan2_state>();
 
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready

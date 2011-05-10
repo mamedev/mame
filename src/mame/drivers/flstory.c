@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
-	flstory_state *state = field->port->machine().driver_data<flstory_state>();
+	flstory_state *state = field->machine().driver_data<flstory_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);

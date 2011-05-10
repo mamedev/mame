@@ -368,15 +368,15 @@ static TIMER_CALLBACK( touch_cb )
 
 static INPUT_CHANGED( touchscreen_press )
 {
-	jpmsys5_state *state = field->port->machine().driver_data<jpmsys5_state>();
+	jpmsys5_state *state = field->machine().driver_data<jpmsys5_state>();
 	if (newval == 0)
 	{
 		attotime rx_period = attotime::from_hz(10000) * 16;
 
 		/* Each touch screen packet is 3 bytes */
 		state->m_touch_data[0] = 0x2a;
-		state->m_touch_data[1] = 0x7 - (input_port_read(field->port->machine(), "TOUCH_Y") >> 5) + 0x30;
-		state->m_touch_data[2] = (input_port_read(field->port->machine(), "TOUCH_X") >> 5) + 0x30;
+		state->m_touch_data[1] = 0x7 - (input_port_read(field->machine(), "TOUCH_Y") >> 5) + 0x30;
+		state->m_touch_data[2] = (input_port_read(field->machine(), "TOUCH_X") >> 5) + 0x30;
 
 		/* Start sending the data to the 68000 serially */
 		state->m_touch_data_count = 0;

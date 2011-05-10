@@ -730,7 +730,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( wheelrun_wheel_r )
 {
 	int player = (FPTR)param;
-	int delta = input_port_read(field->port->machine(), player ? "WHEEL1" : "WHEEL0");
+	int delta = input_port_read(field->machine(), player ? "WHEEL1" : "WHEEL0");
 	delta = (delta & 0x7f) - (delta & 0x80) + 4;
 
 	if		(delta > 7)	delta = 7;

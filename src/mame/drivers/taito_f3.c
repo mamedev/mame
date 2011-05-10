@@ -51,14 +51,14 @@ static CUSTOM_INPUT( f3_analog_r )
 	const char *tag = (const char *)param;
 	UINT32 ipt = 0;
 
-	ipt = ((input_port_read(field->port->machine(), tag) & 0xf)<<12) | ((input_port_read(field->port->machine(), tag) & 0xff0)>>4);
+	ipt = ((input_port_read(field->machine(), tag) & 0xf)<<12) | ((input_port_read(field->machine(), tag) & 0xff0)>>4);
 
 	return ipt;
 }
 
 static CUSTOM_INPUT( f3_coin_r )
 {
-	taito_f3_state *state = field->port->machine().driver_data<taito_f3_state>();
+	taito_f3_state *state = field->machine().driver_data<taito_f3_state>();
 	int num = (FPTR)param;
 	return state->m_coin_word[num];
 }

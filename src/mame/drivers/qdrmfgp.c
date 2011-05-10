@@ -37,10 +37,10 @@ GP1 HDD data contents:
 
 static CUSTOM_INPUT( inputs_r )
 {
-	qdrmfgp_state *state = field->port->machine().driver_data<qdrmfgp_state>();
+	qdrmfgp_state *state = field->machine().driver_data<qdrmfgp_state>();
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field->port->machine(), (state->m_control & 0x0080) ? tag1 : tag2);
+	return input_port_read(field->machine(), (state->m_control & 0x0080) ? tag1 : tag2);
 }
 
 static CUSTOM_INPUT( battery_sensor_r )

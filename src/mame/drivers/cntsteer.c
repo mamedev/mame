@@ -672,7 +672,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cntsteer_state *state = field->port->machine().driver_data<cntsteer_state>();
+	cntsteer_state *state = field->machine().driver_data<cntsteer_state>();
 	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 

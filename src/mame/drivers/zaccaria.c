@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( acs_r )
 {
-	zaccaria_state *state = field->port->machine().driver_data<zaccaria_state>();
+	zaccaria_state *state = field->machine().driver_data<zaccaria_state>();
 	return (state->m_acs & 0x08) ? 1 : 0;
 }
 

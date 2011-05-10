@@ -194,7 +194,7 @@ static INTERRUPT_GEN( tankbatt_interrupt )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine(), "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(field->machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )

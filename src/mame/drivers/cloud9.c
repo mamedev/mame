@@ -142,8 +142,8 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	cloud9_state *state = field->port->machine().driver_data<cloud9_state>();
-	int scanline = field->port->machine().primary_screen->vpos();
+	cloud9_state *state = field->machine().driver_data<cloud9_state>();
+	int scanline = field->machine().primary_screen->vpos();
 	return (~state->m_syncprom[scanline & 0xff] >> 1) & 1;
 }
 

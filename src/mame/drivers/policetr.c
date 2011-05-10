@@ -183,7 +183,7 @@ static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 
 static CUSTOM_INPUT( bsmt_status_r )
 {
-	return field->port->machine().device<bsmt2000_device>("bsmt")->read_status();
+	return field->machine().device<bsmt2000_device>("bsmt")->read_status();
 }
 
 

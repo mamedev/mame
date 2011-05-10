@@ -132,14 +132,14 @@ static CUSTOM_INPUT( prot_r )
 //  offs_t pc;
 	int bit;
 
-//  logerror("%s: IN1_r\n",field->port->machine().describe_context());
+//  logerror("%s: IN1_r\n",field->machine().describe_context());
 
 #if 0
 	/* Pirates protection workaround. It more complicated than this... see code at
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = cpu_get_pc(field->port->machine().device("main"));
+	pc = cpu_get_pc(field->machine().device("main"));
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;

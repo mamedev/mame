@@ -293,7 +293,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -355,12 +355,12 @@ static READ8_HANDLER( razmataz_counter_r )
 
 static CUSTOM_INPUT( razmataz_dial_r )
 {
-	zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = field->machine().driver_data<zaxxon_state>();
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = input_port_read(field->port->machine(), dialname[num]);
+	delta = input_port_read(field->machine(), dialname[num]);
 
 	if (delta < 0x80)
 	{
@@ -408,7 +408,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
 	{
-		zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
+		zaxxon_state *state = field->machine().driver_data<zaxxon_state>();
 
 		state->m_coin_status[(int)(FPTR)param] = state->m_coin_enable[(int)(FPTR)param];
 	}
@@ -417,7 +417,7 @@ static INPUT_CHANGED( zaxxon_coin_inserted )
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	zaxxon_state *state = field->port->machine().driver_data<zaxxon_state>();
+	zaxxon_state *state = field->machine().driver_data<zaxxon_state>();
 
 	return state->m_coin_status[(int)(FPTR)param];
 }

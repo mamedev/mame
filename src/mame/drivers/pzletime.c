@@ -202,8 +202,8 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 static CUSTOM_INPUT( ticket_status_r )
 {
-	pzletime_state *state = field->port->machine().driver_data<pzletime_state>();
-	return (state->m_ticket && !(field->port->machine().primary_screen->frame_number() % 128));
+	pzletime_state *state = field->machine().driver_data<pzletime_state>();
+	return (state->m_ticket && !(field->machine().primary_screen->frame_number() % 128));
 }
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16 )

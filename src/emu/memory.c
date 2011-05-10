@@ -4592,13 +4592,13 @@ void handler_entry_read::set_ioport(const input_port_config &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag, this));
+		set_delegate(read8_delegate(&handler_entry_read::read_stub_ioport<UINT8>, ioport.tag(), this));
 	else if (m_datawidth == 16)
-		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag, this));
+		set_delegate(read16_delegate(&handler_entry_read::read_stub_ioport<UINT16>, ioport.tag(), this));
 	else if (m_datawidth == 32)
-		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag, this));
+		set_delegate(read32_delegate(&handler_entry_read::read_stub_ioport<UINT32>, ioport.tag(), this));
 	else if (m_datawidth == 64)
-		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag, this));
+		set_delegate(read64_delegate(&handler_entry_read::read_stub_ioport<UINT64>, ioport.tag(), this));
 }
 
 
@@ -4919,13 +4919,13 @@ void handler_entry_write::set_ioport(const input_port_config &ioport)
 {
 	m_ioport = &ioport;
 	if (m_datawidth == 8)
-		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag, this));
+		set_delegate(write8_delegate(&handler_entry_write::write_stub_ioport<UINT8>, ioport.tag(), this));
 	else if (m_datawidth == 16)
-		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag, this));
+		set_delegate(write16_delegate(&handler_entry_write::write_stub_ioport<UINT16>, ioport.tag(), this));
 	else if (m_datawidth == 32)
-		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag, this));
+		set_delegate(write32_delegate(&handler_entry_write::write_stub_ioport<UINT32>, ioport.tag(), this));
 	else if (m_datawidth == 64)
-		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag, this));
+		set_delegate(write64_delegate(&handler_entry_write::write_stub_ioport<UINT64>, ioport.tag(), this));
 }
 
 

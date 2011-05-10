@@ -256,7 +256,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (newval == 0)
-		cputag_set_input_line(field->port->machine(), "maincpu", 0, ASSERT_LINE);
+		cputag_set_input_line(field->machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 
@@ -269,14 +269,14 @@ static INPUT_CHANGED( coin_inserted )
 
 static CUSTOM_INPUT( firq_beam_r )
 {
-	exidy440_state *state = field->port->machine().driver_data<exidy440_state>();
+	exidy440_state *state = field->machine().driver_data<exidy440_state>();
 	return state->m_firq_beam;
 }
 
 
 static CUSTOM_INPUT( firq_vblank_r )
 {
-	exidy440_state *state = field->port->machine().driver_data<exidy440_state>();
+	exidy440_state *state = field->machine().driver_data<exidy440_state>();
 	return state->m_firq_vblank;
 }
 
@@ -284,7 +284,7 @@ static CUSTOM_INPUT( firq_vblank_r )
 static CUSTOM_INPUT( hitnmiss_button1_r )
 {
 	/* button 1 shows up in two bits */
-	UINT32 button1 = input_port_read(field->port->machine(), "HITNMISS_BUTTON1");
+	UINT32 button1 = input_port_read(field->machine(), "HITNMISS_BUTTON1");
 	return (button1 << 1) | button1;
 }
 

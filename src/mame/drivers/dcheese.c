@@ -119,7 +119,7 @@ static MACHINE_START( dcheese )
 
 static CUSTOM_INPUT( sound_latch_state_r )
 {
-	dcheese_state *state = field->port->machine().driver_data<dcheese_state>();
+	dcheese_state *state = field->machine().driver_data<dcheese_state>();
 	return state->m_soundlatch_full;
 }
 

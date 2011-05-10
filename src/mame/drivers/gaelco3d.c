@@ -409,7 +409,7 @@ static WRITE16_HANDLER( sound_status_w )
 
 static CUSTOM_INPUT( analog_bit_r )
 {
-	gaelco3d_state *state = field->port->machine().driver_data<gaelco3d_state>();
+	gaelco3d_state *state = field->machine().driver_data<gaelco3d_state>();
 	int which = (FPTR)param;
 	return (state->m_analog_ports[which] >> 7) & 0x01;
 }

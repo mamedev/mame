@@ -608,7 +608,7 @@ static READ8_HANDLER( mcu_r )
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	renegade_state *state = field->port->machine().driver_data<renegade_state>();
+	renegade_state *state = field->machine().driver_data<renegade_state>();
 	UINT8 res = 0;
 
 	if (state->m_mcu_sim == TRUE)

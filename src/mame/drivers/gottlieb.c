@@ -295,11 +295,11 @@ static MACHINE_RESET( gottlieb )
 
 static CUSTOM_INPUT( analog_delta_r )
 {
-	gottlieb_state *state = field->port->machine().driver_data<gottlieb_state>();
+	gottlieb_state *state = field->machine().driver_data<gottlieb_state>();
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(field->port->machine(), &string[1]) - state->m_track[which];
+	return input_port_read(field->machine(), &string[1]) - state->m_track[which];
 }
 
 
@@ -314,9 +314,9 @@ static WRITE8_HANDLER( gottlieb_analog_reset_w )
 
 static CUSTOM_INPUT( stooges_joystick_r )
 {
-	gottlieb_state *state = field->port->machine().driver_data<gottlieb_state>();
+	gottlieb_state *state = field->machine().driver_data<gottlieb_state>();
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[state->m_joystick_select & 3] != NULL) ? input_port_read(field->port->machine(), joyport[state->m_joystick_select & 3]) : 0xff;
+	return (joyport[state->m_joystick_select & 3] != NULL) ? input_port_read(field->machine(), joyport[state->m_joystick_select & 3]) : 0xff;
 }
 
 

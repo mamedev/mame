@@ -220,8 +220,8 @@ void crosshair_init(running_machine &machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (const input_port_config *port = machine.m_portlist.first(); port != NULL; port = port->next())
-		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
+	for (input_port_config *port = machine.m_portlist.first(); port != NULL; port = port->next())
+		for (input_field_config *field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
 			{
 				int player = field->player;

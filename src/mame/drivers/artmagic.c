@@ -387,7 +387,7 @@ static void stonebal_protection(running_machine &machine)
 
 static CUSTOM_INPUT( prot_r )
 {
-	artmagic_state *state = field->port->machine().driver_data<artmagic_state>();
+	artmagic_state *state = field->machine().driver_data<artmagic_state>();
 	return state->m_prot_output_bit;
 }
 

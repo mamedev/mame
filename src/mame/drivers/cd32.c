@@ -230,8 +230,8 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 static CUSTOM_INPUT(cubo_input)
 {
-	cd32_state *state = field->port->machine().driver_data<cd32_state>();
-	return handle_joystick_potgor(field->port->machine(), state->m_potgo_value) >> 10;
+	cd32_state *state = field->machine().driver_data<cd32_state>();
+	return handle_joystick_potgor(field->machine(), state->m_potgo_value) >> 10;
 }
 
 static INPUT_PORTS_START( cd32 )

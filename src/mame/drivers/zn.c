@@ -2066,7 +2066,7 @@ static WRITE32_DEVICE_HANDLER( jdredd_ide_w )
 
 static CUSTOM_INPUT( jdredd_gun_mux_read )
 {
-	zn_state *state = field->port->machine().driver_data<zn_state>();
+	zn_state *state = field->machine().driver_data<zn_state>();
 
 	return state->m_jdredd_gun_mux;
 }

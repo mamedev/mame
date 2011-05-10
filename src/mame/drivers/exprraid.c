@@ -280,13 +280,13 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted_deco16 )
 {
-	exprraid_state *state = field->port->machine().driver_data<exprraid_state>();
+	exprraid_state *state = field->machine().driver_data<exprraid_state>();
 	device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi )
 {
-	exprraid_state *state = field->port->machine().driver_data<exprraid_state>();
+	exprraid_state *state = field->machine().driver_data<exprraid_state>();
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 

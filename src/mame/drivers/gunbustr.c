@@ -80,7 +80,7 @@ static WRITE32_HANDLER( gunbustr_palette_w )
 
 static CUSTOM_INPUT( coin_word_r )
 {
-	gunbustr_state *state = field->port->machine().driver_data<gunbustr_state>();
+	gunbustr_state *state = field->machine().driver_data<gunbustr_state>();
 	return state->m_coin_word;
 }
 

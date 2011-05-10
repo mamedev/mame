@@ -256,7 +256,7 @@ static MACHINE_RESET(supervisor_board)
 static INPUT_CHANGED( coin_inserted )
 {
 	if (!newval)
-		cputag_set_input_line(field->port->machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
+		cputag_set_input_line(field->machine(), "mcu", M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(running_machine &machine)

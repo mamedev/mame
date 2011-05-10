@@ -83,7 +83,7 @@ static void assert_coin_status(running_machine &machine)
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
-	vicdual_state *state = field->port->machine().driver_data<vicdual_state>();
+	vicdual_state *state = field->machine().driver_data<vicdual_state>();
 	return state->m_coin_status;
 }
 
@@ -93,13 +93,13 @@ static INPUT_CHANGED( coin_changed )
 	if (newval && !oldval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(field->port->machine(), 0, 1);
-		coin_counter_w(field->port->machine(), 0, 0);
+		coin_counter_w(field->machine(), 0, 1);
+		coin_counter_w(field->machine(), 0, 0);
 
-		cputag_set_input_line(field->port->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		field->port->machine().scheduler().timer_set(4 * field->port->machine().primary_screen->frame_period(), FUNC(clear_coin_status));
+		field->machine().scheduler().timer_set(4 * field->machine().primary_screen->frame_period(), FUNC(clear_coin_status));
 	}
 }
 
@@ -137,26 +137,26 @@ static int get_vcounter(running_machine &machine)
 
 static CUSTOM_INPUT( vicdual_get_64v )
 {
-	return (get_vcounter(field->port->machine()) >> 6) & 0x01;
+	return (get_vcounter(field->machine()) >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( vicdual_get_vblank_comp )
 {
-	return (get_vcounter(field->port->machine()) < VICDUAL_VBSTART);
+	return (get_vcounter(field->machine()) < VICDUAL_VBSTART);
 }
 
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(field, 0) && !field->port->machine().primary_screen->hblank());
+	return (vicdual_get_vblank_comp(device, field, 0) && !field->machine().primary_screen->hblank());
 }
 
 
 static CUSTOM_INPUT( vicdual_get_timer_value )
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
-	return field->port->machine().time().as_ticks(500) & 1;
+	return field->machine().time().as_ticks(500) & 1;
 }
 
 
@@ -1632,7 +1632,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( brdrline_lives )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->port->machine(), "FAKE_LIVES") & bit_mask) ? 0x00 : 0x01;
+	return (input_port_read(field->machine(), "FAKE_LIVES") & bit_mask) ? 0x00 : 0x01;
 }
 
 static INPUT_PORTS_START( brdrline )
@@ -2053,7 +2053,7 @@ static WRITE8_HANDLER( samurai_protection_w )
 
 static CUSTOM_INPUT( samurai_protection_r )
 {
-	vicdual_state *state = field->port->machine().driver_data<vicdual_state>();
+	vicdual_state *state = field->machine().driver_data<vicdual_state>();
 	int offset = (FPTR)param;
 	UINT32 answer = 0;
 

@@ -141,7 +141,27 @@ public:
 			return prepend(object);
 		object.m_next = insert_after->m_next;
 		insert_after->m_next = &object;
+		if (m_tail == insert_after)
+			m_tail = &object;
 		m_count++;
+		return object;
+	}
+
+	// insert the given object before a particular object (NULL means append)
+	_ElementType &insert_before(_ElementType &object, _ElementType *insert_before)
+	{
+		if (insert_before == NULL)
+			return append(object);
+		for (_ElementType **curptr = &m_head; *curptr != NULL; curptr = &(*curptr)->m_next)
+			if (*curptr == insert_before)
+			{
+				object.m_next = insert_before;
+				*curptr = &object;
+				if (m_head == insert_before)
+					m_head = &object;
+				m_count++;
+				return object;
+			}
 		return object;
 	}
 

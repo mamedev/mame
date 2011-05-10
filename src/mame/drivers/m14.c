@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
-	m14_state *state = field->port->machine().driver_data<m14_state>();
+	m14_state *state = field->machine().driver_data<m14_state>();
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		device_set_input_line(state->m_maincpu, I8085_RST65_LINE, HOLD_LINE);
@@ -230,7 +230,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	m14_state *state = field->port->machine().driver_data<m14_state>();
+	m14_state *state = field->machine().driver_data<m14_state>();
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
 		device_set_input_line(state->m_maincpu, I8085_RST55_LINE, HOLD_LINE);

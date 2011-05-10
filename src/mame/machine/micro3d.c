@@ -545,7 +545,7 @@ WRITE16_HANDLER( micro3d_adc_w )
 
 CUSTOM_INPUT( botssa_hwchk_r )
 {
-	micro3d_state *state = field->port->machine().driver_data<micro3d_state>();
+	micro3d_state *state = field->machine().driver_data<micro3d_state>();
 
 	return state->m_botssa_latch;
 }

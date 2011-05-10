@@ -391,9 +391,9 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( hopper_r )
 {
-	jackie_state *state = field->port->machine().driver_data<jackie_state>();
-	if (state->m_hopper) return !(field->port->machine().primary_screen->frame_number()%10);
-	return input_code_pressed(field->port->machine(), KEYCODE_H);
+	jackie_state *state = field->machine().driver_data<jackie_state>();
+	if (state->m_hopper) return !(field->machine().primary_screen->frame_number()%10);
+	return input_code_pressed(field->machine(), KEYCODE_H);
 }
 
 static INPUT_PORTS_START( jackie )

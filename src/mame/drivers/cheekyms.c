@@ -14,7 +14,7 @@
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cheekyms_state *state = field->port->machine().driver_data<cheekyms_state>();
+	cheekyms_state *state = field->machine().driver_data<cheekyms_state>();
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)

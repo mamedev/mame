@@ -168,7 +168,7 @@ static CUSTOM_INPUT( gstream_mirror_service_r )
 	int result;
 
 	/* PORT_SERVICE_NO_TOGGLE */
-	result = (input_port_read(field->port->machine(), "IN0") & 0x8000) >> 15;
+	result = (input_port_read(field->machine(), "IN0") & 0x8000) >> 15;
 
 	return ~result;
 }
@@ -178,15 +178,15 @@ static CUSTOM_INPUT( gstream_mirror_r )
 	int result;
 
 	/* IPT_COIN1 */
-	result  = ((input_port_read(field->port->machine(), "IN0") & 0x200) >>  9) << 0;
+	result  = ((input_port_read(field->machine(), "IN0") & 0x200) >>  9) << 0;
 	/* IPT_COIN2 */
-	result |= ((input_port_read(field->port->machine(), "IN1") & 0x200) >>  9) << 1;
+	result |= ((input_port_read(field->machine(), "IN1") & 0x200) >>  9) << 1;
 	/* IPT_START1 */
-	result |= ((input_port_read(field->port->machine(), "IN0") & 0x400) >> 10) << 2;
+	result |= ((input_port_read(field->machine(), "IN0") & 0x400) >> 10) << 2;
 	/* IPT_START2 */
-	result |= ((input_port_read(field->port->machine(), "IN1") & 0x400) >> 10) << 3;
+	result |= ((input_port_read(field->machine(), "IN1") & 0x400) >> 10) << 3;
 	/* PORT_SERVICE_NO_TOGGLE */
-	result |= ((input_port_read(field->port->machine(), "IN0") & 0x8000) >> 15) << 6;
+	result |= ((input_port_read(field->machine(), "IN0") & 0x8000) >> 15) << 6;
 
 	return ~result;
 }

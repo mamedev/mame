@@ -265,13 +265,13 @@ static WRITE8_HANDLER( firefox_objram_bank_w )
 
 static CUSTOM_INPUT( mainflag_r )
 {
-	firefox_state *state = field->port->machine().driver_data<firefox_state>();
+	firefox_state *state = field->machine().driver_data<firefox_state>();
 	return state->m_main_to_sound_flag;
 }
 
 static CUSTOM_INPUT( soundflag_r )
 {
-	firefox_state *state = field->port->machine().driver_data<firefox_state>();
+	firefox_state *state = field->machine().driver_data<firefox_state>();
 	return state->m_sound_to_main_flag;
 }
 

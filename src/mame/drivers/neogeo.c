@@ -428,7 +428,7 @@ static void select_controller( running_machine &machine, UINT8 data )
 
 static CUSTOM_INPUT( multiplexed_controller_r )
 {
-	neogeo_state *state = field->port->machine().driver_data<neogeo_state>();
+	neogeo_state *state = field->machine().driver_data<neogeo_state>();
 	int port = (FPTR)param;
 
 	static const char *const cntrl[2][2] =
@@ -436,13 +436,13 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
 		};
 
-	return input_port_read_safe(field->port->machine(), cntrl[port][state->m_controller_select & 0x01], 0x00);
+	return input_port_read_safe(field->machine(), cntrl[port][state->m_controller_select & 0x01], 0x00);
 }
 
 
 static CUSTOM_INPUT( mahjong_controller_r )
 {
-	neogeo_state *state = field->port->machine().driver_data<neogeo_state>();
+	neogeo_state *state = field->machine().driver_data<neogeo_state>();
 	UINT32 ret;
 
 /*
@@ -456,10 +456,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = input_port_read(field->port->machine(), "MAHJONG1"); break;
-	case 0x12: ret = input_port_read(field->port->machine(), "MAHJONG2"); break;
-	case 0x1b: ret = input_port_read(field->port->machine(), "MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = input_port_read(field->port->machine(), "MAHJONG4"); break;
+	case 0x09: ret = input_port_read(field->machine(), "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(field->machine(), "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(field->machine(), "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(field->machine(), "MAHJONG4"); break;
 	}
 
 	return ret;
@@ -525,7 +525,7 @@ READ16_HANDLER( neogeo_unmapped_r )
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	neogeo_state *state = field->port->machine().driver_data<neogeo_state>();
+	neogeo_state *state = field->machine().driver_data<neogeo_state>();
 	return (upd4990a_databit_r(state->m_upd4990a, 0) << 1) | upd4990a_testbit_r(state->m_upd4990a, 0);
 }
 
@@ -567,7 +567,7 @@ static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	return (memcard_present(field->port->machine()) == -1) ? 0x07 : 0x00;
+	return (memcard_present(field->machine()) == -1) ? 0x07 : 0x00;
 }
 
 
@@ -663,10 +663,10 @@ static WRITE8_HANDLER( audio_result_w )
 
 static CUSTOM_INPUT( get_audio_result )
 {
-	neogeo_state *state = field->port->machine().driver_data<neogeo_state>();
+	neogeo_state *state = field->machine().driver_data<neogeo_state>();
 	UINT32 ret = state->m_audio_result;
 
-//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine().device("maincpu")), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->machine().device("maincpu")), ret);
 
 	return ret;
 }

@@ -2354,14 +2354,14 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( moonwar_dial_r )
 {
-	galaxian_state *state = field->port->machine().driver_data<galaxian_state>();
+	galaxian_state *state = field->machine().driver_data<galaxian_state>();
 	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
 	int p = (~state->m_moonwar_port_select >> 4) & 1;
 
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
 	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	signed char dialread = input_port_read(field->port->machine(), dialname[p]);
+	signed char dialread = input_port_read(field->machine(), dialname[p]);
 
 	UINT8 ret;
 

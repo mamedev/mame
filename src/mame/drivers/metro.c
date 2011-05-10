@@ -379,7 +379,7 @@ static READ16_HANDLER( metro_soundstatus_r )
 
 static CUSTOM_INPUT( custom_soundstatus_r )
 {
-	metro_state *state = field->port->machine().driver_data<metro_state>();
+	metro_state *state = field->machine().driver_data<metro_state>();
 	return (state->m_busy_sndcpu ? 0x01 : 0x00);
 }
 

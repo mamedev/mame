@@ -337,8 +337,8 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
-	niyanpai_state *state = field->port->machine().driver_data<niyanpai_state>();
-	address_space *space = field->port->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	niyanpai_state *state = field->machine().driver_data<niyanpai_state>();
+	address_space *space = field->machine().device("maincpu")->memory().space(AS_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on

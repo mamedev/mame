@@ -133,14 +133,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 static CUSTOM_INPUT( exerion_controls_r )
 {
 	static const char *const inname[2] = { "P1", "P2" };
-	exerion_state *state = field->port->machine().driver_data<exerion_state>();
-	return input_port_read(field->port->machine(), inname[state->m_cocktail_flip]) & 0x3f;
+	exerion_state *state = field->machine().driver_data<exerion_state>();
+	return input_port_read(field->machine(), inname[state->m_cocktail_flip]) & 0x3f;
 }
 
 
 static INPUT_CHANGED( coin_inserted )
 {
-	exerion_state *state = field->port->machine().driver_data<exerion_state>();
+	exerion_state *state = field->machine().driver_data<exerion_state>();
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

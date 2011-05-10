@@ -253,7 +253,7 @@ static const eeprom_interface undrfire_eeprom_interface =
 
 static CUSTOM_INPUT(frame_counter_r)
 {
-	undrfire_state *state = field->port->machine().driver_data<undrfire_state>();
+	undrfire_state *state = field->machine().driver_data<undrfire_state>();
 	return state->m_frame_counter;
 }
 

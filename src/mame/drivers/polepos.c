@@ -348,11 +348,11 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 }
 
 
-static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->port->machine(), (const char *)param) >> 4; }
-static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->port->machine(), (const char *)param) & 0x0f; }
+static CUSTOM_INPUT( high_port_r ) { return input_port_read(field->machine(), (const char *)param) >> 4; }
+static CUSTOM_INPUT( low_port_r ) { return input_port_read(field->machine(), (const char *)param) & 0x0f; }
 static CUSTOM_INPUT( auto_start_r )
 {
-	polepos_state *state = field->port->machine().driver_data<polepos_state>();
+	polepos_state *state = field->machine().driver_data<polepos_state>();
 	return state->m_auto_start_mask;
 }
 

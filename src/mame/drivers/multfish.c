@@ -378,7 +378,7 @@ static READ8_HANDLER( ray_r )
 
 static CUSTOM_INPUT( multfish_hopper_r )
 {
-	multfish_state *state = field->port->machine().driver_data<multfish_state>();
+	multfish_state *state = field->machine().driver_data<multfish_state>();
 
 	if ( state->m_hopper_motor != 0 )
 	{

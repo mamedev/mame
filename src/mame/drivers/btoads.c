@@ -72,13 +72,13 @@ READ16_MEMBER( btoads_state::main_sound_r )
 
 CUSTOM_INPUT( btoads_state::static_main_to_sound_r )
 {
-	return field->port->machine().driver_data<btoads_state>()->m_main_to_sound_ready;
+	return field->machine().driver_data<btoads_state>()->m_main_to_sound_ready;
 }
 
 
 CUSTOM_INPUT( btoads_state::static_sound_to_main_r )
 {
-	return field->port->machine().driver_data<btoads_state>()->m_sound_to_main_ready;
+	return field->machine().driver_data<btoads_state>()->m_sound_to_main_ready;
 }
 
 

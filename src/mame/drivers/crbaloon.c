@@ -70,16 +70,16 @@ static WRITE8_HANDLER( pc3092_w )
 
 static CUSTOM_INPUT( pc3092_r )
 {
-	crbaloon_state *state = field->port->machine().driver_data<crbaloon_state>();
+	crbaloon_state *state = field->machine().driver_data<crbaloon_state>();
 	UINT32 ret;
 
 	/* enable coin & start input? Wild guess!!! */
 	if (state->m_pc3092_data[1] & 0x02)
-		ret = input_port_read(field->port->machine(), "PC3092");
+		ret = input_port_read(field->machine(), "PC3092");
 	else
 		ret = 0x00;
 
-	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", field->port->machine().describe_context(), ret);
+	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", field->machine().describe_context(), ret);
 
 	return ret;
 }

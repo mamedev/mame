@@ -261,14 +261,14 @@ static WRITE16_HANDLER( galaxi_500004_w )
 
 static CUSTOM_INPUT( ticket_r )
 {
-	galaxi_state *state = field->port->machine().driver_data<galaxi_state>();
-	return state->m_ticket && !(field->port->machine().primary_screen->frame_number() % 10);
+	galaxi_state *state = field->machine().driver_data<galaxi_state>();
+	return state->m_ticket && !(field->machine().primary_screen->frame_number() % 10);
 }
 
 static CUSTOM_INPUT( hopper_r )
 {
-	galaxi_state *state = field->port->machine().driver_data<galaxi_state>();
-	return state->m_hopper && !(field->port->machine().primary_screen->frame_number() % 10);
+	galaxi_state *state = field->machine().driver_data<galaxi_state>();
+	return state->m_hopper && !(field->machine().primary_screen->frame_number() % 10);
 }
 
 

@@ -1595,8 +1595,8 @@ static slider_state *slider_alloc(running_machine &machine, const char *title, I
 
 static slider_state *slider_init(running_machine &machine)
 {
-	const input_field_config *field;
-	const input_port_config *port;
+	input_field_config *field;
+	input_port_config *port;
 	device_t *device;
 	slider_state *listhead = NULL;
 	slider_state **tailptr = &listhead;
@@ -1625,7 +1625,7 @@ static slider_state *slider_init(running_machine &machine)
 
 	/* add analog adjusters */
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->type == IPT_ADJUSTER)
 			{
 				void *param = (void *)field;
@@ -1730,7 +1730,7 @@ static slider_state *slider_init(running_machine &machine)
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist; field != NULL; field = field->next)
+		for (field = port->fieldlist().first(); field != NULL; field = field->next())
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
 				void *param = (void *)field;
