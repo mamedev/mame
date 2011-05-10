@@ -578,6 +578,7 @@ ROM_START( baryon )
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped. */
 
 	ROM_REGION( 0x6c9, "user1", 0 ) /* Protection data  */
+	ROM_FILL( 0x0, 0x6c9, 0x00 )
 	//ROM_LOAD( "protdata.bin", 0x000, 0x6bc ,  CRC(1) SHA1(1) ) /* extracted */
 
 	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples */
