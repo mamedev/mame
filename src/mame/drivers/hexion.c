@@ -80,7 +80,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
@@ -102,7 +101,16 @@ static WRITE8_HANDLER( coincntr_w )
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 }
 
+/* probably not? */
+static WRITE8_HANDLER( hexion_irq_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+}
 
+static WRITE8_HANDLER( hexion_nmi_ack_w )
+{
+	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -114,7 +122,9 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("konami", k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
-	AM_RANGE(0xf000, 0xf00f) AM_WRITENOP	/* 053252? f00e = IRQ ack, f00f = NMI ack */
+	AM_RANGE(0xf000, 0xf00d) AM_RAM	/* 053252? f00e = IRQ ack, f00f = NMI ack */
+	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(hexion_irq_ack_w)
+	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(hexion_nmi_ack_w)
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
@@ -207,15 +217,15 @@ static GFXDECODE_START( hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-
-
-static INTERRUPT_GEN( hexion_interrupt )
+static TIMER_DEVICE_CALLBACK( hexion_scanline )
 {
-	/* NMI handles start and coin inputs, origin unknown */
-	if (cpu_getiloops(device))
-		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	else
-		device_set_input_line(device, 0, HOLD_LINE);
+	//hexion_state *state = timer.machine().driver_data<hexion_state>();
+	int scanline = param;
+
+	if(scanline == 256)
+		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
+	else if ((scanline == 85) || (scanline == 170))
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( hexion, hexion_state )
@@ -223,14 +233,14 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
-	MCFG_CPU_VBLANK_INT_HACK(hexion_interrupt,3)	/* both IRQ and NMI are used */
+	MCFG_TIMER_ADD_SCANLINE("scantimer", hexion_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(hexion)
 
@@ -244,10 +254,10 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_SOUND_ADD("konami", K051649, 24000000/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -277,4 +287,4 @@ ROM_START( hexion )
 ROM_END
 
 
-GAME( 1992, hexion, 0, hexion, hexion, 0, ROT0, "Konami", "Hexion (Japan)", 0 )
+GAME( 1992, hexion, 0, hexion, hexion, 0, ROT0, "Konami", "Hexion (Japan ver JAB)", 0 )
