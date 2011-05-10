@@ -9000,7 +9000,10 @@ viostorm:  01 FF 00 16 00 39 00 00 01 07 11 0E 75 00 00 00
 mtlchamp:  01 FF 00 21 00 37 00 00 01 07 11 0E 74 00 00 00
 dbz:       01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
 dbz2:      01 FF 00 21 00 37 00 00 01 20 0C 0E 54 00 00 00
+xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 (*)
 (all konamigx, cowboys of moo mesa, run & gun, dj main)
+
+(*) hblank duration 512 (0x200), hdisp 384 (0x180), vblank duration 288 (0x120), vdisp 256 (0x100)
 
 */
 
