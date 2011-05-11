@@ -175,7 +175,7 @@ private:
 // ======================> device_t
 
 // device_t represents a device
-class device_t
+class device_t : public delegate_late_bind
 {
 	DISABLE_COPYING(device_t);
 
