@@ -346,7 +346,7 @@ static WRITE8_HANDLER(casino5_bank_w)
 
 static CUSTOM_INPUT(rndbit_r)
 {
-	return field->machine().rand();
+	return field.machine().rand();
 }
 
 static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8 )

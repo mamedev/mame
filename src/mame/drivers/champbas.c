@@ -119,7 +119,7 @@ static WRITE8_HANDLER( champbas_watchdog_reset_w )
 
 static CUSTOM_INPUT( champbas_watchdog_bit2 )
 {
-	champbas_state *state = field->machine().driver_data<champbas_state>();
+	champbas_state *state = field.machine().driver_data<champbas_state>();
 	return BIT(state->m_watchdog_count, 2);
 }
 

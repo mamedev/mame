@@ -1110,7 +1110,7 @@ WRITE8_HANDLER( balsente_register_addr_w )
 
 CUSTOM_INPUT( nstocker_bits_r )
 {
-	balsente_state *state = field->machine().driver_data<balsente_state>();
+	balsente_state *state = field.machine().driver_data<balsente_state>();
 	return state->m_nstocker_bits;
 }
 

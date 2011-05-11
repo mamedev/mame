@@ -193,7 +193,7 @@ static WRITE8_DEVICE_HANDLER( input_port_4_f0_w )
 
 static CUSTOM_INPUT( input_port_4_f0_r )
 {
-	taitosj_state *state = field->machine().driver_data<taitosj_state>();
+	taitosj_state *state = field.machine().driver_data<taitosj_state>();
 	return state->m_input_port_4_f0;
 }
 
@@ -282,7 +282,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( kikstart_gear_r )
 {
-	taitosj_state *state = field->machine().driver_data<taitosj_state>();
+	taitosj_state *state = field.machine().driver_data<taitosj_state>();
 	const char *port_tag;
 
 	int player = (int)(FPTR)param;
@@ -293,9 +293,9 @@ static CUSTOM_INPUT( kikstart_gear_r )
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (input_port_read(field->machine(), port_tag) & 0x01) state->m_kikstart_gears[player] = 0x02;
-	if (input_port_read(field->machine(), port_tag) & 0x02) state->m_kikstart_gears[player] = 0x03;
-	if (input_port_read(field->machine(), port_tag) & 0x04) state->m_kikstart_gears[player] = 0x01;
+	if (input_port_read(field.machine(), port_tag) & 0x01) state->m_kikstart_gears[player] = 0x02;
+	if (input_port_read(field.machine(), port_tag) & 0x02) state->m_kikstart_gears[player] = 0x03;
+	if (input_port_read(field.machine(), port_tag) & 0x04) state->m_kikstart_gears[player] = 0x01;
 
 	return state->m_kikstart_gears[player];
 }

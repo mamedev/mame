@@ -1486,7 +1486,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 		if (input_condition_true(port->machine(), &device_field->field->condition))
 		{
 			/* replace the bits with bits from the device */
-			input_port_value newval = (*device_field->field->read)(*device_field->device, device_field->field, device_field->field->read_param);
+			input_port_value newval = device_field->field->read(*device_field->field, device_field->field->read_param);
 			device_field->oldval = newval;
 			result = (result & ~device_field->field->mask) | ((newval << device_field->shift) & device_field->field->mask);
 		}
@@ -1608,8 +1608,8 @@ int input_port_get_crosshair_position(running_machine &machine, int player, floa
 					value += field->crossoffset;
 
 					/* apply custom mapping if necessary */
-					if (field->crossmapper != NULL)
-						value = (*field->crossmapper)(field, value);
+					if (!field->crossmapper.isnull())
+						value = field->crossmapper(*field, value);
 
 					/* handle X axis */
 					if (field->crossaxis == CROSSHAIR_AXIS_X)
@@ -1732,7 +1732,7 @@ void input_port_write_direct(const input_port_config *port, input_port_value dat
 			/* if the bits have write, call the handler */
 			if (device_field->oldval != newval)
 			{
-				(*device_field->field->write)(*device_field->device, device_field->field, device_field->field->write_param, device_field->oldval, newval);
+				device_field->field->write(*device_field->field, device_field->field->write_param, device_field->oldval, newval);
 
 				device_field->oldval = newval;
 			}
@@ -2002,12 +2002,26 @@ static astring *get_keyboard_key_name(const input_field_config *field)
     states based on the tokens
 -------------------------------------------------*/
 
+inline const char *get_device_tag(const device_t &device, const char *tag, astring &finaltag)
+{
+	if (strcmp(tag, DEVICE_SELF) == 0)
+		finaltag.cpy(device.tag());
+	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
+	{
+		assert(device.owner() != NULL);
+		finaltag.cpy(device.owner()->tag());
+	}
+	else
+		device.subtag(finaltag, tag);
+	return finaltag;
+}
+
 static void init_port_state(running_machine &machine)
 {
 	const char *joystick_map_default = machine.options().joystick_map();
 	input_port_private *portdata = machine.input_port_data;
-	const input_field_config *field;
-	const input_port_config *port;
+	input_field_config *field;
+	input_port_config *port;
 
 	/* allocate live structures to mirror the configuration */
 	for (port = machine.m_portlist.first(); port != NULL; port = port->next())
@@ -2058,17 +2072,27 @@ static void init_port_state(running_machine &machine)
 			}
 
 			/* if this entry has device input, allocate memory for the tracking structure */
-			if (field->read != NULL)
+			astring devicetag;
+			if (!field->read.isnull())
 			{
-				*readdevicetail = init_field_device_info(field,field->read_device);
+				*readdevicetail = init_field_device_info(field, get_device_tag(port->owner(), field->read_device, devicetag));
+				field->read.late_bind(*(*readdevicetail)->device);
 				readdevicetail = &(*readdevicetail)->next;
 			}
 
 			/* if this entry has device output, allocate memory for the tracking structure */
-			if (field->write != NULL)
+			if (!field->write.isnull())
 			{
-				*writedevicetail = init_field_device_info(field,field->write_device);
+				*writedevicetail = init_field_device_info(field, get_device_tag(port->owner(), field->write_device, devicetag));
+				field->write.late_bind(*(*writedevicetail)->device);
 				writedevicetail = &(*writedevicetail)->next;
+			}
+
+			/* if this entry has device output, allocate memory for the tracking structure */
+			if (!field->crossmapper.isnull())
+			{
+				device_t *device = machine.device(get_device_tag(port->owner(), field->crossmapper_device, devicetag));
+				field->crossmapper.late_bind(*device);
 			}
 
 			/* Name keyboard key names */
@@ -2184,10 +2208,7 @@ static device_field_info *init_field_device_info(const input_field_config *field
 	for (mask = field->mask; !(mask & 1); mask >>= 1)
 		info->shift++;
 
-	if (device_name != NULL)
-		info->device = field->machine().device(device_name);
-	else
-		info->device = &field->port().owner();
+	info->device = (device_name != NULL) ? field->machine().device(device_name) : &field->port().owner();
 
 	info->oldval = field->defvalue >> info->shift;
 	return info;
@@ -2536,7 +2557,7 @@ g_profiler.start(PROFILER_INPUT);
 				/* if the bits have  write, call the handler */
 				if (device_field->oldval != newval)
 				{
-					(*device_field->field->write)(*device_field->device, device_field->field, device_field->field->write_param, device_field->oldval, newval);
+					device_field->field->write(*device_field->field, device_field->field->write_param, device_field->oldval, newval);
 
 					device_field->oldval = newval;
 				}
@@ -2910,12 +2931,10 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 	  flags(0),
 	  impulse(0),
 	  name(_name),
-	  read(NULL),
 	  read_param(NULL),
-	  read_device(NULL),
-	  write(NULL),
+	  read_device(DEVICE_SELF),
 	  write_param(NULL),
-	  write_device(NULL),
+	  write_device(DEVICE_SELF),
 	  min(0),
 	  max(_maskbits),
 	  sensitivity(0),
@@ -2925,7 +2944,7 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 	  crossscale(0),
 	  crossoffset(0),
 	  crossaltaxis(0),
-	  crossmapper(NULL),
+	  crossmapper_device(DEVICE_SELF),
 	  full_turn_count(0),
 	  remap_table(NULL),
 	  way(0),

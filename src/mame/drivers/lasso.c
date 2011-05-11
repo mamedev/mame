@@ -38,7 +38,7 @@ DIP locations verified for:
 
 static INPUT_CHANGED( coin_inserted )
 {
-	lasso_state *state = field->machine().driver_data<lasso_state>();
+	lasso_state *state = field.machine().driver_data<lasso_state>();
 
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

@@ -428,15 +428,15 @@ static WRITE8_HANDLER( videomode_w )
 
 static CUSTOM_INPUT( dakkochn_mux_data_r )
 {
-	system1_state *state = field->machine().driver_data<system1_state>();
+	system1_state *state = field.machine().driver_data<system1_state>();
 	static const char *const ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
-	return input_port_read(field->machine(), ports[state->m_dakkochn_mux_data]);
+	return input_port_read(field.machine(), ports[state->m_dakkochn_mux_data]);
 }
 
 
 static CUSTOM_INPUT( dakkochn_mux_status_r )
 {
-	system1_state *state = field->machine().driver_data<system1_state>();
+	system1_state *state = field.machine().driver_data<system1_state>();
 	/* reads from here indicate which mux port is selected */
 	return 1 << (state->m_dakkochn_mux_data);
 }

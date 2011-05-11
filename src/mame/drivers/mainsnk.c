@@ -136,7 +136,7 @@ static READ8_HANDLER( sound_ack_r )
 
 static CUSTOM_INPUT( mainsnk_sound_r )
 {
-	mainsnk_state *state = field->machine().driver_data<mainsnk_state>();
+	mainsnk_state *state = field.machine().driver_data<mainsnk_state>();
 
 	return (state->m_sound_cpu_busy) ? 0x01 : 0x00;
 }

@@ -276,7 +276,7 @@ static WRITE8_HANDLER( xain_68705_w )
 
 static CUSTOM_INPUT( xain_vblank_r )
 {
-	xain_state *state = field->machine().driver_data<xain_state>();
+	xain_state *state = field.machine().driver_data<xain_state>();
 	return state->m_vblank;
 }
 
@@ -368,10 +368,10 @@ WRITE8_HANDLER( xain_68705_ddr_c_w )
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	xain_state *state = field->machine().driver_data<xain_state>();
+	xain_state *state = field.machine().driver_data<xain_state>();
 	UINT8 res = 0;
 
-	if (field->machine().device("mcu") != NULL)
+	if (field.machine().device("mcu") != NULL)
 	{
 		if (state->m_mcu_ready == 1)
 			res |= 0x01;

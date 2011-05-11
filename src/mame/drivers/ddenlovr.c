@@ -1409,7 +1409,7 @@ SCREEN_UPDATE(ddenlovr)
 
 static CUSTOM_INPUT( ddenlovr_special_r )
 {
-	dynax_state *state = field->machine().driver_data<dynax_state>();
+	dynax_state *state = field.machine().driver_data<dynax_state>();
 	return state->m_ddenlovr_blitter_irq_flag;
 }
 
@@ -1781,7 +1781,7 @@ static WRITE16_HANDLER( ddenlovj_coincounter_w )
 
 static CUSTOM_INPUT( ddenlovj_blitter_r )
 {
-	dynax_state *state = field->machine().driver_data<dynax_state>();
+	dynax_state *state = field.machine().driver_data<dynax_state>();
 	return state->m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;		// bit 4 = 1 -> blitter busy
 }
 
@@ -1921,7 +1921,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( nettoqc_special_r )
 {
-	dynax_state *state = field->machine().driver_data<dynax_state>();
+	dynax_state *state = field.machine().driver_data<dynax_state>();
 	return state->m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;
 }
 
@@ -3446,7 +3446,7 @@ static READ8_HANDLER( mjflove_keyb_r )
 
 static CUSTOM_INPUT( mjflove_blitter_r )
 {
-	dynax_state *state = field->machine().driver_data<dynax_state>();
+	dynax_state *state = field.machine().driver_data<dynax_state>();
 
 	// bit 7 = 1 -> blitter busy
 	// bit 6 = 0 -> VBLANK?

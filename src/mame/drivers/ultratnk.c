@@ -20,15 +20,15 @@ Atari Ultra Tank driver
 
 static CUSTOM_INPUT( get_collision )
 {
-	ultratnk_state *state = field->machine().driver_data<ultratnk_state>();
+	ultratnk_state *state = field.machine().driver_data<ultratnk_state>();
 	return state->m_collision[(FPTR) param];
 }
 
 
 static CUSTOM_INPUT( get_joystick )
 {
-	ultratnk_state *state = field->machine().driver_data<ultratnk_state>();
-	UINT8 joy = input_port_read(field->machine(), (const char *)param) & 3;
+	ultratnk_state *state = field.machine().driver_data<ultratnk_state>();
+	UINT8 joy = input_port_read(field.machine(), (const char *)param) & 3;
 
 	if (joy == 1)
 	{

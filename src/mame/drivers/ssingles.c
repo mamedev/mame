@@ -288,7 +288,7 @@ static WRITE8_HANDLER(c001_w)
 static CUSTOM_INPUT(controls_r)
 {
 	int data = 7;
-	switch(input_port_read(field->machine(), "EXTRA"))		//multiplexed
+	switch(input_port_read(field.machine(), "EXTRA"))		//multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;

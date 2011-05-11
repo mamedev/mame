@@ -508,7 +508,7 @@ static READ8_HANDLER( m11_a700_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	m10_state *state = field->machine().driver_data<m10_state>();
+	m10_state *state = field.machine().driver_data<m10_state>();
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }

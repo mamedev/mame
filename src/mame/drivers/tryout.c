@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted )
 {
 	if(newval != oldval)
-		cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tryout )

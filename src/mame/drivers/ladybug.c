@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin1_inserted )
 {
-	ladybug_state *state = field->machine().driver_data<ladybug_state>();
+	ladybug_state *state = field.machine().driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -197,7 +197,7 @@ static INPUT_CHANGED( coin1_inserted )
 
 static INPUT_CHANGED( coin2_inserted )
 {
-	ladybug_state *state = field->machine().driver_data<ladybug_state>();
+	ladybug_state *state = field.machine().driver_data<ladybug_state>();
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
@@ -210,7 +210,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 static CUSTOM_INPUT( ladybug_p1_control_r )
 {
-	return input_port_read(field->machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+	return input_port_read(field.machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
 static CUSTOM_INPUT( ladybug_p2_control_r )
@@ -218,10 +218,10 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (input_port_read(field->machine(), "DSW0") & 0x20)
-		ret = input_port_read(field->machine(), LADYBUG_P2_CONTROL_PORT_TAG);
+	if (input_port_read(field.machine(), "DSW0") & 0x20)
+		ret = input_port_read(field.machine(), LADYBUG_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field->machine(), LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field.machine(), LADYBUG_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }

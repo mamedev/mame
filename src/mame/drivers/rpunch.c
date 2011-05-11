@@ -146,7 +146,7 @@ static MACHINE_RESET( rpunch )
 
 static CUSTOM_INPUT( hi_bits_r )
 {
-	return input_port_read(field->machine(), "SERVICE");
+	return input_port_read(field.machine(), "SERVICE");
 }
 
 

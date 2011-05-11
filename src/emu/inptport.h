@@ -541,13 +541,13 @@ typedef tagged_list<input_port_config> ioport_list;
 
 
 /* read input port callback function */
-typedef UINT32 (*input_field_read_func)(device_t &device, const input_field_config *field, void *param);
+typedef delegate<UINT32 (const input_field_config &, void *)> input_field_read_delegate;
 
 /* input port write callback function */
-typedef void (*input_field_write_func)(device_t &device, const input_field_config *field, void *param, UINT32 oldval, UINT32 newval);
+typedef delegate<void (const input_field_config &, void *, input_port_value, input_port_value)> input_field_write_delegate;
 
 /* crosshair mapping function */
-typedef float (*input_field_crossmap_func)(const input_field_config *field, float linear_value);
+typedef delegate<float (const input_field_config &, float)> input_field_crossmap_delegate;
 
 
 /* encapsulates a condition on a port field or setting */
@@ -629,10 +629,10 @@ public:
 	UINT8						impulse;		/* number of frames before reverting to defvalue */
 	const char *				name;			/* user-friendly name to display */
 	input_seq					seq[SEQ_TYPE_TOTAL];/* sequences of all types */
-	input_field_read_func		read;			/* read callback routine */
+	input_field_read_delegate	read;			/* read callback routine */
 	void *						read_param;		/* parameter for read callback routine */
 	const char *				read_device;	/* parameter for read callback routine */
-	input_field_write_func		write;			/* write callback routine */
+	input_field_write_delegate	write;			/* write callback routine */
 	void *						write_param;	/* parameter for write callback routine */
 	const char *				write_device;	/* parameter for write callback routine */
 
@@ -646,7 +646,8 @@ public:
 	float						crossscale;		/* crosshair scale */
 	float						crossoffset;	/* crosshair offset */
 	float						crossaltaxis;	/* crosshair alternate axis value */
-	input_field_crossmap_func	crossmapper;	/* crosshair mapping function */
+	input_field_crossmap_delegate crossmapper;	/* crosshair mapping function */
+	const char *				crossmapper_device;	/* parameter for write callback routine */
 	UINT16						full_turn_count;/* number of optical counts for 1 full turn of the original control */
 	const input_port_value *	remap_table;	/* pointer to an array that remaps the port value */
 
@@ -757,28 +758,46 @@ struct _inp_header
 ***************************************************************************/
 
 /* macro for a read callback function (PORT_CUSTOM) */
-#define CUSTOM_INPUT(name)	input_port_value name(device_t &device, const input_field_config *field, void *param)
+#define CUSTOM_INPUT(name)	input_port_value name(device_t &device, const input_field_config &field, void *param)
+#define CUSTOM_INPUT_MEMBER(name)	input_port_value name(const input_field_config &field, void *param)
+#define DECLARE_CUSTOM_INPUT_MEMBER(name)	input_port_value name(const input_field_config &field, void *param)
 
 /* macro for port write callback functions (PORT_CHANGED) */
-#define INPUT_CHANGED(name)	void name(device_t &device, const input_field_config *field, void *param, input_port_value oldval, input_port_value newval)
+#define INPUT_CHANGED(name)	void name(device_t &device, const input_field_config &field, void *param, input_port_value oldval, input_port_value newval)
+#define INPUT_CHANGED_MEMBER(name)	void name(const input_field_config &field, void *param, input_port_value oldval, input_port_value newval)
+#define DECLARE_INPUT_CHANGED_MEMBER(name)	void name(const input_field_config &field, void *param, input_port_value oldval, input_port_value newval)
 
 /* macro for port changed callback functions (PORT_CROSSHAIR_MAPPER) */
-#define CROSSHAIR_MAPPER(name)	float name(const input_field_config *field, float linear_value)
+#define CROSSHAIR_MAPPER(name)	float name(device_t &device, const input_field_config &field, float linear_value)
+#define CROSSHAIR_MAPPER_MEMBER(name)	float name(const input_field_config &field, float linear_value)
+#define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)	float name(const input_field_config &field, float linear_value)
 
 /* macro for wrapping a default string */
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
 
 
-template<int (*_ReadLine)(device_t *)>
-input_port_value ioport_read_line_wrapper(device_t &device, const input_field_config *field, void *param)
+template<int (*_FunctionPointer)(device_t *)>
+input_port_value ioport_read_line_wrapper(device_t &device, const input_field_config &field, void *param)
 {
-	return (*_ReadLine)(&device);
+	return (*_FunctionPointer)(&device);
 }
 
-template<void (*_WriteLine)(device_t *, int)>
-void ioport_write_line_wrapper(device_t &device, const input_field_config *field, void *param, input_port_value oldval, input_port_value newval)
+template<class _FunctionClass, int (_FunctionClass::*_FunctionPointer)()>
+input_port_value ioport_read_line_wrapper(_FunctionClass &device, const input_field_config &field, void *param)
 {
-	return (*_WriteLine)(&device, newval);
+	return (device.*_FunctionPointer)();
+}
+
+template<void (*_FunctionPointer)(device_t *, int)>
+void ioport_write_line_wrapper(device_t &device, const input_field_config &field, void *param, input_port_value oldval, input_port_value newval)
+{
+	return (*_FunctionPointer)(&device, newval);
+}
+
+template<class _FunctionClass, void (_FunctionClass::*_FunctionPointer)(int)>
+void ioport_write_line_wrapper(_FunctionClass &device, const input_field_config &field, void *param, input_port_value oldval, input_port_value newval)
+{
+	return (device.*_FunctionPointer)(newval);
 }
 
 
@@ -918,7 +937,12 @@ void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &er
 	curfield->crossoffset = offset;
 
 #define PORT_CROSSHAIR_MAPPER(_callback) \
-	curfield->crossmapper = _callback;
+	curfield->crossmapper = input_field_crossmap_delegate(_callback, #_callback, (device_t *)NULL); \
+	curfield->crossmapper_device = DEVICE_SELF;
+
+#define PORT_CROSSHAIR_MAPPER_MEMBER(_device, _class, _member) \
+	curfield->crossmapper = input_field_crossmap_delegate(&_class::_member, #_class "::" #_member, (_class *)NULL); \
+	curfield->crossmapper_device = _device;
 
 /* how many optical counts for 1 full turn of the control */
 #define PORT_FULL_TURN_COUNT(_count) \
@@ -945,25 +969,45 @@ void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &er
 
 /* read callbacks */
 #define PORT_CUSTOM(_callback, _param) \
-	curfield->read = _callback; \
+	curfield->read = input_field_read_delegate(_callback, #_callback, (device_t *)NULL); \
 	curfield->read_param = (void *)(_param); \
-	curfield->read_device = NULL;
+	curfield->read_device = DEVICE_SELF;
+
+#define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
+	curfield->read = input_field_read_delegate(&_class::_member, #_class "::" #_member, (_class *)NULL); \
+	curfield->read_param = (void *)(_param); \
+	curfield->read_device = (_device);
 
 /* write callbacks */
 #define PORT_CHANGED(_callback, _param) \
-	curfield->write = _callback; \
+	curfield->write = input_field_write_delegate(_callback, #_callback, (device_t *)NULL); \
 	curfield->write_param = (void *)(_param); \
-	curfield->write_device = NULL;
+	curfield->write_device = DEVICE_SELF;
+
+#define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
+	curfield->write = input_field_write_delegate(&_class::_member, #_class "::" #_member, (_class *)NULL); \
+	curfield->write_param = (void *)(_param); \
+	curfield->write_device = (_device);
 
 /* input device handler */
 #define PORT_READ_LINE_DEVICE(_device, _read_line_device) \
-	curfield->read = &ioport_read_line_wrapper<_read_line_device>; \
+	curfield->read = input_field_read_delegate(&ioport_read_line_wrapper<_read_line_device>, #_read_line_device, (device_t *)NULL); \
+	curfield->read_param = NULL; \
+	curfield->read_device = _device;
+
+#define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
+	curfield->read = input_field_read_delegate(&ioport_read_line_wrapper<_class, &_class::_member>, #_class "::" #_member, (_class *)NULL); \
 	curfield->read_param = NULL; \
 	curfield->read_device = _device;
 
 /* output device handler */
 #define PORT_WRITE_LINE_DEVICE(_device, _write_line_device) \
-	curfield->write = &ioport_write_line_wrapper<_write_line_device>; \
+	curfield->write = input_field_write_delegate(&ioport_write_line_wrapper<_write_line_device>, #_write_line_device, (device_t *)NULL); \
+	curfield->write_param = NULL; \
+	curfield->write_device = _device;
+
+#define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
+	curfield->write = input_field_write_delegate(&ioport_write_line_wrapper<_class, &_class::_member>, #_class "::" #_member, (_class *)NULL); \
 	curfield->write_param = NULL; \
 	curfield->write_device = _device;
 

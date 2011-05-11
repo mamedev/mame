@@ -79,7 +79,7 @@ This was pointed out by Bart Puype
 
 static CUSTOM_INPUT( z80_nmi_r )
 {
-	psikyo_state *state = field->machine().driver_data<psikyo_state>();
+	psikyo_state *state = field.machine().driver_data<psikyo_state>();
 	int ret = 0x00;
 
 	if (state->m_z80_nmi)
@@ -88,7 +88,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
-		field->machine().scheduler().synchronize();
+		field.machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine.describe_context());
 	}
 
@@ -97,7 +97,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 
 static CUSTOM_INPUT( mcu_status_r )
 {
-	psikyo_state *state = field->machine().driver_data<psikyo_state>();
+	psikyo_state *state = field.machine().driver_data<psikyo_state>();
 	int ret = 0x00;
 
 	/* Don't know exactly what this bit is, but s1945 and tengai

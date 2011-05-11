@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 static CUSTOM_INPUT( coin_counter_r )
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field->machine().driver_data<arcadia_state>()->coin_counter;
+	UINT8 *coin_counter = field.machine().driver_data<arcadia_state>()->coin_counter;
 
 	/* return coin counter values */
 	return coin_counter[coin] & 3;
@@ -167,7 +167,7 @@ static CUSTOM_INPUT( coin_counter_r )
 static INPUT_CHANGED( coin_changed_callback )
 {
 	int coin = (FPTR)param;
-	UINT8 *coin_counter = field->machine().driver_data<arcadia_state>()->coin_counter;
+	UINT8 *coin_counter = field.machine().driver_data<arcadia_state>()->coin_counter;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && coin_counter[coin] < 3)

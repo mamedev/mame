@@ -67,22 +67,22 @@ static WRITE8_HANDLER( starshp1_collision_reset_w )
 
 static CUSTOM_INPUT( starshp1_analog_r )
 {
-	starshp1_state *state = field->machine().driver_data<starshp1_state>();
+	starshp1_state *state = field.machine().driver_data<starshp1_state>();
 	int val = 0;
 
 	switch (state->m_analog_in_select)
 	{
 	case 0:
-		val = input_port_read(field->machine(), "STICKY");
+		val = input_port_read(field.machine(), "STICKY");
 		break;
 	case 1:
-		val = input_port_read(field->machine(), "STICKX");
+		val = input_port_read(field.machine(), "STICKX");
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = input_port_read(field->machine(), "PLAYTIME");
+		val = input_port_read(field.machine(), "PLAYTIME");
 		break;
 	}
 
@@ -92,7 +92,7 @@ static CUSTOM_INPUT( starshp1_analog_r )
 
 static CUSTOM_INPUT( collision_latch_r )
 {
-	starshp1_state *state = field->machine().driver_data<starshp1_state>();
+	starshp1_state *state = field.machine().driver_data<starshp1_state>();
 	return state->m_collision_latch & 0x0f;
 }
 

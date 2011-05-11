@@ -414,7 +414,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( panic_coin_inserted )
 {
-	panic_sound_output_w(field->machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
+	panic_sound_output_w(field.machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
 }
 
 static INPUT_PORTS_START( panic )
@@ -475,7 +475,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( cosmica_coin_inserted )
 {
-	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( cosmica )
@@ -530,7 +530,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( cosmicg_coin_inserted )
 {
-	cputag_set_input_line_and_vector(field->machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
+	cputag_set_input_line_and_vector(field.machine(), "maincpu", 0, newval ? ASSERT_LINE : CLEAR_LINE, 6);
 }
 
 static INPUT_PORTS_START( cosmicg )
@@ -577,12 +577,12 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( coin_inserted_irq0 )
 {
-	cputag_set_input_line(field->machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(field.machine(), "maincpu", 0, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi )
 {
-	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( magspot )

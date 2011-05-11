@@ -657,7 +657,7 @@ static READ16_HANDLER(hvoltage_debug_r)
 
 static CUSTOM_INPUT( gekisou_unknown_status )
 {
-	equites_state *state = field->machine().driver_data<equites_state>();
+	equites_state *state = field.machine().driver_data<equites_state>();
 	return state->m_unknown_bit;
 }
 

@@ -19,7 +19,7 @@ Atari Sprint 4 driver
 
 static CUSTOM_INPUT( get_lever )
 {
-	sprint4_state *state = field->machine().driver_data<sprint4_state>();
+	sprint4_state *state = field.machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return 4 * state->m_gear[n] > state->m_da_latch;
@@ -28,7 +28,7 @@ static CUSTOM_INPUT( get_lever )
 
 static CUSTOM_INPUT( get_wheel )
 {
-	sprint4_state *state = field->machine().driver_data<sprint4_state>();
+	sprint4_state *state = field.machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return 8 * state->m_steer_FF1[n] + 8 * state->m_steer_FF2[n] > state->m_da_latch;
@@ -37,7 +37,7 @@ static CUSTOM_INPUT( get_wheel )
 
 static CUSTOM_INPUT( get_collision )
 {
-	sprint4_state *state = field->machine().driver_data<sprint4_state>();
+	sprint4_state *state = field.machine().driver_data<sprint4_state>();
 	int n = (FPTR) param;
 
 	return state->m_collision[n];

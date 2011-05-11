@@ -332,15 +332,15 @@ static WRITE8_HANDLER( wdclr_w )
 
 static CUSTOM_INPUT( tempest_knob_r )
 {
-	tempest_state *state = field->machine().driver_data<tempest_state>();
-	return input_port_read(field->machine(), (state->m_player_select == 0) ?
+	tempest_state *state = field.machine().driver_data<tempest_state>();
+	return input_port_read(field.machine(), (state->m_player_select == 0) ?
 										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
 static CUSTOM_INPUT( tempest_buttons_r )
 {
-	tempest_state *state = field->machine().driver_data<tempest_state>();
-	return input_port_read(field->machine(), (state->m_player_select == 0) ?
+	tempest_state *state = field.machine().driver_data<tempest_state>();
+	return input_port_read(field.machine(), (state->m_player_select == 0) ?
 										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 
@@ -348,7 +348,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 static CUSTOM_INPUT( clock_r )
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (field->machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (field.machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 

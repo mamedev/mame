@@ -228,10 +228,10 @@ static CUSTOM_INPUT( suprridr_control_r )
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped(field->machine()))
-		ret = input_port_read(field->machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
+	if (suprridr_is_screen_flipped(field.machine()))
+		ret = input_port_read(field.machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(field->machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field.machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }

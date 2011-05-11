@@ -21,7 +21,7 @@ static WRITE8_HANDLER( xxmissio_bank_sel_w )
 
 static CUSTOM_INPUT( xxmissio_status_r )
 {
-	xxmissio_state *state = field->machine().driver_data<xxmissio_state>();
+	xxmissio_state *state = field.machine().driver_data<xxmissio_state>();
 	int bit_mask = (FPTR)param;
 	return (state->m_status & bit_mask) ? 1 : 0;
 }

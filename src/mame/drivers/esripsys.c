@@ -414,23 +414,23 @@ static WRITE8_HANDLER( g_ioadd_w )
 
 static INPUT_CHANGED( keypad_interrupt )
 {
-	esripsys_state *state = field->machine().driver_data<esripsys_state>();
+	esripsys_state *state = field.machine().driver_data<esripsys_state>();
 	if (newval == 0)
 	{
 		state->m_io_firq_status |= 2;
 		state->m_keypad_status |= 0x20;
-		cputag_set_input_line(field->machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(field.machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
 static INPUT_CHANGED( coin_interrupt )
 {
-	esripsys_state *state = field->machine().driver_data<esripsys_state>();
+	esripsys_state *state = field.machine().driver_data<esripsys_state>();
 	if (newval == 1)
 	{
 		state->m_io_firq_status |= 2;
-		state->m_coin_latch = input_port_read(field->machine(), "COINS") << 2;
-		cputag_set_input_line(field->machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
+		state->m_coin_latch = input_port_read(field.machine(), "COINS") << 2;
+		cputag_set_input_line(field.machine(), "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 

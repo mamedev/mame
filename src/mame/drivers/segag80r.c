@@ -149,7 +149,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -29,20 +29,20 @@ static void set_service_mode(running_machine &machine, int enable)
 
 static INPUT_CHANGED( service_mode_switch_changed )
 {
-	set_service_mode(field->machine(), newval);
+	set_service_mode(field.machine(), newval);
 }
 
 
 static INPUT_CHANGED( firetrk_horn_changed )
 {
-	device_t *discrete = field->machine().device("discrete");
+	device_t *discrete = field.machine().device("discrete");
 	discrete_sound_w(discrete, FIRETRUCK_HORN_EN, newval);
 }
 
 
 static INPUT_CHANGED( gear_changed )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	if (newval)
 		state->m_gear = (FPTR)param;
 }
@@ -200,21 +200,21 @@ static READ8_HANDLER( montecar_dip_r )
 
 static CUSTOM_INPUT( steer_dir_r )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	return state->m_steer_dir[(FPTR)param];
 }
 
 
 static CUSTOM_INPUT( steer_flag_r )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	return state->m_steer_flag[(FPTR)param];
 }
 
 
 static CUSTOM_INPUT( skid_r )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	UINT32 ret;
 	int which = (FPTR)param;
 
@@ -229,7 +229,7 @@ static CUSTOM_INPUT( skid_r )
 
 static CUSTOM_INPUT( crash_r )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	UINT32 ret;
 	int which = (FPTR)param;
 
@@ -244,7 +244,7 @@ static CUSTOM_INPUT( crash_r )
 
 static CUSTOM_INPUT( gear_r )
 {
-	firetrk_state *state = field->machine().driver_data<firetrk_state>();
+	firetrk_state *state = field.machine().driver_data<firetrk_state>();
 	return (state->m_gear == (FPTR)param) ? 1 : 0;
 }
 

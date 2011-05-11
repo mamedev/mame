@@ -728,7 +728,7 @@ static READ8_DEVICE_HANDLER( scramble_protection_r )
 
 static CUSTOM_INPUT( scramble_protection_alt_r )
 {
-	galaxian_state *state = field->machine().driver_data<galaxian_state>();
+	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	/*
         There are two additional bits that are derived from bit 7 of
         the protection result. This is just a guess but works well enough
@@ -1008,31 +1008,31 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
-	galaxian_state *state = field->machine().driver_data<galaxian_state>();
-	address_space *space = field->machine().device("maincpu")->memory().space(AS_PROGRAM);
+	galaxian_state *state = field.machine().driver_data<galaxian_state>();
+	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* new value is the selected game */
 	state->m_gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(field->machine(), "bank1", state->m_gmgalax_selected_game);
+	memory_set_bank(field.machine(), "bank1", state->m_gmgalax_selected_game);
 	galaxian_gfxbank_w(space, 0, state->m_gmgalax_selected_game);
 
 	/* reset the stars */
 	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
-	cputag_set_input_line(field->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
 static CUSTOM_INPUT( gmgalax_port_r )
 {
-	galaxian_state *state = field->machine().driver_data<galaxian_state>();
+	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	const char *portname = (const char *)param;
 	if (state->m_gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
-	return input_port_read(field->machine(), portname);
+	return input_port_read(field.machine(), portname);
 }
 
 
@@ -1084,7 +1084,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 
 static CUSTOM_INPUT( azurian_port_r )
 {
-	return (input_port_read(field->machine(), "FAKE") >> (FPTR)param) & 1;
+	return (input_port_read(field.machine(), "FAKE") >> (FPTR)param) & 1;
 }
 
 
@@ -1097,9 +1097,9 @@ static CUSTOM_INPUT( azurian_port_r )
 
 static CUSTOM_INPUT( kingball_muxbit_r )
 {
-	galaxian_state *state = field->machine().driver_data<galaxian_state>();
+	galaxian_state *state = field.machine().driver_data<galaxian_state>();
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (input_port_read(field->machine(), "FAKE") >> state->m_kingball_speech_dip) & 1;
+	return (input_port_read(field.machine(), "FAKE") >> state->m_kingball_speech_dip) & 1;
 }
 
 
@@ -1108,7 +1108,7 @@ static CUSTOM_INPUT( kingball_noise_r )
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
        that it's working, doesn't actually use return value, so we can just use
        rand() */
-	return field->machine().rand() & 1;
+	return field.machine().rand() & 1;
 }
 
 
@@ -2689,7 +2689,7 @@ static DRIVER_INIT( gmgalax )
 	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(*state, machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
+	gmgalax_game_changed(*state, *machine.m_portlist.first()->fieldlist().first(), NULL, 0, 0);
 	state_save_register_global(machine, state->m_gmgalax_selected_game);
 }
 

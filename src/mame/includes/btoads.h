@@ -31,8 +31,8 @@ public:
 	// in drivers/btoads
 	DECLARE_WRITE16_MEMBER( main_sound_w );
 	DECLARE_READ16_MEMBER( main_sound_r );
-	static CUSTOM_INPUT( static_main_to_sound_r );
-	static CUSTOM_INPUT( static_sound_to_main_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( main_to_sound_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( sound_to_main_r );
 	DECLARE_WRITE8_MEMBER( sound_data_w );
 	DECLARE_READ8_MEMBER( sound_data_r );
 	DECLARE_READ8_MEMBER( sound_ready_to_send_r );

@@ -28,6 +28,8 @@ public:
 	static void static_set_port_tag(device_t &device, int port, const char *tag);
 	ioport_constructor device_input_ports() const;
 
+	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
+	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
 	void inc_coin(int coin);
 
 protected:

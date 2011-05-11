@@ -466,7 +466,7 @@ static MACHINE_RESET( drivedge )
 
 static CUSTOM_INPUT( special_port_r )
 {
-	itech32_state *state = field->machine().driver_data<itech32_state>();
+	itech32_state *state = field.machine().driver_data<itech32_state>();
 	if (state->m_sound_int_state)
 		state->m_special_result ^= 1;
 

@@ -5290,8 +5290,8 @@ INPUT_PORTS_END /* Time Crisis */
 
 static CUSTOM_INPUT( acedrvr_shift_read )
 {
-	namcos22_state *state = field->machine().driver_data<namcos22_state>();
-	int shift = input_port_read(field->machine(), "SHIFT");
+	namcos22_state *state = field.machine().driver_data<namcos22_state>();
+	int shift = input_port_read(field.machine(), "SHIFT");
 
 	if (shift > 0 && shift != state->m_prev_stick_state)
 	{
@@ -5471,8 +5471,8 @@ INPUT_PORTS_END /* Victory Lap */
 
 static CUSTOM_INPUT( ridger_gear_read )
 {
-	namcos22_state *state = field->machine().driver_data<namcos22_state>();
-	int gear = input_port_read(field->machine(), "GEARS");
+	namcos22_state *state = field.machine().driver_data<namcos22_state>();
+	int gear = input_port_read(field.machine(), "GEARS");
 
 	if (gear > 0 && gear != state->m_prev_stick_state)
 	{

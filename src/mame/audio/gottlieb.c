@@ -466,7 +466,7 @@ static WRITE8_HANDLER( nmi_rate_w )
 
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	return sp0250_drq_r(field->machine().device("spsnd"));
+	return sp0250_drq_r(field.machine().device("spsnd"));
 }
 
 

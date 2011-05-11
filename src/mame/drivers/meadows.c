@@ -199,7 +199,7 @@ static WRITE8_HANDLER( meadows_audio_w )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line_and_vector(field->machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	cputag_set_input_line_and_vector(field.machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 

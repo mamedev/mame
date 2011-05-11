@@ -525,7 +525,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted_irq_hi )
 {
-	btime_state *state = field->machine().driver_data<btime_state>();
+	btime_state *state = field.machine().driver_data<btime_state>();
 
 	if (newval)
 		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
@@ -533,7 +533,7 @@ static INPUT_CHANGED( coin_inserted_irq_hi )
 
 static INPUT_CHANGED( coin_inserted_irq_lo )
 {
-	btime_state *state = field->machine().driver_data<btime_state>();
+	btime_state *state = field.machine().driver_data<btime_state>();
 
 	if (!newval)
 		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
@@ -541,7 +541,7 @@ static INPUT_CHANGED( coin_inserted_irq_lo )
 
 static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
-	btime_state *state = field->machine().driver_data<btime_state>();
+	btime_state *state = field.machine().driver_data<btime_state>();
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 

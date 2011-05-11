@@ -242,7 +242,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_nmi )
 {
-	cputag_set_input_line(field->machine(), Z80_TAG, INPUT_LINE_NMI, (input_port_read(field->machine(), "NMI") ? CLEAR_LINE : ASSERT_LINE));
+	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_NMI, (input_port_read(field.machine(), "NMI") ? CLEAR_LINE : ASSERT_LINE));
 }
 
 /*-------------------------------------------------

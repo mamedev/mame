@@ -104,17 +104,17 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	astrof_state *state = field->machine().driver_data<astrof_state>();
+	astrof_state *state = field.machine().driver_data<astrof_state>();
 
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(field->machine(), 0, newval);
+	coin_counter_w(field.machine(), 0, newval);
 }
 
 
 static INPUT_CHANGED( service_coin_inserted )
 {
-	astrof_state *state = field->machine().driver_data<astrof_state>();
+	astrof_state *state = field.machine().driver_data<astrof_state>();
 
 	/* service coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -123,7 +123,7 @@ static INPUT_CHANGED( service_coin_inserted )
 
 static CUSTOM_INPUT( astrof_p1_controls_r )
 {
-	return input_port_read(field->machine(), "P1");
+	return input_port_read(field.machine(), "P1");
 }
 
 
@@ -134,10 +134,10 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 	/* on an upright cabinet, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (input_port_read(field->machine(), "CAB"))
-		ret = input_port_read(field->machine(), "P2");
+	if (input_port_read(field.machine(), "CAB"))
+		ret = input_port_read(field.machine(), "P2");
 	else
-		ret = input_port_read(field->machine(), "P1");
+		ret = input_port_read(field.machine(), "P1");
 
 	return ret;
 }
@@ -146,16 +146,16 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 static CUSTOM_INPUT( tomahawk_controls_r )
 {
 	UINT32 ret;
-	astrof_state *state = field->machine().driver_data<astrof_state>();
+	astrof_state *state = field.machine().driver_data<astrof_state>();
 
 	/* on a cocktail cabinet, two sets of controls are
        multiplexed on a single set of inputs
          (not verified on pcb) */
 
 	if (state->m_flipscreen)
-		ret = input_port_read(field->machine(), "P2");
+		ret = input_port_read(field.machine(), "P2");
 	else
-		ret = input_port_read(field->machine(), "P1");
+		ret = input_port_read(field.machine(), "P1");
 
 	return ret;
 }

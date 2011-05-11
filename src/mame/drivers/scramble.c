@@ -475,7 +475,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ckongs_coinage_r )
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field->machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (input_port_read(field.machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
 

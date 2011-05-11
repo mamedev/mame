@@ -2,22 +2,22 @@
 
 const device_type SEGA_837_13551 = &device_creator<sega_837_13551>;
 
-WRITE_LINE_DEVICE_HANDLER(jvs13551_coin_1_w)
+WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_1_w)
 {
 	if(state)
-		downcast<sega_837_13551 *>(device)->inc_coin(0);
+		inc_coin(0);
 }
 
-WRITE_LINE_DEVICE_HANDLER(jvs13551_coin_2_w)
+WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_2_w)
 {
 	if(state)
-		downcast<sega_837_13551 *>(device)->inc_coin(1);
+		inc_coin(1);
 }
 
 static INPUT_PORTS_START(sega_837_13551_coins)
 	PORT_START("COINS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE(DEVICE_SELF, jvs13551_coin_1_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE(DEVICE_SELF, jvs13551_coin_2_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_1_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sega_837_13551, jvs13551_coin_2_w)
 INPUT_PORTS_END
 
 void sega_837_13551::static_set_port_tag(device_t &device, int port, const char *tag)

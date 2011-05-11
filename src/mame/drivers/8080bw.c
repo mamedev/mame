@@ -1155,7 +1155,7 @@ MACHINE_CONFIG_END
 
 static CUSTOM_INPUT( sflush_80_r )
 {
-	return (field->machine().primary_screen->vpos() & 0x80) ? 1 : 0;
+	return (field.machine().primary_screen->vpos() & 0x80) ? 1 : 0;
 }
 
 static ADDRESS_MAP_START( sflush_map, AS_PROGRAM, 8 )

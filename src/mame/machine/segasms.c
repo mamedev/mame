@@ -319,24 +319,24 @@ static TIMER_CALLBACK( lphaser_2_callback )
 
 INPUT_CHANGED( lgun1_changed )
 {
-	sms_state *state = field->machine().driver_data<sms_state>();
+	sms_state *state = field.machine().driver_data<sms_state>();
 	if (!state->m_lphaser_1_timer ||
-		(input_port_read_safe(field->machine(), "CTRLSEL", 0x00) & 0x0f) != 0x01)
+		(input_port_read_safe(field.machine(), "CTRLSEL", 0x00) & 0x0f) != 0x01)
 		return;
 
 	if (newval != oldval)
-		lphaser1_sensor_check(field->machine());
+		lphaser1_sensor_check(field.machine());
 }
 
 INPUT_CHANGED( lgun2_changed )
 {
-	sms_state *state = field->machine().driver_data<sms_state>();
+	sms_state *state = field.machine().driver_data<sms_state>();
 	if (!state->m_lphaser_2_timer ||
-		(input_port_read_safe(field->machine(), "CTRLSEL", 0x00) & 0xf0) != 0x10)
+		(input_port_read_safe(field.machine(), "CTRLSEL", 0x00) & 0xf0) != 0x10)
 		return;
 
 	if (newval != oldval)
-		lphaser2_sensor_check(field->machine());
+		lphaser2_sensor_check(field.machine());
 }
 
 

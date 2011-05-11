@@ -306,12 +306,12 @@ static void sasuke_start_counter(running_machine &machine)
 
 static CUSTOM_INPUT( snk6502_music0_r )
 {
-	return (snk6502_music0_playing(field->machine()) ? 0x01 : 0x00);
+	return (snk6502_music0_playing(field.machine()) ? 0x01 : 0x00);
 }
 
 static CUSTOM_INPUT( sasuke_count_r )
 {
-	snk6502_state *state = field->machine().driver_data<snk6502_state>();
+	snk6502_state *state = field.machine().driver_data<snk6502_state>();
 
 	return (state->m_sasuke_counter >> 4);
 }

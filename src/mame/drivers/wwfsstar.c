@@ -274,7 +274,7 @@ static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 
 static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
-	wwfsstar_state *state = field->machine().driver_data<wwfsstar_state>();
+	wwfsstar_state *state = field.machine().driver_data<wwfsstar_state>();
 
 	return state->m_vblank;
 }

@@ -83,10 +83,10 @@ static WRITE8_HANDLER( joinem_misc_w )
 
 static CUSTOM_INPUT( sound_check_r )
 {
-	jack_state *state = field->machine().driver_data<jack_state>();
+	jack_state *state = field.machine().driver_data<jack_state>();
 	UINT8 ret = 0;
 
-	if ((input_port_read(field->machine(), "IN2") & 0x80) && !state->m_joinem_snd_bit)
+	if ((input_port_read(field.machine(), "IN2") & 0x80) && !state->m_joinem_snd_bit)
 		ret = 1;
 
 	return ret;

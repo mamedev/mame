@@ -36,7 +36,7 @@ inputs + notes by stephh
 
 static INPUT_CHANGED( coin_inserted )
 {
-	fcombat_state *state = field->machine().driver_data<fcombat_state>();
+	fcombat_state *state = field.machine().driver_data<fcombat_state>();
 
 	/* coin insertion causes an NMI */
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

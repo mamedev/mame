@@ -228,7 +228,7 @@ static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 
 static CUSTOM_INPUT( get_ttl74123_output )
 {
-	r2dtank_state *state = field->machine().driver_data<r2dtank_state>();
+	r2dtank_state *state = field.machine().driver_data<r2dtank_state>();
 	return state->m_ttl74123_output;
 }
 

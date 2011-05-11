@@ -168,9 +168,9 @@ static CUSTOM_INPUT( sidewndr_payout_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->machine(), "PAYOUT") & bit_mask) >> 0);
+			return ((input_port_read(field.machine(), "PAYOUT") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->machine(), "PAYOUT") & bit_mask) >> 1);
+			return ((input_port_read(field.machine(), "PAYOUT") & bit_mask) >> 1);
 		default:
 			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -184,13 +184,13 @@ static CUSTOM_INPUT( starspnr_coinage_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 0);
+			return ((input_port_read(field.machine(), "COINAGE") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 1);
+			return ((input_port_read(field.machine(), "COINAGE") & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 2);
+			return ((input_port_read(field.machine(), "COINAGE") & bit_mask) >> 2);
 		case 0x08:
-			return ((input_port_read(field->machine(), "COINAGE") & bit_mask) >> 3);
+			return ((input_port_read(field.machine(), "COINAGE") & bit_mask) >> 3);
 		default:
 			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -204,11 +204,11 @@ static CUSTOM_INPUT( starspnr_payout_r )
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((input_port_read(field->machine(), "PAYOUT") & bit_mask) >> 0);
+			return ((input_port_read(field.machine(), "PAYOUT") & bit_mask) >> 0);
 		case 0x02:
-			return ((input_port_read(field->machine(), "PAYOUT") & bit_mask) >> 1);
+			return ((input_port_read(field.machine(), "PAYOUT") & bit_mask) >> 1);
 		case 0x04:
-			return ((input_port_read(field->machine(), "PAYOUT") & bit_mask) >> 2);
+			return ((input_port_read(field.machine(), "PAYOUT") & bit_mask) >> 2);
 		default:
 			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;

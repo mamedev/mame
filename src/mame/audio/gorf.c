@@ -177,6 +177,6 @@ READ8_HANDLER( gorf_speech_r )
 
 CUSTOM_INPUT( gorf_speech_status_r )
 {
-	device_t *samples = field->machine().device("samples");
+	device_t *samples = field.machine().device("samples");
 	return !sample_playing(samples, 0);
 }

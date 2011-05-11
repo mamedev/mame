@@ -262,7 +262,7 @@ static READ8_HANDLER( multigam_IN1_r )
 
 static CUSTOM_INPUT( multigam_inputs_r )
 {
-	multigam_state *state = field->machine().driver_data<multigam_state>();
+	multigam_state *state = field.machine().driver_data<multigam_state>();
 	/* bit 0: serial input (dsw)
        bit 1: coin */
 	return (state->m_in_dsw >> state->m_in_dsw_shift++) & 0x01;

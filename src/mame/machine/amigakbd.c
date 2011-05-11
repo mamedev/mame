@@ -62,17 +62,17 @@ static TIMER_CALLBACK( kbd_update_callback )
 static INPUT_CHANGED( kbd_update )
 {
 	int	index = (int)(FPTR)param, i;
-	UINT32	oldvalue = oldval * field->mask, newvalue = newval * field->mask;
+	UINT32	oldvalue = oldval * field.mask, newvalue = newval * field.mask;
 	UINT32	delta = oldvalue ^ newvalue;
 
 	/* Special case Page UP, which we will use as Action Replay button */
 	if ( (index == 3) && ( delta & 0x80000000 ) && ( newvalue & 0x80000000 ) )
 	{
-		const amiga_machine_interface *amiga_intf = amiga_get_interface(field->machine());
+		const amiga_machine_interface *amiga_intf = amiga_get_interface(field.machine());
 
 		if ( amiga_intf != NULL && amiga_intf->nmi_callback )
 		{
-			(*amiga_intf->nmi_callback)(field->machine());
+			(*amiga_intf->nmi_callback)(field.machine());
 		}
 	}
 	else
@@ -96,7 +96,7 @@ static INPUT_CHANGED( kbd_update )
 		/* if the buffer was empty and we have new data, start a timer to send the keystrokes */
 		if ( key_buf_was_empty && ( kbd.buf_pos != kbd.cur_pos ) )
 		{
-			kbd.timer->adjust(field->machine().primary_screen->frame_period() / 4);
+			kbd.timer->adjust(field.machine().primary_screen->frame_period() / 4);
 		}
 	}
 }

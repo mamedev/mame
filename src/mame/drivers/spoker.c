@@ -105,7 +105,7 @@ static SCREEN_UPDATE(spoker)
 
 static CUSTOM_INPUT( hopper_r )
 {
-	running_machine &machine = field->machine();
+	running_machine &machine = field.machine();
 	spoker_state *state = machine.driver_data<spoker_state>();
 
 	if (state->m_hopper) return !(machine.primary_screen->frame_number()%10);

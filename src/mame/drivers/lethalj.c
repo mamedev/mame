@@ -161,7 +161,7 @@ Pin #11(+) | | R               |
 
 static CUSTOM_INPUT( cclownz_paddle )
 {
-	int value = input_port_read(field->machine(), "PADDLE");
+	int value = input_port_read(field.machine(), "PADDLE");
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 

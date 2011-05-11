@@ -55,7 +55,7 @@ Verify Color PROM resistor values (Last 8 colors)
 
 static CUSTOM_INPUT( get_motor_not_ready )
 {
-	stactics_state *state = field->machine().driver_data<stactics_state>();
+	stactics_state *state = field.machine().driver_data<stactics_state>();
 
 	/* if the motor is self-centering, but not centered yet */
     return ((*state->m_motor_on & 0x01) == 0) &&
@@ -130,7 +130,7 @@ static void move_motor(running_machine &machine, stactics_state *state)
 static CUSTOM_INPUT( get_rng )
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
-	return field->machine().rand() & 0x07;
+	return field.machine().rand() & 0x07;
 }
 
 

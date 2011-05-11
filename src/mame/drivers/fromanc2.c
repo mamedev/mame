@@ -75,19 +75,19 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 
 static CUSTOM_INPUT( subcpu_int_r )
 {
-	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
 	return state->m_subcpu_int_flag & 0x01;
 }
 
 static CUSTOM_INPUT( sndcpu_nmi_r )
 {
-	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
 	return state->m_sndcpu_nmi_flag & 0x01;
 }
 
 static CUSTOM_INPUT( subcpu_nmi_r )
 {
-	fromanc2_state *state = field->machine().driver_data<fromanc2_state>();
+	fromanc2_state *state = field.machine().driver_data<fromanc2_state>();
 	return state->m_subcpu_nmi_flag & 0x01;
 }
 

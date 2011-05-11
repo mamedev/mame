@@ -130,7 +130,7 @@ static const UINT8 prot_data[0x10] =
 
 static CUSTOM_INPUT( prot_r )
 {
-	ddayjlc_state *state = field->machine().driver_data<ddayjlc_state>();
+	ddayjlc_state *state = field.machine().driver_data<ddayjlc_state>();
 	return prot_data[state->m_prot_addr];
 }
 

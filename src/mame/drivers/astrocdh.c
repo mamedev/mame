@@ -90,8 +90,8 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( set_write_protect )  // run when RAM expansion write protect switch is changed
 {
 	int ram_expansion_installed = 0, write_protect_on = 0, expansion_ram_start = 0, expansion_ram_end = 0, shadow_ram_end = 0;
-	address_space *space = field->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *expram = ram_get_ptr(field->machine().device("ram_tag"));
+	address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *expram = ram_get_ptr(field.machine().device("ram_tag"));
 
 	get_ram_expansion_settings(space, ram_expansion_installed, write_protect_on, expansion_ram_start, expansion_ram_end, shadow_ram_end);  // passing by reference
 

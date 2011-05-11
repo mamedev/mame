@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
-	kopunch_state *state = field->machine().driver_data<kopunch_state>();
+	kopunch_state *state = field.machine().driver_data<kopunch_state>();
 
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
@@ -79,7 +79,7 @@ static INPUT_CHANGED( left_coin_inserted )
 
 static INPUT_CHANGED( right_coin_inserted )
 {
-	kopunch_state *state = field->machine().driver_data<kopunch_state>();
+	kopunch_state *state = field.machine().driver_data<kopunch_state>();
 
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)

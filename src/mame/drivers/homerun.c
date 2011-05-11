@@ -64,7 +64,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( homerun_40_r )
 {
-	UINT8 ret = (field->machine().primary_screen->vpos() > 116) ? 1 : 0;
+	UINT8 ret = (field.machine().primary_screen->vpos() > 116) ? 1 : 0;
 
 	return ret;
 }

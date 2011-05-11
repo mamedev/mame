@@ -93,7 +93,7 @@ MACHINE_START( playch10_hboard )
 
 CUSTOM_INPUT( pc10_int_detect_r )
 {
-	playch10_state *state = field->machine().driver_data<playch10_state>();
+	playch10_state *state = field.machine().driver_data<playch10_state>();
 	return ~state->m_pc10_int_detect & 1;
 }
 

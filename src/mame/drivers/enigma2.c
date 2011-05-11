@@ -416,17 +416,17 @@ static WRITE8_HANDLER( enigma2_flip_screen_w )
 
 static CUSTOM_INPUT( p1_controls_r )
 {
-	return input_port_read(field->machine(), "P1CONTROLS");
+	return input_port_read(field.machine(), "P1CONTROLS");
 }
 
 
 static CUSTOM_INPUT( p2_controls_r )
 {
-	enigma2_state *state = field->machine().driver_data<enigma2_state>();
+	enigma2_state *state = field.machine().driver_data<enigma2_state>();
 	if (state->m_flip_screen)
-		return input_port_read(field->machine(), "P2CONTROLS");
+		return input_port_read(field.machine(), "P2CONTROLS");
 	else
-		return input_port_read(field->machine(), "P1CONTROLS");
+		return input_port_read(field.machine(), "P1CONTROLS");
 }
 
 

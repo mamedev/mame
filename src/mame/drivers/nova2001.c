@@ -134,7 +134,7 @@ e000 - e7ff        R/W      Work RAM
 
 static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
 {
-	nova2001_state *state = field->machine().driver_data<nova2001_state>();
+	nova2001_state *state = field.machine().driver_data<nova2001_state>();
 	return state->m_ninjakun_io_a002_ctrl;
 }
 
