@@ -1061,7 +1061,6 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/spacefb.o $(AUDIO)/spacefb.o  $(VIDEO)/spacefb.o \
 	$(DRIVERS)/vsnes.o $(MACHINE)/vsnes.o $(VIDEO)/vsnes.o \
 	$(VIDEO)/ppu2c0x.o \
-	$(VIDEO)/nes.o		\
 
 
 
@@ -1112,7 +1111,6 @@ $(MAMEOBJ)/pacman.a: \
 	$(MACHINE)/theglobp.o \
 
 $(MAMEOBJ)/pce.a: \
-	$(MACHINE)/pce.o \
 	$(DRIVERS)/ggconnie.o \
 	$(DRIVERS)/paranoia.o \
 	$(DRIVERS)/uapce.o \
