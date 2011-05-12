@@ -567,9 +567,9 @@ static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALG
 static READ16_HANDLER( galgames_eeprom_r )
 {
 	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	device_t *eeprom = space->machine().device(galgames_eeprom_names[state->m_galgames_cart]);
+	eeprom_device *eeprom = space->machine().device<eeprom_device>(galgames_eeprom_names[state->m_galgames_cart]);
 
-	return eeprom_read_bit(eeprom) ? 0x80 : 0x00;
+	return eeprom->read_bit() ? 0x80 : 0x00;
 }
 
 static WRITE16_HANDLER( galgames_eeprom_w )
@@ -580,13 +580,13 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		device_t *eeprom = space->machine().device(galgames_eeprom_names[state->m_galgames_cart]);
+		eeprom_device *eeprom = space->machine().device<eeprom_device>(galgames_eeprom_names[state->m_galgames_cart]);
 
 		// latch the bit
-		eeprom_write_bit(eeprom, data & 0x0001);
+		eeprom->write_bit(data & 0x0001);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(eeprom, (data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -656,7 +656,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[i]), ASSERT_LINE);
+					space->machine().device<eeprom_device>(galgames_eeprom_names[i])->set_cs_line(ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -664,12 +664,12 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[data & 0xff]), CLEAR_LINE);
+				space->machine().device<eeprom_device>(galgames_eeprom_names[data & 0xff])->set_cs_line(CLEAR_LINE);
 				galgames_update_rombank(space->machine(), data & 0xff);
 				break;
 
 			default:
-				eeprom_set_cs_line(space->machine().device(galgames_eeprom_names[0]), CLEAR_LINE);
+				space->machine().device<eeprom_device>(galgames_eeprom_names[0])->set_cs_line(CLEAR_LINE);
 				galgames_update_rombank(space->machine(), 0);
 				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(&space->device()), data);
 				break;

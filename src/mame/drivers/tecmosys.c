@@ -345,7 +345,8 @@ static READ16_HANDLER( unk880000_r )
 
 static READ16_DEVICE_HANDLER( eeprom_r )
 {
-	 return ((eeprom_read_bit(device) & 0x01) << 11);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	 return ((eeprom->read_bit() & 0x01) << 11);
 }
 
 
@@ -353,9 +354,10 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
-		eeprom_write_bit(device, data & 0x0800);
-		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x0800);
+		eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 

@@ -109,10 +109,10 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *device = space->machine().device("eeprom");
-				eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(device, data & 0x40);
-				eeprom_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom->write_bit(data & 0x40);
+				eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 			return;
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( gunbustr )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)

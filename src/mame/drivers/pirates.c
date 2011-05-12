@@ -112,9 +112,9 @@ static WRITE16_HANDLER( pirates_out_w )
 		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 
 		/* bits 0-2 control EEPROM */
-		eeprom_write_bit(eeprom, data & 0x04);
-		eeprom_set_cs_line(eeprom, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->write_bit(data & 0x04);
+		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
 		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	// EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)		// protection

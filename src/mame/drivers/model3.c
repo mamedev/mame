@@ -1351,11 +1351,11 @@ static WRITE64_HANDLER( model3_ctrl_w )
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				device_t *device = space->machine().device("eeprom");
+				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 				int reg = (data >> 56) & 0xff;
-				eeprom_write_bit(device, (reg & 0x20) ? 1 : 0);
-				eeprom_set_clock_line(device, (reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_set_cs_line(device, (reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom->write_bit((reg & 0x20) ? 1 : 0);
+				eeprom->set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom->set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 				state->m_controls_bank = reg & 0xff;
 			}
 			return;
@@ -1826,7 +1826,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2061,7 +2061,7 @@ static INPUT_PORTS_START( skichamp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )		/* Select 2 */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )

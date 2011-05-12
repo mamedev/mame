@@ -5,6 +5,8 @@
 
 *************************************************************************/
 
+#include "machine/eeprom.h"
+
 class taitoz_state : public driver_device
 {
 public:
@@ -35,7 +37,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_subcpu;
-	device_t *m_eeprom;
+	eeprom_device *m_eeprom;
 	device_t *m_tc0480scp;
 	device_t *m_tc0150rod;
 	device_t *m_tc0100scn;

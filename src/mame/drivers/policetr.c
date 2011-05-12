@@ -137,10 +137,10 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		device_t *device = space->machine().device("eeprom");
-		eeprom_write_bit(device, data & 0x00800000);
-		eeprom_set_cs_line(device, (data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+		eeprom->write_bit(data & 0x00800000);
+		eeprom->set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* toggling BSMT off then on causes a reset */
@@ -332,7 +332,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 

@@ -386,14 +386,15 @@ static WRITE8_DEVICE_HANDLER( eeprom_w )
 {
 	sigmab98_state *state = device->machine().driver_data<sigmab98_state>();
 	// latch the bit
-	eeprom_write_bit(device, data & 0x40);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
 //  if ((state->m_c0 ^ data) & 0x20)
-		eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->m_c0 = data;
 	show_outputs(state);
@@ -591,19 +592,21 @@ static READ8_HANDLER( animalc_rambank_r )
 
 static READ8_DEVICE_HANDLER( sammymdl_eeprom_r )
 {
-	return eeprom_read_bit(device) ? 0x80 : 0;
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return eeprom->read_bit() ? 0x80 : 0;
 }
 
 static WRITE8_DEVICE_HANDLER( sammymdl_eeprom_w )
 {
 	// latch the bit
-	eeprom_write_bit(device, data & 0x40);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-	eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x8f)
 		logerror("%s: unknown eeeprom bits written %02x\n", device->machine().describe_context(), data);
@@ -1484,7 +1487,7 @@ static INPUT_PORTS_START( gegege )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_IMPULSE(5)	// ? (coin error, pulses mask 4 of port c6)

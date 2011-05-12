@@ -398,7 +398,7 @@ static READ32_HANDLER( fghthist_control_r )
 	switch (offset) {
 	case 0: return 0xffff0000 | input_port_read(space->machine(), "IN0");
 	case 1: return 0xffff0000 | input_port_read(space->machine(), "IN1"); //check top bits??
-	case 2: return 0xfffffffe | eeprom_read_bit(space->machine().device("eeprom"));
+	case 2: return 0xfffffffe | space->machine().device<eeprom_device>("eeprom")->read_bit();
 	}
 
 	return 0xffffffff;
@@ -407,10 +407,10 @@ static READ32_HANDLER( fghthist_control_r )
 static WRITE32_HANDLER( fghthist_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
-		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(device, data & 0x10);
-		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+		eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->write_bit(data & 0x10);
+		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
@@ -480,15 +480,17 @@ static WRITE32_HANDLER( dragngun_lightgun_w )
 
 static READ32_DEVICE_HANDLER( dragngun_eeprom_r )
 {
-	return 0xfffffffe | eeprom_read_bit(device);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return 0xfffffffe | eeprom->read_bit();
 }
 
 static WRITE32_DEVICE_HANDLER( dragngun_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(device, data & 0x1);
-		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->write_bit(data & 0x1);
+		eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
 	logerror("%s:Write control 1 %08x %08x\n",device->machine().describe_context(),offset,data);
@@ -662,7 +664,7 @@ static READ32_HANDLER( nslasher_prot_r )
 	switch (offset<<1) {
 	case 0x280: return input_port_read(space->machine(), "IN0") << 16| 0xffff; /* IN0 */
 	case 0x4c4: return input_port_read(space->machine(), "IN1") << 16| 0xffff; /* IN1 */
-	case 0x35a: return (eeprom_read_bit(space->machine().device("eeprom"))<< 16) | 0xffff; // Debug switch in low word??
+	case 0x35a: return (space->machine().device<eeprom_device>("eeprom")->read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
 	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(&space->device()),offset<<1,mem_mask);
@@ -674,10 +676,10 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
-		eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(device, data & 0x10);
-		eeprom_set_cs_line(device, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+		eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->write_bit(data & 0x10);
+		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}

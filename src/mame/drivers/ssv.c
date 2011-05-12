@@ -463,7 +463,8 @@ static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 	ssv_state *state = device->machine().driver_data<ssv_state>();
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine(), gunnames[state->m_gdfs_lightgun_select])) | (eeprom_read_bit(device) << 8);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine(), gunnames[state->m_gdfs_lightgun_select])) | (eeprom->read_bit() << 8);
 }
 
 static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
@@ -479,13 +480,14 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 //      data & 0x0001 ?
 
 		// latch the bit
-		eeprom_write_bit(device, data & 0x4000);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(state->m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))	// rising clock
 			state->m_gdfs_lightgun_select = (data & 0x0300) >> 8;

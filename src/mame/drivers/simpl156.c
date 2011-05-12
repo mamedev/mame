@@ -130,7 +130,7 @@ INPUT_PORTS_END
 static READ32_HANDLER( simpl156_inputs_read )
 {
 	simpl156_state *state = space->machine().driver_data<simpl156_state>();
-	int eep = eeprom_read_bit(state->m_eeprom);
+	int eep = state->m_eeprom->read_bit();
 	UINT32 returndata = input_port_read(space->machine(), "IN0") ^ 0xffff0000;
 
 	returndata ^= ((eep << 8));
@@ -176,9 +176,9 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 	state->m_okimusic->set_bank_base(0x40000 * (data & 0x7));
 
-	eeprom_set_clock_line(state->m_eeprom, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_write_bit(state->m_eeprom, BIT(data, 4));
-	eeprom_set_cs_line(state->m_eeprom, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	state->m_eeprom->set_clock_line(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+	state->m_eeprom->write_bit(BIT(data, 4));
+	state->m_eeprom->set_cs_line(BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

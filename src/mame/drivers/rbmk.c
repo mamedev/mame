@@ -97,10 +97,11 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
-		eeprom_write_bit(device, data & 0x04);
-		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x04);
+		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
 
-		eeprom_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -353,7 +354,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("IN4")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )

@@ -73,15 +73,17 @@ static SCREEN_UPDATE(fortecar)
 
 static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 {
-	eeprom_write_bit(device, data & 0x04);
-	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x04);
+	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
 //  popmessage("%s",device->machine().describe_context());
-	return (~(eeprom_read_bit(device)<<1) & 2);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return (~(eeprom->read_bit()<<1) & 2);
 }
 
 static const ppi8255_interface ppi0intf =

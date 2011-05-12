@@ -1256,7 +1256,7 @@ static READ16_HANDLER( spacegun_input_bypass_r )
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_read_bit(state->m_eeprom) << 7;
+			return state->m_eeprom->read_bit() << 7;
 
 		default:
 			return tc0220ioc_r(state->m_tc0220ioc, offset);	/* might be a 510NIO ! */
@@ -2638,9 +2638,9 @@ static INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 
 	PORT_START("STICKX1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
@@ -2971,7 +2971,7 @@ static MACHINE_START( bshark )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_subcpu = machine.device("sub");
 	state->m_audiocpu = machine.device("audiocpu");
-	state->m_eeprom = machine.device("eeprom");
+	state->m_eeprom = machine.device<eeprom_device>("eeprom");
 	state->m_tc0100scn = machine.device("tc0100scn");
 	state->m_tc0150rod = machine.device("tc0150rod");
 	state->m_tc0480scp = machine.device("tc0480scp");

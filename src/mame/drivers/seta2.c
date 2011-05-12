@@ -173,14 +173,16 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( gundamex_eeprom_r )
 {
-	return ((eeprom_read_bit(device) & 1)) << 3;
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return ((eeprom->read_bit() & 1)) << 3;
 }
 
 static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
 {
-		eeprom_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(device, data & 0x1);
-		eeprom_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->write_bit(data & 0x1);
+	eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16 )

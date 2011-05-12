@@ -38,7 +38,8 @@ To Do:
 static READ16_DEVICE_HANDLER(galpani2_eeprom_r)
 {
 	galpani2_state *state = device->machine().driver_data<galpani2_state>();
-	return (state->m_eeprom_word & ~1) | (eeprom_read_bit(device) & 1);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return (state->m_eeprom_word & ~1) | (eeprom->read_bit() & 1);
 }
 
 static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
@@ -48,13 +49,14 @@ static WRITE16_DEVICE_HANDLER(galpani2_eeprom_w)
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		eeprom_write_bit(device, data & 0x02);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x02);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

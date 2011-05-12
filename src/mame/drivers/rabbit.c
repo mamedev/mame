@@ -725,13 +725,14 @@ static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		eeprom_write_bit(device, data & 0x01000000);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x01000000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -775,7 +776,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	// as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	// as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )

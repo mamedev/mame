@@ -1616,7 +1616,8 @@ static const eeprom_interface braze_eeprom_intf =
 
 static READ8_DEVICE_HANDLER( braze_eeprom_r )
 {
-	return eeprom_read_bit(device);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return eeprom->read_bit();
 }
 
 static WRITE8_HANDLER( braze_a15_w )
@@ -1627,9 +1628,10 @@ static WRITE8_HANDLER( braze_a15_w )
 
 static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
 {
-	eeprom_write_bit(device, data & 0x01);
-	eeprom_set_cs_line(device, data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line(device, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x01);
+	eeprom->set_cs_line(data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)

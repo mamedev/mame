@@ -161,7 +161,8 @@ static READ16_DEVICE_HANDLER( pntnpuzl_eeprom_r )
 {
 	pntnpuzl_state *state = device->machine().driver_data<pntnpuzl_state>();
 	/* bit 11 is EEPROM data */
-	return (state->m_eeprom & 0xf4ff) | (eeprom_read_bit(device)<<11) | (input_port_read(device->machine(), "IN1") & 0x0300);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return (state->m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (input_port_read(device->machine(), "IN1") & 0x0300);
 }
 
 static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
@@ -173,9 +174,10 @@ static WRITE16_DEVICE_HANDLER( pntnpuzl_eeprom_w )
 	/* bit 13 is clock (active high) */
 	/* bit 14 is cs (active high) */
 
-	eeprom_write_bit(device, data & 0x1000);
-	eeprom_set_cs_line(device, (data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x1000);
+	eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

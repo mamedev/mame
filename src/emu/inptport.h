@@ -643,9 +643,9 @@ public:
 	INT32						delta;			/* delta to apply each frame a digital inc/dec key is pressed */
 	INT32						centerdelta;	/* delta to apply each frame no digital inputs are pressed */
 	UINT8						crossaxis;		/* crosshair axis */
-	float						crossscale;		/* crosshair scale */
-	float						crossoffset;	/* crosshair offset */
-	float						crossaltaxis;	/* crosshair alternate axis value */
+	double						crossscale;		/* crosshair scale */
+	double						crossoffset;	/* crosshair offset */
+	double						crossaltaxis;	/* crosshair alternate axis value */
 	input_field_crossmap_delegate crossmapper;	/* crosshair mapping function */
 	const char *				crossmapper_device;	/* parameter for write callback routine */
 	UINT16						full_turn_count;/* number of optical counts for 1 full turn of the original control */

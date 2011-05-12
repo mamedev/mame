@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER(fake2_w)
 static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
 	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	device_t *eeprom = device->machine().device("eeprom");
+	eeprom_device *eeprom = device->machine().device<eeprom_device>("eeprom");
 	int i;
 
 	if (data & ~0xfd)
@@ -162,13 +162,13 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 			lordgun_update_gun(device->machine(), i);
 
 	// latch the bit
-	eeprom_write_bit(eeprom, data & 0x40);
+	eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-	eeprom_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	state->m_whitescreen = data & 0x80;
 
@@ -178,7 +178,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 {
 	lordgun_state *state = device->machine().driver_data<lordgun_state>();
-	device_t *eeprom = device->machine().device("eeprom");
+	eeprom_device *eeprom = device->machine().device<eeprom_device>("eeprom");
 
 	if (~data & ~0xf8)
 	{
@@ -193,13 +193,13 @@ static WRITE8_DEVICE_HANDLER( aliencha_eeprom_w )
 	coin_counter_w(device->machine(), 1, data & 0x10);
 
 	// latch the bit
-	eeprom_write_bit(eeprom, data & 0x80);
+	eeprom->write_bit(data & 0x80);
 
 	// reset line asserted: reset.
-	eeprom_set_cs_line(eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(eeprom, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -443,7 +443,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("START1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -564,7 +564,7 @@ static INPUT_PORTS_START( aliencha )
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW3:8" ) /* Listed as "Unused" */
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )

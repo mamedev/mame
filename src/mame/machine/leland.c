@@ -841,9 +841,10 @@ WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", device->machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	eeprom_write_bit     (device, (data & 0x10) >> 4);
-	eeprom_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line   (device, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit     ((data & 0x10) >> 4);
+	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1140,7 +1141,7 @@ READ8_HANDLER( leland_master_input_r )
 WRITE8_HANDLER( leland_master_output_w )
 {
 	leland_state *state = space->machine().driver_data<leland_state>();
-	device_t *eeprom;
+	eeprom_device *eeprom;
 
 	switch (offset)
 	{
@@ -1150,12 +1151,12 @@ WRITE8_HANDLER( leland_master_output_w )
 			cputag_set_input_line(space->machine(), "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			cputag_set_input_line(space->machine(), "slave", 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
-			eeprom = space->machine().device("eeprom");
+			eeprom = space->machine().device<eeprom_device>("eeprom");
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(&space->device()),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			eeprom_write_bit     (eeprom, (data & 0x10) >> 4);
-			eeprom_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line   (eeprom, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom->write_bit     ((data & 0x10) >> 4);
+			eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:	/* /OGIA */

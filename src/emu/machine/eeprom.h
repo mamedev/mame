@@ -79,10 +79,10 @@ public:
 	static void static_set_default_value(device_t &device, UINT16 value);
 
 	// I/O operations
-	void write_bit(int state);
-	int read_bit();
-	void set_cs_line(int state);
-	void set_clock_line(int state);
+	DECLARE_WRITE_LINE_MEMBER( write_bit );
+	DECLARE_READ_LINE_MEMBER( read_bit );
+	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
+	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
 
 protected:
 	// device-level overrides
@@ -138,15 +138,5 @@ extern const eeprom_interface eeprom_interface_93C46;
 extern const eeprom_interface eeprom_interface_93C46_8bit;
 extern const eeprom_interface eeprom_interface_93C66B;
 
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE_LINE_DEVICE_HANDLER( eeprom_write_bit );
-READ_LINE_DEVICE_HANDLER( eeprom_read_bit );
-WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line );
-WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line );
 
 #endif

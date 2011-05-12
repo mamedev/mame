@@ -51,19 +51,22 @@ EEPROM chip: 93C46
 static WRITE16_DEVICE_HANDLER( eeprom_chip_select_w )
 {
 	/* bit 0 is CS (active low) */
-	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_serial_clock_w )
 {
 	/* bit 0 is SK (active high) */
-	eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eeprom_write_bit(device, data & 0x01);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x01);
 }
 
 
@@ -99,7 +102,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )

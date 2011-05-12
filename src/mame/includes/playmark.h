@@ -1,4 +1,5 @@
 #include "sound/okim6295.h"
+#include "machine/eeprom.h"
 
 class playmark_state : public driver_device
 {
@@ -46,7 +47,7 @@ public:
 
 	/* devices */
 	okim6295_device *m_oki;
-	device_t *m_eeprom;
+	eeprom_device *m_eeprom;
 };
 
 /*----------- defined in video/playmark.c -----------*/

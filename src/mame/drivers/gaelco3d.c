@@ -296,7 +296,8 @@ static READ16_DEVICE_HANDLER( eeprom_data_r )
 		result |= gaelco_serial_status_r(device->machine().device("serial"), 0);
 	}
 
-	if (eeprom_read_bit(device))
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	if (eeprom->read_bit())
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -324,7 +325,10 @@ static READ32_DEVICE_HANDLER( eeprom_data32_r )
 static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_write_bit(device, data & 0x01);
+	{
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x01);
+	}
 	else if (mem_mask != 0xffff)
 		logerror("write mask: %08x data %08x\n", mem_mask, data);
 }
@@ -333,14 +337,20 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 static WRITE16_DEVICE_HANDLER( eeprom_clock_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	{
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 
 static WRITE16_DEVICE_HANDLER( eeprom_cs_w )
 {
 	if (ACCESSING_BITS_0_7)
-		eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	{
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	}
 }
 
 

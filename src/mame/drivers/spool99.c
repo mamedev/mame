@@ -175,7 +175,7 @@ static READ8_HANDLER( spool99_io_r )
 			case 0xafe4: return input_port_read(space->machine(),"SERVICE2");//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return eeprom_read_bit(space->machine().device("eeprom"));
+			case 0xafe7: return space->machine().device<eeprom_device>("eeprom")->read_bit();
 			case 0xaff8: return space->machine().device<okim6295_device>("oki")->read(*space,0);
 		}
 	}
@@ -188,19 +188,22 @@ static READ8_HANDLER( spool99_io_r )
 static WRITE8_DEVICE_HANDLER( eeprom_resetline_w )
 {
 	// reset line asserted: reset.
-	eeprom_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_clockline_w )
 {
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 {
 	// latch the bit
-	eeprom_write_bit(device, data & 0x01);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x01);
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8 )
@@ -240,7 +243,7 @@ static READ8_HANDLER( vcarn_io_r )
 			case 0xa7a2: return input_port_read(space->machine(),"START");
 			case 0xa7a3: return input_port_read(space->machine(),"BET");//system 2
 
-			case 0xa7a7: return eeprom_read_bit(space->machine().device("eeprom"));
+			case 0xa7a7: return space->machine().device<eeprom_device>("eeprom")->read_bit();
 
 		}
 	}

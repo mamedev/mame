@@ -299,13 +299,14 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_msb_w )
 		coin_counter_w(device->machine(), 0, data & 0x1000);
 
 		// latch the bit
-		eeprom_write_bit(device, data & 0x0800);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x0800);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -320,13 +321,14 @@ static WRITE16_DEVICE_HANDLER( hotdogst_eeprom_msb_w )
 	if (ACCESSING_BITS_8_15)  // even address
 	{
 		// latch the bit
-		eeprom_write_bit(device, data & 0x0800);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x0800);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x0400) ? CLEAR_LINE: ASSERT_LINE);
+		eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE);
 	}
 }
 
@@ -343,13 +345,14 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
 		coin_counter_w(device->machine(), 0,  data & 0x0001);
 
 		// latch the bit
-		eeprom_write_bit(device, data & 0x80);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x80);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -378,13 +381,14 @@ static WRITE16_DEVICE_HANDLER( metmqstr_eeprom_msb_w )
 		if (~data & 0x0100)
 		{
 			// latch the bit
-			eeprom_write_bit(device, data & 0x0800);
+			eeprom_device *eeprom = downcast<eeprom_device *>(device);
+			eeprom->write_bit(data & 0x0800);
 
 			// reset line asserted: reset.
-			eeprom_set_cs_line(device, (data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
 
 			// clock line asserted: write latch or select next bit to read
-			eeprom_set_clock_line(device, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom->set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
 }
@@ -680,13 +684,14 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 		state->m_hopper = data & 0x0100;	// ???
 
 		// latch the bit
-		eeprom_write_bit(device, data & 0x4000);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -795,7 +800,8 @@ ADDRESS_MAP_END
 
 static READ16_DEVICE_HANDLER( pwrinst2_eeprom_r )
 {
-	return ~8 + ((eeprom_read_bit(device) & 1) ? 8 : 0);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return ~8 + ((eeprom->read_bit() & 1) ? 8 : 0);
 }
 
 INLINE void vctrl_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
@@ -898,13 +904,14 @@ static WRITE16_DEVICE_HANDLER( tjumpman_eeprom_lsb_w )
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
 		// latch the bit
-		eeprom_write_bit(device, data & 0x0020);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(data & 0x0020);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom->set_cs_line((data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->set_clock_line((data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1291,7 +1298,7 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1444,7 +1451,7 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1488,7 +1495,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1500,7 +1507,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)	// suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
@@ -1525,7 +1532,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )	// credits
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )

@@ -93,9 +93,9 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 		coin_counter_w(space->machine(), 3, data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		eeprom_set_cs_line(state->m_eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(state->m_eeprom, data & 0x80);
-		eeprom_set_clock_line(state->m_eeprom, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		state->m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		state->m_eeprom->write_bit(data & 0x80);
+		state->m_eeprom->set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -107,9 +107,9 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 	{
 		coin_counter_w(space->machine(), 0,data & 0x20);
 
-		eeprom_set_cs_line(state->m_eeprom, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(state->m_eeprom, data & 4);
-		eeprom_set_clock_line(state->m_eeprom, (data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		state->m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		state->m_eeprom->write_bit(data & 4);
+		state->m_eeprom->set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -567,7 +567,7 @@ static INPUT_PORTS_START( wbeachvl )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_LOW)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* ?? see code at 746a. sound status? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM data */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -733,7 +733,7 @@ static INPUT_PORTS_START( hotmind )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)	/* EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)	/* EEPROM data */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
@@ -1038,7 +1038,7 @@ static MACHINE_START( playmark )
 	playmark_state *state = machine.driver_data<playmark_state>();
 
 	state->m_oki = machine.device<okim6295_device>("oki");
-	state->m_eeprom = machine.device("eeprom");
+	state->m_eeprom = machine.device<eeprom_device>("eeprom");
 
 	state->save_item(NAME(state->m_bgscrollx));
 	state->save_item(NAME(state->m_bgscrolly));

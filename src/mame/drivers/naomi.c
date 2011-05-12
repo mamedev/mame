@@ -1393,7 +1393,7 @@ static READ64_DEVICE_HANDLER( eeprom_93c46a_r )
 	int res;
 
 	/* bit 3 is EEPROM data */
-	res = eeprom_read_bit(device) << 4;
+	res = downcast<eeprom_device *>(device)->read_bit() << 4;
 	return res;
 }
 
@@ -1402,9 +1402,10 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
 	/* bit 4 is data */
 	/* bit 2 is clock */
 	/* bit 5 is cs */
-	eeprom_write_bit(device, data & 0x8);
-	eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line(device, (data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data & 0x8);
+	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom->set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Dreamcast MAP
@@ -1736,9 +1737,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
 	PORT_START("MIE:3")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("mie_eeprom", eeprom_write_bit)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("mie_eeprom", eeprom_set_cs_line)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("mie_eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, set_clock_line)
 
 	PORT_START("MIE:5")
 	PORT_DIPNAME( 0x01, 0x00, "Monitor" ) PORT_DIPLOCATION("SW1:1")
@@ -1756,7 +1757,7 @@ static INPUT_PORTS_START( naomi_mie )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("mie_eeprom", eeprom_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_device, read_bit)
 INPUT_PORTS_END
 
 /* 2 players with 1 joystick and 6 buttons each */

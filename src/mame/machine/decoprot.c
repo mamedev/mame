@@ -1311,7 +1311,7 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 //  case 0x582: return input_port_read(space->machine(), "IN0"); /* IN0 */
 //  case 0x672: return input_port_read(space->machine(), "IN1"); /* IN1 */
-//  case 0x04c: return eeprom_read_bit(space->machine().device("eeprom"));
+//  case 0x04c: return space->machine().device<eeprom_device>("eeprom")->read_bit();
 
 	case 0x468:
 		val=DECO_PORT(0x570);
@@ -1660,7 +1660,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	{
 	case 0x582: return (input_port_read(space->machine(), "IN0")<<16) | 0xffff; /* IN0 */
 	case 0x672: return (input_port_read(space->machine(), "IN1")<<16) | 0xffff; /* IN1 */
-	case 0x04c: return (eeprom_read_bit(space->machine().device("eeprom"))<<16) | 0xffff;
+	case 0x04c: return (space->machine().device<eeprom_device>("eeprom")->read_bit()<<16) | 0xffff;
 	}
 
 	/* Handle 'one shots' - writing data to an address, then immediately reading it back */

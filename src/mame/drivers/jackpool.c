@@ -109,8 +109,8 @@ static READ16_HANDLER( jackpool_io_r )
 		case 0x1c: return input_port_read(space->machine(),"BET");
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-    	case 0x2c: return eeprom_read_bit(space->machine().device("eeprom"));
-    	case 0x2e: return eeprom_read_bit(space->machine().device("eeprom"));
+    	case 0x2c: return space->machine().device<eeprom_device>("eeprom")->read_bit();
+    	case 0x2e: return space->machine().device<eeprom_device>("eeprom")->read_bit();
 //      default: printf("R %02x\n",offset*2); break;
 	}
 
@@ -138,11 +138,11 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
 		case 0x4e: state->m_map_vreg = data & 1;        break;
-		case 0x50: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-		case 0x52: eeprom_set_clock_line(space->machine().device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: eeprom_write_bit(space->machine().device("eeprom"), data & 1); break;
-//      case 0x5a: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//      case 0x5c: eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x50: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x52: space->machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: space->machine().device<eeprom_device>("eeprom")->write_bit(data & 1); break;
+//      case 0x5a: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+//      case 0x5c: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x60: break;
 //      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
 	}
@@ -151,17 +151,17 @@ static WRITE16_HANDLER( jackpool_io_w )
 	if(offset*2 == 0x54)
 	{
 		printf("Write bit %02x\n",data);
-		eeprom_write_bit(space->machine().device("eeprom"), data & 1);
+		space->machine().device<eeprom_device>("eeprom")->write_bit(data & 1);
 	}
 	if(offset*2 == 0x52)
 	{
 		printf("Clock bit %02x\n",data);
-		eeprom_set_clock_line(space->machine().device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		space->machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	if(offset*2 == 0x50)
 	{
 		printf("chip select bit %02x\n",data);
-		eeprom_set_cs_line(space->machine().device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE );
+		space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE );
 	}
 	#endif
 }

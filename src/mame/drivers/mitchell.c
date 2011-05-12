@@ -113,7 +113,7 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
-	int bit = eeprom_read_bit(space->machine().device("eeprom")) << 7;
+	int bit = space->machine().device<eeprom_device>("eeprom")->read_bit() << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
         bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -129,17 +129,20 @@ static READ8_HANDLER( pang_port5_r )
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
 {
-	eeprom_set_cs_line(device, data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_clock_w )
 {
-	eeprom_set_clock_line(device, data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
 {
-	eeprom_write_bit(device, data);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->write_bit(data);
 }
 
 

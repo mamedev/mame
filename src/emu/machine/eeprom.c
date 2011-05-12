@@ -313,12 +313,7 @@ void eeprom_device::nvram_write(emu_file &file)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_DEVICE_HANDLER( eeprom_write_bit )
-{
-	downcast<eeprom_device *>(device)->write_bit(state);
-}
-
-void eeprom_device::write_bit(int state)
+WRITE_LINE_MEMBER( eeprom_device::write_bit )
 {
 	LOG(("write bit %d\n",state));
 	m_latch = state;
@@ -330,7 +325,7 @@ READ_LINE_DEVICE_HANDLER( eeprom_read_bit )
 	return downcast<eeprom_device *>(device)->read_bit();
 }
 
-int eeprom_device::read_bit()
+READ_LINE_MEMBER( eeprom_device::read_bit )
 {
 	int res;
 
@@ -355,12 +350,7 @@ int eeprom_device::read_bit()
 
 
 
-WRITE_LINE_DEVICE_HANDLER( eeprom_set_cs_line )
-{
-	downcast<eeprom_device *>(device)->set_cs_line(state);
-}
-
-void eeprom_device::set_cs_line(int state)
+WRITE_LINE_MEMBER( eeprom_device::set_cs_line )
 {
 	LOG(("set reset line %d\n",state));
 	m_reset_line = state;
@@ -378,12 +368,7 @@ void eeprom_device::set_cs_line(int state)
 
 
 
-WRITE_LINE_DEVICE_HANDLER( eeprom_set_clock_line )
-{
-	downcast<eeprom_device *>(device)->set_clock_line(state);
-}
-
-void eeprom_device::set_clock_line(int state)
+WRITE_LINE_MEMBER( eeprom_device::set_clock_line )
 {
 	LOG(("set clock line %d\n",state));
 	if (state == PULSE_LINE || (m_clock_line == CLEAR_LINE && state != CLEAR_LINE))

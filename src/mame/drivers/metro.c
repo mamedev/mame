@@ -1308,21 +1308,24 @@ static READ16_HANDLER( gakusai_input_r )
 
 static READ16_DEVICE_HANDLER( gakusai_eeprom_r )
 {
-	return eeprom_read_bit(device) & 1;
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return eeprom->read_bit() & 1;
 }
 
 static WRITE16_DEVICE_HANDLER( gakusai_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+
 		// latch the bit
-		eeprom_write_bit(device, BIT(data, 0));
+		eeprom->write_bit(BIT(data, 0));
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -1404,10 +1407,11 @@ ADDRESS_MAP_END
 static READ16_DEVICE_HANDLER( dokyusp_eeprom_r )
 {
 	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line(device, CLEAR_LINE);
-	eeprom_set_clock_line(device, ASSERT_LINE);
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	eeprom->set_clock_line(CLEAR_LINE);
+	eeprom->set_clock_line(ASSERT_LINE);
 
-	return eeprom_read_bit(device) & 1;
+	return eeprom->read_bit() & 1;
 }
 
 static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
@@ -1415,11 +1419,12 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_bit_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_write_bit(device, BIT(data, 0));
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->write_bit(BIT(data, 0));
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, CLEAR_LINE);
-		eeprom_set_clock_line(device, ASSERT_LINE);
+		eeprom->set_clock_line(CLEAR_LINE);
+		eeprom->set_clock_line(ASSERT_LINE);
 	}
 }
 
@@ -1428,7 +1433,8 @@ static WRITE16_DEVICE_HANDLER( dokyusp_eeprom_reset_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
-		eeprom_set_cs_line(device, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->set_cs_line(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

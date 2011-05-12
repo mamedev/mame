@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "machine/eeprom.h"
+
 struct othunder_tempsprite
 {
 	int gfx;
@@ -37,7 +39,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
-	device_t *m_eeprom;
+	eeprom_device *m_eeprom;
 	device_t *m_tc0220ioc;
 	device_t *m_tc0100scn;
 	device_t *m_tc0110pcr;

@@ -322,7 +322,7 @@ static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	device_t *adc1038 = space->machine().device("adc1038");
-	device_t *eeprom = space->machine().device("eeprom");
+	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 
 	switch (offset)
 	{
@@ -342,7 +342,7 @@ static READ8_HANDLER( sysreg_r )
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (eeprom_read_bit(eeprom) << 1);
+			UINT32 eeprom_bit = (eeprom->read_bit() << 1);
 			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
 			return (eeprom_bit | adc_bit);
 		}
@@ -357,7 +357,7 @@ static READ8_HANDLER( sysreg_r )
 static WRITE8_HANDLER( sysreg_w )
 {
 	device_t *adc1038 = space->machine().device("adc1038");
-	device_t *eeprom = space->machine().device("eeprom");
+	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 
 	switch (offset)
 	{
@@ -367,9 +367,9 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 		case 3:
-			eeprom_write_bit(eeprom, (data & 0x01) ? 1 : 0);
-			eeprom_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line(eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom->write_bit((data & 0x01) ? 1 : 0);
+			eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 4:

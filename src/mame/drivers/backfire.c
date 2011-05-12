@@ -45,7 +45,7 @@ public:
 
 	device_t *m_lscreen;
 	device_t *m_rscreen;
-	device_t *m_eeprom;
+	eeprom_device *m_eeprom;
 
 	/* memory */
 	UINT16    m_pf1_rowscroll[0x0800/2];
@@ -144,7 +144,8 @@ static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 {
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
 	int backfire_screen = device->machine().rand() & 1;
-	return ((eeprom_read_bit(device) << 24) | input_port_read(device->machine(), "IN0")
+	eeprom_device *eeprom = downcast<eeprom_device *>(device);
+	return ((eeprom->read_bit() << 24) | input_port_read(device->machine(), "IN0")
 			| ((input_port_read(device->machine(), "IN2") & 0xbf) << 16)
 			| ((input_port_read(device->machine(), "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
@@ -154,7 +155,7 @@ static READ32_HANDLER( backfire_control2_r )
 	backfire_state *state = space->machine().driver_data<backfire_state>();
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
-	return (eeprom_read_bit(state->m_eeprom) << 24) | input_port_read(space->machine(), "IN1") | (input_port_read(space->machine(), "IN1") << 16);
+	return (state->m_eeprom->read_bit() << 24) | input_port_read(space->machine(), "IN1") | (input_port_read(space->machine(), "IN1") << 16);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -163,7 +164,7 @@ static READ32_HANDLER(backfire_control3_r)
 	backfire_state *state = space->machine().driver_data<backfire_state>();
 
 //  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
-	return (eeprom_read_bit(state->m_eeprom) << 24) | input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN2") << 16);
+	return (state->m_eeprom->read_bit() << 24) | input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN2") << 16);
 }
 #endif
 
@@ -173,9 +174,10 @@ static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 	logerror("%s:write eprom %08x (%08x) %08x\n",device->machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_set_clock_line(device, BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(device, BIT(data, 0));
-		eeprom_set_cs_line(device, BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_device *eeprom = downcast<eeprom_device *>(device);
+		eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom->write_bit(BIT(data, 0));
+		eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -447,7 +449,7 @@ static MACHINE_START( backfire )
 	state->m_deco_tilegen2 = machine.device("tilegen2");
 	state->m_lscreen = machine.device("lscreen");
 	state->m_rscreen = machine.device("rscreen");
-	state->m_eeprom = machine.device("eeprom");
+	state->m_eeprom = machine.device<eeprom_device>("eeprom");
 }
 
 UINT16 backfire_pri_callback(UINT16 x)

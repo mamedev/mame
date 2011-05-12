@@ -673,10 +673,10 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 
 			if (which == 0)
 			{
-				eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
-				eeprom_write_bit(device, data & 0x80);
-				eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom->write_bit(data & 0x80);
+				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 /*            coin_lockout_w(space->machine(), 1 + 2*which, data & 0x08);
             coin_lockout_w(space->machine(), 0 + 2*which, data & 0x04);*/
@@ -691,10 +691,10 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 			else
 			{
 				/* multi-32 EEPROM access */
-				eeprom_device *device = space->machine().device<eeprom_device>("eeprom");
-				eeprom_write_bit(device, data & 0x80);
-				eeprom_set_cs_line(device, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom_set_clock_line(device, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom->write_bit(data & 0x80);
+				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 
@@ -1350,7 +1350,7 @@ static INPUT_PORTS_START( system32_generic )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )	/* sometimes mirrors SERVICE1 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )	/* tends to also work as a test switch */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("PORTG_A")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1385,7 +1385,7 @@ static INPUT_PORTS_START( multi32_generic )
 
 	PORT_START("SERVICE34_B")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
 	PORT_START("PORTG_B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
