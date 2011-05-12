@@ -401,7 +401,6 @@ $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/caswin.o \
 
-
 $(MAMEOBJ)/ascii.a: \
 	$(MACHINE)/msx.o \
 	$(DRIVERS)/big10.o \
@@ -1247,8 +1246,6 @@ $(MAMEOBJ)/sega.a: \
 	$(MACHINE)/segasms.o \
 	$(DRIVERS)/segasms.o \
 	$(DRIVERS)/sg1000.o \
-	$(DRIVERS)/dc.o \
-	$(MACHINE)/dccons.o \
 	$(MACHINE)/gdrom.o \
 
 $(MAMEOBJ)/seibu.a: \
