@@ -9029,7 +9029,7 @@ xexex:     01 FF 00 21 00 37 01 00 01 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 typedef struct _k053252_state k053252_state;
 struct _k053252_state
 {
-	UINT16   regs[16];
+	UINT8   regs[16];
 };
 
 /*****************************************************************************
@@ -9048,24 +9048,19 @@ INLINE k053252_state *k053252_get_safe_token( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_DEVICE_HANDLER( k053252_word_r )
+READ8_DEVICE_HANDLER( k053252_r )
 {
 	k053252_state *k053252 = k053252_get_safe_token(device);
 	return k053252->regs[offset];
 }
 
-WRITE16_DEVICE_HANDLER( k053252_word_w )
+WRITE8_DEVICE_HANDLER( k053252_w )
 {
 	k053252_state *k053252 = k053252_get_safe_token(device);
-	COMBINE_DATA(k053252->regs + offset);
+	k053252->regs[offset] = data;
 }
 
-WRITE32_DEVICE_HANDLER( k053252_long_w )
-{
-	offset <<= 1;
-	k053252_word_w(device, offset, data >> 16, mem_mask >> 16);
-	k053252_word_w(device, offset + 1, data, mem_mask);
-}
+
 
 /*****************************************************************************
     DEVICE INTERFACE

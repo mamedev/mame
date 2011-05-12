@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
 	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
 	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
-	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITENOP		// 251 #1
+	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE("k053251", k053251_lsb_w)	// 251 #2
 
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE_MEMBER(dbz_state, m_bg2_videoram)
@@ -395,6 +395,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053936_ADD("k053936_1", dbz_k053936_intf)
 	MCFG_K053936_ADD("k053936_2", dbz_k053936_intf)
+	MCFG_K053252_ADD("k053252")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

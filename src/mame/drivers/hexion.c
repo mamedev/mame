@@ -84,6 +84,7 @@ Notes:
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
 #include "includes/hexion.h"
+#include "video/konicdev.h"
 
 
 static WRITE8_HANDLER( coincntr_w )
@@ -122,9 +123,9 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("konami", k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
-	AM_RANGE(0xf000, 0xf00d) AM_RAM	/* 053252? f00e = IRQ ack, f00f = NMI ack */
-	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(hexion_irq_ack_w)
-	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(hexion_nmi_ack_w)
+	AM_RANGE(0xf000, 0xf00d) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)	/* 053252? f00e = IRQ ack, f00f = NMI ack */
+	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(hexion_irq_ack_w) // - TODO: move these two into the above hook-up
+	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(hexion_nmi_ack_w) // /
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
@@ -224,7 +225,7 @@ static TIMER_DEVICE_CALLBACK( hexion_scanline )
 
 	if(scanline == 256)
 		cputag_set_input_line(timer.machine(), "maincpu", 0, ASSERT_LINE);
-	else if ((scanline == 85) || (scanline == 170))
+	else if ((scanline == 85) || (scanline == 170)) //TODO
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -234,6 +235,8 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", hexion_scanline, "screen", 0, 1)
+
+	MCFG_K053252_ADD("k053252")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

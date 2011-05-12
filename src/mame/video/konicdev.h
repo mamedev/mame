@@ -749,9 +749,8 @@ void k053250_dma(device_t *device, int limiter);
 
 /**  Konami 053252  **/
 /* CRT and interrupt control unit */
-READ16_DEVICE_HANDLER( k053252_word_r );	// CCU registers
-WRITE16_DEVICE_HANDLER( k053252_word_w );
-WRITE32_DEVICE_HANDLER( k053252_long_w );
+READ8_DEVICE_HANDLER( k053252_r );	// CCU registers
+WRITE8_DEVICE_HANDLER( k053252_w );
 
 
 /**  Konami 001006  **/
