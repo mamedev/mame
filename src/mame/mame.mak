@@ -1193,7 +1193,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(MACHINE)/megadriv.o \
-	$(DRIVERS)/megadriv.o \
 	$(MACHINE)/md_cart.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \

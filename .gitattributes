@@ -2270,7 +2270,6 @@ src/mame/drivers/mcr3.c svneol=native#text/plain
 src/mame/drivers/mcr68.c svneol=native#text/plain
 src/mame/drivers/meadows.c svneol=native#text/plain
 src/mame/drivers/mediagx.c svneol=native#text/plain
-src/mame/drivers/megadriv.c svneol=native#text/plain
 src/mame/drivers/megadrvb.c svneol=native#text/plain
 src/mame/drivers/megaplay.c svneol=native#text/plain
 src/mame/drivers/megasys1.c svneol=native#text/plain
