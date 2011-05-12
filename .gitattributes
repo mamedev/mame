@@ -1743,7 +1743,6 @@ src/mame/drivers/asterix.c svneol=native#text/plain
 src/mame/drivers/asteroid.c svneol=native#text/plain
 src/mame/drivers/astinvad.c svneol=native#text/plain
 src/mame/drivers/astrocde.c svneol=native#text/plain
-src/mame/drivers/astrocdh.c svneol=native#text/plain
 src/mame/drivers/astrocorp.c svneol=native#text/plain
 src/mame/drivers/astrof.c svneol=native#text/plain
 src/mame/drivers/asuka.c svneol=native#text/plain
