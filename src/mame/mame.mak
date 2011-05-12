@@ -403,8 +403,6 @@ $(MAMEOBJ)/aristocr.a: \
 
 
 $(MAMEOBJ)/ascii.a: \
-	$(DRIVERS)/msx.o \
-	$(MACHINE)/msx_slot.o \
 	$(MACHINE)/msx.o \
 	$(DRIVERS)/big10.o \
 	$(DRIVERS)/forte2.o \
