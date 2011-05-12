@@ -79,8 +79,7 @@ struct _dev_harddisk_t
 INLINE dev_harddisk_t *get_safe_token(device_t *device)
 {
 	assert( device != NULL );
-	assert( ( device->type() == HARDDISK ) ||
-	        ( device->type() == IDE_HARDDISK ) );
+	assert( device->type() == HARDDISK);
 	return (dev_harddisk_t *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -311,94 +310,4 @@ DEVICE_GET_INFO(hd)
 	}
 }
 
-
-static DEVICE_START(ide)
-{
-	/* old code from idedrive.c */
-#ifdef UNUSED_FUNCTION
-	int which_bus, which_address;
-	struct ide_interface *intf;
-	device_start_func parent_init;
-
-	/* get the basics */
-	ide_get_params(device, &which_bus, &which_address, &intf, &parent_init, NULL, NULL);
-
-	/* call the parent init function */
-	parent_init(device);
-
-	/* configure IDE */
-	/* FIXME IDE */
-	/* ide_controller_init_custom(which_bus, intf, NULL); */
-#endif
-}
-
-
-static DEVICE_IMAGE_LOAD(ide)
-{
-	/* old code from idedrive.c */
-#ifdef UNUSED_FUNCTION
-	int result, which_bus, which_address;
-	struct ide_interface *intf;
-	device_image_load_func parent_load;
-
-	/* get the basics */
-	ide_get_params(image, &which_bus, &which_address, &intf, NULL, &parent_load, NULL);
-
-	/* call the parent load function */
-	result = parent_load(image);
-	if (result != IMAGE_INIT_PASS)
-		return result;
-
-	/* configure IDE */
-	/* FIXME IDE */
-	/* ide_controller_init_custom(which_bus, intf, hd_get_chd_file(image)); */
-	/* ide_controller_reset(which_bus); */
-	return IMAGE_INIT_PASS;
-#endif
-	return device_load_hd( image );
-}
-
-
-static DEVICE_IMAGE_UNLOAD(ide)
-{
-	/* old code from idedrive.c */
-#ifdef UNUSED_FUNCTION
-	int which_bus, which_address;
-	struct ide_interface *intf;
-	device_image_unload_func parent_unload;
-
-	/* get the basics */
-	ide_get_params(image, &which_bus, &which_address, &intf, NULL, NULL, &parent_unload);
-
-	/* call the parent unload function */
-	parent_unload(image);
-
-	/* configure IDE */
-	/* FIXME IDE */
-	/* ide_controller_init_custom(which_bus, intf, NULL); */
-	/* ide_controller_reset(which_bus); */
-#endif
-	device_unload_hd( image );
-}
-
-
-DEVICE_GET_INFO(ide)
-{
-	switch( state )
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ide); break;
-		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(ide); break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(ide); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "IDE harddisk"); break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:		strcpy(info->s, "ideharddrive"); break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:	strcpy(info->s, "idehd"); break;
-
-		default:									DEVICE_GET_INFO_CALL( hd ); break;
-	}
-}
-
 DEFINE_LEGACY_IMAGE_DEVICE(HARDDISK, hd);
-DEFINE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, ide);
