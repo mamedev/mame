@@ -1020,7 +1020,6 @@ $(MAMEOBJ)/namco.a: \
 	$(AUDIO)/namcoc7x.o \
 	$(VIDEO)/bosco.o \
 	$(VIDEO)/digdug.o \
-	$(MACHINE)/psx.o $(VIDEO)/psx.o \
 	$(MACHINE)/xevious.o $(VIDEO)/xevious.o \
 
 $(MAMEOBJ)/nasco.a: \
@@ -1320,6 +1319,7 @@ $(MAMEOBJ)/snk.a: \
 
 $(MAMEOBJ)/sony.a: \
 	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
+	$(MACHINE)/psx.o $(VIDEO)/psx.o \
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \
