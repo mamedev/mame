@@ -12469,7 +12469,7 @@ cd32		// (c)1993 Commodore
 
 // GCE Vectrex
 // (parent to Spectrum I+)
-vectrex		// (c)1982 GCE
+//vectrex		// (c)1982 GCE
 
 // NEC PC Engine
 // Hardware used by uapce.c, and several others (implementations could be merged)
