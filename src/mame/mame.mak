@@ -402,7 +402,6 @@ $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/caswin.o \
 
 $(MAMEOBJ)/ascii.a: \
-	$(MACHINE)/msx.o \
 	$(DRIVERS)/big10.o \
 	$(DRIVERS)/forte2.o \
 	$(DRIVERS)/pengadvb.o \
