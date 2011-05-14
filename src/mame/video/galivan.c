@@ -349,7 +349,7 @@ SCREEN_UPDATE( galivan )
 {
 	galivan_state *state = screen->machine().driver_data<galivan_state>();
 	tilemap_set_scrollx(state->m_bg_tilemap, 0, state->m_galivan_scrollx[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
-	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrollx[1] & 0x07));
+	tilemap_set_scrolly(state->m_bg_tilemap, 0, state->m_galivan_scrolly[0] + 256 * (state->m_galivan_scrolly[1] & 0x07));
 
 	if (state->m_layers & 0x40)
 		bitmap_fill(bitmap, cliprect, 0);
