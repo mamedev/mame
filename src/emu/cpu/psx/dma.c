@@ -67,13 +67,13 @@ void psxdma_device::device_start()
 	{
 		psx_dma_channel *dma = &channel[ index ];
 
-		dma->timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxdma_device::dma_finished_callback), this));
+		dma->timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxdma_device::dma_finished_callback ), this) );
 
-		machine().save().save_item( "psxdma", tag(), index, NAME(dma->n_base) );
-		machine().save().save_item( "psxdma", tag(), index, NAME(dma->n_blockcontrol) );
-		machine().save().save_item( "psxdma", tag(), index, NAME(dma->n_channelcontrol) );
-		machine().save().save_item( "psxdma", tag(), index, NAME(dma->n_ticks) );
-		machine().save().save_item( "psxdma", tag(), index, NAME(dma->b_running) );
+		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_base ) );
+		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_blockcontrol ) );
+		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_channelcontrol ) );
+		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_ticks ) );
+		machine().save().save_item( "psxdma", tag(), index, NAME( dma->b_running ) );
 	}
 
 	save_item( NAME(n_dpcp) );

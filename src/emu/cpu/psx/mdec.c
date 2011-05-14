@@ -3,6 +3,8 @@
  *
  * Copyright 2003-2011 smf
  *
+ * Thanks to Oliver Galibert for help figuring out IDCT
+ *
  */
 
 #include "emu.h"

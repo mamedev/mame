@@ -7,17 +7,9 @@
 #if !defined( PSX_H )
 
 #include "cpu/psx/dma.h"
+#include "cpu/psx/sio.h"
 
-#define PSX_RC_STOP ( 0x01 )
-#define PSX_RC_RESET ( 0x04 ) /* guess */
-#define PSX_RC_COUNTTARGET ( 0x08 )
-#define PSX_RC_IRQTARGET ( 0x10 )
-#define PSX_RC_IRQOVERFLOW ( 0x20 )
-#define PSX_RC_REPEAT ( 0x40 )
-#define PSX_RC_CLC ( 0x100 )
-#define PSX_RC_DIV ( 0x200 )
-
-#define PSX_IRQ_ROOTCOUNTER3	0x0001
+#define PSX_IRQ_VBLANK			0x0001
 #define PSX_IRQ_CDROM			0x0004
 #define PSX_IRQ_DMA				0x0008
 #define PSX_IRQ_ROOTCOUNTER0	0x0010
@@ -27,66 +19,7 @@
 #define PSX_IRQ_SIO1			0x0100
 #define PSX_IRQ_SPU				0x0200
 #define PSX_IRQ_EXTCD			0x0400
-#define PSX_IRQ_MASK			(PSX_IRQ_ROOTCOUNTER3 | PSX_IRQ_CDROM | PSX_IRQ_DMA | PSX_IRQ_ROOTCOUNTER2 | PSX_IRQ_ROOTCOUNTER1 | PSX_IRQ_ROOTCOUNTER0 | PSX_IRQ_SIO0 | PSX_IRQ_SIO1 | PSX_IRQ_SPU | PSX_IRQ_EXTCD)
-
-#define PSX_SIO_OUT_DATA ( 1 )	/* COMMAND */
-#define PSX_SIO_OUT_DTR ( 2 )	/* ATT */
-#define PSX_SIO_OUT_RTS ( 4 )
-#define PSX_SIO_OUT_CLOCK ( 8 )	/* CLOCK */
-#define PSX_SIO_IN_DATA ( 1 )	/* DATA */
-#define PSX_SIO_IN_DSR ( 2 )	/* ACK */
-#define PSX_SIO_IN_CTS ( 4 )
-
-typedef void ( *psx_sio_handler )( running_machine &, int );
-
-#define SIO_BUF_SIZE ( 8 )
-
-#define SIO_STATUS_TX_RDY ( 1 << 0 )
-#define SIO_STATUS_RX_RDY ( 1 << 1 )
-#define SIO_STATUS_TX_EMPTY ( 1 << 2 )
-#define SIO_STATUS_OVERRUN ( 1 << 4 )
-#define SIO_STATUS_DSR ( 1 << 7 )
-#define SIO_STATUS_IRQ ( 1 << 9 )
-
-#define SIO_CONTROL_TX_ENA ( 1 << 0 )
-#define SIO_CONTROL_IACK ( 1 << 4 )
-#define SIO_CONTROL_RESET ( 1 << 6 )
-#define SIO_CONTROL_TX_IENA ( 1 << 10 )
-#define SIO_CONTROL_RX_IENA ( 1 << 11 )
-#define SIO_CONTROL_DSR_IENA ( 1 << 12 )
-#define SIO_CONTROL_DTR ( 1 << 13 )
-
-typedef struct _psx_root psx_root;
-struct _psx_root
-{
-	emu_timer *timer;
-	UINT16 n_count;
-	UINT16 n_mode;
-	UINT16 n_target;
-	UINT64 n_start;
-};
-
-typedef struct _psx_sio psx_sio;
-struct _psx_sio
-{
-	UINT32 n_status;
-	UINT32 n_mode;
-	UINT32 n_control;
-	UINT32 n_baud;
-	UINT32 n_tx;
-	UINT32 n_rx;
-	UINT32 n_tx_prev;
-	UINT32 n_rx_prev;
-	UINT32 n_tx_data;
-	UINT32 n_rx_data;
-	UINT32 n_tx_shift;
-	UINT32 n_rx_shift;
-	UINT32 n_tx_bits;
-	UINT32 n_rx_bits;
-
-	emu_timer *timer;
-	psx_sio_handler fn_handler;
-};
+#define PSX_IRQ_MASK			(PSX_IRQ_VBLANK | PSX_IRQ_CDROM | PSX_IRQ_DMA | PSX_IRQ_ROOTCOUNTER2 | PSX_IRQ_ROOTCOUNTER1 | PSX_IRQ_ROOTCOUNTER0 | PSX_IRQ_SIO0 | PSX_IRQ_SIO1 | PSX_IRQ_SPU | PSX_IRQ_EXTCD)
 
 typedef struct _psx_machine psx_machine;
 struct _psx_machine
@@ -100,10 +33,6 @@ struct _psx_machine
 	UINT32 n_com_delay;
 	UINT32 n_irqdata;
 	UINT32 n_irqmask;
-
-	psx_root root[3];
-
-	psx_sio sio[2];
 };
 
 typedef struct _psx_gpu psx_gpu;
@@ -147,8 +76,6 @@ extern void psx_dma_install_read_handler( running_machine &, int, psx_dma_read_d
 extern void psx_dma_install_write_handler( running_machine &, int, psx_dma_read_delegate );
 WRITE32_HANDLER( psx_counter_w );
 READ32_HANDLER( psx_counter_r );
-WRITE32_HANDLER( psx_sio_w );
-READ32_HANDLER( psx_sio_r );
 extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
 extern void psx_sio_input( running_machine &, int, int, int );
 

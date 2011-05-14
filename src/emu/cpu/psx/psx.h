@@ -10,9 +10,10 @@
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
-#include "includes/psx.h"
 #include "gte.h"
 #include "dma.h"
+#include "sio.h"
+#include "includes/psx.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -131,7 +132,8 @@ public:
 
 	static void install_dma_read_handler( device_t &device, const char *cputag, int channel, psx_dma_read_delegate handler );
 	static void install_dma_write_handler( device_t &device, const char *cputag, int channel, psx_dma_write_delegate handler );
-
+	static void install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler );
+	static void sio_input( device_t &device, const char *cputag, int n_port, int n_mask, int n_data );
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
 
@@ -161,8 +163,6 @@ protected:
 	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
 	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-
-
 
 	// CPU registers
 	UINT32 m_pc;
