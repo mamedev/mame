@@ -1,10 +1,10 @@
-/***************************************************************************/
-/*                                                                         */
-/*                                 053252                                  */
-/*                                                                         */
-/***************************************************************************/
+/***************************************************************************************************************************
 
-/*
+    Konami 053252 chip emulation, codenamed "CCU"
+
+	device emulation by Angelo Salese, based off notes by Olivier Galibert
+
+============================================================================================================================
 
 left res = current in game, right res = computed
 
@@ -48,7 +48,9 @@ TODO:
 - xexex sets up 0x20 as the VC? default value?
 - xexex layers are offsetted if you try to use the CCU
 - understand how to interpret the back / front porch values, and remove the offset x/y hack
-*/
+
+***************************************************************************************************************************/
+
 
 #include "emu.h"
 #include "k053252.h"
