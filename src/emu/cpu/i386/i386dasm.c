@@ -1565,11 +1565,11 @@ static char* handle_param(char* s, UINT32 param)
 			}
 
 			if( address_size ) {
-				d32 = FETCHD32();
-				s += sprintf( s, "[%s]", hexstring(d32, 0) );
+				i32 = FETCHD32();
+				s += sprintf( s, "[%s]", hexstring(i32, 0) );
 			} else {
-				d32 = FETCHD16();
-				s += sprintf( s, "[%s]", hexstring(d32, 0) );
+				i16 = FETCHD16();
+				s += sprintf( s, "[%s]", hexstring(i16, 0) );
 			}
 			break;
 

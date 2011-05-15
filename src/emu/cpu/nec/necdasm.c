@@ -818,7 +818,7 @@ static const GROUP_OP group_op_table[] =
 
 
 static const char *const nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
-static const char *const neg_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
+static const char *const nec_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 static const char *const nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
 static const char *const nec_sfreg[256] =
 {
@@ -1006,7 +1006,7 @@ static char* handle_param(char* s, UINT32 param)
 	switch(param)
 	{
 		case PARAM_REG8:
-			s += sprintf( s, "%s", neg_reg8[MODRM_REG1] );
+			s += sprintf( s, "%s", nec_reg8[MODRM_REG1] );
 			break;
 
 		case PARAM_REG16:
@@ -1014,7 +1014,7 @@ static char* handle_param(char* s, UINT32 param)
 			break;
 
 		case PARAM_REG2_8:
-			s += sprintf( s, "%s", neg_reg8[MODRM_REG2] );
+			s += sprintf( s, "%s", nec_reg8[MODRM_REG2] );
 			break;
 
 		case PARAM_REG2_16:
@@ -1023,7 +1023,7 @@ static char* handle_param(char* s, UINT32 param)
 
 		case PARAM_RM8:
 			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", neg_reg8[MODRM_REG2] );
+				s += sprintf( s, "%s", nec_reg8[MODRM_REG2] );
 			} else {
 				s += sprintf( s, "byte ptr " );
 				s += sprintf( s, "%s", modrm_string );
@@ -1096,8 +1096,8 @@ static char* handle_param(char* s, UINT32 param)
 				case SEG_SS: s += sprintf( s, "ss:" ); break;
 			}
 
-			d16 = FETCHD16();
-			s += sprintf( s, "[%s]", hexstring(d16, 0) );
+			i16 = FETCHD16();
+			s += sprintf( s, "[%s]", hexstring(i16, 0) );
 			break;
 
 		case PARAM_SREG:

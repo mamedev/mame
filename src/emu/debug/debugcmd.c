@@ -1683,7 +1683,7 @@ static void execute_dump(running_machine &machine, int ref, int params, const ch
 				if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT8 byte = debug_read_byte(space, i + j, TRUE);
-					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 128) ? byte : '.');
+					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
 					outdex += sprintf(&output[outdex], " ");
