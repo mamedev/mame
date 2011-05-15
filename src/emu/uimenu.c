@@ -430,6 +430,12 @@ static void ui_menu_exit(running_machine &machine)
 	/* free textures */
 	machine.render().texture_free(hilight_texture);
 	machine.render().texture_free(arrow_texture);
+	
+	if (drivlist)
+	{ 
+		global_free(drivlist);
+		drivlist = NULL;
+	}
 }
 
 
@@ -3720,7 +3726,7 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	// start with an empty list
 	// hack alert: use new directly here to avoid reporting this one-time static memory as unfreed
 	if (drivlist == NULL)
-		drivlist = new driver_enumerator(menu->machine().options());
+		drivlist = global_alloc(driver_enumerator(menu->machine().options()));
 	drivlist->exclude_all();
 
 	/* open a path to the ROMs and find them in the array */
