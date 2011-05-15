@@ -84,7 +84,7 @@ Notes:
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
 #include "includes/hexion.h"
-#include "video/konicdev.h"
+#include "machine/k053252.h"
 
 
 static WRITE8_HANDLER( coincntr_w )

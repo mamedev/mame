@@ -25,6 +25,7 @@
 #include "deprecat.h"
 
 #include "video/konamiic.h"
+#include "machine/k053252.h"
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -280,7 +281,7 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x498014, 0x498015) AM_READ(sound_status_r)
 	AM_RANGE(0x498000, 0x49801f) AM_RAM
 	AM_RANGE(0x49a000, 0x49a001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x49c000, 0x49c01f) AM_WRITE(K053252_word_w)
+	AM_RANGE(0x49c000, 0x49c01f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x49e000, 0x49e007) AM_WRITE(irq_ack_w)	// VSCCS (custom)
 	AM_RANGE(0x600000, 0x601fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)
 	AM_RANGE(0x602000, 0x603fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read(essential)
@@ -292,7 +293,6 @@ static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x484000, 0x484007) AM_READ(K053246_reg_word_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_READ(K054338_word_r)
 	AM_RANGE(0x48c000, 0x48c03f) AM_READ(K056832_word_r)
-	AM_RANGE(0x49c000, 0x49c01f) AM_READ(K053252_word_r)
 #endif
 ADDRESS_MAP_END
 
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x250000, 0x25000f) AM_READWRITE(K053250_0_r,K053250_0_w)
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
-	AM_RANGE(0x260000, 0x26001f) AM_WRITE(K053252_word_w)
+	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x26800e, 0x26800f) AM_WRITE(sound_cmd2_w)
@@ -333,7 +333,6 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x244010, 0x24401f) AM_READ(K053247_reg_word_r)
 	AM_RANGE(0x254000, 0x25401f) AM_READ(K054338_word_r)
 	AM_RANGE(0x258000, 0x2580ff) AM_READ(K055555_word_r)
-	AM_RANGE(0x260000, 0x26001f) AM_READ(K053252_word_r)
 	AM_RANGE(0x26C000, 0x26C007) AM_READ(K056832_b_word_r)
 	AM_RANGE(0x270000, 0x27003f) AM_READ(K056832_word_r)
 #endif
@@ -353,7 +352,7 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
-	AM_RANGE(0x260000, 0x26001f) AM_WRITE(K053252_word_w)
+	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x264000, 0x264001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x26800c, 0x26800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x26800e, 0x26800f) AM_WRITE(sound_cmd2_w)
@@ -377,7 +376,6 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x244010, 0x24401f) AM_READ(K053247_reg_word_r)
 	AM_RANGE(0x254000, 0x25401f) AM_READ(K054338_word_r)
 	AM_RANGE(0x258000, 0x2580ff) AM_READ(K055555_word_r)
-	AM_RANGE(0x260000, 0x26001f) AM_READ(K053252_word_r)
 	AM_RANGE(0x26C000, 0x26C007) AM_READ(K056832_b_word_r)
 	AM_RANGE(0x270000, 0x27003f) AM_READ(K056832_word_r)
 #endif
@@ -460,7 +458,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x41800e, 0x41800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x418000, 0x41801f) AM_RAM									// sound regs fall through
 	AM_RANGE(0x41a000, 0x41a001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x41c000, 0x41c01f) AM_WRITE(K053252_word_w)				// CCU
+	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)				// CCU
 	AM_RANGE(0x41e000, 0x41e007) AM_WRITE(K056832_b_word_w)				// VSCCS
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE_MEMBER(mystwarr_state, m_spriteram)	// sprite RAM
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)						// palette RAM
@@ -494,7 +492,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x480000, 0x48003f) AM_WRITE(K056832_word_w)		// VACSET
 	AM_RANGE(0x482000, 0x482007) AM_WRITE(K056832_b_word_w)	// VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
-	AM_RANGE(0x486000, 0x48601f) AM_WRITE(K053252_word_w)
+	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
@@ -517,7 +515,6 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x450010, 0x45001f) AM_READ(K053247_reg_word_r)
 	AM_RANGE(0x480000, 0x48003f) AM_READ(K056832_word_r)
 	AM_RANGE(0x482000, 0x482007) AM_READ(K056832_b_word_r)
-	AM_RANGE(0x486000, 0x48601f) AM_READ(K053252_word_r)
 	AM_RANGE(0x488000, 0x4880ff) AM_READ(K055555_word_r)
 	AM_RANGE(0x48c000, 0x48c01f) AM_READ(K054338_word_r)
 #endif
@@ -542,7 +539,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x480000, 0x48003f) AM_WRITE(K056832_word_w)			// VACSET
 	AM_RANGE(0x482000, 0x482007) AM_WRITE(K056832_b_word_w)			// VSCCS
 	AM_RANGE(0x484000, 0x484003) AM_WRITE(ddd_053936_clip_w)
-	AM_RANGE(0x486000, 0x48601f) AM_WRITE(K053252_word_w)
+	AM_RANGE(0x486000, 0x48601f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
 	AM_RANGE(0x488000, 0x4880ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x48a00c, 0x48a00d) AM_WRITE(sound_cmd1_msb_w)
 	AM_RANGE(0x48a00e, 0x48a00f) AM_WRITE(sound_cmd2_msb_w)
@@ -565,7 +562,6 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x450010, 0x45001f) AM_READ(K053247_reg_word_r)
 	AM_RANGE(0x480000, 0x48003f) AM_READ(K056832_word_r)
 	AM_RANGE(0x482000, 0x482007) AM_READ(K056832_b_word_r)
-	AM_RANGE(0x486000, 0x48601f) AM_READ(K053252_word_r)
 	AM_RANGE(0x488000, 0x4880ff) AM_READ(K055555_word_r)
 	AM_RANGE(0x48c000, 0x48c01f) AM_READ(K054338_word_r)
 #endif
@@ -943,6 +939,66 @@ static MACHINE_RESET(gaiapols)
 	for (i=5; i<=7; i++) k054539_set_gain(k054539_1, i, 2.0);
 }
 
+static const k053252_interface mystwarr_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	24, 16
+};
+
+static const k053252_interface viostorm_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	40, 16
+};
+
+static const k053252_interface metamrph_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	24, 24
+};
+
+static const k053252_interface martchmp_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	32, 24-1
+};
+
+static const k053252_interface dadandrm_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	24, 16+1
+};
+
+static const k053252_interface gaiapols_k053252_intf =
+{
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	40, 16
+};
+
 static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 
 	/* basic machine hardware */
@@ -957,6 +1013,7 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_K053252_ADD("k053252", 6000000, mystwarr_k053252_intf) // 6 MHz?
 
 	MCFG_MACHINE_START(mystwarr)
 	MCFG_MACHINE_RESET(mystwarr)
@@ -995,6 +1052,9 @@ static MACHINE_CONFIG_DERIVED( viostorm, mystwarr )
 
 	MCFG_MACHINE_RESET(viostorm)
 
+	MCFG_DEVICE_REMOVE("k053252")
+	MCFG_K053252_ADD("k053252", 16000000/2, viostorm_k053252_intf)
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(viostorm_map)
@@ -1020,6 +1080,9 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 	MCFG_CPU_PROGRAM_MAP(metamrph_map)
 	MCFG_CPU_VBLANK_INT_HACK(metamrph_interrupt, 40)
 
+	MCFG_DEVICE_REMOVE("k053252")
+	MCFG_K053252_ADD("k053252", 6000000, metamrph_k053252_intf) // 6 MHz?
+
 	/* video hardware */
 	MCFG_VIDEO_START(metamrph)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1039,6 +1102,9 @@ static MACHINE_CONFIG_DERIVED( dadandrn, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dadandrn_map)
 	MCFG_CPU_VBLANK_INT("screen", ddd_interrupt)
+
+	MCFG_DEVICE_REMOVE("k053252")
+	MCFG_K053252_ADD("k053252", 6000000, dadandrm_k053252_intf) // 6 MHz?
 
 	MCFG_GFXDECODE(dadandrn)
 
@@ -1061,6 +1127,9 @@ static MACHINE_CONFIG_DERIVED( gaiapols, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gaiapols_map)
 	MCFG_CPU_VBLANK_INT("screen", ddd_interrupt)
+
+	MCFG_DEVICE_REMOVE("k053252")
+	MCFG_K053252_ADD("k053252", 6000000, gaiapols_k053252_intf) // 6 MHz?
 
 	MCFG_GFXDECODE(gaiapols)
 
@@ -1087,6 +1156,9 @@ static MACHINE_CONFIG_DERIVED( martchmp, mystwarr )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(martchmp_map)
 	MCFG_CPU_VBLANK_INT_HACK(mchamp_interrupt, 2)
+
+	MCFG_DEVICE_REMOVE("k053252")
+	MCFG_K053252_ADD("k053252", 16000000/2, martchmp_k053252_intf)
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
