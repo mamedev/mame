@@ -2913,11 +2913,16 @@ WRITE16_HANDLER( buggyboy_gas_w )
 	vregs.gas = data;
 }
 
-
 WRITE16_HANDLER( buggyboy_sky_w )
 {
 	tx1_state *state = space->machine().driver_data<tx1_state>();
 	state->m_vregs.sky = data;
+}
+
+WRITE16_HANDLER( buggyboy_scolst_w )
+{
+	tx1_state *state = space->machine().driver_data<tx1_state>();
+	state->m_vregs.scol = data;
 }
 
 

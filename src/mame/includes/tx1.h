@@ -178,3 +178,4 @@ VIDEO_START( buggybjr );
 SCREEN_UPDATE( buggybjr );
 WRITE16_HANDLER( buggyboy_gas_w );
 WRITE16_HANDLER( buggyboy_sky_w );
+WRITE16_HANDLER( buggyboy_scolst_w );
