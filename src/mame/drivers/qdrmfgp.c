@@ -611,6 +611,11 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	qdrmfgp2_tile_callback, "none"
 };
 
+static const k053252_interface qdrmfgp_k053252_intf =
+{
+	"screen"
+};
+
 static MACHINE_START( qdrmfgp )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
@@ -671,7 +676,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_VIDEO_START(qdrmfgp)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp_k056832_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -709,7 +714,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_VIDEO_START(qdrmfgp2)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

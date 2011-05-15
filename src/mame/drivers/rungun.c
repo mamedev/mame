@@ -358,6 +358,10 @@ static const k053247_interface rng_k055673_intf =
 	rng_sprite_callback
 };
 
+static const k053252_interface rng_k053252_intf =
+{
+	"screen"
+};
 
 static MACHINE_START( rng )
 {
@@ -430,7 +434,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_K053936_ADD("k053936", rng_k053936_intf)
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 16000000/4, rng_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

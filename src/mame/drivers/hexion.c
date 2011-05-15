@@ -229,6 +229,11 @@ static TIMER_DEVICE_CALLBACK( hexion_scanline )
 		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+static const k053252_interface hexion_k053252_intf =
+{
+	"screen"
+};
+
 static MACHINE_CONFIG_START( hexion, hexion_state )
 
 	/* basic machine hardware */
@@ -236,7 +241,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", hexion_scanline, "screen", 0, 1)
 
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 24000000/4, hexion_k053252_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

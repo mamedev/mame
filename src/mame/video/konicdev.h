@@ -129,6 +129,12 @@ struct _k053250_interface
 	int                xoff, yoff;
 };
 
+typedef struct _k053252_interface k053252_interface;
+struct _k053252_interface
+{
+	const char         *screen;
+};
+
 typedef struct _k001006_interface k001006_interface;
 struct _k001006_interface
 {
@@ -267,9 +273,9 @@ DECLARE_LEGACY_DEVICE(K037122, k037122);
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
-#define MCFG_K053252_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K053252, 0)
-
+#define MCFG_K053252_ADD(_tag, _clock, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053252, _clock) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 #define MCFG_K001006_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K001006, 0) \

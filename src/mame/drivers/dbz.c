@@ -326,6 +326,10 @@ static const k053936_interface dbz_k053936_intf =
 	1, -46, -16
 };
 
+static const k053252_interface dbz_k053252_intf =
+{
+	"screen"
+};
 
 static MACHINE_START( dbz )
 {
@@ -395,7 +399,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053936_ADD("k053936_1", dbz_k053936_intf)
 	MCFG_K053936_ADD("k053936_2", dbz_k053936_intf)
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 16000000/2, dbz_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

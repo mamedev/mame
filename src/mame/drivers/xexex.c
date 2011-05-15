@@ -455,6 +455,11 @@ static const k053247_interface xexex_k053246_intf =
 	xexex_sprite_callback
 };
 
+static const k053252_interface xexex_k053252_intf =
+{
+	"screen"
+};
+
 static void xexex_postload(running_machine &machine)
 {
 	parse_control2(machine);
@@ -522,7 +527,7 @@ static MACHINE_RESET( xexex )
 static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)	// 16MHz (32MHz xtal)
+	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)	// 16MHz (32MHz xtal)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_HACK(xexex_interrupt,2)
 
@@ -543,7 +548,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(8000000/512/288)
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255)
+	MCFG_SCREEN_RAW_PARAMS(32000000/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
@@ -558,7 +563,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
 	MCFG_K053250_ADD("k053250", xexex_k053250_intf)
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053252_ADD("k053252")
+	MCFG_K053252_ADD("k053252", 32000000/4, xexex_k053252_intf)
 	MCFG_K054338_ADD("k054338", xexex_k054338_intf)
 
 	/* sound hardware */
