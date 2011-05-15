@@ -187,6 +187,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/jvsdev.o		\
 	$(EMUMACHINE)/jvshost.o		\
 	$(EMUMACHINE)/k033906.o		\
+	$(EMUMACHINE)/k053252.o 	\
 	$(EMUMACHINE)/k056230.o		\
 	$(EMUMACHINE)/latch8.o		\
 	$(EMUMACHINE)/ldcore.o		\

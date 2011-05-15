@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "sound/3812intf.h"
 #include "sound/k053260.h"

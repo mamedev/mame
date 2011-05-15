@@ -25,6 +25,7 @@ GP1 HDD data contents:
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "includes/qdrmfgp.h"
 

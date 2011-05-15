@@ -57,6 +57,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "includes/dbz.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 
 
 

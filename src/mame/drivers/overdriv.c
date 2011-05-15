@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
+#include "machine/k053252.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
