@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ( K053936_0_rom_r )       // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_BASE_MEMBER(rungun_state, m_sysreg)
-	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
+//	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_K053936_ADD("k053936", rng_k053936_intf)
 	MCFG_K055673_ADD("k055673", rng_k055673_intf)
-	MCFG_K053252_ADD("k053252", 16000000/4, rng_k053252_intf)
+	MCFG_K053252_ADD("k053252", 16000000/2, rng_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

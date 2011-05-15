@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP			/* unknown (always 0x30) */
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)			/* 053252? (LSB) */
+//	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)			/* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITENOP //watchdog reset?
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0xff00)
@@ -349,6 +349,7 @@ static const k053250_interface overdriv_k053252_intf =
 {
 	"screen"
 };
+
 
 static MACHINE_CONFIG_START( overdriv, overdriv_state )
 

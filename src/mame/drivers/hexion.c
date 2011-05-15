@@ -241,7 +241,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", hexion_scanline, "screen", 0, 1)
 
-	MCFG_K053252_ADD("k053252", 24000000/4, hexion_k053252_intf)
+	MCFG_K053252_ADD("k053252", 24000000/2, hexion_k053252_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
