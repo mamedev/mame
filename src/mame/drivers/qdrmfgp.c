@@ -280,7 +280,7 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 		case 1:
 			/* trigger V-blank interrupt */
 			if (state->m_control & 0x0004)
-				device_set_input_line(device, 3, HOLD_LINE);
+				device_set_input_line(device, 3, ASSERT_LINE);
 			break;
 	}
 }
@@ -303,7 +303,7 @@ static TIMER_CALLBACK( gp2_timer_callback )
 {
 	qdrmfgp_state *state = machine.driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0004)
-		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
@@ -311,7 +311,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->m_control & 0x0008)
-		device_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, ASSERT_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)
@@ -611,13 +611,33 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 	qdrmfgp2_tile_callback, "none"
 };
 
+static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq3_ack_w )
+{
+	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_3, CLEAR_LINE);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( qdrmfgp_irq4_ack_w )
+{
+	cputag_set_input_line(device->machine(), "maincpu", M68K_IRQ_4, CLEAR_LINE);
+}
+
 static const k053252_interface qdrmfgp_k053252_intf =
 {
 	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_LINE(qdrmfgp_irq3_ack_w),
+	DEVCB_NULL,
+	40, 16
+};
+
+static const k053252_interface qdrmfgp2_k053252_intf =
+{
+	"screen",
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_LINE(qdrmfgp_irq4_ack_w),
+	DEVCB_LINE(qdrmfgp_irq3_ack_w),
 	40, 16
 };
 
@@ -719,7 +739,7 @@ static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
 	MCFG_VIDEO_START(qdrmfgp2)
 
 	MCFG_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
-	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp_k053252_intf)
+	MCFG_K053252_ADD("k053252", 32000000/4, qdrmfgp2_k053252_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
