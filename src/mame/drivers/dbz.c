@@ -328,7 +328,11 @@ static const k053936_interface dbz_k053936_intf =
 
 static const k053252_interface dbz_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_START( dbz )

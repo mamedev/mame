@@ -360,7 +360,11 @@ static const k053247_interface rng_k055673_intf =
 
 static const k053252_interface rng_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_START( rng )

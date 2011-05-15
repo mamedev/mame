@@ -102,15 +102,14 @@ static WRITE8_HANDLER( coincntr_w )
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 }
 
-/* probably not? */
-static WRITE8_HANDLER( hexion_irq_ack_w )
+static WRITE_LINE_DEVICE_HANDLER( hexion_irq_ack_w )
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( hexion_nmi_ack_w )
+static WRITE_LINE_DEVICE_HANDLER( hexion_nmi_ack_w )
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
@@ -123,9 +122,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("konami", k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
-	AM_RANGE(0xf000, 0xf00d) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)	/* 053252? f00e = IRQ ack, f00f = NMI ack */
-	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(hexion_irq_ack_w) // - TODO: move these two into the above hook-up
-	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(hexion_nmi_ack_w) // /
+	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
@@ -231,7 +228,11 @@ static TIMER_DEVICE_CALLBACK( hexion_scanline )
 
 static const k053252_interface hexion_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(hexion_irq_ack_w),
+	DEVCB_LINE(hexion_nmi_ack_w)
 };
 
 static MACHINE_CONFIG_START( hexion, hexion_state )

@@ -133,6 +133,11 @@ typedef struct _k053252_interface k053252_interface;
 struct _k053252_interface
 {
 	const char         *screen;
+	devcb_write_line   int1_en;
+	devcb_write_line   int2_en;
+	devcb_write_line   int1_ack;
+	devcb_write_line   int2_ack;
+//	devcb_write8       int_time;
 };
 
 typedef struct _k001006_interface k001006_interface;

@@ -456,7 +456,11 @@ static const k053247_interface xexex_k053246_intf =
 
 static const k053252_interface xexex_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static void xexex_postload(running_machine &machine)

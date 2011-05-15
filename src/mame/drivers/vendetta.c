@@ -454,7 +454,11 @@ static const k053247_interface esckids_k053246_intf =
 
 static const k053252_interface esckids_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_START( vendetta )

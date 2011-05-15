@@ -345,9 +345,13 @@ static const k053250_interface overdriv_k053250_intf_2 =
 	0, 0 //TODO
 };
 
-static const k053250_interface overdriv_k053252_intf =
+static const k053252_interface overdriv_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

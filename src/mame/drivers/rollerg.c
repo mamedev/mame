@@ -236,7 +236,11 @@ static const k051316_interface rollerg_k051316_intf =
 
 static const k053252_interface rollerg_k053252_intf =
 {
-	"screen"
+	"screen",
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_START( rollerg )

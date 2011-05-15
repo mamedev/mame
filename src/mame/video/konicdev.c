@@ -9040,6 +9040,11 @@ struct _k053252_state
 	UINT8   vsw,hsw;
 
 	screen_device *screen;
+	devcb_resolved_write_line int1_en;
+	devcb_resolved_write_line int2_en;
+	devcb_resolved_write_line int1_ack;
+	devcb_resolved_write_line int2_ack;
+	//devcb_resolved_write8     int_time;
 };
 
 /*****************************************************************************
@@ -9057,7 +9062,8 @@ INLINE k053252_state *k053252_get_safe_token( device_t *device )
 INLINE const k053252_interface *k053252_get_interface( device_t *device )
 {
 	assert(device != NULL);
-	assert((device->type() == K053252));
+	assert(device->type() == K053252);
+
 	return (const k053252_interface *) device->static_config();
 }
 
@@ -9087,8 +9093,8 @@ static void k053252_res_change( device_t *device )
 			//VC - VFP - VBP - (VSW+1)
 			attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock()) * (k053252->hc) * k053252->vc;
 
-			printf("H %d %d %d %d\n",k053252->hc,k053252->hfp,k053252->hbp,k053252->hsw);
-			printf("V %d %d %d %d\n",k053252->vc,k053252->vfp,k053252->vbp,k053252->vsw);
+			//printf("H %d %d %d %d\n",k053252->hc,k053252->hfp,k053252->hbp,k053252->hsw);
+			//printf("V %d %d %d %d\n",k053252->vc,k053252->vfp,k053252->vbp,k053252->vsw);
 
 			visarea.min_x = 0;
 			visarea.min_y = 0;
@@ -9132,6 +9138,8 @@ WRITE8_DEVICE_HANDLER( k053252_w )
 			logerror("%d (%04x) HBP set\n",k053252->hbp,k053252->hbp);
 			k053252_res_change(device);
 			break;
+		case 0x06: k053252->int1_en(data); break;
+		case 0x07: k053252->int2_en(data); break;
 		case 0x08:
 		case 0x09:
 			k053252->vc  = (k053252->regs[9]&0xff);
@@ -9155,6 +9163,9 @@ WRITE8_DEVICE_HANDLER( k053252_w )
 			logerror("%02x VSW / %02x HSW set\n",k053252->vsw,k053252->hsw);
 			k053252_res_change(device);
 			break;
+		//case 0x0d: k053252->int_time(data); break;
+		case 0x0e: k053252->int1_ack(1); break;
+		case 0x0f: k053252->int2_ack(1); break;
 	}
 }
 
@@ -9171,6 +9182,11 @@ static DEVICE_START( k053252 )
 
 	device->save_item(NAME(k053252->regs));
 	k053252->screen = device->machine().device<screen_device>(intf->screen);
+	k053252->int1_en.resolve(intf->int1_en, *device);
+	k053252->int2_en.resolve(intf->int2_en, *device);
+	k053252->int1_ack.resolve(intf->int1_ack, *device);
+	k053252->int2_ack.resolve(intf->int2_ack, *device);
+	//k053252->int_time.resolve(intf->int_time, *device);
 }
 
 static DEVICE_RESET( k053252 )
