@@ -332,7 +332,8 @@ static const k053252_interface dbz_k053252_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	0, 0
 };
 
 static MACHINE_START( dbz )

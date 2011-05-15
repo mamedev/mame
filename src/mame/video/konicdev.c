@@ -9028,7 +9028,9 @@ xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 	e-f: bits 8-0: VCT
 
 TODO:
-- xexex sets up 0x20 as the VC?
+- xexex sets up 0x20 as the VC? default value?
+- xexex layers are offsetted if you try to use the CCU
+- understand how to interpret the back / front porch values, and remove the offset x/y hack
 */
 
 typedef struct _k053252_state k053252_state;
@@ -9045,6 +9047,7 @@ struct _k053252_state
 	devcb_resolved_write_line int1_ack;
 	devcb_resolved_write_line int2_ack;
 	//devcb_resolved_write8     int_time;
+	int offsx,offsy;
 };
 
 /*****************************************************************************
@@ -9074,6 +9077,10 @@ INLINE const k053252_interface *k053252_get_interface( device_t *device )
 READ8_DEVICE_HANDLER( k053252_r )
 {
 	k053252_state *k053252 = k053252_get_safe_token(device);
+
+	//TODO: debugger_access()
+	popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
+
 	return k053252->regs[offset];
 }
 
@@ -9096,10 +9103,10 @@ static void k053252_res_change( device_t *device )
 			//printf("H %d %d %d %d\n",k053252->hc,k053252->hfp,k053252->hbp,k053252->hsw);
 			//printf("V %d %d %d %d\n",k053252->vc,k053252->vfp,k053252->vbp,k053252->vsw);
 
-			visarea.min_x = 0;
-			visarea.min_y = 0;
-			visarea.max_x = k053252->hc - k053252->hfp - k053252->hbp - 8*(k053252->hsw) - 1;
-			visarea.max_y = k053252->vc - k053252->vfp - k053252->vbp - (k053252->vsw) - 1;
+			visarea.min_x = k053252->offsx;
+			visarea.min_y = k053252->offsy;
+			visarea.max_x = k053252->offsx + k053252->hc - k053252->hfp - k053252->hbp - 8*(k053252->hsw) - 1;
+			visarea.max_y = k053252->offsy + k053252->vc - k053252->vfp - k053252->vbp - (k053252->vsw) - 1;
 
 			k053252->screen->configure(k053252->hc, k053252->vc, visarea, refresh);
 		}
@@ -9111,8 +9118,6 @@ WRITE8_DEVICE_HANDLER( k053252_w )
 	k053252_state *k053252 = k053252_get_safe_token(device);
 
 	k053252->regs[offset] = data;
-
-	//printf("%04x %02x\n",offset,data);
 
 	switch(offset)
 	{
@@ -9187,6 +9192,8 @@ static DEVICE_START( k053252 )
 	k053252->int1_ack.resolve(intf->int1_ack, *device);
 	k053252->int2_ack.resolve(intf->int2_ack, *device);
 	//k053252->int_time.resolve(intf->int_time, *device);
+	k053252->offsx = intf->offsx;
+	k053252->offsy = intf->offsy;
 }
 
 static DEVICE_RESET( k053252 )

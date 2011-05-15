@@ -460,7 +460,8 @@ static const k053252_interface xexex_k053252_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_NULL,
+	0, 0
 };
 
 static void xexex_postload(running_machine &machine)

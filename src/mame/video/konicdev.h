@@ -138,6 +138,8 @@ struct _k053252_interface
 	devcb_write_line   int1_ack;
 	devcb_write_line   int2_ack;
 //	devcb_write8       int_time;
+	int                offsx;
+	int                offsy;
 };
 
 typedef struct _k001006_interface k001006_interface;
