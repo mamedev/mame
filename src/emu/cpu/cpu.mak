@@ -894,6 +894,8 @@ $(CPUOBJ)/psx/psx.o:	$(CPUSRC)/psx/psx.c \
 			$(CPUSRC)/psx/dma.h \
 			$(CPUSRC)/psx/gte.h \
 			$(CPUSRC)/psx/mdec.h \
+			$(CPUSRC)/psx/rcnt.h \
+			$(CPUSRC)/psx/sio.h
 
 $(CPUOBJ)/psx/dma.o:	$(CPUSRC)/psx/dma.c \
 			$(CPUSRC)/psx/dma.h
@@ -902,6 +904,7 @@ $(CPUOBJ)/psx/gte.o:	$(CPUSRC)/psx/gte.c \
 			$(CPUSRC)/psx/gte.h
 
 $(CPUOBJ)/psx/mdec.o:	$(CPUSRC)/psx/mdec.c \
+			$(CPUSRC)/psx/dma.h \
 			$(CPUSRC)/psx/mdec.h
 
 $(CPUOBJ)/psx/sio.o:	$(CPUSRC)/psx/sio.c \
