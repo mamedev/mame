@@ -1,4 +1,6 @@
 * text=auto !eol
+artwork/aperture.png -text
+artwork/white.png -text
 docs/config.txt svneol=native#text/plain
 docs/license.txt svneol=native#text/plain
 docs/mame.txt svneol=native#text/plain
