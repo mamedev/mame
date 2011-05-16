@@ -2239,33 +2239,30 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE( cps3_0xc0000000_ram_w ) AM_BASE_MEMBER(cps3_state, m_0xc0000000_ram) /* Executes code from here */
 ADDRESS_MAP_END
 
-
-
-
 static INPUT_PORTS_START( cps3 )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Jab Punch") PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Strong Punch") PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Fierce Punch") PORT_PLAYER(1)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Jab Punch") PORT_PLAYER(2)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Strong Punch") PORT_PLAYER(2)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Fierce Punch") PORT_PLAYER(2)
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00020000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00fc0000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Roundhouse Kick") PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_START2 )
@@ -2273,12 +2270,42 @@ static INPUT_PORTS_START( cps3 )
 
 	PORT_START("EXTRA")
 	PORT_BIT( 0x0001ffff, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Roundhouse Kick") PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Forward Kick") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Short Kick") PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Short Kick") PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Forward Kick") PORT_PLAYER(2)
 	PORT_BIT( 0xffc00000, IP_ACTIVE_LOW, IPT_UNUSED ) // nothing here?
+INPUT_PORTS_END
+
+/* Red Earth game inputs */
+static INPUT_PORTS_START ( cps3_re )
+	PORT_INCLUDE ( cps3 )
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / Change Orb")
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start / Change Orb")
+INPUT_PORTS_END
+
+/* Jojo game inputs */
+static INPUT_PORTS_START( cps3_jojo)
+	PORT_INCLUDE( cps3 )
+	
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Light") PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Medium") PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Strong") PORT_PLAYER(1)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Light") PORT_PLAYER(2)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Medium") PORT_PLAYER(2)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Strong") PORT_PLAYER(2)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
+	
+	PORT_MODIFY("EXTRA")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Stand") PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Stand") PORT_PLAYER(2)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INTERRUPT_GEN(cps3_vbl_interrupt)
@@ -3279,30 +3306,30 @@ ROM_END
 
 /* todo: use BIOS for the bios roms, having clones only for CD / NO CD */
 
-GAME( 1996, redearth, 0,        redearth, cps3, redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, redeartha,redearth, redearth, cps3, redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, warzard,  redearth, redearth, cps3, redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, warzarda, redearth, redearth, cps3, redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii,    0,        sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiij,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiih,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2,   0,        sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2j,  sfiii2,   sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojo,     0,        jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoa,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoj,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 990108)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoaj,   jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 981202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3,   0,        sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3a,  sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojoba,   0,        jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, redearth, 0,        redearth, cps3_re,   redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, redeartha,redearth, redearth, cps3_re,   redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, warzard,  redearth, redearth, cps3_re,   redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, warzarda, redearth, redearth, cps3_re,   redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,    0,        sfiii,    cps3,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiij,   sfiii,    sfiii,    cps3,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiih,   sfiii,    sfiii,    cps3,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2,   0,        sfiii2,   cps3,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2j,  sfiii2,   sfiii2,   cps3,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,     0,        jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoa,    jojo,     jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoj,    jojo,     jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoaj,   jojo,     jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,   0,        sfiii3,   cps3,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3a,  sfiii3,   sfiii3,   cps3,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,   0,        jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
 
 /* NO CD sets */
 
-GAME( 1997, sfiiin,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2n,  sfiii2,   sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojon,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoan,   jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3n,  sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3an, sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojoban,  jojoba,   jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobane, jojoba,   jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiin,   sfiii,    sfiii,    cps3,      sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2n,  sfiii2,   sfiii2,   cps3,      sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojon,    jojo,     jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoan,   jojo,     jojo,     cps3_jojo, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3n,  sfiii3,   sfiii3,   cps3,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3an, sfiii3,   sfiii3,   cps3,      sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoban,  jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobane, jojoba,   jojoba,   cps3_jojo, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
