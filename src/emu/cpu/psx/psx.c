@@ -66,6 +66,7 @@
 #include "debugger.h"
 #include "psx.h"
 #include "dma.h"
+#include "irq.h"
 #include "mdec.h"
 #include "rcnt.h"
 #include "sio.h"
@@ -1528,17 +1529,23 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE(0x1f801004, 0x1f80101f) AM_RAM
+	/* 1f801014 spu delay */
+	/* 1f801018 dv delay */
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_DEVREADWRITE( "sio", psxsio_device, read, write )
+	/* 1f801060 ram config */
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
-	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE_LEGACY( psx_irq_r, psx_irq_w )
+	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
 	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
+	/* 1f801800-1f801803 cd */
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE_LEGACY( psx_gpu_r, psx_gpu_w )
 	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16_LEGACY( spu_r, spu_w, 0xffffffff )
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
+	/* 1f802030 int 2000 */
+	/* 1f802040 dip switches */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x20000000, 0x7fffffff) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE(0x80800000, 0x9effffff) AM_READWRITE( berr_r, berr_w )
@@ -1556,7 +1563,7 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80105f) AM_DEVREADWRITE( "sio", psxsio_device, read, write )
 	AM_RANGE(0x1f801060, 0x1f80106f) AM_RAM
-	AM_RANGE(0x1f801070, 0x1f801077) AM_READWRITE_LEGACY( psx_irq_r, psx_irq_w )
+	AM_RANGE(0x1f801070, 0x1f801077) AM_DEVREADWRITE( "irq", psxirq_device, read, write )
 	AM_RANGE(0x1f801080, 0x1f8010ff) AM_DEVREADWRITE( "dma", psxdma_device, read, write )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_DEVREADWRITE( "rcnt", psxrcnt_device, read, write )
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE_LEGACY( psx_gpu_r, psx_gpu_w )
@@ -3159,6 +3166,12 @@ static psxcpu_device *getcpu( device_t &device, const char *cputag )
 	return downcast<psxcpu_device *>( device.siblingdevice( cputag ) );
 }
 
+void psxcpu_device::irq_set( device_t &device, const char *cputag, UINT32 bitmask )
+{
+	psxirq_device *irq = downcast<psxirq_device *>( getcpu( device, cputag )->subdevice("irq") );
+	irq->set( bitmask );
+}
+
 void psxcpu_device::install_dma_read_handler( device_t &device, const char *cputag, int channel, psx_dma_read_delegate handler )
 {
 	psxdma_device *dma = downcast<psxdma_device *>( getcpu( device, cputag )->subdevice("dma") );
@@ -3184,15 +3197,15 @@ void psxcpu_device::sio_input( device_t &device, const char *cputag, int n_port,
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )
-	MCFG_DEVICE_ADD("sio", PSX_SIO, 0)
-
+	MCFG_DEVICE_ADD("irq", PSX_IRQ, 0)
 	MCFG_DEVICE_ADD("dma", PSX_DMA, 0)
-
-	MCFG_DEVICE_ADD("rcnt", PSX_RCNT, 0)
 
 	MCFG_DEVICE_ADD("mdec", PSX_MDEC, 0)
 	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate( FUNC( psxmdec_device::dma_write ), (psxmdec_device *) device ) )
 	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate( FUNC( psxmdec_device::dma_read ), (psxmdec_device *) device ) )
+
+	MCFG_DEVICE_ADD("rcnt", PSX_RCNT, 0)
+	MCFG_DEVICE_ADD("sio", PSX_SIO, 0)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

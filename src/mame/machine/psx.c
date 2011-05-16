@@ -41,72 +41,9 @@ READ32_HANDLER( psx_com_delay_r )
 
 /* IRQ */
 
-static void psx_irq_update( psx_machine *p_psx )
-{
-	if( ( p_psx->n_irqdata & p_psx->n_irqmask ) != 0 )
-	{
-		verboselog( p_psx, 2, "psx irq assert\n" );
-		cputag_set_input_line( p_psx->machine(), "maincpu", PSXCPU_IRQ0, ASSERT_LINE );
-	}
-	else
-	{
-		verboselog( p_psx, 2, "psx irq clear\n" );
-		cputag_set_input_line( p_psx->machine(), "maincpu", PSXCPU_IRQ0, CLEAR_LINE );
-	}
-}
-
-WRITE32_HANDLER( psx_irq_w )
-{
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
-
-	switch( offset )
-	{
-	case 0x00:
-		verboselog( p_psx, 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, p_psx->n_irqdata, ( p_psx->n_irqdata & ~mem_mask ) | ( p_psx->n_irqdata & p_psx->n_irqmask & data ) );
-		p_psx->n_irqdata = ( p_psx->n_irqdata & ~mem_mask ) | ( p_psx->n_irqdata & p_psx->n_irqmask & data );
-		psx_irq_update(p_psx);
-		break;
-	case 0x01:
-		verboselog( p_psx, 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, p_psx->n_irqmask, ( p_psx->n_irqmask & ~mem_mask ) | data );
-		p_psx->n_irqmask = ( p_psx->n_irqmask & ~mem_mask ) | data;
-		if( ( p_psx->n_irqmask &~ PSX_IRQ_MASK ) != 0 )
-		{
-			verboselog( p_psx, 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
-		}
-		psx_irq_update(p_psx);
-		break;
-	default:
-		verboselog( p_psx, 0, "psx_irq_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
-		break;
-	}
-}
-
-READ32_HANDLER( psx_irq_r )
-{
-	psx_machine *p_psx = space->machine().driver_data<psx_state>()->m_p_psx;
-
-	switch( offset )
-	{
-	case 0x00:
-		verboselog( p_psx, 1, "psx_irq_r irq data %08x\n", p_psx->n_irqdata );
-		return p_psx->n_irqdata;
-	case 0x01:
-		verboselog( p_psx, 1, "psx_irq_r irq mask %08x\n", p_psx->n_irqmask );
-		return p_psx->n_irqmask;
-	default:
-		verboselog( p_psx, 0, "psx_irq_r unknown register %d\n", offset );
-		break;
-	}
-	return 0;
-}
-
 void psx_irq_set( running_machine &machine, UINT32 data )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
-
-	verboselog( p_psx, 2, "psx_irq_set %08x\n", data );
-	p_psx->n_irqdata |= data;
-	psx_irq_update(p_psx);
+	psxcpu_device::irq_set( *machine.device("maincpu"), "maincpu", data );
 }
 
 /* DMA */
@@ -149,18 +86,7 @@ static void gpu_write( psx_state *state, UINT32 n_address, INT32 n_size )
 
 void psx_machine_init( running_machine &machine )
 {
-	psx_machine *p_psx = machine.driver_data<psx_state>()->m_p_psx;
-
-	/* irq */
-	p_psx->n_irqdata = 0;
-	p_psx->n_irqmask = 0;
-
 	psx_gpu_reset(machine);
-}
-
-static void psx_postload(psx_machine *p_psx)
-{
-	psx_irq_update(p_psx);
 }
 
 void psx_driver_init( running_machine &machine )
@@ -177,9 +103,4 @@ void psx_driver_init( running_machine &machine )
 
 	psx_dma_install_read_handler( machine, 2, psx_dma_read_delegate( FUNC( gpu_read ), state ) );
 	psx_dma_install_write_handler( machine, 2, psx_dma_write_delegate( FUNC( gpu_write ), state ) );
-
-	state_save_register_global( machine, p_psx->n_irqdata );
-	state_save_register_global( machine, p_psx->n_irqmask );
-
-	machine.save().register_postload( save_prepost_delegate(FUNC(psx_postload), p_psx ));
 }

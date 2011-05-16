@@ -7,19 +7,8 @@
 #if !defined( PSX_H )
 
 #include "cpu/psx/dma.h"
+#include "cpu/psx/irq.h"
 #include "cpu/psx/sio.h"
-
-#define PSX_IRQ_VBLANK			0x0001
-#define PSX_IRQ_CDROM			0x0004
-#define PSX_IRQ_DMA				0x0008
-#define PSX_IRQ_ROOTCOUNTER0	0x0010
-#define PSX_IRQ_ROOTCOUNTER1	0x0020
-#define PSX_IRQ_ROOTCOUNTER2	0x0040
-#define PSX_IRQ_SIO0			0x0080
-#define PSX_IRQ_SIO1			0x0100
-#define PSX_IRQ_SPU				0x0200
-#define PSX_IRQ_EXTCD			0x0400
-#define PSX_IRQ_MASK			(PSX_IRQ_VBLANK | PSX_IRQ_CDROM | PSX_IRQ_DMA | PSX_IRQ_ROOTCOUNTER2 | PSX_IRQ_ROOTCOUNTER1 | PSX_IRQ_ROOTCOUNTER0 | PSX_IRQ_SIO0 | PSX_IRQ_SIO1 | PSX_IRQ_SPU | PSX_IRQ_EXTCD)
 
 typedef struct _psx_machine psx_machine;
 struct _psx_machine
@@ -31,8 +20,6 @@ struct _psx_machine
 	size_t n_psxramsize;
 
 	UINT32 n_com_delay;
-	UINT32 n_irqdata;
-	UINT32 n_irqmask;
 };
 
 typedef struct _psx_gpu psx_gpu;
@@ -69,8 +56,6 @@ extern void psx_lightgun_set( running_machine &, int, int );
 
 WRITE32_HANDLER( psx_com_delay_w );
 READ32_HANDLER( psx_com_delay_r );
-WRITE32_HANDLER( psx_irq_w );
-READ32_HANDLER( psx_irq_r );
 extern void psx_irq_set( running_machine &, UINT32 );
 extern void psx_dma_install_read_handler( running_machine &, int, psx_dma_read_delegate );
 extern void psx_dma_install_write_handler( running_machine &, int, psx_dma_read_delegate );
