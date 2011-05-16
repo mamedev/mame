@@ -78,6 +78,86 @@
 #define WINOPTION_D3DVERSION			"d3dversion"
 #define WINOPTION_FILTER				"filter"
 
+// core post-processing options
+#define WINOPTION_HLSL_ENABLE				"hlsl_enable"
+#define WINOPTION_HLSLPATH					"hlslpath"
+#define WINOPTION_SHADOW_MASK_ALPHA			"shadow_mask_alpha"
+#define WINOPTION_SHADOW_MASK_TEXTURE		"shadow_mask_texture"
+#define WINOPTION_SHADOW_MASK_WIDTH			"shadow_mask_pix_width"
+#define WINOPTION_SHADOW_MASK_HEIGHT		"shadow_mask_pix_height"
+#define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
+#define WINOPTION_SHADOW_MASK_VSIZE			"shadow_mask_vsize"
+#define WINOPTION_PINCUSHION_X				"pincushion_x"
+#define WINOPTION_PINCUSHION_Y				"pincushion_y"
+#define WINOPTION_OVERSAMPLE_X				"oversample_x"
+#define WINOPTION_OVERSAMPLE_Y				"oversample_y"
+#define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
+#define WINOPTION_SCANLINE_SCALE			"scanline_size"
+#define WINOPTION_SCANLINE_BRIGHT_SCALE 	"scanline_bright_scale"
+#define WINOPTION_SCANLINE_BRIGHT_OFFSET 	"scanline_bright_offset"
+#define WINOPTION_SCANLINE_OFFSET			"scanline_jitter"
+#define WINOPTION_DEFOCUS_X					"defocus_x"
+#define WINOPTION_DEFOCUS_Y					"defocus_y"
+#define WINOPTION_RED_CONVERGE_X			"red_converge_x"
+#define WINOPTION_RED_CONVERGE_Y			"red_converge_y"
+#define WINOPTION_GREEN_CONVERGE_X			"green_converge_x"
+#define WINOPTION_GREEN_CONVERGE_Y			"green_converge_y"
+#define WINOPTION_BLUE_CONVERGE_X			"blue_converge_x"
+#define WINOPTION_BLUE_CONVERGE_Y			"blue_converge_y"
+#define WINOPTION_RED_RADIAL_CONVERGE_X		"red_radial_converge_x"
+#define WINOPTION_RED_RADIAL_CONVERGE_Y		"red_radial_converge_y"
+#define WINOPTION_GREEN_RADIAL_CONVERGE_X	"green_radial_converge_x"
+#define WINOPTION_GREEN_RADIAL_CONVERGE_Y	"green_radial_converge_y"
+#define WINOPTION_BLUE_RADIAL_CONVERGE_X	"blue_radial_converge_x"
+#define WINOPTION_BLUE_RADIAL_CONVERGE_Y	"blue_radial_converge_y"
+#define WINOPTION_RED_MATRIX_R				"red_from_r"
+#define WINOPTION_RED_MATRIX_G				"red_from_g"
+#define WINOPTION_RED_MATRIX_B				"red_from_b"
+#define WINOPTION_GREEN_MATRIX_R			"green_from_r"
+#define WINOPTION_GREEN_MATRIX_G			"green_from_g"
+#define WINOPTION_GREEN_MATRIX_B			"green_from_b"
+#define WINOPTION_BLUE_MATRIX_R				"blue_from_r"
+#define WINOPTION_BLUE_MATRIX_G				"blue_from_g"
+#define WINOPTION_BLUE_MATRIX_B				"blue_from_b"
+#define WINOPTION_Y_MATRIX_Y				"y_from_y"
+#define WINOPTION_Y_MATRIX_I				"y_from_i"
+#define WINOPTION_Y_MATRIX_Q				"y_from_q"
+#define WINOPTION_I_MATRIX_Y				"i_from_y"
+#define WINOPTION_I_MATRIX_I				"i_from_i"
+#define WINOPTION_I_MATRIX_Q				"i_from_q"
+#define WINOPTION_Q_MATRIX_Y				"q_from_y"
+#define WINOPTION_Q_MATRIX_I				"q_from_i"
+#define WINOPTION_Q_MATRIX_Q				"q_from_q"
+#define WINOPTION_RED_OFFSET				"red_offset"
+#define WINOPTION_GREEN_OFFSET				"green_offset"
+#define WINOPTION_BLUE_OFFSET				"blue_offset"
+#define WINOPTION_RED_SCALE					"red_scale"
+#define WINOPTION_GREEN_SCALE				"green_scale"
+#define WINOPTION_BLUE_SCALE				"blue_scale"
+#define WINOPTION_RED_POWER					"red_power"
+#define WINOPTION_GREEN_POWER				"green_power"
+#define WINOPTION_BLUE_POWER				"blue_power"
+#define WINOPTION_RED_FLOOR					"red_floor"
+#define WINOPTION_GREEN_FLOOR				"green_floor"
+#define WINOPTION_BLUE_FLOOR				"blue_floor"
+#define WINOPTION_SATURATION				"saturation"
+#define WINOPTION_Y_SCALE					"y_scale"
+#define WINOPTION_I_SCALE					"i_scale"
+#define WINOPTION_Q_SCALE					"q_scale"
+#define WINOPTION_Y_OFFSET					"y_offset"
+#define WINOPTION_I_OFFSET					"i_offset"
+#define WINOPTION_Q_OFFSET					"q_offset"
+#define WINOPTION_EDGE_AMOUNT				"edge_amount"
+#define WINOPTION_EDGE_RATIO				"edge_ratio"
+#define WINOPTION_SUBSAMPLE_LENGTH			"subsample_length"
+#define WINOPTION_RED_PHOSPHOR				"red_phosphor_life"
+#define WINOPTION_GREEN_PHOSPHOR			"green_phosphor_life"
+#define WINOPTION_BLUE_PHOSPHOR				"blue_phosphor_life"
+#define WINOPTION_CRAWL_WIDTH				"dot_crawl_width"
+#define WINOPTION_CRAWL_HEIGHT				"dot_crawl_height"
+#define WINOPTION_CRAWL_RATE				"dot_crawl_rate"
+#define WINOPTION_CRAWL_SKIP				"dot_crawl_skip"
+
 // per-window options
 #define WINOPTION_SCREEN				"screen"
 #define WINOPTION_ASPECT				"aspect"
@@ -139,6 +219,87 @@ public:
 	// Direct3D-specific options
 	int d3d_version() const { return int_value(WINOPTION_D3DVERSION); }
 	bool filter() const { return bool_value(WINOPTION_FILTER); }
+
+	// core post-processing options
+	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
+	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
+	float screen_pincushion_x() const { return float_value(WINOPTION_PINCUSHION_X); }
+	float screen_pincushion_y() const { return float_value(WINOPTION_PINCUSHION_Y); }
+	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
+	const char *screen_shadow_mask_texture() const { return value(WINOPTION_SHADOW_MASK_TEXTURE); }
+	float screen_shadow_mask_width() const { return float_value(WINOPTION_SHADOW_MASK_WIDTH); }
+	float screen_shadow_mask_height() const { return float_value(WINOPTION_SHADOW_MASK_HEIGHT); }
+	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
+	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
+	float screen_shadow_width_y() const { return float_value(WINOPTION_SHADOW_MASK_HEIGHT); }
+	float screen_oversample_x() const { return float_value(WINOPTION_OVERSAMPLE_X); }
+	float screen_oversample_y() const { return float_value(WINOPTION_OVERSAMPLE_Y); }
+	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
+	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
+	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
+	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
+	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
+	float screen_defocus_x() const { return float_value(WINOPTION_DEFOCUS_X); }
+	float screen_defocus_y() const { return float_value(WINOPTION_DEFOCUS_Y); }
+	float screen_red_converge_x() const { return float_value(WINOPTION_RED_CONVERGE_X); }
+	float screen_red_converge_y() const { return float_value(WINOPTION_RED_CONVERGE_Y); }
+	float screen_green_converge_x() const { return float_value(WINOPTION_GREEN_CONVERGE_X); }
+	float screen_green_converge_y() const { return float_value(WINOPTION_GREEN_CONVERGE_Y); }
+	float screen_blue_converge_x() const { return float_value(WINOPTION_BLUE_CONVERGE_X); }
+	float screen_blue_converge_y() const { return float_value(WINOPTION_BLUE_CONVERGE_Y); }
+	float screen_red_radial_converge_x() const { return float_value(WINOPTION_RED_RADIAL_CONVERGE_X); }
+	float screen_red_radial_converge_y() const { return float_value(WINOPTION_RED_RADIAL_CONVERGE_Y); }
+	float screen_green_radial_converge_x() const { return float_value(WINOPTION_GREEN_RADIAL_CONVERGE_X); }
+	float screen_green_radial_converge_y() const { return float_value(WINOPTION_GREEN_RADIAL_CONVERGE_Y); }
+	float screen_blue_radial_converge_x() const { return float_value(WINOPTION_BLUE_RADIAL_CONVERGE_X); }
+	float screen_blue_radial_converge_y() const { return float_value(WINOPTION_BLUE_RADIAL_CONVERGE_Y); }
+	float screen_red_from_red() const { return float_value(WINOPTION_RED_MATRIX_R); }
+	float screen_red_from_green() const { return float_value(WINOPTION_RED_MATRIX_G); }
+	float screen_red_from_blue() const { return float_value(WINOPTION_RED_MATRIX_B); }
+	float screen_green_from_red() const { return float_value(WINOPTION_GREEN_MATRIX_R); }
+	float screen_green_from_green() const { return float_value(WINOPTION_GREEN_MATRIX_G); }
+	float screen_green_from_blue() const { return float_value(WINOPTION_GREEN_MATRIX_B); }
+	float screen_blue_from_red() const { return float_value(WINOPTION_BLUE_MATRIX_R); }
+	float screen_blue_from_green() const { return float_value(WINOPTION_BLUE_MATRIX_G); }
+	float screen_blue_from_blue() const { return float_value(WINOPTION_BLUE_MATRIX_B); }
+	float screen_y_from_y() const { return float_value(WINOPTION_Y_MATRIX_Y); }
+	float screen_y_from_i() const { return float_value(WINOPTION_Y_MATRIX_I); }
+	float screen_y_from_q() const { return float_value(WINOPTION_Y_MATRIX_Q); }
+	float screen_i_from_y() const { return float_value(WINOPTION_I_MATRIX_Y); }
+	float screen_i_from_i() const { return float_value(WINOPTION_I_MATRIX_I); }
+	float screen_i_from_q() const { return float_value(WINOPTION_I_MATRIX_Q); }
+	float screen_q_from_y() const { return float_value(WINOPTION_Q_MATRIX_Y); }
+	float screen_q_from_i() const { return float_value(WINOPTION_Q_MATRIX_I); }
+	float screen_q_from_q() const { return float_value(WINOPTION_Q_MATRIX_Q); }
+	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
+	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }
+	float screen_blue_offset() const { return float_value(WINOPTION_BLUE_OFFSET); }
+	float screen_red_scale() const { return float_value(WINOPTION_RED_SCALE); }
+	float screen_green_scale() const { return float_value(WINOPTION_GREEN_SCALE); }
+	float screen_blue_scale() const { return float_value(WINOPTION_BLUE_SCALE); }
+	float screen_red_power() const { return float_value(WINOPTION_RED_POWER); }
+	float screen_green_power() const { return float_value(WINOPTION_GREEN_POWER); }
+	float screen_blue_power() const { return float_value(WINOPTION_BLUE_POWER); }
+	float screen_red_floor() const { return float_value(WINOPTION_RED_FLOOR); }
+	float screen_green_floor() const { return float_value(WINOPTION_GREEN_FLOOR); }
+	float screen_blue_floor() const { return float_value(WINOPTION_BLUE_FLOOR); }
+	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
+	float screen_y_scale() const { return float_value(WINOPTION_Y_SCALE); }
+	float screen_i_scale() const { return float_value(WINOPTION_I_SCALE); }
+	float screen_q_scale() const { return float_value(WINOPTION_Q_SCALE); }
+	float screen_y_offset() const { return float_value(WINOPTION_Y_OFFSET); }
+	float screen_i_offset() const { return float_value(WINOPTION_I_OFFSET); }
+	float screen_q_offset() const { return float_value(WINOPTION_Q_OFFSET); }
+	float screen_edge_amount() const { return float_value(WINOPTION_EDGE_AMOUNT); }
+	float screen_edge_ratio() const { return float_value(WINOPTION_EDGE_RATIO); }
+	float screen_chroma_subsample_length() const { return float_value(WINOPTION_SUBSAMPLE_LENGTH); }
+	float screen_red_phosphor() const { return float_value(WINOPTION_RED_PHOSPHOR); }
+	float screen_green_phosphor() const { return float_value(WINOPTION_GREEN_PHOSPHOR); }
+	float screen_blue_phosphor() const { return float_value(WINOPTION_BLUE_PHOSPHOR); }
+	float screen_dot_crawl_width() const { return float_value(WINOPTION_CRAWL_WIDTH); }
+	float screen_dot_crawl_height() const { return float_value(WINOPTION_CRAWL_HEIGHT); }
+	int screen_dot_crawl_rate() const { return int_value(WINOPTION_CRAWL_RATE); }
+	int screen_dot_crawl_skip() const { return int_value(WINOPTION_CRAWL_SKIP); }
 
 	// per-window options
 	const char *screen() const { return value(WINOPTION_SCREEN); }

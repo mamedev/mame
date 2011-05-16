@@ -43,6 +43,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <d3d8.h>
+#define D3DXVECTOR4 void
 #undef interface
 
 // MAME headers
@@ -141,6 +142,7 @@ d3d *drawd3d8_init(void)
 	d3dptr->version = 8;
 	d3dptr->d3dobj = d3d8;
 	d3dptr->dllhandle = dllhandle;
+	d3dptr->post_fx_available = false;
 	set_interfaces(d3dptr);
 
 	mame_printf_verbose("Direct3D: Using Direct3D 8\n");
@@ -249,6 +251,7 @@ static HRESULT d3d_get_caps_dword(d3d *d3dptr, UINT adapter, D3DDEVTYPE devtype,
 		case CAPS_MAX_TEXTURE_WIDTH:		*value = caps.MaxTextureWidth;			break;
 		case CAPS_MAX_TEXTURE_HEIGHT:		*value = caps.MaxTextureHeight;			break;
 		case CAPS_STRETCH_RECT_FILTER:		*value = 0;								break;
+		case CAPS_MAX_PS30_INSN_SLOTS:		*value = 0;								break;
 	}
 	return result;
 }
@@ -304,6 +307,14 @@ static HRESULT d3d_device_create_offscreen_plain_surface(d3d_device *dev, UINT w
 	assert(FALSE);
 	return D3D_OK;
 }
+
+
+static HRESULT d3d_device_create_effect(d3d_device *dev, const WCHAR *name, d3d_effect **effect)
+{
+	assert(FALSE);
+	return D3D_OK;
+}
+
 
 
 static HRESULT d3d_device_create_texture(d3d_device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, d3d_texture **texture)
@@ -395,6 +406,13 @@ static HRESULT d3d_device_set_render_target(d3d_device *dev, DWORD index, d3d_su
 }
 
 
+static HRESULT d3d_device_create_render_target(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, d3d_surface **surface)
+{
+	assert(false);
+	return D3D_OK;
+}
+
+
 static HRESULT d3d_device_set_stream_source(d3d_device *dev, UINT number, d3d_vertex_buffer *vbuf, UINT stride)
 {
 	IDirect3DDevice8 *device = (IDirect3DDevice8 *)dev;
@@ -418,7 +436,7 @@ static HRESULT d3d_device_set_texture_stage_state(d3d_device *dev, DWORD stage, 
 }
 
 
-static HRESULT d3d_device_set_vertex_shader(d3d_device *dev, D3DFORMAT format)
+static HRESULT d3d_device_set_vertex_format(d3d_device *dev, D3DFORMAT format)
 {
 	IDirect3DDevice8 *device = (IDirect3DDevice8 *)dev;
 	return IDirect3DDevice8_SetVertexShader(device, format);
@@ -444,8 +462,10 @@ static const d3d_device_interface d3d8_device_interface =
 	d3d_device_begin_scene,
 	d3d_device_clear,
 	d3d_device_create_offscreen_plain_surface,
+	d3d_device_create_effect,
 	d3d_device_create_texture,
 	d3d_device_create_vertex_buffer,
+	d3d_device_create_render_target,
 	d3d_device_draw_primitive,
 	d3d_device_end_scene,
 	d3d_device_get_raster_status,
@@ -459,7 +479,7 @@ static const d3d_device_interface d3d8_device_interface =
 	d3d_device_set_stream_source,
 	d3d_device_set_texture,
 	d3d_device_set_texture_stage_state,
-	d3d_device_set_vertex_shader,
+	d3d_device_set_vertex_format,
 	d3d_device_stretch_rect,
 	d3d_device_test_cooperative_level
 };
@@ -577,6 +597,94 @@ static const d3d_vertex_buffer_interface d3d8_vertex_buffer_interface =
 
 
 //============================================================
+//  Direct3DEffect interfaces
+//============================================================
+
+static void d3d_effect_begin(d3d_effect *effect, UINT *passes, DWORD flags)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_end(d3d_effect *effect)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_begin_pass(d3d_effect *effect, UINT pass)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_end_pass(d3d_effect *effect)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_technique(d3d_effect *effect, const char *name)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_vector(d3d_effect *effect, const char *name, d3d_vector *vector)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_float(d3d_effect *effect, const char *name, float value)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_int(d3d_effect *effect, const char *name, int value)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_matrix(d3d_effect *effect, const char *name, d3d_matrix *matrix)
+{
+	assert(FALSE);
+}
+
+
+static void d3d_effect_set_texture(d3d_effect *effect, const char *name, d3d_texture *tex)
+{
+	assert(FALSE);
+}
+
+
+static ULONG d3d_effect_release(d3d_effect *effect)
+{
+	assert(FALSE);
+	return 0;
+}
+
+
+static const d3d_effect_interface d3d8_effect_interface =
+{
+	d3d_effect_begin,
+	d3d_effect_end,
+	d3d_effect_begin_pass,
+	d3d_effect_end_pass,
+	d3d_effect_set_technique,
+	d3d_effect_set_vector,
+	d3d_effect_set_float,
+	d3d_effect_set_int,
+	d3d_effect_set_matrix,
+	d3d_effect_set_texture,
+	d3d_effect_release
+};
+
+
+
+//============================================================
 //  set_interfaces
 //============================================================
 
@@ -587,4 +695,5 @@ static void set_interfaces(d3d *d3dptr)
 	d3dptr->surface = d3d8_surface_interface;
 	d3dptr->texture = d3d8_texture_interface;
 	d3dptr->vertexbuf = d3d8_vertex_buffer_interface;
+	d3dptr->effect = d3d8_effect_interface;
 }

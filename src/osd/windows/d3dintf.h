@@ -71,6 +71,7 @@ enum
     D3DTSS_MAXMIPLEVEL    = 20,
     D3DTSS_MAXANISOTROPY  = 21
 };
+
 #endif
 #endif
 
@@ -84,6 +85,9 @@ typedef struct _d3d_device d3d_device;
 typedef struct _d3d_surface d3d_surface;
 typedef struct _d3d_texture d3d_texture;
 typedef struct _d3d_vertex_buffer d3d_vertex_buffer;
+typedef struct _d3d_effect d3d_effect;
+typedef D3DXVECTOR4 d3d_vector;
+typedef D3DMATRIX d3d_matrix;
 
 
 //============================================================
@@ -147,7 +151,8 @@ enum _d3d_caps_index
 	CAPS_MAX_TEXTURE_ASPECT,
 	CAPS_MAX_TEXTURE_WIDTH,
 	CAPS_MAX_TEXTURE_HEIGHT,
-	CAPS_STRETCH_RECT_FILTER
+	CAPS_STRETCH_RECT_FILTER,
+	CAPS_MAX_PS30_INSN_SLOTS
 };
 typedef enum _d3d_caps_index d3d_caps_index;
 
@@ -183,8 +188,10 @@ struct _d3d_device_interface
 	HRESULT (*begin_scene)(d3d_device *dev);
 	HRESULT (*clear)(d3d_device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
 	HRESULT (*create_offscreen_plain_surface)(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, d3d_surface **surface);
+	HRESULT (*create_effect)(d3d_device *dev, const WCHAR *name, d3d_effect **effect);
 	HRESULT (*create_texture)(d3d_device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, d3d_texture **texture);
 	HRESULT (*create_vertex_buffer)(d3d_device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, d3d_vertex_buffer **buf);
+	HRESULT (*create_render_target)(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, d3d_surface **surface);
 	HRESULT (*draw_primitive)(d3d_device *dev, D3DPRIMITIVETYPE type, UINT start, UINT count);
 	HRESULT (*end_scene)(d3d_device *dev);
 	HRESULT (*get_raster_status)(d3d_device *dev, D3DRASTER_STATUS *status);
@@ -198,7 +205,7 @@ struct _d3d_device_interface
 	HRESULT (*set_stream_source)(d3d_device *dev, UINT number, d3d_vertex_buffer *vbuf, UINT stride);
 	HRESULT (*set_texture)(d3d_device *dev, DWORD stage, d3d_texture *tex);
 	HRESULT (*set_texture_stage_state)(d3d_device *dev, DWORD stage, D3DTEXTURESTAGESTATETYPE state, DWORD value);
-	HRESULT (*set_vertex_shader)(d3d_device *dev, D3DFORMAT format);
+	HRESULT (*set_vertex_format)(d3d_device *dev, D3DFORMAT format);
 	HRESULT (*stretch_rect)(d3d_device *dev, d3d_surface *source, const RECT *srcrect, d3d_surface *dest, const RECT *dstrect, D3DTEXTUREFILTERTYPE filter);
 	HRESULT (*test_cooperative_level)(d3d_device *dev);
 };
@@ -245,6 +252,27 @@ struct _d3d_vertex_buffer_interface
 
 
 //============================================================
+//  Direct3DEffect interfaces
+//============================================================
+
+typedef struct _d3d_effect_interface d3d_effect_interface;
+struct _d3d_effect_interface
+{
+	void     (*begin)(d3d_effect *effect, UINT *passes, DWORD flags);
+	void     (*end)(d3d_effect *effect);
+	void     (*begin_pass)(d3d_effect *effect, UINT pass);
+	void     (*end_pass)(d3d_effect *effect);
+	void     (*set_technique)(d3d_effect *effect, const char *name);
+	void     (*set_vector)(d3d_effect *effect, const char *name, d3d_vector *vector);
+	void     (*set_float)(d3d_effect *effect, const char *name, float value);
+	void     (*set_int)(d3d_effect *effect, const char *name, int value);
+	void     (*set_matrix)(d3d_effect *effect, const char *name, d3d_matrix *matrix);
+	void     (*set_texture)(d3d_effect *effect, const char *name, d3d_texture *tex);
+	ULONG    (*release)(d3d_effect *effect);
+};
+
+
+//============================================================
 //  Core D3D object
 //============================================================
 
@@ -254,6 +282,7 @@ struct _d3d
 	int							version;
 	void *						d3dobj;
 	HINSTANCE					dllhandle;
+	bool						post_fx_available;
 
 	// interface pointers
 	d3d_interface				d3d;
@@ -261,6 +290,7 @@ struct _d3d
 	d3d_surface_interface		surface;
 	d3d_texture_interface		texture;
 	d3d_vertex_buffer_interface vertexbuf;
+	d3d_effect_interface        effect;
 };
 
 

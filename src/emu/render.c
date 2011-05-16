@@ -1897,7 +1897,8 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 			// set the flags and add it to the list
 			prim->flags = PRIMFLAG_TEXORIENT(container_xform.orientation) |
 							PRIMFLAG_BLENDMODE(BLENDMODE_RGB_MULTIPLY) |
-							PRIMFLAG_TEXFORMAT(container.overlay()->format());
+							PRIMFLAG_TEXFORMAT(container.overlay()->format()) |
+							PRIMFLAG_TEXSHADE(1);
 		}
 		list.append_or_return(*prim, !got_scaled);
 	}

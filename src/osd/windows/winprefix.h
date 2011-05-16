@@ -55,6 +55,8 @@
 #ifndef alloca
 #define alloca	__builtin_alloca
 #endif
+#define min(x,y) fmin(x,y)
+#define max(x,y) fmax(x,y)
 #endif
 
 #define PATH_SEPARATOR		"\\"
