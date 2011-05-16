@@ -38,6 +38,7 @@ Paca Paca Passion (PPP1/VER.A2)          (C) Produce/Namco,1999  COH-700     SYS
 Paca Paca Passion Special (PSP1/VER.A)   (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC052
 Paca Paca Passion 2 (PKS1/VER.A)         (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC046
 Point Blank 2 (GNB5/VER.A)               (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
+Gunbarl (GNB4/VER.A)                     (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
 Soul Calibur (SOC11/VER.A2)              (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
 Soul Calibur (SOC11/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
 Soul Calibur (SOC11/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
@@ -358,6 +359,11 @@ Ghoul Panic   OB2/VER.A    Same PCB but sticker says....                  KC045 
                            (i.e no FlashROMs)
 
 Point Blank 2 GNB5/VER.A   Same PCB but sticker says....                  KC042    GNB1 WAVEB.IC2
+                           'SYSTEM 12 M4F0 PCB 8661962000'                         GNB1 PRG0U.IC11, GNB1 PRG0L.IC12
+                           (i.e no FlashROMs)                                      (note these ROMs contains the same data as)
+                                                                                   (the ones used on System 11 Point Blank 2)
+
+Gunbarl       GNB4/VER.A   Same PCB but sticker says....                  KC042    GNB1 WAVEB.IC2
                            'SYSTEM 12 M4F0 PCB 8661962000'                         GNB1 PRG0U.IC11, GNB1 PRG0L.IC12
                            (i.e no FlashROMs)                                      (note these ROMs contains the same data as)
                                                                                    (the ones used on System 11 Point Blank 2)
@@ -1384,6 +1390,7 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine.system().name, "tenkomor" ) == 0 ||
 		strcmp( machine.system().name, "tenkomorja" ) == 0 ||
 		strcmp( machine.system().name, "ptblank2" ) == 0 ||
+		strcmp( machine.system().name, "gunbarl" ) == 0 ||
 		strcmp( machine.system().name, "sws2000" ) == 0 ||
 		strcmp( machine.system().name, "sws2001" ) == 0 ||
 		strcmp( machine.system().name, "truckk" ) == 0 ||
@@ -2123,7 +2130,24 @@ ROM_START( ptblank2 )
 	ROM_LOAD16_WORD_SWAP( "gnb5vera.11s", 0x000000, 0x080000, CRC(d45a53eb) SHA1(01eb4f659b29671d417c5d3684f15a5876f76009) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "gnb1wave.ic2",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_LOAD( "gnb1waveb.ic2",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( gunbarl )
+	ROM_REGION32_LE( 0x00400000, "user1", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "gnb4vera.2l",  0x0000000, 0x200000, CRC(88c05cde) SHA1(80d210b06c8eda19e37430fb34492885d9eec671) )
+	ROM_LOAD16_BYTE( "gnb4vera.2p",  0x0000001, 0x200000, CRC(7d57437a) SHA1(b4fc960b11e7dc9d3bde567f534635f264276e53) )
+
+	ROM_REGION32_LE( 0x1000000, "user2", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "gnb1prg0l.ic12", 0x000000, 0x800000, CRC(78746037) SHA1(d130ca1153a730e3c967945248f00662f9fab304) )
+	ROM_LOAD16_BYTE( "gnb1prg0u.ic11", 0x000001, 0x800000, CRC(697d3279) SHA1(40302780f7494d9413888b2d1da38bd14a9a444f) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "gnb5vera.11s", 0x000000, 0x080000, CRC(d45a53eb) SHA1(01eb4f659b29671d417c5d3684f15a5876f76009) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "gnb1waveb.ic2",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
@@ -2709,6 +2733,7 @@ GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12, namcos12, ROT90,"Namco",   
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC037 */
 GAME( 1999, pacapp,    0,        coh700,   namcos12, namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC038 */
 GAME( 1999, ptblank2,  0,        coh700,   ptblank2, ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
+GAME( 1999, gunbarl,   ptblank2, coh700,   ptblank2, ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC042 */
 GAME( 1999, sws99,     0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC043 */
 GAME( 1999, tektagt,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (US, TEG3/VER.C1)", GAME_IMPERFECT_SOUND ) /* KC044 */
 GAME( 1999, tektagtac, tektagt,  coh700,   namcos12, namcos12, ROT0, "Namco",           "Tekken Tag Tournament (Asia, TEG2/VER.C1)", GAME_IMPERFECT_SOUND ) /* KC044 */
