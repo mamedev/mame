@@ -29,13 +29,6 @@ const device_type PSX_DMA = &device_creator<psxdma_device>;
 psxdma_device::psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PSX_DMA, "PSX DMA", tag, owner, clock)
 {
-	for( int index = 0; index < 7; index++ )
-	{
-		psx_dma_channel *dma = &channel[ index ];
-
-		dma->read_set = false;
-		dma->write_set = false;
-	}
 }
 
 void psxdma_device::device_reset()
@@ -205,13 +198,11 @@ void psxdma_device::dma_finished_callback(void *ptr, int param)
 void psxdma_device::install_read_handler( int index, psx_dma_read_delegate p_fn_dma_read )
 {
 	channel[ index ].fn_read = p_fn_dma_read;
-	channel[ index ].read_set = true;
 }
 
 void psxdma_device::install_write_handler( int index, psx_dma_read_delegate p_fn_dma_write )
 {
 	channel[ index ].fn_write = p_fn_dma_write;
-	channel[ index ].write_set = true;
 }
 
 WRITE32_MEMBER( psxdma_device::write )
@@ -260,14 +251,14 @@ WRITE32_MEMBER( psxdma_device::write )
 				}
 
 				if( dma->n_channelcontrol == 0x01000000 &&
-					dma->read_set )
+					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
 					dma->fn_read( n_address, n_size );
 					dma_finished( index );
 				}
 				else if (dma->n_channelcontrol == 0x11000000 &&	// CD DMA
-					dma->read_set )
+					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
 
@@ -280,7 +271,7 @@ WRITE32_MEMBER( psxdma_device::write )
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x01000200 &&
-					dma->read_set )
+					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
 					dma->fn_read( n_address, n_size );
@@ -294,14 +285,14 @@ WRITE32_MEMBER( psxdma_device::write )
 					}
 				}
 				else if( dma->n_channelcontrol == 0x01000201 &&
-					dma->write_set )
+					!dma->fn_write.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
 					dma->fn_write( n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11050100 &&
-					dma->write_set )
+					!dma->fn_write.isnull() )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
@@ -309,7 +300,7 @@ WRITE32_MEMBER( psxdma_device::write )
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11150100 &&
-					dma->write_set )
+					!dma->fn_write.isnull() )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
@@ -318,7 +309,7 @@ WRITE32_MEMBER( psxdma_device::write )
 				}
 				else if( dma->n_channelcontrol == 0x01000401 &&
 					index == 2 &&
-					dma->write_set )
+					!dma->fn_write.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d write linked list %08x\n",
 						index, dma->n_base );

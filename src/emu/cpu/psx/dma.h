@@ -25,9 +25,7 @@ struct _psx_dma_channel
 	UINT32 n_channelcontrol;
 	emu_timer *timer;
 	psx_dma_read_delegate fn_read;
-	bool read_set;
 	psx_dma_write_delegate fn_write;
-	bool write_set;
 	UINT32 n_ticks;
 	UINT32 b_running;
 };
