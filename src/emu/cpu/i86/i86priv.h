@@ -121,10 +121,19 @@ typedef enum {
 #define POP(var)				{ cpustate->regs.w[SP] += 2; var = ReadWord(((cpustate->base[SS] + ((cpustate->regs.w[SP]-2) & 0xffff)) & AMASK)); }
 
 /************************************************************************/
+#ifdef I80286
+#define IOPL ((cpustate->flags&0x3000)>>12)
+#define NT ((cpustate->flags&0x4000)>>14)
+#define xF (0)
+#else
+#define IOPL (3)
+#define NT (1)
+#define xF (1)
+#endif
 
-#define CompressFlags() (WORD)(CF | (PF << 2) | (AF << 4) | (ZF << 6) \
+#define CompressFlags() (WORD)(CF | 2 |(PF << 2) | (AF << 4) | (ZF << 6) \
 				| (SF << 7) | (cpustate->TF << 8) | (cpustate->IF << 9) \
-				| (DF << 10) | (OF << 11))
+				| (DF << 10) | (OF << 11) | (IOPL << 12) | (NT << 14) | (xF << 15))
 
 #define ExpandFlags(f) \
 { \
@@ -138,5 +147,4 @@ typedef enum {
 	  cpustate->DirVal = ((f) & 1024) ? -1 : 1; \
 	  cpustate->OverVal = (f) & 2048; \
 }
-
 #endif /* __I86_H__ */

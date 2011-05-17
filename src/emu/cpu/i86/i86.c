@@ -495,21 +495,21 @@ static CPU_EXPORT_STRING( i8086 )
 		case STATE_GENFLAGS:
 			cpustate->flags = CompressFlags();
 			string.printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-					cpustate->flags & 0x8000 ? '?' : '.',
-					cpustate->flags & 0x4000 ? '?' : '.',
-					cpustate->flags & 0x2000 ? '?' : '.',
-					cpustate->flags & 0x1000 ? '?' : '.',
+					cpustate->flags & 0x8000 ? '1' : '.',
+					cpustate->flags & 0x4000 ? '1' : '.',
+					cpustate->flags & 0x2000 ? '1' : '.',
+					cpustate->flags & 0x1000 ? '1' : '.',
 					cpustate->flags & 0x0800 ? 'O' : '.',
 					cpustate->flags & 0x0400 ? 'D' : '.',
 					cpustate->flags & 0x0200 ? 'I' : '.',
 					cpustate->flags & 0x0100 ? 'T' : '.',
 					cpustate->flags & 0x0080 ? 'S' : '.',
 					cpustate->flags & 0x0040 ? 'Z' : '.',
-					cpustate->flags & 0x0020 ? '?' : '.',
+					cpustate->flags & 0x0020 ? '0' : '.',
 					cpustate->flags & 0x0010 ? 'A' : '.',
-					cpustate->flags & 0x0008 ? '?' : '.',
+					cpustate->flags & 0x0008 ? '0' : '.',
 					cpustate->flags & 0x0004 ? 'P' : '.',
-					cpustate->flags & 0x0002 ? 'N' : '.',
+					cpustate->flags & 0x0002 ? '1' : '.',
 					cpustate->flags & 0x0001 ? 'C' : '.');
 			break;
 

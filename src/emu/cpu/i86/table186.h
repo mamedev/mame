@@ -210,8 +210,8 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_iret),              /* 0xcf */
 	 PREFIX86(_rotshft_b),         /* 0xd0 */
 	 PREFIX86(_rotshft_w),         /* 0xd1 */
-	 PREFIX86(_rotshft_bcl),       /* 0xd2 */
-	 PREFIX86(_rotshft_wcl),       /* 0xd3 */
+	 PREFIX186(_rotshft_bcl),       /* 0xd2 */
+	 PREFIX186(_rotshft_wcl),       /* 0xd3 */
 	 PREFIX86(_aam),               /* 0xd4 */
 	 PREFIX86(_aad),               /* 0xd5 */
 	 PREFIX86(_invalid),
@@ -473,8 +473,8 @@ static void (*const PREFIX186(_instruction)[256])(i8086_state *cpustate) =
 	case 0xcf:    PREFIX86(_iret)(cpustate); break;\
 		  case 0xd0:    PREFIX86(_rotshft_b)(cpustate); break;\
 		  case 0xd1:    PREFIX86(_rotshft_w)(cpustate); break;\
-		  case 0xd2:    PREFIX86(_rotshft_bcl)(cpustate); break;\
-		  case 0xd3:    PREFIX86(_rotshft_wcl)(cpustate); break;\
+		  case 0xd2:    PREFIX186(_rotshft_bcl)(cpustate); break;\
+		  case 0xd3:    PREFIX186(_rotshft_wcl)(cpustate); break;\
 	case 0xd4:    PREFIX86(_aam)(cpustate); break;\
 	case 0xd5:    PREFIX86(_aad)(cpustate); break;\
 	case 0xd6:    PREFIX86(_invalid)(cpustate); break;\

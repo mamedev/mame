@@ -140,6 +140,9 @@ static void PREFIX86(_mov_wsreg)(i8086_state *cpustate);
 static void PREFIX86(_lea)(i8086_state *cpustate);
 static void PREFIX86(_mov_sregw)(i8086_state *cpustate);
 static void PREFIX86(_invalid)(i8086_state *cpustate);
+#ifndef I80286
+static void PREFIX86(_invalid_2b)(i8086_state *cpustate);
+#endif
 static void PREFIX86(_popw)(i8086_state *cpustate);
 static void PREFIX86(_nop)(i8086_state *cpustate);
 static void PREFIX86(_xchg_axcx)(i8086_state *cpustate);

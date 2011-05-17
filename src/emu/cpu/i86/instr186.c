@@ -131,7 +131,7 @@ static void PREFIX186(_rotshft_bd8)(i8086_state *cpustate)    /* Opcode 0xc0 */
 	unsigned ModRM = FETCH;
 	unsigned count = FETCH;
 
-	PREFIX86(_rotate_shift_Byte)(cpustate,ModRM,count);
+	PREFIX86(_rotate_shift_Byte)(cpustate,ModRM,count & 0x1f);
 }
 
 static void PREFIX186(_rotshft_wd8)(i8086_state *cpustate)    /* Opcode 0xc1 */
@@ -139,7 +139,7 @@ static void PREFIX186(_rotshft_wd8)(i8086_state *cpustate)    /* Opcode 0xc1 */
 	unsigned ModRM = FETCH;
 	unsigned count = FETCH;
 
-	PREFIX86(_rotate_shift_Word)(cpustate,ModRM,count);
+	PREFIX86(_rotate_shift_Word)(cpustate,ModRM,count & 0x1f);
 }
 
 static void PREFIX186(_enter)(i8086_state *cpustate)    /* Opcode 0xc8 */
@@ -162,4 +162,14 @@ static void PREFIX186(_leave)(i8086_state *cpustate)    /* Opcode 0xc9 */
 	ICOUNT -= timing.leave;
 	cpustate->regs.w[SP]=cpustate->regs.w[BP];
 	POP(cpustate->regs.w[BP]);
+}
+
+static void PREFIX186(_rotshft_bcl)(i8086_state *cpustate)    /* Opcode 0xd2 */
+{
+	PREFIX86(_rotate_shift_Byte)(cpustate,FETCHOP,cpustate->regs.b[CL] & 0x1f);
+}
+
+static void PREFIX186(_rotshft_wcl)(i8086_state *cpustate)    /* Opcode 0xd3 */
+{
+	PREFIX86(_rotate_shift_Word)(cpustate,FETCHOP,cpustate->regs.b[CL] & 0x1f);
 }

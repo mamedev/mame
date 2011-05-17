@@ -96,22 +96,22 @@ static void (*const PREFIX86(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_pop_bp),           /* 0x5d */
 	 PREFIX86(_pop_si),           /* 0x5e */
 	 PREFIX86(_pop_di),           /* 0x5f */
-	 PREFIX86(_invalid), // PREFIX86(_pusha),            /* 0x60 */
-	 PREFIX86(_invalid), // PREFIX86(_popa),             /* 0x61 */
-	 PREFIX86(_invalid), // PREFIX86(_bound),            /* 0x62 */
-	 PREFIX86(_invalid),
-	 PREFIX86(_invalid),
-	 PREFIX86(_invalid),
-	 PREFIX86(_invalid),
-	 PREFIX86(_invalid),
-	 PREFIX86(_invalid), //i_push_d16),         /* 0x68 */
-	 PREFIX86(_invalid), //i_imul_d16),         /* 0x69 */
-	 PREFIX86(_invalid), //i_push_d8),          /* 0x6a */
-	 PREFIX86(_invalid), //i_imul_d8),          /* 0x6b */
-	 PREFIX86(_invalid), //i_insb),             /* 0x6c */
-	 PREFIX86(_invalid), //i_insw),             /* 0x6d */
-	 PREFIX86(_invalid), //i_outsb),            /* 0x6e */
-	 PREFIX86(_invalid), //i_outsw),            /* 0x6f */
+	 PREFIX86(_invalid_2b), // PREFIX86(_pusha),            /* 0x60 */
+	 PREFIX86(_invalid_2b), // PREFIX86(_popa),             /* 0x61 */
+	 PREFIX86(_invalid_2b), // PREFIX86(_bound),            /* 0x62 */
+	 PREFIX86(_invalid_2b),
+	 PREFIX86(_invalid_2b),
+	 PREFIX86(_invalid_2b),
+	 PREFIX86(_invalid_2b),
+	 PREFIX86(_invalid_2b),
+	 PREFIX86(_invalid_2b), //i_push_d16),         /* 0x68 */
+	 PREFIX86(_invalid_2b), //i_imul_d16),         /* 0x69 */
+	 PREFIX86(_invalid_2b), //i_push_d8),          /* 0x6a */
+	 PREFIX86(_invalid_2b), //i_imul_d8),          /* 0x6b */
+	 PREFIX86(_invalid_2b), //i_insb),             /* 0x6c */
+	 PREFIX86(_invalid_2b), //i_insw),             /* 0x6d */
+	 PREFIX86(_invalid_2b), //i_outsb),            /* 0x6e */
+	 PREFIX86(_invalid_2b), //i_outsw),            /* 0x6f */
 	 PREFIX86(_jo),               /* 0x70 */
 	 PREFIX86(_jno),              /* 0x71 */
 	 PREFIX86(_jb),               /* 0x72 */
@@ -359,22 +359,22 @@ static void (*const PREFIX86(_instruction)[256])(i8086_state *cpustate) =
 	case 0x5d:    PREFIX86(_pop_bp)(cpustate); break;\
 	case 0x5e:    PREFIX86(_pop_si)(cpustate); break;\
 	case 0x5f:    PREFIX86(_pop_di)(cpustate); break;\
-		  case 0x60:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x61:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x62:    PREFIX86(_invalid)(cpustate); break;\
-	case 0x63:    PREFIX86(_invalid)(cpustate); break;\
-	case 0x64:    PREFIX86(_invalid)(cpustate); break;\
-	case 0x65:	  PREFIX86(_invalid)(cpustate); break;\
-	case 0x66:    PREFIX86(_invalid)(cpustate); break;\
-	case 0x67:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x68:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x69:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6a:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6b:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6c:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6d:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6e:    PREFIX86(_invalid)(cpustate); break;\
-		  case 0x6f:    PREFIX86(_invalid)(cpustate); break;\
+		  case 0x60:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x61:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x62:    PREFIX86(_invalid_2b)(cpustate); break;\
+	case 0x63:    PREFIX86(_invalid_2b)(cpustate); break;\
+	case 0x64:    PREFIX86(_invalid_2b)(cpustate); break;\
+	case 0x65:	  PREFIX86(_invalid_2b)(cpustate); break;\
+	case 0x66:    PREFIX86(_invalid_2b)(cpustate); break;\
+	case 0x67:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x68:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x69:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6a:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6b:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6c:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6d:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6e:    PREFIX86(_invalid_2b)(cpustate); break;\
+		  case 0x6f:    PREFIX86(_invalid_2b)(cpustate); break;\
 	case 0x70:    PREFIX86(_jo)(cpustate); break;\
 	case 0x71:    PREFIX86(_jno)(cpustate); break;\
 	case 0x72:    PREFIX86(_jb)(cpustate); break;\

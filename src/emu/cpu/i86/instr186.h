@@ -32,3 +32,5 @@ static void PREFIX(_mov_sregw)(i8086_state *cpustate);
 static void PREFIX186(_repne)(i8086_state *cpustate);
 static void PREFIX186(_repe)(i8086_state *cpustate);
 static void PREFIX186(_sti)(i8086_state *cpustate);
+static void PREFIX186(_rotshft_bcl)(i8086_state *cpustate);
+static void PREFIX186(_rotshft_wcl)(i8086_state *cpustate);

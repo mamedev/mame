@@ -42,6 +42,8 @@ enum
 	I80286_IRQ_STATE
 };
 
+#define TRAP(fault, code)  (UINT32)(((fault&0xffff)<<16)|(code&0xffff))
+
 /* Public functions */
 DECLARE_LEGACY_CPU_DEVICE(I80286, i80286);
 
