@@ -115,7 +115,7 @@ Notes:
       RTC-65271  - Epson Toyocom RTC-65271 real-time clock
       D481850GF  - NEC D481850GF-A12 128k x 32Bit x 2 Banks SGRAM (QFP100)
       CXD2925Q   - Sony CXD2925Q SPU (QFP100)
-      CXD8561Q   - Sony CXD8561Q GTE (QFP208)
+      CXD8561Q   - Sony CXD8561Q GPU (QFP208)
       CXD8530CQ  - Sony CXD8530CQ R3000-based CPU (QFP208)
       MC44200FT  - Motorola MC44200FT Triple 8-bit Video DAC (QFP44)
       KM48V514   - Samsung Electronics KM48V514BJ-6 512kx8 EDO DRAM (SOJ28)

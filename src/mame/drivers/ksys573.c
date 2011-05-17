@@ -208,7 +208,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   LA4705    - Sanyo LA4705 15W 2-channel power amplifier (SIP18)
   LM358     - National Semiconductor LM358 low power dual operational amplifier (SOIC8, @ 33C)
   CXD2925Q  - Sony CXD2925Q SPU (QFP100, @ 15Q)
-  CXD8561Q  - Sony CXD8561Q GTE (QFP208, @ 10M)
+  CXD8561Q  - Sony CXD8561Q GPU (QFP208, @ 10M)
   CXD8530CQ - Sony CXD8530CQ R3000-based CPU (QFP208, @ 17M)
   9536      - Xilinx XC9536 in-system-programmable CPLD (PLCC44, @ 22J)
   3644      - Hitachi H8/3644 HD6473644H microcontroller with 32k ROM & 1k RAM (QFP64, @ 18E,
