@@ -1220,9 +1220,6 @@ $(MAMEOBJ)/sega.a: \
 	$(VIDEO)/segaic16.o \
 	$(VIDEO)/sega16sp.o \
 	$(VIDEO)/segaic24.o \
-	$(VIDEO)/smsvdp.o \
-	$(MACHINE)/segasms.o \
-	$(DRIVERS)/segasms.o \
 	$(MACHINE)/gdrom.o \
 
 $(MAMEOBJ)/seibu.a: \
