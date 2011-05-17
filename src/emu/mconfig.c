@@ -75,10 +75,15 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		const slot_interface *intf = slot->get_slot_interfaces();
 		if (intf != NULL)
 		{
-			const char *selval = options.value(owner.tag());
-			for (int i = 0; intf[i].name != NULL; i++)
-				if (strcmp(selval, intf[i].name) == 0)
-					device_add(&owner, intf[i].name, intf[i].devtype, 0);
+			const char *selval = options.value(owner.tag());			
+			if (options.seqid(owner.tag())==0) {		
+				selval = slot->get_default_card();
+			}
+			if (selval) {
+				for (int i = 0; intf[i].name != NULL; i++)
+					if (strcmp(selval, intf[i].name) == 0)
+						device_add(&owner, intf[i].name, intf[i].devtype, 0);
+			}
 		}
 	}
 
