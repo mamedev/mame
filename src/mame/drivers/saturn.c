@@ -470,7 +470,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static UINT8 stv_SMPC_r8 (address_space *space, int offset)
+static READ8_HANDLER( stv_SMPC_r8 )
 {
 	int return_data;
 
@@ -497,7 +497,7 @@ static UINT8 stv_SMPC_r8 (address_space *space, int offset)
 	return return_data;
 }
 
-static void stv_SMPC_w8 (address_space *space, int offset, UINT8 data)
+static WRITE8_HANDLER( stv_SMPC_w8 )
 {
 	system_time systime;
 
@@ -756,7 +756,7 @@ static void smpc_intbackhelper(running_machine &machine)
 	intback_stage++;
 }
 
-static UINT8 saturn_SMPC_r8(address_space *space, int offset)
+static READ8_HANDLER( saturn_SMPC_r8 )
 {
 	int return_data;
 
@@ -813,7 +813,7 @@ static UINT8 saturn_SMPC_r8(address_space *space, int offset)
 	return return_data;
 }
 
-static void saturn_SMPC_w8(address_space *space, int offset, UINT8 data)
+static WRITE8_HANDLER( saturn_SMPC_w8 )
 {
 	system_time systime;
 	UINT8 last;
@@ -1045,79 +1045,6 @@ static void saturn_SMPC_w8(address_space *space, int offset, UINT8 data)
 		smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
-}
-
-
-
-static READ32_HANDLER ( stv_SMPC_r32 )
-{
-	int byte = 0;
-	int readdata = 0;
-	/* registers are all byte accesses, convert here */
-	offset = offset << 2; // multiply offset by 4
-
-	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(space, offset+byte) << 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(space, offset+byte) << 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(space, offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(space, offset+byte) << 0;  }
-
-	return readdata;
-}
-
-
-static WRITE32_HANDLER ( stv_SMPC_w32 )
-{
-	int byte = 0;
-	int writedata = 0;
-	/* registers are all byte accesses, convert here so we can use the data more easily later */
-	offset = offset << 2; // multiply offset by 4
-
-	if (ACCESSING_BITS_24_31)	{ byte = 0; writedata = data >> 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; writedata = data >> 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; writedata = data >> 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; writedata = data >> 0;  }
-
-	writedata &= 0xff;
-
-	offset += byte;
-
-	stv_SMPC_w8(space, offset,writedata);
-}
-
-
-static READ32_HANDLER ( saturn_SMPC_r32 )
-{
-	int byte = 0;
-	int readdata = 0;
-	/* registers are all byte accesses, convert here */
-	offset = offset << 2; // multiply offset by 4
-
-	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = saturn_SMPC_r8(space, offset+byte) << 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = saturn_SMPC_r8(space, offset+byte) << 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = saturn_SMPC_r8(space, offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = saturn_SMPC_r8(space, offset+byte) << 0;  }
-
-	return readdata;
-}
-
-
-static WRITE32_HANDLER ( saturn_SMPC_w32 )
-{
-	int byte = 0;
-	int writedata = 0;
-	/* registers are all byte accesses, convert here so we can use the data more easily later */
-	offset = offset << 2; // multiply offset by 4
-
-	if (ACCESSING_BITS_24_31)	{ byte = 0; writedata = data >> 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; writedata = data >> 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; writedata = data >> 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; writedata = data >> 0;  }
-
-	writedata &= 0xff;
-
-	offset += byte;
-
-	saturn_SMPC_w8(space, offset,writedata);
 }
 
 /*
@@ -2401,7 +2328,7 @@ static NVRAM_HANDLER(saturn)
 
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(saturn_SMPC_r32, saturn_SMPC_w32)
+	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r8, saturn_SMPC_w8,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(satram_r, satram_w)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE(&stv_workram_l)
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
@@ -2432,7 +2359,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
-	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
+	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r8, stv_SMPC_w8,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_RAM AM_SHARE("share1") AM_BASE(&stv_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE(&stv_workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE(&ioga) AM_SHARE("share4") AM_MIRROR(0x20)
