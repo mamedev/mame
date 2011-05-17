@@ -1223,7 +1223,6 @@ $(MAMEOBJ)/sega.a: \
 	$(VIDEO)/smsvdp.o \
 	$(MACHINE)/segasms.o \
 	$(DRIVERS)/segasms.o \
-	$(DRIVERS)/sg1000.o \
 	$(MACHINE)/gdrom.o \
 
 $(MAMEOBJ)/seibu.a: \
