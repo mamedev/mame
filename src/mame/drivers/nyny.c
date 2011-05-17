@@ -107,7 +107,7 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_audiocpu2;
 	device_t *m_ic48_1;
-	device_t *m_mc6845;
+	mc6845_device *m_mc6845;
 	pia6821_device *m_pia1;
 	pia6821_device *m_pia2;
 	pen_t m_pens[NUM_PENS];
@@ -431,7 +431,7 @@ static SCREEN_UPDATE( nyny )
 {
 	nyny_state *state = screen->machine().driver_data<nyny_state>();
 
-	mc6845_update(state->m_mc6845, bitmap, cliprect);
+	state->m_mc6845->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -545,8 +545,8 @@ static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_MEMBER(nyny_state, m_colorram2)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READWRITE(soundlatch3_r, audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
@@ -686,7 +686,7 @@ static MACHINE_START( nyny )
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_audiocpu2 = machine.device("audio2");
 	state->m_ic48_1 = machine.device("ic48_1");
-	state->m_mc6845 = machine.device("crtc");
+	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 	state->m_pia1 = machine.device<pia6821_device>("pia1");
 	state->m_pia2 = machine.device<pia6821_device>("pia2");
 

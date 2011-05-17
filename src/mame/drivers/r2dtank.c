@@ -399,8 +399,8 @@ static const mc6845_interface mc6845_intf =
 
 static SCREEN_UPDATE( r2dtank )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -426,8 +426,8 @@ static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_DEVREAD_MODERN("pia_main", pia6821_device, read) AM_DEVWRITE("pia_main", pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END

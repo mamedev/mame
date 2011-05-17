@@ -242,8 +242,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)

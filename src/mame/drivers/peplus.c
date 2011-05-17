@@ -311,7 +311,7 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
 
 static TIMER_CALLBACK(assert_lp_cb)
 {
-	mc6845_assert_light_pen_input((device_t *) ptr);
+	downcast<mc6845_device *>((device_t*)ptr)->assert_light_pen_input();
 }
 
 static void handle_lightpen( device_t *device )
@@ -333,9 +333,9 @@ static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 	handle_lightpen(device);
 }
 
-static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
+static WRITE8_HANDLER( peplus_crtc_display_w )
 {
-	peplus_state *state = device->machine().driver_data<peplus_state>();
+	peplus_state *state = space->machine().driver_data<peplus_state>();
 	UINT8 *videoram = state->m_videoram;
 	videoram[state->m_vid_address] = data;
 	state->m_palette_ram[state->m_vid_address] = state->m_io_port[1];
@@ -344,7 +344,7 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 	tilemap_mark_tile_dirty(state->m_bg_tilemap, state->m_vid_address);
 
 	/* An access here triggers a device read !*/
-	(void) mc6845_register_r(device, 0);
+	space->machine().device<mc6845_device>("crtc")->register_r(*space, 0);
 }
 
 static WRITE8_HANDLER( peplus_io_w )
@@ -740,9 +740,9 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8 )
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE("crtc", peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE("crtc", mc6845_register_r, peplus_crtc_display_w)
+	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x2083, 0x2083) AM_DEVREAD_MODERN("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
 
     // Superboard Data
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE_MEMBER(peplus_state, m_s3000_ram)

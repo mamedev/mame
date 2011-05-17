@@ -256,8 +256,8 @@ static VIDEO_START(ssingles)
 
 static SCREEN_UPDATE( ssingles )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -335,8 +335,8 @@ static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 
 ADDRESS_MAP_END
 

@@ -78,12 +78,12 @@ WRITE8_HANDLER( speedatk_6845_w )
 	if(offset == 0)
 	{
 		state->m_crtc_index = data;
-		mc6845_address_w(space->machine().device("crtc"),0,data);
+		space->machine().device<mc6845_device>("crtc")->address_w(*space,0,data);
 	}
 	else
 	{
 		state->m_crtc_vreg[state->m_crtc_index] = data;
-		mc6845_register_w(space->machine().device("crtc"),0,data);
+		space->machine().device<mc6845_device>("crtc")->register_w(*space,0,data);
 	}
 }
 

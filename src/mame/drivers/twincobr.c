@@ -276,8 +276,8 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_address_w, 0x00ff)
-	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_register_w, 0x00ff)
+	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8_MODERN("crtc", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8_MODERN("crtc", mc6845_device, register_w, 0x00ff)
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)	/* text layer scroll */
 	AM_RANGE(0x070004, 0x070005) AM_WRITE(twincobr_txoffs_w)	/* offset in text video RAM */
 	AM_RANGE(0x072000, 0x072003) AM_WRITE(twincobr_bgscroll_w)	/* bg layer scroll */

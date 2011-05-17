@@ -730,8 +730,8 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(bankrob_mcu1_r, bankrob_mcu1_w, 0x00ff)
 	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(bankrob_mcu2_r, bankrob_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_status_r,   mc6845_address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_register_r, mc6845_register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 // bankroba:
@@ -871,27 +871,29 @@ static WRITE16_HANDLER( cjffruit_leds3_w )
 }
 
 // CRTC
-static READ8_DEVICE_HANDLER( crtc_r )
+static READ8_HANDLER( crtc_r )
 {
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845_register_r(device, 0);
+		return mc6845->register_r(*space, 0);
 	else
-		return mc6845_status_r(device, 0);
+		return mc6845->status_r(*space, 0);
 }
 
-static WRITE8_DEVICE_HANDLER( crtc_w )
+static WRITE8_HANDLER( crtc_w )
 {
+	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845_register_w(device, 0, data);
+		mc6845->register_w(*space, 0, data);
 	else
-		mc6845_address_w(device, 0, data);
+		mc6845->address_w(*space, 0, data);
 }
 
 static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
 {
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		mc6845_assert_light_pen_input(device);
+		downcast<mc6845_device *>(device)->assert_light_pen_input();
 	// 8fe0007: 1->0 (MCU irq?)
 }
 
@@ -939,7 +941,7 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
 	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
 
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("crtc", crtc_r, crtc_w, 0xffff)
+	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1038,7 +1040,7 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
 	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
 
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("crtc", crtc_r, crtc_w, 0xffff)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1125,8 +1127,8 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(dualgame_mcu1_r, dualgame_mcu1_w, 0x00ff)
 	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(dualgame_mcu2_r, dualgame_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_status_r,   mc6845_address_w,  0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_register_r, mc6845_register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1205,7 +1207,7 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY
 	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
 
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("crtc", crtc_r, crtc_w, 0xffff)	// triggered by MCU?
+	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
 
 	AM_RANGE(0xc80000, 0xc80007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 ADDRESS_MAP_END
@@ -1262,8 +1264,8 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE8(maxidbl_mcu1_r, maxidbl_mcu1_w, 0x00ff)
 	AM_RANGE(0x500006, 0x500007) AM_READWRITE8(maxidbl_mcu2_r, maxidbl_mcu2_w, 0xff00)
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("crtc", mc6845_status_r,   mc6845_address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("crtc", mc6845_register_r, mc6845_register_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 

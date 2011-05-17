@@ -61,8 +61,8 @@ static SCREEN_UPDATE(royalgum)
 static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_w)

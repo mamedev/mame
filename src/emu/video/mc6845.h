@@ -106,16 +106,16 @@ public:
 	mc6845_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	/* select one of the registers for reading or writing */
-	void address_w(UINT8 data);
+	DECLARE_WRITE8_MEMBER( address_w );
 
 	/* read from the status register */
-	UINT8 status_r();
+	DECLARE_READ8_MEMBER( status_r );
 
 	/* read from the currently selected register */
-	UINT8 register_r();
+	DECLARE_READ8_MEMBER( register_r );
 
 	/* write to the currently selected register */
-	void register_w(UINT8 data);
+	DECLARE_WRITE8_MEMBER( register_w );
 
 	/* return the current value on the MA0-MA13 pins */
 	UINT16 get_ma();
@@ -335,16 +335,5 @@ extern const device_type HD6845;
 extern const device_type SY6545_1;
 extern const device_type SY6845E;
 
-
-WRITE8_DEVICE_HANDLER( mc6845_address_w );
-READ8_DEVICE_HANDLER( mc6845_status_r );
-READ8_DEVICE_HANDLER( mc6845_register_r );
-WRITE8_DEVICE_HANDLER( mc6845_register_w );
-UINT16 mc6845_get_ma(device_t *device);
-UINT8 mc6845_get_ra(device_t *device);
-void mc6845_assert_light_pen_input(device_t *device);
-void mc6845_set_clock(device_t *device, int clock);
-void mc6845_set_hpixels_per_column(device_t *device, int hpixels_per_column);
-void mc6845_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

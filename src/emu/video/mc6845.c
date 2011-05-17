@@ -101,13 +101,13 @@ void mc6845_device::call_on_update_address(int strobe)
 }
 
 
-void mc6845_device::address_w(UINT8 data)
+WRITE8_MEMBER( mc6845_device::address_w )
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-UINT8 mc6845_device::status_r()
+READ8_MEMBER( mc6845_device::status_r )
 {
 	UINT8 ret = 0;
 
@@ -127,7 +127,7 @@ UINT8 mc6845_device::status_r()
 }
 
 
-UINT8 mc6845_device::register_r()
+READ8_MEMBER( mc6845_device::register_r )
 {
 	UINT8 ret = 0;
 
@@ -168,7 +168,7 @@ UINT8 mc6845_device::register_r()
 }
 
 
-void mc6845_device::register_w(UINT8 data)
+WRITE8_MEMBER( mc6845_device::register_w )
 {
 	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -974,60 +974,4 @@ sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, d
 	: mc6845_device(mconfig, SY6845E, "sy6845e", tag, owner, clock)
 {
 }
-
-
-/*****************************************
- * TRAMPOLINES
- *****************************************/
-
-WRITE8_DEVICE_HANDLER( mc6845_address_w )
-{
-	downcast<mc6845_device *>(device)->address_w( data );
-}
-
-READ8_DEVICE_HANDLER( mc6845_status_r )
-{
-	return downcast<mc6845_device *>(device)->status_r();
-}
-
-READ8_DEVICE_HANDLER( mc6845_register_r )
-{
-	return downcast<mc6845_device *>(device)->register_r();
-}
-
-WRITE8_DEVICE_HANDLER( mc6845_register_w )
-{
-	downcast<mc6845_device *>(device)->register_w( data );
-}
-
-UINT16 mc6845_get_ma(device_t *device)
-{
-	return downcast<mc6845_device *>(device)->get_ma();
-}
-
-UINT8 mc6845_get_ra(device_t *device)
-{
-	return downcast<mc6845_device *>(device)->get_ra();
-}
-
-void mc6845_assert_light_pen_input(device_t *device)
-{
-	downcast<mc6845_device *>(device)->assert_light_pen_input();
-}
-
-void mc6845_set_clock(device_t *device, int clock)
-{
-	downcast<mc6845_device *>(device)->set_clock( clock );
-}
-
-void mc6845_set_hpixels_per_column(device_t *device, int hpixels_per_column)
-{
-	downcast<mc6845_device *>(device)->set_hpixels_per_column( hpixels_per_column );
-}
-
-void mc6845_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	downcast<mc6845_device *>(device)->update( bitmap, cliprect );
-}
-
 

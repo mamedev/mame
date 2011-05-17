@@ -523,8 +523,8 @@ static const mc6845_interface mc6845_intf =
 
 static SCREEN_UPDATE( spiders )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update(bitmap, cliprect);
 
 	return 0;
 }
@@ -581,8 +581,8 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(spiders_state, m_ram)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
 	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE_MODERN("pia2", pia6821_device, read_alt, write_alt)

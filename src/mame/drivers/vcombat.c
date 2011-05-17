@@ -297,15 +297,15 @@ static WRITE64_HANDLER( v1_fb_w )
 static WRITE16_HANDLER( crtc_w )
 {
 	vcombat_state *state = space->machine().driver_data<vcombat_state>();
-	device_t *crtc = space->machine().device("crtc");
+	mc6845_device *crtc = space->machine().device<mc6845_device>("crtc");
 
 	if (crtc == NULL)
 		return;
 
 	if (state->m_crtc_select == 0)
-		mc6845_address_w(crtc, 0, data >> 8);
+		crtc->address_w(*space, 0, data >> 8);
 	else
-		mc6845_register_w(crtc, 0, data >> 8);
+		crtc->register_w(*space, 0, data >> 8);
 
 	state->m_crtc_select ^= 1;
 }

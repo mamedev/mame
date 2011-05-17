@@ -69,7 +69,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
-	device_t *m_mc6845;
+	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	device_t *m_ay1;
 	device_t *m_ay2;
@@ -120,7 +120,7 @@ static SCREEN_UPDATE( othello )
 {
 	othello_state *state = screen->machine().driver_data<othello_state>();
 
-	mc6845_update(state->m_mc6845, bitmap, cliprect);
+	state->m_mc6845->update(bitmap, cliprect);
 	return 0;
 }
 
@@ -181,8 +181,8 @@ static WRITE8_HANDLER( tilebank_w )
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("INP")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("DSW")
@@ -383,7 +383,7 @@ static MACHINE_START( othello )
 	othello_state *state = machine.driver_data<othello_state>();
 
 	state->m_maincpu = machine.device("maincpu");
-	state->m_mc6845 = machine.device("crtc");
+	state->m_mc6845 = machine.device<mc6845_device>("crtc");
 	state->m_n7751 = machine.device("n7751");
 	state->m_ay1 = machine.device("ay1");
 	state->m_ay2 = machine.device("ay2");

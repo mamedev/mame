@@ -198,8 +198,8 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xd800, 0xd81f) AM_RAM // column scroll for reels?
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(slotcarn_state, m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_MEMBER(slotcarn_state, m_ram_video)
@@ -537,8 +537,8 @@ GFXDECODE_END
 
 static SCREEN_UPDATE( slotcarn )
 {
-	device_t *mc6845 = screen->machine().device("crtc");
-	mc6845_update(mc6845, bitmap, cliprect);
+	mc6845_device *mc6845 = screen->machine().device<mc6845_device>("crtc");
+	mc6845->update(bitmap, cliprect);
 
 	return 0;
 }

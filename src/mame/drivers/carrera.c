@@ -65,8 +65,8 @@ public:
 static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(carrera_state, m_tileram)
 ADDRESS_MAP_END
 
