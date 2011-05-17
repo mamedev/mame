@@ -1174,6 +1174,9 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 	// walk the stack
 	while (walker.unwind())
 		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == NULL) ? "" : symbols->symbol_for_address(walker.ip()));
+	
+	// flush stderr, so the data is actually written when output is being redirected
+	fflush(stderr);
 
 	// exit
 	return EXCEPTION_CONTINUE_SEARCH;

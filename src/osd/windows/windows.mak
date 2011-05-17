@@ -140,6 +140,11 @@ CCOMFLAGS += /wd4267
 #LIBS += -lbufferoverflowu
 endif
 
+# enable basic run-time checks in non-optimized build
+ifeq ($(OPTIMIZE),0)
+CCOMFLAGS += /RTC1
+endif
+
 # enable exception handling for C++
 CPPONLYFLAGS += /EHsc
 
