@@ -5115,8 +5115,31 @@ ROM_START( 600 )
 	ROM_LOAD( "turtles.clr",  0x0000, 0x0020, CRC(f3ef02dd) SHA1(09fd795170d7d30f101d579f57553da5ff3800ab) )
 ROM_END
 
+/* Amidar (c) Konami 1982. Original Konami pcb.
+   Soundboard silkscreened: Konami KT-4108-1B
+   CPU Board Silkscreened: Konami KT4108-2 */
 
 ROM_START( amidar )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.2c",  0x0000, 0x1000, CRC(621b74de) SHA1(f064eccfb7da18119ed3088a5f939085eb446c90) )
+	ROM_LOAD( "2.2e",  0x1000, 0x1000, CRC(38538b98) SHA1(12b2a0c09926d006781bee5d450bc0c391cc1fb5) )
+	ROM_LOAD( "3.2f",  0x2000, 0x1000, CRC(099ecb24) SHA1(e83f049b25aba481e09606db3158726145ebd656) )
+	ROM_LOAD( "4.2h",  0x3000, 0x1000, CRC(ba149a93) SHA1(9ef1d27f0780612be0ea2be94c3a2c781a4924c8) )
+	ROM_LOAD( "5.2j",  0x4000, 0x1000, CRC(eecc1abf) SHA1(1530b374d15e0d05c8eb988cc1cbab48b0be211c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s1.5c",  0x0000, 0x1000, CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) )
+	ROM_LOAD( "s2.5d",  0x1000, 0x1000, CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "c2.5f",  0x0000, 0x0800, CRC(2cfe5ede) SHA1(0d86a78008ac8653c17fff5be5ebdf1f0a9d31eb) )
+	ROM_LOAD( "c2.5d",  0x0800, 0x0800, CRC(57c4fd0d) SHA1(8764deec9fbff4220d61df621b12fc36c3702601) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "amidar.clr",   0x0000, 0x0020, CRC(f940dcc3) SHA1(1015e56f37c244a850a8f4bf0e36668f047fd46d) )
+ROM_END
+
+ROM_START( amidar1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "amidar.2c",    0x0000, 0x1000, CRC(c294bf27) SHA1(399325bf1559e8cdbddf7cfbf0dc739f9ed72ef0) )
 	ROM_LOAD( "amidar.2e",    0x1000, 0x1000, CRC(e6e96826) SHA1(e9c4f8c594640424b456505e676352a98b758c03) )
@@ -6272,7 +6295,8 @@ GAME( 1981, turtles,  0,        turtles,  turtles,  turtles,  ROT90,  "Konami (S
 GAME( 1981, turpin,   turtles,  turtles,  turpin,   turtles,  ROT90,  "Konami (Sega license)", "Turpin", GAME_SUPPORTS_SAVE )
 GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", "600", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, amidar,   0,        turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
+GAME( 1982, amidar,   0,        turtles,  amidaru,  turtles,  ROT90,  "Konami", "Amidar", GAME_SUPPORTS_SAVE )
+GAME( 1981, amidar1,  amidar,   turtles,  amidar,   turtles,  ROT90,  "Konami", "Amidar (older)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaru,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidaro,  amidar,   turtles,  amidaro,  turtles,  ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", GAME_SUPPORTS_SAVE )
 GAME( 1982, amidarb,  amidar,   turtles,  amidaru,  turtles,  ROT90,  "bootleg", "Amidar (bootleg)", GAME_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
