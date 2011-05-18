@@ -604,6 +604,25 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_SIZE_MEMBER(arkanoid_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)	/* gfx bank, flip screen etc. */
+	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, m_videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(arkanoid_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe840, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
+// Interesting locations:
+// c105=0a @ title displays each piece
+// c110=01 - Title, 02 - Start Game, 04 - Select Stage
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_port_a_r, arkanoid_68705_port_a_w)
@@ -890,19 +909,30 @@ static INPUT_PORTS_START( brixian )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x07, "5" )
-	PORT_DIPSETTING(    0x0f, "6" )
-	PORT_DIPNAME( 0x30, 0x00, "Speed of Elevator" )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x30, "Fast" )
-	PORT_DIPNAME( 0xc0, 0x40, "Time Left" )			PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x00, "Half" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0xc0, "Double" )
+	PORT_DIPNAME( 0x01, 0x00, "Switch1-0" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Switch1-1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Switch1-2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Switch1-3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Switch1-4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Switch1-5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Switch1-6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Switch1-7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1093,7 +1123,7 @@ static MACHINE_CONFIG_DERIVED( brixian, arkanoid )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_CPU_PROGRAM_MAP(brixian_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("mcu")
@@ -1512,9 +1542,9 @@ ROM_START( brixian )
 	ROM_LOAD( "e4.bin",      0x10000, 0x8000, CRC(9b2e79d6) SHA1(8a40e0ef2a792efc37ea50eec01cf3fb5a3e3215) )
 
 	ROM_REGION( 0x0600, "proms", 0 )
-	ROM_LOAD( "r",    0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "g",    0x0200, 0x0200, NO_DUMP )
-	ROM_LOAD( "b",    0x0400, 0x0200, NO_DUMP )
+	ROM_LOAD( "n82s131n.6l", 0x0000, 0x0200, CRC(0fa51a5b) SHA1(8c5cb69fbff8a3ba90f945c35f72754f9cc8f18c) )
+	ROM_LOAD( "n82s131n.6p", 0x0200, 0x0200, CRC(d833ad33) SHA1(a7c17c96a670916e7102afc94dc2f0cb0455f0ce) )
+	ROM_LOAD( "n82s131n.6m", 0x0400, 0x0200, CRC(05297649) SHA1(35f99cf8dddd66e26e2110619eb46bd6ccff41df) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "68705p5", 0x0000, 0x0800, NO_DUMP ) // this appears to be providing ~0x200 bytes of code at c600, like most semicom games.
