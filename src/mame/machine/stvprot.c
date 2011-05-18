@@ -114,7 +114,7 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
 
 static READ32_HANDLER( twcup98_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -173,7 +173,7 @@ void install_twcup98_protection(running_machine &machine)
 
 static READ32_HANDLER( sss_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -238,7 +238,7 @@ void install_sss_protection(running_machine &machine)
 
 static READ32_HANDLER( rsgun_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -313,7 +313,7 @@ void install_rsgun_protection(running_machine &machine)
 
 static READ32_HANDLER( elandore_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -420,7 +420,7 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( ffreveng_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
@@ -531,7 +531,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)space->machine().region("game0")->base();
+	UINT32 *ROM = (UINT32 *)space->machine().region("abus")->base();
 
 	if (offset==2)
 	{
