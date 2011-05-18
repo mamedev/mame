@@ -129,26 +129,25 @@ uniform float QSubsampleLength = 3.0f;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	// -- Bandwidth Subsampling --
-	float YSubsampleWidth = (RawWidth * 2.0f) / YSubsampleLength;
-	float ISubsampleWidth = (RawWidth * 2.0f) / ISubsampleLength;
-	float QSubsampleWidth = (RawWidth * 2.0f) / QSubsampleLength;
-	float3 SubsampleWidth = float3(YSubsampleWidth, ISubsampleWidth, QSubsampleWidth);
-	float3 SubsampleFrac = frac(Input.TexCoord.x * SubsampleWidth);
-	float3 SubsampleCoord = (Input.TexCoord.x * SubsampleWidth - SubsampleFrac) / SubsampleWidth + SubsampleFrac / (SubsampleWidth * 2.0f);
-
+	float3 SubsampleWidth = float3(YSubsampleLength, ISubsampleLength, QSubsampleLength);
+	SubsampleWidth = (RawWidth * 2.0f) / SubsampleWidth;
+	float3 SubsampleCoord = Input.TexCoord.x;
+	float3 SubsampleFrac = frac(SubsampleCoord * SubsampleWidth); // Fraction is in subsample width units!
+	SubsampleCoord = (SubsampleCoord * SubsampleWidth - SubsampleFrac) / SubsampleWidth;
+	
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 	
 	float3 YTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.x, Input.TexCoord.y)).rgb;
 	float3 ITexel = tex2D(DiffuseSampler, float2(SubsampleCoord.y, Input.TexCoord.y)).rgb;
 	float3 QTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.z, Input.TexCoord.y)).rgb;
 	
-	float3 LastYTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.x - SubsampleFrac.x / RawWidth, Input.TexCoord.y)).rgb;
-	float3 LastITexel = tex2D(DiffuseSampler, float2(SubsampleCoord.y - SubsampleFrac.y / RawWidth, Input.TexCoord.y)).rgb;
-	float3 LastQTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.z - SubsampleFrac.z / RawWidth, Input.TexCoord.y)).rgb;
+	float3 LastYTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.x + YSubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
+	float3 LastITexel = tex2D(DiffuseSampler, float2(SubsampleCoord.y + ISubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
+	float3 LastQTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.z + QSubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
 	
-	YTexel = lerp(LastYTexel, YTexel, SubsampleFrac.x);
-	ITexel = lerp(LastITexel, ITexel, SubsampleFrac.y);
-	QTexel = lerp(LastQTexel, QTexel, SubsampleFrac.z);
+	YTexel = lerp(YTexel, LastYTexel, SubsampleFrac.x);
+	ITexel = lerp(ITexel, LastITexel, SubsampleFrac.y);
+	QTexel = lerp(QTexel, LastQTexel, SubsampleFrac.z);
 
 	// -- RGB Tint & Shift --
 	float ShiftedRedY = dot(YTexel, float3(RedFromRed, RedFromGrn, RedFromBlu));
@@ -199,8 +198,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// -- Final Pixel --
 	float4 Output = lerp(Input.Color, float4(OutRGB, BaseTexel.a) * Input.Color, Input.ExtraInfo.x);
-	
-	return BaseTexel;
+
+	return Output;
 }
 
 //-----------------------------------------------------------------------------
