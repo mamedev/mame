@@ -21,6 +21,8 @@ public:
 	UINT32 m_scu_dst_add[3];	/* Destination Addition for DMA lv n*/
     INT32  m_scu_size[3];		/* Transfer DMA size lv n*/
     UINT32 m_scu_index[3];
+	UINT8  m_stv_multi_bank;
+	UINT8  m_prev_bankswitch;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
