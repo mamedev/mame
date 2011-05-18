@@ -435,6 +435,9 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		break;
 #ifndef I8086
 	case 0x6c:	/* REP INSB */
+#ifdef I80286
+		if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_ins8_base;
 		cpustate->rep_in_progress = FALSE;
@@ -448,6 +451,9 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6d:  /* REP INSW */
+#ifdef I80286
+		if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_ins16_base;
 		cpustate->rep_in_progress = FALSE;
@@ -461,6 +467,9 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6e:  /* REP OUTSB */
+#ifdef I80286
+		if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_outs8_base;
 		cpustate->rep_in_progress = FALSE;
@@ -474,6 +483,9 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6f:  /* REP OUTSW */
+#ifdef I80286
+		if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.rep_outs16_base;
 		cpustate->rep_in_progress = FALSE;
@@ -2519,7 +2531,11 @@ static void PREFIX86(_jcxz)(i8086_state *cpustate)    /* Opcode 0xe3 */
 
 static void PREFIX86(_inal)(i8086_state *cpustate)    /* Opcode 0xe4 */
 {
-	unsigned port = FETCH;
+	unsigned port;
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
+	port = FETCH;
 
 	ICOUNT -= timing.in_imm8;
 	cpustate->regs.b[AL] = read_port_byte(port);
@@ -2527,7 +2543,11 @@ static void PREFIX86(_inal)(i8086_state *cpustate)    /* Opcode 0xe4 */
 
 static void PREFIX86(_inax)(i8086_state *cpustate)    /* Opcode 0xe5 */
 {
-	unsigned port = FETCH;
+	unsigned port;
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
+	port = FETCH;
 
 	ICOUNT -= timing.in_imm16;
 	cpustate->regs.w[AX] = read_port_word(port);
@@ -2535,7 +2555,11 @@ static void PREFIX86(_inax)(i8086_state *cpustate)    /* Opcode 0xe5 */
 
 static void PREFIX86(_outal)(i8086_state *cpustate)    /* Opcode 0xe6 */
 {
-	unsigned port = FETCH;
+	unsigned port;
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
+	port = FETCH;
 
 	ICOUNT -= timing.out_imm8;
 	write_port_byte(port, cpustate->regs.b[AL]);
@@ -2543,7 +2567,11 @@ static void PREFIX86(_outal)(i8086_state *cpustate)    /* Opcode 0xe6 */
 
 static void PREFIX86(_outax)(i8086_state *cpustate)    /* Opcode 0xe7 */
 {
-	unsigned port = FETCH;
+	unsigned port;
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
+	port = FETCH;
 
 	ICOUNT -= timing.out_imm16;
 	write_port_word(port, cpustate->regs.w[AX]);
@@ -2605,6 +2633,9 @@ static void PREFIX86(_jmp_d8)(i8086_state *cpustate)    /* Opcode 0xeb */
 
 static void PREFIX86(_inaldx)(i8086_state *cpustate)    /* Opcode 0xec */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.in_dx8;
 	cpustate->regs.b[AL] = read_port_byte(cpustate->regs.w[DX]);
 }
@@ -2612,13 +2643,18 @@ static void PREFIX86(_inaldx)(i8086_state *cpustate)    /* Opcode 0xec */
 static void PREFIX86(_inaxdx)(i8086_state *cpustate)    /* Opcode 0xed */
 {
 	unsigned port = cpustate->regs.w[DX];
-
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.in_dx16;
 	cpustate->regs.w[AX] = read_port_word(port);
 }
 
 static void PREFIX86(_outdxal)(i8086_state *cpustate)    /* Opcode 0xee */
 {
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.out_dx8;
 	write_port_byte(cpustate->regs.w[DX], cpustate->regs.b[AL]);
 }
@@ -2626,7 +2662,9 @@ static void PREFIX86(_outdxal)(i8086_state *cpustate)    /* Opcode 0xee */
 static void PREFIX86(_outdxax)(i8086_state *cpustate)    /* Opcode 0xef */
 {
 	unsigned port = cpustate->regs.w[DX];
-
+#ifdef I80286
+	if (PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
+#endif
 	ICOUNT -= timing.out_dx16;
 	write_port_word(port, cpustate->regs.w[AX]);
 }
@@ -2634,6 +2672,9 @@ static void PREFIX86(_outdxax)(i8086_state *cpustate)    /* Opcode 0xef */
 /* I think thats not a V20 instruction...*/
 static void PREFIX86(_lock)(i8086_state *cpustate)    /* Opcode 0xf0 */
 {
+#ifdef I80286
+	if(PM && (CPL>IOPL)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
+#endif
 	ICOUNT -= timing.nop;
 	PREFIX(_instruction)[FETCHOP](cpustate);  /* un-interruptible */
 }

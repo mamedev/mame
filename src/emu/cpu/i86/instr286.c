@@ -248,7 +248,6 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 					if (!IDX(gatesel)||(gatesel>cpustate->gdtr.limit)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
 					addr = cpustate->gdtr.base+IDX(gatesel);
 				}
-				addr = cpustate->gdtr.base+IDX(gatesel);
 				gatedesc[0] = ReadWord(addr);
 				gatedesc[1] = ReadWord(addr+2);
 				gatedesc[2] = ReadWord(addr+4);
@@ -260,8 +259,10 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 
 				if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
 					UINT16 ssdesc[3];
-					UINT16 tss_ss,tss_sp, oldss, oldsp;
-					int oldsp_phy, ssr, i;
+					UINT16 tss_ss, tss_sp, oldss, oldsp;
+					UINT32 oldstk;
+					UINT8 ssr;
+					int i;
 					if(gate == 1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel)); // can't jmp to inner
 					tss_ss = ReadWord(cpustate->tr.base+TSS_SS0+(DPL(r)*4));
 					tss_sp = ReadWord(cpustate->tr.base+TSS_SP0+(DPL(r)*4));
@@ -278,19 +279,20 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 					ssdesc[1] = ReadWord(addr+2);
 					ssdesc[2] = ReadWord(addr+4);
 					ssr = RIGHTS(ssdesc);
-					if ((RPL(tss_ss) != DPL(r)) || DPL(ssr) != DPL(r)) TRAP(INVALID_TSS,IDXTBL(tss_ss));
+					if ((RPL(tss_ss) != DPL(r)) || (DPL(ssr) != DPL(r))) TRAP(INVALID_TSS,IDXTBL(tss_ss));
 					if (!RW(ssr) || !PRES(ssr)) throw TRAP(INVALID_TSS,IDXTBL(tss_ss));
 					oldss = cpustate->sregs[SS];
 					oldsp = cpustate->regs.w[SP];
-					oldsp_phy = cpustate->base[SS]+oldsp+(GATECNT(desc)*2);
+					oldstk = cpustate->base[SS]+oldsp;
 					cpustate->sregs[SS]=tss_ss;
 					cpustate->limit[SS]=LIMIT(ssdesc);
 					cpustate->base[SS]=BASE(ssdesc);
 					cpustate->rights[SS]=RIGHTS(ssdesc);
+					cpustate->regs.w[SP] = tss_sp;
 					PUSH(oldss);
 					PUSH(oldsp);
-					for (i = 0; i < GATECNT(desc); i++)
-						PUSH(ReadWord(oldsp_phy-(i*2)));
+					for (i = GATECNT(desc)-1; i >= 0; i--)
+						PUSH(ReadWord(oldstk+(i*2)));
 				}
 				cpustate->sregs[CS]=IDXTBL(gatesel) | DPL(r);
 				cpustate->limit[CS]=LIMIT(gatedesc);
@@ -384,6 +386,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 			cpustate->limit[SS]=LIMIT(ssdesc);
 			cpustate->base[SS]=BASE(ssdesc);
 			cpustate->rights[SS]=RIGHTS(ssdesc);
+			cpustate->regs.w[SP] = tss_sp;
 			PUSH(oldss);
 			PUSH(oldsp);
 		} 
@@ -479,7 +482,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 					cpustate->ZeroVal=0;
 				else if (CODE(r) && CONF(r))
 					cpustate->ZeroVal=1;
-				else if ((DPL(r)<CPL) || (DPL(r)<RPL(tmp)))
+				else if (DPL(r)<PMAX(CPL,RPL(tmp)))
 					cpustate->ZeroVal=0;
 				else    cpustate->ZeroVal=1;
 			}
@@ -498,7 +501,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 				r = RIGHTS(desc);
 				if (!SEGDESC(r) || CODE(r))
 					cpustate->ZeroVal=0;
-				else if ((DPL(r)<CPL) || (DPL(r)<RPL(tmp)))
+				else if (DPL(r)<PMAX(CPL,RPL(tmp)))
 					cpustate->ZeroVal=0;
 				else    cpustate->ZeroVal=1;
 			}
@@ -539,7 +542,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		case 0x30: /* lmsw */
 			if (PM&&(CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 			msw = GetRMWord(ModRM);
-			if (!PM&(msw&1)) cpustate->sregs[CS] = IDX(cpustate->sregs[CS]); // cheat and set cpl to 0
+			if (!PM&&(msw&1)) cpustate->sregs[CS] = IDX(cpustate->sregs[CS]); // cheat and set cpl to 0
 			cpustate->msw=(cpustate->msw&1)|msw;
 			break;
 		default:
@@ -619,7 +622,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 
 	case 6: /* clts */
 		if (PM&&(CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
-		cpustate->msw=~8;
+		cpustate->msw&=~8;
 		break;
 	default:
 		throw TRAP(ILLEGAL_INSTRUCTION,-1);

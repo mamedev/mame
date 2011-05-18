@@ -170,6 +170,7 @@ static CPU_RESET( i80286 )
 	cpustate->ldtr.rights=cpustate->tr.rights=0;
 	cpustate->ldtr.sel=cpustate->tr.sel=0;
 	cpustate->rep_in_progress = FALSE;
+	cpustate->seg_prefix = FALSE;
 
 	CHANGE_PC(cpustate->pc);
 
@@ -239,10 +240,12 @@ static CPU_EXECUTE( i80286 )
 		debugger_instruction_hook(device, cpustate->pc);
 
 		cpustate->seg_prefix=FALSE;
-		cpustate->prevpc = cpustate->pc;
-
 		try
 		{
+			if (PM && ((cpustate->pc-cpustate->base[CS]) > cpustate->limit[CS]))
+				throw TRAP(GENERAL_PROTECTION_FAULT, cpustate->sregs[CS] & ~3);
+			cpustate->prevpc = cpustate->pc;
+
 			TABLE286 // call instruction
 		}
 		catch (UINT32 e)
