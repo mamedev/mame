@@ -28,6 +28,9 @@ static void PREFIX86(_or_r16w)(i8086_state *cpustate);
 static void PREFIX86(_or_ald8)(i8086_state *cpustate);
 static void PREFIX86(_or_axd16)(i8086_state *cpustate);
 static void PREFIX86(_push_cs)(i8086_state *cpustate);
+#ifndef I80286
+static void PREFIX86(_pop_cs)(i8086_state *cpustate);
+#endif
 static void PREFIX86(_adc_br8)(i8086_state *cpustate);
 static void PREFIX86(_adc_wr16)(i8086_state *cpustate);
 static void PREFIX86(_adc_r8b)(i8086_state *cpustate);

@@ -772,7 +772,17 @@ static void PREFIX86(_push_cs)(i8086_state *cpustate)    /* Opcode 0x0e */
 	PUSH(cpustate->sregs[CS]);
 }
 
-/* Opcode 0x0f invalid */
+#ifndef I80286
+static void PREFIX86(_pop_cs)(i8086_state *cpustate)    /* Opcode 0x0f */
+{
+	int ip = cpustate->pc - cpustate->base[CS];
+	ICOUNT -= timing.push_seg;
+	POP(cpustate->sregs[CS]);
+	cpustate->base[CS] = SegBase(CS);
+	cpustate->pc = (ip + cpustate->base[CS]) & AMASK;
+	CHANGE_PC(cpustate->pc);
+}
+#endif
 
 static void PREFIX86(_adc_br8)(i8086_state *cpustate)    /* Opcode 0x10 */
 {
@@ -2714,7 +2724,14 @@ static void PREFIX(_mov_sregw)(i8086_state *cpustate)    /* Opcode 0x8e */
 		PREFIX(_instruction)[FETCHOP](cpustate);
 		break;
     case 0x08:  /* mov cs,ew */
-		break;  /* doesn't do a jump far */
+#ifndef I80186
+		int ip = cpustate->pc - cpustate->base[CS];
+		cpustate->sregs[CS] = src;
+		cpustate->base[CS] = SegBase(CS);
+		cpustate->pc = (ip + cpustate->base[CS]) & AMASK;
+		CHANGE_PC(cpustate->pc);
+#endif
+		break;
     }
 #endif
 }

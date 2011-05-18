@@ -15,7 +15,7 @@ static void (*const PREFIX86(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_or_ald8),          /* 0x0c */
 	 PREFIX86(_or_axd16),         /* 0x0d */
 	 PREFIX86(_push_cs),          /* 0x0e */
-	 PREFIX86(_invalid),
+	 PREFIX86(_pop_cs),           /* 0x0f */
 	 PREFIX86(_adc_br8),          /* 0x10 */
 	 PREFIX86(_adc_wr16),         /* 0x11 */
 	 PREFIX86(_adc_r8b),          /* 0x12 */
