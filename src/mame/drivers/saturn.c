@@ -162,21 +162,15 @@ ToDo / Notes:
 #include "imagedev/cartslot.h"
 #include "coreutil.h"
 
-#define USE_SLAVE 1
 
-#ifdef MAME_DEBUG
-#define LOG_CDB  0
-#define LOG_SMPC 1
-#define LOG_SCU  1
-#define LOG_IRQ  0
-#define LOG_IOGA 1
-#else
+
 #define LOG_CDB  0
 #define LOG_SMPC 0
 #define LOG_SCU  0
 #define LOG_IRQ  0
 #define LOG_IOGA 0
-#endif
+
+
 
 #define MASTER_CLOCK_352 57272800
 #define MASTER_CLOCK_320 53748200
@@ -185,45 +179,28 @@ ToDo / Notes:
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
 
-static UINT8 *smpc_ram;
 //static void stv_dump_ram(void);
 
-UINT32* stv_workram_l;
-UINT32* stv_workram_h;
 cpu_device *stv_maincpu;
 cpu_device *stv_slave;
 cpu_device *stv_audiocpu;
-static UINT32* stv_backupram;
 static UINT32* ioga;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
 static int saturn_region;
 
-int stv_enable_slave_sh2;
 /*VDP2 stuff*/
 /*SMPC stuff*/
-static UINT8 NMI_reset;
-static void system_reset(void);
-static UINT8 en_68k;
 /*SCU stuff*/
+/* TODO: not stated because IRQ system needs to be rewritten anyway ... */
 static int	  timer_0;			/* Counter for Timer 0 irq*/
 static int    timer_1;          /* Counter for Timer 1 irq*/
 /*Maybe add these in a struct...*/
-static UINT32 scu_src_0,		/* Source DMA lv 0 address*/
-			  scu_src_1,		/* lv 1*/
-			  scu_src_2,		/* lv 2*/
-			  scu_dst_0,		/* Destination DMA lv 0 address*/
-			  scu_dst_1,		/* lv 1*/
-			  scu_dst_2,		/* lv 2*/
-			  scu_src_add_0,	/* Source Addition for DMA lv 0*/
-			  scu_src_add_1,	/* lv 1*/
-			  scu_src_add_2,	/* lv 2*/
-			  scu_dst_add_0,	/* Destination Addition for DMA lv 0*/
-			  scu_dst_add_1,	/* lv 1*/
-			  scu_dst_add_2;	/* lv 2*/
-static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
-			  scu_size_1,		/* lv 1*/
-			  scu_size_2;		/* lv 2*/
+static UINT32 scu_src[3],		/* Source DMA lv 0 address*/
+			  scu_dst[3],		/* Destination DMA lv 0 address*/
+			  scu_src_add[3],	/* Source Addition for DMA lv 0*/
+			  scu_dst_add[3];	/* Destination Addition for DMA lv 0*/
+static INT32  scu_size[3];		/* Transfer DMA size lv 0*/
 
 static struct
 {
@@ -242,12 +219,8 @@ static struct
 	UINT8 abus;
 }stv_irq;
 
-static void dma_direct_lv0(address_space *space);	/*DMA level 0 direct transfer function*/
-static void dma_direct_lv1(address_space *space);   /*DMA level 1 direct transfer function*/
-static void dma_direct_lv2(address_space *space);   /*DMA level 2 direct transfer function*/
-static void dma_indirect_lv0(address_space *space); /*DMA level 0 indirect transfer function*/
-static void dma_indirect_lv1(address_space *space); /*DMA level 1 indirect transfer function*/
-static void dma_indirect_lv2(address_space *space); /*DMA level 2 indirect transfer function*/
+static void scu_dma_direct(address_space *space, UINT8 dma_ch);	/*DMA level 0 direct transfer function*/
+static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
 
 
 int minit_boost,sinit_boost;
@@ -454,14 +427,16 @@ static UINT8 SMEM[4];
 
 
 
-static void system_reset()
+static void system_reset(address_space *space)
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
 	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
 	memset(stv_scu      ,0x00,0x000100);
 	memset(scsp_regs    ,0x00,0x001000);
 	memset(sound_ram    ,0x00,0x080000);
-	memset(stv_workram_h,0x00,0x100000);
-	memset(stv_workram_l,0x00,0x100000);
+	memset(state->workram_h,0x00,0x100000);
+	memset(state->workram_l,0x00,0x100000);
 	memset(stv_vdp2_regs,0x00,0x040000);
 	memset(stv_vdp2_vram,0x00,0x100000);
 	memset(stv_vdp2_cram,0x00,0x080000);
@@ -472,10 +447,10 @@ static void system_reset()
 
 static READ8_HANDLER( stv_SMPC_r8 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	int return_data;
 
-
-	return_data = smpc_ram[offset];
+	return_data = state->smpc_ram[offset];
 
 	if (offset == 0x61) // ?? many games need this or the controls don't work
 		return_data = 0x20 ^ 0xff;
@@ -499,12 +474,12 @@ static READ8_HANDLER( stv_SMPC_r8 )
 
 static WRITE8_HANDLER( stv_SMPC_w8 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	system_time systime;
-
 	space->machine().base_datetime(systime);
 
 //  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
-	smpc_ram[offset] = data;
+	state->smpc_ram[offset] = data;
 
 	if(offset == 0x75)
 	{
@@ -520,7 +495,7 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 //          if(LOG_SMPC) logerror("bit 1 active\n");
 //      if (data & 0x10)
 			//if(LOG_SMPC) logerror("bit 4 active\n");//LOT
-		//if(LOG_SMPC) logerror("SMPC: ram [0x75] = %02x\n",smpc_ram[0x75]);
+		//if(LOG_SMPC) logerror("SMPC: ram [0x75] = %02x\n",state->smpc_ram[0x75]);
 		PDR1 = (data & 0x60);
 	}
 
@@ -530,31 +505,31 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
             ACTIVE LOW
             bit 4(0x10) - Enable Sound System
         */
-		//popmessage("PDR2 = %02x",smpc_ram[0x77]);
-		if(!(smpc_ram[0x77] & 0x10))
+		//popmessage("PDR2 = %02x",state->smpc_ram[0x77]);
+		if(!(state->smpc_ram[0x77] & 0x10))
 		{
 			if(LOG_SMPC) logerror("SMPC: M68k on\n");
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-			en_68k = 1;
+			state->en_68k = 1;
 		}
 		else
 		{
 			if(LOG_SMPC) logerror("SMPC: M68k off\n");
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-			en_68k = 0;
+			state->en_68k = 0;
 		}
-		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",smpc_ram[0x77]);
+		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",state->smpc_ram[0x77]);
 		PDR2 = (data & 0x60);
 	}
 
 	if(offset == 0x7d)
 	{
-		if(smpc_ram[0x7d] & 1)
+		if(state->smpc_ram[0x7d] & 1)
 			SH2_DIRECT_MODE_PORT_1;
 		else
 			SMPC_CONTROL_MODE_PORT_1;
 
-		if(smpc_ram[0x7d] & 2)
+		if(state->smpc_ram[0x7d] & 2)
 			SH2_DIRECT_MODE_PORT_2;
 		else
 			SMPC_CONTROL_MODE_PORT_2;
@@ -564,8 +539,8 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		EXLE1 = smpc_ram[0x7f] & 1 ? 1 : 0;
-		EXLE2 = smpc_ram[0x7f] & 2 ? 1 : 0;
+		EXLE1 = state->smpc_ram[0x7f] & 1 ? 1 : 0;
+		EXLE2 = state->smpc_ram[0x7f] & 2 ? 1 : 0;
 		if(EXLE1 || EXLE2)
 		{
 			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
@@ -579,46 +554,42 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		{
 			case 0x00:
 				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
-				smpc_ram[0x5f]=0x00;
+				state->smpc_ram[0x5f]=0x00;
 				break;
 			//in theory 0x01 is for Master OFF,but obviously is not used.
 			case 0x02:
 				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
-				smpc_ram[0x5f]=0x02;
-				#if USE_SLAVE
-				stv_enable_slave_sh2 = 1;
+				state->smpc_ram[0x5f]=0x02;
 				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, CLEAR_LINE);
-				#endif
 				break;
 			case 0x03:
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
-				smpc_ram[0x5f]=0x03;
-				stv_enable_slave_sh2 = 0;
+				state->smpc_ram[0x5f]=0x03;
 				space->machine().scheduler().trigger(1000);
 				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
-				smpc_ram[0x5f]=0x06;
+				state->smpc_ram[0x5f]=0x06;
 				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				smpc_ram[0x5f]=0x07;
+				state->smpc_ram[0x5f]=0x07;
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
-				smpc_ram[0x5f]=0x0d;
+				state->smpc_ram[0x5f]=0x0d;
 				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-				system_reset();
+				system_reset(space);
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				smpc_ram[0x5f]=0x0e;
+				state->smpc_ram[0x5f]=0x0e;
 				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
@@ -626,7 +597,7 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				smpc_ram[0x5f]=0x0f;
+				state->smpc_ram[0x5f]=0x0f;
 				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
@@ -635,42 +606,42 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
 				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
-				smpc_ram[0x5f]=0x10;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-				//smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-				//smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-				//smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-				//smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-				//smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-				//smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-				//smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+				state->smpc_ram[0x5f]=0x10;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
+				//state->smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+				//state->smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+				//state->smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+				//state->smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+				//state->smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+				//state->smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+				//state->smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
-				smpc_ram[0x31]=0x00;  //?
+				state->smpc_ram[0x31]=0x00;  //?
 
-				//smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
+				//state->smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
 
-				smpc_ram[0x35]=0x00;
-				smpc_ram[0x37]=0x00;
+				state->smpc_ram[0x35]=0x00;
+				state->smpc_ram[0x37]=0x00;
 
-				smpc_ram[0x39]=0xff;
-				smpc_ram[0x3b]=0xff;
-				smpc_ram[0x3d]=0xff;
-				smpc_ram[0x3f]=0xff;
-				smpc_ram[0x41]=0xff;
-				smpc_ram[0x43]=0xff;
-				smpc_ram[0x45]=0xff;
-				smpc_ram[0x47]=0xff;
-				smpc_ram[0x49]=0xff;
-				smpc_ram[0x4b]=0xff;
-				smpc_ram[0x4d]=0xff;
-				smpc_ram[0x4f]=0xff;
-				smpc_ram[0x51]=0xff;
-				smpc_ram[0x53]=0xff;
-				smpc_ram[0x55]=0xff;
-				smpc_ram[0x57]=0xff;
-				smpc_ram[0x59]=0xff;
-				smpc_ram[0x5b]=0xff;
-				smpc_ram[0x5d]=0xff;
+				state->smpc_ram[0x39]=0xff;
+				state->smpc_ram[0x3b]=0xff;
+				state->smpc_ram[0x3d]=0xff;
+				state->smpc_ram[0x3f]=0xff;
+				state->smpc_ram[0x41]=0xff;
+				state->smpc_ram[0x43]=0xff;
+				state->smpc_ram[0x45]=0xff;
+				state->smpc_ram[0x47]=0xff;
+				state->smpc_ram[0x49]=0xff;
+				state->smpc_ram[0x4b]=0xff;
+				state->smpc_ram[0x4d]=0xff;
+				state->smpc_ram[0x4f]=0xff;
+				state->smpc_ram[0x51]=0xff;
+				state->smpc_ram[0x53]=0xff;
+				state->smpc_ram[0x55]=0xff;
+				state->smpc_ram[0x57]=0xff;
+				state->smpc_ram[0x59]=0xff;
+				state->smpc_ram[0x5b]=0xff;
+				state->smpc_ram[0x5d]=0xff;
 
 			//  /*This is for RTC,cartridge code and similar stuff...*/
 				/*System Manager(SMPC) irq*/
@@ -682,44 +653,44 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 			/* RTC write*/
 			case 0x16:
 				if(LOG_SMPC) logerror("SMPC: RTC write\n");
-				smpc_ram[0x2f] = smpc_ram[0x0d];
-				smpc_ram[0x2d] = smpc_ram[0x0b];
-				smpc_ram[0x2b] = smpc_ram[0x09];
-				smpc_ram[0x29] = smpc_ram[0x07];
-				smpc_ram[0x27] = smpc_ram[0x05];
-				smpc_ram[0x25] = smpc_ram[0x03];
-				smpc_ram[0x23] = smpc_ram[0x01];
-				smpc_ram[0x5f]=0x16;
+				state->smpc_ram[0x2f] = state->smpc_ram[0x0d];
+				state->smpc_ram[0x2d] = state->smpc_ram[0x0b];
+				state->smpc_ram[0x2b] = state->smpc_ram[0x09];
+				state->smpc_ram[0x29] = state->smpc_ram[0x07];
+				state->smpc_ram[0x27] = state->smpc_ram[0x05];
+				state->smpc_ram[0x25] = state->smpc_ram[0x03];
+				state->smpc_ram[0x23] = state->smpc_ram[0x01];
+				state->smpc_ram[0x5f]=0x16;
 			break;
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-				smpc_ram[0x5f]=0x17;
+				state->smpc_ram[0x5f]=0x17;
 			break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				smpc_ram[0x5f]=0x18;
+				state->smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
 				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				smpc_ram[0x5f]=0x19;
-				NMI_reset = 0;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				state->smpc_ram[0x5f]=0x19;
+				state->NMI_reset = 0;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 				break;
 			case 0x1a:
 				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				smpc_ram[0x5f]=0x1a;
-				NMI_reset = 1;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				state->smpc_ram[0x5f]=0x1a;
+				state->NMI_reset = 1;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 				break;
 			default:
 				if(LOG_SMPC) logerror ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
 		}
 
 		// we've processed the command, clear status flag
-		smpc_ram[0x63] = 0x00;
+		state->smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
 }
@@ -727,6 +698,7 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 
 static void smpc_intbackhelper(running_machine &machine)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	int pad;
 	static const char *const padnames[] = { "JOY1", "JOY2" };
 
@@ -739,10 +711,10 @@ static void smpc_intbackhelper(running_machine &machine)
 	pad = input_port_read(machine, padnames[intback_stage-2]);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	smpc_ram[33] = 0xf1;	// no tap, direct connect
-	smpc_ram[35] = 0x02;	// saturn pad
-	smpc_ram[37] = pad>>8;
-	smpc_ram[39] = pad & 0xff;
+	state->smpc_ram[33] = 0xf1;	// no tap, direct connect
+	state->smpc_ram[35] = 0x02;	// saturn pad
+	state->smpc_ram[37] = pad>>8;
+	state->smpc_ram[39] = pad & 0xff;
 
 	if (intback_stage == 3)
 	{
@@ -758,9 +730,10 @@ static void smpc_intbackhelper(running_machine &machine)
 
 static READ8_HANDLER( saturn_SMPC_r8 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	int return_data;
 
-	return_data = smpc_ram[offset];
+	return_data = state->smpc_ram[offset];
 
 	if ((offset == 0x61))
 		return_data = smpcSR;
@@ -815,6 +788,7 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 
 static WRITE8_HANDLER( saturn_SMPC_w8 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	system_time systime;
 	UINT8 last;
 	running_machine &machine = space->machine();
@@ -822,11 +796,11 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 	/* get the current date/time from the core */
 	machine.current_datetime(systime);
 
-  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
+  if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, state->smpc_ram[offset]);
 
 //  if (offset == 0x7d) printf("IOSEL2 %d IOSEL1 %d\n", (data>>1)&1, data&1);
 
-	last = smpc_ram[offset];
+	last = state->smpc_ram[offset];
 
 	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
 	{
@@ -845,26 +819,26 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		intback_stage = 0;
 	}
 
-	smpc_ram[offset] = data;
+	state->smpc_ram[offset] = data;
 
 	if (offset == 0x75)	// PDR1
 	{
-		PDR1 = (data & smpc_ram[0x79]);
+		PDR1 = (data & state->smpc_ram[0x79]);
 	}
 
 	if (offset == 0x77)	// PDR2
 	{
-		PDR2 = (data & smpc_ram[0x7b]);
+		PDR2 = (data & state->smpc_ram[0x7b]);
 	}
 
 	if(offset == 0x7d)
 	{
-		if(smpc_ram[0x7d] & 1)
+		if(state->smpc_ram[0x7d] & 1)
 			SH2_DIRECT_MODE_PORT_1;
 		else
 			SMPC_CONTROL_MODE_PORT_1;
 
-		if(smpc_ram[0x7d] & 2)
+		if(state->smpc_ram[0x7d] & 2)
 			SH2_DIRECT_MODE_PORT_2;
 		else
 			SMPC_CONTROL_MODE_PORT_2;
@@ -873,8 +847,8 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		EXLE1 = smpc_ram[0x7f] & 1 ? 1 : 0;
-		EXLE2 = smpc_ram[0x7f] & 2 ? 1 : 0;
+		EXLE1 = state->smpc_ram[0x7f] & 1 ? 1 : 0;
+		EXLE2 = state->smpc_ram[0x7f] & 2 ? 1 : 0;
 		if(EXLE1 || EXLE2)
 			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
 			{
@@ -889,47 +863,45 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		{
 			case 0x00:
 				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
-				smpc_ram[0x5f]=0x00;
+				state->smpc_ram[0x5f]=0x00;
 				break;
 			//in theory 0x01 is for Master OFF,but obviously is not used.
 			case 0x02:
 				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
-				smpc_ram[0x5f]=0x02;
-				stv_enable_slave_sh2 = 1;
+				state->smpc_ram[0x5f]=0x02;
 				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x03:
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
-				smpc_ram[0x5f]=0x03;
-				stv_enable_slave_sh2 = 0;
+				state->smpc_ram[0x5f]=0x03;
 				machine.scheduler().trigger(1000);
 				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
-				smpc_ram[0x5f]=0x06;
+				state->smpc_ram[0x5f]=0x06;
 				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-				en_68k = 1;
+				state->en_68k = 1;
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
 				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-				en_68k = 0;
-				smpc_ram[0x5f]=0x07;
+				state->en_68k = 0;
+				state->smpc_ram[0x5f]=0x07;
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
-				smpc_ram[0x5f]=0x0d;
+				state->smpc_ram[0x5f]=0x0d;
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-				system_reset();
+				system_reset(space);
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				smpc_ram[0x5f]=0x0e;
+				state->smpc_ram[0x5f]=0x0e;
 				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
@@ -937,7 +909,7 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				smpc_ram[0x5f]=0x0f;
+				state->smpc_ram[0x5f]=0x0f;
 				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
@@ -946,45 +918,45 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
 		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
-				smpc_ram[0x5f]=0x10;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-				smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-			    	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-		    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-			    	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-			    	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-			    	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-			    	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+				state->smpc_ram[0x5f]=0x10;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
+				state->smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+			    state->smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+		    	state->smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+			    state->smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+			    state->smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+			    state->smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+			    state->smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
 
-				smpc_ram[0x31]=0x00;  //?
+				state->smpc_ram[0x31]=0x00;  //?
 
 
-				smpc_ram[0x35]=0x00;
-				smpc_ram[0x37]=0x00;
+				state->smpc_ram[0x35]=0x00;
+				state->smpc_ram[0x37]=0x00;
 
-				smpc_ram[0x39] = SMEM[0];
-				smpc_ram[0x3b] = SMEM[1];
-				smpc_ram[0x3d] = SMEM[2];
-				smpc_ram[0x3f] = SMEM[3];
+				state->smpc_ram[0x39] = SMEM[0];
+				state->smpc_ram[0x3b] = SMEM[1];
+				state->smpc_ram[0x3d] = SMEM[2];
+				state->smpc_ram[0x3f] = SMEM[3];
 
-				smpc_ram[0x41]=0xff;
-				smpc_ram[0x43]=0xff;
-				smpc_ram[0x45]=0xff;
-				smpc_ram[0x47]=0xff;
-				smpc_ram[0x49]=0xff;
-				smpc_ram[0x4b]=0xff;
-				smpc_ram[0x4d]=0xff;
-				smpc_ram[0x4f]=0xff;
-				smpc_ram[0x51]=0xff;
-				smpc_ram[0x53]=0xff;
-				smpc_ram[0x55]=0xff;
-				smpc_ram[0x57]=0xff;
-				smpc_ram[0x59]=0xff;
-				smpc_ram[0x5b]=0xff;
-				smpc_ram[0x5d]=0xff;
+				state->smpc_ram[0x41]=0xff;
+				state->smpc_ram[0x43]=0xff;
+				state->smpc_ram[0x45]=0xff;
+				state->smpc_ram[0x47]=0xff;
+				state->smpc_ram[0x49]=0xff;
+				state->smpc_ram[0x4b]=0xff;
+				state->smpc_ram[0x4d]=0xff;
+				state->smpc_ram[0x4f]=0xff;
+				state->smpc_ram[0x51]=0xff;
+				state->smpc_ram[0x53]=0xff;
+				state->smpc_ram[0x55]=0xff;
+				state->smpc_ram[0x57]=0xff;
+				state->smpc_ram[0x59]=0xff;
+				state->smpc_ram[0x5b]=0xff;
+				state->smpc_ram[0x5d]=0xff;
 
 				smpcSR = 0x60;		// peripheral data ready, no reset, etc.
-				pmode = smpc_ram[1]>>4;
+				pmode = state->smpc_ram[1]>>4;
 
 				intback_stage = 1;
 
@@ -999,42 +971,42 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			/* RTC write*/
 			case 0x16:
 				if(LOG_SMPC) logerror("SMPC: RTC write\n");
-				smpc_ram[0x2f] = smpc_ram[0x0d];
-				smpc_ram[0x2d] = smpc_ram[0x0b];
-				smpc_ram[0x2b] = smpc_ram[0x09];
-				smpc_ram[0x29] = smpc_ram[0x07];
-				smpc_ram[0x27] = smpc_ram[0x05];
-				smpc_ram[0x25] = smpc_ram[0x03];
-				smpc_ram[0x23] = smpc_ram[0x01];
-				smpc_ram[0x5f]=0x16;
+				state->smpc_ram[0x2f] = state->smpc_ram[0x0d];
+				state->smpc_ram[0x2d] = state->smpc_ram[0x0b];
+				state->smpc_ram[0x2b] = state->smpc_ram[0x09];
+				state->smpc_ram[0x29] = state->smpc_ram[0x07];
+				state->smpc_ram[0x27] = state->smpc_ram[0x05];
+				state->smpc_ram[0x25] = state->smpc_ram[0x03];
+				state->smpc_ram[0x23] = state->smpc_ram[0x01];
+				state->smpc_ram[0x5f]=0x16;
 			break;
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-		    		SMEM[0] = smpc_ram[1];
-		    		SMEM[1] = smpc_ram[3];
-		    		SMEM[2] = smpc_ram[5];
-		    		SMEM[3] = smpc_ram[7];
+		    		SMEM[0] = state->smpc_ram[1];
+		    		SMEM[1] = state->smpc_ram[3];
+		    		SMEM[2] = state->smpc_ram[5];
+		    		SMEM[3] = state->smpc_ram[7];
 
-				smpc_ram[0x5f]=0x17;
+				state->smpc_ram[0x5f]=0x17;
 			break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				smpc_ram[0x5f]=0x18;
+				state->smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				smpc_ram[0x5f]=0x19;
-				NMI_reset = 0;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				state->smpc_ram[0x5f]=0x19;
+				state->NMI_reset = 0;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 				break;
 			case 0x1a:
 				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				smpc_ram[0x5f]=0x1a;
-				NMI_reset = 1;
-				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+				state->smpc_ram[0x5f]=0x1a;
+				state->NMI_reset = 1;
+				state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 
 				break;
 			default:
@@ -1042,7 +1014,7 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		}
 
 		// we've processed the command, clear status flag
-		smpc_ram[0x63] = 0x00;
+		state->smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
 }
@@ -1354,20 +1326,18 @@ DMA TODO:
 
 #define DMA_STATUS				(stv_scu[31])
 /*These macros sets the various DMA status flags.*/
-#define D0MV_1	if(!(DMA_STATUS & 0x10))    DMA_STATUS^=0x10
-#define D1MV_1	if(!(DMA_STATUS & 0x100))   DMA_STATUS^=0x100
-#define D2MV_1	if(!(DMA_STATUS & 0x1000))  DMA_STATUS^=0x1000
-#define D0MV_0	if(DMA_STATUS & 0x10)	    DMA_STATUS^=0x10
-#define D1MV_0	if(DMA_STATUS & 0x100)	    DMA_STATUS^=0x100
-#define D2MV_0	if(DMA_STATUS & 0x1000)     DMA_STATUS^=0x1000
+#define D0MV_1	DMA_STATUS|=0x10
+#define D1MV_1	DMA_STATUS|=0x100
+#define D2MV_1	DMA_STATUS|=0x1000
+#define D0MV_0	DMA_STATUS&=~0x10
+#define D1MV_0	DMA_STATUS&=~0x100
+#define D2MV_0	DMA_STATUS&=~0x1000
 
-static UINT32 scu_index_0,scu_index_1,scu_index_2;
-static UINT8 scsp_to_main_irq;
-
+static UINT32 scu_index[3];
 static UINT32 scu_add_tmp;
 
 /*For area checking*/
-#define ABUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x02000000) && ((scu_##_lv_ & 0x07ffffff) <= 0x04ffffff)
+#define ABUS(_lv_)       ((scu_src[_lv_] & 0x07ffffff) >= 0x02000000) && ((scu_src[_lv_] & 0x07ffffff) <= 0x04ffffff)
 #define BBUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05ffffff)
 #define VDP1_REGS(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05d00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05dfffff)
 #define VDP2(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05e00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05fdffff)
@@ -1427,6 +1397,8 @@ static READ32_HANDLER( stv_scu_r32 )
 	}
 }
 
+#define DMA_CH ((offset & 0x18) / 8)
+
 static WRITE32_HANDLER( stv_scu_w32 )
 {
 	COMBINE_DATA(&stv_scu[offset]);
@@ -1434,30 +1406,17 @@ static WRITE32_HANDLER( stv_scu_w32 )
 	switch(offset)
 	{
 		/*LV 0 DMA*/
-		case 0:	scu_src_0  = ((stv_scu[0] & 0x07ffffff) >> 0); break;
-		case 1:	scu_dst_0  = ((stv_scu[1] & 0x07ffffff) >> 0); break;
-		case 2: scu_size_0 = ((stv_scu[2] & 0x000fffff) >> 0); break;
-		case 3:
+		case 0:	case 8: case 16:  scu_src[DMA_CH]  = ((stv_scu[offset] & 0x07ffffff) >> 0); break;
+		case 1:	case 9: case 17:  scu_dst[DMA_CH]  = ((stv_scu[offset] & 0x07ffffff) >> 0); break;
+		case 2: case 10: case 18: scu_size[DMA_CH] = ((stv_scu[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
+		case 3: case 11: case 19:
 			/*Read address add value for DMA lv 0*/
-			if(stv_scu[3] & 0x100)
-				scu_src_add_0 = 4;
-			else
-				scu_src_add_0 = 1;
+			scu_src_add[DMA_CH] = (stv_scu[offset] & 0x100) ? 4 : 1;
 
 			/*Write address add value for DMA lv 0*/
-			switch(stv_scu[3] & 7)
-			{
-				case 0: scu_dst_add_0 = 2;   break;
-				case 1: scu_dst_add_0 = 4;   break;
-				case 2: scu_dst_add_0 = 8;   break;
-				case 3: scu_dst_add_0 = 16;  break;
-				case 4: scu_dst_add_0 = 32;  break;
-				case 5: scu_dst_add_0 = 64;  break;
-				case 6: scu_dst_add_0 = 128; break;
-				case 7: scu_dst_add_0 = 256; break;
-			}
+			scu_dst_add[DMA_CH] = 2 << (stv_scu[offset] & 7);
 			break;
-		case 4:
+		case 4: case 12: case 20:
 /*
 -stv_scu[4] bit 0 is DMA starting bit.
     Used when the start factor is 7.Toggle after execution.
@@ -1467,142 +1426,26 @@ static WRITE32_HANDLER( stv_scu_w32 )
     It must be 7 for this specific condition.
 -stv_scu[5] bit 24 is Indirect Mode/Direct Mode (0/1).
 */
-		if(stv_scu[4] & 1 && ((stv_scu[5] & 7) == 7) && stv_scu[4] & 0x100)
+		if(stv_scu[offset] & 1 && ((stv_scu[offset+1] & 7) == 7) && stv_scu[offset] & 0x100)
 		{
-			if(DIRECT_MODE(0)) { dma_direct_lv0(space); }
-			else			   { dma_indirect_lv0(space); }
+			if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
+			else			   	   { scu_dma_indirect(space,DMA_CH); }
 
-			stv_scu[4]^=1;//disable starting bit.
-
-			/*Sound IRQ*/
-			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
-			{
-				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
-				#if 0
-				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
-				{
-					if(!(stv_scu[40] & 0x1000))
-					{
-						cputag_set_input_line_and_vector(space->machine(), "maincpu", 3, HOLD_LINE, 0x4c);
-						logerror("SCU: Illegal DMA interrupt\n");
-					}
-				}
-				#endif
-			}
+			stv_scu[offset]&=~1;//disable starting bit.
 		}
 		break;
-		case 5:
-		if(INDIRECT_MODE(0))
+		case 5: case 13: case 21:
+		if(INDIRECT_MODE(DMA_CH))
 		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 0 set\n");
-			if(!DWUP(0)) scu_index_0 = scu_dst_0;
+			if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
+			if(!DWUP(DMA_CH)) scu_index[DMA_CH] = scu_dst[DMA_CH];
 		}
 
 		/*Start factor enable bits,bit 2,bit 1 and bit 0*/
-		if((stv_scu[5] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 0 = %d\n",stv_scu[5] & 7);
+		if((stv_scu[offset] & 7) != 7)
+			if(LOG_SCU) logerror("Start factor chosen for lv %d = %d\n",stv_scu[offset+1] & 7,DMA_CH);
 		break;
-		/*LV 1 DMA*/
-		case 8:	 scu_src_1  = ((stv_scu[8] &  0x07ffffff) >> 0);  break;
-		case 9:	 scu_dst_1  = ((stv_scu[9] &  0x07ffffff) >> 0);  break;
-		case 10: scu_size_1 = ((stv_scu[10] & 0x00001fff) >> 0);  break;
-		case 11:
-		/*Read address add value for DMA lv 1*/
-		if(stv_scu[11] & 0x100)
-			scu_src_add_1 = 4;
-		else
-			scu_src_add_1 = 1;
 
-		/*Write address add value for DMA lv 1*/
-		switch(stv_scu[11] & 7)
-		{
-			case 0: scu_dst_add_1 = 2;   break;
-			case 1: scu_dst_add_1 = 4;   break;
-			case 2: scu_dst_add_1 = 8;   break;
-			case 3: scu_dst_add_1 = 16;  break;
-			case 4: scu_dst_add_1 = 32;  break;
-			case 5: scu_dst_add_1 = 64;  break;
-			case 6: scu_dst_add_1 = 128; break;
-			case 7: scu_dst_add_1 = 256; break;
-		}
-		break;
-		case 12:
-		if(stv_scu[12] & 1 && ((stv_scu[13] & 7) == 7) && stv_scu[12] & 0x100)
-		{
-			if(DIRECT_MODE(1)) { dma_direct_lv1(space); }
-			else			   { dma_indirect_lv1(space); }
-
-			stv_scu[12]^=1;
-
-			/*Sound IRQ*/
-			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
-			{
-				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
-			}
-		}
-		break;
-		case 13:
-		if(INDIRECT_MODE(1))
-		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 1 set\n");
-			if(!DWUP(1)) scu_index_1 = scu_dst_1;
-		}
-
-		if((stv_scu[13] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 1 = %d\n",stv_scu[13] & 7);
-		break;
-		/*LV 2 DMA*/
-		case 16: scu_src_2  = ((stv_scu[16] & 0x07ffffff) >> 0);  break;
-		case 17: scu_dst_2  = ((stv_scu[17] & 0x07ffffff) >> 0);  break;
-		case 18: scu_size_2 = ((stv_scu[18] & 0x00001fff) >> 0);  break;
-		case 19:
-		/*Read address add value for DMA lv 2*/
-		if(stv_scu[19] & 0x100)
-			scu_src_add_2 = 4;
-		else
-			scu_src_add_2 = 1;
-
-		/*Write address add value for DMA lv 2*/
-		switch(stv_scu[19] & 7)
-		{
-			case 0: scu_dst_add_2 = 2;   break;
-			case 1: scu_dst_add_2 = 4;   break;
-			case 2: scu_dst_add_2 = 8;   break;
-			case 3: scu_dst_add_2 = 16;  break;
-			case 4: scu_dst_add_2 = 32;  break;
-			case 5: scu_dst_add_2 = 64;  break;
-			case 6: scu_dst_add_2 = 128; break;
-			case 7: scu_dst_add_2 = 256; break;
-		}
-		break;
-		case 20:
-		if(stv_scu[20] & 1 && ((stv_scu[21] & 7) == 7) && stv_scu[20] & 0x100)
-		{
-			if(DIRECT_MODE(2)) { dma_direct_lv2(space); }
-			else			   { dma_indirect_lv2(space); }
-
-			stv_scu[20]^=1;
-
-			/*Sound IRQ*/
-			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
-			{
-				//cputag_set_input_line_and_vector(space->machine(), "maincpu", 9, HOLD_LINE , 0x46);
-				logerror("SCSP: Main CPU interrupt\n");
-			}
-		}
-		break;
-		case 21:
-		if(INDIRECT_MODE(2))
-		{
-			if(LOG_SCU) logerror("Indirect Mode DMA lv 2 set\n");
-			if(!DWUP(2)) scu_index_2 = scu_dst_2;
-		}
-
-		if((stv_scu[21] & 7) != 7)
-			if(LOG_SCU) logerror("Start factor chosen for lv 2 = %d\n",stv_scu[21] & 7);
-		break;
 		case 24:
 		if(LOG_SCU) logerror("DMA Forced Stop Register set = %02x\n",stv_scu[24]);
 		break;
@@ -1726,35 +1569,36 @@ static TIMER_CALLBACK( dma_lv2_ended )
 	D2MV_0;
 }
 
-static void dma_direct_lv0(address_space *space)
+static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
-			             "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
+			             "Start %08x End %08x Size %04x\n",scu_src[0],scu_dst[0],scu_size[0]);
+	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add[0],scu_dst_add[0]);
 
 	D0MV_1;
 
-	if(scu_size_0 == 0) scu_size_0 = 0x00100000;
-
-	scsp_to_main_irq = 0;
+	/* max size */
+	if(scu_size[dma_ch] == 0) { scu_size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
 
 	/*set here the boundaries checks*/
 	/*...*/
 
+	if((scu_dst_add[dma_ch] != scu_src_add[dma_ch]) && (ABUS(dma_ch)))
+	{
+		logerror("A-Bus invalid transfer,sets to default\n");
+		scu_add_tmp = (scu_dst_add[dma_ch]*0x100) | (scu_src_add[dma_ch]);
+		scu_dst_add[dma_ch] = scu_src_add[dma_ch] = 4;
+		scu_add_tmp |= 0x80000000;
+	}
+
+	#if 0
 	if(SOUND_RAM(dst_0))
 	{
 		logerror("Sound RAM DMA write\n");
 		scsp_to_main_irq = 1;
 	}
 
-	if((scu_dst_add_0 != scu_src_add_0) && (ABUS(src_0)))
-	{
-		logerror("A-Bus invalid transfer,sets to default\n");
-		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
-		scu_dst_add_0 = scu_src_add_0 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
 	/*Let me know if you encounter any of these three*/
 	if(ABUS(dst_0))
 	{
@@ -1774,270 +1618,74 @@ static void dma_direct_lv0(address_space *space)
 	if(VDP1_REGS(dst_0))
 	{
 		logerror("VDP1 register access,must be in word units\n");
-		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
-		scu_dst_add_0 = scu_src_add_0 = 2;
+		scu_add_tmp = (scu_dst_add[0]*0x100) | (scu_src_add[0]);
+		scu_dst_add[0] = scu_src_add[0] = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 	if(DRUP(0))
 	{
 		logerror("Data read update = 1,read address add value must be 1 too\n");
-		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
-		scu_src_add_0 = 4;
+		scu_add_tmp = (scu_dst_add[0]*0x100) | (scu_src_add[0]);
+		scu_src_add[0] = 4;
 		scu_add_tmp |= 0x80000000;
 	}
 
-	if (WORK_RAM_H(dst_0) && (scu_dst_add_0 != 4))
+	if (WORK_RAM_H(dst_0) && (scu_dst_add[0] != 4))
 	{
-		scu_add_tmp = (scu_dst_add_0*0x100) | (scu_src_add_0);
-		scu_dst_add_0 = 4;
+		scu_add_tmp = (scu_dst_add[0]*0x100) | (scu_src_add[0]);
+		scu_dst_add[0] = 4;
 		scu_add_tmp |= 0x80000000;
 	}
+	#endif
 
-	tmp_size = scu_size_0;
-	if(!(DRUP(0))) tmp_src = scu_src_0;
-	if(!(DWUP(0))) tmp_dst = scu_dst_0;
+	tmp_size = scu_size[dma_ch];
+	if(!(DRUP(dma_ch))) tmp_src = scu_src[dma_ch];
+	if(!(DWUP(dma_ch))) tmp_dst = scu_dst[dma_ch];
 
-	for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
+	for (; scu_size[dma_ch] > 0; scu_size[dma_ch]-=scu_dst_add[dma_ch])
 	{
-		if(scu_dst_add_0 == 2)
-			space->write_word(scu_dst_0,space->read_word(scu_src_0));
-		else if(scu_dst_add_0 == 8)
+		if(scu_dst_add[dma_ch] == 2)
+			space->write_word(scu_dst[dma_ch],space->read_word(scu_src[dma_ch]));
+		else if(scu_dst_add[dma_ch] == 8)
 		{
-			space->write_word(scu_dst_0,space->read_word(scu_src_0));
-			space->write_word(scu_dst_0+2,space->read_word(scu_src_0));
-			space->write_word(scu_dst_0+4,space->read_word(scu_src_0+2));
-			space->write_word(scu_dst_0+6,space->read_word(scu_src_0+2));
+			space->write_word(scu_dst[dma_ch],  space->read_word(scu_src[dma_ch]  ));
+			space->write_word(scu_dst[dma_ch]+2,space->read_word(scu_src[dma_ch]  ));
+			space->write_word(scu_dst[dma_ch]+4,space->read_word(scu_src[dma_ch]+2));
+			space->write_word(scu_dst[dma_ch]+6,space->read_word(scu_src[dma_ch]+2));
 		}
 		else
 		{
-			space->write_word(scu_dst_0,space->read_word(scu_src_0));
-			space->write_word(scu_dst_0+2,space->read_word(scu_src_0+2));
+			space->write_word(scu_dst[dma_ch],  space->read_word(scu_src[dma_ch]  ));
+			space->write_word(scu_dst[dma_ch]+2,space->read_word(scu_src[dma_ch]+2));
 		}
 
-		scu_dst_0+=scu_dst_add_0;
-		scu_src_0+=scu_src_add_0;
+		scu_dst[dma_ch]+=scu_dst_add[dma_ch];
+		scu_src[dma_ch]+=scu_src_add[dma_ch];
 	}
 
-	scu_size_0 = tmp_size;
-	if(!(DRUP(0))) scu_src_0 = tmp_src;
-	if(!(DWUP(0))) scu_dst_0 = tmp_dst;
+	scu_size[dma_ch] = tmp_size;
+	if(!(DRUP(dma_ch))) scu_src[dma_ch] = tmp_src;
+	if(!(DWUP(dma_ch))) scu_dst[dma_ch] = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	/*TODO: timing of this*/
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
+	/*TODO: timing of this, clean up */
+	switch(dma_ch)
+	{
+		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+	}
 
 	if(scu_add_tmp & 0x80000000)
 	{
-		scu_dst_add_0 = (scu_add_tmp & 0xff00) >> 8;
-		scu_src_add_0 = (scu_add_tmp & 0x00ff) >> 0;
+		scu_dst_add[dma_ch] = (scu_add_tmp & 0xff00) >> 8;
+		scu_src_add[dma_ch] = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
 }
 
-static void dma_direct_lv1(address_space *space)
-{
-	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
-			 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
-
-	D1MV_1;
-
-	if(scu_size_1 == 0) scu_size_1 = 0x00002000;
-
-	scsp_to_main_irq = 0;
-
-	/*set here the boundaries checks*/
-	/*...*/
-
-	if(SOUND_RAM(dst_1))
-	{
-		logerror("Sound RAM DMA write\n");
-		scsp_to_main_irq = 1;
-	}
-
-	if((scu_dst_add_1 != scu_src_add_1) && (ABUS(src_1)))
-	{
-		logerror("A-Bus invalid transfer,sets to default\n");
-		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
-		scu_dst_add_1 = scu_src_add_1 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-	/*Let me know if you encounter any of these ones*/
-	if(ABUS(dst_1))
-	{
-		logerror("A-Bus invalid write\n");
-		/*...*/
-	}
-	if(WORK_RAM_L(dst_1))
-	{
-		logerror("WorkRam-L invalid write\n");
-		/*...*/
-	}
-	if(VDP1_REGS(dst_1))
-	{
-		logerror("VDP1 register access,must be in word units\n");
-		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
-		scu_dst_add_1 = scu_src_add_1 = 2;
-		scu_add_tmp |= 0x80000000;
-	}
-	if(VDP2(src_1))
-	{
-		logerror("VDP-2 invalid read\n");
-		/*...*/
-	}
-	if(DRUP(1))
-	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
-		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
-		scu_src_add_1 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-
-	if (WORK_RAM_H(dst_1) && (scu_dst_add_1 != 4))
-	{
-		scu_add_tmp = (scu_dst_add_1*0x100) | (scu_src_add_1);
-		scu_src_add_1 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-
-	tmp_size = scu_size_1;
-	if(!(DRUP(1))) tmp_src = scu_src_1;
-	if(!(DWUP(1))) tmp_dst = scu_dst_1;
-
-	for (; scu_size_1 > 0; scu_size_1-=scu_dst_add_1)
-	{
-		if(scu_dst_add_1 == 2)
-			space->write_word(scu_dst_1,space->read_word(scu_src_1));
-		else
-		{
-			space->write_word(scu_dst_1,space->read_word(scu_src_1));
-			space->write_word(scu_dst_1+2,space->read_word(scu_src_1+2));
-		}
-
-		scu_dst_1+=scu_dst_add_1;
-		scu_src_1+=scu_src_add_1;
-	}
-
-	scu_size_1 = tmp_size;
-	if(!(DRUP(1))) scu_src_1 = tmp_src;
-	if(!(DWUP(1))) scu_dst_1 = tmp_dst;
-
-	if(LOG_SCU) logerror("DMA transfer END\n");
-
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
-
-	if(scu_add_tmp & 0x80000000)
-	{
-		scu_dst_add_1 = (scu_add_tmp & 0xff00) >> 8;
-		scu_src_add_1 = (scu_add_tmp & 0x00ff) >> 0;
-		scu_add_tmp^=0x80000000;
-	}
-}
-
-static void dma_direct_lv2(address_space *space)
-{
-	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
-			 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
-
-	D2MV_1;
-
-	scsp_to_main_irq = 0;
-
-	if(scu_size_2 == 0) scu_size_2 = 0x00002000;
-
-	/*set here the boundaries checks*/
-	/*...*/
-
-	if(SOUND_RAM(dst_2))
-	{
-		logerror("Sound RAM DMA write\n");
-		scsp_to_main_irq = 1;
-	}
-
-	if((scu_dst_add_2 != scu_src_add_2) && (ABUS(src_2)))
-	{
-		logerror("A-Bus invalid transfer,sets to default\n");
-		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
-		scu_dst_add_2 = scu_src_add_2 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-	/*Let me know if you encounter any of these ones*/
-	if(ABUS(dst_2))
-	{
-		logerror("A-Bus invalid write\n");
-		/*...*/
-	}
-	if(WORK_RAM_L(dst_2))
-	{
-		logerror("WorkRam-L invalid write\n");
-		/*...*/
-	}
-	if(VDP1_REGS(dst_2))
-	{
-		logerror("VDP1 register access,must be in word units\n");
-		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
-		scu_dst_add_2 = scu_src_add_2 = 2;
-		scu_add_tmp |= 0x80000000;
-	}
-	if(VDP2(src_2))
-	{
-		logerror("VDP-2 invalid read\n");
-		/*...*/
-	}
-	if(DRUP(2))
-	{
-		logerror("Data read update = 1,read address add value must be 1 too\n");
-		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
-		scu_src_add_2 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-
-	if (WORK_RAM_H(dst_2) && (scu_dst_add_2 != 4))
-	{
-		scu_add_tmp = (scu_dst_add_2*0x100) | (scu_src_add_2);
-		scu_src_add_2 = 4;
-		scu_add_tmp |= 0x80000000;
-	}
-
-	tmp_size = scu_size_2;
-	if(!(DRUP(2))) tmp_src = scu_src_2;
-	if(!(DWUP(2))) tmp_dst = scu_dst_2;
-
-	for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
-	{
-		if(scu_dst_add_2 == 2)
-			space->write_word(scu_dst_2,space->read_word(scu_src_2));
-		else
-		{
-			space->write_word(scu_dst_2,space->read_word(scu_src_2));
-			space->write_word(scu_dst_2+2,space->read_word(scu_src_2+2));
-		}
-
-		scu_dst_2+=scu_dst_add_2;
-		scu_src_2+=scu_src_add_2;
-	}
-
-	scu_size_2 = tmp_size;
-	if(!(DRUP(2))) scu_src_2 = tmp_src;
-	if(!(DWUP(2))) scu_dst_2 = tmp_dst;
-
-	if(LOG_SCU) logerror("DMA transfer END\n");
-
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
-
-	if(scu_add_tmp & 0x80000000)
-	{
-		scu_dst_add_2 = (scu_add_tmp & 0xff00) >> 8;
-		scu_src_add_2 = (scu_add_tmp & 0x00ff) >> 0;
-		scu_add_tmp^=0x80000000;
-	}
-}
-
-static void dma_indirect_lv0(address_space *space)
+static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -2046,41 +1694,42 @@ static void dma_indirect_lv0(address_space *space)
 
 	D0MV_1;
 
-	scsp_to_main_irq = 0;
-
-	if(scu_index_0 == 0) { scu_index_0 = scu_dst_0; }
+	if(scu_index[dma_ch] == 0) { scu_index[dma_ch] = scu_dst[0]; }
 
 	do{
-		tmp_src = scu_index_0;
+		tmp_src = scu_index[dma_ch];
 
-		/*Thanks for Runik of Saturnin for pointing this out...*/
-		scu_size_0 = space->read_dword(scu_index_0);
-		scu_src_0 =  space->read_dword(scu_index_0+8);
-		scu_dst_0 =  space->read_dword(scu_index_0+4);
+		scu_size[dma_ch] = space->read_dword(scu_index[dma_ch]);
+		scu_src[dma_ch]  = space->read_dword(scu_index[dma_ch]+8);
+		scu_dst[dma_ch]  = space->read_dword(scu_index[dma_ch]+4);
 
 		/*Indirect Mode end factor*/
-		if(scu_src_0 & 0x80000000)
+		if(scu_src[dma_ch] & 0x80000000)
 			job_done = 1;
 
+		#if 0
 		if(SOUND_RAM(dst_0))
 		{
 			logerror("Sound RAM DMA write\n");
 			scsp_to_main_irq = 1;
 		}
+		#endif
 
-		if(LOG_SCU) logerror("DMA lv 0 indirect mode transfer START\n"
-				 "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
+		if(LOG_SCU) logerror("DMA lv %d indirect mode transfer START\n"
+				             "Start %08x End %08x Size %04x\n",dma_ch,scu_src[dma_ch],scu_dst[dma_ch],scu_size[dma_ch]);
+		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add[dma_ch],scu_dst_add[dma_ch]);
 
 		//guess,but I believe it's right.
-		scu_src_0 &=0x07ffffff;
-		scu_dst_0 &=0x07ffffff;
-		scu_size_0 &=0xfffff;
+		scu_src[dma_ch] &=0x07ffffff;
+		scu_dst[dma_ch] &=0x07ffffff;
+		scu_size[dma_ch] &= ((dma_ch == 0) ? 0xfffff : 0x1fff);
 
-		for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
+		if(scu_size[dma_ch] == 0) { scu_size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
+
+		for (; scu_size[dma_ch] > 0; scu_size[dma_ch]-=scu_dst_add[dma_ch])
 		{
-			if(scu_dst_add_0 == 2)
-				space->write_word(scu_dst_0,space->read_word(scu_src_0));
+			if(scu_dst_add[dma_ch] == 2)
+				space->write_word(scu_dst[dma_ch],space->read_word(scu_src[dma_ch]));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -2088,158 +1737,27 @@ static void dma_indirect_lv0(address_space *space)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				space->write_word(scu_dst_0,space->read_word(scu_src_0));
-				space->write_word(scu_dst_0+2,space->read_word(scu_src_0+2));
+				space->write_word(scu_dst[dma_ch],space->read_word(scu_src[dma_ch]));
+				space->write_word(scu_dst[dma_ch]+2,space->read_word(scu_src[dma_ch]+2));
 			}
-			scu_dst_0+=scu_dst_add_0;
-			scu_src_0+=scu_src_add_0;
+			scu_dst[dma_ch]+=scu_dst_add[dma_ch];
+			scu_src[dma_ch]+=scu_src_add[dma_ch];
 		}
 
-		//if(DRUP(0))   space->write_dword(tmp_src+8,scu_src_0|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) space->write_dword(tmp_src+4,scu_dst_0);
+		//if(DRUP(0))   space->write_dword(tmp_src+8,scu_src[0]|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) space->write_dword(tmp_src+4,scu_dst[0]);
 
-		scu_index_0 = tmp_src+0xc;
+		scu_index[dma_ch] = tmp_src+0xc;
 
 	}while(job_done == 0);
 
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended));
-}
-
-static void dma_indirect_lv1(address_space *space)
-{
-	/*Helper to get out of the cycle*/
-	UINT8 job_done = 0;
-	/*temporary storage for the transfer data*/
-	UINT32 tmp_src;
-
-	D1MV_1;
-
-	scsp_to_main_irq = 0;
-
-	if(scu_index_1 == 0) { scu_index_1 = scu_dst_1; }
-
-	do{
-		tmp_src = scu_index_1;
-
-		scu_size_1 = space->read_dword(scu_index_1);
-		scu_src_1 =  space->read_dword(scu_index_1+8);
-		scu_dst_1 =  space->read_dword(scu_index_1+4);
-
-		/*Indirect Mode end factor*/
-		if(scu_src_1 & 0x80000000)
-			job_done = 1;
-
-		if(SOUND_RAM(dst_1))
-		{
-			logerror("Sound RAM DMA write\n");
-			scsp_to_main_irq = 1;
-		}
-
-		if(LOG_SCU) logerror("DMA lv 1 indirect mode transfer START\n"
-				 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
-
-		//guess,but I believe it's right.
-		scu_src_1 &=0x07ffffff;
-		scu_dst_1 &=0x07ffffff;
-		scu_size_1 &=0xffff;
-
-
-		for (; scu_size_1 > 0; scu_size_1-=scu_dst_add_1)
-		{
-
-			if(scu_dst_add_1 == 2)
-				space->write_word(scu_dst_1,space->read_word(scu_src_1));
-			else
-			{
-				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
-                  they start a dma on a 2 byte boundary in 4 byte add mode, using the dword reads we
-                  can't access 2 byte boundaries, and the end of the sprite list never gets marked,
-                  the length of the transfer is also set to a 2 byte boundary, maybe the add values
-                  should be different, I don't know */
-				space->write_word(scu_dst_1,space->read_word(scu_src_1));
-				space->write_word(scu_dst_1+2,space->read_word(scu_src_1+2));
-			}
-			scu_dst_1+=scu_dst_add_1;
-			scu_src_1+=scu_src_add_1;
-		}
-
-		//if(DRUP(1))   space->write_dword(tmp_src+8,scu_src_1|job_done ? 0x80000000 : 0);
-		//if(DWUP(1)) space->write_dword(tmp_src+4,scu_dst_1);
-
-		scu_index_1 = tmp_src+0xc;
-
-	}while(job_done == 0);
-
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended));
-}
-
-static void dma_indirect_lv2(address_space *space)
-{
-	/*Helper to get out of the cycle*/
-	UINT8 job_done = 0;
-	/*temporary storage for the transfer data*/
-	UINT32 tmp_src;
-
-	D2MV_1;
-
-	scsp_to_main_irq = 0;
-
-	if(scu_index_2 == 0) { scu_index_2 = scu_dst_2; }
-
-	do{
-		tmp_src = scu_index_2;
-
-		scu_size_2 = space->read_dword(scu_index_2);
-		scu_src_2 =  space->read_dword(scu_index_2+8);
-		scu_dst_2 =  space->read_dword(scu_index_2+4);
-
-		/*Indirect Mode end factor*/
-		if(scu_src_2 & 0x80000000)
-			job_done = 1;
-
-		if(SOUND_RAM(dst_2))
-		{
-			logerror("Sound RAM DMA write\n");
-			scsp_to_main_irq = 1;
-		}
-
-		if(LOG_SCU) logerror("DMA lv 2 indirect mode transfer START\n"
-				 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
-
-		//guess,but I believe it's right.
-		scu_src_2 &=0x07ffffff;
-		scu_dst_2 &=0x07ffffff;
-		scu_size_2 &=0xffff;
-
-		for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
-		{
-			if(scu_dst_add_2 == 2)
-				space->write_word(scu_dst_2,space->read_word(scu_src_2));
-			else
-			{
-				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
-                  they start a dma on a 2 byte boundary in 4 byte add mode, using the dword reads we
-                  can't access 2 byte boundaries, and the end of the sprite list never gets marked,
-                  the length of the transfer is also set to a 2 byte boundary, maybe the add values
-                  should be different, I don't know */
-				space->write_word(scu_dst_2,space->read_word(scu_src_2));
-				space->write_word(scu_dst_2+2,space->read_word(scu_src_2+2));
-			}
-
-			scu_dst_2+=scu_dst_add_2;
-			scu_src_2+=scu_src_add_2;
-		}
-
-		//if(DRUP(2))   space->write_dword(tmp_src+8,scu_src_2|job_done ? 0x80000000 : 0);
-		//if(DWUP(2)) space->write_dword(tmp_src+4,scu_dst_2);
-
-		scu_index_2 = tmp_src+0xc;
-
-	}while(job_done == 0);
-
-	space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended));
+	/*TODO: timing of this, clean up */
+	switch(dma_ch)
+	{
+		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+	}
 }
 
 
@@ -2284,20 +1802,24 @@ static READ32_HANDLER( stv_sh2_random_r )
 #endif
 
 
-static UINT32 backup[64*1024/4];
-
-static READ32_HANDLER(satram_r)
+static READ32_HANDLER(saturn_backupram_r)
 {
-	return backup[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	return state->backupram[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
 }
 
-static WRITE32_HANDLER(satram_w)
+static WRITE32_HANDLER(saturn_backupram_w)
 {
-	COMBINE_DATA(&backup[offset]);
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	COMBINE_DATA(&state->backupram[offset]);
 }
 
 static NVRAM_HANDLER(saturn)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	static const UINT32 init[8] =
 	{
 		0x420061, 0x63006b, 0x550070, 0x520061, 0x6d0020, 0x46006f, 0x72006d, 0x610074,
@@ -2305,22 +1827,22 @@ static NVRAM_HANDLER(saturn)
 	int i;
 
 	if (read_or_write)
-		file->write(backup, 64*1024/4);
+		file->write(state->backupram, 64*1024/4);
 	else
 	{
 		if (file)
 		{
-			file->read(backup, 64*1024/4);
+			file->read(state->backupram, 64*1024/4);
 		}
 		else
 		{
-			memset(backup, 0, 64*1024/4);
+			memset(state->backupram, 0, 64*1024/4);
 			for (i = 0; i < 8; i++)
 			{
-				backup[i] = init[i];
-				backup[i+8] = init[i];
-				backup[i+16] = init[i];
-				backup[i+24] = init[i];
+				state->backupram[i] = init[i];
+				state->backupram[i+8] = init[i];
+				state->backupram[i+16] = init[i];
+				state->backupram[i+24] = init[i];
 			}
 		}
 	}
@@ -2329,11 +1851,10 @@ static NVRAM_HANDLER(saturn)
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r8, saturn_SMPC_w8,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(satram_r, satram_w)
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE(&stv_workram_l)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
-	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,backupram)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,workram_l)
+	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
+	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
@@ -2351,27 +1872,23 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(stv_vdp2_cram_r, stv_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(stv_scu_r32, stv_scu_w32)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE(&stv_workram_h)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE_MEMBER(saturn_state,workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r8, stv_SMPC_w8,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_RAM AM_SHARE("share1") AM_BASE(&stv_backupram)
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE(&stv_workram_l)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,backupram)
+	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE(&ioga) AM_SHARE("share4") AM_MIRROR(0x20)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
-	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
-//  AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w) AM_MIRROR(0x00080000)
-	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(sinit_w)
+	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
+	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("user1", 0) // cartridge
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
-	//AM_RANGE(0x05a80000, 0x05afffff) AM_READ(stv_sh2_random_r)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
@@ -2381,7 +1898,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(stv_vdp2_cram_r, stv_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(stv_scu_r32, stv_scu_w32)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE(&stv_workram_h)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE_MEMBER(saturn_state,workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 ADDRESS_MAP_END
@@ -2769,7 +2286,9 @@ INPUT_PORTS_END
 
 static WRITE32_HANDLER ( w60ffc44_write )
 {
-	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	COMBINE_DATA(&state->workram_h[0xffc44/4]);
 
 	logerror("cpu %s (PC=%08X): 60ffc44_write write = %08X & %08X\n", space->device().tag(), cpu_get_pc(&space->device()), data, mem_mask);
 	//sinit_w(offset,data,mem_mask);
@@ -2777,7 +2296,9 @@ static WRITE32_HANDLER ( w60ffc44_write )
 
 static WRITE32_HANDLER ( w60ffc48_write )
 {
-	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	COMBINE_DATA(&state->workram_h[0xffc48/4]);
 
 	logerror("cpu %s (PC=%08X): 60ffc48_write write = %08X & %08X\n", space->device().tag(), cpu_get_pc(&space->device()), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
@@ -2789,6 +2310,7 @@ static void print_game_info(void);
 
 DRIVER_INIT ( stv )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 
 	machine.base_datetime(systime);
@@ -2799,7 +2321,7 @@ DRIVER_INIT ( stv )
 	minit_boost_timeslice = attotime::zero;
 	sinit_boost_timeslice = attotime::zero;
 
-	smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
+	state->smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);
 	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 
@@ -2817,9 +2339,9 @@ DRIVER_INIT ( stv )
 	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
 	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
 
-    smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = input_port_read(machine, "FAKE");
-	smpc_ram[0x5f] = 0x10;
+    state->smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
+//  state->smpc_ram[0x33] = input_port_read(machine, "FAKE");
+	state->smpc_ram[0x5f] = 0x10;
 
 	#ifdef MAME_DEBUG
 	/*Uncomment this to enable header info*/
@@ -2945,8 +2467,10 @@ static int scsp_last_line = 0;
 
 static void scsp_irq(device_t *device, int irq)
 {
+	saturn_state *state = device->machine().driver_data<saturn_state>();
+
 	// don't bother the 68k if it's off
-	if (!en_68k)
+	if (!state->en_68k)
 	{
 		return;
 	}
@@ -2974,75 +2498,77 @@ static const scsp_interface scsp_config =
 
 static TIMER_CALLBACK(stv_rtc_increment)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	static int year_num, year_count;
 
 	/*
-        smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-        smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-        smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-        smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-        smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-        smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-        smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+        state->smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+        state->smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+        state->smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+        state->smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+        state->smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+        state->smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+        state->smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     */
 
-	smpc_ram[0x2f]++;
+	state->smpc_ram[0x2f]++;
 
 	/* seconds from 9 -> 10*/
-	if((smpc_ram[0x2f] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2f]+=0x10; smpc_ram[0x2f]&=0xf0; }
+	if((state->smpc_ram[0x2f] & 0x0f) >= 0x0a) 			{ state->smpc_ram[0x2f]+=0x10; state->smpc_ram[0x2f]&=0xf0; }
 	/* seconds from 59 -> 0 */
-	if((smpc_ram[0x2f] & 0xf0) >= 0x60) 			{ smpc_ram[0x2d]++;     smpc_ram[0x2f] = 0; }
+	if((state->smpc_ram[0x2f] & 0xf0) >= 0x60) 			{ state->smpc_ram[0x2d]++;     state->smpc_ram[0x2f] = 0; }
 	/* minutes from 9 -> 10 */
-	if((smpc_ram[0x2d] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2d]+=0x10; smpc_ram[0x2d]&=0xf0; }
+	if((state->smpc_ram[0x2d] & 0x0f) >= 0x0a) 			{ state->smpc_ram[0x2d]+=0x10; state->smpc_ram[0x2d]&=0xf0; }
 	/* minutes from 59 -> 0 */
-	if((smpc_ram[0x2d] & 0xf0) >= 0x60) 			{ smpc_ram[0x2b]++;     smpc_ram[0x2d] = 0; }
+	if((state->smpc_ram[0x2d] & 0xf0) >= 0x60) 			{ state->smpc_ram[0x2b]++;     state->smpc_ram[0x2d] = 0; }
 	/* hours from 9 -> 10 */
-	if((smpc_ram[0x2b] & 0x0f) >= 0x0a) 			{ smpc_ram[0x2b]+=0x10; smpc_ram[0x2b]&=0xf0; }
+	if((state->smpc_ram[0x2b] & 0x0f) >= 0x0a) 			{ state->smpc_ram[0x2b]+=0x10; state->smpc_ram[0x2b]&=0xf0; }
 	/* hours from 23 -> 0 */
-	if((smpc_ram[0x2b] & 0xff) >= 0x24)				{ smpc_ram[0x29]++; smpc_ram[0x27]+=0x10; smpc_ram[0x2b] = 0; }
+	if((state->smpc_ram[0x2b] & 0xff) >= 0x24)				{ state->smpc_ram[0x29]++; state->smpc_ram[0x27]+=0x10; state->smpc_ram[0x2b] = 0; }
 	/* week day name sunday -> monday */
-	if((smpc_ram[0x27] & 0xf0) >= 0x70)				{ smpc_ram[0x27]&=0x0f; }
+	if((state->smpc_ram[0x27] & 0xf0) >= 0x70)				{ state->smpc_ram[0x27]&=0x0f; }
 	/* day number 9 -> 10 */
-	if((smpc_ram[0x29] & 0x0f) >= 0x0a)				{ smpc_ram[0x29]+=0x10; smpc_ram[0x29]&=0xf0; }
+	if((state->smpc_ram[0x29] & 0x0f) >= 0x0a)				{ state->smpc_ram[0x29]+=0x10; state->smpc_ram[0x29]&=0xf0; }
 
 	// year BCD to dec conversion (for the leap year stuff)
 	{
-		year_num = (smpc_ram[0x25] & 0xf);
+		year_num = (state->smpc_ram[0x25] & 0xf);
 
-		for(year_count = 0; year_count < (smpc_ram[0x25] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->smpc_ram[0x25] & 0xf0); year_count += 0x10)
 			year_num += 0xa;
 
-		year_num += (smpc_ram[0x23] & 0xf)*0x64;
+		year_num += (state->smpc_ram[0x23] & 0xf)*0x64;
 
-		for(year_count = 0; year_count < (smpc_ram[0x23] & 0xf0); year_count += 0x10)
+		for(year_count = 0; year_count < (state->smpc_ram[0x23] & 0xf0); year_count += 0x10)
 			year_num += 0x3e8;
 	}
 
 	/* month +1 check */
 	/* the RTC have a range of 1980 - 2100, so we don't actually need to support the leap year special conditions */
-	if(((year_num % 4) == 0) && (smpc_ram[0x27] & 0xf) == 2)
+	if(((year_num % 4) == 0) && (state->smpc_ram[0x27] & 0xf) == 2)
 	{
-		if((smpc_ram[0x29] & 0xff) >= dpm[(smpc_ram[0x27] & 0xf)-1]+1+1)
-			{ smpc_ram[0x27]++; smpc_ram[0x29] = 0x01; }
+		if((state->smpc_ram[0x29] & 0xff) >= dpm[(state->smpc_ram[0x27] & 0xf)-1]+1+1)
+			{ state->smpc_ram[0x27]++; state->smpc_ram[0x29] = 0x01; }
 	}
-	else if((smpc_ram[0x29] & 0xff) >= dpm[(smpc_ram[0x27] & 0xf)-1]+1){ smpc_ram[0x27]++; smpc_ram[0x29] = 0x01; }
+	else if((state->smpc_ram[0x29] & 0xff) >= dpm[(state->smpc_ram[0x27] & 0xf)-1]+1){ state->smpc_ram[0x27]++; state->smpc_ram[0x29] = 0x01; }
 	/* year +1 check */
-	if((smpc_ram[0x27] & 0x0f) > 12)				{ smpc_ram[0x25]++;  smpc_ram[0x27] = (smpc_ram[0x27] & 0xf0) | 0x01; }
+	if((state->smpc_ram[0x27] & 0x0f) > 12)				{ state->smpc_ram[0x25]++;  state->smpc_ram[0x27] = (state->smpc_ram[0x27] & 0xf0) | 0x01; }
 	/* year from 9 -> 10 */
-	if((smpc_ram[0x25] & 0x0f) >= 0x0a)				{ smpc_ram[0x25]+=0x10; smpc_ram[0x25]&=0xf0; }
+	if((state->smpc_ram[0x25] & 0x0f) >= 0x0a)				{ state->smpc_ram[0x25]+=0x10; state->smpc_ram[0x25]&=0xf0; }
 	/* year from 99 -> 100 */
-	if((smpc_ram[0x25] & 0xf0) >= 0xa0)				{ smpc_ram[0x23]++; smpc_ram[0x25] = 0; }
+	if((state->smpc_ram[0x25] & 0xf0) >= 0xa0)				{ state->smpc_ram[0x23]++; state->smpc_ram[0x25] = 0; }
 
 	// probably not SO precise, here just for reference ...
 	/* year from 999 -> 1000 */
-	//if((smpc_ram[0x23] & 0x0f) >= 0x0a)               { smpc_ram[0x23]+=0x10; smpc_ram[0x23]&=0xf0; }
+	//if((state->smpc_ram[0x23] & 0x0f) >= 0x0a)               { state->smpc_ram[0x23]+=0x10; state->smpc_ram[0x23]&=0xf0; }
 	/* year from 9999 -> 0 */
-	//if((smpc_ram[0x23] & 0xf0) >= 0xa0)               { smpc_ram[0x23] = 0; } //roll over
+	//if((state->smpc_ram[0x23] & 0xf0) >= 0xa0)               { state->smpc_ram[0x23] = 0; } //roll over
 }
 
 static MACHINE_START( stv )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 	machine.base_datetime(systime);
 
@@ -3053,14 +2579,13 @@ static MACHINE_START( stv )
 	scsp_set_ram_base(machine.device("scsp"), sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, smpc_ram, 0x80);
+	state_save_register_global_pointer(machine, state->smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, stv_scu, 0x100/4);
 	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
 //  state_save_register_global(machine, stv_vblank);
 //  state_save_register_global(machine, stv_hblank);
-	state_save_register_global(machine, stv_enable_slave_sh2);
-	state_save_register_global(machine, NMI_reset);
-	state_save_register_global(machine, en_68k);
+	state_save_register_global(machine, state->NMI_reset);
+	state_save_register_global(machine, state->en_68k);
 	state_save_register_global(machine, timer_0);
 	state_save_register_global(machine, timer_1);
 //  state_save_register_global(machine, scanline);
@@ -3078,13 +2603,13 @@ static MACHINE_START( stv )
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 
-	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-    smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-    smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-    smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-    smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-    smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-    smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+	state->smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
+    state->smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
+    state->smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
+    state->smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+    state->smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+    state->smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+    state->smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
 	stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
@@ -3092,17 +2617,17 @@ static MACHINE_START( stv )
 
 static MACHINE_START( saturn )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	scsp_set_ram_base(machine.device("scsp"), sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine, smpc_ram, 0x80);
+	state_save_register_global_pointer(machine, state->smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, stv_scu, 0x100/4);
 	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
 	state_save_register_global(machine, stv_vblank);
 	state_save_register_global(machine, stv_hblank);
-	state_save_register_global(machine, stv_enable_slave_sh2);
-	state_save_register_global(machine, NMI_reset);
-	state_save_register_global(machine, en_68k);
+	state_save_register_global(machine, state->NMI_reset);
+	state_save_register_global(machine, state->en_68k);
 	state_save_register_global(machine, timer_0);
 	state_save_register_global(machine, timer_1);
 	state_save_register_global(machine, IOSEL1);
@@ -3309,23 +2834,23 @@ static INTERRUPT_GEN( stv_interrupt )
 
 static MACHINE_RESET( saturn )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	// don't let the slave cpu and the 68k go anywhere
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
-	stv_enable_slave_sh2 = 0;
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	smpcSR = 0x40;	// this bit is always on according to docs
 
 	timer_0 = 0;
 	timer_1 = 0;
-	en_68k = 0;
-	NMI_reset = 1;
-	smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+	state->en_68k = 0;
+	state->NMI_reset = 1;
+	state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 
 	DMA_STATUS = 0;
 
-	memset(stv_workram_l, 0, 0x100000);
-	memset(stv_workram_h, 0, 0x100000);
+	//memset(stv_workram_l, 0, 0x100000);
+	//memset(stv_workram_h, 0, 0x100000);
 
 	machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 	machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
@@ -3344,16 +2869,17 @@ static MACHINE_RESET( saturn )
 
 static MACHINE_RESET( stv )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	// don't let the slave cpu and the 68k go anywhere
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
-	stv_enable_slave_sh2 = 0;
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	timer_0 = 0;
 	timer_1 = 0;
-	en_68k = 0;
-	NMI_reset = 1;
-	smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+	state->en_68k = 0;
+	state->NMI_reset = 1;
+	state->smpc_ram[0x21] = (0x80) | ((state->NMI_reset & 1) << 6);
 
 	port_sel = mux_data = 0;
 	port_i = -1;
@@ -3477,6 +3003,7 @@ MACHINE_CONFIG_END
 
 static void saturn_init_driver(running_machine &machine, int rgn)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 
 	saturn_region = rgn;
@@ -3494,20 +3021,20 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	minit_boost_timeslice = attotime::zero;
 	sinit_boost_timeslice = attotime::zero;
 
-	smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
+	state->smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	stv_scu = auto_alloc_array(machine, UINT32, 0x100/4);
 	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 
-	smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-	smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-	smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-	smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
-	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = input_port_read(machine, "???");
-	smpc_ram[0x5f] = 0x10;
+	state->smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+	state->smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+	state->smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+	state->smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+	state->smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+	state->smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+	state->smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+	state->smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
+//  state->smpc_ram[0x33] = input_port_read(machine, "???");
+	state->smpc_ram[0x5f] = 0x10;
 }
 
 static DRIVER_INIT( saturnus )

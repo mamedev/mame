@@ -1,9 +1,19 @@
 /*----------- defined in drivers/stv.c -----------*/
 
-extern UINT32 *stv_workram_h;
-extern UINT32 *stv_workram_l;
+class saturn_state : public driver_device
+{
+public:
+	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
 
-extern int stv_enable_slave_sh2;
+	UINT32 *workram_l;
+	UINT32 *workram_h;
+	UINT8  *smpc_ram;
+	UINT32 *backupram;
+	UINT8  NMI_reset;
+	UINT8  en_68k;
+};
+
 
 extern int minit_boost,sinit_boost;
 extern attotime minit_boost_timeslice, sinit_boost_timeslice;
