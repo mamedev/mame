@@ -6,21 +6,30 @@ public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT32 *workram_l;
-	UINT32 *workram_h;
-	UINT8  *smpc_ram;
-	UINT32 *backupram;
-	UINT8  NMI_reset;
-	UINT8  en_68k;
+	UINT32 *m_workram_l;
+	UINT32 *m_workram_h;
+	UINT8  *m_smpc_ram;
+	UINT32 *m_backupram;
+	UINT32 *m_scu_regs;
+	UINT8  m_NMI_reset;
+	UINT8  m_en_68k;
+	UINT16 *m_sound_ram;
+
+	UINT32 m_scu_src[3];		/* Source DMA lv n address*/
+	UINT32 m_scu_dst[3];		/* Destination DMA lv n address*/
+	UINT32 m_scu_src_add[3];	/* Source Addition for DMA lv n*/
+	UINT32 m_scu_dst_add[3];	/* Destination Addition for DMA lv n*/
+    INT32  m_scu_size[3];		/* Transfer DMA size lv n*/
+    UINT32 m_scu_index[3];
+
+	legacy_cpu_device* m_maincpu;
+	legacy_cpu_device* m_slave;
+	legacy_cpu_device* m_audiocpu;
 };
 
 
 extern int minit_boost,sinit_boost;
 extern attotime minit_boost_timeslice, sinit_boost_timeslice;
-
-extern cpu_device *stv_maincpu;
-extern cpu_device *stv_slave;
-extern cpu_device *stv_audiocpu;
 
 DRIVER_INIT ( stv );
 

@@ -52,26 +52,27 @@ Changelog:
 #include "emu.h"
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
+#include "includes/stv.h"
 
 /*DSP macros*/
-#define PRF ((stv_scu[32] & 0x04000000) >> 26)
-#define EPF ((stv_scu[32] & 0x02000000) >> 25)
-#define T0F ((stv_scu[32] & 0x00800000) >> 23)
-#define SF  ((stv_scu[32] & 0x00400000) >> 22)
-#define ZF  ((stv_scu[32] & 0x00200000) >> 21)
-#define CF  ((stv_scu[32] & 0x00100000) >> 20)
-#define VF  ((stv_scu[32] & 0x00080000) >> 19)
-#define EF  ((stv_scu[32] & 0x00040000) >> 18)
-#define ESF ((stv_scu[32] & 0x00020000) >> 17)
-#define EXF ((stv_scu[32] & 0x00010000) >> 16)
-#define LEF ((stv_scu[32] & 0x00008000) >> 15)
-#define T0F_1 if(!(stv_scu[32] & 0x00800000)) stv_scu[32]^=0x00800000
-#define T0F_0 if(stv_scu[32] & 0x00800000) stv_scu[32]^=0x00800000
+#define PRF ((state->m_scu_regs[32] & 0x04000000) >> 26)
+#define EPF ((state->m_scu_regs[32] & 0x02000000) >> 25)
+#define T0F ((state->m_scu_regs[32] & 0x00800000) >> 23)
+#define SF  ((state->m_scu_regs[32] & 0x00400000) >> 22)
+#define ZF  ((state->m_scu_regs[32] & 0x00200000) >> 21)
+#define CF  ((state->m_scu_regs[32] & 0x00100000) >> 20)
+#define VF  ((state->m_scu_regs[32] & 0x00080000) >> 19)
+#define EF  ((state->m_scu_regs[32] & 0x00040000) >> 18)
+#define ESF ((state->m_scu_regs[32] & 0x00020000) >> 17)
+#define EXF ((state->m_scu_regs[32] & 0x00010000) >> 16)
+#define LEF ((state->m_scu_regs[32] & 0x00008000) >> 15)
+#define T0F_1 if(!(state->m_scu_regs[32] & 0x00800000)) state->m_scu_regs[32]^=0x00800000
+#define T0F_0 if(state->m_scu_regs[32] & 0x00800000) state->m_scu_regs[32]^=0x00800000
 
-#define SET_C(_val) (stv_scu[32] = ((stv_scu[32] & ~0x00100000) | ((_val) ? 0x00100000 : 0)))
-#define SET_S(_val) (stv_scu[32] = ((stv_scu[32] & ~0x00400000) | ((_val) ? 0x00400000 : 0)))
-#define SET_Z(_val) (stv_scu[32] = ((stv_scu[32] & ~0x00200000) | ((_val) ? 0x00200000 : 0)))
-#define SET_V(_val) (stv_scu[32] = ((stv_scu[32] & ~0x00080000) | ((_val) ? 0x00080000 : 0)))
+#define SET_C(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00100000) | ((_val) ? 0x00100000 : 0)))
+#define SET_S(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00400000) | ((_val) ? 0x00400000 : 0)))
+#define SET_Z(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00200000) | ((_val) ? 0x00200000 : 0)))
+#define SET_V(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00080000) | ((_val) ? 0x00080000 : 0)))
 
 typedef union {
 	INT32  si;
@@ -255,8 +256,9 @@ static void dsp_set_dest_mem_reg_2( UINT32 mode, UINT32 value )
 	}
 }
 
-static UINT32 dsp_compute_condition( UINT32 condition )
+static UINT32 dsp_compute_condition( address_space *space, UINT32 condition )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	UINT32 result = 0;
 
 	switch( condition & 0xf )
@@ -314,9 +316,10 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 
 void dsp_prg_ctrl(address_space *space, UINT32 data)
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
-	if(EF && (!(stv_scu[40] & 0x0020)))
+	if(EF && (!(state->m_scu_regs[40] & 0x0020)))
 		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0xa, HOLD_LINE , 0x45);
 }
 
@@ -366,8 +369,9 @@ UINT32 dsp_ram_addr_r()
 	return data;
 }
 
-static void dsp_operation(void)
+static void dsp_operation(address_space *space)
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 	INT64 i1,i2;
 	INT32 i3;
 	int update_ct[4] = {0,0,0,0};
@@ -568,13 +572,13 @@ static void dsp_operation(void)
 
 }
 
-static void dsp_move_immediate( void )
+static void dsp_move_immediate( address_space *space )
 {
 	UINT32 value;
 
 	if ( opcode & 0x2000000 )
 	{
-		if ( dsp_compute_condition( (opcode & 0x3F80000 ) >> 18 ) )
+		if ( dsp_compute_condition( space, (opcode & 0x3F80000 ) >> 18 ) )
 		{
 			value = opcode & 0x7ffff;
 			if ( value & 0x40000 ) value |= 0xfff80000;
@@ -592,6 +596,8 @@ static void dsp_move_immediate( void )
 
 static void dsp_dma( address_space *space )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
 	UINT8 hold = (opcode &  0x4000) >> 14;
 	UINT32 add = (opcode & 0x38000) >> 15;
 	UINT32 dir_from_D0 = (opcode & 0x1000 ) >> 12;
@@ -700,11 +706,11 @@ static void dsp_dma( address_space *space )
 	T0F_0;
 }
 
-static void dsp_jump( void )
+static void dsp_jump( address_space *space )
 {
 	if ( opcode & 0x3f80000 )
 	{
-		if ( dsp_compute_condition( (opcode & 0x3f80000) >> 19 ) )
+		if ( dsp_compute_condition( space, (opcode & 0x3f80000) >> 19 ) )
 		{
 			dsp_reg.delay = dsp_reg.pc;
 			dsp_reg.pc = opcode & 0xff;
@@ -717,18 +723,20 @@ static void dsp_jump( void )
 	}
 }
 
-static void dsp_end( void )
+static void dsp_end( address_space *dmaspace )
 {
+	saturn_state *state = dmaspace->machine().driver_data<saturn_state>();
+
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
-		if(!EF) stv_scu[32]^=0x00040000;
-		if(EXF) stv_scu[32]^=0x00100000;
+		if(!EF) state->m_scu_regs[32]^=0x00040000;
+		if(EXF) state->m_scu_regs[32]^=0x00100000;
 	}
 	else
 	{
 		/*END*/
-		if(EXF) stv_scu[32]^=0x00100000;
+		if(EXF) state->m_scu_regs[32]^=0x00100000;
 	}
 
 }
@@ -824,13 +832,13 @@ void dsp_execute_program(address_space *dmaspace)
 		switch( (opcode & 0xc0000000) >> 30 )
 		{
 		case 0x00: /* 00 */
-			dsp_operation();
+			dsp_operation( dmaspace );
 			break;
 		case 0x01: /* 01 */
 			/* unrecognized opcode */
 			break;
 		case 0x02: /* 10 */
-			dsp_move_immediate( );
+			dsp_move_immediate( dmaspace );
 			break;
 		case 0x03: /* 11 */
 			switch( (opcode & 0x30000000) >> 28 )
@@ -839,13 +847,13 @@ void dsp_execute_program(address_space *dmaspace)
 					dsp_dma(dmaspace);
 					break;
 				case 0x01:
-					dsp_jump();
+					dsp_jump(dmaspace);
 					break;
 				case 0x02:
 					dsp_loop();
 					break;
 				case 0x03:
-					dsp_end();
+					dsp_end(dmaspace);
 					cont = 0;
 					break;
 			}
