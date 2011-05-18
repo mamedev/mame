@@ -1534,7 +1534,7 @@ ROM_END
 ROM_START( brixian )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",      0x00000, 0x8000, CRC(3d167d09) SHA1(1d5bd098b655b8d2f956cfcb718213915bee3e41) )
-	ROM_LOAD( "e7.bin",      0x08000, 0x2000, CRC(9e3707ab) SHA1(a04fb4824239f8ed1ef1de2f3c0f9d749320b2ba) ) // what is this? where does it map?
+	ROM_LOAD( "e7.bin",      0x08000, 0x2000, CRC(9e3707ab) SHA1(a04fb4824239f8ed1ef1de2f3c0f9d749320b2ba) ) // this is near a 6116 RAM bank, unknown purpose
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "b4.bin",      0x00000, 0x8000, CRC(34a7a693) SHA1(793fa6dd065a158bedcd0fdc494cc8fc793ae8be) )
