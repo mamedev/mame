@@ -130,11 +130,15 @@ struct _texture_info
 	d3d_texture *			d3dtex;						// Direct3D texture pointer
 	d3d_surface *			d3dsurface;					// Direct3D offscreen plain surface pointer
 	d3d_surface *			d3dtarget0;					// Direct3D render target surface pointer (pass 0, if necessary)
-	d3d_surface *			d3dtarget1;					// Direct3D render target surface pointer (pass 2, if necessary)
-	d3d_surface *			d3dtarget2;					// Direct3D render target surface pointer (pass 3, if necessary)
+	d3d_surface *			d3dtarget1;					// Direct3D render target surface pointer (pass 1, if necessary)
+	d3d_surface *			d3dtarget2;					// Direct3D render target surface pointer (pass 2, if necessary)
+	d3d_surface *			d3dsmalltarget0;			// Direct3D render target surface pointer (small pass 0, if necessary)
+	d3d_surface *			d3dsmalltarget1;			// Direct3D render target surface pointer (small pass 1, if necessary)
 	d3d_texture *			d3dtexture0;				// Direct3D render target texture pointer (pass 0, if necessary)
-	d3d_texture *			d3dtexture1;				// Direct3D render target texture pointer (pass 2, if necessary)
-	d3d_texture *			d3dtexture2;				// Direct3D render target texture pointer (pass 3, if necessary)
+	d3d_texture *			d3dtexture1;				// Direct3D render target texture pointer (pass 1, if necessary)
+	d3d_texture *			d3dtexture2;				// Direct3D render target texture pointer (pass 2, if necessary)
+	d3d_texture *			d3dsmalltexture0;			// Direct3D render target texture pointer (small pass 0, if necessary)
+	d3d_texture *			d3dsmalltexture1;			// Direct3D render target texture pointer (small pass 1, if necessary)
 	d3d_texture *			d3dfinaltex;				// Direct3D final (post-scaled) texture
 };
 
@@ -190,6 +194,8 @@ struct _d3d_info
 	d3d_effect *			pincushion_effect;			// pointer to the current pincushion-effect object
 	d3d_effect *			focus_effect;				// pointer to the current focus-effect object
 	d3d_effect *			phosphor_effect;			// pointer to the current phosphor-effect object
+	d3d_effect *			deconverge_effect;			// pointer to the current deconvergence-effect object
+	d3d_effect *			color_effect;				// pointer to the current color-effect object
 
 	poly_info				poly[VERTEX_BUFFER_SIZE / 3];// array to hold polygons as they are created
 	int						numpolys;					// number of accumulated polygons
@@ -357,7 +363,7 @@ INLINE void set_texture(d3d_info *d3d, texture_info *texture)
 		if(d3d->hlsl_enable && d3d->effect != NULL)
 		{
 			(*d3dintf->effect.set_texture)(d3d->effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
-			(*d3dintf->effect.set_texture)(d3d->post_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
+			(*d3dintf->effect.set_texture)(d3d->color_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
 			(*d3dintf->effect.set_texture)(d3d->pincushion_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
 		}
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
@@ -636,7 +642,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 	d3d->vector_bitmap = NULL;
 
 	// experimental: free the shadow PNG
-	if(d3d->hlsl_enable)
+	if(d3d->hlsl_enable && d3d->shadow_bitmap != NULL)
 	{
 		global_free(d3d->shadow_bitmap);
 		d3d->shadow_bitmap = NULL;
@@ -850,7 +856,7 @@ try_again:
 
 	// create the D3D device
 	result = (*d3dintf->d3d.create_device)(d3dintf, d3d->adapter, D3DDEVTYPE_HAL, win_window_list->hwnd,
-					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3d->presentation, &d3d->device);
+					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3d->presentation, &d3d->device);
 	if (result != D3D_OK)
 	{
 		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
@@ -900,7 +906,7 @@ try_again:
 	}
 
 	// experimental: initialize some more things if we're using HLSL
-	if(d3d->hlsl_enable)
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
 		const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
 		char primary_name_cstr[1024];
@@ -908,6 +914,8 @@ try_again:
 		char pincushion_name_cstr[1024];
 		char phosphor_name_cstr[1024];
 		char focus_name_cstr[1024];
+		char deconverge_name_cstr[1024];
+		char color_name_cstr[1024];
 
 		sprintf(primary_name_cstr, "%s\\primary.fx", fx_dir);
 		TCHAR *primary_name = tstring_from_utf8(primary_name_cstr);
@@ -924,6 +932,12 @@ try_again:
 		sprintf(focus_name_cstr, "%s\\focus.fx", fx_dir);
 		TCHAR *focus_name = tstring_from_utf8(focus_name_cstr);
 
+		sprintf(deconverge_name_cstr, "%s\\deconverge.fx", fx_dir);
+		TCHAR *deconverge_name = tstring_from_utf8(deconverge_name_cstr);
+
+		sprintf(color_name_cstr, "%s\\color.fx", fx_dir);
+		TCHAR *color_name = tstring_from_utf8(color_name_cstr);
+
 		// create the regular shader
 		result = (*d3dintf->device.create_effect)(d3d->device, primary_name, &d3d->effect);
 
@@ -939,6 +953,12 @@ try_again:
 		// create the focus shader
 		result = (*d3dintf->device.create_effect)(d3d->device, focus_name, &d3d->focus_effect);
 
+		// create the deconvergence shader
+		result = (*d3dintf->device.create_effect)(d3d->device, deconverge_name, &d3d->deconverge_effect);
+
+		// create the color convolution shader
+		result = (*d3dintf->device.create_effect)(d3d->device, color_name, &d3d->color_effect);
+
 		if (primary_name)
 			osd_free(primary_name);
 		if (post_name)
@@ -949,6 +969,10 @@ try_again:
 			osd_free(phosphor_name);
 		if (focus_name)
 			osd_free(focus_name);
+		if (deconverge_name)
+			osd_free(deconverge_name);
+		if (color_name)
+			osd_free(color_name);
 	}
 
 	return device_create_resources(d3d);
@@ -967,8 +991,8 @@ static int device_create_resources(d3d_info *d3d)
 	// allocate a vertex buffer to use
 	result = (*d3dintf->device.create_vertex_buffer)(d3d->device,
 				sizeof(d3d_vertex) * VERTEX_BUFFER_SIZE,
-				D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
-				VERTEX_BASE_FORMAT | (d3d->hlsl_enable ? D3DFVF_XYZW : D3DFVF_XYZRHW), D3DPOOL_DEFAULT, &d3d->vertexbuf);
+				D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
+				VERTEX_BASE_FORMAT | ((d3d->hlsl_enable && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW), D3DPOOL_DEFAULT, &d3d->vertexbuf);
 	if (result != D3D_OK)
 	{
 		mame_printf_error("Error creating vertex buffer (%08X)", (UINT32)result);
@@ -976,7 +1000,7 @@ static int device_create_resources(d3d_info *d3d)
 	}
 
 	// set the vertex format
-	result = (*d3dintf->device.set_vertex_format)(d3d->device, (D3DFORMAT)(VERTEX_BASE_FORMAT | (d3d->hlsl_enable ? D3DFVF_XYZW : D3DFVF_XYZRHW)));
+	result = (*d3dintf->device.set_vertex_format)(d3d->device, (D3DFORMAT)(VERTEX_BASE_FORMAT | ((d3d->hlsl_enable && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW)));
 	if (result != D3D_OK)
 	{
 		mame_printf_error("Error setting vertex format (%08X)", (UINT32)result);
@@ -1033,7 +1057,7 @@ static int device_create_resources(d3d_info *d3d)
 	}
 
 	// experimental: initialize some more things if we're using HLSL
-	if(d3d->hlsl_enable)
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
 		// experimental: create a default bitmap for our shader
 		if (d3d->default_bitmap != NULL)
@@ -1120,12 +1144,20 @@ static void device_delete_resources(d3d_info *d3d)
 			(*d3dintf->texture.release)(tex->d3dtexture1);
 		if (tex->d3dtexture2 != NULL)
 			(*d3dintf->texture.release)(tex->d3dtexture2);
+		if (tex->d3dsmalltexture0 != NULL)
+			(*d3dintf->texture.release)(tex->d3dsmalltexture0);
+		if (tex->d3dsmalltexture1 != NULL)
+			(*d3dintf->texture.release)(tex->d3dsmalltexture1);
 		if (tex->d3dtarget0 != NULL)
 			(*d3dintf->surface.release)(tex->d3dtarget0);
 		if (tex->d3dtarget1 != NULL)
 			(*d3dintf->surface.release)(tex->d3dtarget1);
 		if (tex->d3dtarget2 != NULL)
 			(*d3dintf->surface.release)(tex->d3dtarget2);
+		if (tex->d3dsmalltarget0 != NULL)
+			(*d3dintf->surface.release)(tex->d3dsmalltarget0);
+		if (tex->d3dsmalltarget1 != NULL)
+			(*d3dintf->surface.release)(tex->d3dsmalltarget1);
 		global_free(tex);
 	}
 
@@ -1161,6 +1193,16 @@ static void device_delete_resources(d3d_info *d3d)
 	{
 		(*d3dintf->effect.release)(d3d->focus_effect);
 		d3d->focus_effect = NULL;
+	}
+	if(d3d->deconverge_effect != NULL)
+	{
+		(*d3dintf->effect.release)(d3d->deconverge_effect);
+		d3d->deconverge_effect = NULL;
+	}
+	if(d3d->color_effect != NULL)
+	{
+		(*d3dintf->effect.release)(d3d->color_effect);
+		d3d->color_effect = NULL;
 	}
 
 	for(int index = 0; index < 9; index++)
@@ -1943,20 +1985,25 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 	d3d_effect *curr_effect = d3d->effect;
 
-	if(d3d->hlsl_enable)
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
 		(*d3dintf->effect.set_technique)(d3d->effect, "TestTechnique");
-		(*d3dintf->effect.set_technique)(d3d->post_effect, "TestTechnique");
+		(*d3dintf->effect.set_technique)(d3d->post_effect, "ScanMaskTechnique");
 		(*d3dintf->effect.set_technique)(d3d->pincushion_effect, "TestTechnique");
 		(*d3dintf->effect.set_technique)(d3d->phosphor_effect, "TestTechnique");
 		(*d3dintf->effect.set_technique)(d3d->focus_effect, "TestTechnique");
+		(*d3dintf->effect.set_technique)(d3d->deconverge_effect, "DeconvergeTechnique");
+		(*d3dintf->effect.set_technique)(d3d->color_effect, "ColorTechnique");
 	}
 
 	d3d_surface *backbuffer;
 
 	// first remember the original render target in case we need to set a new one
-	result = (*d3dintf->device.get_render_target)(d3d->device, 0, &backbuffer);
-	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
+	{
+		result = (*d3dintf->device.get_render_target)(d3d->device, 0, &backbuffer);
+		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+	}
 
 	windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
 
@@ -1980,7 +2027,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 			set_wrap(d3d, PRIMFLAG_GET_TEXWRAP(poly->flags));
 			set_modmode(d3d, poly->modmode);
 
-			if(d3d->hlsl_enable)
+			if(d3d->hlsl_enable && d3dintf->post_fx_available)
 			{
 				if(PRIMFLAG_GET_TEXSHADE(d3d->last_texture_flags))
 				{
@@ -1988,90 +2035,35 @@ static void primitive_flush_pending(d3d_info *d3d)
 				}
 				else if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags))
 				{
+					// Plug in all of the shader settings we're going to need
+					// This is extremely slow, but we're not rendering models here,
+					// just post-processing.
 					curr_effect = d3d->post_effect;
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Shadow", d3d->shadow_texture == NULL ? NULL : d3d->shadow_texture->d3dfinaltex);
-					(*d3dintf->effect.set_float)(curr_effect, "UseShadow", d3d->shadow_texture == NULL ? 0.0f : 1.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", (float)options.screen_shadow_mask_alpha());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeX", (float)options.screen_shadow_mask_width());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeY", (float)options.screen_shadow_mask_height());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowU", (float)options.screen_shadow_mask_u_size());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowV", (float)options.screen_shadow_mask_v_size());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawwidth);
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawheight);
 					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "PostPass", 0.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountX", (float)options.screen_pincushion_x());
-					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountY", (float)options.screen_pincushion_y());
+					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", (float)options.screen_pincushion());
+					(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", (float)options.screen_curvature());
+					(*d3dintf->effect.set_float)(curr_effect, "UseShadow", d3d->shadow_texture == NULL ? 0.0f : 1.0f);
+					(*d3dintf->effect.set_texture)(curr_effect, "Shadow", d3d->shadow_texture == NULL ? NULL : d3d->shadow_texture->d3dfinaltex);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", (float)options.screen_shadow_mask_alpha());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeX", (float)options.screen_shadow_mask_ratio_x());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowPixelSizeY", (float)options.screen_shadow_mask_ratio_y());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options.screen_shadow_mask_count_x());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options.screen_shadow_mask_count_y());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowU", (float)options.screen_shadow_mask_u_size());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowV", (float)options.screen_shadow_mask_v_size());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawwidth);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawheight);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", (float)options.screen_scanline_amount());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", (float)options.screen_scanline_scale());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", (float)options.screen_scanline_bright_scale());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", (float)options.screen_scanline_bright_offset());
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture != NULL && poly->texture->cur_frame == 0) ? 0.0f : (float)options.screen_scanline_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", (float)options.screen_red_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", (float)options.screen_red_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", (float)options.screen_green_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeY", (float)options.screen_green_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "BluConvergeX", (float)options.screen_blue_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "BluConvergeY", (float)options.screen_blue_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeX", (float)options.screen_red_radial_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeY", (float)options.screen_red_radial_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeX", (float)options.screen_green_radial_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeY", (float)options.screen_green_radial_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeX", (float)options.screen_blue_radial_converge_x());
-					(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeY", (float)options.screen_blue_radial_converge_y());
-					(*d3dintf->effect.set_float)(curr_effect, "RedFromRed", (float)options.screen_red_from_red());
-					(*d3dintf->effect.set_float)(curr_effect, "RedFromGrn", (float)options.screen_red_from_green());
-					(*d3dintf->effect.set_float)(curr_effect, "RedFromBlu", (float)options.screen_red_from_blue());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnFromRed", (float)options.screen_green_from_red());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnFromGrn", (float)options.screen_green_from_green());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnFromBlu", (float)options.screen_green_from_blue());
-					(*d3dintf->effect.set_float)(curr_effect, "BluFromRed", (float)options.screen_blue_from_red());
-					(*d3dintf->effect.set_float)(curr_effect, "BluFromGrn", (float)options.screen_blue_from_green());
-					(*d3dintf->effect.set_float)(curr_effect, "BluFromBlu", (float)options.screen_blue_from_blue());
-					(*d3dintf->effect.set_float)(curr_effect, "YfromY", (float)options.screen_y_from_y());
-					(*d3dintf->effect.set_float)(curr_effect, "YfromI", (float)options.screen_y_from_i());
-					(*d3dintf->effect.set_float)(curr_effect, "YfromQ", (float)options.screen_y_from_q());
-					(*d3dintf->effect.set_float)(curr_effect, "IfromY", (float)options.screen_i_from_y());
-					(*d3dintf->effect.set_float)(curr_effect, "IfromI", (float)options.screen_i_from_i());
-					(*d3dintf->effect.set_float)(curr_effect, "IfromQ", (float)options.screen_i_from_q());
-					(*d3dintf->effect.set_float)(curr_effect, "QfromY", (float)options.screen_q_from_y());
-					(*d3dintf->effect.set_float)(curr_effect, "QfromI", (float)options.screen_q_from_i());
-					(*d3dintf->effect.set_float)(curr_effect, "QfromQ", (float)options.screen_q_from_q());
-					(*d3dintf->effect.set_float)(curr_effect, "RedOffset", (float)options.screen_red_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnOffset", (float)options.screen_green_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "BluOffset", (float)options.screen_blue_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "RedScale", (float)options.screen_red_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnScale", (float)options.screen_green_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "BluScale", (float)options.screen_blue_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "RedPower", (float)options.screen_red_power());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnPower", (float)options.screen_green_power());
-					(*d3dintf->effect.set_float)(curr_effect, "BluPower", (float)options.screen_blue_power());
-					(*d3dintf->effect.set_float)(curr_effect, "RedFloor", (float)options.screen_red_floor());
-					(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", (float)options.screen_green_floor());
-					(*d3dintf->effect.set_float)(curr_effect, "BluFloor", (float)options.screen_blue_floor());
-					(*d3dintf->effect.set_float)(curr_effect, "Saturation", (float)options.screen_saturation());
-					(*d3dintf->effect.set_float)(curr_effect, "YScale", (float)options.screen_y_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "IScale", (float)options.screen_i_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "QScale", (float)options.screen_q_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "YOffset", (float)options.screen_y_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "IOffset", (float)options.screen_i_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "QOffset", (float)options.screen_q_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "EdgeDetectScale", (float)options.screen_edge_amount());
-					(*d3dintf->effect.set_float)(curr_effect, "EdgeToBaseRatio", (float)options.screen_edge_ratio());
-					(*d3dintf->effect.set_float)(curr_effect, "SubsampleLength", (float)options.screen_chroma_subsample_length());
-					int frame = (poly->texture != NULL && poly->texture->cur_frame) ? (float)poly->texture->cur_frame : 0;
-					frame = (frame == options.screen_dot_crawl_skip()) ? 0 : frame;
-					(*d3dintf->effect.set_float)(curr_effect, "CurrFrame", (float)frame);
-					(*d3dintf->effect.set_float)(curr_effect, "CrawlWidth", (float)options.screen_dot_crawl_width());
-					(*d3dintf->effect.set_float)(curr_effect, "CrawlHeight", (float)options.screen_dot_crawl_height());
-					(*d3dintf->effect.set_float)(curr_effect, "CrawlRate", (float)options.screen_dot_crawl_rate());
-					(*d3dintf->effect.set_float)(curr_effect, "CrawlSkip", (float)options.screen_dot_crawl_skip());
 				}
 				else
 				{
@@ -2085,7 +2077,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 		// set the blendmode if different
 		set_blendmode(d3d, PRIMFLAG_GET_BLENDMODE(poly->flags));
 
-		if(d3d->hlsl_enable)
+		if(d3d->hlsl_enable && d3dintf->post_fx_available)
 		{
 			assert(vertnum + poly->numverts <= d3d->numverts);
 
@@ -2093,13 +2085,60 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 			if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 			{
-				/* Render the initial screen pass */
-				(*d3dintf->effect.set_float)(curr_effect, "FixedAlpha", 1.0f);
+				curr_effect = d3d->color_effect;
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget0);
+				/* Render the initial color-convolution pass */
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromRed", (float)options.screen_red_from_red());
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromGrn", (float)options.screen_red_from_green());
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromBlu", (float)options.screen_red_from_blue());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromRed", (float)options.screen_green_from_red());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromGrn", (float)options.screen_green_from_green());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromBlu", (float)options.screen_green_from_blue());
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromRed", (float)options.screen_blue_from_red());
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromGrn", (float)options.screen_blue_from_green());
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromBlu", (float)options.screen_blue_from_blue());
+				(*d3dintf->effect.set_float)(curr_effect, "YfromY", (float)options.screen_y_from_y());
+				(*d3dintf->effect.set_float)(curr_effect, "YfromI", (float)options.screen_y_from_i());
+				(*d3dintf->effect.set_float)(curr_effect, "YfromQ", (float)options.screen_y_from_q());
+				(*d3dintf->effect.set_float)(curr_effect, "IfromY", (float)options.screen_i_from_y());
+				(*d3dintf->effect.set_float)(curr_effect, "IfromI", (float)options.screen_i_from_i());
+				(*d3dintf->effect.set_float)(curr_effect, "IfromQ", (float)options.screen_i_from_q());
+				(*d3dintf->effect.set_float)(curr_effect, "QfromY", (float)options.screen_q_from_y());
+				(*d3dintf->effect.set_float)(curr_effect, "QfromI", (float)options.screen_q_from_i());
+				(*d3dintf->effect.set_float)(curr_effect, "QfromQ", (float)options.screen_q_from_q());
+				(*d3dintf->effect.set_float)(curr_effect, "RedOffset", (float)options.screen_red_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnOffset", (float)options.screen_green_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "BluOffset", (float)options.screen_blue_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "RedScale", (float)options.screen_red_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnScale", (float)options.screen_green_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "BluScale", (float)options.screen_blue_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "RedPower", (float)options.screen_red_power());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnPower", (float)options.screen_green_power());
+				(*d3dintf->effect.set_float)(curr_effect, "BluPower", (float)options.screen_blue_power());
+				(*d3dintf->effect.set_float)(curr_effect, "RedFloor", (float)options.screen_red_floor());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", (float)options.screen_green_floor());
+				(*d3dintf->effect.set_float)(curr_effect, "BluFloor", (float)options.screen_blue_floor());
+				(*d3dintf->effect.set_float)(curr_effect, "Saturation", (float)options.screen_saturation());
+				(*d3dintf->effect.set_float)(curr_effect, "YScale", (float)options.screen_y_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "IScale", (float)options.screen_i_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "QScale", (float)options.screen_q_scale());
+				(*d3dintf->effect.set_float)(curr_effect, "YOffset", (float)options.screen_y_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "IOffset", (float)options.screen_i_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "QOffset", (float)options.screen_q_offset());
+				(*d3dintf->effect.set_float)(curr_effect, "YSubsampleLength", (float)options.screen_y_subsample_length());
+				(*d3dintf->effect.set_float)(curr_effect, "ISubsampleLength", (float)options.screen_i_subsample_length());
+				(*d3dintf->effect.set_float)(curr_effect, "QSubsampleLength", (float)options.screen_q_subsample_length());
 
-				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 3\n", (int)result);
-				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dsmalltarget0);
+
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -2115,7 +2154,115 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
-				// max() the two previous frames
+				/* Deconverge pass */
+				curr_effect = d3d->deconverge_effect;
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dsmalltexture0);
+
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", (float)options.screen_red_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", (float)options.screen_red_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", (float)options.screen_green_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeY", (float)options.screen_green_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeX", (float)options.screen_blue_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeY", (float)options.screen_blue_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeX", (float)options.screen_red_radial_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeY", (float)options.screen_red_radial_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeX", (float)options.screen_green_radial_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeY", (float)options.screen_green_radial_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeX", (float)options.screen_blue_radial_converge_x());
+				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeY", (float)options.screen_blue_radial_converge_y());
+
+				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget2);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
+				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+
+				for (UINT pass = 0; pass < num_passes; pass++)
+				{
+					(*d3dintf->effect.begin_pass)(curr_effect, pass);
+					// add the primitives
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+					(*d3dintf->effect.end_pass)(curr_effect);
+				}
+
+				(*d3dintf->effect.end)(curr_effect);
+
+				/* Defocus pass 1 */
+				curr_effect = d3d->focus_effect;
+
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture2);
+
+				float defocus_x = (float)options.screen_defocus_x();
+				float defocus_y = (float)options.screen_defocus_y();
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "DefocusX", defocus_x);
+				(*d3dintf->effect.set_float)(curr_effect, "DefocusY", defocus_y);
+				(*d3dintf->effect.set_float)(curr_effect, "FocusEnable", (defocus_x == 0.0f && defocus_y == 0.0f) ? 0.0f : 1.0f);
+
+				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget0);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
+				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+
+				for (UINT pass = 0; pass < num_passes; pass++)
+				{
+					(*d3dintf->effect.begin_pass)(curr_effect, pass);
+					// add the primitives
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+					(*d3dintf->effect.end_pass)(curr_effect);
+				}
+
+				(*d3dintf->effect.end)(curr_effect);
+
+				/* Defocus pass 2 */
+
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
+
+				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "DefocusX", defocus_x);
+				(*d3dintf->effect.set_float)(curr_effect, "DefocusY", defocus_y);
+				(*d3dintf->effect.set_float)(curr_effect, "FocusEnable", (defocus_x == 0.0f && defocus_y == 0.0f) ? 0.0f : 1.0f);
+
+				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget1);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 7\n", (int)result);
+
+				for (UINT pass = 0; pass < num_passes; pass++)
+				{
+					(*d3dintf->effect.begin_pass)(curr_effect, pass);
+					// add the primitives
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+					(*d3dintf->effect.end_pass)(curr_effect);
+				}
+
+				(*d3dintf->effect.end)(curr_effect);
+
+				// Simulate phosphorescence. This should happen after the shadow/scanline pass, but since
+				// the phosphors are a direct result of the incoming texture, might as well just change the
+				// input texture.
 				curr_effect = d3d->phosphor_effect;
 
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
@@ -2126,10 +2273,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "GreenPhosphor", (float)options.screen_green_phosphor());
 				(*d3dintf->effect.set_float)(curr_effect, "BluePhosphor", (float)options.screen_blue_phosphor());
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture1);
 				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", d3d->last_d3dtexture[cur_render_screen]);
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget1);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -2173,54 +2320,17 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
-				/* Next, defocus pass 1 */
-				curr_effect = d3d->focus_effect;
+				/* Scanlines and shadow mask */
+				curr_effect = d3d->post_effect;
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture1);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
 
-				float defocus_x = (float)options.screen_defocus_x();
-				float defocus_y = (float)options.screen_defocus_y();
-				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "DefocusX", defocus_x);
-				(*d3dintf->effect.set_float)(curr_effect, "DefocusY", defocus_y);
-				(*d3dintf->effect.set_float)(curr_effect, "FocusEnable", (defocus_x == 0.0f && defocus_y == 0.0f) ? 0.0f : 1.0f);
-
-				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
-
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget2);
-				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
-				for (UINT pass = 0; pass < num_passes; pass++)
-				{
-					(*d3dintf->effect.begin_pass)(curr_effect, pass);
-					// add the primitives
-					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
-					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
-					(*d3dintf->effect.end_pass)(curr_effect);
-				}
-
-				(*d3dintf->effect.end)(curr_effect);
-
-				/* Lastly, defocus pass 1 */
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture2);
-
-				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "DefocusX", defocus_x);
-				(*d3dintf->effect.set_float)(curr_effect, "DefocusY", defocus_y);
-				(*d3dintf->effect.set_float)(curr_effect, "FocusEnable", (defocus_x == 0.0f && defocus_y == 0.0f) ? 0.0f : 1.0f);
-
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
-
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
-				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 7\n", (int)result);
 
 				for (UINT pass = 0; pass < num_passes; pass++)
 				{
@@ -2234,7 +2344,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.end)(curr_effect);
 
 				poly->texture->cur_frame++;
-				poly->texture->cur_frame %= options.screen_dot_crawl_rate();
+				poly->texture->cur_frame %= 2;
 			}
 			else
 			{
@@ -2245,8 +2355,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "PostPass", 0.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountX", (float)options.screen_pincushion_x());
-				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountY", (float)options.screen_pincushion_y());
+				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountX", (float)options.screen_pincushion());
+				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountY", (float)options.screen_pincushion());
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -2274,7 +2384,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 		vertnum += poly->numverts;
 	}
 
-	(*d3dintf->surface.release)(backbuffer);
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
+	{
+		(*d3dintf->surface.release)(backbuffer);
+	}
 
 	// reset the vertex count
 	d3d->numverts = 0;
@@ -2372,7 +2485,6 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 					if (result != D3D_OK)
 						goto error;
 					(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
-					d3d->registered_targets++;
 
 					result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
 					if (result != D3D_OK)
@@ -2383,6 +2495,19 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 					if (result != D3D_OK)
 						goto error;
 					(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
+
+					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
+					if (result != D3D_OK)
+						goto error;
+					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+
+					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture1);
+					if (result != D3D_OK)
+						goto error;
+					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture1, 0, &texture->d3dsmalltarget1);
+
+					d3d->registered_targets++;
+
 					break;
 				}
 			}
@@ -2441,6 +2566,16 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 					if (result != D3D_OK)
 						goto error;
 					(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
+
+					result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
+					if (result != D3D_OK)
+						goto error;
+					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+
+					result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture1);
+					if (result != D3D_OK)
+						goto error;
+					(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 1, &texture->d3dsmalltarget1);
 
 					break;
 				}

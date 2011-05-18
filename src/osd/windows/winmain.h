@@ -83,12 +83,14 @@
 #define WINOPTION_HLSLPATH					"hlslpath"
 #define WINOPTION_SHADOW_MASK_ALPHA			"shadow_mask_alpha"
 #define WINOPTION_SHADOW_MASK_TEXTURE		"shadow_mask_texture"
-#define WINOPTION_SHADOW_MASK_WIDTH			"shadow_mask_pix_width"
-#define WINOPTION_SHADOW_MASK_HEIGHT		"shadow_mask_pix_height"
+#define WINOPTION_SHADOW_MASK_RATIO_X		"shadow_mask_pix_width"
+#define WINOPTION_SHADOW_MASK_RATIO_Y		"shadow_mask_pix_height"
+#define WINOPTION_SHADOW_MASK_COUNT_X		"shadow_mask_x_count"
+#define WINOPTION_SHADOW_MASK_COUNT_Y		"shadow_mask_y_count"
 #define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
 #define WINOPTION_SHADOW_MASK_VSIZE			"shadow_mask_vsize"
-#define WINOPTION_PINCUSHION_X				"pincushion_x"
-#define WINOPTION_PINCUSHION_Y				"pincushion_y"
+#define WINOPTION_PINCUSHION				"pincushion"
+#define WINOPTION_CURVATURE					"curvature"
 #define WINOPTION_OVERSAMPLE_X				"oversample_x"
 #define WINOPTION_OVERSAMPLE_Y				"oversample_y"
 #define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
@@ -147,16 +149,12 @@
 #define WINOPTION_Y_OFFSET					"y_offset"
 #define WINOPTION_I_OFFSET					"i_offset"
 #define WINOPTION_Q_OFFSET					"q_offset"
-#define WINOPTION_EDGE_AMOUNT				"edge_amount"
-#define WINOPTION_EDGE_RATIO				"edge_ratio"
-#define WINOPTION_SUBSAMPLE_LENGTH			"subsample_length"
+#define WINOPTION_Y_SUBSAMPLE_LENGTH		"y_subsample_length"
+#define WINOPTION_I_SUBSAMPLE_LENGTH		"i_subsample_length"
+#define WINOPTION_Q_SUBSAMPLE_LENGTH		"q_subsample_length"
 #define WINOPTION_RED_PHOSPHOR				"red_phosphor_life"
 #define WINOPTION_GREEN_PHOSPHOR			"green_phosphor_life"
 #define WINOPTION_BLUE_PHOSPHOR				"blue_phosphor_life"
-#define WINOPTION_CRAWL_WIDTH				"dot_crawl_width"
-#define WINOPTION_CRAWL_HEIGHT				"dot_crawl_height"
-#define WINOPTION_CRAWL_RATE				"dot_crawl_rate"
-#define WINOPTION_CRAWL_SKIP				"dot_crawl_skip"
 
 // per-window options
 #define WINOPTION_SCREEN				"screen"
@@ -223,15 +221,14 @@ public:
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
-	float screen_pincushion_x() const { return float_value(WINOPTION_PINCUSHION_X); }
-	float screen_pincushion_y() const { return float_value(WINOPTION_PINCUSHION_Y); }
 	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
 	const char *screen_shadow_mask_texture() const { return value(WINOPTION_SHADOW_MASK_TEXTURE); }
-	float screen_shadow_mask_width() const { return float_value(WINOPTION_SHADOW_MASK_WIDTH); }
-	float screen_shadow_mask_height() const { return float_value(WINOPTION_SHADOW_MASK_HEIGHT); }
+	float screen_shadow_mask_ratio_x() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_X); }
+	float screen_shadow_mask_ratio_y() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_Y); }
+	float screen_shadow_mask_count_x() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_X); }
+	float screen_shadow_mask_count_y() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
 	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
-	float screen_shadow_width_y() const { return float_value(WINOPTION_SHADOW_MASK_HEIGHT); }
 	float screen_oversample_x() const { return float_value(WINOPTION_OVERSAMPLE_X); }
 	float screen_oversample_y() const { return float_value(WINOPTION_OVERSAMPLE_Y); }
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
@@ -239,6 +236,8 @@ public:
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
+	float screen_pincushion() const { return float_value(WINOPTION_PINCUSHION); }
+	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_defocus_x() const { return float_value(WINOPTION_DEFOCUS_X); }
 	float screen_defocus_y() const { return float_value(WINOPTION_DEFOCUS_Y); }
 	float screen_red_converge_x() const { return float_value(WINOPTION_RED_CONVERGE_X); }
@@ -290,16 +289,12 @@ public:
 	float screen_y_offset() const { return float_value(WINOPTION_Y_OFFSET); }
 	float screen_i_offset() const { return float_value(WINOPTION_I_OFFSET); }
 	float screen_q_offset() const { return float_value(WINOPTION_Q_OFFSET); }
-	float screen_edge_amount() const { return float_value(WINOPTION_EDGE_AMOUNT); }
-	float screen_edge_ratio() const { return float_value(WINOPTION_EDGE_RATIO); }
-	float screen_chroma_subsample_length() const { return float_value(WINOPTION_SUBSAMPLE_LENGTH); }
+	float screen_y_subsample_length() const { return float_value(WINOPTION_Y_SUBSAMPLE_LENGTH); }
+	float screen_i_subsample_length() const { return float_value(WINOPTION_I_SUBSAMPLE_LENGTH); }
+	float screen_q_subsample_length() const { return float_value(WINOPTION_Q_SUBSAMPLE_LENGTH); }
 	float screen_red_phosphor() const { return float_value(WINOPTION_RED_PHOSPHOR); }
 	float screen_green_phosphor() const { return float_value(WINOPTION_GREEN_PHOSPHOR); }
 	float screen_blue_phosphor() const { return float_value(WINOPTION_BLUE_PHOSPHOR); }
-	float screen_dot_crawl_width() const { return float_value(WINOPTION_CRAWL_WIDTH); }
-	float screen_dot_crawl_height() const { return float_value(WINOPTION_CRAWL_HEIGHT); }
-	int screen_dot_crawl_rate() const { return int_value(WINOPTION_CRAWL_RATE); }
-	int screen_dot_crawl_skip() const { return int_value(WINOPTION_CRAWL_SKIP); }
 
 	// per-window options
 	const char *screen() const { return value(WINOPTION_SCREEN); }
