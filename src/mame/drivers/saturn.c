@@ -3064,7 +3064,7 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 		UINT8 j[4];
 		int i;
 
-		for(i=0;i<0x0200000;i+=4)//0x0200000
+		for(i=0;i<length;i+=4)
 		{
 			j[0] = ROM[i];
 			j[1] = ROM[i+1];
@@ -3074,17 +3074,6 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 			ROM[i+1] = j[2];
 			ROM[i+2] = j[1];
 			ROM[i+3] = j[0];
-		}
-		for(i=0x0200000;i<length;i+=4)//0x0200000
-		{
-			j[0] = ROM[i];
-			j[1] = ROM[i+1];
-			j[2] = ROM[i+2];
-			j[3] = ROM[i+3];
-			ROM[i] = j[2];
-			ROM[i+1] = j[3];
-			ROM[i+2] = j[0];
-			ROM[i+3] = j[1];
 		}
 	}
 
