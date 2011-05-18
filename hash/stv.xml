@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+	Note: most games doesn't support multi cart system, the ones that are does have a "CART-AM" in the header
+-->
+
+<softwarelist name="stv" description="Sega Titan Video cartridges">
+
+  <!-- Game: Baku Baku Animal -->
+  <software name="bakubaku">
+    <description>Baku Baku Animal (J 950407 V1.000)</description>
+    <year>1995</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="stv_cart">
+        <dataarea name="rom" size="0x3000000">
+        <rom name="fpr17969.13" size="0x100000" crc="bee327e5" sha1="1d226db72d6ef68fd294f60659df7f882b25def6" offset="0x000001" loadflag="load16_byte"/>
+        <rom name="mpr17970.2" size="0x400000" crc="bc4d6f91" sha1="dcc241dcabea59325decfba3fd5e113c07958422"  offset="0x400000"/>
+        <rom name="mpr17971.3" size="0x400000" crc="c780a3b3" sha1="99587eea528a6413cacc3e4d3d1dbfff57b03dca"  offset="0x800000"/>
+        <rom name="mpr17972.4" size="0x400000" crc="8f29815a" sha1="e86acd8096f2aee5f5e3ddfd3abb4f5c2b11df66"  offset="0xc00000"/>
+        <rom name="mpr17973.5" size="0x400000" crc="5f6e0e8b" sha1="eeb5efb5216ab8b8fdee4656774bbd5a2a5b2d42"  offset="0x1000000"/>
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Game: Golden Axe - The Duel -->
+  <software name="gaxeduel">
+    <description>Golden Axe - The Duel (JUETL 950117 V1.000)</description>
+    <year>1994</year>
+    <publisher>Sega</publisher>
+    <part name="cart" interface="stv_cart">
+      <dataarea name="rom" size="0x3000000">
+        <rom name="epr17766.13"      size="0x0080000" crc="a83fcd62" sha1="4ce77ebaa0e93c6553ad8f7fb87cbdc32433402b" offset="0x0000001" loadflag="load16_byte"/>
+	<rom size="0x0080000" offset="0x0100001" loadflag="reload" />
+        <rom name="mpr17768.2"       size="0x0400000" crc="d6808a7d" sha1="83a97bbe1160cb45b3bdcbde8adc0d9bae5ded60" offset="0x0400000"/>
+        <rom name="mpr17769.3"       size="0x0400000" crc="3471dd35" sha1="24febddfe70984cebc0e6948ad718e0e6957fa82" offset="0x0800000"/>
+        <rom name="mpr17770.4"       size="0x0400000" crc="06978a00" sha1="a8d1333a9f4322e28b23724937f595805315b136" offset="0x0c00000"/>
+        <rom name="mpr17771.5"       size="0x0400000" crc="aea2ea3b" sha1="2fbe3e10d3f5a3b3099a7ed5b38b93b6e22e19b8" offset="0x1000000"/>
+        <rom name="mpr17772.6"       size="0x0400000" crc="b3dc0e75" sha1="fbe2790c84466d186ea3e9d41edfcb7afaf54bea" offset="0x1400000"/>
+        <rom name="mpr17767.1"       size="0x0400000" crc="9ba1e7b1" sha1="f297c3697d2e8ba4476d672267163f91f371b362" offset="0x1800000"/>
+      </dataarea>
+    </part>
+  </software>
+
+
+
+</softwarelist>

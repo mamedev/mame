@@ -8,6 +8,7 @@ docs/newvideo.txt svneol=native#text/plain
 docs/windows.txt svneol=native#text/plain
 hash/megatech.xml svneol=native#text/plain
 hash/softwarelist.dtd svneol=native#text/plain
+hash/stv.xml svneol=native#text/plain
 hlsl/color.fx svneol=native#text/plain
 hlsl/color_heavy.fx svneol=native#text/plain
 hlsl/color_light.fx svneol=native#text/plain

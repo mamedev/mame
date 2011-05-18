@@ -3020,16 +3020,17 @@ MACHINE_CONFIG_END
 
 struct stv_cart_region
 {
+	const char *tag;
 	int        slot;
 	const char *region;
 };
 
 static const struct stv_cart_region stv_cart_table[] =
 {
-	{ 0, "game0" },
-	{ 1, "game1" },
-	{ 2, "game2" },
-	{ 3, "game3" },
+	{ "cart1", 0, "game0" },
+	{ "cart2", 1, "game1" },
+	{ "cart3", 2, "game2" },
+	{ "cart4", 3, "game3" },
 	{ 0 }
 };
 
@@ -3037,12 +3038,12 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 {
 //	saturn_state *state = image.device().machine().driver_data<saturn_state>();
 	const struct stv_cart_region *stv_cart = &stv_cart_table[0], *this_cart;
-	const char	*pcb_name;
+	//const char	*pcb_name;
 
 	/* First, determine where this cart has to be loaded */
-	while (stv_cart->region)
+	while (stv_cart->tag)
 	{
-		if (strcmp(stv_cart->region, image.device().tag()) == 0)
+		if (strcmp(stv_cart->tag, image.device().tag()) == 0)
 			break;
 
 		stv_cart++;
@@ -3053,14 +3054,42 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	//printf("load list\n");
 	UINT8 *ROM = image.device().machine().region(this_cart->region)->base();
-	//printf("load list2\n");
 	UINT32 length = image.get_software_region_length("rom");
+
 	memcpy(ROM, image.get_software_region("rom"), length);
 
-	if ((pcb_name = image.get_feature("pcb_type")) == NULL)
-		return IMAGE_INIT_FAIL;
+	/* fix endianess */
+	{
+		UINT8 j[4];
+		int i;
+
+		for(i=0;i<0x0200000;i+=4)//0x0200000
+		{
+			j[0] = ROM[i];
+			j[1] = ROM[i+1];
+			j[2] = ROM[i+2];
+			j[3] = ROM[i+3];
+			ROM[i] = j[3];
+			ROM[i+1] = j[2];
+			ROM[i+2] = j[1];
+			ROM[i+3] = j[0];
+		}
+		for(i=0x0200000;i<length;i+=4)//0x0200000
+		{
+			j[0] = ROM[i];
+			j[1] = ROM[i+1];
+			j[2] = ROM[i+2];
+			j[3] = ROM[i+3];
+			ROM[i] = j[2];
+			ROM[i+1] = j[3];
+			ROM[i+2] = j[0];
+			ROM[i+3] = j[1];
+		}
+	}
+
+	//if ((pcb_name = image.get_feature("pcb_type")) == NULL)
+	//	return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
 }
@@ -3256,7 +3285,13 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 
 ROM_START( stvbios )
 	STV_BIOS
-	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 )
+
+	ROM_REGION32_BE( 0x3000000, "game1", ROMREGION_ERASE00 )
+
+	ROM_REGION32_BE( 0x3000000, "game2", ROMREGION_ERASE00 )
+
+	ROM_REGION32_BE( 0x3000000, "game3", ROMREGION_ERASE00 )
 ROM_END
 
 /*
