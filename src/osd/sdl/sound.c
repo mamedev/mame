@@ -37,7 +37,7 @@ static int stream_in_initialized = 0;
 static int stream_loop = 0;
 
 // maximum audio latency
-#define MAX_AUDIO_LATENCY		10
+#define MAX_AUDIO_LATENCY		5
 
 //============================================================
 //  LOCAL VARIABLES
