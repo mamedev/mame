@@ -696,6 +696,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 							/* Handle 'reload' loadflag */
 							add_rom_entry( swlist, NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS );
 						}
+						else if ( str_loadflag && !strcmp(str_loadflag, "reload_plain") )
+						{
+							/* Handle 'reload_plain' loadflag */
+							add_rom_entry( swlist, NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD);
+						}
 						else if ( str_loadflag && !strcmp(str_loadflag, "continue") )
 						{
 							/* Handle 'continue' loadflag */
