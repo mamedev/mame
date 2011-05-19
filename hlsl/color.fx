@@ -55,6 +55,8 @@ uniform float RawHeight;
 uniform float WidthRatio;
 uniform float HeightRatio;
 
+uniform float YIQEnable;
+
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
@@ -67,7 +69,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord;//(Input.TexCoord - float2(0.5f, 0.5f)) / 8.0f + float2(0.25f, 0.25f);
+	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
+	float2 TexCoord = (Input.Position.xy * InvTexSize) / float2(WidthRatio, HeightRatio);
+	Output.TexCoord = lerp(Input.TexCoord, TexCoord, YIQEnable);
 	Output.ExtraInfo = Input.ExtraInfo;
 
 	return Output;
@@ -87,16 +91,6 @@ uniform float BluFromRed = 0.0f;
 uniform float BluFromGrn = 0.0f;
 uniform float BluFromBlu = 1.0f;
 
-uniform float YfromY = 1.0f;
-uniform float YfromI = 0.0f;
-uniform float YfromQ = 0.0f;
-uniform float IfromY = 0.0f;
-uniform float IfromI = 1.0f;
-uniform float IfromQ = 0.0f;
-uniform float QfromY = 0.0f;
-uniform float QfromI = 0.0f;
-uniform float QfromQ = 1.0f;
-
 uniform float RedOffset = 0.0f;
 uniform float GrnOffset = 0.0f;
 uniform float BluOffset = 0.0f;
@@ -111,87 +105,35 @@ uniform float BluFloor = 0.0f;
 
 uniform float Saturation = 1.0f;
 
-uniform float YScale = 1.0f;
-uniform float IScale = 1.0f;
-uniform float QScale = 1.0f;
-uniform float YOffset = 0.0f;
-uniform float IOffset = 0.0f;
-uniform float QOffset = 0.0f;
-
 uniform float RedPower = 2.2f;
 uniform float GrnPower = 2.2f;
 uniform float BluPower = 2.2f;
 
-uniform float YSubsampleLength = 3.0f;
-uniform float ISubsampleLength = 3.0f;
-uniform float QSubsampleLength = 3.0f;
-
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	// -- Bandwidth Subsampling --
-	float3 SubsampleWidth = float3(YSubsampleLength, ISubsampleLength, QSubsampleLength);
-	SubsampleWidth = (RawWidth * 2.0f) / SubsampleWidth;
-	float3 SubsampleCoord = Input.TexCoord.x;
-	float3 SubsampleFrac = frac(SubsampleCoord * SubsampleWidth); // Fraction is in subsample width units!
-	SubsampleCoord = (SubsampleCoord * SubsampleWidth - SubsampleFrac) / SubsampleWidth;
-	
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 	
-	float3 YTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.x, Input.TexCoord.y)).rgb;
-	float3 ITexel = tex2D(DiffuseSampler, float2(SubsampleCoord.y, Input.TexCoord.y)).rgb;
-	float3 QTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.z, Input.TexCoord.y)).rgb;
-	
-	float3 LastYTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.x + YSubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
-	float3 LastITexel = tex2D(DiffuseSampler, float2(SubsampleCoord.y + ISubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
-	float3 LastQTexel = tex2D(DiffuseSampler, float2(SubsampleCoord.z + QSubsampleLength / (RawWidth * 2.0f), Input.TexCoord.y)).rgb;
-	
-	YTexel = lerp(YTexel, LastYTexel, SubsampleFrac.x);
-	ITexel = lerp(ITexel, LastITexel, SubsampleFrac.y);
-	QTexel = lerp(QTexel, LastQTexel, SubsampleFrac.z);
+	float3 OutRGB = BaseTexel.rgb;
 
 	// -- RGB Tint & Shift --
-	float ShiftedRedY = dot(YTexel, float3(RedFromRed, RedFromGrn, RedFromBlu));
-	float ShiftedGrnY = dot(YTexel, float3(GrnFromRed, GrnFromGrn, GrnFromBlu));
-	float ShiftedBluY = dot(YTexel, float3(BluFromRed, BluFromGrn, BluFromBlu));
-	float ShiftedRedI = dot(ITexel, float3(RedFromRed, RedFromGrn, RedFromBlu));
-	float ShiftedGrnI = dot(ITexel, float3(GrnFromRed, GrnFromGrn, GrnFromBlu));
-	float ShiftedBluI = dot(ITexel, float3(BluFromRed, BluFromGrn, BluFromBlu));
-	float ShiftedRedQ = dot(QTexel, float3(RedFromRed, RedFromGrn, RedFromBlu));
-	float ShiftedGrnQ = dot(QTexel, float3(GrnFromRed, GrnFromGrn, GrnFromBlu));
-	float ShiftedBluQ = dot(QTexel, float3(BluFromRed, BluFromGrn, BluFromBlu));
+	float ShiftedRed = dot(OutRGB, float3(RedFromRed, RedFromGrn, RedFromBlu));
+	float ShiftedGrn = dot(OutRGB, float3(GrnFromRed, GrnFromGrn, GrnFromBlu));
+	float ShiftedBlu = dot(OutRGB, float3(BluFromRed, BluFromGrn, BluFromBlu));
 	
 	// -- RGB Offset & Scale --
 	float3 RGBScale = float3(RedScale, GrnScale, BluScale);
 	float3 RGBShift = float3(RedOffset, GrnOffset, BluOffset);
-	float3 OutTexelY = float3(ShiftedRedY, ShiftedGrnY, ShiftedBluY) * RGBScale + RGBShift;
-	float3 OutTexelI = float3(ShiftedRedI, ShiftedGrnI, ShiftedBluI) * RGBScale + RGBShift;
-	float3 OutTexelQ = float3(ShiftedRedQ, ShiftedGrnQ, ShiftedBluQ) * RGBScale + RGBShift;
+	float3 OutTexel = float3(ShiftedRed, ShiftedGrn, ShiftedBlu) * RGBScale + RGBShift;
 	
 	// -- Saturation --
 	float3 Gray = float3(0.3f, 0.59f, 0.11f);
-	float OutLumaY = dot(OutTexelY, Gray);
-	float OutLumaI = dot(OutTexelI, Gray);
-	float OutLumaQ = dot(OutTexelQ, Gray);
-	float3 OutChromaY = OutTexelY - OutLumaY;
-	float3 OutChromaI = OutTexelI - OutLumaI;
-	float3 OutChromaQ = OutTexelQ - OutLumaQ;
-	float3 SaturatedY = OutLumaY + OutChromaY * Saturation;
-	float3 SaturatedI = OutLumaI + OutChromaI * Saturation;
-	float3 SaturatedQ = OutLumaQ + OutChromaQ * Saturation;
+	float OutLuma = dot(OutTexel, Gray);
+	float3 OutChroma = OutTexel - OutLuma;
+	float3 Saturated = OutLuma + OutChroma * Saturation;
 	
-	// -- YIQ Convolution --
-	float Y = dot(SaturatedY, float3(0.299f, 0.587f, 0.114f));
-	float I = dot(SaturatedI, float3(0.595716f, -0.274453f, -0.321263f));
-	float Q = dot(SaturatedQ, float3(0.211456f, -0.522591f, 0.311135f));
-	Y = dot(float3(Y, I, Q), float3(YfromY, YfromI, YfromQ));
-	I = dot(float3(Y, I, Q), float3(IfromY, IfromI, IfromQ));
-	Q = dot(float3(Y, I, Q), float3(QfromY, QfromI, QfromQ));
-	float3 OutYIQ = float3(Y, I, Q) * float3(YScale, IScale, QScale) + float3(YOffset, IOffset, QOffset);
-	float3 OutRGB = float3(dot(OutYIQ, float3(1.0f, 0.9563f, 0.6210f)), dot(OutYIQ, float3(1.0f, -0.2721f, -0.6474f)), dot(OutYIQ, float3(1.0f, -1.1070f, 1.7046f)));
-
-	OutRGB.r = pow(OutRGB.r, RedPower);
-	OutRGB.g = pow(OutRGB.g, GrnPower);
-	OutRGB.b = pow(OutRGB.b, BluPower);
+	OutRGB.r = pow(Saturated.r, RedPower);
+	OutRGB.g = pow(Saturated.g, GrnPower);
+	OutRGB.b = pow(Saturated.b, BluPower);
 
 	// -- Color Compression (increasing the floor of the signal without affecting the ceiling) --
 	OutRGB = float3(RedFloor + (1.0f - RedFloor) * OutRGB.r, GrnFloor + (1.0f - GrnFloor) * OutRGB.g, BluFloor + (1.0f - BluFloor) * OutRGB.b);

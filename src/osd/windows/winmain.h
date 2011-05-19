@@ -121,15 +121,6 @@
 #define WINOPTION_BLUE_MATRIX_R				"blue_from_r"
 #define WINOPTION_BLUE_MATRIX_G				"blue_from_g"
 #define WINOPTION_BLUE_MATRIX_B				"blue_from_b"
-#define WINOPTION_Y_MATRIX_Y				"y_from_y"
-#define WINOPTION_Y_MATRIX_I				"y_from_i"
-#define WINOPTION_Y_MATRIX_Q				"y_from_q"
-#define WINOPTION_I_MATRIX_Y				"i_from_y"
-#define WINOPTION_I_MATRIX_I				"i_from_i"
-#define WINOPTION_I_MATRIX_Q				"i_from_q"
-#define WINOPTION_Q_MATRIX_Y				"q_from_y"
-#define WINOPTION_Q_MATRIX_I				"q_from_i"
-#define WINOPTION_Q_MATRIX_Q				"q_from_q"
 #define WINOPTION_RED_OFFSET				"red_offset"
 #define WINOPTION_GREEN_OFFSET				"green_offset"
 #define WINOPTION_BLUE_OFFSET				"blue_offset"
@@ -142,19 +133,15 @@
 #define WINOPTION_RED_FLOOR					"red_floor"
 #define WINOPTION_GREEN_FLOOR				"green_floor"
 #define WINOPTION_BLUE_FLOOR				"blue_floor"
-#define WINOPTION_SATURATION				"saturation"
-#define WINOPTION_Y_SCALE					"y_scale"
-#define WINOPTION_I_SCALE					"i_scale"
-#define WINOPTION_Q_SCALE					"q_scale"
-#define WINOPTION_Y_OFFSET					"y_offset"
-#define WINOPTION_I_OFFSET					"i_offset"
-#define WINOPTION_Q_OFFSET					"q_offset"
-#define WINOPTION_Y_SUBSAMPLE_LENGTH		"y_subsample_length"
-#define WINOPTION_I_SUBSAMPLE_LENGTH		"i_subsample_length"
-#define WINOPTION_Q_SUBSAMPLE_LENGTH		"q_subsample_length"
 #define WINOPTION_RED_PHOSPHOR				"red_phosphor_life"
 #define WINOPTION_GREEN_PHOSPHOR			"green_phosphor_life"
 #define WINOPTION_BLUE_PHOSPHOR				"blue_phosphor_life"
+#define WINOPTION_SATURATION				"saturation"
+#define WINOPTION_YIQ_ENABLE				"yiq_enable"
+#define WINOPTION_YIQ_WVALUE				"yiq_w"
+#define WINOPTION_YIQ_AVALUE				"yiq_a"
+#define WINOPTION_YIQ_BVALUE				"yiq_b"
+#define WINOPTION_YIQ_PHASE_COUNT			"yiq_phase_count"
 
 // per-window options
 #define WINOPTION_SCREEN				"screen"
@@ -261,15 +248,11 @@ public:
 	float screen_blue_from_red() const { return float_value(WINOPTION_BLUE_MATRIX_R); }
 	float screen_blue_from_green() const { return float_value(WINOPTION_BLUE_MATRIX_G); }
 	float screen_blue_from_blue() const { return float_value(WINOPTION_BLUE_MATRIX_B); }
-	float screen_y_from_y() const { return float_value(WINOPTION_Y_MATRIX_Y); }
-	float screen_y_from_i() const { return float_value(WINOPTION_Y_MATRIX_I); }
-	float screen_y_from_q() const { return float_value(WINOPTION_Y_MATRIX_Q); }
-	float screen_i_from_y() const { return float_value(WINOPTION_I_MATRIX_Y); }
-	float screen_i_from_i() const { return float_value(WINOPTION_I_MATRIX_I); }
-	float screen_i_from_q() const { return float_value(WINOPTION_I_MATRIX_Q); }
-	float screen_q_from_y() const { return float_value(WINOPTION_Q_MATRIX_Y); }
-	float screen_q_from_i() const { return float_value(WINOPTION_Q_MATRIX_I); }
-	float screen_q_from_q() const { return float_value(WINOPTION_Q_MATRIX_Q); }
+	bool screen_yiq_enable() const { return bool_value(WINOPTION_YIQ_ENABLE); }
+	float screen_yiq_w() const { return float_value(WINOPTION_YIQ_WVALUE); }
+	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
+	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
+	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
 	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }
 	float screen_blue_offset() const { return float_value(WINOPTION_BLUE_OFFSET); }
@@ -283,15 +266,6 @@ public:
 	float screen_green_floor() const { return float_value(WINOPTION_GREEN_FLOOR); }
 	float screen_blue_floor() const { return float_value(WINOPTION_BLUE_FLOOR); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
-	float screen_y_scale() const { return float_value(WINOPTION_Y_SCALE); }
-	float screen_i_scale() const { return float_value(WINOPTION_I_SCALE); }
-	float screen_q_scale() const { return float_value(WINOPTION_Q_SCALE); }
-	float screen_y_offset() const { return float_value(WINOPTION_Y_OFFSET); }
-	float screen_i_offset() const { return float_value(WINOPTION_I_OFFSET); }
-	float screen_q_offset() const { return float_value(WINOPTION_Q_OFFSET); }
-	float screen_y_subsample_length() const { return float_value(WINOPTION_Y_SUBSAMPLE_LENGTH); }
-	float screen_i_subsample_length() const { return float_value(WINOPTION_I_SUBSAMPLE_LENGTH); }
-	float screen_q_subsample_length() const { return float_value(WINOPTION_Q_SUBSAMPLE_LENGTH); }
 	float screen_red_phosphor() const { return float_value(WINOPTION_RED_PHOSPHOR); }
 	float screen_green_phosphor() const { return float_value(WINOPTION_GREEN_PHOSPHOR); }
 	float screen_blue_phosphor() const { return float_value(WINOPTION_BLUE_PHOSPHOR); }

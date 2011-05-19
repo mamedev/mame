@@ -1,0 +1,169 @@
+//-----------------------------------------------------------------------------
+// YIQ Encode Effect
+//-----------------------------------------------------------------------------
+
+texture Diffuse;
+
+sampler DiffuseSampler = sampler_state
+{
+	Texture   = <Diffuse>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = CLAMP;
+	AddressV = CLAMP;
+	AddressW = CLAMP;
+};
+
+//-----------------------------------------------------------------------------
+// Vertex Definitions
+//-----------------------------------------------------------------------------
+
+struct VS_OUTPUT
+{
+	float4 Position : POSITION;
+	float4 Color : COLOR0;
+	float2 Coord0 : TEXCOORD0;
+	float2 Coord1 : TEXCOORD1;
+	float2 Coord2 : TEXCOORD2;
+	float2 Coord3 : TEXCOORD3;
+};
+
+struct VS_INPUT
+{
+	float4 Position : POSITION;
+	float4 Color : COLOR0;
+	float2 TexCoord : TEXCOORD0;
+	float2 ExtraInfo : TEXCOORD1;
+};
+
+struct PS_INPUT
+{
+	float4 Color : COLOR0;
+	float2 Coord0 : TEXCOORD0;
+	float2 Coord1 : TEXCOORD1;
+	float2 Coord2 : TEXCOORD2;
+	float2 Coord3 : TEXCOORD3;
+};
+
+//-----------------------------------------------------------------------------
+// YIQ Encode Vertex Shader
+//-----------------------------------------------------------------------------
+
+uniform float TargetWidth;
+uniform float TargetHeight;
+
+uniform float RawWidth;
+uniform float RawHeight;
+
+uniform float WidthRatio;
+uniform float HeightRatio;
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0;
+	
+	Output.Position = float4(Input.Position.xyz, 1.0f);
+	Output.Position.x /= TargetWidth;
+	Output.Position.y /= TargetHeight;
+	Output.Position.y /= HeightRatio;
+	Output.Position.y = 1.0f - Output.Position.y;
+	Output.Position.x /= WidthRatio;
+	Output.Position.x -= 0.5f;
+	Output.Position.y -= 0.5f;
+	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
+	Output.Color = Input.Color;
+	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
+	Output.Coord0 = Input.TexCoord + float2(0.00f / RawWidth, 0.0f);
+	Output.Coord1 = Input.TexCoord + float2(0.25f / RawWidth, 0.0f);
+	Output.Coord2 = Input.TexCoord + float2(0.50f / RawWidth, 0.0f);
+	Output.Coord3 = Input.TexCoord + float2(0.75f / RawWidth, 0.0f);
+
+	return Output;
+}
+
+//-----------------------------------------------------------------------------
+// YIQ Encode Pixel Shader
+//-----------------------------------------------------------------------------
+
+uniform float YSubsampleLength = 3.0f;
+uniform float ISubsampleLength = 3.0f;
+uniform float QSubsampleLength = 3.0f;
+
+uniform float WValue;
+uniform float AValue;
+uniform float BValue;
+
+float4 ps_main(PS_INPUT Input) : COLOR
+{
+	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0).rgb;
+	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1).rgb;
+	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2).rgb;
+	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3).rgb;
+	
+	// Cos goes from 1 to 0 to 1 over the course of 2PI
+	// Sin goes from 0 to 1 to 0 over the course of 2PI
+	// WValue is 4PI / 3
+	// That is, 3 cycles through WValue will reuslt in 4PI being traversed, or cos() to go from 1 to 0 to 1 to 0 to 1
+	// WValue appears to be the chroma carrier rate
+	// 1 Pixel -> 1 cycle
+	// WValue will cycle from 1 to 0 to 1 to 0 to 1 over 3 pixels
+
+
+	float PI = 3.14159265f;
+	float W = WValue;
+	
+	float T0 = Input.Coord0.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord0.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
+	float T1 = Input.Coord1.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord1.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
+	float T2 = Input.Coord2.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord2.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
+	float T3 = Input.Coord3.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord3.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
+	
+	float Y0 = dot(Texel0, float3(0.299f, 0.587f, 0.114f));
+	float I0 = dot(Texel0, float3(0.595716f, -0.274453f, -0.321263f));
+	float Q0 = dot(Texel0, float3(0.211456f, -0.522591f, 0.311135f));
+
+	float Y1 = dot(Texel1, float3(0.299f, 0.587f, 0.114f));
+	float I1 = dot(Texel1, float3(0.595716f, -0.274453f, -0.321263f));
+	float Q1 = dot(Texel1, float3(0.211456f, -0.522591f, 0.311135f));
+
+	float Y2 = dot(Texel2, float3(0.299f, 0.587f, 0.114f));
+	float I2 = dot(Texel2, float3(0.595716f, -0.274453f, -0.321263f));
+	float Q2 = dot(Texel2, float3(0.211456f, -0.522591f, 0.311135f));
+
+	float Y3 = dot(Texel3, float3(0.299f, 0.587f, 0.114f));
+	float I3 = dot(Texel3, float3(0.595716f, -0.274453f, -0.321263f));
+	float Q3 = dot(Texel3, float3(0.211456f, -0.522591f, 0.311135f));
+
+	//float MaxC = 1.5957f;
+	//float MinC = -0.5957f;
+	float MaxC = 2.1183f;
+	float MinC = -1.1183f;
+	float CRange = MaxC - MinC;
+	
+	float C0 = Y0 + I0 * sin(T0 * W) + Q0 * cos(T0 * W);
+	float C1 = Y1 + I1 * sin(T1 * W) + Q1 * cos(T1 * W);
+	float C2 = Y2 + I2 * sin(T2 * W) + Q2 * cos(T2 * W);
+	float C3 = Y3 + I3 * sin(T3 * W) + Q3 * cos(T3 * W);
+	C0 = (C0 - MinC) / CRange;
+	C1 = (C1 - MinC) / CRange;
+	C2 = (C2 - MinC) / CRange;
+	C3 = (C3 - MinC) / CRange;
+	
+	float4 Tc = float4(T0, T1, T2, T3);
+	return float4(C0, C1, C2, C3);
+}
+
+//-----------------------------------------------------------------------------
+// YIQ Encode Technique
+//-----------------------------------------------------------------------------
+
+technique EncodeTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_3_0 vs_main();
+		PixelShader  = compile ps_3_0 ps_main();
+	}
+}
