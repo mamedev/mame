@@ -487,7 +487,8 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			r = RIGHTS(desc);
 			if (DPL(r)>=PMAX(RPL(tmp),CPL)) {
 				cpustate->ZeroVal = 0;
-				RegWord(ModRM) = RIGHTS(desc);
+				// rights are expected to be in upper byte
+				RegWord(ModRM) = r << 8;
 			}
 			else
 				cpustate->ZeroVal = 1;
@@ -574,11 +575,11 @@ static void PREFIX286(_arpl)(i8086_state *cpustate) /* 0x63 */
 
 	if (RPL(tmp)<RPL(source))
 	{
-		cpustate->ZeroVal = 1;
+		cpustate->ZeroVal = 0;
 		PutbackRMWord(ModRM, IDXTBL(tmp)|RPL(source));
 	}
 	else
-		cpustate->ZeroVal = 0;
+		cpustate->ZeroVal = 1;
 }
 
 static void i80286_load_flags(i8086_state *cpustate, int flags, int cpl)
