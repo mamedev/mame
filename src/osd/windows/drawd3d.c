@@ -2495,7 +2495,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				/* Scanlines and shadow mask */
 				curr_effect = d3d->post_effect;
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture3);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
 
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);

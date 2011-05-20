@@ -69,9 +69,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	float2 TexCoord = (Input.Position.xy * InvTexSize) / float2(WidthRatio, HeightRatio);
-	Output.TexCoord = lerp(Input.TexCoord, TexCoord, YIQEnable);
+	Output.TexCoord = Input.TexCoord;
 	Output.ExtraInfo = Input.ExtraInfo;
 
 	return Output;
@@ -111,7 +109,7 @@ uniform float BluPower = 2.2f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord - 0.5f / float2(RawWidth, RawHeight));
 	
 	float3 OutRGB = BaseTexel.rgb;
 
@@ -138,10 +136,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// -- Color Compression (increasing the floor of the signal without affecting the ceiling) --
 	OutRGB = float3(RedFloor + (1.0f - RedFloor) * OutRGB.r, GrnFloor + (1.0f - GrnFloor) * OutRGB.g, BluFloor + (1.0f - BluFloor) * OutRGB.b);
 
-	// -- Final Pixel --
-	float4 Output = lerp(Input.Color, float4(OutRGB, BaseTexel.a) * Input.Color, Input.ExtraInfo.x);
-
-	return Output;
+	return float4(OutRGB, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
