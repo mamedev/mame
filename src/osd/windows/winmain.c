@@ -341,6 +341,8 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_OVERSAMPLE_X";fs_overx(0.1-9.0)",            	"1.0",     	 OPTION_FLOAT,    	"oversample amount in screen-relative X direction, multiple" },
 	{ WINOPTION_OVERSAMPLE_Y";fs_overy(0.1-9.0)",            	"1.0",     	 OPTION_FLOAT,     	"oversample amount in screen-relative Y direction, multiple" },
 	{ WINOPTION_CURVATURE";fs_curv(0.0-4.0)",            		"0.0",       OPTION_FLOAT,    	"screen curvature amount" },
+	{ WINOPTION_SCREEN_SCALE_TOP";fs_scalex(0.0-2.0)",          "1.0",       OPTION_FLOAT,    	"screen scale, top" },
+	{ WINOPTION_SCREEN_SCALE_BOTTOM";fs_scaley(0.0-2.0)",     	"1.0",       OPTION_FLOAT,    	"screen scale, bottom" },
 	/* Beam-related values below this line*/
 	{ WINOPTION_PINCUSHION";fs_pin(0.0-4.0)",            		"0.0",       OPTION_FLOAT,    	"pincushion amount" },
 	{ WINOPTION_SCANLINE_AMOUNT";fs_scanam(0.0-4.0)",       	"0.0",       OPTION_FLOAT,    	"overall alpha scaling value for scanlines" },

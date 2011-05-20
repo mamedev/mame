@@ -66,19 +66,16 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.x /= TargetWidth;
 	Output.Position.y /= TargetHeight;
-	Output.Position.y /= HeightRatio;
 	Output.Position.y = 1.0f - Output.Position.y;
-	Output.Position.x /= WidthRatio;
 	Output.Position.x -= 0.5f;
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
 	Output.Coord0 = Input.TexCoord + float2(0.00f / RawWidth, 0.0f);
 	Output.Coord1 = Input.TexCoord + float2(0.25f / RawWidth, 0.0f);
 	Output.Coord2 = Input.TexCoord + float2(0.50f / RawWidth, 0.0f);
 	Output.Coord3 = Input.TexCoord + float2(0.75f / RawWidth, 0.0f);
-
+	
 	return Output;
 }
 
@@ -96,28 +93,26 @@ uniform float BValue;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0).rgb;
-	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1).rgb;
-	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2).rgb;
-	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3).rgb;
+	float2 InvRatios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
+	float2 Offset = float2(0.5f / RawWidth, 0.5f / RawHeight);
+	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 - Offset).rgb;
+	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 - Offset).rgb;
+	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 - Offset).rgb;
+	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 - Offset).rgb;
 	
-	// Cos goes from 1 to 0 to 1 over the course of 2PI
-	// Sin goes from 0 to 1 to 0 over the course of 2PI
-	// WValue is 4PI / 3
-	// That is, 3 cycles through WValue will reuslt in 4PI being traversed, or cos() to go from 1 to 0 to 1 to 0 to 1
-	// WValue appears to be the chroma carrier rate
-	// 1 Pixel -> 1 cycle
-	// WValue will cycle from 1 to 0 to 1 to 0 to 1 over 3 pixels
-
-
-	float PI = 3.14159265f;
+	float2 Scaler = float2(RawWidth, RawHeight);
+	float2 Coord0 = Input.Coord0.xy * Scaler;
+	float2 Coord1 = Input.Coord1.xy * Scaler;
+	float2 Coord2 = Input.Coord2.xy * Scaler;
+	float2 Coord3 = Input.Coord3.xy * Scaler;
+	
 	float W = WValue;
-	
-	float T0 = Input.Coord0.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord0.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
-	float T1 = Input.Coord1.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord1.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
-	float T2 = Input.Coord2.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord2.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
-	float T3 = Input.Coord3.x * (RawWidth / WidthRatio) * 2.0f + AValue * 0.5333f * Input.Coord3.y * (RawHeight / HeightRatio) * 2.0f + BValue * 2.0f + 2.0f;
-	
+	float YRatio = 1.0f;
+	float T0 = Coord0.x + AValue * YRatio * Coord0.y + BValue;
+	float T1 = Coord1.x + AValue * YRatio * Coord1.y + BValue;
+	float T2 = Coord2.x + AValue * YRatio * Coord2.y + BValue;
+	float T3 = Coord3.x + AValue * YRatio * Coord3.y + BValue;
+
 	float Y0 = dot(Texel0, float3(0.299f, 0.587f, 0.114f));
 	float I0 = dot(Texel0, float3(0.595716f, -0.274453f, -0.321263f));
 	float Q0 = dot(Texel0, float3(0.211456f, -0.522591f, 0.311135f));
@@ -134,8 +129,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float I3 = dot(Texel3, float3(0.595716f, -0.274453f, -0.321263f));
 	float Q3 = dot(Texel3, float3(0.211456f, -0.522591f, 0.311135f));
 
-	//float MaxC = 1.5957f;
-	//float MinC = -0.5957f;
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
 	float CRange = MaxC - MinC;
@@ -149,7 +142,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	C2 = (C2 - MinC) / CRange;
 	C3 = (C3 - MinC) / CRange;
 	
-	float4 Tc = float4(T0, T1, T2, T3);
 	return float4(C0, C1, C2, C3);
 }
 

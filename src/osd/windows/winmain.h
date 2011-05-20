@@ -90,6 +90,8 @@
 #define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
 #define WINOPTION_SHADOW_MASK_VSIZE			"shadow_mask_vsize"
 #define WINOPTION_PINCUSHION				"pincushion"
+#define WINOPTION_SCREEN_SCALE_TOP			"screen_scale_top"
+#define WINOPTION_SCREEN_SCALE_BOTTOM		"screen_scale_bottom"
 #define WINOPTION_CURVATURE					"curvature"
 #define WINOPTION_OVERSAMPLE_X				"oversample_x"
 #define WINOPTION_OVERSAMPLE_Y				"oversample_y"
@@ -224,6 +226,8 @@ public:
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
 	float screen_pincushion() const { return float_value(WINOPTION_PINCUSHION); }
+	float screen_scale_top() const { return float_value(WINOPTION_SCREEN_SCALE_TOP); }
+	float screen_scale_bottom() const { return float_value(WINOPTION_SCREEN_SCALE_BOTTOM); }
 	float screen_curvature() const { return float_value(WINOPTION_CURVATURE); }
 	float screen_defocus_x() const { return float_value(WINOPTION_DEFOCUS_X); }
 	float screen_defocus_y() const { return float_value(WINOPTION_DEFOCUS_Y); }

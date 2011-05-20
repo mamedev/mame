@@ -87,7 +87,7 @@ extern void mtlog_add(const char *event);
 #define ENABLE_BORDER_PIX	(1)
 
 #define VERTEX_BASE_FORMAT	(D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEX2)
-#define VERTEX_BUFFER_SIZE	(2048*4)
+#define VERTEX_BUFFER_SIZE	(2048*6+6)
 
 enum
 {
@@ -200,6 +200,7 @@ struct _d3d_info
 	d3d_effect *			color_effect;				// pointer to the current color-effect object
 	d3d_effect *			yiq_encode_effect;			// pointer to the current YIQ encoder effect object
 	d3d_effect *			yiq_decode_effect;			// pointer to the current YIQ decoder effect object
+	d3d_vertex *			fsfx_vertices;				// pointer to our full-screen-quad object
 
 	poly_info				poly[VERTEX_BUFFER_SIZE / 3];// array to hold polygons as they are created
 	int						numpolys;					// number of accumulated polygons
@@ -524,6 +525,7 @@ static int update_window_size(win_window_info *window);
 // drawing
 static void draw_line(d3d_info *d3d, const render_primitive *prim);
 static void draw_quad(d3d_info *d3d, const render_primitive *prim);
+static void init_fsfx_quad(d3d_info *d3d);
 
 // primitives
 static d3d_vertex *primitive_alloc(d3d_info *d3d, int numverts);
@@ -744,6 +746,11 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 	d3d->lockedbuf = NULL;
 
 	// loop over primitives
+	if(d3d->hlsl_enable && d3dintf->post_fx_available)
+	{
+		init_fsfx_quad(d3d);
+	}
+
 mtlog_add("drawd3d_window_draw: primitive loop begin");
 	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
 		switch (prim->type)
@@ -1974,6 +1981,59 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 
 
 //============================================================
+//  init_fsfx_quad
+//============================================================
+
+static void init_fsfx_quad(d3d_info *d3d)
+{
+	// get a pointer to the vertex buffer
+	d3d->fsfx_vertices = primitive_alloc(d3d, 6);
+	if (d3d->fsfx_vertices == NULL)
+		return;
+
+	// fill in the vertexes clockwise
+	windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
+	float scale_top = options.screen_scale_top();
+	float scale_bottom = options.screen_scale_bottom();
+
+	d3d->fsfx_vertices[0].x = (d3d->width * (scale_top * 0.5f - 0.5f));
+	d3d->fsfx_vertices[0].y = 0.0f;
+	d3d->fsfx_vertices[1].x = d3d->width - (d3d->width * (scale_top * 0.5f - 0.5f));
+	d3d->fsfx_vertices[1].y = 0.0f;
+	d3d->fsfx_vertices[2].x = (d3d->width * (scale_bottom * 0.5f - 0.5f));
+	d3d->fsfx_vertices[2].y = d3d->height;
+	d3d->fsfx_vertices[3].x = d3d->width - (d3d->width * (scale_top * 0.5f - 0.5f));
+	d3d->fsfx_vertices[3].y = 0.0f;
+	d3d->fsfx_vertices[4].x = (d3d->width * (scale_bottom * 0.5f - 0.5f));
+	d3d->fsfx_vertices[4].y = d3d->height;
+	d3d->fsfx_vertices[5].x = d3d->width - (d3d->width * (scale_bottom * 0.5f - 0.5f));
+	d3d->fsfx_vertices[5].y = d3d->height;
+
+	d3d->fsfx_vertices[0].u0 = 0.0f;
+	d3d->fsfx_vertices[0].v0 = 0.0f;
+	d3d->fsfx_vertices[1].u0 = 1.0f;
+	d3d->fsfx_vertices[1].v0 = 0.0f;
+	d3d->fsfx_vertices[2].u0 = 0.0f;
+	d3d->fsfx_vertices[2].v0 = 1.0f;
+	d3d->fsfx_vertices[3].u0 = 1.0f;
+	d3d->fsfx_vertices[3].v0 = 0.0f;
+	d3d->fsfx_vertices[4].u0 = 0.0f;
+	d3d->fsfx_vertices[4].v0 = 1.0f;
+	d3d->fsfx_vertices[5].u0 = 1.0f;
+	d3d->fsfx_vertices[5].v0 = 1.0f;
+
+	// set the color, Z parameters to standard values
+	for (int i = 0; i < 6; i++)
+	{
+		d3d->fsfx_vertices[i].z = 0.0f;
+		d3d->fsfx_vertices[i].rhw = 1.0f;
+		d3d->fsfx_vertices[i].color = D3DCOLOR_ARGB(255, 255, 255, 255);
+	}
+}
+
+
+
+//============================================================
 //  primitive_alloc
 //============================================================
 
@@ -2050,13 +2110,18 @@ static void primitive_flush_pending(d3d_info *d3d)
 	{
 		result = (*d3dintf->device.get_render_target)(d3d->device, 0, &backbuffer);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
+		vertnum = 6;
+	}
+	else
+	{
+		vertnum = 0;
 	}
 
 	windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
 
 	int cur_render_screen = 0;
 	// now do the polys
-	for (polynum = vertnum = 0; polynum < d3d->numpolys; polynum++)
+	for (polynum = 0; polynum < d3d->numpolys; polynum++)
 	{
 		poly_info *poly = &d3d->poly[polynum];
 		int newfilter;
@@ -2160,7 +2225,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					{
 						(*d3dintf->effect.begin_pass)(curr_effect, pass);
 						// add the primitives
-						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 						(*d3dintf->effect.end_pass)(curr_effect);
 					}
@@ -2175,8 +2240,6 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
-					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 					(*d3dintf->effect.set_float)(curr_effect, "WValue", options.screen_yiq_w());
@@ -2195,7 +2258,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					{
 						(*d3dintf->effect.begin_pass)(curr_effect, pass);
 						// add the primitives
-						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 						(*d3dintf->effect.end_pass)(curr_effect);
 					}
@@ -2252,7 +2315,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				{
 					(*d3dintf->effect.begin_pass)(curr_effect, pass);
 					// add the primitives
-					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 					(*d3dintf->effect.end_pass)(curr_effect);
 				}
@@ -2293,7 +2356,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				{
 					(*d3dintf->effect.begin_pass)(curr_effect, pass);
 					// add the primitives
-					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 					(*d3dintf->effect.end_pass)(curr_effect);
 				}
@@ -2331,7 +2394,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					{
 						(*d3dintf->effect.begin_pass)(curr_effect, pass);
 						// add the primitives
-						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 						(*d3dintf->effect.end_pass)(curr_effect);
 					}
@@ -2361,7 +2424,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					{
 						(*d3dintf->effect.begin_pass)(curr_effect, pass);
 						// add the primitives
-						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 						(*d3dintf->effect.end_pass)(curr_effect);
 					}
@@ -2396,7 +2459,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				{
 					(*d3dintf->effect.begin_pass)(curr_effect, pass);
 					// add the primitives
-					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 					(*d3dintf->effect.end_pass)(curr_effect);
 				}
@@ -2422,7 +2485,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				{
 					(*d3dintf->effect.begin_pass)(curr_effect, pass);
 					// add the primitives
-					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+					result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 					(*d3dintf->effect.end_pass)(curr_effect);
 				}
@@ -2432,7 +2495,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				/* Scanlines and shadow mask */
 				curr_effect = d3d->post_effect;
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture3);
 
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
@@ -2686,7 +2749,6 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 						goto error;
 					(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
 
-					printf("Boo\n");
 					result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
 					if (result != D3D_OK)
 						goto error;

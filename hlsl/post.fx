@@ -80,9 +80,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	float2 TexCoord = (Input.Position.xy * InvTexSize) / float2(WidthRatio, HeightRatio);
-	Output.TexCoord = TexCoord;//(Input.TexCoord - float2(0.5f, 0.5f)) / 8.0f + float2(0.25f, 0.25f);
+	//float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
+	//float2 TexCoord = (Input.Position.xy * InvTexSize) / float2(WidthRatio, HeightRatio);
+	float2 Ratios = float2(WidthRatio, HeightRatio);
+	float2 Offset = float2(0.5f / RawWidth, 0.5f / RawHeight);
+	Output.TexCoord = Input.TexCoord;//(Input.TexCoord - float2(0.5f, 0.5f)) / 8.0f + float2(0.25f, 0.25f);
 	Output.ExtraInfo = Input.ExtraInfo;
 	
 	return Output;
@@ -148,7 +150,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 PincushionCurveX = PinUnitCoord.x * PincushionAmount * PincushionR2;
 	float3 PincushionCurveY = PinUnitCoord.y * PincushionAmount * PincushionR2;
 
-	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord * Ratios);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
 	clip((ScreenClipCoord.x < 1.0f / TargetWidth) ? -1 : 1);
