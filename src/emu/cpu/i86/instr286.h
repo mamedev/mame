@@ -19,7 +19,7 @@
 static void i80286_trap2(i80286_state *cpustate,UINT32 error);
 static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, int trap, int error);
 static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT16 offset, int gate);
-static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 selector, int cpl);
+static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 selector);
 static void PREFIX286(_0fpre)(i80286_state *cpustate);
 static void PREFIX286(_arpl)(i80286_state *cpustate);
 static void i80286_pop_seg(i80286_state *cpustate,int reg);

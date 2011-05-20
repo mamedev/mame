@@ -17,10 +17,6 @@
    7 p present 0 gives trap when accessed
    UINT16 reserved (should be zero)
 */
-#define IS_PRESENT(a)		( ( (a) & 0x80 ) == 0x80 )
-#define IS_WRITEABLE(a)		( ( (a) & 0xa ) == 2 )
-#define IS_READABLE(a)		( ( ( (a) & 0xa ) == 0xa ) || ( ( (a) & 8 ) == 0 ) )
-
 #define LIMIT(desc)  (desc[0]&0xffff)
 #define BASE(desc)   ((desc[1]&0xffff)|((desc[2]&0xff)<<16))
 #define RIGHTS(desc) ((desc[2]>>8)&0xff)
@@ -115,37 +111,48 @@ static void i80286_trap2(i80286_state *cpustate,UINT32 error)
 	cpustate->trap_level = 0;
 }
 
-static int i80286_selector_okay(i80286_state *cpustate,UINT16 selector)
+static UINT32 i80286_selector_address(i80286_state *cpustate,UINT16 sel)
 {
-	if (selector&4) {
-		return (selector&~7)<cpustate->ldtr.limit;
-	} else {
-		return (selector&~7)<cpustate->gdtr.limit;
-	}
+	UINT32 base;
+	UINT16 limit;
+	if(TBL(sel)) { base = cpustate->ldtr.base; limit = cpustate->ldtr.limit; }
+	else { base = cpustate->gdtr.base; limit = cpustate->gdtr.limit; }
+	return ((IDX(sel)>=limit)||!IDXTBL(sel)?-1:base+IDX(sel));
 }
 
-static offs_t i80286_selector_to_address(i80286_state *cpustate,UINT16 selector)
+static int i80286_verify(i80286_state *cpustate, UINT16 selector, i80286_operation operation, UINT8 rights)
 {
-	if (selector&4) {
-		return cpustate->ldtr.base+(selector&~7);
-	} else {
-		return cpustate->gdtr.base+(selector&~7);
+	if (!IDXTBL(selector)) return GENERAL_PROTECTION_FAULT;
+	if (!SEGDESC(rights)) return GENERAL_PROTECTION_FAULT;
+	
+	switch(operation) {
+		case I80286_READ:
+			if (CODE(rights) && !READ(rights)) return GENERAL_PROTECTION_FAULT;
+			break;
+		case I80286_WRITE:
+			if (CODE(rights) || !RW(rights)) return GENERAL_PROTECTION_FAULT;
+			break;
+		case I80286_EXECUTE:
+			if (!CODE(rights)) return GENERAL_PROTECTION_FAULT;
+			break;
+
 	}
+	return 0;
 }
 
-static void i80286_pop_seg(i80286_state *cpustate, int reg) {
-	UINT16 sel;
-	sel = ReadWord(cpustate->base[SS]+cpustate->regs.w[SP]);
-	i80286_data_descriptor(cpustate, reg, sel, CPL);
+static void i80286_pop_seg(i80286_state *cpustate, int reg)
+{
+	UINT16 sel = ReadWord(cpustate->base[SS]+cpustate->regs.w[SP]);
+	i80286_data_descriptor(cpustate, reg, sel);
 	cpustate->regs.w[SP] += 2;
 }
 
-static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 selector, int cpl)
+static void i80286_data_descriptor_full(i80286_state *cpustate,int reg, UINT16 selector, int cpl, UINT32 trap)
 {
 	if (PM) {
 		UINT16 desc[3];
 		UINT8 r;
-		int addr;
+		UINT32 addr;
 		/* selector format
            15..3 number/address in descriptor table
            2: 0 global, 1 local descriptor table
@@ -159,28 +166,23 @@ static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 select
 			return;
 		}
 
-		if (TBL(selector)) { /* local descriptor table */
-			if (selector>cpustate->ldtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			addr = cpustate->ldtr.base+IDX(selector);
-		} else { /* global descriptor table */
-			if (selector>cpustate->gdtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			addr = cpustate->gdtr.base+IDX(selector);
-		}
+		if ((addr = i80286_selector_address(cpustate,selector)) == -1) throw trap;
 
 		desc[0] = ReadWord(addr);
 		desc[1] = ReadWord(addr+2);
 		desc[2] = ReadWord(addr+4);
 		r = RIGHTS(desc);
-		if (!SEGDESC(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
+		if (!SEGDESC(r)) throw trap;
 		if (reg == SS) {
-			if (!IDXTBL(selector)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
-			if (DPL(r)!=cpl) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			if (RPL(selector)!=cpl) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			if (!RW(r) || CODE(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			if (!PRES(r)) throw TRAP(STACK_FAULT,IDXTBL(selector));
+			if (!IDXTBL(selector)) throw trap;
+			if (DPL(r)!=cpl) throw trap;
+			if (RPL(selector)!=cpl) throw trap;
+			if (!RW(r) || CODE(r)) throw trap;
+			if (!PRES(r)) throw TRAP(STACK_FAULT,(IDXTBL(selector)+(trap&1)));
 		} else {
-			if (DPL(r) < PMAX(cpl,RPL(selector))) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			if (CODE(r) && !READ(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
+			if ((DPL(r) < PMAX(cpl,RPL(selector))) && (!CODE(r) || (CODE(r) && !CONF(r)))) throw trap;
+			if (CODE(r) && !READ(r)) throw trap;
+			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,(IDXTBL(selector)+(trap&1)));
 		}
 
 		SET_ACC(desc);
@@ -195,24 +197,23 @@ static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 select
 	}
 }
 
-static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT16 offset, int gate)
+static void i80286_data_descriptor(i80286_state *cpustate, int reg, UINT16 selector)
+{
+	i80286_data_descriptor_full(cpustate, reg, selector, CPL, TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector)));
+}
+
+static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT16 offset, int gate)
 {
 	if (PM) {
 		UINT16 desc[3];
 		UINT8 r;
-		int addr;
+		UINT32 addr;
 		/* selector format
            15..3 number/address in descriptor table
            2: 0 global, 1 local descriptor table
            1,0: requested privileg level
            must be higher or same as current privileg level in code selector */
-		if (TBL(selector)) { /* local descriptor table */
-			if (selector>cpustate->ldtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			addr = cpustate->ldtr.base+IDX(selector);
-		} else { /* global descriptor table */
-			if (!IDX(selector)||(selector>cpustate->gdtr.limit)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			addr = cpustate->gdtr.base+IDX(selector);
-		}
+		if ((addr = i80286_selector_address(cpustate,selector)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
 		desc[0] = ReadWord(addr);
 		desc[1] = ReadWord(addr+2);
 		desc[2] = ReadWord(addr+4);
@@ -241,13 +242,7 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 
 			switch (GATE(r)) {
 			case CALLGATE:
-				if (TBL(gatesel)) { /* local descriptor table */
-					if (gatesel>cpustate->ldtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
-					addr = cpustate->ldtr.base+IDX(gatesel);
-				} else { /* global descriptor table */
-					if (!IDX(gatesel)||(gatesel>cpustate->gdtr.limit)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
-					addr = cpustate->gdtr.base+IDX(gatesel);
-				}
+				if ((addr = i80286_selector_address(cpustate,gatesel)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
 				gatedesc[0] = ReadWord(addr);
 				gatedesc[1] = ReadWord(addr+2);
 				gatedesc[2] = ReadWord(addr+4);
@@ -258,36 +253,17 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 				if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
 
 				if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
-					UINT16 ssdesc[3];
 					UINT16 tss_ss, tss_sp, oldss, oldsp;
 					UINT32 oldstk;
-					UINT8 ssr;
 					int i;
 					if(gate == 1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel)); // can't jmp to inner
 					tss_ss = ReadWord(cpustate->tr.base+TSS_SS0+(DPL(r)*4));
 					tss_sp = ReadWord(cpustate->tr.base+TSS_SP0+(DPL(r)*4));
 
-					if (!IDXTBL(tss_ss)) throw TRAP(INVALID_TSS, 0);
-					if (TBL(tss_ss)) { /* local descriptor table */
-						if (tss_ss>cpustate->ldtr.limit) throw TRAP(INVALID_TSS,IDXTBL(tss_ss));
-						addr = cpustate->ldtr.base+IDX(tss_ss);
-					} else { /* global descriptor table */
-						if (tss_ss>cpustate->gdtr.limit) throw TRAP(INVALID_TSS,IDXTBL(tss_ss));
-						addr = cpustate->gdtr.base+IDX(tss_ss);
-					}
-					ssdesc[0] = ReadWord(addr);
-					ssdesc[1] = ReadWord(addr+2);
-					ssdesc[2] = ReadWord(addr+4);
-					ssr = RIGHTS(ssdesc);
-					if ((RPL(tss_ss) != DPL(r)) || (DPL(ssr) != DPL(r))) TRAP(INVALID_TSS,IDXTBL(tss_ss));
-					if (!RW(ssr) || !PRES(ssr)) throw TRAP(INVALID_TSS,IDXTBL(tss_ss));
 					oldss = cpustate->sregs[SS];
 					oldsp = cpustate->regs.w[SP];
-					oldstk = cpustate->base[SS]+oldsp;
-					cpustate->sregs[SS]=tss_ss;
-					cpustate->limit[SS]=LIMIT(ssdesc);
-					cpustate->base[SS]=BASE(ssdesc);
-					cpustate->rights[SS]=RIGHTS(ssdesc);
+					oldstk = cpustate->base[SS] + oldsp;
+					i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,IDXTBL(tss_ss)));
 					cpustate->regs.w[SP] = tss_sp;
 					PUSH(oldss);
 					PUSH(oldsp);
@@ -301,7 +277,7 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 				cpustate->pc=(cpustate->base[CS]+GATEOFF(desc))&AMASK;
 				break;
 			case TASKGATE:
-				i80286_data_descriptor(cpustate, CS, desc[1], CPL);
+				i80286_data_descriptor(cpustate, CS, desc[1]);
 				cpustate->pc=cpustate->base[CS]+desc[0];
 				break;
 			default:
@@ -320,7 +296,8 @@ static void i80286_code_descriptor(i80286_state *cpustate,UINT16 selector, UINT1
 static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, int hwint, int error)
 {
 	UINT16 desc[3], gatedesc[3], gatesel;
-	int r, addr;
+	UINT8 r;
+	UINT32 addr;
 
 	if(!PM) return PREFIX86(_interrupt)(cpustate, number);
 
@@ -336,20 +313,14 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 
 	switch (GATE(r)) {
 	case TASKGATE:
-		i80286_data_descriptor(cpustate, CS, desc[1], CPL);
+		i80286_data_descriptor(cpustate, CS, desc[1]);
 		cpustate->pc=cpustate->base[CS]+desc[0];
 		break;
 	case INTGATE:
 	case TRAPGATE:
 		gatesel = GATESEL(desc);
-		if (TBL(gatesel)) { /* local descriptor table */
-			if (gatesel>cpustate->ldtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
-			addr = cpustate->ldtr.base+IDX(gatesel);
-		} else { /* global descriptor table */
-			if (!IDX(gatesel)||(gatesel>cpustate->gdtr.limit)) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
-			addr = cpustate->gdtr.base+IDX(gatesel);
-		}
-		gatedesc[0] = ReadWord(addr);
+		if ((addr = i80286_selector_address(cpustate,gatesel)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
+	 	gatedesc[0] = ReadWord(addr);
 		gatedesc[1] = ReadWord(addr+2);
 		gatedesc[2] = ReadWord(addr+4);
 		r = RIGHTS(gatedesc);
@@ -359,33 +330,13 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 		if (GATEOFF(desc) > LIMIT(gatedesc)) throw TRAP(GENERAL_PROTECTION_FAULT,(IDXTBL(gatesel)+(hwint&&1)));
 
 		if (!CONF(r)&&(DPL(r)<CPL)) {  // inner call
-			UINT16 ssdesc[3];
-			UINT16 tss_ss,tss_sp, oldss, oldsp;
-			int ssr;
+			UINT16 tss_ss, tss_sp, oldss, oldsp;
 			tss_ss = ReadWord(cpustate->tr.base+TSS_SS0+(DPL(r)*4));
 			tss_sp = ReadWord(cpustate->tr.base+TSS_SP0+(DPL(r)*4));
 
-			if (!IDXTBL(tss_ss)) throw TRAP(INVALID_TSS, (hwint&&1));
-			if (TBL(tss_ss)) { /* local descriptor table */
-				if (tss_ss>cpustate->ldtr.limit) throw TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1)));
-				addr = cpustate->ldtr.base+IDX(tss_ss);
-			} else { /* global descriptor table */
-				if (tss_ss>cpustate->gdtr.limit) throw TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1)));
-				addr = cpustate->gdtr.base+IDX(tss_ss);
-			}
-			ssdesc[0] = ReadWord(addr);
-			ssdesc[1] = ReadWord(addr+2);
-			ssdesc[2] = ReadWord(addr+4);
-			ssr = RIGHTS(ssdesc);
-			if ((RPL(tss_ss) != DPL(r)) || (DPL(ssr) != DPL(r))) TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1)));
-			if (!SEGDESC(ssr) || CODE(ssr) || !RW(ssr)) throw TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1)));
-			if (!PRES(ssr)) throw TRAP(STACK_FAULT,(IDXTBL(tss_ss)+(hwint&&1)));
 			oldss = cpustate->sregs[SS];
 			oldsp = cpustate->regs.w[SP];
-			cpustate->sregs[SS]=tss_ss;
-			cpustate->limit[SS]=LIMIT(ssdesc);
-			cpustate->base[SS]=BASE(ssdesc);
-			cpustate->rights[SS]=RIGHTS(ssdesc);
+			i80286_data_descriptor_full(cpustate, SS, tss_ss, DPL(r), TRAP(INVALID_TSS,(IDXTBL(tss_ss)+(hwint&&1))));
 			cpustate->regs.w[SP] = tss_sp;
 			PUSH(oldss);
 			PUSH(oldsp);
@@ -411,11 +362,10 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 static void PREFIX286(_0fpre)(i8086_state *cpustate)
 {
 	unsigned next = FETCHOP;
-	UINT16 ModRM;
-	UINT16 tmp;
-	offs_t addr;
-	int msw, sel, addr2, r;
-	UINT16 desc[2];
+	UINT16 ModRM, desc[3];
+	UINT16 tmp, msw, sel;
+	UINT8 r;
+	UINT32 addr;
 
 	switch (next) {
 	case 0:
@@ -429,14 +379,14 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			PutRMWord(ModRM, cpustate->tr.sel);
 			break;
 		case 0x10: /* lldt */
-			if (CPL!=0) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 			sel=GetRMWord(ModRM);
+			if (TBL(sel)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
 			if (IDXTBL(sel)) {
 				if (IDX(sel)>=cpustate->gdtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
-				addr2 = cpustate->gdtr.base + IDX(sel);
-				desc[0] = ReadWord(addr2);
-				desc[1] = ReadWord(addr2+2);
-				desc[2] = ReadWord(addr2+4);
+				addr = cpustate->gdtr.base + IDX(sel);
+				desc[0] = ReadWord(addr);
+				desc[1] = ReadWord(addr+2);
+				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
 				if (GATE(r) != LDTDESC) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
 				if (!PRES(r)) TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
@@ -451,13 +401,11 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			cpustate->ldtr.rights=RIGHTS(desc);
 			break;
 		case 0x18: /* ltr */
-			if (CPL!=0) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 			sel=GetRMWord(ModRM);
-			if (IDX(sel)>=cpustate->gdtr.limit) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
-			addr2 = cpustate->gdtr.base + IDX(sel);
-			desc[0] = ReadWord(addr2);
-			desc[1] = ReadWord(addr2+2);
-			desc[2] = ReadWord(addr2+4);
+			if ((addr = i80286_selector_address(cpustate,sel)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
+			desc[0] = ReadWord(addr);
+			desc[1] = ReadWord(addr+2);
+			desc[2] = ReadWord(addr+4);
 			r = RIGHTS(desc);
 			if (GATE(r) != TSSDESCIDLE) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
 			if (!PRES(r)) TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
@@ -468,42 +416,21 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			break;
 		case 0x20: /* verr */
 			tmp=GetRMWord(ModRM);
-			if (!tmp) 
-				cpustate->ZeroVal=0;
-			else if (tmp>((TBL(tmp)?cpustate->ldtr.limit:cpustate->gdtr.limit))) 
-				cpustate->ZeroVal=0;
+			if ((addr = i80286_selector_address(cpustate,tmp)) == -1) cpustate->ZeroVal = 1;
 			else {
-				addr2 = (TBL(tmp)?cpustate->ldtr.base:cpustate->gdtr.base);
-				desc[0] = ReadWord(addr2);
-				desc[1] = ReadWord(addr2+2);
-				desc[2] = ReadWord(addr2+4);
+				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
-				if (!SEGDESC(r))
-					cpustate->ZeroVal=0;
-				else if (CODE(r) && CONF(r))
-					cpustate->ZeroVal=1;
-				else if (DPL(r)<PMAX(CPL,RPL(tmp)))
-					cpustate->ZeroVal=0;
-				else    cpustate->ZeroVal=1;
+				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_READ, RIGHTS(desc));
+				cpustate->ZeroVal = cpustate->ZeroVal || (CODE(r) && CONF(r) ? 0 : (DPL(r)<PMAX(RPL(tmp),CPL)));
 			}
 			break;
 		case 0x28: /* verw */
 			tmp=GetRMWord(ModRM);
-			if (!tmp) 
-				cpustate->ZeroVal=0;
-			else if (tmp>((TBL(tmp)?cpustate->ldtr.limit:cpustate->gdtr.limit))) 
-				cpustate->ZeroVal=0;
+			if ((addr = i80286_selector_address(cpustate,tmp)) == -1) cpustate->ZeroVal = 1;
 			else {
-				addr2 = (TBL(tmp)?cpustate->ldtr.base:cpustate->gdtr.base);
-				desc[0] = ReadWord(addr2);
-				desc[1] = ReadWord(addr2+2);
-				desc[2] = ReadWord(addr2+4);
+				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
-				if (!SEGDESC(r) || CODE(r))
-					cpustate->ZeroVal=0;
-				else if (DPL(r)<PMAX(CPL,RPL(tmp)))
-					cpustate->ZeroVal=0;
-				else    cpustate->ZeroVal=1;
+				cpustate->ZeroVal = i80286_verify(cpustate, tmp, I80286_WRITE, RIGHTS(desc));
 			}
 			break;
 		default:
@@ -551,39 +478,45 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		}
 		break;
 	case 2: /* LAR */
+		if (!PM) throw TRAP(ILLEGAL_INSTRUCTION,-1);
 		ModRM = FETCHOP;
 		tmp=GetRMWord(ModRM);
-		if ( i80286_selector_okay(cpustate,tmp) )
-		{
-			cpustate->ZeroVal = 0;
-			RegWord(ModRM) = ReadByte( i80286_selector_to_address(cpustate,tmp) + 5 ) << 8;
-		}
-		else
-		{
-			cpustate->ZeroVal = 1;
+		if ((addr = i80286_selector_address(cpustate,tmp)) == -1) cpustate->ZeroVal = 1;
+		else {
+			desc[2] = ReadWord(addr+4);
+			r = RIGHTS(desc);
+			if (DPL(r)>=PMAX(RPL(tmp),CPL)) {
+				cpustate->ZeroVal = 0;
+				RegWord(ModRM) = RIGHTS(desc);
+			}
+			else
+				cpustate->ZeroVal = 1;
 		}
 		break;
 	case 3: /* LSL */
 		if (!PM) throw TRAP(ILLEGAL_INSTRUCTION,-1);
 		ModRM = FETCHOP;
 		tmp=GetRMWord(ModRM);
-		if ( i80286_selector_okay(cpustate,tmp) )
-		{
-			cpustate->ZeroVal = 0;
-			addr=i80286_selector_to_address(cpustate,tmp);
-			RegWord(ModRM)=ReadWord(addr);
-		}
-		else
-		{
-			cpustate->ZeroVal = 1;
+		if ((addr = i80286_selector_address(cpustate,tmp)) == -1) cpustate->ZeroVal = 1;
+		else {
+			desc[2] = ReadWord(addr+4);
+			r = RIGHTS(desc);
+			if (DPL(r)>=PMAX(RPL(tmp),CPL)) {
+				cpustate->ZeroVal = 0;
+				RegWord(ModRM) = ReadWord(addr);
+			}
+			else
+				cpustate->ZeroVal = 1;
 		}
 		break;
 	case 5: /* loadall */
 		if (PM&&(CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 		cpustate->msw =        (cpustate->msw&1)|ReadWord(0x806);
 		cpustate->tr.sel =     ReadWord(0x816);
-		cpustate->flags =      ReadWord(0x818);
-		ExpandFlags(cpustate->flags);
+		tmp = 	               ReadWord(0x818);
+		ExpandFlags(tmp);
+		cpustate->flags = tmp;
+		cpustate->flags = CompressFlags();
 		cpustate->pc =         ReadWord(0x81a);
 		cpustate->ldtr.sel =   ReadWord(0x81c);
 		cpustate->sregs[DS] =  ReadWord(0x81e);
@@ -632,24 +565,20 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 
 static void PREFIX286(_arpl)(i8086_state *cpustate) /* 0x63 */
 {
-	if (PM)
-	{
-		UINT16 ModRM=FETCHOP, tmp=GetRMWord(ModRM), source=RegWord(ModRM);
+	UINT16 ModRM, tmp, source;
+	if (!PM) throw TRAP(ILLEGAL_INSTRUCTION,-1);
 
-		if ( i80286_selector_okay(cpustate,tmp) &&i80286_selector_okay(cpustate,source) &&((tmp&3)<(source&3)) )
-		{
-			cpustate->ZeroVal = 0;
-			PutbackRMWord(ModRM, (tmp&~3)|(source&3));
-		}
-		else
-		{
-			cpustate->ZeroVal = 1;
-		}
+	ModRM=FETCHOP;
+	tmp=GetRMWord(ModRM);
+	source=RegWord(ModRM);
+
+	if (RPL(tmp)<RPL(source))
+	{
+		cpustate->ZeroVal = 1;
+		PutbackRMWord(ModRM, IDXTBL(tmp)|RPL(source));
 	}
 	else
-	{
-		throw TRAP(ILLEGAL_INSTRUCTION,-1);
-	}
+		cpustate->ZeroVal = 0;
 }
 
 static void i80286_load_flags(i8086_state *cpustate, int flags, int cpl)
@@ -716,7 +645,7 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		if (CPL<RPL(sel)) {
 			newsp = ReadWord(spaddr+((iret?6:4)+bytes));
 			newss = ReadWord(spaddr+((iret?8:6)+bytes));
-			i80286_data_descriptor(cpustate, SS, newss, RPL(sel));
+			i80286_data_descriptor_full(cpustate, SS, newss, RPL(sel), TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(newss)));
 			cpustate->regs.w[SP] = newsp + bytes;
 		} else cpustate->regs.w[SP] += (iret?6:4) + bytes;
 		cpustate->sregs[CS]=sel;
@@ -726,13 +655,11 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		cpustate->pc=(cpustate->base[CS]+off)&AMASK ;
 
 		// docs say check rpl but windows doesn't like it
-		if (((CODE(cpustate->rights[DS])&&!CONF(cpustate->rights[DS])) || !CODE(cpustate->rights[DS]))
-		   && (DPL(cpustate->rights[DS]) < CPL))
-			i80286_data_descriptor(cpustate, DS, 0, CPL);
+		if (i80286_verify(cpustate, cpustate->sregs[DS], I80286_READ, cpustate->rights[DS]) && (DPL(cpustate->rights[DS]) < CPL))
+			i80286_data_descriptor(cpustate, DS, 0);
 
-		if (((CODE(cpustate->rights[ES])&&!CONF(cpustate->rights[ES])) || !CODE(cpustate->rights[ES]))
-		   && (DPL(cpustate->rights[ES]) < CPL))
-			i80286_data_descriptor(cpustate, ES, 0, CPL);
+		if (i80286_verify(cpustate, cpustate->sregs[ES], I80286_READ, cpustate->rights[ES]) && (DPL(cpustate->rights[ES]) < CPL))
+			i80286_data_descriptor(cpustate, ES, 0);
 	} else {
 		cpustate->regs.w[SP] += (iret?6:4) + bytes;
 		cpustate->sregs[CS]=sel;
@@ -770,38 +697,13 @@ static void PREFIX286(_retf)(i8086_state *cpustate)
 
 static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT16 offset, i80286_size size, i80286_operation operation)
 {
-	if (PM)
-	{
-		// is the selector null?
-		if (!IDXTBL(cpustate->sregs[check_seg])) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
-		
-		/* Is the segment physically present? */
-		if (!PRES(cpustate->rights[check_seg]))
-			throw TRAP((check_seg==SS)?STACK_FAULT:SEG_NOT_PRESENT, IDXTBL(cpustate->sregs[check_seg]));
+	int trap = 0;
+	if (PM) {
+		trap = i80286_verify(cpustate, cpustate->sregs[check_seg], operation, cpustate->rights[check_seg]);
+		if (!EXPDOWN(cpustate->rights[check_seg]) && ((offset+size-1) > cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
+		if (EXPDOWN(cpustate->rights[check_seg]) && (offset < cpustate->limit[check_seg])) trap = GENERAL_PROTECTION_FAULT;
 
-		/* Would we go past the segment boundary? */
-		if ( (offset + (size-1)) > cpustate->limit[check_seg] )
-			throw TRAP((check_seg==SS)?STACK_FAULT:GENERAL_PROTECTION_FAULT, 0);
-
-		switch(operation)
-		{
-		case I80286_READ:
-			/* Is the segment readable? */
-			if ( ! IS_READABLE( cpustate->rights[check_seg] ) )
-				throw TRAP(GENERAL_PROTECTION_FAULT, IDXTBL(cpustate->sregs[check_seg]));
-			break;
-
-		case I80286_WRITE:
-			/* Is the segment writeable?  */
-			if ( ! IS_WRITEABLE( cpustate->rights[check_seg] ) )
-				throw TRAP(GENERAL_PROTECTION_FAULT, IDXTBL(cpustate->sregs[check_seg]));
-			break;
-
-		case I80286_EXECUTE:
-			/* TODO */
-			break;
-		}
-		/* TODO: Mark segment as accessed? */
+		if (trap) throw TRAP(trap, IDXTBL(cpustate->sregs[check_seg]));
 	}
 }
 

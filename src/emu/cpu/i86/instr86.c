@@ -2297,7 +2297,7 @@ static void PREFIX86(_les_dw)(i8086_state *cpustate)    /* Opcode 0xc4 */
 
     RegWord(ModRM)= tmp;
 #ifdef I80286
-	i80286_data_descriptor(cpustate,ES,GetnextRMWord,CPL);
+	i80286_data_descriptor(cpustate,ES,GetnextRMWord);
 #else
 	cpustate->sregs[ES] = GetnextRMWord;
 	cpustate->base[ES] = SegBase(ES);
@@ -2312,7 +2312,7 @@ static void PREFIX86(_lds_dw)(i8086_state *cpustate)    /* Opcode 0xc5 */
 
     RegWord(ModRM)=tmp;
 #ifdef I80286
-	i80286_data_descriptor(cpustate,DS,GetnextRMWord,CPL);
+	i80286_data_descriptor(cpustate,DS,GetnextRMWord);
 #else
 	cpustate->sregs[DS] = GetnextRMWord;
 	cpustate->base[DS] = SegBase(DS);
@@ -2734,13 +2734,13 @@ static void PREFIX(_mov_sregw)(i8086_state *cpustate)    /* Opcode 0x8e */
     switch (ModRM & 0x38)
     {
     case 0x00:  /* mov es,ew */
-		i80286_data_descriptor(cpustate,ES,src,CPL);
+		i80286_data_descriptor(cpustate,ES,src);
 		break;
     case 0x18:  /* mov ds,ew */
-		i80286_data_descriptor(cpustate,DS,src,CPL);
+		i80286_data_descriptor(cpustate,DS,src);
 		break;
     case 0x10:  /* mov ss,ew */
-		i80286_data_descriptor(cpustate,SS,src,CPL);
+		i80286_data_descriptor(cpustate,SS,src);
 		cpustate->seg_prefix = FALSE;
 		PREFIX(_instruction)[FETCHOP](cpustate);
 		break;
