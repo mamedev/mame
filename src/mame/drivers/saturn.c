@@ -3281,6 +3281,9 @@ ROM_START( stvbios )
 	ROM_REGION32_BE( 0x3000000, "game2", ROMREGION_ERASE00 )
 
 	ROM_REGION32_BE( 0x3000000, "game3", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to multi cart mode
+	ROM_LOAD( "stvbios.nv", 0x0000, 0x0080, CRC(15432ae2) SHA1(7d9364d546f3d3f839ec36be148076f8d26a65a6) )
 ROM_END
 
 /*
