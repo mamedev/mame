@@ -216,9 +216,6 @@ static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 
 
 //static int scanline;
 
-static emu_timer *stv_rtc_timer;
-
-
 /*A-Bus IRQ checks,where they could be located these?*/
 #define ABUSIRQ(_irq_,_vector_) \
 	{ cputag_set_input_line_and_vector(device->machine(), "maincpu", _irq_, HOLD_LINE , _vector_); }
@@ -2627,7 +2624,7 @@ static MACHINE_START( stv )
     state->m_smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
-	stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
+	state->m_stv_rtc_timer = machine.scheduler().timer_alloc(FUNC(stv_rtc_increment));
 }
 
 
@@ -2915,7 +2912,7 @@ static MACHINE_RESET( stv )
 	vblank_out_timer->adjust(machine.primary_screen->time_until_pos(0));
 	scan_timer->adjust(machine.primary_screen->time_until_pos(224, 352));
 
-	stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
+	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	state->m_prev_bankswitch = 0xff;
 }
 
