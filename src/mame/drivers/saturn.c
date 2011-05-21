@@ -1818,14 +1818,14 @@ static WRITE32_HANDLER( sinit_w )
 	sh2_set_frt_input(space->machine().device("maincpu"), PULSE_LINE);
 }
 
-static READ32_HANDLER(saturn_m_backupram_r)
+static READ32_HANDLER(saturn_backupram_r)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
 	return state->m_backupram[offset] & 0x00ff00ff;	// yes, it makes sure the "holes" are there.
 }
 
-static WRITE32_HANDLER(saturn_m_backupram_w)
+static WRITE32_HANDLER(saturn_backupram_w)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
@@ -1867,7 +1867,7 @@ static NVRAM_HANDLER(saturn)
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r8, saturn_SMPC_w8,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_m_backupram_r, saturn_m_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r, saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
@@ -1896,7 +1896,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r8, stv_SMPC_w8,0xffffffff)
-	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_m_backupram_r,saturn_m_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
 	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE(&ioga) AM_SHARE("share4") AM_MIRROR(0x20)
 	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
