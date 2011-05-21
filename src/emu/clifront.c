@@ -1223,7 +1223,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_VERIFYROMS,	&cli_frontend::verifyroms },
 		{ CLICOMMAND_VERIFYSAMPLES,	&cli_frontend::verifysamples },
 		{ CLICOMMAND_LISTMEDIA,		&cli_frontend::listmedia },
-//      { CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
+		{ CLICOMMAND_LISTSOFTWARE,  &cli_frontend::listsoftware },
 		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident }
 	};
 
