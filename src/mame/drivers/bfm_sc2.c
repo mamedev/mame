@@ -6,13 +6,15 @@
 
 *****************************************************************************************
 
+     04-2011: J Wallace: Fixed watchdog to match actual circuit, also fixed lamping code.
   30-12-2006: J Wallace: Fixed init routines.
   07-03-2006: El Condor: Recoded to more accurately represent the hardware setup.
   18-01-2006: Cleaned up for MAME inclusion
   19-08-2005: Re-Animator
 
 Standard scorpion2 memorymap
-
+The hardware in Scorpion 2 is effectively a Scorpion 1 board with better, non-compatible
+microcontrollers, incorporating many of the old expansions on board.
 
    hex     |r/w| D D D D D D D D |
  location  |   | 7 6 5 4 3 2 1 0 | function
@@ -193,6 +195,7 @@ public:
 	int m_volume_override;
 	int m_sc2_show_door;
 	int m_sc2_door_state;
+	int m_reels;
 	int m_reel12_latch;
 	int m_reel34_latch;
 	int m_reel56_latch;
@@ -204,9 +207,6 @@ public:
 	int m_hopper_running;
 	int m_hopper_coin_sense;
 	int m_timercnt;
-	int m_watchdog_cnt;
-	int m_watchdog_kicked;
-	UINT8 m_Lamps[256];
 	UINT8 m_sc2_Inputs[64];
 	UINT8 m_input_override[64];
 	int m_e2reg;
@@ -293,10 +293,6 @@ static void on_scorpion2_reset(running_machine &machine)
 	state->m_slide_states[4] = 0;
 	state->m_slide_states[5] = 0;
 
-	state->m_watchdog_cnt    = 0;
-	state->m_watchdog_kicked = 0;
-
-
 	BFM_BD1_reset(0);	// reset display1
 	BFM_BD1_reset(1);	// reset display2
 
@@ -306,13 +302,9 @@ static void on_scorpion2_reset(running_machine &machine)
 
   // reset stepper motors /////////////////////////////////////////////////
 	{
-/* Although the BFM video games don't use stepper motors to control reels,
-the connections are still present on the board, and some of the programs still
-send data to them, although obviously there's no response. */
-
 		int pattern =0, i;
 
-		for ( i = 0; i < 6; i++)
+		for ( i = 0; i < state->m_reels; i++)
 		{
 			stepper_reset_position(i);
 			if ( stepper_optic_state(i) ) pattern |= 1<<i;
@@ -427,14 +419,6 @@ static NVRAM_HANDLER( bfm_sc2 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( watchdog_w )
-{
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_watchdog_kicked = 1;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
 static WRITE8_HANDLER( bankswitch_w )
 {
 	memory_set_bank(space->machine(), "bank1",data & 0x03);
@@ -446,22 +430,6 @@ static INTERRUPT_GEN( timer_irq )
 {
 	bfm_sc2_state *state = device->machine().driver_data<bfm_sc2_state>();
 	state->m_timercnt++;
-
-	if ( state->m_watchdog_kicked )
-	{
-		state->m_watchdog_cnt    = 0;
-		state->m_watchdog_kicked = 0;
-	}
-	else
-	{
-		state->m_watchdog_cnt++;
-		if ( state->m_watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
-		{  // reset board
-			device->machine().schedule_soft_reset();		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
-			on_scorpion2_reset(device->machine());
-			return;
-		}
-	}
 
 	if ( state->m_is_timer_enabled )
 	{
@@ -509,44 +477,6 @@ static WRITE8_HANDLER( reel12_vid_w )  // in a video cabinet this is used to dri
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
-static WRITE8_HANDLER( reel34_w )
-{
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel34_latch = data;
-
-	if ( stepper_update(2, data&0x0f ) ) state->m_reel_changed |= 0x04;
-	if ( stepper_update(3, (data>>4)&0x0f) ) state->m_reel_changed |= 0x08;
-
-	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
-	else                          state->m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
-	else                          state->m_optic_pattern &= ~0x08;
-
-	awp_draw_reel(2);
-	awp_draw_reel(3);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static WRITE8_HANDLER( reel56_w )
-{
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel56_latch = data;
-
-	if ( stepper_update(4, data&0x0f   ) ) state->m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) state->m_reel_changed |= 0x20;
-
-	if ( stepper_optic_state(4) ) state->m_optic_pattern |=  0x10;
-	else                          state->m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) state->m_optic_pattern |=  0x20;
-	else                          state->m_optic_pattern &= ~0x20;
-
-	awp_draw_reel(4);
-	awp_draw_reel(5);
-}
-
-///////////////////////////////////////////////////////////////////////////
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
@@ -572,21 +502,12 @@ static WRITE8_HANDLER( mmtr_w )
 
 static WRITE8_HANDLER( mux_output_w )
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	int i;
 	int off = offset<<3;
 
 	for (i=0; i<8; i++)
-	{
-		state->m_Lamps[ off+i ] = (data & (1 << i)) != 0;
-	}
-	if (offset == 0) // update all lamps after strobe 0 has been updated (HACK)
-	{
-		for ( i = 0; i < 256; i++ )
-		{
-			output_set_lamp_value(i, state->m_Lamps[i]);
-		}
-	}
+		output_set_lamp_value(off+i, ((data & (1 << i)) != 0));
+
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1448,7 +1369,6 @@ static MACHINE_RESET( init )
 	on_scorpion2_reset(machine);
 	BFM_BD1_init(0);
 	BFM_BD1_init(1);
-	//BFM_dm01_reset(machine); No known video based game has a Matrix board
 }
 
 static SCREEN_UPDATE( addersc2 )
@@ -1469,8 +1389,8 @@ static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
+	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
+	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
 
 	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)			// mux inputs
 	AM_RANGE(0x2300, 0x231F) AM_WRITE(mux_output_w)			// mux outputs
@@ -1485,7 +1405,7 @@ static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8 )
 	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)			// coin inhibits
 	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
 	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_w)			// kick watchdog
+	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)			// kick watchdog
 	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)				// mechanical meters
 	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
 	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)				// ?unknown dim related
@@ -1712,15 +1632,6 @@ static INPUT_PORTS_START( gldncrwn )
 	PORT_DIPSETTING(    0x01, "2 credits per game")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "1 credit  per round")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x10)
 	PORT_DIPSETTING(    0x01, "4 credits per round")PORT_CONDITION("STROBE10",0x10,PORTCOND_EQUALS,0x10)
-
-/*
-          Type1 Type2
-              0     0   4 credits per game
-              0     1   2 credits per game
-              1     0   1 credit  per round
-              1     1   4 credits per round
- */
-
 	PORT_DIPNAME( 0x02, 0x00, "Attract Mode" )PORT_DIPLOCATION("DIL:!13")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
@@ -2180,6 +2091,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_NVRAM_HANDLER(bfm_sc2)
@@ -2201,7 +2113,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 
 	MCFG_CPU_ADD("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MCFG_CPU_PROGRAM_MAP(adder2_memmap)				// setup adder2 board memorymap
-	MCFG_CPU_VBLANK_INT("adder", adder2_vbl)			// board has a VBL IRQ
+	MCFG_CPU_VBLANK_INT("adder", adder2_vbl)		// board has a VBL IRQ
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
@@ -2624,6 +2536,44 @@ static WRITE8_HANDLER( reel12_w )
 	awp_draw_reel(1);
 }
 
+static WRITE8_HANDLER( reel34_w )
+{
+	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
+	state->m_reel34_latch = data;
+
+	if ( stepper_update(2, data&0x0f ) ) state->m_reel_changed |= 0x04;
+	if ( stepper_update(3, (data>>4)&0x0f) ) state->m_reel_changed |= 0x08;
+
+	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
+	else                          state->m_optic_pattern &= ~0x04;
+	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
+	else                          state->m_optic_pattern &= ~0x08;
+
+	awp_draw_reel(2);
+	awp_draw_reel(3);
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+static WRITE8_HANDLER( reel56_w )
+{
+	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
+	state->m_reel56_latch = data;
+
+	if ( stepper_update(4, data&0x0f   ) ) state->m_reel_changed |= 0x10;
+	if ( stepper_update(5, (data>>4)&0x0f) ) state->m_reel_changed |= 0x20;
+
+	if ( stepper_optic_state(4) ) state->m_optic_pattern |=  0x10;
+	else                          state->m_optic_pattern &= ~0x10;
+	if ( stepper_optic_state(5) ) state->m_optic_pattern |=  0x20;
+	else                          state->m_optic_pattern &= ~0x20;
+
+	awp_draw_reel(4);
+	awp_draw_reel(5);
+}
+
+///////////////////////////////////////////////////////////////////////////
+
 
 /* VFD Status */
 static READ8_HANDLER( vfd_status_r )
@@ -2738,7 +2688,7 @@ static ADDRESS_MAP_START( sc2_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
 	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
 	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_w)
+	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
 	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
 	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
@@ -2761,7 +2711,7 @@ static ADDRESS_MAP_START( sc2_memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM									/* 8k  fixed ROM */
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")							/* 8k  paged ROM (4 pages) */
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					/* 8k  paged ROM (4 pages) */
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM									/* 32k ROM */
 ADDRESS_MAP_END
 
@@ -2787,7 +2737,7 @@ static ADDRESS_MAP_START( sc3_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
 	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
 	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_w)
+	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
 	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
 	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
@@ -2836,7 +2786,7 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, AS_PROGRAM, 8 )
 	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
 	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
 	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_w)
+	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
 	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
 	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
@@ -3311,7 +3261,6 @@ static INPUT_PORTS_START( drwho )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( cpeno1 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)
@@ -3465,7 +3414,6 @@ static INPUT_PORTS_START( cpeno1 )
 	PORT_DIPSETTING(    0x10, "81%" )
 	PORT_DIPSETTING(    0x18, "85%" )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( luvjub )
 	PORT_START("COINS")
@@ -3623,7 +3571,6 @@ static INPUT_PORTS_START( luvjub )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( bfmcgslm )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)
@@ -3779,7 +3726,6 @@ static INPUT_PORTS_START( bfmcgslm )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( scorpion3 )
 	PORT_START("COINS")
@@ -3944,6 +3890,7 @@ static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(sc2_memmap)
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
@@ -3974,6 +3921,8 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(memmap_sc2_dm01)
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
+
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
@@ -3994,9 +3943,14 @@ MACHINE_CONFIG_END
 
 static void sc2awp_common_init(running_machine &machine,int reels, int decrypt)
 {
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
+
 	int n;
 	sc2_common_init(machine, decrypt);
 	/* setup n default 96 half step reels */
+
+	state->m_reels=reels;
+
 	for ( n = 0; n < reels; n++ )
 	{
 		stepper_config(machine, n, &starpoint_interface_48step);

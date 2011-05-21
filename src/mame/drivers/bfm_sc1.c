@@ -2,14 +2,12 @@
 
     Bellfruit scorpion1 driver, (under heavy construction !!!)
 
-    A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
-    Visit http://agemame.mameworld.info for more information.
-
     M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
     used under license from http://mamedev.org
 
 ******************************************************************************************
 
+     04-2011: J Wallace: Fixed watchdog to match actual circuit, also fixed lamping code.
   20-01-2007: J Wallace: Tidy up of coding
   30-12-2006: J Wallace: Fixed init routines.
   07-03-2006: El Condor: Recoded to more accurately represent the hardware setup.
@@ -18,6 +16,10 @@
   25-08-2005: Added support for adder2 (Toppoker), added support for NEC upd7759 soundcard
 
 Standard scorpion1 memorymap
+Note the similarity to system85 - indeed, the working title for this system was System 88,
+and was considered an update to existing technology. Later revisions made it a platform in
+its own right, prompting marketers to change the name.
+
 ___________________________________________________________________________________
    hex     |r/w| D D D D D D D D |
  location  |   | 7 6 5 4 3 2 1 0 | function
@@ -119,9 +121,6 @@ public:
 	int m_mux2_datalo;
 	int m_mux2_datahi;
 	int m_mux2_input;
-	int m_watchdog_cnt;
-	int m_watchdog_kicked;
-	UINT8 m_Lamps[256];
 	UINT8 m_sc1_Inputs[64];
 	UINT8 m_codec_data[256];
 };
@@ -164,20 +163,6 @@ static WRITE8_HANDLER( bankswitch_w )
 static INTERRUPT_GEN( timer_irq )
 {
 	bfm_sc1_state *state = device->machine().driver_data<bfm_sc1_state>();
-	if ( state->m_watchdog_kicked )
-	{
-		state->m_watchdog_cnt    = 0;
-		state->m_watchdog_kicked = 0;
-	}
-	else
-	{
-		state->m_watchdog_cnt++;
-		if ( state->m_watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
-		{  // reset board
-			device->machine().schedule_soft_reset();// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
-			return;
-		}
-	}
 
 	if ( state->m_is_timer_enabled )
 	{
@@ -421,19 +406,12 @@ static WRITE8_HANDLER( mux1latch_w )
 
 			for ( i = 0; i < 8; i++ )
 			{
-				state->m_Lamps[ BFM_strcnv[offset  ] ] = state->m_mux1_datalo & pattern?1:0;
-				state->m_Lamps[ BFM_strcnv[offset+8] ] = state->m_mux1_datahi & pattern?1:0;
+				output_set_lamp_value(BFM_strcnv[offset  ], (state->m_mux1_datalo & pattern?1:0) );
+				output_set_lamp_value(BFM_strcnv[offset+8], (state->m_mux1_datahi & pattern?1:0) );
 				pattern<<=1;
 				offset++;
 			}
 
-			if (strobe == 0)
-			{
-				for ( i = 0; i < 256; i++ )
-				{
-					output_set_lamp_value(i, state->m_Lamps[i]);
-				}
-			}
 		}
 
 		if ( !(data & 0x08) )
@@ -505,9 +483,9 @@ static WRITE8_HANDLER( mux2latch_w )
 
 			for ( i = 0; i < 8; i++ )
 			{
-				state->m_Lamps[ BFM_strcnv[offset  ] ] = state->m_mux2_datalo & pattern?1:0;
-				state->m_Lamps[ BFM_strcnv[offset+8] ] = state->m_mux2_datahi & pattern?1:0;
-				pattern<<=1;
+				output_set_lamp_value(BFM_strcnv[offset  ], (state->m_mux2_datalo & pattern?1:0) );
+				output_set_lamp_value(BFM_strcnv[offset+8], (state->m_mux2_datahi & pattern?1:0) );
+ 				pattern<<=1;
 				offset++;
 			}
 		}
@@ -533,14 +511,6 @@ static WRITE8_HANDLER( mux2dathi_w )
 {
 	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
 	state->m_mux2_datahi = data;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////
-
-static WRITE8_HANDLER( watchdog_w )
-{
-	bfm_sc1_state *state = space->machine().driver_data<bfm_sc1_state>();
-	state->m_watchdog_kicked = 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -797,7 +767,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE (watchdog_w)//AM_RAM_WRITE(watchdog_w) // 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE (watchdog_reset_w) // 32k ROM
 
 ADDRESS_MAP_END
 
@@ -845,7 +815,7 @@ static ADDRESS_MAP_START( memmap_adder2, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_w)	// 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_reset_w)	// 32k ROM
 
 ADDRESS_MAP_END
 
@@ -890,7 +860,7 @@ static ADDRESS_MAP_START( sc1_nec_uk, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_w)	// 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_reset_w)	// 32k ROM
 
 ADDRESS_MAP_END
 
@@ -1244,6 +1214,7 @@ static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
+	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)

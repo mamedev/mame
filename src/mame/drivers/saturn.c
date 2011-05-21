@@ -3309,7 +3309,6 @@ some of the rom names were using something else and have been renamed to match t
 0x2800000 - 0x2bfffff IC11
 0x2c00000 - 0x2ffffff IC12
 
-Update:Issue fixed,see stvhacks.c for more details (TODO: Clean-up that)
 */
 
 

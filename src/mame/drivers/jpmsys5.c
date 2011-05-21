@@ -43,6 +43,9 @@ public:
 	int m_touch_data_count;
 	int m_touch_data[3];
 	int m_touch_shift_cnt;
+	int m_lamp_strobe;
+	int m_mpxclk;
+	int m_muxram[255];
 	UINT8 m_a0_acia_dcd;
 	UINT8 m_a0_data_out;
 	UINT8 m_a0_data_in;
@@ -204,6 +207,16 @@ static SCREEN_UPDATE( jpmsys5v )
 	return 0;
 }
 
+static void sys5_draw_lamps(jpmsys5_state *state)
+{
+	int i;
+	for (i = 0; i <8; i++)
+	{
+		output_set_lamp_value( (16*state->m_lamp_strobe)+i,  (state->m_muxram[(4*state->m_lamp_strobe)] & (1 << i)) !=0);
+		output_set_lamp_value((16*state->m_lamp_strobe)+i+8, (state->m_muxram[(4*state->m_lamp_strobe) +1 ] & (1 << i)) !=0);
+		output_set_indexed_value("sys5led",(8*state->m_lamp_strobe)+i,(state->m_muxram[(4*state->m_lamp_strobe) +2 ] & (1 << i)) !=0);
+	}
+}
 
 /****************************************
  *
@@ -238,7 +251,8 @@ static READ16_HANDLER( unk_r )
 
 static WRITE16_HANDLER( mux_w )
 {
-	/* TODO: Lamps! */
+	jpmsys5_state *state = space->machine().driver_data<jpmsys5_state>();
+	state->m_muxram[offset]=data;
 }
 
 static READ16_HANDLER( mux_r )
@@ -467,11 +481,30 @@ static WRITE_LINE_DEVICE_HANDLER( ptm_irq )
 	cputag_set_input_line(device->machine(), "maincpu", INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+static WRITE8_DEVICE_HANDLER(u26_o1_callback)
+{
+	jpmsys5_state *state = device->machine().driver_data<jpmsys5_state>();
+	if (state->m_mpxclk !=data)
+	{
+		if (!data) //falling edge
+		{
+			state->m_lamp_strobe++;
+			if (state->m_lamp_strobe >15)
+			{
+				state->m_lamp_strobe =0;
+			}
+		}
+		sys5_draw_lamps(state);
+	}
+	state->m_mpxclk = data;
+}
+
+
 static const ptm6840_interface ptm_intf =
 {
 	1000000,
 	{ 0, 0, 0 },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_HANDLER(u26_o1_callback), DEVCB_NULL, DEVCB_NULL },
 	DEVCB_LINE(ptm_irq)
 };
 
@@ -700,3 +733,162 @@ ROM_END
 GAME( 1994, monopoly, 0,        jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly",         0 )
 GAME( 1995, monoplcl, monopoly, jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly Classic", 0 )
 GAME( 1995, monopldx, 0,        jpmsys5v, monopoly, 0, ROT0, "JPM", "Monopoly Deluxe",  0 )
+
+//AWP Skeleton driver
+#include "video/awpvid.h"
+#include "machine/steppers.h"
+#include "machine/roc10937.h"
+
+static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
+	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
+	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8_MODERN("acia6850_0", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8_MODERN("acia6850_0", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0x046040, 0x04604f) AM_DEVREADWRITE8_MODERN("6840ptm", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0x046060, 0x046061) AM_READ_PORT("DIRECT") AM_WRITENOP
+	AM_RANGE(0x046062, 0x046063) AM_WRITENOP
+	AM_RANGE(0x046064, 0x046065) AM_WRITENOP
+	AM_RANGE(0x046066, 0x046067) AM_WRITENOP
+	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0x046084, 0x046085) AM_READ(unk_r) // PIA?
+	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) // PIA?
+	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8_MODERN("acia6850_2", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8_MODERN("acia6850_2", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_w, 0x00ff)
+	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
+	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
+	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
+	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE("upd7759", jpm_upd7759_r, jpm_upd7759_w)
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( popeye )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Change state to enter test" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Alarm" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(	0x04, "Discontinue alarm when jam is cleared" )
+	PORT_DIPSETTING(	0x00, "Continue alarm until back door open" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Payout Percentage" ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(	0x00, "50%" )
+	PORT_DIPSETTING(	0x80, "45%" )
+	PORT_DIPSETTING(	0x40, "40%" )
+	PORT_DIPSETTING(	0xc0, "30%" )
+
+	PORT_START("DIRECT")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill key") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR ( Unknown ) )
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR ( Unknown ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR ( Unknown ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Reset" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR ( Unknown ) )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("10p")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("20p")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("50p")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("100p")
+	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+/*************************************
+ *
+ *  Initialisation
+ *
+ *************************************/
+
+static MACHINE_START( jpmsys5 )
+{
+	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+}
+
+static MACHINE_RESET( jpmsys5 )
+{
+	jpmsys5_state *state = machine.driver_data<jpmsys5_state>();
+	state->m_a2_data_in = 1;
+	state->m_a2_acia_dcd = 0;
+}
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
+
+	MCFG_ACIA6850_ADD("acia6850_0", acia0_if)
+	MCFG_ACIA6850_ADD("acia6850_1", acia1_if)
+	MCFG_ACIA6850_ADD("acia6850_2", acia2_if)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_MACHINE_START(jpmsys5)
+	MCFG_MACHINE_RESET(jpmsys5)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	/* Earlier revisions use an SAA1099 */
+	MCFG_SOUND_ADD("ym2413", YM2413, 4000000 ) /* Unconfirmed */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* 6840 PTM */
+	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
+MACHINE_CONFIG_END
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+ROM_START( m_popeye )
+	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "popeye_std_p1.bin", 0x000000, 0x10000, CRC(a8d5394c) SHA1(5be0cd8bc4cdb230a839f83e1297bc57dde20d94) )
+	ROM_LOAD16_BYTE( "popeye_std_p2.bin", 0x000001, 0x10000, CRC(5537afc2) SHA1(3e90fef908b80939c781a85a2ac9783de62d4122) )
+
+	ROM_REGION( 0x80000, "upd7759", 0 )
+	ROM_LOAD( "popsnd.bin", 0x00000, 0x80000, CRC(67378dbc) SHA1(83f87e35bb2c73a788c0ed778b33f3710eb95406) )
+ROM_END
+
+GAME( 1994, m_popeye, 0, jpmsys5, popeye, 0, ROT0, "JPM", "Popeye (20p/8 GBP Token)", GAME_NOT_WORKING )
