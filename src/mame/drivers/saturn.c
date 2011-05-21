@@ -213,8 +213,6 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch);	/*DMA level 0 di
 static void scu_dma_indirect(address_space *space, UINT8 dma_ch); /*DMA level 0 indirect transfer function*/
 
 
-int minit_boost,sinit_boost;
-attotime minit_boost_timeslice, sinit_boost_timeslice;
 
 //static int scanline;
 
@@ -1734,9 +1732,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		}
 		#endif
 
-		printf("DMA lv %d indirect mode transfer START\n"
+		if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu_src[dma_ch],state->m_scu_dst[dma_ch],state->m_scu_size[dma_ch]);
-		printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
+		if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
 
 		//guess,but I believe it's right.
 		state->m_scu_src[dma_ch] &=0x07ffffff;
@@ -1803,17 +1801,21 @@ static READ16_HANDLER( saturn_soundram_r )
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  */
 static WRITE32_HANDLER( minit_w )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
-	space->machine().scheduler().boost_interleave(minit_boost_timeslice, attotime::from_usec(minit_boost));
+	space->machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
 	space->machine().scheduler().trigger(1000);
-	sh2_set_frt_input(space->machine().device("slave"), PULSE_LINE);
+	sh2_set_frt_input(state->m_slave, PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
-	space->machine().scheduler().boost_interleave(sinit_boost_timeslice, attotime::from_usec(sinit_boost));
-	sh2_set_frt_input(space->machine().device("maincpu"), PULSE_LINE);
+	space->machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
+	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }
 
 static READ32_HANDLER(saturn_backupram_r)
@@ -2330,10 +2332,10 @@ DRIVER_INIT ( stv )
 	machine.base_datetime(systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
-	minit_boost = 400;
-	sinit_boost = 400;
-	minit_boost_timeslice = attotime::zero;
-	sinit_boost_timeslice = attotime::zero;
+	state->m_minit_boost = 400;
+	state->m_sinit_boost = 400;
+	state->m_minit_boost_timeslice = attotime::zero;
+	state->m_sinit_boost_timeslice = attotime::zero;
 
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
@@ -3116,10 +3118,10 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	machine.current_datetime(systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
-	minit_boost = 400;
-	sinit_boost = 400;
-	minit_boost_timeslice = attotime::zero;
-	sinit_boost_timeslice = attotime::zero;
+	state->m_minit_boost = 400;
+	state->m_sinit_boost = 400;
+	state->m_minit_boost_timeslice = attotime::zero;
+	state->m_sinit_boost_timeslice = attotime::zero;
 
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
@@ -4402,6 +4404,8 @@ GAME( 1998, sss,       stvbios, stv,      stv,		sss,    	ROT0,   "Capcom / Cave 
 GAME( 1995, sandor,    stvbios, stv,      stv,		sandor, 	ROT0,   "Sega", 	    				"Puzzle & Action: Sando-R (J 951114 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, thunt,     sandor,  stv,      stv,		thunt,  	ROT0,   "Sega",	                		"Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, thuntk,    sandor,  stv,      stv,		sandor, 	ROT0,   "Sega / Deniam",        		"Puzzle & Action: BoMulEul Chajara (JUET 970125 V2.00K)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, smleague,  stvbios, stv,      stv,		smleague,	ROT0,   "Sega", 	    				"Super Major League (U 960108 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, finlarch,  smleague,stv,      stv,		finlarch,	ROT0,   "Sega", 	    				"Final Arch (J 950714 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sokyugrt,  stvbios, stv,      stv,		sokyugrt,	ROT0,   "Raizing / Eighting",   		"Soukyugurentai / Terra Diver (JUET 960821 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv,		suikoenb,	ROT0,   "Data East",                	"Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND )
 GAME( 1996, vfkids,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND )
@@ -4411,8 +4415,6 @@ GAME( 1997, znpwfv,    stvbios, stv,      stv,		znpwfv, 	ROT0,   "Sega", 	    		
 /* Almost */
 GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stv,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, twcup98,   stvbios, stv,      stv,		twcup98,	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
-GAME( 1995, smleague,  stvbios, stv,      stv,		smleague,	ROT0,   "Sega", 	    				"Super Major League (U 960108 V1.000)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, finlarch,  smleague,stv,      stv,		finlarch,	ROT0,   "Sega", 	    				"Final Arch (J 950714 V1.001)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, elandore,  stvbios, stv,      stv,		elandore,	ROT0,   "Sai-Mate", 					"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Unemulated printer device */

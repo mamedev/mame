@@ -105,6 +105,8 @@ DRIVER_INIT(prikura)
 
     (loops for 263473 instructions)
 */
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	// master
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6018640);
 	// slave
@@ -112,8 +114,8 @@ DRIVER_INIT(prikura)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(hanagumi)
@@ -161,14 +163,16 @@ CPU0: Aids Screen
 
 DRIVER_INIT(puyosun)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6021cf0);
 
 	sh2drc_add_pcflush(machine.device("slave"), 0x60236fe);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 /* mausuke
@@ -183,32 +187,38 @@ CPU0 Data East Logo:
 
 DRIVER_INIT(mausuke)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x60461A0);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(cottonbm)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 //  sh2drc_add_pcflush(machine.device("maincpu"), 0x6030ee2);
 //  sh2drc_add_pcflush(machine.device("slave"), 0x6032b52);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(10);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(10);
 }
 
 DRIVER_INIT(cotton2)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6031c7a);
 	sh2drc_add_pcflush(machine.device("slave"), 0x60338ea);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(dnmtdeka)
@@ -250,6 +260,8 @@ DRIVER_INIT(fhboxers)
 
 DRIVER_INIT( groovef )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6005e7c);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6005e86);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x60a4970);
@@ -258,19 +270,21 @@ DRIVER_INIT( groovef )
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT( danchih )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6028b28);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6028c8e);
 	sh2drc_add_pcflush(machine.device("slave"), 0x602ae26);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 /*
@@ -319,87 +333,105 @@ DRIVER_INIT( astrass )
 
 DRIVER_INIT(thunt)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x602A024);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6013EEA);
 	sh2drc_add_pcflush(machine.device("slave"), 0x602AAF8);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(1);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
 DRIVER_INIT(sandor)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x602a0f8);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6013fbe);
 	sh2drc_add_pcflush(machine.device("slave"), 0x602abcc);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(1);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(1);
 }
 
 DRIVER_INIT(grdforce)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6041e32);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6043aa2);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(batmanfr)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x60121c0);
 	sh2drc_add_pcflush(machine.device("slave"), 0x60125bc);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(colmns97)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("slave"), 0x60298a2);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost = sinit_boost = 0;
+	state->m_minit_boost = state->m_sinit_boost = 0;
 }
 
 DRIVER_INIT(winterht)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6098aea);
 	sh2drc_add_pcflush(machine.device("slave"), 0x609ae4e);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(2);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 DRIVER_INIT(seabass)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x602cbfa);
 	sh2drc_add_pcflush(machine.device("slave"), 0x60321ee);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 DRIVER_INIT(vfremix)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x602c30c);
 	sh2drc_add_pcflush(machine.device("slave"), 0x604c332);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(20);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
 DRIVER_INIT(sss)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6026398);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6028cd6);
 
@@ -407,26 +439,30 @@ DRIVER_INIT(sss)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(othellos)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x602bcbe);
 	sh2drc_add_pcflush(machine.device("slave"), 0x602d92e);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(sasissu)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("slave"), 0x60710be);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(2);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(2);
 }
 
 DRIVER_INIT(gaxeduel)
@@ -446,56 +482,74 @@ DRIVER_INIT(suikoenb)
 
 DRIVER_INIT(sokyugrt)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(znpwfv)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6012ec2);
 	sh2drc_add_pcflush(machine.device("slave"), 0x60175a6);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_nsec(500);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_nsec(500);
 }
 
 DRIVER_INIT(twcup98)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x605edde);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 	install_twcup98_protection(machine);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(5);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
 DRIVER_INIT(smleague)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6063bf4);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	/* tight sync to avoid dead locks */
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
 DRIVER_INIT(finlarch)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6064d60);
 
 	DRIVER_INIT_CALL(stv);
+
+	/* tight sync to avoid dead locks */
+	state->m_minit_boost = state->m_sinit_boost = 0;
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
 DRIVER_INIT(maruchan)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x601ba46);
 	sh2drc_add_pcflush(machine.device("slave"), 0x601ba46);
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(50);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(50);
 }
 
 DRIVER_INIT(pblbeach)
@@ -514,17 +568,21 @@ DRIVER_INIT(shanhigw)
 
 DRIVER_INIT(elandore)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x604eac0);
 	sh2drc_add_pcflush(machine.device("slave"), 0x605340a);
 
 	install_elandore_protection(machine);
 
 	DRIVER_INIT_CALL(stv);
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(0);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(0);
 }
 
 DRIVER_INIT(rsgun)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x6034d04);
 	sh2drc_add_pcflush(machine.device("slave"), 0x6036152);
 
@@ -532,7 +590,7 @@ DRIVER_INIT(rsgun)
 
 	DRIVER_INIT_CALL(stv);
 
-	minit_boost_timeslice = sinit_boost_timeslice = attotime::from_usec(20);
+	state->m_minit_boost_timeslice = state->m_sinit_boost_timeslice = attotime::from_usec(20);
 }
 
 DRIVER_INIT(ffreveng)

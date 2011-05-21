@@ -23,6 +23,10 @@ public:
     UINT32 m_scu_index[3];
 	UINT8  m_stv_multi_bank;
 	UINT8  m_prev_bankswitch;
+	int    m_minit_boost;
+	int    m_sinit_boost;
+	attotime m_minit_boost_timeslice;
+	attotime m_sinit_boost_timeslice;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
