@@ -163,7 +163,7 @@ ToDo / Notes:
 #include "coreutil.h"
 
 
-
+/* TODO: do this in a verboselog style */
 #define LOG_CDB  0
 #define LOG_SMPC 0
 #define LOG_SCU  0
@@ -1335,12 +1335,8 @@ DMA TODO:
 
 #define DMA_STATUS				(state->m_scu_regs[31])
 /*These macros sets the various DMA status flags.*/
-#define D0MV_1	DMA_STATUS|=0x10
-#define D1MV_1	DMA_STATUS|=0x100
-#define D2MV_1	DMA_STATUS|=0x1000
-#define D0MV_0	DMA_STATUS&=~0x10
-#define D1MV_0	DMA_STATUS&=~0x100
-#define D2MV_0	DMA_STATUS&=~0x1000
+#define DnMV_1(_ch_) DMA_STATUS|=(0x10 << 4 * _ch_)
+#define DnMV_0(_ch_) DMA_STATUS&=~(0x10 << 4 * _ch_)
 
 static UINT32 scu_add_tmp;
 
@@ -1441,7 +1437,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		if(state->m_scu_regs[offset] & 1 && ((state->m_scu_regs[offset+1] & 7) == 7) && state->m_scu_regs[offset] & 0x100)
 		{
 			if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
-			else			   	   { scu_dma_indirect(space,DMA_CH); }
+			else			   	    { scu_dma_indirect(space,DMA_CH); }
 
 			state->m_scu_regs[offset]&=~1;//disable starting bit.
 		}
@@ -1564,7 +1560,7 @@ static TIMER_CALLBACK( dma_lv0_ended )
 
 	cputag_set_input_line_and_vector(machine, "maincpu", 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
 
-	D0MV_0;
+	DnMV_0(0);
 }
 
 /*Lv 1 DMA end irq*/
@@ -1574,7 +1570,7 @@ static TIMER_CALLBACK( dma_lv1_ended )
 
 	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
 
-	D1MV_0;
+	DnMV_0(1);
 }
 
 /*Lv 2 DMA end irq*/
@@ -1584,18 +1580,19 @@ static TIMER_CALLBACK( dma_lv2_ended )
 
 	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
 
-	D2MV_0;
+	DnMV_0(2);
 }
 
 static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 	static UINT32 tmp_src,tmp_dst,tmp_size;
-	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
-			             "Start %08x End %08x Size %04x\n",state->m_scu_src[0],state->m_scu_dst[0],state->m_scu_size[0]);
-	if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[0],state->m_scu_dst_add[0]);
 
-	D0MV_1;
+	if(LOG_SCU) printf("DMA lv %d transfer START\n"
+			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu_src[dma_ch],state->m_scu_dst[dma_ch],state->m_scu_size[dma_ch]);
+	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
+
+	DnMV_1(dma_ch);
 
 	/* max size */
 	if(state->m_scu_size[dma_ch] == 0) { state->m_scu_size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
@@ -1686,6 +1683,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(!(DRUP(dma_ch))) state->m_scu_src[dma_ch] = tmp_src;
 	if(!(DWUP(dma_ch))) state->m_scu_dst[dma_ch] = tmp_dst;
 
+	if(dma_ch != 2)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this, clean up */
@@ -1713,7 +1711,7 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 	/*temporary storage for the transfer data*/
 	UINT32 tmp_src;
 
-	D0MV_1;
+	DnMV_1(dma_ch);
 
 	if(state->m_scu_index[dma_ch] == 0) { state->m_scu_index[dma_ch] = state->m_scu_dst[0]; }
 
@@ -1736,9 +1734,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		}
 		#endif
 
-		if(LOG_SCU) logerror("DMA lv %d indirect mode transfer START\n"
+		printf("DMA lv %d indirect mode transfer START\n"
 				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu_src[dma_ch],state->m_scu_dst[dma_ch],state->m_scu_size[dma_ch]);
-		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
+		printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
 
 		//guess,but I believe it's right.
 		state->m_scu_src[dma_ch] &=0x07ffffff;
@@ -1775,9 +1773,9 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 	/*TODO: timing of this, clean up */
 	switch(dma_ch)
 	{
-		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+		case 0: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv0_ended)); break;
+		case 1: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv1_ended)); break;
+		case 2: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv2_ended)); break;
 	}
 }
 
