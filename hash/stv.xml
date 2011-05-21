@@ -3,9 +3,7 @@
 
 <!--
 	Note: Most games do not support multi cart system - the ones that are has the text "CART-AM" in the header.
-	THIS IS A PRELIMINARY LIST WHICH LIKELY WILL REQUIRE WORK TO MAKE OPERATE CORRECTLY!  
-	All titles which were not recognized or needed specific region to run when attempting with "-cart1" have been
-        given preliminary/unsupported status.  If a game will never run in a multi cart format, please remove from this list.
+	All titles that doesn't support it have a supported="no" flag.
 -->
 
 <softwarelist name="stv" description="Sega Titan Video cartridges">
@@ -26,7 +24,6 @@
         <rom name="mpr20826.1" size="0x400000" crc="bdc4b941" sha1="c5e8b1b186324c2ccab617915f7bdbfe6897ca9f" offset="0x1800000" loadflag="load16_word_swap"/>
         <rom name="mpr20832.8" size="0x400000" crc="af1b0985" sha1="d7a0e4e0a8b0556915f924bdde8c3d14e5b3423e" offset="0x1c00000" loadflag="load16_word_swap"/>
         <rom name="mpr20833.9" size="0x400000" crc="cb6af231" sha1="4a2e5d7c2fd6179c19cdefa84a03f9a34fbb9e70" offset="0x2000000" loadflag="load16_word_swap"/>
-        <rom name="stat_t.bin" size="73376" crc="52a0b542" sha1="2b352dee919d7e7a5d338ece1691577d0b288eca" status="baddump" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -73,7 +70,7 @@
   </software>
   
   <!-- Game: Columns '97 -->
-  <software name="colmns97">
+  <software name="colmns97" supported="no">
     <description>Columns '97 (JET 961209 V1.000)</description>
     <year>1996</year>
     <publisher>Sega</publisher>
@@ -106,7 +103,7 @@
   </software>
   
   <!-- Game: Cotton Boomerang -->
-  <software name="cottonbm">
+  <software name="cottonbm" supported="no">
     <description>Cotton Boomerang (JUET 980709 V1.000)</description>
     <year>1998</year>
     <publisher>Success</publisher>
@@ -134,13 +131,12 @@
         <rom size="0x080000" offset="0x100001" loadflag="reload"/>
         <rom name="mpr-18789.ic8" size="0x400000" crc="b388616f" sha1="0b2c5a547c3a6a8fb9f4ca54336cf6dc9adb8c6a" offset="0x1c00000" loadflag="load16_word_swap"/>
         <rom name="mpr-18788.ic9" size="0x400000" crc="feae5867" sha1="7d2e47d5ab18700a246d53fdb7872a905cdac55a" offset="0x2000000" loadflag="load16_word_swap"/>
-        <rom name="critcrsh.nv" size="0x80" crc="3da9860e" sha1="05b315aa71fcfc4e617266e1c5e4954eccbf7854" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Danchi de Hanafuda -->
-  <software name="danchih">
+  <software name="danchih" supported="no">
     <description>Danchi de Hanafuda (J 990607 V1.400)</description>
     <year>1999</year>
     <publisher>Altron (Tecmo license)</publisher>
@@ -156,7 +152,7 @@
   </software>
   
   <!-- Game: Danchi de Quiz Okusan Yontaku Desuyo! -->
-  <software name="danchiq">
+  <software name="danchiq" supported="no">
     <description>Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)</description>
     <year>2000</year>
     <publisher>Altron</publisher>
@@ -177,7 +173,7 @@
   </software>
   
   <!-- Game: Decathlete -->
-  <software name="decathlt">
+  <software name="decathlt" supported="no">
     <description>Decathlete (JUET 960709 V1.001)</description>
     <year>1996</year>
     <publisher>Sega</publisher>
@@ -194,7 +190,7 @@
   </software>
   
   <!-- Game: Decathlete -->
-  <software name="decathlto" cloneof="decathlt">
+  <software name="decathlto" cloneof="decathlt" supported="no">
     <description>Decathlete (JUET 960424 V1.000)</description>
     <year>1996</year>
     <publisher>Sega</publisher>
@@ -261,7 +257,7 @@
   </software>
   
   <!-- Game: Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon -->
-  <software name="elandore">
+  <software name="elandore" supported="no">
     <description>Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)</description>
     <year>1998</year>
     <publisher>Sai-Mate</publisher>
@@ -280,7 +276,7 @@
   </software>
   
   <!-- Game: Final Fight Revenge -->
-  <software name="ffreveng">
+  <software name="ffreveng" supported="no">
     <description>Final Fight Revenge (JUET 990714 V1.000)</description>
     <year>1999</year>
     <publisher>Capcom</publisher>
@@ -314,7 +310,6 @@
         <rom name="mpr18532.1"  size="0x400000" crc="39528643" sha1="e35f4c35c9eb13e1cdcc26cb2599bb846f2c1af7" offset="0x1800000" loadflag="load16_word_swap"/>
         <rom name="mpr18539.8"  size="0x400000" crc="62b3908c" sha1="3f00e49beb0e5575cc4250a25c41f04dc91d6ed0" offset="0x1c00000" loadflag="load16_word_swap"/>
         <rom name="mpr18540.9"  size="0x400000" crc="4c2b59a4" sha1="4d15503fcff0e9e0d1ed3bac724278102b506da0" offset="0x2000000" loadflag="load16_word_swap"/>
-        <rom name="fhboxers.nv" size="0x80" crc="590fd6da" sha1="1abe71c62c51a246d854f02cd4cb79fd0d427e88" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -339,7 +334,6 @@
         <rom name="mpr20434.10" size="0x400000" crc="85c94afc" sha1="dfc2f16614bc499747ea87567a21c86e7bddce45" offset="0x2400000" loadflag="load16_word_swap"/>
         <rom name="mpr20435.11" size="0x400000" crc="263a2e48" sha1="27ef4bf577d240e36dcb6e6a09b9c5f24e59ce8c" offset="0x2800000" loadflag="load16_word_swap"/>
         <rom name="mpr20436.12" size="0x400000" crc="e3823f49" sha1="754d48635bd1d4fb01ff665bfe2a71593d92f688" offset="0x2c00000" loadflag="load16_word_swap"/>
-        <rom name="findlove.nv" size="0x80" crc="df2fa9f6" sha1="f05450e1648eafd2ffb52e50769f07bdc75ffb95" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -385,7 +379,7 @@
   </software>
   
   <!-- Game: Guardian Force -->
-  <software name="grdforce">
+  <software name="grdforce" supported="no">
     <description>Guardian Force (JUET 980318 V0.105)</description>
     <year>1998</year>
     <publisher>Success</publisher>
@@ -402,7 +396,7 @@
   </software>
   
   <!-- Game: Groove on Fight - Gouketsuji Ichizoku 3 -->
-  <software name="groovef">
+  <software name="groovef" supported="no">
     <description>Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)</description>
     <year>1998</year>
     <publisher>Atlus</publisher>
@@ -422,7 +416,7 @@
   </software>
   
   <!-- Game: Hanagumi Taisen Columns - Sakura Wars -->
-  <software name="hanagumi">
+  <software name="hanagumi" supported="no">
     <description>Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)</description>
     <year>1997</year>
     <publisher>Sega</publisher>
@@ -445,7 +439,7 @@
   </software>
   
   <!-- Game: Karaoke Quiz Intro Don Don! -->
-  <software name="introdon">
+  <software name="introdon" supported="no">
     <description>Karaoke Quiz Intro Don Don! (J 960213 V1.000)</description>
     <year>1996</year>
     <publisher>Sunsoft / Success</publisher>
@@ -465,7 +459,8 @@
   </software>
   
   <!-- Game: Pro Mahjong Kiwame S -->
-  <software name="kiwames" supported="no" >
+  <!-- Note: you have to init it manually via test mode -->
+  <software name="kiwames">
     <description>Pro Mahjong Kiwame S (J 951020 V1.208)</description>
     <year>1995</year>
     <publisher>Athena</publisher>
@@ -476,7 +471,6 @@
         <rom name="mpr18738.2" size="0x400000" crc="4b3c175a" sha1="b6d2438ae1d3d51950a7ed1eaadf2dae45c4e7b1" offset="0x400000" loadflag="load16_word_swap"/>
         <rom name="mpr18739.3" size="0x400000" crc="eb41fa67" sha1="d12acebb1df9eafd17aff1841087f5017225e7e7" offset="0x800000" loadflag="load16_word_swap"/>
         <rom name="mpr18740.4" size="0x200000" crc="9ca7962f" sha1="a09e0db2246b34ca7efa3165afbc5ba292a95398" offset="0xc00000" loadflag="load16_word_swap"/>
-        <rom name="kiwames.nv" size="0x80" crc="c7002732" sha1="57395d256a58ddcedd354ce1f2c458321be40505" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -495,7 +489,6 @@
         <rom name="mpr-19357.ic5" size="0x400000" crc="aa749370" sha1="f09b0aa94fcc983419aaf2465dae5c9c64606158" offset="0x1000000" loadflag="load16_word_swap"/>
         <rom name="mpr-19358.ic6" size="0x400000" crc="0969f1ec" sha1="25b9671f0975172f283458d46e160080dd1d19e9" offset="0x1400000" loadflag="load16_word_swap"/>
         <rom name="mpr-19359.ic1" size="0x400000" crc="b0d06f9c" sha1="19e04c9c3a0bea5950aba8e1975962fa37722f32" offset="0x1800000" loadflag="load16_word_swap"/>
-        <rom name="magzun.nv" size="0x80" crc="42700321" sha1="1f2ba760c410312539c8677223edcd1cda3b51d4" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -556,7 +549,6 @@
         <rom name="ic32"        size="0x200000" crc="62c10626" sha1="58cb0ca0330fa7a62b277ab0ff84bff65b81bb23" offset="0xc00000" loadflag="load16_word_swap"/>
         <rom name="ic34"        size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0x1000000" loadflag="load16_word_swap"/>
         <rom name="ic36"        size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0x1200000" loadflag="load16_word_swap"/>
-        <rom name="micrombc.nv" size="0x80" crc="6e89815f" sha1="4478f614fb61859f4ee7bf55462f737387887e6f" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -576,7 +568,6 @@
         <rom name="mpr20999.6"  size="0x400000" crc="82e31f25" sha1="0cf74af14abb6ede21d19bc22041214232751594" offset="0x1400000" loadflag="load16_word_swap"/>
         <rom name="mpr20994.1"  size="0x400000" crc="a69243a0" sha1="e5a1b6ec62bdd5b015ed6cf48f5a6aabaf4bd837" offset="0x1800000" loadflag="load16_word_swap"/>
         <rom name="mpr21001.8"  size="0x400000" crc="95fbe549" sha1="8cfb48f353b2849600373d66f293f103bca700df" offset="0x1c00000" loadflag="load16_word_swap"/>
-        <rom name="myfairld.nv" size="0x80" crc="c7cf3a5a" sha1="5365f38047821305658f94395f03cf2c49c87576" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -598,13 +589,12 @@
         <rom name="ic36"       size="0x200000" crc="0c9df896" sha1="4d8c18205e7aa90bfaa677ecff2b65128f2ad47c" offset="0x1000000" loadflag="load16_word_swap"/>
         <rom name="ic23"       size="0x200000" crc="bd922829" sha1="4c6f988173e439a05a77da043d856e142b0da831" offset="0x1200000" loadflag="load16_word_swap"/>
         <rom name="ic25"       size="0x200000" crc="f77f9e24" sha1="9a9636114e74c1fd7bd67db8005af02ef6a75ab1" offset="0x1400000" loadflag="load16_word_swap"/>
-        <rom name="nclubv3.nv" size="0x80" crc="9122a9e9" sha1="5318994905e005567709c41449547c545182bece" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Othello Shiyouyo -->
-  <software name="othellos">
+  <software name="othellos" supported="no">
     <description>Othello Shiyouyo (J 980423 V1.002)</description>
     <year>1998</year>
     <publisher>Success</publisher>
@@ -637,7 +627,7 @@
   </software>
   
   <!-- Game: Print Club 2 -->
-  <software name="pclub2">
+  <software name="pclub2" supported="no">
     <description>Print Club 2 (U 970921 V1.000)</description>
     <year>1997</year>
     <publisher>Atlus</publisher>
@@ -648,13 +638,12 @@
         <rom name="ic26"      size="0x200000" crc="ab51da70" sha1="85214aa805ffc9de59900dc0cd4e19e5ab756bf7" offset="0x600000" loadflag="load16_word_swap"/>
         <rom name="ic28"      size="0x200000" crc="3a654b2a" sha1="7398e25836bfbdeab6350759f25c420c3b496172" offset="0x800000" loadflag="load16_word_swap"/>
         <rom name="ic30"      size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0xa00000" loadflag="load16_word_swap"/>
-        <rom name="pclub2.nv" size="0x80" crc="00d0f04e" sha1="8b5a3e1c52e34443f83fd4a8948a00cacb5071d0" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Print Club 2 Vol. 3 -->
-  <software name="pclub2v3" cloneof="pclub2">
+  <software name="pclub2v3" cloneof="pclub2" supported="no">
     <description>Print Club 2 Vol. 3 (U 990310 V1.000)</description>
     <year>1999</year>
     <publisher>Atlus</publisher>
@@ -665,13 +654,12 @@
         <rom name="ic26"        size="0x200000" crc="d97034ed" sha1="a7a0f659eefd539b2a1fd70ef394eed30ea54c0c" offset="0x600000" loadflag="load16_word_swap"/>
         <rom name="ic28"        size="0x200000" crc="f1421506" sha1="c384b695338144e5f051134bda73b059b678a7df" offset="0x800000" loadflag="load16_word_swap"/>
         <rom name="ic30" merge="ic30" size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0xa00000" loadflag="load16_word_swap"/>
-        <rom name="pclub2v3.nv" size="0x80" crc="a8a2d30c" sha1="bdde3d62ff21190a23698058ff66e476a75a09aa" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Print Club Pokemon B -->
-  <software name="pclubpok">
+  <software name="pclubpok" supported="no">
     <description>Print Club Pokemon B (U 991126 V1.000)</description>
     <year>1999</year>
     <publisher>Atlus</publisher>
@@ -682,7 +670,6 @@
         <rom name="ic26"        size="0x200000" crc="054ad120" sha1="987e812af099bb0aa5d43a4c10ae8345370a2606" offset="0x600000" loadflag="load16_word_swap"/>
         <rom name="ic28"        size="0x200000" crc="3a654b2a" sha1="7398e25836bfbdeab6350759f25c420c3b496172" offset="0x800000" loadflag="load16_word_swap"/>
         <rom name="ic30"        size="0x200000" crc="98747bef" sha1="8d452507a9842a48cd1a7db8fde11a070a6f068b" offset="0xa00000" loadflag="load16_word_swap"/>
-        <rom name="pclubpok.nv" size="0x80" crc="4ba3f21a" sha1="898a393fb2fc1961b68b7d4f383d5447e6c010e8" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -704,7 +691,7 @@
   </software>
   
   <!-- Game: Puyo Puyo Sun -->
-  <software name="puyosun">
+  <software name="puyosun" supported="no">
     <description>Puyo Puyo Sun (J 961115 V0.001)</description>
     <year>1996</year>
     <publisher>Compile</publisher>
@@ -725,7 +712,7 @@
   </software>
   
   <!-- Game: Radiant Silvergun -->
-  <software name="rsgun">
+  <software name="rsgun" supported="no">
     <description>Radiant Silvergun (JUET 980523 V1.000)</description>
     <year>1998</year>
     <publisher>Treasure</publisher>
@@ -761,7 +748,7 @@
   </software>
   
   <!-- Game: DaeJeon! SanJeon SuJeon -->
-  <software name="sanjeon" supported="no"  cloneof="sasissu">
+  <software name="sanjeon" cloneof="sasissu" supported="no" >
     <description>DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)</description>
     <year>1999</year>
     <publisher>Sega / Deniam</publisher>
@@ -784,7 +771,7 @@
   </software>
   
   <!-- Game: Taisen Tanto-R Sashissu!! -->
-  <software name="sasissu">
+  <software name="sasissu" supported="no">
     <description>Taisen Tanto-R Sashissu!! (J 980216 V1.000)</description>
     <year>1998</year>
     <publisher>Sega</publisher>
@@ -817,7 +804,6 @@
         <rom name="mpr20550.1" size="0x400000" crc="083e1ca8" sha1="03944dd8fe86f305ca4bd2d71e2140e03798ffc9" offset="0x1800000" loadflag="load16_word_swap"/>
         <rom name="mpr20556.8" size="0x400000" crc="1fd70c6c" sha1="d9d2e362d13238216f4f7e10095fb8383bbd91e8" offset="0x1c00000" loadflag="load16_word_swap"/>
         <rom name="mpr20557.9" size="0x400000" crc="3c9ba442" sha1="2e5b795cf4cdc11ab3e4887b2f77c7147c6e3eec" offset="0x2000000" loadflag="load16_word_swap"/>
-        <rom name="seabass.nv" size="0x80" crc="4e7c0944" sha1="dbba78f6a7f3e7d12d5c4fff36117db82f5f9c01" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -836,7 +822,7 @@
   </software>
   
   <!-- Game: Shienryu -->
-  <software name="shienryu">
+  <software name="shienryu" supported="no" >
     <description>Shienryu (JUET 961226 V1.000)</description>
     <year>1997</year>
     <publisher>Warashi</publisher>
@@ -869,7 +855,7 @@
   </software>
   
   <!-- Game: Soukyugurentai / Terra Diver -->
-  <software name="sokyugrt">
+  <software name="sokyugrt" supported="no" >
     <description>Soukyugurentai / Terra Diver (JUET 960821 V1.000)</description>
     <year>1996</year>
     <publisher>Raizing / Eighting</publisher>
@@ -898,13 +884,12 @@
         <rom name="mpr21491.4" size="0x400000" crc="cf7ee784" sha1="af823df2d60d8ef3d17628b95a04136b807ca095" offset="0xc00000" loadflag="load16_word_swap"/>
         <rom name="mpr21492.5" size="0x400000" crc="57753894" sha1="5c51167c158443d02a53d724a5ceb73055876c06" offset="0x1000000" loadflag="load16_word_swap"/>
         <rom name="mpr21493.6" size="0x400000" crc="efb2d271" sha1="a591e48206704fbda5fef3ce69ad279da1017ed6" offset="0x1400000" loadflag="load16_word_swap"/>
-        <rom name="sss.nv" size="0x80" crc="3473b2f3" sha1="6480b4b321af8ee6e967710e74f2556c17bfca97" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Stress Busters -->
-  <software name="stress">
+  <software name="stress" supported="no" >
     <description>Stress Busters (J 981020 V1.000)</description>
     <year>1998</year>
     <publisher>Sega</publisher>
@@ -957,7 +942,6 @@
         <rom name="ic26"        size="0x200000" crc="fb073352" sha1="a5164aa5854ab3095f704ab73b6e4fb9ed0e0785" offset="0x600000" loadflag="load16_word_swap"/>
         <rom name="ic28"        size="0x200000" crc="530e0ceb" sha1="8d14eb9dbf253a4563587d256a15492384e7ca5c" offset="0x800000" loadflag="load16_word_swap"/>
         <rom name="ic30"        size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" offset="0xa00000" loadflag="load16_word_swap"/>
-        <rom name="techbowl.nv" size="0x80" crc="5bebc2b7" sha1="e189e891e1753059fbaad4ce82ddf191d5e8176a" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
@@ -1001,7 +985,7 @@
   </software>
   
   <!-- Game: Tecmo World Cup '98 -->
-  <software name="twcup98">
+  <software name="twcup98" supported="no" >
     <description>Tecmo World Cup '98 (JUET 980410 V1.000)</description>
     <year>1998</year>
     <publisher>Tecmo</publisher>
@@ -1017,7 +1001,7 @@
   </software>
   
   <!-- Game: Virtua Fighter Kids -->
-  <software name="vfkids">
+  <software name="vfkids" supported="no" >
     <description>Virtua Fighter Kids (JUET 960319 V0.000)</description>
     <year>1996</year>
     <publisher>Sega</publisher>
@@ -1070,13 +1054,12 @@
         <rom name="mpr19619.6"  size="0x400000" crc="0b76866c" sha1="10add2993dfe9daf757ec2ff8675390081a93c0a" offset="0x1400000" loadflag="load16_word_swap"/>
         <rom name="mpr19614.1"  size="0x400000" crc="b83b3f03" sha1="e5a5919ee74964633eaaf4af2fe04c38604ccf16" offset="0x1800000" loadflag="load16_word_swap"/>
         <rom name="mpr19621.8"  size="0x400000" crc="f92616b3" sha1="61a9dda92a86a02d027260e11b1bad3b0dda9f02" offset="0x1c00000" loadflag="load16_word_swap"/>
-        <rom name="vmahjong.nv" size="0x80" crc="4e6487f4" sha1="d6d930ab5f21b8c4f42812d08b3ee90f2bc94081" offset="0x000000" loadflag="load16_word_swap"/>
       </dataarea>
     </part>
   </software>
   
   <!-- Game: Winter Heat -->
-  <software name="winterht">
+  <software name="winterht" supported="no" >
     <description>Winter Heat (JUET 971012 V1.000)</description>
     <year>1997</year>
     <publisher>Sega</publisher>
@@ -1095,7 +1078,7 @@
   </software>
   
   <!-- Game: Zen Nippon Pro-Wrestling Featuring Virtua -->
-  <software name="znpwfv">
+  <software name="znpwfv" supported="no" >
     <description>Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)</description>
     <year>1997</year>
     <publisher>Sega</publisher>
