@@ -116,6 +116,7 @@ public:
 	void listdevices(const char *gamename = "*");
 	void listslots(const char *gamename = "*");
 	void listmedia(const char *gamename = "*");
+	void listsoftware(const char *gamename = "*");
 	void verifyroms(const char *gamename = "*");
 	void verifysamples(const char *gamename = "*");
 	void romident(const char *filename);

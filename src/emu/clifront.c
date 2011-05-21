@@ -837,8 +837,6 @@ void cli_frontend::verifysamples(const char *gamename)
 }
 
 
-
-#if 0
 /*-------------------------------------------------
     info_listsoftware - output the list of
     software supported by a given game or set of
@@ -848,7 +846,7 @@ void cli_frontend::verifysamples(const char *gamename)
         identifying duplicate lists.
 -------------------------------------------------*/
 
-static void info_listsoftware(const char *gamename)
+void cli_frontend::listsoftware(const char *gamename)
 {
 	FILE *out = stdout;
 
@@ -969,10 +967,10 @@ static void info_listsoftware(const char *gamename)
 
 						if (!seen_before)
 						{
-							lists[list_count++] = swlist->list_name[i];
+							lists[list_count++] = swlist->list_name[listnum];
 							software_list_parse( list, NULL, NULL );
 
-							fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name[i], xml_normalize_string(software_list_get_description(list)) );
+							fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlist->list_name[listnum], xml_normalize_string(software_list_get_description(list)) );
 
 							for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 							{
@@ -1120,7 +1118,6 @@ static void info_listsoftware(const char *gamename)
 
 	global_free( lists );
 }
-#endif
 
 
 //-------------------------------------------------
