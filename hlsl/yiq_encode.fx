@@ -107,10 +107,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Coord3 = Input.Coord3.xy * Scaler;
 	
 	float W = WValue;
-	float T0 = Coord0.x + AValue * Coord0.y + BValue - 1.1f;
-	float T1 = Coord1.x + AValue * Coord1.y + BValue - 1.1f;
-	float T2 = Coord2.x + AValue * Coord2.y + BValue - 1.1f;
-	float T3 = Coord3.x + AValue * Coord3.y + BValue - 1.1f;
+	float T0 = Coord0.x + AValue * Coord0.y + BValue;// - 1.1f;
+	float T1 = Coord1.x + AValue * Coord1.y + BValue;// - 1.1f;
+	float T2 = Coord2.x + AValue * Coord2.y + BValue;// - 1.1f;
+	float T3 = Coord3.x + AValue * Coord3.y + BValue;// - 1.1f;
 
 	float Y0 = dot(Texel0, float3(0.299f, 0.587f, 0.114f));
 	float I0 = dot(Texel0, float3(0.595716f, -0.274453f, -0.321263f));
