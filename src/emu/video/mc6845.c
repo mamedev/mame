@@ -772,7 +772,38 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	
+	m_has_valid_parameters = false;
+	m_line_enable_ff = false;
+	m_vsync_ff = 0;
+	m_raster_counter = 0;
+	m_adjust_active = 0;
+	m_horiz_sync_pos = 1;
+	m_vert_sync_pos = 1;
+	m_de = 0;		
+	m_sync_width = 1;
+	m_vert_char_total = 0;
+	m_vert_disp = 0;
+	m_horiz_pix_total = m_vert_pix_total = 0;
+	m_max_visible_x = m_max_visible_y = 0;
+	m_hsync_on_pos = m_vsync_on_pos = 0;
+	m_hsync_off_pos = m_vsync_off_pos = 0;
+	m_vsync = m_hsync = 0;
+	m_line_counter = 0;
+	m_horiz_disp = m_vert_disp = 0;
+	m_vert_sync_pos = 0;
+	m_vert_total_adj = 0;
+	m_cursor_start_ras = m_cursor_end_ras = 0;
+	m_cursor_blink_count = 0;
+	m_cursor_state = 0;
+	m_update_ready_bit = 0;
+	m_cursor_state = 0;
+	m_raster_counter = 0;
+	m_cursor_start_ras = 0;
+	m_cursor_end_ras = m_cursor_addr = 0;
+	m_line_address = 0;
+	m_current_disp_addr = 0;
+	m_line_address = 0;
+
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_register_address_latch));
 	save_item(NAME(m_horiz_char_total));
@@ -810,6 +841,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_adjust_active));
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
+	save_item(NAME(m_has_valid_parameters));
 }
 
 
@@ -922,6 +954,11 @@ void mc6845_device::device_reset()
 	}
 
 	m_light_pen_latched = false;
+
+	m_cursor_addr = 0;
+	m_line_address = 0;
+	m_horiz_disp = 0;
+	m_cursor_x = 0;
 }
 
 
