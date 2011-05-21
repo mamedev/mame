@@ -26,6 +26,7 @@ struct VS_OUTPUT
 	float2 RedCoord : TEXCOORD0;
 	float2 GrnCoord : TEXCOORD1;
 	float2 BluCoord : TEXCOORD2;
+	float2 TexCoord : TEXCOORD3;
 };
 
 struct VS_INPUT
@@ -42,6 +43,7 @@ struct PS_INPUT
 	float2 RedCoord : TEXCOORD0;
 	float2 GrnCoord : TEXCOORD1;
 	float2 BluCoord : TEXCOORD2;
+	float2 TexCoord : TEXCOORD3;
 };
 
 //-----------------------------------------------------------------------------
@@ -86,18 +88,17 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	float2 TexCoord = (Input.Position.xy * InvTexSize);
-	TexCoord = TexCoord;// + float2(0.5f / TargetWidth, 0.5f / TargetHeight);// * float2(WidthRatio, HeightRatio);//(Input.TexCoord - float2(0.5f, 0.5f)) / 8.0f + float2(0.25f, 0.25f);
+	float2 TexCoord = Input.TexCoord;
 
 	Output.RedCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + RedRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + RedConvergeX * invDims.x;
 	Output.GrnCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + GrnRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + GrnConvergeX * invDims.x;
-	Output.BluCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + BluRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + GrnConvergeX * invDims.x;
+	Output.BluCoord.x = ((((TexCoord.x / Ratios.x) - 0.5f)) * (1.0f + BluRadialConvergeX / RawWidth) + 0.5f) * Ratios.x + BluConvergeX * invDims.x;
 	
 	Output.RedCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + RedRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + RedConvergeY * invDims.y;
-	Output.GrnCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + GrnRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + BluConvergeY * invDims.y;
+	Output.GrnCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + GrnRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + GrnConvergeY * invDims.y;
 	Output.BluCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + BluRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + BluConvergeY * invDims.y;
-	
+
+	Output.TexCoord = TexCoord;	
 	return Output;
 }
 
@@ -107,9 +108,14 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float RedTexel = tex2D(DiffuseSampler, Input.RedCoord).r;
-	float GrnTexel = tex2D(DiffuseSampler, Input.GrnCoord).g;
-	float BluTexel = tex2D(DiffuseSampler, Input.BluCoord).b;
+	float2 MagnetOffset = float2(32.0f / RawWidth, 32.0f / RawHeight);
+	float2 MagnetCenter = float2(0.9f / WidthRatio, 0.9f / HeightRatio);
+	float MagnetDistance = length((MagnetCenter - Input.TexCoord) * float2(WidthRatio, HeightRatio));
+	float Deconverge = 1.0f - MagnetDistance / MagnetCenter;
+	Deconverge = clamp(Deconverge, 0.0f, 1.0f);
+	float RedTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.RedCoord, Deconverge)).r;
+	float GrnTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.GrnCoord, Deconverge)).g;
+	float BluTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.BluCoord, Deconverge)).b;
 	
 	return float4(RedTexel, GrnTexel, BluTexel, 1.0f);
 }
