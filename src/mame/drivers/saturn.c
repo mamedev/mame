@@ -1801,7 +1801,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
 	space->machine().scheduler().boost_interleave(state->m_minit_boost_timeslice, attotime::from_usec(state->m_minit_boost));
 	space->machine().scheduler().trigger(1000);
 	sh2_set_frt_input(state->m_slave, PULSE_LINE);
@@ -1811,7 +1811,7 @@ static WRITE32_HANDLER( sinit_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
 
-	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
+	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->device().tag(), cpu_get_pc(&space->device()),data);
 	space->machine().scheduler().boost_interleave(state->m_sinit_boost_timeslice, attotime::from_usec(state->m_sinit_boost));
 	sh2_set_frt_input(state->m_maincpu, PULSE_LINE);
 }
@@ -2294,6 +2294,7 @@ static INPUT_PORTS_START( stvmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+#ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER ( w60ffc44_write )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -2313,6 +2314,7 @@ static WRITE32_HANDLER ( w60ffc48_write )
 	logerror("cpu %s (PC=%08X): 60ffc48_write write = %08X & %08X\n", space->device().tag(), cpu_get_pc(&space->device()), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
+#endif
 
 #ifdef UNUSED_FUNCTION
 static void print_game_info(void);
@@ -2344,10 +2346,10 @@ DRIVER_INIT ( stv )
 	sh2drc_set_options(machine.device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
-	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
-	machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	//machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
+	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	//machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
 
     state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  state->m_smpc_ram[0x33] = input_port_read(machine, "FAKE");
