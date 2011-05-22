@@ -28,10 +28,27 @@ static DRIVER_INIT( play_1 )
 {
 }
 
+static COSMAC_INTERFACE( cdp1802_config )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( play_1, play_1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COSMAC, 400000)
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
+	MCFG_CPU_CONFIG(cdp1802_config)
 
 	MCFG_MACHINE_RESET( play_1 )
 

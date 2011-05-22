@@ -217,18 +217,10 @@ void cosmac_device::device_config_complete()
 	if (intf != NULL)
 		*static_cast<cosmac_interface *>(this) = *intf;
 
-	// or initialize to defaults if none provided
+	// or error out if none provided
 	else
 	{
-		memset(&m_in_wait_func, 0, sizeof(m_in_wait_func));
-		memset(&m_in_clear_func, 0, sizeof(m_in_clear_func));
-		// TODO: clear ef1-4
-		memset(&m_out_q_func, 0, sizeof(m_out_q_func));
-		memset(&m_in_dma_func, 0, sizeof(m_in_dma_func));
-		memset(&m_out_dma_func, 0, sizeof(m_out_dma_func));
-		m_out_sc_func = NULL;
-		memset(&m_out_tpa_func, 0, sizeof(m_out_tpa_func));
-		memset(&m_out_tpb_func, 0, sizeof(m_out_tpb_func));
+		fatalerror("COSMAC_INTERFACE for cpu '%s' not defined!", tag());
 	}
 }
 
