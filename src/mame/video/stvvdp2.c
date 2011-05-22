@@ -5830,6 +5830,8 @@ static int		stv_sprite_priorities_used[8];
 static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
 
+#define STV_VDP1_TVMR ((state->m_vdp1_regs[0x000/4] >> 16)&0x0000ffff)
+#define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 pri)
 {
@@ -5931,7 +5933,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 
 	/*Guess:Some games needs that the horizontal sprite size to be doubled
       (TODO: understand the proper settings,it might not work like this)*/
-	if(STV_VDP2_LSMD == 3 && /*((STV_VDP2_HRES & 3) != 3) &&*/ (!(state->m_vdp1.framebuffer_mode & 1)))
+	if(STV_VDP1_TVM == 0 && STV_VDP2_HRES & 2) // astrass & findlove
 		double_x = 1;
 	else
 		double_x = 0;

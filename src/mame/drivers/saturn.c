@@ -181,7 +181,6 @@ ToDo / Notes:
 
 //static void stv_dump_ram(void);
 
-static UINT32* ioga;
 static int saturn_region;
 
 /*VDP2 stuff*/
@@ -1063,6 +1062,7 @@ static int port_i;
 
 static READ32_HANDLER ( stv_io_r32 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, mem_mask);
 //  popmessage("SEL: %02x MUX: %02x OFF: %02x",port_sel,mux_data,offset*4);
 
@@ -1115,17 +1115,17 @@ static READ32_HANDLER ( stv_io_r32 )
 		}
 		case 0x04/4:
 		if ( strcmp(space->machine().system().name,"critcrsh") == 0 )
-			return ((input_port_read(space->machine(), "SYSTEM") << 16) & ((input_port_read(space->machine(), "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
+			return ((input_port_read(space->machine(), "SYSTEM") << 16) & ((input_port_read(space->machine(), "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (state->m_ioga[1]);
 		else
-			return (input_port_read(space->machine(), "SYSTEM") << 16) | (ioga[1]);
+			return (input_port_read(space->machine(), "SYSTEM") << 16) | (state->m_ioga[1]);
 
 		case 0x08/4:
 		switch(port_sel)
 		{
 			case 0x77:	return (input_port_read(space->machine(), "UNUSED") << 16) | (input_port_read(space->machine(), "EXTRA"));
 			case 0x67:	return 0xffffffff;/**/
-			case 0x20:  return 0xffff0000 | (ioga[2] & 0xffff);
-			case 0x10:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
+			case 0x20:  return 0xffff0000 | (state->m_ioga[2] & 0xffff);
+			case 0x10:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
 			case 0x60:  return 0xffffffff;/**/
 			default:
 			return 0xffffffff;
@@ -1133,7 +1133,7 @@ static READ32_HANDLER ( stv_io_r32 )
 		case 0x0c/4:
 		switch(port_sel)
 		{
-			case 0x60:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
+			case 0x60:  return ((state->m_ioga[2] & 0xffff) << 16) | 0xffff;
 			default:
 			//popmessage("offs: 3 %02x",port_sel);
 			return 0xffffffff;
@@ -1144,23 +1144,23 @@ static READ32_HANDLER ( stv_io_r32 )
 		{
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(&space->device()),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(&space->device()),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(&space->device()),port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(&space->device()),port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
 
-				//stv_m_workram_h[0x8e830/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
-				//stv_m_workram_h[0x8e834/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
-				return (ioga[5] & 0xff0000) >> 16;//stv_m_workram_h[0x8e830/4];//sound board data
+				//stv_m_workram_h[0x8e830/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
+				//stv_m_workram_h[0x8e834/4] = ((state->m_ioga[5] & 0xff0000) >> 16) ^ 0x3;
+				return (state->m_ioga[5] & 0xff0000) >> 16;//stv_m_workram_h[0x8e830/4];//sound board data
 			}
 			default: return 0xffffffff;
 		}
 		case 0x18/4:
 		switch(port_sel)
 		{
-			case 0x60:  return ioga[5];
+			case 0x60:  return state->m_ioga[5];
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(&space->device()),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(&space->device()),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(&space->device()),port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(&space->device()),port_sel,((state->m_ioga[5] & 0xff0000) >> 16));
 				return 0;//sound board status,non-zero = processing
 			}
 			default:
@@ -1173,12 +1173,13 @@ static READ32_HANDLER ( stv_io_r32 )
 		port_i++;
 		return port_ad[port_i & 7];
 		default:
-		return ioga[offset];
+		return state->m_ioga[offset];
 	}
 }
 
 static WRITE32_HANDLER ( stv_io_w32 )
 {
+	saturn_state *state = space->machine().driver_data<saturn_state>();
 //  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
 
 //  printf("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(&space->device()), offset*4, data, mem_mask);
@@ -1189,7 +1190,7 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			if(ACCESSING_BITS_0_7)
 			{
 				/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
-				ioga[1] = (data) & 0xff;
+				state->m_ioga[1] = (data) & 0xff;
 				coin_counter_w(space->machine(), 0,~data & 0x01);
 				coin_counter_w(space->machine(), 1,~data & 0x02);
 				coin_lockout_w(space->machine(), 0,~data & 0x04);
@@ -1202,15 +1203,15 @@ static WRITE32_HANDLER ( stv_io_w32 )
 		case 0x08/4:
 			if(ACCESSING_BITS_16_23)
 			{
-				ioga[2] = data >> 16;
-				mux_data = ioga[2];
+				state->m_ioga[2] = data >> 16;
+				mux_data = state->m_ioga[2];
 			}
 			else if(ACCESSING_BITS_0_7)
-				ioga[2] = data;
+				state->m_ioga[2] = data;
 			break;
 		case 0x0c/4:
 			if(ACCESSING_BITS_16_23)
-				ioga[3] = data;
+				state->m_ioga[3] = data;
 			break;
 		case 0x10/4:
 			if(ACCESSING_BITS_16_23)
@@ -1218,13 +1219,13 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			break;
 		case 0x14/4:
 			if(ACCESSING_BITS_16_23)
-				ioga[5] = data;
+				state->m_ioga[5] = data;
 			break;
 		//case 0x18/4:
 		case 0x1c/4:
 			//technical bowling tests here
 			if(ACCESSING_BITS_16_23)
-				ioga[7] = data;
+				state->m_ioga[7] = data;
 			break;
 
 	}
@@ -1891,7 +1892,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r8, stv_SMPC_w8,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE(saturn_backupram_r,saturn_backupram_w) AM_SHARE("share1") AM_BASE_MEMBER(saturn_state,m_backupram)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE("share2") AM_BASE_MEMBER(saturn_state,m_workram_l)
-	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE(&ioga) AM_SHARE("share4") AM_MIRROR(0x20)
+	AM_RANGE(0x00400000, 0x0040001f) AM_READWRITE(stv_io_r32, stv_io_w32) AM_BASE_MEMBER(saturn_state,m_ioga) AM_SHARE("share4") AM_MIRROR(0x20)
 	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge

@@ -68,6 +68,7 @@ public:
 	UINT8     m_stv_multi_bank;
 	UINT8     m_prev_bankswitch;
     emu_timer *m_stv_rtc_timer;
+	UINT32    *m_ioga;
 
 	legacy_cpu_device* m_maincpu;
 	legacy_cpu_device* m_slave;
