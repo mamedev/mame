@@ -182,7 +182,6 @@ ToDo / Notes:
 //static void stv_dump_ram(void);
 
 static UINT32* ioga;
-static UINT16* scsp_regs;
 static int saturn_region;
 
 /*VDP2 stuff*/
@@ -418,13 +417,13 @@ static void system_reset(address_space *space)
 
 	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
 	memset(state->m_scu_regs ,0x00,0x000100);
-	memset(scsp_regs    ,0x00,0x001000);
-	memset(state->m_sound_ram  ,0x00,0x080000);
+	memset(state->m_scsp_regs,0x00,0x001000);
+	memset(state->m_sound_ram,0x00,0x080000);
 	memset(state->m_workram_h,0x00,0x100000);
 	memset(state->m_workram_l,0x00,0x100000);
-	memset(stv_vdp2_regs,0x00,0x040000);
-	memset(stv_vdp2_vram,0x00,0x100000);
-	memset(stv_vdp2_cram,0x00,0x080000);
+	memset(state->m_vdp2_regs,0x00,0x040000);
+	memset(state->m_vdp2_vram,0x00,0x100000);
+	memset(state->m_vdp2_cram,0x00,0x080000);
 	//vdp1
 	//A-Bus
 	/*Order is surely wrong but whatever...*/
@@ -1881,9 +1880,9 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
 	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
-	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(stv_vdp2_vram_r, stv_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(stv_vdp2_cram_r, stv_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
+	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
+	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE_MEMBER(saturn_state,m_workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
@@ -1907,9 +1906,9 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
 	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
-	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(stv_vdp2_vram_r, stv_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(stv_vdp2_cram_r, stv_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(stv_vdp2_regs_r, stv_vdp2_regs_w)
+	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
+	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x01f00000) AM_SHARE("share3") AM_BASE_MEMBER(saturn_state,m_workram_h)
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
@@ -2336,7 +2335,7 @@ DRIVER_INIT ( stv )
 
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
-	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_scsp_regs  = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	install_stvbios_speedups(machine);
 
@@ -2594,7 +2593,7 @@ static MACHINE_START( stv )
 	// save states
 	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
+	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 //  state_save_register_global(machine, stv_vblank);
 //  state_save_register_global(machine, stv_hblank);
 	state_save_register_global(machine, state->m_NMI_reset);
@@ -2636,7 +2635,7 @@ static MACHINE_START( saturn )
 	// save states
 	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
+	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
 	state_save_register_global(machine, stv_vblank);
 	state_save_register_global(machine, stv_hblank);
 	state_save_register_global(machine, state->m_NMI_reset);
@@ -3122,7 +3121,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
-	scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
 	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);

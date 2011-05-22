@@ -12,6 +12,11 @@ public:
 	UINT32    *m_backupram;
 	UINT32    *m_scu_regs;
 	UINT16    *m_sound_ram;
+	UINT16    *m_scsp_regs;
+	UINT32    *m_vdp2_regs;
+	UINT32    *m_vdp2_vram;
+	UINT32    *m_vdp2_cram;
+
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
 
@@ -108,21 +113,18 @@ READ32_HANDLER ( stv_vdp1_framebuffer0_r );
 
 /*----------- defined in video/stvvdp2.c -----------*/
 
-extern UINT32* stv_vdp2_regs;
-extern UINT32* stv_vdp2_vram;
 extern int stv_vblank,stv_hblank;
-extern UINT32* stv_vdp2_cram;
 
 UINT8 stv_get_vblank(running_machine &machine);
 
-WRITE32_HANDLER ( stv_vdp2_vram_w );
-READ32_HANDLER ( stv_vdp2_vram_r );
+WRITE32_HANDLER ( saturn_vdp2_vram_w );
+READ32_HANDLER ( saturn_vdp2_vram_r );
 
-WRITE32_HANDLER ( stv_vdp2_cram_w );
-READ32_HANDLER ( stv_vdp2_cram_r );
+WRITE32_HANDLER ( saturn_vdp2_cram_w );
+READ32_HANDLER ( saturn_vdp2_cram_r );
 
-WRITE32_HANDLER ( stv_vdp2_regs_w );
-READ32_HANDLER ( stv_vdp2_regs_r );
+WRITE32_HANDLER ( saturn_vdp2_regs_w );
+READ32_HANDLER ( saturn_vdp2_regs_r );
 
 VIDEO_START ( stv_vdp2 );
 SCREEN_UPDATE( stv_vdp2 );
