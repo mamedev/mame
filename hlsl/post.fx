@@ -80,7 +80,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord = Input.TexCoord + 0.5f / float2(RawWidth, RawHeight);
 	Output.ExtraInfo = Input.ExtraInfo;
 
 	//Output.TexCoord /= 16.0f;
@@ -151,8 +151,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
-	clip((ScreenClipCoord.x < 0.0f / TargetWidth) ? -1 : 1);
-	clip((ScreenClipCoord.y < 0.0f / TargetHeight) ? -1 : 1);
+	clip((ScreenClipCoord.x < 1.0f / TargetWidth) ? -1 : 1);
+	clip((ScreenClipCoord.y < 1.0f / TargetHeight) ? -1 : 1);
 	clip((ScreenClipCoord.x > 1.0f / WidthRatio) ? -1 : 1);
 	clip((ScreenClipCoord.y > 1.0f / HeightRatio) ? -1 : 1);
 

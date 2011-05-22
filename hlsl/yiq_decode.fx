@@ -123,9 +123,9 @@ uniform float BValue;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy);
-	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy);
-	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
+	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy + 0.5f / RawDims);
+	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy + 0.5f / RawDims);
 	float4 C = OrigC;
 	float4 C2 = OrigC2;
 	
@@ -166,10 +166,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 	float Yavg = Ytotal / (FscValue * 4.0f);
 
-	float4 I = (C - Yavg) * sin(W * Tc);
-	float4 Q = (C - Yavg) * cos(W * Tc);
-	float4 I2 = (C2 - Yavg) * sin(W * Tc2);
-	float4 Q2 = (C2 - Yavg) * cos(W * Tc2);
+	float4 I = C * sin(W * Tc);
+	float4 Q = C * cos(W * Tc);
+	float4 I2 = C2 * sin(W * Tc2);
+	float4 Q2 = C2 * cos(W * Tc2);
 	
 	float Itotal = 0.0f;
 	float Qtotal = 0.0f;
