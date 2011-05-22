@@ -337,6 +337,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 		} else { // systemdescriptor
 			UINT16 gatedesc[3]={0,0,0};
 			UINT16 gatesel = GATESEL(desc);
+			if (!gate) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector)); // can't ret through gate
 			if (DPL(r) < PMAX(CPL,RPL(selector))) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
 			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT, IDXTBL(selector));
 
@@ -381,8 +382,6 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 			case TASKGATE:
 				gatesel = GATESEL(gatedesc);
 				if ((addr = i80286_selector_address(cpustate,gatesel)) == -1) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
-				gatedesc[0] = ReadWord(addr);
-				gatedesc[1] = ReadWord(addr+2);
 				gatedesc[2] = ReadWord(addr+4);
 				r = RIGHTS(gatedesc);
 				if (SEGDESC(r) || (GATE(r) != TSSDESCIDLE)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(gatesel));
@@ -406,7 +405,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 
 static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, int hwint, int error)
 {
-	UINT16 desc[3], gatedesc[3]={0,0,0}, gatesel, oldcs, oldip, oldflags;
+	UINT16 desc[3], gatedesc[3]={0,0,0}, gatesel;
 	UINT8 r;
 	UINT32 addr;
 
@@ -425,14 +424,8 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 	
 	switch (GATE(r)) {
 	case TASKGATE:
-		oldcs = cpustate->sregs[CS];
-		oldip = cpustate->pc-cpustate->base[CS];
-		oldflags = CompressFlags();
 		gatesel = GATESEL(gatedesc);
 		i80286_switch_task(cpustate, gatesel, 2);
-		PUSH(oldflags);
-		PUSH(oldcs);
-		PUSH(oldip);
 		if((hwint == 1) && (error != -1)) PUSH(error);
 		i80286_load_flags(cpustate, cpustate->flags, CPL);
 		break;
