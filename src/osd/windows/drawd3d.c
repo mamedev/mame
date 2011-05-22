@@ -2148,7 +2148,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 		(*d3dintf->effect.set_technique)(d3d->yiq_decode_effect, "DecodeTechnique");
 	}
 
-	d3d_surface *backbuffer;
+	d3d_surface *backbuffer = NULL;
 
 	// first remember the original render target in case we need to set a new one
 	if(d3d->hlsl_enable && d3dintf->post_fx_available)
