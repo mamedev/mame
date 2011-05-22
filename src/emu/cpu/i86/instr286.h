@@ -23,6 +23,7 @@ static void i80286_data_descriptor(i80286_state *cpustate,int reg, UINT16 select
 static void PREFIX286(_0fpre)(i80286_state *cpustate);
 static void PREFIX286(_arpl)(i80286_state *cpustate);
 static void i80286_pop_seg(i80286_state *cpustate,int reg);
+static void i80286_load_flags(i80286_state *cpustate, UINT16 flags, int cpl);
 
 enum i80286_size
 {
