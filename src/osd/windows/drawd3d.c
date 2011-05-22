@@ -2784,6 +2784,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 
 error:
 	d3dintf->post_fx_available = false;
+	mame_printf_verbose("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
 	if (texture->d3dsurface != NULL)
 		(*d3dintf->surface.release)(texture->d3dsurface);
 	if (texture->d3dtex != NULL)
