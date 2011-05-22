@@ -335,7 +335,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 			cpustate->rights[CS]=RIGHTS(desc);
 			cpustate->pc=cpustate->base[CS]+offset;
 		} else { // systemdescriptor
-			UINT16 gatedesc[3];
+			UINT16 gatedesc[3]={0,0,0};
 			UINT16 gatesel = GATESEL(desc);
 			if (DPL(r) < PMAX(CPL,RPL(selector))) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
 			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT, IDXTBL(selector));
@@ -406,7 +406,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 
 static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, int hwint, int error)
 {
-	UINT16 desc[3], gatedesc[3], gatesel, oldcs, oldip, oldflags;
+	UINT16 desc[3], gatedesc[3]={0,0,0}, gatesel, oldcs, oldip, oldflags;
 	UINT8 r;
 	UINT32 addr;
 
