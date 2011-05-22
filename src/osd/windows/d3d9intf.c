@@ -341,8 +341,15 @@ static HRESULT d3d_device_create_effect(d3d_device *dev, const WCHAR *name, d3d_
 	HRESULT hr = (*g_load_effect)(device, name, NULL, NULL, 0, NULL, (ID3DXEffect**)effect, &buffer_errors);
 	if(FAILED(hr))
 	{
-		LPVOID compile_errors = buffer_errors->GetBufferPointer();
-		printf("Unable to compile shader: %s\n", (const char*)compile_errors);
+		if(buffer_errors != NULL)
+		{
+			LPVOID compile_errors = buffer_errors->GetBufferPointer();
+			printf("Unable to compile shader: %s\n", (const char*)compile_errors);
+		}
+		else
+		{
+			printf("Unable to compile shader (unspecified reason)\n");
+		}
 	}
 
 	return hr;
