@@ -108,8 +108,6 @@ In other words,the first three types uses the offset and not the color allocated
 static UINT8* stv_vdp2_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
-int stv_hblank,stv_vblank;
-static int stv_odd;
 static int horz_res,vert_res;
 
 
@@ -5189,6 +5187,7 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 	{
 		case 0x4/4:
 		{
+			int stv_hblank,stv_vblank,stv_odd;
 			/*Screen Status Register*/
 			stv_vblank = stv_get_vblank(space->machine());
 			stv_hblank = get_hblank(space->machine());
@@ -5476,6 +5475,7 @@ static int stv_vdp2_start (running_machine &machine)
 /* maybe we should move this to video/stv.c */
 VIDEO_START( stv_vdp2 )
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
 	stv_vdp2_start(machine);
 	stv_vdp1_start(machine);
@@ -5486,10 +5486,10 @@ VIDEO_START( stv_vdp2 )
 	gfx_element_set_source(machine.gfx[1], stv_vdp2_gfx_decode);
 	gfx_element_set_source(machine.gfx[2], stv_vdp2_gfx_decode);
 	gfx_element_set_source(machine.gfx[3], stv_vdp2_gfx_decode);
-	gfx_element_set_source(machine.gfx[4], stv_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[5], stv_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[6], stv_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[7], stv_vdp1_gfx_decode);
+	gfx_element_set_source(machine.gfx[4], state->m_vdp1_gfx_decode);
+	gfx_element_set_source(machine.gfx[5], state->m_vdp1_gfx_decode);
+	gfx_element_set_source(machine.gfx[6], state->m_vdp1_gfx_decode);
+	gfx_element_set_source(machine.gfx[7], state->m_vdp1_gfx_decode);
 }
 
 static void stv_vdp2_dynamic_res_change(running_machine &machine)
@@ -5931,14 +5931,14 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 
 	/* framebuffer interlace */
-	if ( (STV_VDP2_LSMD == 2 || STV_VDP2_LSMD == 3) && stv_framebuffer_double_interlace == 0 )
+	if ( (STV_VDP2_LSMD == 2 || STV_VDP2_LSMD == 3) && state->m_vdp1.framebuffer_double_interlace == 0 )
 		interlace_framebuffer = 1;
 	else
 		interlace_framebuffer = 0;
 
 	/*Guess:Some games needs that the horizontal sprite size to be doubled
       (TODO: understand the proper settings,it might not work like this)*/
-	if(STV_VDP2_LSMD == 3 && /*((STV_VDP2_HRES & 3) != 3) &&*/ (!(stv_framebuffer_mode & 1)))
+	if(STV_VDP2_LSMD == 3 && /*((STV_VDP2_HRES & 3) != 3) &&*/ (!(state->m_vdp1.framebuffer_mode & 1)))
 		double_x = 1;
 	else
 		double_x = 0;
@@ -5967,7 +5967,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 						continue;
 
-				framebuffer_line = stv_framebuffer_display_lines[y];
+				framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = BITMAP_ADDR16(bitmap, y, 0);
 
 				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
@@ -6039,7 +6039,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 						continue;
 
-				framebuffer_line = stv_framebuffer_display_lines[y];
+				framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = BITMAP_ADDR16(bitmap, y, 0);
 
 				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
@@ -6141,7 +6141,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 					continue;
 
-			framebuffer_line = stv_framebuffer_display_lines[y];
+			framebuffer_line = state->m_vdp1.framebuffer_display_lines[y];
 			if ( interlace_framebuffer == 0 )
 			{
 				bitmap_line = BITMAP_ADDR16(bitmap, y, 0);

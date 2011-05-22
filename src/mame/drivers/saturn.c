@@ -424,7 +424,8 @@ static void system_reset(address_space *space)
 	memset(state->m_vdp2_regs,0x00,0x040000);
 	memset(state->m_vdp2_vram,0x00,0x100000);
 	memset(state->m_vdp2_cram,0x00,0x080000);
-	//vdp1
+	memset(state->m_vdp1_vram,0x00,0x100000);
+
 	//A-Bus
 	/*Order is surely wrong but whatever...*/
 }
@@ -1873,13 +1874,9 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
-	/*0x05c00000-0x05c7ffff VRAM*/
-	/*0x05c80000-0x05c9ffff Frame Buffer 0*/
-	/*0x05ca0000-0x05cbffff Frame Buffer 1*/
-	/*0x05d00000-0x05d7ffff VDP1 Regs */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
+	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
+	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -1903,9 +1900,9 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
+	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
+	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(saturn_vdp1_regs_r, saturn_vdp1_regs_w)
 	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE(saturn_vdp2_regs_r, saturn_vdp2_regs_w)
@@ -2594,8 +2591,6 @@ static MACHINE_START( stv )
 	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
-//  state_save_register_global(machine, stv_vblank);
-//  state_save_register_global(machine, stv_hblank);
 	state_save_register_global(machine, state->m_NMI_reset);
 	state_save_register_global(machine, state->m_en_68k);
 	state_save_register_global(machine, timer_0);
@@ -2636,8 +2631,6 @@ static MACHINE_START( saturn )
 	state_save_register_global_pointer(machine, state->m_smpc_ram, 0x80);
 	state_save_register_global_pointer(machine, state->m_scu_regs, 0x100/4);
 	state_save_register_global_pointer(machine, state->m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine, stv_vblank);
-	state_save_register_global(machine, stv_hblank);
 	state_save_register_global(machine, state->m_NMI_reset);
 	state_save_register_global(machine, state->m_en_68k);
 	state_save_register_global(machine, timer_0);
