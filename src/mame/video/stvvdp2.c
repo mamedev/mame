@@ -105,12 +105,6 @@ In other words,the first three types uses the offset and not the color allocated
 #include "profiler.h"
 #include "includes/stv.h"
 
-static UINT8* stv_vdp2_gfx_decode;
-
-static int stv_vdp2_render_rbg0;
-static int horz_res,vert_res;
-
-
 static void stv_vdp2_dynamic_res_change(running_machine &machine);
 static UINT8 get_hblank(running_machine &machine);
 static int get_vblank_duration(running_machine &machine);
@@ -122,7 +116,6 @@ static int stv_vdp2_window_process(running_machine &machine,int x,int y);
 static int stv_vdp2_apply_window_on_layer(running_machine &machine,rectangle *cliprect);
 static void stv_vdp2_get_window0_coordinates(running_machine &machine,UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
 static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect);
-static bitmap_t *stv_vdp2_roz_bitmap[2];
 
 enum
 {
@@ -2723,12 +2716,13 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(running_machine &machine
 static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, const rectangle *clip, running_machine &machine, UINT32 code, int flipx, int flipy,
 									 int sx, int sy, int transparency, int alpha)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
 	rectangle myclip;
 	UINT8* gfxdata;
 	int t_pen;
 	int sprite_screen_width, sprite_screen_height;
 
-	gfxdata = stv_vdp2_gfx_decode + code * 0x20;
+	gfxdata = state->m_vdp2.gfx_decode + code * 0x20;
 	sprite_screen_width = sprite_screen_height = 8;
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
@@ -2857,7 +2851,7 @@ static void stv_vdp2_draw_basic_bitmap(running_machine &machine, bitmap_t *bitma
 	int ysize = 0/*, ysizemask = 0*/;
 	int xlinesize = 0/*, xpixelsize = 0*/;
 	int xcnt,ycnt;
-	UINT8* gfxdata = stv_vdp2_gfx_decode;
+	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 	static UINT16 *destline;
 	UINT16 pal_color_offset = 0;
 	UINT8* gfxdatalow, *gfxdatahigh;
@@ -4896,8 +4890,8 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t *bi
 	}
 	else
 	{
-		if ( stv_vdp2_roz_bitmap[iRP-1] == NULL )
-			stv_vdp2_roz_bitmap[iRP-1] = auto_alloc(machine, bitmap_t(4096, 4096, machine.primary_screen->format()));
+		if ( state->m_vdp2.roz_bitmap[iRP-1] == NULL )
+			state->m_vdp2.roz_bitmap[iRP-1] = auto_alloc(machine, bitmap_t(4096, 4096, machine.primary_screen->format()));
 
 		roz_clip_rect.min_x = roz_clip_rect.min_y = 0;
 		if ( (iRP == 1 && STV_VDP2_RAOVR == 3) ||
@@ -4934,8 +4928,8 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t *bi
 		if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
 			memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 		{
-			bitmap_fill( stv_vdp2_roz_bitmap[iRP-1], &roz_clip_rect , get_black_pen(machine));
-			stv_vdp2_check_tilemap(machine, stv_vdp2_roz_bitmap[iRP-1], &roz_clip_rect);
+			bitmap_fill( state->m_vdp2.roz_bitmap[iRP-1], &roz_clip_rect , get_black_pen(machine));
+			stv_vdp2_check_tilemap(machine, state->m_vdp2.roz_bitmap[iRP-1], &roz_clip_rect);
 			// prepare cache data
 			stv_rbg_cache_data.watch_vdp2_vram_writes |= iRP;
 			stv_rbg_cache_data.is_cache_dirty &= ~iRP;
@@ -4970,7 +4964,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine &machine, bitmap_t *bi
 		stv2_current_tilemap.fade_control = fade_control;
 
 		g_profiler.start(PROFILER_USER2);
-		stv_vdp2_copy_roz_bitmap(bitmap, machine, stv_vdp2_roz_bitmap[iRP-1], &mycliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
+		stv_vdp2_copy_roz_bitmap(bitmap, machine, state->m_vdp2.roz_bitmap[iRP-1], &mycliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
 		g_profiler.stop();
 	}
 
@@ -5054,7 +5048,6 @@ static void stv_vdp2_draw_RBG0(running_machine &machine, bitmap_t *bitmap, const
 	/*Use 0x80 as a normal/rotate switch*/
 	stv2_current_tilemap.layer_name=0x80;
 
-	if ( !stv_vdp2_render_rbg0 ) return;
 	if ( !stv2_current_tilemap.enabled ) return;
 
 	switch(STV_VDP2_RPMD)
@@ -5081,7 +5074,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int xcnt,ycnt;
-	UINT8* gfxdata = stv_vdp2_gfx_decode;
+	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 	static UINT16 *destline;
 	int r,b,g;
 	UINT16 data;
@@ -5124,7 +5117,7 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_t *bitmap, const
 WRITE32_HANDLER ( saturn_vdp2_vram_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	UINT8* gfxdata = stv_vdp2_gfx_decode;
+	UINT8* gfxdata = state->m_vdp2.gfx_decode;
 
 	COMBINE_DATA(&state->m_vdp2_vram[offset]);
 
@@ -5407,7 +5400,7 @@ static UINT8 get_odd_bit(running_machine &machine)
 static void stv_vdp2_state_save_postload(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	UINT8 *gfxdata = stv_vdp2_gfx_decode;
+	UINT8 *gfxdata = state->m_vdp2.gfx_decode;
 	int offset;
 	UINT32 data;
 
@@ -5443,7 +5436,8 @@ static void stv_vdp2_state_save_postload(running_machine &machine)
 
 static void stv_vdp2_exit (running_machine &machine)
 {
-	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
+	saturn_state *state = machine.driver_data<saturn_state>();
+	state->m_vdp2.roz_bitmap[0] =  state->m_vdp2.roz_bitmap[1] = NULL;
 }
 
 static int stv_vdp2_start (running_machine &machine)
@@ -5454,9 +5448,8 @@ static int stv_vdp2_start (running_machine &machine)
 	state->m_vdp2_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
 	state->m_vdp2_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 ); // actually we only need half of it since we don't emulate extra 4mbit ram cart.
 	state->m_vdp2_cram = auto_alloc_array_clear(machine, UINT32, 0x080000/4 );
-	stv_vdp2_gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
+	state->m_vdp2.gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 
-	stv_vdp2_render_rbg0 = 1;
 //  machine.gfx[0]->color_granularity=4;
 //  machine.gfx[1]->color_granularity=4;
 
@@ -5476,26 +5469,26 @@ static int stv_vdp2_start (running_machine &machine)
 VIDEO_START( stv_vdp2 )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
+	state->m_vdp2.roz_bitmap[0] =  state->m_vdp2.roz_bitmap[1] = NULL;
 	stv_vdp2_start(machine);
 	stv_vdp1_start(machine);
 	debug.l_en = 0xff;
 	debug.error = 0xffffffff;
 	debug.roz = 0;
-	gfx_element_set_source(machine.gfx[0], stv_vdp2_gfx_decode);
-	gfx_element_set_source(machine.gfx[1], stv_vdp2_gfx_decode);
-	gfx_element_set_source(machine.gfx[2], stv_vdp2_gfx_decode);
-	gfx_element_set_source(machine.gfx[3], stv_vdp2_gfx_decode);
-	gfx_element_set_source(machine.gfx[4], state->m_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[5], state->m_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[6], state->m_vdp1_gfx_decode);
-	gfx_element_set_source(machine.gfx[7], state->m_vdp1_gfx_decode);
+	gfx_element_set_source(machine.gfx[0], state->m_vdp2.gfx_decode);
+	gfx_element_set_source(machine.gfx[1], state->m_vdp2.gfx_decode);
+	gfx_element_set_source(machine.gfx[2], state->m_vdp2.gfx_decode);
+	gfx_element_set_source(machine.gfx[3], state->m_vdp2.gfx_decode);
+	gfx_element_set_source(machine.gfx[4], state->m_vdp1.gfx_decode);
+	gfx_element_set_source(machine.gfx[5], state->m_vdp1.gfx_decode);
+	gfx_element_set_source(machine.gfx[6], state->m_vdp1.gfx_decode);
+	gfx_element_set_source(machine.gfx[7], state->m_vdp1.gfx_decode);
 }
 
 static void stv_vdp2_dynamic_res_change(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	static UINT8 old_vres = 0,old_hres = 0;
+	int horz_res,vert_res;
 
 	switch( STV_VDP2_VRES & 3 )
 	{
@@ -5526,7 +5519,7 @@ static void stv_vdp2_dynamic_res_change(running_machine &machine)
 	}
 //  horz_res+=1;
 //  vert_res*=2;
-	if(old_vres != vert_res || old_hres != horz_res)
+	if(state->m_vdp2.old_vres != vert_res || state->m_vdp2.old_hres != horz_res)
 	{
 		int vblank_period,hblank_period;
 		rectangle visarea = machine.primary_screen->visible_area();
@@ -5541,8 +5534,8 @@ static void stv_vdp2_dynamic_res_change(running_machine &machine)
 //      hblank_period = get_hblank_duration(machine.primary_screen);
 		machine.primary_screen->configure((horz_res+hblank_period), (vert_res+vblank_period), visarea, machine.primary_screen->frame_period().attoseconds );
 
-		old_vres = vert_res;
-		old_hres = horz_res;
+		state->m_vdp2.old_vres = vert_res;
+		state->m_vdp2.old_hres = horz_res;
 	}
 //  machine.primary_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);

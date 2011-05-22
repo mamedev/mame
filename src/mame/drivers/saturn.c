@@ -1336,7 +1336,7 @@ DMA TODO:
 static UINT32 scu_add_tmp;
 
 /*For area checking*/
-#define ABUS(_lv_)       ((state->m_scu_src[_lv_] & 0x07ffffff) >= 0x02000000) && ((state->m_scu_src[_lv_] & 0x07ffffff) <= 0x04ffffff)
+#define ABUS(_lv_)       ((state->m_scu.src[_lv_] & 0x07ffffff) >= 0x02000000) && ((state->m_scu.src[_lv_] & 0x07ffffff) <= 0x04ffffff)
 #define BBUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05ffffff)
 #define VDP1_REGS(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05d00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05dfffff)
 #define VDP2(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05e00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05fdffff)
@@ -1409,15 +1409,15 @@ static WRITE32_HANDLER( saturn_scu_w )
 	switch(offset)
 	{
 		/*LV 0 DMA*/
-		case 0:	case 8: case 16:  state->m_scu_src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 1:	case 9: case 17:  state->m_scu_dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
-		case 2: case 10: case 18: state->m_scu_size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
+		case 0:	case 8: case 16:  state->m_scu.src[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 1:	case 9: case 17:  state->m_scu.dst[DMA_CH]  = ((state->m_scu_regs[offset] & 0x07ffffff) >> 0); break;
+		case 2: case 10: case 18: state->m_scu.size[DMA_CH] = ((state->m_scu_regs[offset] & ((offset == 2) ? 0x000fffff : 0x1fff)) >> 0); break;
 		case 3: case 11: case 19:
 			/*Read address add value for DMA lv 0*/
-			state->m_scu_src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 1;
+			state->m_scu.src_add[DMA_CH] = (state->m_scu_regs[offset] & 0x100) ? 4 : 1;
 
 			/*Write address add value for DMA lv 0*/
-			state->m_scu_dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
+			state->m_scu.dst_add[DMA_CH] = 2 << (state->m_scu_regs[offset] & 7);
 			break;
 		case 4: case 12: case 20:
 /*
@@ -1441,7 +1441,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		if(INDIRECT_MODE(DMA_CH))
 		{
 			if(LOG_SCU) logerror("Indirect Mode DMA lv %d set\n",DMA_CH);
-			if(!DWUP(DMA_CH)) state->m_scu_index[DMA_CH] = state->m_scu_dst[DMA_CH];
+			if(!DWUP(DMA_CH)) state->m_scu.index[DMA_CH] = state->m_scu.dst[DMA_CH];
 		}
 
 		/*Start factor enable bits,bit 2,bit 1 and bit 0*/
@@ -1584,22 +1584,22 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 
 	if(LOG_SCU) printf("DMA lv %d transfer START\n"
-			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu_src[dma_ch],state->m_scu_dst[dma_ch],state->m_scu_size[dma_ch]);
-	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
+			             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
+	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
 
 	DnMV_1(dma_ch);
 
 	/* max size */
-	if(state->m_scu_size[dma_ch] == 0) { state->m_scu_size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
+	if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
 
 	/*set here the boundaries checks*/
 	/*...*/
 
-	if((state->m_scu_dst_add[dma_ch] != state->m_scu_src_add[dma_ch]) && (ABUS(dma_ch)))
+	if((state->m_scu.dst_add[dma_ch] != state->m_scu.src_add[dma_ch]) && (ABUS(dma_ch)))
 	{
 		logerror("A-Bus invalid transfer,sets to default\n");
-		scu_add_tmp = (state->m_scu_dst_add[dma_ch]*0x100) | (state->m_scu_src_add[dma_ch]);
-		state->m_scu_dst_add[dma_ch] = state->m_scu_src_add[dma_ch] = 4;
+		scu_add_tmp = (state->m_scu.dst_add[dma_ch]*0x100) | (state->m_scu.src_add[dma_ch]);
+		state->m_scu.dst_add[dma_ch] = state->m_scu.src_add[dma_ch] = 4;
 		scu_add_tmp |= 0x80000000;
 	}
 
@@ -1629,54 +1629,54 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(VDP1_REGS(dst_0))
 	{
 		logerror("VDP1 register access,must be in word units\n");
-		scu_add_tmp = (state->m_scu_dst_add[0]*0x100) | (state->m_scu_src_add[0]);
-		state->m_scu_dst_add[0] = state->m_scu_src_add[0] = 2;
+		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
+		state->m_scu.dst_add[0] = state->m_scu.src_add[0] = 2;
 		scu_add_tmp |= 0x80000000;
 	}
 	if(DRUP(0))
 	{
 		logerror("Data read update = 1,read address add value must be 1 too\n");
-		scu_add_tmp = (state->m_scu_dst_add[0]*0x100) | (state->m_scu_src_add[0]);
-		state->m_scu_src_add[0] = 4;
+		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
+		state->m_scu.src_add[0] = 4;
 		scu_add_tmp |= 0x80000000;
 	}
 
-	if (WORK_RAM_H(dst_0) && (state->m_scu_dst_add[0] != 4))
+	if (WORK_RAM_H(dst_0) && (state->m_scu.dst_add[0] != 4))
 	{
-		scu_add_tmp = (state->m_scu_dst_add[0]*0x100) | (state->m_scu_src_add[0]);
-		state->m_scu_dst_add[0] = 4;
+		scu_add_tmp = (state->m_scu.dst_add[0]*0x100) | (state->m_scu.src_add[0]);
+		state->m_scu.dst_add[0] = 4;
 		scu_add_tmp |= 0x80000000;
 	}
 	#endif
 
-	tmp_size = state->m_scu_size[dma_ch];
-	if(!(DRUP(dma_ch))) tmp_src = state->m_scu_src[dma_ch];
-	if(!(DWUP(dma_ch))) tmp_dst = state->m_scu_dst[dma_ch];
+	tmp_size = state->m_scu.size[dma_ch];
+	if(!(DRUP(dma_ch))) tmp_src = state->m_scu.src[dma_ch];
+	if(!(DWUP(dma_ch))) tmp_dst = state->m_scu.dst[dma_ch];
 
-	for (; state->m_scu_size[dma_ch] > 0; state->m_scu_size[dma_ch]-=state->m_scu_dst_add[dma_ch])
+	for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
 	{
-		if(state->m_scu_dst_add[dma_ch] == 2)
-			space->write_word(state->m_scu_dst[dma_ch],space->read_word(state->m_scu_src[dma_ch]));
-		else if(state->m_scu_dst_add[dma_ch] == 8)
+		if(state->m_scu.dst_add[dma_ch] == 2)
+			space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
+		else if(state->m_scu.dst_add[dma_ch] == 8)
 		{
-			space->write_word(state->m_scu_dst[dma_ch],  space->read_word(state->m_scu_src[dma_ch]  ));
-			space->write_word(state->m_scu_dst[dma_ch]+2,space->read_word(state->m_scu_src[dma_ch]  ));
-			space->write_word(state->m_scu_dst[dma_ch]+4,space->read_word(state->m_scu_src[dma_ch]+2));
-			space->write_word(state->m_scu_dst[dma_ch]+6,space->read_word(state->m_scu_src[dma_ch]+2));
+			space->write_word(state->m_scu.dst[dma_ch],  space->read_word(state->m_scu.src[dma_ch]  ));
+			space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]  ));
+			space->write_word(state->m_scu.dst[dma_ch]+4,space->read_word(state->m_scu.src[dma_ch]+2));
+			space->write_word(state->m_scu.dst[dma_ch]+6,space->read_word(state->m_scu.src[dma_ch]+2));
 		}
 		else
 		{
-			space->write_word(state->m_scu_dst[dma_ch],  space->read_word(state->m_scu_src[dma_ch]  ));
-			space->write_word(state->m_scu_dst[dma_ch]+2,space->read_word(state->m_scu_src[dma_ch]+2));
+			space->write_word(state->m_scu.dst[dma_ch],  space->read_word(state->m_scu.src[dma_ch]  ));
+			space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]+2));
 		}
 
-		state->m_scu_dst[dma_ch]+=state->m_scu_dst_add[dma_ch];
-		state->m_scu_src[dma_ch]+=state->m_scu_src_add[dma_ch];
+		state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
+		state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
 	}
 
-	state->m_scu_size[dma_ch] = tmp_size;
-	if(!(DRUP(dma_ch))) state->m_scu_src[dma_ch] = tmp_src;
-	if(!(DWUP(dma_ch))) state->m_scu_dst[dma_ch] = tmp_dst;
+	state->m_scu.size[dma_ch] = tmp_size;
+	if(!(DRUP(dma_ch))) state->m_scu.src[dma_ch] = tmp_src;
+	if(!(DWUP(dma_ch))) state->m_scu.dst[dma_ch] = tmp_dst;
 
 	if(dma_ch != 2)
 	if(LOG_SCU) logerror("DMA transfer END\n");
@@ -1691,8 +1691,8 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 	if(scu_add_tmp & 0x80000000)
 	{
-		state->m_scu_dst_add[dma_ch] = (scu_add_tmp & 0xff00) >> 8;
-		state->m_scu_src_add[dma_ch] = (scu_add_tmp & 0x00ff) >> 0;
+		state->m_scu.dst_add[dma_ch] = (scu_add_tmp & 0xff00) >> 8;
+		state->m_scu.src_add[dma_ch] = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
 }
@@ -1708,17 +1708,17 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 	DnMV_1(dma_ch);
 
-	if(state->m_scu_index[dma_ch] == 0) { state->m_scu_index[dma_ch] = state->m_scu_dst[0]; }
+	if(state->m_scu.index[dma_ch] == 0) { state->m_scu.index[dma_ch] = state->m_scu.dst[0]; }
 
 	do{
-		tmp_src = state->m_scu_index[dma_ch];
+		tmp_src = state->m_scu.index[dma_ch];
 
-		state->m_scu_size[dma_ch] = space->read_dword(state->m_scu_index[dma_ch]);
-		state->m_scu_src[dma_ch]  = space->read_dword(state->m_scu_index[dma_ch]+8);
-		state->m_scu_dst[dma_ch]  = space->read_dword(state->m_scu_index[dma_ch]+4);
+		state->m_scu.size[dma_ch] = space->read_dword(state->m_scu.index[dma_ch]);
+		state->m_scu.src[dma_ch]  = space->read_dword(state->m_scu.index[dma_ch]+8);
+		state->m_scu.dst[dma_ch]  = space->read_dword(state->m_scu.index[dma_ch]+4);
 
 		/*Indirect Mode end factor*/
-		if(state->m_scu_src[dma_ch] & 0x80000000)
+		if(state->m_scu.src[dma_ch] & 0x80000000)
 			job_done = 1;
 
 		#if 0
@@ -1730,20 +1730,20 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		#endif
 
 		if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
-				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu_src[dma_ch],state->m_scu_dst[dma_ch],state->m_scu_size[dma_ch]);
-		if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu_src_add[dma_ch],state->m_scu_dst_add[dma_ch]);
+				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
+		if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",state->m_scu.src_add[dma_ch],state->m_scu.dst_add[dma_ch]);
 
 		//guess,but I believe it's right.
-		state->m_scu_src[dma_ch] &=0x07ffffff;
-		state->m_scu_dst[dma_ch] &=0x07ffffff;
-		state->m_scu_size[dma_ch] &= ((dma_ch == 0) ? 0xfffff : 0x1fff);
+		state->m_scu.src[dma_ch] &=0x07ffffff;
+		state->m_scu.dst[dma_ch] &=0x07ffffff;
+		state->m_scu.size[dma_ch] &= ((dma_ch == 0) ? 0xfffff : 0x1fff);
 
-		if(state->m_scu_size[dma_ch] == 0) { state->m_scu_size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
+		if(state->m_scu.size[dma_ch] == 0) { state->m_scu.size[dma_ch] = (dma_ch == 0) ? 0x00100000 : 0x2000; }
 
-		for (; state->m_scu_size[dma_ch] > 0; state->m_scu_size[dma_ch]-=state->m_scu_dst_add[dma_ch])
+		for (; state->m_scu.size[dma_ch] > 0; state->m_scu.size[dma_ch]-=state->m_scu.dst_add[dma_ch])
 		{
-			if(state->m_scu_dst_add[dma_ch] == 2)
-				space->write_word(state->m_scu_dst[dma_ch],space->read_word(state->m_scu_src[dma_ch]));
+			if(state->m_scu.dst_add[dma_ch] == 2)
+				space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1751,17 +1751,17 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				space->write_word(state->m_scu_dst[dma_ch],space->read_word(state->m_scu_src[dma_ch]));
-				space->write_word(state->m_scu_dst[dma_ch]+2,space->read_word(state->m_scu_src[dma_ch]+2));
+				space->write_word(state->m_scu.dst[dma_ch],space->read_word(state->m_scu.src[dma_ch]));
+				space->write_word(state->m_scu.dst[dma_ch]+2,space->read_word(state->m_scu.src[dma_ch]+2));
 			}
-			state->m_scu_dst[dma_ch]+=state->m_scu_dst_add[dma_ch];
-			state->m_scu_src[dma_ch]+=state->m_scu_src_add[dma_ch];
+			state->m_scu.dst[dma_ch]+=state->m_scu.dst_add[dma_ch];
+			state->m_scu.src[dma_ch]+=state->m_scu.src_add[dma_ch];
 		}
 
-		//if(DRUP(0))   space->write_dword(tmp_src+8,state->m_scu_src[0]|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) space->write_dword(tmp_src+4,state->m_scu_dst[0]);
+		//if(DRUP(0))   space->write_dword(tmp_src+8,state->m_scu.src[0]|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) space->write_dword(tmp_src+4,state->m_scu.dst[0]);
 
-		state->m_scu_index[dma_ch] = tmp_src+0xc;
+		state->m_scu.index[dma_ch] = tmp_src+0xc;
 
 	}while(job_done == 0);
 

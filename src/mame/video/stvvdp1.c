@@ -323,7 +323,7 @@ READ32_HANDLER ( saturn_vdp1_vram_r )
 WRITE32_HANDLER ( saturn_vdp1_vram_w )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
-	UINT8 *vdp1 = state->m_vdp1_gfx_decode;
+	UINT8 *vdp1 = state->m_vdp1.gfx_decode;
 
 	COMBINE_DATA (&state->m_vdp1_vram[offset]);
 
@@ -1037,7 +1037,7 @@ static void stv_vdp1_set_drawpixel(running_machine &machine)
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
 	int ecd = stv2_current_sprite.CMDPMOD & 0x80;
 
-	gfxdata = state->m_vdp1_gfx_decode;
+	gfxdata = state->m_vdp1.gfx_decode;
 
 	if ( mesh || !ecd || ((stv2_current_sprite.CMDPMOD & 0x7) != 0) )
 	{
@@ -2070,7 +2070,7 @@ void video_update_vdp1(running_machine &machine)
 static void stv_vdp1_state_save_postload(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	UINT8 *vdp1 = state->m_vdp1_gfx_decode;
+	UINT8 *vdp1 = state->m_vdp1.gfx_decode;
 	int offset;
 	UINT32 data;
 
@@ -2095,7 +2095,7 @@ int stv_vdp1_start ( running_machine &machine )
 	saturn_state *state = machine.driver_data<saturn_state>();
 	state->m_vdp1_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
 	state->m_vdp1_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 );
-	state->m_vdp1_gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
+	state->m_vdp1.gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 
 	stv_vdp1_shading_data = auto_alloc(machine, struct stv_vdp1_poly_scanline_data);
 

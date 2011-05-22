@@ -18,17 +18,18 @@ public:
 	UINT32    *m_vdp2_cram;
     UINT32    *m_vdp1_vram;
     UINT32    *m_vdp1_regs;
-	UINT8     *m_vdp1_gfx_decode;
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
 
-	UINT32    m_scu_src[3];		/* Source DMA lv n address*/
-	UINT32    m_scu_dst[3];		/* Destination DMA lv n address*/
-	UINT32    m_scu_src_add[3];	/* Source Addition for DMA lv n*/
-	UINT32    m_scu_dst_add[3];	/* Destination Addition for DMA lv n*/
-    INT32     m_scu_size[3];		/* Transfer DMA size lv n*/
-    UINT32    m_scu_index[3];
+	struct {
+		UINT32    src[3];		/* Source DMA lv n address*/
+		UINT32    dst[3];		/* Destination DMA lv n address*/
+		UINT32    src_add[3];	/* Source Addition for DMA lv n*/
+		UINT32    dst_add[3];	/* Destination Addition for DMA lv n*/
+		INT32     size[3];		/* Transfer DMA size lv n*/
+		UINT32    index[3];
+	}m_scu;
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
@@ -49,11 +50,19 @@ public:
 		rectangle user_cliprect;
         UINT16	  *framebuffer[2];
         UINT16	  **framebuffer_draw_lines;
+	    UINT8     *gfx_decode;
 
 		int       local_x;
 		int       local_y;
 	}m_vdp1;
 
+	struct {
+	    int       old_vres;
+	    int       old_hres;
+
+	    UINT8     *gfx_decode;
+	    bitmap_t  *roz_bitmap[2];
+	}m_vdp2;
 
 	/* ST-V specific */
 	UINT8     m_stv_multi_bank;
