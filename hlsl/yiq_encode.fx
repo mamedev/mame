@@ -91,14 +91,15 @@ uniform float WValue;
 uniform float AValue;
 uniform float BValue;
 
+uniform float FscScale;
+
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 InvRatios = float2(1.0f / WidthRatio, 1.0f / HeightRatio);
-	float2 Offset = float2(0.5f / RawWidth, 0.5f / RawHeight);
-	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 - Offset).rgb;
-	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 - Offset).rgb;
-	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 - Offset).rgb;
-	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 - Offset).rgb;
+	float3 Texel0 = tex2D(DiffuseSampler, Input.Coord0 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel1 = tex2D(DiffuseSampler, Input.Coord1 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel2 = tex2D(DiffuseSampler, Input.Coord2 - float2(0.0f, 0.5f / RawHeight)).rgb;
+	float3 Texel3 = tex2D(DiffuseSampler, Input.Coord3 - float2(0.0f, 0.5f / RawHeight)).rgb;
 	
 	float2 Scaler = float2(RawWidth, RawHeight);
 	float2 Coord0 = Input.Coord0.xy * Scaler;
@@ -107,10 +108,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Coord3 = Input.Coord3.xy * Scaler;
 	
 	float W = WValue;
-	float T0 = Coord0.x + AValue * Coord0.y + BValue;// - 1.1f;
-	float T1 = Coord1.x + AValue * Coord1.y + BValue;// - 1.1f;
-	float T2 = Coord2.x + AValue * Coord2.y + BValue;// - 1.1f;
-	float T3 = Coord3.x + AValue * Coord3.y + BValue;// - 1.1f;
+	float T0 = Coord0.x + AValue * Coord0.y + BValue;
+	float T1 = Coord1.x + AValue * Coord1.y + BValue;
+	float T2 = Coord2.x + AValue * Coord2.y + BValue;
+	float T3 = Coord3.x + AValue * Coord3.y + BValue;
 
 	float Y0 = dot(Texel0, float3(0.299f, 0.587f, 0.114f));
 	float I0 = dot(Texel0, float3(0.595716f, -0.274453f, -0.321263f));

@@ -332,8 +332,6 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_HLSLPATH,                                    	"hlsl",   	 OPTION_STRING,     "path to hlsl files" },
 	{ WINOPTION_SHADOW_MASK_ALPHA";fs_shadwa(0.0-1.0)",         "0.0",     	 OPTION_FLOAT,    	"shadow mask alpha-blend value (1.0 is fully blended, 0.0 is no mask)" },
 	{ WINOPTION_SHADOW_MASK_TEXTURE";fs_shadwt(0.0-1.0)",       "aperture.png", OPTION_STRING,  "shadow mask texture name" },
-	{ WINOPTION_SHADOW_MASK_RATIO_X";fs_shadwx",				"3.0",		 OPTION_FLOAT,		"shadow mask texels per dot mask pixel in screen-relative X direction" },
-	{ WINOPTION_SHADOW_MASK_RATIO_Y";fs_shadwy",				"3.0",		 OPTION_FLOAT,		"shadow mask texels per dot mask pixel in screen-relative Y direction" },
 	{ WINOPTION_SHADOW_MASK_COUNT_X";fs_shadww",				"640",	 	 OPTION_INTEGER,	"shadow mask width, in phosphor dots" },
 	{ WINOPTION_SHADOW_MASK_COUNT_Y";fs_shadwh",				"480",		 OPTION_INTEGER,	"shadow mask height, in phosphor dots" },
 	{ WINOPTION_SHADOW_MASK_USIZE";fs_shadwu(0.0-1.0)",			"0.1875",	 OPTION_FLOAT,		"shadow mask texture size in U direction" },
@@ -399,9 +397,11 @@ const options_entry windows_options::s_option_entries[] =
 	/* NTSC simulation below this line */
 	{ WINOPTION_YIQ_ENABLE";yiq",            					"0",       	 OPTION_BOOLEAN,    "enable YIQ-space HLSL post-processing" },
 	{ WINOPTION_YIQ_WVALUE";yiqw",								"4.1187867", OPTION_FLOAT,		"W value for YIQ signal processing" },
-	{ WINOPTION_YIQ_AVALUE";yiqa",								"0.5", 		 OPTION_FLOAT,		"A value for YIQ signal processing (usually 0.5)" },
-	{ WINOPTION_YIQ_BVALUE";yiqb",								"0.5",  	 OPTION_FLOAT,		"B value for YIQ signal processing (usually 0.5)" },
-	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",							"3",		 OPTION_INTEGER,	"Phase Count value for YIQ signal processing (usually 2)" },
+	{ WINOPTION_YIQ_AVALUE";yiqa",								"0.5", 		 OPTION_FLOAT,		"A value for YIQ signal processing" },
+	{ WINOPTION_YIQ_BVALUE";yiqb",								"0.5",  	 OPTION_FLOAT,		"B value for YIQ signal processing" },
+	{ WINOPTION_YIQ_FSCVALUE";yiqfsc",							"1.5", 	     OPTION_FLOAT,		"Fsc value for YIQ signal processing" },
+	{ WINOPTION_YIQ_FSCSCALE";yiqfscs",							"1.0", 		 OPTION_FLOAT,		"Incoming Fsc scaling value for YIQ signal processing" },
+	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",							"2",		 OPTION_INTEGER,	"Phase Count value for YIQ signal processing" },
 
 	// per-window options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },

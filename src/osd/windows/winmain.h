@@ -83,8 +83,6 @@
 #define WINOPTION_HLSLPATH					"hlslpath"
 #define WINOPTION_SHADOW_MASK_ALPHA			"shadow_mask_alpha"
 #define WINOPTION_SHADOW_MASK_TEXTURE		"shadow_mask_texture"
-#define WINOPTION_SHADOW_MASK_RATIO_X		"shadow_mask_pix_width"
-#define WINOPTION_SHADOW_MASK_RATIO_Y		"shadow_mask_pix_height"
 #define WINOPTION_SHADOW_MASK_COUNT_X		"shadow_mask_x_count"
 #define WINOPTION_SHADOW_MASK_COUNT_Y		"shadow_mask_y_count"
 #define WINOPTION_SHADOW_MASK_USIZE			"shadow_mask_usize"
@@ -143,6 +141,8 @@
 #define WINOPTION_YIQ_WVALUE				"yiq_w"
 #define WINOPTION_YIQ_AVALUE				"yiq_a"
 #define WINOPTION_YIQ_BVALUE				"yiq_b"
+#define WINOPTION_YIQ_FSCVALUE				"yiq_fsc"
+#define WINOPTION_YIQ_FSCSCALE				"yiq_fsc_scale"
 #define WINOPTION_YIQ_PHASE_COUNT			"yiq_phase_count"
 
 // per-window options
@@ -212,8 +212,6 @@ public:
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
 	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
 	const char *screen_shadow_mask_texture() const { return value(WINOPTION_SHADOW_MASK_TEXTURE); }
-	float screen_shadow_mask_ratio_x() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_X); }
-	float screen_shadow_mask_ratio_y() const { return float_value(WINOPTION_SHADOW_MASK_RATIO_Y); }
 	float screen_shadow_mask_count_x() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_X); }
 	float screen_shadow_mask_count_y() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
@@ -256,6 +254,8 @@ public:
 	float screen_yiq_w() const { return float_value(WINOPTION_YIQ_WVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
+	float screen_yiq_fsc() const { return float_value(WINOPTION_YIQ_FSCVALUE); }
+	float screen_yiq_fsc_scale() const { return float_value(WINOPTION_YIQ_FSCSCALE); }
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
 	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }

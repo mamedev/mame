@@ -4,7 +4,7 @@
 
 texture Diffuse;
 
-sampler DiffuseSampler = sampler_state
+sampler CompositeSampler = sampler_state
 {
 	Texture   = <Diffuse>;
 	MipFilter = POINT;
@@ -29,6 +29,8 @@ struct VS_OUTPUT
 	float4 Coord3 : TEXCOORD3;
 	float4 Coord4 : TEXCOORD4;
 	float4 Coord5 : TEXCOORD5;
+	float4 Coord6 : TEXCOORD6;
+	float4 Coord7 : TEXCOORD7;
 };
 
 struct VS_INPUT
@@ -48,6 +50,8 @@ struct PS_INPUT
 	float4 Coord3 : TEXCOORD3;
 	float4 Coord4 : TEXCOORD4;
 	float4 Coord5 : TEXCOORD5;
+	float4 Coord6 : TEXCOORD6;
+	float4 Coord7 : TEXCOORD7;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,6 +66,8 @@ uniform float RawHeight;
 
 uniform float WidthRatio;
 uniform float HeightRatio;
+
+uniform float FscValue;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -83,12 +89,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Coord3.xy = Input.TexCoord + float2(0.75f / RawWidth, 0.0f);
 	Output.Coord4.xy = Input.TexCoord + float2(1.00f / RawWidth, 0.0f);
 	Output.Coord5.xy = Input.TexCoord + float2(1.25f / RawWidth, 0.0f);
-	Output.Coord0.zw = Input.TexCoord + float2(-0.25f / RawWidth, 0.0f);
-	Output.Coord1.zw = Input.TexCoord + float2(-0.50f / RawWidth, 0.0f);
-	Output.Coord2.zw = Input.TexCoord + float2(-0.75f / RawWidth, 0.0f);
-	Output.Coord3.zw = Input.TexCoord + float2(-1.00f / RawWidth, 0.0f);
-	Output.Coord4.zw = Input.TexCoord + float2(-1.25f / RawWidth, 0.0f);
-	Output.Coord5.zw = Input.TexCoord + float2(-1.55f / RawWidth, 0.0f);
+	Output.Coord6.xy = Input.TexCoord + float2(1.50f / RawWidth, 0.0f);
+	Output.Coord7.xy = Input.TexCoord + float2(1.75f / RawWidth, 0.0f);
 
 	return Output;
 }
@@ -108,12 +110,10 @@ uniform float BValue;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
-	float4 OrigC = tex2D(DiffuseSampler, Input.Coord0.xy);
-	float4 OrigC2 = tex2D(DiffuseSampler, Input.Coord4.xy);
-	float4 OrigC3 = tex2D(DiffuseSampler, Input.Coord2.zw);
+	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy);
+	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy);
 	float4 C = OrigC;
 	float4 C2 = OrigC2;
-	float4 C3 = OrigC3;
 	
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
@@ -121,7 +121,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	C = C * CRange + MinC;
 	C2 = C2 * CRange + MinC;
-	C3 = C3 * CRange + MinC;
 	
 	float2 Coord0 = Input.Coord0.xy * RawDims;
 	float2 Coord1 = Input.Coord1.xy * RawDims;
@@ -129,13 +128,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Coord3 = Input.Coord3.xy * RawDims;
 	float2 Coord4 = Input.Coord4.xy * RawDims;
 	float2 Coord5 = Input.Coord5.xy * RawDims;
-	
-	float2 Coord6 = Input.Coord0.zw * RawDims;
-	float2 Coord7 = Input.Coord1.zw * RawDims;
-	float2 Coord8 = Input.Coord2.zw * RawDims;
-	float2 Coord9 = Input.Coord3.zw * RawDims;
-	float2 CoordA = Input.Coord4.zw * RawDims;
-	float2 CoordB = Input.Coord5.zw * RawDims;
+	float2 Coord6 = Input.Coord6.xy * RawDims;
+	float2 Coord7 = Input.Coord7.xy * RawDims;
 	
 	float W = WValue;
 	float T0 = Coord0.x + AValue * Coord0.y + BValue;
@@ -146,29 +140,39 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float T5 = Coord5.x + AValue * Coord5.y + BValue;
 	float T6 = Coord6.x + AValue * Coord6.y + BValue;
 	float T7 = Coord7.x + AValue * Coord7.y + BValue;
-	float T8 = Coord8.x + AValue * Coord8.y + BValue;
-	float T9 = Coord9.x + AValue * Coord9.y + BValue;
-	float TA = CoordA.x + AValue * CoordA.y + BValue;
-	float TB = CoordB.x + AValue * CoordB.y + BValue;
 	float4 Tc = float4(T0, T1, T2, T3);
 	float4 Tc2 = float4(T4, T5, T6, T7);
-	float4 Tc3 = float4(T8, T9, TA, TB);
 	
-	float Y = (C.r + C.g + C.b + C.a + C2.r + C2.g) / 6.0f;// + C2.a + C3.r + C3.g + C3.b + C3.a) / 12.0f;
-	
-	float4 I = (C - Y) * sin(W * Tc);
-	float4 Q = (C - Y) * cos(W * Tc);
-	float4 I2 = (C2 - Y) * sin(W * Tc2);
-	float4 Q2 = (C2 - Y) * cos(W * Tc2);
-	float4 I3 = (C3 - Y) * sin(W * Tc3);
-	float4 Q3 = (C3 - Y) * cos(W * Tc3);
-	
-	float Iavg = (I.r + I.g + I.b + I.a + I2.r + I2.g) / 3.0f;
-	float Qavg = (Q.r + Q.g + Q.b + Q.a + Q2.r + Q2.g) / 3.0f;
-	float Iavg2 = (I2.b + I2.a + I3.r + I3.g + I3.b + I3.a) / 3.0f;
-	float Qavg2 = (Q2.b + Q2.a + Q3.r + Q3.g + Q3.b + Q3.a) / 3.0f;
+	float Yvals[8];
+	Yvals[0] = C.r; Yvals[1] = C.g; Yvals[2] = C.b; Yvals[3] = C.a; Yvals[4] = C2.r; Yvals[5] = C2.g; Yvals[6] = C2.b; Yvals[7] = C2.a;
+	float Ytotal = 0.0f;
+	for(uint idx = 0; idx < FscValue * 4.0f; idx++ )
+	{
+		Ytotal = Ytotal + Yvals[idx];
+	}
+	float Yavg = Ytotal / (FscValue * 4.0f);
 
-	float3 YIQ = float3(Y, Iavg, Qavg);
+	float4 I = (C - Yavg) * sin(W * Tc);
+	float4 Q = (C - Yavg) * cos(W * Tc);
+	float4 I2 = (C2 - Yavg) * sin(W * Tc2);
+	float4 Q2 = (C2 - Yavg) * cos(W * Tc2);
+	
+	float Itotal = 0.0f;
+	float Qtotal = 0.0f;
+	
+	float Ivals[8];
+	float Qvals[8];
+	Ivals[0] = I.r; Ivals[1] = I.g; Ivals[2] = I.b; Ivals[3] = I.a; Ivals[4] = I2.r; Ivals[5] = I2.g; Ivals[6] = I2.b; Ivals[7] = I2.a;
+	Qvals[0] = Q.r; Qvals[1] = Q.g; Qvals[2] = Q.b; Qvals[3] = Q.a; Qvals[4] = Q2.r; Qvals[5] = Q2.g; Qvals[6] = Q2.b; Qvals[7] = Q2.a;
+	for(uint idx = 0; idx < FscValue * 4.0f; idx++ )
+	{
+		Itotal = Itotal + Ivals[idx];
+		Qtotal = Qtotal + Qvals[idx];
+	}
+	float Iavg = Itotal / (FscValue * 4.0f);
+	float Qavg = Qtotal / (FscValue * 4.0f);
+
+	float3 YIQ = float3(Yavg, Iavg, Qavg);
 	
 	float3 OutRGB = float3(dot(YIQ, float3(1.0f, 0.9563f, 0.6210f)), dot(YIQ, float3(1.0f, -0.2721f, -0.6474f)), dot(YIQ, float3(1.0f, -1.1070f, 1.7046f)));	
 	

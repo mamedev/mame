@@ -84,7 +84,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.ExtraInfo = Input.ExtraInfo;
 
 	//Output.TexCoord /= 16.0f;
-	//Output.TexCoord += 0.4875f;
+	//Output.TexCoord += float2(0.3f, 0.25f);
 	return Output;
 }
 
@@ -164,7 +164,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ShadowUV = float2(ShadowU, ShadowV);
 	float2 ShadowMaskSize = float2(ShadowMaskSizeX, ShadowMaskSizeY);
 	float2 ShadowFrac = frac(ScreenCurveCoord * ShadowMaskSize * Ratios * 0.5f);
-	float2 ShadowCoord = ShadowFrac * ShadowUV + 2.5f / ShadowDims;
+	float2 ShadowCoord = ShadowFrac * ShadowUV + 1.5f / ShadowDims;
 	float3 ShadowTexel = lerp(1.0f, tex2D(ShadowSampler, ShadowCoord), UseShadow);
 	
 	// -- Final Pixel --
