@@ -729,7 +729,7 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 
 mtlog_add("drawd3d_window_draw: begin");
 
-	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
+	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if(result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	// first update any textures
@@ -967,30 +967,75 @@ try_again:
 
 		// create the regular shader
 		result = (*d3dintf->device.create_effect)(d3d->device, primary_name, &d3d->effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load primary.fx\n");
+			return 1;
+		}
 
 		// create the post-processing shader
 		result = (*d3dintf->device.create_effect)(d3d->device, post_name, &d3d->post_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load post.fx\n");
+			return 1;
+		}
 
 		// create the pincushion shader
 		result = (*d3dintf->device.create_effect)(d3d->device, pincushion_name, &d3d->pincushion_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load pincushion.fx\n");
+			return 1;
+		}
 
 		// create the phosphor shader
 		result = (*d3dintf->device.create_effect)(d3d->device, phosphor_name, &d3d->phosphor_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load phosphor.fx\n");
+			return 1;
+		}
 
 		// create the focus shader
 		result = (*d3dintf->device.create_effect)(d3d->device, focus_name, &d3d->focus_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load focus.fx\n");
+			return 1;
+		}
 
 		// create the deconvergence shader
 		result = (*d3dintf->device.create_effect)(d3d->device, deconverge_name, &d3d->deconverge_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load deconverge.fx\n");
+			return 1;
+		}
 
 		// create the color convolution shader
 		result = (*d3dintf->device.create_effect)(d3d->device, color_name, &d3d->color_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load color.fx\n");
+			return 1;
+		}
 
 		// create the YIQ modulation shader
 		result = (*d3dintf->device.create_effect)(d3d->device, yiq_encode_name, &d3d->yiq_encode_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load yiq_encode.fx\n");
+			return 1;
+		}
 
 		// create the YIQ demodulation shader
 		result = (*d3dintf->device.create_effect)(d3d->device, yiq_decode_name, &d3d->yiq_decode_effect);
+		if(result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to load yiq_decode.fx\n");
+			return 1;
+		}
 
 		if (primary_name)
 			osd_free(primary_name);
@@ -2216,7 +2261,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget4);
 
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
+					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -2235,7 +2280,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 					/* Convert our signal from YIQ */
 					curr_effect = d3d->yiq_decode_effect;
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture4);
+					(*d3dintf->effect.set_texture)(curr_effect, "Composite", poly->texture->d3dtexture4);
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
 					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
 					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
@@ -2250,7 +2296,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget3);
 
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
+					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -2307,7 +2353,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dsmalltarget0);
 
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
-				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
+				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -2500,8 +2546,6 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
-				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 

@@ -111,7 +111,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float3 d0 = tex2D(DiffuseSampler, Input.TexCoord0).rgb;
+	float4 d0 = tex2D(DiffuseSampler, Input.TexCoord0);
 	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord1).rgb;
 	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord2).rgb;
 	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord3).rgb;
@@ -120,10 +120,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord6).rgb;
 	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord7).rgb;
 
-	float3 blurred = (d0 + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
+	float3 blurred = (d0.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7) / 8.0f;
 
-	blurred = lerp(d0, blurred, 1.0f);
-	return float4(blurred, 1.0f);
+	blurred = lerp(d0.rgb, blurred, 1.0f);
+	return float4(blurred, d0.a);
 }
 
 //-----------------------------------------------------------------------------

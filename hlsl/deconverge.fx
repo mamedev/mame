@@ -113,11 +113,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float MagnetDistance = length((MagnetCenter - Input.TexCoord) * float2(WidthRatio, HeightRatio));
 	float Deconverge = 1.0f - MagnetDistance / MagnetCenter;
 	Deconverge = clamp(Deconverge, 0.0f, 1.0f);
+	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
 	float RedTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.RedCoord, Deconverge)).r;
 	float GrnTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.GrnCoord, Deconverge)).g;
 	float BluTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.BluCoord, Deconverge)).b;
 	
-	return float4(RedTexel, GrnTexel, BluTexel, 1.0f);
+	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
 }
 
 //-----------------------------------------------------------------------------
