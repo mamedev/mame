@@ -430,9 +430,9 @@ static void ui_menu_exit(running_machine &machine)
 	/* free textures */
 	machine.render().texture_free(hilight_texture);
 	machine.render().texture_free(arrow_texture);
-	
+
 	if (drivlist)
-	{ 
+	{
 		global_free(drivlist);
 		drivlist = NULL;
 	}
@@ -3001,6 +3001,21 @@ static void menu_sliders_populate(running_machine &machine, ui_menu *menu, int m
 
 	/* add all sliders */
 	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
+	{
+		INT32 curval = (*curslider->update)(machine, curslider->arg, &tempstring, SLIDER_NOCHANGE);
+		UINT32 flags = 0;
+		if (curval > curslider->minval)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (curval < curslider->maxval)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+		ui_menu_item_append(menu, curslider->description, tempstring, flags, (void *)curslider);
+
+		if (menuless_mode)
+			break;
+	}
+
+	/* add all sliders */
+	for (curslider = (slider_state*)osd_get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine, curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;

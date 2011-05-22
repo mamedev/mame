@@ -115,3 +115,13 @@ char *osd_get_clipboard_text(void)
 	return NULL;
 }
 
+
+//============================================================
+//  osd_get_slider_list
+//============================================================
+
+const slider_value *osd_get_slider_list()
+{
+	// nothing to slide in mini OSD
+	return NULL;
+}

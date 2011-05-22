@@ -59,6 +59,7 @@
 // MAME headers
 #include "emu.h"
 #include "render.h"
+#include "ui.h"
 #include "rendutil.h"
 #include "options.h"
 #include "emuopts.h"
@@ -170,6 +171,63 @@ struct _d3d_vertex
 };
 
 
+/* d3d_options is the information about runtime-mutable Direct3D options */
+typedef struct _d3d_options d3d_options;
+struct _d3d_options
+{
+	float					screen_shadow_mask_alpha;
+	int						screen_shadow_mask_count_x;
+	int						screen_shadow_mask_count_y;
+	float					screen_shadow_mask_u_size;
+	float					screen_shadow_mask_v_size;
+	float					screen_curvature;
+	float					screen_pincushion;
+	float					screen_scanline_alpha;
+	float					screen_scanline_scale;
+	float					screen_scanline_bright_scale;
+	float					screen_scanline_bright_offset;
+	float					screen_scanline_offset;
+	float					screen_defocus_x;
+	float					screen_defocus_y;
+	float					screen_red_converge_x;
+	float					screen_red_converge_y;
+	float					screen_green_converge_x;
+	float					screen_green_converge_y;
+	float					screen_blue_converge_x;
+	float					screen_blue_converge_y;
+	float					screen_red_radial_converge_x;
+	float					screen_red_radial_converge_y;
+	float					screen_green_radial_converge_x;
+	float					screen_green_radial_converge_y;
+	float					screen_blue_radial_converge_x;
+	float					screen_blue_radial_converge_y;
+	float					screen_red_from_red;
+	float					screen_red_from_green;
+	float					screen_red_from_blue;
+	float					screen_green_from_red;
+	float					screen_green_from_green;
+	float					screen_green_from_blue;
+	float					screen_blue_from_red;
+	float					screen_blue_from_green;
+	float					screen_blue_from_blue;
+	float					screen_red_offset;
+	float					screen_green_offset;
+	float					screen_blue_offset;
+	float					screen_red_scale;
+	float					screen_green_scale;
+	float					screen_blue_scale;
+	float					screen_red_power;
+	float					screen_green_power;
+	float					screen_blue_power;
+	float					screen_red_floor;
+	float					screen_green_floor;
+	float					screen_blue_floor;
+	float					screen_red_phosphor_life;
+	float					screen_green_phosphor_life;
+	float					screen_blue_phosphor_life;
+	float					screen_saturation;
+};
+
 /* d3d_info is the information about Direct3D for the current screen */
 typedef struct _d3d_info d3d_info;
 struct _d3d_info
@@ -243,6 +301,7 @@ struct _d3d_info
 	bitmap_t *				shadow_bitmap;				// experimental: shadow mask bitmap for post-processing shader
 	texture_info *			shadow_texture;				// experimental: shadow mask texture for post-processing shader
 	int						registered_targets;			// Number of registered HLSL targets (i.e., screens)
+	d3d_options *			hlsl_options;				// HLSL uniforms
 };
 
 
@@ -277,7 +336,382 @@ static const line_aa_step line_aa_4step[] =
 	{ 0 }
 };
 
+/*-------------------------------------------------
+    slider_alloc - allocate a new slider entry
+    currently duplicated from ui.c, this could
+    be done in a more ideal way.
+-------------------------------------------------*/
 
+static slider_state *slider_alloc(running_machine &machine, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+{
+	int size = sizeof(slider_state) + strlen(title);
+	slider_state *state = (slider_state *)auto_alloc_array_clear(machine, UINT8, size);
+
+	state->minval = minval;
+	state->defval = defval;
+	state->maxval = maxval;
+	state->incval = incval;
+	state->update = update;
+	state->arg = arg;
+	strcpy(state->description, title);
+
+	return state;
+}
+
+
+//============================================================
+//  assorted slider accessors
+//============================================================
+
+static slider_state *slider_list;
+
+static INT32 slider_set(float *option, float scale, const char *fmt, astring *string, INT32 newval)
+{
+	if (option != NULL && newval != SLIDER_NOCHANGE) *option = (float)newval * scale;
+	if (string != NULL) string->printf(fmt, *option);
+	return floor(*option / scale + 0.5f);
+}
+
+static INT32 slider_shadow_mask_alpha(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_shadow_mask_alpha), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_shadow_mask_x_count(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	d3d_options *options = ((d3d_info*)arg)->hlsl_options;
+	if (newval != SLIDER_NOCHANGE) options->screen_shadow_mask_count_x = newval;
+	if (string != NULL) string->printf("%d", options->screen_shadow_mask_count_x);
+	return options->screen_shadow_mask_count_x;
+}
+
+static INT32 slider_shadow_mask_y_count(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	d3d_options *options = ((d3d_info*)arg)->hlsl_options;
+	if (newval != SLIDER_NOCHANGE) options->screen_shadow_mask_count_y = newval;
+	if (string != NULL) string->printf("%d", options->screen_shadow_mask_count_y);
+	return options->screen_shadow_mask_count_y;
+}
+
+static INT32 slider_shadow_mask_usize(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_shadow_mask_u_size), 1.0f / 32.0f, "%2.5f", string, newval);
+}
+
+static INT32 slider_shadow_mask_vsize(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_shadow_mask_v_size), 1.0f / 32.0f, "%2.5f", string, newval);
+}
+
+static INT32 slider_curvature(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_curvature), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_pincushion(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_pincushion), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_alpha(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_alpha), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_scale), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_bright_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_bright_scale), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_bright_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_bright_offset), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_offset), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_defocus_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_defocus_x), 0.5f, "%2.1f", string, newval);
+}
+
+static INT32 slider_defocus_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_defocus_y), 0.5f, "%2.1f", string, newval);
+}
+
+static INT32 slider_red_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_red_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_green_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_green_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_blue_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_blue_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_red_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_radial_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_red_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_radial_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_green_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_radial_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_green_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_radial_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_blue_radial_converge_x(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_radial_converge_x), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_blue_radial_converge_y(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_radial_converge_y), 0.1f, "%3.1f", string, newval);
+}
+
+static INT32 slider_red_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_from_red), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_red_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_from_green), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_red_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_from_blue), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_green_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_from_red), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_green_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_from_green), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_green_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_from_blue), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_blue_from_r(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_from_red), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_blue_from_g(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_from_green), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_blue_from_b(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_from_blue), 0.005f, "%2.3f", string, newval);
+}
+
+static INT32 slider_red_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_offset), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_green_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_offset), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_blue_offset(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_offset), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_red_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_scale), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_green_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_scale), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_blue_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_scale), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_red_power(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_power), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_green_power(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_power), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_blue_power(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_power), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_red_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_floor), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_green_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_floor), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_blue_floor(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_floor), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_red_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_phosphor_life), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_green_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_green_phosphor_life), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_blue_phosphor_life(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_blue_phosphor_life), 0.01f, "%2.2f", string, newval);
+}
+
+static INT32 slider_saturation(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_saturation), 0.01f, "%2.2f", string, newval);
+}
+
+//============================================================
+//  init_slider_list
+//============================================================
+
+static slider_state *init_slider_list(d3d_info *d3d)
+{
+	slider_state *listhead = NULL;
+	slider_state **tailptr = &listhead;
+	astring string;
+
+	if(!d3d->hlsl_enable || !d3dintf->post_fx_available)
+	{
+		slider_list = NULL;
+		return NULL;
+	}
+
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Darkness", 0, 0, 100, 1, slider_shadow_mask_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask X Count", 1, 640, 1024, 0, slider_shadow_mask_x_count, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Y Count", 1, 640, 1024, 0, slider_shadow_mask_y_count, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Pixel Count X", 1, 3, 32, 1, slider_shadow_mask_usize, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Pixel Count Y", 1, 3, 32, 1, slider_shadow_mask_vsize, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Screen Curvature", 0, 0, 100, 1, slider_curvature, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Image Pincushion", 0, 0, 100, 1, slider_pincushion, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Darkness", 0, 0, 100, 1, slider_scanline_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Size", 1, 20, 80, 1, slider_scanline_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Brightness", 0, 20, 40, 1, slider_scanline_bright_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Brightness Overdrive", 0, 12, 20, 1, slider_scanline_bright_offset, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Jitter", 0, 0, 40, 1, slider_scanline_offset, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Defocus X", 0, 0, 64, 1, slider_defocus_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Defocus Y", 0, 0, 64, 1, slider_defocus_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Position Offset X", -1500, 0, 1500, 1, slider_red_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Position Offset Y", -1500, 0, 1500, 1, slider_red_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Position Offset X", -1500, 0, 1500, 1, slider_green_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Position Offset Y", -1500, 0, 1500, 1, slider_green_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Position Offset X", -1500, 0, 1500, 1, slider_blue_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Position Offset Y", -1500, 0, 1500, 1, slider_blue_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Convergence X", -1500, 0, 1500, 1, slider_red_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Convergence Y", -1500, 0, 1500, 1, slider_red_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Convergence X", -1500, 0, 1500, 1, slider_green_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Convergence Y", -1500, 0, 1500, 1, slider_green_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Convergence X", -1500, 0, 1500, 1, slider_blue_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Convergence Y", -1500, 0, 1500, 1, slider_blue_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Red Input", -400, 200, 400, 5, slider_red_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Green Input", -400, 0, 400, 5, slider_red_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Blue Input", -400, 0, 400, 5, slider_red_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Red Input", -400, 0, 400, 5, slider_green_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Green Input", -400, 200, 400, 5, slider_green_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Blue Input", -400, 0, 400, 5, slider_green_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Red Input", -400, 0, 400, 5, slider_blue_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Green Input", -400, 0, 400, 5, slider_blue_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Blue Input", -400, 200, 400, 5, slider_blue_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red DC Offset", -100, 0, 100, 1, slider_red_offset, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green DC Offset", -100, 0, 100, 1, slider_green_offset, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue DC Offset", -100, 0, 100, 1, slider_blue_offset, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Scale", -200, 100, 200, 1, slider_red_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Scale", -200, 100, 200, 1, slider_green_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Scale", -200, 100, 200, 1, slider_blue_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Power", -80, 20, 80, 1, slider_red_power, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Power", -80, 20, 80, 1, slider_green_power, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Power", -80, 20, 80, 1, slider_blue_power, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Floor", 0, 0, 100, 1, slider_red_floor, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Floor", 0, 0, 100, 1, slider_green_floor, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Floor", 0, 0, 100, 1, slider_blue_floor, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Phosphor Life", 0, 0, 100, 1, slider_red_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Phosphor Life", 0, 0, 100, 1, slider_green_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Phosphor Life", 0, 0, 100, 1, slider_blue_phosphor_life, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Saturation", 0, 100, 400, 1, slider_saturation, (void*)d3d); tailptr = &(*tailptr)->next;
+
+	return listhead;
+}
+
+//============================================================
+//  osd_get_slider_list
+//============================================================
+
+const void *osd_get_slider_list()
+{
+	return (void*)slider_list;
+}
 
 //============================================================
 //  INLINES
@@ -1158,10 +1592,12 @@ static int device_create_resources(d3d_info *d3d)
 			d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 		}
 
+		windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
+
 		// experimental: load a PNG to use for vector rendering; it is treated
 		// as a brightness map
 		emu_file file(d3d->window->machine().options().art_path(), OPEN_FLAG_READ);
-		d3d->shadow_bitmap = render_load_png(file, NULL, downcast<windows_options &>(d3d->window->machine().options()).screen_shadow_mask_texture(), NULL, NULL);
+		d3d->shadow_bitmap = render_load_png(file, NULL, options.screen_shadow_mask_texture(), NULL, NULL);
 
 		// experimental: if we have a shadow bitmap, create a texture for it
 		if (d3d->shadow_bitmap != NULL)
@@ -1179,6 +1615,65 @@ static int device_create_resources(d3d_info *d3d)
 			// now create it
 			d3d->shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 		}
+
+		d3d->hlsl_options = (d3d_options*)global_alloc_clear(d3d_options);
+		d3d->hlsl_options->screen_shadow_mask_alpha = options.screen_shadow_mask_alpha();
+		d3d->hlsl_options->screen_shadow_mask_count_x = options.screen_shadow_mask_count_x();
+		d3d->hlsl_options->screen_shadow_mask_count_y = options.screen_shadow_mask_count_y();
+		d3d->hlsl_options->screen_shadow_mask_u_size = options.screen_shadow_mask_u_size();
+		d3d->hlsl_options->screen_shadow_mask_v_size = options.screen_shadow_mask_v_size();
+		d3d->hlsl_options->screen_curvature = options.screen_curvature();
+		d3d->hlsl_options->screen_pincushion = options.screen_pincushion();
+		d3d->hlsl_options->screen_scanline_alpha = options.screen_scanline_amount();
+		d3d->hlsl_options->screen_scanline_scale = options.screen_scanline_scale();
+		d3d->hlsl_options->screen_scanline_bright_scale = options.screen_scanline_bright_scale();
+		d3d->hlsl_options->screen_scanline_bright_offset = options.screen_scanline_bright_offset();
+		d3d->hlsl_options->screen_scanline_offset = options.screen_scanline_offset();
+		d3d->hlsl_options->screen_defocus_x = options.screen_defocus_x();
+		d3d->hlsl_options->screen_defocus_y = options.screen_defocus_y();
+		d3d->hlsl_options->screen_red_converge_x = options.screen_red_converge_x();
+		d3d->hlsl_options->screen_red_converge_y = options.screen_red_converge_y();
+		d3d->hlsl_options->screen_green_converge_x = options.screen_green_converge_x();
+		d3d->hlsl_options->screen_green_converge_y = options.screen_green_converge_y();
+		d3d->hlsl_options->screen_blue_converge_x = options.screen_blue_converge_x();
+		d3d->hlsl_options->screen_blue_converge_y = options.screen_blue_converge_y();
+		d3d->hlsl_options->screen_red_radial_converge_x = options.screen_red_radial_converge_x();
+		d3d->hlsl_options->screen_red_radial_converge_y = options.screen_red_radial_converge_y();
+		d3d->hlsl_options->screen_green_radial_converge_x = options.screen_green_radial_converge_x();
+		d3d->hlsl_options->screen_green_radial_converge_y = options.screen_green_radial_converge_y();
+		d3d->hlsl_options->screen_blue_radial_converge_x = options.screen_blue_radial_converge_x();
+		d3d->hlsl_options->screen_blue_radial_converge_y = options.screen_blue_radial_converge_y();
+		d3d->hlsl_options->screen_red_from_red = options.screen_red_from_red();
+		d3d->hlsl_options->screen_red_from_green = options.screen_red_from_green();
+		d3d->hlsl_options->screen_red_from_blue = options.screen_red_from_blue();
+		d3d->hlsl_options->screen_green_from_red = options.screen_green_from_red();
+		d3d->hlsl_options->screen_green_from_green = options.screen_green_from_green();
+		d3d->hlsl_options->screen_green_from_blue = options.screen_green_from_blue();
+		d3d->hlsl_options->screen_blue_from_red = options.screen_blue_from_red();
+		d3d->hlsl_options->screen_blue_from_green = options.screen_blue_from_green();
+		d3d->hlsl_options->screen_blue_from_blue = options.screen_blue_from_blue();
+		d3d->hlsl_options->screen_red_offset = options.screen_red_offset();
+		d3d->hlsl_options->screen_green_offset = options.screen_green_offset();
+		d3d->hlsl_options->screen_blue_offset = options.screen_blue_offset();
+		d3d->hlsl_options->screen_red_scale = options.screen_red_scale();
+		d3d->hlsl_options->screen_green_scale = options.screen_green_scale();
+		d3d->hlsl_options->screen_blue_scale = options.screen_blue_scale();
+		d3d->hlsl_options->screen_red_power = options.screen_red_power();
+		d3d->hlsl_options->screen_green_power = options.screen_green_power();
+		d3d->hlsl_options->screen_blue_power = options.screen_blue_power();
+		d3d->hlsl_options->screen_red_floor = options.screen_red_floor();
+		d3d->hlsl_options->screen_green_floor = options.screen_green_floor();
+		d3d->hlsl_options->screen_blue_floor = options.screen_blue_floor();
+		d3d->hlsl_options->screen_red_phosphor_life = options.screen_red_phosphor();
+		d3d->hlsl_options->screen_green_phosphor_life = options.screen_green_phosphor();
+		d3d->hlsl_options->screen_blue_phosphor_life = options.screen_blue_phosphor();
+		d3d->hlsl_options->screen_saturation = options.screen_saturation();
+
+		slider_list = init_slider_list(d3d);
+	}
+	else
+	{
+		d3d->hlsl_options = NULL;
 	}
 
 	return 0;
@@ -1313,6 +1808,11 @@ static void device_delete_resources(d3d_info *d3d)
 			(*d3dintf->surface.release)(d3d->last_d3dtarget[index]);
 			d3d->last_d3dtarget[index] = NULL;
 		}
+	}
+
+	if(d3d->hlsl_options != NULL)
+	{
+		global_free(d3d->hlsl_options);
 	}
 
 	d3d->registered_targets = 0;
@@ -2149,6 +2649,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 	}
 
 	d3d_surface *backbuffer = NULL;
+	windows_options &winoptions = downcast<windows_options &>(d3d->window->machine().options());
 
 	// first remember the original render target in case we need to set a new one
 	if(d3d->hlsl_enable && d3dintf->post_fx_available)
@@ -2162,7 +2663,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 		vertnum = 0;
 	}
 
-	windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
+	d3d_options *options = d3d->hlsl_options;
 
 	int cur_render_screen = 0;
 	// now do the polys
@@ -2190,35 +2691,35 @@ static void primitive_flush_pending(d3d_info *d3d)
 				{
 					curr_effect = d3d->pincushion_effect;
 				}
-				else if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags))
+				else if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 				{
 					// Plug in all of the shader settings we're going to need
 					// This is extremely slow, but we're not rendering models here,
 					// just post-processing.
 					curr_effect = d3d->post_effect;
 
-					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", (float)options.screen_pincushion());
-					(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", (float)options.screen_curvature());
+					(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", options->screen_pincushion);
+					(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", options->screen_curvature);
 					(*d3dintf->effect.set_float)(curr_effect, "UseShadow", d3d->shadow_texture == NULL ? 0.0f : 1.0f);
 					(*d3dintf->effect.set_texture)(curr_effect, "Shadow", d3d->shadow_texture == NULL ? NULL : d3d->shadow_texture->d3dfinaltex);
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", (float)options.screen_shadow_mask_alpha());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options.screen_shadow_mask_count_x());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options.screen_shadow_mask_count_y());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowU", (float)options.screen_shadow_mask_u_size());
-					(*d3dintf->effect.set_float)(curr_effect, "ShadowV", (float)options.screen_shadow_mask_v_size());
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", options->screen_shadow_mask_alpha);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options->screen_shadow_mask_count_x);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options->screen_shadow_mask_count_y);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowU", options->screen_shadow_mask_u_size);
+					(*d3dintf->effect.set_float)(curr_effect, "ShadowV", options->screen_shadow_mask_v_size);
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawwidth);
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawheight);
-					(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", (float)options.screen_scanline_amount());
-					(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", (float)options.screen_scanline_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", (float)options.screen_scanline_bright_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", (float)options.screen_scanline_bright_offset());
-					(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture != NULL && poly->texture->cur_frame == 0) ? 0.0f : (float)options.screen_scanline_offset());
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", options->screen_scanline_alpha);
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", options->screen_scanline_scale);
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->screen_scanline_bright_scale);
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->screen_scanline_bright_offset);
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->screen_scanline_offset);
 				}
 				else
 				{
@@ -2240,23 +2741,22 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 			if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 			{
-				bool yiq_enable = options.screen_yiq_enable();
-				if(yiq_enable)
+				if(d3d->yiq_enable)
 				{
 					/* Convert our signal into YIQ */
 					curr_effect = d3d->yiq_encode_effect;
 
-					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "WValue", options.screen_yiq_w());
-					(*d3dintf->effect.set_float)(curr_effect, "AValue", options.screen_yiq_a());
-					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * options.screen_yiq_b());
-					(*d3dintf->effect.set_float)(curr_effect, "FscScale", options.screen_yiq_fsc_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "FscValue", options.screen_yiq_fsc());
+					(*d3dintf->effect.set_float)(curr_effect, "WValue", winoptions.screen_yiq_w());
+					(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
+					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * winoptions.screen_yiq_b());
+					(*d3dintf->effect.set_float)(curr_effect, "FscScale", winoptions.screen_yiq_fsc_scale());
+					(*d3dintf->effect.set_float)(curr_effect, "FscValue", winoptions.screen_yiq_fsc());
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget4);
 
@@ -2282,16 +2782,16 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					(*d3dintf->effect.set_texture)(curr_effect, "Composite", poly->texture->d3dtexture4);
 					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
-					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
-					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
+					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "WValue", options.screen_yiq_w());
-					(*d3dintf->effect.set_float)(curr_effect, "AValue", options.screen_yiq_a());
-					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * options.screen_yiq_b());
-					(*d3dintf->effect.set_float)(curr_effect, "FscValue", options.screen_yiq_fsc());
+					(*d3dintf->effect.set_float)(curr_effect, "WValue", winoptions.screen_yiq_w());
+					(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
+					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * winoptions.screen_yiq_b());
+					(*d3dintf->effect.set_float)(curr_effect, "FscValue", winoptions.screen_yiq_fsc());
 
 					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget3);
 
@@ -2320,35 +2820,35 @@ static void primitive_flush_pending(d3d_info *d3d)
 				curr_effect = d3d->color_effect;
 
 				/* Render the initial color-convolution pass */
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", yiq_enable ? 1.0f : (poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f));
-				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", yiq_enable ? 1.0f : (poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f));
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", d3d->yiq_enable ? 1.0f : (1.0f / (poly->texture->ustop - poly->texture->ustart)));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", d3d->yiq_enable ? 1.0f : (1.0f / (poly->texture->vstop - poly->texture->vstart)));
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-				(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", yiq_enable ? 1.0f : 0.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "RedFromRed", (float)options.screen_red_from_red());
-				(*d3dintf->effect.set_float)(curr_effect, "RedFromGrn", (float)options.screen_red_from_green());
-				(*d3dintf->effect.set_float)(curr_effect, "RedFromBlu", (float)options.screen_red_from_blue());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnFromRed", (float)options.screen_green_from_red());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnFromGrn", (float)options.screen_green_from_green());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnFromBlu", (float)options.screen_green_from_blue());
-				(*d3dintf->effect.set_float)(curr_effect, "BluFromRed", (float)options.screen_blue_from_red());
-				(*d3dintf->effect.set_float)(curr_effect, "BluFromGrn", (float)options.screen_blue_from_green());
-				(*d3dintf->effect.set_float)(curr_effect, "BluFromBlu", (float)options.screen_blue_from_blue());
-				(*d3dintf->effect.set_float)(curr_effect, "RedOffset", (float)options.screen_red_offset());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnOffset", (float)options.screen_green_offset());
-				(*d3dintf->effect.set_float)(curr_effect, "BluOffset", (float)options.screen_blue_offset());
-				(*d3dintf->effect.set_float)(curr_effect, "RedScale", (float)options.screen_red_scale());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnScale", (float)options.screen_green_scale());
-				(*d3dintf->effect.set_float)(curr_effect, "BluScale", (float)options.screen_blue_scale());
-				(*d3dintf->effect.set_float)(curr_effect, "RedPower", (float)options.screen_red_power());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnPower", (float)options.screen_green_power());
-				(*d3dintf->effect.set_float)(curr_effect, "BluPower", (float)options.screen_blue_power());
-				(*d3dintf->effect.set_float)(curr_effect, "RedFloor", (float)options.screen_red_floor());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", (float)options.screen_green_floor());
-				(*d3dintf->effect.set_float)(curr_effect, "BluFloor", (float)options.screen_blue_floor());
-				(*d3dintf->effect.set_float)(curr_effect, "Saturation", (float)options.screen_saturation());
+				(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", d3d->yiq_enable ? 1.0f : 0.0f);
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromRed", options->screen_red_from_red);
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromGrn", options->screen_red_from_green);
+				(*d3dintf->effect.set_float)(curr_effect, "RedFromBlu", options->screen_red_from_blue);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromRed", options->screen_green_from_red);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromGrn", options->screen_green_from_green);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFromBlu", options->screen_green_from_blue);
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromRed", options->screen_blue_from_red);
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromGrn", options->screen_blue_from_green);
+				(*d3dintf->effect.set_float)(curr_effect, "BluFromBlu", options->screen_blue_from_blue);
+				(*d3dintf->effect.set_float)(curr_effect, "RedOffset", options->screen_red_offset);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnOffset", options->screen_green_offset);
+				(*d3dintf->effect.set_float)(curr_effect, "BluOffset", options->screen_blue_offset);
+				(*d3dintf->effect.set_float)(curr_effect, "RedScale", options->screen_red_scale);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnScale", options->screen_green_scale);
+				(*d3dintf->effect.set_float)(curr_effect, "BluScale", options->screen_blue_scale);
+				(*d3dintf->effect.set_float)(curr_effect, "RedPower", options->screen_red_power);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnPower", options->screen_green_power);
+				(*d3dintf->effect.set_float)(curr_effect, "BluPower", options->screen_blue_power);
+				(*d3dintf->effect.set_float)(curr_effect, "RedFloor", options->screen_red_floor);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnFloor", options->screen_green_floor);
+				(*d3dintf->effect.set_float)(curr_effect, "BluFloor", options->screen_blue_floor);
+				(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->screen_saturation);
 
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dsmalltarget0);
 
@@ -2377,20 +2877,20 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
 				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", (float)options.screen_red_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", (float)options.screen_red_converge_y());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", (float)options.screen_green_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeY", (float)options.screen_green_converge_y());
-				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeX", (float)options.screen_blue_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeY", (float)options.screen_blue_converge_y());
-				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeX", (float)options.screen_red_radial_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeY", (float)options.screen_red_radial_converge_y());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeX", (float)options.screen_green_radial_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeY", (float)options.screen_green_radial_converge_y());
-				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeX", (float)options.screen_blue_radial_converge_x());
-				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeY", (float)options.screen_blue_radial_converge_y());
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeX", options->screen_red_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "RedConvergeY", options->screen_red_converge_y);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeX", options->screen_green_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnConvergeY", options->screen_green_converge_y);
+				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeX", options->screen_blue_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "BluConvergeY", options->screen_blue_converge_y);
+				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeX", options->screen_red_radial_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "RedRadialConvergeY", options->screen_red_radial_converge_y);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeX", options->screen_green_radial_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "GrnRadialConvergeY", options->screen_green_radial_converge_y);
+				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeX", options->screen_blue_radial_converge_x);
+				(*d3dintf->effect.set_float)(curr_effect, "BluRadialConvergeY", options->screen_blue_radial_converge_y);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -2410,8 +2910,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
-				float defocus_x = (float)options.screen_defocus_x();
-				float defocus_y = (float)options.screen_defocus_y();
+				float defocus_x = options->screen_defocus_x;
+				float defocus_y = options->screen_defocus_y;
 				bool focus_enable = defocus_x != 0.0f || defocus_y != 0.0f;
 				if(focus_enable)
 				{
@@ -2488,9 +2988,9 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
 				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "RedPhosphor", (float)options.screen_red_phosphor());
-				(*d3dintf->effect.set_float)(curr_effect, "GreenPhosphor", (float)options.screen_green_phosphor());
-				(*d3dintf->effect.set_float)(curr_effect, "BluePhosphor", (float)options.screen_blue_phosphor());
+				(*d3dintf->effect.set_float)(curr_effect, "RedPhosphor", options->screen_red_phosphor_life);
+				(*d3dintf->effect.set_float)(curr_effect, "GreenPhosphor", options->screen_green_phosphor_life);
+				(*d3dintf->effect.set_float)(curr_effect, "BluePhosphor", options->screen_blue_phosphor_life);
 
 				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? poly->texture->d3dtexture1 : poly->texture->d3dtexture2);
 				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", d3d->last_d3dtexture[cur_render_screen]);
@@ -2561,7 +3061,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.end)(curr_effect);
 
 				poly->texture->cur_frame++;
-				poly->texture->cur_frame %= options.screen_yiq_phase_count();
+				poly->texture->cur_frame %= winoptions.screen_yiq_phase_count();
 			}
 			else
 			{
@@ -2572,8 +3072,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "PostPass", 0.0f);
-				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountX", (float)options.screen_pincushion());
-				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountY", (float)options.screen_pincushion());
+				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountX", options->screen_pincushion);
+				(*d3dintf->effect.set_float)(curr_effect, "PincushionAmountY", options->screen_pincushion);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 

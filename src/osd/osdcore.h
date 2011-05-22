@@ -905,6 +905,16 @@ file_error osd_get_full_path(char **dst, const char *path);
 -----------------------------------------------------------------------------*/
 const char *osd_get_volume_name(int idx);
 
+/*-----------------------------------------------------------------------------
+    osd_set_shared_float_buffer: retrieves the OSD-shared float buffer
+
+    Return value:
+
+        pointer to the OSD-specific list of sliders
+
+-----------------------------------------------------------------------------*/
+const void *osd_get_slider_list();
+
 #ifdef __cplusplus
 }
 #endif
