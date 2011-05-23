@@ -152,6 +152,8 @@ video_manager::video_manager(running_machine &machine)
 		m_snap_target->set_backdrops_enabled(false);
 		m_snap_target->set_overlays_enabled(false);
 		m_snap_target->set_bezels_enabled(false);
+		m_snap_target->set_cpanels_enabled(false);
+		m_snap_target->set_marquees_enabled(false);
 		m_snap_target->set_screen_overlay_enabled(false);
 		m_snap_target->set_zoom_to_screen(false);
 	}

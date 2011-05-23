@@ -143,8 +143,8 @@ static const render_quad_texuv oriented_texcoords[8] =
 };
 
 // layer orders
-static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL };
-static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL };
+static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
+static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
 
 
 
@@ -204,9 +204,9 @@ inline void normalize_bounds(render_bounds &bounds)
 inline item_layer get_layer_and_blendmode(const layout_view &view, int index, int &blendmode)
 {
 	//  if we have multiple backdrop pieces and no overlays, render:
-    //      backdrop (add) + screens (add) + bezels (alpha)
+    //      backdrop (add) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
     //  else render:
-    //      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
+    //      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 
     const int *layer_order = layer_order_standard;
 	if (view.first_item(ITEM_LAYER_BACKDROP) != NULL && view.first_item(ITEM_LAYER_BACKDROP)->next() != NULL && view.first_item(ITEM_LAYER_OVERLAY) == NULL)
@@ -1069,6 +1069,8 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
 	m_base_layerconfig.set_overlays_enabled(manager.machine().options().use_overlays());
 	m_base_layerconfig.set_bezels_enabled(manager.machine().options().use_bezels());
+	m_base_layerconfig.set_cpanels_enabled(manager.machine().options().use_cpanels());
+	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());	
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// determine the base orientation based on options
@@ -2100,6 +2102,14 @@ void render_target::config_load(xml_data_node &targetnode)
 	tmpint = xml_get_attribute_int(&targetnode, "bezels", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_bezels_enabled(tmpint);
+		
+	tmpint = xml_get_attribute_int(&targetnode, "cpanels", -1);
+	if (tmpint == 0 || tmpint == 1)
+		set_cpanels_enabled(tmpint);
+		
+	tmpint = xml_get_attribute_int(&targetnode, "marquees", -1);
+	if (tmpint == 0 || tmpint == 1)
+		set_marquees_enabled(tmpint);
 
 	tmpint = xml_get_attribute_int(&targetnode, "zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
@@ -2158,6 +2168,8 @@ bool render_target::config_save(xml_data_node &targetnode)
 		xml_set_attribute_int(&targetnode, "backdrops", m_layerconfig.backdrops_enabled());
 		xml_set_attribute_int(&targetnode, "overlays", m_layerconfig.overlays_enabled());
 		xml_set_attribute_int(&targetnode, "bezels", m_layerconfig.bezels_enabled());
+		xml_set_attribute_int(&targetnode, "cpanels", m_layerconfig.cpanels_enabled());
+		xml_set_attribute_int(&targetnode, "marquees", m_layerconfig.marquees_enabled());
 		xml_set_attribute_int(&targetnode, "zoom", m_layerconfig.zoom_to_screen());
 		changed = true;
 	}

@@ -290,9 +290,11 @@ class render_layer_config
 	static const UINT8 ENABLE_BACKDROP			= 0x01;	// enable backdrop layers
 	static const UINT8 ENABLE_OVERLAY			= 0x02;	// enable overlay layers
 	static const UINT8 ENABLE_BEZEL				= 0x04;	// enable bezel layers
-	static const UINT8 ZOOM_TO_SCREEN			= 0x08;	// zoom to screen area by default
-	static const UINT8 ENABLE_SCREEN_OVERLAY	= 0x10;	// enable screen overlays
-	static const UINT8 DEFAULT = ENABLE_BACKDROP | ENABLE_OVERLAY | ENABLE_BEZEL | ENABLE_SCREEN_OVERLAY;
+	static const UINT8 ENABLE_CPANEL			= 0x08;	// enable cpanel layers
+	static const UINT8 ENABLE_MARQUEE			= 0x10;	// enable marquee layers
+	static const UINT8 ZOOM_TO_SCREEN			= 0x20;	// zoom to screen area by default
+	static const UINT8 ENABLE_SCREEN_OVERLAY	= 0x40;	// enable screen overlays
+	static const UINT8 DEFAULT = ENABLE_BACKDROP | ENABLE_OVERLAY | ENABLE_BEZEL | ENABLE_CPANEL | ENABLE_MARQUEE | ENABLE_SCREEN_OVERLAY;
 
 public:
 	render_layer_config()
@@ -304,12 +306,16 @@ public:
 	bool backdrops_enabled() const { return ((m_state & ENABLE_BACKDROP) != 0); }
 	bool overlays_enabled() const { return ((m_state & ENABLE_OVERLAY) != 0); }
 	bool bezels_enabled() const { return ((m_state & ENABLE_BEZEL) != 0); }
+	bool cpanels_enabled() const { return ((m_state & ENABLE_CPANEL) != 0); }
+	bool marquees_enabled() const { return ((m_state & ENABLE_MARQUEE) != 0); }
 	bool screen_overlay_enabled() const { return ((m_state & ENABLE_SCREEN_OVERLAY) != 0); }
 	bool zoom_to_screen() const { return ((m_state & ZOOM_TO_SCREEN) != 0); }
 
 	render_layer_config &set_backdrops_enabled(bool enable) { if (enable) m_state |= ENABLE_BACKDROP; else m_state &= ~ENABLE_BACKDROP; return *this; }
 	render_layer_config &set_overlays_enabled(bool enable) { if (enable) m_state |= ENABLE_OVERLAY; else m_state &= ~ENABLE_OVERLAY; return *this; }
 	render_layer_config &set_bezels_enabled(bool enable) { if (enable) m_state |= ENABLE_BEZEL; else m_state &= ~ENABLE_BEZEL; return *this; }
+	render_layer_config &set_cpanels_enabled(bool enable) { if (enable) m_state |= ENABLE_CPANEL; else m_state &= ~ENABLE_CPANEL; return *this; }
+	render_layer_config &set_marquees_enabled(bool enable) { if (enable) m_state |= ENABLE_MARQUEE; else m_state &= ~ENABLE_MARQUEE; return *this; }
 	render_layer_config &set_screen_overlay_enabled(bool enable) { if (enable) m_state |= ENABLE_SCREEN_OVERLAY; else m_state &= ~ENABLE_SCREEN_OVERLAY; return *this; }
 	render_layer_config &set_zoom_to_screen(bool zoom) { if (zoom) m_state |= ZOOM_TO_SCREEN; else m_state &= ~ZOOM_TO_SCREEN; return *this; }
 
@@ -625,6 +631,8 @@ public:
 	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
 	bool overlays_enabled() const { return m_layerconfig.overlays_enabled(); }
 	bool bezels_enabled() const { return m_layerconfig.bezels_enabled(); }
+	bool cpanels_enabled() const { return m_layerconfig.cpanels_enabled(); }
+	bool marquees_enabled() const { return m_layerconfig.marquees_enabled(); }
 	bool screen_overlay_enabled() const { return m_layerconfig.screen_overlay_enabled(); }
 	bool zoom_to_screen() const { return m_layerconfig.zoom_to_screen(); }
 
@@ -632,6 +640,8 @@ public:
 	void set_backdrops_enabled(bool enable) { m_layerconfig.set_backdrops_enabled(enable); update_layer_config(); }
 	void set_overlays_enabled(bool enable) { m_layerconfig.set_overlays_enabled(enable); update_layer_config(); }
 	void set_bezels_enabled(bool enable) { m_layerconfig.set_bezels_enabled(enable); update_layer_config(); }
+	void set_cpanels_enabled(bool enable) { m_layerconfig.set_cpanels_enabled(enable); update_layer_config(); }
+	void set_marquees_enabled(bool enable) { m_layerconfig.set_marquees_enabled(enable); update_layer_config(); }
 	void set_screen_overlay_enabled(bool enable) { m_layerconfig.set_screen_overlay_enabled(enable); update_layer_config(); }
 	void set_zoom_to_screen(bool zoom) { m_layerconfig.set_zoom_to_screen(zoom); update_layer_config(); }
 

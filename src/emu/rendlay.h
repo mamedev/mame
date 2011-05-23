@@ -54,6 +54,8 @@ enum item_layer
 	ITEM_LAYER_SCREEN,
 	ITEM_LAYER_OVERLAY,
 	ITEM_LAYER_BEZEL,
+	ITEM_LAYER_CPANEL,
+	ITEM_LAYER_MARQUEE,
 	ITEM_LAYER_MAX
 };
 DECLARE_ENUM_OPERATORS(item_layer);
@@ -192,7 +194,7 @@ class layout_view
 	friend class simple_list<layout_view>;
 
 public:
-	// an item is a single backdrop, screen, overlay, or bezel item
+	// an item is a single backdrop, screen, overlay, bezel, cpanel, or marquee item
 	class item
 	{
 		friend class layout_view;
@@ -243,7 +245,7 @@ public:
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 
 	//
-	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() != 0); }
+	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() + m_cpanel_list.count() + m_marquee_list.count() != 0); }
 	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
 
 	// operations
@@ -264,6 +266,8 @@ private:
 	simple_list<item>	m_screen_list;		// list of screen items
 	simple_list<item>	m_overlay_list;		// list of overlay items
 	simple_list<item>	m_bezel_list;		// list of bezel items
+	simple_list<item>	m_cpanel_list;		// list of marquee items
+	simple_list<item>	m_marquee_list;		// list of marquee items
 };
 
 

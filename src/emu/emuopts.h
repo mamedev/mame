@@ -131,6 +131,8 @@ enum
 #define OPTION_USE_BACKDROPS		"use_backdrops"
 #define OPTION_USE_OVERLAYS			"use_overlays"
 #define OPTION_USE_BEZELS			"use_bezels"
+#define OPTION_USE_CPANELS			"use_cpanels"
+#define OPTION_USE_MARQUEES			"use_marquees"
 
 // core screen options
 #define OPTION_BRIGHTNESS			"brightness"
@@ -278,6 +280,8 @@ public:
 	bool use_backdrops() const { return bool_value(OPTION_USE_BACKDROPS); }
 	bool use_overlays() const { return bool_value(OPTION_USE_OVERLAYS); }
 	bool use_bezels() const { return bool_value(OPTION_USE_BEZELS); }
+	bool use_cpanels() const { return bool_value(OPTION_USE_CPANELS); }
+	bool use_marquees() const { return bool_value(OPTION_USE_MARQUEES); }
 
 	// core screen options
 	float brightness() const { return float_value(OPTION_BRIGHTNESS); }
