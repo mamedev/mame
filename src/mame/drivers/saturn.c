@@ -431,6 +431,151 @@ static void smpc_system_reset(running_machine &machine)
 	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
+static void smpc_change_clock(running_machine &machine, UINT8 cmd)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	UINT32 xtal;
+
+	xtal = cmd ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+
+	machine.device("maincpu")->set_unscaled_clock(xtal/2);
+	machine.device("slave")->set_unscaled_clock(xtal/2);
+	machine.device("audiocpu")->set_unscaled_clock(xtal/5);
+
+	// TODO: pixel clock change goes there
+
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+}
+
+static void smpc_intbackhelper(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int pad;
+	static const char *const padnames[] = { "JOY1", "JOY2" };
+
+	if (state->m_smpc.intback_stage == 1)
+	{
+		state->m_smpc.intback_stage++;
+		return;
+	}
+
+	pad = input_port_read(machine, padnames[state->m_smpc.intback_stage-2]);
+
+//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+	state->m_smpc_ram[33] = 0xf1;	// no tap, direct connect
+	state->m_smpc_ram[35] = 0x02;	// saturn pad
+	state->m_smpc_ram[37] = pad>>8;
+	state->m_smpc_ram[39] = pad & 0xff;
+
+	if (state->m_smpc.intback_stage == 3)
+	{
+		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
+	}
+	else
+	{
+		state->m_smpc.smpcSR = (0xe0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
+	}
+
+	state->m_smpc.intback_stage++;
+}
+
+/* sys_type 1 == STV, 0 == SATURN */
+static void smpc_intback(running_machine &machine, UINT8 sys_type,system_time systime)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+
+	if(sys_type == 0)
+	{
+		state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+    	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
+   		state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+    	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
+    	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
+    	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
+    	state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
+	}
+
+	state->m_smpc_ram[0x31]=0x00;  //?
+
+	//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
+
+	state->m_smpc_ram[0x35]=0x00;
+	state->m_smpc_ram[0x37]=0x00;
+
+	state->m_smpc_ram[0x39]=sys_type ? 0xff : state->m_smpc.SMEM[0];
+	state->m_smpc_ram[0x3b]=sys_type ? 0xff : state->m_smpc.SMEM[1];
+	state->m_smpc_ram[0x3d]=sys_type ? 0xff : state->m_smpc.SMEM[2];
+	state->m_smpc_ram[0x3f]=sys_type ? 0xff : state->m_smpc.SMEM[3];
+
+	state->m_smpc_ram[0x41]=0xff;
+	state->m_smpc_ram[0x43]=0xff;
+	state->m_smpc_ram[0x45]=0xff;
+	state->m_smpc_ram[0x47]=0xff;
+	state->m_smpc_ram[0x49]=0xff;
+	state->m_smpc_ram[0x4b]=0xff;
+	state->m_smpc_ram[0x4d]=0xff;
+	state->m_smpc_ram[0x4f]=0xff;
+	state->m_smpc_ram[0x51]=0xff;
+	state->m_smpc_ram[0x53]=0xff;
+	state->m_smpc_ram[0x55]=0xff;
+	state->m_smpc_ram[0x57]=0xff;
+	state->m_smpc_ram[0x59]=0xff;
+	state->m_smpc_ram[0x5b]=0xff;
+	state->m_smpc_ram[0x5d]=0xff;
+
+	if(sys_type == 0)
+	{
+		state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
+		state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
+
+		state->m_smpc.intback_stage = 1;
+
+		smpc_intbackhelper(machine);
+	}
+
+	//  /*This is for RTC,cartridge code and similar stuff...*/
+	//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+	device_set_input_line_and_vector(state->m_maincpu, 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
+}
+
+static void smpc_rtc_write(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	state->m_smpc_ram[0x2f] = state->m_smpc_ram[0x0d];
+	state->m_smpc_ram[0x2d] = state->m_smpc_ram[0x0b];
+	state->m_smpc_ram[0x2b] = state->m_smpc_ram[0x09];
+	state->m_smpc_ram[0x29] = state->m_smpc_ram[0x07];
+	state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
+	state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
+	state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
+}
+
+static void smpc_memory_setting(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	state->m_smpc.SMEM[0] = state->m_smpc_ram[1];
+	state->m_smpc.SMEM[1] = state->m_smpc_ram[3];
+	state->m_smpc.SMEM[2] = state->m_smpc_ram[5];
+	state->m_smpc.SMEM[3] = state->m_smpc_ram[7];
+}
+
+static void smpc_nmi_req(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	/*NMI is unconditionally requested?*/
+	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	state->m_NMI_reset = cmd ^ 1;
+	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+}
+
 static WRITE8_HANDLER( stv_SMPC_w8 )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -486,7 +631,6 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
 	}
 
-	/*TODO: probably this is wrong...*/
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
@@ -495,11 +639,11 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
 		{
 			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
+			//cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 		}
 	}
 
-	if (offset == 0x1f)
+	if (offset == 0x1f) // COMREG
 	{
 		switch (data)
 		{
@@ -525,94 +669,33 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
-				break;
 			case 0x0f:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				if(LOG_SMPC) logerror ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+				smpc_change_clock(space->machine(),data & 1);
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
 				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-				//state->m_smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
-				//state->m_smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
-				//state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-				//state->m_smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-				//state->m_smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-				//state->m_smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-				//state->m_smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
-
-				state->m_smpc_ram[0x31]=0x00;  //?
-
-				//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
-
-				state->m_smpc_ram[0x35]=0x00;
-				state->m_smpc_ram[0x37]=0x00;
-
-				state->m_smpc_ram[0x39]=0xff;
-				state->m_smpc_ram[0x3b]=0xff;
-				state->m_smpc_ram[0x3d]=0xff;
-				state->m_smpc_ram[0x3f]=0xff;
-				state->m_smpc_ram[0x41]=0xff;
-				state->m_smpc_ram[0x43]=0xff;
-				state->m_smpc_ram[0x45]=0xff;
-				state->m_smpc_ram[0x47]=0xff;
-				state->m_smpc_ram[0x49]=0xff;
-				state->m_smpc_ram[0x4b]=0xff;
-				state->m_smpc_ram[0x4d]=0xff;
-				state->m_smpc_ram[0x4f]=0xff;
-				state->m_smpc_ram[0x51]=0xff;
-				state->m_smpc_ram[0x53]=0xff;
-				state->m_smpc_ram[0x55]=0xff;
-				state->m_smpc_ram[0x57]=0xff;
-				state->m_smpc_ram[0x59]=0xff;
-				state->m_smpc_ram[0x5b]=0xff;
-				state->m_smpc_ram[0x5d]=0xff;
-
-			//  /*This is for RTC,cartridge code and similar stuff...*/
-				/*System Manager(SMPC) irq*/
-				{
-					//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-					cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
-				}
-			break;
+				smpc_intback(space->machine(),1,systime);
+				break;
 			/* RTC write*/
 			case 0x16:
 				if(LOG_SMPC) logerror("SMPC: RTC write\n");
-				state->m_smpc_ram[0x2f] = state->m_smpc_ram[0x0d];
-				state->m_smpc_ram[0x2d] = state->m_smpc_ram[0x0b];
-				state->m_smpc_ram[0x2b] = state->m_smpc_ram[0x09];
-				state->m_smpc_ram[0x29] = state->m_smpc_ram[0x07];
-				state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
-				state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
-				state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
-			break;
+				smpc_rtc_write(space->machine());
+				break;
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-			break;
+				//smpc_memory_setting(space->machine());
+				break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				/*NMI is unconditionally requested?*/
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+				smpc_nmi_req(space->machine());
 				break;
 			case 0x19:
-				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				state->m_NMI_reset = 0;
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-				break;
 			case 0x1a:
-				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				state->m_NMI_reset = 1;
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+				if(LOG_SMPC) logerror ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+				smpc_nmi_set(space->machine(),data & 1);
 				break;
 			default:
 				printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
@@ -623,39 +706,6 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		state->m_smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
-}
-
-
-static void smpc_intbackhelper(running_machine &machine)
-{
-	saturn_state *state = machine.driver_data<saturn_state>();
-	int pad;
-	static const char *const padnames[] = { "JOY1", "JOY2" };
-
-	if (state->m_smpc.intback_stage == 1)
-	{
-		state->m_smpc.intback_stage++;
-		return;
-	}
-
-	pad = input_port_read(machine, padnames[state->m_smpc.intback_stage-2]);
-
-//  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
-	state->m_smpc_ram[33] = 0xf1;	// no tap, direct connect
-	state->m_smpc_ram[35] = 0x02;	// saturn pad
-	state->m_smpc_ram[37] = pad>>8;
-	state->m_smpc_ram[39] = pad & 0xff;
-
-	if (state->m_smpc.intback_stage == 3)
-	{
-		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
-	}
-	else
-	{
-		state->m_smpc.smpcSR = (0xe0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
-	}
-
-	state->m_smpc.intback_stage++;
 }
 
 static READ8_HANDLER( saturn_SMPC_r8 )
@@ -772,8 +822,8 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		//enable PAD irq & VDP2 external latch for port 1/2
 		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
 		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
-		if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
+		//if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
+		//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 	}
 
 	if (offset == 0x1f)
@@ -803,110 +853,40 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
-				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
-				break;
 			case 0x0f:
-				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				if(LOG_SMPC) logerror ("SMPC: Change Clock to %s\n",data & 1 ? "320" : "352");
+				smpc_change_clock(space->machine(),data & 1);
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-				state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
-			    state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-		    	state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-			    state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
-			    state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
-			    state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
-			    state->m_smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
-
-				state->m_smpc_ram[0x31]=0x00;  //?
-
-
-				state->m_smpc_ram[0x35]=0x00;
-				state->m_smpc_ram[0x37]=0x00;
-
-				state->m_smpc_ram[0x39] = state->m_smpc.SMEM[0];
-				state->m_smpc_ram[0x3b] = state->m_smpc.SMEM[1];
-				state->m_smpc_ram[0x3d] = state->m_smpc.SMEM[2];
-				state->m_smpc_ram[0x3f] = state->m_smpc.SMEM[3];
-
-				state->m_smpc_ram[0x41]=0xff;
-				state->m_smpc_ram[0x43]=0xff;
-				state->m_smpc_ram[0x45]=0xff;
-				state->m_smpc_ram[0x47]=0xff;
-				state->m_smpc_ram[0x49]=0xff;
-				state->m_smpc_ram[0x4b]=0xff;
-				state->m_smpc_ram[0x4d]=0xff;
-				state->m_smpc_ram[0x4f]=0xff;
-				state->m_smpc_ram[0x51]=0xff;
-				state->m_smpc_ram[0x53]=0xff;
-				state->m_smpc_ram[0x55]=0xff;
-				state->m_smpc_ram[0x57]=0xff;
-				state->m_smpc_ram[0x59]=0xff;
-				state->m_smpc_ram[0x5b]=0xff;
-				state->m_smpc_ram[0x5d]=0xff;
-
-				state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
-				state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
-
-				state->m_smpc.intback_stage = 1;
-
-			//  /*This is for RTC,cartridge code and similar stuff...*/
-				{
-//                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-					smpc_intbackhelper(machine);
-					cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
-				}
-			break;
+                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
+		        smpc_intback(space->machine(),0,systime);
+				break;
 			/* RTC write*/
 			case 0x16:
 				if(LOG_SMPC) logerror("SMPC: RTC write\n");
-				state->m_smpc_ram[0x2f] = state->m_smpc_ram[0x0d];
-				state->m_smpc_ram[0x2d] = state->m_smpc_ram[0x0b];
-				state->m_smpc_ram[0x2b] = state->m_smpc_ram[0x09];
-				state->m_smpc_ram[0x29] = state->m_smpc_ram[0x07];
-				state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
-				state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
-				state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
-			break;
+				smpc_rtc_write(space->machine());
+				break;
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-		    		state->m_smpc.SMEM[0] = state->m_smpc_ram[1];
-		    		state->m_smpc.SMEM[1] = state->m_smpc_ram[3];
-		    		state->m_smpc.SMEM[2] = state->m_smpc_ram[5];
-		    		state->m_smpc.SMEM[3] = state->m_smpc_ram[7];
-			break;
+				smpc_memory_setting(space->machine());
+				break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				/*NMI is unconditionally requested?*/
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+				smpc_nmi_req(space->machine());
 				break;
 			case 0x19:
-				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				state->m_NMI_reset = 0;
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-				break;
 			case 0x1a:
-				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				state->m_NMI_reset = 1;
-				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+				if(LOG_SMPC) logerror ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
+				smpc_nmi_set(space->machine(),data & 1);
 				break;
 			default:
 				printf ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
 		}
 
 		// we've processed the command, clear status flag
-		state->m_smpc_ram[0x5f] = data; //read-back command
+		state->m_smpc_ram[0x5f] = data; //read-back for last command issued
 		state->m_smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
