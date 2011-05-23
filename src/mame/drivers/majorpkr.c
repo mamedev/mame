@@ -437,6 +437,7 @@
 
   To Do:
 
+  - Workaround to hide the unused last column (16 pixels), but forced on the 6845.
   - Find the input that unlocks the "KEY-LOCK" mode in the settings.
   - Proper flip mode.
   - Resistors Network.
@@ -532,8 +533,7 @@ static SCREEN_UPDATE(majorpkr)
        form the render. We need more proof about how the video is working.
     */
 	custom_clip.min_x=cliprect->min_x;
-//  custom_clip.max_x=cliprect->max_x-16;
-	custom_clip.max_x=cliprect->max_x;
+	custom_clip.max_x=cliprect->max_x-16;
 	custom_clip.min_y=cliprect->min_y;
 	custom_clip.max_y=cliprect->max_y;
 
@@ -813,8 +813,8 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
 	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
 
-//  AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_address_w)
-//  AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
 
 	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
@@ -1039,8 +1039,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE((47+1)*16, (36+1)*8)				/* through CRTC registers: 768 x 296 */
-//  MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
-	MCFG_SCREEN_VISIBLE_AREA(0, (35*16)-1, 0, (28*8)-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, (36*16)-1, 0, (28*8)-1) /* through CRTC registers: 560(+16) x 224 */
 
 	MCFG_GFXDECODE(majorpkr)
 	MCFG_PALETTE_LENGTH(0x100 * 16)
