@@ -341,25 +341,6 @@ static int DectoBCD(int num)
 7f -w EXLE2/1
 */
 
-static void system_reset(address_space *space)
-{
-	saturn_state *state = space->machine().driver_data<saturn_state>();
-
-	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
-	memset(state->m_scu_regs ,0x00,0x000100);
-	memset(state->m_scsp_regs,0x00,0x001000);
-	memset(state->m_sound_ram,0x00,0x080000);
-	memset(state->m_workram_h,0x00,0x100000);
-	memset(state->m_workram_l,0x00,0x100000);
-	memset(state->m_vdp2_regs,0x00,0x040000);
-	memset(state->m_vdp2_vram,0x00,0x100000);
-	memset(state->m_vdp2_cram,0x00,0x080000);
-	memset(state->m_vdp1_vram,0x00,0x100000);
-
-	//A-Bus
-	/*Order is surely wrong but whatever...*/
-}
-
 static READ8_HANDLER( stv_SMPC_r8 )
 {
 	saturn_state *state = space->machine().driver_data<saturn_state>();
@@ -407,6 +388,47 @@ static TIMER_CALLBACK( stv_bankswitch_state )
 static void stv_select_game(running_machine &machine, int gameno)
 {
 	machine.scheduler().timer_set(attotime::zero, FUNC(stv_bankswitch_state), gameno);
+}
+
+static void smpc_master_on(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+static void smpc_slave_enable(running_machine &machine,UINT8 cmd)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	device_set_input_line(state->m_slave, INPUT_LINE_RESET, cmd ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static void smpc_sound_enable(running_machine &machine,UINT8 cmd)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, cmd ? ASSERT_LINE : CLEAR_LINE);
+	state->m_en_68k = cmd ^ 1;
+}
+
+static void smpc_system_reset(running_machine &machine)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	/*Only backup ram and SMPC ram are retained after that this command is issued.*/
+	memset(state->m_scu_regs ,0x00,0x000100);
+	memset(state->m_scsp_regs,0x00,0x001000);
+	memset(state->m_sound_ram,0x00,0x080000);
+	memset(state->m_workram_h,0x00,0x100000);
+	memset(state->m_workram_l,0x00,0x100000);
+	memset(state->m_vdp2_regs,0x00,0x040000);
+	memset(state->m_vdp2_vram,0x00,0x100000);
+	memset(state->m_vdp2_cram,0x00,0x080000);
+	memset(state->m_vdp1_vram,0x00,0x100000);
+	//A-Bus
+
+	device_set_input_line(state->m_maincpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( stv_SMPC_w8 )
@@ -483,42 +505,27 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		{
 			case 0x00:
 				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
-				state->m_smpc_ram[0x5f]=0x00;
+				smpc_master_on(space->machine());
 				break;
 			//in theory 0x01 is for Master OFF,but obviously is not used.
 			case 0x02:
-				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
-				state->m_smpc_ram[0x5f]=0x02;
-				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, CLEAR_LINE);
-				break;
 			case 0x03:
-				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
-				state->m_smpc_ram[0x5f]=0x03;
-				space->machine().scheduler().trigger(1000);
-				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE);
+				if(LOG_SMPC) logerror ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+				smpc_slave_enable(space->machine(),(data & 1));
 				break;
 			case 0x06:
-				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
-				/* wrong? */
-				state->m_smpc_ram[0x5f]=0x06;
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-				break;
 			case 0x07:
-				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				state->m_smpc_ram[0x5f]=0x07;
+				if(LOG_SMPC) logerror ("SMPC: Sound %s, ignored\n",(data & 1) ? "off" : "on");
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
-				state->m_smpc_ram[0x5f]=0x0d;
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-				system_reset(space);
+				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				state->m_smpc_ram[0x5f]=0x0e;
 				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
@@ -526,7 +533,6 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				state->m_smpc_ram[0x5f]=0x0f;
 				space->machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				space->machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				space->machine().device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
@@ -535,7 +541,6 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
 				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
-				state->m_smpc_ram[0x5f]=0x10;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 				//state->m_smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
 				//state->m_smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);
@@ -589,36 +594,32 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 				state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
 				state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
 				state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
-				state->m_smpc_ram[0x5f]=0x16;
 			break;
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-				state->m_smpc_ram[0x5f]=0x17;
 			break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				state->m_smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
 				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				state->m_smpc_ram[0x5f]=0x19;
 				state->m_NMI_reset = 0;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 				break;
 			case 0x1a:
 				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				state->m_smpc_ram[0x5f]=0x1a;
 				state->m_NMI_reset = 1;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+				printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
 		}
 
 		// we've processed the command, clear status flag
+		state->m_smpc_ram[0x5f] = data; //read-back command
 		state->m_smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}
@@ -781,45 +782,28 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		{
 			case 0x00:
 				if(LOG_SMPC) logerror ("SMPC: Master ON\n");
-				state->m_smpc_ram[0x5f]=0x00;
+				smpc_master_on(space->machine());
 				break;
-			//in theory 0x01 is for Master OFF,but obviously is not used.
+			//in theory 0x01 is for Master OFF
 			case 0x02:
-				if(LOG_SMPC) logerror ("SMPC: Slave ON\n");
-				state->m_smpc_ram[0x5f]=0x02;
-				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, CLEAR_LINE);
-				break;
 			case 0x03:
-				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
-				state->m_smpc_ram[0x5f]=0x03;
-				machine.scheduler().trigger(1000);
-				cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
+				if(LOG_SMPC) logerror ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
+				smpc_slave_enable(space->machine(),data & 1);
 				break;
 			case 0x06:
-				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
-				/* wrong? */
-				state->m_smpc_ram[0x5f]=0x06;
-				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
-				state->m_en_68k = 1;
-				break;
 			case 0x07:
-				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
-				cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-				state->m_en_68k = 0;
-				state->m_smpc_ram[0x5f]=0x07;
+				if(LOG_SMPC) logerror ("SMPC: Sound %s\n",(data & 1) ? "off" : "on");
+				smpc_sound_enable(space->machine(),data & 1);
 				break;
 			/*CD (SH-1) ON/OFF,guess that this is needed for Sports Fishing games...*/
 			//case 0x08:
 			//case 0x09:
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
-				state->m_smpc_ram[0x5f]=0x0d;
-				cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-				system_reset(space);
+				smpc_system_reset(space->machine());
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
-				state->m_smpc_ram[0x5f]=0x0e;
 				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
 				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
@@ -827,7 +811,6 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
-				state->m_smpc_ram[0x5f]=0x0f;
 				machine.device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				machine.device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 				machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
@@ -836,7 +819,6 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
 		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
-				state->m_smpc_ram[0x5f]=0x10;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 				state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
 			    state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
@@ -895,7 +877,6 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				state->m_smpc_ram[0x27] = state->m_smpc_ram[0x05];
 				state->m_smpc_ram[0x25] = state->m_smpc_ram[0x03];
 				state->m_smpc_ram[0x23] = state->m_smpc_ram[0x01];
-				state->m_smpc_ram[0x5f]=0x16;
 			break;
 			/* SMPC memory setting*/
 			case 0x17:
@@ -904,33 +885,28 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		    		state->m_smpc.SMEM[1] = state->m_smpc_ram[3];
 		    		state->m_smpc.SMEM[2] = state->m_smpc_ram[5];
 		    		state->m_smpc.SMEM[3] = state->m_smpc_ram[7];
-
-				state->m_smpc_ram[0x5f]=0x17;
 			break;
 			case 0x18:
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
-				state->m_smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
 				cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
-				state->m_smpc_ram[0x5f]=0x19;
 				state->m_NMI_reset = 0;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 				break;
 			case 0x1a:
 				if(LOG_SMPC) logerror ("SMPC: NMI Disable\n");
-				state->m_smpc_ram[0x5f]=0x1a;
 				state->m_NMI_reset = 1;
 				state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
-
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
+				printf ("cpu %s (PC=%08X) SMPC: undocumented Command %02x\n", space->device().tag(), cpu_get_pc(&space->device()), data);
 		}
 
 		// we've processed the command, clear status flag
+		state->m_smpc_ram[0x5f] = data; //read-back command
 		state->m_smpc_ram[0x63] = 0x00;
 		/*TODO:emulate the timing of each command...*/
 	}

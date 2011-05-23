@@ -76,6 +76,8 @@ DECLARE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
+#define CASSETTE_TAG		"cassette"
+#define CASSETTE2_TAG		"cassette2"
 
 #define MCFG_CASSETTE_ADD(_tag, _config)	\
 	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)			\

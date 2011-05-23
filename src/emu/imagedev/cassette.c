@@ -12,7 +12,6 @@
 #include "ui.h"
 
 
-#define CASSETTE_TAG		"cassette"
 #define ANIMATION_FPS		1
 #define ANIMATION_FRAMES	4
 
