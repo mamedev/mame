@@ -585,7 +585,7 @@ static INT32 slider_blue_scale(running_machine &machine, void *arg, astring *str
 
 static INT32 slider_red_power(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
-	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_power), 0.01f, "%2.2f", string, newval);
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_red_power), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_green_power(running_machine &machine, void *arg, astring *string, INT32 newval)
