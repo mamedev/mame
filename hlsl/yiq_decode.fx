@@ -104,6 +104,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Coord5.xy = Input.TexCoord + float2(1.25f / RawWidth, 0.0f);
 	Output.Coord6.xy = Input.TexCoord + float2(1.50f / RawWidth, 0.0f);
 	Output.Coord7.xy = Input.TexCoord + float2(1.75f / RawWidth, 0.0f);
+	Output.Coord0.zw = Input.TexCoord + float2(2.00f / RawWidth, 0.0f);
+	Output.Coord1.zw = Input.TexCoord + float2(2.25f / RawWidth, 0.0f);
+	Output.Coord2.zw = Input.TexCoord + float2(2.50f / RawWidth, 0.0f);
+	Output.Coord3.zw = Input.TexCoord + float2(2.75f / RawWidth, 0.0f);
 
 	return Output;
 }
@@ -123,11 +127,13 @@ uniform float BValue;
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float2 RawDims = float2(RawWidth, RawHeight);
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + 0.5f / RawDims);
-	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy + 0.5f / RawDims);
-	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy + 0.5f / RawDims);
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.Coord0.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC = tex2D(CompositeSampler, Input.Coord0.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC2 = tex2D(CompositeSampler, Input.Coord4.xy + float2(0.5f, 0.5f) / RawDims);
+	float4 OrigC3 = tex2D(CompositeSampler, Input.Coord0.zw + float2(0.5f, 0.5f) / RawDims);
 	float4 C = OrigC;
 	float4 C2 = OrigC2;
+	float4 C3 = OrigC3;
 	
 	float MaxC = 2.1183f;
 	float MinC = -1.1183f;
@@ -144,6 +150,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Coord5 = Input.Coord5.xy * RawDims;
 	float2 Coord6 = Input.Coord6.xy * RawDims;
 	float2 Coord7 = Input.Coord7.xy * RawDims;
+	float2 Coord8 = Input.Coord0.zw * RawDims;
+	float2 Coord9 = Input.Coord1.zw * RawDims;
+	float2 CoordA = Input.Coord2.zw * RawDims;
+	float2 CoordB = Input.Coord3.zw * RawDims;
 	
 	float W = WValue;
 	float T0 = Coord0.x + AValue * Coord0.y + BValue;
@@ -154,8 +164,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float T5 = Coord5.x + AValue * Coord5.y + BValue;
 	float T6 = Coord6.x + AValue * Coord6.y + BValue;
 	float T7 = Coord7.x + AValue * Coord7.y + BValue;
+	float T8 = Coord8.x + AValue * Coord8.y + BValue;
+	float T9 = Coord9.x + AValue * Coord9.y + BValue;
+	float TA = CoordA.x + AValue * CoordA.y + BValue;
+	float TB = CoordB.x + AValue * CoordB.y + BValue;
 	float4 Tc = float4(T0, T1, T2, T3);
 	float4 Tc2 = float4(T4, T5, T6, T7);
+	float4 Tc3 = float4(T8, T9, TA, TB);
 	
 	float Yvals[8];
 	Yvals[0] = C.r; Yvals[1] = C.g; Yvals[2] = C.b; Yvals[3] = C.a; Yvals[4] = C2.r; Yvals[5] = C2.g; Yvals[6] = C2.b; Yvals[7] = C2.a;
@@ -166,10 +181,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 	float Yavg = Ytotal / (FscValue * 4.0f);
 
-	float4 I = C * sin(W * Tc);
-	float4 Q = C * cos(W * Tc);
-	float4 I2 = C2 * sin(W * Tc2);
-	float4 Q2 = C2 * cos(W * Tc2);
+	float4 I = (C - Yavg) * sin(W * Tc);
+	float4 Q = (C - Yavg) * cos(W * Tc);
+	float4 I2 = (C2 - Yavg) * sin(W * Tc2);
+	float4 Q2 = (C2 - Yavg) * cos(W * Tc2);
+	float4 I3 = (C3 - Yavg) * sin(W * Tc3);
+	float4 Q3 = (C3 - Yavg) * cos(W * Tc3);
 	
 	float Itotal = 0.0f;
 	float Qtotal = 0.0f;
@@ -183,12 +200,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		Itotal = Itotal + Ivals[idx];
 		Qtotal = Qtotal + Qvals[idx];
 	}
-	float Iavg = Itotal / (FscValue * 4.0f);
-	float Qavg = Qtotal / (FscValue * 4.0f);
+	float Iavg = Itotal / (FscValue * 3.0f);
+	float Qavg = Qtotal / (FscValue * 3.0f);
 
-	float3 YIQ = float3(Yavg, Iavg, Qavg);
+	float3 YIQ = float3(Yavg, Iavg * 1.5f, Qavg);
 	
-	float3 OutRGB = float3(dot(YIQ, float3(1.0f, 0.9563f, 0.6210f)), dot(YIQ, float3(1.0f, -0.2721f, -0.6474f)), dot(YIQ, float3(1.0f, -1.1070f, 1.7046f)));	
+	float3 OutRGB = float3(dot(YIQ, float3(1.0f, 0.956f, 0.621f)), dot(YIQ, float3(1.0f, -0.272f, -0.647f)), dot(YIQ, float3(1.0f, -1.106f, 1.703f)));	
 	
 	return float4(OutRGB, BaseTexel.a);
 }
