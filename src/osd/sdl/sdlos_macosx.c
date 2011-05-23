@@ -367,7 +367,7 @@ const char *osd_get_volume_name(int idx)
 //  osd_get_slider_list
 //============================================================
 
-const slider_value *osd_get_slider_list()
+const void *osd_get_slider_list()
 {
 	return NULL;
 }
