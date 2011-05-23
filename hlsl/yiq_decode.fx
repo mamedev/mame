@@ -155,7 +155,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 CoordA = Input.Coord2.zw * RawDims;
 	float2 CoordB = Input.Coord3.zw * RawDims;
 	
-	float W = WValue;
+	float W = WValue * 2.0f;
 	float T0 = Coord0.x + AValue * Coord0.y + BValue;
 	float T1 = Coord1.x + AValue * Coord1.y + BValue;
 	float T2 = Coord2.x + AValue * Coord2.y + BValue;

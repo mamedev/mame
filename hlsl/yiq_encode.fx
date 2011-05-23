@@ -107,7 +107,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 Coord2 = (Input.Coord2.xy + float2(0.50f / RawWidth, 0.0f)) * Scaler;
 	float2 Coord3 = (Input.Coord3.xy + float2(0.75f / RawWidth, 0.0f)) * Scaler;
 	
-	float W = WValue;
+	float W = WValue * 2.0f;
 	float T0 = Coord0.x + AValue * Coord0.y + BValue;
 	float T1 = Coord1.x + AValue * Coord1.y + BValue;
 	float T2 = Coord2.x + AValue * Coord2.y + BValue;
