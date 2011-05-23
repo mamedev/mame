@@ -83,8 +83,9 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.TexCoord = Input.TexCoord + 0.5f / float2(RawWidth, RawHeight);
 	Output.ExtraInfo = Input.ExtraInfo;
 
-	//Output.TexCoord /= 16.0f;
-	//Output.TexCoord += float2(0.3f, 0.25f);
+	//float Zoom = 1.0f;
+	//Output.TexCoord /= Zoom;
+	//Output.TexCoord += float2(0.175f * (1.0f - 1.0f / Zoom) / WidthRatio, 0.175f * (1.0f - 1.0f / Zoom) / HeightRatio);
 	return Output;
 }
 
@@ -151,10 +152,10 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
-	clip((ScreenClipCoord.x < 1.0f / TargetWidth) ? -1 : 1);
-	clip((ScreenClipCoord.y < 1.0f / TargetHeight) ? -1 : 1);
-	clip((ScreenClipCoord.x > 1.0f / WidthRatio) ? -1 : 1);
-	clip((ScreenClipCoord.y > 1.0f / HeightRatio) ? -1 : 1);
+	clip((BaseCoord.x < WidthRatio / RawWidth) ? -1 : 1);
+	clip((BaseCoord.y < HeightRatio / RawHeight) ? -1 : 1);
+	clip((BaseCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth)) ? -1 : 1);
+	clip((BaseCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight)) ? -1 : 1);
 
 	// -- Scanline Simulation --
 	float3 ScanBrightness = lerp(1.0f, abs(sin(((BaseCoord.y * Ratios.y * RawHeight * ScanlineScale) * PI + ScanlineOffset * RawHeight))) * ScanlineBrightScale + ScanlineBrightOffset, ScanlineAmount);

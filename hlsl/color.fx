@@ -109,7 +109,7 @@ uniform float BluPower = 2.2f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord + 0.5f / float2(RawWidth, RawHeight));
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord + 0.5f / float2(-RawWidth, -RawHeight));
 	
 	float3 OutRGB = BaseTexel.rgb;
 
