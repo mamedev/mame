@@ -338,6 +338,9 @@ public:
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
+	// video overridables
+	virtual void *get_slider_list();
+
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
 

@@ -3015,7 +3015,7 @@ static void menu_sliders_populate(running_machine &machine, ui_menu *menu, int m
 	}
 
 	/* add all sliders */
-	for (curslider = (slider_state*)osd_get_slider_list(); curslider != NULL; curslider = curslider->next)
+	for (curslider = (slider_state*)machine.osd().get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
 		INT32 curval = (*curslider->update)(machine, curslider->arg, &tempstring, SLIDER_NOCHANGE);
 		UINT32 flags = 0;

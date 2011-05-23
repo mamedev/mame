@@ -90,6 +90,9 @@ public:
 	virtual void font_close(osd_font font);
 	virtual bitmap_t *font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs);
 
+	// video overridables
+	virtual void *get_slider_list();
+
 private:
 	// internal state
 	running_machine *	m_machine;

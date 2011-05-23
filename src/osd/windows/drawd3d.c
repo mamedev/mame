@@ -705,10 +705,10 @@ static slider_state *init_slider_list(d3d_info *d3d)
 }
 
 //============================================================
-//  osd_get_slider_list
+//  get_slider_list
 //============================================================
 
-const void *osd_get_slider_list()
+void *windows_osd_interface::get_slider_list()
 {
 	return (void*)slider_list;
 }

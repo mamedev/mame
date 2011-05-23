@@ -231,3 +231,12 @@ bitmap_t *osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT3
 {
 	return NULL;
 }
+
+//-------------------------------------------------
+//  get_slider_list - allocate and populate a
+//  list of OS-dependent slider values.
+//-------------------------------------------------
+void *osd_interface::get_slider_list()
+{
+	return NULL;
+}
