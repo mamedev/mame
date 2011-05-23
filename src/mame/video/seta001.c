@@ -180,19 +180,19 @@ WRITE8_DEVICE_HANDLER( spritebgflag_w8 )
 ***************************************************************************/
 
 /*
-twineagl:   010 02d 0f 10   (ship)
-tndrcade:   058 02d 07 18   (start of game - yes, flip on!)
-arbalest:   018 02d 0f 10   (logo)
-metafox :   018 021 0f f0   (bomb)
-zingzip :   010 02c 00 0f   (bomb)
-wrofaero:   010 021 00 ff   (test mode)
-thunderl:   010 06c 00 ff   (always?)
-krzybowl:   011 028 c0 ff   (game)
-kiwame  :   016 021 7f 00   (logo)
-oisipuzl:   059 020 00 00   (game - yes, flip on!)
-
-superman:   010 021 07 38   (game)
-twineagl:   000 027 00 0f   (test mode)
+twineagl:   10 2d 0f 10   (ship)
+tndrcade:   58 2d 07 18   (start of game - yes, flip on!)
+arbalest:   18 2d 0f 10   (logo)
+metafox :   18 21 0f f0   (bomb)
+zingzip :   10 2c 00 0f   (bomb)
+wrofaero:   10 21 00 ff   (test mode)
+thunderl:   10 6c 00 ff   (always?)
+krzybowl:   11 28 c0 ff   (game)
+kiwame  :   16 21 7f 00   (logo)
+oisipuzl:   59 20 00 00   (game - yes, flip on!)
+superman:   10 21 07 38   (game)
+twineagl:   00 27 00 0f   (test mode)
+doraemon:   19 2a 00 03   (always)
 */
 
 
@@ -230,6 +230,7 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_t
 	switch (ctrl & 0x0f)
 	{
 		case 0x01:	col0	=	0x4;	break;	// krzybowl
+		case 0x09:	col0	=	0x4;	break;	// doraemon
 		case 0x06:	col0	=	0x8;	break;	// kiwame
 
 		default:	col0	=	0x0;
