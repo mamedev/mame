@@ -1298,8 +1298,8 @@ static void handle_modrm(char* s)
 		{
 			case 0: s += sprintf( s, "bx+si" ); break;
 			case 1: s += sprintf( s, "bx+di" ); break;
-			case 2: s += sprintf( s, "bx+si" ); break;
-			case 3: s += sprintf( s, "bx+di" ); break;
+			case 2: s += sprintf( s, "bp+si" ); break;
+			case 3: s += sprintf( s, "bp+di" ); break;
 			case 4: s += sprintf( s, "si" ); break;
 			case 5: s += sprintf( s, "di" ); break;
 			case 6:
