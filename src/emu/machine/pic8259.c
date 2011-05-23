@@ -43,8 +43,6 @@ struct pic8259
 
 	pic8259_state_t state;
 
-	UINT8 irq_lines;
-	UINT8 esr;
 	UINT8 isr;
 	UINT8 irr;
 	UINT8 prio;
@@ -126,7 +124,6 @@ INLINE void pic8259_set_timer(pic8259_t *pic8259)
 static void pic8259_set_irq_line(device_t *device, int irq, int state)
 {
 	pic8259_t	*pic8259 = get_safe_token(device);
-	UINT8		old_irq_lines = pic8259->irq_lines;
 
 	if (state)
 	{
@@ -134,11 +131,7 @@ static void pic8259_set_irq_line(device_t *device, int irq, int state)
 		if (LOG_GENERAL)
 			logerror("pic8259_set_irq_line(): PIC set IRQ line #%d\n", irq);
 
-		pic8259->irq_lines |= 1 << irq;
-
-		/* Set ESR bit if we see a 0 -> 1 transition */
-		if ( ! ( old_irq_lines & ( 1 << irq ) ) )
-			pic8259->esr |= ( 1 << irq );
+		pic8259->irr |= 1 << irq;
 	}
 	else
 	{
@@ -146,10 +139,9 @@ static void pic8259_set_irq_line(device_t *device, int irq, int state)
 		if (LOG_GENERAL)
 			logerror("pic8259_set_irq_line(): PIC cleared IRQ line #%d\n", irq);
 
-		pic8259->irq_lines &= ~(1 << irq);
+		pic8259->irr &= ~(1 << irq);
 	}
 
-	pic8259->irr = ( pic8259->level_trig_mode ) ? pic8259->esr & pic8259->irq_lines : pic8259->irq_lines;
 	pic8259_set_timer(pic8259);
 }
 
@@ -177,11 +169,12 @@ int pic8259_acknowledge(device_t *device)
 		{
 			if (LOG_GENERAL)
 				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
-			pic8259->irr &= ~mask;
-			pic8259->esr &= ~mask;
+			if (!pic8259->level_trig_mode)
+				pic8259->irr &= ~mask;
 
 			if (!pic8259->auto_eoi)
 				pic8259->isr |= mask;
+
 			pic8259_set_timer(pic8259);
 
 			if ((pic8259->cascade!=0) && (pic8259->master!=0) && (mask & pic8259->slave)) {
@@ -272,7 +265,6 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 					logerror("pic8259_w(): ICW1; data=0x%02X\n", data);
 
 				pic8259->imr				= 0x00;
-				pic8259->esr				= 0x00;
 				pic8259->isr				= 0x00;
 				pic8259->irr				= 0x00;
 				pic8259->level_trig_mode	= (data & 0x08) ? 1 : 0;
@@ -281,7 +273,6 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 				pic8259->icw4_needed		= (data & 0x01) ? 1 : 0;
 				pic8259->vector_addr_low	= (data & 0xe0);
 				pic8259->state			= STATE_ICW2;
-				pic8259->irq_lines          = 0x00;
 			}
 			else if (pic8259->state == STATE_READY)
 			{
@@ -430,9 +421,7 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
 	pic8259->state = STATE_READY;
-	pic8259->irq_lines = 0;
 	pic8259->isr = 0;
-	pic8259->esr = 0;
 	pic8259->irr = 0;
 	pic8259->prio = 0;
 	pic8259->imr = 0;
