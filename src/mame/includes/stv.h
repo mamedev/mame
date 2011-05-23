@@ -92,9 +92,6 @@ public:
 };
 
 
-extern int minit_boost,sinit_boost;
-extern attotime minit_boost_timeslice, sinit_boost_timeslice;
-
 DRIVER_INIT ( stv );
 
 

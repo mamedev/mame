@@ -398,7 +398,7 @@ static void custom_tilemap_draw(
 
 	width_mask = src_bitmap0->width - 1;
 	height_mask = src_bitmap0->height - 1;
-	src_y = scrolly + starty;
+	src_y = (scrolly + starty) & height_mask;
 
 
 	for (y = starty; y < endy; y++)
