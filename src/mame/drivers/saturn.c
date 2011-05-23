@@ -129,8 +129,6 @@ also has a DSP;
 
 //static void stv_dump_ram(void);
 
-static int saturn_region;
-
 /*VDP2 stuff*/
 /*SMPC stuff*/
 /*SCU stuff*/
@@ -342,21 +340,6 @@ static int DectoBCD(int num)
 7e
 7f -w EXLE2/1
 */
-static UINT8 IOSEL1;
-static UINT8 IOSEL2;
-static UINT8 EXLE1;
-static UINT8 EXLE2;
-static UINT8 PDR1;
-static UINT8 PDR2;
-static int intback_stage = 0, smpcSR, pmode;
-static UINT8 SMEM[4];
-
-#define SH2_DIRECT_MODE_PORT_1 IOSEL1 = 1
-#define SH2_DIRECT_MODE_PORT_2 IOSEL2 = 1
-#define SMPC_CONTROL_MODE_PORT_1 IOSEL1 = 0
-#define SMPC_CONTROL_MODE_PORT_2 IOSEL2 = 0
-
-
 
 static void system_reset(address_space *space)
 {
@@ -395,8 +378,6 @@ static READ8_HANDLER( stv_SMPC_r8 )
 
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
-
-	if (cpu_get_pc(&space->device())==0x060020E6) return_data = 0x10;//???
 
 	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, return_data);
 
@@ -439,6 +420,13 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 
 	if(offset == 0x75)
 	{
+		/*
+		-xx- ---- PDR1
+		---x ---- EEPROM write bit
+		---- x--- EEPROM CLOCK line
+		---- -x-- EEPROM CS line
+		---- --xx A-Bus bank bits
+		*/
 		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 		eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom->write_bit(data & 0x10);
@@ -447,21 +435,14 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 
 		stv_select_game(space->machine(), state->m_stv_multi_bank);
 
-//      if (data & 0x01)
-//          if(LOG_SMPC) logerror("bit 0 active\n");
-//      if (data & 0x02)
-//          if(LOG_SMPC) logerror("bit 1 active\n");
-//      if (data & 0x10)
-			//if(LOG_SMPC) logerror("bit 4 active\n");//LOT
-		//if(LOG_SMPC) logerror("SMPC: ram [0x75] = %02x\n",state->m_smpc_ram[0x75]);
-		PDR1 = (data & 0x60);
+		state->m_smpc.PDR1 = (data & 0x60);
 	}
 
 	if(offset == 0x77)
 	{
 		/*
-            ACTIVE LOW
-            bit 4(0x10) - Enable Sound System
+			-xx- ---- PDR2
+            ---x ---- Enable Sound System (ACTIVE LOW)
         */
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
 
@@ -470,29 +451,26 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 		state->m_en_68k = ((state->m_smpc_ram[0x77] & 0x10) >> 4) ^ 1;
 
 		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",state->m_smpc_ram[0x77]);
-		PDR2 = (data & 0x60);
+		state->m_smpc.PDR2 = (data & 0x60);
 	}
 
 	if(offset == 0x7d)
 	{
-		if(state->m_smpc_ram[0x7d] & 1)
-			SH2_DIRECT_MODE_PORT_1;
-		else
-			SMPC_CONTROL_MODE_PORT_1;
-
-		if(state->m_smpc_ram[0x7d] & 2)
-			SH2_DIRECT_MODE_PORT_2;
-		else
-			SMPC_CONTROL_MODE_PORT_2;
+		/*
+		---- --x- IOSEL2 direct (1) / control mode (0) port select
+		---- ---x IOSEL1 direct (1) / control mode (0) port select
+		*/
+		state->m_smpc.IOSEL1 = (state->m_smpc_ram[0x7d] & 1) >> 0;
+		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
 	}
 
 	/*TODO: probably this is wrong...*/
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		EXLE1 = state->m_smpc_ram[0x7f] & 1 ? 1 : 0;
-		EXLE2 = state->m_smpc_ram[0x7f] & 2 ? 1 : 0;
-		if(EXLE1 || EXLE2)
+		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
+		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
+		if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
 		{
 			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
 			cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
@@ -653,13 +631,13 @@ static void smpc_intbackhelper(running_machine &machine)
 	int pad;
 	static const char *const padnames[] = { "JOY1", "JOY2" };
 
-	if (intback_stage == 1)
+	if (state->m_smpc.intback_stage == 1)
 	{
-		intback_stage++;
+		state->m_smpc.intback_stage++;
 		return;
 	}
 
-	pad = input_port_read(machine, padnames[intback_stage-2]);
+	pad = input_port_read(machine, padnames[state->m_smpc.intback_stage-2]);
 
 //  if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
 	state->m_smpc_ram[33] = 0xf1;	// no tap, direct connect
@@ -667,16 +645,16 @@ static void smpc_intbackhelper(running_machine &machine)
 	state->m_smpc_ram[37] = pad>>8;
 	state->m_smpc_ram[39] = pad & 0xff;
 
-	if (intback_stage == 3)
+	if (state->m_smpc.intback_stage == 3)
 	{
-		smpcSR = (0x80 | pmode);	// pad 2, no more data, echo back pad mode set by intback
+		state->m_smpc.smpcSR = (0x80 | state->m_smpc.pmode);	// pad 2, no more data, echo back pad mode set by intback
 	}
 	else
 	{
-		smpcSR = (0xe0 | pmode);	// pad 1, more data, echo back pad mode set by intback
+		state->m_smpc.smpcSR = (0xe0 | state->m_smpc.pmode);	// pad 1, more data, echo back pad mode set by intback
 	}
 
-	intback_stage++;
+	state->m_smpc.intback_stage++;
 }
 
 static READ8_HANDLER( saturn_SMPC_r8 )
@@ -687,15 +665,15 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 	return_data = state->m_smpc_ram[offset];
 
 	if ((offset == 0x61))
-		return_data = smpcSR;
+		return_data = state->m_smpc.smpcSR;
 
 	if (offset == 0x75)//PDR1 read
 	{
-		if (IOSEL1)
+		if (state->m_smpc.IOSEL1)
 		{
 			int hshake;
 
-			hshake = (PDR1>>5) & 3;
+			hshake = (state->m_smpc.PDR1>>5) & 3;
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
@@ -729,7 +707,7 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 		return_data =  0xff; // | EEPROM_read_bit());
 	}
 
-	if (offset == 0x33) return_data = saturn_region;
+	if (offset == 0x33) return_data = state->saturn_region;
 
 	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
 
@@ -753,12 +731,12 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 
 	last = state->m_smpc_ram[offset];
 
-	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
+	if ((state->m_smpc.intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
 	{
-      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", intback_stage);
-		if (intback_stage != 3)
+      if (LOG_SMPC) logerror("SMPC: CONTINUE request, stage %d\n", state->m_smpc.intback_stage);
+		if (state->m_smpc.intback_stage != 3)
 		{
-			intback_stage = 2;
+			state->m_smpc.intback_stage = 2;
 		}
 		smpc_intbackhelper(machine);
 		cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
@@ -767,45 +745,34 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 	if ((offset == 1) && (data & 0x40))
 	{
       if (LOG_SMPC) logerror("SMPC: BREAK request\n");
-		intback_stage = 0;
+		state->m_smpc.intback_stage = 0;
 	}
 
 	state->m_smpc_ram[offset] = data;
 
 	if (offset == 0x75)	// PDR1
 	{
-		PDR1 = (data & state->m_smpc_ram[0x79]);
+		state->m_smpc.PDR1 = (data & state->m_smpc_ram[0x79]);
 	}
 
 	if (offset == 0x77)	// PDR2
 	{
-		PDR2 = (data & state->m_smpc_ram[0x7b]);
+		state->m_smpc.PDR2 = (data & state->m_smpc_ram[0x7b]);
 	}
 
 	if(offset == 0x7d)
 	{
-		if(state->m_smpc_ram[0x7d] & 1)
-			SH2_DIRECT_MODE_PORT_1;
-		else
-			SMPC_CONTROL_MODE_PORT_1;
-
-		if(state->m_smpc_ram[0x7d] & 2)
-			SH2_DIRECT_MODE_PORT_2;
-		else
-			SMPC_CONTROL_MODE_PORT_2;
+		state->m_smpc.IOSEL1 = state->m_smpc_ram[0x7d] & 1;
+		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
 	}
 
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		EXLE1 = state->m_smpc_ram[0x7f] & 1 ? 1 : 0;
-		EXLE2 = state->m_smpc_ram[0x7f] & 2 ? 1 : 0;
-		if(EXLE1 || EXLE2)
-			if(!(state->m_scu_regs[40] & 0x0100)) /*Pad irq*/
-			{
-				if(LOG_SMPC) logerror ("Interrupt: PAD irq, Vector 0x48 Level 0x08\n");
-				cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x48);
-			}
+		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
+		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
+		if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
+			cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 	}
 
 	if (offset == 0x1f)
@@ -885,10 +852,10 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				state->m_smpc_ram[0x35]=0x00;
 				state->m_smpc_ram[0x37]=0x00;
 
-				state->m_smpc_ram[0x39] = SMEM[0];
-				state->m_smpc_ram[0x3b] = SMEM[1];
-				state->m_smpc_ram[0x3d] = SMEM[2];
-				state->m_smpc_ram[0x3f] = SMEM[3];
+				state->m_smpc_ram[0x39] = state->m_smpc.SMEM[0];
+				state->m_smpc_ram[0x3b] = state->m_smpc.SMEM[1];
+				state->m_smpc_ram[0x3d] = state->m_smpc.SMEM[2];
+				state->m_smpc_ram[0x3f] = state->m_smpc.SMEM[3];
 
 				state->m_smpc_ram[0x41]=0xff;
 				state->m_smpc_ram[0x43]=0xff;
@@ -906,17 +873,16 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 				state->m_smpc_ram[0x5b]=0xff;
 				state->m_smpc_ram[0x5d]=0xff;
 
-				smpcSR = 0x60;		// peripheral data ready, no reset, etc.
-				pmode = state->m_smpc_ram[1]>>4;
+				state->m_smpc.smpcSR = 0x60;		// peripheral data ready, no reset, etc.
+				state->m_smpc.pmode = state->m_smpc_ram[1]>>4;
 
-				intback_stage = 1;
+				state->m_smpc.intback_stage = 1;
 
 			//  /*This is for RTC,cartridge code and similar stuff...*/
-			//  if(!(state->m_scu_regs[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
 				{
 //                  if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
 					smpc_intbackhelper(machine);
-					cputag_set_input_line_and_vector(machine, "maincpu", 8, HOLD_LINE , 0x47);
+					cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
 				}
 			break;
 			/* RTC write*/
@@ -934,10 +900,10 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-		    		SMEM[0] = state->m_smpc_ram[1];
-		    		SMEM[1] = state->m_smpc_ram[3];
-		    		SMEM[2] = state->m_smpc_ram[5];
-		    		SMEM[3] = state->m_smpc_ram[7];
+		    		state->m_smpc.SMEM[0] = state->m_smpc_ram[1];
+		    		state->m_smpc.SMEM[1] = state->m_smpc_ram[3];
+		    		state->m_smpc.SMEM[2] = state->m_smpc_ram[5];
+		    		state->m_smpc.SMEM[3] = state->m_smpc_ram[7];
 
 				state->m_smpc_ram[0x5f]=0x17;
 			break;
@@ -2547,12 +2513,12 @@ static MACHINE_START( stv )
 	state_save_register_global(machine, timer_0);
 	state_save_register_global(machine, timer_1);
 //  state_save_register_global(machine, scanline);
-	state_save_register_global(machine, IOSEL1);
-	state_save_register_global(machine, IOSEL2);
-	state_save_register_global(machine, EXLE1);
-	state_save_register_global(machine, EXLE2);
-	state_save_register_global(machine, PDR1);
-	state_save_register_global(machine, PDR2);
+	state_save_register_global(machine, state->m_smpc.IOSEL1);
+	state_save_register_global(machine, state->m_smpc.IOSEL2);
+	state_save_register_global(machine, state->m_smpc.EXLE1);
+	state_save_register_global(machine, state->m_smpc.EXLE2);
+	state_save_register_global(machine, state->m_smpc.PDR1);
+	state_save_register_global(machine, state->m_smpc.PDR2);
 	state_save_register_global(machine, port_sel);
 	state_save_register_global(machine, mux_data);
 	state_save_register_global(machine, scsp_last_line);
@@ -2586,19 +2552,19 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, state->m_en_68k);
 	state_save_register_global(machine, timer_0);
 	state_save_register_global(machine, timer_1);
-	state_save_register_global(machine, IOSEL1);
-	state_save_register_global(machine, IOSEL2);
-	state_save_register_global(machine, EXLE1);
-	state_save_register_global(machine, EXLE2);
-	state_save_register_global(machine, PDR1);
-	state_save_register_global(machine, PDR2);
+	state_save_register_global(machine, state->m_smpc.IOSEL1);
+	state_save_register_global(machine, state->m_smpc.IOSEL2);
+	state_save_register_global(machine, state->m_smpc.EXLE1);
+	state_save_register_global(machine, state->m_smpc.EXLE2);
+	state_save_register_global(machine, state->m_smpc.PDR1);
+	state_save_register_global(machine, state->m_smpc.PDR2);
 //  state_save_register_global(machine, port_sel);
 //  state_save_register_global(machine, mux_data);
 	state_save_register_global(machine, scsp_last_line);
-	state_save_register_global(machine, intback_stage);
-	state_save_register_global(machine, pmode);
-	state_save_register_global(machine, smpcSR);
-	state_save_register_global_array(machine, SMEM);
+	state_save_register_global(machine, state->m_smpc.intback_stage);
+	state_save_register_global(machine, state->m_smpc.pmode);
+	state_save_register_global(machine, state->m_smpc.smpcSR);
+	state_save_register_global_array(machine, state->m_smpc.SMEM);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 }
@@ -2797,7 +2763,7 @@ static MACHINE_RESET( saturn )
 	cputag_set_input_line(machine, "slave", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	smpcSR = 0x40;	// this bit is always on according to docs
+	state->m_smpc.smpcSR = 0x40;	// this bit is always on according to docs
 
 	timer_0 = 0;
 	timer_1 = 0;
@@ -3048,7 +3014,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 
-	saturn_region = rgn;
+	state->saturn_region = rgn;
 
 	// set compatible options
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);

@@ -64,6 +64,22 @@ public:
 	    bitmap_t  *roz_bitmap[2];
 	}m_vdp2;
 
+	struct {
+		UINT8 IOSEL1;
+        UINT8 IOSEL2;
+        UINT8 EXLE1;
+        UINT8 EXLE2;
+        UINT8 PDR1;
+        UINT8 PDR2;
+        int   intback_stage;
+        int   smpcSR;
+        int   pmode;
+        UINT8 SMEM[4];
+	}m_smpc;
+
+	/* Saturn specific*/
+	int saturn_region;
+
 	/* ST-V specific */
 	UINT8     m_stv_multi_bank;
 	UINT8     m_prev_bankswitch;
