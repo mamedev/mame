@@ -1,10 +1,68 @@
-/*
-   Sega Saturn & Sega ST-V (Sega Titan Video)
+/**************************************************************************************************
 
-Driver by David Haywood,Angelo Salese,Olivier Galibert & Mariusz Wojcieszek
-SCSP driver provided by R.Belmont,based on ElSemi's SCSP sound chip emulator
-CD Block driver provided by ANY,based on sthief original emulator
-Many thanks to Guru,Fabien & Runik for the help given.
+    Sega Saturn & Sega ST-V (Sega Titan Video) HW (c) 1994 Sega
+
+    Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
+    SCSP driver provided by R.Belmont, based on ElSemi's SCSP sound chip emulator
+    CD Block driver provided by ANY, based on sthief original emulator
+    Many thanks to Guru, Fabien & Runik for the help given.
+
+===================================================================================================
+
+Notes:
+-To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
+-Memo: Some tests done on the original & working PCB,to be implemented:
+ -The AD-Stick returns 0x00 or a similar value.
+ -The Ports E,F & G must return 0xff
+ -The regular BIOS tests (Memory Test) changes his background color at some point to
+  several gradients of red,green and blue.Current implementation remains black.I dunno
+  if this is a framebuffer write or a funky transparency issue (i.e TRANSPARENT_NONE
+  should instead show the back layer).
+ -RBG0 rotating can be checked on the "Advanced Test" menu thru the VDP1/VDP2 check.
+  It rotates clockwise IIRC.Also the ST-V logo when the game is in Multi mode rotates too.
+ -The MIDI communication check fails even on a ST-V board,somebody needs to check if there
+  is a MIDI port on the real PCB...
+
+TODO:
+(Main issues)
+- decap the SH-1, used for CD block (needed especially for Sega Saturn)
+- IRQs: some games have some issues with timing accurate IRQs,check/fix all of them.
+- The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
+- IC13 games on the bios dev doesn't even load the cartridge / crashes the emulation at start-up,
+  rom rearrange needed?
+- finish the DSP core.
+- Add the RS232c interface (serial port),needed by fhboxers.
+- (PCB owners) check if the clocks documented in the manuals are really right for ST-V.
+- We need to check every game if can be completed or there are any hanging/crash/protection
+  issues on them.
+- Clean-ups and split the various chips(SCU,SMPC) into their respective files (in progress).
+- Video emulation bugs: check stvvdp2.c file.
+- Reimplement the idle skip if possible.
+- clean up the I/Os, by using per-game specific mapped ports and rewrite it by using 16-bit trampolines
+- Properly emulate the protection chips, used by several games (check stvprot.c for more info)
+
+(per-game issues)
+- stress: accesses the Sound Memory Expansion Area (0x05a00000-0x05afffff), unknown purpose;
+- smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
+  SH-2 synching.
+- suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause might be by a communication with the M68k
+- bakubaku: sound part is largely incomplete,caused by a tight loop at location PC=1048 of the sound cpu part.
+- myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
+  10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
+  Likely to not be a bug but an in-game design issue.
+- myfairld: Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
+  joystick panel is mapped with input_port(10) instead of input_port(2),so for now use
+  the mahjong panel instead.
+- danchih: hanafuda panel doesn't work.
+- findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
+  still doesn't work,missing irq?
+- batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
+  ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
+- vfremix: when you play Akira, there is a problem with third match: game doesn't upload all textures
+  and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
+  to title screen after losing a match
+
+===================================================================================================
 
 Hardware overview:
 ------------------
@@ -37,117 +95,7 @@ also has a DSP;
  -shadow effects;
  -global rgb brightness control,separate for every plane;
 
-Memory map:
------------
-
-0x00000000, 0x0007ffff  BIOS ROM
-0x00080000, 0x000fffff  Unused
-0x00100000, 0x0010007f  SMPC
-0x00100080, 0x0017ffff  Unused
-0x00180000, 0x0018ffff  Back Up Ram
-0x00190000, 0x001fffff  Unused
-0x00200000, 0x002fffff  Work Ram-L
-0x00300000, 0x00ffffff  Unused
-0x01000000, 0x01000003  MINIT
-0x01000004, 0x017fffff  Unused
-0x01800000, 0x01800003  SINIT
-0x01800004, 0x01ffffff  Unused
-0x02000000, 0x03ffffff  A-BUS CS0
-0x04000000, 0x04ffffff  A-BUS CS1
-0x05000000, 0x057fffff  A-BUS DUMMY
-0x05800000, 0x058fffff  A-BUS CS2
-0x05900000, 0x059fffff  Unused
-0x05a00000, 0x05b00ee3  Sound Region
-0x05b00ee4, 0x05bfffff  Unused
-0x05c00000, 0x05cbffff  VDP 1
-0x05cc0000, 0x05cfffff  Unused
-0x05d00000, 0x05d00017  VDP 1 regs
-0x05d00018, 0x05dfffff  Unused
-0x05e00000, 0x05e7ffff  VDP2
-0x05e80000, 0x05efffff  VDP2 Extra RAM,accessible thru the VRAMSZ register
-0x05f00000, 0x05f00fff  VDP2 Color RAM
-0x05f01000, 0x05f7ffff  Unused
-0x05f80000  0x05f8011f  VDP2 regs
-0x05f80120, 0x05fdffff  Unused
-0x05fe0000, 0x05fe00cf  SCU regs
-0x05fe00d0, 0x05ffffff  Unused
-0x06000000, 0x060fffff  Work Ram-H
-0x06100000, 0x07ffffff  Unused
-
-*the unused locations aren't known if they are really unused or not,needs verification,most
-of them seem just mirrors of the previous valid memory allocated.
-
-ToDo / Notes:
--------------
-
--To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
-
-(Main issues)
--IRQs: some games have some issues with timing accurate IRQs,check/fix all of them.
--Clean-ups and split the various chips(SCU,SMPC)into their respective files.
--CD block:complete it.
--The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
--IC13 games on the bios dev doesn't even load the cartridge / crashes the emulation at start-up,
- rom rearrange needed?
--finish the DSP core.
--Add the RS232c interface (serial port),needed by fhboxers.
--(PCB owners) check if the clocks documented in the manuals are really right for ST-V.
--SCSP to master irq: see if there is a sound cpu mask bit.
--Does the device_set_clock really works?Investigate.
--We need to check every game if can be completed or there are any hanging/crash/protection
- issues on them.
--Memo: Some tests done on the original & working PCB,to be implemented:
- -The AD-Stick returns 0x00 or a similar value.
- -The Ports E,F & G must return 0xff
- -The regular BIOS tests (Memory Test) changes his background color at some point to
-  several gradients of red,green and blue.Current implementation remains black.I dunno
-  if this is a framebuffer write or a funky transparency issue (i.e TRANSPARENT_NONE
-  should instead show the back layer).
- -RBG0 rotating can be checked on the "Advanced Test" menu thru the VDP1/VDP2 check.
-  It rotates clockwise IIRC.Also the ST-V logo when the game is in Multi mode rotates too.
- -The MIDI communication check fails even on a ST-V board,somebody needs to check if there
-  is a MIDI port on the real PCB...
--All games except shienryu: add default eeprom if necessary (1P/3P games for example).
--Video emulation bugs: check stvvdp2.c file.
-
-(per-game issues)
--stress: accesses the Sound Memory Expansion Area (0x05a00000-0x05afffff), unknown purpose;
--smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
- SH-2 synching.
--various: find idle skip if possible.
--suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause might be by a communication with the M68k
--colmns97/puyosun/mausuke/cotton2/cottonbm: interrupt issues? we can't check the SCU mask
- on SMPC or controls fail
--mausuke/bakubaku/grdforce: need to sort out transparency on the colour mapped sprites
--bakubaku: sound part is largely incomplete,caused by a tight loop at location PC=1048 of the sound cpu part.
--myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
- 10 seconds and the game will load everything.This is because of a hellishly slow m68k sub-routine located at 54c2.
- Likely to not be a bug but an in-game design issue.
--myfairld: Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
- joystick panel is mapped with input_port(10) instead of input_port(2),so for now use
- the mahjong panel instead.
--danchih: hanafuda panel doesn't work.
--decathlt: Is currently using a strange protection DMA abus control,and it uses some sort of RLE
- compression/encryption that serves as a gfxdecode.
--findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
- still doesn't work,missing irq?
--batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
- ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
--vfremix: when you play Akira, there is a problem with third match: game doesn't upload all textures
- and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
- to title screen after losing a match
--sokyugrt: gameplay seems to be not smooth, timing?
--seabass: crashes in stvcd.c - there is no CD and we report than we have one, and game tries
- to read something, however it doesn't do it after nvram is deleted?
--Protection issues:
- \-ffreveng: boot vectors;
- \-decathlt: in-game graphics;
- \-elandore: human / dragons textures;
- \-twcup98: tecmo logo / sprite movements;
- \-astrass: text layer (kludged for now);
-
-
-*/
+****************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
