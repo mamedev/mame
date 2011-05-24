@@ -3026,9 +3026,6 @@ static void menu_sliders_populate(running_machine &machine, ui_menu *menu, int m
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
 		ui_menu_item_append(menu, curslider->description, tempstring, flags, (void *)curslider);
-
-		if (menuless_mode)
-			break;
 	}
 
 	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height(machine) + 2.0f * UI_BOX_TB_BORDER);

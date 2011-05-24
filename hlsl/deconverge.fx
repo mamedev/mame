@@ -112,12 +112,25 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 MagnetCenter = float2(0.9f / WidthRatio, 0.9f / HeightRatio);
 	float MagnetDistance = length((MagnetCenter - Input.TexCoord) * float2(WidthRatio, HeightRatio));
 	float Deconverge = 1.0f - MagnetDistance / MagnetCenter;
-	Deconverge = clamp(Deconverge, 0.0f, 1.0f);
+	Deconverge = 1.0f;//clamp(Deconverge, 0.0f, 1.0f);
 	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
 	float RedTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.RedCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).r;
 	float GrnTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.GrnCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).g;
 	float BluTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.BluCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).b;
 	
+	RedTexel *= Input.RedCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
+	RedTexel *= Input.RedCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
+	RedTexel *= Input.RedCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
+	RedTexel *= Input.RedCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
+	GrnTexel *= Input.GrnCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
+	GrnTexel *= Input.GrnCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
+	GrnTexel *= Input.GrnCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
+	GrnTexel *= Input.GrnCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
+	BluTexel *= Input.BluCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
+	BluTexel *= Input.BluCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
+	BluTexel *= Input.BluCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
+	BluTexel *= Input.BluCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
+
 	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
 }
 

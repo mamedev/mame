@@ -650,8 +650,8 @@ static slider_state *init_slider_list(d3d_info *d3d)
 	}
 
 	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Darkness", 0, 0, 100, 1, slider_shadow_mask_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask X Count", 1, 640, 1024, 0, slider_shadow_mask_x_count, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Y Count", 1, 640, 1024, 0, slider_shadow_mask_y_count, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask X Count", 1, 640, 1024, 1, slider_shadow_mask_x_count, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Y Count", 1, 480, 1024, 1, slider_shadow_mask_y_count, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Pixel Count X", 1, 3, 32, 1, slider_shadow_mask_usize, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Shadow Mask Pixel Count Y", 1, 3, 32, 1, slider_shadow_mask_vsize, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Screen Curvature", 0, 0, 100, 1, slider_curvature, (void*)d3d); tailptr = &(*tailptr)->next;
@@ -675,15 +675,15 @@ static slider_state *init_slider_list(d3d_info *d3d)
 	*tailptr = slider_alloc(d3d->window->machine(), "Green Convergence Y", -1500, 0, 1500, 1, slider_green_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Blue Convergence X", -1500, 0, 1500, 1, slider_blue_radial_converge_x, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Blue Convergence Y", -1500, 0, 1500, 1, slider_blue_radial_converge_y, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Red Input", -400, 200, 400, 5, slider_red_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Red Input", -400, 0, 400, 5, slider_red_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Green Input", -400, 0, 400, 5, slider_red_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Red Output from Blue Input", -400, 0, 400, 5, slider_red_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Red Input", -400, 0, 400, 5, slider_green_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Green Input", -400, 200, 400, 5, slider_green_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Green Input", -400, 0, 400, 5, slider_green_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Green Output from Blue Input", -400, 0, 400, 5, slider_green_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Red Input", -400, 0, 400, 5, slider_blue_from_r, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Green Input", -400, 0, 400, 5, slider_blue_from_g, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Blue Input", -400, 200, 400, 5, slider_blue_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Blue Output from Blue Input", -400, 0, 400, 5, slider_blue_from_b, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Red DC Offset", -100, 0, 100, 1, slider_red_offset, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Green DC Offset", -100, 0, 100, 1, slider_green_offset, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Blue DC Offset", -100, 0, 100, 1, slider_blue_offset, (void*)d3d); tailptr = &(*tailptr)->next;
