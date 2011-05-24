@@ -5477,7 +5477,7 @@ VIDEO_START( stv_vdp2 )
 void stv_vdp2_dynamic_res_change(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int horz_res,vert_res;
+	int horz_res = 0,vert_res = 0;
 
 	switch( STV_VDP2_VRES & 3 )
 	{
