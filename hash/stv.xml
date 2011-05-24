@@ -348,13 +348,13 @@
         <rom name="finlarch.13" size="0x100000" crc="4505fa9e" sha1="96c6399146cf9c8f1d27a8fb6a265f937258004a" offset="0x000001" loadflag="load16_byte"/>
         <rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
         <rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
-        <rom name="mpr18257.2" size="0x400000" crc="137fdf55" sha1="07a02fe531b3707e063498f5bc9749bd1b4cadb3" offset="0x400000"/>
+        <rom name="mpr18257.2" size="0x400000" crc="137fdf55" sha1="07a02fe531b3707e063498f5bc9749bd1b4cadb3" offset="0x400000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0x1400000" loadflag="reload"/>
-        <rom name="mpr18258.3" size="0x400000" crc="f519c505" sha1="5cad39314e46b98c24a71f1c2c10c682ef3bdcf3" offset="0x800000"/>
+        <rom name="mpr18258.3" size="0x400000" crc="f519c505" sha1="5cad39314e46b98c24a71f1c2c10c682ef3bdcf3" offset="0x800000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0x1800000" loadflag="reload"/>
-        <rom name="mpr18259.4" size="0x400000" crc="5cabc775" sha1="84383a4cbe3b1a9dcc6c140cff165425666dc780" offset="0xc00000"/>
+        <rom name="mpr18259.4" size="0x400000" crc="5cabc775" sha1="84383a4cbe3b1a9dcc6c140cff165425666dc780" offset="0xc00000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0x1c00000" loadflag="reload"/>
-        <rom name="mpr18260.5" size="0x400000" crc="f5b92082" sha1="806ad85a187a23a5cf867f2f3dea7d8150065b8e" offset="0x1000000"/>
+        <rom name="mpr18260.5" size="0x400000" crc="f5b92082" sha1="806ad85a187a23a5cf867f2f3dea7d8150065b8e" offset="0x1000000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0x2000000" loadflag="reload"/>
       </dataarea>
     </part>
@@ -736,13 +736,13 @@
     <part name="cart" interface="stv_cart">
       <dataarea name="rom" size="0x3000000">
         <rom name="sando-r.13"  size="0x100000" crc="fe63a239" sha1="01502d4494f968443581cd2c74f25967d41f775e" offset="0x000001" loadflag="load16_byte"/>
-        <rom name="mpr18635.8"  size="0x400000" crc="441e1368" sha1="acb2a7e8d44c2203b8d3c7a7b70e20ffb120bebf" offset="0x1c00000"/>
+        <rom name="mpr18635.8"  size="0x400000" crc="441e1368" sha1="acb2a7e8d44c2203b8d3c7a7b70e20ffb120bebf" offset="0x1c00000" loadflag="load16_word_swap"/>
         <rom  size="0x400000" offset="0x400000" loadflag="reload"/>
-        <rom name="mpr18636.9"  size="0x400000" crc="fff1dd80" sha1="36b8e1526a4370ae33fd4671850faf51c448bca4" offset="0x2000000"/>
+        <rom name="mpr18636.9"  size="0x400000" crc="fff1dd80" sha1="36b8e1526a4370ae33fd4671850faf51c448bca4" offset="0x2000000" loadflag="load16_word_swap"/>
         <rom  size="0x400000" offset="0x800000" loadflag="reload"/>
-        <rom name="mpr18637.10" size="0x400000" crc="83aced0f" sha1="6cd1702b9c2655dc4f56c666607c333f62b09fc0" offset="0x2400000"/>
+        <rom name="mpr18637.10" size="0x400000" crc="83aced0f" sha1="6cd1702b9c2655dc4f56c666607c333f62b09fc0" offset="0x2400000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0xc00000" loadflag="reload"/>
-        <rom name="mpr18638.11" size="0x400000" crc="caab531b" sha1="a77bdcc27d183896c0ed576eeebcc1785d93669e" offset="0x2800000"/>
+        <rom name="mpr18638.11" size="0x400000" crc="caab531b" sha1="a77bdcc27d183896c0ed576eeebcc1785d93669e" offset="0x2800000" loadflag="load16_word_swap"/>
         <rom size="0x400000" offset="0x1000000" loadflag="reload"/>
       </dataarea>
     </part>
