@@ -1570,26 +1570,26 @@ static int device_create_resources(d3d_info *d3d)
 		d3d->vector_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
+	// experimental: create a default bitmap for our shader
+	if (d3d->default_bitmap != NULL)
+	{
+		render_texinfo texture;
+
+		// fake in the basic data so it looks like it came from render.c
+		texture.base = d3d->default_bitmap->base;
+		texture.rowpixels = d3d->default_bitmap->rowpixels;
+		texture.width = d3d->default_bitmap->width;
+		texture.height = d3d->default_bitmap->height;
+		texture.palette = NULL;
+		texture.seqid = 0;
+
+		// now create it
+		d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+	}
+
 	// experimental: initialize some more things if we're using HLSL
 	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
-		// experimental: create a default bitmap for our shader
-		if (d3d->default_bitmap != NULL)
-		{
-			render_texinfo texture;
-
-			// fake in the basic data so it looks like it came from render.c
-			texture.base = d3d->default_bitmap->base;
-			texture.rowpixels = d3d->default_bitmap->rowpixels;
-			texture.width = d3d->default_bitmap->width;
-			texture.height = d3d->default_bitmap->height;
-			texture.palette = NULL;
-			texture.seqid = 0;
-
-			// now create it
-			d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
-		}
-
 		windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
 
 		// experimental: load a PNG to use for vector rendering; it is treated
