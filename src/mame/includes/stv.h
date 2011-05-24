@@ -62,6 +62,7 @@ public:
 
 	    UINT8     *gfx_decode;
 	    bitmap_t  *roz_bitmap[2];
+	    UINT8     pixel_clock;
 	}m_vdp2;
 
 	struct {
@@ -147,6 +148,7 @@ extern UINT8* stv_vdp1_gfx_decode;
 
 int stv_vdp1_start ( running_machine &machine );
 void video_update_vdp1(running_machine &machine);
+void stv_vdp2_dynamic_res_change(running_machine &machine);
 
 READ32_HANDLER ( saturn_vdp1_regs_r );
 READ32_HANDLER ( saturn_vdp1_vram_r );

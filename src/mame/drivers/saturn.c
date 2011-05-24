@@ -442,7 +442,8 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 	machine.device("slave")->set_unscaled_clock(xtal/2);
 	machine.device("audiocpu")->set_unscaled_clock(xtal/5);
 
-	// TODO: pixel clock change goes there
+	state->m_vdp2.pixel_clock = cmd;
+	stv_vdp2_dynamic_res_change(machine);
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 }

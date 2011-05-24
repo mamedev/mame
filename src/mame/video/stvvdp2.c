@@ -105,7 +105,6 @@ In other words,the first three types uses the offset and not the color allocated
 #include "profiler.h"
 #include "includes/stv.h"
 
-static void stv_vdp2_dynamic_res_change(running_machine &machine);
 static UINT8 get_hblank(running_machine &machine);
 static int get_vblank_duration(running_machine &machine);
 static int get_hblank_duration(running_machine &machine);
@@ -5485,7 +5484,7 @@ VIDEO_START( stv_vdp2 )
 	gfx_element_set_source(machine.gfx[7], state->m_vdp1.gfx_decode);
 }
 
-static void stv_vdp2_dynamic_res_change(running_machine &machine)
+void stv_vdp2_dynamic_res_change(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int horz_res,vert_res;
