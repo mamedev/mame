@@ -1574,13 +1574,13 @@ ROM_START( metamrph )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+	/* K053250 linescroll/zoom thingy (unpacked) */
+	ROM_REGION( 0x80000, "gfx3", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
-	/* K053250 linescroll/zoom thingy (unpacked) */
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
+	/* K053250 linescroll/zoom thingy */
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )
+	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -1617,8 +1617,11 @@ ROM_START( metamrphu )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x80000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
+
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -1655,8 +1658,11 @@ ROM_START( metamrphj )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x80000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
+
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )

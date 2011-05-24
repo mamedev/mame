@@ -8423,6 +8423,8 @@ struct _k053250_state
 	UINT16      *ram, *rammax;
 	UINT16      *buffer[2];
 	UINT32      rommask;
+	UINT8       *packed;
+	UINT32      packedmask;
 	int         page;
 	int         frame, offsx, offsy;
 
@@ -8507,7 +8509,7 @@ READ16_DEVICE_HANDLER( k053250_rom_r )
 {
 	k053250_state *k053250 = k053250_get_safe_token(device);
 
-	return *(k053250->base + 0x80000 * k053250->regs[6] + 0x800 * k053250->regs[7] + (offset >> 1)) & 0x0f;
+	return *(k053250->packed + 0x80000 * k053250->regs[6] + 0x800 * k053250->regs[7] + offset);
 }
 
 
@@ -8922,8 +8924,11 @@ static DEVICE_START( k053250 )
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	const k053250_interface *intf = k053250_get_interface(device);
 
-	k053250->base = device->machine().region(intf->gfx_memory_region)->base();
-	k053250->rommask = device->machine().region(intf->gfx_memory_region)->bytes();
+	k053250->packed = device->machine().region(intf->gfx_memory_region)->base();
+	k053250->packedmask = device->machine().region(intf->gfx_memory_region)->bytes();
+
+	k053250->base = device->machine().region(intf->gfx_memory_region_unpack)->base();
+	k053250->rommask = device->machine().region(intf->gfx_memory_region_unpack)->bytes();
 
 	k053250->screen = device->machine().device<screen_device>(intf->screen);
 
