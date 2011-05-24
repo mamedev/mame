@@ -269,6 +269,7 @@ Notes:
 #include "deprecat.h"
 #include "cpu/psx/psx.h"
 #include "cpu/m37710/m37710.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
@@ -978,7 +979,6 @@ static MACHINE_RESET( namcos11 )
 	namcos11_state *state = machine.driver_data<namcos11_state>();
 
 	memset( state->m_keycus, 0, state->m_keycus_size );
-	psx_machine_init(machine);
 }
 
 static MACHINE_CONFIG_START( coh100, namcos11_state )
@@ -1006,7 +1006,7 @@ static MACHINE_CONFIG_START( coh100, namcos11_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type1 )
+	MCFG_DEVICE_ADD( "gpu", CXD8538Q, 0 )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("c352", C352, 16384000)
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 	MCFG_CPU_VBLANK_INT("screen", namcos11_vblank)
 
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_REPLACE( "gpu", CXD8561Q, 0 )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE( 30 )

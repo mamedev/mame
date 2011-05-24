@@ -48,6 +48,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "includes/konamigx.h"
 #include "machine/eeprom.h"
@@ -358,7 +359,6 @@ static MACHINE_START( konamigq )
 
 static MACHINE_RESET( konamigq )
 {
-	psx_machine_init(machine);
 }
 
 static MACHINE_CONFIG_START( konamigq, konamigq_state )
@@ -391,7 +391,7 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type1 )
+	MCFG_DEVICE_ADD( "gpu", CXD8538Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

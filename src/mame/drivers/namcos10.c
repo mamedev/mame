@@ -266,6 +266,7 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 
 WRITE32_HANDLER( namcos10_bank_w )
@@ -468,7 +469,6 @@ static DRIVER_INIT( panikuru )
 
 static MACHINE_RESET( namcos10 )
 {
-	psx_machine_init(machine);
 }
 
 static MACHINE_CONFIG_START( namcos10, namcos10_state )
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_START( namcos10, namcos10_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561CQ, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

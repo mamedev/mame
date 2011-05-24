@@ -20,9 +20,8 @@ struct _psx_machine
 	size_t n_psxramsize;
 
 	UINT32 n_com_delay;
+	int b_need_sianniv_vblank_hack;
 };
-
-typedef struct _psx_gpu psx_gpu;
 
 class psx_state : public driver_device
 {
@@ -31,14 +30,13 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	psx_machine *m_p_psx;
-	psx_gpu *m_p_psxgpu;
 
 	UINT32 *m_p_n_psxram;
 	size_t m_n_psxramsize;
 };
 
 
-/*----------- defined in video/psx.c -----------*/
+/*----------- defined in machine/psx.c -----------*/
 
 PALETTE_INIT( psx );
 VIDEO_START( psx_type1 );
@@ -52,8 +50,6 @@ READ32_HANDLER( psx_gpu_r );
 WRITE32_HANDLER( psx_gpu_w );
 extern void psx_lightgun_set( running_machine &, int, int );
 
-/*----------- defined in machine/psx.c -----------*/
-
 WRITE32_HANDLER( psx_com_delay_w );
 READ32_HANDLER( psx_com_delay_r );
 extern void psx_irq_set( running_machine &, UINT32 );
@@ -64,7 +60,6 @@ READ32_HANDLER( psx_counter_r );
 extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
 extern void psx_sio_input( running_machine &, int, int, int );
 
-extern void psx_machine_init( running_machine &machine );
 extern void psx_driver_init( running_machine &machine );
 
 #define PSX_H ( 1 )

@@ -120,6 +120,7 @@ Notes:
 #include "emu.h"
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
@@ -311,8 +312,6 @@ static MACHINE_START( konamigv )
 
 static MACHINE_RESET( konamigv )
 {
-	psx_machine_init(machine);
-
 	/* also hook up CDDA audio to the CD-ROM drive */
 	cdda_set_cdrom(machine.device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
@@ -351,7 +350,7 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8514Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

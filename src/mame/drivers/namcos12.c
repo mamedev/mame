@@ -1031,6 +1031,7 @@ Notes:
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "cpu/h83002/h8.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
@@ -1359,7 +1360,6 @@ static MACHINE_RESET( namcos12 )
 {
 	namcos12_state *state = machine.driver_data<namcos12_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	psx_machine_init(machine);
 	bankoffset_w(space,0,0,0xffffffff);
 	state->m_has_tektagt_dma = 0;
 
@@ -1670,7 +1670,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8654Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

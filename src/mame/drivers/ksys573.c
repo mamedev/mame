@@ -335,6 +335,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "emu.h"
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/intelfsh.h"
 #include "machine/cr589.h"
@@ -1272,8 +1273,6 @@ static DRIVER_INIT( konami573 )
 static MACHINE_RESET( konami573 )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
-
-	psx_machine_init(machine);
 
 	if( state->machine().device<device_secure_serial_flash>("install_eeprom") )
 	{
@@ -2989,7 +2988,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

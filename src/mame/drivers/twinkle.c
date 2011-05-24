@@ -227,6 +227,7 @@ Notes:
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "cpu/m68000/m68000.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/am53cf96.h"
 #include "machine/rtc65271.h"
@@ -856,8 +857,6 @@ static DRIVER_INIT( twinkle )
 
 static MACHINE_RESET( twinkle )
 {
-	psx_machine_init(machine);
-
 	/* also hook up CDDA audio to the CD-ROM drive */
 	cdda_set_cdrom(machine.device("cdda"), am53cf96_get_device(SCSI_ID_4));
 }
@@ -907,7 +906,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")

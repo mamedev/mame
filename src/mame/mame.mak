@@ -1287,7 +1287,7 @@ $(MAMEOBJ)/snk.a: \
 
 $(MAMEOBJ)/sony.a: \
 	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
-	$(MACHINE)/psx.o $(VIDEO)/psx.o \
+	$(MACHINE)/psx.o
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \

@@ -12,6 +12,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/psx/psx.h"
 #include "cpu/z80/z80.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
@@ -481,7 +482,6 @@ static void zn_machine_init( running_machine &machine )
 
 	state->m_n_dip_bit = 0;
 	state->m_b_lastclock = 1;
-	psx_machine_init(machine);
 }
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8561Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8654Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

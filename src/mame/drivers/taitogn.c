@@ -319,6 +319,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 
 #include "emu.h"
 #include "cpu/psx/psx.h"
+#include "video/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "machine/intelfsh.h"
@@ -907,7 +908,6 @@ static MACHINE_RESET( coh3002t )
 	state->m_locked = 0x1ff;
 	install_handlers(machine, 0);
 	state->m_control = 0;
-	psx_machine_init(machine);
 	devtag_reset(machine, "card");
 	ide_set_gnet_readlock(machine.device("card"), 1);
 
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_PALETTE_LENGTH( 65536 )
 
 	MCFG_PALETTE_INIT( psx )
-	MCFG_VIDEO_START( psx_type2 )
+	MCFG_DEVICE_ADD( "gpu", CXD8654Q, 0 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
