@@ -57,9 +57,6 @@ public:
 	}m_vdp1;
 
 	struct {
-	    int       old_vres;
-	    int       old_hres;
-
 	    UINT8     *gfx_decode;
 	    bitmap_t  *roz_bitmap[2];
 	    UINT8     pixel_clock;

@@ -5361,24 +5361,14 @@ UINT8 stv_get_vblank(running_machine &machine)
 static int get_vblank_duration(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+
 	if(STV_VDP2_HRES & 4)
-	{
-		switch(STV_VDP2_HRES & 1)
-		{
-			case 0: return 45; //31kHz Monitor
-			case 1: return 82; //Hi-Vision Monitor
-		}
-	}
+		return (STV_VDP2_HRES & 1) ? 480+82 : 480+45; //Hi-Vision / 31kHz Monitor
 
-	switch(STV_VDP2_VRES & 3)
-	{
-		case 0: return 40; //264-224
-		case 1: return 24; //264-240
-		case 2: return 8; //264-256
-		case 3: return 8; //264-256
-	}
+	if((STV_VDP2_LSMD & 3) == 3)
+		return 264*2;
 
-	return 0;
+	return 264;
 }
 
 static UINT8 get_odd_bit(running_machine &machine)
@@ -5516,9 +5506,7 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 		case 6: horz_res = 640; vert_res = 480; break;
 		case 7: horz_res = 704; vert_res = 480; break;
 	}
-//  horz_res+=1;
-//  vert_res*=2;
-	if(state->m_vdp2.old_vres != vert_res || state->m_vdp2.old_hres != horz_res)
+
 	{
 		int vblank_period,hblank_period;
 		rectangle visarea = machine.primary_screen->visible_area();
@@ -5529,12 +5517,10 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 
 		vblank_period = get_vblank_duration(machine);
 		hblank_period = get_hblank_duration(machine);
-//      popmessage("%d",vblank_period);
-//      hblank_period = get_hblank_duration(machine.primary_screen);
-		machine.primary_screen->configure((horz_res+hblank_period), (vert_res+vblank_period), visarea, machine.primary_screen->frame_period().attoseconds );
 
-		state->m_vdp2.old_vres = vert_res;
-		state->m_vdp2.old_hres = horz_res;
+		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
+
+		machine.primary_screen->configure((horz_res+hblank_period), (vblank_period), visarea, machine.primary_screen->frame_period().attoseconds );
 	}
 //  machine.primary_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
