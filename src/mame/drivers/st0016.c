@@ -530,6 +530,15 @@ ROM_START( dcrown )
 	ROM_COPY( "maincpu",   0x010000, 0x000000, 0x08000 )
 ROM_END
 
+ROM_START( dcrowna )
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "dcn-0.1c",     0x010000, 0x080000, CRC(5dd0615d) SHA1(b859994bd79229da4c687deefe1997313724b26e) )
+	ROM_LOAD( "dcn-1.1d",     0x090000, 0x080000, CRC(6c6f14e7) SHA1(2a3474e44420cc78e3ead777eb91481c4bb46eef) )
+	ROM_LOAD( "dcn-2.1e",     0x110000, 0x080000, CRC(e9401a5e) SHA1(db24ebe5a0073c7c1c2da957772e223545f3c778) )
+	ROM_LOAD( "dcn-3.1f",     0x190000, 0x080000, CRC(ec2e88bc) SHA1(2a8deee63e123dae411e2b834eca69be6f646d66) )
+	ROM_COPY( "maincpu",   0x010000, 0x000000, 0x08000 )
+ROM_END
+
 /*
 Koi Koi Shimasho
 Visco
@@ -685,10 +694,11 @@ static DRIVER_INIT(mayjisn2)
  *
  *************************************/
 
-GAME(  1994, renju,	0,	  st0016,   renju,    renju,    ROT0, "Visco", "Renju Kizoku", 0)
-GAME(  1996, nratechu,	0,	  st0016,   nratechu, nratechu, ROT0, "Seta",  "Neratte Chu", 0)
-GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjinsen 2", 0)
-GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
+GAME(  1994, renju,	    0,	    st0016,   renju,    renju,    ROT0, "Visco",     "Renju Kizoku", 0)
+GAME(  1996, nratechu,	0,	    st0016,   nratechu, nratechu, ROT0, "Seta",      "Neratte Chu", 0)
+GAME(  1994, mayjisn2,	0,	    mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",      "Mayjinsen 2", 0)
+GAME(  1995, koikois,   0,	    st0016,   koikois,  renju,    ROT0, "Visco",     "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
-GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-GAME( 199?, dcrown,	0,	  st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown", GAME_NOT_WORKING)
+GAME( 1994, mayjinsn,	0,	    mayjinsn, st0016,   mayjinsn, ROT0, "Seta",      "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
+GAME( 199?, dcrown,	    0,      st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown (Set 1)", GAME_NOT_WORKING)
+GAME( 199?, dcrowna,    dcrown, st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown (Set 2)", GAME_NOT_WORKING)

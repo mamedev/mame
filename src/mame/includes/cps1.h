@@ -86,7 +86,7 @@ public:
 	UINT16 *     m_cps2_buffered_obj;
 	size_t       m_output_size;
 	// game-specific
-	UINT16 *     m_gigamn2_dummyqsound_ram;
+	UINT16 *     m_gigaman2_dummyqsound_ram;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];

@@ -29,7 +29,7 @@ Mr Driller 2 (DR21 Ver.A)                        (C) Namco, 2000
 Mr Driller 2 (DR22 Ver.A)                        (C) Namco, 2000
 Mr Driller G (DRG1 Ver.A)                        (C) Namco, 2001
 *NFL Classic Football                            (C) Namco, 2003
-*Panicuru Panekuru (PPA1 Ver.A)                  (C) Namco, 2001
+Panicuru Panekuru (PPA1 Ver.A)                   (C) Namco, 2001
 *Photo Battole                                   (C) Namco, 2001
 Point Blank 3 / Gunbalina (GNN2 Ver. A)          (C) Namco, 2000
 *Ren-ai Quiz High School Angel                   (C) Namco, 2002
@@ -458,6 +458,14 @@ static DRIVER_INIT( chocovdr )
 	decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
 }
 
+static DRIVER_INIT( panikuru )
+{
+	memn_driver_init(machine);
+	/* TODO */
+	//decrypt_bios( machine, 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
+}
+
+
 static MACHINE_RESET( namcos10 )
 {
 	psx_machine_init(machine);
@@ -629,6 +637,17 @@ ROM_START( chocovdr )
 	ROM_LOAD( "4.6e",         0x4200000, 0x1080000, CRC(6c18678d) SHA1(410a282397e4a4b5763467811080172b462bfcef) )
 ROM_END
 
+ROM_START( panikuru )
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(3aa66da4) SHA1(3f6ff164981e2c1825766c775442608fbf86d702) )
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(18e5135d) SHA1(a7b1533a1df71be5498718e301d1c9c548551fb4) )
+	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(cd3b25e0) SHA1(39dfebc59e71b8f1c28e718ee71032620f11440c) )
+ROM_END
+
+
 GAME( 2000, mrdrilr2,  0,        namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10, namcos10, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, ptblank3,  0,        namcos10, namcos10, gunbalna, ROT0, "Namco", "Point Blank 3 (GNN2 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -637,4 +656,5 @@ GAME( 2001, mrdrilrg,  0,        namcos10, namcos10, mrdrilrg, ROT0, "Namco", "M
 GAME( 2001, knpuzzle,  0,        namcos10, namcos10, knpuzzle, ROT0, "Namco", "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, chocovdr,  0,        namcos10, namcos10, chocovdr, ROT0, "Namco", "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2002, startrgn,  0,        namcos10, namcos10, startrgn, ROT0, "Namco", "Star Trigon (Japan, STT1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, panikuru,  0,        namcos10, namcos10, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gamshara,  0,        namcos10, namcos10, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )

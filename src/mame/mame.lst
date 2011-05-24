@@ -965,6 +965,7 @@ aquajet			// (c) 1996
 // Namco System 23
 finlflng		// July 1997
 motoxgo			// November 1997
+motoxgoa		// November 1997
 rapidrvr		// December 1997
 rapidrvr2		// December 1997
 downhill		// March 1998
@@ -3021,7 +3022,7 @@ megaman2		// 08/07/1996 (c) 1996 (USA)
 megaman2a		// 08/07/1996 (c) 1996 (Asia)
 rockman2j		// 08/07/1996 (c) 1996 (Japan)
 megaman2h		// 12/07/1996 (c) 1996 (Hispanic)
-gigamn2			// bootleg
+gigaman2		// bootleg
 sfz2al			// 26/08/1996 (c) 1996 (Asia)
 sfz2alj			// 05/08/1996 (c) 1996 (Japan)
 sfz2alh			// 13/08/1996 (c) 1996 (Hispanic)
@@ -3429,7 +3430,7 @@ mrdrilrg		// 2001.03 Mr. Driller G (DRG1 Ver.A)
 				// 2001.11 Knock Down 2001
 knpuzzle		// 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)
 gjspace			// 2001.12 Gekitoride-Jong Space (10011 Ver.A)
-				// 2002.03 Panicuru Panekuru
+panikuru		// 2002.03 Panicuru Panekuru
 				// 2002.03 Taiko no Tatsujin 3
 startrgn		// 2002.07 Star Trigon (STT1 Ver.A)
 				// 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi
@@ -4524,6 +4525,7 @@ vs29815			// 1998.05 Virtua Striker 2 ver.98
 // Step 2.0
 vs2				// 1997.06 Virtua Striker 2
 harley			// 1997.12 Harley Davidson & L.A.Riders
+harleyb
 skichamp		// 1998.01 Ski Champ
 srally2			// 1998.02 Sega Rally 2 Championship
 srally2x
@@ -8145,6 +8147,7 @@ renju			// (c) 1994 Visco
 koikois			// (c) 1995 Seta
 nratechu		// (c) 1996 Seta
 dcrown			// 199? unknown
+dcrowna			// 199? unknown
 // R3000 + ST-0016
 srmp5			// (c) 199? Seta
 speglsht		// (c) 1994 Seta

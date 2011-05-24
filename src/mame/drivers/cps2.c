@@ -597,7 +597,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
-#include "sound/okim6295.h" // gigamn2 bootleg
+#include "sound/okim6295.h" // gigaman2 bootleg
 
 #include "includes/cps1.h"       /* External CPS1 definitions */
 
@@ -1208,7 +1208,7 @@ static MACHINE_START( cps2 )
 
 	state->save_item(NAME(state->m_scancount));
 
-	if (state->m_audiocpu != NULL)	// gigamn2 has no audiocpu
+	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
 		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
 }
 
@@ -1267,7 +1267,7 @@ static MACHINE_CONFIG_DERIVED( dead_cps2, cps2 )
 	MCFG_CPU_PROGRAM_MAP(dead_cps2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gigamn2, cps2 )
+static MACHINE_CONFIG_DERIVED( gigaman2, cps2 )
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 
@@ -3605,26 +3605,26 @@ Sound : Atmel AT89C4051-24PI + M6295 (noted AD-65)
 
 */
 
-ROM_START( gigamn2 )
+ROM_START( gigaman2 )
 	ROM_REGION(CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "prog.bin", 0x000000, 0x400000, CRC(2eaa5e10) SHA1(79f9a137bf5b3317579c548f346c1dc1cccdb771) )
+	ROM_LOAD16_WORD_SWAP( "sys_rom1.bin", 0x000000, 0x400000, CRC(2eaa5e10) SHA1(79f9a137bf5b3317579c548f346c1dc1cccdb771) )
 
 	ROM_REGION(0x10000, "mcu", 0 )      /* sound MCU code */
 	ROM_LOAD( "89c4051.bin", 0x000000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
-	ROM_FILL(              0x000000, 0x800000, 0 )
 	/* you can use the original CPS2 gfx roms, but the 'GIGA part of GIGAMAN2 is missing, on real HW it isn't, roms are different */
 //  ROMX_LOAD( "rm2.14m",  0x800000, 0x200000, CRC(9b1f00b4) SHA1(c1c5c2d9d00121425ae6598444d704f420ef4eef) , ROM_GROUPWORD | ROM_SKIP(6) )
 //  ROMX_LOAD( "rm2.16m",  0x800002, 0x200000, CRC(c2bb0c24) SHA1(38724c49d9db49765a4ed9bc2dc8f57cec45ec7c) , ROM_GROUPWORD | ROM_SKIP(6) )
 //  ROMX_LOAD( "rm2.18m",  0x800004, 0x200000, CRC(12257251) SHA1(20cb58afda0e6200991277817485340a6a41ae2b) , ROM_GROUPWORD | ROM_SKIP(6) )
 //  ROMX_LOAD( "rm2.20m",  0x800006, 0x200000, CRC(f9b6e786) SHA1(aeb4acff7208e66a35198143fd2478039fdaa3a6) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_LOAD( "gfx1.bin", 0x800000, 0x400000, NO_DUMP )
-	ROM_LOAD( "gfx2.bin", 0xc00000, 0x400000, NO_DUMP )
+	/* TODO: understand the proper ROM loading and gfxdecoding */
+    ROM_LOAD32_WORD( "cg_rom1.bin",  0x0000000, 0x800000, CRC(ed55a641) SHA1(fa798779a3787317937a646047620b1c0dbe102a) )
+    ROM_LOAD32_WORD( "cg_rom2.bin",  0x0000002, 0x800000, CRC(63918c05) SHA1(3a7fdf88e87bdbc622504276287740c08df38f6f) )
 
-	ROM_REGION( 0x400000, "oki", 0 ) /* QSound samples */
+	ROM_REGION( 0x800000, "oki", 0 ) /* QSound samples */
 	/* No Qsound, OKI instead.. */
-	ROM_LOAD( "oki.bin", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD( "pcm_rom1.bin", 0x000000, 0x800000, CRC(41a854ab) SHA1(206448c3e27d260d0650c28a9cd524854ce0b64d) )
 ROM_END
 
 ROM_START( mmatrix )
@@ -8015,19 +8015,19 @@ static DRIVER_INIT ( pzloop2 )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
 
-static READ16_HANDLER( gigamn2_dummyqsound_r )
+static READ16_HANDLER( gigaman2_dummyqsound_r )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	return state->m_gigamn2_dummyqsound_ram[offset];
+	return state->m_gigaman2_dummyqsound_ram[offset];
 };
 
-static WRITE16_HANDLER( gigamn2_dummyqsound_w )
+static WRITE16_HANDLER( gigaman2_dummyqsound_w )
 {
 	cps_state *state = space->machine().driver_data<cps_state>();
-	state->m_gigamn2_dummyqsound_ram[offset] = data;
+	state->m_gigaman2_dummyqsound_ram[offset] = data;
 };
 
-static DRIVER_INIT( gigamn2 )
+static DRIVER_INIT( gigaman2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -8036,10 +8036,10 @@ static DRIVER_INIT( gigamn2 )
 
 	DRIVER_INIT_CALL(cps2);
 
-	state->m_gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
-	state->save_pointer(NAME(state->m_gigamn2_dummyqsound_ram), 0x20000 / 2);
+	state->m_gigaman2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
+	state->save_pointer(NAME(state->m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigamn2_dummyqsound_r), FUNC(gigamn2_dummyqsound_w)); // no qsound..
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine.device("maincpu"), 0, length);
 }
@@ -9620,7 +9620,7 @@ GAME( 1996, sfz2jd,   sfa2,     dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg"
 GAME( 1996, spf2td,   spf2t,    dead_cps2, cps2_2p2b, cps2,    ROT0,   "bootleg", "Super Puzzle Fighter II Turbo (USA 960620 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, spf2xjd,  spf2t,    dead_cps2, cps2_2p2b, cps2,    ROT0,   "bootleg", "Super Puzzle Fighter II X (Japan 960531 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, ddsomud,  ddsom,    dead_cps2, cps2_4p4b, cps2,    ROT0,   "bootleg", "Dungeons & Dragons: Shadow over Mystara (USA 960619 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1996, gigamn2,  megaman2, gigamn2,   cps2_2p3b, gigamn2, ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // flash roms aren't dumped, layer offsets different, different sound system
+GAME( 1996, gigaman2,  megaman2, gigaman2,   cps2_2p3b, gigaman2, ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // flash roms aren't dumped, layer offsets different, different sound system
 GAME( 1996, megamn2d, megaman2, dead_cps2, cps2_2p3b, cps2,    ROT0,   "bootleg", "Mega Man 2: The Power Fighters (USA 960708 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, sfz2ald,  sfz2al,   dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1996, xmvsfu1d, xmvsf,    dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "X-Men Vs. Street Fighter (USA 961004 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
