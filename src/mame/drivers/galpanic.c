@@ -248,7 +248,7 @@ static READ16_HANDLER( comad_timer_r )
 static READ8_DEVICE_HANDLER( comad_okim6295_r )
 {
 	UINT16 retvalue;
-//	okim6295_device *oki = downcast<okim6295_device *>(device);
+//  okim6295_device *oki = downcast<okim6295_device *>(device);
 
 //  retvalue = oki->read_status(); // doesn't work, causes lockups when girls change..
 	retvalue = device->machine().rand();
@@ -942,7 +942,7 @@ static MACHINE_CONFIG_DERIVED( supmodel, comad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(12000000)	/* ? */
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
-//	MCFG_TIMER_ADD_SCANLINE("scantimer", galpanic_scanline, "screen", 0, 1)
+//  MCFG_TIMER_ADD_SCANLINE("scantimer", galpanic_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

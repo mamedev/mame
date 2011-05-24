@@ -382,7 +382,7 @@ static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, 
 			cpustate->AuxVal = 1;
 			PutbackRMWord(ModRM,dst);
 			break;
-		case 0x38:	/* SAR ew,count */			
+		case 0x38:	/* SAR ew,count */
 			for(int i=0;i<count-1;i++) dst = ((INT16)dst) >> 1;
 			cpustate->CarryVal = dst & 0x01;
 			dst = ((INT16)((WORD)dst)) >> 1;
@@ -1856,7 +1856,7 @@ static void PREFIX86(_mov_wsreg)(i8086_state *cpustate)    /* Opcode 0x8c */
 		cpustate->pc = cpustate->prevpc;
 		return PREFIX86(_invalid)(cpustate);
 	}
-		
+
 	PutRMWord(ModRM,cpustate->sregs[(ModRM & 0x38) >> 3]);
 }
 
@@ -2800,7 +2800,7 @@ static void PREFIX(_sti)(i8086_state *cpustate)    /* Opcode 0xfb */
 	if (cpustate->irq_state)
 #ifdef I80286
 		i80286_interrupt_descriptor(cpustate, (*cpustate->irq_callback)(cpustate->device, 0), 2, -1);
-#else		
+#else
 		PREFIX86(_interrupt)(cpustate, (UINT32)-1);
 #endif
 }

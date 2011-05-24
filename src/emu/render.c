@@ -1070,7 +1070,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	m_base_layerconfig.set_overlays_enabled(manager.machine().options().use_overlays());
 	m_base_layerconfig.set_bezels_enabled(manager.machine().options().use_bezels());
 	m_base_layerconfig.set_cpanels_enabled(manager.machine().options().use_cpanels());
-	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());	
+	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// determine the base orientation based on options
@@ -2102,11 +2102,11 @@ void render_target::config_load(xml_data_node &targetnode)
 	tmpint = xml_get_attribute_int(&targetnode, "bezels", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_bezels_enabled(tmpint);
-		
+
 	tmpint = xml_get_attribute_int(&targetnode, "cpanels", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_cpanels_enabled(tmpint);
-		
+
 	tmpint = xml_get_attribute_int(&targetnode, "marquees", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_marquees_enabled(tmpint);

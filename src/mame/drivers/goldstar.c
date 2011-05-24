@@ -8036,7 +8036,7 @@ ROM_END
 ******************************************************************************
 
   About encryption...
-  
+
   Seems that programmers left a hole at offset 3890-3a90, enough to see some
   values and progressions as hints. Some of these strings (IE: 00 20 00 20),
   are valid to XOR some text offsets, as 3ac7-3acf, 3ae5-3aea, 3c00-3c0f, and

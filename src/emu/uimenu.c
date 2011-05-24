@@ -3222,7 +3222,7 @@ static void menu_video_options(running_machine &machine, ui_menu *menu, void *pa
 					changed = TRUE;
 				}
 				break;
-				
+
 			case VIDEO_ITEM_MARQUEES:
 				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 				{
@@ -3304,11 +3304,11 @@ static void menu_video_options_populate(running_machine &machine, ui_menu *menu,
 	/* bezel item */
 	enabled = target->bezels_enabled();
 	ui_menu_item_append(menu, "Bezels", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_BEZELS);
-	
+
 	/* cpanel item */
 	enabled = target->cpanels_enabled();
 	ui_menu_item_append(menu, "CPanels", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_CPANELS);
-	
+
 	/* marquee item */
 	enabled = target->marquees_enabled();
 	ui_menu_item_append(menu, "Marquees", enabled ? "Enabled" : "Disabled", enabled ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW, (void *)VIDEO_ITEM_MARQUEES);

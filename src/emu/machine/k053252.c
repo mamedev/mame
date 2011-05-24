@@ -2,7 +2,7 @@
 
     Konami 053252 chip emulation, codenamed "CCU"
 
-	device emulation by Angelo Salese, based off notes by Olivier Galibert
+    device emulation by Angelo Salese, based off notes by Olivier Galibert
 
 ============================================================================================================================
 
@@ -25,24 +25,24 @@ xexex:     01 FF 00 21 00 37 01 00 00 20 0C 0E 54 00 00 00 384x256 ~ 384x256 (*)
 
 (*) hblank duration 512 (0x200), hdisp 384 (0x180), vblank duration 288 (0x120), vdisp 256 (0x100)
 
-	 Definitions from GX, look similar, all values big-endian, write-only:
+     Definitions from GX, look similar, all values big-endian, write-only:
 
-	0-1: bits 9-0: HC        - Total hblank duration (-1)     Hres ~ (HC+1) - HFP - HBP - 8*(HSW+1)
-	2-3: bits 8-0: HFP       - HBlank front porch
-	4-5: bits 8-0: HBP       - HBlank back porch
-	6  : bits 7-0: INT1EN
-	7  : bits 7-0: INT2EN
-	8-9: bits 8-0: VC        - Total vblank duration
-	a  : bits 7-0: VFP       - VBlank front porch             Vres ~ VC - VFP - VBP - (VSW+1)
-	b  : bits 7-0: VBP       - VBlank back porch
-	c  : bits 7-4: VSW       - V-Sync Width
-	c  : bits 3-0: HSW       - H-Sync Width
-	d  : bits 7-0: INT-TIME
-	e  : bits 7-0: INT1ACK
-	f  : bits 7-0: INT2ACK
+    0-1: bits 9-0: HC        - Total hblank duration (-1)     Hres ~ (HC+1) - HFP - HBP - 8*(HSW+1)
+    2-3: bits 8-0: HFP       - HBlank front porch
+    4-5: bits 8-0: HBP       - HBlank back porch
+    6  : bits 7-0: INT1EN
+    7  : bits 7-0: INT2EN
+    8-9: bits 8-0: VC        - Total vblank duration
+    a  : bits 7-0: VFP       - VBlank front porch             Vres ~ VC - VFP - VBP - (VSW+1)
+    b  : bits 7-0: VBP       - VBlank back porch
+    c  : bits 7-4: VSW       - V-Sync Width
+    c  : bits 3-0: HSW       - H-Sync Width
+    d  : bits 7-0: INT-TIME
+    e  : bits 7-0: INT1ACK
+    f  : bits 7-0: INT2ACK
 
-	 Read-only:
-	e-f: bits 8-0: VCT
+     Read-only:
+    e-f: bits 8-0: VCT
 
 TODO:
 - xexex sets up 0x20 as the VC? default value?

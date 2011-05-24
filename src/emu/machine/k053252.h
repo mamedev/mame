@@ -19,7 +19,7 @@ struct _k053252_interface
 	devcb_write_line   int2_en;
 	devcb_write_line   int1_ack;
 	devcb_write_line   int2_ack;
-//	devcb_write8       int_time;
+//  devcb_write8       int_time;
 	int                offsx;
 	int                offsy;
 };

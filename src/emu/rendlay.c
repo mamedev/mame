@@ -1701,11 +1701,11 @@ layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simp
 	// load bezel items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "bezel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "bezel"))
 		m_bezel_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
-		
+
 	// load cpanel items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "cpanel"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "cpanel"))
 		m_cpanel_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));
-		
+
 	// load marquee items
 	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "marquee"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "marquee"))
 		m_marquee_list.append(*auto_alloc(machine, item(machine, *itemnode, elemlist)));

@@ -75,8 +75,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 		const slot_interface *intf = slot->get_slot_interfaces();
 		if (intf != NULL)
 		{
-			const char *selval = options.value(owner.tag());			
-			if (options.seqid(owner.tag())==0) {		
+			const char *selval = options.value(owner.tag());
+			if (options.seqid(owner.tag())==0) {
 				selval = slot->get_default_card();
 			}
 			if (selval) {

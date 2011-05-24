@@ -235,12 +235,12 @@ static WRITE8_HANDLER( igs_lamps_w )
     ---- ---x  Start lamp.
 
     cpokerx set has different layout:
-	
+
     - Lbits -
     7654 3210
     =========
     ---- ---x  Start lamp.
-	
+
     ---- ---x  Hold1 lamp.
     ---- --x-  Hold2 lamp.
     ---- -x--  Hold3 lamp.
@@ -2035,7 +2035,7 @@ ROM_END
 
 /*
   Champion Poker (IGS) V100.
-  
+
 1x ZILOG Z0840006PSC-Z80CPU (main)
 
 1x oscillator 12.000MHz (main)

@@ -107,7 +107,7 @@ static void i80286_trap2(i80286_state *cpustate,UINT32 error)
 			i80286_interrupt_descriptor(cpustate,number,1,-1);
 		}
 	} catch(UINT32 e) { i80286_trap2(cpustate, e); }
-	if(cpustate->trap_level == 3) 
+	if(cpustate->trap_level == 3)
 		// this is supposed to triggered by support hardware
 		// create a shutdown output line that causes a reset
 		// NMI can wake processor without reset
@@ -128,7 +128,7 @@ static int i80286_verify(i80286_state *cpustate, UINT16 selector, i80286_operati
 {
 	if (!IDXTBL(selector)) return GENERAL_PROTECTION_FAULT;
 	if (!SEGDESC(rights)) return GENERAL_PROTECTION_FAULT;
-	
+
 	switch(operation) {
 		case I80286_READ:
 			if (CODE(rights) && !READ(rights)) return GENERAL_PROTECTION_FAULT;
@@ -228,7 +228,7 @@ static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
 	cpustate->flags = CompressFlags();
 	if (type == CALL) WriteWord(BASE(ndesc)+TSS_BACK*2, cpustate->tr.sel);
 	if (type == IRET) cpustate->flags &= ~0x4000;
- 
+
 	otss[TSS_IP] = cpustate->pc-cpustate->base[CS];
 	otss[TSS_FLAG] = cpustate->flags;
 	otss[TSS_AX] = cpustate->regs.w[AX];
@@ -282,7 +282,7 @@ static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
 
 	if (type == CALL) cpustate->flags |= 0x4000;
 	cpustate->msw |= 8;
-		
+
 	cpustate->ldtr.sel=ntss[TSS_LDT]; // docs say nothing about whether a null ldt can be in a tss
 	cpustate->ldtr.limit=LIMIT(desc);
 	cpustate->ldtr.base=BASE(desc);
@@ -298,7 +298,7 @@ static void i80286_switch_task(i80286_state *cpustate, UINT16 ntask, int type)
 		if(error_code == GENERAL_PROTECTION_FAULT) e = TRAP(INVALID_TSS,(e >> 16)); // #NP fault is correct
 		throw e;
 	}
-	
+
 	i80286_data_descriptor_full(cpustate, ES, ntss[TSS_ES], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_ES])));
 	i80286_data_descriptor_full(cpustate, DS, ntss[TSS_DS], RPL(ntss[TSS_CS]), TRAP(INVALID_TSS,IDXTBL(ntss[TSS_DS])));
 }
@@ -324,7 +324,7 @@ static void i80286_code_descriptor(i80286_state *cpustate, UINT16 selector, UINT
 			if (!CODE(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
 			if (CONF(r)) { if(DPL(r)>CPL) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector)); }
 			else if ((RPL(selector)>CPL) || (DPL(r)!=CPL)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(selector));
-			
+
 			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(selector));  // this order is important
 			if (offset > LIMIT(desc)) throw TRAP(GENERAL_PROTECTION_FAULT, 0);
 			SET_ACC(desc);
@@ -411,7 +411,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 
 	if(!PM) return PREFIX86(_interrupt)(cpustate, number);
 
-	if ((number<<3)>=cpustate->idtr.limit) 
+	if ((number<<3)>=cpustate->idtr.limit)
 		throw TRAP(GENERAL_PROTECTION_FAULT,(number*8+2+(hwint&&1)));
 
 	desc[0] = ReadWord(cpustate->idtr.base+(number<<3));
@@ -421,7 +421,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 	if (!hwint && (DPL(r)<CPL)) throw TRAP(GENERAL_PROTECTION_FAULT,(number*8+2+(hwint&&1)));
 	if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,(number*8+2+(hwint&&1)));
 	gatesel = GATESEL(desc);
-	
+
 	switch (GATE(r)) {
 	case TASKGATE:
 		gatesel = GATESEL(gatedesc);
@@ -452,7 +452,7 @@ static void i80286_interrupt_descriptor(i80286_state *cpustate,UINT16 number, in
 			cpustate->regs.w[SP] = tss_sp;
 			PUSH(oldss);
 			PUSH(oldsp);
-		} 
+		}
 		SET_ACC(gatedesc);
 		WriteWord(addr+4, gatedesc[2]);
 		PREFIX(_pushf(cpustate));
@@ -635,7 +635,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		if (PM&&(CPL!=0)) throw TRAP(GENERAL_PROTECTION_FAULT,0);
 		cpustate->msw =        (cpustate->msw&1)|ReadWord(0x806);
 		cpustate->tr.sel =     ReadWord(0x816);
-		tmp = 	               ReadWord(0x818);
+		tmp =	               ReadWord(0x818);
 		ExpandFlags(tmp);
 		cpustate->flags = tmp;
 		cpustate->flags = CompressFlags();
@@ -715,7 +715,7 @@ static void i80286_load_flags(i8086_state *cpustate, UINT16 flags, int cpl)
 	ExpandFlags(flags);
 	cpustate->flags = flags;
 	cpustate->flags = CompressFlags();
-	
+
 	if (cpustate->TF) PREFIX(_trap)(cpustate);
 	/* if the IF is set, and an interrupt is pending, signal an interrupt */
 	if (cpustate->IF && cpustate->irq_state)
@@ -756,12 +756,12 @@ static UINT16 i80286_far_return(i8086_state *cpustate, int iret, int bytes)
 		desc[1] = ReadWord(addr+2);
 		desc[2] = ReadWord(addr+4);
 		r = RIGHTS(desc);
-		
+
 		if (NT && iret) {
 			i80286_switch_task(cpustate, ReadWord(cpustate->tr.base+TSS_BACK*2), IRET);
 			return cpustate->flags;
 		}
-		
+
 		if (!CODE(r) || !SEGDESC(r)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
 		if (CONF(r)) { if(DPL(r)>RPL(sel)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel)); }
 		else if (DPL(r)!=RPL(sel)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));

@@ -96,7 +96,7 @@
 #define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE			"scanline_size"
 #define WINOPTION_SCANLINE_BRIGHT_SCALE 	"scanline_bright_scale"
-#define WINOPTION_SCANLINE_BRIGHT_OFFSET 	"scanline_bright_offset"
+#define WINOPTION_SCANLINE_BRIGHT_OFFSET	"scanline_bright_offset"
 #define WINOPTION_SCANLINE_OFFSET			"scanline_jitter"
 #define WINOPTION_DEFOCUS_X					"defocus_x"
 #define WINOPTION_DEFOCUS_Y					"defocus_y"

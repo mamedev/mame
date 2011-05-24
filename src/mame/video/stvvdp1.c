@@ -154,7 +154,7 @@ struct shaded_point
 #define STV_VDP1_EDSR ((state->m_vdp1_regs[0x010/4] >> 16)&0x0000ffff)
 #define STV_VDP1_CEF  (STV_VDP1_EDSR & 2)
 #define STV_VDP1_BEF  (STV_VDP1_EDSR & 1)
-#define CEF_1 	state->m_vdp1_regs[0x010/4]|=0x00020000
+#define CEF_1	state->m_vdp1_regs[0x010/4]|=0x00020000
 #define CEF_0   state->m_vdp1_regs[0x010/4]&=~0x00020000
 /**/
 

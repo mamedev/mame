@@ -485,7 +485,7 @@ static WRITE8_HANDLER( mux2latch_w )
 			{
 				output_set_lamp_value(BFM_strcnv[offset  ], (state->m_mux2_datalo & pattern?1:0) );
 				output_set_lamp_value(BFM_strcnv[offset+8], (state->m_mux2_datahi & pattern?1:0) );
- 				pattern<<=1;
+				pattern<<=1;
 				offset++;
 			}
 		}

@@ -421,7 +421,7 @@ protected:
 	static delegate_generic_class *late_bind_helper(delegate_late_bind &object)
 	{
 		return reinterpret_cast<delegate_generic_class *>(dynamic_cast<_FunctionClass *>(&object));
-	} 
+	}
 
 	// internal state
 	const char *				m_name;				// name string
@@ -593,13 +593,13 @@ protected:
 		if (m_object != NULL && m_rawfunction.m_function != 0)
 			m_function = reinterpret_cast<generic_static_func>(m_rawfunction.convert_to_generic(m_object));
 	}
-	
+
 	// late binding helper
 	template<class _FunctionClass>
 	static delegate_generic_class *late_bind_helper(delegate_late_bind &object)
 	{
 		return reinterpret_cast<delegate_generic_class *>(dynamic_cast<_FunctionClass *>(&object));
-	} 
+	}
 
 	// internal state
 	const char *				m_name;				// name string

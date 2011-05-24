@@ -706,9 +706,9 @@ public:
 	simple_list<input_field_config> &fieldlist() { return m_fieldlist; }
 	const char *tag() const { return m_tag; }
 	int modcount() const { return m_modcount; }
-	
+
 	void bump_modcount() { m_modcount++; }
-	
+
 	void collapse_fields(astring &errorbuf);
 
 	/* these fields are only valid if the port is live */

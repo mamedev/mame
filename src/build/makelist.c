@@ -122,7 +122,7 @@ int parse_file(const char *srcfile)
 			in_import = true;
 			continue;
 		}
-		
+
 		// if we hit a C++ comment, scan to the end of line
 		if (c == '/' && *srcptr == '/')
 		{
@@ -132,7 +132,7 @@ int parse_file(const char *srcfile)
 		}
 
 		if (in_import) {
-			in_import = false;	
+			in_import = false;
 			char filename[256];
 			filename[0] = 0;
 			srcptr--;

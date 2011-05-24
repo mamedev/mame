@@ -489,7 +489,7 @@ static void smpc_intback(running_machine &machine, UINT8 sys_type,system_time sy
 	{
 		state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
     	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
-   		state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+		state->m_smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
     	state->m_smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
     	state->m_smpc_ram[0x2b] = dec_2_bcd(systime.local_time.hour);
     	state->m_smpc_ram[0x2d] = dec_2_bcd(systime.local_time.minute);
@@ -588,12 +588,12 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 	if(offset == 0x75)
 	{
 		/*
-		-xx- ---- PDR1
-		---x ---- EEPROM write bit
-		---- x--- EEPROM CLOCK line
-		---- -x-- EEPROM CS line
-		---- --xx A-Bus bank bits
-		*/
+        -xx- ---- PDR1
+        ---x ---- EEPROM write bit
+        ---- x--- EEPROM CLOCK line
+        ---- -x-- EEPROM CS line
+        ---- --xx A-Bus bank bits
+        */
 		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
 		eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom->write_bit(data & 0x10);
@@ -608,7 +608,7 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 	if(offset == 0x77)
 	{
 		/*
-			-xx- ---- PDR2
+            -xx- ---- PDR2
             ---x ---- Enable Sound System (ACTIVE LOW)
         */
 		//popmessage("PDR2 = %02x",state->m_smpc_ram[0x77]);
@@ -624,9 +624,9 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 	if(offset == 0x7d)
 	{
 		/*
-		---- --x- IOSEL2 direct (1) / control mode (0) port select
-		---- ---x IOSEL1 direct (1) / control mode (0) port select
-		*/
+        ---- --x- IOSEL2 direct (1) / control mode (0) port select
+        ---- ---x IOSEL1 direct (1) / control mode (0) port select
+        */
 		state->m_smpc.IOSEL1 = (state->m_smpc_ram[0x7d] & 1) >> 0;
 		state->m_smpc.IOSEL2 = (state->m_smpc_ram[0x7d] & 2) >> 1;
 	}
@@ -823,7 +823,7 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 		state->m_smpc.EXLE1 = (state->m_smpc_ram[0x7f] & 1) >> 0;
 		state->m_smpc.EXLE2 = (state->m_smpc_ram[0x7f] & 2) >> 1;
 		//if(state->m_smpc.EXLE1 || state->m_smpc.EXLE2)
-		//	cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
+		//  cputag_set_input_line_and_vector(space->machine(), "maincpu", 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 	}
 
 	if (offset == 0x1f)
@@ -1303,7 +1303,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		if(state->m_scu_regs[offset] & 1 && ((state->m_scu_regs[offset+1] & 7) == 7) && state->m_scu_regs[offset] & 0x100)
 		{
 			if(DIRECT_MODE(DMA_CH)) { scu_dma_direct(space,DMA_CH);   }
-			else			   	    { scu_dma_indirect(space,DMA_CH); }
+			else				    { scu_dma_indirect(space,DMA_CH); }
 
 			state->m_scu_regs[offset]&=~1;//disable starting bit.
 		}
@@ -2397,15 +2397,15 @@ static TIMER_CALLBACK(stv_rtc_increment)
 	state->m_smpc_ram[0x2f]++;
 
 	/* seconds from 9 -> 10*/
-	if((state->m_smpc_ram[0x2f] & 0x0f) >= 0x0a) 			{ state->m_smpc_ram[0x2f]+=0x10; state->m_smpc_ram[0x2f]&=0xf0; }
+	if((state->m_smpc_ram[0x2f] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2f]+=0x10; state->m_smpc_ram[0x2f]&=0xf0; }
 	/* seconds from 59 -> 0 */
-	if((state->m_smpc_ram[0x2f] & 0xf0) >= 0x60) 			{ state->m_smpc_ram[0x2d]++;     state->m_smpc_ram[0x2f] = 0; }
+	if((state->m_smpc_ram[0x2f] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2d]++;     state->m_smpc_ram[0x2f] = 0; }
 	/* minutes from 9 -> 10 */
-	if((state->m_smpc_ram[0x2d] & 0x0f) >= 0x0a) 			{ state->m_smpc_ram[0x2d]+=0x10; state->m_smpc_ram[0x2d]&=0xf0; }
+	if((state->m_smpc_ram[0x2d] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2d]+=0x10; state->m_smpc_ram[0x2d]&=0xf0; }
 	/* minutes from 59 -> 0 */
-	if((state->m_smpc_ram[0x2d] & 0xf0) >= 0x60) 			{ state->m_smpc_ram[0x2b]++;     state->m_smpc_ram[0x2d] = 0; }
+	if((state->m_smpc_ram[0x2d] & 0xf0) >= 0x60)			{ state->m_smpc_ram[0x2b]++;     state->m_smpc_ram[0x2d] = 0; }
 	/* hours from 9 -> 10 */
-	if((state->m_smpc_ram[0x2b] & 0x0f) >= 0x0a) 			{ state->m_smpc_ram[0x2b]+=0x10; state->m_smpc_ram[0x2b]&=0xf0; }
+	if((state->m_smpc_ram[0x2b] & 0x0f) >= 0x0a)			{ state->m_smpc_ram[0x2b]+=0x10; state->m_smpc_ram[0x2b]&=0xf0; }
 	/* hours from 23 -> 0 */
 	if((state->m_smpc_ram[0x2b] & 0xff) >= 0x24)				{ state->m_smpc_ram[0x29]++; state->m_smpc_ram[0x27]+=0x10; state->m_smpc_ram[0x2b] = 0; }
 	/* week day name sunday -> monday */
@@ -2898,9 +2898,9 @@ static const struct stv_cart_region stv_cart_table[] =
 
 static DEVICE_IMAGE_LOAD( stv_cart )
 {
-//	saturn_state *state = image.device().machine().driver_data<saturn_state>();
+//  saturn_state *state = image.device().machine().driver_data<saturn_state>();
 	const struct stv_cart_region *stv_cart = &stv_cart_table[0], *this_cart;
-	//const char	*pcb_name;
+	//const char    *pcb_name;
 
 	/* First, determine where this cart has to be loaded */
 	while (stv_cart->tag)
@@ -2940,7 +2940,7 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 	}
 
 	//if ((pcb_name = image.get_feature("pcb_type")) == NULL)
-	//	return IMAGE_INIT_FAIL;
+	//  return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
 }

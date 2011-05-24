@@ -974,7 +974,7 @@ void input_port_list_init(device_t &device, ioport_list &portlist, astring &erro
 	/* detokenize into the list */
 	(*constructor)(device, portlist, errorbuf);
 
-	// collapse fields and sort the list 
+	// collapse fields and sort the list
 	for (input_port_config *port = portlist.first(); port != NULL; port = port->next())
 		port->collapse_fields(errorbuf);
 }
@@ -3004,7 +3004,7 @@ void input_port_config::collapse_fields(astring &errorbuf)
 void field_config_insert(input_field_config &newfield, input_port_value &disallowedbits, astring &errorbuf)
 {
 	input_port_value lowbit;
-	
+
 	/* verify against the disallowed bits, but only if we are condition-free */
 	if (newfield.condition.condition == PORTCOND_ALWAYS)
 	{

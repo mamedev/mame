@@ -779,7 +779,7 @@ void mc6845_device::device_start()
 	m_adjust_active = 0;
 	m_horiz_sync_pos = 1;
 	m_vert_sync_pos = 1;
-	m_de = 0;		
+	m_de = 0;
 	m_sync_width = 1;
 	m_vert_char_total = 0;
 	m_vert_disp = 0;
