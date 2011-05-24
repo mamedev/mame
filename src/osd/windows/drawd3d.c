@@ -87,8 +87,8 @@ extern void mtlog_add(const char *event);
 
 #define ENABLE_BORDER_PIX	(1)
 
-#define VERTEX_BASE_FORMAT	(D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEX2)
-#define VERTEX_BUFFER_SIZE	(2048*6+6)
+#define VERTEX_BASE_FORMAT	(D3DFVF_DIFFUSE | D3DFVF_TEX1)
+#define VERTEX_BUFFER_SIZE	(2048*4+4)
 
 enum
 {
@@ -167,7 +167,6 @@ struct _d3d_vertex
 	float					rhw;						// RHW when no HLSL, padding when HLSL
 	D3DCOLOR				color;						// diffuse color
 	float					u0, v0;						// texture stage 0 coordinates
-	float					uv_stretch, pad;			// UV stretch (used by HLSL)
 };
 
 
@@ -799,19 +798,19 @@ INLINE void set_texture(d3d_info *d3d, texture_info *texture)
 	{
 		d3d->last_texture = texture;
 		d3d->last_texture_flags = (texture == NULL ? 0 : texture->flags);
-		result = (*d3dintf->device.set_texture)(d3d->device, 0, (texture == NULL) ? NULL : texture->d3dfinaltex);
+		result = (*d3dintf->device.set_texture)(d3d->device, 0, (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 		if(d3d->hlsl_enable && d3d->effect != NULL)
 		{
-			(*d3dintf->effect.set_texture)(d3d->effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
+			(*d3dintf->effect.set_texture)(d3d->effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 			if(d3d->yiq_enable)
 			{
-				(*d3dintf->effect.set_texture)(d3d->yiq_encode_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
+				(*d3dintf->effect.set_texture)(d3d->yiq_encode_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 			}
 			else
 			{
-				(*d3dintf->effect.set_texture)(d3d->color_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
+				(*d3dintf->effect.set_texture)(d3d->color_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 			}
-			(*d3dintf->effect.set_texture)(d3d->pincushion_effect, "Diffuse", (texture == NULL) ? NULL : texture->d3dfinaltex);
+			(*d3dintf->effect.set_texture)(d3d->pincushion_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 		}
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 	}
@@ -1162,9 +1161,8 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 	}
 
 mtlog_add("drawd3d_window_draw: begin");
-
 	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
-	if(result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
 	// first update any textures
 	window->primlist->acquire_lock();
@@ -1309,7 +1307,7 @@ try_again:
 
 	// create the D3D device
 	result = (*d3dintf->d3d.create_device)(d3dintf, d3d->adapter, D3DDEVTYPE_HAL, win_window_list->hwnd,
-					D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3d->presentation, &d3d->device);
+					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3d->presentation, &d3d->device);
 	if (result != D3D_OK)
 	{
 		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
@@ -1507,7 +1505,7 @@ static int device_create_resources(d3d_info *d3d)
 	// allocate a vertex buffer to use
 	result = (*d3dintf->device.create_vertex_buffer)(d3d->device,
 				sizeof(d3d_vertex) * VERTEX_BUFFER_SIZE,
-				D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
+				D3DUSAGE_DYNAMIC | D3DUSAGE_SOFTWAREPROCESSING | D3DUSAGE_WRITEONLY,
 				VERTEX_BASE_FORMAT | ((d3d->hlsl_enable && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW), D3DPOOL_DEFAULT, &d3d->vertexbuf);
 	if (result != D3D_OK)
 	{
@@ -1552,7 +1550,7 @@ static int device_create_resources(d3d_info *d3d)
 	reset_render_states(d3d);
 
 	// clear the buffer
-	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(255,0,0,0), 0, 0);
+	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	result = (*d3dintf->device.present)(d3d->device, NULL, NULL, NULL, NULL, 0);
 
 	// experimental: if we have a vector bitmap, create a texture for it
@@ -2352,11 +2350,6 @@ static void draw_line(d3d_info *d3d, const render_primitive *prim)
 
 			vertex[3].u0 = d3d->vector_texture->ustop;
 			vertex[3].v0 = d3d->vector_texture->vstop;
-
-			vertex[0].uv_stretch = 1.0f;
-			vertex[1].uv_stretch = 1.0f;
-			vertex[2].uv_stretch = 1.0f;
-			vertex[3].uv_stretch = 1.0f;
 		}
 		else if(d3d->default_texture != NULL)
 		{
@@ -2371,18 +2364,6 @@ static void draw_line(d3d_info *d3d, const render_primitive *prim)
 
 			vertex[3].u0 = d3d->default_texture->ustart;
 			vertex[3].v0 = d3d->default_texture->vstart;
-
-			vertex[0].uv_stretch = 0.0f;
-			vertex[1].uv_stretch = 0.0f;
-			vertex[2].uv_stretch = 0.0f;
-			vertex[3].uv_stretch = 0.0f;
-		}
-		else
-		{
-			vertex[0].uv_stretch = 0.0f;
-			vertex[1].uv_stretch = 0.0f;
-			vertex[2].uv_stretch = 0.0f;
-			vertex[3].uv_stretch = 0.0f;
 		}
 
 		// set the color, Z parameters to standard values
@@ -2422,7 +2403,7 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	texture = texture != NULL ? texture : d3d->default_texture;
 
 	// get a pointer to the vertex buffer
-	vertex = primitive_alloc(d3d, 6);
+	vertex = primitive_alloc(d3d, 4);
 	if (vertex == NULL)
 		return;
 
@@ -2433,13 +2414,8 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	vertex[1].y = prim->bounds.y0 - 0.5f;
 	vertex[2].x = prim->bounds.x0 - 0.5f;
 	vertex[2].y = prim->bounds.y1 - 0.5f;
-
-	vertex[3].x = vertex[1].x;
-	vertex[3].y = vertex[1].y;
-	vertex[4].x = vertex[2].x;
-	vertex[4].y = vertex[2].y;
-	vertex[5].x = prim->bounds.x1 - 0.5f;
-	vertex[5].y = prim->bounds.y1 - 0.5f;
+	vertex[3].x = prim->bounds.x1 - 0.5f;
+	vertex[3].y = prim->bounds.y1 - 0.5f;
 
 	// set the texture coordinates
 	if(texture != NULL)
@@ -2452,29 +2428,8 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 		vertex[1].v0 = texture->vstart + dv * prim->texcoords.tr.v;
 		vertex[2].u0 = texture->ustart + du * prim->texcoords.bl.u;
 		vertex[2].v0 = texture->vstart + dv * prim->texcoords.bl.v;
-
-		vertex[3].u0 = texture->ustart + du * prim->texcoords.tr.u;
-		vertex[3].v0 = texture->vstart + dv * prim->texcoords.tr.v;
-		vertex[4].u0 = texture->ustart + du * prim->texcoords.bl.u;
-		vertex[4].v0 = texture->vstart + dv * prim->texcoords.bl.v;
-		vertex[5].u0 = texture->ustart + du * prim->texcoords.br.u;
-		vertex[5].v0 = texture->vstart + dv * prim->texcoords.br.v;
-
-		vertex[0].uv_stretch = 1.0f;
-		vertex[1].uv_stretch = 1.0f;
-		vertex[2].uv_stretch = 1.0f;
-		vertex[3].uv_stretch = 1.0f;
-		vertex[4].uv_stretch = 1.0f;
-		vertex[5].uv_stretch = 1.0f;
-	}
-	else
-	{
-		vertex[0].uv_stretch = 1.0f;
-		vertex[1].uv_stretch = 1.0f;
-		vertex[2].uv_stretch = 1.0f;
-		vertex[3].uv_stretch = 1.0f;
-		vertex[4].uv_stretch = 1.0f;
-		vertex[5].uv_stretch = 1.0f;
+		vertex[3].u0 = texture->ustart + du * prim->texcoords.br.u;
+		vertex[3].v0 = texture->vstart + dv * prim->texcoords.br.v;
 	}
 
 	// determine the color, allowing for over modulation
@@ -2506,7 +2461,7 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
-	for (i = 0; i < 6; i++)
+	for (i = 0; i < 4; i++)
 	{
 		vertex[i].z = 0.0f;
 		vertex[i].rhw = 1.0f;
@@ -2515,9 +2470,9 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 
 	// now add a polygon entry
 	poly = &d3d->poly[d3d->numpolys++];
-	poly->type = D3DPT_TRIANGLELIST;
+	poly->type = D3DPT_TRIANGLESTRIP;
 	poly->count = 2;
-	poly->numverts = 6;
+	poly->numverts = 4;
 	poly->flags = prim->flags;
 	poly->modmode = modmode;
 	poly->texture = texture;
@@ -2532,7 +2487,7 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 static void init_fsfx_quad(d3d_info *d3d)
 {
 	// get a pointer to the vertex buffer
-	d3d->fsfx_vertices = primitive_alloc(d3d, 6);
+	d3d->fsfx_vertices = primitive_alloc(d3d, 4);
 	if (d3d->fsfx_vertices == NULL)
 		return;
 
@@ -2547,12 +2502,8 @@ static void init_fsfx_quad(d3d_info *d3d)
 	d3d->fsfx_vertices[1].y = 0.0f;
 	d3d->fsfx_vertices[2].x = (d3d->width * (scale_bottom * 0.5f - 0.5f));
 	d3d->fsfx_vertices[2].y = d3d->height;
-	d3d->fsfx_vertices[3].x = d3d->width - (d3d->width * (scale_top * 0.5f - 0.5f));
-	d3d->fsfx_vertices[3].y = 0.0f;
-	d3d->fsfx_vertices[4].x = (d3d->width * (scale_bottom * 0.5f - 0.5f));
-	d3d->fsfx_vertices[4].y = d3d->height;
-	d3d->fsfx_vertices[5].x = d3d->width - (d3d->width * (scale_bottom * 0.5f - 0.5f));
-	d3d->fsfx_vertices[5].y = d3d->height;
+	d3d->fsfx_vertices[3].x = d3d->width - (d3d->width * (scale_bottom * 0.5f - 0.5f));
+	d3d->fsfx_vertices[3].y = d3d->height;
 
 	d3d->fsfx_vertices[0].u0 = 0.0f;
 	d3d->fsfx_vertices[0].v0 = 0.0f;
@@ -2561,14 +2512,10 @@ static void init_fsfx_quad(d3d_info *d3d)
 	d3d->fsfx_vertices[2].u0 = 0.0f;
 	d3d->fsfx_vertices[2].v0 = 1.0f;
 	d3d->fsfx_vertices[3].u0 = 1.0f;
-	d3d->fsfx_vertices[3].v0 = 0.0f;
-	d3d->fsfx_vertices[4].u0 = 0.0f;
-	d3d->fsfx_vertices[4].v0 = 1.0f;
-	d3d->fsfx_vertices[5].u0 = 1.0f;
-	d3d->fsfx_vertices[5].v0 = 1.0f;
+	d3d->fsfx_vertices[3].v0 = 1.0f;
 
 	// set the color, Z parameters to standard values
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		d3d->fsfx_vertices[i].z = 0.0f;
 		d3d->fsfx_vertices[i].rhw = 1.0f;
@@ -2656,7 +2603,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 	{
 		result = (*d3dintf->device.get_render_target)(d3d->device, 0, &backbuffer);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
-		vertnum = 6;
+		vertnum = 4;
 	}
 	else
 	{

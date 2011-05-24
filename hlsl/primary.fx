@@ -24,7 +24,6 @@ struct VS_OUTPUT
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 struct VS_INPUT
@@ -32,14 +31,12 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 //-----------------------------------------------------------------------------
@@ -64,7 +61,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	Output.TexCoord = lerp(Input.TexCoord, Input.Position.xy / float2(TargetWidth, TargetHeight), PostPass);
-	Output.ExtraInfo = Input.ExtraInfo;
 
 	return Output;
 }
@@ -76,7 +72,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	return lerp(Input.Color, BaseTexel * Input.Color, Input.ExtraInfo.x);
+	return BaseTexel * Input.Color;
 }
 
 //-----------------------------------------------------------------------------

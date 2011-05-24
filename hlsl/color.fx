@@ -24,7 +24,6 @@ struct VS_OUTPUT
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 struct VS_INPUT
@@ -32,14 +31,12 @@ struct VS_INPUT
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 //-----------------------------------------------------------------------------
@@ -70,7 +67,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
 	Output.TexCoord = Input.TexCoord;
-	Output.ExtraInfo = Input.ExtraInfo;
 
 	return Output;
 }

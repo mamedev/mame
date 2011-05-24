@@ -24,7 +24,6 @@ struct VS_OUTPUT
 	float4 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 	float2 RedCoord : TEXCOORD2;
 	float2 GreenCoord : TEXCOORD3;
 	float2 BlueCoord : TEXCOORD4;
@@ -35,14 +34,12 @@ struct VS_INPUT
 	float3 Position : POSITION;
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 };
 
 struct PS_INPUT
 {
 	float4 Color : COLOR0;
 	float2 TexCoord : TEXCOORD0;
-	float2 ExtraInfo : TEXCOORD1;
 	float2 RedCoord : TEXCOORD2;
 	float2 GreenCoord : TEXCOORD3;
 	float2 BlueCoord : TEXCOORD4;
