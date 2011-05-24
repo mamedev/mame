@@ -207,7 +207,7 @@ READ16_HANDLER( K053250_0_rom_r );
 
 void K053250_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
-void K053250_unpack_pixels(running_machine &machine, const char *region);
+void K053250_unpack_pixels(running_machine &machine, const char *src_region, const char *dst_region);
 
 
 // K053252 CRT and interrupt control unit

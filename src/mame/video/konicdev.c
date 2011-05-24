@@ -6453,33 +6453,12 @@ READ32_DEVICE_HANDLER( k056832_6bpp_rom_long_r )
 READ16_DEVICE_HANDLER( k056832_rom_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int ofs16, ofs8;
-	UINT8 *rombase;
-	int ret;
-
-	ofs16 = (offset / 8)*5;
-	ofs8 = (offset / 4)*5;
-
-	ofs16 += (k056832->cur_gfx_banks * 5 * 1024);
-	ofs8 += (k056832->cur_gfx_banks * 10 * 1024);
+	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
-	{
 		k056832->rombase = device->machine().region(k056832->memory_region)->base();
-	}
-	rombase = (UINT8 *)k056832->rombase;
 
-	ret = (rombase[ofs8 + 4]<<8);
-	if ((offset % 8) >= 4)
-	{
-		ret |= (rombase[ofs16 + 1] << 24) | (rombase[ofs16 + 3] << 16);
-	}
-	else
-	{
-		ret |= (rombase[ofs16] << 24) | (rombase[ofs16 + 2] << 16);
-	}
-
-	return ret;
+	return k056832->rombase[addr + 1] | (k056832->rombase[addr] << 8);
 }
 
 // data is arranged like this:
@@ -8528,20 +8507,19 @@ READ16_DEVICE_HANDLER( k053250_rom_r )
 {
 	k053250_state *k053250 = k053250_get_safe_token(device);
 
-//  if (!(k053250->regs[5] & 1)) logerror("Back: Reading rom memory with enable=0\n");
-
-	return *(k053250->base + 0x80000 * k053250->regs[6] + 0x800 * k053250->regs[7] + (offset >> 1));
+	return *(k053250->base + 0x80000 * k053250->regs[6] + 0x800 * k053250->regs[7] + (offset >> 1)) & 0x0f;
 }
 
 
 // Pixel data of the k053250 is nibble packed. It's preferable to be unpacked into byte format.
-static void k053250_unpack_pixels(running_machine &machine, const char *region)
+static void k053250_unpack_pixels(running_machine &machine, const char *src_region, const char *dst_region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = machine.region(region)->base();
-	offset = machine.region(region)->bytes() / 2 - 1;
+	dst_ptr = machine.region(dst_region)->base();
+	src_ptr = machine.region(src_region)->base();
+	offset = machine.region(dst_region)->bytes() / 2 - 1;
 
 	do
 	{
@@ -8959,7 +8937,7 @@ static DEVICE_START( k053250 )
 	k053250->offsy = intf->yoff;
 
 	/* unpack graphics */
-	k053250_unpack_pixels(device->machine(), intf->gfx_memory_region);
+	k053250_unpack_pixels(device->machine(), intf->gfx_memory_region, intf->gfx_memory_region_unpack);
 
 	device->save_pointer(NAME(k053250->ram), 0x6000 / 2);
 	device->save_item(NAME(k053250->regs));

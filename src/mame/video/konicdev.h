@@ -126,6 +126,7 @@ struct _k053250_interface
 {
 	const char         *screen;
 	const char         *gfx_memory_region;
+	const char         *gfx_memory_region_unpack;
 	int                xoff, yoff;
 };
 

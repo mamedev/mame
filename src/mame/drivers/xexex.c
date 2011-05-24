@@ -432,6 +432,7 @@ static const k054338_interface xexex_k054338_intf =
 static const k053250_interface xexex_k053250_intf =
 {
 	"screen",
+	"gfx4",
 	"gfx3",
 	-5, -16
 };
@@ -683,7 +684,10 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067_b10.rom", 0x200000, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
 	ROM_LOAD( "067_b09.rom", 0x300000, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
 
 	ROM_REGION( 0x300000, "k054539", 0 )

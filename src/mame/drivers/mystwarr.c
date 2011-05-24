@@ -1575,7 +1575,11 @@ ROM_START( metamrph )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
+
+	/* K053250 linescroll/zoom thingy (unpacked) */
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
 	/* sound data */
@@ -2090,7 +2094,7 @@ ROM_END
 
 static DRIVER_INIT(metamrph)
 {
-	K053250_unpack_pixels(machine, "gfx3");
+	K053250_unpack_pixels(machine, "gfx4", "gfx3");
 }
 
 

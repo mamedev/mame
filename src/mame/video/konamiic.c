@@ -3362,13 +3362,13 @@ static void K053250_dma(running_machine &machine, int chip, int limiter)
 }
 
 // Pixel data of the K053250 is nibble packed. It's preferable to be unpacked into byte format.
-void K053250_unpack_pixels(running_machine &machine, const char *region)
+void K053250_unpack_pixels(running_machine &machine, const char *src_region, const char *dst_region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = machine.region(region)->base();
-	offset = machine.region(region)->bytes() / 2 - 1;
+	dst_ptr = src_ptr = machine.region(dst_region)->base();
+	offset = machine.region(src_region)->bytes() / 2 - 1;
 
 	do
 	{

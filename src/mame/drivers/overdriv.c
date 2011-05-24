@@ -335,6 +335,7 @@ static MACHINE_RESET( overdriv )
 static const k053250_interface overdriv_k053250_intf_1 =
 {
 	"screen",
+	"gfx6",
 	"gfx4",
 	0, 0 //TODO
 };
@@ -342,6 +343,7 @@ static const k053250_interface overdriv_k053250_intf_1 =
 static const k053250_interface overdriv_k053250_intf_2 =
 {
 	"screen",
+	"gfx7",
 	"gfx5",
 	0, 0 //TODO
 };
@@ -461,13 +463,22 @@ ROM_START( overdriv )
 	// 19 current 0x4096 correct: 0xf21e
 	// 20 current 0x0000 correct: 0xa317
 
-	ROM_REGION( 0x0c0000*2, "gfx4", ROMREGION_ERASE00 )	/* graphics (addressable by the CPU) */
+	ROM_REGION( 0x0c0000, "gfx4", ROMREGION_ERASE00 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e19.r22",      0x000000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
 	ROM_LOAD( "e18.p22",      0x040000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )	/* 053250 #0 */
 	ROM_LOAD( "e20.s22",      0x080000, 0x040000, CRC(ea204acd) SHA1(52b8c30234eaefcba1074496028a4ac2bca48e95) )
 
-	ROM_REGION( 0x080000*2, "gfx5", ROMREGION_ERASE00 )	/* unknown (053250?) */
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_ERASE00 )	/* unknown (053250?) */
 	ROM_LOAD( "e16.p12",      0x000000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )	/* 053250 #1 */
+	ROM_LOAD( "e17.p17",      0x040000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
+
+	ROM_REGION( 0x0c0000*2, "gfx4", ROMREGION_ERASE00 )	/* graphics (addressable by the CPU, unpacked) */
+	ROM_LOAD( "e19.r22",      0x000000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
+	ROM_LOAD( "e18.p22",      0x040000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )	/* 053250 #0, unpacked */
+	ROM_LOAD( "e20.s22",      0x080000, 0x040000, CRC(ea204acd) SHA1(52b8c30234eaefcba1074496028a4ac2bca48e95) )
+
+	ROM_REGION( 0x080000*2, "gfx5", ROMREGION_ERASE00 )	/* unknown (053250, unpacked?) */
+	ROM_LOAD( "e16.p12",      0x000000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )	/* 053250 #1, unpacked */
 	ROM_LOAD( "e17.p17",      0x040000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
 
 	ROM_REGION( 0x200000, "shared", 0 )	/* 053260 samples */
