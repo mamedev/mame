@@ -5477,35 +5477,23 @@ VIDEO_START( stv_vdp2 )
 void stv_vdp2_dynamic_res_change(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int horz_res = 0,vert_res = 0;
+	const int d_vres[4] = { 224, 240, 256, 256 };
+	const int d_hres[4] = { 320, 352, 640, 704 };
+	int horz_res,vert_res;
 
-	switch( STV_VDP2_VRES & 3 )
-	{
-		case 0: vert_res = 224; break;
-		case 1: vert_res = 240; break;
-		case 2: vert_res = 256; break;
-		case 3:
-			if(LOG_VDP2) logerror("WARNING: V Res setting (3) not allowed!\n");
-			vert_res = 256;
-			break;
-	}
+	vert_res = d_vres[STV_VDP2_VRES & 3];
+
+	if((STV_VDP2_VRES & 3) == 3)
+		popmessage("Illegal VRES MODE, contact MAMEdev");
 
 	/*Double-density interlace mode,doubles the vertical res*/
 	if((STV_VDP2_LSMD & 3) == 3) { vert_res*=2;  }
 
-	switch( STV_VDP2_HRES & 7 )
-	{
-		case 0: horz_res = 320; break;
-		case 1: horz_res = 352; break;
-		case 2: horz_res = 640; break;
-		case 3: horz_res = 704; break;
-		/*Exclusive modes,they sets the Vertical Resolution without considering the
-            VRES register.*/
-		case 4: horz_res = 320; vert_res = 480; break;
-		case 5: horz_res = 352; vert_res = 480; break;
-		case 6: horz_res = 640; vert_res = 480; break;
-		case 7: horz_res = 704; vert_res = 480; break;
-	}
+	horz_res = d_hres[STV_VDP2_HRES & 3];
+	/*Exclusive modes,they sets the Vertical Resolution without considering the
+      VRES register.*/
+	if(STV_VDP2_HRES & 4)
+		vert_res = 480;
 
 	{
 		int vblank_period,hblank_period;
