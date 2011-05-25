@@ -554,7 +554,7 @@ DRIVER_INIT(maruchan)
 
 DRIVER_INIT(pblbeach)
 {
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x605eb78);
+	//sh2drc_add_pcflush(machine.device("maincpu"), 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
 }

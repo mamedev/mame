@@ -1416,11 +1416,20 @@ static WRITE32_HANDLER( saturn_scu_w )
 }
 
 /*Lv 0 DMA end irq*/
+#ifdef UNUSED_FUNCTION
+	/*TODO: timing of this, clean up */
+	switch(dma_ch)
+	{
+		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
+		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
+		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+	}
+
 static TIMER_CALLBACK( dma_lv0_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	cputag_set_input_line_and_vector(machine, "maincpu", 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
+	device_set_input_line_and_vector(state->m_maincpu, 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
 
 	DnMV_0(0);
 }
@@ -1430,7 +1439,7 @@ static TIMER_CALLBACK( dma_lv1_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
+	device_set_input_line_and_vector(state->m_maincpu, 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
 
 	DnMV_0(1);
 }
@@ -1440,10 +1449,11 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	cputag_set_input_line_and_vector(machine, "maincpu", 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
+	device_set_input_line_and_vector(state->m_maincpu, 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
 
 	DnMV_0(2);
 }
+#endif
 
 static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
@@ -1461,10 +1471,9 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 
 	/*set here the boundaries checks*/
 	/*...*/
-
 	if((state->m_scu.dst_add[dma_ch] != state->m_scu.src_add[dma_ch]) && (ABUS(dma_ch)))
 	{
-		logerror("A-Bus invalid transfer,sets to default\n");
+		logerror("A-Bus invalid transfer, sets to default\n");
 		scu_add_tmp = (state->m_scu.dst_add[dma_ch]*0x100) | (state->m_scu.src_add[dma_ch]);
 		state->m_scu.dst_add[dma_ch] = state->m_scu.src_add[dma_ch] = 4;
 		scu_add_tmp |= 0x80000000;
@@ -1543,12 +1552,13 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(dma_ch != 2)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	/*TODO: timing of this, clean up */
-	switch(dma_ch)
+	/*TODO: insta-timed irq! Peeble Bitch is pretty picky with delayed irqs ...  */
 	{
-		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
+		static int dma_irq_line[3] =   { 5, 6, 6 };
+		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
+
+		device_set_input_line_and_vector(state->m_maincpu, dma_irq_line[dma_ch], (stv_irq.dma_end[dma_ch]) ? HOLD_LINE : CLEAR_LINE, dma_irq_vector[dma_ch]);
+		DnMV_0(dma_ch);
 	}
 
 	if(scu_add_tmp & 0x80000000)
@@ -1619,12 +1629,13 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 	}while(job_done == 0);
 
-	/*TODO: timing of this, clean up */
-	switch(dma_ch)
+	/*TODO: insta-timed irq! Peeble Bitch is pretty picky with delayed irqs ...  */
 	{
-		case 0: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv0_ended)); break;
-		case 1: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv1_ended)); break;
-		case 2: space->machine().scheduler().timer_set(attotime::from_usec(3000), FUNC(dma_lv2_ended)); break;
+		static int dma_irq_line[3] =   { 5, 6, 6 };
+		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
+
+		device_set_input_line_and_vector(state->m_maincpu, dma_irq_line[dma_ch], (stv_irq.dma_end[dma_ch]) ? HOLD_LINE : CLEAR_LINE, dma_irq_vector[dma_ch]);
+		DnMV_0(dma_ch);
 	}
 }
 
@@ -2555,7 +2566,8 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	else if((scanline % y_step) == 0 && scanline < 240*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
 
-	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0) && scanline < 240*y_step)
+	/* TODO: this isn't completely correct */
+	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0))
 		device_set_input_line_and_vector(state->m_maincpu, 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 );
 
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
