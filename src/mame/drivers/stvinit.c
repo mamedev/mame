@@ -251,11 +251,15 @@ DRIVER_INIT(diehard)
 
 DRIVER_INIT(fhboxers)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x60041c2);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x600bb0a);
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x600b31e);
 
 	DRIVER_INIT_CALL(stv);
+
+	state->m_instadma_hack = 1;
 }
 
 DRIVER_INIT( groovef )
@@ -554,9 +558,14 @@ DRIVER_INIT(maruchan)
 
 DRIVER_INIT(pblbeach)
 {
+	saturn_state *state = machine.driver_data<saturn_state>();
+
 	//sh2drc_add_pcflush(machine.device("maincpu"), 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
+
+	state->m_instadma_hack = 1;
+
 }
 
 DRIVER_INIT(shanhigw)

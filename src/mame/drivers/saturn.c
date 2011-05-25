@@ -1416,20 +1416,11 @@ static WRITE32_HANDLER( saturn_scu_w )
 }
 
 /*Lv 0 DMA end irq*/
-#ifdef UNUSED_FUNCTION
-	/*TODO: timing of this, clean up */
-	switch(dma_ch)
-	{
-		case 0: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv0_ended)); break;
-		case 1: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv1_ended)); break;
-		case 2: space->machine().scheduler().timer_set(attotime::from_usec(300), FUNC(dma_lv2_ended)); break;
-	}
-
 static TIMER_CALLBACK( dma_lv0_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line_and_vector(state->m_maincpu, 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
+	if(stv_irq.dma_end[0]) device_set_input_line_and_vector(state->m_maincpu, 5, HOLD_LINE, 0x4b);
 
 	DnMV_0(0);
 }
@@ -1439,7 +1430,7 @@ static TIMER_CALLBACK( dma_lv1_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line_and_vector(state->m_maincpu, 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
+	if(stv_irq.dma_end[1]) device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x4a);
 
 	DnMV_0(1);
 }
@@ -1449,11 +1440,10 @@ static TIMER_CALLBACK( dma_lv2_ended )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	device_set_input_line_and_vector(state->m_maincpu, 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
+	if(stv_irq.dma_end[2])	device_set_input_line_and_vector(state->m_maincpu, 6, HOLD_LINE, 0x49);
 
 	DnMV_0(2);
 }
-#endif
 
 static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 {
@@ -1552,13 +1542,14 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(dma_ch != 2)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	/*TODO: insta-timed irq! Pebble Beach is pretty picky with delayed irqs ...  */
 	{
-		static int dma_irq_line[3] =   { 5, 6, 6 };
-		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
-
-		device_set_input_line_and_vector(state->m_maincpu, dma_irq_line[dma_ch], (stv_irq.dma_end[dma_ch]) ? HOLD_LINE : CLEAR_LINE, dma_irq_vector[dma_ch]);
-		DnMV_0(dma_ch);
+		/*TODO: this is completely wrong HW-wise ...  */
+		switch(dma_ch)
+		{
+			case 0: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv0_ended)); break;
+			case 1: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv1_ended)); break;
+			case 2: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv2_ended)); break;
+		}
 	}
 
 	if(scu_add_tmp & 0x80000000)
@@ -1629,13 +1620,14 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 	}while(job_done == 0);
 
-	/*TODO: insta-timed irq! Pebble Beach is pretty picky with delayed irqs ...  */
 	{
-		static int dma_irq_line[3] =   { 5, 6, 6 };
-		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
-
-		device_set_input_line_and_vector(state->m_maincpu, dma_irq_line[dma_ch], (stv_irq.dma_end[dma_ch]) ? HOLD_LINE : CLEAR_LINE, dma_irq_vector[dma_ch]);
-		DnMV_0(dma_ch);
+		/*TODO: this is completely wrong HW-wise ...  */
+		switch(dma_ch)
+		{
+			case 0: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv0_ended)); break;
+			case 1: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv1_ended)); break;
+			case 2: space->machine().scheduler().timer_set(attotime::from_usec(state->m_instadma_hack ? 0 : 300), FUNC(dma_lv2_ended)); break;
+		}
 	}
 }
 
@@ -2218,6 +2210,8 @@ DRIVER_INIT ( stv )
     state->m_smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  state->m_smpc_ram[0x33] = input_port_read(machine, "FAKE");
 	state->m_smpc_ram[0x5f] = 0x10;
+
+	state->m_instadma_hack = 0;
 
 	#ifdef MAME_DEBUG
 	/*Uncomment this to enable header info*/
