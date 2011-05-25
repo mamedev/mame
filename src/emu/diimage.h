@@ -46,8 +46,6 @@
 #ifndef __DIIMAGE_H__
 #define __DIIMAGE_H__
 
-#include "pool.h"
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -245,11 +243,6 @@ public:
 	UINT32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
 
-	void *image_malloc(size_t size);
-	char *image_strdup(const char *src);
-	void *image_realloc(void *ptr, size_t size);
-	void image_freeptr(void *ptr);
-
 	UINT32 crc();
 	hash_collection& hash() { return m_hash; }
 
@@ -309,8 +302,6 @@ protected:
     /* special - used when creating */
     int m_create_format;
     option_resolution *m_create_args;
-
-	object_pool *m_mempool;
 
 	hash_collection m_hash;
 };

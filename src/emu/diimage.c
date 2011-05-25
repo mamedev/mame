@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "ui.h"
-#include "pool.h"
 #include "zippath.h"
 
 
@@ -70,16 +69,6 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 //  DEVICE IMAGE INTERFACE
 //**************************************************************************
 
-/*-------------------------------------------------
-    memory_error - report a memory error
--------------------------------------------------*/
-
-static void memory_error(const char *message)
-{
-    fatalerror("%s", message);
-}
-
-
 //-------------------------------------------------
 //  device_image_interface - constructor
 //-------------------------------------------------
@@ -94,7 +83,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
       m_readonly(false),
       m_created(false)
 {
-	m_mempool = pool_alloc_lib(memory_error);
 }
 
 
@@ -104,7 +92,6 @@ device_image_interface::device_image_interface(const machine_config &mconfig, de
 
 device_image_interface::~device_image_interface()
 {
-    pool_free_lib(m_mempool);
 }
 
 //-------------------------------------------------
@@ -448,35 +435,6 @@ const char *device_image_interface::get_feature(const char *feature_name)
 
 	return NULL;
 }
-
-/****************************************************************************
-  Memory allocators
-
-  These allow memory to be allocated for the lifetime of a mounted image.
-  If these (and the above accessors) are used well enough, they should be
-  able to eliminate the need for a unload function.
-****************************************************************************/
-
-void *device_image_interface::image_malloc(size_t size)
-{
-    return image_realloc(NULL, size);
-}
-
-char *device_image_interface::image_strdup(const char *src)
-{
-	return pool_strdup_lib(m_mempool, src);
-}
-
-void *device_image_interface::image_realloc(void *ptr, size_t size)
-{
-    return pool_realloc_lib(m_mempool, ptr, size);
-}
-
-void device_image_interface::image_freeptr(void *ptr)
-{
-	pool_object_remove(m_mempool, ptr, 0);
-}
-
 
 /****************************************************************************
   Hash info loading
