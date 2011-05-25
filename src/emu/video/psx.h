@@ -236,7 +236,7 @@ protected:
 	INT32 n_drawoffset_y;
 	UINT32 m_n_displaystartx;
 	UINT32 n_displaystarty;
-	int n_gputype;
+	int m_n_gputype;
 	UINT32 n_gpustatus;
 	UINT32 n_gpuinfo;
 	UINT32 n_gpu_buffer_offset;

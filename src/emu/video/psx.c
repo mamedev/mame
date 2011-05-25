@@ -472,7 +472,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	int width = machine().primary_screen->width();
 	int height = machine().primary_screen->height();
 
-	n_gputype = n_gputype;
+	m_n_gputype = n_gputype;
 
 #if defined( MAME_DEBUG )
 	DebugMeshInit();
@@ -783,7 +783,7 @@ f  e| d  c| b| a  9| 8  7| 6  5| 4| 3  2  1  0
 
 void psxgpu_device::decode_tpage( UINT32 tpage )
 {
-	if( n_gputype == 2 )
+	if( m_n_gputype == 2 )
 	{
 		n_gpustatus = ( n_gpustatus & 0xfffff800 ) | ( tpage & 0x7ff );
 
@@ -3435,7 +3435,7 @@ void psxgpu_device::dma_write( UINT32 *p_ram, INT32 n_size )
 			break;
 		case 0xe3:
 			n_drawarea_x1 = m_packet.n_entry[ 0 ] & 1023;
-			if( n_gputype == 2 )
+			if( m_n_gputype == 2 )
 			{
 				n_drawarea_y1 = ( m_packet.n_entry[ 0 ] >> 10 ) & 1023;
 			}
@@ -3448,7 +3448,7 @@ void psxgpu_device::dma_write( UINT32 *p_ram, INT32 n_size )
 			break;
 		case 0xe4:
 			n_drawarea_x2 = m_packet.n_entry[ 0 ] & 1023;
-			if( n_gputype == 2 )
+			if( m_n_gputype == 2 )
 			{
 				n_drawarea_y2 = ( m_packet.n_entry[ 0 ] >> 10 ) & 1023;
 			}
@@ -3461,7 +3461,7 @@ void psxgpu_device::dma_write( UINT32 *p_ram, INT32 n_size )
 			break;
 		case 0xe5:
 			n_drawoffset_x = SINT11( m_packet.n_entry[ 0 ] & 2047 );
-			if( n_gputype == 2 )
+			if( m_n_gputype == 2 )
 			{
 				n_drawoffset_y = SINT11( ( m_packet.n_entry[ 0 ] >> 11 ) & 2047 );
 			}
@@ -3535,7 +3535,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 			break;
 		case 0x05:
 			m_n_displaystartx = data & 1023;
-			if( n_gputype == 2 )
+			if( m_n_gputype == 2 )
 			{
 				n_displaystarty = ( data >> 10 ) & 1023;
 			}
@@ -3560,7 +3560,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 			n_gpustatus &= ~( 127L << 0x10 );
 			n_gpustatus |= ( data & 0x3f ) << 0x11; /* width 0 + height + videmode + isrgb24 + isinter */
 			n_gpustatus |= ( ( data & 0x40 ) >> 0x06 ) << 0x10; /* width 1 */
-			if( n_gputype == 1 )
+			if( m_n_gputype == 1 )
 			{
 				b_reverseflag = ( data >> 7 ) & 1;
 			}
@@ -3578,7 +3578,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 			switch( data & 0xff )
 			{
 			case 0x03:
-				if( n_gputype == 2 )
+				if( m_n_gputype == 2 )
 				{
 					n_gpuinfo = n_drawarea_x1 | ( n_drawarea_y1 << 10 );
 				}
@@ -3589,7 +3589,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 				verboselog( machine(), 1, "GPU Info - Draw area top left %08x\n", n_gpuinfo );
 				break;
 			case 0x04:
-				if( n_gputype == 2 )
+				if( m_n_gputype == 2 )
 				{
 					n_gpuinfo = n_drawarea_x2 | ( n_drawarea_y2 << 10 );
 				}
@@ -3600,7 +3600,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 				verboselog( machine(), 1, "GPU Info - Draw area bottom right %08x\n", n_gpuinfo );
 				break;
 			case 0x05:
-				if( n_gputype == 2 )
+				if( m_n_gputype == 2 )
 				{
 					n_gpuinfo = ( n_drawoffset_x & 2047 ) | ( ( n_drawoffset_y & 2047 ) << 11 );
 				}
@@ -3611,7 +3611,7 @@ WRITE32_MEMBER( psxgpu_device::write )
 				verboselog( machine(), 1, "GPU Info - Draw offset %08x\n", n_gpuinfo );
 				break;
 			case 0x07:
-				n_gpuinfo = n_gputype;
+				n_gpuinfo = m_n_gputype;
 				verboselog( machine(), 1, "GPU Info - GPU Type %08x\n", n_gpuinfo );
 				break;
 			case 0x08:
