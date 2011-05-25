@@ -5342,7 +5342,7 @@ static int get_vblank_duration(running_machine &machine)
 	if((STV_VDP2_LSMD & 3) == 3)
 		return 263*2;
 
-	return 263;
+	return 263; //TODO: PAL uses 313
 }
 
 static int get_pixel_clock(running_machine &machine)
@@ -5505,7 +5505,7 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 	const int d_hres[4] = { 320, 352, 640, 704 };
 	int horz_res,vert_res;
 
-	vert_res = d_vres[STV_VDP2_VRES & 3];
+	vert_res = d_vres[STV_VDP2_VRES & 1]; //TODO: PAL uses mask 3, NTSC uses mask 1
 
 	if((STV_VDP2_VRES & 3) == 3)
 		popmessage("Illegal VRES MODE, contact MAMEdev");

@@ -52,7 +52,7 @@ TODO:
   Likely to not be a bug but an in-game design issue.
 - myfairld: Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
   joystick panel is mapped with input_port(10) instead of input_port(2),so for now use
-  the mahjong panel instead.
+  the mahjong panel instead. Also the REACH and RON buttons are actually reversed.
 - danchih: hanafuda panel doesn't work.
 - findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
   still doesn't work,missing irq?
