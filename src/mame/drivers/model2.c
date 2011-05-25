@@ -1917,7 +1917,8 @@ static void scsp_irq(device_t *device, int irq)
 static const scsp_interface scsp_config =
 {
 	0,
-	scsp_irq
+	scsp_irq,
+	DEVCB_NULL
 };
 
 

@@ -222,6 +222,7 @@ struct _scsp_state
 	int ARTABLE[64], DRTABLE[64];
 
 	struct _SCSPDSP DSP;
+	devcb_resolved_write_line main_irq;
 
 	device_t *device;
 };
@@ -1251,6 +1252,8 @@ static DEVICE_START( scsp )
 
 		scsp->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, scsp, SCSP_Update);
 	}
+
+	scsp->main_irq.resolve(intf->main_irq, *device);
 }
 
 
@@ -1322,13 +1325,8 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
-		//check main cpu IRQ
-		case 0x42a:
-			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
-			{
-				device_set_input_line_and_vector(device->machine().firstcpu, 9, HOLD_LINE , 0x46);
-			    logerror("SCSP: Main CPU interrupt\n");
-			}
+		case 0x42a:		//check main cpu IRQ
+		scsp->main_irq(1);
 		break;
 		case 0x42c:
 		break;

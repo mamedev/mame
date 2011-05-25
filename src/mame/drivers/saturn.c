@@ -1471,11 +1471,6 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	}
 
 	#if 0
-	if(SOUND_RAM(dst_0))
-	{
-		logerror("Sound RAM DMA write\n");
-		scsp_to_main_irq = 1;
-	}
 
 	/*Let me know if you encounter any of these three*/
 	if(ABUS(dst_0))
@@ -1587,14 +1582,6 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 		/*Indirect Mode end factor*/
 		if(state->m_scu.src[dma_ch] & 0x80000000)
 			job_done = 1;
-
-		#if 0
-		if(SOUND_RAM(dst_0))
-		{
-			logerror("Sound RAM DMA write\n");
-			scsp_to_main_irq = 1;
-		}
-		#endif
 
 		if(LOG_SCU) printf("DMA lv %d indirect mode transfer START\n"
 				             "Start %08x End %08x Size %04x\n",dma_ch,state->m_scu.src[dma_ch],state->m_scu.dst[dma_ch],state->m_scu.size[dma_ch]);
@@ -2368,10 +2355,18 @@ static void scsp_irq(device_t *device, int irq)
 	}
 }
 
+static WRITE_LINE_DEVICE_HANDLER( scsp_to_main_irq )
+{
+	saturn_state *drvstate = device->machine().driver_data<saturn_state>();
+
+	device_set_input_line_and_vector(drvstate->m_maincpu, 9, (stv_irq.sound_req) ? HOLD_LINE : CLEAR_LINE, 0x46);
+}
+
 static const scsp_interface scsp_config =
 {
 	0,
-	scsp_irq
+	scsp_irq,
+	DEVCB_LINE(scsp_to_main_irq)
 };
 
 static TIMER_CALLBACK(stv_rtc_increment)
