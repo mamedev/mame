@@ -1552,7 +1552,7 @@ static void scu_dma_direct(address_space *space, UINT8 dma_ch)
 	if(dma_ch != 2)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	/*TODO: insta-timed irq! Peeble Bitch is pretty picky with delayed irqs ...  */
+	/*TODO: insta-timed irq! Pebble Beach is pretty picky with delayed irqs ...  */
 	{
 		static int dma_irq_line[3] =   { 5, 6, 6 };
 		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
@@ -1629,7 +1629,7 @@ static void scu_dma_indirect(address_space *space,UINT8 dma_ch)
 
 	}while(job_done == 0);
 
-	/*TODO: insta-timed irq! Peeble Bitch is pretty picky with delayed irqs ...  */
+	/*TODO: insta-timed irq! Pebble Beach is pretty picky with delayed irqs ...  */
 	{
 		static int dma_irq_line[3] =   { 5, 6, 6 };
 		static int dma_irq_vector[3] = { 0x4b, 0x4a, 0x49 };
