@@ -6128,7 +6128,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	}
 	else
 	{
-		for ( y = mycliprect.min_y; y <= mycliprect.max_y; y++ )
+		for ( y = mycliprect.min_y; y <= mycliprect.max_y / (interlace_framebuffer+1); y++ )
 		{
 			if ( stv_sprite_priorities_usage_valid )
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6145,7 +6145,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 				bitmap_line2 = BITMAP_ADDR16(bitmap, 2*y + 1, 0);
 			}
 
-			for ( x = mycliprect.min_x; double_x ? x <= ((mycliprect.max_x)/2) : (x <= mycliprect.max_x); x++ )
+			for ( x = mycliprect.min_x; x <= mycliprect.max_x /(double_x+1) ; x++ )
 			{
 				pix = framebuffer_line[x];
 				if ( (pix & 0x8000) && sprite_color_mode)
