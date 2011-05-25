@@ -4126,11 +4126,11 @@ GAME( 1995, finlarch,  smleague,stv,      stv,		finlarch,	ROT0,   "Sega", 	    	
 GAME( 1996, sokyugrt,  stvbios, stv,      stv,		sokyugrt,	ROT0,   "Raizing / Eighting",   		"Soukyugurentai / Terra Diver (JUET 960821 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, suikoenb,  stvbios, stv,      stv,		suikoenb,	ROT0,   "Data East",                	"Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND )
 GAME( 1996, vfkids,    stvbios, stv,      stv,		stv,    	ROT0,   "Sega", 						"Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND )
+GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stv,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winterht,  stvbios, stv,      stv,		winterht,	ROT0,   "Sega", 						"Winter Heat (JUET 971012 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv,      stv,		znpwfv, 	ROT0,   "Sega", 	    				"Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Almost */
-GAME( 1997, vmahjong,  stvbios, stv,      stvmp,	stv,    	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, twcup98,   stvbios, stv,      stv,		twcup98,	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
 GAME( 1998, elandore,  stvbios, stv,      stv,		elandore,	ROT0,   "Sai-Mate", 					"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 

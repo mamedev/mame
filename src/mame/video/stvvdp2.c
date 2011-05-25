@@ -5637,8 +5637,8 @@ static void stv_vdp2_get_window0_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W0SY & 0x7ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x7ff) >> 0);
+			*s_y = ((STV_VDP2_W1SY & 0x7ff) >> 0) << 1;
+			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0) << 1;
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)
@@ -5684,8 +5684,8 @@ static void stv_vdp2_get_window1_coordinates(running_machine &machine,UINT16 *s_
 			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
 			break;
 		case 3:
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0) << 1;
+			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0) << 1;
 			break;
 	}
 	switch(STV_VDP2_HRES & 6)
@@ -5948,6 +5948,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 	mycliprect.max_x = cliprect->max_x;
 	mycliprect.min_y = cliprect->min_y;
 	mycliprect.max_y = cliprect->max_y;
+
 	stv_vdp2_apply_window_on_layer(machine,&mycliprect);
 
 	if (interlace_framebuffer == 0 && double_x == 0 )
@@ -6446,7 +6447,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		fp=fopen("mamevdp1", "w+b");
 		if (fp)
 		{
-			fwrite(stv_vdp1_vram, 0x80000, 1, fp);
+			fwrite(state->m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -6458,7 +6459,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		fp=fopen("vdp1_vram.bin", "r+b");
 		if (fp)
 		{
-			fread(stv_vdp1_vram, 0x80000, 1, fp);
+			fread(state->m_vdp1_vram, 0x80000, 1, fp);
 			fclose(fp);
 		}
 	}
