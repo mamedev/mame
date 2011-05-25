@@ -335,8 +335,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_word_w)				// VACSET (K054157)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053246_word_w)				// OBJSET1
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053246_word_r)				// Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_ram_r, k053250_ram_w)	// K053250 "road" RAM
-	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_r, k053250_w)
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE_MODERN("k053250", k053250_t, ram_r, ram_w)	// K053250 "road" RAM
+	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE_MODERN("k053250", k053250_t, reg_r, reg_w)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_word_w)				// CLTC
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_lsb_w)				// priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)                // CCU
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_rom_word_r)		// Passthrough to tile roms
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_rom_r)
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD_MODERN("k053250", k053250_t, rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 
 #if XE_DEBUG
@@ -428,15 +428,6 @@ static const k054338_interface xexex_k054338_intf =
 	"none"
 };
 
-
-static const k053250_interface xexex_k053250_intf =
-{
-	"screen",
-	"gfx4",
-	"gfx3",
-	-5, -16
-};
-
 static const k056832_interface xexex_k056832_intf =
 {
 	"gfx1", 0,
@@ -483,7 +474,7 @@ static MACHINE_START( xexex )
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k053246 = machine.device("k053246");
-	state->m_k053250 = machine.device("k053250");
+	state->m_k053250 = machine.device<k053250_t>("k053250");
 	state->m_k053251 = machine.device("k053251");
 	state->m_k053252 = machine.device("k053252");
 	state->m_k056832 = machine.device("k056832");
@@ -567,7 +558,7 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	MCFG_K056832_ADD("k056832", xexex_k056832_intf)
 	MCFG_K053246_ADD("k053246", xexex_k053246_intf)
-	MCFG_K053250_ADD("k053250", xexex_k053250_intf)
+	MCFG_K053250_ADD("k053250", "screen", -5, -16)
 	MCFG_K053251_ADD("k053251")
 	MCFG_K053252_ADD("k053252", 32000000/4, xexex_k053252_intf)
 	MCFG_K054338_ADD("k054338", xexex_k054338_intf)
@@ -620,11 +611,8 @@ ROM_START( xexex ) /* Europe, Version AA */
 	ROM_LOAD( "067_b10.rom", 0x200000, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
 	ROM_LOAD( "067_b09.rom", 0x300000, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x080000, "k053250", 0 )
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_COPY( "gfx3", 0x000000, 0x000000, 0x080000 )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )
@@ -655,11 +643,8 @@ ROM_START( xexexa ) /* Asia, Version AA */
 	ROM_LOAD( "067_b10.rom", 0x200000, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
 	ROM_LOAD( "067_b09.rom", 0x300000, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x080000, "k053250", 0 )
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_COPY( "gfx3", 0x000000, 0x000000, 0x080000 )
 
 	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )
@@ -690,12 +675,8 @@ ROM_START( xexexj ) /* Japan, Version AA */
 	ROM_LOAD( "067_b10.rom", 0x200000, 0x100000, CRC(ee31db8d) SHA1(c41874fb8b401ea9cdd327ee6239b5925418cf7b) )
 	ROM_LOAD( "067_b09.rom", 0x300000, 0x100000, CRC(88f072ef) SHA1(7ecc04dbcc29b715117e970cc96e11137a21b83a) )
 
-	ROM_REGION( 0x80000, "gfx3",ROMREGION_ERASE00 )
+	ROM_REGION( 0x080000, "k053250", 0 )
 	ROM_LOAD( "067_b08.rom", 0x000000, 0x080000, CRC(ca816b7b) SHA1(769ce3700e41200c34adec98598c0fe371fe1e6d) )
-
-	ROM_REGION( 0x100000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_COPY( "gfx3", 0x000000, 0x000000, 0x080000 )
-
 
 	ROM_REGION( 0x300000, "k054539", 0 )
 	ROM_LOAD( "067_b06.rom", 0x000000, 0x200000, CRC(3b12fce4) SHA1(c69172d9965b8da8a539812fac92d5f1a3c80d17) )

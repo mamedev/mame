@@ -260,13 +260,11 @@ VIDEO_START(mystwarr)
 VIDEO_START(metamrph)
 {
 	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	const char * rgn_250 = "gfx3";
 
 	state->m_gametype = 0;
 
 	K055555_vh_start(machine);
 	K054338_vh_start(machine);
-	K053250_vh_start(machine, 1, &rgn_250);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
@@ -281,8 +279,6 @@ VIDEO_START(metamrph)
 	K056832_set_LayerOffset(1,  0+4, 0); // attract sea
 	K056832_set_LayerOffset(2,  2+4, 0); // attract red monster in background of sea
 	K056832_set_LayerOffset(3,  3+4, 0); // attract sky background to sea
-
-	K053250_set_LayerOffset(0, -7, 0);
 }
 
 VIDEO_START(viostorm)

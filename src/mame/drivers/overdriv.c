@@ -22,6 +22,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
+#include "video/k053250.h"
 #include "machine/k053252.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
@@ -190,16 +191,16 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* work RAM */
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM //AM_DEVREADWRITE("k053250_1", k053250_ram_r, k053250_ram_w)
-	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("k053250_1", k053250_r, k053250_w)	// K053250 #0
-	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_r, k053250_w)	// K053250 #1
+	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE_MODERN("k053250_1", k053250_t, reg_r, reg_w)
+	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE_MODERN("k053250_2", k053250_t, reg_r, reg_w)
 	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w)	/* enable K053247 ROM reading, plus something else */
 	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE("k053246", k053246_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
-	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD("k053250_1", k053250_rom_r)	// K053250 #0 gfx ROM read (LSB)
-	AM_RANGE(0x220000, 0x221fff) AM_DEVREAD("k053250_2", k053250_rom_r)	// K053250 #1 gfx ROM read (LSB)
+	AM_RANGE(0x218000, 0x219fff) AM_DEVREAD_MODERN("k053250_1", k053250_t, rom_r)
+	AM_RANGE(0x220000, 0x221fff) AM_DEVREAD_MODERN("k053250_2", k053250_t, rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8 )
@@ -244,25 +245,6 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
-
-
-#if 0
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ STEP8(0,4) },
-	{ STEP8(7*8*4,-8*4) },
-	8*8*4
-};
-
-static GFXDECODE_START( overdriv )
-	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 0, 0x80 )
-	GFXDECODE_ENTRY( "gfx5", 0, charlayout, 0, 0x80 )
-GFXDECODE_END
-#endif
 
 
 static const k053260_interface k053260_config =
@@ -332,22 +314,6 @@ static MACHINE_RESET( overdriv )
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const k053250_interface overdriv_k053250_intf_1 =
-{
-	"screen",
-	"gfx6",
-	"gfx4",
-	0, 0 //TODO
-};
-
-static const k053250_interface overdriv_k053250_intf_2 =
-{
-	"screen",
-	"gfx7",
-	"gfx5",
-	0, 0 //TODO
-};
-
 static const k053252_interface overdriv_k053252_intf =
 {
 	"screen",
@@ -402,8 +368,8 @@ static MACHINE_CONFIG_START( overdriv, overdriv_state )
 	MCFG_K051316_ADD("k051316_1", overdriv_k051316_intf_1)
 	MCFG_K051316_ADD("k051316_2", overdriv_k051316_intf_2)
 	MCFG_K053251_ADD("k053251")
-	MCFG_K053250_ADD("k053250_1", overdriv_k053250_intf_1)
-	MCFG_K053250_ADD("k053250_2", overdriv_k053250_intf_2)
+	MCFG_K053250_ADD("k053250_1", "screen", 0, 0)
+	MCFG_K053250_ADD("k053250_2", "screen", 0, 0)
 	MCFG_K053252_ADD("k053252", 24000000/4, overdriv_k053252_intf)
 
 	/* sound hardware */
@@ -456,30 +422,14 @@ ROM_START( overdriv )
 	ROM_REGION( 0x020000, "gfx3", 0 )	/* graphics (addressable by the CPU) */
 	ROM_LOAD( "e07.c23",      0x000000, 0x020000, CRC(8a6ceab9) SHA1(1a52b7361f71a6126cd648a76af00223d5b25c7a) )	/* zoom/rotate */
 
-	// sum16
-	// 16 current 0x811c correct: 0xb1cc
-	// 17 current 0xb221 correct: 0xb474
-	// 18 current 0x4f4e correct: 0xabd9
-	// 19 current 0x4096 correct: 0xf21e
-	// 20 current 0x0000 correct: 0xa317
-
-	ROM_REGION( 0x0c0000, "gfx4", ROMREGION_ERASE00 )	/* graphics (addressable by the CPU) */
-	ROM_LOAD( "e19.r22",      0x000000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
-	ROM_LOAD( "e18.p22",      0x040000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )	/* 053250 #0 */
+	ROM_REGION( 0x0c0000, "k053250_1", 0 )	/* graphics (addressable by the CPU) */
+	ROM_LOAD( "e18.p22",      0x000000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )
+	ROM_LOAD( "e19.r22",      0x040000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
 	ROM_LOAD( "e20.s22",      0x080000, 0x040000, CRC(ea204acd) SHA1(52b8c30234eaefcba1074496028a4ac2bca48e95) )
 
-	ROM_REGION( 0x080000, "gfx5", ROMREGION_ERASE00 )	/* unknown (053250?) */
-	ROM_LOAD( "e16.p12",      0x000000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )	/* 053250 #1 */
-	ROM_LOAD( "e17.p17",      0x040000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
-
-	ROM_REGION( 0x0c0000*2, "gfx6", ROMREGION_ERASE00 )	/* graphics (addressable by the CPU, unpacked) */
-	ROM_LOAD( "e19.r22",      0x000000, 0x040000, CRC(15c54ea2) SHA1(5b10bd28e48e51613359820ba8c75d4a91c2d322) )
-	ROM_LOAD( "e18.p22",      0x040000, 0x040000, CRC(985a4a75) SHA1(b726166c295be6fbec38a9d11098cc4a4a5de456) )	/* 053250 #0, unpacked */
-	ROM_LOAD( "e20.s22",      0x080000, 0x040000, CRC(ea204acd) SHA1(52b8c30234eaefcba1074496028a4ac2bca48e95) )
-
-	ROM_REGION( 0x080000*2, "gfx7", ROMREGION_ERASE00 )	/* unknown (053250, unpacked?) */
-	ROM_LOAD( "e16.p12",      0x000000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )	/* 053250 #1, unpacked */
-	ROM_LOAD( "e17.p17",      0x040000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
+	ROM_REGION( 0x080000, "k053250_2", 0 )	/* graphics (addressable by the CPU) */
+	ROM_LOAD( "e17.p17",      0x000000, 0x040000, CRC(04c07248) SHA1(873445002cbf90c9fc5a35bf4a8f6c43193ee342) )
+	ROM_LOAD( "e16.p12",      0x040000, 0x040000, CRC(9348dee1) SHA1(367193373e28962b5b0e54cc15d68ed88ab83f12) )
 
 	ROM_REGION( 0x200000, "shared", 0 )	/* 053260 samples */
 	ROM_LOAD( "e03.j1",       0x000000, 0x100000, CRC(51ebfebe) SHA1(17f0c23189258e801f48d5833fe934e7a48d071b) )

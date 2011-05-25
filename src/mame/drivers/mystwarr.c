@@ -25,6 +25,7 @@
 #include "deprecat.h"
 
 #include "video/konamiic.h"
+#include "video/k053250.h"
 #include "machine/k053252.h"
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
@@ -305,8 +306,8 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_READ(K055673_rom_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_WRITE(K053247_reg_word_w)
-	AM_RANGE(0x24c000, 0x24ffff) AM_READWRITE(K053250_0_ram_r,K053250_0_ram_w) // "LVC RAM" (53250_ram)
-	AM_RANGE(0x250000, 0x25000f) AM_READWRITE(K053250_0_r,K053250_0_w)
+	AM_RANGE(0x24c000, 0x24ffff) AM_DEVREADWRITE_MODERN("k053250_1", k053250_t, ram_r, ram_w)
+	AM_RANGE(0x250000, 0x25000f) AM_DEVREADWRITE_MODERN("k053250_1", k053250_t, reg_r, reg_w)
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x260000, 0x26001f) AM_DEVREADWRITE8("k053252",k053252_r,k053252_w,0x00ff)
@@ -326,7 +327,7 @@ static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x301fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)
 	AM_RANGE(0x302000, 0x303fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x310000, 0x311fff) AM_READ(K056832_mw_rom_word_r)
-	AM_RANGE(0x320000, 0x321fff) AM_READ(K053250_0_rom_r)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREAD_MODERN("k053250_1", k053250_t, rom_r)
 	AM_RANGE(0x330000, 0x331fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 #if MW_DEBUG
 	AM_RANGE(0x240000, 0x240007) AM_READ(K053246_reg_word_r)
@@ -347,8 +348,8 @@ static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x244000, 0x24400f) AM_READ(K055673_rom_word_r)
 	AM_RANGE(0x244010, 0x24401f) AM_WRITE(K053247_reg_word_w)
-	AM_RANGE(0x24c000, 0x24ffff) AM_RAM		// K053250_0_ram_r / K053250_0_ram_w
-	AM_RANGE(0x250000, 0x25000f) AM_RAM		// K053250_0_r / K053250_0_w
+	AM_RANGE(0x24c000, 0x24ffff) AM_RAM		// K053250 ram
+	AM_RANGE(0x250000, 0x25000f) AM_RAM		// K053250 reg
 	AM_RANGE(0x254000, 0x25401f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x258000, 0x2580ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x25c000, 0x25c03f) AM_READWRITE(K055550_word_r,K055550_word_w)
@@ -1082,6 +1083,7 @@ static MACHINE_CONFIG_DERIVED( metamrph, mystwarr )
 
 	MCFG_DEVICE_REMOVE("k053252")
 	MCFG_K053252_ADD("k053252", 6000000, metamrph_k053252_intf) // 6 MHz?
+	MCFG_K053250_ADD("k053250_1", "screen", -7, 0)
 
 	/* video hardware */
 	MCFG_VIDEO_START(metamrph)
@@ -1574,13 +1576,9 @@ ROM_START( metamrph )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
-	/* K053250 linescroll/zoom thingy (unpacked) */
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
-
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )
-	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
+	ROM_REGION( 0x40000, "k053250_1", 0 )
+	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -1617,11 +1615,8 @@ ROM_START( metamrphu )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
-
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -1658,11 +1653,8 @@ ROM_START( metamrphj )
 	ROM_LOAD64_WORD( "224a13", 0x000006, 2*1024*1024, CRC(86b58feb) SHA1(5a43746e2cd3c7aca21496c092aef83e64b3ab2c) )
 
 	/* K053250 linescroll/zoom thingy */
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "k053250_1", 0 )
 	ROM_LOAD( "224a14", 0x000000, 0x40000, CRC(3c79b404) SHA1(7c6bb4cbf050f314ea0cd3e8bc6e1947d0573084) )
-
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_ERASE00 ) // NOTE: region must be 2xROM size for unpacking
-	ROM_COPY( "gfx3", 0x00000, 0x00000, 0x40000 )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
@@ -2098,38 +2090,32 @@ ROM_START( dadandrn )
 	ROM_LOAD( "dadandrn.nv", 0x0000, 0x080, CRC(346ae0cf) SHA1(1f79b2e21766f7a971c7d0f618700deb8a32f78a) )
 ROM_END
 
-static DRIVER_INIT(metamrph)
-{
-	K053250_unpack_pixels(machine, "gfx4", "gfx3");
-}
-
-
 /*           ROM       parent    machine   inp       init */
-GAME( 1993, mystwarr,  0,        mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarru, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarrj, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra, mystwarr, mystwarr, mystwarr, 0,        ROT0,  "Konami", "Mystic Warriors (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarr,  0,        mystwarr, mystwarr, 0, ROT0,  "Konami", "Mystic Warriors (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru, mystwarr, mystwarr, mystwarr, 0, ROT0,  "Konami", "Mystic Warriors (ver UAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj, mystwarr, mystwarr, mystwarr, 0, ROT0,  "Konami", "Mystic Warriors (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra, mystwarr, mystwarr, mystwarr, 0, ROT0,  "Konami", "Mystic Warriors (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mmaulers,  0,        dadandrn, dadandrn, 0,        ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, dadandrn,  mmaulers, dadandrn, dadandrn, 0,        ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulers,  0,        dadandrn, dadandrn, 0, ROT0,  "Konami", "Monster Maulers (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dadandrn,  mmaulers, dadandrn, dadandrn, 0, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, viostorm,  0,        viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormu, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormub,viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormj, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostorma, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormab, viostorm, viostorm, viostorm, 0,        ROT0,  "Konami", "Violent Storm (ver AAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorm,  0,        viostorm, viostorm, 0, ROT0,  "Konami", "Violent Storm (ver EAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormu, viostorm, viostorm, viostorm, 0, ROT0,  "Konami", "Violent Storm (ver UAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormub,viostorm, viostorm, viostorm, 0, ROT0,  "Konami", "Violent Storm (ver UAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormj, viostorm, viostorm, viostorm, 0, ROT0,  "Konami", "Violent Storm (ver JAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorma, viostorm, viostorm, viostorm, 0, ROT0,  "Konami", "Violent Storm (ver AAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormab, viostorm, viostorm, viostorm, 0,ROT0,  "Konami", "Violent Storm (ver AAB)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, metamrph,  0,        metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphu, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphj, metamrph, metamrph, metamrph, metamrph, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrph,  0,        metamrph, metamrph, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphu, metamrph, metamrph, metamrph, 0, ROT0,  "Konami", "Metamorphic Force (ver UAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphj, metamrph, metamrph, metamrph, 0, ROT0,  "Konami", "Metamorphic Force (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mtlchamp,  0,        martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchamp1, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampj, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampa, mtlchamp, martchmp, martchmp, 0,        ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp,  0,        martchmp, martchmp, 0, ROT0,  "Konami", "Martial Champion (ver EAB)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp1, mtlchamp, martchmp, martchmp, 0, ROT0,  "Konami", "Martial Champion (ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu, mtlchamp, martchmp, martchmp, 0, ROT0,  "Konami", "Martial Champion (ver UAD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampj, mtlchamp, martchmp, martchmp, 0, ROT0,  "Konami", "Martial Champion (ver JAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampa, mtlchamp, martchmp, martchmp, 0, ROT0,  "Konami", "Martial Champion (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, gaiapols,  0,        gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsu, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsj, gaiapols, gaiapols, dadandrn, 0,        ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapols,  0,        gaiapols, dadandrn, 0, ROT90, "Konami", "Gaiapolis (ver EAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsu, gaiapols, gaiapols, dadandrn, 0, ROT90, "Konami", "Gaiapolis (ver UAF)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsj, gaiapols, gaiapols, dadandrn, 0, ROT90, "Konami", "Gaiapolis (ver JAF)", GAME_IMPERFECT_GRAPHICS )

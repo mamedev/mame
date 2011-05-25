@@ -121,15 +121,6 @@ struct _k054338_interface
 	const char         *k055555;
 };
 
-typedef struct _k053250_interface k053250_interface;
-struct _k053250_interface
-{
-	const char         *screen;
-	const char         *gfx_memory_region;
-	const char         *gfx_memory_region_unpack;
-	int                xoff, yoff;
-};
-
 typedef struct _k001006_interface k001006_interface;
 struct _k001006_interface
 {
@@ -185,7 +176,6 @@ DECLARE_LEGACY_DEVICE(K051733, k051733);
 DECLARE_LEGACY_DEVICE(K056832, k056832);
 DECLARE_LEGACY_DEVICE(K055555, k055555);
 DECLARE_LEGACY_DEVICE(K054338, k054338);
-DECLARE_LEGACY_DEVICE(K053250, k053250);
 DECLARE_LEGACY_DEVICE(K001006, k001006);
 DECLARE_LEGACY_DEVICE(K001005, k001005);
 DECLARE_LEGACY_DEVICE(K001604, k001604);
@@ -262,11 +252,6 @@ DECLARE_LEGACY_DEVICE(K037122, k037122);
 #define MCFG_K054338_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K054338, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
-
-#define MCFG_K053250_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K053250, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
-
 
 #define MCFG_K001006_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, K001006, 0) \
@@ -728,20 +713,6 @@ void k054338_invert_alpha(device_t *device, int invert);								// 0=0x00(invis)
 #define K338_CTL_WAILSL		0x10
 #define K338_CTL_CLIPSL		0x20
 
-
-/**  Konami 053250  **/
-WRITE16_DEVICE_HANDLER( k053250_w );
-READ16_DEVICE_HANDLER( k053250_r );
-WRITE16_DEVICE_HANDLER( k053250_ram_w );
-READ16_DEVICE_HANDLER( k053250_ram_r );
-READ16_DEVICE_HANDLER( k053250_rom_r );
-
-// K053250_draw() control flags
-#define K053250_WRAP500		0x01
-#define K053250_OVERDRIVE	0x02
-
-void k053250_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int pri);
-void k053250_dma(device_t *device, int limiter);
 
 /**  Konami 001006  **/
 UINT32 k001006_get_palette(device_t *device, int index);

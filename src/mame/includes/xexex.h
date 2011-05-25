@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include <video/k053250.h>
+
 class xexex_state : public driver_device
 {
 public:
@@ -40,7 +42,7 @@ public:
 	device_t *m_filter2r;
 	device_t *m_k056832;
 	device_t *m_k053246;
-	device_t *m_k053250;
+	k053250_t *m_k053250;
 	device_t *m_k053251;
 	device_t *m_k053252;
 	device_t *m_k054338;

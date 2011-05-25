@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "video/konamiic.h"
+#include "video/k053250.h"
 #include "includes/konamigx.h"
 
 
@@ -1588,7 +1589,7 @@ void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle 
 					}
 					else
 					{
-						K053250_draw(machine, bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
+						machine.device<k053250_t>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
 					}
 				}
 				continue;
@@ -1650,7 +1651,7 @@ void konamigx_mixer(running_machine &machine, bitmap_t *bitmap, const rectangle 
 						}
 					}
 					else
-						K053250_draw(machine, bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
+						machine.device<k053250_t>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
 				}
 				continue;
 			}

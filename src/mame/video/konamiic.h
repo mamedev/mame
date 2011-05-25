@@ -193,23 +193,6 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_WAILSL		0x10
 #define K338_CTL_CLIPSL		0x20
 
-void K053250_vh_start(running_machine &machine, int chips, const char **region);
-WRITE16_HANDLER( K053250_0_w );
-READ16_HANDLER( K053250_0_r );
-WRITE16_HANDLER( K053250_0_ram_w );
-READ16_HANDLER( K053250_0_ram_r );
-READ16_HANDLER( K053250_0_rom_r );
-
-
-// K053250_draw() control flags
-#define K053250_WRAP500		0x01
-#define K053250_OVERDRIVE	0x02
-
-void K053250_draw(running_machine &machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
-void K053250_set_LayerOffset(int chip, int offsx, int offsy);
-void K053250_unpack_pixels(running_machine &machine, const char *src_region, const char *dst_region);
-
-
 // K053252 CRT and interrupt control unit
 WRITE16_HANDLER( K053252_word_w );
 

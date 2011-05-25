@@ -87,7 +87,7 @@ SCREEN_UPDATE( xexex )
 	{
 		if (layer[plane] < 0)
 		{
-			k053250_draw(state->m_k053250, bitmap, cliprect, bg_colorbase, 0, 1 << plane);
+			state->m_k053250->draw(bitmap, cliprect, bg_colorbase, 0, 1 << plane);
 		}
 		else if (!state->m_cur_alpha || layer[plane] != 1)
 		{
