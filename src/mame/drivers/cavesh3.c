@@ -1,6 +1,7 @@
 /* Cave SH3 ( CAVE CV1000-B ) */
 /* skeleton placeholder driver */
 
+
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 
@@ -109,6 +110,18 @@ ROM_START( futari15 )
 	ROM_LOAD("u24", 0x400000, 0x400000, CRC(c631a766) SHA1(8bb6934a2f5b8a9841c3dcf85192b1743773dd8b) )
 ROM_END
 
+ROM_START( ibara )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD( "u4",           0x000000, 0x200000, CRC(8e6c155d) SHA1(38ac2107dc7824836e2b4e04c7180d5ae43c9b79) )
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+    ROM_LOAD( "u2",           0x000000, 0x8400000, CRC(55840976) SHA1(4982bdce84f9603adfed7a618f18bc80359ab81e) )
+
+	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+    ROM_LOAD( "u23",          0x000000, 0x400000, CRC(ee5e585d) SHA1(7eeba4ee693060e927f8c46b16e39227c6a62392) )
+	ROM_LOAD( "u24",          0x400000, 0x400000, CRC(f0aa3cb6) SHA1(f9d137cd879e718811b2d21a0af2a9c6b7dca2f9) )
+ROM_END
+
 ROM_START( ibarabl )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD( "u4",           0x000000, 0x200000, CRC(a9d43839) SHA1(507696e616608c05893c7ac2814b3365e9cb0720) )
@@ -133,10 +146,78 @@ ROM_START( espgal2 )
 	ROM_LOAD( "espg2_u24",    0x400000, 0x400000, CRC(c76b1ec4) SHA1(b98a53d41a995d968e0432ed824b0b06d93dcea8) )
 ROM_END
 
+ROM_START( deathsml )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD( "u4",           0x000000, 0x200000, CRC(1a7b98bf) SHA1(07798a4a846e5802756396b34df47d106895c1f1) )
+
+	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+    ROM_LOAD( "u2",           0x000000, 0x8400000, CRC(5a69204d) SHA1(1043850cb10c62867b2e014494fefdf9dc1f1cea) )
+
+	ROM_REGION( 0x800000, "samples", ROMREGION_ERASEFF)
+    ROM_LOAD( "u23",          0x000000, 0x400000, CRC(aab718c8) SHA1(0e636c46d06151abd6f73232bc479dafcafe5327) )
+	ROM_LOAD( "u24",          0x400000, 0x400000, CRC(83881d84) SHA1(6e2294b247dfcbf0ced155dc45c706f29052775d) )
+ROM_END
+
 
 GAME( 2004, mushisam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, mushitam,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Tama", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2005, espgal2,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "EspGaluda 2", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari15,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.5 (2006/12/8 Master Ver 1.54)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, futari10,  futari15,   cavesh3,    cavesh3,  0, ROT0, "Cave", "Mushihime Sama Futari Ver 1.0", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2006, ibara,     0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2006, ibarabl,   0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Ibara Kuro - Black Label", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2007, deathsml,  0,          cavesh3,    cavesh3,  0, ROT0, "Cave", "Death Smiles", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+/*
+MUSHIHIMESAMA
+"2004/10/12 MASTER VER"  - broken
+"2004/10/12 MASTER VER." - fixed 1
+"2004/10/12.MASTER VER." - fixed 2
+
+IBARA
+"2005/03/22 MASTER VER.."
+
+IBARA BLACK LABEL
+"2006/02/06 MASTER VER."
+"2006/02/06.MASTER VER."
+
+ESPGALUDA II
+"2005/11/14 MASTER VER"
+
+PINK SWEETS
+"2006/04/06 MASTER VER."
+"2006/05/18 MASTER VER."
+"2006/xx/xx MASTER VER"
+"2006/04/06 MASTER VER...."
+
+MUSHIHIMESAMA FUTARI 1.0
+"2006/10/23 MASTER VER"  - Ultra unlockable
+"2006/10/23 MASTER VER." - Ultra unlockable
+"2006/10/23.MASTER VER." - Cannot unlock ultra
+
+MUSHIHIME SAMA FUTARI 1.5
+"2006/12/8.MASTER VER. 1.54."
+
+MUSHIHIMESAMA FUTARI BLACK LABEL
+"2007/12/11 BLACK LABEL VER"
+"2009/11/17 INTERNATIONAL BL"  ("Another Ver" on title screen)
+
+MUCHI MUCHI PORK
+"2007/ 4/17 MASTER VER."
+
+DEATH SMILES
+"2007/10/09 MASTER VER"
+
+DEATH SMILES MEGA BLACK LABEL
+"2008/10/06 MEGABLACK LABEL VER"
+
+DODONPACHI FUKKATSU
+"2008/06/23 MASTER VER 1.5"
+
+Dodonpachi Daifukkatsu Black Label
+unknown revs
+
+Akai Katana
+unknown revs
+
+*/
