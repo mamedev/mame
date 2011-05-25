@@ -483,6 +483,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	n_gpu_buffer_offset = 0;
 	n_lightgun_x = 0;
 	n_lightgun_y = 0;
+	b_reverseflag = 0;
 
 	n_vram_size = width * height;
 	p_vram = auto_alloc_array_clear( machine(), UINT16, n_vram_size );
