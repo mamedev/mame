@@ -101,7 +101,7 @@ ROM_START( arctthnd )
 	ROM_LOAD( "m29f002bt.u6", 0x000000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
 	DISK_REGION( "disk" )
-	DISK_IMAGE( "arctthnd", 0,  SHA1(7d500ac5e24916f46fe76ae014cdedd60d5acb65) )
+	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
 ROM_END
 
 
