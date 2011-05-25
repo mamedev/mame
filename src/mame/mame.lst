@@ -10399,6 +10399,7 @@ cgip30cs		// (c) 1999, CGI
 kimblz80		// (c) 198?, Kimble Ireland
 pma				// 1983, PMA
 bjpoker			// (c) M. Kramer Inc.
+newhilop
 
 // Draw Poker HI-LO based (8080)
 dphl			// (c) 1983 M. Kramer Inc.

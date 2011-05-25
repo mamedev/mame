@@ -560,7 +560,7 @@
 static VIDEO_START( norautp )
 {
 	norautp_state *state = machine.driver_data<norautp_state>();
-	state->m_np_vram = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_np_vram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 }
 
 
@@ -877,6 +877,10 @@ static ADDRESS_MAP_START( norautxp_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 #endif
 
+static ADDRESS_MAP_START( newhilop_map, AS_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")	/* 6116 */
+ADDRESS_MAP_END
 
 /*********** 8080 based **********/
 
@@ -1352,6 +1356,14 @@ static MACHINE_CONFIG_DERIVED( kimble, noraut_base )
 	MCFG_SOUND_CONFIG_DISCRETE(kimble)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( newhilop, noraut_base )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(newhilop_map)
+//	MCFG_CPU_IO_MAP(newhilop_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+MACHINE_CONFIG_END
 
 /********** 8080 based **********/
 
@@ -2499,6 +2511,23 @@ ROM_START( bjpoker )
 
 ROM_END
 
+ROM_START( newhilop )
+	ROM_REGION( 0x10000, "cpu_data", 0 )
+	ROM_LOAD( "new_hi-low.3e",  0x0000, 0x10000, CRC(8efe02a2) SHA1(e8150544f073e80ca83f2033bce64b65de08194c) )
+
+	ROM_REGION( 0x10000, "gfx_data", 0 )
+	ROM_LOAD( "new_hi-low.3a",  0x0000, 0x10000, CRC(6750f0e7) SHA1(cfb180aed9ff288cf1108071f2618587ac85ad1a) )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_COPY( "cpu_data", 0xe000, 0x0000, 0x2000 )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_COPY( "gfx_data", 0xf000, 0x0000, 0x1000 )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129.4d", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) ) //= japan_6301.u51        dphljp     Draw Poker HI-LO (Japanese)
+ROM_END
+
 
 /*************************************** 8080 sets **************************************/
 /*                                                                                      */
@@ -3512,6 +3541,7 @@ GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, deb, ROT0, "CGI",           
 GAME(  198?, kimblz80, 0,       kimble,   norautp,  0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   GAME_NOT_WORKING )
 GAME(  1983, pma,      0,       nortest1, norautp,  0,   ROT0, "PMA",                      "PMA Poker",                           GAME_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, 0,   ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
+GAME(  19??, newhilop, 0,       newhilop, norautp,  0,   ROT0, "Song Won?",                "New Hi-Low Poker",                    GAME_NOT_WORKING )
 
 
 /************************************* 8080 sets **************************************/
