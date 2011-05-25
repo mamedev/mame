@@ -198,6 +198,15 @@ protected:
 	void psx_gpu_init( int n_gputype );
 	void gpu_reset();
 
+#if defined( MAME_DEBUG )
+	void DebugMeshInit( void );
+	void DebugMesh( int n_coordx, int n_coordy );
+	void DebugMeshEnd( void );
+	void DebugCheckKeys( void );
+	int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect );
+	int DebugTextureDisplay( bitmap_t *bitmap );
+#endif
+
 	INT32 m_n_tx;
 	INT32 m_n_ty;
 	INT32 n_abr;

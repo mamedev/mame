@@ -156,7 +156,7 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 
 	if( m_debug.n_coord < DEBUG_COORDS )
 	{
-		n_coordx += n_displaystartx;
+		n_coordx += m_n_displaystartx;
 		n_coordy += n_displaystarty;
 
 		n_coordx *= 511;
@@ -638,11 +638,11 @@ void psxgpu_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 #if defined( MAME_DEBUG )
 	if( DebugMeshDisplay( bitmap, cliprect ) )
 	{
-		return 0;
+		return;
 	}
 	if( DebugTextureDisplay( bitmap ) )
 	{
-		return 0;
+		return;
 	}
 #endif
 
