@@ -74,13 +74,13 @@ typedef enum {
 #define XORB(dst,src)		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
 #define XORW(dst,src)		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define CF					(cpustate->CarryVal != 0)
-#define SF					(cpustate->SignVal < 0)
-#define ZF					(cpustate->ZeroVal == 0)
+#define CF					(int)(cpustate->CarryVal != 0)
+#define SF					(int)(cpustate->SignVal < 0)
+#define ZF					(int)(cpustate->ZeroVal == 0)
 #define PF					parity_table[cpustate->ParityVal]
-#define AF					(cpustate->AuxVal != 0)
-#define OF					(cpustate->OverVal != 0)
-#define DF					(cpustate->DirVal < 0)
+#define AF					(int)(cpustate->AuxVal != 0)
+#define OF					(int)(cpustate->OverVal != 0)
+#define DF					(int)(cpustate->DirVal < 0)
 
 /************************************************************************/
 
