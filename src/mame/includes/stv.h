@@ -89,6 +89,8 @@ public:
 	legacy_cpu_device* m_audiocpu;
 };
 
+#define MASTER_CLOCK_352 57272800
+#define MASTER_CLOCK_320 53748200
 
 DRIVER_INIT ( stv );
 

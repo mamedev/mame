@@ -5,7 +5,7 @@
     Driver by David Haywood, Angelo Salese, Olivier Galibert & Mariusz Wojcieszek
     SCSP driver provided by R.Belmont, based on ElSemi's SCSP sound chip emulator
     CD Block driver provided by ANY, based on sthief original emulator
-    Many thanks to Guru, Fabien & Runik for the help given.
+    Many thanks to Guru, Fabien, Runik and Charles MacDonald for the help given.
 
 ===================================================================================================
 
@@ -118,11 +118,6 @@ also has a DSP;
 #define LOG_IRQ  0
 #define LOG_IOGA 0
 
-
-
-#define MASTER_CLOCK_352 57272800
-#define MASTER_CLOCK_320 53748200
-#define PIXEL_CLOCK 50160000/2/4 /*TODO: fix me up! */
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -2546,9 +2541,7 @@ SCU register[36] is the timer zero compare register.
 SCU register[40] is for IRQ masking.
 */
 
-#define NEW_IRQ_CODE 0
 
-#if NEW_IRQ_CODE
 static TIMER_DEVICE_CALLBACK( saturn_scanline )
 {
 	saturn_state *state = timer.machine().driver_data<saturn_state>();
@@ -2556,21 +2549,18 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	int max_y = timer.machine().primary_screen->height();
 	int y_step;
 
-	if(max_y == 264)
-		y_step = 1;
-	else
-		y_step = 2;
+	y_step = (max_y == 263) ? 1 : 2;
 
-	popmessage("%08x %d %08x %08x",state->m_scu_regs[40] ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
+	//popmessage("%08x %d %08x %08x",state->m_scu_regs[40] ^ 0xffffffff,max_y,state->m_scu_regs[36],state->m_scu_regs[38]);
 
 	if(scanline == 0*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41);
 	else if(scanline == 240*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40);
-	else if((scanline % y_step) == 0)
+	else if((scanline % y_step) == 0 && scanline < 240*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42);
 
-	if((state->m_scu_regs[38] & 0x81) == 0x01 && scanline == 64)
+	if((state->m_scu_regs[38] & 0x81) == 0x01 && ((scanline % y_step) == 0) && scanline < 240*y_step)
 		device_set_input_line_and_vector(state->m_maincpu, 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 );
 
 	if(scanline == (state->m_scu_regs[36] & 0x3ff)*y_step)
@@ -2579,132 +2569,6 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 	if(scanline == 64) //TODO: emulate the timing of this
 		device_set_input_line_and_vector(state->m_maincpu, 0x2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d);
 }
-
-#else
-
-static timer_device *vblank_out_timer,*scan_timer,*t1_timer;
-static int h_sync,v_sync;
-static int cur_scan;
-
-#define VBLANK_OUT_IRQ(m)	\
-timer_0 = 0; \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cputag_set_input_line_and_vector(m, "maincpu", 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
-} \
-
-#define VBLANK_IN_IRQ \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
-	cputag_set_input_line_and_vector(device->machine(), "maincpu", 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
-} \
-
-#define HBLANK_IN_IRQ(m) \
-timer_1 = state->m_scu_regs[37] & 0x1ff; \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
-	cputag_set_input_line_and_vector(m, "maincpu", 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
-} \
-
-#define TIMER_0_IRQ(m) \
-if(timer_0 == (state->m_scu_regs[36] & 0x3ff)) \
-{ \
-	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
-	cputag_set_input_line_and_vector(m, "maincpu", 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
-} \
-
-#define TIMER_1_IRQ(m)	\
-if((state->m_scu_regs[38] & 1)) \
-{ \
-	if(!(state->m_scu_regs[38] & 0x80)) \
-	{ \
-		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-		cputag_set_input_line_and_vector(m, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
-	} \
-	else \
-	{ \
-		if((timer_0) == (state->m_scu_regs[36] & 0x3ff)) \
-		{ \
-			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
-			cputag_set_input_line_and_vector(m, "maincpu", 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
-		} \
-	} \
-} \
-
-#define VDP1_IRQ \
-{ \
-	cputag_set_input_line_and_vector(machine, "maincpu", 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
-} \
-
-static TIMER_DEVICE_CALLBACK( hblank_in_irq )
-{
-	saturn_state *state = timer.machine().driver_data<saturn_state>();
-	int scanline = param;
-
-//  h = timer.machine().primary_screen->height();
-//  w = timer.machine().primary_screen->width();
-
-	HBLANK_IN_IRQ(timer.machine());
-	TIMER_0_IRQ(timer.machine());
-
-	if(scanline+1 < v_sync)
-	{
-		if(stv_irq.hblank_in || stv_irq.timer_0)
-			scan_timer->adjust(timer.machine().primary_screen->time_until_pos(scanline+1, h_sync), scanline+1);
-		/*set the first Timer-1 event*/
-		cur_scan = scanline+1;
-		if(stv_irq.timer_1)
-			t1_timer->adjust(timer.machine().primary_screen->time_until_pos(scanline+1, timer_1), scanline+1);
-	}
-
-	timer_0++;
-}
-
-static TIMER_DEVICE_CALLBACK( timer1_irq )
-{
-	saturn_state *state = timer.machine().driver_data<saturn_state>();
-	int scanline = param;
-
-	TIMER_1_IRQ(timer.machine());
-
-	if(stv_irq.timer_1)
-		t1_timer->adjust(timer.machine().primary_screen->time_until_pos(scanline+1, timer_1), scanline+1);
-}
-
-static TIMER_CALLBACK( vdp1_irq )
-{
-	VDP1_IRQ;
-}
-
-static TIMER_DEVICE_CALLBACK( vblank_out_irq )
-{
-	VBLANK_OUT_IRQ(timer.machine());
-}
-
-/*V-Blank-IN event*/
-static INTERRUPT_GEN( stv_interrupt )
-{
-//  scanline = 0;
-	rectangle visarea = device->machine().primary_screen->visible_area();
-
-	h_sync = visarea.max_x+1;//horz
-	v_sync = visarea.max_y+1;//vert
-
-	VBLANK_IN_IRQ;
-
-	/*Next V-Blank-OUT event*/
-	if(stv_irq.vblank_out)
-		vblank_out_timer->adjust(device->machine().primary_screen->time_until_pos(0));
-	/*Set the first Hblank-IN event*/
-	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
-		scan_timer->adjust(device->machine().primary_screen->time_until_pos(0, h_sync));
-
-	/*TODO: timing of this one (related to the VDP1 speed)*/
-	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	device->machine().scheduler().timer_set(device->machine().primary_screen->time_until_pos(0), FUNC(vdp1_irq));
-}
-#endif
-
 
 static MACHINE_RESET( saturn )
 {
@@ -2731,16 +2595,6 @@ static MACHINE_RESET( saturn )
 	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
-
-	/* set the first scanline 0 timer to go off */
-	#if NEW_IRQ_CODE
-	#else
-	scan_timer = machine.device<timer_device>("scan_timer");
-	t1_timer = machine.device<timer_device>("t1_timer");
-	vblank_out_timer = machine.device<timer_device>("vbout_timer");
-	vblank_out_timer->adjust(machine.primary_screen->time_until_pos(0));
-	scan_timer->adjust(machine.primary_screen->time_until_pos(224, 352));
-	#endif
 }
 
 
@@ -2767,17 +2621,6 @@ static MACHINE_RESET( stv )
 
 	stvcd_reset(machine);
 
-	/* set the first scanline 0 timer to go off */
-	#if NEW_IRQ_CODE
-
-	#else
-	scan_timer = machine.device<timer_device>("scan_timer");
-	t1_timer = machine.device<timer_device>("t1_timer");
-	vblank_out_timer = machine.device<timer_device>("vbout_timer");
-	vblank_out_timer->adjust(machine.primary_screen->time_until_pos(0));
-	scan_timer->adjust(machine.primary_screen->time_until_pos(224, 352));
-	#endif
-
 	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	state->m_prev_bankswitch = 0xff;
 }
@@ -2789,11 +2632,7 @@ static MACHINE_CONFIG_START( saturn, driver_device )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
-	#if NEW_IRQ_CODE
 	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
-	#else
-	MCFG_CPU_VBLANK_INT("screen",stv_interrupt)
-	#endif
 	MCFG_CPU_CONFIG(sh2_conf_master)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2808,22 +2647,12 @@ static MACHINE_CONFIG_START( saturn, driver_device )
 
 	MCFG_NVRAM_HANDLER(saturn)
 
-	#if NEW_IRQ_CODE
-
-	#else
-	MCFG_TIMER_ADD("scan_timer", hblank_in_irq)
-	MCFG_TIMER_ADD("t1_timer", timer1_irq)
-	MCFG_TIMER_ADD("vbout_timer", vblank_out_irq)
-	#endif
 	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MCFG_SCREEN_SIZE(704*2, 512*2)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 464, 0, 320, 263, 0, 224)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
 
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
@@ -2848,11 +2677,7 @@ static MACHINE_CONFIG_START( stv, driver_device )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	#if NEW_IRQ_CODE
 	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
-	#else
-	MCFG_CPU_VBLANK_INT("screen",stv_interrupt)
-	#endif
 	MCFG_CPU_CONFIG(sh2_conf_master)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2867,13 +2692,6 @@ static MACHINE_CONFIG_START( stv, driver_device )
 
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	#if NEW_IRQ_CODE
-
-	#else
-	MCFG_TIMER_ADD("scan_timer", hblank_in_irq)
-	MCFG_TIMER_ADD("t1_timer", timer1_irq)
-	MCFG_TIMER_ADD("vbout_timer", vblank_out_irq)
-	#endif
 	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
 
 	/* video hardware */
@@ -2881,7 +2699,7 @@ static MACHINE_CONFIG_START( stv, driver_device )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 400, 0, 320, 262, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_320/8, 464, 0, 320, 263, 0, 224)
 	MCFG_SCREEN_UPDATE(stv_vdp2)
 
 	MCFG_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
