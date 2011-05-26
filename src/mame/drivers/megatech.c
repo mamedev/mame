@@ -45,7 +45,7 @@ Out Run                    171-5783    837-6963-06       610-0239-06         MPR
 Alien Syndrome             171-5783    837-6963-07       610-0239-07         MPR-11194      (232011)      EPR-12368-07   (27256)   n/a
 Afterburner                171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
 Great Football             171-5783    837-6963-19       610-0239-19         MPR-10576F     (831000)      EPR-12368-19   (27256)   n/a
-World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-126078     (uPD23C4000)  EPR-12607B     (27256)   n/a
+World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-12607B     (uPD23C4000)  EPR-12368-21   (27256)   n/a
 Tetris                     171-5834    837-6963-22       610-0239-22         MPR-12356F     (831000)      MPR-12357F     (831000)  EPR-12368-22 (27256)
 Ghouls & Ghosts            171-5869A   -                 610-0239-23         MPR-12605      (40 pins)     MPR-12606      (40 pins) EPR-12368-23 (27256)
 Super Hang On              171-5782    837-6963-24       610-0239-24         MPR-12640      (234000)      EPR-12368-24   (27256)   n/a
@@ -1081,7 +1081,7 @@ ROM_START( mt_srage ) /* Streets of Rage */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "game0", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "mpr-13571-s.ic1", 0x000000, 0x080000, CRC(db4ac746) SHA1(c7cc24e2329f279574513fa32bbf79f72f75aeea) )
+	ROM_LOAD16_WORD_SWAP( "mpr-14125-s.ic1", 0x000000, 0x080000, CRC(db4ac746) SHA1(c7cc24e2329f279574513fa32bbf79f72f75aeea) )
 	ROM_LOAD16_BYTE( "epr-12368-51.ic2", 0x300001, 0x08000, CRC(49b7d6f4) SHA1(96e69851c92715e7daf35b184cf374147a8d2880) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1247,7 +1247,7 @@ ROM_END
 /* 15 */ // unknown
 /* 16 */ // unknown
 /* 17 */ // unknown
-/* 18 */ // unknown
+/* 18 */ // Kung Fu Kid (sms)
 /* 19 */ GAME( 1987, mt_gfoot, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Great Football (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
 /* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, mt_crt, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
