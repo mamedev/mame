@@ -350,12 +350,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_tag(tag),
 	  m_config_complete(false)
 {
-	// derive the clock from our owner if requested
-	if ((m_configured_clock & 0xff000000) == 0xff000000)
-	{
-		assert(m_owner != NULL);
-		m_clock = m_unscaled_clock = m_configured_clock = m_owner->m_configured_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff);
-	}
+	static_set_clock(*this, clock);
 }
 
 
@@ -387,12 +382,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	  m_tag(tag),
 	  m_config_complete(false)
 {
-	// derive the clock from our owner if requested
-	if ((m_configured_clock & 0xff000000) == 0xff000000)
-	{
-		assert(m_owner != NULL);
-		m_clock = m_unscaled_clock = m_configured_clock = m_owner->m_configured_clock * ((m_configured_clock >> 12) & 0xfff) / ((m_configured_clock >> 0) & 0xfff);
-	}
+	static_set_clock(*this, clock);
 }
 
 
@@ -453,6 +443,25 @@ device_t *device_t::siblingdevice(const char *_tag) const
 	// build a fully-qualified name
 	astring tempstring;
 	return mconfig().devicelist().find((const char *)siblingtag(tempstring, _tag));
+}
+
+
+//-------------------------------------------------
+//  static_set_clock - set/change the clock on
+//  a device
+//-------------------------------------------------
+
+void device_t::static_set_clock(device_t &device, UINT32 clock)
+{
+	// derive the clock from our owner if requested
+	if ((clock & 0xff000000) == 0xff000000)
+	{
+		assert(device.m_owner != NULL);
+		clock = device.m_owner->m_configured_clock * ((clock >> 12) & 0xfff) / ((clock >> 0) & 0xfff);
+	}
+
+	device.m_clock = device.m_unscaled_clock = device.m_configured_clock = clock;
+	device.m_attoseconds_per_clock = (clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock);
 }
 
 

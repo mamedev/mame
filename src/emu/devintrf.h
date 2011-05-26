@@ -245,7 +245,7 @@ public:
 	const memory_region *region() const { return m_region; }
 
 	// configuration helpers
-	static void static_set_clock(device_t &device, UINT32 clock) { device.m_clock = clock; }
+	static void static_set_clock(device_t &device, UINT32 clock);
 	static void static_set_static_config(device_t &device, const void *config) { device.m_static_config = config; }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 
