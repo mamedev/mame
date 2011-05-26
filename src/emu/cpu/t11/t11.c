@@ -75,6 +75,7 @@ INLINE t11_state *get_safe_token(device_t *device)
 
 INLINE int ROPCODE(t11_state *cpustate)
 {
+	cpustate->PC &= 0xfffe;
 	int val = cpustate->direct->read_decrypted_word(cpustate->PC);
 	cpustate->PC += 2;
 	return val;
