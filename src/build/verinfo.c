@@ -251,8 +251,8 @@ int main(int argc, char *argv[])
 	// parse out version string
 	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &v.version_string))
 	{
-		free(buffer);
 		fprintf(stderr, "Error parsing version from '%s'\n", buffer);
+		free(buffer);
 		return 1;
 	}
 

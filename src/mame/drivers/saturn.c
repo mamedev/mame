@@ -2628,7 +2628,7 @@ static MACHINE_RESET( stv )
 
 
 
-static MACHINE_CONFIG_START( saturn, driver_device )
+static MACHINE_CONFIG_START( saturn, saturn_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2673,7 +2673,7 @@ static MACHINE_CONFIG_START( saturn, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( stv, driver_device )
+static MACHINE_CONFIG_START( stv, saturn_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

@@ -3965,7 +3965,7 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 		{
 			prev_scroll_values[i] &= 0x0007ff00;
 			if ( prev_scroll_values[i] & 0x00040000 ) prev_scroll_values[i] |= 0xfff80000;
-			stv2_current_tilemap.incx = prev_scroll_values[i];
+			incx = prev_scroll_values[i];
 			i++;
 		}
 
@@ -4051,31 +4051,12 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 	UINT32 address;
 	UINT16 *line;
 	UINT16 pix;
-	UINT32 coeff_line_color_screen_data;
+	//UINT32 coeff_line_color_screen_data;
 	INT32 clipxmask = 0, clipymask = 0;
 
 
-	if((STV_VDP2_LSMD & 3) == 3)
-	{
-		vcnt_shift = 1;
-	}
-	else
-	{
-		vcnt_shift = 0;
-	}
-
-	switch( STV_VDP2_HRES & 7 )
-	{
-		case 2: /*640*/
-		case 3: /*704*/
-		case 6:
-		case 7:
-			hcnt_shift = 1;
-			break;
-		default:
-			hcnt_shift = 0;
-			break;
-	}
+	vcnt_shift = ((STV_VDP2_LSMD & 3) == 3);
+	hcnt_shift = ((STV_VDP2_HRES & 2) == 2);
 
 	planesizex--;
 	planesizey--;
@@ -4215,7 +4196,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 					case 0:
 						address = coeff_table_offset + ((RP.kast + RP.dkast*(vcnt>>vcnt_shift)) >> 16) * 4;
 						coeff_table_val = coeff_table_base[ address / 4 ];
-						coeff_line_color_screen_data = (coeff_table_val & 0x7f000000) >> 24;
+						//coeff_line_color_screen_data = (coeff_table_val & 0x7f000000) >> 24;
 						coeff_msb = (coeff_table_val & 0x80000000) > 0;
 						if ( coeff_table_val & 0x00800000 )
 						{
@@ -4234,7 +4215,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 							coeff_table_val >>= 16;
 						}
 						coeff_table_val &= 0xffff;
-						coeff_line_color_screen_data = 0;
+						//coeff_line_color_screen_data = 0;
 						coeff_msb = (coeff_table_val & 0x8000) > 0;
 						if ( coeff_table_val & 0x4000 )
 						{
@@ -4312,7 +4293,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 					case 0:
 						address = coeff_table_offset + ((RP.kast + RP.dkast*(vcnt>>vcnt_shift) + RP.dkax*hcnt) >> 16) * 4;
 						coeff_table_val = coeff_table_base[ address / 4 ];
-						coeff_line_color_screen_data = (coeff_table_val & 0x7f000000) >> 24;
+						//coeff_line_color_screen_data = (coeff_table_val & 0x7f000000) >> 24;
 						coeff_msb = (coeff_table_val & 0x80000000) > 0;
 						if ( coeff_table_val & 0x00800000 )
 						{
@@ -4331,7 +4312,7 @@ static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
 							coeff_table_val >>= 16;
 						}
 						coeff_table_val &= 0xffff;
-						coeff_line_color_screen_data = 0;
+						//coeff_line_color_screen_data = 0;
 						coeff_msb = (coeff_table_val & 0x8000) > 0;
 						if ( coeff_table_val & 0x4000 )
 						{
