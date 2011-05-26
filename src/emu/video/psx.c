@@ -1,21 +1,9 @@
-/***************************************************************************
-
-    PSX GPU
-
-    Preliminary software renderer by smf.
-    Thanks to Ryan Holtz, Pete B & Farfetch'd.
-
-    Supports:
-      type 1 1024x1024 framebuffer (CXD8538Q)
-      type 2 1024x512 framebuffer (CXD8561Q)
-      type 2 1024x1024 framebuffer (CXD8514Q/CXD8561Q/CXD8654Q)
-
-    Debug Keys:
-        M toggles mesh viewer.
-        V toggles vram viewer.
-        I toggles interleave in vram viewer.
-
-***************************************************************************/
+/*
+ * PlayStation GPU emulator
+ *
+ * Copyright 2003-2011 smf
+ *
+ */
 
 #include "emu.h"
 #include "video/psx.h"
@@ -2186,9 +2174,6 @@ void psxgpu_device::MonochromeLine( void )
 	PAIR n_y;
 	INT32 n_dx;
 	INT32 n_dy;
-	INT32 n_dr;
-	INT32 n_dg;
-	INT32 n_db;
 	INT32 n_len;
 	INT32 n_xlen;
 	INT32 n_ylen;
@@ -2257,9 +2242,6 @@ void psxgpu_device::MonochromeLine( void )
 
 	n_dx = (INT32)( ( n_xend << 16 ) - n_x.d ) / n_len;
 	n_dy = (INT32)( ( n_yend << 16 ) - n_y.d ) / n_len;
-	n_dr = 0;
-	n_dg = 0;
-	n_db = 0;
 
 	while( n_len > 0 )
 	{
