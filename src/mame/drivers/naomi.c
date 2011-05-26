@@ -271,7 +271,6 @@ Heavy Metal Geo Matrix (Rev A)                  HMG016007  23716A  11 (64Mb)   p
 Idol Janshi Suchie-Pai 3                        841-0002C  21979   14 (64Mb)   ?        315-6213  317-5047-JPN   requires special I/O board and mahjong panel
 Jambo! Safari (Rev A)                           840-0013C  22826A   8 (64Mb)   ?        315-6213  317-0264-COM
 OutTrigger                                      840-0017C  22163   19 (64Mb)   ?        315-6213  317-0266-COM   requires analog controllers/special panel
-Power Smash / Virtua Tennis                     840-0015C  22927   11 (64Mb)   present  315-6213  317-0263-COM
 Power Stone                                     841-0001C  21597    8 (64Mb)   present  315-6213  317-5046-COM   joystick + 3 buttons
 Power Stone 2                                   841-0008C  23127    9 (64Mb)   present  315-6213  317-5054-COM   joystick + 3 buttons
 Puyo Puyo Da!                                   841-0006C  22206   20 (64Mb)   ?        ?         ?
@@ -286,6 +285,7 @@ Toy Fighter / Waffupu                           840-0011C  22035   10 (64Mb)   ?
 Virtua NBA                                      840-0021C  23073   21 (64Mb)   present  315-6213  not present
 Virtua NBA (original)                           840-0021C  23073   21 (64Mb)   ?        315-6213  not present
 Virtua Striker 2 Ver. 2000 (Rev C)              840-0010C  21929C  14 (64Mb)   present  315-6213  317-0258-COM   joystick + 3 buttons (+1x 32Mb)
+Virtua Tennis / Power Smash                     840-0015C  22927   11 (64Mb)   present  315-6213  317-0263-COM
 Zombie Revenge                                  840-0003C  21707   19 (64Mb)   ?        315-6213  317-0249-COM   joystick + 3 buttons
 
 
@@ -338,12 +338,12 @@ Game                                           on cart    IC11#   # of SOP44 IC1
 Giant Gram 2000                                840-0039C  23377   20 (64Mb)  present   317-0296-COM
 Kick '4' Cash                                  840-0140C  24212   16 (64Mb)  present   317-0397-COM
 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)  841-0007C  23085A  14 (64Mb)  present   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
-Power Smash 2 / Virtua Tennis 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present   317-0320-COM
 Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  present   317-0280-JPN
 Shootout Pool                                  840-0098C  23844    4 (64mb)  present   317-0336-COM
 Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64mb)  present   317-0367-COM
 Shootout Pool Medal                            ?          24148    4 (64Mb)  ?         ?
 Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present   317-0339-COM
+Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present   317-0320-COM
 
 
 
@@ -387,7 +387,7 @@ Derby Owners Club II (Rev B)                    840-0083C  22306B  11 (128Mb)  3
 Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  present   not present
 Derby Owners Club World Edition (Rev D)         840-0088C  22336D   7 (128Mb)  315-6319A  present   not present   2 MaskROM are different from Rev C
 Giga Wing 2                                     841-0014C  22270    5 (128Mb)  315-6319A  present   317-5064-COM
-Mobile Suit Gundam: Fed. VS Zeon (cart)         841-0017C  23638   10 (128Mb)  ?          ?         ?
+Mobile Suit Gundam: Federation Vs. Zeon         841-0017C  23638   10 (128Mb)  ?          ?         ?
 Moero Justice Gakuen / Project Justice (Rev A)  841-0015C  23548A  11 (128Mb)  315-6319A  present   317-5065-COM
 Oinori-daimyoujin Matsuri                       840-0126B  24053    5 (128Mb)  315-6319A  present   not present
 Samba de Amigo Ver.2000                         840-0047C  23600   21 (128Mb)  315-6319A  present   317-0295-COM
@@ -437,9 +437,9 @@ Notes:
 Game                               on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
 ----------------------------------------------------------------------------------------------------------------------------
 /Akatsuki Denkou Senki Blitz Kampf
-\Ausf. Achse                       841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A"
-Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ?
-Illmatic Envelope                  841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2"
+\Ausf. Achse                       841-0058C  not present  4 (512Mb)   present  317-5130-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "5A" - IC#10 & IC#11 are empty
+Dynamite Deka EX / Asian Dynamite  840-0175C  not present  4 (512Mb)   present  317-0495-COM  present  IC2# is labeled "VER.2"
+Illmatic Envelope                  841-0059C  not present  4 (512Mb)   present  317-5131-JPN  present  IC2# is labeled "VER.2" - IC#11 is empty
 Mamonoro                           841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
 Melty Blood Actress Again          841-0061C  not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Melty Blood Actress Again (Rev A)  841-0061C  24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
@@ -492,7 +492,8 @@ Notes:
                                    Sticker   FL0-FL3   FLASHROMs   X76F100      EPM7064   EPM7064   315-5581      Game
  Game                              on cart   FLASHROM  # of SOP48  IC @ 1F      IC @ 1H   IC @ 2K   IC @ 1M       code       Notes
 -----------------------------------------------------------------------------------------------------------------------------------------------
-Gun Survivor 2: Biohazard Code V.  25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
+/Gun Survivor 2 Biohazard
+\Code: Veronica                    25709801  1 (64Mb)  14 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5075-COM  BHF1
 /Shin Nihon Prowrestling                                                                                                     /FL0 & FL1 have pin55 raised from PCB.
 \Toukon Retsuden 4 Arcade Edition  25349801  2 (64Mb)  15 (128Mb)  not present  NAODEC2A  NAODEC1B  317-5040-COM  TRF1Ver.A  \They are connected togheter and go to pin89 on 2K.
 World Kicks                        25209801  2 (32Mb)  10 (128Mb)  not present  NAODEC2A  NAODEC1A  317-5040-COM  WK3 Ver.A  317-5040-COM is confirmed.
@@ -537,11 +538,11 @@ Notes:
    CN1/2/3  - connectors joining to main board
 
    Games known to use this PCB include....
-                          Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
- Game                     on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code        Notes
+                           Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5581      Game
+ Game                      on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 3J  IC @ 1M       code        Notes
 --------------------------------------------------------------------------------------------------------------------
-Mazan: Flash of the Blade 25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0056-COM  MAZ1
-Ninja Assault             25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
+Mazan: Flash of the Blade  25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0056-COM  MAZ1
+Ninja Assault              25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA3 Ver.A
 
 
 
@@ -2780,7 +2781,7 @@ ROM_START( derbyoc2 )
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0xb800000, "user1", ROMREGION_ERASEFF)
-	ROM_LOAD("epr-22306.ic22",  0x0000000, 0x0400000, CRC(fcac20eb) SHA1(26cec9f615cd18ce7fccfc5e273e42c58dea1995) )
+	ROM_LOAD("epr-22306b.ic22",  0x0000000, 0x0400000, CRC(fcac20eb) SHA1(26cec9f615cd18ce7fccfc5e273e42c58dea1995) )
         ROM_LOAD( "mpr-22295.ic1",  0x0800000, 0x1000000, CRC(1085001b) SHA1(096ac0ecc7d5324f04514d24eb338de591926a3d) )
         ROM_LOAD( "mpr-22296.ic2",  0x1800000, 0x1000000, CRC(f18cb28b) SHA1(e7f253a35e15f62e178a1ff565f8a94102eea057) )
         ROM_LOAD( "mpr-22297.ic3",  0x2800000, 0x1000000, CRC(a78a527b) SHA1(7d4e7bd93519377a8676f7ca6f72c4d0de2a0475) )
@@ -7055,7 +7056,7 @@ ROM_END
 /* 0011 */ GAME( 1999, toyfight, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Toy Fighter", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012 */ GAME( 1999, smlg99,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Super Major League '99", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0013 */ GAME( 1999, jambo,    naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Jambo! Safari (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0015 */ GAME( 1999, vtennis,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0015 */ GAME( 1999, vtennis,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua Tennis (USA, EXP, KOR, AUS) / Power Smash (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0016 */ GAME( 1999, derbyoc,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club (JPN, USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0017 */ GAME( 1999, otrigger, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0018 */ GAME( 1999, sgtetris, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Sega Tetris", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7075,20 +7076,21 @@ ROM_END
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomi,   naomi,    gram2000, ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0041 */ GAME( 2000, slasho,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0042 */ GAME( 1999, f355twn2, f355bios, naomi,   naomi,    0,        ROT0, "Sega", "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
+/* 0042 */ GAME( 2001, f355twn2, f355bios, naomi,   naomi,    0,        ROT0, "Sega", "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "f355bios" needed */
 /* 0043 */ GAME( 2000, crackndj, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Crackin' DJ", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0044 */ GAME( 2001, csmash,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0044 */ GAME( 2001, csmasho,  csmash,   naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0044 */ GAME( 2000, csmasho,  csmash,   naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0044 */ GAME( 2000, csmash,   csmash,   naomi,   naomi,    naomi,    ROT0, "Sega", "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0048 Alien Front
 /* 0052 */ GAME( 2000, derbyo2k, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0083 */ GAME( 2001, derbyoc2, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club II (JPN, USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0084 */ GAME( 2001, vtenis2c, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Power Smash 2 (JPN) / Virtua Tennis 2  (USA, EXP, KOR, AUS) (Cart, Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0084 */ GAME( 2001, vtenis2c, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (JPN) (USA, EXP, KOR, AUS) (Cart, Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088 */ GAME( 2001, derbyocw, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev D)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0088 */ GAME( 2001, drbyocwc, derbyocw, naomi,   naomi,    naomi,    ROT0, "Sega", "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098 */ GAME( 2002, shootopl, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+// 0120 Poka Suka Ghost
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128 */ GAME( 2001, shootpl,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomi,   naomi,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7100,6 +7102,7 @@ ROM_END
 /* 00?? */ GAME( 1999, ringout,  naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 00?? */ GAME( 1999, alpiltdx, airlbios, naomi,   naomi,    0,        ROT0, "Sega", "Airline Pilots Deluxe (Rev B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) /* specific BIOS "airlbios" needed */
 /* 0??? */ GAME( 2001, shootplm, naomi,    naomi,   naomi,    naomi,    ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+// 00?? Crackin' DJ Part 2
 // 00?? Touch de Uno!
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
@@ -7121,16 +7124,16 @@ ROM_END
 /* 0004 */ GAME( 1999, shangril, naomi,    naomi,   naomi_mp, naomi_mp, ROT0, "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0005 */ GAME( 1999, spawn,    naomi,    naomi,   naomi,    naomi,    ROT0, "Capcom",          "Spawn In the Demon's Hand (JPN, USA, EUR, ASI, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0006 */ GAME( 1999, puyoda,   naomi,    naomi,   naomi,    naomi,    ROT0, "Compile",         "Puyo Puyo Da!", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0007-02 */ GAME( 2000,mvsc2,  naomi,    naomi,   naomi,    mvsc2,    ROT0, "Capcom",          "Marvel vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0007-02 */ GAME( 2000,mvsc2,  naomi,    naomi,   naomi,    mvsc2,    ROT0, "Capcom",          "Marvel Vs. Capcom 2 New Age of Heroes (JPN, USA, EUR, ASI, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0008 */ GAME( 2000, pstone2,  naomi,    naomi,   naomi,    naomi,    ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0011 */ GAME( 2000, capsnk,   naomi,    naomi,   naomi,    naomi,    ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (000904 JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0011 */ GAME( 2000, capsnka,  capsnk,   naomi,   naomi,    naomi,    ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (000804 JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0011 */ GAME( 2000, capsnk,   naomi,    naomi,   naomi,    naomi,    ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0011 */ GAME( 2000, capsnka,  capsnk,   naomi,   naomi,    naomi,    ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012 */ GAME( 2000, cspike,   naomi,    naomi,   naomi,    naomi,    ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0013 */ GAME( 2000, ggx,      naomi,    naomi,   naomi,    naomi,    ROT0, "Arc System Works","Guilty Gear X (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0014 */ GAME( 2000, gwing2,   naomi,    naomi,   naomi,    naomi,    ROT0, "Takumi / Capcom", "Giga Wing 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0015 */ GAME( 2000, pjustic,  naomi,    naomi,   naomi,    naomi,    ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0016 */ GAME( 2000, deathcox, naomi,    naomi,   naomi,    naomi,    ROT0, "Ecole Software",  "Death Crimson OX (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0017 */ GAME( 2001, gundmct,  naomi,    naomi,   naomi,    naomi,    ROT0, "Banpresto",       "Mobile Suit Gundam: Federation vs. Zeon (2001-02-08)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0017 */ GAME( 2001, gundmct,  naomi,    naomi,   naomi,    naomi,    ROT0, "Banpresto",       "Mobile Suit Gundam: Federation Vs. Zeon (2001-02-08)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020 */ GAME( 2001, zerogu2,  naomi,    naomi,   naomi,    naomi,    ROT0, "Psikyo",          "Zero Gunner 2", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0057 Shooting Love 2007
 // 0058 Akatsuki Denkou Senki Blitz Kampf - Ausf. Achse
@@ -7145,11 +7148,11 @@ ROM_END
 /* 25209801 */ GAME( 2000, wldkicks, naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 25349801 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition
 // 25469801 Ninja Assault
-/* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2: Bio Hazard Code Veronica", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 25869812 Mazan : Flash of the Blade
 
 /* GDS-xxxx (Sega GD-ROM games) */
-/* 0001  */ GAME( 2001, confmiss,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0001  */ GAME( 2000, confmiss,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Confidential Mission (GDS-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0002  Shakatto Tambourine
 /* 0003  */ GAME( 2000, sprtjam,   naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Sports Jam (GDS-0003)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0004  */ GAME( 2000, slashout,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Slashout (GDS-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7159,18 +7162,18 @@ ROM_END
 /* 0008  */ GAME( 2001, monkeyba,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0009  Virtua Golf / Dynamic Golf
 /* 0009A */ GAME( 2001, dygolf,    naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "World Series Baseball / Super Major League (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0011  */ GAME( 2001, vtennisg,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Power Smash / Virtua Tennis (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0010  */ GAME( 2001, wsbbgd,    naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Super Major League / World Series Baseball (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0011  */ GAME( 1999, vtennisg,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012  */ GAME( 2001, vf4,       naomi2,   naomigd, naomi,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 (GDS-0012)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0012A Virtua Fighter 4 (Rev A)
 /* 0012B */ GAME( 2001, vf4b,      vf4,      naomigd, naomi,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0012C */ GAME( 2001, vf4c,      vf4,      naomigd, naomi,    naomi2,   ROT0, "Sega", "Virtua Fighter 4 (Rev C) (GDS-0012C)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0013
 /* 0014  */ GAME( 2002, beachspi,  naomi2,   naomigd, naomi,    naomi2,   ROT0, "Sega", "Beach Spikers (GDS-0014)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-// 0015  Power Smash 2 / Virtua Tennis 2
-/* 0015A */ GAME( 2001, vtennis2,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Power Smash 2 / Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+// 0015  Virtua Tennis 2 / Power Smash 2
+/* 0015A */ GAME( 2001, vtennis2,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0016  */ GAME( 2001, shaktamb,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Shakatto Tambourine Cho Powerup Chu (GDS-0016)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0017  */ GAME( 2001, keyboard,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "La Keyboardxyu (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0017  */ GAME( 2001, keyboard,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "La Keyboard (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0018  */ GAME( 2001, lupinsho,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0018A Lupin The Third - The Shooting (Rev A)
 /* 0019  */ GAME( 2002, vathlete,  naomigd,  naomigd, naomi,    naomi,    ROT0, "Sega", "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -7221,7 +7224,6 @@ ROM_END
 // 0041
 // 0042  NAOMI DIMM Firm Update for CF-BOX
 // 0042A NAOMI DIMM Firm Update for CF-BOX (Rev A)
-// 00??  Crackin' DJ Part 2
 // 00??  Dragon Treasure
 // 00??  Dragon Treasure II
 // 00??  Dragon Treasure III
@@ -7230,12 +7232,12 @@ ROM_END
 // 00??  World Club Champion Football Serie A 2001-2002
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
-/* 0001  */ GAME( 2001, gundmgd,   naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0001  */ GAME( 2001, gundmgd,   naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0002  */ GAME( 2001, sfz3ugd,   naomigd,  naomigd, naomi,    sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0003
 /* 0004  */ GAME( 2001, cvsgd,     naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0005  */ GAME( 2001, starseek,  naomigd,  naomigd, naomi,    naomi,    ROT0,   "G-Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-/* 0006  */ GAME( 2001, gundmxgd,  naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 0006  */ GAME( 2001, gundmxgd,  naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom",       "Mobile Suit Gundam: Federation Vs. Zeon DX  (GDL-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0007  Capcom Vs. SNK 2
 /* 0007A */ GAME( 2001, cvs2gd,    naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 // 0008  Capcom Vs. SNK 2 Mark Of The Millenium 2001 (Export)
