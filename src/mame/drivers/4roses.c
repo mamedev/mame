@@ -404,7 +404,7 @@ static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	MCFG_PALETTE_INIT(funworld)
 	MCFG_VIDEO_START(funworld)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
+//	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
