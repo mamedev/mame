@@ -2494,6 +2494,11 @@ static MACHINE_START( stv )
 static MACHINE_START( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+
+	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
+	state->m_slave = downcast<legacy_cpu_device*>( machine.device("slave") );
+	state->m_audiocpu = downcast<legacy_cpu_device*>( machine.device("audiocpu") );
+
 	scsp_set_ram_base(machine.device("scsp"), state->m_sound_ram);
 
 	// save states
@@ -2633,8 +2638,8 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(saturn_mem)
@@ -2678,8 +2683,8 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 	MCFG_CPU_CONFIG(sh2_conf_master)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", saturn_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MCFG_CPU_PROGRAM_MAP(stv_mem)
