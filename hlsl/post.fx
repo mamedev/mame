@@ -155,7 +155,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// -- Scanline Simulation --
 	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale + 0.5f;
-	float3 ScanBrightness = lerp(1.0f, sin(InnerSine * PI * 2.0f + ScanlineOffset * RawHeight) * ScanlineBrightScale + 1.0f, ScanlineAmount);
+	float3 ScanBrightness = lerp(1.0f, abs(sin(InnerSine * PI + ScanlineOffset * RawHeight)) * ScanlineBrightScale + 1.0f, ScanlineAmount);
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 
 	float2 ShadowDims = float2(ShadowWidth, ShadowHeight);
