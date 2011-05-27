@@ -1096,17 +1096,21 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #endif
 #ifdef VOICED_PULSE_HACK
-          // if pitch is between 0 and PWIDTH, out = PAMP, if between PWIDTH and 2*PWIDTH, out ~PAMP, else out = 0
-          if (tms->pitch_count < PWIDTH)
+          // if pitch is between 1 and PWIDTH+1, out = PAMP, if between PWIDTH+1 and (2*PWIDTH)+1, out ~PAMP, else out = 0
+          if (tms->pitch_count == 0)
+              tms->excitation_data = 0;
+          else if (tms->pitch_count < PWIDTH+1)
               tms->excitation_data = PAMP;
-          else if (tms->pitch_count < PWIDTH*2)
+          else if (tms->pitch_count < (PWIDTH*2)+1)
               tms->excitation_data = ~PAMP;
           else
               tms->excitation_data = 0;
 #endif
 #ifdef VOICED_PULSE_MONOPOLAR_HACK
-          // if pitch is between 0 and PWIDTH, out = PAMP, else out = 0
-          if (tms->pitch_count < PWIDTH)
+          // if pitch is between 1 and PWIDTH+1, out = PAMP, else out = 0
+          if (tms->pitch_count == 0)
+              tms->excitation_data = 0;
+          else if (tms->pitch_count < PWIDTH+1)
               tms->excitation_data = PAMP;
           else
               tms->excitation_data = 0;
@@ -1125,9 +1129,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 	}
 		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C: %01d; ",tms->subcycle);
-		//fprintf(stderr,"IP: %01d; PC: %02d; X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->interp_period, tms->PC, tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
-		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ", tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
+		//fprintf(stderr,"C:%01d; ",tms->subcycle);
+		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",tms->interp_period, tms->PC, tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
+		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
 		fprintf(stderr,"Out:%06d", this_sample);
@@ -1170,6 +1174,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
         }
         tms->pitch_count++;
         if (tms->pitch_count >= tms->current_pitch) tms->pitch_count = 0;
+        tms->pitch_count &= 0x1FF;
         buf_count++;
         size--;
     }
@@ -1237,10 +1242,12 @@ static INT16 clip_analog(INT16 cliptemp)
 
 /**********************************************************************************************
 
-     ti_matrix_multiply -- does the proper multiply and shift as the TI chips do.
+     matrix_multiply -- does the proper multiply and shift
      a is the k coefficient and is clamped to 10 bits (9 bits plus a sign)
      b is the running result and is clamped to 14 bits.
-     output is 14 bits, but note the result LSB bit is always 1. (or is it?)
+     output is 14 bits, but note the result LSB bit is always 1.
+     Because the low 4 bits of the result are trimmed off before
+     output, this makes almost no difference in the computation.
 
 **********************************************************************************************/
 static INT32 matrix_multiply(INT32 a, INT32 b)
