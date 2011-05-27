@@ -5331,7 +5331,7 @@ static int get_pixel_clock(running_machine &machine)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int res,divider;
 
-	res = state->m_vdp2.pixel_clock ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+	res = state->m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320;
 	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
 	divider = 8;
 

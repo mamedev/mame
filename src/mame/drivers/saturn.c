@@ -364,12 +364,12 @@ static READ8_HANDLER( stv_SMPC_r8 )
 static TIMER_CALLBACK( stv_bankswitch_state )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	static const char *const keynames[] = { "game0", "game1", "game2", "game3" };
+	static const char *const banknames[] = { "game0", "game1", "game2", "game3" };
 	UINT8* game_region;
 
 	if(state->m_prev_bankswitch != param)
 	{
-		game_region = machine.region(keynames[param])->base();
+		game_region = machine.region(banknames[param])->base();
 
 		if (game_region)
 			memcpy(machine.region("abus")->base(), game_region, 0x3000000);
@@ -437,10 +437,11 @@ static void smpc_change_clock(running_machine &machine, UINT8 cmd)
 	machine.device("slave")->set_unscaled_clock(xtal/2);
 	machine.device("audiocpu")->set_unscaled_clock(xtal/5);
 
-	state->m_vdp2.pixel_clock = cmd;
+	state->m_vdp2.dotsel = cmd ^ 1;
 	stv_vdp2_dynamic_res_change(machine);
 
 	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values */
 }
 
 static void smpc_intbackhelper(running_machine &machine)
@@ -476,9 +477,13 @@ static void smpc_intbackhelper(running_machine &machine)
 }
 
 /* sys_type 1 == STV, 0 == SATURN */
-static void smpc_intback(running_machine &machine, UINT8 sys_type,system_time systime)
+static TIMER_CALLBACK( smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	system_time systime;
+	machine.base_datetime(systime);
+	UINT8 sys_type = param;
+
 	state->m_smpc_ram[0x21] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
 	if(sys_type == 0)
@@ -496,8 +501,15 @@ static void smpc_intback(running_machine &machine, UINT8 sys_type,system_time sy
 
 	//state->m_smpc_ram[0x33]=input_port_read(space->machine(), "FAKE");
 
-	state->m_smpc_ram[0x35]=0x00;
-	state->m_smpc_ram[0x37]=0x00;
+	state->m_smpc_ram[0x35]= 0 << 7 |
+	                         state->m_vdp2.dotsel << 6 |
+	                         1 << 5 |
+	                         1 << 4 |
+	                         0 << 3 | //MSHNMI
+	                         1 << 2 |
+	                         0 << 1 | //SYSRES
+	                         0 << 0;  //SOUNDRES
+	state->m_smpc_ram[0x37]= 0 << 6; //CDRES
 
 	state->m_smpc_ram[0x39]=sys_type ? 0xff : state->m_smpc.SMEM[0];
 	state->m_smpc_ram[0x3b]=sys_type ? 0xff : state->m_smpc.SMEM[1];
@@ -532,7 +544,8 @@ static void smpc_intback(running_machine &machine, UINT8 sys_type,system_time sy
 
 	//  /*This is for RTC,cartridge code and similar stuff...*/
 	//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-	device_set_input_line_and_vector(state->m_maincpu, 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
+	if(stv_irq.smpc)
+		device_set_input_line_and_vector(state->m_maincpu, 8, HOLD_LINE, 0x47);
 }
 
 static void smpc_rtc_write(running_machine &machine)
@@ -672,7 +685,7 @@ static WRITE8_HANDLER( stv_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
 				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
-				smpc_intback(space->machine(),1,systime);
+				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),1); //TODO: variable time
 				break;
 			/* RTC write*/
 			case 0x16:
@@ -716,36 +729,32 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 
 	if (offset == 0x75)//PDR1 read
 	{
+/*
+	PORT_START("JOY1")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)	// START
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)	// A
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)	// B
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)	// C
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1)	// X
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1)	// Y
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1)	// Z
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
+*/
 		if (state->m_smpc.IOSEL1)
 		{
 			int hshake;
+			const int shift_bit[4] = { 4, 12, 8, 0 };
 
 			hshake = (state->m_smpc.PDR1>>5) & 3;
 
 			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
 
-			return_data = 0x9f;
-
-			switch (hshake)
-			{
-				case 0:
-					return_data = 0x90;
-//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>4) & 0xf);
-					break;
-
-				case 1:
-//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>12) & 0xf);
-					break;
-
-				case 2:
-//                  return_data = 0xf0 | ((input_port_read(space->machine(), "JOY1")>>8) & 0xf);
-					break;
-
-				case 3:
-					return_data = 0x94;
-//                  return_data = 0xf0 | (input_port_read(space->machine(), "JOY1")&0x8) | 0x4;
-					break;
-			}
+			return_data = 0x80 | 0x10 | ((input_port_read(space->machine(), "JOY1")>>shift_bit[hshake]) & 0xf);
 		}
 	}
 
@@ -856,7 +865,7 @@ static WRITE8_HANDLER( saturn_SMPC_w8 )
 			/*"Interrupt Back"*/
 			case 0x10:
                 if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
-		        smpc_intback(space->machine(),0,systime);
+				space->machine().scheduler().timer_set(attotime::from_msec(16), FUNC(smpc_intback),0); //TODO: variable time
 				break;
 			/* RTC write*/
 			case 0x16:
@@ -1352,7 +1361,7 @@ static WRITE32_HANDLER( saturn_scu_w )
 		stv_irq.timer_1 =    (((state->m_scu_regs[40] & 0x0010)>>4) ^ 1);
 		stv_irq.dsp_end =    (((state->m_scu_regs[40] & 0x0020)>>5) ^ 1);
 		stv_irq.sound_req =  (((state->m_scu_regs[40] & 0x0040)>>6) ^ 1);
-		stv_irq.smpc =       (((state->m_scu_regs[40] & 0x0080)>>7)); //NOTE: SCU bug
+		stv_irq.smpc =       (((state->m_scu_regs[40] & 0x0080)>>7) ^ 1); //NOTE: SCU bug
 		stv_irq.pad =        (((state->m_scu_regs[40] & 0x0100)>>8) ^ 1);
 		stv_irq.dma_end[2] = (((state->m_scu_regs[40] & 0x0200)>>9) ^ 1);
 		stv_irq.dma_end[1] = (((state->m_scu_regs[40] & 0x0400)>>10) ^ 1);
@@ -1842,6 +1851,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1)	// Z
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1)	// R
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
 
 	PORT_START("JOY2")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -1857,6 +1867,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Z") PORT_PLAYER(2)	// Z
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 L") PORT_PLAYER(2)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
 INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_)							\
@@ -2630,8 +2641,6 @@ static MACHINE_RESET( stv )
 	state->m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	state->m_prev_bankswitch = 0xff;
 }
-
-
 
 static MACHINE_CONFIG_START( saturn, saturn_state )
 

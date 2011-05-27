@@ -59,7 +59,7 @@ public:
 	struct {
 	    UINT8     *gfx_decode;
 	    bitmap_t  *roz_bitmap[2];
-	    UINT8     pixel_clock;
+	    UINT8     dotsel;
 	}m_vdp2;
 
 	struct {
@@ -73,6 +73,7 @@ public:
         int   smpcSR;
         int   pmode;
         UINT8 SMEM[4];
+        UINT8 intback;
 	}m_smpc;
 
 	/* Saturn specific*/
