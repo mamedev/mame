@@ -4,6 +4,10 @@ System Control Unit - DSP emulator version 0.06
 Written by Angelo Salese & Mariusz Wojcieszek
 
 Changelog:
+110527: Angelo Salese
+- Fixed incorrectly setted execute flag clearance, allows animation of the Sega Saturn
+  splash screen;
+
 051129: Mariusz Wojcieszek
 - Fixed parallel instructions which increment CT registers to update CT register only
   once, after dsp operation is finished. This fixes instructions like
@@ -44,8 +48,8 @@ Changelog:
 - overworked disassembler
 
  TODO:
+- Convert this to cpu structure
 - Disassembler: complete it
-- (Maybe) Convert this to cpu structure
 - Add control flags
 
 ******************************************************************************************/
@@ -66,8 +70,10 @@ Changelog:
 #define ESF ((state->m_scu_regs[32] & 0x00020000) >> 17)
 #define EXF ((state->m_scu_regs[32] & 0x00010000) >> 16)
 #define LEF ((state->m_scu_regs[32] & 0x00008000) >> 15)
-#define T0F_1 if(!(state->m_scu_regs[32] & 0x00800000)) state->m_scu_regs[32]^=0x00800000
-#define T0F_0 if(state->m_scu_regs[32] & 0x00800000) state->m_scu_regs[32]^=0x00800000
+#define T0F_1 state->m_scu_regs[32]|=0x00800000
+#define T0F_0 state->m_scu_regs[32]&=~0x00800000
+#define EXF_0 state->m_scu_regs[32]&=~0x00010000
+#define EF_1  state->m_scu_regs[32]|=0x00040000
 
 #define SET_C(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00100000) | ((_val) ? 0x00100000 : 0)))
 #define SET_S(_val) (state->m_scu_regs[32] = ((state->m_scu_regs[32] & ~0x00400000) | ((_val) ? 0x00400000 : 0)))
@@ -730,15 +736,10 @@ static void dsp_end( address_space *dmaspace )
 	if(opcode & 0x08000000)
 	{
 		/*ENDI*/
-		if(!EF) state->m_scu_regs[32]^=0x00040000;
-		if(EXF) state->m_scu_regs[32]^=0x00100000;
-	}
-	else
-	{
-		/*END*/
-		if(EXF) state->m_scu_regs[32]^=0x00100000;
+		EF_1;
 	}
 
+	EXF_0; /* END / ENDI */
 }
 
 static void dsp_loop( void )
