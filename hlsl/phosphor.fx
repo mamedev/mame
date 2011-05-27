@@ -7,9 +7,9 @@ texture Diffuse;
 sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
+	MipFilter = POINT;
+	MinFilter = POINT;
+	MagFilter = POINT;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 	AddressW = CLAMP;
@@ -20,9 +20,9 @@ texture LastPass;
 sampler PreviousSampler = sampler_state
 {
 	Texture   = <LastPass>;
-	MipFilter = LINEAR;
-	MinFilter = LINEAR;
-	MagFilter = LINEAR;
+	MipFilter = POINT;
+	MinFilter = POINT;
+	MagFilter = POINT;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 	AddressW = CLAMP;
