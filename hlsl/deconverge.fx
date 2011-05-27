@@ -7,9 +7,9 @@ texture Diffuse;
 sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
-	MipFilter = POINT;
-	MinFilter = POINT;
-	MagFilter = POINT;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
 	AddressU = CLAMP;
 	AddressV = CLAMP;
 	AddressW = CLAMP;
@@ -113,9 +113,20 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float Deconverge = 1.0f - MagnetDistance / MagnetCenter;
 	Deconverge = 1.0f;//clamp(Deconverge, 0.0f, 1.0f);
 	float Alpha = tex2D(DiffuseSampler, Input.TexCoord).a;
-	float RedTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.RedCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).r;
-	float GrnTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.GrnCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).g;
-	float BluTexel = tex2D(DiffuseSampler, lerp(Input.TexCoord, Input.BluCoord, Deconverge) + 0.5f / float2(RawWidth, RawHeight)).b;
+	
+	float2 RawDims = float2(RawWidth, RawHeight);
+	float2 TexCoord = Input.TexCoord * RawDims;
+	float2 RedCoord = Input.RedCoord * RawDims;
+	float2 GrnCoord = Input.GrnCoord * RawDims;
+	float2 BluCoord = Input.BluCoord * RawDims;
+	TexCoord.y = TexCoord.y - frac(TexCoord.y);
+	RedCoord.y = RedCoord.y - frac(RedCoord.y);
+	GrnCoord.y = GrnCoord.y - frac(GrnCoord.y);
+	BluCoord.y = BluCoord.y - frac(BluCoord.y);
+	
+	float RedTexel = tex2D(DiffuseSampler, lerp(TexCoord, RedCoord, Deconverge) / RawDims + 0.5f / float2(RawWidth, RawHeight)).r;
+	float GrnTexel = tex2D(DiffuseSampler, lerp(TexCoord, GrnCoord, Deconverge) / RawDims + 0.5f / float2(RawWidth, RawHeight)).g;
+	float BluTexel = tex2D(DiffuseSampler, lerp(TexCoord, BluCoord, Deconverge) / RawDims + 0.5f / float2(RawWidth, RawHeight)).b;
 	
 	RedTexel *= Input.RedCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
 	RedTexel *= Input.RedCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;

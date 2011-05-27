@@ -79,7 +79,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	Output.TexCoord = Input.TexCoord + 0.5f / float2(RawWidth, RawHeight);
 
-	//float Zoom = 1.0f;
+	//float Zoom = 32.0f;
 	//Output.TexCoord /= Zoom;
 	//Output.TexCoord += float2(0.175f * (1.0f - 1.0f / Zoom) / WidthRatio, 0.175f * (1.0f - 1.0f / Zoom) / HeightRatio);
 	return Output;
@@ -156,13 +156,14 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// -- Scanline Simulation --
 	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale + 0.5f;
 	float3 ScanBrightness = lerp(1.0f, abs(sin(InnerSine * PI + ScanlineOffset * RawHeight)) * ScanlineBrightScale + 1.0f, ScanlineAmount);
+	//float3 Scanned = BaseTexel.rgb * ScanBrightness;
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 
 	float2 ShadowDims = float2(ShadowWidth, ShadowHeight);
 	float2 ShadowUV = float2(ShadowU, ShadowV);
 	float2 ShadowMaskSize = float2(ShadowMaskSizeX, ShadowMaskSizeY);
-	float2 ShadowFrac = frac((ScreenCurveCoord * ShadowMaskSize * 0.5f) / Ratios);
-	float2 ShadowCoord = ShadowFrac * ShadowUV + 1.5f / ShadowDims;
+	float2 ShadowFrac = frac(BaseCoord * ShadowMaskSize * 0.5f);
+	float2 ShadowCoord = ShadowFrac * ShadowUV + float2(1.5f / ShadowWidth, 1.5f / ShadowHeight);
 	float3 ShadowTexel = lerp(1.0f, tex2D(ShadowSampler, ShadowCoord), UseShadow);
 	
 	// -- Final Pixel --

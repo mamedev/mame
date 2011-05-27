@@ -90,7 +90,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	
 	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	float2 TexCoord = (Input.Position.xy * InvTexSize);
+	float2 TexCoord = Input.TexCoord;
 	TexCoord = TexCoord + 0.5f * InvTexSize;
 	float2 DefocusVal = float2(DefocusX, DefocusY);
 	Output.TexCoord0 = TexCoord + Coord0Offset * InvTexSize * DefocusVal;
