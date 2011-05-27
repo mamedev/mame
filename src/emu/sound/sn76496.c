@@ -157,7 +157,7 @@ INLINE sn76496_state *get_safe_token(device_t *device)
 		   device->type() == SN94624 ||
 		   device->type() == NCR7496 ||
 		   device->type() == GAMEGEAR ||
-		   device->type() == SMSIII);
+		   device->type() == SEGAPSG);
 	return (sn76496_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -469,7 +469,7 @@ static DEVICE_START( gamegear )
 	generic_start(device, 0x8000, 0x01, 0x08, TRUE, TRUE, 8, FALSE); // Verified by Justin Kerk
 }
 
-static DEVICE_START( smsiii )
+static DEVICE_START( segapsg )
 {
 	generic_start(device, 0x8000, 0x01, 0x08, TRUE, FALSE, 8, FALSE); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 }
@@ -560,12 +560,12 @@ DEVICE_GET_INFO( gamegear )
 	}
 }
 
-DEVICE_GET_INFO( smsiii )
+DEVICE_GET_INFO( segapsg )
 {
 	switch (state)
 	{
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( smsiii );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SMSIII PSG");					break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( segapsg );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SMS VDP PSG");					break;
 		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
@@ -578,4 +578,4 @@ DEFINE_LEGACY_SOUND_DEVICE(SN76494, sn76494);
 DEFINE_LEGACY_SOUND_DEVICE(SN94624, sn94624);
 DEFINE_LEGACY_SOUND_DEVICE(NCR7496, ncr7496);
 DEFINE_LEGACY_SOUND_DEVICE(GAMEGEAR, gamegear);
-DEFINE_LEGACY_SOUND_DEVICE(SMSIII, smsiii);
+DEFINE_LEGACY_SOUND_DEVICE(SEGAPSG, segapsg);
