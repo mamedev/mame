@@ -5299,15 +5299,18 @@ WRITE32_HANDLER ( saturn_vdp2_regs_w )
 	}
 }
 
-/* the following is a complete guess-work */
 static int get_hblank_duration(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	int res;
 
+	res = (STV_VDP2_HRES & 1) ? 455 : 427;
+
+	/* double pump horizontal max res */
 	if(STV_VDP2_HRES & 2)
-		return 464*2;
+		res<<=1;
 
-	return 464;
+	return res;
 }
 
 /*some vblank lines measurements (according to Charles MacDonald)*/
@@ -5503,11 +5506,11 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 	{
 		int vblank_period,hblank_period;
 		rectangle visarea = machine.primary_screen->visible_area();
+		attoseconds_t refresh;;
 		visarea.min_x = 0;
 		visarea.max_x = horz_res-1;
 		visarea.min_y = 0;
 		visarea.max_y = vert_res-1;
-		attoseconds_t refresh;;
 
 		vblank_period = get_vblank_duration(machine);
 		hblank_period = get_hblank_duration(machine);
