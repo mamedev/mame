@@ -67,7 +67,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord + 0.5f * invDims;
+	Output.TexCoord = Input.TexCoord + float2(0.5f, 0.5f) * invDims;
 
 	return Output;
 }

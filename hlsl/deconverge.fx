@@ -128,18 +128,18 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float GrnTexel = tex2D(DiffuseSampler, lerp(TexCoord, GrnCoord, Deconverge) / RawDims + 0.5f / RawDims).g;
 	float BluTexel = tex2D(DiffuseSampler, lerp(TexCoord, BluCoord, Deconverge) / RawDims + 0.5f / RawDims).b;
 	
-	//RedTexel *= Input.RedCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
-	//RedTexel *= Input.RedCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
-	//GrnTexel *= Input.GrnCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.x < (1.0f / TargetWidth) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.y < (1.0f / TargetHeight) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.x > (1.0f / WidthRatio) ? 0.0f : 1.0f;
-	//BluTexel *= Input.BluCoord.y > (1.0f / HeightRatio) ? 0.0f : 1.0f;
+	//RedTexel *= Input.RedCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
+	//RedTexel *= Input.RedCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
+	//RedTexel *= Input.RedCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
+	//RedTexel *= Input.RedCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
+	//GrnTexel *= Input.GrnCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
+	//GrnTexel *= Input.GrnCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
+	//GrnTexel *= Input.GrnCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
+	//GrnTexel *= Input.GrnCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
+	//BluTexel *= Input.BluCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
+	//BluTexel *= Input.BluCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;
+	//BluTexel *= Input.BluCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth) ? 0.0f : 1.0f;
+	//BluTexel *= Input.BluCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight) ? 0.0f : 1.0f;
 
 	return float4(RedTexel, GrnTexel, BluTexel, Alpha);
 }

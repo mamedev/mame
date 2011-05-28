@@ -78,7 +78,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Color = Input.Color;
 	
 	float2 InvTexSize = float2(1.0f / TargetWidth, 1.0f / TargetHeight);
-	Output.TexCoord = Input.TexCoord + 0.5f * InvTexSize;
+	Output.TexCoord = Input.TexCoord + 0.5f * InvTexSize; 
 	Output.PrevCoord = Output.TexCoord + 0.5f * InvTexSize;
 	
 	return Output;

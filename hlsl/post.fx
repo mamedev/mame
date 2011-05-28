@@ -148,13 +148,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 BaseTexel = tex2D(DiffuseSampler, BaseCoord);
 
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
-	clip((BaseCoord.x < WidthRatio / RawWidth) ? -1 : 1);
-	clip((BaseCoord.y < HeightRatio / RawHeight) ? -1 : 1);
-	clip((BaseCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth + 1.0f / TargetWidth)) ? -1 : 1);
-	clip((BaseCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight + 1.0f / TargetHeight)) ? -1 : 1);
+	clip((BaseCoord.x < 1.0f / RawWidth) ? -1 : 1);
+	clip((BaseCoord.y < 1.0f / RawHeight) ? -1 : 1);
+	clip((BaseCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth)) ? -1 : 1);
+	clip((BaseCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight)) ? -1 : 1);
 
 	// -- Scanline Simulation --
-	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale + 0.5f;
+	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale;
 	float3 ScanBrightness = lerp(1.0f, abs(sin(InnerSine * PI + ScanlineOffset * RawHeight)) * ScanlineBrightScale + 1.0f, ScanlineAmount);
 	//float3 Scanned = BaseTexel.rgb * ScanBrightness;
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
