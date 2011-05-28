@@ -265,7 +265,6 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/mc6845.o		\
 	$(EMUVIDEO)/msm6255.o		\
 	$(EMUVIDEO)/pc_vga.o		\
-	$(EMUVIDEO)/pc_video.o		\
 	$(EMUVIDEO)/poly.o			\
 	$(EMUVIDEO)/psx.o			\
 	$(EMUVIDEO)/resnet.o		\

@@ -79,7 +79,6 @@ video card
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "video/pc_vga.h"
-#include "video/pc_video.h"
 
 
 class magtouch_state : public driver_device

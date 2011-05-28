@@ -97,7 +97,6 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "machine/8042kbdc.h"
 #include "machine/pcshare.h"
 #include "video/pc_vga.h"
-#include "video/pc_video.h"
 
 
 class pangofun_state : public driver_device

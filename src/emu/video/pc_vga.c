@@ -30,10 +30,17 @@
 
 #include "emu.h"
 #include "pc_vga.h"
-#include "pc_video.h"
 
-#include "memconv.h"
+/***************************************************************************
 
+    Local variables
+
+***************************************************************************/
+
+static pc_video_update_proc (*pc_choosevideomode)(running_machine &machine, int *width, int *height);
+
+static int pc_current_height;
+static int pc_current_width;
 /***************************************************************************
 
     Static declarations
@@ -43,45 +50,11 @@
 #define LOG_ACCESSES	0
 #define LOG_REGISTERS	0
 
-static const char* vga_crtc_reg_names[] =
-{
-	"Horizontal Total Register",
-	"End Horizontal Display Register",
-	"Start Horizontal Blanking Register",
-	"End Horizontal Blanking Register",
-	"Start Horizontal Retrace Register",
-	"End Horizontal Retrace Register",
-	"Vertical Total Register",
-	"Overflow Register",
-	"Preset Row Scan Register",
-	"Maximum Scan Line Register",
-	"Cursor Start Register",
-	"Cursor End Register",
-	"Start Address High Register",
-	"Start Address Low Register",
-	"Cursor Location High Register",
-	"Cursor Location Low Register",
-	"Vertical Retrace Start Register",
-	"Vertical Retrace End Register",
-	"Vertical Display End Register",
-	"Offset Register",
-	"Underline Location Register",
-	"Start Vertical Blanking Register",
-	"End Vertical Blanking",
-	"CRTC Mode Control Register",
-	"Line Compare Register"
-};
-
-
-static PALETTE_INIT( ega );
 static PALETTE_INIT( vga );
-static VIDEO_START( ega );
 static VIDEO_START( vga );
-static VIDEO_RESET( ega );
 static VIDEO_RESET( vga );
 
 static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height);
-static pc_video_update_proc pc_ega_choosevideomode(running_machine &machine, int *width, int *height);
 
 /***************************************************************************
 
@@ -89,132 +62,47 @@ static pc_video_update_proc pc_ega_choosevideomode(running_machine &machine, int
 
 ***************************************************************************/
 
-/* grabbed from dac inited by et4000 bios */
-static const unsigned char ega_palette[] =
+void pc_video_start(running_machine &machine, pc_video_update_proc (*choosevideomode)(running_machine &machine, int *width, int *height))
 {
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xa8,
-	0x00, 0xa8, 0x00,
-	0x00, 0xa8, 0xa8,
-	0xa8, 0x00, 0x00,
-	0xa8, 0x00, 0xa8,
-	0xa8, 0x54, 0x00,
-	0xa8, 0xa8, 0xa8,
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xa8,
-	0x00, 0xa8, 0x00,
-	0x00, 0xa8, 0xa8,
-	0xa8, 0x00, 0x00,
-	0xa8, 0x00, 0xa8,
-	0xa8, 0x54, 0x00,
-	0xa8, 0xa8, 0xa8,
-	0x54, 0x54, 0x54,
-	0x54, 0x54, 0xfc,
-	0x54, 0xfc, 0x54,
-	0x54, 0xfc, 0xfc,
-	0xfc, 0x54, 0x54,
-	0xfc, 0x54, 0xfc,
-	0xfc, 0xfc, 0x54,
-	0xfc, 0xfc, 0xfc,
-	0x54, 0x54, 0x54,
-	0x54, 0x54, 0xfc,
-	0x54, 0xfc, 0x54,
-	0x54, 0xfc, 0xfc,
-	0xfc, 0x54, 0x54,
-	0xfc, 0x54, 0xfc,
-	0xfc, 0xfc, 0x54,
-	0xfc, 0xfc, 0xfc,
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xa8,
-	0x00, 0xa8, 0x00,
-	0x00, 0xa8, 0xa8,
-	0xa8, 0x00, 0x00,
-	0xa8, 0x00, 0xa8,
-	0xa8, 0x54, 0x00,
-	0xa8, 0xa8, 0xa8,
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xa8,
-	0x00, 0xa8, 0x00,
-	0x00, 0xa8, 0xa8,
-	0xa8, 0x00, 0x00,
-	0xa8, 0x00, 0xa8,
-	0xa8, 0x54, 0x00,
-	0xa8, 0xa8, 0xa8,
-	0x54, 0x54, 0x54,
-	0x54, 0x54, 0xfc,
-	0x54, 0xfc, 0x54,
-	0x54, 0xfc, 0xfc,
-	0xfc, 0x54, 0x54,
-	0xfc, 0x54, 0xfc,
-	0xfc, 0xfc, 0x54,
-	0xfc, 0xfc, 0xfc,
-	0x54, 0x54, 0x54,
-	0x54, 0x54, 0xfc,
-	0x54, 0xfc, 0x54,
-	0x54, 0xfc, 0xfc,
-	0xfc, 0x54, 0x54,
-	0xfc, 0x54, 0xfc,
-	0xfc, 0xfc, 0x54,
-	0xfc, 0xfc, 0xfc
-};
-
-static const unsigned short vga_colortable[] =
-{
-     0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15,
-     1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1,10, 1,11, 1,12, 1,13, 1,14, 1,15,
-     2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 2, 6, 2, 7, 2, 8, 2, 9, 2,10, 2,11, 2,12, 2,13, 2,14, 2,15,
-     3, 0, 3, 1, 3, 2, 3, 3, 3, 4, 3, 5, 3, 6, 3, 7, 3, 8, 3, 9, 3,10, 3,11, 3,12, 3,13, 3,14, 3,15,
-     4, 0, 4, 1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4, 8, 4, 9, 4,10, 4,11, 4,12, 4,13, 4,14, 4,15,
-     5, 0, 5, 1, 5, 2, 5, 3, 5, 4, 5, 5, 5, 6, 5, 7, 5, 8, 5, 9, 5,10, 5,11, 5,12, 5,13, 5,14, 5,15,
-     6, 0, 6, 1, 6, 2, 6, 3, 6, 4, 6, 5, 6, 6, 6, 7, 6, 8, 6, 9, 6,10, 6,11, 6,12, 6,13, 6,14, 6,15,
-     7, 0, 7, 1, 7, 2, 7, 3, 7, 4, 7, 5, 7, 6, 7, 7, 7, 8, 7, 9, 7,10, 7,11, 7,12, 7,13, 7,14, 7,15,
-/* flashing is done by dirtying the videoram buffer positions with attr bit #7 set */
-     8, 0, 8, 1, 8, 2, 8, 3, 8, 4, 8, 5, 8, 6, 8, 7, 8, 8, 8, 9, 8,10, 8,11, 8,12, 8,13, 8,14, 8,15,
-     9, 0, 9, 1, 9, 2, 9, 3, 9, 4, 9, 5, 9, 6, 9, 7, 9, 8, 9, 9, 9,10, 9,11, 9,12, 9,13, 9,14, 9,15,
-    10, 0,10, 1,10, 2,10, 3,10, 4,10, 5,10, 6,10, 7,10, 8,10, 9,10,10,10,11,10,12,10,13,10,14,10,15,
-    11, 0,11, 1,11, 2,11, 3,11, 4,11, 5,11, 6,11, 7,11, 8,11, 9,11,10,11,11,11,12,11,13,11,14,11,15,
-    12, 0,12, 1,12, 2,12, 3,12, 4,12, 5,12, 6,12, 7,12, 8,12, 9,12,10,12,11,12,12,12,13,12,14,12,15,
-    13, 0,13, 1,13, 2,13, 3,13, 4,13, 5,13, 6,13, 7,13, 8,13, 9,13,10,13,11,13,12,13,13,13,14,13,15,
-    14, 0,14, 1,14, 2,14, 3,14, 4,14, 5,14, 6,14, 7,14, 8,14, 9,14,10,14,11,14,12,14,13,14,14,14,15,
-    15, 0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15
-};
-
-MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(720, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0,720-1, 0,480-1)
-	MCFG_PALETTE_LENGTH(0x100)
-	MCFG_PALETTE_INIT(vga)
-
-	MCFG_VIDEO_START(vga)
-	MCFG_VIDEO_RESET(vga)
-	MCFG_SCREEN_UPDATE(pc_video)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_FRAGMENT( pcvideo_pc1640 )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(720, 350)
-	MCFG_SCREEN_VISIBLE_AREA(0,720-1, 0,350-1)
-	MCFG_PALETTE_LENGTH(sizeof(ega_palette) / 3)
-	MCFG_PALETTE_INIT(ega)
-
-	MCFG_VIDEO_START(ega)
-	MCFG_VIDEO_RESET(ega)
-	MCFG_SCREEN_UPDATE(pc_video)
-MACHINE_CONFIG_END
-
-/***************************************************************************/
-
-static PALETTE_INIT( ega )
-{
-	int i;
-
-	for ( i = 0; i < sizeof(ega_palette) / 3; i++ ) {
-		palette_set_color_rgb(machine, i, ega_palette[i*3], ega_palette[i*3+1], ega_palette[i*3+2]);
-	}
+	pc_choosevideomode = choosevideomode;
+	pc_current_height = -1;
+	pc_current_width = -1;
 }
+
+
+
+SCREEN_UPDATE( pc_video )
+{
+	UINT32 rc = 0;
+	int w = 0, h = 0;
+	pc_video_update_proc video_update = pc_choosevideomode(screen->machine(), &w, &h);
+
+	if (video_update)
+	{
+		if ((pc_current_width != w) || (pc_current_height != h))
+		{
+			int width = screen->width();
+			int height = screen->height();
+
+			pc_current_width = w;
+			pc_current_height = h;
+
+			if (pc_current_width > width)
+				pc_current_width = width;
+			if (pc_current_height > height)
+				pc_current_height = height;
+
+			if ((pc_current_width > 100) && (pc_current_height > 100))
+				screen->set_visible_area(0, pc_current_width-1, 0, pc_current_height-1);
+
+			bitmap_fill(bitmap, cliprect, 0);
+		}
+
+		video_update(bitmap);
+	}
+	return rc;
+}
+/***************************************************************************/
 
 static PALETTE_INIT( vga )
 {
@@ -290,10 +178,17 @@ static struct
 } vga;
 
 
-// to use the mscrtc6845 macros
 #define REG(x) vga.crtc.data[x]
 
-#define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0) )
+#define CRTC_CHAR_HEIGHT ((REG(9)&0x1f)+1)
+#define CRTC_CURSOR_MODE (REG(0xa)&0x60)
+#define CRTC_CURSOR_OFF 0x20
+#define CRTC_SKEW	(REG(8)&15)
+#define CRTC_CURSOR_POS ((REG(0xe)<<8)|REG(0xf))
+#define CRTC_CURSOR_TOP	(REG(0xa)&0x1f)
+#define CRTC_CURSOR_BOTTOM REG(0xb)
+
+#define DOUBLESCAN ((vga.crtc.data[9]&0x80)||((vga.crtc.data[9]&0x1f)!=0))
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output&1)?0x3d0:0x3b0)
 
 #define CRTC_ON (vga.crtc.data[0x17]&0x80)
@@ -316,39 +211,16 @@ static struct
 #define VGA_LINE_LENGTH (EGA_LINE_LENGTH<<2)
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
-//#define CHAR_HEIGHT ((vga.crtc.data[9]&0x1f)+1)
 
 #define TEXT_COLUMNS (vga.crtc.data[1]+1)
 #define TEXT_START_ADDRESS (EGA_START_ADDRESS)
 #define TEXT_LINE_LENGTH (EGA_LINE_LENGTH>>2)
 
-#define TEXT_COPY_9COLUMN(ch) ( (ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
+#define TEXT_COPY_9COLUMN(ch) ((ch>=192)&&(ch<=223)&&(vga.attribute.data[0x10]&4))
 
-//#define CURSOR_ON (!(vga.crtc.data[0xa]&0x20))
-//#define CURSOR_STARTLINE (vga.crtc.data[0xa]&0x1f)
-//#define CURSOR_ENDLINE (vga.crtc.data[0xb]&0x1f)
-//#define CURSOR_POS (vga.crtc.data[0xf]|(vga.crtc.data[0xe]<<8))
+#define FONT1 (  ((vga.sequencer.data[3]&0x3)    |((vga.sequencer.data[3]&0x10)<<2))*0x2000 )
+#define FONT2 ( (((vga.sequencer.data[3]&0xc)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000 )
 
-#define FONT1 ( ((vga.sequencer.data[3]&3)|((vga.sequencer.data[3]&0x10)<<2))*0x2000)
-#define FONT2 ((((vga.sequencer.data[3]&c)>>2)|((vga.sequencer.data[3]&0x20)<<3))*0x2000)
-
-#define CRTC6845_COLUMNS (REG(0)+1)
-#define CRTC6845_CHAR_COLUMNS (REG(1))
-#define CRTC6845_LINES (REG(4)*CRTC6845_CHAR_HEIGHT+REG(5))
-#define CRTC6845_CHAR_LINES REG(6)
-#define CRTC6845_CHAR_HEIGHT ((REG(9)&0x1f)+1)
-#define CRTC6845_VIDEO_START ((REG(0xc)<<8)|REG(0xd))
-#define CRTC6845_INTERLACE_MODE (REG(8)&3)
-#define CRTC6845_INTERLACE_SIGNAL 1
-#define CRTC6845_INTERLACE 3
-#define CRTC6845_CURSOR_MODE (REG(0xa)&0x60)
-#define CRTC6845_CURSOR_OFF 0x20
-#define CRTC6845_CURSOR_16FRAMES 0x40
-#define CRTC6845_CURSOR_32FRAMES 0x60
-#define CRTC6845_SKEW	(REG(8)&15)
-#define CRTC6845_CURSOR_POS ((REG(0xe)<<8)|REG(0xf))
-#define CRTC6845_CURSOR_TOP	(REG(0xa)&0x1f)
-#define CRTC6845_CURSOR_BOTTOM REG(0xb)
 
 INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
 {
@@ -356,19 +228,6 @@ INLINE UINT8 rotate_right(UINT8 val, UINT8 rot)
 }
 
 
-
-static int ega_get_clock(void)
-{
-	int clck=0;
-	switch(vga.miscellaneous_output&0xc) {
-	case 0: clck=14000000;break;
-	case 4: clck=16000000;break;
-	/* case 8: external */
-	/* case 0xc: reserved */
-	}
-	if (vga.sequencer.data[1]&8) clck/=2;
-	return clck;
-}
 
 static int vga_get_clock(void)
 {
@@ -381,24 +240,6 @@ static int vga_get_clock(void)
 	}
 	if (vga.sequencer.data[1]&8) clck/=2;
 	return clck;
-}
-
-static int ega_get_crtc_columns(void) /* in clocks! */
-{
-	int columns=vga.crtc.data[0]+2;
-	if (!GRAPHIC_MODE) {
-		columns*=CHAR_WIDTH;
-	} else {
-		columns*=8;
-	}
-	return columns;
-}
-
-static int ega_get_crtc_lines(void)
-{
-	int lines=vga.crtc.data[6]|((vga.crtc.data[7]&1));
-
-	return lines;
 }
 
 static int vga_get_crtc_columns(void) /* in clocks! */
@@ -567,47 +408,15 @@ static WRITE8_HANDLER(vga_vga_w)
 	vga_dirty_font_w(space, ((offset&~3)<<2)|(offset&3),data);
 }
 
-/* 16 bit */
-static READ16_HANDLER( vga_text16_r ) { return read16le_with_read8_handler(vga_text_r, space, offset, mem_mask); }
-static READ16_HANDLER( vga_vga16_r ) { return read16le_with_read8_handler(vga_vga_r, space, offset, mem_mask); }
-static WRITE16_HANDLER( vga_text16_w ) { write16le_with_write8_handler(vga_text_w, space, offset, data, mem_mask); }
-static WRITE16_HANDLER( vga_vga16_w ) { write16le_with_write8_handler(vga_vga_w, space, offset, data, mem_mask); }
-
-static READ16_HANDLER( vga_ega16_r ) { return read16le_with_read8_handler(vga_ega_r, space, offset, mem_mask); }
-static WRITE16_HANDLER( vga_ega16_w ) { write16le_with_write8_handler(vga_ega_w, space, offset, data, mem_mask); }
-
-/* 32 bit */
-static READ32_HANDLER( vga_text32_r ) { return read32le_with_read8_handler(vga_text_r, space, offset, mem_mask); }
-static READ32_HANDLER( vga_vga32_r ) { return read32le_with_read8_handler(vga_vga_r, space, offset, mem_mask); }
-static WRITE32_HANDLER( vga_text32_w ) { write32le_with_write8_handler(vga_text_w, space, offset, data, mem_mask); }
-static WRITE32_HANDLER( vga_vga32_w ) { write32le_with_write8_handler(vga_vga_w, space, offset, data, mem_mask); }
-
-static READ32_HANDLER( vga_ega32_r ) { return read32le_with_read8_handler(vga_ega_r, space, offset, mem_mask); }
-static WRITE32_HANDLER( vga_ega32_w ) { write32le_with_write8_handler(vga_ega_w, space, offset, data, mem_mask); }
-
-/* 64 bit */
-static READ64_HANDLER( vga_text64_r ) { return read64be_with_read8_handler(vga_text_r, space, offset, mem_mask); }
-static READ64_HANDLER( vga_vga64_r ) { return read64be_with_read8_handler(vga_vga_r, space, offset, mem_mask); }
-static WRITE64_HANDLER( vga_text64_w ) { write64be_with_write8_handler(vga_text_w, space, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_vga64_w ) { write64be_with_write8_handler(vga_vga_w, space, offset, data, mem_mask); }
-
-static READ64_HANDLER( vga_ega64_r ) { return read64be_with_read8_handler(vga_ega_r, space, offset, mem_mask); }
-static WRITE64_HANDLER( vga_ega64_w ) { write64be_with_write8_handler(vga_ega_w, space, offset, data, mem_mask); }
-
 static void vga_cpu_interface(running_machine &machine)
 {
 	address_space *space = machine.firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
-	read8_space_func read_handler; const char *read_handler_name=NULL;
-	write8_space_func write_handler; const char *write_handler_name=NULL;
-	read16_space_func read_handler16;
-	write16_space_func write_handler16;
-	read32_space_func read_handler32;
-	write32_space_func write_handler32;
-	read64_space_func read_handler64;
-	write64_space_func write_handler64;
+	read8_space_func read_handler; const char *read_handler_name;
+	write8_space_func write_handler; const char *write_handler_name;
 	UINT8 sel;
 	int buswidth;
+	UINT64 mask = 0;
 
 	if ((gc==vga.gc.data[6])&&(sequencer==vga.sequencer.data[4])) return;
 
@@ -618,34 +427,16 @@ static void vga_cpu_interface(running_machine &machine)
 	{
 		read_handler = vga_vga_r; read_handler_name = "vga_vga_r";
 		write_handler = vga_vga_w; write_handler_name = "vga_vga_w";
-		read_handler16 = vga_vga16_r;
-		write_handler16 = vga_vga16_w;
-		read_handler32 = vga_vga32_r;
-		write_handler32 = vga_vga32_w;
-		read_handler64 = vga_vga64_r;
-		write_handler64 = vga_vga64_w;
 	}
 	else if (vga.sequencer.data[4] & 4)
 	{
 		read_handler = vga_ega_r; read_handler_name = "vga_ega_r";
-		write_handler = vga_ega_w; read_handler_name = "vga_ega_w";
-		read_handler16 = vga_ega16_r;
-		write_handler16 = vga_ega16_w;
-		read_handler32 = vga_ega32_r;
-		write_handler32 = vga_ega32_w;
-		read_handler64 = vga_ega64_r;
-		write_handler64 = vga_ega64_w;
+		write_handler = vga_ega_w; write_handler_name = "vga_ega_w";
 	}
 	else
 	{
 		read_handler = vga_text_r; read_handler_name = "vga_text_r";
-		write_handler = vga_text_w; read_handler_name = "vga_text_w";
-		read_handler16 = vga_text16_r;
-		write_handler16 = vga_text16_w;
-		read_handler32 = vga_text32_r;
-		write_handler32 = vga_text32_w;
-		read_handler64 = vga_text64_r;
-		write_handler64 = vga_text64_w;
+		write_handler = vga_text_w; write_handler_name = "vga_text_w";
 	}
 
 	/* remap the VGA memory */
@@ -658,106 +449,64 @@ static void vga_cpu_interface(running_machine &machine)
 			case 0x00:
 				if (vga.vga_intf.vga_memory_bank != NULL)
 				{
-					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
+					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 					memory_set_bankptr(machine, vga.vga_intf.vga_memory_bank, vga.memory);
 				}
 				break;
 			case 0x04:
-				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xAFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xAFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 			case 0x08:
-				vga.vga_intf.map_vga_memory(machine, 0xB0000, 0xB7FFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB0000, 0xB7FFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 			case 0x0C:
-				vga.vga_intf.map_vga_memory(machine, 0xB8000, 0xBFFFF, read_handler, write_handler);
+				vga.vga_intf.map_vga_memory(machine, 0xB8000, 0xBFFFF, read_handler, read_handler_name, write_handler, write_handler_name);
 				break;
 		}
 	}
 	else
 	{
-		buswidth = downcast<cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+		buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 		switch(buswidth)
 		{
 			case 8:
-				sel = vga.gc.data[6] & 0x0c;
-				if (sel)
-				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler, read_handler_name); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler, read_handler_name); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler, read_handler_name); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
-				}
-				else
-				{
-					space->install_read_bank(0xa0000, 0xbffff, "vgabank" );
-					space->install_write_bank(0xa0000, 0xbffff, "vgabank" );
-					memory_set_bankptr(machine,"vgabank", vga.memory);
-				}
+				mask = 0;
 				break;
 
 			case 16:
-				sel = vga.gc.data[6] & 0x0c;
-				if (sel)
-				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler16, read_handler_name); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler16, read_handler_name); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler16, read_handler_name); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler16, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler16, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler16, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
-				}
-				else
-				{
-					space->install_read_bank(0xa0000, 0xbffff, "vgabank" );
-					space->install_write_bank(0xa0000, 0xbffff, "vgabank" );
-					memory_set_bankptr(machine,"vgabank", vga.memory);
-				}
+				mask = 0xffff;
 				break;
 
 			case 32:
-				sel = vga.gc.data[6] & 0x0c;
-				if (sel)
-				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler32, read_handler_name); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler32, read_handler_name); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler32, read_handler_name); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler32, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler32, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler32, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
-				}
-				else
-				{
-					space->install_read_bank(0xa0000, 0xbffff, "vgabank" );
-					space->install_write_bank(0xa0000, 0xbffff, "vgabank" );
-					memory_set_bankptr(machine,"vgabank", vga.memory);
-				}
+				mask = 0xffffffff;
 				break;
 
 			case 64:
-				sel = vga.gc.data[6] & 0x0c;
-				if (sel)
-				{
-					if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler64, read_handler_name); else space->nop_read(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler64, read_handler_name); else space->nop_read(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler64, read_handler_name); else space->nop_read(0xb8000, 0xbffff);
-					if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler64, write_handler_name); else space->nop_write(0xa0000, 0xaffff);
-					if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler64, write_handler_name); else space->nop_write(0xb0000, 0xb7fff);
-					if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler64, write_handler_name); else space->nop_write(0xb8000, 0xbffff);
-				}
-				else
-				{
-					space->install_read_bank(0xa0000, 0xbffff, "vgabank" );
-					space->install_write_bank(0xa0000, 0xbffff, "vgabank" );
-					memory_set_bankptr(machine,"vgabank", vga.memory);
-				}
+				mask = -1;
 				break;
 
 			default:
-				fatalerror("VGA:  Bus width %d not supported\n", buswidth);
+				fatalerror("VGA: Bus width %d not supported", buswidth);
 				break;
 		}
+
+		sel = vga.gc.data[6] & 0x0c;
+		if (sel)
+		{
+			if (sel == 0x04) space->install_legacy_read_handler(0xa0000, 0xaffff, read_handler, read_handler_name, mask); else space->nop_read(0xa0000, 0xaffff);
+			if (sel == 0x08) space->install_legacy_read_handler(0xb0000, 0xb7fff, read_handler, read_handler_name, mask); else space->nop_read(0xb0000, 0xb7fff);
+			if (sel == 0x0C) space->install_legacy_read_handler(0xb8000, 0xbffff, read_handler, read_handler_name, mask); else space->nop_read(0xb8000, 0xbffff);
+			if (sel == 0x04) space->install_legacy_write_handler(0xa0000, 0xaffff, write_handler, write_handler_name, mask); else space->nop_write(0xa0000, 0xaffff);
+			if (sel == 0x08) space->install_legacy_write_handler(0xb0000, 0xb7fff, write_handler, write_handler_name, mask); else space->nop_write(0xb0000, 0xb7fff);
+			if (sel == 0x0C) space->install_legacy_write_handler(0xb8000, 0xbffff, write_handler, write_handler_name, mask); else space->nop_write(0xb8000, 0xbffff);
+		}
+		else
+		{
+			memory_set_bankptr(machine,"bank1", vga.memory);
+			space->install_read_bank(0xa0000, 0xbffff, "bank1" );
+			space->install_write_bank(0xa0000, 0xbffff, "bank1" );
+		}
+
 	}
 }
 
@@ -799,7 +548,7 @@ static READ8_HANDLER(vga_crtc_r)
 		}
 		else
 		{
-			if ((space->machine().time() - vga.monitor.start_time) > attotime::from_msec(15))
+			if ((space->machine().time() - vga.monitor.start_time)  > attotime::from_msec(15))
 				vga.monitor.retrace=1;
 			vga.monitor.start_time=space->machine().time();
 		}
@@ -828,7 +577,7 @@ static READ8_HANDLER(vga_crtc_r)
 		break;
 	case 0xf:
 		/* oak test */
-		data=0;
+		//data=0;
 		/* pega bios on/off */
 		data=0x80;
 		break;
@@ -851,9 +600,9 @@ static WRITE8_HANDLER(vga_crtc_w)
 		case 5:
 			if (LOG_REGISTERS)
 			{
-				logerror("vga_crtc_w(): CRTC[0x%02X %s] = 0x%02X\n",
+				logerror("vga_crtc_w(): CRTC[0x%02X%s] = 0x%02X\n",
 					vga.crtc.index,
-					(vga.crtc.index < vga.svga_intf.crtc_regcount) ? vga_crtc_reg_names[vga.crtc.index] : "?",
+					(vga.crtc.index < vga.svga_intf.crtc_regcount) ? "" : "?",
 					data);
 			}
 			if(vga.crtc.index == 0x18 || vga.crtc.index == 0x07 || vga.crtc.index == 0x19 ) // Line compare
@@ -871,17 +620,6 @@ READ8_HANDLER( vga_port_03b0_r )
 	UINT8 data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
 		data=vga_crtc_r(space, offset);
-	return data;
-}
-
-
-
-READ8_HANDLER( ega_port_03c0_r)
-{
-	UINT8 data = 0xff;
-	switch (offset) {
-	case 2: data=0xff;/*!*/break;
-	}
 	return data;
 }
 
@@ -1135,30 +873,11 @@ WRITE8_HANDLER(vga_port_03d0_w)
 		vga_crtc_w(space, offset, data);
 }
 
-
-
-READ8_HANDLER( paradise_ega_03c0_r )
-{
-	UINT8 data = vga_port_03c0_r(space, offset);
-
-	if (offset == 2)
-	{
-		if ( (vga.feature_control&3)==2 ) {
-			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(space, 0)&0xc0)>>1);
-		} else if ((vga.feature_control&3)==1 ) {
-			data=(data&~0x60)|((vga.vga_intf.read_dipswitch(space, 0)&0x30)<<1);
-		}
-	}
-	return data;
-}
-
-
-
 void pc_vga_reset(running_machine &machine)
 {
 	/* clear out the VGA structure */
 	memset(vga.pens, 0, sizeof(vga.pens));
-	vga.miscellaneous_output = 1;
+	vga.miscellaneous_output = 0;
 	vga.feature_control = 0;
 	vga.sequencer.index = 0;
 	memset(vga.sequencer.data, 0, vga.svga_intf.seq_regcount * sizeof(*vga.sequencer.data));
@@ -1190,49 +909,22 @@ void pc_vga_reset(running_machine &machine)
 		vga.crtc.data[0x09] |= 0x40;
 }
 
-/* 16 bit */
-READ16_HANDLER( vga_port16le_03b0_r ) { return read16le_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }
-READ16_HANDLER( vga_port16le_03c0_r ) { return read16le_with_read8_handler(vga_port_03c0_r, space, offset, mem_mask); }
-READ16_HANDLER( vga_port16le_03d0_r ) { return read16le_with_read8_handler(vga_port_03d0_r, space, offset, mem_mask); }
-
-WRITE16_HANDLER( vga_port16le_03b0_w ) { write16le_with_write8_handler(vga_port_03b0_w, space, offset, data, mem_mask); }
-WRITE16_HANDLER( vga_port16le_03c0_w ) { write16le_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
-WRITE16_HANDLER( vga_port16le_03d0_w ) { write16le_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
-
-/* 32 bit */
-static READ32_HANDLER( vga_port32le_03b0_r ) { return read32le_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }
-static READ32_HANDLER( vga_port32le_03c0_r ) { return read32le_with_read8_handler(vga_port_03c0_r, space, offset, mem_mask); }
-static READ32_HANDLER( vga_port32le_03d0_r ) { return read32le_with_read8_handler(vga_port_03d0_r, space, offset, mem_mask); }
-
-static WRITE32_HANDLER( vga_port32le_03b0_w ) { write32le_with_write8_handler(vga_port_03b0_w, space, offset, data, mem_mask); }
-static WRITE32_HANDLER( vga_port32le_03c0_w ) { write32le_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
-static WRITE32_HANDLER( vga_port32le_03d0_w ) { write32le_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
-
-/* 64 bit */
-static READ64_HANDLER( vga_port64be_03b0_r ) { return read64be_with_read8_handler(vga_port_03b0_r, space, offset, mem_mask); }
-static READ64_HANDLER( vga_port64be_03c0_r ) { return read64be_with_read8_handler(vga_port_03c0_r, space, offset, mem_mask); }
-static READ64_HANDLER( vga_port64be_03d0_r ) { return read64be_with_read8_handler(vga_port_03d0_r, space, offset, mem_mask); }
-
-static WRITE64_HANDLER( vga_port64be_03b0_w ) { write64be_with_write8_handler(vga_port_03b0_w, space, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_port64be_03c0_w ) { write64be_with_write8_handler(vga_port_03c0_w, space, offset, data, mem_mask); }
-static WRITE64_HANDLER( vga_port64be_03d0_w ) { write64be_with_write8_handler(vga_port_03d0_w, space, offset, data, mem_mask); }
-
 void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_intf, const struct pc_svga_interface *svga_intf)
 {
-	int i, j, k, mask, buswidth;
+	int i, j, k, mask1, buswidth;
 	address_space *spacevga;
 
 	memset(&vga, 0, sizeof(vga));
 
 	for (k=0;k<4;k++)
 	{
-		for (mask=0x80, j=0; j<8; j++, mask>>=1)
+		for (mask1=0x80, j=0; j<8; j++, mask1>>=1)
 		{
 			for  (i=0; i<256; i++)
-				color_bitplane_to_packed[k][j][i]=(i&mask)?(1<<k):0;
+				color_bitplane_to_packed[k][j][i]=(i&mask1)?(1<<k):0;
 		}
 	}
-
+	UINT64 mask = 0;
 	/* copy over interfaces */
 	vga.vga_intf = *vga_intf;
 	if (svga_intf)
@@ -1265,50 +957,37 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 	memset(vga.crtc.data, '\0', vga.svga_intf.crtc_regcount);
 	memset(vga.gc.data, '\0', vga.svga_intf.gc_regcount);
 
-	buswidth = downcast<cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
-	spacevga = machine.firstcpu->memory().space(vga.vga_intf.port_addressspace);
+	buswidth = downcast<legacy_cpu_device *>(machine.firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
+	spacevga =machine.firstcpu->memory().space(vga.vga_intf.port_addressspace);
 	switch(buswidth)
 	{
 		case 8:
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_r) );
-
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_w) );
+			mask = 0;
 			break;
 
 		case 16:
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port16le_03b0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port16le_03c0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port16le_03d0_r) );
-
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port16le_03b0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port16le_03c0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port16le_03d0_w) );
+			mask = 0xffff;
 			break;
 
 		case 32:
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port32le_03b0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port32le_03c0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port32le_03d0_r) );
-
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port32le_03b0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port32le_03c0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port32le_03d0_w) );
+			mask = 0xffffffff;
 			break;
 
 		case 64:
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port64be_03b0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port64be_03c0_r) );
-			spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port64be_03d0_r) );
+			mask = -1;
+			break;
 
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port64be_03b0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port64be_03c0_w) );
-			spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port64be_03d0_w) );
+		default:
+			fatalerror("VGA: Bus width %d not supported", buswidth);
 			break;
 	}
+	spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_r), mask);
+	spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_r), mask);
+	spacevga->install_legacy_read_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_r), mask);
+
+	spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3b0, vga.vga_intf.port_offset + 0x3bf, FUNC(vga_port_03b0_w), mask);
+	spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3c0, vga.vga_intf.port_offset + 0x3cf, FUNC(vga_port_03c0_w), mask);
+	spacevga->install_legacy_write_handler(vga.vga_intf.port_offset + 0x3d0, vga.vga_intf.port_offset + 0x3df, FUNC(vga_port_03d0_w), mask);
 
 	pc_vga_reset(machine);
 }
@@ -1317,22 +996,6 @@ static TIMER_CALLBACK(vga_timer)
 {
 	vga.monitor.retrace=1;
 }
-
-static VIDEO_START( ega )
-{
-	vga.monitor.get_clock = ega_get_clock;
-	vga.monitor.get_lines = ega_get_crtc_lines;
-	vga.monitor.get_columns = ega_get_crtc_columns;
-	vga.monitor.get_sync_lines = vga_get_crtc_sync_lines;
-	vga.monitor.get_sync_columns = vga_get_crtc_sync_columns;
-	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
-	pc_video_start(machine, pc_ega_choosevideomode, 0);
-}
-
-static VIDEO_RESET( ega )
-{
-}
-
 static VIDEO_START( vga )
 {
 	vga.monitor.get_clock=vga_get_clock;
@@ -1341,7 +1004,7 @@ static VIDEO_START( vga )
 	vga.monitor.get_sync_lines=vga_get_crtc_sync_lines;
 	vga.monitor.get_sync_columns=vga_get_crtc_sync_columns;
 	machine.scheduler().timer_pulse(attotime::from_hz(60), FUNC(vga_timer));
-	pc_video_start(machine, pc_vga_choosevideomode, 0);
+	pc_video_start(machine, pc_vga_choosevideomode);
 }
 
 static VIDEO_RESET( vga )
@@ -1355,11 +1018,11 @@ static void vga_vh_text(bitmap_t *bitmap)
 	UINT8 bits;
 	UINT8 *font;
 	UINT16 *bitmapline;
-	int width=CHAR_WIDTH, height=CRTC6845_CHAR_HEIGHT;
+	int width=CHAR_WIDTH, height=CRTC_CHAR_HEIGHT;
 	int pos, line, column, mask, w, h, addr;
 	pen_t pen;
 
-	if (CRTC6845_CURSOR_MODE!=CRTC6845_CURSOR_OFF)
+	if (CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
 	{
 		if (++vga.cursor.time>=0x10)
 		{
@@ -1368,7 +1031,7 @@ static void vga_vh_text(bitmap_t *bitmap)
 		}
 	}
 
-	for (addr = TEXT_START_ADDRESS, line = -CRTC6845_SKEW; line < TEXT_LINES;
+	for (addr = TEXT_START_ADDRESS, line = -CRTC_SKEW; line < TEXT_LINES;
 		 line += height, addr += TEXT_LINE_LENGTH)
 	{
 		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
@@ -1402,11 +1065,11 @@ static void vga_vh_text(bitmap_t *bitmap)
 					bitmapline[column*width+w] = pen;
 				}
 			}
-			if ((CRTC6845_CURSOR_MODE!=CRTC6845_CURSOR_OFF)
-				&&vga.cursor.visible&&(pos==CRTC6845_CURSOR_POS))
+			if ((CRTC_CURSOR_MODE!=CRTC_CURSOR_OFF)
+				&&vga.cursor.visible&&(pos==CRTC_CURSOR_POS))
 			{
-				for (h=CRTC6845_CURSOR_TOP;
-					 (h<=CRTC6845_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
+				for (h=CRTC_CURSOR_TOP;
+					 (h<=CRTC_CURSOR_BOTTOM)&&(h<height)&&(line+h<TEXT_LINES);
 					 h++)
 				{
 					plot_box(bitmap, column*width, line+h, width, 1, vga.pens[attr&0xf]);
@@ -1419,7 +1082,7 @@ static void vga_vh_text(bitmap_t *bitmap)
 static void vga_vh_ega(bitmap_t *bitmap)
 {
 	int pos, line, column, c, addr, i;
-	int height = CRTC6845_CHAR_HEIGHT;
+	int height = CRTC_CHAR_HEIGHT;
 	UINT16 *bitmapline;
 	UINT16 *newbitmapline;
 	pen_t pen;
@@ -1519,38 +1182,12 @@ static void vga_vh_vga(bitmap_t *bitmap)
 	}
 }
 
-static pc_video_update_proc pc_ega_choosevideomode(running_machine &machine, int *width, int *height)
-{
-	pc_video_update_proc proc = NULL;
-	int i;
-
-	//if (CRTC_ON)
-	{
-		for (i = 0; i < 16; i++)
-			vga.pens[i]=machine.pens[i/*vga.attribute.data[i]&0x3f*/];
-
-		if (!GRAPHIC_MODE)
-		{
-			proc = vga_vh_text;
-			*height = TEXT_LINES;
-			*width = TEXT_COLUMNS*CHAR_WIDTH;
-		}
-		else
-		{
-			proc = vga_vh_ega;
-			*height = LINES;
-			*width = EGA_COLUMNS*8;
-		}
-	}
-	return proc;
-}
-
 static pc_video_update_proc pc_vga_choosevideomode(running_machine &machine, int *width, int *height)
 {
 	pc_video_update_proc proc = NULL;
 	int i;
 
-	//if (CRTC_ON)
+	if (CRTC_ON)
 	{
 		if (vga.dac.dirty)
 		{
@@ -1622,4 +1259,18 @@ size_t pc_vga_memory_size(void)
 	return vga.svga_intf.vram_size;
 }
 
-READ16_HANDLER( paradise_ega16le_03c0_r ) { return read16le_with_read8_handler(paradise_ega_03c0_r, space, offset, mem_mask); }
+MACHINE_CONFIG_FRAGMENT( pcvideo_vga )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(720, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0,720-1, 0,480-1)
+	MCFG_SCREEN_UPDATE(pc_video)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(vga)
+
+	MCFG_VIDEO_START(vga)
+	MCFG_VIDEO_RESET(vga)
+MACHINE_CONFIG_END

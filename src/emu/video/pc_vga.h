@@ -9,23 +9,21 @@
 #ifndef PC_VGA_H
 #define PC_VGA_H
 
-#include "osdepend.h"
-#include "pc_video.h"
+typedef void (*pc_video_update_proc)(bitmap_t *bitmap);
 
 MACHINE_CONFIG_EXTERN( pcvideo_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_pc1640 );
 
 struct pc_vga_interface
 {
 	/* VGA memory mapper */
 	const char *vga_memory_bank;
-	void (*map_vga_memory)(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, write8_space_func wh);
+	void (*map_vga_memory)(running_machine &machine, offs_t begin, offs_t end, read8_space_func rh, const char *rh_name, write8_space_func wh, const char *wh_name);
 
 	/* VGA dipswitch (???) */
 	read8_space_func read_dipswitch;
 
 	/* where the ports go */
-	address_spacenum port_addressspace;
+	int port_addressspace;
 	offs_t port_offset;
 };
 
@@ -42,25 +40,6 @@ void pc_vga_init(running_machine &machine, const struct pc_vga_interface *vga_in
 void pc_vga_reset(running_machine &machine);
 void *pc_vga_memory(void);
 size_t pc_vga_memory_size(void);
-
-READ8_HANDLER( ega_port_03c0_r );
-
-READ8_HANDLER( paradise_ega_03c0_r );
-READ16_HANDLER( paradise_ega16le_03c0_r );
-
-READ8_HANDLER( vga_port_03b0_r );
-READ8_HANDLER( vga_port_03c0_r );
-READ8_HANDLER( vga_port_03d0_r );
-WRITE8_HANDLER( vga_port_03b0_w );
-WRITE8_HANDLER( vga_port_03c0_w );
-WRITE8_HANDLER( vga_port_03d0_w );
-
-READ16_HANDLER( vga_port16le_03b0_r );
-READ16_HANDLER( vga_port16le_03c0_r );
-READ16_HANDLER( vga_port16le_03d0_r );
-WRITE16_HANDLER( vga_port16le_03b0_w );
-WRITE16_HANDLER( vga_port16le_03c0_w );
-WRITE16_HANDLER( vga_port16le_03d0_w );
 
 /*
   pega notes (paradise)
