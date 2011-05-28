@@ -241,28 +241,28 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac0", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac3", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac4", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac5", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac6", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 
 	MCFG_SOUND_ADD("dac7", DAC, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(0, "mono", 0.05)
 MACHINE_CONFIG_END
 
 ROM_START( ertictac )
