@@ -9,6 +9,8 @@
 #include "video/psx.h"
 #include "includes/psx.h"
 
+#define VERBOSE_LEVEL ( 0 )
+
 // device type definition
 const device_type CXD8514Q = &device_creator<cxd8514q_device>;
 const device_type CXD8538Q = &device_creator<cxd8538q_device>;
@@ -3114,7 +3116,9 @@ void psxgpu_device::dma_write( UINT32 *p_ram, INT32 n_size )
 			}
 			break;
 		case 0x50:
+		case 0x51:
 		case 0x52:
+		case 0x53:
 			if( n_gpu_buffer_offset < 3 )
 			{
 				n_gpu_buffer_offset++;

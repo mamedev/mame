@@ -21,8 +21,6 @@ extern const device_type CXD8654Q;
 
 #define STOP_ON_ERROR ( 0 )
 
-#define VERBOSE_LEVEL ( 0 )
-
 #define MAX_LEVEL ( 32 )
 #define MID_LEVEL ( ( MAX_LEVEL / 2 ) << 8 )
 #define MAX_SHADE ( 0x100 )
