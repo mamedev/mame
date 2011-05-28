@@ -1414,6 +1414,7 @@ $(MAMEOBJ)/tatsumi.a: \
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \
 	$(DRIVERS)/littlerb.o \
+	$(DRIVERS)/rltennis.o $(VIDEO)/rltennis.o \
 	$(DRIVERS)/speedspn.o $(VIDEO)/speedspn.o \
 	$(DRIVERS)/wheelfir.o \
 
