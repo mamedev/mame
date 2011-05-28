@@ -58,6 +58,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output = (VS_OUTPUT)0;
 	
+	float2 invDims = float2(1.0f / RawWidth, 1.0f / RawHeight);
 	Output.Position = float4(Input.Position.xyz, 1.0f);
 	Output.Position.x /= TargetWidth;
 	Output.Position.y /= TargetHeight;
@@ -66,7 +67,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord;
+	Output.TexCoord = Input.TexCoord + 0.5f * invDims;
 
 	return Output;
 }
@@ -105,7 +106,7 @@ uniform float BluPower = 2.2f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord + 0.5f / float2(-RawWidth, -RawHeight));
+	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
 	
 	float3 OutRGB = BaseTexel.rgb;
 

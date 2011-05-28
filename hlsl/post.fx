@@ -77,7 +77,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.Position.y -= 0.5f;
 	Output.Position *= float4(2.0f, 2.0f, 1.0f, 1.0f);
 	Output.Color = Input.Color;
-	Output.TexCoord = Input.TexCoord + 0.5f / float2(RawWidth, RawHeight);
+	Output.TexCoord = Input.TexCoord + 0.5f / float2(TargetWidth, TargetHeight);
 
 	//float Zoom = 32.0f;
 	//Output.TexCoord /= Zoom;
@@ -150,8 +150,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	// -- Alpha Clipping (1px border in drawd3d does not work for some reason) --
 	clip((BaseCoord.x < WidthRatio / RawWidth) ? -1 : 1);
 	clip((BaseCoord.y < HeightRatio / RawHeight) ? -1 : 1);
-	clip((BaseCoord.x > (1.0f / WidthRatio + 1.0f / RawWidth)) ? -1 : 1);
-	clip((BaseCoord.y > (1.0f / HeightRatio + 1.0f / RawHeight)) ? -1 : 1);
+	//clip((BaseCoord.x > 1.0f / WidthRatio) ? -1 : 1);
+	//clip((BaseCoord.y > 1.0f / HeightRatio) ? -1 : 1);
 
 	// -- Scanline Simulation --
 	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale + 0.5f;
