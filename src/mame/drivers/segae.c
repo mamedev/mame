@@ -11,7 +11,10 @@
  An interesting feature of the system is that the CPU is contained on the ROM
  board, the MAIN System E board contains the Graphics processor, this opens the
  possibility for using processors other than the Standard Z80 to run the main
- game code on; several games have an encrypted Z80 module instead.
+ game code on; several games have an encrypted Z80 module instead. However, the
+ system as a whole is very Z80-centric; using a completely non-Z80 processor
+ would require the addition of glue logic to the rom board to make the cpu
+ 'look' like a Z80 to the rest of the system.
 
  Also interesting is each VDP has double the Video RAM found on the SMS console
  this is banked through Port Writes, the System also allows for the Video RAM
@@ -106,9 +109,9 @@ PCB Layout
 | LA4460        |----------------------------------|  |
 |-----------------------------------------------------|
 Notes:
-      XTAL1              - 10.738535Mhz
-      315-5124 VDP clock - 10.738535MHz
-      SN76496 clock      - 3.579545MHz [10.7386/3]
+      XTAL1              - 10.7386Mhz
+      315-5124 VDP clock - 10.7386MHz
+      SN76496 clock      - 3.579533MHz [10.7386/3]
       D4168              - 8k x8 SRAM
       VSync              - 60Hz
       HSync              - 15.58kHz
@@ -868,7 +871,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( systeme, driver_device )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693175Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 
