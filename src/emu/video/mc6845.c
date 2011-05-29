@@ -38,6 +38,7 @@ const device_type H46505 = &device_creator<h46505_device>;
 const device_type HD6845 = &device_creator<hd6845_device>;
 const device_type SY6545_1 = &device_creator<sy6545_1_device>;
 const device_type SY6845E = &device_creator<sy6845e_device>;
+const device_type HD6345 = &device_creator<hd6345_device>;
 
 
 /* mode macros */
@@ -935,6 +936,19 @@ void sy6845e_device::device_start()
 }
 
 
+void hd6345_device::device_start()
+{
+	mc6845_device::device_start();
+
+	m_supports_disp_start_addr_r = true;
+	m_supports_vert_sync_width = true;
+	m_supports_status_reg_d5 = true;
+	m_supports_status_reg_d6 = true;
+	m_supports_status_reg_d7 = true;
+	m_supports_transparent = true;
+}
+
+
 void mc6845_device::device_reset()
 {
 	/* internal registers other than status remain unchanged, all outputs go low */
@@ -968,46 +982,52 @@ void hd6845_device::device_reset() { mc6845_device::device_reset(); }
 void c6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6545_1_device::device_reset() { mc6845_device::device_reset(); }
 void sy6845e_device::device_reset() { mc6845_device::device_reset(); }
+void hd6345_device::device_reset() { mc6845_device::device_reset(); }
 
 
 r6545_1_device::r6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, R6545_1, "r6545_1", tag, owner, clock)
+	: mc6845_device(mconfig, R6545_1, "R6545-1", tag, owner, clock)
 {
 }
 
 
 h46505_device::h46505_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, H46505, "h46505", tag, owner, clock)
+	: mc6845_device(mconfig, H46505, "H46505", tag, owner, clock)
 {
 }
 
 
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, MC6845_1, "mc6845_1", tag, owner, clock)
+	: mc6845_device(mconfig, MC6845_1, "MC6845-1", tag, owner, clock)
 {
 }
 
 
 hd6845_device::hd6845_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, HD6845, "hd6845", tag, owner, clock)
+	: mc6845_device(mconfig, HD6845, "HD6845", tag, owner, clock)
 {
 }
 
 
 c6545_1_device::c6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, C6545_1, "c6545_1", tag, owner, clock)
+	: mc6845_device(mconfig, C6545_1, "C6545-1", tag, owner, clock)
 {
 }
 
 
 sy6545_1_device::sy6545_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, SY6545_1, "sy6545_1", tag, owner, clock)
+	: mc6845_device(mconfig, SY6545_1, "SY6545-1", tag, owner, clock)
 {
 }
 
 
 sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6845_device(mconfig, SY6845E, "sy6845e", tag, owner, clock)
+	: mc6845_device(mconfig, SY6845E, "SY6845E", tag, owner, clock)
 {
 }
 
+
+hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: mc6845_device(mconfig, HD6345, "HD6345", tag, owner, clock)
+{
+}
