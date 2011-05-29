@@ -172,8 +172,8 @@ INLINE INT32 mdec_unpack_val( UINT16 n_packed )
 
 UINT32 psxmdec_device::mdec_unpack( UINT32 n_address )
 {
-	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 
 	UINT8 n_z;
 	INT32 n_qscale;
@@ -424,8 +424,8 @@ void psxmdec_device::mdec_yuv2_to_rgb24( void )
 
 void psxmdec_device::dma_write( UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	int n_index;
 
 	verboselog( machine(), 2, "mdec0_write( %08x, %08x )\n", n_address, n_size );
@@ -483,8 +483,8 @@ void psxmdec_device::dma_write( UINT32 n_address, INT32 n_size )
 
 void psxmdec_device::dma_read( UINT32 n_address, INT32 n_size )
 {
-	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	UINT32 n_this;
 	UINT32 n_nextaddress;
 

@@ -10,29 +10,17 @@
 #include "cpu/psx/irq.h"
 #include "cpu/psx/sio.h"
 
-typedef struct _psx_machine psx_machine;
-struct _psx_machine
-{
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-
-	running_machine *m_machine;
-	UINT32 *p_n_psxram;
-	size_t n_psxramsize;
-
-	UINT32 n_com_delay;
-	int b_need_sianniv_vblank_hack;
-};
-
 class psx_state : public driver_device
 {
 public:
 	psx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	psx_machine *m_p_psx;
-
 	UINT32 *m_p_n_psxram;
 	size_t m_n_psxramsize;
+
+	UINT32 n_com_delay;
+	int b_need_sianniv_vblank_hack;
 };
 
 

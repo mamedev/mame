@@ -127,8 +127,8 @@ void psxdma_device::dma_interrupt_update()
 
 void psxdma_device::dma_finished( int index )
 {
-	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+	psx_state *p_psx = machine().driver_data<psx_state>();
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 
 	psx_dma_channel *dma = &channel[ index ];
 
@@ -137,7 +137,7 @@ void psxdma_device::dma_finished( int index )
 		UINT32 n_size;
 		UINT32 n_total;
 		UINT32 n_address = ( dma->n_base & 0xffffff );
-		UINT32 n_adrmask = p_psx->n_psxramsize - 1;
+		UINT32 n_adrmask = p_psx->m_n_psxramsize - 1;
 		UINT32 n_nextaddress;
 
 		if( n_address != 0xffffff )
@@ -207,9 +207,9 @@ void psxdma_device::install_write_handler( int index, psx_dma_read_delegate p_fn
 
 WRITE32_MEMBER( psxdma_device::write )
 {
-	psx_machine *p_psx = machine().driver_data<psx_state>()->m_p_psx;
+	psx_state *p_psx = machine().driver_data<psx_state>();
 
-	UINT32 *p_n_psxram = p_psx->p_n_psxram;
+	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	int index = offset / 4;
 	psx_dma_channel *dma = &channel[ index ];
 
@@ -235,7 +235,7 @@ WRITE32_MEMBER( psxdma_device::write )
 				UINT32 n_nextaddress;
 				UINT32 n_adrmask;
 
-				n_adrmask = p_psx->n_psxramsize - 1;
+				n_adrmask = p_psx->m_n_psxramsize - 1;
 
 				n_address = ( dma->n_base & n_adrmask );
 				n_size = dma->n_blockcontrol;
