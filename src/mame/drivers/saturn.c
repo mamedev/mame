@@ -763,7 +763,7 @@ static READ8_HANDLER( saturn_SMPC_r8 )
 		return_data =  0xff; // | EEPROM_read_bit());
 	}
 
-	if (offset == 0x33) return_data = state->saturn_region;
+	if (offset == 0x33) return_data = state->m_saturn_region;
 
 	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space->device().tag(), cpu_get_pc(&space->device()), offset, offset>>1, return_data);
 
@@ -1727,6 +1727,14 @@ static NVRAM_HANDLER(saturn)
 	}
 }
 
+static READ8_HANDLER( saturn_cart_type_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+	const int cart_ram_header[3] = { 0xff, 0x5a, 0x5c };
+
+	return cart_ram_header[state->m_cart_type];
+}
+
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r8, saturn_SMPC_w8,0xffffffff)
@@ -1735,6 +1743,8 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x01000000, 0x01000003) AM_MIRROR(0x7ffffc) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_MIRROR(0x7ffffc) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)	// cartridge space
+//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
@@ -1868,6 +1878,12 @@ static INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P2 L") PORT_PLAYER(2)	// L
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) //read '1' when direct mode is polled
+
+	PORT_START("CART_AREA")
+	PORT_CONFNAME( 0x03, 0x02, "Cart Type" )
+	PORT_CONFSETTING( 0x00, "None" )
+	PORT_CONFSETTING( 0x01, "8 Mbit Cart RAM" )
+	PORT_CONFSETTING( 0x02, "32 Mbit Cart RAM" )
 INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_)							\
@@ -2534,6 +2550,7 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, state->m_smpc.pmode);
 	state_save_register_global(machine, state->m_smpc.smpcSR);
 	state_save_register_global_array(machine, state->m_smpc.SMEM);
+	state_save_register_global_pointer(machine, state->m_cart_dram, 0x400000/4);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine));
 }
@@ -2593,6 +2610,34 @@ static TIMER_DEVICE_CALLBACK( saturn_scanline )
 		device_set_input_line_and_vector(state->m_maincpu, 0x2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d);
 }
 
+static READ32_HANDLER( saturn_cart_dram0_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	return state->m_cart_dram[offset];
+}
+
+static WRITE32_HANDLER( saturn_cart_dram0_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	COMBINE_DATA(&state->m_cart_dram[offset]);
+}
+
+static READ32_HANDLER( saturn_cart_dram1_r )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	return state->m_cart_dram[offset+0x200000/4];
+}
+
+static WRITE32_HANDLER( saturn_cart_dram1_w )
+{
+	saturn_state *state = space->machine().driver_data<saturn_state>();
+
+	COMBINE_DATA(&state->m_cart_dram[offset+0x200000/4]);
+}
+
 static MACHINE_RESET( saturn )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -2618,6 +2663,29 @@ static MACHINE_RESET( saturn )
 	machine.device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset( machine );
+
+	state->m_cart_type = input_port_read(machine,"CART_AREA") & 3;
+
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+	machine.device("slave")->memory().space(AS_PROGRAM)->nop_readwrite(0x02400000, 0x027fffff);
+
+	if(state->m_cart_type == 1)
+	{
+		//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x0247ffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x0267ffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+	}
+
+	if(state->m_cart_type == 2)
+	{
+		//	AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02400000, 0x025fffff, FUNC(saturn_cart_dram0_r), FUNC(saturn_cart_dram0_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+		machine.device("slave")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x02600000, 0x027fffff, FUNC(saturn_cart_dram1_r), FUNC(saturn_cart_dram1_w));
+	}
 }
 
 
@@ -2826,7 +2894,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	saturn_state *state = machine.driver_data<saturn_state>();
 	system_time systime;
 
-	state->saturn_region = rgn;
+	state->m_saturn_region = rgn;
 	state->m_vdp2.pal = (rgn == 12) ? 1 : 0;
 
 	// set compatible options
@@ -2845,6 +2913,7 @@ static void saturn_init_driver(running_machine &machine, int rgn)
 	state->m_smpc_ram = auto_alloc_array(machine, UINT8, 0x80);
 	state->m_scu_regs = auto_alloc_array(machine, UINT32, 0x100/4);
 	state->m_scsp_regs = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_cart_dram = auto_alloc_array(machine, UINT32, 0x400000/4);
 
 	state->m_smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
 	state->m_smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);

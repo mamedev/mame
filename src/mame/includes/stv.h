@@ -78,7 +78,9 @@ public:
 	}m_smpc;
 
 	/* Saturn specific*/
-	int saturn_region;
+	int m_saturn_region;
+	UINT8 m_cart_type;
+	UINT32 *m_cart_dram;
 
 	/* ST-V specific */
 	UINT8     m_stv_multi_bank;
