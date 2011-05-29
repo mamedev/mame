@@ -351,7 +351,7 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 	multicart_t *mc;
 	int i;
 
-	if (image.software_entry() == NULL && image.exists())
+	if (image.exists())
 	{
 		/* try opening this as if it were a multicart */
 		multicart_open_error me = multicart_open(image.device().machine().options(), image.filename(), image.device().machine().system().name, MULTICART_FLAGS_DONT_LOAD_RESOURCES, &mc);
