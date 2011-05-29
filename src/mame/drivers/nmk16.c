@@ -6339,6 +6339,36 @@ ROM_START( nouryoku )
 	ROM_LOAD( "ic27.7",     0x040000, 0x100000, CRC(8a69fded) SHA1(ee73f1789bcc672232606a4b3b28087fea1c5c69) )	/* all banked */
 ROM_END
 
+ROM_START( nouryokup )
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
+	ROM_LOAD16_BYTE( "ic76.1",  0x00000, 0x40000, CRC(26075988) SHA1(c3d0eef0417be3f78008c026915fd7e2fd589563) )
+	ROM_LOAD16_BYTE( "ic75.2",  0x00001, 0x40000, CRC(75ab82cd) SHA1(fb828f87eebbe9d61766535efc18de9dfded110c) )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "ic35.3",		0x000000, 0x010000, CRC(03d0c3b1) SHA1(4d5427c324e2141d0a953cc5133d10b327827e0b) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "bg0.u1.ic32", 0x000000, 0x080000, CRC(1fec8e14) SHA1(7c596a455f829f31a801ea3d9fbb6a63810436a6) )
+	ROM_LOAD( "bg1.u2.ic32", 0x080000, 0x080000, CRC(7b8ea3f0) SHA1(14722f7dcf5e86f32126ccb975f0a592c065f836) )
+	ROM_LOAD( "bg2.u3.ic32", 0x100000, 0x080000, CRC(6f4eb408) SHA1(7f10676b7263bdf0fd5cfc4e5449f932984d4eb3) )
+	ROM_LOAD( "bg3.u4.ic32", 0x180000, 0x080000, CRC(dea8c120) SHA1(c3f36fc0c97ee54f8ae3a55098c743980496eaa5) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "obj0even.u7.ic100", 0x000000, 0x080000, CRC(7966ce07) SHA1(231644bafd8970da2c57aeffc2fdaab60f4a512a) )
+	ROM_LOAD16_BYTE( "obj0odd.u6.ic100",  0x000001, 0x080000, CRC(d4913a08) SHA1(49082a71c71176ff0e122844a40ac4f893342e45) )
+	ROM_LOAD16_BYTE( "obj1even.u9.ic100", 0x100000, 0x080000, CRC(e01567e8) SHA1(69775752b61ce103d91e127f1fbf7c94b960b835) )
+	ROM_LOAD16_BYTE( "obj1odd.u8.ic100",  0x100001, 0x080000, CRC(4a383085) SHA1(45351eb67c90936e500b527e9f93c1f70b67bd9a) )
+
+
+	ROM_REGION( 0x140000, "oki1", 0 )	/* OKIM6295 samples */
+	ROM_LOAD("soundpcm0.bottom.ic30", 0x040000, 0x080000, CRC(34ded136) SHA1(00fe1d6327483bb9e73802beca3ce6d808a20ceb) )
+	ROM_LOAD("soundpcm1.top.ic30",    0x0c0000, 0x080000, CRC(a8d2abf7) SHA1(5619437e3e1f70f78cb2aeb2d619511be11e02e1) )
+
+	ROM_REGION( 0x140000, "oki2", 0 )	/* OKIM6295 samples */
+	ROM_LOAD("soundpcm2.top.ic27",	  0x040000, 0x080000, CRC(29d0a15d) SHA1(a235eec225dd5006dd1f4e21d78fd647335f45dc) )
+	ROM_LOAD("soundpcm3.bottom.ic27", 0x0c0000, 0x080000, CRC(c764e749) SHA1(8399d3b6807bd263eee607c5625618d19688b394) )
+ROM_END
+
 ROM_START( manybloc )
 	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "1-u33.bin",  0x00001, 0x20000, CRC(07473154) SHA1(e67f637e74dfe5f1be558f963c0b3225254afe33) )
@@ -7164,6 +7194,7 @@ GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin,   0,        ROT270, "NMK",    
 
 
 GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
+GAME( 1995, nouryokup,nouryoku, bjtwin,   nouryoku, 0,        ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai (prototype)", GAME_NO_COCKTAIL ) // GFX aren't encrypted
 
 /* Non NMK boards */
 
