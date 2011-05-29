@@ -138,9 +138,8 @@ Notes:
             On some games this is replaced with a NEC MC-8123 Encrypted CPU Module.
             The clock speed is the same. The MC-8123 contains a Z80 core, plus a RAM chip
             and battery. When the battery dies, the program can no longer be decrypted
-            and the PCB does not boot up at all. The battery can be changed via a door
-            on the bottom of the MC-8123, assuming the module is kept powered via another
-            battery during the changing procedure.
+            and the PCB does not boot up at all. The battery can not be changed because the
+            MC-8123 is sealed, so there is no way to access it.
 
  IC2 - IC5: 27C256 EPROM (DIP28)
 
