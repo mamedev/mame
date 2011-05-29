@@ -155,7 +155,7 @@
 #define WINOPTION_TRIPLEBUFFER			"triplebuffer"
 #define WINOPTION_SWITCHRES				"switchres"
 #define WINOPTION_FULLSCREENBRIGHTNESS	"full_screen_brightness"
-#define WINOPTION_FULLLSCREENCONTRAST	"full_screen_contrast"
+#define WINOPTION_FULLSCREENCONTRAST	"full_screen_contrast"
 #define WINOPTION_FULLSCREENGAMMA		"full_screen_gamma"
 
 // sound options
@@ -288,7 +288,7 @@ public:
 	bool triple_buffer() const { return bool_value(WINOPTION_TRIPLEBUFFER); }
 	bool switch_res() const { return bool_value(WINOPTION_SWITCHRES); }
 	float full_screen_brightness() const { return float_value(WINOPTION_FULLSCREENBRIGHTNESS); }
-	float full_screen_contrast() const { return float_value(WINOPTION_FULLLSCREENCONTRAST); }
+	float full_screen_contrast() const { return float_value(WINOPTION_FULLSCREENCONTRAST); }
 	float full_screen_gamma() const { return float_value(WINOPTION_FULLSCREENGAMMA); }
 
 	// sound options
