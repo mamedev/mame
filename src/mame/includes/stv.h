@@ -60,6 +60,7 @@ public:
 	    UINT8     *gfx_decode;
 	    bitmap_t  *roz_bitmap[2];
 	    UINT8     dotsel;
+	    UINT8     pal;
 	}m_vdp2;
 
 	struct {
@@ -99,6 +100,7 @@ DRIVER_INIT ( stv );
 
 /*----------- defined in drivers/stvinit.c -----------*/
 
+UINT8 get_vblank(running_machine &machine);
 void install_stvbios_speedups(running_machine &machine);
 DRIVER_INIT(mausuke);
 DRIVER_INIT(puyosun);
@@ -160,8 +162,6 @@ WRITE32_HANDLER ( saturn_vdp1_vram_w );
 WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
 
 /*----------- defined in video/stvvdp2.c -----------*/
-
-UINT8 stv_get_vblank(running_machine &machine);
 
 READ32_HANDLER ( saturn_vdp2_vram_r );
 READ32_HANDLER ( saturn_vdp2_cram_r );

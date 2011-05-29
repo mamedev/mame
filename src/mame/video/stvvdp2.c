@@ -5161,14 +5161,9 @@ READ32_HANDLER ( saturn_vdp2_regs_r )
 	{
 		case 0x4/4:
 		{
-			int stv_hblank,stv_vblank,stv_odd;
 			/*Screen Status Register*/
-			stv_vblank = stv_get_vblank(space->machine());
-			stv_hblank = get_hblank(space->machine());
-			stv_odd = get_odd_bit(space->machine());
-
-								   /*VBLANK              HBLANK            ODD               PAL    */
-			state->m_vdp2_regs[offset] = (stv_vblank<<19) | (stv_hblank<<18) | (stv_odd << 17) | (0 << 16);
+								       /*VBLANK              HBLANK            ODD               PAL    */
+			state->m_vdp2_regs[offset] = (get_vblank(space->machine())<<19) | (get_hblank(space->machine())<<18) | (get_odd_bit(space->machine()) << 17) | (state->m_vdp2.pal << 16);
 			break;
 		}
 		case 0x8/4:
@@ -5314,19 +5309,22 @@ static int get_hblank_duration(running_machine &machine)
 }
 
 /*some vblank lines measurements (according to Charles MacDonald)*/
+/* TODO: interlace mode "eats" one line, should be 262.5 */
 static int get_vblank_duration(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
+	int res;
 
-	/* TODO: interlace mode "eats" one line, should be 262.5 */
+	res = (state->m_vdp2.pal) ? 313 : 263;
+
+	/* compensate for interlacing */
+	if((STV_VDP2_LSMD & 3) == 3)
+		res<<=1;
 
 	if(STV_VDP2_HRES & 4)
-		return (STV_VDP2_HRES & 1) ? 561 : 525; //Hi-Vision / 31kHz Monitor
+		res = (STV_VDP2_HRES & 1) ? 561 : 525;  //Hi-Vision / 31kHz Monitor
 
-	if((STV_VDP2_LSMD & 3) == 3)
-		return 263*2;
-
-	return 263; //TODO: PAL uses 313
+	return res;
 }
 
 static int get_pixel_clock(running_machine &machine)
@@ -5362,13 +5360,13 @@ static UINT8 get_hblank(running_machine &machine)
 	return 0;
 }
 
-UINT8 stv_get_vblank(running_machine &machine)
+UINT8 get_vblank(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int cur_v,vblank;
 	cur_v = machine.primary_screen->vpos();
 
-	vblank = 240;
+	vblank = (state->m_vdp2.pal) ? 288 : 240;
 
 	if((STV_VDP2_LSMD & 3) == 3)
 		vblank<<=1;
@@ -5488,8 +5486,10 @@ void stv_vdp2_dynamic_res_change(running_machine &machine)
 	const int d_vres[4] = { 224, 240, 256, 256 };
 	const int d_hres[4] = { 320, 352, 640, 704 };
 	int horz_res,vert_res;
+	int vres_mask;
 
-	vert_res = d_vres[STV_VDP2_VRES & 1]; //TODO: PAL uses mask 3, NTSC uses mask 1
+	vres_mask = (state->m_vdp2.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
+	vert_res = d_vres[STV_VDP2_VRES & vres_mask];
 
 	if((STV_VDP2_VRES & 3) == 3)
 		popmessage("Illegal VRES MODE, contact MAMEdev");

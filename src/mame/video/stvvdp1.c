@@ -272,7 +272,7 @@ WRITE32_HANDLER( saturn_vdp1_regs_w )
 		else
 		{
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && stv_get_vblank(space->machine()) )
+			if ( STV_VDP1_VBE && get_vblank(space->machine()) )
 			{
 				state->m_vdp1.framebuffer_clear_on_next_frame = 1;
 			}
