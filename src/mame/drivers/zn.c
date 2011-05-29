@@ -1495,15 +1495,14 @@ static MACHINE_RESET( coh1000w )
 	zn_machine_init(machine);
 
 	devtag_reset(machine, "ide");
-	psx_dma_install_read_handler( machine, 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), machine.driver_data<zn_state>() ) );
-	psx_dma_install_write_handler( machine, 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), machine.driver_data<zn_state>() ) );
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
-
 	MCFG_MACHINE_RESET( coh1000w )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( atpsx_dma_read ), (zn_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( atpsx_dma_write ), (zn_state *) owner ) )
 MACHINE_CONFIG_END
 
 /*
