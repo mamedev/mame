@@ -2,7 +2,7 @@
 
   machine/stvcd.c - Sega Saturn and ST-V CD-ROM handling
 
-  Rewritten (again) 2007 by R. Belmont.
+  Another tilt at the windmill in 2011 by R. Belmont.
 
   Status: All known discs at least load their executable, and many load
           some data files successfully, but there are other problems.
@@ -41,7 +41,8 @@ static void cd_playdata(void);
 
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
-#define MAX_DIR_SIZE	(16384)
+#define MAX_DIR_SIZE	(128*1024)
+#define CD_SPEED 75*1 /* TODO: should be x2 */
 
 typedef struct
 {
@@ -135,6 +136,7 @@ static UINT32 in_buffer = 0;	// amount of data in the buffer
 static int oddframe = 0;
 static UINT32 fadstoplay = 0;
 static int buffull, sectorstore, freeblocks;
+static int cur_track;
 
 // iso9660 utilities
 static void read_new_dir(running_machine &machine, UINT32 fileno);
@@ -192,11 +194,18 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 
 	cd_stat |= CD_STAT_PERI;
 	cr1 = cd_stat;
-	cr2 = 0x4101;
+	if (cur_track == 0xff)
+	{
+		cr2 = 0xffff;
+	}
+	else
+	{
+		cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
+	}
 	cr3 = (cd_curfad>>16)&0xff;
 	cr4 = cd_curfad;
 
-	timer.adjust(attotime::from_hz(150));
+	timer.adjust(attotime::from_hz(CD_SPEED));
 }
 
 // global functions
@@ -211,6 +220,7 @@ void stvcd_reset(running_machine &machine)
 	cr3 = ('L'<<8) | 'O';
 	cr4 = ('C'<<8) | 'K';
 	cd_stat = CD_STAT_PAUSE;
+	cur_track = 0xff;
 
 	if (curdir != (direntryT *)NULL)
 		auto_free(machine, curdir);
@@ -272,7 +282,7 @@ void stvcd_reset(running_machine &machine)
 	}
 
 	sector_timer = machine.device<timer_device>("sector_timer");
-	sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
+	sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -377,7 +387,7 @@ static UINT16 cd_readWord(UINT32 addr)
 
 			hirqreg = rv;
 
-//          CDROM_LOG(("%s:RW HIRQ: %04x\n", Machine->describe_context(), rv))
+//          CDROM_LOG(("RW HIRQ: %04x\n", rv))
 
 			return rv;
 
@@ -412,6 +422,7 @@ static UINT16 cd_readWord(UINT32 addr)
 			{
 				case XFERTYPE_TOC:
 					rv = tocbuf[xfercount]<<8 | tocbuf[xfercount+1];
+
 					xfercount += 2;
 					xferdnum += 2;
 
@@ -443,7 +454,7 @@ static UINT16 cd_readWord(UINT32 addr)
 			return rv;
 
 		default:
-			CDROM_LOG(("%s:CD: RW %08x\n", machine.describe_context(), addr))
+			CDROM_LOG(("CD: RW %08x\n", addr))
 			return 0xffff;
 	}
 
@@ -517,7 +528,7 @@ static UINT32 cd_readLong(UINT32 addr)
 			return rv;
 
 		default:
-			CDROM_LOG(("%s:CD: RL %08x\n", machine.describe_context(), addr))
+			CDROM_LOG(("CD: RL %08x\n", addr))
 			return 0xffff;
 	}
 }
@@ -574,11 +585,16 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 		{
 		case 0x0000:
 			CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
-
-			// values taken from a US saturn with a disc in and the lid closed
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
-			cr2 = 0x4101;
+			if (cur_track == 0xff)
+			{
+				cr2 = 0xffff;
+			}
+			else
+			{
+				cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
+			}
 			cr3 = 0x100 | (cd_curfad>>16);
 			cr4 = cd_curfad;
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
@@ -629,7 +645,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 					break;
 			}
 			cd_stat = CD_STAT_PAUSE;
-			cr1 = cd_stat << 8;
+			cr1 = cd_stat;
+			cr2 = 0;
 			hirqreg |= (CMOK);
 			break;
 
@@ -729,30 +746,42 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
-		case 0x1000: // Play Disk.  FAD is in lowest 7 bits of cr1 and all of cr2.
-			CDROM_LOG(("%s:CD: Play Disk\n",   machine.describe_context()))
-			cd_stat = CD_STAT_PLAY; //|0x80;    // set "cd-rom" bit?
-			cd_curfad = ((cr1&0xff)<<16) | cr2;
-			fadstoplay = ((cr3&0xff)<<16) | cr4;
+		case 0x1000: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
+			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
+			cd_stat = CD_STAT_PLAY;
 
-			if (cd_curfad & 0x800000)
+			if (!(cr3 & 0x8000))	// preserve current position if bit 7 set
 			{
-				if (cd_curfad != 0xffffff)
+				cd_curfad = ((cr1&0xff)<<16) | cr2;
+				fadstoplay = ((cr3&0xff)<<16) | cr4;
+
+				if (cd_curfad & 0x800000)
 				{
-					// fad mode
-					cd_curfad &= 0xfffff;
-					fadstoplay &= 0xfffff;
+					if (cd_curfad != 0xffffff)
+					{
+						// fad mode
+						cd_curfad &= 0xfffff;
+						fadstoplay &= 0xfffff;
+					}
+
+					cur_track = cdrom_get_track(cdrom, cd_curfad-150);
+				}
+				else
+				{
+					// track mode
+					cur_track = cd_curfad>>8;
+					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+					fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
 				}
 			}
-			else
+			else	// play until the end of the disc
 			{
-				// track mode
-				mame_printf_error("CD: Play Disk track mode, not yet implemented\n");
+				fadstoplay = cdrom_get_track_start(cdrom, 0xaa) + 150;
 			}
 
-			CDROM_LOG(("CD: Play Disk: start %x length %x\n", cd_curfad, fadstoplay))
+			CDROM_LOG(("CD: Play Disc: start %x length %x\n", cd_curfad, fadstoplay))
 
-			cr2 = 0x4101;	// ctrl/adr in hi byte, track # in low byte
+			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 			cr3 = (0x100) | ((cd_curfad>>16)&0xff);	// index of subcode in hi byte, frame address
 			cr4 = cd_curfad & 0xffff;
 			hirqreg |= (CMOK|DRDY);
@@ -764,23 +793,19 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			// and do the disc I/O
 			// make sure it doesn't come in too early
 			sector_timer->reset();
-			sector_timer->adjust(attotime::from_hz(150));	// 150 sectors / second = 300kBytes/second
+			sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
 			break;
 
-		case 0x1100: // disk seek
-			CDROM_LOG(("%s:CD: Disk seek\n",   machine.describe_context()))
+		case 0x1100: // disc seek
+			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
 			if (cr1 & 0x80)
 			{
 				temp = (cr1&0x7f)<<16;	// get FAD to seek to
 				temp |= cr2;
 
-				if (temp == 0xffffff)
+				cd_stat = CD_STAT_PAUSE;
+				if (temp != 0xffffff)
 				{
-					cd_stat = CD_STAT_PAUSE;
-				}
-				else
-				{
-					CDROM_LOG(("CD: not clear how to handle FAD seek\n"))
 					cd_curfad = temp;
 				}
 			}
@@ -790,19 +815,21 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				if (cr2 >> 8)
 				{
 					cd_stat = CD_STAT_PAUSE;
+					cur_track = cr2>>8;;
 					// (index is cr2 low byte)
 				}
 				else
 				{
 					cd_stat = CD_STAT_STANDBY;
 					cd_curfad = 0xffffffff;
+					cur_track = 0xff;
 				}
 			}
 
 
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
-			cr2 = 0x4101;
+			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 			cr3 = (cd_curfad>>16)&0xff;
 			cr4 = cd_curfad;
 			break;
@@ -933,7 +960,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			cr3 = 0x1800;
 			cr4 = 200;
-			CDROM_LOG(("%s:CD: Get Buffer Size = %d\n", cr2, machine.describe_context()))
+			CDROM_LOG(("CD: Get Buffer Size = %d\n", cr2))
 			hirqreg |= (CMOK|ESEL|DRDY);	// DRDY is probably wrong
 			break;
 
@@ -1183,7 +1210,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		case 0x7200:	// Get file system scope
-			CDROM_LOG(("%s:CD: Get file system scope(PC=%x)\n",   machine.describe_context()))
+			CDROM_LOG(("CD: Get file system scope\n"))
 			hirqreg |= (CMOK|DRDY);
 			cr2 = numfiles;	// # of files in directory
 			cr3 = 0x0100;	// report directory held
@@ -1250,7 +1277,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			temp |= cr4;
 
 			cd_stat = CD_STAT_PLAY|0x80;	// set "cd-rom" bit
-			cr2 = 0x4101;	// CTRL/track
+			cur_track = cdrom_get_track(cdrom, curdir[temp].firstfad-150);
+			cr2 = cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track;
 			cr3 = (curdir[temp].firstfad>>16)&0xff;
 			cr4 = (curdir[temp].firstfad&0xffff);
 
@@ -1272,7 +1300,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//          sector_timer->adjust(attotime::from_hz(150));  // 150 sectors / second = 300kBytes/second
+//          sector_timer->adjust(attotime::from_hz(CD_SPEED));  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:
@@ -1301,14 +1329,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			break;
 
 		default:
-			CDROM_LOG(("%s:CD: Unknown command %04x\n", cr1,   machine.describe_context()))
+			CDROM_LOG(("CD: Unknown command %04x\n", cr1))
 			hirqreg |= (CMOK);
 			break;
 		}
 //      CDROM_LOG(("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 		break;
 	default:
-		CDROM_LOG(("%s:CD: WW %08x %04x\n", addr, data, machine.describe_context()))
+		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))
 		break;
 	}
 }
@@ -1555,7 +1583,7 @@ void stvcd_exit(running_machine& machine)
 
 static void cd_readTOC(void)
 {
-	int i, ntrks, /*toclen, */tocptr, fad;
+	int i, ntrks, tocptr, fad;
 
 	xfertype = XFERTYPE_TOC;
 	xfercount = 0;
@@ -1568,8 +1596,6 @@ static void cd_readTOC(void)
 	{
 		ntrks = 0;
 	}
-
-	//toclen = (4 * ntrks); // toclen header entry
 
 	// data format for Saturn TOC:
 	// no header.
@@ -1589,19 +1615,25 @@ static void cd_readTOC(void)
 		{
 			tocbuf[tocptr] = cdrom_get_adr_control(cdrom, i)<<4 | 0x01;
 		}
+		else
+		{
+			tocbuf[tocptr] = 0xff;
+		}
 
 		if (cdrom)
 		{
 			fad = cdrom_get_track_start(cdrom, i) + 150;
+
+			tocbuf[tocptr+1] = (fad>>16)&0xff;
+			tocbuf[tocptr+2] = (fad>>8)&0xff;
+			tocbuf[tocptr+3] = fad&0xff;
 		}
 		else
 		{
-			fad = 150;
+			tocbuf[tocptr+1] = 0xff;
+			tocbuf[tocptr+2] = 0xff;
+			tocbuf[tocptr+3] = 0xff;
 		}
-
-		tocbuf[tocptr+1] = (fad>>16)&0xff;
-		tocbuf[tocptr+2] = (fad>>8)&0xff;
-		tocbuf[tocptr+3] = fad&0xff;
 
 		tocptr += 4;
 	}
@@ -1816,13 +1848,11 @@ static void cd_playdata(void)
 	{
 		if (fadstoplay)
 		{
-        		logerror("STVCD: Reading FAD %d\n", cd_curfad);
+       		logerror("STVCD: Reading FAD %d\n", cd_curfad);
 
 			if (cdrom)
 			{
-				//partitionT *playpart;
-
-				/*playpart = */cd_read_filtered_sector(cd_curfad);
+				cd_read_filtered_sector(cd_curfad);
 
 				cd_curfad++;
 				fadstoplay--;
