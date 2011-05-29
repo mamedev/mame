@@ -565,7 +565,7 @@ DEVICE_GET_INFO( segapsg )
 	switch (state)
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( segapsg );			break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SMS VDP PSG");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SEGA VDP PSG");					break;
 		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
