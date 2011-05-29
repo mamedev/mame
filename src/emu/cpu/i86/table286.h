@@ -221,14 +221,14 @@ static void (*const PREFIX286(_instruction)[256])(i8086_state *cpustate) =
 	 PREFIX86(_aad),				/* 0xd5 */
 	 PREFIX286(_invalid),
 	 PREFIX86(_xlat),				/* 0xd7 */
-	 PREFIX86(_escape), 			/* 0xd8 */
-	 PREFIX86(_escape), 			/* 0xd9 */
-	 PREFIX86(_escape), 			/* 0xda */
-	 PREFIX86(_escape), 			/* 0xdb */
-	 PREFIX86(_escape), 			/* 0xdc */
-	 PREFIX86(_escape), 			/* 0xdd */
-	 PREFIX86(_escape), 			/* 0xde */
-	 PREFIX86(_escape), 			/* 0xdf */
+	 PREFIX286(_escape), 			/* 0xd8 */
+	 PREFIX286(_escape), 			/* 0xd9 */
+	 PREFIX286(_escape), 			/* 0xda */
+	 PREFIX286(_escape), 			/* 0xdb */
+	 PREFIX286(_escape), 			/* 0xdc */
+	 PREFIX286(_escape), 			/* 0xdd */
+	 PREFIX286(_escape), 			/* 0xde */
+	 PREFIX286(_escape_7), 			/* 0xdf */
 	 PREFIX86(_loopne), 			/* 0xe0 */
 	 PREFIX86(_loope),				/* 0xe1 */
 	 PREFIX86(_loop),				/* 0xe2 */
@@ -484,14 +484,14 @@ static void (*const PREFIX286(_instruction)[256])(i8086_state *cpustate) =
 	case 0xd5: PREFIX86(_aad)(cpustate); break;\
 	case 0xd6: PREFIX286(_invalid)(cpustate); break;\
 	case 0xd7: PREFIX86(_xlat)(cpustate); break;\
-	case 0xd8: PREFIX86(_escape)(cpustate); break;\
-	case 0xd9: PREFIX86(_escape)(cpustate); break;\
-	case 0xda: PREFIX86(_escape)(cpustate); break;\
-	case 0xdb: PREFIX86(_escape)(cpustate); break;\
-	case 0xdc: PREFIX86(_escape)(cpustate); break;\
-	case 0xdd: PREFIX86(_escape)(cpustate); break;\
-	case 0xde: PREFIX86(_escape)(cpustate); break;\
-	case 0xdf: PREFIX86(_escape)(cpustate); break;\
+	case 0xd8: PREFIX286(_escape)(cpustate); break;\
+	case 0xd9: PREFIX286(_escape)(cpustate); break;\
+	case 0xda: PREFIX286(_escape)(cpustate); break;\
+	case 0xdb: PREFIX286(_escape)(cpustate); break;\
+	case 0xdc: PREFIX286(_escape)(cpustate); break;\
+	case 0xdd: PREFIX286(_escape)(cpustate); break;\
+	case 0xde: PREFIX286(_escape)(cpustate); break;\
+	case 0xdf: PREFIX286(_escape_7)(cpustate); break;\
 	case 0xe0: PREFIX86(_loopne)(cpustate); break;\
 	case 0xe1: PREFIX86(_loope)(cpustate); break;\
 	case 0xe2: PREFIX86(_loop)(cpustate); break;\

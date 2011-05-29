@@ -1177,6 +1177,8 @@ static void handle_command(ide_state *ide, UINT8 command)
 
 		case IDE_COMMAND_SET_CONFIG:
 			LOGPRINT(("IDE Set configuration (%d heads, %d sectors)\n", ide->cur_head + 1, ide->sector_count));
+			ide->status &= ~IDE_STATUS_ERROR;
+			ide->error = IDE_ERROR_NONE;
 
 			ide->num_sectors = ide->sector_count;
 			ide->num_heads = ide->cur_head + 1;
