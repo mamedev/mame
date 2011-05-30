@@ -2189,6 +2189,7 @@ static void build_optable(running_machine &machine)
 									length += ((flags & OF_SIZEMASK) == OF_LONG) ? 2 : 1;
 
 								/* make sure we match the disassembler */
+								#ifdef DEBUG
 								{
 									char dummybuffer[40];
 									UINT8 instrbuffer[10];
@@ -2197,6 +2198,7 @@ static void build_optable(running_machine &machine)
 									dummybuffer[0] = 0;
 									assert(length == (m68k_disassemble_raw(dummybuffer, 0, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000) & 0xff) / 2);
 								}
+								#endif
 
 								/* set the value of the entry in the table */
 								optable[opnum | eabits].flags = flags | (length << 28);

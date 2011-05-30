@@ -349,7 +349,7 @@ void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	}
 	//compute clamp flags
 	int under_s = 0;
-	int under_t = 0;
+//	int under_t = 0;
 	int over_s = 0;
 	int over_t = 0;
 
@@ -369,7 +369,7 @@ void Processor::TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	{
 		if (tprod & (1 << 29))
 		{
-			under_t = 1;
+//			under_t = 1;
 		}
 		else
 		{
@@ -2783,7 +2783,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 
 	INT32 width = (sh - sl) + 1;
 	INT32 height = (th - tl) + 1;
-
+/*
 	int topad;
 	if (m_misc_state.m_ti_size < 3)
 	{
@@ -2794,7 +2794,7 @@ void N64::RDP::Processor::CmdLoadTile(UINT32 w1, UINT32 w2)
 		topad = (width << 2) & 0x7;
 	}
 	topad = 0; // ????
-
+*/
 	switch (m_misc_state.m_ti_size)
 	{
 		case PIXEL_SIZE_8BIT:

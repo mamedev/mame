@@ -642,7 +642,7 @@ static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, U
 static void common_io_chip_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	segas32_state *state = space->machine().driver_data<segas32_state>();
-	UINT8 old;
+//	UINT8 old;
 
 	/* only LSB matters */
 	if (!ACCESSING_BITS_0_7)
@@ -650,7 +650,7 @@ static void common_io_chip_w(address_space *space, int which, offs_t offset, UIN
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-	old = state->m_misc_io_data[which][offset];
+//	old = state->m_misc_io_data[which][offset];
 	state->m_misc_io_data[which][offset] = data;
 
 	switch (offset)

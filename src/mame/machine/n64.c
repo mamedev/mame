@@ -1031,7 +1031,7 @@ static int audio_fifo_num = 0;
 
 static void audio_fifo_push(running_machine &machine, UINT32 address, UINT32 length)
 {
-    AUDIO_DMA *current;
+//    AUDIO_DMA *current;
 
     if (audio_fifo_num == AUDIO_DMA_DEPTH)
     {
@@ -1042,7 +1042,7 @@ static void audio_fifo_push(running_machine &machine, UINT32 address, UINT32 len
 
     audio_fifo[audio_fifo_wpos].address = address;
     audio_fifo[audio_fifo_wpos].length = length;
-    current = &audio_fifo[audio_fifo_wpos];
+//    current = &audio_fifo[audio_fifo_wpos];
 
     audio_fifo_wpos++;
     audio_fifo_num++;
@@ -1644,7 +1644,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
 
 		case 0x02:
 		{
-			UINT32 address, checksum;
+			UINT32 address;
 
 			/*mame_printf_debug("Read from mempack, rlength = %d, slength = %d\n", rlength, slength);
             for (i=0; i < slength; i++)
@@ -1654,7 +1654,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
             mame_printf_debug("\n");*/
 
 			address = (sdata[1] << 8) | (sdata[2]);
-			checksum = address & 0x1f;
+//			checksum = address & 0x1f;
 			address &= ~0x1f;
 
 			if (address == 0x400)
@@ -1681,7 +1681,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
 		}
 		case 0x03:
 		{
-			UINT32 address, checksum;
+			UINT32 address;
 			int i;
 			/*mame_printf_debug("Write to mempack, rlength = %d, slength = %d\n", rlength, slength);
             for (i=0; i < slength; i++)
@@ -1691,7 +1691,7 @@ static int pif_channel_handle_command(running_machine &machine, int channel, int
             mame_printf_debug("\n");*/
 
 			address = (sdata[1] << 8) | (sdata[2]);
-			checksum = address & 0x1f;
+//			checksum = address & 0x1f;
 			address &= ~0x1f;
 
 			if (address == 0x8000)

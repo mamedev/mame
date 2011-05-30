@@ -2416,14 +2416,14 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				UINT8 offs;
 				int div;
-				INT16 offs_val;
+//				INT16 offs_val;
 
 				//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_register[0],cop_register[1],cop_register[2],cop_register[3],cop_register[4],cop_register[5],cop_register[6]);
 
 				offs = (offset & 3) * 4;
 
 				div = space->read_word(cop_register[4] + offs) + 1;
-				offs_val = space->read_word(cop_register[3] + offs);
+//				offs_val = space->read_word(cop_register[3] + offs);
 				//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
 
 				if(div == 0) { div = 1; }
