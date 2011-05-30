@@ -2079,6 +2079,9 @@ INLINE UINT32 compute_raster_hash(const raster_info *info)
 	const UINT8 *dither4 = NULL;												\
 	const UINT8 *dither = NULL													\
 
+#define DECLARE_DITHER_POINTERS_NO_DITHER_VAR 												\
+	const UINT8 *dither_lookup = NULL;											\
+
 #define COMPUTE_DITHER_POINTERS(FBZMODE, YY)									\
 do																				\
 {																				\
@@ -2094,6 +2097,24 @@ do																				\
 		else																	\
 		{																		\
 			dither = &dither_matrix_2x2[((YY) & 3) * 4];						\
+			dither_lookup = &dither2_lookup[(YY & 3) << 11];					\
+		}																		\
+	}																			\
+}																				\
+while (0)
+
+#define COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(FBZMODE, YY)									\
+do																				\
+{																				\
+	/* compute the dithering pointers */										\
+	if (FBZMODE_ENABLE_DITHERING(FBZMODE))										\
+	{																			\
+		if (FBZMODE_DITHER_TYPE(FBZMODE) == 0)									\
+		{																		\
+			dither_lookup = &dither4_lookup[(YY & 3) << 11];					\
+		}																		\
+		else																	\
+		{																		\
 			dither_lookup = &dither2_lookup[(YY & 3) << 11];					\
 		}																		\
 	}																			\

@@ -118,7 +118,7 @@ static STREAM_UPDATE( rf5c400_update )
 	int i, ch;
 	rf5c400_state *info = (rf5c400_state *)param;
 	INT16 *rom = info->rom;
-	UINT32 start, end, loop;
+	UINT32 end, loop;
 	UINT64 pos;
 	UINT8 vol, lvol, rvol, type;
 	UINT8 env_phase;
@@ -133,7 +133,7 @@ static STREAM_UPDATE( rf5c400_update )
 		stream_sample_t *buf0 = outputs[0];
 		stream_sample_t *buf1 = outputs[1];
 
-		start = ((channel->startH & 0xFF00) << 8) | channel->startL;
+//		start = ((channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
 		loop = ((channel->endHloopH & 0xFF00) << 8) | channel->loopL;
 		pos = channel->pos;

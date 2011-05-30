@@ -677,7 +677,7 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
 	int ax = _ax;
 	int ay = _ay;
-	int ax_neg,ay_neg;
+	int ax_neg; //,ay_neg;
 	int xxs = src_x;
 	int yys = src_y;
 	int xxd = hd63484->cpx;
@@ -688,10 +688,10 @@ static void ptn( device_t *device, int opcode, int src_x, int src_y, INT16 _ax, 
 		ax_neg = -1;
 	else
 		ax_neg = 1;
-	if (ay < 0)
+/*	if (ay < 0)
 		ay_neg = -1;
 	else
-		ay_neg = 1;
+		ay_neg = 1;*/
 
 	if (opcode & 0x0800)
 		switch (opcode & 0x0700)
