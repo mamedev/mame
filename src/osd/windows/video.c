@@ -364,6 +364,14 @@ static void check_osd_inputs(running_machine &machine)
 	// check for toggling fullscreen mode
 	if (ui_input_pressed(machine, IPT_OSD_1))
 		winwindow_toggle_full_screen();
+
+	// check for taking fullscreen snap
+	if (ui_input_pressed(machine, IPT_OSD_2))
+		winwindow_take_snap();
+
+	// check for taking fullscreen video
+	if (ui_input_pressed(machine, IPT_OSD_3))
+		winwindow_take_video();
 }
 
 

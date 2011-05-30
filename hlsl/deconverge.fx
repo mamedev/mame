@@ -98,6 +98,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	Output.BluCoord.y = ((((TexCoord.y / Ratios.y) - 0.5f)) * (1.0f + BluRadialConvergeY / RawHeight) + 0.5f) * Ratios.y + BluConvergeY * invDims.y;
 
 	Output.TexCoord = TexCoord;	
+
 	return Output;
 }
 
@@ -124,9 +125,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	GrnCoord.y = GrnCoord.y - frac(GrnCoord.y);
 	BluCoord.y = BluCoord.y - frac(BluCoord.y);
 	
-	float RedTexel = tex2D(DiffuseSampler, lerp(TexCoord, RedCoord, Deconverge) / RawDims + 0.5f / RawDims).r;
-	float GrnTexel = tex2D(DiffuseSampler, lerp(TexCoord, GrnCoord, Deconverge) / RawDims + 0.5f / RawDims).g;
-	float BluTexel = tex2D(DiffuseSampler, lerp(TexCoord, BluCoord, Deconverge) / RawDims + 0.5f / RawDims).b;
+	RedCoord = lerp(TexCoord, RedCoord, Deconverge) / RawDims;
+	GrnCoord = lerp(TexCoord, GrnCoord, Deconverge) / RawDims;
+	BluCoord = lerp(TexCoord, BluCoord, Deconverge) / RawDims;
+
+	float RedTexel = tex2D(DiffuseSampler, RedCoord + float2(0.0f, 0.5f) / RawDims).r;
+	float GrnTexel = tex2D(DiffuseSampler, GrnCoord + float2(0.0f, 0.5f) / RawDims).g;
+	float BluTexel = tex2D(DiffuseSampler, BluCoord + float2(0.0f, 0.5f) / RawDims).b;
 	
 	//RedTexel *= Input.RedCoord.x < (WidthRatio / RawWidth) ? 0.0f : 1.0f;
 	//RedTexel *= Input.RedCoord.y < (HeightRatio / RawHeight) ? 0.0f : 1.0f;

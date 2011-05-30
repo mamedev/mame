@@ -499,6 +499,52 @@ void winwindow_dispatch_message(running_machine &machine, MSG *message)
 
 
 //============================================================
+//  winwindow_take_snap
+//  (main thread)
+//============================================================
+
+void winwindow_take_snap(void)
+{
+	if (draw.window_record == NULL)
+		return;
+
+	win_window_info *window;
+
+	assert(GetCurrentThreadId() == main_threadid);
+
+	// iterate over windows and request a snap
+	for (window = win_window_list; window != NULL; window = window->next)
+	{
+		(*draw.window_save)(window);
+	}
+}
+
+
+
+//============================================================
+//  winwindow_take_video
+//  (main thread)
+//============================================================
+
+void winwindow_take_video(void)
+{
+	if (draw.window_record == NULL)
+		return;
+
+	win_window_info *window;
+
+	assert(GetCurrentThreadId() == main_threadid);
+
+	// iterate over windows and request a snap
+	for (window = win_window_list; window != NULL; window = window->next)
+	{
+		(*draw.window_record)(window);
+	}
+}
+
+
+
+//============================================================
 //  winwindow_toggle_full_screen
 //  (main thread)
 //============================================================

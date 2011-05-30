@@ -190,6 +190,7 @@ struct _d3d_device_interface
 	HRESULT (*end_scene)(d3d_device *dev);
 	HRESULT (*get_raster_status)(d3d_device *dev, D3DRASTER_STATUS *status);
 	HRESULT (*get_render_target)(d3d_device *dev, DWORD index, d3d_surface **surface);
+	HRESULT (*get_render_target_data)(d3d_device *dev, d3d_surface *rendertarget, d3d_surface *destsurface);
 	HRESULT (*present)(d3d_device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags);
 	ULONG   (*release)(d3d_device *dev);
 	HRESULT (*reset)(d3d_device *dev, d3d_present_parameters *params);

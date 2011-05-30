@@ -54,6 +54,7 @@
 #include <mmsystem.h>
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <math.h>
 #undef interface
 
 // MAME headers
@@ -63,6 +64,8 @@
 #include "rendutil.h"
 #include "options.h"
 #include "emuopts.h"
+#include "aviio.h"
+#include "png.h"
 
 // MAMEOS headers
 #include "d3dintf.h"
@@ -116,6 +119,7 @@ typedef struct _texture_info texture_info;
 struct _texture_info
 {
 	texture_info *			next;						// next texture in the list
+	texture_info *			prev;						// prev texture in the list
 	UINT32					hash;						// hash value for the texture
 	UINT32					flags;						// rendering flags
 	render_texinfo			texinfo;					// copy of the texture info
@@ -130,19 +134,8 @@ struct _texture_info
 	int						cur_frame;					// what is our current frame?
 	d3d_texture *			d3dtex;						// Direct3D texture pointer
 	d3d_surface *			d3dsurface;					// Direct3D offscreen plain surface pointer
-	d3d_surface *			d3dtarget0;					// Direct3D render target surface pointer (pass 0, if necessary)
-	d3d_surface *			d3dtarget1;					// Direct3D render target surface pointer (pass 1, if necessary)
-	d3d_surface *			d3dtarget2;					// Direct3D render target surface pointer (pass 2, if necessary)
-	d3d_surface *			d3dtarget3;					// Direct3D render target surface pointer (pass 3, if necessary)
-	d3d_surface *			d3dtarget4;					// Direct3D render target surface pointer (pass 4, if necessary)
-	d3d_surface *			d3dsmalltarget0;			// Direct3D render target surface pointer (small pass 0, if necessary)
-	d3d_texture *			d3dtexture0;				// Direct3D render target texture pointer (pass 0, if necessary)
-	d3d_texture *			d3dtexture1;				// Direct3D render target texture pointer (pass 1, if necessary)
-	d3d_texture *			d3dtexture2;				// Direct3D render target texture pointer (pass 2, if necessary)
-	d3d_texture *			d3dtexture3;				// Direct3D render target texture pointer (pass 3, if necessary)
-	d3d_texture *			d3dtexture4;				// Direct3D render target texture pointer (pass 4, if necessary)
-	d3d_texture *			d3dsmalltexture0;			// Direct3D render target texture pointer (small pass 0, if necessary)
 	d3d_texture *			d3dfinaltex;				// Direct3D final (post-scaled) texture
+	int						target_index;				// Direct3D target index
 };
 
 
@@ -169,7 +162,6 @@ struct _d3d_vertex
 	float					u0, v0;						// texture stage 0 coordinates
 };
 
-
 /* d3d_options is the information about runtime-mutable Direct3D options */
 typedef struct _d3d_options d3d_options;
 struct _d3d_options
@@ -183,6 +175,7 @@ struct _d3d_options
 	float					screen_pincushion;
 	float					screen_scanline_alpha;
 	float					screen_scanline_scale;
+	float					screen_scanline_height;
 	float					screen_scanline_bright_scale;
 	float					screen_scanline_bright_offset;
 	float					screen_scanline_offset;
@@ -227,6 +220,88 @@ struct _d3d_options
 	float					screen_saturation;
 };
 
+static d3d_options g_d3d_hlsl_presets[6] =
+{
+	{ 0.00f,   1,   1, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	  0.0f, 0.0f, 0.0f,
+	  1.1f, 1.1f, 1.1f,
+	  0.9f, 0.9f, 0.9f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  1.4f },
+	{ 0.15f, 512, 384, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	  0.0f, 0.0f, 0.0f,
+	  1.1f, 1.1f, 1.1f,
+	  0.9f, 0.9f, 0.9f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  1.4f },
+	{ 0.15f, 512, 384, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.4f, 0.1f, 0.0, 0.0f,-0.25f,-0.3f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	  0.0f, 0.0f, 0.0f,
+	  1.1f, 1.1f, 1.1f,
+	  0.9f, 0.9f, 0.9f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  1.4f },
+	{ 0.15f, 512, 384, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.4f, 0.1f, 0.0, 0.0f,-0.25f,-0.3f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	  0.0f, 0.0f, 0.0f,
+	  1.0f, 1.0f, 1.0f,
+	  1.0f, 1.0f, 1.0f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  1.0f },
+	{ 0.15f, 512, 384, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.4f, 0.1f, 0.0, 0.0f,-0.25f,-0.3f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+	  0.0f, 0.0f, 0.0f,
+	  1.0f, 1.0f, 1.0f,
+	  1.0f, 1.0f, 1.0f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  0.8f },
+	{ 0.15f, 512, 384, 0.1875f, 0.1875f,
+	  0.03f, 0.03f,
+	  0.25f, 1.0f, 1.0f, 0.6f, 0.0f,
+	  0.0f, 0.0f,
+	  0.4f, 0.1f, 0.0, 0.0f,-0.25f,-0.3f,
+	  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+	  0.7f, 0.3f, 0.0f, 0.0f, 0.7f, 0.3f, 0.3f, 0.0f, 0.7f,
+	  0.0f, 0.0f, 0.0f,
+	  1.0f, 1.0f, 1.0f,
+	  1.0f, 1.0f, 1.0f,
+	  0.05f, 0.05f, 0.05f,
+	  0.45f, 0.45f, 0.45f,
+	  0.8f }
+};
+
 /* d3d_info is the information about Direct3D for the current screen */
 typedef struct _d3d_info d3d_info;
 struct _d3d_info
@@ -249,6 +324,7 @@ struct _d3d_info
 	int						numverts;					// number of accumulated vertices
 
 	d3d_effect *			effect;						// pointer to the current effect object
+	d3d_effect *			prescale_effect;			// pointer to the current prescale-effect object
 	d3d_effect *			post_effect;				// pointer to the current post-effect object
 	d3d_effect *			pincushion_effect;			// pointer to the current pincushion-effect object
 	d3d_effect *			focus_effect;				// pointer to the current focus-effect object
@@ -291,16 +367,54 @@ struct _d3d_info
 	bitmap_t *				default_bitmap;				// experimental: default bitmap
 	texture_info *			default_texture;			// experimental: default texture
 
-	bool					hlsl_enable;				// experimental: HLSL enable flag
-	bool					yiq_enable;					// experimental: HLSL YIQ-convolution flag
-	d3d_surface *			last_d3dtarget[9];			// Direct3D render target surface pointer for each screen's previous frame
-	d3d_texture *			last_d3dtexture[9];			// Direct3D render target texture pointer for each screen's previous frame
-	float					oversample_x;				// experimental: render target oversampling factor (width) for shader prettification
-	float					oversample_y;				// experimental: render target oversampling factor (height) for shader prettification
-	bitmap_t *				shadow_bitmap;				// experimental: shadow mask bitmap for post-processing shader
-	texture_info *			shadow_texture;				// experimental: shadow mask texture for post-processing shader
+	bool					hlsl_enable;				// HLSL enable flag
+	bool					yiq_enable;					// HLSL YIQ-convolution flag
+	bool					hlsl_prescale;				// HLSL prescale enable flag
+	int						hlsl_prescale_size;			// HLSL prescale size
+	int						hlsl_preset;				// HLSL preset, if relevant
+	float					oversample_x;				// render target oversampling factor (width) for shader prettification
+	float					oversample_y;				// render target oversampling factor (height) for shader prettification
+	bitmap_t *				shadow_bitmap;				// shadow mask bitmap for post-processing shader
+	texture_info *			shadow_texture;				// shadow mask texture for post-processing shader
 	int						registered_targets;			// Number of registered HLSL targets (i.e., screens)
 	d3d_options *			hlsl_options;				// HLSL uniforms
+	avi_file *				hlsl_avi_file;				// HLSL AVI file
+	bitmap_t *				hlsl_avi_snap;				// HLSL AVI snapshot
+	int						hlsl_avi_frame;				// HLSL AVI frame
+	attotime				hlsl_avi_frame_period;		// HLSL AVI frame period
+	attotime				hlsl_avi_next_frame_time;	// HLSL AVI next frame time
+	d3d_surface *           hlsl_avi_copy_surface;		// HLSL AVI destination surface in system memory
+	d3d_texture *           hlsl_avi_copy_texture;		// HLSL AVI destination texture in system memory
+	d3d_surface *           hlsl_avi_final_target;		// HLSL AVI upscaled surface
+	d3d_texture *           hlsl_avi_final_texture;		// HLSL AVI upscaled texture
+	bool					hlsl_render_snap;			// whether or not to take HLSL post-render snapshot
+	bool					hlsl_snap_rendered;			// whether we just rendered our HLSL post-render shot or not
+	d3d_surface *           hlsl_snap_copy_target;		// HLSL snapshot destination surface in system memory
+	d3d_texture *           hlsl_snap_copy_texture;		// HLSL snapshot destination surface in system memory
+	d3d_surface *           hlsl_snap_target;			// HLSL snapshot upscaled surface
+	d3d_texture *           hlsl_snap_texture;			// HLSL snapshot upscaled texture
+	int						hlsl_snap_width;			// HLSL snapshot width
+	int						hlsl_snap_height;			// HLSL snapshot height
+
+	// HLSL render targets
+	int						target_use_count[9];		// Whether or not a target has been used yet
+	texture_info *			target_in_use[9];			// Target texture that is currently in use
+	d3d_surface *			last_hlsltarget[9];			// HLSL render target surface pointer for each screen's previous frame
+	d3d_texture *			last_hlsltexture[9];		// HLSL  render target texture pointer for each screen's previous frame
+	d3d_surface *			hlslprescaletarget0[9];		// Direct3D render target surface pointer (prescale, if necessary)
+	d3d_surface *			hlsltarget0[9];				// HLSL  render target surface pointer (pass 0, if necessary)
+	d3d_surface *			hlsltarget1[9];				// HLSL  render target surface pointer (pass 1, if necessary)
+	d3d_surface *			hlsltarget2[9];				// HLSL  render target surface pointer (pass 2, if necessary)
+	d3d_surface *			hlsltarget3[9];				// HLSL  render target surface pointer (pass 3, if necessary)
+	d3d_surface *			hlsltarget4[9];				// HLSL  render target surface pointer (pass 4, if necessary)
+	d3d_surface *			hlslsmalltarget0[9];		// HLSL  render target surface pointer (small pass 0, if necessary)
+	d3d_texture *			hlslprescaletexture0[9];	// HLSL  render target surface pointer (prescale, if necessary)
+	d3d_texture *			hlsltexture0[9];			// HLSL  render target texture pointer (pass 0, if necessary)
+	d3d_texture *			hlsltexture1[9];			// HLSL  render target texture pointer (pass 1, if necessary)
+	d3d_texture *			hlsltexture2[9];			// HLSL  render target texture pointer (pass 2, if necessary)
+	d3d_texture *			hlsltexture3[9];			// HLSL  render target texture pointer (pass 3, if necessary)
+	d3d_texture *			hlsltexture4[9];			// HLSL  render target texture pointer (pass 4, if necessary)
+	d3d_texture *			hlslsmalltexture0[9];		// HLSL  render target texture pointer (small pass 0, if necessary)
 };
 
 
@@ -420,6 +534,11 @@ static INT32 slider_scanline_alpha(running_machine &machine, void *arg, astring 
 static INT32 slider_scanline_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
 {
 	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_scale), 0.05f, "%2.2f", string, newval);
+}
+
+static INT32 slider_scanline_height(running_machine &machine, void *arg, astring *string, INT32 newval)
+{
+	return slider_set(&(((d3d_info*)arg)->hlsl_options->screen_scanline_height), 0.05f, "%2.2f", string, newval);
 }
 
 static INT32 slider_scanline_bright_scale(running_machine &machine, void *arg, astring *string, INT32 newval)
@@ -656,7 +775,8 @@ static slider_state *init_slider_list(d3d_info *d3d)
 	*tailptr = slider_alloc(d3d->window->machine(), "Screen Curvature", 0, 0, 100, 1, slider_curvature, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Image Pincushion", 0, 0, 100, 1, slider_pincushion, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Darkness", 0, 0, 100, 1, slider_scanline_alpha, (void*)d3d); tailptr = &(*tailptr)->next;
-	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Size", 1, 20, 80, 1, slider_scanline_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Screen Height", 1, 20, 80, 1, slider_scanline_scale, (void*)d3d); tailptr = &(*tailptr)->next;
+	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Indiv. Height", 1, 10, 80, 1, slider_scanline_height, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Brightness", 0, 20, 40, 1, slider_scanline_bright_scale, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Brightness Overdrive", 0, 12, 20, 1, slider_scanline_bright_offset, (void*)d3d); tailptr = &(*tailptr)->next;
 	*tailptr = slider_alloc(d3d->window->machine(), "Scanline Jitter", 0, 0, 40, 1, slider_scanline_offset, (void*)d3d); tailptr = &(*tailptr)->next;
@@ -939,6 +1059,8 @@ static void drawd3d_exit(void);
 static int drawd3d_window_init(win_window_info *window);
 static void drawd3d_window_destroy(win_window_info *window);
 static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
+static void drawd3d_window_save(win_window_info *window);
+static void drawd3d_window_record(win_window_info *window);
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
 
 // devices
@@ -972,6 +1094,12 @@ static void texture_prescale(d3d_info *d3d, texture_info *texture);
 static texture_info *texture_find(d3d_info *d3d, const render_primitive *prim);
 static void texture_update(d3d_info *d3d, const render_primitive *prim);
 
+// logging
+static void end_hlsl_avi_recording(d3d_info *d3d);
+static void hlsl_render_snapshot(d3d_info *d3d, d3d_surface *surface);
+static void begin_hlsl_avi_recording(d3d_info *d3d, const char *name);
+static void hlsl_record_texture(d3d_info *d3d, d3d_surface *surface);
+static file_error open_next(d3d_info *d3d, emu_file &file, const char *extension, int idx);
 
 
 //============================================================
@@ -1005,6 +1133,8 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_init = drawd3d_window_init;
 	callbacks->window_get_primitives = drawd3d_window_get_primitives;
 	callbacks->window_draw = drawd3d_window_draw;
+	callbacks->window_save = drawd3d_window_save;
+	callbacks->window_record = drawd3d_window_record;
 	callbacks->window_destroy = drawd3d_window_destroy;
 	return 0;
 }
@@ -1035,6 +1165,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d = global_alloc_clear(d3d_info);
 	window->drawdata = d3d;
 	d3d->window = window;
+	d3d->hlsl_options = NULL;
 
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
@@ -1070,12 +1201,69 @@ error:
 
 
 //============================================================
+//  drawd3d_window_save
+//============================================================
+
+static void drawd3d_window_save(win_window_info *window)
+{
+	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+	if (!d3d->hlsl_enable || !d3dintf->post_fx_available)
+		return;
+
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, d3d->hlsl_snap_width, d3d->hlsl_snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &d3d->hlsl_snap_copy_texture);
+	if (result != D3D_OK)
+	{
+		mame_printf_verbose("Direct3D: Unable to init system-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
+		return;
+	}
+	(*d3dintf->texture.get_surface_level)(d3d->hlsl_snap_copy_texture, 0, &d3d->hlsl_snap_copy_target);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, d3d->hlsl_snap_width, d3d->hlsl_snap_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsl_snap_texture);
+	if (result != D3D_OK)
+	{
+		mame_printf_verbose("Direct3D: Unable to init video-memory target for HLSL snapshot (%08x), bailing\n", (UINT32)result);
+		return;
+	}
+	(*d3dintf->texture.get_surface_level)(d3d->hlsl_snap_texture, 0, &d3d->hlsl_snap_target);
+
+	d3d->hlsl_render_snap = true;
+	d3d->hlsl_snap_rendered = false;
+}
+
+static void drawd3d_window_record(win_window_info *window)
+{
+	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+	if (!d3d->hlsl_enable || !d3dintf->post_fx_available)
+		return;
+
+	windows_options &options = downcast<windows_options &>(window->machine().options());
+	const char *filename = options.d3d_hlsl_write();
+
+	if(d3d->hlsl_avi_file != NULL)
+	{
+		end_hlsl_avi_recording(d3d);
+	}
+	else
+	{
+		if (filename[0] != 0)
+		{
+			begin_hlsl_avi_recording(d3d, filename);
+		}
+	}
+}
+
+
+//============================================================
 //  drawd3d_window_destroy
 //============================================================
 
 static void drawd3d_window_destroy(win_window_info *window)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+	end_hlsl_avi_recording(d3d);
 
 	// skip if nothing
 	if (d3d == NULL)
@@ -1164,6 +1352,8 @@ mtlog_add("drawd3d_window_draw: begin");
 	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
 
+	hlsl_record_texture(d3d, d3d->hlsl_avi_final_target);
+
 	// first update any textures
 	window->primlist->acquire_lock();
 	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
@@ -1217,6 +1407,11 @@ mtlog_add("drawd3d_window_draw: present begin");
 	result = (*d3dintf->device.present)(d3d->device, NULL, NULL, NULL, NULL, 0);
 mtlog_add("drawd3d_window_draw: present end");
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device present call\n", (int)result);
+
+	if(d3d->hlsl_render_snap && d3d->hlsl_snap_rendered)
+	{
+		hlsl_render_snapshot(d3d, d3d->hlsl_snap_target);
+	}
 
 	return 0;
 }
@@ -1326,6 +1521,11 @@ try_again:
 	d3d->create_error_count = 0;
 	mame_printf_verbose("Direct3D: Device created at %dx%d\n", d3d->width, d3d->height);
 
+	d3d->oversample_x = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_x();
+	d3d->oversample_y = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_y();
+	d3d->hlsl_snap_width = downcast<windows_options &>(d3d->window->machine().options()).d3d_snap_width();
+	d3d->hlsl_snap_height = downcast<windows_options &>(d3d->window->machine().options()).d3d_snap_height();
+
 	// set the max texture size
 	window->target->set_max_texture_size(d3d->texture_max_width, d3d->texture_max_height);
 	mame_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)d3d->texture_max_width, (int)d3d->texture_max_height);
@@ -1362,6 +1562,7 @@ try_again:
 		const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
 		char primary_name_cstr[1024];
 		char post_name_cstr[1024];
+		char prescale_name_cstr[1024];
 		char pincushion_name_cstr[1024];
 		char phosphor_name_cstr[1024];
 		char focus_name_cstr[1024];
@@ -1375,6 +1576,9 @@ try_again:
 
 		sprintf(post_name_cstr, "%s\\post.fx", fx_dir);
 		TCHAR *post_name = tstring_from_utf8(post_name_cstr);
+
+		sprintf(prescale_name_cstr, "%s\\prescale.fx", fx_dir);
+		TCHAR *prescale_name = tstring_from_utf8(prescale_name_cstr);
 
 		sprintf(pincushion_name_cstr, "%s\\pincushion.fx", fx_dir);
 		TCHAR *pincushion_name = tstring_from_utf8(pincushion_name_cstr);
@@ -1401,7 +1605,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, primary_name, &d3d->effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load primary.fx\n");
+			printf("Direct3D: Unable to load primary.fx\n");
 			return 1;
 		}
 
@@ -1409,7 +1613,15 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, post_name, &d3d->post_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load post.fx\n");
+			printf("Direct3D: Unable to load post.fx\n");
+			return 1;
+		}
+
+		// create the prescaling shader
+		result = (*d3dintf->device.create_effect)(d3d->device, prescale_name, &d3d->prescale_effect);
+		if(result != D3D_OK)
+		{
+			printf("Direct3D: Unable to load prescale.fx\n");
 			return 1;
 		}
 
@@ -1417,7 +1629,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, pincushion_name, &d3d->pincushion_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load pincushion.fx\n");
+			printf("Direct3D: Unable to load pincushion.fx\n");
 			return 1;
 		}
 
@@ -1425,7 +1637,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, phosphor_name, &d3d->phosphor_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load phosphor.fx\n");
+			printf("Direct3D: Unable to load phosphor.fx\n");
 			return 1;
 		}
 
@@ -1433,7 +1645,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, focus_name, &d3d->focus_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load focus.fx\n");
+			printf("Direct3D: Unable to load focus.fx\n");
 			return 1;
 		}
 
@@ -1441,7 +1653,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, deconverge_name, &d3d->deconverge_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load deconverge.fx\n");
+			printf("Direct3D: Unable to load deconverge.fx\n");
 			return 1;
 		}
 
@@ -1449,7 +1661,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, color_name, &d3d->color_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load color.fx\n");
+			printf("Direct3D: Unable to load color.fx\n");
 			return 1;
 		}
 
@@ -1457,7 +1669,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, yiq_encode_name, &d3d->yiq_encode_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load yiq_encode.fx\n");
+			printf("Direct3D: Unable to load yiq_encode.fx\n");
 			return 1;
 		}
 
@@ -1465,7 +1677,7 @@ try_again:
 		result = (*d3dintf->device.create_effect)(d3d->device, yiq_decode_name, &d3d->yiq_decode_effect);
 		if(result != D3D_OK)
 		{
-			mame_printf_verbose("Direct3D: Unable to load yiq_decode.fx\n");
+			printf("Direct3D: Unable to load yiq_decode.fx\n");
 			return 1;
 		}
 
@@ -1473,6 +1685,8 @@ try_again:
 			osd_free(primary_name);
 		if (post_name)
 			osd_free(post_name);
+		if (prescale_name)
+			osd_free(prescale_name);
 		if (pincushion_name)
 			osd_free(pincushion_name);
 		if (phosphor_name)
@@ -1590,6 +1804,22 @@ static int device_create_resources(d3d_info *d3d)
 	// experimental: initialize some more things if we're using HLSL
 	if(d3d->hlsl_enable && d3dintf->post_fx_available)
 	{
+		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &d3d->hlsl_avi_copy_texture);
+		if (result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to init system-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
+			return 1;
+		}
+		(*d3dintf->texture.get_surface_level)(d3d->hlsl_avi_copy_texture, 0, &d3d->hlsl_avi_copy_surface);
+
+		result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsl_avi_final_texture);
+		if (result != D3D_OK)
+		{
+			mame_printf_verbose("Direct3D: Unable to init video-memory target for HLSL AVI dumping (%08x)\n", (UINT32)result);
+			return 1;
+		}
+		(*d3dintf->texture.get_surface_level)(d3d->hlsl_avi_final_texture, 0, &d3d->hlsl_avi_final_target);
+
 		windows_options &options = downcast<windows_options &>(d3d->window->machine().options());
 
 		// experimental: load a PNG to use for vector rendering; it is treated
@@ -1615,57 +1845,66 @@ static int device_create_resources(d3d_info *d3d)
 		}
 
 		d3d->hlsl_options = (d3d_options*)global_alloc_clear(d3d_options);
-		d3d->hlsl_options->screen_shadow_mask_alpha = options.screen_shadow_mask_alpha();
-		d3d->hlsl_options->screen_shadow_mask_count_x = options.screen_shadow_mask_count_x();
-		d3d->hlsl_options->screen_shadow_mask_count_y = options.screen_shadow_mask_count_y();
-		d3d->hlsl_options->screen_shadow_mask_u_size = options.screen_shadow_mask_u_size();
-		d3d->hlsl_options->screen_shadow_mask_v_size = options.screen_shadow_mask_v_size();
-		d3d->hlsl_options->screen_curvature = options.screen_curvature();
-		d3d->hlsl_options->screen_pincushion = options.screen_pincushion();
-		d3d->hlsl_options->screen_scanline_alpha = options.screen_scanline_amount();
-		d3d->hlsl_options->screen_scanline_scale = options.screen_scanline_scale();
-		d3d->hlsl_options->screen_scanline_bright_scale = options.screen_scanline_bright_scale();
-		d3d->hlsl_options->screen_scanline_bright_offset = options.screen_scanline_bright_offset();
-		d3d->hlsl_options->screen_scanline_offset = options.screen_scanline_offset();
-		d3d->hlsl_options->screen_defocus_x = options.screen_defocus_x();
-		d3d->hlsl_options->screen_defocus_y = options.screen_defocus_y();
-		d3d->hlsl_options->screen_red_converge_x = options.screen_red_converge_x();
-		d3d->hlsl_options->screen_red_converge_y = options.screen_red_converge_y();
-		d3d->hlsl_options->screen_green_converge_x = options.screen_green_converge_x();
-		d3d->hlsl_options->screen_green_converge_y = options.screen_green_converge_y();
-		d3d->hlsl_options->screen_blue_converge_x = options.screen_blue_converge_x();
-		d3d->hlsl_options->screen_blue_converge_y = options.screen_blue_converge_y();
-		d3d->hlsl_options->screen_red_radial_converge_x = options.screen_red_radial_converge_x();
-		d3d->hlsl_options->screen_red_radial_converge_y = options.screen_red_radial_converge_y();
-		d3d->hlsl_options->screen_green_radial_converge_x = options.screen_green_radial_converge_x();
-		d3d->hlsl_options->screen_green_radial_converge_y = options.screen_green_radial_converge_y();
-		d3d->hlsl_options->screen_blue_radial_converge_x = options.screen_blue_radial_converge_x();
-		d3d->hlsl_options->screen_blue_radial_converge_y = options.screen_blue_radial_converge_y();
-		d3d->hlsl_options->screen_red_from_red = options.screen_red_from_red();
-		d3d->hlsl_options->screen_red_from_green = options.screen_red_from_green();
-		d3d->hlsl_options->screen_red_from_blue = options.screen_red_from_blue();
-		d3d->hlsl_options->screen_green_from_red = options.screen_green_from_red();
-		d3d->hlsl_options->screen_green_from_green = options.screen_green_from_green();
-		d3d->hlsl_options->screen_green_from_blue = options.screen_green_from_blue();
-		d3d->hlsl_options->screen_blue_from_red = options.screen_blue_from_red();
-		d3d->hlsl_options->screen_blue_from_green = options.screen_blue_from_green();
-		d3d->hlsl_options->screen_blue_from_blue = options.screen_blue_from_blue();
-		d3d->hlsl_options->screen_red_offset = options.screen_red_offset();
-		d3d->hlsl_options->screen_green_offset = options.screen_green_offset();
-		d3d->hlsl_options->screen_blue_offset = options.screen_blue_offset();
-		d3d->hlsl_options->screen_red_scale = options.screen_red_scale();
-		d3d->hlsl_options->screen_green_scale = options.screen_green_scale();
-		d3d->hlsl_options->screen_blue_scale = options.screen_blue_scale();
-		d3d->hlsl_options->screen_red_power = options.screen_red_power();
-		d3d->hlsl_options->screen_green_power = options.screen_green_power();
-		d3d->hlsl_options->screen_blue_power = options.screen_blue_power();
-		d3d->hlsl_options->screen_red_floor = options.screen_red_floor();
-		d3d->hlsl_options->screen_green_floor = options.screen_green_floor();
-		d3d->hlsl_options->screen_blue_floor = options.screen_blue_floor();
-		d3d->hlsl_options->screen_red_phosphor_life = options.screen_red_phosphor();
-		d3d->hlsl_options->screen_green_phosphor_life = options.screen_green_phosphor();
-		d3d->hlsl_options->screen_blue_phosphor_life = options.screen_blue_phosphor();
-		d3d->hlsl_options->screen_saturation = options.screen_saturation();
+
+		if(d3d->hlsl_preset == -1)
+		{
+			d3d->hlsl_options->screen_shadow_mask_alpha = options.screen_shadow_mask_alpha();
+			d3d->hlsl_options->screen_shadow_mask_count_x = options.screen_shadow_mask_count_x();
+			d3d->hlsl_options->screen_shadow_mask_count_y = options.screen_shadow_mask_count_y();
+			d3d->hlsl_options->screen_shadow_mask_u_size = options.screen_shadow_mask_u_size();
+			d3d->hlsl_options->screen_shadow_mask_v_size = options.screen_shadow_mask_v_size();
+			d3d->hlsl_options->screen_curvature = options.screen_curvature();
+			d3d->hlsl_options->screen_pincushion = options.screen_pincushion();
+			d3d->hlsl_options->screen_scanline_alpha = options.screen_scanline_amount();
+			d3d->hlsl_options->screen_scanline_scale = options.screen_scanline_scale();
+			d3d->hlsl_options->screen_scanline_height = options.screen_scanline_height();
+			d3d->hlsl_options->screen_scanline_bright_scale = options.screen_scanline_bright_scale();
+			d3d->hlsl_options->screen_scanline_bright_offset = options.screen_scanline_bright_offset();
+			d3d->hlsl_options->screen_scanline_offset = options.screen_scanline_offset();
+			d3d->hlsl_options->screen_defocus_x = options.screen_defocus_x();
+			d3d->hlsl_options->screen_defocus_y = options.screen_defocus_y();
+			d3d->hlsl_options->screen_red_converge_x = options.screen_red_converge_x();
+			d3d->hlsl_options->screen_red_converge_y = options.screen_red_converge_y();
+			d3d->hlsl_options->screen_green_converge_x = options.screen_green_converge_x();
+			d3d->hlsl_options->screen_green_converge_y = options.screen_green_converge_y();
+			d3d->hlsl_options->screen_blue_converge_x = options.screen_blue_converge_x();
+			d3d->hlsl_options->screen_blue_converge_y = options.screen_blue_converge_y();
+			d3d->hlsl_options->screen_red_radial_converge_x = options.screen_red_radial_converge_x();
+			d3d->hlsl_options->screen_red_radial_converge_y = options.screen_red_radial_converge_y();
+			d3d->hlsl_options->screen_green_radial_converge_x = options.screen_green_radial_converge_x();
+			d3d->hlsl_options->screen_green_radial_converge_y = options.screen_green_radial_converge_y();
+			d3d->hlsl_options->screen_blue_radial_converge_x = options.screen_blue_radial_converge_x();
+			d3d->hlsl_options->screen_blue_radial_converge_y = options.screen_blue_radial_converge_y();
+			d3d->hlsl_options->screen_red_from_red = options.screen_red_from_red();
+			d3d->hlsl_options->screen_red_from_green = options.screen_red_from_green();
+			d3d->hlsl_options->screen_red_from_blue = options.screen_red_from_blue();
+			d3d->hlsl_options->screen_green_from_red = options.screen_green_from_red();
+			d3d->hlsl_options->screen_green_from_green = options.screen_green_from_green();
+			d3d->hlsl_options->screen_green_from_blue = options.screen_green_from_blue();
+			d3d->hlsl_options->screen_blue_from_red = options.screen_blue_from_red();
+			d3d->hlsl_options->screen_blue_from_green = options.screen_blue_from_green();
+			d3d->hlsl_options->screen_blue_from_blue = options.screen_blue_from_blue();
+			d3d->hlsl_options->screen_red_offset = options.screen_red_offset();
+			d3d->hlsl_options->screen_green_offset = options.screen_green_offset();
+			d3d->hlsl_options->screen_blue_offset = options.screen_blue_offset();
+			d3d->hlsl_options->screen_red_scale = options.screen_red_scale();
+			d3d->hlsl_options->screen_green_scale = options.screen_green_scale();
+			d3d->hlsl_options->screen_blue_scale = options.screen_blue_scale();
+			d3d->hlsl_options->screen_red_power = options.screen_red_power();
+			d3d->hlsl_options->screen_green_power = options.screen_green_power();
+			d3d->hlsl_options->screen_blue_power = options.screen_blue_power();
+			d3d->hlsl_options->screen_red_floor = options.screen_red_floor();
+			d3d->hlsl_options->screen_green_floor = options.screen_green_floor();
+			d3d->hlsl_options->screen_blue_floor = options.screen_blue_floor();
+			d3d->hlsl_options->screen_red_phosphor_life = options.screen_red_phosphor();
+			d3d->hlsl_options->screen_green_phosphor_life = options.screen_green_phosphor();
+			d3d->hlsl_options->screen_blue_phosphor_life = options.screen_blue_phosphor();
+			d3d->hlsl_options->screen_saturation = options.screen_saturation();
+		}
+		else
+		{
+			d3d->hlsl_options = &g_d3d_hlsl_presets[d3d->hlsl_preset];
+		}
 
 		slider_list = init_slider_list(d3d);
 	}
@@ -1713,30 +1952,6 @@ static void device_delete_resources(d3d_info *d3d)
 			(*d3dintf->texture.release)(tex->d3dtex);
 		if (tex->d3dsurface != NULL)
 			(*d3dintf->surface.release)(tex->d3dsurface);
-		if (tex->d3dtexture0 != NULL)
-			(*d3dintf->texture.release)(tex->d3dtexture0);
-		if (tex->d3dtexture1 != NULL)
-			(*d3dintf->texture.release)(tex->d3dtexture1);
-		if (tex->d3dtexture2 != NULL)
-			(*d3dintf->texture.release)(tex->d3dtexture2);
-		if (tex->d3dtexture3 != NULL)
-			(*d3dintf->texture.release)(tex->d3dtexture3);
-		if (tex->d3dtexture4 != NULL)
-			(*d3dintf->texture.release)(tex->d3dtexture4);
-		if (tex->d3dsmalltexture0 != NULL)
-			(*d3dintf->texture.release)(tex->d3dsmalltexture0);
-		if (tex->d3dtarget0 != NULL)
-			(*d3dintf->surface.release)(tex->d3dtarget0);
-		if (tex->d3dtarget1 != NULL)
-			(*d3dintf->surface.release)(tex->d3dtarget1);
-		if (tex->d3dtarget2 != NULL)
-			(*d3dintf->surface.release)(tex->d3dtarget2);
-		if (tex->d3dtarget3 != NULL)
-			(*d3dintf->surface.release)(tex->d3dtarget3);
-		if (tex->d3dtarget4 != NULL)
-			(*d3dintf->surface.release)(tex->d3dtarget4);
-		if (tex->d3dsmalltarget0 != NULL)
-			(*d3dintf->surface.release)(tex->d3dsmalltarget0);
 		global_free(tex);
 	}
 
@@ -1757,6 +1972,11 @@ static void device_delete_resources(d3d_info *d3d)
 	{
 		(*d3dintf->effect.release)(d3d->post_effect);
 		d3d->post_effect = NULL;
+	}
+	if(d3d->prescale_effect != NULL)
+	{
+		(*d3dintf->effect.release)(d3d->prescale_effect);
+		d3d->prescale_effect = NULL;
 	}
 	if(d3d->pincushion_effect != NULL)
 	{
@@ -1796,16 +2016,110 @@ static void device_delete_resources(d3d_info *d3d)
 
 	for(int index = 0; index < 9; index++)
 	{
-		if(d3d->last_d3dtexture[index] != NULL)
+		if (d3d->hlslprescaletexture0[index] != NULL)
 		{
-			(*d3dintf->texture.release)(d3d->last_d3dtexture[index]);
-			d3d->last_d3dtexture[index] = NULL;
+			(*d3dintf->texture.release)(d3d->hlslprescaletexture0[index]);
+			d3d->hlslprescaletexture0[index] = NULL;
 		}
-		if(d3d->last_d3dtarget[index] != NULL)
+		if (d3d->hlsltexture0[index] != NULL)
 		{
-			(*d3dintf->surface.release)(d3d->last_d3dtarget[index]);
-			d3d->last_d3dtarget[index] = NULL;
+			(*d3dintf->texture.release)(d3d->hlsltexture0[index]);
+			d3d->hlsltexture0[index] = NULL;
 		}
+		if (d3d->hlsltexture1[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->hlsltexture1[index]);
+			d3d->hlsltexture1[index] = NULL;
+		}
+		if (d3d->hlsltexture2[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->hlsltexture2[index]);
+			d3d->hlsltexture2[index] = NULL;
+		}
+		if (d3d->hlsltexture3[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->hlsltexture3[index]);
+			d3d->hlsltexture3[index] = NULL;
+		}
+		if (d3d->hlsltexture4[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->hlsltexture4[index]);
+			d3d->hlsltexture4[index] = NULL;
+		}
+		if (d3d->hlslsmalltexture0[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->hlslsmalltexture0[index]);
+			d3d->hlslsmalltexture0[index] = NULL;
+		}
+		if (d3d->hlslprescaletarget0[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlslprescaletarget0[index]);
+			d3d->hlslprescaletarget0[index] = NULL;
+		}
+		if (d3d->hlsltarget0[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlsltarget0[index]);
+			d3d->hlsltarget0[index] = NULL;
+		}
+		if (d3d->hlsltarget1[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlsltarget1[index]);
+			d3d->hlsltarget1[index] = NULL;
+		}
+		if (d3d->hlsltarget2[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlsltarget2[index]);
+			d3d->hlsltarget2[index] = NULL;
+		}
+		if (d3d->hlsltarget3[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlsltarget3[index]);
+			d3d->hlsltarget3[index] = NULL;
+		}
+		if (d3d->hlsltarget4[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlsltarget4[index]);
+			d3d->hlsltarget4[index] = NULL;
+		}
+		if (d3d->hlslsmalltarget0[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->hlslsmalltarget0[index]);
+			d3d->hlslsmalltarget0[index] = NULL;
+		}
+		if(d3d->last_hlsltexture[index] != NULL)
+		{
+			(*d3dintf->texture.release)(d3d->last_hlsltexture[index]);
+			d3d->last_hlsltexture[index] = NULL;
+		}
+		if(d3d->last_hlsltarget[index] != NULL)
+		{
+			(*d3dintf->surface.release)(d3d->last_hlsltarget[index]);
+			d3d->last_hlsltarget[index] = NULL;
+		}
+	}
+
+	if(d3d->hlsl_avi_copy_texture != NULL)
+	{
+		(*d3dintf->texture.release)(d3d->hlsl_avi_copy_texture);
+		d3d->hlsl_avi_copy_texture = NULL;
+	}
+
+	if(d3d->hlsl_avi_copy_surface != NULL)
+	{
+		(*d3dintf->surface.release)(d3d->hlsl_avi_copy_surface);
+		d3d->hlsl_avi_copy_surface = NULL;
+	}
+
+	if(d3d->hlsl_avi_final_texture != NULL)
+	{
+		(*d3dintf->texture.release)(d3d->hlsl_avi_final_texture);
+		d3d->hlsl_avi_final_texture = NULL;
+	}
+
+	if(d3d->hlsl_avi_final_target != NULL)
+	{
+		(*d3dintf->surface.release)(d3d->hlsl_avi_final_target);
+		d3d->hlsl_avi_final_target = NULL;
 	}
 
 	if(d3d->hlsl_options != NULL)
@@ -1846,6 +2160,10 @@ static int device_verify_caps(d3d_info *d3d, win_window_info *window)
 
 	d3d->hlsl_enable = downcast<windows_options &>(window->machine().options()).d3d_hlsl_enable() && d3dintf->post_fx_available;
 	d3d->yiq_enable = downcast<windows_options &>(window->machine().options()).screen_yiq_enable();
+	d3d->hlsl_prescale = downcast<windows_options &>(window->machine().options()).d3d_hlsl_prescale();
+	d3d->hlsl_prescale_size = downcast<windows_options &>(window->machine().options()).d3d_hlsl_prescale_size();
+	d3d->hlsl_preset = downcast<windows_options &>(window->machine().options()).d3d_hlsl_preset();
+
 	result = (*d3dintf->d3d.get_caps_dword)(d3dintf, d3d->adapter, D3DDEVTYPE_HAL, CAPS_MAX_PS30_INSN_SLOTS, &tempcaps);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D Error %08X during get_caps_dword call\n", (int)result);
 	if(tempcaps < 512 && d3d->hlsl_enable)
@@ -2610,9 +2928,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 		vertnum = 0;
 	}
 
+	bool screen_encountered[9] = { false };
+
 	d3d_options *options = d3d->hlsl_options;
 
-	int cur_render_screen = 0;
 	// now do the polys
 	for (polynum = 0; polynum < d3d->numpolys; polynum++)
 	{
@@ -2625,6 +2944,9 @@ static void primitive_flush_pending(d3d_info *d3d)
 		// set filtering if different
 		if (poly->texture != NULL)
 		{
+			screen_encountered[poly->texture->target_index] = true;
+			d3d->target_in_use[poly->texture->target_index] = poly->texture;
+
 			newfilter = FALSE;
 			if (PRIMFLAG_GET_SCREENTEX(poly->flags))
 				newfilter = video_config.filter;
@@ -2664,6 +2986,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", d3d->shadow_texture == NULL ? 1.0f : (float)d3d->shadow_texture->rawheight);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", options->screen_scanline_alpha);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", options->screen_scanline_scale);
+					(*d3dintf->effect.set_float)(curr_effect, "ScanlineHeight", options->screen_scanline_height);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->screen_scanline_bright_scale);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->screen_scanline_bright_offset);
 					(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->screen_scanline_offset);
@@ -2688,6 +3011,8 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 			if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 			{
+				d3d->target_use_count[poly->texture->target_index] = 60;
+
 				if(d3d->yiq_enable)
 				{
 					/* Convert our signal into YIQ */
@@ -2699,13 +3024,16 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "WValue", winoptions.screen_yiq_w());
+					(*d3dintf->effect.set_float)(curr_effect, "CCValue", winoptions.screen_yiq_cc());
 					(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
-					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * winoptions.screen_yiq_b());
-					(*d3dintf->effect.set_float)(curr_effect, "FscScale", winoptions.screen_yiq_fsc_scale());
-					(*d3dintf->effect.set_float)(curr_effect, "FscValue", winoptions.screen_yiq_fsc());
+					(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
+					(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
+					(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
+					(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
+					(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
+					(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
 
-					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget4);
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget4[poly->texture->target_index]);
 
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -2727,7 +3055,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					/* Convert our signal from YIQ */
 					curr_effect = d3d->yiq_decode_effect;
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Composite", poly->texture->d3dtexture4);
+					(*d3dintf->effect.set_texture)(curr_effect, "Composite", d3d->hlsltexture4[poly->texture->target_index]);
 					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
 					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
 					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
@@ -2735,12 +3063,17 @@ static void primitive_flush_pending(d3d_info *d3d)
 					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-					(*d3dintf->effect.set_float)(curr_effect, "WValue", winoptions.screen_yiq_w());
+					(*d3dintf->effect.set_float)(curr_effect, "CCValue", winoptions.screen_yiq_cc());
 					(*d3dintf->effect.set_float)(curr_effect, "AValue", winoptions.screen_yiq_a());
-					(*d3dintf->effect.set_float)(curr_effect, "BValue", (float)poly->texture->cur_frame * winoptions.screen_yiq_b());
-					(*d3dintf->effect.set_float)(curr_effect, "FscValue", winoptions.screen_yiq_fsc());
+					(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * winoptions.screen_yiq_b()));
+					(*d3dintf->effect.set_float)(curr_effect, "OValue", winoptions.screen_yiq_o());
+					(*d3dintf->effect.set_float)(curr_effect, "PValue", winoptions.screen_yiq_p());
+					(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", winoptions.screen_yiq_y());
+					(*d3dintf->effect.set_float)(curr_effect, "IFreqResponse", winoptions.screen_yiq_i());
+					(*d3dintf->effect.set_float)(curr_effect, "QFreqResponse", winoptions.screen_yiq_q());
+					(*d3dintf->effect.set_float)(curr_effect, "ScanTime", winoptions.screen_yiq_scan_time());
 
-					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget3);
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget3[poly->texture->target_index]);
 
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -2761,7 +3094,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					curr_effect = d3d->color_effect;
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture3);
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture3[poly->texture->target_index]);
 				}
 
 				curr_effect = d3d->color_effect;
@@ -2797,7 +3130,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "BluFloor", options->screen_blue_floor);
 				(*d3dintf->effect.set_float)(curr_effect, "Saturation", options->screen_saturation);
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dsmalltarget0);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlslsmalltarget0[poly->texture->target_index]);
 
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
@@ -2816,9 +3149,48 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
+				/* Pre-scaling pass (if enabled) */
+				if(d3d->hlsl_prescale)
+				{
+					curr_effect = d3d->prescale_effect;
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslsmalltexture0[poly->texture->target_index]);
+
+					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
+					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
+					(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+					(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+					(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+					(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
+
+					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlslprescaletarget0[poly->texture->target_index]);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
+
+					for (UINT pass = 0; pass < num_passes; pass++)
+					{
+						(*d3dintf->effect.begin_pass)(curr_effect, pass);
+						// add the primitives
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, 0, poly->count);
+						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+						(*d3dintf->effect.end_pass)(curr_effect);
+					}
+
+					(*d3dintf->effect.end)(curr_effect);
+
+					curr_effect = d3d->deconverge_effect;
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslprescaletexture0[poly->texture->target_index]);
+				}
+				else
+				{
+					curr_effect = d3d->deconverge_effect;
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlslsmalltexture0[poly->texture->target_index]);
+				}
+
 				/* Deconverge pass */
 				curr_effect = d3d->deconverge_effect;
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dsmalltexture0);
 
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -2841,7 +3213,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget2);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget2[poly->texture->target_index]);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -2865,7 +3237,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 					/* Defocus pass 1 */
 					curr_effect = d3d->focus_effect;
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture2);
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture2[poly->texture->target_index]);
 
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -2879,7 +3251,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget0);
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget0[poly->texture->target_index]);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 6\n", (int)result);
 					result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -2897,7 +3269,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					/* Defocus pass 2 */
 
-					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture0[poly->texture->target_index]);
 
 					(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 					(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
@@ -2911,7 +3283,7 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
-					result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget1);
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget1[poly->texture->target_index]);
 					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 7\n", (int)result);
 
 					for (UINT pass = 0; pass < num_passes; pass++)
@@ -2939,10 +3311,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 				(*d3dintf->effect.set_float)(curr_effect, "GreenPhosphor", options->screen_green_phosphor_life);
 				(*d3dintf->effect.set_float)(curr_effect, "BluePhosphor", options->screen_blue_phosphor_life);
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? poly->texture->d3dtexture1 : poly->texture->d3dtexture2);
-				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", d3d->last_d3dtexture[cur_render_screen]);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? d3d->hlsltexture1[poly->texture->target_index] : d3d->hlsltexture2[poly->texture->target_index]);
+				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", d3d->last_hlsltexture[poly->texture->target_index]);
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, poly->texture->d3dtarget0);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsltarget0[poly->texture->target_index]);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 4\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -2965,10 +3337,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.set_float)(curr_effect, "FixedAlpha", 1.0f);
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? poly->texture->d3dtexture1 : poly->texture->d3dtexture2);
-				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", focus_enable ? poly->texture->d3dtexture1 : poly->texture->d3dtexture2);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", focus_enable ? d3d->hlsltexture1[poly->texture->target_index] : d3d->hlsltexture2[poly->texture->target_index]);
+				(*d3dintf->effect.set_texture)(curr_effect, "LastPass", focus_enable ? d3d->hlsltexture1[poly->texture->target_index] : d3d->hlsltexture2[poly->texture->target_index]);
 
-				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->last_d3dtarget[cur_render_screen++]);
+				result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->last_hlsltarget[poly->texture->target_index]);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
 				result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device clear call\n", (int)result);
@@ -2986,13 +3358,62 @@ static void primitive_flush_pending(d3d_info *d3d)
 
 				(*d3dintf->effect.end)(curr_effect);
 
+				/* Scanlines and shadow mask, at high res for AVI logging*/
+				if(d3d->hlsl_avi_file != NULL)
+				{
+					curr_effect = d3d->post_effect;
+
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture0[poly->texture->target_index]);
+
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsl_avi_final_target);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+
+					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+					for (UINT pass = 0; pass < num_passes; pass++)
+					{
+						(*d3dintf->effect.begin_pass)(curr_effect, pass);
+						// add the primitives
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+						(*d3dintf->effect.end_pass)(curr_effect);
+					}
+
+					(*d3dintf->effect.end)(curr_effect);
+				}
+
+				if(d3d->hlsl_render_snap)
+				{
+					curr_effect = d3d->post_effect;
+
+					(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture0[poly->texture->target_index]);
+
+					result = (*d3dintf->device.set_render_target)(d3d->device, 0, d3d->hlsl_snap_target);
+					if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
+
+					(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
+
+					for (UINT pass = 0; pass < num_passes; pass++)
+					{
+						(*d3dintf->effect.begin_pass)(curr_effect, pass);
+						// add the primitives
+						result = (*d3dintf->device.draw_primitive)(d3d->device, poly->type, vertnum, poly->count);
+						if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
+						(*d3dintf->effect.end_pass)(curr_effect);
+					}
+
+					(*d3dintf->effect.end)(curr_effect);
+
+					d3d->hlsl_snap_rendered = true;
+				}
+
 				/* Scanlines and shadow mask */
 				curr_effect = d3d->post_effect;
 
-				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dtexture0);
+				(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", d3d->hlsltexture0[poly->texture->target_index]);
 
 				result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
-				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 5\n", (int)result);
+				if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
 
 				(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
 
@@ -3053,11 +3474,427 @@ static void primitive_flush_pending(d3d_info *d3d)
 		(*d3dintf->surface.release)(backbuffer);
 	}
 
+	// Unregister any registered targets we didn't traverse in the past frame. A resolution change must
+	// have occurred.
+	for(int index = 0; index < 9 && d3d->hlsl_enable && d3dintf->post_fx_available; index++)
+	{
+		if(!screen_encountered[index] && d3d->hlslsmalltarget0[index] != NULL)
+		{
+			if(d3d->target_use_count[index] > 0)
+			{
+				d3d->target_use_count[index]--;
+			}
+			else
+			{
+				// free all textures
+				if(d3d->target_in_use[index] != NULL)
+				{
+					texture_info *tex = d3d->target_in_use[index];
+					if(d3d->texlist == tex)
+					{
+						d3d->texlist = tex->next;
+						if(d3d->texlist != NULL)
+						{
+							d3d->texlist->prev = NULL;
+						}
+					}
+					else
+					{
+						if(tex->next != NULL)
+						{
+							tex->next->prev = tex->prev;
+						}
+						if(tex->prev != NULL)
+						{
+							tex->prev->next = tex->next;
+						}
+					}
+
+					if (tex->d3dfinaltex != NULL)
+						(*d3dintf->texture.release)(tex->d3dfinaltex);
+					if (tex->d3dtex != NULL && tex->d3dtex != tex->d3dfinaltex)
+						(*d3dintf->texture.release)(tex->d3dtex);
+					if (tex->d3dsurface != NULL)
+						(*d3dintf->surface.release)(tex->d3dsurface);
+					global_free(tex);
+				}
+
+				if (d3d->hlslprescaletexture0[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlslprescaletexture0[index]);
+					d3d->hlslprescaletexture0[index] = NULL;
+				}
+				if (d3d->hlsltexture0[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlsltexture0[index]);
+					d3d->hlsltexture0[index] = NULL;
+				}
+				if (d3d->hlsltexture1[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlsltexture1[index]);
+					d3d->hlsltexture1[index] = NULL;
+				}
+				if (d3d->hlsltexture2[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlsltexture2[index]);
+					d3d->hlsltexture2[index] = NULL;
+				}
+				if (d3d->hlsltexture3[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlsltexture3[index]);
+					d3d->hlsltexture3[index] = NULL;
+				}
+				if (d3d->hlsltexture4[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlsltexture4[index]);
+					d3d->hlsltexture4[index] = NULL;
+				}
+				if (d3d->hlslsmalltexture0[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->hlslsmalltexture0[index]);
+					d3d->hlslsmalltexture0[index] = NULL;
+				}
+				if (d3d->hlslprescaletarget0[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlslprescaletarget0[index]);
+					d3d->hlslprescaletarget0[index] = NULL;
+				}
+				if (d3d->hlsltarget0[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlsltarget0[index]);
+					d3d->hlsltarget0[index] = NULL;
+				}
+				if (d3d->hlsltarget1[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlsltarget1[index]);
+					d3d->hlsltarget1[index] = NULL;
+				}
+				if (d3d->hlsltarget2[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlsltarget2[index]);
+					d3d->hlsltarget2[index] = NULL;
+				}
+				if (d3d->hlsltarget3[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlsltarget3[index]);
+					d3d->hlsltarget3[index] = NULL;
+				}
+				if (d3d->hlsltarget4[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlsltarget4[index]);
+					d3d->hlsltarget4[index] = NULL;
+				}
+				if (d3d->hlslsmalltarget0[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->hlslsmalltarget0[index]);
+					d3d->hlslsmalltarget0[index] = NULL;
+				}
+				if(d3d->last_hlsltexture[index] != NULL)
+				{
+					(*d3dintf->texture.release)(d3d->last_hlsltexture[index]);
+					d3d->last_hlsltexture[index] = NULL;
+				}
+				if(d3d->last_hlsltarget[index] != NULL)
+				{
+					(*d3dintf->surface.release)(d3d->last_hlsltarget[index]);
+					d3d->last_hlsltarget[index] = NULL;
+				}
+				d3d->target_use_count[index] = 0;
+			}
+		}
+	}
+
 	// reset the vertex count
 	d3d->numverts = 0;
 	d3d->numpolys = 0;
 }
 
+
+//============================================================
+//  hlsl_avi_update_snap
+//============================================================
+
+static void hlsl_avi_update_snap(d3d_info *d3d, d3d_surface *surface)
+{
+	D3DLOCKED_RECT rect;
+
+	// if we don't have a bitmap, or if it's not the right size, allocate a new one
+	if (d3d->hlsl_avi_snap == NULL || (int)((float)d3d->width * d3d->oversample_x) != d3d->hlsl_avi_snap->width || (int)((float)d3d->height * d3d->oversample_y) != d3d->hlsl_avi_snap->height)
+	{
+		if (d3d->hlsl_avi_snap != NULL)
+		{
+			auto_free(d3d->window->machine(), d3d->hlsl_avi_snap);
+		}
+		d3d->hlsl_avi_snap = auto_alloc(d3d->window->machine(), bitmap_t((int)((float)d3d->width * d3d->oversample_x), (int)((float)d3d->height * d3d->oversample_y), BITMAP_FORMAT_RGB32));
+	}
+
+	// copy the texture
+	HRESULT result = (*d3dintf->device.get_render_target_data)(d3d->device, surface, d3d->hlsl_avi_copy_surface);
+	if (result != D3D_OK)
+	{
+		printf("Couldn't copy (%08x)\n", (UINT32)result);
+		return;
+	}
+
+	// lock the texture
+	result = (*d3dintf->surface.lock_rect)(d3d->hlsl_avi_copy_surface, &rect, NULL, D3DLOCK_DISCARD);
+	if (result != D3D_OK)
+	{
+		printf("Couldn't lock (%08x)\n", (UINT32)result);
+		return;
+	}
+
+	// loop over Y
+	for (int srcy = 0; srcy < (int)((float)d3d->height * d3d->oversample_y); srcy++)
+	{
+		BYTE *src = (BYTE *)rect.pBits + srcy * rect.Pitch;
+		BYTE *dst = (BYTE *)d3d->hlsl_avi_snap->base + srcy * d3d->hlsl_avi_snap->rowpixels * 4;
+
+		for(int x = 0; x < (int)((float)d3d->width * d3d->oversample_x); x++)
+		{
+			*dst++ = *src++;
+			*dst++ = *src++;
+			*dst++ = *src++;
+			*dst++ = *src++;
+		}
+	}
+
+	// unlock
+	result = (*d3dintf->surface.unlock_rect)(d3d->hlsl_avi_copy_surface);
+	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+}
+
+
+
+//============================================================
+//  hlsl_render_snapshot
+//============================================================
+
+static void hlsl_render_snapshot(d3d_info *d3d, d3d_surface *surface)
+{
+	D3DLOCKED_RECT rect;
+
+	d3d->hlsl_render_snap = false;
+
+	// if we don't have a bitmap, or if it's not the right size, allocate a new one
+	if (d3d->hlsl_avi_snap == NULL || d3d->hlsl_snap_width != (d3d->hlsl_avi_snap->width / 2) || d3d->hlsl_snap_height != (d3d->hlsl_avi_snap->height / 2))
+	{
+		if (d3d->hlsl_avi_snap != NULL)
+		{
+			auto_free(d3d->window->machine(), d3d->hlsl_avi_snap);
+		}
+		d3d->hlsl_avi_snap = auto_alloc(d3d->window->machine(), bitmap_t(d3d->hlsl_snap_width / 2, d3d->hlsl_snap_height / 2, BITMAP_FORMAT_RGB32));
+	}
+
+	// copy the texture
+	HRESULT result = (*d3dintf->device.get_render_target_data)(d3d->device, surface, d3d->hlsl_snap_copy_target);
+	if (result != D3D_OK)
+	{
+		printf("Couldn't copy (%08x)\n", (UINT32)result);
+		return;
+	}
+
+	// lock the texture
+	result = (*d3dintf->surface.lock_rect)(d3d->hlsl_snap_copy_target, &rect, NULL, D3DLOCK_DISCARD);
+	if (result != D3D_OK)
+	{
+		printf("Couldn't lock (%08x)\n", (UINT32)result);
+		return;
+	}
+
+	for(int cy = 0; cy < 2; cy++)
+	{
+		for(int cx = 0; cx < 2; cx++)
+		{
+			// loop over Y
+			for (int srcy = 0; srcy < d3d->hlsl_snap_height / 2; srcy++)
+			{
+				int toty = (srcy + cy * (d3d->hlsl_snap_height / 2));
+				int totx = cx * (d3d->hlsl_snap_width / 2);
+				BYTE *src = (BYTE *)rect.pBits + toty * rect.Pitch + totx * 4;
+				BYTE *dst = (BYTE *)d3d->hlsl_avi_snap->base + srcy * d3d->hlsl_avi_snap->rowpixels * 4;
+
+				for(int x = 0; x < d3d->hlsl_snap_width / 2; x++)
+				{
+					*dst++ = *src++;
+					*dst++ = *src++;
+					*dst++ = *src++;
+					*dst++ = *src++;
+				}
+			}
+
+			int idx = cy * 2 + cx;
+
+			emu_file file(d3d->window->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			file_error filerr = open_next(d3d, file, "png", idx);
+			if (filerr != FILERR_NONE)
+				return;
+
+			// add two text entries describing the image
+			astring text1(APPNAME, " ", build_version);
+			astring text2(d3d->window->machine().system().manufacturer, " ", d3d->window->machine().system().description);
+			png_info pnginfo = { 0 };
+			png_add_text(&pnginfo, "Software", text1);
+			png_add_text(&pnginfo, "System", text2);
+
+			// now do the actual work
+			png_error error = png_write_bitmap(file, &pnginfo, d3d->hlsl_avi_snap, 1 << 24, NULL);
+			if (error != PNGERR_NONE)
+				mame_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
+
+			// free any data allocated
+			png_free(&pnginfo);
+		}
+	}
+
+	// unlock
+	result = (*d3dintf->surface.unlock_rect)(d3d->hlsl_snap_copy_target);
+	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
+
+	if(d3d->hlsl_snap_texture != NULL)
+	{
+		(*d3dintf->texture.release)(d3d->hlsl_snap_texture);
+		d3d->hlsl_snap_texture = NULL;
+	}
+
+	if(d3d->hlsl_snap_target != NULL)
+	{
+		(*d3dintf->surface.release)(d3d->hlsl_snap_target);
+		d3d->hlsl_snap_target = NULL;
+	}
+
+	if(d3d->hlsl_snap_copy_texture != NULL)
+	{
+		(*d3dintf->texture.release)(d3d->hlsl_snap_copy_texture);
+		d3d->hlsl_snap_copy_texture = NULL;
+	}
+
+	if(d3d->hlsl_snap_copy_target != NULL)
+	{
+		(*d3dintf->surface.release)(d3d->hlsl_snap_copy_target);
+		d3d->hlsl_snap_copy_target = NULL;
+	}
+}
+
+
+//============================================================
+//  hlsl_record_texture
+//============================================================
+
+static void hlsl_record_texture(d3d_info *d3d, d3d_surface *surface)
+{
+	// ignore if nothing to do
+	if (d3d->hlsl_avi_file == NULL || surface == NULL)
+	{
+		return;
+	}
+
+	// get the current time
+	attotime curtime = d3d->window->machine().time();
+
+	hlsl_avi_update_snap(d3d, surface);
+
+	// loop until we hit the right time
+	while (d3d->hlsl_avi_next_frame_time <= curtime)
+	{
+		// handle an AVI recording
+		// write the next frame
+		avi_error avierr = avi_append_video_frame_rgb32(d3d->hlsl_avi_file, d3d->hlsl_avi_snap);
+		if (avierr != AVIERR_NONE)
+		{
+			end_hlsl_avi_recording(d3d);
+			return;
+		}
+
+		// advance time
+		d3d->hlsl_avi_next_frame_time += d3d->hlsl_avi_frame_period;
+		d3d->hlsl_avi_frame++;
+	}
+}
+
+
+//============================================================
+//  end_hlsl_avi_recording
+//============================================================
+
+static void end_hlsl_avi_recording(d3d_info *d3d)
+{
+	if(d3d->hlsl_avi_file != NULL)
+	{
+		avi_close(d3d->hlsl_avi_file);
+	}
+	d3d->hlsl_avi_file = NULL;
+	d3d->hlsl_avi_frame = 0;
+}
+
+
+//============================================================
+//  begin_hlsl_avi_recording
+//============================================================
+
+static void begin_hlsl_avi_recording(d3d_info *d3d, const char *name)
+{
+	// stop any existing recording
+	end_hlsl_avi_recording(d3d);
+
+	// reset the state
+	d3d->hlsl_avi_frame = 0;
+	d3d->hlsl_avi_next_frame_time = d3d->window->machine().time();
+
+	// build up information about this new movie
+	avi_movie_info info;
+	info.video_format = 0;
+	info.video_timescale = 1000 * ((d3d->window->machine().primary_screen != NULL) ? ATTOSECONDS_TO_HZ(d3d->window->machine().primary_screen->frame_period().attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_sampletime = 1000;
+	info.video_numsamples = 0;
+	info.video_width = d3d->width * d3d->oversample_x;
+	info.video_height = d3d->height * d3d->oversample_y;
+	info.video_depth = 24;
+
+	info.audio_format = 0;
+	info.audio_timescale = d3d->window->machine().sample_rate();
+	info.audio_sampletime = 1;
+	info.audio_numsamples = 0;
+	info.audio_channels = 2;
+	info.audio_samplebits = 16;
+	info.audio_samplerate = d3d->window->machine().sample_rate();
+
+	// create a new temporary movie file
+	file_error filerr;
+	astring fullpath;
+	{
+		emu_file tempfile(d3d->window->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		if (name != NULL)
+		{
+			filerr = tempfile.open(name);
+		}
+		else
+		{
+			filerr = open_next(d3d, tempfile, "avi", 0);
+		}
+
+		// compute the frame time
+		{
+			d3d->hlsl_avi_frame_period = attotime::from_seconds(1000) / info.video_timescale;
+		}
+
+		// if we succeeded, make a copy of the name and create the real file over top
+		if (filerr == FILERR_NONE)
+		{
+			fullpath = tempfile.fullpath();
+		}
+	}
+
+	if (filerr == FILERR_NONE)
+	{
+		// create the file and free the string
+		avi_error avierr = avi_create(fullpath, &info, &d3d->hlsl_avi_file);
+		if (avierr != AVIERR_NONE)
+		{
+			mame_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
+		}
+	}
+}
 
 
 //============================================================
@@ -3081,9 +3918,6 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 
 	// compute the size
 	texture_compute_size(d3d, texsource->width, texsource->height, texture);
-
-	d3d->oversample_x = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_x();
-	d3d->oversample_y = downcast<windows_options &>(d3d->window->machine().options()).screen_oversample_y();
 
 	// non-screen textures are easy
 	if (!PRIMFLAG_GET_SCREENTEX(flags))
@@ -3143,42 +3977,56 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 
 					if(d3d->hlsl_enable && d3dintf->post_fx_available)
 					{
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
+						int idx = d3d->registered_targets;
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture0[idx], 0, &d3d->hlsltarget0[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
+						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture1[idx], 0, &d3d->hlsltarget1[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(d3d->width * d3d->oversample_x), (int)(d3d->height * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture2[idx], 0, &d3d->hlsltarget2[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
 
-						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
+						int scale = 1;
+						if(d3d->hlsl_prescale) scale = d3d->hlsl_prescale_size;
+
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * scale, texture->rawheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+						(*d3dintf->texture.get_surface_level)(d3d->hlslsmalltexture0[idx], 0, &d3d->hlslsmalltarget0[idx]);
 
+						result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth * scale, texture->rawheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlslprescaletexture0[idx], 0, &d3d->hlslprescaletarget0[idx]);
+
+						texture->target_index = d3d->registered_targets;
+						d3d->target_use_count[texture->target_index] = 60;
+						d3d->target_in_use[texture->target_index] = texture;
 						d3d->registered_targets++;
+						d3d->registered_targets %= 9;
 					}
 
 					break;
@@ -3221,41 +4069,56 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 				{
 					if(d3d->hlsl_enable && d3dintf->post_fx_available)
 					{
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture0);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture0, 0, &texture->d3dtarget0);
+						int idx = d3d->registered_targets;
 
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_d3dtexture[d3d->registered_targets]);
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture0[idx]);
 						if (result != D3D_OK)
 							goto error;
-						(*d3dintf->texture.get_surface_level)(d3d->last_d3dtexture[d3d->registered_targets], 0, &d3d->last_d3dtarget[d3d->registered_targets]);
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture0[idx], 0, &d3d->hlsltarget0[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->last_hlsltexture[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->last_hlsltexture[idx], 0, &d3d->last_hlsltarget[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture1[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture1[idx], 0, &d3d->hlsltarget1[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture2[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture2[idx], 0, &d3d->hlsltarget2[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture3[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture3[idx], 0, &d3d->hlsltarget3[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlsltexture4[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlsltexture4[idx], 0, &d3d->hlsltarget4[idx]);
+
+						int scale = 1;
+						if(d3d->hlsl_prescale) scale = d3d->hlsl_prescale_size;
+
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * scale, scheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslsmalltexture0[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlslsmalltexture0[idx], 0, &d3d->hlslsmalltarget0[idx]);
+
+						result = (*d3dintf->device.create_texture)(d3d->device, scwidth * scale, scheight * scale, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &d3d->hlslprescaletexture0[idx]);
+						if (result != D3D_OK)
+							goto error;
+						(*d3dintf->texture.get_surface_level)(d3d->hlslprescaletexture0[idx], 0, &d3d->hlslprescaletarget0[idx]);
+
+						texture->target_index = d3d->registered_targets;
+						d3d->target_use_count[texture->target_index] = 60;
+						d3d->target_in_use[texture->target_index] = texture;
 						d3d->registered_targets++;
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture1);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture1, 0, &texture->d3dtarget1);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture2);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture2, 0, &texture->d3dtarget2);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture3);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture3, 0, &texture->d3dtarget3);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, (int)(scwidth * d3d->oversample_x), (int)(scheight * d3d->oversample_y), 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dtexture4);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dtexture4, 0, &texture->d3dtarget4);
-
-						result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture->d3dsmalltexture0);
-						if (result != D3D_OK)
-							goto error;
-						(*d3dintf->texture.get_surface_level)(texture->d3dsmalltexture0, 0, &texture->d3dsmalltarget0);
+						d3d->registered_targets %= 9;
 					}
 					break;
 				}
@@ -3269,6 +4132,9 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	texture_set_data(d3d, texture, texsource, flags);
 
 	// add us to the texture list
+	if(d3d->texlist != NULL)
+		d3d->texlist->prev = texture;
+	texture->prev = NULL;
 	texture->next = d3d->texlist;
 	d3d->texlist = texture;
 	return texture;
@@ -4021,4 +4887,131 @@ static void texture_update(d3d_info *d3d, const render_primitive *prim)
 		texture_set_data(d3d, texture, &prim->texture, prim->flags);
 		texture->texinfo.seqid = prim->texture.seqid;
 	}
+}
+
+
+// NOTE: The function below is taken directly from src/emu/video.c and should likely be moved into a global helper function.
+//-------------------------------------------------
+//  open_next - open the next non-existing file of
+//  type filetype according to our numbering
+//  scheme
+//-------------------------------------------------
+
+static file_error open_next(d3d_info *d3d, emu_file &file, const char *extension, int idx)
+{
+	UINT32 origflags = file.openflags();
+
+	// handle defaults
+	const char *snapname = d3d->window->machine().options().snap_name();
+
+	if (snapname == NULL || snapname[0] == 0)
+		snapname = "%g/%i";
+	astring snapstr(snapname);
+
+	// strip any extension in the provided name
+	int index = snapstr.rchr(0, '.');
+	if (index != -1)
+		snapstr.substr(0, index);
+
+	// handle %d in the template (for image devices)
+	astring snapdev("%d_");
+	int pos = snapstr.find(0, snapdev);
+
+	if (pos != -1)
+	{
+		// if more %d are found, revert to default and ignore them all
+		if (snapstr.find(pos + 3, snapdev) != -1)
+			snapstr.cpy("%g/%i");
+		// else if there is a single %d, try to create the correct snapname
+		else
+		{
+			int name_found = 0;
+
+			// find length of the device name
+			int end1 = snapstr.find(pos + 3, "/");
+			int end2 = snapstr.find(pos + 3, "%");
+			int end = -1;
+
+			if ((end1 != -1) && (end2 != -1))
+				end = MIN(end1, end2);
+			else if (end1 != -1)
+				end = end1;
+			else if (end2 != -1)
+				end = end2;
+			else
+				end = snapstr.len();
+
+			if (end - pos < 3)
+				fatalerror("Something very wrong is going on!!!");
+
+			// copy the device name to an astring
+			astring snapdevname;
+			snapdevname.cpysubstr(snapstr, pos + 3, end - pos - 3);
+
+			// verify that there is such a device for this system
+			device_image_interface *image = NULL;
+			for (bool gotone = d3d->window->machine().devicelist().first(image); gotone; gotone = image->next(image))
+			{
+				// get the device name
+				astring tempdevname(image->brief_instance_name());
+
+				if (snapdevname.cmp(tempdevname) == 0)
+				{
+					// verify that such a device has an image mounted
+					if (image->basename() != NULL)
+					{
+						astring filename(image->basename());
+
+						// strip extension
+						filename.substr(0, filename.rchr(0, '.'));
+
+						// setup snapname and remove the %d_
+						snapstr.replace(0, snapdevname, filename);
+						snapstr.del(pos, 3);
+
+						name_found = 1;
+					}
+				}
+			}
+
+			// or fallback to default
+			if (name_found == 0)
+				snapstr.cpy("%g/%i");
+		}
+	}
+
+	// add our own index
+	// add our own extension
+	snapstr.cat(".").cat(extension);
+
+	// substitute path and gamename up front
+	snapstr.replace(0, "/", PATH_SEPARATOR);
+	snapstr.replace(0, "%g", d3d->window->machine().basename());
+
+	// determine if the template has an index; if not, we always use the same name
+	astring fname;
+	if (snapstr.find(0, "%i") == -1)
+		fname.cpy(snapstr);
+
+	// otherwise, we scan for the next available filename
+	else
+	{
+		// try until we succeed
+		astring seqtext;
+		file.set_openflags(OPEN_FLAG_READ);
+		for (int seq = 0; ; seq++)
+		{
+			// build up the filename
+			fname.cpy(snapstr).replace(0, "%i", seqtext.format("%04d_%d", seq, idx).cstr());
+
+			// try to open the file; stop when we fail
+			file_error filerr = file.open(fname);
+			if (filerr != FILERR_NONE)
+				break;
+		}
+	}
+
+	// create the final file
+	file.set_openflags(origflags);
+    return file.open(fname);
 }

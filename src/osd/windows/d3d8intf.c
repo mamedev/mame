@@ -360,6 +360,13 @@ static HRESULT d3d_device_get_render_target(d3d_device *dev, DWORD index, d3d_su
 }
 
 
+static HRESULT d3d_device_get_render_target_data(d3d_device *dev, d3d_surface *rendertarget, d3d_surface *destsurface)
+{
+	assert(false);
+	return D3D_OK;
+}
+
+
 static HRESULT d3d_device_present(d3d_device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags)
 {
 	IDirect3DDevice8 *device = (IDirect3DDevice8 *)dev;
@@ -470,6 +477,7 @@ static const d3d_device_interface d3d8_device_interface =
 	d3d_device_end_scene,
 	d3d_device_get_raster_status,
 	d3d_device_get_render_target,
+	d3d_device_get_render_target_data,
 	d3d_device_present,
 	d3d_device_release,
 	d3d_device_reset,

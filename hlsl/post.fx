@@ -99,6 +99,7 @@ uniform float ScanlineScale = 1.0f;
 uniform float ScanlineBrightScale = 1.0f;
 uniform float ScanlineBrightOffset = 1.0f;
 uniform float ScanlineOffset = 1.0f;
+uniform float ScanlineHeight = 0.5f;
 
 uniform float UseShadow = 0.0f;
 uniform float ShadowBrightness = 1.0f;
@@ -155,8 +156,8 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	// -- Scanline Simulation --
 	float InnerSine = BaseCoord.y * RawHeight * ScanlineScale;
-	float3 ScanBrightness = lerp(1.0f, abs(sin(InnerSine * PI + ScanlineOffset * RawHeight)) * ScanlineBrightScale + 1.0f, ScanlineAmount);
-	//float3 Scanned = BaseTexel.rgb * ScanBrightness;
+	float ScanBrightMod = sin(InnerSine * PI + ScanlineOffset * RawHeight);
+	float3 ScanBrightness = lerp(1.0f, pow(ScanBrightMod * ScanBrightMod, ScanlineHeight) * ScanlineBrightScale + 1.0f, ScanlineAmount);
 	float3 Scanned = BaseTexel.rgb * ScanBrightness;
 
 	float2 ShadowDims = float2(ShadowWidth, ShadowHeight);
@@ -164,7 +165,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float2 ShadowMaskSize = float2(ShadowMaskSizeX, ShadowMaskSizeY);
 	float2 ShadowFrac = frac(BaseCoord * ShadowMaskSize * 0.5f);
 	float2 ShadowCoord = ShadowFrac * ShadowUV + float2(1.5f / ShadowWidth, 1.5f / ShadowHeight);
-	float3 ShadowTexel = lerp(1.0f, tex2D(ShadowSampler, ShadowCoord), UseShadow);
+	float3 ShadowTexel = lerp(1.0f, tex2D(ShadowSampler, ShadowCoord).rgb, UseShadow);
 	
 	// -- Final Pixel --
 	float4 Output = float4(Scanned * lerp(1.0f, ShadowTexel, ShadowBrightness), BaseTexel.a) * Input.Color;

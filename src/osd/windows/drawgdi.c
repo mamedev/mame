@@ -94,6 +94,8 @@ int drawgdi_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_init = drawgdi_window_init;
 	callbacks->window_get_primitives = drawgdi_window_get_primitives;
 	callbacks->window_draw = drawgdi_window_draw;
+	callbacks->window_save = NULL;
+	callbacks->window_record = NULL;
 	callbacks->window_destroy = drawgdi_window_destroy;
 	return 0;
 }

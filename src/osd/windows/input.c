@@ -781,6 +781,20 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 				entry->name = "Toggle Fullscreen";
 				entry->defseq[SEQ_TYPE_STANDARD].set(KEYCODE_LALT, KEYCODE_ENTER);
 				break;
+
+			// alt-F12 for fullscreen snap
+			case IPT_OSD_2:
+				entry->token = "RENDER_SNAP";
+				entry->name = "Take Rendered Snapshot";
+				entry->defseq[SEQ_TYPE_STANDARD].set(KEYCODE_LALT, KEYCODE_F12);
+				break;
+
+			// alt-F11 for fullscreen video
+			case IPT_OSD_3:
+				entry->token = "RENDER_AVI";
+				entry->name = "Record Rendered Video";
+				entry->defseq[SEQ_TYPE_STANDARD].set(KEYCODE_LALT, KEYCODE_F11);
+				break;
 		}
 }
 

@@ -81,6 +81,12 @@
 // core post-processing options
 #define WINOPTION_HLSL_ENABLE				"hlsl_enable"
 #define WINOPTION_HLSLPATH					"hlslpath"
+#define WINOPTION_HLSL_PRESCALE				"hlsl_prescale"
+#define WINOPTION_HLSL_PRESCALE_SIZE		"hlsl_prescale_size"
+#define WINOPTION_HLSL_PRESET				"hlsl_preset"
+#define WINOPTION_HLSL_WRITE				"hlsl_write"
+#define WINOPTION_HLSL_SNAP_WIDTH			"hlsl_snap_width"
+#define WINOPTION_HLSL_SNAP_HEIGHT			"hlsl_snap_height"
 #define WINOPTION_SHADOW_MASK_ALPHA			"shadow_mask_alpha"
 #define WINOPTION_SHADOW_MASK_TEXTURE		"shadow_mask_texture"
 #define WINOPTION_SHADOW_MASK_COUNT_X		"shadow_mask_x_count"
@@ -95,6 +101,7 @@
 #define WINOPTION_OVERSAMPLE_Y				"oversample_y"
 #define WINOPTION_SCANLINE_AMOUNT			"scanline_alpha"
 #define WINOPTION_SCANLINE_SCALE			"scanline_size"
+#define WINOPTION_SCANLINE_HEIGHT			"scanline_height"
 #define WINOPTION_SCANLINE_BRIGHT_SCALE 	"scanline_bright_scale"
 #define WINOPTION_SCANLINE_BRIGHT_OFFSET	"scanline_bright_offset"
 #define WINOPTION_SCANLINE_OFFSET			"scanline_jitter"
@@ -138,11 +145,15 @@
 #define WINOPTION_BLUE_PHOSPHOR				"blue_phosphor_life"
 #define WINOPTION_SATURATION				"saturation"
 #define WINOPTION_YIQ_ENABLE				"yiq_enable"
-#define WINOPTION_YIQ_WVALUE				"yiq_w"
+#define WINOPTION_YIQ_CCVALUE				"yiq_cc"
 #define WINOPTION_YIQ_AVALUE				"yiq_a"
 #define WINOPTION_YIQ_BVALUE				"yiq_b"
-#define WINOPTION_YIQ_FSCVALUE				"yiq_fsc"
-#define WINOPTION_YIQ_FSCSCALE				"yiq_fsc_scale"
+#define WINOPTION_YIQ_OVALUE				"yiq_o"
+#define WINOPTION_YIQ_PVALUE				"yiq_p"
+#define WINOPTION_YIQ_YVALUE				"yiq_y"
+#define WINOPTION_YIQ_IVALUE				"yiq_i"
+#define WINOPTION_YIQ_QVALUE				"yiq_q"
+#define WINOPTION_YIQ_SCAN_TIME				"yiq_scan_time"
 #define WINOPTION_YIQ_PHASE_COUNT			"yiq_phase_count"
 
 // per-window options
@@ -210,16 +221,23 @@ public:
 	// core post-processing options
 	const char *screen_post_fx_dir() const { return value(WINOPTION_HLSLPATH); }
 	bool d3d_hlsl_enable() const { return bool_value(WINOPTION_HLSL_ENABLE); }
+	const char *d3d_hlsl_write() const { return value(WINOPTION_HLSL_WRITE); }
+	bool d3d_hlsl_prescale() const { return bool_value(WINOPTION_HLSL_PRESCALE); }
+	int d3d_hlsl_prescale_size() const { return int_value(WINOPTION_HLSL_PRESCALE_SIZE); }
+	int d3d_hlsl_preset() const { return int_value(WINOPTION_HLSL_PRESET); }
+	int d3d_snap_width() const { return int_value(WINOPTION_HLSL_SNAP_WIDTH); }
+	int d3d_snap_height() const { return int_value(WINOPTION_HLSL_SNAP_HEIGHT); }
 	float screen_shadow_mask_alpha() const { return float_value(WINOPTION_SHADOW_MASK_ALPHA); }
 	const char *screen_shadow_mask_texture() const { return value(WINOPTION_SHADOW_MASK_TEXTURE); }
-	float screen_shadow_mask_count_x() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_X); }
-	float screen_shadow_mask_count_y() const { return float_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
+	int screen_shadow_mask_count_x() const { return int_value(WINOPTION_SHADOW_MASK_COUNT_X); }
+	int screen_shadow_mask_count_y() const { return int_value(WINOPTION_SHADOW_MASK_COUNT_Y); }
 	float screen_shadow_mask_u_size() const { return float_value(WINOPTION_SHADOW_MASK_USIZE); }
 	float screen_shadow_mask_v_size() const { return float_value(WINOPTION_SHADOW_MASK_VSIZE); }
 	float screen_oversample_x() const { return float_value(WINOPTION_OVERSAMPLE_X); }
 	float screen_oversample_y() const { return float_value(WINOPTION_OVERSAMPLE_Y); }
 	float screen_scanline_amount() const { return float_value(WINOPTION_SCANLINE_AMOUNT); }
 	float screen_scanline_scale() const { return float_value(WINOPTION_SCANLINE_SCALE); }
+	float screen_scanline_height() const { return float_value(WINOPTION_SCANLINE_HEIGHT); }
 	float screen_scanline_bright_scale() const { return float_value(WINOPTION_SCANLINE_BRIGHT_SCALE); }
 	float screen_scanline_bright_offset() const { return float_value(WINOPTION_SCANLINE_BRIGHT_OFFSET); }
 	float screen_scanline_offset() const { return float_value(WINOPTION_SCANLINE_OFFSET); }
@@ -251,11 +269,15 @@ public:
 	float screen_blue_from_green() const { return float_value(WINOPTION_BLUE_MATRIX_G); }
 	float screen_blue_from_blue() const { return float_value(WINOPTION_BLUE_MATRIX_B); }
 	bool screen_yiq_enable() const { return bool_value(WINOPTION_YIQ_ENABLE); }
-	float screen_yiq_w() const { return float_value(WINOPTION_YIQ_WVALUE); }
+	float screen_yiq_cc() const { return float_value(WINOPTION_YIQ_CCVALUE); }
 	float screen_yiq_a() const { return float_value(WINOPTION_YIQ_AVALUE); }
 	float screen_yiq_b() const { return float_value(WINOPTION_YIQ_BVALUE); }
-	float screen_yiq_fsc() const { return float_value(WINOPTION_YIQ_FSCVALUE); }
-	float screen_yiq_fsc_scale() const { return float_value(WINOPTION_YIQ_FSCSCALE); }
+	float screen_yiq_o() const { return float_value(WINOPTION_YIQ_OVALUE); }
+	float screen_yiq_p() const { return float_value(WINOPTION_YIQ_PVALUE); }
+	float screen_yiq_y() const { return float_value(WINOPTION_YIQ_YVALUE); }
+	float screen_yiq_i() const { return float_value(WINOPTION_YIQ_IVALUE); }
+	float screen_yiq_q() const { return float_value(WINOPTION_YIQ_QVALUE); }
+	float screen_yiq_scan_time() const { return float_value(WINOPTION_YIQ_SCAN_TIME); }
 	int screen_yiq_phase_count() const { return int_value(WINOPTION_YIQ_PHASE_COUNT); }
 	float screen_red_offset() const { return float_value(WINOPTION_RED_OFFSET); }
 	float screen_green_offset() const { return float_value(WINOPTION_GREEN_OFFSET); }
