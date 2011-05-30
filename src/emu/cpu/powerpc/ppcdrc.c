@@ -25,6 +25,8 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
+#ifdef PPC_USE_DRC
+
 using namespace uml;
 
 extern offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op);
@@ -2123,7 +2125,7 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 	if (desc->pc == PROBE_ADDRESS)
 	{
 		UML_MOV(block, mem(&ppc->pc), desc->pc);										// mov     [pc],desc->pc
-		UML_CALLC(block, cfunc_printf_probe, (void *)desc->pc);										// callc   cfunc_printf_probe,desc->pc
+		UML_CALLC(block, cfunc_printf_probe, (void *)(FPTR)desc->pc);										// callc   cfunc_printf_probe,desc->pc
 	}
 
 	/* if we are debugging, call the debugger */
@@ -4584,3 +4586,5 @@ DEFINE_LEGACY_CPU_DEVICE(PPC603E, ppc603e);
 DEFINE_LEGACY_CPU_DEVICE(PPC603R, ppc603r);
 DEFINE_LEGACY_CPU_DEVICE(PPC604, ppc604);
 DEFINE_LEGACY_CPU_DEVICE(MPC8240, mpc8240);
+
+#endif

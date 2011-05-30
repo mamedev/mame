@@ -75,7 +75,7 @@ public:
 
 INLINE const char *input_port_string_from_index(UINT32 index)
 {
-	return input_port_string_from_token((const char *)index);
+	return input_port_string_from_token((const char *)(FPTR)index);
 }
 
 
