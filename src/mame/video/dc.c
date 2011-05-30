@@ -1013,14 +1013,14 @@ WRITE64_HANDLER( pvr_ta_w )
 {
 	int reg;
 	UINT64 shift;
-	UINT32 old,dat;
+	UINT32 dat;
 	UINT32 sizera,offsetra;
 	int a;
 	int sanitycount;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = pvrta_regs[reg];
+	//old = pvrta_regs[reg];
 
 	// Dreamcast BIOS attempts to set PVRID to zero and then dies
 	// if it succeeds.  Don't allow.
@@ -1632,12 +1632,12 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 WRITE64_HANDLER( ta_fifo_yuv_w )
 {
-	int reg;
-	UINT64 shift;
-	UINT32 dat;
+//	int reg;
+//	UINT64 shift;
+//	UINT32 dat;
 
-	reg = decode_reg_64(offset, mem_mask, &shift);
-	dat = (UINT32)(data >> shift);
+//	reg = decode_reg_64(offset, mem_mask, &shift);
+//	dat = (UINT32)(data >> shift);
 
 //  printf("YUV FIFO: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x %08x\n", 0x10800000+reg*4, dat, data, offset, mem_mask,test);
 }

@@ -943,15 +943,15 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 {
 	struct view *view = state->m_view;
 	UINT32 flags;
-	UINT32 tex_adr, lum, v1, v2;
+	UINT32 tex_adr, lum; //, v1, v2;
 	struct point *old_p0, *old_p1, *p0, *p1;
 	int link, type;
 	float z;
 	struct quad_m1 cquad;
 
 	tex_adr = readi(list);
-	v1      = readi(list+2);
-	v2      = readi(list+10);
+//	v1      = readi(list+2);
+//	v2      = readi(list+10);
 
 	old_p0 = state->m_pointpt++;
 	old_p1 = state->m_pointpt++;
@@ -999,7 +999,7 @@ static UINT16 *push_direct(model1_state *state, UINT16 *list)
 		p1 = state->m_pointpt++;
 
 		lum   = readi(list+2);
-		v1    = readi(list+4);
+//		v1    = readi(list+4);
 
 		if(type == 2) {
 			p0->x = readf(list+6);

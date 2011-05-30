@@ -1223,7 +1223,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 
 static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 {
-	UINT32 result;
+//	UINT32 result;
 	cdrom_file *gdromfile;
 	UINT8 buffer[2048];
 	UINT8 *ptr;
@@ -1262,20 +1262,20 @@ static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 	// primary volume descriptor
 	// read frame 0xb06e (frame=sector+150)
 	// dimm board firmware starts straight from this frame
-	result = cdrom_read_data(gdromfile, 0xb06e - 150, buffer, CD_TRACK_MODE1);
+	cdrom_read_data(gdromfile, 0xb06e - 150, buffer, CD_TRACK_MODE1);
 	start=((buffer[0x8c+0] << 0) |
 		   (buffer[0x8c+1] << 8) |
 		   (buffer[0x8c+2] << 16) |
 		   (buffer[0x8c+3] << 24));
 	// path table
-	result = cdrom_read_data(gdromfile, start, buffer, CD_TRACK_MODE1);
+	cdrom_read_data(gdromfile, start, buffer, CD_TRACK_MODE1);
 	start=((buffer[0x2+0] << 0) |
 		   (buffer[0x2+1] << 8) |
 		   (buffer[0x2+2] << 16) |
 		   (buffer[0x2+3] << 24));
 	dir = start;
 	// directory
-	result = cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
+	cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
 	// find data of file
 	start = 0;
 	size = 0;
@@ -1326,14 +1326,14 @@ static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 	if ((start != 0) && (size == 0x100))
 	{
 		// read file
-		result = cdrom_read_data(gdromfile, start, buffer, CD_TRACK_MODE1);
+		cdrom_read_data(gdromfile, start, buffer, CD_TRACK_MODE1);
 		// get "rom" file name
 		memset(name,'\0', 128);
 		memcpy(name, buffer+0xc0, FILENAME_LENGTH-1);
 
 
 		// directory
-		result = cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
+		cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
 		// find data of "rom" file
 		start = 0;
 		size = 0;
@@ -1388,7 +1388,7 @@ static void load_rom_gdrom(running_machine& machine, naomibd_state *v)
 			sectors = (size+2047)/2048;
 			while (sectors > 0)
 			{
-				result = cdrom_read_data(gdromfile, start, ptr, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, start, ptr, CD_TRACK_MODE1);
 				ptr += 2048;
 				start++;
 				sectors--;

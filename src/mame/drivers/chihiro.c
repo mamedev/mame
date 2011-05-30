@@ -365,7 +365,7 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 	char sop1[16];
 	char sop2[16];
 	char pcrel[16];
-	int prefix;
+//	int prefix;
 
 	addr=address;
 	while (1)
@@ -385,14 +385,14 @@ static void jamtable_disasm(running_machine &machine, address_space *space,UINT3
 			sprintf(sop2,"%08X",op2);
 			sprintf(sop1,"ACC");
 			sprintf(pcrel,"PC+ACC");
-			prefix=1;
+//			prefix=1;
 		}
 		else
 		{
 			sprintf(sop2,"%08X",op2);
 			sprintf(sop1,"%08X",op1);
 			sprintf(pcrel,"%08X",base+9+op1);
-			prefix=0;
+//			prefix=0;
 		}
 		debug_console_printf(machine,"%08X ",base);
 		// dl=instr ebx=par1 eax=par2

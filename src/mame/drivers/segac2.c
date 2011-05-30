@@ -356,11 +356,11 @@ static WRITE16_HANDLER( io_chip_w )
 {
 	segac2_state *state = space->machine().driver_data<segac2_state>();
 	UINT8 newbank;
-	UINT8 old;
+//	UINT8 old;
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-	old = state->m_misc_io_data[offset];
+//	old = state->m_misc_io_data[offset];
 	state->m_misc_io_data[offset] = data;
 
 	switch (offset)

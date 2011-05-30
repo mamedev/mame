@@ -994,17 +994,16 @@ static void megadrive_do_insta_68k_to_vsram_dma(running_machine &machine,UINT32 
 /* This can be simplified quite a lot.. */
 static void handle_dma_bits(running_machine &machine)
 {
-
+#if 0
 	if (megadrive_vdp_code&0x20)
 	{
 		UINT32 source;
 		UINT16 length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine.describe_context(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
-
+		mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine.describe_context(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 	}
-
+#endif
 	if (megadrive_vdp_code==0x20)
 	{
 		mame_printf_debug("DMA bit set 0x20 but invalid??\n");
@@ -7537,12 +7536,12 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	UINT16 hsize = 64;
 	UINT16 vsize = 64;
 	UINT16 window_right;
-	UINT16 window_hpos;
+//	UINT16 window_hpos;
 	UINT16 window_down;
-	UINT16 window_vpos;
+//	UINT16 window_vpos;
 	UINT16 hscroll_base;
-	UINT8  vscroll_mode;
-	UINT8  hscroll_mode;
+//	UINT8  vscroll_mode;
+//	UINT8  hscroll_mode;
 	int window_firstline;
 	int window_lastline;
 	int window_firstcol;
@@ -7587,9 +7586,9 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	base_b = MEGADRIVE_REG04_PATTERN_ADDR_B << 13;
 	size  = MEGADRIVE_REG10_HSCROLL_SIZE | (MEGADRIVE_REG10_VSCROLL_SIZE<<4);
 	window_right = MEGADRIVE_REG11_WINDOW_RIGHT;
-	window_hpos = MEGADRIVE_REG11_WINDOW_HPOS;
+//	window_hpos = MEGADRIVE_REG11_WINDOW_HPOS;
 	window_down = MEGADRIVE_REG12_WINDOW_DOWN;
-	window_vpos = MEGADRIVE_REG12_WINDOW_VPOS;
+//	window_vpos = MEGADRIVE_REG12_WINDOW_VPOS;
 
 	screenwidth = MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1);
 
@@ -7649,8 +7648,8 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	}
 
 
-    vscroll_mode = MEGADRIVE_REG0B_VSCROLL_MODE;
-    hscroll_mode = MEGADRIVE_REG0B_HSCROLL_MODE;
+//    vscroll_mode = MEGADRIVE_REG0B_VSCROLL_MODE;
+//    hscroll_mode = MEGADRIVE_REG0B_HSCROLL_MODE;
     hscroll_base = MEGADRIVE_REG0D_HSCROLL_ADDR<<10;
 
 	switch (size)
@@ -9488,10 +9487,10 @@ int megadrive_z80irq_hpos = 320;
 	if (0)
 	{
 		//int xxx;
-		UINT64 frametime;
+//		UINT64 frametime;
 
 	//  /* reference */
-		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
+//		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 		//time_elapsed_since_crap = frame_timer->time_elapsed();
 		//xxx = machine.device<cpudevice>("maincpu")->attotime_to_cycles(time_elapsed_since_crap);

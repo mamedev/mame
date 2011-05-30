@@ -1047,7 +1047,7 @@ static TGP_FUNCTION( track_lookup )
 	int offi, offd, len;
 	float dist;
 	int i;
-	UINT32 behaviour, entry;
+	UINT32 entry;
 	float height;
 
 	logerror("TGP track_lookup %f, 0x%x, %f, %f (%x)\n", a, b, c, d, state->m_pushpc);
@@ -1059,7 +1059,7 @@ static TGP_FUNCTION( track_lookup )
 
 	dist = -1;
 
-	behaviour = 0;
+//	behaviour = 0;
 	height = 0.0;
 	entry = 0;
 
@@ -1080,7 +1080,7 @@ static TGP_FUNCTION( track_lookup )
 				float d = (a-z)*(a-z);
 				if(dist == -1 || d<dist) {
 					dist = d;
-					behaviour = tgp_data[posd+15];
+//					behaviour = tgp_data[posd+15];
 					height = z;
 					entry = bpos+i;
 				}
