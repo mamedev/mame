@@ -260,7 +260,7 @@ static const UINT8 ptable[7][8] =
 	{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x10}
 };
 
-	INT32 data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, hmask, magicid;
+	INT32 data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, magicid;
 	UINT32 *src, *srcend, *obj, *objend;
 	UINT16 *dst;
 	const UINT8  *zcode, *pcode;
@@ -347,7 +347,7 @@ if((data1=obj[0])&0x80000000)\
 		// I can't make out anything meaningful.
 		magicid = srcbase[0x71f0/4];
 
-		hmask = vmask = 0x3ff;
+		vmask = 0x3ff;
 		if (magicid != 0x11010111)
 		{
 			switch (magicid)

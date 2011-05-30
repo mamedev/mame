@@ -324,7 +324,7 @@ static SCREEN_UPDATE( maygayv1 )
 			// Draw on this line?
 			if ( !BIT(slmask, obj) )
 			{
-				UINT32	objbase, trans, width, res, cspec;
+				UINT32	objbase, trans, width;
 				INT32	x, xpos;
 				UINT16	w0, w1, w2;
 				UINT16	*objptr;
@@ -343,11 +343,11 @@ static SCREEN_UPDATE( maygayv1 )
 //                  printf("Blinking\n");
 
 				/* Resolution: either 4bpp or 2bpp */
-				res = (w0 >> 9) & 3;
+//				res = (w0 >> 9) & 3;
 
 
 				/* Expand 2bpp to 3bpp */
-				cspec = (w0 & 3) << 2;
+				//cspec = (w0 & 3) << 2;
 
 				if ( BIT(w0, 11) )
 				{

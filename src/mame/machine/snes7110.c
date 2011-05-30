@@ -1274,12 +1274,12 @@ static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data
 	case 0x4805: snes_spc7110.r4805 = data; break;
 	case 0x4806:
 		{
-			UINT32 table, index, length, address, mode, offset;
+			UINT32 table, index, address, mode, offset;
 			snes_spc7110.r4806 = data;
 
 			table   = (snes_spc7110.r4801 + (snes_spc7110.r4802 << 8) + (snes_spc7110.r4803 << 16));
 			index   = (snes_spc7110.r4804 << 2);
-			length  = (snes_spc7110.r4809 + (snes_spc7110.r480a << 8));
+			//length  = (snes_spc7110.r4809 + (snes_spc7110.r480a << 8));
 			address = spc7110_datarom_addr(table + index);
 			mode    = (ROM[address + 0]);
 			offset  = (ROM[address + 1] << 16)

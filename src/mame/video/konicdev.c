@@ -9013,7 +9013,7 @@ static void k001005_render_polygons( device_t *device )
 		if (k001005->_3d_fifo[i] == 0x80000003)
 		{
 			poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(k001005->poly);
-			poly_vertex v[4];
+//			poly_vertex v[4];
 			int r, g, b, a;
 			UINT32 color;
 			int index = i;
@@ -9029,10 +9029,11 @@ static void k001005_render_polygons( device_t *device )
 				x |= ((x & 0x2000) ? 0xffffc000 : 0);
 				y |= ((y & 0x1000) ? 0xffffe000 : 0);
 				++index;
-
+#if POLY_DEVICE
 				v[j].x = ((float)(x) / 16.0f) + 256.0f;
 				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
 				v[j].p[0] = 0;	/* ??? */
+#endif
 			}
 
 			++index;
