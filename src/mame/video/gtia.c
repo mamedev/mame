@@ -34,8 +34,11 @@ static void gtia_state_postload(running_machine &machine);
 /**********************************************
  * split a color into hue and luminance values
  **********************************************/
-#define SPLIT_HUE_LUM(data,hue,lum) \
-    hue = (data & HUE); lum = (data & LUM)
+#define SPLIT_HUE(data,hue) \
+    hue = (data & HUE)
+
+#define SPLIT_LUM(data,lum) \
+    lum = (data & LUM)
 
 /**********************************************
  * set both color clocks equal for one color
@@ -384,10 +387,13 @@ static void recalc_m3(void)
 WRITE8_HANDLER( atari_gtia_w )
 {
 	/* used for mixing hue/lum of different colors */
-	static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;
-	static UINT8 lumpf1=0,lumpf2=0,lumbk= 0;
+//	static UINT8 lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;
+	static UINT8 lumpf1=0;
+//	static UINT8 lumpf2=0;
+//	static UINT8 lumbk= 0;
 	static UINT8 huepm0=0,huepm1=0,huepm2=0,huepm3=0,huepm4=0;
-	static UINT8 huepf1=0,huepf2=0,huebk= 0;
+//	static UINT8 huepf1=0;
+	static UINT8 huepf2=0,huebk= 0;
 
     switch (offset & 31)
     {
@@ -493,7 +499,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(P000,data);	/* set player 0 both pixels 0 */
 		SETCOL_L(P001,data);	/* set player 0 left pixel 0 */
 		SETCOL_R(P010,data);	/* set player 0 right pixel 0 */
-		SPLIT_HUE_LUM(data,huepm0,lumpm0);
+		SPLIT_HUE(data,huepm0);
 		data = huepm0 | lumpf1;
 		SETCOL_R(P001,data);	/* set player 0 right pixel 1 */
 		SETCOL_L(P010,data);	/* set player 0 left pixel 1 */
@@ -513,7 +519,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(P100,data);	/* set player 1 both pixels 0 */
 		SETCOL_L(P101,data);	/* set player 1 left pixel 0 */
 		SETCOL_R(P110,data);	/* set player 1 right pixel 0 */
-		SPLIT_HUE_LUM(data,huepm1,lumpm1);
+		SPLIT_HUE(data,huepm1);
 		data = huepm1 | lumpf1;
 		SETCOL_R(P101,data);	/* set player 1 right pixel 1 */
 		SETCOL_L(P110,data);	/* set player 1 left pixel 1 */
@@ -533,7 +539,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(P200,data);	/* set player 2 both pixels 0 */
 		SETCOL_L(P201,data);	/* set player 2 left pixel 0 */
 		SETCOL_R(P210,data);	/* set player 2 right pixel 0 */
-		SPLIT_HUE_LUM(data,huepm2,lumpm2);
+		SPLIT_HUE(data,huepm2);
 		data = huepm2 | lumpf1;
 		SETCOL_R(P201,data);	/* set player 2 right pixel 1 */
 		SETCOL_L(P210,data);	/* set player 2 left pixel 1 */
@@ -553,7 +559,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(P300,data);	/* set player 3 both pixels 0 */
 		SETCOL_L(P301,data);	/* set player 3 left pixel 0 */
 		SETCOL_R(P310,data);	/* set player 3 right pixel 0 */
-		SPLIT_HUE_LUM(data,huepm3,lumpm3);
+		SPLIT_HUE(data,huepm3);
 		data = huepm3 | lumpf1;
 		SETCOL_R(P301,data);	/* set player 3 right pixel 1 */
 		SETCOL_L(P310,data);	/* set player 3 left pixel 1 */
@@ -580,7 +586,7 @@ WRITE8_HANDLER( atari_gtia_w )
 
 		SETCOL_B(PF1,data); 	/* set playfield 1 color */
 		SETCOL_B(GT2+5,data);	/* set GTIA mode 2 color 5 */
-		SPLIT_HUE_LUM(data,huepf1,lumpf1);
+		SPLIT_LUM(data,lumpf1);
 		data = huepf2 | lumpf1;
 		SETCOL_R(T01,data); 	/* set text mode right pixel 1 */
 		SETCOL_L(T10,data); 	/* set text mode left pixel 1 */
@@ -623,7 +629,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(T00,data); 	/* set text mode both pixels 0 */
 		SETCOL_L(T01,data); 	/* set text mode left pixel 0 */
 		SETCOL_R(T10,data); 	/* set text mode right pixel 0 */
-		SPLIT_HUE_LUM(data,huepf2,lumpf2);
+		SPLIT_HUE(data,huepf2);
 		data = huepf2 | lumpf1;
 		SETCOL_R(T01,data); 	/* set text mode right pixel 1 */
 		SETCOL_L(T10,data); 	/* set text mode left pixel 1 */
@@ -642,7 +648,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(P400,data);	/* set p/m xor mode both pixels 0 */
 		SETCOL_L(P401,data);	/* set p/m xor mode left pixel 0 */
 		SETCOL_R(P410,data);	/* set p/m xor mode right pixel 0 */
-		SPLIT_HUE_LUM(data,huepm4,lumpm4);
+		SPLIT_HUE(data,huepm4);
 		data = huepm4 | lumpf1;
 		SETCOL_R(P401,data);	/* set p/m xor mode right pixel 1 */
 		SETCOL_L(P410,data);	/* set p/m xor mode left pixel 1 */
@@ -668,7 +674,7 @@ WRITE8_HANDLER( atari_gtia_w )
 		SETCOL_B(G00,data); 	/* set 2 color graphics both pixels 0 */
 		SETCOL_L(G01,data); 	/* set 2 color graphics left pixel 0 */
 		SETCOL_R(G10,data); 	/* set 2 color graphics right pixel 0 */
-		SPLIT_HUE_LUM(data,huebk,lumbk);
+		SPLIT_HUE(data,huebk);
 		data = huebk | lumpf1;
 		SETCOL_R(G01,data); 	/* set 2 color graphics right pixel 1 */
 		SETCOL_L(G10,data); 	/* set 2 color graphics left pixel 1 */

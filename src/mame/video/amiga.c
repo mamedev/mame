@@ -624,7 +624,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 	amiga_state *state = machine.driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
-	int hires = 0, dualpf = 0, lace = 0, ham = 0;
+	int hires = 0, dualpf = 0, ham = 0;
 	int hstart = 0, hstop = 0;
 	int vstart = 0, vstop = 0;
 	int pf1pri = 0, pf2pri = 0;
@@ -683,7 +683,7 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
-			lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
+//			lace = CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE;
 
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);

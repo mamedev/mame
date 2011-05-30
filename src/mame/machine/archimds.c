@@ -1002,9 +1002,9 @@ The physical page is encoded differently depending on the page size :
 
 WRITE32_HANDLER(archimedes_memc_page_w)
 {
-	UINT32 log, phys, memc, perms;
+	UINT32 log, phys, memc;
 
-	perms = (data & 0x300)>>8;
+//	perms = (data & 0x300)>>8;
 	log = phys = memc = 0;
 
 	switch (memc_pagesize)

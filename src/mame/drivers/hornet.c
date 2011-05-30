@@ -1153,7 +1153,7 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 static void jamma_jvs_cmd_exec(running_machine &machine)
 {
 	hornet_state *state = machine.driver_data<hornet_state>();
-	UINT8 sync, node, byte_num;
+	UINT8 byte_num;
 	UINT8 data[1024], rdata[1024];
 #if 0
 	int length;
@@ -1161,8 +1161,8 @@ static void jamma_jvs_cmd_exec(running_machine &machine)
 	int rdata_ptr;
 	int sum;
 
-	sync = state->m_jvs_sdata[0];
-	node = state->m_jvs_sdata[1];
+//	sync = state->m_jvs_sdata[0];
+//	node = state->m_jvs_sdata[1];
 	byte_num = state->m_jvs_sdata[2];
 
 #if 0

@@ -1513,10 +1513,10 @@ error:
 
 static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk *strf)
 {
-	UINT32 entries, entry, id;
+	UINT32 entries, entry;
 	UINT8 *chunkdata = NULL;
 	UINT16 longs_per_entry;
-	UINT8 subtype, type;
+	UINT8 type;
 	UINT64 baseoffset;
 	avi_error avierr;
 
@@ -1527,10 +1527,10 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 
 	/* extract the data */
 	longs_per_entry = fetch_16bits(&chunkdata[0]);
-	subtype = chunkdata[2];
+	//subtype = chunkdata[2];
 	type = chunkdata[3];
 	entries = fetch_32bits(&chunkdata[4]);
-	id = fetch_32bits(&chunkdata[8]);
+	//id = fetch_32bits(&chunkdata[8]); 
 	baseoffset = fetch_64bits(&chunkdata[12]);
 
 	/* if this is a superindex, loop over entries and call ourselves recursively */
