@@ -532,7 +532,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		state->m_madam.mult[offset & 0xff] = data;
+		state->m_madam.mult[offset & 0x3f] = data;
 	case 0x07f0/4:
 		state->m_madam.mult_control |= data;
 		break;
