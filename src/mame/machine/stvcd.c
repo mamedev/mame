@@ -25,6 +25,7 @@
 #include "imagedev/chd_cd.h"
 #include "cdrom.h"
 #include "stvcd.h"
+#include "sound/cdda.h"
 
 // super-verbose
 #if 0
@@ -271,6 +272,8 @@ void stvcd_reset(running_machine &machine)
 	cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
 	#endif
 
+	cdda_set_cdrom( machine.device("cdda"), cdrom );
+
 	if (cdrom)
 	{
 		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
@@ -445,9 +448,13 @@ static UINT16 cd_readWord(UINT32 addr)
 					}
 					break;
 
+				case XFERTYPE_FILEINFO_254:
+					CDROM_LOG(("STVCD: Unhandled xfer type 254\n"))
+					break;
+
 				default:
 					CDROM_LOG(("STVCD: Unhandled xfer type %d\n", (int)xfertype))
-					rv = 0xffff;
+					rv = 0;
 					break;
 			}
 
@@ -584,7 +591,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 		switch (cr1 & 0xff00)
 		{
 		case 0x0000:
-			CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
+			//CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
 			if (cur_track == 0xff)
@@ -597,7 +604,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			}
 			cr3 = 0x100 | (cd_curfad>>16);
 			cr4 = cd_curfad;
-			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
+			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
 		case 0x0100:
@@ -764,12 +771,14 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 						fadstoplay &= 0xfffff;
 					}
 
+					printf("fad mode\n");
 					cur_track = cdrom_get_track(cdrom, cd_curfad-150);
 				}
 				else
 				{
 					// track mode
 					cur_track = cd_curfad>>8;
+					printf("track mode %d\n",cur_track);
 					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
 					fadstoplay = cdrom_get_track_start(cdrom, cur_track) - cd_curfad;
 				}
@@ -777,6 +786,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 			else	// play until the end of the disc
 			{
 				fadstoplay = cdrom_get_track_start(cdrom, 0xaa) + 150;
+				printf("track mode %08x %08x\n",cd_curfad,fadstoplay);
 			}
 
 			CDROM_LOG(("CD: Play Disc: start %x length %x\n", cd_curfad, fadstoplay))
@@ -792,12 +802,20 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 			// and do the disc I/O
 			// make sure it doesn't come in too early
-			sector_timer->reset();
-			sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+			if (cdrom_get_track_type(cdrom, cur_track-1) == CD_TRACK_AUDIO)
+			{
+				cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
+			}
+			else
+			{
+				sector_timer->reset();
+				sector_timer->adjust(attotime::from_hz(CD_SPEED));	// 150 sectors / second = 300kBytes/second
+			}
 			break;
 
 		case 0x1100: // disc seek
 			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
+			printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
 			{
 				temp = (cr1&0x7f)<<16;	// get FAD to seek to
@@ -816,13 +834,15 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 				{
 					cd_stat = CD_STAT_PAUSE;
 					cur_track = cr2>>8;;
+					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
 					// (index is cr2 low byte)
 				}
-				else
+				else // error!
 				{
 					cd_stat = CD_STAT_STANDBY;
 					cd_curfad = 0xffffffff;
 					cur_track = 0xff;
+					//cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
 				}
 			}
 
@@ -1200,7 +1220,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 
 		case 0x7100:	// Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
-			hirqreg |= (CMOK|DRDY);
+			hirqreg |= (CMOK|EFLS);
 
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
