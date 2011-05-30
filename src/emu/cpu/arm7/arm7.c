@@ -791,7 +791,7 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
     UINT32 opcode = offset;
     UINT8 cReg = ( opcode & INSN_COPRO_CREG ) >> INSN_COPRO_CREG_SHIFT;
     UINT8 op2 =  ( opcode & INSN_COPRO_OP2 )  >> INSN_COPRO_OP2_SHIFT;
-    UINT8 op3 =    opcode & INSN_COPRO_OP3;
+//    UINT8 op3 =    opcode & INSN_COPRO_OP3;
     UINT8 cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
     UINT32 data = 0;
 
@@ -942,7 +942,7 @@ static READ32_DEVICE_HANDLER( arm7_rt_r_callback )
     }
 
     op2 = 0;
-    op3 = 0;
+//    op3 = 0;
 
     return data;
 }

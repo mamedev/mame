@@ -764,7 +764,7 @@ static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 static void memorywin_new(running_machine &machine)
 {
 	win_i *mem;
-	int item, cursel;
+	int item; //, cursel;
 	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
 	GtkComboBox *		zone_w;
 
@@ -781,7 +781,8 @@ static void memorywin_new(running_machine &machine)
 	downcast<debug_view_memory *>(mem->views[0]->view)->set_expression("0");
 
 	// populate the combobox
-	cursel = item = 0;
+//	cursel = 0;
+	item = 0;
 
 	for (const debug_view_source *source = mem->views[0]->view->source_list().head(); source != NULL; source = source->next())
 	{
@@ -858,7 +859,7 @@ static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 static void disasmwin_new(running_machine &machine)
 {
 	win_i *dis;
-	int item, cursel;
+	int item; //, cursel;
 	device_t *curcpu = debug_cpu_get_visible_cpu(machine);
 	GtkComboBox 		*cpu_w;
 	astring title;
@@ -877,7 +878,8 @@ static void disasmwin_new(running_machine &machine)
 	downcast<debug_view_disasm *>(dis->views[0]->view)->set_expression("curpc");
 
 	// populate the combobox
-	cursel = item = 0;
+//	cursel = 0;
+	item = 0;
 	for (const debug_view_source *source = dis->views[0]->view->source_list().head(); source != NULL; source = source->next())
 	{
 		gtk_combo_box_append_text(cpu_w, source->name());

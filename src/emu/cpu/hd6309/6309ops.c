@@ -478,10 +478,10 @@ OP_HANDLER( bra )
 }
 
 /* $21 BRN relative ----- */
+static UINT8 brn_temp;	// hack around GCC 4.6 error because we need the side effects of IMMBYTE
 OP_HANDLER( brn )
 {
-	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(brn_temp);
 }
 
 /* $1021 LBRN relative ----- */

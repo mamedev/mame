@@ -1018,7 +1018,7 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 	UINT32 repeated_eip = cpustate->eip;
 	UINT32 repeated_pc = cpustate->pc;
 	UINT8 opcode; // = FETCH(cpustate);
-	UINT32 eas, ead;
+//	UINT32 eas, ead;
 	UINT32 count;
 	INT32 cycle_base = 0, cycle_adjustment = 0;
 	UINT8 prefix_flag=1;
@@ -1068,11 +1068,12 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 
 	if( cpustate->segment_prefix ) {
 		// FIXME: the following does not work if both address override and segment override are used
-		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->sreg[cpustate->segment_prefix].d ? REG32(ESI) : REG16(SI) );
+		i386_translate(cpustate, cpustate->segment_override, cpustate->sreg[cpustate->segment_prefix].d ? REG32(ESI) : REG16(SI) );
 	} else {
-		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
+		//eas = 
+		i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
 	}
-	ead = i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
+	i386_translate(cpustate, ES, cpustate->address_size ? REG32(EDI) : REG16(DI) );
 
 	switch(opcode)
 	{
@@ -2218,13 +2219,13 @@ static void I386OP(into)(i386_state *cpustate)				// Opcode 0xce
 	}
 }
 
+static UINT32 i386_escape_ea;	// hack around GCC 4.6 error because we need the side effects of GetEA()
 static void I386OP(escape)(i386_state *cpustate)			// Opcodes 0xd8 - 0xdf
 {
 	UINT8 modrm = FETCH(cpustate);
 	if(modrm < 0xc0)
 	{
-		UINT32 ea;
-		ea = GetEA(cpustate,modrm);
+		i386_escape_ea = GetEA(cpustate,modrm);
 	}
 	CYCLES(cpustate,3);	// TODO: confirm this
 	(void) LOAD_RM8(modrm);

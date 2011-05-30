@@ -1177,8 +1177,8 @@ static void PREFIX86(_cmp_axd16)(i8086_state *cpustate)    /* Opcode 0x3d */
 
 static void PREFIX86(_aas)(i8086_state *cpustate)    /* Opcode 0x3f */
 {
-	UINT8 ALcarry=1;
-	if (cpustate->regs.b[AL]>0xf9) ALcarry=2;
+//	UINT8 ALcarry=1;
+//	if (cpustate->regs.b[AL]>0xf9) ALcarry=2;
 
 	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))
     {
