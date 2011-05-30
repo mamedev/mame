@@ -187,7 +187,7 @@ OP(07) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB0 ZPG ?? */
 OP(27) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB2 ZPG ?? */
 OP(47) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB4 ZPG ?? */
 OP(67) {
-	int tmp; RD_IMM;
+	RD_IMM_DISCARD;
 	cpustate->a=cpustate->io->read_byte(0);
 
 //  logerror("%04x: VBL (0x67)\n",PCW);
@@ -271,7 +271,7 @@ OP(0b) { int tmp; cpustate->icount -= 1; RD_IMM;
 
 				}
 OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(4b) { int tmp; cpustate->icount -= 1; RD_IMM;
+OP(4b) { cpustate->icount -= 1; RD_IMM_DISCARD;
 	//logerror("%04x: OP4B %02x\n",PCW,tmp);
 	/* TODO: Maybe it's just read I/O 0 and do a logic AND with bit 1? */
 	cpustate->a=cpustate->io->read_byte(1);

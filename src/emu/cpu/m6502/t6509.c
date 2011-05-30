@@ -30,7 +30,7 @@ OP(00) {                  BRK;                 } /* 7 BRK */
 OP(20) {                  JSR;                 } /* 6 JSR */
 OP(40) {                  RTI;                 } /* 6 RTI */
 OP(60) {                  RTS;                 } /* 6 RTS */
-OP(80) { int tmp; RD_IMM; NOP;                 } /* 2 NOP IMM */
+OP(80) { RD_IMM_DISCARD; NOP;                 } /* 2 NOP IMM */
 OP(a0) { int tmp; RD_IMM; LDY;                 } /* 2 LDY IMM */
 OP(c0) { int tmp; RD_IMM; CPY;                 } /* 2 CPY IMM */
 OP(e0) { int tmp; RD_IMM; CPX;                 } /* 2 CPX IMM */
@@ -66,10 +66,10 @@ OP(02) {                  KIL;                 } /* 1 KIL */
 OP(22) {                  KIL;                 } /* 1 KIL */
 OP(42) {                  KIL;                 } /* 1 KIL */
 OP(62) {                  KIL;                 } /* 1 KIL */
-OP(82) { int tmp; RD_IMM; NOP;                 } /* 2 NOP IMM */
+OP(82) { RD_IMM_DISCARD; NOP;                 } /* 2 NOP IMM */
 OP(a2) { int tmp; RD_IMM; LDX;                 } /* 2 LDX IMM */
-OP(c2) { int tmp; RD_IMM; NOP;                 } /* 2 NOP IMM */
-OP(e2) { int tmp; RD_IMM; NOP;                 } /* 2 NOP IMM */
+OP(c2) { RD_IMM_DISCARD; NOP;                 } /* 2 NOP IMM */
+OP(e2) { RD_IMM_DISCARD; NOP;                 } /* 2 NOP IMM */
 
 OP(12) { KIL;                                  } /* 1 KIL */
 OP(32) { KIL;                                  } /* 1 KIL */
@@ -98,23 +98,23 @@ OP(b3) { int tmp; RD_IDY_P; LAX;                } /* 5 LAX IDY page penalty */
 OP(d3) { int tmp; RD_IDY_NP; WB_EA; DCP; WB_EA; } /* 7 DCP IDY */
 OP(f3) { int tmp; RD_IDY_NP; WB_EA; ISB; WB_EA; } /* 7 ISB IDY */
 
-OP(04) { int tmp; RD_ZPG; NOP;                  } /* 3 NOP ZPG */
+OP(04) { RD_ZPG_DISCARD; NOP;                  } /* 3 NOP ZPG */
 OP(24) { int tmp; RD_ZPG; BIT;                  } /* 3 BIT ZPG */
-OP(44) { int tmp; RD_ZPG; NOP;                  } /* 3 NOP ZPG */
-OP(64) { int tmp; RD_ZPG; NOP;                  } /* 3 NOP ZPG */
+OP(44) { RD_ZPG_DISCARD; NOP;                  } /* 3 NOP ZPG */
+OP(64) { RD_ZPG_DISCARD; NOP;                  } /* 3 NOP ZPG */
 OP(84) { int tmp; STY; WR_ZPG;                  } /* 3 STY ZPG */
 OP(a4) { int tmp; RD_ZPG; LDY;                  } /* 3 LDY ZPG */
 OP(c4) { int tmp; RD_ZPG; CPY;                  } /* 3 CPY ZPG */
 OP(e4) { int tmp; RD_ZPG; CPX;                  } /* 3 CPX ZPG */
 
-OP(14) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
-OP(34) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
-OP(54) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
-OP(74) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
+OP(14) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
+OP(34) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
+OP(54) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
+OP(74) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
 OP(94) { int tmp; STY; WR_ZPX;                  } /* 4 STY ZPX */
 OP(b4) { int tmp; RD_ZPX; LDY;                  } /* 4 LDY ZPX */
-OP(d4) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
-OP(f4) { int tmp; RD_ZPX; NOP;                  } /* 4 NOP ZPX */
+OP(d4) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
+OP(f4) { RD_ZPX_DISCARD; NOP;                  } /* 4 NOP ZPX */
 
 OP(05) { int tmp; RD_ZPG; ORA;                  } /* 3 ORA ZPG */
 OP(25) { int tmp; RD_ZPG; AND;                  } /* 3 AND ZPG */
@@ -192,7 +192,7 @@ OP(09) { int tmp; RD_IMM; ORA;                  } /* 2 ORA IMM */
 OP(29) { int tmp; RD_IMM; AND;                  } /* 2 AND IMM */
 OP(49) { int tmp; RD_IMM; EOR;                  } /* 2 EOR IMM */
 OP(69) { int tmp; RD_IMM; ADC;                  } /* 2 ADC IMM */
-OP(89) { int tmp; RD_IMM; NOP;                  } /* 2 NOP IMM */
+OP(89) { RD_IMM_DISCARD; NOP;                  } /* 2 NOP IMM */
 OP(a9) { int tmp; RD_IMM; LDA;                  } /* 2 LDA IMM */
 OP(c9) { int tmp; RD_IMM; CMP;                  } /* 2 CMP IMM */
 OP(e9) { int tmp; RD_IMM; SBC;                  } /* 2 SBC IMM */
@@ -242,7 +242,7 @@ OP(bb) { int tmp; RD_ABY_P; AST;                } /* 4 AST ABY page penalty */
 OP(db) { int tmp; RD_ABY_NP; WB_EA; DCP; WB_EA; } /* 7 DCP ABY */
 OP(fb) { int tmp; RD_ABY_NP; WB_EA; ISB; WB_EA; } /* 7 ISB ABY */
 
-OP(0c) { int tmp; RD_ABS; NOP;                  } /* 4 NOP ABS */
+OP(0c) { RD_ABS_DISCARD; NOP;                  } /* 4 NOP ABS */
 OP(2c) { int tmp; RD_ABS; BIT;                  } /* 4 BIT ABS */
 OP(4c) { EA_ABS; JMP;                           } /* 3 JMP ABS */
 OP(6c) { int tmp; EA_IND; JMP;                  } /* 5 JMP IND */
@@ -251,14 +251,14 @@ OP(ac) { int tmp; RD_ABS; LDY;                  } /* 4 LDY ABS */
 OP(cc) { int tmp; RD_ABS; CPY;                  } /* 4 CPY ABS */
 OP(ec) { int tmp; RD_ABS; CPX;                  } /* 4 CPX ABS */
 
-OP(1c) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
-OP(3c) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
-OP(5c) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
-OP(7c) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
+OP(1c) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
+OP(3c) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
+OP(5c) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
+OP(7c) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
 OP(9c) { int tmp; EA_ABX_NP; SYH; WB_EA;        } /* 5 SYH ABX */
 OP(bc) { int tmp; RD_ABX_P; LDY;                } /* 4 LDY ABX page penalty */
-OP(dc) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
-OP(fc) { int tmp; RD_ABX_P; NOP;                } /* 4 NOP ABX page penalty */
+OP(dc) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
+OP(fc) { RD_ABX_P_DISCARD; NOP;                } /* 4 NOP ABX page penalty */
 
 OP(0d) { int tmp; RD_ABS; ORA;                  } /* 4 ORA ABS */
 OP(2d) { int tmp; RD_ABS; AND;                  } /* 4 AND ABS */

@@ -74,14 +74,14 @@ OP(b1) { int tmp; RD_IDY_C02_P; LDA;                } /* 5 LDA IDY page penalty 
 OP(d1) { int tmp; RD_IDY_C02_P; CMP;                } /* 5 CMP IDY page penalty */
 OP(f1) { int tmp; RD_IDY_C02_P; SBC_C02;            } /* 5/6 SBC IDY page penalty */
 
-OP(02) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
-OP(22) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
-OP(42) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
-OP(62) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
-OP(82) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(02) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(22) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(42) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(62) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(82) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
 OP(a2) { int tmp; RD_IMM; LDX;                      } /* 2 LDX IMM */
-OP(c2) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
-OP(e2) { int tmp; RD_IMM; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(c2) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
+OP(e2) { RD_IMM_DISCARD; NOP;                      } /* 2 NOP not sure for rockwell */
 
 OP(12) { int tmp; RD_ZPI; ORA;                      } /* 5 ORA ZPI */
 OP(32) { int tmp; RD_ZPI; AND;                      } /* 5 AND ZPI */
@@ -112,7 +112,7 @@ OP(f3) { NOP;                                       } /* 1 NOP not sure for rock
 
 OP(04) { int tmp; RD_ZPG; RD_EA; TSB; WB_EA;        } /* 5 TSB ZPG */
 OP(24) { int tmp; RD_ZPG; BIT;                      } /* 3 BIT ZPG */
-OP(44) { int tmp; RD_ZPG; NOP;                      } /* 3 NOP not sure for rockwell */
+OP(44) { RD_ZPG_DISCARD; NOP;                      } /* 3 NOP not sure for rockwell */
 OP(64) { int tmp; STZ; WR_ZPG;                      } /* 3 STZ ZPG */
 OP(84) { int tmp; STY; WR_ZPG;                      } /* 3 STY ZPG */
 OP(a4) { int tmp; RD_ZPG; LDY;                      } /* 3 LDY ZPG */
@@ -121,12 +121,12 @@ OP(e4) { int tmp; RD_ZPG; CPX;                      } /* 3 CPX ZPG */
 
 OP(14) { int tmp; RD_ZPG; RD_EA; TRB; WB_EA;        } /* 5 TRB ZPG */
 OP(34) { int tmp; RD_ZPX; BIT;                      } /* 4 BIT ZPX */
-OP(54) { int tmp; RD_ZPX; NOP;                      } /* 4 NOP not sure for rockwell */
+OP(54) { RD_ZPX_DISCARD; NOP;                      } /* 4 NOP not sure for rockwell */
 OP(74) { int tmp; STZ; WR_ZPX;                      } /* 4 STZ ZPX */
 OP(94) { int tmp; STY; WR_ZPX;                      } /* 4 STY ZPX */
 OP(b4) { int tmp; RD_ZPX; LDY;                      } /* 4 LDY ZPX */
-OP(d4) { int tmp; RD_ZPX; NOP;                      } /* 4 NOP not sure for rockwell */
-OP(f4) { int tmp; RD_ZPX; NOP;                      } /* 4 NOP not sure for rockwell */
+OP(d4) { RD_ZPX_DISCARD; NOP;                      } /* 4 NOP not sure for rockwell */
+OP(f4) { RD_ZPX_DISCARD; NOP;                      } /* 4 NOP not sure for rockwell */
 
 OP(05) { int tmp; RD_ZPG; ORA;                      } /* 3 ORA ZPG */
 OP(25) { int tmp; RD_ZPG; AND;                      } /* 3 AND ZPG */
@@ -265,12 +265,12 @@ OP(ec) { int tmp; RD_ABS; CPX;                      } /* 4 CPX ABS */
 
 OP(1c) { int tmp; RD_ABS; RD_EA; TRB; WB_EA;        } /* 6 TRB ABS */
 OP(3c) { int tmp; RD_ABX_C02_P; BIT;                } /* 4 BIT ABX page penalty */
-OP(5c) { int tmp; RD_ABX_C02_NP; RD_DUM; RD_DUM; RD_DUM; RD_DUM; } /* 8 NOP ABX not sure for rockwell. Page penalty not sure */
+OP(5c) { RD_ABX_C02_NP_DISCARD; RD_DUM; RD_DUM; RD_DUM; RD_DUM; } /* 8 NOP ABX not sure for rockwell. Page penalty not sure */
 OP(7c) { int tmp; EA_IAX; JMP;                      } /* 6 JMP IAX page penalty */
 OP(9c) { int tmp; STZ; WR_ABS;                      } /* 4 STZ ABS */
 OP(bc) { int tmp; RD_ABX_C02_P; LDY;                } /* 4 LDY ABX page penalty */
-OP(dc) { int tmp; RD_ABX_C02_NP; NOP;               } /* 4 NOP ABX not sure for rockwell. Page penalty not sure  */
-OP(fc) { int tmp; RD_ABX_C02_NP; NOP;               } /* 4 NOP ABX not sure for rockwell. Page penalty not sure  */
+OP(dc) { RD_ABX_C02_NP_DISCARD; NOP;               } /* 4 NOP ABX not sure for rockwell. Page penalty not sure  */
+OP(fc) { RD_ABX_C02_NP_DISCARD; NOP;               } /* 4 NOP ABX not sure for rockwell. Page penalty not sure  */
 
 OP(0d) { int tmp; RD_ABS; ORA;                      } /* 4 ORA ABS */
 OP(2d) { int tmp; RD_ABS; AND;                      } /* 4 AND ABS */

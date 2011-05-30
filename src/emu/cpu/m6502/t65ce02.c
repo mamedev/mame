@@ -73,7 +73,7 @@ OP(02) { RD_DUM; CLE; } /* 2 CLE */
 OP(22) { JSR_IND; } /* 7 JSR IND */
 OP(42) { RD_DUM; NEG; } /* 2 NEG */
 OP(62) { int tmp; RD_IMM; RTN; } /* 7 RTN IMM */
-OP(82) { int tmp; RD_INSY; STA; } /* 6 STA INSY */
+OP(82) { RD_INSY_DISCARD; } /* 6 STA INSY */
 OP(a2) { int tmp; RD_IMM; LDX; } /* 2 LDX IMM */
 OP(c2) { int tmp; RD_IMM; CPZ; } /* 2 CPZ IMM */
 OP(e2) { int tmp; RD_INSY; LDA; } /* 6 LDA INSY */
@@ -82,7 +82,7 @@ OP(12) { int tmp; RD_IDZ; ORA; } /* 5 ORA IDZ */
 OP(32) { int tmp; RD_IDZ; AND; } /* 5 AND IDZ */
 OP(52) { int tmp; RD_IDZ; EOR; } /* 5 EOR IDZ */
 OP(72) { int tmp; RD_IDZ; ADC; } /* 5 ADC IDZ */
-OP(92) { int tmp; RD_IDZ; STA; } /* 5 STA IDZ */
+OP(92) { RD_IDZ_DISCARD; } /* 5 STA IDZ */
 OP(b2) { int tmp; RD_IDZ; LDA; } /* 5 LDA IDZ */
 OP(d2) { int tmp; RD_IDZ; CMP; } /* 5 CMP IDZ */
 OP(f2) { int tmp; RD_IDZ; SBC; } /* 5 SBC IDZ */

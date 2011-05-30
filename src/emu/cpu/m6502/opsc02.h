@@ -127,6 +127,7 @@
  */
 #define RD_ABX_C02_P	EA_ABX_C02_P; tmp = RDMEM(EAD)
 #define RD_ABX_C02_NP	EA_ABX_C02_NP; tmp = RDMEM(EAD)
+#define RD_ABX_C02_NP_DISCARD	EA_ABX_C02_NP; RDMEM(EAD)
 #define RD_ABY_C02_P	EA_ABY_C02_P; tmp = RDMEM(EAD)
 #define RD_IDY_C02_P	EA_IDY_C02_P; tmp = RDMEM_ID(EAD); cpustate->icount -= 1
 
