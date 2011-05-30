@@ -510,7 +510,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 				desc[2] = ReadWord(addr+4);
 				r = RIGHTS(desc);
 				if (SEGDESC(r) || (GATE(r) != LDTDESC)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
-				if (!PRES(r)) TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
+				if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
 			} else {
 				desc[0] = 0;
 				desc[1] = 0;
@@ -530,7 +530,7 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			desc[2] = ReadWord(addr+4);
 			r = RIGHTS(desc);
 			if (SEGDESC(r) || (GATE(r) != TSSDESCIDLE)) throw TRAP(GENERAL_PROTECTION_FAULT,IDXTBL(sel));
-			if (!PRES(r)) TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
+			if (!PRES(r)) throw TRAP(SEG_NOT_PRESENT,IDXTBL(sel));
 			desc[2] |= 0x200; // mark busy
 			WriteWord(addr+4, desc[2]);
 			cpustate->tr.sel=sel;

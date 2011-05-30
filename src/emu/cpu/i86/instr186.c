@@ -68,7 +68,7 @@ static void PREFIX186(_imul_d16)(i8086_state *cpustate)    /* Opcode 0x69 */
 {
 	DEF_r16w(dst,src);
 	unsigned src2=FETCH;
-	src+=(FETCH<<8);
+	src2+=(FETCH<<8);
 
 	ICOUNT -= (ModRM >= 0xc0) ? timing.imul_rri16 : timing.imul_rmi16;
 
