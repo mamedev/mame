@@ -152,12 +152,12 @@ OP( 0x60, i_pusha  ) {
 	PUSH(Wreg(IY));
 	CLKS(67,35,20);
 }
+static unsigned nec_popa_tmp;
 OP( 0x61, i_popa  ) {
-	unsigned tmp;
 	POP(Wreg(IY));
 	POP(Wreg(IX));
 	POP(Wreg(BP));
-	POP(tmp);
+	POP(nec_popa_tmp);
 	POP(Wreg(BW));
 	POP(Wreg(DW));
 	POP(Wreg(CW));
@@ -529,8 +529,8 @@ OP( 0xd3, i_rotshft_wcl ) {
 	}
 }
 
-OP( 0xd4, i_aam    ) { UINT32 mult=FETCH(); mult=0; Breg(AH) = Breg(AL) / 10; Breg(AL) %= 10; SetSZPF_Word(Wreg(AW)); CLKS(15,15,12); }
-OP( 0xd5, i_aad    ) { UINT32 mult=FETCH(); mult=0; Breg(AL) = Breg(AH) * 10 + Breg(AL); Breg(AH) = 0; SetSZPF_Byte(Breg(AL)); CLKS(7,7,8); }
+OP( 0xd4, i_aam    ) { FETCH(); Breg(AH) = Breg(AL) / 10; Breg(AL) %= 10; SetSZPF_Word(Wreg(AW)); CLKS(15,15,12); }
+OP( 0xd5, i_aad    ) { FETCH(); Breg(AL) = Breg(AH) * 10 + Breg(AL); Breg(AH) = 0; SetSZPF_Byte(Breg(AL)); CLKS(7,7,8); }
 OP( 0xd6, i_setalc ) { Breg(AL) = (CF)?0xff:0x00; nec_state->icount-=3; logerror("%06x: Undefined opcode (SETALC)\n",PC(nec_state)); }
 OP( 0xd7, i_trans  ) { UINT32 dest = (Wreg(BW)+Breg(AL))&0xffff; Breg(AL) = GetMemB(DS0, dest); CLKS(9,9,5); }
 OP( 0xd8, i_fpo    ) { GetModRM; nec_state->icount-=2;	logerror("%06x: Unimplemented floating point control %04x\n",PC(nec_state),ModRM); }

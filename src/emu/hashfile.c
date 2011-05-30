@@ -178,7 +178,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 	hash_collection hashes;
 	astring all_functions;
 	char functions;
-	iodevice_t device;
+//	iodevice_t device;
 	int i;
 
 	switch(state->pos)
@@ -198,7 +198,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			{
 				// we are now examining a hash tag
 				name = NULL;
-				device = IO_COUNT;
+//				device = IO_COUNT;
 
 				while(attributes[0])
 				{
@@ -230,7 +230,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						if (i < 0)
 							unknown_attribute_value(state, attributes[0], attributes[1]);
 						else
-							device = (iodevice_t) i;
+						{
+	 //   						device = (iodevice_t) i;
+						}
 					}
 					else
 					{
