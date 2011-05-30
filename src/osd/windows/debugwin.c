@@ -331,26 +331,27 @@ void windows_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 
 static int debugwin_seq_pressed(running_machine &machine)
 {
-	const input_seq *seq = input_type_seq(machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
+	const input_seq &seq = input_type_seq(machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
 	int result = FALSE;
 	int invert = FALSE;
 	int first = TRUE;
 	int codenum;
 
 	// iterate over all of the codes
-	for (codenum = 0; codenum < ARRAY_LENGTH(seq->code); codenum++)
+	int length = seq.length();
+	for (codenum = 0; codenum < length; codenum++)
 	{
-		input_code code = seq->code[codenum];
+		input_code code = seq[codenum];
 
 		// handle NOT
-		if (code == SEQCODE_NOT)
+		if (code == input_seq::not_code)
 			invert = TRUE;
 
 		// handle OR and END
-		else if (code == SEQCODE_OR || code == SEQCODE_END)
+		else if (code == input_seq::or_code || code == input_seq::end_code)
 		{
 			// if we have a positive result from the previous set, we're done
-			if (result || code == SEQCODE_END)
+			if (result || code == input_seq::end_code)
 				break;
 
 			// otherwise, reset our state

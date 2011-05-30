@@ -365,12 +365,12 @@ static VIDEO_START( meritm )
 static SCREEN_UPDATE( meritm )
 {
 	meritm_state *state = screen->machine().driver_data<meritm_state>();
-	if(input_code_pressed_once(screen->machine(), KEYCODE_Q))
+	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		state->m_layer0_enabled^=1;
 		popmessage("Layer 0 %sabled",state->m_layer0_enabled ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_W))
+	if(screen->machine().input().code_pressed_once(KEYCODE_W))
 	{
 		state->m_layer1_enabled^=1;
 		popmessage("Layer 1 %sabled",state->m_layer1_enabled ? "en" : "dis");

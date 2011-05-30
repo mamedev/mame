@@ -494,7 +494,7 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 	bool lay_debug = false;
 	for (i = 0; i <= 3; i++)
 	{
-		if(input_code_pressed(machine, lay_keys[i])) {
+		if(machine.input().code_pressed(lay_keys[i])) {
 			lay_debug = true;
 		}
 	}
@@ -504,7 +504,7 @@ static void draw_background( running_machine &machine, bitmap_t *bitmap, const r
 	for (i = 0; i <= 3; i++)
 	{
 #ifdef DEBUG_KEYS
-		if(lay_debug && !input_code_pressed(machine, lay_keys[i]))
+		if(lay_debug && !machine.input().code_pressed(lay_keys[i]))
 			continue;
 #endif
 
@@ -1106,12 +1106,12 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
     Could be a sprite-sprite priority, tests seem to back this up
 
     **- End Sprite Format -*/
-	const int spr_keys[8] = {KEYCODE_Y, KEYCODE_U, KEYCODE_I, KEYCODE_O};
+	const input_code spr_keys[8] = {KEYCODE_Y, KEYCODE_U, KEYCODE_I, KEYCODE_O};
 	bool spr_debug = false;
 #ifdef DEBUG_KEYS
 	for (int i = 0; i <= 3; i++)
 	{
-		if(input_code_pressed(machine, spr_keys[i])) {
+		if(machine.input().code_pressed(spr_keys[i])) {
 			spr_debug = true;
 		}
 	}
@@ -1174,7 +1174,7 @@ static void draw_sprites(running_machine &machine, bitmap_t *bitmap, const recta
 			else
 				alpha = pal6bit(0x3f - alpha); /* 0x3f-0x00 maps to 0x00-0xff */
 
-			if(!spr_debug || input_code_pressed(machine, spr_keys[spr_pri]))
+			if(!spr_debug || machine.input().code_pressed(spr_keys[spr_pri]))
 			{
 				/* start drawing */
 				if (zoom_table[BYTE_XOR_BE(zoomy)] && zoom_table[BYTE_XOR_BE(zoomx)]) /* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
@@ -1301,18 +1301,18 @@ SCREEN_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct pri
 	int pri_debug = false;
 	int sprites = true;
 	int backgrounds = true;
-	const int pri_keys[8] = {KEYCODE_Z, KEYCODE_X, KEYCODE_C, KEYCODE_V, KEYCODE_B, KEYCODE_N, KEYCODE_M, KEYCODE_K};
+	const input_code pri_keys[8] = {KEYCODE_Z, KEYCODE_X, KEYCODE_C, KEYCODE_V, KEYCODE_B, KEYCODE_N, KEYCODE_M, KEYCODE_K};
 #ifdef DEBUG_KEYS
 	for (i = 0; i <= 7; i++)
 	{
-		if(input_code_pressed(screen->machine(), pri_keys[i])) {
+		if(screen->machine().input().code_pressed(pri_keys[i])) {
 			pri_debug = true;
 		}
 	}
-	if(input_code_pressed(screen->machine(), KEYCODE_G)) {
+	if(screen->machine().input().code_pressed(KEYCODE_G)) {
 		sprites = false;
 	}
-	if(input_code_pressed(screen->machine(), KEYCODE_H)) {
+	if(screen->machine().input().code_pressed(KEYCODE_H)) {
 		backgrounds = false;
 	}
 #endif
@@ -1330,7 +1330,7 @@ popmessage   ("%08x %08x %08x %08x\n%08x %08x %08x %08x",
 	psikyosh_prelineblend(screen->machine(), bitmap, cliprect); // fills screen
 	for (i = 0; i <= 7; i++)
 	{
-		if(!pri_debug || input_code_pressed(screen->machine(), pri_keys[i]))
+		if(!pri_debug || screen->machine().input().code_pressed(pri_keys[i]))
 		{
 			if(sprites) {
 				draw_sprites(screen->machine(), bitmap, cliprect, i); // When same priority bg's have higher pri

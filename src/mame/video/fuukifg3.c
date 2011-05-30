@@ -211,10 +211,10 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
 #if 0
-		if(!( (input_code_pressed(screen.machine(), KEYCODE_V) && (((attr >> 6)&3) == 0))
-		   || (input_code_pressed(screen.machine(), KEYCODE_B) && (((attr >> 6)&3) == 1))
-		   || (input_code_pressed(screen.machine(), KEYCODE_N) && (((attr >> 6)&3) == 2))
-		   || (input_code_pressed(screen.machine(), KEYCODE_M) && (((attr >> 6)&3) == 3))
+		if(!( (screen.machine().input().code_pressed(KEYCODE_V) && (((attr >> 6)&3) == 0))
+		   || (screen.machine().input().code_pressed(KEYCODE_B) && (((attr >> 6)&3) == 1))
+		   || (screen.machine().input().code_pressed(KEYCODE_N) && (((attr >> 6)&3) == 2))
+		   || (screen.machine().input().code_pressed(KEYCODE_M) && (((attr >> 6)&3) == 3))
 		   ))
 #endif
 
@@ -243,7 +243,7 @@ static void draw_sprites( screen_device &screen, bitmap_t *bitmap, const rectang
 
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(screen.machine(), KEYCODE_X))
+if (screen.machine().input().code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);

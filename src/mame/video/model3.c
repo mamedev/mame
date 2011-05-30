@@ -370,15 +370,15 @@ SCREEN_UPDATE( model3 )
 	if( state->m_tick >= 5 ) {
 		state->m_tick = 0;
 
-		if( input_code_pressed(screen->machine(), KEYCODE_Y) )
+		if( screen->machine().input().code_pressed(KEYCODE_Y) )
 			state->m_debug_layer_disable ^= 0x1;
-		if( input_code_pressed(screen->machine(), KEYCODE_U) )
+		if( screen->machine().input().code_pressed(KEYCODE_U) )
 			state->m_debug_layer_disable ^= 0x2;
-		if( input_code_pressed(screen->machine(), KEYCODE_I) )
+		if( screen->machine().input().code_pressed(KEYCODE_I) )
 			state->m_debug_layer_disable ^= 0x4;
-		if( input_code_pressed(screen->machine(), KEYCODE_O) )
+		if( screen->machine().input().code_pressed(KEYCODE_O) )
 			state->m_debug_layer_disable ^= 0x8;
-		if( input_code_pressed(screen->machine(), KEYCODE_T) )
+		if( screen->machine().input().code_pressed(KEYCODE_T) )
 			state->m_debug_layer_disable ^= 0x10;
 	}
 

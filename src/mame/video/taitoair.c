@@ -350,13 +350,13 @@ SCREEN_UPDATE( taitoair )
 	bitmap_fill(bitmap, cliprect, 0x41);
 
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(screen->machine(), KEYCODE_A))
+	if (!screen->machine().input().code_pressed(KEYCODE_A))
 		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, 0, 0);
-	if (!input_code_pressed(screen->machine(), KEYCODE_S))
+	if (!screen->machine().input().code_pressed(KEYCODE_S))
 		draw_sprites(screen->machine(), bitmap, cliprect, 0);
-	if (!input_code_pressed(screen->machine(), KEYCODE_D))
+	if (!screen->machine().input().code_pressed(KEYCODE_D))
 		tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 1, 0, 0);
-	if (!input_code_pressed(screen->machine(), KEYCODE_F))
+	if (!screen->machine().input().code_pressed(KEYCODE_F))
 		draw_sprites(screen->machine(), bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(state->m_tc0080vco, bitmap, cliprect, 0, 0, 0);

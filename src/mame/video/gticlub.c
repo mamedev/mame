@@ -995,15 +995,15 @@ SCREEN_UPDATE( gticlub )
 	if( tick >= 5 ) {
 		tick = 0;
 
-		if( input_code_pressed(screen->machine(), KEYCODE_O) )
+		if( screen->machine().input().code_pressed(KEYCODE_O) )
 			debug_tex_page++;
 
-		if( input_code_pressed(screen->machine(), KEYCODE_I) )
+		if( screen->machine().input().code_pressed(KEYCODE_I) )
 			debug_tex_page--;
 
-		if (input_code_pressed(screen->machine(), KEYCODE_U))
+		if (screen->machine().input().code_pressed(KEYCODE_U))
 			debug_tex_palette++;
-		if (input_code_pressed(screen->machine(), KEYCODE_Y))
+		if (screen->machine().input().code_pressed(KEYCODE_Y))
 			debug_tex_palette--;
 
 		if (debug_tex_page < 0)

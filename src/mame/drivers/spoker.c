@@ -109,7 +109,7 @@ static CUSTOM_INPUT( hopper_r )
 	spoker_state *state = machine.driver_data<spoker_state>();
 
 	if (state->m_hopper) return !(machine.primary_screen->frame_number()%10);
-	return input_code_pressed(machine, KEYCODE_H);
+	return machine.input().code_pressed(KEYCODE_H);
 }
 
 static void show_out(UINT8 *out)

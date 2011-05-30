@@ -22,10 +22,10 @@ static TILE_GET_INFO( holeland_get_tile_info )
 	int attr = state->m_colorram[tile_index];
 	int tile_number = state->m_videoram[tile_index] | ((attr & 0x03) << 8);
 
-/*if (input_code_pressed(machine, KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
-/*if (input_code_pressed(machine, KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
-/*if (input_code_pressed(machine, KEYCODE_E) && (attr & 0x40)) tile_number = rand(); */
-/*if (input_code_pressed(machine, KEYCODE_R) && (attr & 0x80)) tile_number = rand(); */
+/*if (machine.input().code_pressed(KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
+/*if (machine.input().code_pressed(KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
+/*if (machine.input().code_pressed(KEYCODE_E) && (attr & 0x40)) tile_number = rand(); */
+/*if (machine.input().code_pressed(KEYCODE_R) && (attr & 0x80)) tile_number = rand(); */
 	SET_TILE_INFO(
 			0,
 			tile_number,

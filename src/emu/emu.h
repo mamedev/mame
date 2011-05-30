@@ -81,7 +81,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // I/O
 #include "input.h"
-#include "inputseq.h"
 #include "inptport.h"
 #include "output.h"
 

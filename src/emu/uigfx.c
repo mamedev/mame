@@ -992,8 +992,8 @@ static void tilemap_handle_keys(running_machine &machine, ui_gfx_state *state, i
 
 	/* handle navigation (up,down,left,right) */
 	step = 8;
-	if (input_code_pressed(machine, KEYCODE_LSHIFT)) step = 1;
-	if (input_code_pressed(machine, KEYCODE_LCONTROL)) step = 64;
+	if (machine.input().code_pressed(KEYCODE_LSHIFT)) step = 1;
+	if (machine.input().code_pressed(KEYCODE_LCONTROL)) step = 64;
 	if (ui_input_pressed_repeat(machine, IPT_UI_UP, 4))
 		state->tilemap.yoffs -= step;
 	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN, 4))

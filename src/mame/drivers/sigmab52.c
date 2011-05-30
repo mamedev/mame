@@ -166,7 +166,7 @@ static SCREEN_UPDATE( jwildb52 )
 
 //save vram to file
 #if 0
-	if (input_code_pressed_once(screen->machine(), KEYCODE_Q))
+	if (screen->machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p = fopen("vram.bin", "wb");
 		fwrite(&HD63484_ram[0], 1, 0x40000 * 4, p);
@@ -190,7 +190,7 @@ static SCREEN_UPDATE( jwildb52 )
 		}
 	}
 
-if (!input_code_pressed(screen->machine(), KEYCODE_O))
+if (!screen->machine().input().code_pressed(KEYCODE_O))
 	if ((hd63484_regs_r(hd63484, 0x06/2, 0xffff) & 0x0300) == 0x0300)
 	{
 		int sy = (hd63484_regs_r(hd63484, 0x94/2, 0xffff) & 0x0fff) - (hd63484_regs_r(hd63484, 0x88/2, 0xffff) >> 8);

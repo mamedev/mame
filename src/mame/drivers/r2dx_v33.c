@@ -198,17 +198,17 @@ static SCREEN_UPDATE( rdx_v33 )
 		static int frame;
 		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		//if(input_code_pressed_once(screen->machine(),KEYCODE_A))
+		//if(screen->machine().input().code_pressed_once(KEYCODE_A))
 		//  src_addr+=0x800;
 
-		//if(input_code_pressed_once(screen->machine(),KEYCODE_S))
+		//if(screen->machine().input().code_pressed_once(KEYCODE_S))
 		//  src_addr-=0x800;
 
 		frame++;
 
 		popmessage("%08x 0",src_addr);
 
-		//if(input_code_pressed_once(screen->machine(),KEYCODE_Z))
+		//if(screen->machine().input().code_pressed_once(KEYCODE_Z))
 		if(frame == 5)
 		{
 			int i,data;

@@ -115,31 +115,31 @@ SCREEN_UPDATE( topspeed )
 	UINT8 layer[4];
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
+	if (screen->machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("bg: %01x", state->m_dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
+	if (screen->machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("fg: %01x", state->m_dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_N))
+	if (screen->machine().input().code_pressed_once (KEYCODE_N))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x", state->m_dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_M))
+	if (screen->machine().input().code_pressed_once (KEYCODE_M))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("fg2: %01x", state->m_dislayer[3]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
+	if (screen->machine().input().code_pressed_once (KEYCODE_C))
 	{
 		state->m_dislayer[4] ^= 1;
 		popmessage("sprites: %01x", state->m_dislayer[4]);

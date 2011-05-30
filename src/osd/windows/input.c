@@ -581,8 +581,8 @@ void wininput_poll(running_machine &machine)
 		winwindow_process_events_periodic(machine);
 
 		// track if mouse/lightgun is enabled, for mouse hiding purposes
-		mouse_enabled = input_device_class_enabled(machine, DEVICE_CLASS_MOUSE);
-		lightgun_enabled = input_device_class_enabled(machine, DEVICE_CLASS_LIGHTGUN);
+		mouse_enabled = machine.input().device_class(DEVICE_CLASS_MOUSE).enabled();
+		lightgun_enabled = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
 	}
 
 	// poll all of the devices
@@ -743,9 +743,9 @@ BOOL wininput_handle_raw(HANDLE device)
 int wininput_vkey_for_mame_code(input_code code)
 {
 	// only works for keyboard switches
-	if (INPUT_CODE_DEVCLASS(code) == DEVICE_CLASS_KEYBOARD && INPUT_CODE_ITEMCLASS(code) == ITEM_CLASS_SWITCH)
+	if (code.device_class() == DEVICE_CLASS_KEYBOARD && code.item_class() == ITEM_CLASS_SWITCH)
 	{
-		input_item_id id = INPUT_CODE_ITEMID(code);
+		input_item_id id = code.item_id();
 		int tablenum;
 
 		// scan the table for a match
@@ -761,25 +761,25 @@ int wininput_vkey_for_mame_code(input_code code)
 //  customize_input_type_list
 //============================================================
 
-void windows_osd_interface::customize_input_type_list(input_type_desc *typelist)
+void windows_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
-	input_type_desc *typedesc;
+	input_type_entry *entry;
 
 	// loop over the defaults
-	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
-		switch (typedesc->type)
+	for (entry = typelist.first(); entry != NULL; entry = entry->next())
+		switch (entry->type)
 		{
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
-				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
 
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				typedesc->token = "TOGGLE_FULLSCREEN";
-				typedesc->name = "Toggle Fullscreen";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_ENTER);
+				entry->token = "TOGGLE_FULLSCREEN";
+				entry->name = "Toggle Fullscreen";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_LALT, KEYCODE_ENTER);
 				break;
 		}
 }
@@ -967,13 +967,13 @@ static void win32_init(running_machine &machine)
 			break;
 
 		// add the device
-		devinfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, devinfo->name, devinfo);
+		devinfo->device = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).add_device(devinfo->name, devinfo);
 
 		// populate the axes
 		for (axisnum = 0; axisnum < 2; axisnum++)
 		{
 			char *name = utf8_from_tstring(default_axis_name[axisnum]);
-			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+			devinfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.state.lX + axisnum);
 			osd_free(name);
 		}
 
@@ -981,7 +981,7 @@ static void win32_init(running_machine &machine)
 		for (butnum = 0; butnum < 2; butnum++)
 		{
 			char *name = utf8_from_tstring(default_button_name(butnum));
-			input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			devinfo->device->add_item(name, (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.state.rgbButtons[butnum]);
 			osd_free(name);
 		}
 	}
@@ -1346,7 +1346,7 @@ static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 		goto exit;
 
 	// add the device
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name, devinfo);
 	devinfo->poll = dinput_keyboard_poll;
 
 	// populate it
@@ -1361,7 +1361,7 @@ static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 		name = dinput_device_item_name(devinfo, keynum, defname, NULL);
 
 		// add the item to the device
-		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
+		devinfo->device->add_item(name, itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
 		osd_free(name);
 	}
 
@@ -1419,11 +1419,11 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	}
 
 	// add the device
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name, devinfo);
 	devinfo->poll = dinput_mouse_poll;
 	if (guninfo != NULL)
 	{
-		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->device = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).add_device(guninfo->name, guninfo);
 		guninfo->poll = win32_lightgun_poll;
 	}
 
@@ -1437,9 +1437,9 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		char *name = dinput_device_item_name(devinfo, offsetof(DIMOUSESTATE, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], NULL);
 
 		// add to the mouse device and optionally to the gun device as well
-		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+		devinfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.state.lX + axisnum);
 		if (guninfo != NULL && axisnum < 2)
-			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+			guninfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &guninfo->mouse.state.lX + axisnum);
 
 		osd_free(name);
 	}
@@ -1452,9 +1452,9 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 
 		// add to the mouse device and optionally to the gun device as well
 		// note that the gun device points to the mouse buttons rather than its own
-		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+		devinfo->device->add_item(name, (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.state.rgbButtons[butnum]);
 		if (guninfo != NULL)
-			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			guninfo->device->add_item(name, (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.state.rgbButtons[butnum]);
 
 		osd_free(name);
 	}
@@ -1528,7 +1528,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, 128);
 
 	// add the device
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_JOYSTICK).add_device(devinfo->name, devinfo);
 	devinfo->poll = dinput_joystick_poll;
 
 	// populate the axes
@@ -1550,7 +1550,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 
 		// populate the item description as well
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], NULL);
-		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+		devinfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->joystick.state.lX + axisnum);
 		osd_free(name);
 
 		axiscount++;
@@ -1563,22 +1563,22 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 
 		// left
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("L"));
-		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_LEFT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		devinfo->device->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, (void *)(FPTR)(povnum * 4 + POVDIR_LEFT));
 		osd_free(name);
 
 		// right
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("R"));
-		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_RIGHT), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		devinfo->device->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, (void *)(FPTR)(povnum * 4 + POVDIR_RIGHT));
 		osd_free(name);
 
 		// up
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("U"));
-		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_UP), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		devinfo->device->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, (void *)(FPTR)(povnum * 4 + POVDIR_UP));
 		osd_free(name);
 
 		// down
 		name = dinput_device_item_name(devinfo, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), TEXT("D"));
-		input_device_item_add(devinfo->device, name, (void *)(FPTR)(povnum * 4 + POVDIR_DOWN), ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state);
+		devinfo->device->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, (void *)(FPTR)(povnum * 4 + POVDIR_DOWN));
 		osd_free(name);
 	}
 
@@ -1587,7 +1587,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	{
 		FPTR offset = (FPTR)(&((DIJOYSTATE2 *)NULL)->rgbButtons[butnum]);
 		char *name = dinput_device_item_name(devinfo, offset, default_button_name(butnum), NULL);
-		input_device_item_add(devinfo->device, name, &devinfo->joystick.state.rgbButtons[butnum], (butnum < 16) ? (input_item_id)(ITEM_ID_BUTTON1 + butnum) : ITEM_ID_OTHER_SWITCH, generic_button_get_state);
+		devinfo->device->add_item(name, (butnum < 16) ? (input_item_id)(ITEM_ID_BUTTON1 + butnum) : ITEM_ID_OTHER_SWITCH, generic_button_get_state, &devinfo->joystick.state.rgbButtons[butnum]);
 		osd_free(name);
 	}
 
@@ -1967,7 +1967,7 @@ static void rawinput_keyboard_enum(running_machine &machine, PRAWINPUTDEVICELIST
 		return;
 
 	// add the device
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name, devinfo);
 
 	// populate it
 	for (keynum = 0; keynum < MAX_KEYS; keynum++)
@@ -1982,7 +1982,7 @@ static void rawinput_keyboard_enum(running_machine &machine, PRAWINPUTDEVICELIST
 		name = utf8_from_tstring(keyname);
 
 		// add the item to the device
-		input_device_item_add(devinfo->device, name, &devinfo->keyboard.state[keynum], itemid, generic_button_get_state);
+		devinfo->device->add_item(name, itemid, generic_button_get_state, &devinfo->keyboard.state[keynum]);
 		osd_free(name);
 	}
 }
@@ -2040,10 +2040,10 @@ static void rawinput_mouse_enum(running_machine &machine, PRAWINPUTDEVICELIST de
 	}
 
 	// add the device
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name, devinfo);
 	if (guninfo != NULL)
 	{
-		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->device = machine.input().device_class(DEVICE_CLASS_LIGHTGUN).add_device(guninfo->name, guninfo);
 		guninfo->poll = NULL;
 	}
 
@@ -2053,9 +2053,9 @@ static void rawinput_mouse_enum(running_machine &machine, PRAWINPUTDEVICELIST de
 		char *name = utf8_from_tstring(default_axis_name[axisnum]);
 
 		// add to the mouse device and optionally to the gun device as well
-		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+		devinfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &devinfo->mouse.state.lX + axisnum);
 		if (guninfo != NULL && axisnum < 2)
-			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.lX + axisnum, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state);
+			guninfo->device->add_item(name, (input_item_id)(ITEM_ID_XAXIS + axisnum), generic_axis_get_state, &guninfo->mouse.state.lX + axisnum);
 
 		osd_free(name);
 	}
@@ -2066,9 +2066,9 @@ static void rawinput_mouse_enum(running_machine &machine, PRAWINPUTDEVICELIST de
 		char *name = utf8_from_tstring(default_button_name(butnum));
 
 		// add to the mouse device and optionally to the gun device as well
-		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+		devinfo->device->add_item(name, (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &devinfo->mouse.state.rgbButtons[butnum]);
 		if (guninfo != NULL)
-			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			guninfo->device->add_item(name, (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state, &guninfo->mouse.state.rgbButtons[butnum]);
 
 		osd_free(name);
 	}

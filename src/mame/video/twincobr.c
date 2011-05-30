@@ -418,11 +418,11 @@ static void twincobr_log_vram(running_machine &machine)
 #ifdef MAME_DEBUG
 	twincobr_state *state = machine.driver_data<twincobr_state>();
 
-	if ( input_code_pressed(machine, KEYCODE_M) )
+	if ( machine.input().code_pressed(KEYCODE_M) )
 	{
 		offs_t tile_voffs;
 		int tcode[4];
-		while (input_code_pressed(machine, KEYCODE_M)) ;
+		while (machine.input().code_pressed(KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
 		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",state->m_bgscrollx,state->m_bgscrolly,state->m_fgscrollx,state->m_fgscrolly,state->m_txscrollx,state->m_txscrolly);
 		for ( tile_voffs = 0; tile_voffs < (state->m_txvideoram_size/2); tile_voffs++ )

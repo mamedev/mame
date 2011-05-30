@@ -200,37 +200,37 @@ static SCREEN_UPDATE( pntnpuzl )
 	static int yyy=512;
 	static int sss=0xa8;
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_Q) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_Q) )
 	{
 		xxx--;
 		mame_printf_debug("xxx %04x\n",xxx);
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		xxx++;
 		mame_printf_debug("xxx %04x\n",xxx);
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_A) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_A) )
 	{
 		yyy--;
 		mame_printf_debug("yyy %04x\n",yyy);
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_S) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_S) )
 	{
 		yyy++;
 		mame_printf_debug("yyy %04x\n",yyy);
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_Z) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_Z) )
 	{
 		sss--;
 		mame_printf_debug("sss %04x\n",sss);
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_X) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_X) )
 	{
 		sss++;
 		mame_printf_debug("sss %04x\n",sss);

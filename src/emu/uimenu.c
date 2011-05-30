@@ -329,12 +329,12 @@ static void menu_settings_custom_render(running_machine &machine, ui_menu *menu,
     to the default sequence for the given field
 -------------------------------------------------*/
 
-INLINE const input_seq *get_field_default_seq(input_field_config *field, input_seq_type seqtype)
+INLINE const input_seq &get_field_default_seq(input_field_config *field, input_seq_type seqtype)
 {
-	if (input_seq_get_1(&field->seq[seqtype]) == SEQCODE_DEFAULT)
+	if (field->seq[seqtype].is_default())
 		return input_type_seq(field->machine(), field->type, field->player, seqtype);
 	else
-		return &field->seq[seqtype];
+		return field->seq[seqtype];
 }
 
 
@@ -343,15 +343,15 @@ INLINE const input_seq *get_field_default_seq(input_field_config *field, input_s
     and the default item
 -------------------------------------------------*/
 
-INLINE void toggle_none_default(input_seq *selected_seq, input_seq *original_seq, const input_seq *selected_defseq)
+INLINE void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
 {
 	/* if we used to be "none", toggle to the default value */
-	if (input_seq_get_1(original_seq) == SEQCODE_END)
-		*selected_seq = *selected_defseq;
+	if (original_seq.length() == 0)
+		selected_seq = selected_defseq;
 
 	/* otherwise, toggle to "none" */
 	else
-		input_seq_set_1(selected_seq, SEQCODE_END);
+		selected_seq.reset();
 }
 
 
@@ -1787,7 +1787,6 @@ static void menu_input_general(running_machine &machine, ui_menu *menu, void *pa
 static void menu_input_general_populate(running_machine &machine, ui_menu *menu, input_menu_state *menustate, int group)
 {
 	input_item_data *itemlist = NULL;
-	const input_type_desc *typedesc;
 	int suborder[SEQ_TYPE_TOTAL];
 	astring tempstring;
 	int sortorder = 1;
@@ -1798,10 +1797,10 @@ static void menu_input_general_populate(running_machine &machine, ui_menu *menu,
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (typedesc = input_type_list(machine); typedesc != NULL; typedesc = typedesc->next)
+	for (input_type_entry *entry = input_type_list(machine).first(); entry != NULL; entry = entry->next())
 
 		/* add if we match the group and we have a valid name */
-		if (typedesc->group == group && typedesc->name != NULL && typedesc->name[0] != 0)
+		if (entry->group == group && entry->name != NULL && entry->name[0] != 0)
 		{
 			input_seq_type seqtype;
 
@@ -1812,13 +1811,13 @@ static void menu_input_general_populate(running_machine &machine, ui_menu *menu,
 				/* build an entry for the standard sequence */
 				input_item_data *item = (input_item_data *)ui_menu_pool_alloc(menu, sizeof(*item));
 				memset(item, 0, sizeof(*item));
-				item->ref = typedesc;
+				item->ref = entry;
 				item->seqtype = seqtype;
-				item->seq = *input_type_seq(machine, typedesc->type, typedesc->player, seqtype);
-				item->defseq = &typedesc->seq[seqtype];
+				item->seq = input_type_seq(machine, entry->type, entry->player, seqtype);
+				item->defseq = &entry->defseq[seqtype];
 				item->sortorder = sortorder * 4 + suborder[seqtype];
-				item->type = input_type_is_analog(typedesc->type) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-				item->name = typedesc->name;
+				item->type = input_type_is_analog(entry->type) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->name = entry->name;
 				item->next = itemlist;
 				itemlist = item;
 
@@ -1890,8 +1889,8 @@ static void menu_input_specific_populate(running_machine &machine, ui_menu *menu
 					memset(item, 0, sizeof(*item));
 					item->ref = field;
 					item->seqtype = seqtype;
-					item->seq = *input_field_seq(field, seqtype);
-					item->defseq = get_field_default_seq(field, seqtype);
+					item->seq = input_field_seq(field, seqtype);
+					item->defseq = &get_field_default_seq(field, seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
 					item->type = input_type_is_analog(field->type) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
@@ -1949,16 +1948,16 @@ static void menu_input_common(running_machine &machine, ui_menu *menu, void *par
 		{
 			menustate->pollingitem = NULL;
 			menustate->record_next = FALSE;
-			toggle_none_default(&item->seq, &menustate->starting_seq, item->defseq);
+			toggle_none_default(item->seq, menustate->starting_seq, *item->defseq);
 			seqchangeditem = item;
 		}
 
 		/* poll again; if finished, update the sequence */
-		if (input_seq_poll(machine, &newseq))
+		if (machine.input().seq_poll())
 		{
 			menustate->pollingitem = NULL;
 			menustate->record_next = TRUE;
-			item->seq = newseq;
+			item->seq = machine.input().seq_poll_final();
 			seqchangeditem = item;
 		}
 	}
@@ -1974,13 +1973,13 @@ static void menu_input_common(running_machine &machine, ui_menu *menu, void *par
 				menustate->pollingitem = item;
 				menustate->last_sortorder = item->sortorder;
 				menustate->starting_seq = item->seq;
-				input_seq_poll_start(machine, (item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
+				machine.input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
 				invalidate = TRUE;
 				break;
 
 			/* if the clear key was pressed, reset the selected item */
 			case IPT_UI_CLEAR:
-				toggle_none_default(&item->seq, &item->seq, item->defseq);
+				toggle_none_default(item->seq, item->seq, *item->defseq);
 				menustate->record_next = FALSE;
 				seqchangeditem = item;
 				break;
@@ -1998,8 +1997,8 @@ static void menu_input_common(running_machine &machine, ui_menu *menu, void *par
 		/* update a general input */
 		if (parameter != NULL)
 		{
-			const input_type_desc *typedesc = (const input_type_desc *)seqchangeditem->ref;
-			input_type_set_seq(machine, typedesc->type, typedesc->player, seqchangeditem->seqtype, &seqchangeditem->seq);
+			const input_type_entry *entry = (const input_type_entry *)seqchangeditem->ref;
+			input_type_set_seq(machine, entry->type, entry->player, seqchangeditem->seqtype, &seqchangeditem->seq);
 		}
 
 		/* update a game-specific input */
@@ -2096,8 +2095,8 @@ static void menu_input_populate_and_sort(running_machine &machine, ui_menu *menu
 		/* otherwise, generate the sequence name and invert it if different from the default */
 		else
 		{
-			input_seq_name(machine, subtext, &item->seq);
-			flags |= input_seq_cmp(&item->seq, item->defseq) ? MENU_FLAG_INVERT : 0;
+			machine.input().seq_name(subtext, item->seq);
+			flags |= (item->seq != *item->defseq) ? MENU_FLAG_INVERT : 0;
 		}
 
 		/* add the item */
@@ -2418,12 +2417,12 @@ static void menu_analog(running_machine &machine, ui_menu *menu, void *parameter
 
 			/* left decrements */
 			case IPT_UI_LEFT:
-				newval -= input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
+				newval -= machine.input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 
 			/* right increments */
 			case IPT_UI_RIGHT:
-				newval += input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
+				newval += machine.input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 		}
 
@@ -2925,11 +2924,11 @@ static void menu_sliders(running_machine &machine, ui_menu *menu, void *paramete
 
 				/* decrease value */
 				case IPT_UI_LEFT:
-					if (input_code_pressed(machine, KEYCODE_LALT) || input_code_pressed(machine, KEYCODE_RALT))
+					if (machine.input().code_pressed(KEYCODE_LALT) || machine.input().code_pressed(KEYCODE_RALT))
 						increment = -1;
-					else if (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT))
+					else if (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT))
 						increment = (slider->incval > 10) ? -(slider->incval / 10) : -1;
-					else if (input_code_pressed(machine, KEYCODE_LCONTROL) || input_code_pressed(machine, KEYCODE_RCONTROL))
+					else if (machine.input().code_pressed(KEYCODE_LCONTROL) || machine.input().code_pressed(KEYCODE_RCONTROL))
 						increment = -slider->incval * 10;
 					else
 						increment = -slider->incval;
@@ -2937,11 +2936,11 @@ static void menu_sliders(running_machine &machine, ui_menu *menu, void *paramete
 
 				/* increase value */
 				case IPT_UI_RIGHT:
-					if (input_code_pressed(machine, KEYCODE_LALT) || input_code_pressed(machine, KEYCODE_RALT))
+					if (machine.input().code_pressed(KEYCODE_LALT) || machine.input().code_pressed(KEYCODE_RALT))
 						increment = 1;
-					else if (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT))
+					else if (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT))
 						increment = (slider->incval > 10) ? (slider->incval / 10) : 1;
-					else if (input_code_pressed(machine, KEYCODE_LCONTROL) || input_code_pressed(machine, KEYCODE_RCONTROL))
+					else if (machine.input().code_pressed(KEYCODE_LCONTROL) || machine.input().code_pressed(KEYCODE_RCONTROL))
 						increment = slider->incval * 10;
 					else
 						increment = slider->incval;
@@ -3354,12 +3353,12 @@ static void menu_crosshair(running_machine &machine, ui_menu *menu, void *parame
 
 			/* left decrements */
 			case IPT_UI_LEFT:
-				newval -= input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
+				newval -= machine.input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 
 			/* right increments */
 			case IPT_UI_RIGHT:
-				newval += input_code_pressed(machine, KEYCODE_LSHIFT) ? 10 : 1;
+				newval += machine.input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
 				break;
 		}
 

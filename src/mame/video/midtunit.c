@@ -715,7 +715,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 if (LOG_DMA)
 {
-	if (input_code_pressed(space->machine(), KEYCODE_L))
+	if (space->machine().input().code_pressed(KEYCODE_L))
 	{
 		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
 				command, (command >> 12) & 7, (command >> 7) & 1, (command >> 4) & 1, (command >> 5) & 1, (command >> 8) & 3, (command >> 10) & 3);

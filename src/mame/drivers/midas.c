@@ -181,11 +181,11 @@ static SCREEN_UPDATE( midas )
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if ( input_code_pressed(screen->machine(), KEYCODE_Z) )
+	if ( screen->machine().input().code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1 << 0;	// for state->m_tmap
-		if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 1 << 1;	// for sprites
+		if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1 << 0;	// for state->m_tmap
+		if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 1 << 1;	// for sprites
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif

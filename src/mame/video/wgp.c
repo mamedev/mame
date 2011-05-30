@@ -650,25 +650,25 @@ SCREEN_UPDATE( wgp )
 	UINT8 layer[3];
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
+	if (screen->machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("piv0: %01x",state->m_dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
+	if (screen->machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("piv1: %01x",state->m_dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_N))
+	if (screen->machine().input().code_pressed_once (KEYCODE_N))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("piv2: %01x",state->m_dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_M))
+	if (screen->machine().input().code_pressed_once (KEYCODE_M))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("TC0100SCN top bg layer: %01x",state->m_dislayer[3]);

@@ -383,7 +383,7 @@ WRITE32_HANDLER( itech020_paletteram_w )
 static void logblit(running_machine &machine, const char *tag)
 {
 	itech32_state *state = machine.driver_data<itech32_state>();
-	if (!input_code_pressed(machine, KEYCODE_L))
+	if (!machine.input().code_pressed(KEYCODE_L))
 		return;
 	if (state->m_is_drivedge && VIDEO_TRANSFER_FLAGS == 0x5490)
 	{

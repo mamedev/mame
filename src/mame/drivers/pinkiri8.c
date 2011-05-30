@@ -183,7 +183,7 @@ static SCREEN_UPDATE( pinkiri8 )
 
 	if (!strcmp(screen->machine().system().name,"janshi")) game_type_hack = 1;
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int i;
 		int count2;

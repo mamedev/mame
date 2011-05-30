@@ -319,8 +319,8 @@ int ui_display_startup_screens(running_machine &machine, int first_time, int sho
 		}
 
 		/* clear the input memory */
-		input_code_poll_switches(machine, TRUE);
-		while (input_code_poll_switches(machine, FALSE) != INPUT_CODE_INVALID) ;
+		machine.input().reset_polling();
+		while (machine.input().poll_switches() != INPUT_CODE_INVALID) ;
 
 		/* loop while we have a handler */
 		while (ui_handler_callback != handler_ingame && !machine.scheduled_event_pending() && !ui_menu_is_force_game_select())
@@ -1135,11 +1135,11 @@ static UINT32 handler_messagebox_ok(running_machine &machine, render_container *
 	ui_draw_text_box(container, messagebox_text, JUSTIFY_LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	/* an 'O' or left joystick kicks us to the next state */
-	if (state == 0 && (input_code_pressed_once(machine, KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
+	if (state == 0 && (machine.input().code_pressed_once(KEYCODE_O) || ui_input_pressed(machine, IPT_UI_LEFT)))
 		state++;
 
 	/* a 'K' or right joystick exits the state */
-	else if (state == 1 && (input_code_pressed_once(machine, KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
+	else if (state == 1 && (machine.input().code_pressed_once(KEYCODE_K) || ui_input_pressed(machine, IPT_UI_RIGHT)))
 		state = UI_HANDLER_CANCEL;
 
 	/* if the user cancels, exit out completely */
@@ -1172,7 +1172,7 @@ static UINT32 handler_messagebox_anykey(running_machine &machine, render_contain
 	}
 
 	/* if any key is pressed, just exit */
-	else if (input_code_poll_switches(machine, FALSE) != INPUT_CODE_INVALID)
+	else if (machine.input().poll_switches() != INPUT_CODE_INVALID)
 		state = UI_HANDLER_CANCEL;
 
 	return state;
@@ -1205,10 +1205,10 @@ static void process_natural_keyboard(running_machine &machine)
 	{
 		/* identify this keycode */
 		itemid = non_char_keys[i];
-		code = input_code_from_input_item_id(machine, itemid);
+		code = machine.input().code_from_itemid(itemid);
 
 		/* ...and determine if it is pressed */
-		pressed = input_code_pressed(machine, code);
+		pressed = machine.input().code_pressed(code);
 
 		/* figure out whey we are in the key_down map */
 		key_down_ptr = &non_char_keys_down[i / 8];
@@ -1220,7 +1220,7 @@ static void process_natural_keyboard(running_machine &machine)
 			*key_down_ptr |= key_down_mask;
 
 			/* post the key */
-			inputx_postc(machine, UCHAR_MAMEKEY_BEGIN + code);
+			inputx_postc(machine, UCHAR_MAMEKEY_BEGIN + code.item_id());
 		}
 		else if (!pressed && (*key_down_ptr & key_down_mask))
 		{
@@ -1402,7 +1402,7 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	if (ui_input_pressed(machine, IPT_UI_PAUSE))
 	{
 		/* with a shift key, it is single step */
-		if (is_paused && (input_code_pressed(machine, KEYCODE_LSHIFT) || input_code_pressed(machine, KEYCODE_RSHIFT)))
+		if (is_paused && (machine.input().code_pressed(KEYCODE_LSHIFT) || machine.input().code_pressed(KEYCODE_RSHIFT)))
 		{
 			single_step = TRUE;
 			machine.resume();
@@ -1519,17 +1519,17 @@ static UINT32 handler_load_save(running_machine &machine, render_container *cont
 	}
 
 	/* check for A-Z or 0-9 */
-	for (code = KEYCODE_A; code <= (input_code)KEYCODE_Z; code++)
-		if (input_code_pressed_once(machine, code))
-			file = code - KEYCODE_A + 'a';
+	for (input_item_id id = ITEM_ID_A; id <= ITEM_ID_Z; id++)
+		if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+			file = id - ITEM_ID_A + 'a';
 	if (file == 0)
-		for (code = KEYCODE_0; code <= (input_code)KEYCODE_9; code++)
-			if (input_code_pressed_once(machine, code))
-				file = code - KEYCODE_0 + '0';
+		for (input_item_id id = ITEM_ID_0; id <= ITEM_ID_9; id++)
+			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				file = id - ITEM_ID_0 + '0';
 	if (file == 0)
-		for (code = KEYCODE_0_PAD; code <= (input_code)KEYCODE_9_PAD; code++)
-			if (input_code_pressed_once(machine, code))
-				file = code - KEYCODE_0_PAD + '0';
+		for (input_item_id id = ITEM_ID_0_PAD; id <= ITEM_ID_9_PAD; id++)
+			if (machine.input().code_pressed_once(input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, id)))
+				file = id - ITEM_ID_0_PAD + '0';
 	if (file == 0)
 		return state;
 

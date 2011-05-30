@@ -4,8 +4,36 @@
 
     Handle input from the user.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -19,60 +47,28 @@
 #define __INPUT_H__
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* make sure RELATIVE and ABSOLUTE aren't defined elsewhere; otherwise it fouls up our macros */
-#undef RELATIVE
-#undef ABSOLUTE
+// relative devices return ~512 units per onscreen pixel
+const INT32 INPUT_RELATIVE_PER_PIXEL = 512;
 
-/* relative devices return ~512 units per onscreen pixel */
-#define INPUT_RELATIVE_PER_PIXEL		512
+// absolute devices return values between -65536 and +65536
+const INT32 INPUT_ABSOLUTE_MIN = -65536;
+const INT32 INPUT_ABSOLUTE_MAX = 65536;
 
-/* absolute devices return values between -65536 and +65536 */
-#define INPUT_ABSOLUTE_MIN				-65536
-#define INPUT_ABSOLUTE_MAX				65536
-
-/* flags in the top 4 bits of the input code */
-#define INPUT_CODE_INTERNAL				(1 << 31)
-
-/* extract components of the input code */
-#define INPUT_CODE_IS_INTERNAL(c)		(((c) & INPUT_CODE_INTERNAL) != 0)
-#define INPUT_CODE_DEVCLASS(c)			((input_device_class)(((c) >> 24) & 0x0f))
-#define INPUT_CODE_DEVINDEX(c)			((UINT8)(((c) >> 20) & 0x0f))
-#define INPUT_CODE_ITEMCLASS(c)			((input_item_class)(((c) >> 16) & 0x0f))
-#define INPUT_CODE_MODIFIER(c)			((input_item_modifier)(((c) >> 12) & 0x0f))
-#define INPUT_CODE_ITEMID(c)			((input_item_id)(int)((c) & 0xfff))
-
-/* build or modify input codes */
-#define INPUT_CODE(d,x,i,m,o)			((((d) & 0x0f) << 24) | (((x) & 0x0f) << 20) | (((i) & 0x0f) << 16) | (((m) & 0x0f) << 12) | ((o) & 0xfff))
-#define INPUT_CODE_SET_DEVINDEX(c,x)	(((c) & ~(0xf << 20)) | (((x) & 0x0f) << 20))
-#define INPUT_CODE_SET_ITEMCLASS(c,i)	(((c) & ~(0xf << 16)) | (((i) & 0x0f) << 16))
-#define INPUT_CODE_SET_MODIFIER(c,m)	(((c) & ~(0xf << 12)) | (((m) & 0x0f) << 12))
-#define INPUT_CODE_SET_ITEMID(c,d)		(((c) & ~0xfff) | ((d) & 0xfff))
-
-/* standard code building */
-#define STANDARD_CODE(d,x,i,m,o)		(INPUT_CODE(DEVICE_CLASS_##d, x, ITEM_CLASS_##i, ITEM_MODIFIER_##m, ITEM_ID_##o))
-#define INTERNAL_CODE(x)				(INPUT_CODE_INTERNAL | ((x) & 0xfff))
-#define INPUT_CODE_INVALID				STANDARD_CODE(INVALID, 0, INVALID, NONE, INVALID)
-
-/* maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer */
-#define INPUT_MAX_AXIS					(8)
-#define INPUT_MAX_BUTTONS				(16)
-#define INPUT_MAX_HATS					(4)
-#define INPUT_MAX_ADD_SWITCH			(16)
-#define INPUT_MAX_ADD_ABSOLUTE			(16)
-#define INPUT_MAX_ADD_RELATIVE			(16)
+// maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
+const int INPUT_MAX_AXIS = 8;
+const int INPUT_MAX_BUTTONS = 16;
+const int INPUT_MAX_HATS = 4;
+const int INPUT_MAX_ADD_SWITCH = 16;
+const int INPUT_MAX_ADD_ABSOLUTE = 16;
+const int INPUT_MAX_ADD_RELATIVE = 16;
 
 
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* input device classes */
-enum _input_device_class
+// device classes
+enum input_device_class
 {
 	DEVICE_CLASS_INVALID,
 	DEVICE_CLASS_FIRST_VALID,
@@ -80,14 +76,19 @@ enum _input_device_class
 	DEVICE_CLASS_MOUSE,
 	DEVICE_CLASS_LIGHTGUN,
 	DEVICE_CLASS_JOYSTICK,
+	DEVICE_CLASS_LAST_VALID = DEVICE_CLASS_JOYSTICK,
+	DEVICE_CLASS_INTERNAL,
 	DEVICE_CLASS_MAXIMUM
 };
-typedef enum _input_device_class input_device_class;
 DECLARE_ENUM_OPERATORS(input_device_class)
 
 
-/* input item classes */
-enum _input_item_class
+// device index
+const int DEVICE_INDEX_MAXIMUM = 0xff;
+
+
+// input item classes
+enum input_item_class
 {
 	ITEM_CLASS_INVALID,
 	ITEM_CLASS_SWITCH,
@@ -95,11 +96,10 @@ enum _input_item_class
 	ITEM_CLASS_RELATIVE,
 	ITEM_CLASS_MAXIMUM
 };
-typedef enum _input_item_class input_item_class;
 
 
-/* input item modifiers */
-enum _input_item_modifier
+// input item modifiers
+enum input_item_modifier
 {
 	ITEM_MODIFIER_NONE,
 	ITEM_MODIFIER_POS,
@@ -110,16 +110,15 @@ enum _input_item_modifier
 	ITEM_MODIFIER_DOWN,
 	ITEM_MODIFIER_MAXIMUM
 };
-typedef enum _input_item_modifier input_item_modifier;
 
 
-/* standard item IDs */
-enum _input_item_id
+// standard item IDs
+enum input_item_id
 {
 	ITEM_ID_INVALID,
 	ITEM_ID_FIRST_VALID,
 
-	/* standard keyboard IDs */
+	// standard keyboard IDs
 	ITEM_ID_A = ITEM_ID_FIRST_VALID,
 	ITEM_ID_B,
 	ITEM_ID_C,
@@ -230,7 +229,7 @@ enum _input_item_id
 	ITEM_ID_MENU,
 	ITEM_ID_CANCEL,
 
-	/* standard mouse/joystick/gun IDs */
+	// standard mouse/joystick/gun IDs
 	ITEM_ID_XAXIS,
 	ITEM_ID_YAXIS,
 	ITEM_ID_ZAXIS,
@@ -258,7 +257,7 @@ enum _input_item_id
 	ITEM_ID_START,
 	ITEM_ID_SELECT,
 
-	/* Hats */
+	// Hats
 	ITEM_ID_HAT1UP,
 	ITEM_ID_HAT1DOWN,
 	ITEM_ID_HAT1LEFT,
@@ -276,7 +275,7 @@ enum _input_item_id
 	ITEM_ID_HAT4LEFT,
 	ITEM_ID_HAT4RIGHT,
 
-	/* Additional IDs */
+	// Additional IDs
 	ITEM_ID_ADD_SWITCH1,
 	ITEM_ID_ADD_SWITCH2,
 	ITEM_ID_ADD_SWITCH3,
@@ -328,325 +327,762 @@ enum _input_item_id
 	ITEM_ID_ADD_RELATIVE15,
 	ITEM_ID_ADD_RELATIVE16,
 
-	/* generic other IDs */
+	// generic other IDs
 	ITEM_ID_OTHER_SWITCH,
 	ITEM_ID_OTHER_AXIS_ABSOLUTE,
 	ITEM_ID_OTHER_AXIS_RELATIVE,
 	ITEM_ID_MAXIMUM,
+	
+	// internal codes for sequences
+	ITEM_ID_SEQ_END,
+	ITEM_ID_SEQ_DEFAULT,
+	ITEM_ID_SEQ_NOT,
+	ITEM_ID_SEQ_OR,
 
-	/* absolute maximum ID */
+	// absolute maximum ID
 	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
-typedef enum _input_item_id input_item_id;
 DECLARE_ENUM_OPERATORS(input_item_id)
 
 
-/* expanded codes referencing specific devices for input definitions */
-/* note that these all implcitly refer to device 0; to reference additional */
-/* devices, wrap the code in INPUT_CODE_SET_DEVINDEX() */
-enum
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// forward declarations
+class input_device_item;
+class input_device;
+class input_class;
+class input_manager;
+
+
+// callback for getting the value of an item on a device
+typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
+
+
+// ======================> joystick_map
+
+// a 9x9 joystick map
+class joystick_map
 {
-	/* keyboard codes */
-	KEYCODE_A = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, A),
-	KEYCODE_B = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, B),
-	KEYCODE_C = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, C),
-	KEYCODE_D = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, D),
-	KEYCODE_E = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, E),
-	KEYCODE_F = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F),
-	KEYCODE_G = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, G),
-	KEYCODE_H = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, H),
-	KEYCODE_I = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, I),
-	KEYCODE_J = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, J),
-	KEYCODE_K = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, K),
-	KEYCODE_L = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, L),
-	KEYCODE_M = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, M),
-	KEYCODE_N = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, N),
-	KEYCODE_O = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, O),
-	KEYCODE_P = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, P),
-	KEYCODE_Q = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, Q),
-	KEYCODE_R = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, R),
-	KEYCODE_S = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, S),
-	KEYCODE_T = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, T),
-	KEYCODE_U = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, U),
-	KEYCODE_V = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, V),
-	KEYCODE_W = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, W),
-	KEYCODE_X = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, X),
-	KEYCODE_Y = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, Y),
-	KEYCODE_Z = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, Z),
-	KEYCODE_0 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 0),
-	KEYCODE_1 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 1),
-	KEYCODE_2 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 2),
-	KEYCODE_3 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 3),
-	KEYCODE_4 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 4),
-	KEYCODE_5 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 5),
-	KEYCODE_6 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 6),
-	KEYCODE_7 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 7),
-	KEYCODE_8 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 8),
-	KEYCODE_9 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 9),
-	KEYCODE_F1 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F1),
-	KEYCODE_F2 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F2),
-	KEYCODE_F3 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F3),
-	KEYCODE_F4 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F4),
-	KEYCODE_F5 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F5),
-	KEYCODE_F6 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F6),
-	KEYCODE_F7 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F7),
-	KEYCODE_F8 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F8),
-	KEYCODE_F9 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F9),
-	KEYCODE_F10 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F10),
-	KEYCODE_F11 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F11),
-	KEYCODE_F12 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F12),
-	KEYCODE_F13 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F13),
-	KEYCODE_F14 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F14),
-	KEYCODE_F15 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, F15),
-	KEYCODE_ESC = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, ESC),
-	KEYCODE_TILDE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, TILDE),
-	KEYCODE_MINUS = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, MINUS),
-	KEYCODE_EQUALS = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, EQUALS),
-	KEYCODE_BACKSPACE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, BACKSPACE),
-	KEYCODE_TAB = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, TAB),
-	KEYCODE_OPENBRACE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, OPENBRACE),
-	KEYCODE_CLOSEBRACE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, CLOSEBRACE),
-	KEYCODE_ENTER = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, ENTER),
-	KEYCODE_COLON = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, COLON),
-	KEYCODE_QUOTE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, QUOTE),
-	KEYCODE_BACKSLASH = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, BACKSLASH),
-	KEYCODE_BACKSLASH2 = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, BACKSLASH2),
-	KEYCODE_COMMA = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, COMMA),
-	KEYCODE_STOP = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, STOP),
-	KEYCODE_SLASH = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, SLASH),
-	KEYCODE_SPACE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, SPACE),
-	KEYCODE_INSERT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, INSERT),
-	KEYCODE_DEL = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, DEL),
-	KEYCODE_HOME = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, HOME),
-	KEYCODE_END = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, END),
-	KEYCODE_PGUP = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, PGUP),
-	KEYCODE_PGDN = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, PGDN),
-	KEYCODE_LEFT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, LEFT),
-	KEYCODE_RIGHT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, RIGHT),
-	KEYCODE_UP = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, UP),
-	KEYCODE_DOWN = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, DOWN),
-	KEYCODE_0_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 0_PAD),
-	KEYCODE_1_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 1_PAD),
-	KEYCODE_2_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 2_PAD),
-	KEYCODE_3_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 3_PAD),
-	KEYCODE_4_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 4_PAD),
-	KEYCODE_5_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 5_PAD),
-	KEYCODE_6_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 6_PAD),
-	KEYCODE_7_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 7_PAD),
-	KEYCODE_8_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 8_PAD),
-	KEYCODE_9_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, 9_PAD),
-	KEYCODE_SLASH_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, SLASH_PAD),
-	KEYCODE_ASTERISK = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, ASTERISK),
-	KEYCODE_MINUS_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, MINUS_PAD),
-	KEYCODE_PLUS_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, PLUS_PAD),
-	KEYCODE_DEL_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, DEL_PAD),
-	KEYCODE_ENTER_PAD = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, ENTER_PAD),
-	KEYCODE_PRTSCR = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, PRTSCR),
-	KEYCODE_PAUSE = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, PAUSE),
-	KEYCODE_LSHIFT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, LSHIFT),
-	KEYCODE_RSHIFT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, RSHIFT),
-	KEYCODE_LCONTROL = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, LCONTROL),
-	KEYCODE_RCONTROL = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, RCONTROL),
-	KEYCODE_LALT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, LALT),
-	KEYCODE_RALT = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, RALT),
-	KEYCODE_SCRLOCK = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, SCRLOCK),
-	KEYCODE_NUMLOCK = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, NUMLOCK),
-	KEYCODE_CAPSLOCK = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, CAPSLOCK),
-	KEYCODE_LWIN = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, LWIN),
-	KEYCODE_RWIN = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, RWIN),
-	KEYCODE_MENU = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, MENU),
-	KEYCODE_CANCEL = STANDARD_CODE(KEYBOARD, 0, SWITCH, NONE, CANCEL),
+public:
+	// construction/destruction
+	joystick_map();
+	joystick_map(const joystick_map &src) { copy(src); }
+	
+	// operators
+	joystick_map &operator=(const joystick_map &src) { if (this != &src) copy(src); return *this; }
 
-	/* mouse axes as relative devices */
-	MOUSECODE_X = STANDARD_CODE(MOUSE, 0, RELATIVE, NONE, XAXIS),
-	MOUSECODE_Y = STANDARD_CODE(MOUSE, 0, RELATIVE, NONE, YAXIS),
-	MOUSECODE_Z = STANDARD_CODE(MOUSE, 0, RELATIVE, NONE, ZAXIS),
+	// parse from a string
+	bool parse(const char *mapstring);
 
-	/* mouse axes as switches in +/- direction */
-	MOUSECODE_X_POS_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, POS, XAXIS),
-	MOUSECODE_X_NEG_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, NEG, XAXIS),
-	MOUSECODE_Y_POS_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, POS, YAXIS),
-	MOUSECODE_Y_NEG_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, NEG, YAXIS),
-	MOUSECODE_Z_POS_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, POS, ZAXIS),
-	MOUSECODE_Z_NEG_SWITCH = STANDARD_CODE(MOUSE, 0, SWITCH, NEG, ZAXIS),
+	// create a friendly string	
+	const char *to_string(astring &string) const;
 
-	/* mouse buttons */
-	MOUSECODE_BUTTON1 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON1),
-	MOUSECODE_BUTTON2 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON2),
-	MOUSECODE_BUTTON3 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON3),
-	MOUSECODE_BUTTON4 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON4),
-	MOUSECODE_BUTTON5 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON5),
-	MOUSECODE_BUTTON6 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON6),
-	MOUSECODE_BUTTON7 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON7),
-	MOUSECODE_BUTTON8 = STANDARD_CODE(MOUSE, 0, SWITCH, NONE, BUTTON8),
+	// update the state of a live map
+	UINT8 update(INT32 xaxisval, INT32 yaxisval);
 
-	/* gun axes as absolute devices */
-	GUNCODE_X = STANDARD_CODE(LIGHTGUN, 0, ABSOLUTE, NONE, XAXIS),
-	GUNCODE_Y = STANDARD_CODE(LIGHTGUN, 0, ABSOLUTE, NONE, YAXIS),
+	// joystick mapping codes
+	static const UINT8 JOYSTICK_MAP_NEUTRAL	= 0x00;
+	static const UINT8 JOYSTICK_MAP_LEFT	= 0x01;
+	static const UINT8 JOYSTICK_MAP_RIGHT	= 0x02;
+	static const UINT8 JOYSTICK_MAP_UP		= 0x04;
+	static const UINT8 JOYSTICK_MAP_DOWN	= 0x08;
+	static const UINT8 JOYSTICK_MAP_STICKY	= 0x0f;
 
-	/* gun buttons */
-	GUNCODE_BUTTON1 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON1),
-	GUNCODE_BUTTON2 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON2),
-	GUNCODE_BUTTON3 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON3),
-	GUNCODE_BUTTON4 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON4),
-	GUNCODE_BUTTON5 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON5),
-	GUNCODE_BUTTON6 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON6),
-	GUNCODE_BUTTON7 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON7),
-	GUNCODE_BUTTON8 = STANDARD_CODE(LIGHTGUN, 0, SWITCH, NONE, BUTTON8),
+private:
+	// internal helpers
+	void copy(const joystick_map &src)
+	{
+		memcpy(m_map, src.m_map, sizeof(m_map));
+		m_lastmap = JOYSTICK_MAP_NEUTRAL;
+		m_origstring = src.m_origstring;
+	}
 
-	/* joystick axes as absolute devices */
-	JOYCODE_X = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NONE, XAXIS),
-	JOYCODE_Y = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NONE, YAXIS),
-	JOYCODE_Z = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NONE, ZAXIS),
-	JOYCODE_U = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NONE, RXAXIS),
-	JOYCODE_V = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NONE, RYAXIS),
+	// internal state
+	UINT8					m_map[9][9];			// 9x9 grid
+	UINT8					m_lastmap;				// last value returned (for sticky tracking)
+	astring					m_origstring;			// originally parsed string
+};
 
-	/* joystick axes as absolute half-axes */
-	JOYCODE_X_POS_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, POS, XAXIS),
-	JOYCODE_X_NEG_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NEG, XAXIS),
-	JOYCODE_Y_POS_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, POS, YAXIS),
-	JOYCODE_Y_NEG_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NEG, YAXIS),
-	JOYCODE_Z_POS_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, POS, ZAXIS),
-	JOYCODE_Z_NEG_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NEG, ZAXIS),
-	JOYCODE_U_POS_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, POS, RXAXIS),
-	JOYCODE_U_NEG_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NEG, RXAXIS),
-	JOYCODE_V_POS_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, POS, RYAXIS),
-	JOYCODE_V_NEG_ABSOLUTE = STANDARD_CODE(JOYSTICK, 0, ABSOLUTE, NEG, RYAXIS),
 
-	/* joystick axes as switches; X/Y are specially handled for left/right/up/down mapping */
-	JOYCODE_X_LEFT_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, LEFT, XAXIS),
-	JOYCODE_X_RIGHT_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, RIGHT, XAXIS),
-	JOYCODE_Y_UP_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, UP, YAXIS),
-	JOYCODE_Y_DOWN_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, DOWN, YAXIS),
-	JOYCODE_Z_POS_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, POS, ZAXIS),
-	JOYCODE_Z_NEG_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, NEG, ZAXIS),
-	JOYCODE_U_POS_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, POS, RXAXIS),
-	JOYCODE_U_NEG_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, NEG, RXAXIS),
-	JOYCODE_V_POS_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, POS, RYAXIS),
-	JOYCODE_V_NEG_SWITCH = STANDARD_CODE(JOYSTICK, 0, SWITCH, NEG, RYAXIS),
+// ======================> input_code
 
-	/* joystick buttons */
-	JOYCODE_BUTTON1 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON1),
-	JOYCODE_BUTTON2 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON2),
-	JOYCODE_BUTTON3 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON3),
-	JOYCODE_BUTTON4 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON4),
-	JOYCODE_BUTTON5 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON5),
-	JOYCODE_BUTTON6 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON6),
-	JOYCODE_BUTTON7 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON7),
-	JOYCODE_BUTTON8 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON8),
-	JOYCODE_BUTTON9 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON9),
-	JOYCODE_BUTTON10 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON10),
-	JOYCODE_BUTTON11 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON11),
-	JOYCODE_BUTTON12 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON12),
-	JOYCODE_BUTTON13 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON13),
-	JOYCODE_BUTTON14 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON14),
-	JOYCODE_BUTTON15 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON15),
-	JOYCODE_BUTTON16 = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, BUTTON16),
-	JOYCODE_START = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, START),
-	JOYCODE_SELECT = STANDARD_CODE(JOYSTICK, 0, SWITCH, NONE, SELECT)
+// a combined code that describes a particular input on a particular device
+class input_code
+{
+public:
+	// construction/destruction
+	input_code(input_device_class devclass = DEVICE_CLASS_INVALID, int devindex = 0, input_item_class itemclass = ITEM_CLASS_INVALID, input_item_modifier modifier = ITEM_MODIFIER_NONE, input_item_id itemid = ITEM_ID_INVALID)
+		: m_internal(((devclass & 0xf) << 28) | ((devindex & 0xff) << 20) | ((itemclass & 0xf) << 16) | ((modifier & 0xf) << 12) | (itemid & 0xfff))
+	{
+		assert(devclass >= 0 && devclass < DEVICE_CLASS_MAXIMUM);
+		assert(devindex >= 0 && devindex < DEVICE_INDEX_MAXIMUM);
+		assert(itemclass >= 0 && itemclass < ITEM_CLASS_MAXIMUM);
+		assert(modifier >= 0 && modifier < ITEM_MODIFIER_MAXIMUM);
+		assert(itemid >= 0 && itemid < ITEM_ID_ABSOLUTE_MAXIMUM);
+	}
+	input_code(const input_code &src)
+		: m_internal(src.m_internal) { }
+	input_code(input_device &device, input_item_id itemid);
+	
+	// operators
+	bool operator==(const input_code &rhs) const { return m_internal == rhs.m_internal; }
+	bool operator!=(const input_code &rhs) const { return m_internal != rhs.m_internal; }
+	
+	// getters
+	bool internal() const { return device_class() == DEVICE_CLASS_INTERNAL; }
+	input_device_class device_class() const { return input_device_class((m_internal >> 28) & 0xf); }
+	int device_index() const { return ((m_internal >> 20) & 0xff); }
+	input_item_class item_class() const { return input_item_class((m_internal >> 16) & 0xf); }
+	input_item_modifier item_modifier() const { return input_item_modifier((m_internal >> 12) & 0xf); }
+	input_item_id item_id() const { return input_item_id(m_internal & 0xfff); }
+	
+	// setters
+	void set_device_class(input_device_class devclass) { assert(devclass >= 0 && devclass <= 0xf); m_internal = (m_internal & ~(0xf << 28)) | ((devclass & 0xf) << 28); }
+	void set_device_index(int devindex) { assert(devindex >= 0 && devindex <= 0xff); m_internal = (m_internal & ~(0xff << 20)) | ((devindex & 0xff) << 20); }
+	void set_item_class(input_item_class itemclass) { assert(itemclass >= 0 && itemclass <= 0xf); m_internal = (m_internal & ~(0xf << 16)) | ((itemclass & 0xf) << 16); }
+	void set_item_modifier(input_item_modifier modifier) { assert(modifier >= 0 && modifier <= 0xf); m_internal = (m_internal & ~(0xf << 12)) | ((modifier & 0xf) << 12); }
+	void set_item_id(input_item_id itemid) { assert(itemid >= 0 && itemid <= 0xfff); m_internal = (m_internal & ~0xfff) | (itemid & 0xfff); }
+	
+private:
+	// internal state
+	UINT32		m_internal;
+};
+
+
+// ======================> input_seq
+
+// a sequence of input_codes, supporting AND/OR and inversion
+class input_seq
+{
+public:
+	// construction/destruction
+	input_seq(input_code code0 = input_seq::end_code, input_code code1 = input_seq::end_code, input_code code2 = input_seq::end_code, input_code code3 = input_seq::end_code, input_code code4 = input_seq::end_code, input_code code5 = input_seq::end_code, input_code code6 = input_seq::end_code)
+		{ set(code0, code1, code2, code3, code4, code5, code6); }
+	input_seq(const input_seq &rhs) { memcpy(m_code, rhs.m_code, sizeof(m_code)); }
+
+	// operators
+	bool operator==(const input_seq &rhs) const { return (memcmp(m_code, rhs.m_code, sizeof(m_code)) == 0); }
+	bool operator!=(const input_seq &rhs) const { return (memcmp(m_code, rhs.m_code, sizeof(m_code)) != 0); }
+	input_code operator[](int index) const { return (index >= 0 && index < ARRAY_LENGTH(m_code)) ? m_code[index] : input_seq::end_code; }
+	input_seq &operator+=(input_code code);
+	input_seq &operator|=(input_code code);
+
+	// getters
+	int length() const;
+	bool is_valid() const;
+	bool is_default() const { return m_code[0] == default_code; }
+
+	// setters
+	void set(input_code code0 = input_seq::end_code, input_code code1 = input_seq::end_code, input_code code2 = input_seq::end_code, input_code code3 = input_seq::end_code, input_code code4 = input_seq::end_code, input_code code5 = input_seq::end_code, input_code code6 = input_seq::end_code);
+	void reset() { set(); }
+	void set_default() { set(default_code); }
+	void backspace();
+	void replace(input_code oldcode, input_code newcode);
+	
+	// constant codes used in sequences
+	static const input_code end_code;
+	static const input_code default_code;
+	static const input_code not_code;
+	static const input_code or_code;
+
+	// constant sequences
+	static const input_seq empty_seq;
+	static const input_seq default_seq;
+
+private:
+	// internal state
+	input_code 	m_code[16];
+};
+
+
+// ======================> input_device
+
+// a logical device of a given class that can provide input
+class input_device
+{	
+	friend class input_class;
+
+	// construction/destruction
+	input_device(input_class &_class, int _devindex, const char *_name, void *_internal);
+
+public:
+	// getters
+	input_class &device_class() const { return m_class; }
+	input_manager &manager() const;
+	running_machine &machine() const;
+	input_device_class devclass() const;
+	const char *name() const { return m_name; }
+	int devindex() const { return m_devindex; }
+	input_device_item *item(input_item_id index) const { return m_item[index]; }
+	input_item_id maxitem() const { return m_maxitem; }
+	void *internal() const { return m_internal; }
+	joystick_map &joymap() { return m_joymap; }
+	bool steadykey_enabled() const { return m_steadykey_enabled; }
+	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
+
+	// item management
+	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = NULL);
+	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
+
+	// helpers
+	INT32 apply_deadzone_and_saturation(INT32 value) const;
+	void apply_steadykey() const;
+
+private:
+	// internal state
+	input_class &			m_class;				// reference to our class
+	astring					m_name;					// string name of device
+	int						m_devindex;				// device index of this device
+	input_device_item *		m_item[ITEM_ID_ABSOLUTE_MAXIMUM];	// array of pointers to items
+	input_item_id			m_maxitem;				// maximum item index
+	void *					m_internal;				// internal callback pointer
+
+	// joystick information
+	joystick_map			m_joymap;				// joystick map for this device
+	INT32					m_joystick_deadzone;	// deadzone for joystick
+	INT32					m_joystick_saturation;	// saturation position for joystick
+	bool					m_steadykey_enabled;	// steadykey enabled for keyboards
+	bool					m_lightgun_reload_button; // lightgun reload hack
+};
+
+
+// ======================> input_class
+
+// a class of device that provides input
+class input_class
+{
+public:
+	// construction/destruction
+	input_class(input_manager &manager, input_device_class devclass, bool enabled = false, bool multi = false);
+	
+	// getters
+	input_manager &manager() const { return m_manager; }
+	running_machine &machine() const;
+	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index] : NULL; }
+	input_device_class devclass() const { return m_devclass; }
+	int maxindex() const { return m_maxindex; }
+	bool enabled() const { return m_enabled; }
+	bool multi() const { return m_multi; }
+	
+	// setters
+	void enable(bool state = true) { m_enabled = state; }
+	void set_multi(bool multi = true) { m_multi = multi; }
+
+	// device management
+	input_device *add_device(const char *name, void *internal = NULL);
+	input_device *add_device(int devindex, const char *name, void *internal = NULL);
+
+	// misc helpers
+	input_item_class standard_item_class(input_item_id itemid);
+
+private:
+	// internal helpers
+	void frame_callback();
+
+	// internal state
+	input_manager &			m_manager;				// reference to our manager
+	input_device * 			m_device[DEVICE_INDEX_MAXIMUM];	// array of devices in this class
+	input_device_class		m_devclass;				// our device class
+	int						m_maxindex;				// maximum populated index
+	bool					m_enabled;				// is this class enabled?
+	bool					m_multi;				// are multiple instances of this class allowed?
+};
+
+
+// ======================> input_manager
+
+// global machine-level information about devices
+class input_manager
+{
+public:
+	// construction/destruction
+	input_manager(running_machine &machine);
+	
+	// getters
+	running_machine &machine() const { return m_machine; }
+	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != NULL); return *m_class[devclass]; }
+	
+	// input code readers
+	INT32 code_value(input_code code);
+	bool code_pressed(input_code code) { return code_value(code) != 0; }
+	bool code_pressed_once(input_code code);
+	
+	// input code polling
+	void reset_polling();
+	input_code poll_axes();
+	input_code poll_switches();
+	input_code poll_keyboard_switches();
+	
+	// input code helpers
+	input_device *device_from_code(input_code code) const;
+	input_device_item *item_from_code(input_code code) const;
+	input_code code_from_itemid(input_item_id itemid) const;
+	const char *code_name(astring &string, input_code code) const;
+	const char *code_to_token(astring &string, input_code code) const;
+	input_code code_from_token(const char *_token);
+	
+	// input sequence readers
+	bool seq_pressed(const input_seq &seq);
+	INT32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
+	
+	// input sequence polling
+	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = NULL);
+	bool seq_poll();
+	const input_seq &seq_poll_final() const { return m_poll_seq; }
+	
+	// input sequence helpers
+	const char *seq_name(astring &string, const input_seq &seq) const;
+	const char *seq_to_tokens(astring &string, const input_seq &seq) const;
+	void seq_from_tokens(input_seq &seq, const char *_token);
+
+	// misc
+	bool set_global_joystick_map(const char *mapstring);
+
+private:
+	// internal helpers
+	void reset_memory();
+	bool code_check_axis(input_device_item &item, input_code code);
+
+	// internal state
+	running_machine &	m_machine;
+	input_code			m_switch_memory[64];
+
+	// classes
+	input_class			m_keyboard_class;
+	input_class			m_mouse_class;
+	input_class			m_joystick_class;
+	input_class			m_lightgun_class;
+	input_class *		m_class[DEVICE_CLASS_MAXIMUM];
+	
+	// sequence polling state
+	input_seq			m_poll_seq;
+	osd_ticks_t			m_poll_seq_last_ticks;
+	input_item_class	m_poll_seq_class;
 };
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
-/* input codes are UINT32 */
-typedef UINT32 input_code;
+// invalid codes
+#define INPUT_CODE_INVALID input_code()
 
-/* callback for getting the value of an item on a device */
-typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
+// keyboard codes
+#define KEYCODE_A_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_A)
+#define KEYCODE_B_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_B)
+#define KEYCODE_C_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_C)
+#define KEYCODE_D_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_D)
+#define KEYCODE_E_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_E)
+#define KEYCODE_F_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F)
+#define KEYCODE_G_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_G)
+#define KEYCODE_H_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_H)
+#define KEYCODE_I_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_I)
+#define KEYCODE_J_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_J)
+#define KEYCODE_K_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_K)
+#define KEYCODE_L_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_L)
+#define KEYCODE_M_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_M)
+#define KEYCODE_N_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_N)
+#define KEYCODE_O_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_O)
+#define KEYCODE_P_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_P)
+#define KEYCODE_Q_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_Q)
+#define KEYCODE_R_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_R)
+#define KEYCODE_S_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_S)
+#define KEYCODE_T_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_T)
+#define KEYCODE_U_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_U)
+#define KEYCODE_V_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_V)
+#define KEYCODE_W_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_W)
+#define KEYCODE_X_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_X)
+#define KEYCODE_Y_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_Y)
+#define KEYCODE_Z_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_Z)
+#define KEYCODE_0_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_0)
+#define KEYCODE_1_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_1)
+#define KEYCODE_2_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_2)
+#define KEYCODE_3_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_3)
+#define KEYCODE_4_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_4)
+#define KEYCODE_5_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_5)
+#define KEYCODE_6_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_6)
+#define KEYCODE_7_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_7)
+#define KEYCODE_8_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_8)
+#define KEYCODE_9_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_9)
+#define KEYCODE_F1_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F1)
+#define KEYCODE_F2_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F2)
+#define KEYCODE_F3_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F3)
+#define KEYCODE_F4_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F4)
+#define KEYCODE_F5_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F5)
+#define KEYCODE_F6_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F6)
+#define KEYCODE_F7_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F7)
+#define KEYCODE_F8_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F8)
+#define KEYCODE_F9_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F9)
+#define KEYCODE_F10_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F10)
+#define KEYCODE_F11_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F11)
+#define KEYCODE_F12_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F12)
+#define KEYCODE_F13_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F13)
+#define KEYCODE_F14_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F14)
+#define KEYCODE_F15_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_F15)
+#define KEYCODE_ESC_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ESC)
+#define KEYCODE_TILDE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_TILDE)
+#define KEYCODE_MINUS_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_MINUS)
+#define KEYCODE_EQUALS_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_EQUALS)
+#define KEYCODE_BACKSPACE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BACKSPACE)
+#define KEYCODE_TAB_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_TAB)
+#define KEYCODE_OPENBRACE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_OPENBRACE)
+#define KEYCODE_CLOSEBRACE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_CLOSEBRACE)
+#define KEYCODE_ENTER_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ENTER)
+#define KEYCODE_COLON_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_COLON)
+#define KEYCODE_QUOTE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_QUOTE)
+#define KEYCODE_BACKSLASH_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BACKSLASH)
+#define KEYCODE_BACKSLASH2_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BACKSLASH2)
+#define KEYCODE_COMMA_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_COMMA)
+#define KEYCODE_STOP_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_STOP)
+#define KEYCODE_SLASH_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_SLASH)
+#define KEYCODE_SPACE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_SPACE)
+#define KEYCODE_INSERT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_INSERT)
+#define KEYCODE_DEL_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_DEL)
+#define KEYCODE_HOME_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_HOME)
+#define KEYCODE_END_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_END)
+#define KEYCODE_PGUP_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PGUP)
+#define KEYCODE_PGDN_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PGDN)
+#define KEYCODE_LEFT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LEFT)
+#define KEYCODE_RIGHT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_RIGHT)
+#define KEYCODE_UP_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_UP)
+#define KEYCODE_DOWN_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_DOWN)
+#define KEYCODE_0_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_0_PAD)
+#define KEYCODE_1_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_1_PAD)
+#define KEYCODE_2_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_2_PAD)
+#define KEYCODE_3_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_3_PAD)
+#define KEYCODE_4_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_4_PAD)
+#define KEYCODE_5_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_5_PAD)
+#define KEYCODE_6_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_6_PAD)
+#define KEYCODE_7_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_7_PAD)
+#define KEYCODE_8_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_8_PAD)
+#define KEYCODE_9_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_9_PAD)
+#define KEYCODE_SLASH_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_SLASH_PAD)
+#define KEYCODE_ASTERISK_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ASTERISK)
+#define KEYCODE_MINUS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_MINUS_PAD)
+#define KEYCODE_PLUS_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PLUS_PAD)
+#define KEYCODE_DEL_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_DEL_PAD)
+#define KEYCODE_ENTER_PAD_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_ENTER_PAD)
+#define KEYCODE_PRTSCR_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PRTSCR)
+#define KEYCODE_PAUSE_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_PAUSE)
+#define KEYCODE_LSHIFT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LSHIFT)
+#define KEYCODE_RSHIFT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_RSHIFT)
+#define KEYCODE_LCONTROL_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LCONTROL)
+#define KEYCODE_RCONTROL_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_RCONTROL)
+#define KEYCODE_LALT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LALT)
+#define KEYCODE_RALT_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_RALT)
+#define KEYCODE_SCRLOCK_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_SCRLOCK)
+#define KEYCODE_NUMLOCK_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_NUMLOCK)
+#define KEYCODE_CAPSLOCK_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_CAPSLOCK)
+#define KEYCODE_LWIN_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_LWIN)
+#define KEYCODE_RWIN_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_RWIN)
+#define KEYCODE_MENU_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_MENU)
+#define KEYCODE_CANCEL_INDEXED(n) input_code(DEVICE_CLASS_KEYBOARD, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_CANCEL)
 
-/* (opaque) input device object */
-class input_device;
+#define KEYCODE_A KEYCODE_A_INDEXED(0)
+#define KEYCODE_B KEYCODE_B_INDEXED(0)
+#define KEYCODE_C KEYCODE_C_INDEXED(0)
+#define KEYCODE_D KEYCODE_D_INDEXED(0)
+#define KEYCODE_E KEYCODE_E_INDEXED(0)
+#define KEYCODE_F KEYCODE_F_INDEXED(0)
+#define KEYCODE_G KEYCODE_G_INDEXED(0)
+#define KEYCODE_H KEYCODE_H_INDEXED(0)
+#define KEYCODE_I KEYCODE_I_INDEXED(0)
+#define KEYCODE_J KEYCODE_J_INDEXED(0)
+#define KEYCODE_K KEYCODE_K_INDEXED(0)
+#define KEYCODE_L KEYCODE_L_INDEXED(0)
+#define KEYCODE_M KEYCODE_M_INDEXED(0)
+#define KEYCODE_N KEYCODE_N_INDEXED(0)
+#define KEYCODE_O KEYCODE_O_INDEXED(0)
+#define KEYCODE_P KEYCODE_P_INDEXED(0)
+#define KEYCODE_Q KEYCODE_Q_INDEXED(0)
+#define KEYCODE_R KEYCODE_R_INDEXED(0)
+#define KEYCODE_S KEYCODE_S_INDEXED(0)
+#define KEYCODE_T KEYCODE_T_INDEXED(0)
+#define KEYCODE_U KEYCODE_U_INDEXED(0)
+#define KEYCODE_V KEYCODE_V_INDEXED(0)
+#define KEYCODE_W KEYCODE_W_INDEXED(0)
+#define KEYCODE_X KEYCODE_X_INDEXED(0)
+#define KEYCODE_Y KEYCODE_Y_INDEXED(0)
+#define KEYCODE_Z KEYCODE_Z_INDEXED(0)
+#define KEYCODE_0 KEYCODE_0_INDEXED(0)
+#define KEYCODE_1 KEYCODE_1_INDEXED(0)
+#define KEYCODE_2 KEYCODE_2_INDEXED(0)
+#define KEYCODE_3 KEYCODE_3_INDEXED(0)
+#define KEYCODE_4 KEYCODE_4_INDEXED(0)
+#define KEYCODE_5 KEYCODE_5_INDEXED(0)
+#define KEYCODE_6 KEYCODE_6_INDEXED(0)
+#define KEYCODE_7 KEYCODE_7_INDEXED(0)
+#define KEYCODE_8 KEYCODE_8_INDEXED(0)
+#define KEYCODE_9 KEYCODE_9_INDEXED(0)
+#define KEYCODE_F1 KEYCODE_F1_INDEXED(0)
+#define KEYCODE_F2 KEYCODE_F2_INDEXED(0)
+#define KEYCODE_F3 KEYCODE_F3_INDEXED(0)
+#define KEYCODE_F4 KEYCODE_F4_INDEXED(0)
+#define KEYCODE_F5 KEYCODE_F5_INDEXED(0)
+#define KEYCODE_F6 KEYCODE_F6_INDEXED(0)
+#define KEYCODE_F7 KEYCODE_F7_INDEXED(0)
+#define KEYCODE_F8 KEYCODE_F8_INDEXED(0)
+#define KEYCODE_F9 KEYCODE_F9_INDEXED(0)
+#define KEYCODE_F10 KEYCODE_F10_INDEXED(0)
+#define KEYCODE_F11 KEYCODE_F11_INDEXED(0)
+#define KEYCODE_F12 KEYCODE_F12_INDEXED(0)
+#define KEYCODE_F13 KEYCODE_F13_INDEXED(0)
+#define KEYCODE_F14 KEYCODE_F14_INDEXED(0)
+#define KEYCODE_F15 KEYCODE_F15_INDEXED(0)
+#define KEYCODE_ESC KEYCODE_ESC_INDEXED(0)
+#define KEYCODE_TILDE KEYCODE_TILDE_INDEXED(0)
+#define KEYCODE_MINUS KEYCODE_MINUS_INDEXED(0)
+#define KEYCODE_EQUALS KEYCODE_EQUALS_INDEXED(0)
+#define KEYCODE_BACKSPACE KEYCODE_BACKSPACE_INDEXED(0)
+#define KEYCODE_TAB KEYCODE_TAB_INDEXED(0)
+#define KEYCODE_OPENBRACE KEYCODE_OPENBRACE_INDEXED(0)
+#define KEYCODE_CLOSEBRACE KEYCODE_CLOSEBRACE_INDEXED(0)
+#define KEYCODE_ENTER KEYCODE_ENTER_INDEXED(0)
+#define KEYCODE_COLON KEYCODE_COLON_INDEXED(0)
+#define KEYCODE_QUOTE KEYCODE_QUOTE_INDEXED(0)
+#define KEYCODE_BACKSLASH KEYCODE_BACKSLASH_INDEXED(0)
+#define KEYCODE_BACKSLASH2 KEYCODE_BACKSLASH2_INDEXED(0)
+#define KEYCODE_COMMA KEYCODE_COMMA_INDEXED(0)
+#define KEYCODE_STOP KEYCODE_STOP_INDEXED(0)
+#define KEYCODE_SLASH KEYCODE_SLASH_INDEXED(0)
+#define KEYCODE_SPACE KEYCODE_SPACE_INDEXED(0)
+#define KEYCODE_INSERT KEYCODE_INSERT_INDEXED(0)
+#define KEYCODE_DEL KEYCODE_DEL_INDEXED(0)
+#define KEYCODE_HOME KEYCODE_HOME_INDEXED(0)
+#define KEYCODE_END KEYCODE_END_INDEXED(0)
+#define KEYCODE_PGUP KEYCODE_PGUP_INDEXED(0)
+#define KEYCODE_PGDN KEYCODE_PGDN_INDEXED(0)
+#define KEYCODE_LEFT KEYCODE_LEFT_INDEXED(0)
+#define KEYCODE_RIGHT KEYCODE_RIGHT_INDEXED(0)
+#define KEYCODE_UP KEYCODE_UP_INDEXED(0)
+#define KEYCODE_DOWN KEYCODE_DOWN_INDEXED(0)
+#define KEYCODE_0_PAD KEYCODE_0_PAD_INDEXED(0)
+#define KEYCODE_1_PAD KEYCODE_1_PAD_INDEXED(0)
+#define KEYCODE_2_PAD KEYCODE_2_PAD_INDEXED(0)
+#define KEYCODE_3_PAD KEYCODE_3_PAD_INDEXED(0)
+#define KEYCODE_4_PAD KEYCODE_4_PAD_INDEXED(0)
+#define KEYCODE_5_PAD KEYCODE_5_PAD_INDEXED(0)
+#define KEYCODE_6_PAD KEYCODE_6_PAD_INDEXED(0)
+#define KEYCODE_7_PAD KEYCODE_7_PAD_INDEXED(0)
+#define KEYCODE_8_PAD KEYCODE_8_PAD_INDEXED(0)
+#define KEYCODE_9_PAD KEYCODE_9_PAD_INDEXED(0)
+#define KEYCODE_SLASH_PAD KEYCODE_SLASH_PAD_INDEXED(0)
+#define KEYCODE_ASTERISK KEYCODE_ASTERISK_INDEXED(0)
+#define KEYCODE_MINUS_PAD KEYCODE_MINUS_PAD_INDEXED(0)
+#define KEYCODE_PLUS_PAD KEYCODE_PLUS_PAD_INDEXED(0)
+#define KEYCODE_DEL_PAD KEYCODE_DEL_PAD_INDEXED(0)
+#define KEYCODE_ENTER_PAD KEYCODE_ENTER_PAD_INDEXED(0)
+#define KEYCODE_PRTSCR KEYCODE_PRTSCR_INDEXED(0)
+#define KEYCODE_PAUSE KEYCODE_PAUSE_INDEXED(0)
+#define KEYCODE_LSHIFT KEYCODE_LSHIFT_INDEXED(0)
+#define KEYCODE_RSHIFT KEYCODE_RSHIFT_INDEXED(0)
+#define KEYCODE_LCONTROL KEYCODE_LCONTROL_INDEXED(0)
+#define KEYCODE_RCONTROL KEYCODE_RCONTROL_INDEXED(0)
+#define KEYCODE_LALT KEYCODE_LALT_INDEXED(0)
+#define KEYCODE_RALT KEYCODE_RALT_INDEXED(0)
+#define KEYCODE_SCRLOCK KEYCODE_SCRLOCK_INDEXED(0)
+#define KEYCODE_NUMLOCK KEYCODE_NUMLOCK_INDEXED(0)
+#define KEYCODE_CAPSLOCK KEYCODE_CAPSLOCK_INDEXED(0)
+#define KEYCODE_LWIN KEYCODE_LWIN_INDEXED(0)
+#define KEYCODE_RWIN KEYCODE_RWIN_INDEXED(0)
+#define KEYCODE_MENU KEYCODE_MENU_INDEXED(0)
+#define KEYCODE_CANCEL KEYCODE_CANCEL_INDEXED(0)
+
+// mouse axes as relative devices
+#define MOUSECODE_X_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, ITEM_ID_XAXIS)
+#define MOUSECODE_Y_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, ITEM_ID_YAXIS)
+#define MOUSECODE_Z_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, ITEM_ID_ZAXIS)
+
+#define MOUSECODE_X MOUSECODE_X_INDEXED(0)
+#define MOUSECODE_Y MOUSECODE_Y_INDEXED(0)
+#define MOUSECODE_Z MOUSECODE_Z_INDEXED(0)
+
+// mouse axes as switches in +/- direction
+#define MOUSECODE_X_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_XAXIS)
+#define MOUSECODE_X_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_XAXIS)
+#define MOUSECODE_Y_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_YAXIS)
+#define MOUSECODE_Y_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_YAXIS)
+#define MOUSECODE_Z_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_ZAXIS)
+#define MOUSECODE_Z_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_ZAXIS)
+
+#define MOUSECODE_X_POS_SWITCH MOUSECODE_X_POS_SWITCH_INDEXED(0)
+#define MOUSECODE_X_NEG_SWITCH MOUSECODE_X_NEG_SWITCH_INDEXED(0)
+#define MOUSECODE_Y_POS_SWITCH MOUSECODE_Y_POS_SWITCH_INDEXED(0)
+#define MOUSECODE_Y_NEG_SWITCH MOUSECODE_Y_NEG_SWITCH_INDEXED(0)
+#define MOUSECODE_Z_POS_SWITCH MOUSECODE_Z_POS_SWITCH_INDEXED(0)
+#define MOUSECODE_Z_NEG_SWITCH MOUSECODE_Z_NEG_SWITCH_INDEXED(0)
+
+// mouse buttons
+#define MOUSECODE_BUTTON1_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON1)
+#define MOUSECODE_BUTTON2_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON2)
+#define MOUSECODE_BUTTON3_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON3)
+#define MOUSECODE_BUTTON4_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON4)
+#define MOUSECODE_BUTTON5_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON5)
+#define MOUSECODE_BUTTON6_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON6)
+#define MOUSECODE_BUTTON7_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON7)
+#define MOUSECODE_BUTTON8_INDEXED(n) input_code(DEVICE_CLASS_MOUSE, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON8)
+
+#define MOUSECODE_BUTTON1 MOUSECODE_BUTTON1_INDEXED(0)
+#define MOUSECODE_BUTTON2 MOUSECODE_BUTTON2_INDEXED(0)
+#define MOUSECODE_BUTTON3 MOUSECODE_BUTTON3_INDEXED(0)
+#define MOUSECODE_BUTTON4 MOUSECODE_BUTTON4_INDEXED(0)
+#define MOUSECODE_BUTTON5 MOUSECODE_BUTTON5_INDEXED(0)
+#define MOUSECODE_BUTTON6 MOUSECODE_BUTTON6_INDEXED(0)
+#define MOUSECODE_BUTTON7 MOUSECODE_BUTTON7_INDEXED(0)
+#define MOUSECODE_BUTTON8 MOUSECODE_BUTTON8_INDEXED(0)
+
+// gun axes as absolute devices
+#define GUNCODE_X_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_XAXIS)
+#define GUNCODE_Y_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_YAXIS)
+
+#define GUNCODE_X GUNCODE_X_INDEXED(0)
+#define GUNCODE_Y GUNCODE_Y_INDEXED(0)
+
+// gun buttons
+#define GUNCODE_BUTTON1_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON1)
+#define GUNCODE_BUTTON2_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON2)
+#define GUNCODE_BUTTON3_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON3)
+#define GUNCODE_BUTTON4_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON4)
+#define GUNCODE_BUTTON5_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON5)
+#define GUNCODE_BUTTON6_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON6)
+#define GUNCODE_BUTTON7_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON7)
+#define GUNCODE_BUTTON8_INDEXED(n) input_code(DEVICE_CLASS_LIGHTGUN, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON8)
+
+#define GUNCODE_BUTTON1 GUNCODE_BUTTON1_INDEXED(0)
+#define GUNCODE_BUTTON2 GUNCODE_BUTTON2_INDEXED(0)
+#define GUNCODE_BUTTON3 GUNCODE_BUTTON3_INDEXED(0)
+#define GUNCODE_BUTTON4 GUNCODE_BUTTON4_INDEXED(0)
+#define GUNCODE_BUTTON5 GUNCODE_BUTTON5_INDEXED(0)
+#define GUNCODE_BUTTON6 GUNCODE_BUTTON6_INDEXED(0)
+#define GUNCODE_BUTTON7 GUNCODE_BUTTON7_INDEXED(0)
+#define GUNCODE_BUTTON8 GUNCODE_BUTTON8_INDEXED(0)
+
+// joystick axes as absolute devices
+#define JOYCODE_X_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_XAXIS)
+#define JOYCODE_Y_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_YAXIS)
+#define JOYCODE_Z_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_ZAXIS)
+#define JOYCODE_U_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RXAXIS)
+#define JOYCODE_V_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RYAXIS)
+
+#define JOYCODE_X JOYCODE_X_INDEXED(0)
+#define JOYCODE_Y JOYCODE_Y_INDEXED(0)
+#define JOYCODE_Z JOYCODE_Z_INDEXED(0)
+#define JOYCODE_U JOYCODE_U_INDEXED(0)
+#define JOYCODE_V JOYCODE_V_INDEXED(0)
+
+// joystick axes as absolute half-axes
+#define JOYCODE_X_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_XAXIS)
+#define JOYCODE_X_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_XAXIS)
+#define JOYCODE_Y_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_YAXIS)
+#define JOYCODE_Y_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_YAXIS)
+#define JOYCODE_Z_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_ZAXIS)
+#define JOYCODE_Z_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_ZAXIS)
+#define JOYCODE_U_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RXAXIS)
+#define JOYCODE_U_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
+#define JOYCODE_V_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
+#define JOYCODE_V_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+
+#define JOYCODE_X_POS_ABSOLUTE JOYCODE_X_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_X_NEG_ABSOLUTE JOYCODE_X_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_Y_POS_ABSOLUTE JOYCODE_Y_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_Y_NEG_ABSOLUTE JOYCODE_Y_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_Z_POS_ABSOLUTE JOYCODE_Z_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_Z_NEG_ABSOLUTE JOYCODE_Z_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_U_POS_ABSOLUTE JOYCODE_U_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_U_NEG_ABSOLUTE JOYCODE_U_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_V_POS_ABSOLUTE JOYCODE_V_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_V_NEG_ABSOLUTE JOYCODE_V_NEG_ABSOLUTE_INDEXED(0)
+
+// joystick axes as switches; X/Y are specially handled for left/right/up/down mapping
+#define JOYCODE_X_LEFT_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, ITEM_ID_XAXIS)
+#define JOYCODE_X_RIGHT_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_RIGHT, ITEM_ID_XAXIS)
+#define JOYCODE_Y_UP_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_UP, ITEM_ID_YAXIS)
+#define JOYCODE_Y_DOWN_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_DOWN, ITEM_ID_YAXIS)
+#define JOYCODE_Z_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_ZAXIS)
+#define JOYCODE_Z_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_ZAXIS)
+#define JOYCODE_U_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RXAXIS)
+#define JOYCODE_U_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
+#define JOYCODE_V_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
+#define JOYCODE_V_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+
+#define JOYCODE_X_LEFT_SWITCH JOYCODE_X_LEFT_SWITCH_INDEXED(0)
+#define JOYCODE_X_RIGHT_SWITCH JOYCODE_X_RIGHT_SWITCH_INDEXED(0)
+#define JOYCODE_Y_UP_SWITCH JOYCODE_Y_UP_SWITCH_INDEXED(0)
+#define JOYCODE_Y_DOWN_SWITCH JOYCODE_Y_DOWN_SWITCH_INDEXED(0)
+#define JOYCODE_Z_POS_SWITCH JOYCODE_Z_POS_SWITCH_INDEXED(0)
+#define JOYCODE_Z_NEG_SWITCH JOYCODE_Z_NEG_SWITCH_INDEXED(0)
+#define JOYCODE_U_POS_SWITCH JOYCODE_U_POS_SWITCH_INDEXED(0)
+#define JOYCODE_U_NEG_SWITCH JOYCODE_U_NEG_SWITCH_INDEXED(0)
+#define JOYCODE_V_POS_SWITCH JOYCODE_V_POS_SWITCH_INDEXED(0)
+#define JOYCODE_V_NEG_SWITCH JOYCODE_V_NEG_SWITCH_INDEXED(0)
+
+// joystick buttons
+#define JOYCODE_BUTTON1_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON1)
+#define JOYCODE_BUTTON2_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON2)
+#define JOYCODE_BUTTON3_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON3)
+#define JOYCODE_BUTTON4_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON4)
+#define JOYCODE_BUTTON5_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON5)
+#define JOYCODE_BUTTON6_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON6)
+#define JOYCODE_BUTTON7_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON7)
+#define JOYCODE_BUTTON8_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON8)
+#define JOYCODE_BUTTON9_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON9)
+#define JOYCODE_BUTTON10_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON10)
+#define JOYCODE_BUTTON11_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON11)
+#define JOYCODE_BUTTON12_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON12)
+#define JOYCODE_BUTTON13_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON13)
+#define JOYCODE_BUTTON14_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON14)
+#define JOYCODE_BUTTON15_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON15)
+#define JOYCODE_BUTTON16_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON16)
+#define JOYCODE_START_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_START)
+#define JOYCODE_SELECT_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_SELECT)
+
+#define JOYCODE_BUTTON1 JOYCODE_BUTTON1_INDEXED(0)
+#define JOYCODE_BUTTON2 JOYCODE_BUTTON2_INDEXED(0)
+#define JOYCODE_BUTTON3 JOYCODE_BUTTON3_INDEXED(0)
+#define JOYCODE_BUTTON4 JOYCODE_BUTTON4_INDEXED(0)
+#define JOYCODE_BUTTON5 JOYCODE_BUTTON5_INDEXED(0)
+#define JOYCODE_BUTTON6 JOYCODE_BUTTON6_INDEXED(0)
+#define JOYCODE_BUTTON7 JOYCODE_BUTTON7_INDEXED(0)
+#define JOYCODE_BUTTON8 JOYCODE_BUTTON8_INDEXED(0)
+#define JOYCODE_BUTTON9 JOYCODE_BUTTON9_INDEXED(0)
+#define JOYCODE_BUTTON10 JOYCODE_BUTTON10_INDEXED(0)
+#define JOYCODE_BUTTON11 JOYCODE_BUTTON11_INDEXED(0)
+#define JOYCODE_BUTTON12 JOYCODE_BUTTON12_INDEXED(0)
+#define JOYCODE_BUTTON13 JOYCODE_BUTTON13_INDEXED(0)
+#define JOYCODE_BUTTON14 JOYCODE_BUTTON14_INDEXED(0)
+#define JOYCODE_BUTTON15 JOYCODE_BUTTON15_INDEXED(0)
+#define JOYCODE_BUTTON16 JOYCODE_BUTTON16_INDEXED(0)
+#define JOYCODE_START JOYCODE_START_INDEXED(0)
+#define JOYCODE_SELECT JOYCODE_SELECT_INDEXED(0)
 
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-/* joystick maps */
+// joystick maps
 extern const char joystick_map_8way[];
 extern const char joystick_map_4way_sticky[];
 extern const char joystick_map_4way_diagonal[];
 
 
+//**************************************************************************
+//  INLINE FUNCTIONS
+//**************************************************************************
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+// input_device helpers
+inline input_manager &input_device::manager() const { return m_class.manager(); }
+inline running_machine &input_device::machine() const { return m_class.machine(); }
+inline input_device_class input_device::devclass() const { return m_class.devclass(); }
 
-
-/* ----- initialization and configuration ----- */
-
-/* core initialization, prior to calling osd_init() */
-void input_init(running_machine &machine);
-
-/* enable or disable a device class */
-void input_device_class_enable(running_machine &machine, input_device_class devclass, UINT8 enable);
-
-/* is a device class enabled? */
-UINT8 input_device_class_enabled(running_machine &machine, input_device_class devclass);
-
-/* configure default joystick maps */
-int input_device_set_joystick_map(running_machine &machine, int devindex, const char *mapstring);
+// input_class helpers
+inline running_machine &input_class::machine() const { return m_manager.machine(); }
 
 
-/* ----- OSD configuration and access ----- */
-
-/* add a new input device */
-input_device *input_device_add(running_machine &machine, input_device_class devclass, const char *name, void *internal);
-
-/* add a new item to an input device */
-void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
-
-
-
-/* ----- state queries ----- */
-
-/* return the value of a particular input code */
-INT32 input_code_value(running_machine &machine, input_code code);
-
-/* return TRUE if the given input code has been pressed */
-INT32 input_code_pressed(running_machine &machine, input_code code);
-
-/* same as above, but returns TRUE only on the first call after an off->on transition */
-INT32 input_code_pressed_once(running_machine &machine, input_code code);
-
-/* translates an input_item_id to an input_code */
-input_code input_code_from_input_item_id(running_machine &machine, input_item_id itemid);
-
-/* poll for any switch input, optionally resetting internal memory */
-input_code input_code_poll_switches(running_machine &machine, int reset);
-
-/* poll for any keyboard switch input, optionally resetting internal memory */
-input_code input_code_poll_keyboard_switches(running_machine &machine, int reset);
-
-/* poll for any axis input, optionally resetting internal memory */
-input_code input_code_poll_axes(running_machine &machine, int reset);
-
-
-
-/* ----- strings and tokenization ----- */
-
-/* generate the friendly name of an input code, returning the length (buffer can be NULL) */
-astring &input_code_name(running_machine &machine, astring &buffer, input_code code);
-
-/* convert an input code to a token, returning the length (buffer can be NULL) */
-astring &input_code_to_token(running_machine &machine, astring &buffer, input_code code);
-
-/* convert a token back to an input code */
-input_code input_code_from_token(running_machine &machine, const char *_token);
-
-
-
-/* ----- debugging utilities ----- */
-
-/* return TRUE if the given input code has been pressed */
-INT32 debug_global_input_code_pressed(input_code code);
-INT32 debug_global_input_code_pressed_once(input_code code);
-
-
-#endif	/* __INPUT_H__ */
+#endif	// __INPUT_H__

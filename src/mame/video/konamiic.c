@@ -1617,7 +1617,7 @@ static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl, bitmap_t *
 	}
 
 #if 0
-if (input_code_pressed(machine, KEYCODE_D))
+if (machine.input().code_pressed(KEYCODE_D))
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x",
 			ctrl[0x00],
 			ctrl[0x01],

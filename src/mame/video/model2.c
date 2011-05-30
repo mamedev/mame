@@ -1032,7 +1032,7 @@ static void model2_3d_frame_end( model2_state *state, bitmap_t *bitmap, const re
 		return;
 
 #if DEBUG
-	if (input_code_pressed(machine, KEYCODE_Q))
+	if (machine.input().code_pressed(KEYCODE_Q))
 	{
 		UINT32	i;
 

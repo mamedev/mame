@@ -535,7 +535,7 @@ SCREEN_UPDATE( decocass )
 
 #ifdef MAME_DEBUG
 	{
-		if (input_code_pressed_once(screen->machine(), KEYCODE_I))
+		if (screen->machine().input().code_pressed_once(KEYCODE_I))
 			state->m_showmsg ^= 1;
 		if (state->m_showmsg)
 			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",

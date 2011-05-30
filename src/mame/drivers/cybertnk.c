@@ -435,40 +435,40 @@ static SCREEN_UPDATE( cybertnk )
 			int x,y,count;
 			const UINT8 *blit_ram = screen->machine().region("spr_gfx")->base();
 
-			if(input_code_pressed(screen->machine(), KEYCODE_Z))
+			if(screen->machine().input().code_pressed(KEYCODE_Z))
 			state->m_test_x++;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_X))
+			if(screen->machine().input().code_pressed(KEYCODE_X))
 			state->m_test_x--;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_A))
+			if(screen->machine().input().code_pressed(KEYCODE_A))
 			state->m_test_y++;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_S))
+			if(screen->machine().input().code_pressed(KEYCODE_S))
 			state->m_test_y--;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_Q))
+			if(screen->machine().input().code_pressed(KEYCODE_Q))
 			state->m_start_offs+=0x200;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_W))
+			if(screen->machine().input().code_pressed(KEYCODE_W))
 			state->m_start_offs-=0x200;
 
-			if(input_code_pressed_once(screen->machine(), KEYCODE_T))
+			if(screen->machine().input().code_pressed_once(KEYCODE_T))
 			state->m_start_offs+=0x20000;
 
-			if(input_code_pressed_once(screen->machine(), KEYCODE_Y))
+			if(screen->machine().input().code_pressed_once(KEYCODE_Y))
 			state->m_start_offs-=0x20000;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_E))
+			if(screen->machine().input().code_pressed(KEYCODE_E))
 			state->m_start_offs+=4;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_R))
+			if(screen->machine().input().code_pressed(KEYCODE_R))
 			state->m_start_offs-=4;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_D))
+			if(screen->machine().input().code_pressed(KEYCODE_D))
 			state->m_color_pen++;
 
-			if(input_code_pressed(screen->machine(), KEYCODE_F))
+			if(screen->machine().input().code_pressed(KEYCODE_F))
 			state->m_color_pen--;
 
 			popmessage("%02x %02x %04x %02x",state->m_test_x,state->m_test_y,state->m_start_offs,state->m_color_pen);

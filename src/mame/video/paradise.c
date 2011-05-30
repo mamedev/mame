@@ -236,14 +236,14 @@ SCREEN_UPDATE( paradise )
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine(), KEYCODE_Z))
+if (screen->machine().input().code_pressed(KEYCODE_Z))
 {
 	int mask = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_E))	mask |= 4;
-	if (input_code_pressed(screen->machine(), KEYCODE_R))	mask |= 8;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 16;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_E))	mask |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_R))	mask |= 8;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	mask |= 16;
 	if (mask != 0) layers_ctrl &= mask;
 }
 #endif

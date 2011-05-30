@@ -224,7 +224,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
    x - no bg/sprite pri.
 */
 
-#define mKEY_MASK(x,y) if (input_code_pressed_once(machine, x)) { state->m_mask |= y; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); }
+#define mKEY_MASK(x,y) if (machine.input().code_pressed_once(x)) { state->m_mask |= y; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap); }
 
 static void nycaptor_setmask( running_machine &machine )
 {
@@ -244,8 +244,8 @@ static void nycaptor_setmask( running_machine &machine )
 	mKEY_MASK(KEYCODE_J, 0x400);
 	mKEY_MASK(KEYCODE_K, 0x800);
 
-	if (input_code_pressed_once(machine, KEYCODE_Z)){state->m_mask = 0; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* disable */
-	if (input_code_pressed_once(machine, KEYCODE_X)){state->m_mask |= 0x1000; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* no layers */
+	if (machine.input().code_pressed_once(KEYCODE_Z)){state->m_mask = 0; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* disable */
+	if (machine.input().code_pressed_once(KEYCODE_X)){state->m_mask |= 0x1000; tilemap_mark_all_tiles_dirty(state->m_bg_tilemap);} /* no layers */
 }
 #endif
 

@@ -72,13 +72,13 @@ static READ8_HANDLER( sound_test_r )
 {
 	bingoc_state *state = space->machine().driver_data<bingoc_state>();
 
-	if(input_code_pressed_once(space->machine(), KEYCODE_Z))
+	if(space->machine().input().code_pressed_once(KEYCODE_Z))
 		state->m_x++;
 
-	if(input_code_pressed_once(space->machine(), KEYCODE_X))
+	if(space->machine().input().code_pressed_once(KEYCODE_X))
 		state->m_x--;
 
-	if(input_code_pressed_once(space->machine(), KEYCODE_A))
+	if(space->machine().input().code_pressed_once(KEYCODE_A))
 		return 0xff;
 
 	popmessage("%02x",state->m_x);

@@ -364,11 +364,11 @@ SCREEN_UPDATE( midzeus2 )
 
 	poly_wait(poly, "VIDEO_UPDATE");
 
-if (input_code_pressed(screen->machine(), KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
-if (input_code_pressed(screen->machine(), KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
+if (screen->machine().input().code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
+if (screen->machine().input().code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
 
 	/* normal update case */
-	if (!input_code_pressed(screen->machine(), KEYCODE_W))
+	if (!screen->machine().input().code_pressed(KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0x38]);
 		int xoffs = screen->visible_area().min_x;
@@ -385,10 +385,10 @@ if (input_code_pressed(screen->machine(), KEYCODE_DOWN)) { zbase -= 1.0f; popmes
 	{
 		const UINT64 *base;
 
-		if (input_code_pressed(screen->machine(), KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine(), KEYCODE_LEFT)) ; }
-		if (input_code_pressed(screen->machine(), KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine(), KEYCODE_RIGHT)) ; }
+		if (screen->machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen->machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen->machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen->machine().input().code_pressed(KEYCODE_LEFT)) ; }
+		if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen->machine().input().code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);
@@ -585,7 +585,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset, UINT32
 				UINT32 temp = zeusbase[0x38];
 				zeusbase[0x38] = oldval;
 				machine.primary_screen->update_partial(machine.primary_screen->vpos());
-				log_fifo = input_code_pressed(machine, KEYCODE_L);
+				log_fifo = machine.input().code_pressed(KEYCODE_L);
 				zeusbase[0x38] = temp;
 			}
 			break;
@@ -1058,15 +1058,15 @@ static void zeus_draw_quad(running_machine &machine, const UINT32 *databuffer, U
 	if (logit)
 		logerror("quad\n");
 
-if (input_code_pressed(machine, KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
-if (input_code_pressed(machine, KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
-if (input_code_pressed(machine, KEYCODE_R) && (texoffs & 0xffff) == 0x11d) return;
-if (input_code_pressed(machine, KEYCODE_T) && (texoffs & 0xffff) == 0x05d) return;
-if (input_code_pressed(machine, KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
-//if (input_code_pressed(machine, KEYCODE_U) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(machine, KEYCODE_I) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(machine, KEYCODE_O) && (texoffs & 0xffff) == 0x119) return;
-//if (input_code_pressed(machine, KEYCODE_L) && (texoffs & 0x100)) return;
+if (machine.input().code_pressed(KEYCODE_Q) && (texoffs & 0xffff) == 0x119) return;
+if (machine.input().code_pressed(KEYCODE_E) && (texoffs & 0xffff) == 0x01d) return;
+if (machine.input().code_pressed(KEYCODE_R) && (texoffs & 0xffff) == 0x11d) return;
+if (machine.input().code_pressed(KEYCODE_T) && (texoffs & 0xffff) == 0x05d) return;
+if (machine.input().code_pressed(KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
+//if (machine.input().code_pressed(KEYCODE_U) && (texoffs & 0xffff) == 0x119) return;
+//if (machine.input().code_pressed(KEYCODE_I) && (texoffs & 0xffff) == 0x119) return;
+//if (machine.input().code_pressed(KEYCODE_O) && (texoffs & 0xffff) == 0x119) return;
+//if (machine.input().code_pressed(KEYCODE_L) && (texoffs & 0x100)) return;
 
 	callback = render_poly_8bit;
 

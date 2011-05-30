@@ -2276,7 +2276,7 @@ SCREEN_UPDATE( namcos22s )
 	ApplyGamma( screen->machine(), bitmap );
 
 #ifdef MAME_DEBUG
-	if( input_code_pressed(screen->machine(), KEYCODE_D) )
+	if( screen->machine().input().code_pressed(KEYCODE_D) )
 	{
 		namcos22_state *state = screen->machine().driver_data<namcos22_state>();
 		FILE *f = fopen( "dump.txt", "wb" );
@@ -2309,7 +2309,7 @@ SCREEN_UPDATE( namcos22s )
 			Dump(space, f,0xc00000, 0xc1ffff, "polygonram");
 			fclose( f );
 		}
-		while( input_code_pressed(screen->machine(), KEYCODE_D) ){}
+		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 	return 0;
@@ -2327,7 +2327,7 @@ SCREEN_UPDATE( namcos22 )
 	ApplyGamma( screen->machine(), bitmap );
 
 #ifdef MAME_DEBUG
-	if( input_code_pressed(screen->machine(), KEYCODE_D) )
+	if( screen->machine().input().code_pressed(KEYCODE_D) )
 	{
 		FILE *f = fopen( "dump.txt", "wb" );
 		if( f )
@@ -2341,7 +2341,7 @@ SCREEN_UPDATE( namcos22 )
 			//Dump(space, f,0x70000000, 0x7001ffff, "polygonram");
 			fclose( f );
 		}
-		while( input_code_pressed(screen->machine(), KEYCODE_D) ){}
+		while( screen->machine().input().code_pressed(KEYCODE_D) ){}
 	}
 #endif
 	return 0;

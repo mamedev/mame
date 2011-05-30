@@ -497,13 +497,13 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_t *bitmap, int 
 #if BT_DEBUG
 	popmessage("screen_control = %02X", m_screen_control & 0x7f);
 
-	if (input_code_pressed(machine(), KEYCODE_X))
+	if (machine().input().code_pressed(KEYCODE_X))
 	{
 		char name[10];
 		FILE *f;
 		int i;
 
-		while (input_code_pressed(machine(), KEYCODE_X)) ;
+		while (machine().input().code_pressed(KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", m_xcount++);
 		f = fopen(name, "w");

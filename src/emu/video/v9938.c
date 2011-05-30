@@ -1412,7 +1412,7 @@ have to test.
 static void v9938_interrupt_start_vblank (running_machine &machine)
 	{
 #if 0
-	if (input_code_pressed (machine, KEYCODE_D) )
+	if (machine.input().code_pressed (KEYCODE_D) )
 		{
 		FILE *fp;
 		int i;

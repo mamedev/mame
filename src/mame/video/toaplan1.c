@@ -764,12 +764,12 @@ static void toaplan1_log_vram(running_machine &machine)
 #ifdef MAME_DEBUG
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	if ( input_code_pressed(machine, KEYCODE_M) )
+	if ( machine.input().code_pressed(KEYCODE_M) )
 	{
 		UINT16 *spriteram16 = state->m_spriteram;
 		UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
 		offs_t sprite_voffs;
-		while (input_code_pressed(machine, KEYCODE_M)) ;
+		while (machine.input().code_pressed(KEYCODE_M)) ;
 		if (state->m_spritesizeram16)			/* FCU controller */
 		{
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
@@ -816,12 +816,12 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( input_code_pressed(machine, KEYCODE_SLASH) )
+	if ( machine.input().code_pressed(KEYCODE_SLASH) )
 	{
 		UINT16 *size  = (UINT16 *)(state->m_spritesizeram16);
 		UINT16 *bsize = (UINT16 *)(state->m_buffered_spritesizeram16);
 		offs_t offs;
-		while (input_code_pressed(machine, KEYCODE_SLASH)) ;
+		while (machine.input().code_pressed(KEYCODE_SLASH)) ;
 		if (state->m_spritesizeram16)			/* FCU controller */
 		{
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
@@ -838,11 +838,11 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( input_code_pressed(machine, KEYCODE_N) )
+	if ( machine.input().code_pressed(KEYCODE_N) )
 	{
 		offs_t tile_voffs;
 		int tchar[5], tattr[5];
-		while (input_code_pressed(machine, KEYCODE_N)) ;	/* BCU controller */
+		while (machine.input().code_pressed(KEYCODE_N)) ;	/* BCU controller */
 		logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
 			state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
@@ -863,14 +863,14 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( input_code_pressed(machine, KEYCODE_W) )
+	if ( machine.input().code_pressed(KEYCODE_W) )
 	{
-		while (input_code_pressed(machine, KEYCODE_W)) ;
+		while (machine.input().code_pressed(KEYCODE_W)) ;
 		logerror("Mark here\n");
 	}
-	if ( input_code_pressed(machine, KEYCODE_E) )
+	if ( machine.input().code_pressed(KEYCODE_E) )
 	{
-		while (input_code_pressed(machine, KEYCODE_E)) ;
+		while (machine.input().code_pressed(KEYCODE_E)) ;
 		state->m_displog += 1;
 		state->m_displog &= 1;
 	}
@@ -880,9 +880,9 @@ static void toaplan1_log_vram(running_machine &machine)
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
 			state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
 	}
-	if ( input_code_pressed(machine, KEYCODE_B) )
+	if ( machine.input().code_pressed(KEYCODE_B) )
 	{
-//      while (input_code_pressed(machine, KEYCODE_B)) ;
+//      while (machine.input().code_pressed(KEYCODE_B)) ;
 		state->m_scrollx_offs1 += 0x1; state->m_scrollx_offs2 += 0x1; state->m_scrollx_offs3 += 0x1; state->m_scrollx_offs4 += 0x1;
 		logerror("Scrollx_offs now = %08x\n", state->m_scrollx_offs4);
 		tilemap_set_scrollx(state->m_pf1_tilemap, 0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
@@ -890,9 +890,9 @@ static void toaplan1_log_vram(running_machine &machine)
 		tilemap_set_scrollx(state->m_pf3_tilemap, 0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
 		tilemap_set_scrollx(state->m_pf4_tilemap, 0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
 	}
-	if ( input_code_pressed(machine, KEYCODE_V) )
+	if ( machine.input().code_pressed(KEYCODE_V) )
 	{
-//      while (input_code_pressed(machine, KEYCODE_V)) ;
+//      while (machine.input().code_pressed(KEYCODE_V)) ;
 		state->m_scrollx_offs1 -= 0x1; state->m_scrollx_offs2 -= 0x1; state->m_scrollx_offs3 -= 0x1; state->m_scrollx_offs4 -= 0x1;
 		logerror("Scrollx_offs now = %08x\n", state->m_scrollx_offs4);
 		tilemap_set_scrollx(state->m_pf1_tilemap, 0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
@@ -900,9 +900,9 @@ static void toaplan1_log_vram(running_machine &machine)
 		tilemap_set_scrollx(state->m_pf3_tilemap, 0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
 		tilemap_set_scrollx(state->m_pf4_tilemap, 0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
 	}
-	if ( input_code_pressed(machine, KEYCODE_C) )
+	if ( machine.input().code_pressed(KEYCODE_C) )
 	{
-//      while (input_code_pressed(machine, KEYCODE_C)) ;
+//      while (machine.input().code_pressed(KEYCODE_C)) ;
 		state->m_scrolly_offs += 0x1;
 		logerror("Scrolly_offs now = %08x\n", state->m_scrolly_offs);
 		tilemap_set_scrolly(state->m_pf1_tilemap, 0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
@@ -910,9 +910,9 @@ static void toaplan1_log_vram(running_machine &machine)
 		tilemap_set_scrolly(state->m_pf3_tilemap, 0, (state->m_pf3_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
 		tilemap_set_scrolly(state->m_pf4_tilemap, 0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
 	}
-	if ( input_code_pressed(machine, KEYCODE_X) )
+	if ( machine.input().code_pressed(KEYCODE_X) )
 	{
-//      while (input_code_pressed(machine, KEYCODE_X)) ;
+//      while (machine.input().code_pressed(KEYCODE_X)) ;
 		state->m_scrolly_offs -= 0x1;
 		logerror("Scrolly_offs now = %08x\n", state->m_scrolly_offs);
 		tilemap_set_scrolly(state->m_pf1_tilemap, 0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
@@ -921,30 +921,30 @@ static void toaplan1_log_vram(running_machine &machine)
 		tilemap_set_scrolly(state->m_pf4_tilemap, 0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
 	}
 
-	if ( input_code_pressed(machine, KEYCODE_L) )		/* Turn Playfield 4 on/off */
+	if ( machine.input().code_pressed(KEYCODE_L) )		/* Turn Playfield 4 on/off */
 	{
-		while (input_code_pressed(machine, KEYCODE_L)) ;
+		while (machine.input().code_pressed(KEYCODE_L)) ;
 		state->m_display_pf4 += 1;
 		state->m_display_pf4 &= 1;
 		tilemap_set_enable(state->m_pf4_tilemap, state->m_display_pf4);
 	}
-	if ( input_code_pressed(machine, KEYCODE_K) )		/* Turn Playfield 3 on/off */
+	if ( machine.input().code_pressed(KEYCODE_K) )		/* Turn Playfield 3 on/off */
 	{
-		while (input_code_pressed(machine, KEYCODE_K)) ;
+		while (machine.input().code_pressed(KEYCODE_K)) ;
 		state->m_display_pf3 += 1;
 		state->m_display_pf3 &= 1;
 		tilemap_set_enable(state->m_pf3_tilemap, state->m_display_pf3);
 	}
-	if ( input_code_pressed(machine, KEYCODE_J) )		/* Turn Playfield 2 on/off */
+	if ( machine.input().code_pressed(KEYCODE_J) )		/* Turn Playfield 2 on/off */
 	{
-		while (input_code_pressed(machine, KEYCODE_J)) ;
+		while (machine.input().code_pressed(KEYCODE_J)) ;
 		state->m_display_pf2 += 1;
 		state->m_display_pf2 &= 1;
 		tilemap_set_enable(state->m_pf2_tilemap, state->m_display_pf2);
 	}
-	if ( input_code_pressed(machine, KEYCODE_H) )		/* Turn Playfield 1 on/off */
+	if ( machine.input().code_pressed(KEYCODE_H) )		/* Turn Playfield 1 on/off */
 	{
-		while (input_code_pressed(machine, KEYCODE_H)) ;
+		while (machine.input().code_pressed(KEYCODE_H)) ;
 		state->m_display_pf1 += 1;
 		state->m_display_pf1 &= 1;
 		tilemap_set_enable(state->m_pf1_tilemap, state->m_display_pf1);

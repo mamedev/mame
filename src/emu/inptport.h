@@ -84,7 +84,7 @@ enum
 
 
 /* groups for input ports */
-enum
+enum ioport_group
 {
 	IPG_UI = 0,
 	IPG_PLAYER1,
@@ -512,8 +512,7 @@ enum
 #define UCHAR_SHIFT_1		(UCHAR_PRIVATE + 0)
 #define UCHAR_SHIFT_2		(UCHAR_PRIVATE + 1)
 #define UCHAR_MAMEKEY_BEGIN	(UCHAR_PRIVATE + 2)
-#define UCHAR_MAMEKEY_END	(UCHAR_MAMEKEY_BEGIN + __code_key_last)
-#define UCHAR_MAMEKEY(code)	(UCHAR_MAMEKEY_BEGIN + KEYCODE_##code)
+#define UCHAR_MAMEKEY(code)	(UCHAR_MAMEKEY_BEGIN + ITEM_ID_##code)
 
 #define UCHAR_SHIFT_BEGIN	(UCHAR_SHIFT_1)
 #define UCHAR_SHIFT_END		(UCHAR_SHIFT_2)
@@ -725,16 +724,26 @@ private:
 
 
 /* describes a fundamental input type, including default input sequences */
-class input_type_desc
+class input_type_entry
 {
+	friend class simple_list<input_type_entry>;
+	
 public:
-	input_type_desc *			next;			/* next description in the list */
+	input_type_entry(UINT32 type, ioport_group group, int player, const char *token, const char *name, input_seq standard);
+	input_type_entry(UINT32 type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment);
+
+	input_type_entry *next() const { return m_next; }
+
 	UINT32						type;			/* IPT_* for this entry */
-	UINT8						group;			/* which group the port belongs to */
+	ioport_group				group;			/* which group the port belongs to */
 	UINT8						player;			/* player number (0 is player 1) */
 	const char *				token;			/* token used to store settings */
 	const char *				name;			/* user-friendly name */
-	input_seq					seq[SEQ_TYPE_TOTAL];/* default input sequence */
+	input_seq					defseq[SEQ_TYPE_TOTAL];/* default input sequence */
+	input_seq					seq[SEQ_TYPE_TOTAL];/* currently configured sequences */
+
+private:
+	input_type_entry *			m_next;			/* next description in the list */
 };
 
 
@@ -1140,7 +1149,7 @@ const char *input_type_name(running_machine &machine, int type, int player);
 int input_type_group(running_machine &machine, int type, int player);
 
 /* return the global input mapping sequence for the given type/player */
-const input_seq *input_type_seq(running_machine &machine, int type, int player, input_seq_type seqtype);
+const input_seq &input_type_seq(running_machine &machine, int type, int player, input_seq_type seqtype);
 
 /* change the global input sequence for the given type/player */
 void input_type_set_seq(running_machine &machine, int type, int player, input_seq_type seqtype, const input_seq *newseq);
@@ -1149,7 +1158,7 @@ void input_type_set_seq(running_machine &machine, int type, int player, input_se
 int input_type_pressed(running_machine &machine, int type, int player);
 
 /* return the list of default mappings */
-const input_type_desc *input_type_list(running_machine &machine);
+const simple_list<input_type_entry> &input_type_list(running_machine &machine);
 
 
 
@@ -1159,7 +1168,7 @@ const input_type_desc *input_type_list(running_machine &machine);
 const char *input_field_name(const input_field_config *field);
 
 /* return the input sequence for the given input field */
-const input_seq *input_field_seq(const input_field_config *field, input_seq_type seqtype);
+const input_seq &input_field_seq(const input_field_config *field, input_seq_type seqtype);
 
 /* return the current settings for the given input field */
 void input_field_get_user_settings(const input_field_config *field, input_field_user_settings *settings);

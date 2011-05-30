@@ -251,14 +251,14 @@ SCREEN_UPDATE( ginganin )
 	int layers_ctrl1 = state->m_layers_ctrl;
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine(), KEYCODE_Z))
+if (screen->machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
 
-	if (input_code_pressed(screen->machine(), KEYCODE_Q)) { msk |= 0xfff1;}
-	if (input_code_pressed(screen->machine(), KEYCODE_W)) { msk |= 0xfff2;}
-	if (input_code_pressed(screen->machine(), KEYCODE_E)) { msk |= 0xfff4;}
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	{ msk |= 0xfff8;}
+	if (screen->machine().input().code_pressed(KEYCODE_Q)) { msk |= 0xfff1;}
+	if (screen->machine().input().code_pressed(KEYCODE_W)) { msk |= 0xfff2;}
+	if (screen->machine().input().code_pressed(KEYCODE_E)) { msk |= 0xfff4;}
+	if (screen->machine().input().code_pressed(KEYCODE_A))	{ msk |= 0xfff8;}
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
@@ -268,11 +268,11 @@ if (input_code_pressed(screen->machine(), KEYCODE_Z))
 	tilemap_set_scrolly(state->m_fg_tilemap, 0, state->m_posy); \
 	popmessage("B>%04X:%04X F>%04X:%04X",state->m_posx%(BG_NX*16),state->m_posy%(BG_NY*16),state->m_posx%(FG_NX*16),state->m_posy%(FG_NY*16));
 
-	if (input_code_pressed(screen->machine(), KEYCODE_L))	{ state->m_posx +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine(), KEYCODE_J))	{ state->m_posx -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine(), KEYCODE_K))	{ state->m_posy +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine(), KEYCODE_I))	{ state->m_posy -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine(), KEYCODE_H))	{ state->m_posx = state->m_posy = 0;	SETSCROLL }
+	if (screen->machine().input().code_pressed(KEYCODE_L))	{ state->m_posx +=8; SETSCROLL }
+	if (screen->machine().input().code_pressed(KEYCODE_J))	{ state->m_posx -=8; SETSCROLL }
+	if (screen->machine().input().code_pressed(KEYCODE_K))	{ state->m_posy +=8; SETSCROLL }
+	if (screen->machine().input().code_pressed(KEYCODE_I))	{ state->m_posy -=8; SETSCROLL }
+	if (screen->machine().input().code_pressed(KEYCODE_H))	{ state->m_posx = state->m_posy = 0;	SETSCROLL }
 
 }
 #endif

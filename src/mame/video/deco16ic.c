@@ -836,7 +836,7 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 	deco16ic_state *deco16ic = get_safe_token(device);
 	char buf[64*5];
 
-	if (input_code_pressed(device->machine(), KEYCODE_O))
+	if (device->machine().input().code_pressed(KEYCODE_O))
 		return;
 
 	if (deco16ic->pf12_control)

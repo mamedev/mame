@@ -356,13 +356,13 @@ SCREEN_UPDATE( unico )
 	tilemap_set_scrolly(state->m_tilemap[2], 0, state->m_scroll[0x02]);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) )
+if ( screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -396,13 +396,13 @@ SCREEN_UPDATE( zeropnt2 )
 	tilemap_set_scrolly(state->m_tilemap[2], 0, state->m_scroll32[1] >> 16);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) )
+if ( screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_E))	msk |= 4;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 8;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_E))	msk |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

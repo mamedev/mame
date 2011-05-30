@@ -176,13 +176,13 @@ static SCREEN_UPDATE(srmp6)
 
 #if 0
 	/* debug */
-	if(input_code_pressed_once(screen->machine(), KEYCODE_Q))
+	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		++xixi;
 		printf("%x\n",xixi);
 	}
 
-	if(input_code_pressed_once(screen->machine(), KEYCODE_W))
+	if(screen->machine().input().code_pressed_once(KEYCODE_W))
 	{
 		--xixi;
 		printf("%x\n",xixi);
@@ -273,7 +273,7 @@ static SCREEN_UPDATE(srmp6)
 
 	memcpy(state->m_sprram_old, state->m_sprram, 0x80000);
 
-	if(input_code_pressed_once(screen->machine(), KEYCODE_Q))
+	if(screen->machine().input().code_pressed_once(KEYCODE_Q))
 	{
 		FILE *p=fopen("tileram.bin","wb");
 		fwrite(state->m_tileram, 1, 0x100000*16, p);

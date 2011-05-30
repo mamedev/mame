@@ -165,17 +165,17 @@ static SCREEN_UPDATE( igs011 )
 	UINT16 *pri_ram;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine(), KEYCODE_Z))
+	if (screen->machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
-		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 0x01;
-		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 0x02;
-		if (input_code_pressed(screen->machine(), KEYCODE_E))	mask |= 0x04;
-		if (input_code_pressed(screen->machine(), KEYCODE_R))	mask |= 0x08;
-		if (input_code_pressed(screen->machine(), KEYCODE_A))	mask |= 0x10;
-		if (input_code_pressed(screen->machine(), KEYCODE_S))	mask |= 0x20;
-		if (input_code_pressed(screen->machine(), KEYCODE_D))	mask |= 0x40;
-		if (input_code_pressed(screen->machine(), KEYCODE_F))	mask |= 0x80;
+		if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 0x01;
+		if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 0x02;
+		if (screen->machine().input().code_pressed(KEYCODE_E))	mask |= 0x04;
+		if (screen->machine().input().code_pressed(KEYCODE_R))	mask |= 0x08;
+		if (screen->machine().input().code_pressed(KEYCODE_A))	mask |= 0x10;
+		if (screen->machine().input().code_pressed(KEYCODE_S))	mask |= 0x20;
+		if (screen->machine().input().code_pressed(KEYCODE_D))	mask |= 0x40;
+		if (screen->machine().input().code_pressed(KEYCODE_F))	mask |= 0x80;
 		if (mask)	layer_enable &= mask;
 	}
 #endif
@@ -446,7 +446,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 	#ifdef MAME_DEBUG
 #if 1
-	if (input_code_pressed(space->machine(), KEYCODE_Z))
+	if (space->machine().input().code_pressed(KEYCODE_Z))
 	{	char buf[20];
 		sprintf(buf, "%02X%02X",blitter.depth,blitter.flags&0xff);
 //      ui_draw_text(buf, blitter.x, blitter.y);    // crashes mame!

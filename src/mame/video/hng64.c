@@ -1461,7 +1461,7 @@ SCREEN_UPDATE( hng64 )
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_L) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_L) )
 	{
 		address_space *space = screen->machine().device("maincpu")->memory().space(AS_PROGRAM);
 		space->write_byte(0x2f27c8, 0x2);
@@ -1630,22 +1630,22 @@ SCREEN_UPDATE( hng64 )
 		hng64_tcram[0x58/4],
 		hng64_tcram[0x5c/4]);
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_T) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_T) )
 	{
 		state->m_additive_tilemap_debug ^= 1;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_Y) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_Y) )
 	{
 		state->m_additive_tilemap_debug ^= 2;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_U) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_U) )
 	{
 		state->m_additive_tilemap_debug ^= 4;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);
 	}
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_I) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_I) )
 	{
 		state->m_additive_tilemap_debug ^= 8;
 		popmessage("blend changed %02x", state->m_additive_tilemap_debug);

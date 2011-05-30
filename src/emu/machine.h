@@ -336,6 +336,7 @@ public:
 	save_manager &save() { return m_save; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
+	input_manager &input() const { assert(m_input != NULL); return *m_input; }
 	sound_manager &sound() const { assert(m_sound != NULL); return *m_sound; }
 	video_manager &video() const { assert(m_video != NULL); return *m_video; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
@@ -459,6 +460,7 @@ private:
 	// managers
 	cheat_manager *			m_cheat;				// internal data from cheat.c
 	render_manager *		m_render;				// internal data from render.c
+	input_manager *			m_input;				// internal data from input.c
 	sound_manager *			m_sound;				// internal data from sound.c
 	video_manager *			m_video;				// internal data from video.c
 	debug_view_manager *	m_debug_view;			// internal data from debugvw.c

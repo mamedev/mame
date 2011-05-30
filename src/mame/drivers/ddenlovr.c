@@ -1332,36 +1332,36 @@ SCREEN_UPDATE(ddenlovr)
 	state->m_ddenlovr_clip_ctrl = 0x0f;
 	next = blit_draw(screen->machine(), base, 0);
 	popmessage("GFX %06x", base);
-	if (input_code_pressed(screen->machine(), KEYCODE_S)) base = next;
-	if (input_code_pressed_once(screen->machine(), KEYCODE_X)) base = next;
-	if (input_code_pressed(screen->machine(), KEYCODE_C)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
-	if (input_code_pressed(screen->machine(), KEYCODE_V)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
-	if (input_code_pressed_once(screen->machine(), KEYCODE_D)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
-	if (input_code_pressed_once(screen->machine(), KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
+	if (screen->machine().input().code_pressed(KEYCODE_S)) base = next;
+	if (screen->machine().input().code_pressed_once(KEYCODE_X)) base = next;
+	if (screen->machine().input().code_pressed(KEYCODE_C)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (screen->machine().input().code_pressed(KEYCODE_V)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
+	if (screen->machine().input().code_pressed_once(KEYCODE_D)) { base--; while ((gfx[base] & 0xf0) != 0x30) base--; }
+	if (screen->machine().input().code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
 	bitmap_fill(bitmap, cliprect, state->m_ddenlovr_bgcolor);
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine(), KEYCODE_Z))
+	if (screen->machine().input().code_pressed(KEYCODE_Z))
 	{
 		int mask, mask2;
 
 		mask = 0;
 
-		if (input_code_pressed(screen->machine(), KEYCODE_Q))	mask |= 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_W))	mask |= 2;
-		if (input_code_pressed(screen->machine(), KEYCODE_E))	mask |= 4;
-		if (input_code_pressed(screen->machine(), KEYCODE_R))	mask |= 8;
+		if (screen->machine().input().code_pressed(KEYCODE_Q))	mask |= 1;
+		if (screen->machine().input().code_pressed(KEYCODE_W))	mask |= 2;
+		if (screen->machine().input().code_pressed(KEYCODE_E))	mask |= 4;
+		if (screen->machine().input().code_pressed(KEYCODE_R))	mask |= 8;
 
 		mask2 = 0;
 
 		if (state->m_extra_layers)
 		{
-			if (input_code_pressed(screen->machine(), KEYCODE_A))	mask2 |= 1;
-			if (input_code_pressed(screen->machine(), KEYCODE_S))	mask2 |= 2;
-			if (input_code_pressed(screen->machine(), KEYCODE_D))	mask2 |= 4;
-			if (input_code_pressed(screen->machine(), KEYCODE_F))	mask2 |= 8;
+			if (screen->machine().input().code_pressed(KEYCODE_A))	mask2 |= 1;
+			if (screen->machine().input().code_pressed(KEYCODE_S))	mask2 |= 2;
+			if (screen->machine().input().code_pressed(KEYCODE_D))	mask2 |= 4;
+			if (screen->machine().input().code_pressed(KEYCODE_F))	mask2 |= 8;
 		}
 
 		if (mask || mask2)

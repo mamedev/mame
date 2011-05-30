@@ -12,10 +12,10 @@ void rollerg_sprite_callback( running_machine &machine, int *code, int *color, i
 {
 	rollerg_state *state = machine.driver_data<rollerg_state>();
 #if 0
-	if (input_code_pressed(machine, KEYCODE_Q) && (*color & 0x80)) *color = rand();
-	if (input_code_pressed(machine, KEYCODE_W) && (*color & 0x40)) *color = rand();
-	if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x20)) *color = rand();
-	if (input_code_pressed(machine, KEYCODE_R) && (*color & 0x10)) *color = rand();
+	if (machine.input().code_pressed(KEYCODE_Q) && (*color & 0x80)) *color = rand();
+	if (machine.input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
+	if (machine.input().code_pressed(KEYCODE_E) && (*color & 0x20)) *color = rand();
+	if (machine.input().code_pressed(KEYCODE_R) && (*color & 0x10)) *color = rand();
 #endif
 	*priority_mask = (*color & 0x10) ? 0 : 0x02;
 	*color = state->m_sprite_colorbase + (*color & 0x0f);

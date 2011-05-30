@@ -967,7 +967,7 @@ static void cischeat_draw_sprites(running_machine &machine, bitmap_t *bitmap , c
 
 		/* dimension of a tile after zoom */
 #ifdef MAME_DEBUG
-		if ( input_code_pressed(machine, KEYCODE_Z) && input_code_pressed(machine, KEYCODE_M) )
+		if ( machine.input().code_pressed(KEYCODE_Z) && machine.input().code_pressed(KEYCODE_M) )
 		{
 			xdim	=	16 << 16;
 			ydim	=	16 << 16;
@@ -1033,7 +1033,7 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 		}
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(machine, KEYCODE_X))
+if (machine.input().code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
@@ -1124,7 +1124,7 @@ static void bigrun_draw_sprites(running_machine &machine, bitmap_t *bitmap , con
 
 		/* dimension of a tile after zoom */
 #ifdef MAME_DEBUG
-		if ( input_code_pressed(machine, KEYCODE_Z) && input_code_pressed(machine, KEYCODE_M) )
+		if ( machine.input().code_pressed(KEYCODE_Z) && machine.input().code_pressed(KEYCODE_M) )
 		{
 			xdim	=	16 << 16;
 			ydim	=	16 << 16;
@@ -1188,7 +1188,7 @@ if ( (state->m_debugsprites) && ( ((attr & 0x0300)>>8) != (state->m_debugsprites
 		}
 #ifdef MAME_DEBUG
 #if 0
-if (input_code_pressed(machine, KEYCODE_X))
+if (machine.input().code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
 	sprintf(buf, "%04x",attr);
 	ui_draw_text(buf, sx>>16, sy>>16);
@@ -1210,24 +1210,24 @@ if (input_code_pressed(machine, KEYCODE_X))
 #ifdef MAME_DEBUG
 #define CISCHEAT_LAYERSCTRL \
 state->m_debugsprites = 0; \
-if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) ) \
+if ( screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X) ) \
 { \
 	int msk = 0; \
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	{ msk |= 0x01;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	{ msk |= 0x02;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_E))	{ msk |= 0x04;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	{ msk |= 0x08; state->m_debugsprites = 1;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_S))	{ msk |= 0x08; state->m_debugsprites = 2;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_D))	{ msk |= 0x08; state->m_debugsprites = 3;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_F))	{ msk |= 0x08; state->m_debugsprites = 4;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_R))	{ msk |= 0x10;} \
-	if (input_code_pressed(screen->machine(), KEYCODE_T))	{ msk |= 0x20;} \
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x01;} \
+	if (screen->machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x02;} \
+	if (screen->machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x04;} \
+	if (screen->machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x08; state->m_debugsprites = 1;} \
+	if (screen->machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x08; state->m_debugsprites = 2;} \
+	if (screen->machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x08; state->m_debugsprites = 3;} \
+	if (screen->machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x08; state->m_debugsprites = 4;} \
+	if (screen->machine().input().code_pressed(KEYCODE_R))	{ msk |= 0x10;} \
+	if (screen->machine().input().code_pressed(KEYCODE_T))	{ msk |= 0x20;} \
  \
 	if (msk != 0) state->m_active_layers &= msk; \
 } \
 \
 { \
-	if ( input_code_pressed(screen->machine(), KEYCODE_Z) && input_code_pressed_once(screen->machine(), KEYCODE_U) ) \
+	if ( screen->machine().input().code_pressed(KEYCODE_Z) && screen->machine().input().code_pressed_once(KEYCODE_U) ) \
 		state->m_show_unknown ^= 1; \
 	if (state->m_show_unknown) \
 		popmessage("0:%04X 2:%04X 4:%04X 6:%04X c:%04X", \
@@ -1423,16 +1423,16 @@ SCREEN_UPDATE( scudhamm )
 
 #ifdef MAME_DEBUG
 state->m_debugsprites = 0;
-if ( input_code_pressed(screen->machine(), KEYCODE_Z) || input_code_pressed(screen->machine(), KEYCODE_X) )
+if ( screen->machine().input().code_pressed(KEYCODE_Z) || screen->machine().input().code_pressed(KEYCODE_X) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	{ msk |= 0x1;}
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	{ msk |= 0x2;}
-	if (input_code_pressed(screen->machine(), KEYCODE_E))	{ msk |= 0x4;}
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	{ msk |= 0x8; state->m_debugsprites = 1;}
-	if (input_code_pressed(screen->machine(), KEYCODE_S))	{ msk |= 0x8; state->m_debugsprites = 2;}
-	if (input_code_pressed(screen->machine(), KEYCODE_D))	{ msk |= 0x8; state->m_debugsprites = 3;}
-	if (input_code_pressed(screen->machine(), KEYCODE_F))	{ msk |= 0x8; state->m_debugsprites = 4;}
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	{ msk |= 0x1;}
+	if (screen->machine().input().code_pressed(KEYCODE_W))	{ msk |= 0x2;}
+	if (screen->machine().input().code_pressed(KEYCODE_E))	{ msk |= 0x4;}
+	if (screen->machine().input().code_pressed(KEYCODE_A))	{ msk |= 0x8; state->m_debugsprites = 1;}
+	if (screen->machine().input().code_pressed(KEYCODE_S))	{ msk |= 0x8; state->m_debugsprites = 2;}
+	if (screen->machine().input().code_pressed(KEYCODE_D))	{ msk |= 0x8; state->m_debugsprites = 3;}
+	if (screen->machine().input().code_pressed(KEYCODE_F))	{ msk |= 0x8; state->m_debugsprites = 4;}
 
 	if (msk != 0) state->m_active_layers &= msk;
 #if 1

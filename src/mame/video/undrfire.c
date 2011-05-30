@@ -357,36 +357,36 @@ SCREEN_UPDATE( undrfire )
 
 #ifdef MAME_DEBUG
 	undrfire_state *state = screen->machine().driver_data<undrfire_state>();
-	if (input_code_pressed_once (screen->machine(), KEYCODE_X))
+	if (screen->machine().input().code_pressed_once (KEYCODE_X))
 	{
 		state->m_dislayer[5] ^= 1;
 		popmessage("piv text: %01x",state->m_dislayer[5]);
 	}
-	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
+	if (screen->machine().input().code_pressed_once (KEYCODE_C))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("bg0: %01x",state->m_dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
+	if (screen->machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("bg1: %01x",state->m_dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
+	if (screen->machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x",state->m_dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_N))
+	if (screen->machine().input().code_pressed_once (KEYCODE_N))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("bg3: %01x",state->m_dislayer[3]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_M))
+	if (screen->machine().input().code_pressed_once (KEYCODE_M))
 	{
 		state->m_dislayer[4] ^= 1;
 		popmessage("sprites: %01x",state->m_dislayer[4]);
@@ -500,36 +500,36 @@ SCREEN_UPDATE( cbombers )
 
 #ifdef MAME_DEBUG
 	undrfire_state *state = screen->machine().driver_data<undrfire_state>();
-	if (input_code_pressed_once (screen->machine(), KEYCODE_X))
+	if (screen->machine().input().code_pressed_once (KEYCODE_X))
 	{
 		state->m_dislayer[5] ^= 1;
 		popmessage("piv text: %01x",state->m_dislayer[5]);
 	}
-	if (input_code_pressed_once (screen->machine(), KEYCODE_C))
+	if (screen->machine().input().code_pressed_once (KEYCODE_C))
 	{
 		state->m_dislayer[0] ^= 1;
 		popmessage("bg0: %01x",state->m_dislayer[0]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_V))
+	if (screen->machine().input().code_pressed_once (KEYCODE_V))
 	{
 		state->m_dislayer[1] ^= 1;
 		popmessage("bg1: %01x",state->m_dislayer[1]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_B))
+	if (screen->machine().input().code_pressed_once (KEYCODE_B))
 	{
 		state->m_dislayer[2] ^= 1;
 		popmessage("bg2: %01x",state->m_dislayer[2]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_N))
+	if (screen->machine().input().code_pressed_once (KEYCODE_N))
 	{
 		state->m_dislayer[3] ^= 1;
 		popmessage("bg3: %01x",state->m_dislayer[3]);
 	}
 
-	if (input_code_pressed_once (screen->machine(), KEYCODE_M))
+	if (screen->machine().input().code_pressed_once (KEYCODE_M))
 	{
 		state->m_dislayer[4] ^= 1;
 		popmessage("sprites: %01x",state->m_dislayer[4]);

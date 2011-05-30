@@ -322,7 +322,7 @@ static CUSTOM_INPUT( hopper_r )
 {
 	igspoker_state *state = field.machine().driver_data<igspoker_state>();
 	if (state->m_hopper) return !(field.machine().primary_screen->frame_number()%10);
-	return input_code_pressed(field.machine(), KEYCODE_H);
+	return field.machine().input().code_pressed(KEYCODE_H);
 }
 
 static READ8_HANDLER( exp_rom_r )

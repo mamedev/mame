@@ -128,13 +128,13 @@ SCREEN_UPDATE(fitfight)
 	if (vblank > 0)
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 	else {
-//      if (input_code_pressed(screen->machine(), KEYCODE_Q))
+//      if (screen->machine().input().code_pressed(KEYCODE_Q))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_W))
+//      else if (screen->machine().input().code_pressed(KEYCODE_W))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_E))
+//      else if (screen->machine().input().code_pressed(KEYCODE_E))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_R))
+//      else if (screen->machine().input().code_pressed(KEYCODE_R))
 //          scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
 //      else
 		scrollbak = ((state->m_fof_a00000[0] & 0xff00) >> 5);
@@ -144,19 +144,19 @@ SCREEN_UPDATE(fitfight)
 
 		draw_sprites(screen->machine(), bitmap, cliprect, 0);
 
-//      if (input_code_pressed(screen->machine(), KEYCODE_A))
+//      if (screen->machine().input().code_pressed(KEYCODE_A))
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x01c0) >> 6);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_S))
+//      else if (screen->machine().input().code_pressed(KEYCODE_S))
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_D))
+//      else if (screen->machine().input().code_pressed(KEYCODE_D))
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) - ((state->m_fof_700000[0] & 0x0038) >> 3);
-//      else if (input_code_pressed(screen->machine(), KEYCODE_F))
+//      else if (screen->machine().input().code_pressed(KEYCODE_F))
 //          scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5) + ((state->m_fof_700000[0] & 0x01c0) >> 6);
 //      else
 		scrollmid = ((state->m_fof_900000[0] & 0xff00) >> 5);
 		tilemap_set_scrollx(state->m_fof_mid_tilemap, 0, scrollmid );
 		tilemap_set_scrolly(state->m_fof_mid_tilemap, 0, state->m_fof_900000[0] & 0xff);
-//      if (!input_code_pressed(screen->machine(), KEYCODE_F))
+//      if (!screen->machine().input().code_pressed(KEYCODE_F))
 		tilemap_draw(bitmap, cliprect, state->m_fof_mid_tilemap, 0, 0);
 
 		draw_sprites(screen->machine(), bitmap, cliprect, 1);

@@ -288,7 +288,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( cmmb_irq )
 {
-	//if(input_code_pressed_once(device->machine(), KEYCODE_Z))
+	//if(device->machine().input().code_pressed_once(KEYCODE_Z))
 	//  device_set_input_line(device, 0, HOLD_LINE);
 }
 

@@ -97,7 +97,7 @@ SCREEN_UPDATE(funybubl)
 	draw_sprites(screen->machine(), bitmap, cliprect);
 
 #if 0
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		FILE *fp;
 

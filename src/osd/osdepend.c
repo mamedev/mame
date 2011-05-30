@@ -183,7 +183,7 @@ void osd_interface::set_mastervolume(int attenuation)
 //  additions/modifications to the input list
 //-------------------------------------------------
 
-void osd_interface::customize_input_type_list(input_type_desc *typelist)
+void osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
 	//
 	// inptport.c defines some general purpose defaults for key and joystick bindings.

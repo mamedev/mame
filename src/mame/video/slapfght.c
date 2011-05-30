@@ -137,7 +137,7 @@ static void slapfght_log_vram(running_machine &machine)
 {
 #ifdef MAME_DEBUG
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	if ( input_code_pressed_once(machine, KEYCODE_B) )
+	if ( machine.input().code_pressed_once(KEYCODE_B) )
 	{
 		int i;
 		for (i=0; i<0x800; i++)

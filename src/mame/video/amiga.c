@@ -983,9 +983,9 @@ void amiga_render_scanline(running_machine &machine, bitmap_t *bitmap, int scanl
 #if GUESS_COPPER_OFFSET
 	if (machine.primary_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
-		if (input_code_pressed(machine, KEYCODE_Q))
+		if (machine.input().code_pressed(KEYCODE_Q))
 			popmessage("%d", state->m_wait_offset -= 1);
-		if (input_code_pressed(machine, KEYCODE_W))
+		if (machine.input().code_pressed(KEYCODE_W))
 			popmessage("%d", state->m_wait_offset += 1);
 	}
 #endif

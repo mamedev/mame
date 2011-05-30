@@ -179,10 +179,10 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		int old = state->m_irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (input_code_pressed(timer->machine(), KEYCODE_Q)) { while (input_code_pressed(timer->machine(), KEYCODE_Q)) ; state->m_irq2_scanline -= 10; }
-		if (input_code_pressed(timer->machine(), KEYCODE_W)) { while (input_code_pressed(timer->machine(), KEYCODE_W)) ; state->m_irq2_scanline -= 1; }
-		if (input_code_pressed(timer->machine(), KEYCODE_E)) { while (input_code_pressed(timer->machine(), KEYCODE_E)) ; state->m_irq2_scanline += 1; }
-		if (input_code_pressed(timer->machine(), KEYCODE_R)) { while (input_code_pressed(timer->machine(), KEYCODE_R)) ; state->m_irq2_scanline += 10; }
+		if (timer->machine().input().code_pressed(KEYCODE_Q)) { while (timer->machine().input().code_pressed(KEYCODE_Q)) ; state->m_irq2_scanline -= 10; }
+		if (timer->machine().input().code_pressed(KEYCODE_W)) { while (timer->machine().input().code_pressed(KEYCODE_W)) ; state->m_irq2_scanline -= 1; }
+		if (timer->machine().input().code_pressed(KEYCODE_E)) { while (timer->machine().input().code_pressed(KEYCODE_E)) ; state->m_irq2_scanline += 1; }
+		if (timer->machine().input().code_pressed(KEYCODE_R)) { while (timer->machine().input().code_pressed(KEYCODE_R)) ; state->m_irq2_scanline += 10; }
 		if (old != state->m_irq2_scanline)
 			popmessage("scanline = %d", state->m_irq2_scanline);
 	}

@@ -1138,7 +1138,7 @@ static void butasan_log_vram(running_machine &machine)
 	argus_state *state = machine.driver_data<argus_state>();
 	int offs;
 
-	if (input_code_pressed(machine, KEYCODE_M))
+	if (machine.input().code_pressed(KEYCODE_M))
 	{
 		UINT8 *spriteram = state->m_spriteram;
 		int i;

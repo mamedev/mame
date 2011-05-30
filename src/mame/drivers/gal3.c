@@ -188,8 +188,8 @@ static SCREEN_UPDATE(gal3)
 
 	update_palette(screen->machine());
 
-	if( input_code_pressed_once(screen->machine(), KEYCODE_H)&&(pivot<15) )	pivot+=1;
-	if( input_code_pressed_once(screen->machine(), KEYCODE_J)&&(pivot>0) )	pivot-=1;
+	if( screen->machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )	pivot+=1;
+	if( screen->machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) )	pivot-=1;
 
 	for( pri=0; pri<pivot; pri++ )
 	{

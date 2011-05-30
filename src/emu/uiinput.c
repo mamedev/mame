@@ -103,7 +103,7 @@ void ui_input_frame_update(running_machine &machine)
 	/* update the state of all the UI keys */
 	for (code = __ipt_ui_start; code <= __ipt_ui_end; code++)
 	{
-		int pressed = input_seq_pressed(machine, input_type_seq(machine, code, 0, SEQ_TYPE_STANDARD));
+		int pressed = machine.input().seq_pressed(input_type_seq(machine, code, 0, SEQ_TYPE_STANDARD));
 		if (!pressed || uidata->seqpressed[code] != SEQ_PRESSED_RESET)
 			uidata->seqpressed[code] = pressed;
 	}

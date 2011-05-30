@@ -175,14 +175,14 @@ static SCREEN_UPDATE(galaxi)
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(screen->machine(), KEYCODE_R))	// remapped due to inputs changes.
+	if (screen->machine().input().code_pressed(KEYCODE_R))	// remapped due to inputs changes.
 	{
 		int msk = 0;
-		if (input_code_pressed(screen->machine(), KEYCODE_T))	msk |= 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_Y))	msk |= 2;
-		if (input_code_pressed(screen->machine(), KEYCODE_U))	msk |= 4;
-		if (input_code_pressed(screen->machine(), KEYCODE_I))	msk |= 8;
-		if (input_code_pressed(screen->machine(), KEYCODE_O))	msk |= 16;
+		if (screen->machine().input().code_pressed(KEYCODE_T))	msk |= 1;
+		if (screen->machine().input().code_pressed(KEYCODE_Y))	msk |= 2;
+		if (screen->machine().input().code_pressed(KEYCODE_U))	msk |= 4;
+		if (screen->machine().input().code_pressed(KEYCODE_I))	msk |= 8;
+		if (screen->machine().input().code_pressed(KEYCODE_O))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif

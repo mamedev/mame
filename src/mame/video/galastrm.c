@@ -476,17 +476,17 @@ SCREEN_UPDATE( galastrm )
 #if 0
 	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
 	{
-		if (!input_code_pressed(screen->machine(), KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[0], 0, 1);
-		if (!input_code_pressed(screen->machine(), KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[1], 0, 4);
-		if (!input_code_pressed(screen->machine(), KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[2], 0, 4);
-		if (!input_code_pressed(screen->machine(), KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[3], 0, 4);
+		if (!screen->machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[0], 0, 1);
+		if (!screen->machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[1], 0, 4);
+		if (!screen->machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[2], 0, 4);
+		if (!screen->machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[3], 0, 4);
 	}
 	else
 	{
-		if (!input_code_pressed(screen->machine(), KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[0], 0, 1);
-		if (!input_code_pressed(screen->machine(), KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[1], 0, 2);
-		if (!input_code_pressed(screen->machine(), KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[2], 0, 4);
-		if (!input_code_pressed(screen->machine(), KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[3], 0, 8);
+		if (!screen->machine().input().code_pressed(KEYCODE_Z)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[0], 0, 1);
+		if (!screen->machine().input().code_pressed(KEYCODE_X)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[1], 0, 2);
+		if (!screen->machine().input().code_pressed(KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[2], 0, 4);
+		if (!screen->machine().input().code_pressed(KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, state->m_tmpbitmaps, &clip, layer[3], 0, 8);
 	}
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
@@ -515,8 +515,8 @@ SCREEN_UPDATE( galastrm )
 	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine(),bitmap,cliprect,primasks,0);
 
-	if (!input_code_pressed(screen->machine(), KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
-	if (!input_code_pressed(screen->machine(), KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
+	if (!screen->machine().input().code_pressed(KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
+	if (!screen->machine().input().code_pressed(KEYCODE_M)) tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);
 
 
 

@@ -61,6 +61,12 @@ int sort_callback(const void *elem1, const void *elem2)
 	return strcmp(*item1, *item2);
 }
 
+
+//-------------------------------------------------
+//  parse_file - parse a single file, may be 
+//  called recursively
+//-------------------------------------------------
+
 int parse_file(const char *srcfile)
 {
 	// read source file
@@ -78,7 +84,6 @@ int parse_file(const char *srcfile)
 	char *endptr = srcptr + length;
 	int linenum = 1;
 	bool in_comment = false;
-	bool in_import = false;
 	while (srcptr < endptr)
 	{
 		char c = *srcptr++;
@@ -116,13 +121,6 @@ int parse_file(const char *srcfile)
 			continue;
 		}
 
-		// look for start of import directive start
-		if (c == '#')
-		{
-			in_import = true;
-			continue;
-		}
-
 		// if we hit a C++ comment, scan to the end of line
 		if (c == '/' && *srcptr == '/')
 		{
@@ -131,11 +129,11 @@ int parse_file(const char *srcfile)
 			continue;
 		}
 
-		if (in_import) {
-			in_import = false;
+		// look for an import directive
+		if (c == '#')
+		{
 			char filename[256];
 			filename[0] = 0;
-			srcptr--;
 			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(filename) - 1 && !isspace(*srcptr); pos++)
 			{
 				filename[pos] = *srcptr++;
@@ -143,34 +141,37 @@ int parse_file(const char *srcfile)
 			}
 			fprintf(stderr, "Importing drivers from '%s'\n", filename);
 			parse_file(filename);
-		} else {
-			// extract the driver name
-			char drivname[32];
-			drivname[0] = 0;
-			srcptr--;
-			for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
-			{
-				drivname[pos] = *srcptr++;
-				drivname[pos+1] = 0;
-			}
-
-			// verify the name as valid
-			for (char *drivch = drivname; *drivch != 0; drivch++)
-			{
-				if ((*drivch >= 'a' && *drivch <= 'z') || (*drivch >= '0' && *drivch <= '9') || *drivch == '_')
-					continue;
-				fprintf(stderr, "%s:%d - Invalid character '%c' in driver \"%s\"\n", srcfile, linenum, *drivch, drivname);
-				return 1;
-			}
-
-			// add it to the list
-			char *name = (char *)malloc(strlen(drivname) + 1);
-			strcpy(name, drivname);
-			drivlist[drivcount++] = name;
+			continue;
 		}
+		
+		// otherwise treat as a driver name
+		char drivname[32];
+		drivname[0] = 0;
+		srcptr--;
+		for (int pos = 0; srcptr < endptr && pos < ARRAY_LENGTH(drivname) - 1 && !isspace(*srcptr); pos++)
+		{
+			drivname[pos] = *srcptr++;
+			drivname[pos+1] = 0;
+		}
+
+		// verify the name as valid
+		for (char *drivch = drivname; *drivch != 0; drivch++)
+		{
+			if ((*drivch >= 'a' && *drivch <= 'z') || (*drivch >= '0' && *drivch <= '9') || *drivch == '_')
+				continue;
+			fprintf(stderr, "%s:%d - Invalid character '%c' in driver \"%s\"\n", srcfile, linenum, *drivch, drivname);
+			return 1;
+		}
+
+		// add it to the list
+		char *name = (char *)malloc(strlen(drivname) + 1);
+		strcpy(name, drivname);
+		drivlist[drivcount++] = name;
 	}
 	return 0;
 }
+
+
 //-------------------------------------------------
 //  main - primary entry point
 //-------------------------------------------------
@@ -190,10 +191,10 @@ int main(int argc, char *argv[])
 	// extract arguments
 	const char *srcfile = argv[1];
 
+	// parse the root file, exit early upon failure
 	drivcount = 0;
-	if (parse_file(srcfile)) {
+	if (parse_file(srcfile))
 		return 1;
-	}
 
 	// add a reference to the ___empty driver
 	drivlist[drivcount++] = "___empty";

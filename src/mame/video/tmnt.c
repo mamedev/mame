@@ -178,9 +178,9 @@ void blswhstl_sprite_callback( running_machine &machine, int *code, int *color, 
 {
 	tmnt_state *state = machine.driver_data<tmnt_state>();
 #if 0
-if (input_code_pressed(machine, KEYCODE_Q) && (*color & 0x20)) *color = rand();
-if (input_code_pressed(machine, KEYCODE_W) && (*color & 0x40)) *color = rand();
-if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x80)) *color = rand();
+if (machine.input().code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
+if (machine.input().code_pressed(KEYCODE_W) && (*color & 0x40)) *color = rand();
+if (machine.input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = rand();
 #endif
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= state->m_layerpri[2])

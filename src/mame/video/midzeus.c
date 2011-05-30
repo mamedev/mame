@@ -317,7 +317,7 @@ SCREEN_UPDATE( midzeus )
 	poly_wait(poly, "VIDEO_UPDATE");
 
 	/* normal update case */
-	if (!input_code_pressed(screen->machine(), KEYCODE_W))
+	if (!screen->machine().input().code_pressed(KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
 		int xoffs = screen->visible_area().min_x;
@@ -334,10 +334,10 @@ SCREEN_UPDATE( midzeus )
 	{
 		const void *base;
 
-		if (input_code_pressed(screen->machine(), KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine(), KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine(), KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine(), KEYCODE_LEFT)) ; }
-		if (input_code_pressed(screen->machine(), KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine(), KEYCODE_RIGHT)) ; }
+		if (screen->machine().input().code_pressed(KEYCODE_DOWN)) yoffs += screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen->machine().input().code_pressed(KEYCODE_UP)) yoffs -= screen->machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x40 : 1;
+		if (screen->machine().input().code_pressed(KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (screen->machine().input().code_pressed(KEYCODE_LEFT)) ; }
+		if (screen->machine().input().code_pressed(KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (screen->machine().input().code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = waveram0_ptr_from_block_addr(yoffs << 12);
@@ -739,7 +739,7 @@ static void zeus_register_update(running_machine &machine, offs_t offset)
 
 		case 0xcc:
 			machine.primary_screen->update_partial(machine.primary_screen->vpos());
-			log_fifo = input_code_pressed(machine, KEYCODE_L);
+			log_fifo = machine.input().code_pressed(KEYCODE_L);
 			break;
 
 		case 0xe0:
@@ -1099,7 +1099,7 @@ if (
 	{
 		if (logit)
 			logerror("quad (culled %08X)\n", rotnormal[2]);
-//      if (input_code_pressed(machine, KEYCODE_COMMA))
+//      if (machine.input().code_pressed(KEYCODE_COMMA))
 //          return;
 	}
 
@@ -1112,13 +1112,13 @@ if (
 	val2 = (texdata >> 16) & 0x3ff;
 	texwshift = (val2 >> 6) & 7;
 
-//if (input_code_pressed(machine, KEYCODE_Z) && (val2 & 0x01)) return;
-//if (input_code_pressed(machine, KEYCODE_X) && (val2 & 0x02)) return;
-//if (input_code_pressed(machine, KEYCODE_C) && (val2 & 0x04)) return;
-//if (input_code_pressed(machine, KEYCODE_V) && (val2 & 0x08)) return;
-//if (input_code_pressed(machine, KEYCODE_B) && (val2 & 0x10)) return;
-//if (input_code_pressed(machine, KEYCODE_N) && (val2 & 0x20)) return;
-//if (input_code_pressed(machine, KEYCODE_M) && (val2 & 0x200)) return;
+//if (machine.input().code_pressed(KEYCODE_Z) && (val2 & 0x01)) return;
+//if (machine.input().code_pressed(KEYCODE_X) && (val2 & 0x02)) return;
+//if (machine.input().code_pressed(KEYCODE_C) && (val2 & 0x04)) return;
+//if (machine.input().code_pressed(KEYCODE_V) && (val2 & 0x08)) return;
+//if (machine.input().code_pressed(KEYCODE_B) && (val2 & 0x10)) return;
+//if (machine.input().code_pressed(KEYCODE_N) && (val2 & 0x20)) return;
+//if (machine.input().code_pressed(KEYCODE_M) && (val2 & 0x200)) return;
 
 	uscale = (8 >> ((zeusbase[0x04] >> 4) & 3)) * 0.125f * 256.0f;
 	vscale = (8 >> ((zeusbase[0x04] >> 6) & 3)) * 0.125f * 256.0f;

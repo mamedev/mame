@@ -198,7 +198,7 @@ static device_info *generic_device_find_index(device_info *devlist_head, int ind
 // master keyboard translation table
 typedef struct _kt_table kt_table;
 struct _kt_table {
-	INT32			mame_key;
+	input_item_id	mame_key;
 	INT32			sdl_key;
 	//const char *  vkey;
 	//const char *  ascii;
@@ -334,7 +334,7 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY2(  MENU,			MENU ),
 	KTT_ENTRY0(  TILDE, 		GRAVE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY0(  BACKSLASH2,	NONUSBACKSLASH,     0xdc,   '\\', "BACKSLASH2" ),
-	{ -1 }
+	{ ITEM_ID_INVALID }
 };
 #else
 
@@ -459,7 +459,7 @@ static kt_table sdl_key_trans_table[] =
 	KTT_ENTRY2(  MENU,			MENU ),
 	KTT_ENTRY0(  TILDE, 		BACKQUOTE,  	0xc0,	'`',	"TILDE" ),
 	KTT_ENTRY0(  BACKSLASH2,	HASH,     0xdc,   '\\', "BACKSLASH2" ),
-	{ -1 }
+	{ ITEM_ID_INVALID }
 };
 #endif
 
@@ -661,14 +661,14 @@ static device_info *devmap_class_register(running_machine &machine, device_map_t
 		{
 			sprintf(tempname, "NC%d", index);
 			devinfo = generic_device_alloc(devlist, tempname);
-			devinfo->device = input_device_add(machine, devclass, devinfo->name, devinfo);
+			devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
 		}
 		return NULL;
 	}
 	else
 	{
 		devinfo = generic_device_alloc(devlist, devmap->map[index].name);
-		devinfo->device = input_device_add(machine, devclass, devinfo->name, devinfo);
+		devinfo->device = machine.input().device_class(devclass).add_device(devinfo->name, devinfo);
 	}
 	return devinfo;
 }
@@ -725,7 +725,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
 
 			sprintf(tempname, "A%d %s", axis, devinfo->name);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.axes[axis], itemid, generic_axis_get_state);
+			devinfo->device->add_item(tempname, itemid, generic_axis_get_state, &devinfo->joystick.axes[axis]);
 		}
 
 		// loop over all buttons
@@ -743,7 +743,7 @@ static void sdlinput_register_joysticks(running_machine &machine)
 				itemid = ITEM_ID_OTHER_SWITCH;
 
 			sprintf(tempname, "button %d", button);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.buttons[button], itemid, generic_button_get_state);
+			devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.buttons[button]);
 		}
 
 		// loop over all hats
@@ -753,16 +753,16 @@ static void sdlinput_register_joysticks(running_machine &machine)
 
 			sprintf(tempname, "hat %d Up", hat);
 			itemid = (input_item_id) ((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsU[hat], itemid, generic_button_get_state);
+			devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsU[hat]);
 			sprintf(tempname, "hat %d Down", hat);
 			itemid = (input_item_id) ((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsD[hat], itemid, generic_button_get_state);
+			devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsD[hat]);
 			sprintf(tempname, "hat %d Left", hat);
 			itemid = (input_item_id) ((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-			input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsL[hat], itemid, generic_button_get_state);
+			devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsL[hat]);
 			sprintf(tempname, "hat %d Right", hat);
 			itemid = (input_item_id) ((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + 4 * hat : ITEM_ID_OTHER_SWITCH);
-	    	input_device_item_add(devinfo->device, tempname, &devinfo->joystick.hatsR[hat], itemid, generic_button_get_state);
+	    	devinfo->device->add_item(tempname, itemid, generic_button_get_state, &devinfo->joystick.hatsR[hat]);
 		}
 	}
 	mame_printf_verbose("Joystick: End initialization\n");
@@ -820,9 +820,9 @@ static void sdlinput_register_mice(running_machine &machine)
 
 		// add the axes
 		sprintf(defname, "X %s", devinfo->name);
-		input_device_item_add(devinfo->device, defname, &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
+		devinfo->device->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->mouse.lX);
 		sprintf(defname, "Y %s", devinfo->name);
-		input_device_item_add(devinfo->device, defname, &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
+		devinfo->device->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->mouse.lY);
 
 		for (button = 0; button < 4; button++)
 		{
@@ -831,7 +831,7 @@ static void sdlinput_register_mice(running_machine &machine)
 			sprintf(defname, "B%d", button + 1);
 			itemid = (input_item_id) (ITEM_ID_BUTTON1+button);
 
-			input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], itemid, generic_button_get_state);
+			devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->mouse.buttons[button]);
 		}
 
 		if (0 && mouse_enabled)
@@ -853,20 +853,20 @@ static void sdlinput_register_mice(running_machine &machine)
 
 	// SDL 1.2 has only 1 mouse - 1.3+ will also change that, so revisit this then
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_MOUSE).add_device(devinfo->name, devinfo);
 
 	mouse_enabled = machine.options().mouse();
 
 	// add the axes
-	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
-	input_device_item_add(devinfo->device, "Y", &devinfo->mouse.lY, ITEM_ID_YAXIS, generic_axis_get_state);
+	devinfo->device->add_item("X", ITEM_ID_XAXIS, generic_axis_get_state, &devinfo->mouse.lX);
+	devinfo->device->add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state, &devinfo->mouse.lY);
 
 	for (button = 0; button < 4; button++)
 	{
 		input_item_id itemid = (input_item_id) (ITEM_ID_BUTTON1+button);
 		sprintf(defname, "B%d", button + 1);
 
-		input_device_item_add(devinfo->device, defname, &devinfo->mouse.buttons[button], itemid, generic_button_get_state);
+		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->mouse.buttons[button]);
 	}
 
 	mame_printf_verbose("Mouse: Registered %s\n", devinfo->name);
@@ -903,7 +903,7 @@ static int lookup_mame_index(const char *scode)
 
 	index=-1;
 	i=0;
-	while (sdl_key_trans_table[i].mame_key >= 0)
+	while (sdl_key_trans_table[i].mame_key != ITEM_ID_INVALID)
 	{
 		if (!strcmp(scode, sdl_key_trans_table[i].mame_key_name))
 		{
@@ -915,14 +915,14 @@ static int lookup_mame_index(const char *scode)
 	return index;
 }
 
-static int lookup_mame_code(const char *scode)
+static input_item_id lookup_mame_code(const char *scode)
 {
 	int index;
 	index = lookup_mame_index(scode);
 	if (index >= 0)
 		return sdl_key_trans_table[index].mame_key;
 	else
-		return -1;
+		return ITEM_ID_INVALID;
 }
 
 
@@ -1035,17 +1035,17 @@ static void sdlinput_register_keyboards(running_machine &machine)
 			continue;
 
 		// populate it
-		for (keynum = 0; sdl_key_trans_table[keynum].mame_key >= 0; keynum++)
+		for (keynum = 0; sdl_key_trans_table[keynum].mame_key!= ITEM_ID_INVALID; keynum++)
 		{
 			input_item_id itemid;
 
-			itemid = (input_item_id) key_trans_table[keynum].mame_key;
+			itemid = key_trans_table[keynum].mame_key;
 
 			// generate the default / modified name
 			snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 			// add the item to the device
-			input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
+			devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 		}
 
 		mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
@@ -1069,21 +1069,21 @@ static void sdlinput_register_keyboards(running_machine &machine)
 	// SDL 1.2 only has 1 keyboard (1.3+ will have multiple, this must be revisited then)
 	// add it now
 	devinfo = generic_device_alloc(&keyboard_list, "System keyboard");
-	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = machine.input().device_class(DEVICE_CLASS_KEYBOARD).add_device(devinfo->name, devinfo);
 
 	// populate it
-	for (keynum = 0; sdl_key_trans_table[keynum].mame_key >= 0; keynum++)
+	for (keynum = 0; sdl_key_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
 	{
 		input_item_id itemid;
 
-		itemid = (input_item_id) key_trans_table[keynum].mame_key;
+		itemid = key_trans_table[keynum].mame_key;
 
 		// generate the default / modified name
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 		// add the item to the device
 //      printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
-		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
+		devinfo->device->add_item(defname, itemid, generic_button_get_state, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)]);
 	}
 
 	mame_printf_verbose("Keyboard: Registered %s\n", devinfo->name);
@@ -1590,17 +1590,18 @@ int sdlinput_should_hide_mouse(running_machine &machine)
 //  customize_input_type_list
 //============================================================
 
-void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
+void sdl_osd_interface::customize_input_type_list(simple_list<input_type_entry> &typelist)
 {
-	int mameid_code ,ui_code;
-	input_type_desc *typedesc;
+	input_item_id mameid_code;
+	input_code ui_code;
+	input_type_entry *entry;
 	const char*  uimode;
 	char fullmode[64];
 
 	// loop over the defaults
-	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
+	for (entry = typelist.first(); entry != NULL; entry = entry->next())
 	{
-		switch (typedesc->type)
+		switch (entry->type)
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
@@ -1618,27 +1619,27 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
 					mameid_code = lookup_mame_code(fullmode);
 				}
-				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
-				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], ui_code);
+				ui_code = input_code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(mameid_code));
+				entry->seq[SEQ_TYPE_STANDARD].set(ui_code);
 				break;
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				typedesc->token = "TOGGLE_FULLSCREEN";
-				typedesc->name = "Toggle Fullscreen";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_ENTER, KEYCODE_LALT);
+				entry->token = "TOGGLE_FULLSCREEN";
+				entry->name = "Toggle Fullscreen";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_ENTER, KEYCODE_LALT);
 				break;
 
 			// disable UI_SELECT when LALT is down, this stops selecting
 			// things in the menu when toggling fullscreen with LALT+ENTER
 /*          case IPT_UI_SELECT:
-                input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_ENTER, SEQCODE_NOT, KEYCODE_LALT);
+                entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT);
                 break;*/
 
 			// page down for fastforward (must be OSD_3 as per src/emu/ui.c)
 			case IPT_UI_FAST_FORWARD:
-				typedesc->token = "FAST_FORWARD";
-				typedesc->name = "Fast Forward";
-				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_PGDN);
+				entry->token = "FAST_FORWARD";
+				entry->name = "Fast Forward";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_PGDN);
 				break;
 
 			// OSD hotkeys use LCTRL and start at F3, they start at
@@ -1648,68 +1649,68 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 
 			// LCTRL-F3 to toggle fullstretch
 			case IPT_OSD_2:
-				typedesc->token = "TOGGLE_FULLSTRETCH";
-				typedesc->name = "Toggle Uneven stretch";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F3, KEYCODE_LCONTROL);
+				entry->token = "TOGGLE_FULLSTRETCH";
+				entry->name = "Toggle Uneven stretch";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F3, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the reset key
 			case IPT_UI_SOFT_RESET:
-				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F3, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F3, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
 				break;
 
 			// LCTRL-F4 to toggle keep aspect
 			case IPT_OSD_4:
-				typedesc->token = "TOGGLE_KEEP_ASPECT";
-				typedesc->name = "Toggle Keepaspect";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F4, KEYCODE_LCONTROL);
+				entry->token = "TOGGLE_KEEP_ASPECT";
+				entry->name = "Toggle Keepaspect";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F4, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the show gfx key
 			case IPT_UI_SHOW_GFX:
-				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F4, SEQCODE_NOT, KEYCODE_LCONTROL);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F4, input_seq::not_code, KEYCODE_LCONTROL);
 				break;
 
 			// LCTRL-F5 to toggle OpenGL filtering
 			case IPT_OSD_5:
-				typedesc->token = "TOGGLE_FILTER";
-				typedesc->name = "Toggle Filter";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F5, KEYCODE_LCONTROL);
+				entry->token = "TOGGLE_FILTER";
+				entry->name = "Toggle Filter";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F5, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the toggle debug key
 			case IPT_UI_TOGGLE_DEBUG:
-				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F5, SEQCODE_NOT, KEYCODE_LCONTROL);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL);
 				break;
 
 			// LCTRL-F6 to decrease OpenGL prescaling
 			case IPT_OSD_6:
-				typedesc->token = "DECREASE_PRESCALE";
-				typedesc->name = "Decrease Prescaling";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F6, KEYCODE_LCONTROL);
+				entry->token = "DECREASE_PRESCALE";
+				entry->name = "Decrease Prescaling";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F6, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the toggle cheat key
 			case IPT_UI_TOGGLE_CHEAT:
-				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F6, SEQCODE_NOT, KEYCODE_LCONTROL);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F6, input_seq::not_code, KEYCODE_LCONTROL);
 				break;
 
 			// LCTRL-F7 to increase OpenGL prescaling
 			case IPT_OSD_7:
-				typedesc->token = "INCREASE_PRESCALE";
-				typedesc->name = "Increase Prescaling";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, KEYCODE_LCONTROL);
+				entry->token = "INCREASE_PRESCALE";
+				entry->name = "Increase Prescaling";
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F7, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the load state key
 			case IPT_UI_LOAD_STATE:
-				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
 				break;
 
 			// add a Not lcrtl condition to the throttle key
 			case IPT_UI_THROTTLE:
-				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, SEQCODE_NOT, KEYCODE_LCONTROL);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F10, input_seq::not_code, KEYCODE_LCONTROL);
 				break;
 
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between apps)
 			case IPT_UI_CONFIGURE:
-				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
+				entry->seq[SEQ_TYPE_STANDARD].set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
 		}
 	}

@@ -252,7 +252,7 @@ public:
 	virtual void set_mastervolume(int attenuation);
 
 	// input overridables
-	virtual void customize_input_type_list(input_type_desc *typelist);
+	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist);
 
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);

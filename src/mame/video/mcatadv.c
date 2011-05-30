@@ -231,19 +231,19 @@ SCREEN_UPDATE( mcatadv )
 	for (i = 0; i <= 3; i++)
 	{
 	#ifdef MAME_DEBUG
-			if (!input_code_pressed(screen->machine(), KEYCODE_Q))
+			if (!screen->machine().input().code_pressed(KEYCODE_Q))
 	#endif
 			mcatadv_draw_tilemap_part(state->m_scroll1,  state->m_videoram1, i, state->m_tilemap1, bitmap, cliprect);
 
 	#ifdef MAME_DEBUG
-			if (!input_code_pressed(screen->machine(), KEYCODE_W))
+			if (!screen->machine().input().code_pressed(KEYCODE_W))
 	#endif
 				mcatadv_draw_tilemap_part(state->m_scroll2, state->m_videoram2, i, state->m_tilemap2, bitmap, cliprect);
 	}
 
 	g_profiler.start(PROFILER_USER1);
 #ifdef MAME_DEBUG
-	if (!input_code_pressed(screen->machine(), KEYCODE_E))
+	if (!screen->machine().input().code_pressed(KEYCODE_E))
 #endif
 		draw_sprites (screen->machine(), bitmap, cliprect);
 	g_profiler.stop();

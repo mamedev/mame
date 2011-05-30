@@ -633,11 +633,11 @@ void raiden2_state::draw_sprites(running_machine &machine, bitmap_t *bitmap, con
 //  static int ytlim = 1;
 //  static int xtlim = 1;
 
-//  if ( input_code_pressed_once(machine, KEYCODE_Q) ) ytlim--;
-//  if ( input_code_pressed_once(machine, KEYCODE_W) ) ytlim++;
+//  if ( machine.input().code_pressed_once(KEYCODE_Q) ) ytlim--;
+//  if ( machine.input().code_pressed_once(KEYCODE_W) ) ytlim++;
 
-//  if ( input_code_pressed_once(machine, KEYCODE_A) ) xtlim--;
-//  if ( input_code_pressed_once(machine, KEYCODE_S) ) xtlim++;
+//  if ( machine.input().code_pressed_once(KEYCODE_A) ) xtlim--;
+//  if ( machine.input().code_pressed_once(KEYCODE_S) ) xtlim++;
 
 
 	/*00 ???? ????  (colour / priority?)
@@ -886,31 +886,31 @@ static SCREEN_UPDATE( raiden2 )
 	raiden2_state *state = screen->machine().driver_data<raiden2_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine()));
 
-	//if (!input_code_pressed(screen->machine(), KEYCODE_Q))
+	//if (!screen->machine().input().code_pressed(KEYCODE_Q))
 	{
 		if (!(state->raiden2_tilemap_enable & 1))
 			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine(), KEYCODE_W))
+	//if (!screen->machine().input().code_pressed(KEYCODE_W))
 	{
 		if (!(state->raiden2_tilemap_enable & 2))
 			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine(), KEYCODE_E))
+	//if (!screen->machine().input().code_pressed(KEYCODE_E))
 	{
 		if (!(state->raiden2_tilemap_enable & 4))
 			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine(), KEYCODE_S))
+	//if (!screen->machine().input().code_pressed(KEYCODE_S))
 	{
 		//if (!(raiden2_tilemap_enable & 0x10))
 			state->draw_sprites(screen->machine(), bitmap, cliprect, 0);
 	}
 
-	//if (!input_code_pressed(screen->machine(), KEYCODE_A))
+	//if (!screen->machine().input().code_pressed(KEYCODE_A))
 	{
 		if (!(state->raiden2_tilemap_enable & 8))
 			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);

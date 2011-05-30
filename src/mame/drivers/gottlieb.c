@@ -599,7 +599,7 @@ static void audio_handle_zero_crossing(gottlieb_state *state, attotime zerotime,
 static void laserdisc_audio_process(device_t *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
 	gottlieb_state *state = device->machine().driver_data<gottlieb_state>();
-	int logit = LOG_AUDIO_DECODE && input_code_pressed(device->machine(), KEYCODE_L);
+	int logit = LOG_AUDIO_DECODE && device->machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
 	attotime curtime = state->m_laserdisc_last_time;
 	int cursamp;

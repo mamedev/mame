@@ -1737,7 +1737,7 @@ void k007342_tilemap_update( device_t *device )
 	{
 		static int current_layer = 0;
 
-		if (input_code_pressed_once(machine, KEYCODE_Z)) current_layer = !current_layer;
+		if (machine.input().code_pressed_once(KEYCODE_Z)) current_layer = !current_layer;
 		tilemap_set_enable(k007342->tilemap[current_layer], 1);
 		tilemap_set_enable(k007342->tilemap[!current_layer], 0);
 
@@ -2086,8 +2086,8 @@ void k007420_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 	{
 		static int current_sprite = 0;
 
-		if (input_code_pressed_once(machine, KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
-		if (input_code_pressed_once(machine, KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
+		if (machine.input().code_pressed_once(KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
+		if (machine.input().code_pressed_once(KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
 
 		popmessage("%02x:%02x %02x %02x %02x %02x %02x %02x %02x", current_sprite,
 			k007420->ram[(current_sprite*8)+0], k007420->ram[(current_sprite*8)+1],
@@ -2547,7 +2547,7 @@ if ((k052109->scrollctrl & 0x03) == 0x01 ||
 		(k052109->scrollctrl & 0xc0) != 0)
 	popmessage("scrollcontrol = %02x", k052109->scrollctrl);
 
-if (input_code_pressed(machine, KEYCODE_F))
+if (machine.input().code_pressed(KEYCODE_F))
 {
 	FILE *fp;
 	fp=fopen("TILE.DMP", "w+b");
@@ -3182,7 +3182,7 @@ void k051960_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 		}
 	}
 #if 0
-if (input_code_pressed(machine, KEYCODE_D))
+if (machine.input().code_pressed(KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -3766,7 +3766,7 @@ void k053245_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 		}
 	}
 #if 0
-if (input_code_pressed(machine, KEYCODE_D))
+if (machine.input().code_pressed(KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -4016,7 +4016,7 @@ void k053245_sprites_draw_lethal( device_t *device, bitmap_t *bitmap, const rect
 		}
 	}
 #if 0
-if (input_code_pressed(machine, KEYCODE_D))
+if (machine.input().code_pressed(KEYCODE_D))
 {
 	FILE *fp;
 	fp=fopen("SPRITE.DMP", "w+b");
@@ -5570,7 +5570,7 @@ void k053936_zoom_draw( device_t *device, bitmap_t *bitmap, const rectangle *cli
 	}
 
 #if 0
-if (input_code_pressed(machine, KEYCODE_D))
+if (machine.input().code_pressed(KEYCODE_D))
 	popmessage("%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x\n%04x %04x %04x %04x",
 			k053936->ctrl[0x00],
 			k053936->ctrl[0x01],

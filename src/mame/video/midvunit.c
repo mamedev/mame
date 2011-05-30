@@ -370,7 +370,7 @@ static void process_dma_queue(running_machine &machine)
 WRITE32_HANDLER( midvunit_dma_queue_w )
 {
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
-	if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
+	if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
 		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(&space->device()), state->m_dma_data_index, data);
 	if (state->m_dma_data_index < 16)
 		state->m_dma_data[state->m_dma_data_index++] = data;
@@ -389,7 +389,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	midvunit_state *state = space->machine().driver_data<midvunit_state>();
 	if (offset)
 	{
-		if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
+		if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
 			logerror("%06X:trigger\n", cpu_get_pc(&space->device()));
 		process_dma_queue(space->machine());
 		state->m_dma_data_index = 0;
@@ -412,7 +412,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 	if ((state->m_page_control ^ data) & 1)
 	{
 		state->m_video_changed = TRUE;
-		if (LOG_DMA && input_code_pressed(space->machine(), KEYCODE_L))
+		if (LOG_DMA && space->machine().input().code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
 		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1);
 	}

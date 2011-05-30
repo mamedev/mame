@@ -249,10 +249,10 @@ void psxgpu_device::DebugMeshEnd( void )
 
 void psxgpu_device::DebugCheckKeys( void )
 {
-	if( input_code_pressed_once( machine(), KEYCODE_M ) )
+	if( machine().input().code_pressed_once( KEYCODE_M ) )
 		m_debug.b_mesh = !m_debug.b_mesh;
 
-	if( input_code_pressed_once( machine(), KEYCODE_V ) )
+	if( machine().input().code_pressed_once( KEYCODE_V ) )
 		m_debug.b_texture = !m_debug.b_texture;
 
 	if( m_debug.b_mesh || m_debug.b_texture )
@@ -265,7 +265,7 @@ void psxgpu_device::DebugCheckKeys( void )
 	else
 		machine().primary_screen->set_visible_area( 0, n_screenwidth - 1, 0, n_screenheight - 1 );
 
-	if( input_code_pressed_once( machine(), KEYCODE_I ) )
+	if( machine().input().code_pressed_once( KEYCODE_I ) )
 	{
 		if( m_debug.b_texture )
 		{
@@ -293,7 +293,7 @@ void psxgpu_device::DebugCheckKeys( void )
 	}
 
 #if 0
-	if( input_code_pressed_once( machine(), KEYCODE_D ) )
+	if( machine().input().code_pressed_once( KEYCODE_D ) )
 	{
 		FILE *f;
 		int n_x;
@@ -303,7 +303,7 @@ void psxgpu_device::DebugCheckKeys( void )
 				fprintf( f, "%04u,%04u = %04x\n", n_y, n_x, p_p_vram[ n_y ][ n_x ] );
 		fclose( f );
 	}
-	if( input_code_pressed_once( machine(), KEYCODE_S ) )
+	if( machine().input().code_pressed_once( KEYCODE_S ) )
 	{
 		FILE *f;
 		popmessage( "saving..." );
@@ -312,7 +312,7 @@ void psxgpu_device::DebugCheckKeys( void )
 			fwrite( p_p_vram[ n_y ], 1024 * 2, 1, f );
 		fclose( f );
 	}
-	if( input_code_pressed_once( machine(), KEYCODE_L ) )
+	if( machine().input().code_pressed_once( KEYCODE_L ) )
 	{
 		FILE *f;
 		popmessage( "loading..." );

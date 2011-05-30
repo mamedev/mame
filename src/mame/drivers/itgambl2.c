@@ -88,28 +88,28 @@ static SCREEN_UPDATE( itgambl2 )
 	int x,y,count;
 	const UINT8 *blit_ram = screen->machine().region("gfx1")->base();
 
-	if(input_code_pressed(screen->machine(), KEYCODE_Z))
+	if(screen->machine().input().code_pressed(KEYCODE_Z))
 		state->m_test_x++;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_X))
+	if(screen->machine().input().code_pressed(KEYCODE_X))
 		state->m_test_x--;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_A))
+	if(screen->machine().input().code_pressed(KEYCODE_A))
 		state->m_test_y++;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_S))
+	if(screen->machine().input().code_pressed(KEYCODE_S))
 		state->m_test_y--;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_Q))
+	if(screen->machine().input().code_pressed(KEYCODE_Q))
 		state->m_start_offs+=0x200;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_W))
+	if(screen->machine().input().code_pressed(KEYCODE_W))
 		state->m_start_offs-=0x200;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_E))
+	if(screen->machine().input().code_pressed(KEYCODE_E))
 		state->m_start_offs++;
 
-	if(input_code_pressed(screen->machine(), KEYCODE_R))
+	if(screen->machine().input().code_pressed(KEYCODE_R))
 		state->m_start_offs--;
 
 	popmessage("%d %d %04x",state->m_test_x,state->m_test_y,state->m_start_offs);

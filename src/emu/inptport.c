@@ -235,16 +235,6 @@ struct _input_port_state
 };
 
 
-/* internal live state of an input type */
-typedef struct _input_type_state input_type_state;
-struct _input_type_state
-{
-	input_type_state *			next;				/* pointer to the next live state in the list */
-	input_type_desc				typedesc;			/* copy of the original description, modified by the OSD */
-	input_seq					seq[SEQ_TYPE_TOTAL];/* currently configured sequences */
-};
-
-
 typedef struct _inputx_code inputx_code;
 struct _inputx_code
 {
@@ -277,8 +267,8 @@ struct _input_port_private
 	UINT8						safe_to_read;		/* clear at start; set after state is loaded */
 
 	/* types */
-	input_type_state *			typestatelist;		/* list of live type states */
-	input_type_state *			type_to_typestate[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
+	simple_list<input_type_entry> typelist;		/* list of live type states */
+	input_type_entry *			type_to_entry[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
 
 	/* specific special global input states */
 	digital_joystick_state		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
@@ -800,7 +790,7 @@ static int load_game_config(running_machine &machine, xml_data_node *portnode, i
 
 /* settings save */
 static void save_config_callback(running_machine &machine, int config_type, xml_data_node *parentnode);
-static void save_sequence(running_machine &machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq);
+static void save_sequence(running_machine &machine, xml_data_node *parentnode, int type, int porttype, const input_seq &seq);
 static int save_this_input_field_type(int type);
 static void save_default_inputs(running_machine &machine, xml_data_node *parentnode);
 static void save_game_inputs(running_machine &machine, xml_data_node *parentnode);
@@ -1028,20 +1018,17 @@ const char *input_field_name(const input_field_config *field)
     for the given input field
 -------------------------------------------------*/
 
-const input_seq *input_field_seq(const input_field_config *field, input_seq_type seqtype)
+const input_seq &input_field_seq(const input_field_config *field, input_seq_type seqtype)
 {
-	static const input_seq ip_none = SEQ_DEF_0;
-	const input_seq *portseq = &ip_none;
-
 	/* if the field is disabled, return no key */
 	if (field->flags & FIELD_FLAG_UNUSED)
-		return portseq;
+		return input_seq::empty_seq;
 
 	/* select either the live or config state depending on whether we have live state */
-	portseq = (field->state == NULL) ? &field->seq[seqtype] : &field->state->seq[seqtype];
+	const input_seq &portseq = (field->state == NULL) ? field->seq[seqtype] : field->state->seq[seqtype];
 
 	/* if the portseq is the special default code, return the expanded default value */
-	if (input_seq_get_1(portseq) == SEQCODE_DEFAULT)
+	if (portseq.is_default())
 		return input_type_seq(field->machine(), field->type, field->player, seqtype);
 
 	/* otherwise, return the sequence as-is */
@@ -1087,15 +1074,14 @@ void input_field_get_user_settings(const input_field_config *field, input_field_
 
 void input_field_set_user_settings(const input_field_config *field, const input_field_user_settings *settings)
 {
-	static const input_seq default_seq = SEQ_DEF_1(SEQCODE_DEFAULT);
 	int seqtype;
 
 	/* copy the basics */
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(settings->seq); seqtype++)
 	{
-		const input_seq *defseq = input_type_seq(field->machine(), field->type, field->player, (input_seq_type)seqtype);
-		if (input_seq_cmp(defseq, &settings->seq[seqtype]) == 0)
-			field->state->seq[seqtype] = default_seq;
+		const input_seq &defseq = input_type_seq(field->machine(), field->type, field->player, (input_seq_type)seqtype);
+		if (defseq == settings->seq[seqtype])
+			field->state->seq[seqtype] = input_seq::default_seq;
 		else
 			field->state->seq[seqtype] = settings->seq[seqtype];
 	}
@@ -1289,22 +1275,10 @@ int input_type_is_analog(int type)
 const char *input_type_name(running_machine &machine, int type, int player)
 {
 	/* if we have a machine, use the live state and quick lookup */
-	if (1)//machine != NULL)
-	{
-		input_port_private *portdata = machine.input_port_data;
-		input_type_state *typestate = portdata->type_to_typestate[type][player];
-		if (typestate != NULL)
-			return typestate->typedesc.name;
-	}
-
-	/* if no machine, fall back to brute force searching */
-	else
-	{
-		int typenum;
-		for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
-			if (core_types[typenum].type == type && core_types[typenum].player == player)
-				return core_types[typenum].name;
-	}
+	input_port_private *portdata = machine.input_port_data;
+	input_type_entry *entry = portdata->type_to_entry[type][player];
+	if (entry != NULL)
+		return entry->name;
 
 	/* if we find nothing, return an invalid group */
 	return "???";
@@ -1318,23 +1292,10 @@ const char *input_type_name(running_machine &machine, int type, int player)
 
 int input_type_group(running_machine &machine, int type, int player)
 {
-	/* if we have a machine, use the live state and quick lookup */
-	if (1)//machine != NULL)
-	{
-		input_port_private *portdata = machine.input_port_data;
-		input_type_state *typestate = portdata->type_to_typestate[type][player];
-		if (typestate != NULL)
-			return typestate->typedesc.group;
-	}
-
-	/* if no machine, fall back to brute force searching */
-	else
-	{
-		int typenum;
-		for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
-			if (core_types[typenum].type == type && core_types[typenum].player == player)
-				return core_types[typenum].group;
-	}
+	input_port_private *portdata = machine.input_port_data;
+	input_type_entry *entry = portdata->type_to_entry[type][player];
+	if (entry != NULL)
+		return entry->group;
 
 	/* if we find nothing, return an invalid group */
 	return IPG_INVALID;
@@ -1346,33 +1307,19 @@ int input_type_group(running_machine &machine, int type, int player)
     sequence for the given type/player
 -------------------------------------------------*/
 
-const input_seq *input_type_seq(running_machine &machine, int type, int player, input_seq_type seqtype)
+const input_seq &input_type_seq(running_machine &machine, int type, int player, input_seq_type seqtype)
 {
-	static const input_seq ip_none = SEQ_DEF_0;
-
-	assert((type >= 0) && (type < __ipt_max));
-	assert((player >= 0) && (player < MAX_PLAYERS));
+	assert(type >= 0 && type < __ipt_max);
+	assert(player >= 0 && player < MAX_PLAYERS);
 
 	/* if we have a machine, use the live state and quick lookup */
-	if (1)//machine != NULL)
-	{
-		input_port_private *portdata = machine.input_port_data;
-		input_type_state *typestate = portdata->type_to_typestate[type][player];
-		if (typestate != NULL)
-			return &typestate->seq[seqtype];
-	}
-
-	/* if no machine, fall back to brute force searching */
-	else
-	{
-		int typenum;
-		for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
-			if (core_types[typenum].type == type && core_types[typenum].player == player)
-				return &core_types[typenum].seq[seqtype];
-	}
+	input_port_private *portdata = machine.input_port_data;
+	input_type_entry *entry = portdata->type_to_entry[type][player];
+	if (entry != NULL)
+		return entry->seq[seqtype];
 
 	/* if we find nothing, return an empty sequence */
-	return &ip_none;
+	return input_seq::empty_seq;
 }
 
 
@@ -1384,9 +1331,9 @@ const input_seq *input_type_seq(running_machine &machine, int type, int player, 
 void input_type_set_seq(running_machine &machine, int type, int player, input_seq_type seqtype, const input_seq *newseq)
 {
 	input_port_private *portdata = machine.input_port_data;
-	input_type_state *typestate = portdata->type_to_typestate[type][player];
-	if (typestate != NULL)
-		typestate->seq[seqtype] = *newseq;
+	input_type_entry *entry = portdata->type_to_entry[type][player];
+	if (entry != NULL)
+		entry->seq[seqtype] = *newseq;
 }
 
 
@@ -1398,7 +1345,7 @@ void input_type_set_seq(running_machine &machine, int type, int player, input_se
 
 int input_type_pressed(running_machine &machine, int type, int player)
 {
-	return input_seq_pressed(machine, input_type_seq(machine, type, player, SEQ_TYPE_STANDARD));
+	return machine.input().seq_pressed(input_type_seq(machine, type, player, SEQ_TYPE_STANDARD));
 }
 
 
@@ -1406,10 +1353,10 @@ int input_type_pressed(running_machine &machine, int type, int player)
     input_type_list - return the list of types
 -------------------------------------------------*/
 
-const input_type_desc *input_type_list(running_machine &machine)
+const simple_list<input_type_entry> &input_type_list(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
-	return &portdata->typestatelist->typedesc;
+	return portdata->typelist;
 }
 
 
@@ -1851,43 +1798,25 @@ const char *input_port_string_from_token(const char *string)
 static void init_port_types(running_machine &machine)
 {
 	input_port_private *portdata = machine.input_port_data;
-	input_type_state **stateptr;
-	input_type_state *curtype;
-	input_type_desc *lasttype = NULL;
-	int seqtype, typenum;
 
 	/* convert the array into a list of type states that can be modified */
-	portdata->typestatelist = NULL;
-	stateptr = &portdata->typestatelist;
-	for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
-	{
-		/* allocate memory for the state and link it to the end of the list */
-		*stateptr = auto_alloc_clear(machine, input_type_state);
-
-		/* copy the type description and link the previous description to it */
-		(*stateptr)->typedesc = core_types[typenum];
-		if (lasttype != NULL)
-			lasttype->next = &(*stateptr)->typedesc;
-		lasttype = &(*stateptr)->typedesc;
-
-		/* advance */
-		stateptr = &(*stateptr)->next;
-	}
+	construct_core_types(portdata->typelist);
 
 	/* ask the OSD to customize the list */
-	machine.osd().customize_input_type_list(&portdata->typestatelist->typedesc);
+	machine.osd().customize_input_type_list(portdata->typelist);
 
 	/* now iterate over the OSD-modified types */
-	for (curtype = portdata->typestatelist; curtype != NULL; curtype = curtype->next)
+	for (input_type_entry *curtype = portdata->typelist.first(); curtype != NULL; curtype = curtype->next())
 	{
 		/* first copy all the OSD-updated sequences into our current state */
-		for (seqtype = 0; seqtype < ARRAY_LENGTH(curtype->seq); seqtype++)
-			curtype->seq[seqtype] = curtype->typedesc.seq[seqtype];
+		for (int seqtype = 0; seqtype < ARRAY_LENGTH(curtype->seq); seqtype++)
+			curtype->seq[seqtype] = curtype->defseq[seqtype];
 
 		/* also make a lookup table mapping type/player to the appropriate type list entry */
-		portdata->type_to_typestate[curtype->typedesc.type][curtype->typedesc.player] = curtype;
+		portdata->type_to_entry[curtype->type][curtype->player] = curtype;
 	}
 }
+
 
 /*-------------------------------------------------
     get_keyboard_code - accesses a particular
@@ -1903,6 +1832,7 @@ static unicode_char get_keyboard_code(const input_field_config *field, int i)
 		ch &= 0xFF;
 	return ch;
 }
+
 
 /***************************************************************************
     MISCELLANEOUS
@@ -2124,7 +2054,7 @@ static void init_port_state(running_machine &machine)
 			for (field = port->first_field(); field != NULL; field = field->next())
 				if (field->state->joystick != NULL && field->way == 4)
 				{
-					input_device_set_joystick_map(machine, -1, (field->flags & FIELD_FLAG_ROTATED) ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
+					machine.input().set_global_joystick_map((field->flags & FIELD_FLAG_ROTATED) ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
 					break;
 				}
 }
@@ -2174,7 +2104,7 @@ static void init_autoselect_devices(running_machine &machine, int type1, int typ
 		mame_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
 
 	/* only scan the list if we haven't already enabled this class of control */
-	if (portlist.first() != NULL && !input_device_class_enabled(portlist.first()->machine(), autoenable))
+	if (portlist.first() != NULL && !machine.input().device_class(autoenable).enabled())
 		for (port = portlist.first(); port != NULL; port = port->next())
 			for (field = port->first_field(); field != NULL; field = field->next())
 
@@ -2184,7 +2114,7 @@ static void init_autoselect_devices(running_machine &machine, int type1, int typ
 					(type3 != 0 && field->type == type3))
 				{
 					mame_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-					input_device_class_enable(port->machine(), autoenable, TRUE);
+					machine.input().device_class(autoenable).enable();
 					break;
 				}
 }
@@ -2590,13 +2520,13 @@ static void frame_update_digital_joysticks(running_machine &machine)
 				joystick->current = 0;
 
 				/* read all the associated ports */
-				if (joystick->field[JOYDIR_UP] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_UP], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_UP] != NULL && machine.input().seq_pressed(input_field_seq(joystick->field[JOYDIR_UP], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_UP_BIT;
-				if (joystick->field[JOYDIR_DOWN] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_DOWN] != NULL && machine.input().seq_pressed(input_field_seq(joystick->field[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_DOWN_BIT;
-				if (joystick->field[JOYDIR_LEFT] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_LEFT] != NULL && machine.input().seq_pressed(input_field_seq(joystick->field[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_LEFT_BIT;
-				if (joystick->field[JOYDIR_RIGHT] != NULL && input_seq_pressed(machine, input_field_seq(joystick->field[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
+				if (joystick->field[JOYDIR_RIGHT] != NULL && machine.input().seq_pressed(input_field_seq(joystick->field[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
 					joystick->current |= JOYDIR_RIGHT_BIT;
 
 				/* lock out opposing directions (left + right or up + down) */
@@ -2669,7 +2599,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 	analog->previous = analog->accum = apply_analog_min_max(analog, analog->accum);
 
 	/* get the new raw analog value and its type */
-	rawvalue = input_seq_axis_value(machine, input_field_seq(analog->field, SEQ_TYPE_STANDARD), &itemclass);
+	rawvalue = machine.input().seq_axis_value(input_field_seq(analog->field, SEQ_TYPE_STANDARD), itemclass);
 
 	/* if we got an absolute input, it overrides everything else */
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
@@ -2727,7 +2657,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 
 	/* if the decrement code sequence is pressed, add the key delta to */
 	/* the accumulated delta; also note that the last input was a digital one */
-	if (input_seq_pressed(machine, input_field_seq(analog->field, SEQ_TYPE_DECREMENT)))
+	if (machine.input().seq_pressed(input_field_seq(analog->field, SEQ_TYPE_DECREMENT)))
 	{
 		keypressed = TRUE;
 		if (analog->delta != 0)
@@ -2739,7 +2669,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 	}
 
 	/* same for the increment code sequence */
-	if (input_seq_pressed(machine, input_field_seq(analog->field, SEQ_TYPE_INCREMENT)))
+	if (machine.input().seq_pressed(input_field_seq(analog->field, SEQ_TYPE_INCREMENT)))
 	{
 		keypressed = TRUE;
 		if (analog->delta)
@@ -2803,7 +2733,7 @@ static void frame_update_analog_field(running_machine &machine, analog_field_sta
 
 static int frame_get_digital_field_state(const input_field_config *field, int mouse_down)
 {
-	int curstate = mouse_down || input_seq_pressed(field->machine(), input_field_seq(field, SEQ_TYPE_STANDARD));
+	int curstate = mouse_down || field->machine().input().seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
 	int changed = FALSE;
 
 	/* if the state changed, look for switch down/switch up */
@@ -2955,7 +2885,7 @@ input_field_config::input_field_config(input_port_config &port, int _type, input
 {
 	memset(&condition, 0, sizeof(condition));
 	for (int seqtype = 0; seqtype < ARRAY_LENGTH(seq); seqtype++)
-		input_seq_set_1(&seq[seqtype], SEQCODE_DEFAULT);
+		seq[seqtype].set_default();
 	chars[0] = chars[1] = chars[2] = (unicode_char) 0;		
 }
 
@@ -3144,7 +3074,6 @@ void diplocation_list_alloc(input_field_config &field, const char *location, ast
 static int token_to_input_field_type(running_machine &machine, const char *string, int *player)
 {
 	input_port_private *portdata = machine.input_port_data;
-	const input_type_desc *typedesc;
 	int ipnum;
 
 	/* check for our failsafe case first */
@@ -3152,11 +3081,11 @@ static int token_to_input_field_type(running_machine &machine, const char *strin
 		return ipnum;
 
 	/* find the token in the list */
-	for (typedesc = &portdata->typestatelist->typedesc; typedesc != NULL; typedesc = typedesc->next)
-		if (typedesc->token != NULL && !strcmp(typedesc->token, string))
+	for (input_type_entry *entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
+		if (entry->token != NULL && !strcmp(entry->token, string))
 		{
-			*player = typedesc->player;
-			return typedesc->type;
+			*player = entry->player;
+			return entry->type;
 		}
 
 	/* if we fail, return IPT_UNKNOWN */
@@ -3173,13 +3102,12 @@ static int token_to_input_field_type(running_machine &machine, const char *strin
 static const char *input_field_type_to_token(running_machine &machine, int type, int player)
 {
 	input_port_private *portdata = machine.input_port_data;
-	input_type_state *typestate;
 	static char tempbuf[32];
 
 	/* look up the port and return the token */
-	typestate = portdata->type_to_typestate[type][player];
-	if (typestate != NULL)
-		return typestate->typedesc.token;
+	input_type_entry *entry = portdata->type_to_entry[type][player];
+	if (entry != NULL)
+		return entry->token;
 
 	/* if that fails, carry on */
 	sprintf(tempbuf, "TYPE_OTHER(%d,%d)", type, player);
@@ -3248,7 +3176,7 @@ static void load_config_callback(running_machine &machine, int config_type, xml_
 
 		/* initialize sequences to invalid defaults */
 		for (seqtype = 0; seqtype < ARRAY_LENGTH(newseq); seqtype++)
-			input_seq_set_1(&newseq[seqtype], INPUT_CODE_INVALID);
+			newseq[seqtype].set(INPUT_CODE_INVALID);
 
 		/* loop over new sequences */
 		for (seqnode = xml_get_sibling(portnode->child, "newseq"); seqnode; seqnode = xml_get_sibling(seqnode->next, "newseq"))
@@ -3258,9 +3186,9 @@ static void load_config_callback(running_machine &machine, int config_type, xml_
 			if (seqtype != -1 && seqnode->value != NULL)
 			{
 				if (strcmp(seqnode->value, "NONE") == 0)
-					input_seq_set_0(&newseq[seqtype]);
-				else if (input_seq_from_tokens(machine, seqnode->value, &tempseq) != 0)
-					newseq[seqtype] = tempseq;
+					newseq[seqtype].set();
+				else
+					machine.input().seq_from_tokens(newseq[seqtype], seqnode->value);
 			}
 		}
 
@@ -3274,14 +3202,9 @@ static void load_config_callback(running_machine &machine, int config_type, xml_
 	/* after applying the controller config, push that back into the backup, since that is */
 	/* what we will diff against */
 	if (config_type == CONFIG_TYPE_CONTROLLER)
-	{
-		input_type_state *typestate;
-		int seqtype;
-
-		for (typestate = portdata->typestatelist; typestate != NULL; typestate = typestate->next)
-			for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->typedesc.seq); seqtype++)
-				typestate->typedesc.seq[seqtype] = typestate->seq[seqtype];
-	}
+		for (input_type_entry *entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
+			for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+				entry->defseq[seqtype] = entry->seq[seqtype];
 }
 
 
@@ -3315,8 +3238,8 @@ static void load_remap_table(running_machine &machine, xml_data_node *parentnode
 		count = 0;
 		for (remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != NULL; remapnode = xml_get_sibling(remapnode->next, "remap"))
 		{
-			input_code origcode = input_code_from_token(machine, xml_get_attribute_string(remapnode, "origcode", ""));
-			input_code newcode = input_code_from_token(machine, xml_get_attribute_string(remapnode, "newcode", ""));
+			input_code origcode = machine.input().code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
+			input_code newcode = machine.input().code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
 			if (origcode != INPUT_CODE_INVALID && newcode != INPUT_CODE_INVALID)
 			{
 				oldtable[count] = origcode;
@@ -3330,18 +3253,13 @@ static void load_remap_table(running_machine &machine, xml_data_node *parentnode
 		{
 			input_code oldcode = oldtable[remapnum];
 			input_code newcode = newtable[remapnum];
-			input_type_state *typestate;
 
 			/* loop over all default ports, remapping the requested keys */
-			for (typestate = portdata->typestatelist; typestate != NULL; typestate = typestate->next)
+			for (input_type_entry *entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
 			{
-				int seqtype, codenum;
-
 				/* remap anything in the default sequences */
-				for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
-					for (codenum = 0; codenum < ARRAY_LENGTH(typestate->seq[0].code); codenum++)
-						if (typestate->seq[seqtype].code[codenum] == oldcode)
-							typestate->seq[seqtype].code[codenum] = newcode;
+				for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+					entry->seq[seqtype].replace(oldcode, newcode);
 			}
 		}
 
@@ -3360,16 +3278,14 @@ static void load_remap_table(running_machine &machine, xml_data_node *parentnode
 static int load_default_config(running_machine &machine, xml_data_node *portnode, int type, int player, const input_seq *newseq)
 {
 	input_port_private *portdata = machine.input_port_data;
-	input_type_state *typestate;
-	int seqtype;
 
 	/* find a matching port in the list */
-	for (typestate = portdata->typestatelist; typestate != NULL; typestate = typestate->next)
-		if (typestate->typedesc.type == type && typestate->typedesc.player == player)
+	for (input_type_entry *entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
+		if (entry->type == type && entry->player == player)
 		{
-			for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
-				if (input_seq_get_1(&newseq[seqtype]) != INPUT_CODE_INVALID)
-					typestate->seq[seqtype] = newseq[seqtype];
+			for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
+					entry->seq[seqtype] = newseq[seqtype];
 			return TRUE;
 		}
 
@@ -3409,7 +3325,7 @@ static int load_game_config(running_machine &machine, xml_data_node *portnode, i
 
 					/* if a sequence was specified, copy it in */
 					for (seqtype = 0; seqtype < ARRAY_LENGTH(field->state->seq); seqtype++)
-						if (input_seq_get_1(&newseq[seqtype]) != INPUT_CODE_INVALID)
+						if (newseq[seqtype][0] != INPUT_CODE_INVALID)
 							field->state->seq[seqtype] = newseq[seqtype];
 
 					/* for non-analog fields, fetch the value */
@@ -3465,16 +3381,16 @@ static void save_config_callback(running_machine &machine, int config_type, xml_
     sequence
 -------------------------------------------------*/
 
-static void save_sequence(running_machine &machine, xml_data_node *parentnode, int type, int porttype, const input_seq *seq)
+static void save_sequence(running_machine &machine, xml_data_node *parentnode, int type, int porttype, const input_seq &seq)
 {
 	astring seqstring;
 	xml_data_node *seqnode;
 
 	/* get the string for the sequence */
-	if (input_seq_get_1(seq) == SEQCODE_END)
+	if (seq.length() == 0)
 		seqstring.cpy("NONE");
 	else
-		input_seq_to_tokens(machine, seqstring, seq);
+		machine.input().seq_to_tokens(seqstring, seq);
 
 	/* add the new node */
 	seqnode = xml_add_child(parentnode, "newseq", seqstring);
@@ -3511,35 +3427,35 @@ static int save_this_input_field_type(int type)
 static void save_default_inputs(running_machine &machine, xml_data_node *parentnode)
 {
 	input_port_private *portdata = machine.input_port_data;
-	input_type_state *typestate;
+	input_type_entry *entry;
 
 	/* iterate over ports */
-	for (typestate = portdata->typestatelist; typestate != NULL; typestate = typestate->next)
+	for (entry = portdata->typelist.first(); entry != NULL; entry = entry->next())
 	{
 		/* only save if this port is a type we save */
-		if (save_this_input_field_type(typestate->typedesc.type))
+		if (save_this_input_field_type(entry->type))
 		{
 			int seqtype;
 
 			/* see if any of the sequences have changed */
-			for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
-				if (input_seq_cmp(&typestate->seq[seqtype], &typestate->typedesc.seq[seqtype]) != 0)
+			for (seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+				if (entry->seq[seqtype] != entry->defseq[seqtype])
 					break;
 
 			/* if so, we need to add a node */
-			if (seqtype < ARRAY_LENGTH(typestate->seq))
+			if (seqtype < ARRAY_LENGTH(entry->seq))
 			{
 				/* add a new port node */
 				xml_data_node *portnode = xml_add_child(parentnode, "port", NULL);
 				if (portnode != NULL)
 				{
 					/* add the port information and attributes */
-					xml_set_attribute(portnode, "type", input_field_type_to_token(machine, typestate->typedesc.type, typestate->typedesc.player));
+					xml_set_attribute(portnode, "type", input_field_type_to_token(machine, entry->type, entry->player));
 
 					/* add only the sequences that have changed from the defaults */
-					for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
-						if (input_seq_cmp(&typestate->seq[seqtype], &typestate->typedesc.seq[seqtype]) != 0)
-							save_sequence(machine, portnode, seqtype, typestate->typedesc.type, &typestate->seq[seqtype]);
+					for (int seqtype = 0; seqtype < ARRAY_LENGTH(entry->seq); seqtype++)
+						if (entry->seq[seqtype] != entry->defseq[seqtype])
+							save_sequence(machine, portnode, seqtype, entry->type, entry->seq[seqtype]);
 				}
 			}
 		}
@@ -3567,7 +3483,7 @@ static void save_game_inputs(running_machine &machine, xml_data_node *parentnode
 
 				/* determine if we changed */
 				for (seqtype = 0; seqtype < ARRAY_LENGTH(field->state->seq); seqtype++)
-					changed |= (input_seq_cmp(&field->state->seq[seqtype], &field->seq[seqtype]) != 0);
+					changed |= (field->state->seq[seqtype] != field->seq[seqtype]);
 
 				/* non-analog changes */
 				if (field->state->analog == NULL)
@@ -3599,8 +3515,8 @@ static void save_game_inputs(running_machine &machine, xml_data_node *parentnode
 
 						/* add sequences if changed */
 						for (seqtype = 0; seqtype < ARRAY_LENGTH(field->state->seq); seqtype++)
-							if (input_seq_cmp(&field->state->seq[seqtype], &field->seq[seqtype]) != 0)
-								save_sequence(machine, portnode, seqtype, field->type, &field->state->seq[seqtype]);
+							if (field->state->seq[seqtype] != field->seq[seqtype])
+								save_sequence(machine, portnode, seqtype, field->type, field->state->seq[seqtype]);
 
 						/* write out non-analog changes */
 						if (field->state->analog == NULL)
@@ -4080,10 +3996,10 @@ static const char *code_point_string(running_machine &machine, unicode_char ch)
 			}
 			else if (ch >= UCHAR_MAMEKEY_BEGIN)
 			{
-				/* try to obtain a codename with input_code_name(); this can result in an empty string */
-				astring astr;
-				input_code_name(machine, astr, (input_code) ch - UCHAR_MAMEKEY_BEGIN);
-				snprintf(buf, ARRAY_LENGTH(buf), "%s", astr.cstr());
+				/* try to obtain a codename with code_name(); this can result in an empty string */
+				input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
+				astring tempstr;
+				snprintf(buf, ARRAY_LENGTH(buf), "%s", machine.input().code_name(tempstr, code));
 			}
 			else
 			{
@@ -4949,7 +4865,7 @@ input_field_config *ioconfig_alloc_onoff(input_port_config &port, const char *na
 	if (name == DEF_STR(Service_Mode))
 	{
 		curfield->flags |= FIELD_FLAG_TOGGLE;
-		curfield->seq[SEQ_TYPE_STANDARD].code[0] = KEYCODE_F2;
+		curfield->seq[SEQ_TYPE_STANDARD].set(KEYCODE_F2);
 	}
 	if (diplocation != NULL)
 		diplocation_list_alloc(*curfield, diplocation, errorbuf);
@@ -4975,6 +4891,33 @@ void ioconfig_field_add_char(input_field_config &field, unicode_char ch, astring
 
 void ioconfig_add_code(input_field_config &field, int which, input_code code)
 {
-	input_seq_append_or(&field.seq[which], code);
+	field.seq[which] |= code;
 }
 
+
+
+input_type_entry::input_type_entry(UINT32 _type, ioport_group _group, int _player, const char *_token, const char *_name, input_seq standard)
+	: type(_type),
+	  group(_group),
+	  player(_player),
+	  token(_token),
+	  name(_name),
+	  m_next(NULL)
+{
+	defseq[SEQ_TYPE_STANDARD] = seq[SEQ_TYPE_STANDARD] = standard;
+	defseq[SEQ_TYPE_INCREMENT] = seq[SEQ_TYPE_INCREMENT] = input_seq::empty_seq;
+	defseq[SEQ_TYPE_DECREMENT] = seq[SEQ_TYPE_DECREMENT] = input_seq::empty_seq;
+}
+
+input_type_entry::input_type_entry(UINT32 _type, ioport_group _group, int _player, const char *_token, const char *_name, input_seq standard, input_seq decrement, input_seq increment)
+	: type(_type),
+	  group(_group),
+	  player(_player),
+	  token(_token),
+	  name(_name),
+	  m_next(NULL)
+{
+	defseq[SEQ_TYPE_STANDARD] = seq[SEQ_TYPE_STANDARD] = standard;
+	defseq[SEQ_TYPE_INCREMENT] = seq[SEQ_TYPE_INCREMENT] = increment;
+	defseq[SEQ_TYPE_DECREMENT] = seq[SEQ_TYPE_DECREMENT] = decrement;
+}

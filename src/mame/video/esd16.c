@@ -337,12 +337,12 @@ SCREEN_UPDATE( esd16 )
 	tilemap_set_scrolly(state->m_tilemap_1, 0, state->m_scroll_1[1]);
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine(), KEYCODE_Z))
+if (screen->machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -365,12 +365,12 @@ SCREEN_UPDATE( hedpanic )
 	bitmap_fill(screen->machine().priority_bitmap, cliprect, 0);
 
 #ifdef MAME_DEBUG
-if (input_code_pressed(screen->machine(), KEYCODE_Z))
+if (screen->machine().input().code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
@@ -428,12 +428,12 @@ SCREEN_UPDATE( hedpanio )
 	bitmap_fill(screen->machine().priority_bitmap,cliprect,0);
 
 #ifdef MAME_DEBUG
-if ( input_code_pressed(screen->machine(), KEYCODE_Z) )
+if ( screen->machine().input().code_pressed(KEYCODE_Z) )
 {
 	int msk = 0;
-	if (input_code_pressed(screen->machine(), KEYCODE_Q))	msk |= 1;
-	if (input_code_pressed(screen->machine(), KEYCODE_W))	msk |= 2;
-	if (input_code_pressed(screen->machine(), KEYCODE_A))	msk |= 4;
+	if (screen->machine().input().code_pressed(KEYCODE_Q))	msk |= 1;
+	if (screen->machine().input().code_pressed(KEYCODE_W))	msk |= 2;
+	if (screen->machine().input().code_pressed(KEYCODE_A))	msk |= 4;
 	if (msk != 0) layers_ctrl &= msk;
 }
 #endif

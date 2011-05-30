@@ -1988,7 +1988,7 @@ static STREAM_UPDATE( SN76477_update )
 
 
 #if TEST_MODE
-	static int recursing = 0;	/* we need to prevent recursion since enable_w calls input_code_pressed_once(device->machine(), KEYCODE_SPACE->update */
+	static int recursing = 0;	/* we need to prevent recursion since enable_w calls device->machine().input().code_pressed_once(KEYCODE_SPACE->update */
 
 	if () && !recursing)
 	{

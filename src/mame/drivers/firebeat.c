@@ -555,7 +555,7 @@ static SCREEN_UPDATE(firebeat)
 	if (state->m_tick >= 5)
 	{
 		state->m_tick = 0;
-		if (input_code_pressed(screen->machine(), KEYCODE_0))
+		if (screen->machine().input().code_pressed(KEYCODE_0))
 		{
 			state->m_layer++;
 			if (state->m_layer > 2)
@@ -565,7 +565,7 @@ static SCREEN_UPDATE(firebeat)
 		}
 
 		/*
-        if (input_code_pressed_once(screen->machine(), KEYCODE_9))
+        if (screen->machine().input().code_pressed_once(KEYCODE_9))
         {
             FILE *file = fopen("vram0.bin", "wb");
             int i;

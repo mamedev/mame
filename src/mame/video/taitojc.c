@@ -216,10 +216,10 @@ SCREEN_UPDATE( taitojc )
     if( tick >= 5 ) {
         tick = 0;
 
-        if( input_code_pressed(screen->machine(), KEYCODE_O) )
+        if( screen->machine().input().code_pressed(KEYCODE_O) )
             debug_tex_pal++;
 
-        if( input_code_pressed(screen->machine(), KEYCODE_I) )
+        if( screen->machine().input().code_pressed(KEYCODE_I) )
             debug_tex_pal--;
 
         debug_tex_pal &= 0x7f;

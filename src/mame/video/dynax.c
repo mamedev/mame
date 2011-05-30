@@ -1205,16 +1205,16 @@ static int debug_mask( running_machine &machine )
 {
 #ifdef MAME_DEBUG
 	int msk = 0;
-	if (input_code_pressed(machine, KEYCODE_Z))
+	if (machine.input().code_pressed(KEYCODE_Z))
 	{
-		if (input_code_pressed(machine, KEYCODE_Q))	msk |= 0x01;	// layer 0
-		if (input_code_pressed(machine, KEYCODE_W))	msk |= 0x02;	// layer 1
-		if (input_code_pressed(machine, KEYCODE_E))	msk |= 0x04;	// layer 2
-		if (input_code_pressed(machine, KEYCODE_R))	msk |= 0x08;	// layer 3
-		if (input_code_pressed(machine, KEYCODE_A))	msk |= 0x10;	// layer 4
-		if (input_code_pressed(machine, KEYCODE_S))	msk |= 0x20;	// layer 5
-		if (input_code_pressed(machine, KEYCODE_D))	msk |= 0x40;	// layer 6
-		if (input_code_pressed(machine, KEYCODE_F))	msk |= 0x80;	// layer 7
+		if (machine.input().code_pressed(KEYCODE_Q))	msk |= 0x01;	// layer 0
+		if (machine.input().code_pressed(KEYCODE_W))	msk |= 0x02;	// layer 1
+		if (machine.input().code_pressed(KEYCODE_E))	msk |= 0x04;	// layer 2
+		if (machine.input().code_pressed(KEYCODE_R))	msk |= 0x08;	// layer 3
+		if (machine.input().code_pressed(KEYCODE_A))	msk |= 0x10;	// layer 4
+		if (machine.input().code_pressed(KEYCODE_S))	msk |= 0x20;	// layer 5
+		if (machine.input().code_pressed(KEYCODE_D))	msk |= 0x40;	// layer 6
+		if (machine.input().code_pressed(KEYCODE_F))	msk |= 0x80;	// layer 7
 		if (msk != 0)	return msk;
 	}
 #endif
@@ -1232,7 +1232,7 @@ static int debug_viewer( running_machine &machine, bitmap_t *bitmap, const recta
 
 #ifdef MAME_DEBUG
 	static int toggle;
-	if (input_code_pressed_once(machine, KEYCODE_T))	toggle = 1 - toggle;
+	if (machine.input().code_pressed_once(KEYCODE_T))	toggle = 1 - toggle;
 	if (toggle)
 	{
 		dynax_state *state = machine.driver_data<dynax_state>();
@@ -1240,14 +1240,14 @@ static int debug_viewer( running_machine &machine, bitmap_t *bitmap, const recta
 		size_t size = machine.region( "gfx1" )->bytes();
 		static int i = 0, c = 0, r = 0;
 
-		if (input_code_pressed_once(machine, KEYCODE_I))	c = (c - 1) & 0x1f;
-		if (input_code_pressed_once(machine, KEYCODE_O))	c = (c + 1) & 0x1f;
-		if (input_code_pressed_once(machine, KEYCODE_R))	{ r = (r + 1) & 0x7;	i = size / 8 * r; }
-		if (input_code_pressed(machine, KEYCODE_M) | input_code_pressed_once(machine, KEYCODE_K))
+		if (machine.input().code_pressed_once(KEYCODE_I))	c = (c - 1) & 0x1f;
+		if (machine.input().code_pressed_once(KEYCODE_O))	c = (c + 1) & 0x1f;
+		if (machine.input().code_pressed_once(KEYCODE_R))	{ r = (r + 1) & 0x7;	i = size / 8 * r; }
+		if (machine.input().code_pressed(KEYCODE_M) | machine.input().code_pressed_once(KEYCODE_K))
 		{
 			while (i < size && RAM[i]) i++;		while (i < size && !RAM[i]) i++;
 		}
-		if (input_code_pressed(machine, KEYCODE_N) | input_code_pressed_once(machine, KEYCODE_J))
+		if (machine.input().code_pressed(KEYCODE_N) | machine.input().code_pressed_once(KEYCODE_J))
 		{
 			if (i >= 2) i -= 2;	while (i > 0 && RAM[i]) i--;	i++;
 		}

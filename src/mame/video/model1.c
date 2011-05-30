@@ -1343,7 +1343,7 @@ static void tgp_scan(running_machine &machine)
 	model1_state *state = machine.driver_data<model1_state>();
 	struct view *view = state->m_view;
 #if 0
-	if (input_code_pressed_once(machine, KEYCODE_F))
+	if (machine.input().code_pressed_once(KEYCODE_F))
         {
 		FILE *fp;
 		fp=fopen("tgp-ram.bin", "w+b");
@@ -1478,35 +1478,35 @@ SCREEN_UPDATE(model1)
 		double delta;
 		delta = 1;
 
-		if(input_code_pressed(screen->machine(), KEYCODE_F)) {
+		if(screen->machine().input().code_pressed(KEYCODE_F)) {
 			mod = 1;
 			view->vxx -= delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_G)) {
+		if(screen->machine().input().code_pressed(KEYCODE_G)) {
 			mod = 1;
 			view->vxx += delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_H)) {
+		if(screen->machine().input().code_pressed(KEYCODE_H)) {
 			mod = 1;
 			view->vyy -= delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_J)) {
+		if(screen->machine().input().code_pressed(KEYCODE_J)) {
 			mod = 1;
 			view->vyy += delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_K)) {
+		if(screen->machine().input().code_pressed(KEYCODE_K)) {
 			mod = 1;
 			view->vzz -= delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_L)) {
+		if(screen->machine().input().code_pressed(KEYCODE_L)) {
 			mod = 1;
 			view->vzz += delta;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_U)) {
+		if(screen->machine().input().code_pressed(KEYCODE_U)) {
 			mod = 1;
 			view->ayy -= 0.05;
 		}
-		if(input_code_pressed(screen->machine(), KEYCODE_I)) {
+		if(screen->machine().input().code_pressed(KEYCODE_I)) {
 			mod = 1;
 			view->ayy += 0.05;
 		}

@@ -266,8 +266,8 @@ SCREEN_UPDATE( vsgongf )
 {
 	tsamurai_state *state = screen->machine().driver_data<tsamurai_state>();
 	#ifdef MAME_DEBUG
-	if( input_code_pressed( screen->machine(), KEYCODE_Q ) ){
-		while( input_code_pressed( screen->machine(), KEYCODE_Q ) ){
+	if( screen->machine().input().code_pressed( KEYCODE_Q ) ){
+		while( screen->machine().input().code_pressed( KEYCODE_Q ) ){
 			state->m_key_count++;
 			state->m_vsgongf_color = state->m_key_count;
 			tilemap_mark_all_tiles_dirty( state->m_foreground );

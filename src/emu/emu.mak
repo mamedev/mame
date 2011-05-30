@@ -79,7 +79,6 @@ EMUOBJS = \
 	$(EMUOBJ)/image.o \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
-	$(EMUOBJ)/inputseq.o \
 	$(EMUOBJ)/inptport.o \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/machine.o \

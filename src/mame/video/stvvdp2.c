@@ -2209,10 +2209,10 @@ static void stv_vdp2_fill_rotation_parameter_table( running_machine &machine, UI
 	/*Attempt to show on screen the rotation table*/
 	if(LOG_ROZ == 2)
 	{
-		if(input_code_pressed_once(machine, JOYCODE_Y_UP_SWITCH))
+		if(machine.input().code_pressed_once(JOYCODE_Y_UP_SWITCH))
 			debug.roz++;
 
-		if(input_code_pressed_once(machine, JOYCODE_Y_DOWN_SWITCH))
+		if(machine.input().code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
 			debug.roz--;
 
 		if(debug.roz > 10)
@@ -6312,32 +6312,32 @@ SCREEN_UPDATE( stv_vdp2 )
 	stv_vdp2_draw_back(screen->machine(), bitmap,cliprect);
 
 	#if DEBUG_MODE
-	if(input_code_pressed_once(screen->machine(), KEYCODE_T))
+	if(screen->machine().input().code_pressed_once(KEYCODE_T))
 	{
 		debug.l_en^=1;
 		popmessage("NBG3 %sabled",debug.l_en & 1 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_Y))
+	if(screen->machine().input().code_pressed_once(KEYCODE_Y))
 	{
 		debug.l_en^=2;
 		popmessage("NBG2 %sabled",debug.l_en & 2 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_U))
+	if(screen->machine().input().code_pressed_once(KEYCODE_U))
 	{
 		debug.l_en^=4;
 		popmessage("NBG1 %sabled",debug.l_en & 4 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_I))
+	if(screen->machine().input().code_pressed_once(KEYCODE_I))
 	{
 		debug.l_en^=8;
 		popmessage("NBG0 %sabled",debug.l_en & 8 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_K))
+	if(screen->machine().input().code_pressed_once(KEYCODE_K))
 	{
 		debug.l_en^=0x10;
 		popmessage("RBG0 %sabled",debug.l_en & 0x10 ? "en" : "dis");
 	}
-	if(input_code_pressed_once(screen->machine(), KEYCODE_O))
+	if(screen->machine().input().code_pressed_once(KEYCODE_O))
 	{
 		debug.l_en^=0x20;
 		popmessage("SPRITE %sabled",debug.l_en & 0x20 ? "en" : "dis");
@@ -6380,7 +6380,7 @@ SCREEN_UPDATE( stv_vdp2 )
     ,STV_VDP2_N1ZMXI,STV_VDP2_N1ZMXD
     ,STV_VDP2_N1ZMYI,STV_VDP2_N1ZMYD);*/
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_W) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_W) )
 	{
 		int tilecode;
 
@@ -6424,7 +6424,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_N) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_N) )
 	{
 		FILE *fp;
 
@@ -6436,7 +6436,7 @@ SCREEN_UPDATE( stv_vdp2 )
 		}
 	}
 
-	if ( input_code_pressed_once(screen->machine(), KEYCODE_M) )
+	if ( screen->machine().input().code_pressed_once(KEYCODE_M) )
 	{
 		FILE *fp;
 

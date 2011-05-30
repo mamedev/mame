@@ -301,28 +301,28 @@ static SCREEN_UPDATE(coolridr)
 	int y,x;
 
 
-	if(input_code_pressed(screen->machine(),KEYCODE_Z))
+	if(screen->machine().input().code_pressed(KEYCODE_Z))
 		state->m_test_offs+=4;
 
-	if(input_code_pressed(screen->machine(),KEYCODE_X))
+	if(screen->machine().input().code_pressed(KEYCODE_X))
 		state->m_test_offs-=4;
 
-	if(input_code_pressed(screen->machine(),KEYCODE_C))
+	if(screen->machine().input().code_pressed(KEYCODE_C))
 		state->m_test_offs+=0x40;
 
-	if(input_code_pressed(screen->machine(),KEYCODE_V))
+	if(screen->machine().input().code_pressed(KEYCODE_V))
 		state->m_test_offs-=0x40;
 
-	if(input_code_pressed(screen->machine(),KEYCODE_B))
+	if(screen->machine().input().code_pressed(KEYCODE_B))
 		state->m_test_offs+=0x400;
 
-	if(input_code_pressed(screen->machine(),KEYCODE_N))
+	if(screen->machine().input().code_pressed(KEYCODE_N))
 		state->m_test_offs-=0x400;
 
-	if(input_code_pressed_once(screen->machine(),KEYCODE_A))
+	if(screen->machine().input().code_pressed_once(KEYCODE_A))
 		state->m_color++;
 
-	if(input_code_pressed_once(screen->machine(),KEYCODE_S))
+	if(screen->machine().input().code_pressed_once(KEYCODE_S))
 		state->m_color--;
 
 	if(state->m_test_offs > 0x100000*4)
