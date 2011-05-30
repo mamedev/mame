@@ -130,9 +130,6 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	OutRGB.g = pow(Saturated.g, GrnPower);
 	OutRGB.b = pow(Saturated.b, BluPower);
 
-	// -- Color Compression (increasing the floor of the signal without affecting the ceiling) --
-	OutRGB = float3(RedFloor + (1.0f - RedFloor) * OutRGB.r, GrnFloor + (1.0f - GrnFloor) * OutRGB.g, BluFloor + (1.0f - BluFloor) * OutRGB.b);
-
 	return float4(OutRGB, BaseTexel.a);
 }
 
