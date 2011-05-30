@@ -355,7 +355,7 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 	int zx, zy, zoomx, zoomy, priority = 0;
 	UINT8 small_sprite, col, flipx, flipy;
 	UINT16 code, bigsprite, map_index;
-	UINT16 rotate = 0;
+//	UINT16 rotate = 0;
 	UINT16 tile_mask = (machine.gfx[0]->total_elements) - 1;
 	static const int primasks[2] = {0x0, 0xfffc};	/* fff0 => under rhs of road only */
 
@@ -378,10 +378,10 @@ static void draw_sprites( running_machine &machine, bitmap_t *bitmap, const rect
 			if ((spriteram[i + 4] == 0xfff6) && (spriteram[i + 5] == 0))
 				continue;
 
-			if (((spriteram[i + 4] != 0xf800) && (spriteram[i + 4] != 0xfff6))
-				|| ((spriteram[i + 5] != 0xf800) && (spriteram[i + 5] != 0))
-				|| spriteram[i + 7] != 0)
-				rotate = i << 1;
+//			if (((spriteram[i + 4] != 0xf800) && (spriteram[i + 4] != 0xfff6))
+//				|| ((spriteram[i + 5] != 0xf800) && (spriteram[i + 5] != 0))
+//				|| spriteram[i + 7] != 0)
+//				rotate = i << 1;
 
 			/***** Begin zoom kludge ******/
 

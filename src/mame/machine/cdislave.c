@@ -165,15 +165,15 @@ UINT16 cdislave_device::register_read(const UINT32 offset, const UINT16 mem_mask
 
 void cdislave_device::set_mouse_position()
 {
-    UINT16 x, y;
+//    UINT16 x, y;
 
     //printf( "Set mouse position: %02x %02x %02x\n", m_in_buf[0], m_in_buf[1], m_in_buf[2] );
 
     m_fake_mouse_y = ((m_in_buf[1] & 0x0f) << 6) | (m_in_buf[0] & 0x3f);
     m_fake_mouse_x = ((m_in_buf[1] & 0x70) << 3) | m_in_buf[2];
 
-    x = m_fake_mouse_x;
-    y = m_fake_mouse_y;
+//    x = m_fake_mouse_x;
+//    y = m_fake_mouse_y;
 
     if(m_polling_active)
     {

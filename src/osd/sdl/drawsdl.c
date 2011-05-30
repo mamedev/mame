@@ -654,7 +654,10 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	UINT8 *surfptr;
 	INT32 pitch;
 	int bpp;
-	Uint32 rmask, gmask, bmask, amask;
+	Uint32 rmask, gmask, bmask;
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	Uint32 amask;
+#endif
 	INT32 vofs, hofs, blitwidth, blitheight, ch, cw;
 
 	if (video_config.novideo)
@@ -674,7 +677,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	rmask = sdl->sdlsurf->format->Rmask;
 	gmask = sdl->sdlsurf->format->Gmask;
 	bmask = sdl->sdlsurf->format->Bmask;
-	amask = sdl->sdlsurf->format->Amask;
+//	amask = sdl->sdlsurf->format->Amask;
 
 	if (window->blitwidth != sdl->old_blitwidth || window->blitheight != sdl->old_blitheight)
 	{

@@ -283,7 +283,7 @@ SCREEN_EOF( dreamwld )
 static SCREEN_UPDATE( dreamwld )
 {
 	dreamwld_state *state = screen->machine().driver_data<dreamwld_state>();
-	int tm0size, tm1size;
+//	int tm0size, tm1size;
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
@@ -302,6 +302,7 @@ static SCREEN_UPDATE( dreamwld )
 	tilemap_set_scrolly(tmptilemap1, 0, layer1_scrolly);
 
 	// not on this hw?
+#if 0
 	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
 	case 0:	tm0size = 1;	break;
@@ -317,7 +318,7 @@ static SCREEN_UPDATE( dreamwld )
 	case 2:	tm1size = 3;	break;
 	default:	tm1size = 0;	break;
 	}
-
+#endif
 	//popmessage("sizes %d %d\n", tm0size, tm1size);
 
 	for (int i = 0; i < 256; i++)	/* 256 screen lines */

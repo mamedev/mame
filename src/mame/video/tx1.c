@@ -1570,7 +1570,7 @@ static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 		UINT32	bnkcs = 1;
 		UINT32	bnkrs = 1;
 
-		UINT32	x_offs;
+//		UINT32	x_offs;
 		UINT8 sf;
 
 		/* Vertical positions shift register */
@@ -1634,7 +1634,7 @@ static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 		sld = (vprom[rva0_6] + vregs.slin_val) & 0x38;
 
 		/* Determine the x-offset */
-		x_offs = ls161 & 7;
+//		x_offs = ls161 & 7;
 
 		/* Fill vertical position shift register with bits for this line */
 		/* TODO; cheated slightly to shift stuff up one pixel*/
@@ -2200,7 +2200,7 @@ static void buggybjr_draw_road(running_machine &machine, UINT8 *bitmap, int wide
 		UINT32	rcmd;
 		UINT32	bnkcs = 1;
 
-		UINT32	x_offs;
+//		UINT32	x_offs;
 		UINT8	sf;
 
 		/* Vertical positions shift register */
@@ -2259,7 +2259,7 @@ static void buggybjr_draw_road(running_machine &machine, UINT8 *bitmap, int wide
 		sld = (vprom[rva0_6] + vregs.slin_val) & 0x38;
 
 		/* Determine the x-offset */
-		x_offs = ls161 & 7;
+//		x_offs = ls161 & 7;
 
 		/* Fill vertical position shift register with bits for this line */
 		/* TODO; cheated slightly to shift stuff up one pixel*/

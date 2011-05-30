@@ -237,7 +237,7 @@ static SCREEN_UPDATE( pinkiri8 )
 	}
 
 	{
-		int x,y,unk2;
+		int x,y; //,unk2;
 		int col;
 
 		int spr_offs,i;
@@ -269,7 +269,7 @@ static SCREEN_UPDATE( pinkiri8 )
 			x &= 0xff;
 			x *= 2;
 
-			unk2 = state->m_janshi_vram2[(i*2)+1];
+//			unk2 = state->m_janshi_vram2[(i*2)+1];
 			y = (state->m_janshi_vram2[(i*2)+0]);
 
 			y = 0x100-y;
