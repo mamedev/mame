@@ -524,7 +524,7 @@ static void update_pcm(YMF271Chip *chip, int slotnum, INT32 *mixp, int length)
 	int i;
 	int final_volume;
 	INT16 sample;
-	INT64 ch0_vol, ch1_vol, ch2_vol, ch3_vol;
+	INT64 ch0_vol, ch1_vol; //, ch2_vol, ch3_vol;
 	const UINT8 *rombase;
 
 	YMF271Slot *slot = &chip->slots[slotnum];
@@ -561,8 +561,8 @@ static void update_pcm(YMF271Chip *chip, int slotnum, INT32 *mixp, int length)
 
 		ch0_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch0_level]) >> 16;
 		ch1_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch1_level]) >> 16;
-		ch2_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch2_level]) >> 16;
-		ch3_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch3_level]) >> 16;
+//		ch2_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch2_level]) >> 16;
+//		ch3_vol = ((UINT64)final_volume * (UINT64)channel_attenuation[slot->ch3_level]) >> 16;
 
 		if (ch0_vol > 65536) ch0_vol = 65536;
 		if (ch1_vol > 65536) ch1_vol = 65536;
