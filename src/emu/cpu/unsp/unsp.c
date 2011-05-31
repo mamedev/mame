@@ -115,8 +115,6 @@ static CPU_INIT( unsp )
 
     unsp->device = device;
     unsp->program = device->space(AS_PROGRAM);
-    unsp->irq = 0;
-    unsp->fiq = 0;
 }
 
 static CPU_RESET( unsp )
@@ -125,6 +123,8 @@ static CPU_RESET( unsp )
     memset(unsp->r, 0, sizeof(UINT16) * UNSP_GPR_COUNT);
 
     UNSP_REG(PC) = READ16(unsp, 0xfff7);
+    unsp->irq = 0;
+    unsp->fiq = 0;
 }
 
 /*****************************************************************************/
