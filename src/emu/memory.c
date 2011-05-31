@@ -490,6 +490,28 @@ protected:
 class handler_entry_read : public handler_entry
 {
 public:
+	// combination of unions to hold legacy objects and callbacks
+	struct legacy_info
+	{
+		union
+		{
+			address_space *	space;
+			device_t *				device;
+		} object;
+
+		union
+		{
+			read8_space_func		space8;
+			read16_space_func		space16;
+			read32_space_func		space32;
+			read64_space_func		space64;
+			read8_device_func		device8;
+			read16_device_func		device16;
+			read32_device_func		device32;
+			read64_device_func		device64;
+		} handler;
+	};
+
 	// construction/destruction
 	handler_entry_read(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
@@ -501,10 +523,10 @@ public:
 	virtual const char *name() const;
 
 	// configure delegate callbacks
-	void set_delegate(read8_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read16_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read32_delegate delegate, UINT64 mask = 0);
-	void set_delegate(read64_delegate delegate, UINT64 mask = 0);
+	void set_delegate(read8_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(read16_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(read32_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(read64_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
 
 	// configure legacy address space functions
 	void set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask = 0);
@@ -553,6 +575,16 @@ private:
 	read64_delegate				m_read64;
 	const input_port_config *	m_ioport;
 
+	legacy_info m_legacy_info;
+};
+
+
+// ======================> handler_entry_write
+
+// a write-access-specific extension of handler_entry
+class handler_entry_write : public handler_entry
+{
+public:
 	// combination of unions to hold legacy objects and callbacks
 	struct legacy_info
 	{
@@ -564,27 +596,17 @@ private:
 
 		union
 		{
-			read8_space_func		space8;
-			read16_space_func		space16;
-			read32_space_func		space32;
-			read64_space_func		space64;
-			read8_device_func		device8;
-			read16_device_func		device16;
-			read32_device_func		device32;
-			read64_device_func		device64;
+			write8_space_func		space8;
+			write16_space_func		space16;
+			write32_space_func		space32;
+			write64_space_func		space64;
+			write8_device_func		device8;
+			write16_device_func		device16;
+			write32_device_func		device32;
+			write64_device_func		device64;
 		} handler;
 	};
 
-	legacy_info m_legacy_info;
-};
-
-
-// ======================> handler_entry_write
-
-// a write-access-specific extension of handler_entry
-class handler_entry_write : public handler_entry
-{
-public:
 	// construction/destruction
 	handler_entry_write(UINT8 width, endianness_t endianness, UINT8 **rambaseptr)
 		: handler_entry(width, endianness, rambaseptr)
@@ -596,10 +618,10 @@ public:
 	virtual const char *name() const;
 
 	// configure delegate callbacks
-	void set_delegate(write8_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write16_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write32_delegate delegate, UINT64 mask = 0);
-	void set_delegate(write64_delegate delegate, UINT64 mask = 0);
+	void set_delegate(write8_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(write16_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(write32_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
+	void set_delegate(write64_delegate delegate, UINT64 mask = 0, const legacy_info *info = 0);
 
 	// configure legacy address space functions
 	void set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask = 0);
@@ -647,28 +669,6 @@ private:
 	write32_delegate			m_write32;
 	write64_delegate			m_write64;
 	const input_port_config *	m_ioport;
-
-	// combination of unions to hold legacy objects and callbacks
-	struct legacy_info
-	{
-		union
-		{
-			address_space *	space;
-			device_t *				device;
-		} object;
-
-		union
-		{
-			write8_space_func		space8;
-			write16_space_func		space16;
-			write32_space_func		space32;
-			write64_space_func		space64;
-			write8_device_func		device8;
-			write16_device_func		device16;
-			write32_device_func		device32;
-			write64_device_func		device64;
-		} handler;
-	};
 
 	legacy_info m_legacy_info;
 };
@@ -4430,7 +4430,7 @@ const char *handler_entry_read::name() const
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4439,6 +4439,8 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 8);
 	m_read8 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
@@ -4459,7 +4461,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4468,6 +4470,8 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 16);
 	m_read16 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 16)
@@ -4486,7 +4490,7 @@ void handler_entry_read::set_delegate(read16_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4495,6 +4499,8 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 32);
 	m_read32 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
@@ -4510,7 +4516,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
+void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	// error if no object
 	if (!delegate.has_object())
@@ -4519,6 +4525,8 @@ void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 64);
 	m_read64 = delegate;
+	if (info)
+		m_legacy_info = *info;
 }
 
 
@@ -4529,30 +4537,34 @@ void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
 
 void handler_entry_read::set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space8 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space8 = func;
+	info.object.space = &space;
+	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space16 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space16 = func;
+	info.object.space = &space;
+	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space32 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space32 = func;
+	info.object.space = &space;
+	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space64 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space64 = func;
+	info.object.space = &space;
+	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 
@@ -4563,30 +4575,34 @@ void handler_entry_read::set_legacy_func(address_space &space, read64_space_func
 
 void handler_entry_read::set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device8 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device8 = func;
+	info.object.device = &device;
+	set_delegate(read8_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device16 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device16 = func;
+	info.object.device = &device;
+	set_delegate(read16_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device32 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device32 = func;
+	info.object.device = &device;
+	set_delegate(read32_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_read::set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device64 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device64 = func;
+	info.object.device = &device;
+	set_delegate(read64_delegate(&handler_entry_read::read_stub_legacy, name, this), mask, &info);
 }
 
 
@@ -4777,10 +4793,12 @@ const char *handler_entry_write::name() const
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 8);
 	m_write8 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
@@ -4801,10 +4819,12 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 16);
 	m_write16 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 16)
@@ -4823,10 +4843,12 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
 //  configure a stub if necessary
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 32);
 	m_write32 = delegate;
+	if (info)
+		m_legacy_info = *info;
 
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
@@ -4842,10 +4864,12 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
 //  set_delegate - set a 64-bit delegate
 //-------------------------------------------------
 
-void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask)
+void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask, const legacy_info *info)
 {
 	assert(m_datawidth >= 64);
 	m_write64 = delegate;
+	if (info)
+		m_legacy_info = *info;
 }
 
 
@@ -4856,30 +4880,34 @@ void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask)
 
 void handler_entry_write::set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space8 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space8 = func;
+	info.object.space = &space;
+	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space16 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space16 = func;
+	info.object.space = &space;
+	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space32 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space32 = func;
+	info.object.space = &space;
+	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.space64 = func;
-	m_legacy_info.object.space = &space;
-	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.space64 = func;
+	info.object.space = &space;
+	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 
@@ -4890,30 +4918,34 @@ void handler_entry_write::set_legacy_func(address_space &space, write64_space_fu
 
 void handler_entry_write::set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device8 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device8 = func;
+	info.object.device = &device;
+	set_delegate(write8_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device16 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device16 = func;
+	info.object.device = &device;
+	set_delegate(write16_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device32 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device32 = func;
+	info.object.device = &device;
+	set_delegate(write32_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 void handler_entry_write::set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask)
 {
-	m_legacy_info.handler.device64 = func;
-	m_legacy_info.object.device = &device;
-	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask);
+	legacy_info info;
+	info.handler.device64 = func;
+	info.object.device = &device;
+	set_delegate(write64_delegate(&handler_entry_write::write_stub_legacy, name, this), mask, &info);
 }
 
 
