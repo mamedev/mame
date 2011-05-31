@@ -995,10 +995,14 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(floppy);	break;
 		case DEVINFO_FCT_IMAGE_DISPLAY_INFO:
-			if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
-				info->f = (genf *) get_config_dev(device)->device_displayinfo;
-			} else {
+			if (device->type() == FLOPPY_APPLE) {
 				info->f = NULL;
+			} else {
+				if ( device && downcast<const legacy_image_device_base *>(device)->inline_config() && get_config_dev(device)->device_displayinfo) {
+					info->f = (genf *) get_config_dev(device)->device_displayinfo;
+				} else {
+					info->f = NULL;
+				}
 			}
 			break;
 
