@@ -181,6 +181,7 @@ static CPU_RESET( v25 )
 	nec_state->intp_state[0] = 0;
 	nec_state->intp_state[1] = 0;
 	nec_state->intp_state[2] = 0;
+	nec_state->noem = 1;
 
 	nec_state->TM0 = nec_state->MD0 = nec_state->TM1 = nec_state->MD1 = 0;
 	nec_state->TMC0 = nec_state->TMC1 = 0;
@@ -694,7 +695,7 @@ static CPU_GET_INFO( v25v35 )
                 flags & 0x0001 ? 'C':'.');
             break;
 
-        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s, "PC:%04X", (Sreg(PS)<<4) + nec_state->ip); break;
+        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s, "PC:%05X", (Sreg(PS)<<4) + nec_state->ip); break;
         case CPUINFO_STR_REGISTER + NEC_IP:				sprintf(info->s, "IP:%04X", nec_state->ip); break;
         case CPUINFO_STR_REGISTER + NEC_SP:				sprintf(info->s, "SP:%04X", Wreg(SP)); break;
         case CPUINFO_STR_REGISTER + NEC_FLAGS:			sprintf(info->s, "F:%04X", CompressFlags()); break;

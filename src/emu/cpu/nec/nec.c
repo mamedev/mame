@@ -215,6 +215,7 @@ static CPU_RESET( nec )
 	nec_state->nmi_state = 0;
 	nec_state->irq_state = 0;
 	nec_state->poll_state = 1;
+	nec_state->noem = 1;  // brkem should set to 0 when implemented
 
 	Sreg(PS) = 0xffff;
 	Sreg(SS) = 0;
@@ -586,7 +587,7 @@ static CPU_GET_INFO( nec )
                 flags & 0x0001 ? 'C':'.');
             break;
 
-        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s, "PC:%04X", (Sreg(PS)<<4) + nec_state->ip); break;
+        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s, "PC:%05X", (Sreg(PS)<<4) + nec_state->ip); break;
         case CPUINFO_STR_REGISTER + NEC_IP:				sprintf(info->s, "IP:%04X", nec_state->ip); break;
         case CPUINFO_STR_REGISTER + NEC_SP:				sprintf(info->s, "SP:%04X", Wreg(SP)); break;
         case CPUINFO_STR_REGISTER + NEC_FLAGS:			sprintf(info->s, "F:%04X", CompressFlags()); break;

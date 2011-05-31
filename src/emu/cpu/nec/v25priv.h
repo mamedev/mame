@@ -108,6 +108,7 @@ struct _v25_state_t
 	direct_read_data *direct;
 	address_space *io;
 	int		icount;
+	int noem;
 
 	const nec_config *config;
 
@@ -211,7 +212,7 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, UINT16 d);
 
 
 #define PUSH(val) { Wreg(SP)-=2; write_mem_word((((Sreg(SS)<<4)+Wreg(SP))),val); }
-#define POP(var) { var = read_mem_word((((Sreg(SS)<<4)+Wreg(SP)))); Wreg(SP)+=2; }
+#define POP(var) { Wreg(SP)+=2; var = read_mem_word((((Sreg(SS)<<4)+Wreg(SP)-2))); }
 
 #define GetModRM UINT32 ModRM=FETCH()
 
